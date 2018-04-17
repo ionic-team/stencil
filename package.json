@@ -35,6 +35,7 @@
     "test.dist": "node scripts/test-dist.js",
     "test.jest": "jest",
     "test.karma": "cd test/karma && npm run karma.prod",
+    "test.server": "cd test/server && npm run test.prod",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },
@@ -49,7 +50,7 @@
     "rollup-pluginutils": "2.0.1",
     "typescript": "^2.8.1",
     "uglify-es": "3.3.9",
-    "workbox-build": "3.0.0-alpha.6"
+    "workbox-build": "^3.1.0"
   },
   "devDependencies": {
     "@types/acorn": "^4.0.3",

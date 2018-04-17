@@ -1,16 +1,61 @@
-import { Config } from '../../declarations';
-import { loadConfig } from '../../compiler/config/load-config';
+import * as d from '../../declarations';
+import { loadConfig as compilerLoadConfig } from '../../compiler/config/load-config';
+import { loadConfig as serverLoadConfig } from '../load-config';
 import { Renderer } from '../renderer';
 
 
-export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
+export function initApp(ssrConfig: d.ServerConfigInput) {
+  if (!ssrConfig.app) {
+    throw new Error(`missing "app" config`);
+  }
+
+  if (typeof ssrConfig.app.use !== 'function') {
+    throw new Error(`invalid express app, missing the "app.use()" function`);
+  }
+
+  if (typeof ssrConfig.configPath !== 'string') {
+    ssrConfig.configPath = process.cwd();
+  }
+
+  // load up the user's config
+  // to be passed to the middleware
+  const middlewareConfig: d.MiddlewareConfig = {
+    config: serverLoadConfig(ssrConfig.configPath)
+  };
+
+  // start the ssr middleware
+  ssrConfig.app.use(ssrPathRegex, ssrMiddleware(middlewareConfig));
+
+  const wwwOutput = (middlewareConfig.config as d.Config).outputTargets.find(o => {
+    return o.type === 'www';
+  }) as d.OutputTargetWww;
+
+  if (!wwwOutput || typeof wwwOutput.dir !== 'string') {
+    throw new Error(`unable to find www directory to serve static files from`);
+  }
+
+  return {
+    config: (middlewareConfig.config as d.Config),
+    logger: (middlewareConfig.config as d.Config).logger,
+    wwwDir: wwwOutput.dir
+  } as d.ServerConfigOutput;
+}
+
+
+export function ssrMiddleware(middlewareConfig: d.MiddlewareConfig) {
   // load up the config
   const path = require('path');
   const nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
-  const config = loadConfig(nodeSys.sys, middlewareConfig.config);
+  middlewareConfig.config = compilerLoadConfig(nodeSys.sys, middlewareConfig.config);
+
+  const config: d.Config = middlewareConfig.config;
+
+  // set the ssr flag
+  config.flags = config.flags || {};
+  config.flags.ssr = true;
 
   // create the renderer
-  const renderer = new Renderer(config);
+  const renderer = new Renderer(middlewareConfig.config);
 
   let srcIndexHtml: string;
   try {
@@ -58,8 +103,3 @@ export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
  * Please see the unit tests if any changes are required.
  */
 export const ssrPathRegex = /^([^.+]|.html)*(\?.*)?$/i;
-
-
-export interface MiddlewareConfig {
-  config: string | Config;
-}

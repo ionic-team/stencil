@@ -14,8 +14,7 @@ export class Renderer {
 
 
   constructor(public config: d.Config, registry?: d.ComponentRegistry, ctx?: d.CompilerCtx, outputTarget?: d.OutputTargetWww) {
-    this.config = config;
-    validateConfig(config);
+    this.config = validateConfig(config);
 
     // init the build context
     this.ctx = getCompilerCtx(config, ctx);
@@ -63,21 +62,6 @@ export class Renderer {
     return this.ctx.fs;
   }
 
-}
-
-
-/**
- * Deprecated
- * Please use "const renderer = new Renderer(config);" instead.
- */
-export function createRenderer(config: d.Config) {
-  const renderer = new Renderer(config);
-
-  config.logger.warn(`"createRenderer(config)" is deprecated. Please use "const renderer = new Renderer(config);" instead"`);
-
-  return {
-    hydrateToString: renderer.hydrate.bind(renderer)
-  };
 }
 
 

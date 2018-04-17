@@ -71,6 +71,7 @@ export interface ConfigFlags {
   cache?: boolean;
   prerender?: boolean;
   prod?: boolean;
+  ssr?: boolean;
   stats?: boolean;
   version?: boolean;
   watch?: boolean;
