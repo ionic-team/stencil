@@ -110,7 +110,6 @@ describe('bundle-module', () => {
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
-      console.log(r.filesWritten);
 
       expectFiles(c.fs, [
         '/www/build/app/cmp-a.js',
