@@ -26,7 +26,7 @@ export function createPlatformServer(
   isPrerender: boolean,
   compilerCtx?: d.CompilerCtx
 ): d.PlatformApi {
-  const loadedBundles: {[bundleId: string]: any} = {};
+  const loadedBundles: {[bundleId: string]:  d.CjsExports} = {};
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: d.HostElement} = {};
 
@@ -143,6 +143,18 @@ export function createPlatformServer(
     cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   }
 
+
+  function setLoadedBundle(bundleId: string, value: d.CjsExports) {
+    loadedBundles[bundleId] = value;
+  }
+
+  function getLoadedBundle(bundleId: string) {
+    if (bundleId == null) {
+      return null;
+    }
+    return loadedBundles[bundleId.replace(/^\.\//, '')];
+  }
+
   /**
    * Execute a bundle queue item
    * @param name
@@ -153,7 +165,7 @@ export function createPlatformServer(
     const bundleExports: d.CjsExports = {};
 
     try {
-      callback(bundleExports, ...deps.map(d => loadedBundles[d]));
+      callback(bundleExports, ...deps.map(d => getLoadedBundle(d)));
     } catch (e) {
       onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
     }
@@ -163,12 +175,12 @@ export function createPlatformServer(
       return;
     }
 
-    loadedBundles[name] = bundleExports;
+    setLoadedBundle(name, bundleExports);
 
     // If name contains chunk then this callback was associated with a dependent bundle loading
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    if (!name.startsWith('./chunk')) {
+    if (!name.startsWith('chunk')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
@@ -192,7 +204,7 @@ export function createPlatformServer(
    */
   App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
 
-    const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
+    const missingDependents = dependentsList.filter(d => !getLoadedBundle(d));
     missingDependents.forEach(d => {
       const fileName = d.replace('.js', '.es5.js');
       loadFile(fileName);
@@ -232,7 +244,7 @@ export function createPlatformServer(
         cmpMeta.bundleIds :
         cmpMeta.bundleIds[elm.mode];
 
-      if (loadedBundles[bundleId]) {
+      if (getLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
         queueUpdate(plt, elm);
 
