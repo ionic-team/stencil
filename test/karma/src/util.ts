@@ -81,7 +81,11 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
       const observer = new MutationObserver(function(mutations: MutationRecord[]) {
         mutations;
         observer.disconnect();
-        resolve();
+        setTimeout(() => {
+          (window as any).App.Context.queue.write(() => {
+            resolve();
+          });
+        }, 100);
       });
 
       observer.observe(scratch, {
