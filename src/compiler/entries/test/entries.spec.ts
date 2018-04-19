@@ -31,7 +31,7 @@ describe('entries', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+    const content = (await c.fs.readFile('/www/build/app/cmp-a.js')).replace(/(?:\r\n|\r|\n)/g, ' ').replace(/\s\s+/g, ' ');
     expect(content).toContain(`"arr": { "type": "Any", "attr": "arr" }`);
     expect(content).toContain(`"myAny": { "type": "Any", "attr": "my-any"`);
     expect(content).toContain(`"myBool": { "type": Boolean, "attr": "my-bool" }`);
