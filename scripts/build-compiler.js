@@ -13,7 +13,7 @@ const DECLARATIONS_DST_DIR = path.join(__dirname, '../dist/declarations');
 
 
 // transpile
-cp.execSync('node ../node_modules/.bin/tsc -p ../src/compiler/tsconfig.json', { cwd: __dirname });
+cp.execSync('npx tsc -p ../src/compiler/tsconfig.json', { cwd: __dirname });
 
 
 function bundleCompiler() {

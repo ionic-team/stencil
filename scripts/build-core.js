@@ -19,7 +19,7 @@ const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
 
 
 // transpile
-cp.execSync('node ../node_modules/.bin/tsc -p ../src/tsconfig.json', { cwd: __dirname });
+cp.execSync('npx tsc -p ../src/tsconfig.json', { cwd: __dirname });
 
 
 // empty out the dist/client directory

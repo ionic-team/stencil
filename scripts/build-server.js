@@ -12,7 +12,7 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
 // transpile
-cp.execSync('node ../node_modules/.bin/tsc -p ../src/server/tsconfig.json', { cwd: __dirname });
+cp.execSync('npx tsc -p ../src/server/tsconfig.json', { cwd: __dirname });
 
 
 function bundleCompiler() {
