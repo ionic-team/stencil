@@ -125,7 +125,7 @@ function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExp
     return ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
   });
 
-  return ts.createObjectLiteral(newProperties);
+  return ts.createObjectLiteral(newProperties, true);
 }
 
 /**
