@@ -65,7 +65,7 @@ export function forEachRule(win: Window, node: StyleNode, styleRuleCallback?: (s
  * Walk from text[start] matching parens and
  * returns position of the outer end paren
  */
-function findMatchingParen(text: string, start: number) {
+export function findMatchingParen(text: string, start: number) {
   let level = 0;
   for (let i = start, l = text.length; i < l; i++) {
     if (text[i] === '(') {
