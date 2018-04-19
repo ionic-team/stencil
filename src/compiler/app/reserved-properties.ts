@@ -101,6 +101,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'capture',
   'charset',
   'childNodes',
+  'children',
   'class',
   'classList',
   'className',
