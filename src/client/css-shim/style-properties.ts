@@ -81,7 +81,6 @@ export class StyleProperties {
     if (property) {
       if (this.hasNonNestedSemicolon(property)) {
         property = this.valueForProperties(property, props);
-
       } else {
         // case (2) variable
         let fn = (prefix: any, value: any, fallback: any, suffix: any) => {
@@ -104,17 +103,22 @@ export class StyleProperties {
     return property && property.trim() || '';
   }
 
-  private getParts(property: string, startIndex = 0) {
-    const SAFE_TOKEN = '__SAFE_SEMICOLON__';
+  private SAFE_TOKEN = '__!__';
+  private sanitizeSemicolons(property: string, startIndex: number): string {
     const openingParen = property.indexOf('(', startIndex);
-    let safeProp = property;
-    if (openingParen !== -1) {
-      const closingParens = StyleUtil.findMatchingParen(property, openingParen);
-      const safeArea = property.substr(openingParen, closingParens - openingParen);
-      const sanitizedSafeArea = safeArea.replace(';', SAFE_TOKEN);
-      safeProp = property.replace(safeArea, sanitizedSafeArea);
+    if (openingParen === -1) {
+      return property;
     }
-    return safeProp.split(';').map(part => part.replace(SAFE_TOKEN, ';'));
+    const closingParens = StyleUtil.findMatchingParen(property, openingParen);
+    const safeArea = property.substr(openingParen, closingParens - openingParen);
+    const sanitizedSafeArea = safeArea.replace(';', this.SAFE_TOKEN);
+    const safeProp = property.replace(safeArea, sanitizedSafeArea);
+    return this.sanitizeSemicolons(safeProp, closingParens + 2);
+  }
+
+  private getParts(property: string) {
+    const safeProp = this.sanitizeSemicolons(property, 0);
+    return safeProp.split(';').map(part => part.replace(this.SAFE_TOKEN, ';'));
   }
 
   // note: we do not yet support mixin within mixin
