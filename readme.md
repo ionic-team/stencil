@@ -1,5 +1,7 @@
 [![npm][npm-badge]][npm-badge-url]
 [![Build Status][circle-badge]][circle-badge-url]
+[![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
+
 # Stencil: A Compiler for Web Components
 
 [Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and progressive web apps (PWA).
@@ -182,3 +184,5 @@ For the small minority of browsers that do not support modern browser features a
 [npm-badge-url]: https://www.npmjs.com/package/@stencil/core
 [circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
 [circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
+[browserstack-badge]: https://www.browserstack.com/automate/badge.svg?badge_key=WVNVbkRJdDBJQnBEMzZuWUdlMEZuTjlPUm9sOHZsSVNkUlJTRkJVQkx0ST0tLTFhbk5jRUNEVWxJL1J0SVR0WUFndnc9PQ==--90c84981a2ed2ede760ca48fbfc3fdd5b71d3e5e
+[browserstack-badge-url]: https://www.browserstack.com/automate/public-build/WVNVbkRJdDBJQnBEMzZuWUdlMEZuTjlPUm9sOHZsSVNkUlJTRkJVQkx0ST0tLTFhbk5jRUNEVWxJL1J0SVR0WUFndnc9PQ==--90c84981a2ed2ede760ca48fbfc3fdd5b71d3e5e
