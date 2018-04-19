@@ -6,8 +6,38 @@ var browserStackLaunchers = {
   bs_chrome: {
     base: 'BrowserStack',
     browser: 'chrome',
-    os: 'WINDOWS',
+    os: 'Windows',
     os_version: '10'
+  },
+  bs_firefox: {
+    base: 'BrowserStack',
+    browser: 'firefox',
+    os: 'Windows',
+    os_version: '10'
+  },
+  bs_edge: {
+    base: 'BrowserStack',
+    browser: 'edge',
+    os: 'Windows',
+    os_version: '10'
+  },
+  bs_ie: {
+    base: 'BrowserStack',
+    browser: 'ie',
+    os: 'Windows',
+    os_version: '10'
+  },
+  bs_safari: {
+    base: 'BrowserStack',
+    browser: 'safari',
+    os: 'OS X',
+    os_version: 'High Sierra'
+  },
+  bs_iphone8: {
+    base: 'BrowserStack',
+    device: 'iPhone 8',
+    os: 'ios',
+    os_version: '11.0'
   }
 };
 
