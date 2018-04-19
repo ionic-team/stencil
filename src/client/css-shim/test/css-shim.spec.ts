@@ -171,6 +171,27 @@ describe('css-shim', () => {
     );
   });
 
+  it('should set a base64 value in from fallback svg', async () => {
+    const customStyle = new CustomStyle(window, document);
+
+    const styleElm = style(`
+      html {
+        background-image: var(--invalid, url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxMC4xMjEiPg0KICAgIDxwYXRoIGQ9Ik04LjU5OSA5LjkwNWEuNzUuNzUgMCAwIDEtMS4wNTMtLjAwMmwtNy4yMy03LjIzYS43NDUuNzQ1IDAgMCAxIDAtMS4wNTJsMS40LTEuNGMuMjktLjI5Ljc2LS4yOSAxLjA1IDBMNy41NTQgNS4wMWMuMjkuMjkuNzYyLjI5MiAxLjA1MyAwbDQuODMtNC43OTRhLjc0Ny43NDcgMCAwIDEgMS4wNS4wMDRsMS40IDEuNDA2YS43NDcuNzQ3IDAgMCAxLS4wMDcgMS4wNUw4LjU5OSA5LjkwNHoiLz4NCjwvc3ZnPg0K'));
+      }
+    `);
+
+    await customStyle.addStyle(styleElm);
+
+    expect(css(styleElm.innerHTML)).toBe(
+
+      css(`
+        html {
+          background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxMC4xMjEiPg0KICAgIDxwYXRoIGQ9Ik04LjU5OSA5LjkwNWEuNzUuNzUgMCAwIDEtMS4wNTMtLjAwMmwtNy4yMy03LjIzYS43NDUuNzQ1IDAgMCAxIDAtMS4wNTJsMS40LTEuNGMuMjktLjI5Ljc2LS4yOSAxLjA1IDBMNy41NTQgNS4wMWMuMjkuMjkuNzYyLjI5MiAxLjA1MyAwbDQuODMtNC43OTRhLjc0Ny43NDcgMCAwIDEgMS4wNS4wMDRsMS40IDEuNDA2YS43NDcuNzQ3IDAgMCAxLS4wMDcgMS4wNUw4LjU5OSA5LjkwNHoiLz4NCjwvc3ZnPg0K');
+        }
+      `)
+    );
+  });
+
   it('should set value in same script in different rule and remove var only rule', async () => {
     const customStyle = new CustomStyle(window, document);
 
