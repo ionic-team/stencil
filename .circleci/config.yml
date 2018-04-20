@@ -16,5 +16,6 @@ jobs:
           paths:
             - ./node_modules
 
+      - run: npm install npm@latest
       - run: npm run build
       - run: npm run test.jest -- --maxWorkers=4
