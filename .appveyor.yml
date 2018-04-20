@@ -12,6 +12,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
   - npm version
+  - npm install npm@latest
   - npm install
 
 cache:
