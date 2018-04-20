@@ -1,5 +1,5 @@
 var path = require('path');
-const browserStack = true;
+const browserStack = false;
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 var browserStackLaunchers = {
@@ -52,13 +52,6 @@ const localLaunchers = {
 			// Without a remote debugging port, Google Chrome exits immediately.
 			'--remote-debugging-port=9333'
 		]
-  },
-  Chrome: {
-    base: 'Chrome',
-    flags: [
-			// Without a remote debugging port, Google Chrome exits immediately.
-			'--remote-debugging-port=9333'
-		]
   }
 };
 
@@ -87,7 +80,7 @@ module.exports = function(config) {
       "**/*.ts": "karma-typescript"
     },
 
-    customLaunchers: browserStack ? browserStackLaunchers : localLaunchers,
+    customLaunchers: browserStack ? browserStackLaunchers : {},
 
     files: [
       'src/**/*.spec.ts',
@@ -106,10 +99,9 @@ module.exports = function(config) {
       '/www/**/*.html': '/base/www/**/*.html'
     },
 
-    reporters: [
-      'progress',
-      'BrowserStack'
-    ],
+    reporters: ['progress'].concat(browserStack
+      ? [ 'BrowserStack' ]
+      : []),
 
     karmaTypescriptConfig: {
       tsconfig: "./tsconfig.json"
