@@ -91,9 +91,11 @@ function methods(instance: any, ref: ElementRef, methods: string[]) {
   methods.forEach(methodName => {
     Object.defineProperty(instance, methodName, {
       get: function() {
-        const args = arguments;
-        return el.componentOnReady()
-          .then((el: any) => el[methodName].apply(el, args));
+        return function() {
+          const args = arguments;
+          return el.componentOnReady()
+            .then((el: any) => el[methodName].apply(el, args));
+        };
       }
     });
   });
