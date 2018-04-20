@@ -18,7 +18,7 @@ install:
 cache:
   - '%APPDATA%\npm-cache'
 
-build_script:
+before_test:
   - cmd: npm run build
 
 # Post-install test scripts.
