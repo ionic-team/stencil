@@ -1,49 +1,53 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const cp = require('child_process');
+const transpile = require('./transpile');
 
 const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-cli');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli/index.js');
 const DEST_FILE = path.join(__dirname, '../dist/cli/index.js');
 
-// transpile
-cp.execSync('npx tsc -p ../src/cli/tsconfig.json', { cwd: __dirname });
 
-function bundle() {
-  rollup.rollup({
-    input: ENTRY_FILE,
-    external: [
-      'fs',
-      'path'
-    ],
-    onwarn: (message) => {
-      if (/top level of an ES module/.test(message)) return;
-      console.error( message );
-    }
+const success = transpile('../src/cli/tsconfig.json');
 
-  }).then(bundle => {
+if (success) {
 
-    bundle.write({
-      format: 'cjs',
-      file: DEST_FILE
+  function bundle() {
+    rollup.rollup({
+      input: ENTRY_FILE,
+      external: [
+        'fs',
+        'path'
+      ],
+      onwarn: (message) => {
+        if (/top level of an ES module/.test(message)) return;
+        console.error( message );
+      }
+
+    }).then(bundle => {
+
+      bundle.write({
+        format: 'cjs',
+        file: DEST_FILE
+
+      }).catch(err => {
+        console.log(`build cli error: ${err}`);
+        process.exit(1);
+      });
 
     }).catch(err => {
       console.log(`build cli error: ${err}`);
       process.exit(1);
     });
+  }
 
-  }).catch(err => {
-    console.log(`build cli error: ${err}`);
-    process.exit(1);
+
+  bundle();
+
+
+  process.on('exit', (code) => {
+    fs.removeSync(TRANSPILED_DIR);
+    console.log(`✅ cli: ${DEST_FILE}`);
   });
+
 }
-
-
-bundle();
-
-
-process.on('exit', (code) => {
-  fs.removeSync(TRANSPILED_DIR);
-  console.log(`✅ cli: ${DEST_FILE}`);
-});
