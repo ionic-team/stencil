@@ -34,7 +34,8 @@ var injectTestingScript = [
   'var StencilTesting = require("' + normalizePath(stencilTestingPath) + '");',
   'var h = StencilTesting.h;',
   'var resourcesUrl = "build/"',
-  'var Context = {};'
+  'var Context = {}',
+  'expect.extend(StencilTesting.expect)'
 ].join('\n');
 
 
