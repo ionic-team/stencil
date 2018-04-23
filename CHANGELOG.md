@@ -1,3 +1,21 @@
+<a name="0.7.26"></a>
+## 👻 [0.7.26](https://github.com/ionic-team/stencil/compare/v0.7.25...v0.7.26) (2018-04-23)
+
+
+### Bug Fixes
+
+* **angular:** methods proxy ([d014206](https://github.com/ionic-team/stencil/commit/d014206))
+* **style:** Support multiple base64 variables ([5458790](https://github.com/ionic-team/stencil/commit/5458790))
+* **styles:** prevent stackoverflow when shimming base64 css vars ([089636b](https://github.com/ionic-team/stencil/commit/089636b)), closes [#749](https://github.com/ionic-team/stencil/issues/749)
+* **windows:** use npx for build scripts ([d67dcdb](https://github.com/ionic-team/stencil/commit/d67dcdb))
+
+
+### Features
+
+* **test:** adds auxiliar test utils ([093c425](https://github.com/ionic-team/stencil/commit/093c425))
+
+
+
 <a name="0.7.25"></a>
 ## 🎬 [0.7.25](https://github.com/ionic-team/stencil/compare/v0.7.24...v0.7.25) (2018-04-18)
 
