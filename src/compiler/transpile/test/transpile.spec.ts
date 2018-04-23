@@ -4,9 +4,9 @@ import { wroteFile } from '../../../testing/utils';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const root = path.resolve('/');
 
 describe('transpile', () => {
+  const root = path.resolve('/');
 
   let c: TestingCompiler;
 
