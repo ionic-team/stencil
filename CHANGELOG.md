@@ -1,3 +1,13 @@
+<a name="0.7.27-0"></a>
+## 🚣 [0.7.27-0](https://github.com/ionic-team/stencil/compare/v0.7.26...v0.7.27-0) (2018-04-23)
+
+
+### Bug Fixes
+
+* **slot:** conditionally render slot and fallback slot content ([294c559](https://github.com/ionic-team/stencil/commit/294c559)), closes [#721](https://github.com/ionic-team/stencil/issues/721)
+
+
+
 <a name="0.7.26"></a>
 ## 👻 [0.7.26](https://github.com/ionic-team/stencil/compare/v0.7.25...v0.7.26) (2018-04-23)
 
