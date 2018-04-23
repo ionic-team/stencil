@@ -58,7 +58,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       node.nextSibling,
 
     $tagName: (elm: Element) =>
-      toLowerCase(elm.tagName),
+      toLowerCase(elm.nodeName),
 
     $getTextContent: (node: any) =>
       node.textContent,
@@ -236,13 +236,11 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     } catch (e) {}
   }
 
-  domApi.$parentElement = (elm: Node, parentNode?: any): any => {
+  domApi.$parentElement = (elm: Node, parentNode?: any): any =>
     // if the parent node is a document fragment (shadow root)
     // then use the "host" property on it
     // otherwise use the parent node
-    parentNode = domApi.$parentNode(elm);
-    return (parentNode && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode;
-  };
+    ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode;
 
   return domApi;
 }

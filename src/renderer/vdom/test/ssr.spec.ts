@@ -140,7 +140,7 @@ describe('ssr', () => {
     var oldVnode: d.VNode;
     var newVnode: d.VNode;
     var ssrVNode: d.VNode;
-    var elm: Element;
+    var elm: d.RenderNode;
 
     beforeEach(() => {
       oldVnode = {};
@@ -165,7 +165,7 @@ describe('ssr', () => {
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
       expect(elm.firstElementChild.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
-      expect(elm.firstElementChild.innerHTML).toBe('<!----><child-a></child-a>');
+      expect(elm.firstElementChild.innerHTML).toBe('<child-a></child-a>');
     });
 
     it('should add same ssr to all elements', () => {

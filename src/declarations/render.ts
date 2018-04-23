@@ -106,6 +106,62 @@ export interface HostSnapshotAttributes {
 
 
 export interface ContentSlots {
-  $defaultSlot?: Node[];
+  $?: Node[];
   [slotName: string]: Node[] | undefined;
+}
+
+
+/**
+ * Generic node that represents all of the
+ * different types of nodes we'd see when rendering
+ */
+export interface RenderNode extends d.HostElement {
+
+  /**
+   * Shadow root's host
+   */
+  host?: Element;
+
+  /**
+   * Is Content Reference Node:
+   * This node is a content reference node.
+   */
+  ['s-cn']?: boolean;
+
+  /**
+   * Is a slot reference node:
+   * This is a node that represents where a slots
+   * was originally located.
+   */
+  ['s-sr']?: boolean;
+
+  /**
+   * Slot name
+   */
+  ['s-sn']?: string;
+
+  /**
+   * Host element tag name:
+   * The tag name of the host element that this
+   * node was created in.
+   */
+  ['s-hn']?: string;
+
+  /**
+   * Original Location Reference:
+   * A reference pointing to the comment
+   * which represents the original location
+   * before it was moved to its slot
+   */
+  ['s-ol']?: RenderNode;
+
+  /**
+   * Scope Id
+   */
+  ['s-si']?: string;
+
+  /**
+   * Scope Id
+   */
+  ['s-si']?: string;
 }

@@ -253,11 +253,11 @@ export interface ComponentRegistry {
 
 export interface HostElement extends HTMLElement {
   // web component APIs
-  connectedCallback: () => void;
+  connectedCallback?: () => void;
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
-  host: Element;
-  forceUpdate: () => void;
+  host?: Element;
+  forceUpdate?: () => void;
 
   // "s-" prefixed properties should not be property renamed
   // and should be common between all versions of stencil
@@ -275,17 +275,17 @@ export interface HostElement extends HTMLElement {
    * always represent where host element's light dom is.
    * (deprecated $defaultHolder)
    */
-  ['s-cr']?: Comment;
+  ['s-cr']?: d.RenderNode;
 
   /**
-   * Active Loading:
+   * Is Active Loading:
    * Array of child host elements that are actively loading.
    * (deprecated $activeLoading)
    */
   ['s-ld']?: HostElement[];
 
   /**
-   * Rendered:
+   * Has Rendered:
    * Set to true if this component has rendered
    * (deprecated $rendered)
    */
@@ -296,7 +296,7 @@ export interface HostElement extends HTMLElement {
    * Array of callbacks to fire off after it has rendered.
    * (deprecated $onRender)
    */
-  ['s-rc']: (() => void)[];
+  ['s-rc']?: (() => void)[];
 
   /**
    * Component Initial Load:
@@ -304,7 +304,7 @@ export interface HostElement extends HTMLElement {
    * and has rendered. Method is on the host element prototype.
    * (deprecated $initLoad)
    */
-  ['s-init']: () => void;
+  ['s-init']?: () => void;
 
   componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
   color?: string;

@@ -7,7 +7,7 @@ export function updateElement(plt: d.PlatformApi, oldVnode: d.VNode | null, newV
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
-  const elm = (newVnode.elm.nodeType === NODE_TYPE.DocumentFragment && (newVnode.elm as ShadowRoot).host) ? (newVnode.elm as ShadowRoot).host : (newVnode.elm as any);
+  const elm = (newVnode.elm.nodeType === NODE_TYPE.DocumentFragment && newVnode.elm.host) ? newVnode.elm.host : (newVnode.elm as any);
   const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
   const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 

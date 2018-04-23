@@ -81,14 +81,15 @@ describe('slot-basic', function() {
       expect(results[1].textContent).toEqual('B');
 
       result = component.querySelector('.results11 article');
-      expect(result.textContent).toEqual('ACB');
+      expect(result.textContent).toEqual('ABC');
 
       results = component.querySelectorAll('.results11 article div');
       expect(results[0].textContent).toEqual('A');
       expect(results[1].textContent).toEqual('B');
+      expect(results[2].textContent).toEqual('C');
 
       result = component.querySelector('.results11 article footer');
-      expect(result.textContent).toEqual('C');
+      expect(result.textContent).toEqual('B');
     }
 
     testValues(1);

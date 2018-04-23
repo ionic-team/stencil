@@ -8,6 +8,7 @@ const divA = <div>A</div>;
 const textB = 'B';
 const spanB = <span>B</span>;
 const divB = <div>B</div>;
+const divC = <div>C</div>;
 
 
 @Component({
@@ -73,7 +74,7 @@ export class SlotBasicRoot {
         </div>
 
         <div class='results11'>
-          <slot-basic>{divA}<footer>C</footer>{divB}</slot-basic>
+          <slot-basic>{divA}<footer>{divB}</footer>{divC}</slot-basic>
         </div>
 
       </div>

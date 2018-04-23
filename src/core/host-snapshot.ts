@@ -12,15 +12,11 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm
       // only required when we're NOT using native shadow dom (slot)
       // this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
-      // create a comment to represent where the original
+      // create a node to represent where the original
       // content was first placed, which is useful later on
-      domApi.$insertBefore(elm, (elm['s-cr'] = domApi.$createComment('')), domApi.$childNodes(elm)[0]);
-
-      if (Build.isDev) {
-        // only add this extra data in dev mode
-        (elm['s-cr'] as any)['s-host-id'] = elm['s-id'];
-        (elm['s-cr'] as any)['s-host-tag'] = elm.tagName.toLowerCase();
-      }
+      elm['s-cr'] = domApi.$createTextNode('') as any;
+      elm['s-cr']['s-cn'] = true;
+      domApi.$insertBefore(elm, elm['s-cr'], domApi.$childNodes(elm)[0]);
     }
 
     if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {

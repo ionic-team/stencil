@@ -97,7 +97,7 @@ describe('instance update', () => {
     const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
-    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.TextNode);
     expect(elm.childNodes[1].nodeName).toBe('GRASSHOPPER');
     expect(elm.childNodes[1].textContent).toBe('hi');
   });
@@ -119,7 +119,7 @@ describe('instance update', () => {
     const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
-    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.TextNode);
     expect(elm.childNodes[1].nodeType).toBe(3); // Node.TEXT_NODE
     expect(elm.childNodes[1].textContent).toBe('');
     expect(elm.childNodes[2].nodeType).toBe(1); // Node.ELEMENT_NODE

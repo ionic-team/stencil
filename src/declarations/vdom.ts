@@ -1,3 +1,4 @@
+import * as d from '../declarations';
 
 
 export interface Hyperscript {
@@ -28,8 +29,10 @@ export interface VNode {
   vtext?: string;
   vchildren?: VNode[];
   vattrs?: any;
-  elm?: Element | Node;
+  elm?: d.RenderNode;
   ishost?: boolean;
+  isSlotFallback?: boolean;
+  isSlotReference?: boolean;
 }
 
 

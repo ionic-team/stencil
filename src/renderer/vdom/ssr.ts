@@ -23,14 +23,14 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
       plt.vnodeMap.set(elm, ssrVNode);
 
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
-        addChildSsrVNodes(domApi, elm.childNodes[j], ssrVNode, ssrVNodeId, true);
+        addChildSsrVNodes(domApi, elm.childNodes[j] as d.RenderNode, ssrVNode, ssrVNodeId, true);
       }
     }
   }
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, node: Node, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean) {
+function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean) {
   const nodeType = domApi.$nodeType(node);
   let previousComment: Comment;
   let childVNodeId: string,

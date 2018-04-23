@@ -299,6 +299,171 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotDynamicWrapperRoot {
+
+    }
+  }
+
+  interface HTMLSlotDynamicWrapperRootElement extends StencilComponents.SlotDynamicWrapperRoot, HTMLStencilElement {}
+
+  var HTMLSlotDynamicWrapperRootElement: {
+    prototype: HTMLSlotDynamicWrapperRootElement;
+    new (): HTMLSlotDynamicWrapperRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-dynamic-wrapper-root': JSXElements.SlotDynamicWrapperRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotDynamicWrapperRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotDynamicWrapper {
+      'tag': string;
+    }
+  }
+
+  interface HTMLSlotDynamicWrapperElement extends StencilComponents.SlotDynamicWrapper, HTMLStencilElement {}
+
+  var HTMLSlotDynamicWrapperElement: {
+    prototype: HTMLSlotDynamicWrapperElement;
+    new (): HTMLSlotDynamicWrapperElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
+  }
+  interface ElementTagNameMap {
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-dynamic-wrapper': JSXElements.SlotDynamicWrapperAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotDynamicWrapperAttributes extends HTMLAttributes {
+      'tag'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotFallbackRoot {
+
+    }
+  }
+
+  interface HTMLSlotFallbackRootElement extends StencilComponents.SlotFallbackRoot, HTMLStencilElement {}
+
+  var HTMLSlotFallbackRootElement: {
+    prototype: HTMLSlotFallbackRootElement;
+    new (): HTMLSlotFallbackRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-fallback-root': HTMLSlotFallbackRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-fallback-root': HTMLSlotFallbackRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-fallback-root': JSXElements.SlotFallbackRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotFallbackRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotFallback {
+      'inc': number;
+    }
+  }
+
+  interface HTMLSlotFallbackElement extends StencilComponents.SlotFallback, HTMLStencilElement {}
+
+  var HTMLSlotFallbackElement: {
+    prototype: HTMLSlotFallbackElement;
+    new (): HTMLSlotFallbackElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-fallback': HTMLSlotFallbackElement;
+  }
+  interface ElementTagNameMap {
+    'slot-fallback': HTMLSlotFallbackElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-fallback': JSXElements.SlotFallbackAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotFallbackAttributes extends HTMLAttributes {
+      'inc'?: number;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotHtml {
+      'inc': number;
+    }
+  }
+
+  interface HTMLSlotHtmlElement extends StencilComponents.SlotHtml, HTMLStencilElement {}
+
+  var HTMLSlotHtmlElement: {
+    prototype: HTMLSlotHtmlElement;
+    new (): HTMLSlotHtmlElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-html': HTMLSlotHtmlElement;
+  }
+  interface ElementTagNameMap {
+    'slot-html': HTMLSlotHtmlElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-html': JSXElements.SlotHtmlAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotHtmlAttributes extends HTMLAttributes {
+      'inc'?: number;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotLightDomRoot {
 
     }
