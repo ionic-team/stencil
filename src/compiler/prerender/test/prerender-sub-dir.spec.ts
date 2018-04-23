@@ -19,8 +19,8 @@ describe('prerender', () => {
     config.flags.prerender = true;
     outputTarget = {
       type: 'www',
-      dir: 'www/docs',
-      baseUrl: '/docs'
+      dir: path.join('www', 'docs'),
+      baseUrl: path.join('/', 'docs')
     };
     config.outputTargets = [outputTarget];
 
