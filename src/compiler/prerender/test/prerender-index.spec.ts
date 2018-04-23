@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
@@ -18,11 +19,11 @@ describe('prerender index', () => {
     config.flags.prerender = true;
 
     c = new TestingCompiler(config);
-    await c.fs.writeFile('/src/index.html', `
+    await c.fs.writeFile(path.join('/', 'src', 'index.html'), `
       <script src="/build/app.js"></script>
       <cmp-a></cmp-a>
     `);
-    await c.fs.writeFile('/src/components/cmp-a/cmp-a.tsx', `
+    await c.fs.writeFile(path.join('/', 'src', 'components', 'cmp-a', 'cmp-a.tsx'), `
       @Component({ tag: 'cmp-a' }) export class CmpA {
 
         render() {
@@ -30,7 +31,7 @@ describe('prerender index', () => {
         }
       }
     `);
-    await c.fs.writeFile('/src/components/cmp-b/cmp-b.tsx', `
+    await c.fs.writeFile(path.join('/', 'src', 'components', 'cmp-b', 'cmp-b.tsx'), `
       @Component({ tag: 'cmp-b' }) export class CmpB {
         @Prop() someProp = 'unset';
         @Prop() someAttr = 'unset';
@@ -52,7 +53,7 @@ describe('prerender index', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const index = await c.fs.readFile('/www/index.html');
+    const index = await c.fs.readFile(path.join('/', 'www', 'index.html'));
 
     expect(index).toContain('<p data-ssrc=\"1.0\"><!--s.1.0-->property from parent<!--/--> </p>');
     expect(index).toContain('<p data-ssrc=\"1.1\"><!--s.1.0-->attr from parent<!--/--> </p>');
@@ -73,11 +74,11 @@ describe('prerender index', () => {
     ];
 
     c = new TestingCompiler(config);
-    await c.fs.writeFile('/src/index.html', `
+    await c.fs.writeFile(path.join('/', 'src', 'index.html'), `
       <script src="/build/app.js"></script>
       <cmp-a></cmp-a>
     `);
-    await c.fs.writeFile('/src/components/cmp-a/cmp-a.tsx', `
+    await c.fs.writeFile(path.join('/', 'src', 'components', 'cmp-a', 'cmp-a.tsx'), `
       @Component({ tag: 'cmp-a' }) export class CmpA { render() { return <p>cmp-a</p>; } }
     `);
     await c.fs.commit();
@@ -86,17 +87,17 @@ describe('prerender index', () => {
     expect(r.diagnostics).toEqual([]);
 
     expectFiles(c.fs, [
-      '/assets/out.html',
-      '/assets/web-components/app.js',
-      '/assets/web-components/app/app.core.js',
-      '/assets/web-components/app/app.core.pf.js',
-      '/assets/web-components/app/app.registry.json',
-      '/assets/web-components/app/cmp-a.es5.js',
-      '/assets/web-components/app/cmp-a.js'
+      path.join('/', 'assets', 'out.html'),
+      path.join('/', 'assets', 'web-components', 'app.js'),
+      path.join('/', 'assets', 'web-components', 'app', 'app.core.js'),
+      path.join('/', 'assets', 'web-components', 'app', 'app.core.pf.js'),
+      path.join('/', 'assets', 'web-components', 'app', 'app.registry.json'),
+      path.join('/', 'assets', 'web-components', 'app', 'cmp-a.es5.js'),
+      path.join('/', 'assets', 'web-components', 'app', 'cmp-a.js')
     ]);
 
     doNotExpectFiles(c.fs, [
-      '/assets/index.html'
+      path.join('/', 'assets', 'index.html')
     ]);
   });
 

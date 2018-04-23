@@ -14,36 +14,36 @@ describe('stats and docs', () => {
     config = new TestingConfig();
     config.flags.docs = true;
     config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
+    config.rootDir = path.join('/', 'User', 'testing', '/');
     config.outputTargets = [
       { type: 'www' } as d.OutputTargetWww,
       { type: 'stats' } as d.OutputTargetStats,
       { type: 'stats', file: 'my-stats.json' } as d.OutputTargetStats,
-      { type: 'stats', file: '/I/do/what/I/want/some-stats.json' } as d.OutputTargetStats,
+      { type: 'stats', file: path.join('/', 'I', 'do', 'what', 'I', 'want', 'some-stats.json') } as d.OutputTargetStats,
       { type: 'docs' } as d.OutputTargetDocs,
-      { type: 'docs', readmeDir: '/docs/' } as d.OutputTargetDocs
+      { type: 'docs', readmeDir: path.join('/', 'docs', '/') } as d.OutputTargetDocs
     ];
 
     c = new TestingCompiler(config);
 
-    await c.fs.writeFile('/User/testing/src/components/cmp-a/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await c.fs.writeFile(path.join('/', 'User', 'testing', 'src', 'components', 'cmp-a', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     await c.fs.commit();
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const statsJson = JSON.parse(await c.fs.readFile('/User/testing/stencil-stats.json'));
-    const myStatsJson = JSON.parse(await c.fs.readFile('/User/testing/my-stats.json'));
-    const whereEverJson = JSON.parse(await c.fs.readFile('/I/do/what/I/want/some-stats.json'));
+    const statsJson = JSON.parse(await c.fs.readFile(path.join('/', 'User/testing/stencil-stats.json')));
+    const myStatsJson = JSON.parse(await c.fs.readFile(path.join('/', 'User/testing/my-stats.json')));
+    const whereEverJson = JSON.parse(await c.fs.readFile(path.join('/', 'I/do/what/I/want/some-stats.json')));
 
     expect(statsJson.app.namespace).toBe('App');
     expect(myStatsJson.app.fsNamespace).toBe('app');
     expect(whereEverJson.app.components).toBe(1);
 
-    const cmpAReadme = await c.fs.readFile('/User/testing/src/components/cmp-a/readme.md');
+    const cmpAReadme = await c.fs.readFile(path.join('/', 'User/testing/src/components/cmp-a/readme.md'));
     expect(cmpAReadme).toContain('# cmp-a');
 
-    const cmpACustomReadme = await c.fs.readFile('/docs/components/cmp-a/readme.md');
+    const cmpACustomReadme = await c.fs.readFile(path.join('/', 'docs/components/cmp-a/readme.md'));
     expect(cmpACustomReadme).toContain('# cmp-a');
   });
 

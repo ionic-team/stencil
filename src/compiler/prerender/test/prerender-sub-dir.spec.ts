@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
@@ -25,11 +26,11 @@ describe('prerender', () => {
 
     c = new TestingCompiler(config);
 
-    await c.fs.writeFile('/src/index.html', `
+    await c.fs.writeFile(path.join('/', 'src', 'index.html'), `
       <script src="/docs/build/app.js"></script>
       <ionic-docs></ionic-docs>
     `);
-    await c.fs.writeFile('/src/components/ionic-docs/ionic-docs.tsx', `
+    await c.fs.writeFile(path.join('/', 'src', 'components', 'ionic-docs', 'ionic-docs.tsx'), `
       @Component({ tag: 'ionic-docs' })
       export class IonicDocs {
         render() {
@@ -51,33 +52,33 @@ describe('prerender', () => {
     expect(r.diagnostics).toEqual([]);
 
     expectFiles(c.fs, [
-      '/www/docs/build/app.js',
-      '/www/docs/build/app/app.core.js',
-      '/www/docs/build/app/app.core.pf.js',
-      '/www/docs/build/app/ionic-docs.es5.js',
-      '/www/docs/build/app/app.registry.json',
-      '/www/docs/build/app/ionic-docs.js',
-      '/www/docs/host.config.json',
-      '/www/docs/index.html',
-      '/www/docs/about/index.html',
-      '/www/docs/components/toggle/index.html'
+      path.join('/', 'www', 'docs', 'build', 'app.js'),
+      path.join('/', 'www', 'docs', 'build', 'app', 'app.core.js'),
+      path.join('/', 'www', 'docs', 'build', 'app', 'app.core.pf.js'),
+      path.join('/', 'www', 'docs', 'build', 'app', 'ionic-docs.es5.js'),
+      path.join('/', 'www', 'docs', 'build', 'app', 'app.registry.json'),
+      path.join('/', 'www', 'docs', 'build', 'app', 'ionic-docs.js'),
+      path.join('/', 'www', 'docs', 'host.config.json'),
+      path.join('/', 'www', 'docs', 'index.html'),
+      path.join('/', 'www', 'docs', 'about', 'index.html'),
+      path.join('/', 'www', 'docs', 'components', 'toggle', 'index.html')
     ]);
 
     doNotExpectFiles(c.fs, [
-      '/www/docs/docs/index.html',
-      '/www/docs/docs/build/app.js',
-      '/www/docs/data.pdf',
-      '/www/docs/data.pdf/index.html',
-      '/www/docs/components/button/index.html'
+      path.join('/', 'www', 'docs', 'docs', 'index.html'),
+      path.join('/', 'www', 'docs', 'docs', 'build', 'app.js'),
+      path.join('/', 'www', 'docs', 'data.pdf'),
+      path.join('/', 'www', 'docs', 'data.pdf', 'index.html'),
+      path.join('/', 'www', 'docs', 'components', 'button', 'index.html')
     ]);
 
-    const indexHtml = await c.fs.readFile('/www/docs/index.html');
+    const indexHtml = await c.fs.readFile(path.join('/', 'www', 'docs', 'index.html'));
     expect(indexHtml).toContain('<script data-resources-url="/docs/build/app/">');
 
-    const aboutHtml = await c.fs.readFile('/www/docs/about/index.html');
+    const aboutHtml = await c.fs.readFile(path.join('/', 'www', 'docs', 'about', 'index.html'));
     expect(aboutHtml).toContain('<script data-resources-url="/docs/build/app/">');
 
-    const toggleHtml = await c.fs.readFile('/www/docs/components/toggle/index.html');
+    const toggleHtml = await c.fs.readFile(path.join('/', 'www', 'docs', 'components', 'toggle', 'index.html'));
     expect(toggleHtml).toContain('<script data-resources-url="/docs/build/app/">');
   });
 

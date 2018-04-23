@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { escapeCssForJs } from '../style';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 
@@ -10,7 +11,7 @@ describe('component-styles', () => {
 
     beforeEach(async () => {
       c = new TestingCompiler();
-      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+      await c.fs.writeFile(path.join('/', 'src', 'index.html'), `<cmp-a></cmp-a>`);
       await c.fs.commit();
     });
 
@@ -26,36 +27,36 @@ describe('component-styles', () => {
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
       expect(content).toContain('\\\\F113');
     });
 
     it('should escape octal literals', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
-        '/src/cmp-a.css': `.myclass:before { content: "\\2014 \\00A0"; }`,
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+        [path.join('/', 'src', 'cmp-a.css')]: `.myclass:before { content: "\\2014 \\00A0"; }`,
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
       expect(content).toContain('\\\\2014 \\\\00A0');
     });
 
     it('should build one component w/ inline style', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styles: 'body { color: red; }' }) export class CmpA {}`,
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: red; }' }) export class CmpA {}`,
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
       expect(content).toContain('body { color: red; }');
     });
 
@@ -66,7 +67,7 @@ describe('component-styles', () => {
       c.config.hashFileNames = true;
       c.config.hashedFileNameLength = 1;
       await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({
           tag: 'cmp-a',
           styleUrls: {
             ios: '/src/cmp-a.ios.css',
@@ -75,20 +76,20 @@ describe('component-styles', () => {
         })
         export class CmpA {}`,
 
-        '/src/cmp-a.ios.css': `body{font:ios}`,
+        [path.join('/', 'src', 'cmp-a.ios.css')]: `body{font:ios}`,
 
-        '/src/cmp-a.md.css': `body{font:md}`
+        [path.join('/', 'src', 'cmp-a.md.css')]: `body{font:md}`
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const iosContent = await c.fs.readFile('/www/build/app/t.js');
+      const iosContent = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 't.js'));
       expect(iosContent).toContain(`body{font:ios}`);
       expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-      const mdContent = await c.fs.readFile('/www/build/app/x.js');
+      const mdContent = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'x.js'));
       expect(mdContent).toContain(`body{font:md}`);
       expect(mdContent).toContain(`static get styleMode(){return"md"}`);
     });
@@ -100,15 +101,15 @@ describe('component-styles', () => {
       c.config.hashFileNames = true;
       c.config.hashedFileNameLength = 1;
       await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
-        '/src/cmp-a.css': `body{color:red}`
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+        [path.join('/', 'src', 'cmp-a.css')]: `body{color:red}`
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/s.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 's.js'));
       expect(content).toContain(`body{color:red}`);
     });
 
@@ -116,23 +117,23 @@ describe('component-styles', () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       c.config.minifyCss = true;
       await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
-        '/src/cmp-a.css': `body {    color:        red;    /** plz  minify me **/ }`
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+        [path.join('/', 'src', 'cmp-a.css')]: `body {    color:        red;    /** plz  minify me **/ }`
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
       expect(content).toContain(`body{color:red}`);
     });
 
     it('should build one component w/ styleUrl', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
-        '/src/cmp-a.css': `body { color: red; }`
+        [path.join('/', 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+        [path.join('/', 'src', 'cmp-a.css')]: `body { color: red; }`
       });
       await c.fs.commit();
 
@@ -142,7 +143,7 @@ describe('component-styles', () => {
       expect(r.transpileBuildCount).toBe(1);
       expect(r.bundleBuildCount).toBe(1);
 
-      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const content = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
       expect(content).toContain(`body { color: red; }`);
     });
 
