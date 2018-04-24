@@ -1,3 +1,15 @@
+<a name="0.7.27-1"></a>
+## ⛺️ [0.7.27-1](https://github.com/ionic-team/stencil/compare/v0.7.27-0...v0.7.27-1) (2018-04-24)
+
+
+### Bug Fixes
+
+* **lifecycle:** ensure child components have connected before lifecycle checks ([5a1377f](https://github.com/ionic-team/stencil/commit/5a1377f)), closes [#747](https://github.com/ionic-team/stencil/issues/747)
+* **slot:** fix conditional slot reordering ([6489f8e](https://github.com/ionic-team/stencil/commit/6489f8e))
+* **tag:** fix legacy module lookups when using tags with numbers ([e918f48](https://github.com/ionic-team/stencil/commit/e918f48)), closes [#753](https://github.com/ionic-team/stencil/issues/753)
+
+
+
 <a name="0.7.27-0"></a>
 ## 🚣 [0.7.27-0](https://github.com/ionic-team/stencil/compare/v0.7.26...v0.7.27-0) (2018-04-23)
 
