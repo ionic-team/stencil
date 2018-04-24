@@ -226,7 +226,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
   }
 
-  function updateChildren(parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[], oldKeyToIdx?: any, idxInOld?: number, i?: number, node?: Node, elmToMove?: d.VNode) {
+  function updateChildren(parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[], idxInOld?: number, i?: number, node?: Node, elmToMove?: d.VNode) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -261,37 +261,35 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
       } else if (isSameVnode(oldStartVnode, newEndVnode)) {
         // Vnode moved right
+        if (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot') {
+          putBackInOriginalLocation(domApi.$parentNode(oldStartVnode.elm));
+        }
         patchVNode(oldStartVnode, newEndVnode);
-        domApi.$insertBefore(parentElm, oldStartVnode.elm, referenceNode(domApi.$nextSibling(oldEndVnode.elm) as any));
+        domApi.$insertBefore(parentElm, oldStartVnode.elm, domApi.$nextSibling(oldEndVnode.elm) as any);
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldEndVnode, newStartVnode)) {
         // Vnode moved left
+        if (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot') {
+          putBackInOriginalLocation(domApi.$parentNode(oldEndVnode.elm));
+        }
         patchVNode(oldEndVnode, newStartVnode);
-        domApi.$insertBefore(parentElm, oldEndVnode.elm, referenceNode(oldStartVnode.elm));
+        domApi.$insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
 
       } else {
-        if (!isDef(oldKeyToIdx)) {
-          // createKeyToOldIdx
-          oldKeyToIdx = {};
-          for (i = oldStartIdx; i <= oldEndIdx; ++i) {
-            if (isDef(oldCh[i]) && isDef(oldCh[i].vkey)) {
-              oldKeyToIdx[oldCh[i].vkey] = i;
-            }
+        // createKeyToOldIdx
+        idxInOld = null;
+        for (i = oldStartIdx; i <= oldEndIdx; ++i) {
+          if (oldCh[i] && isDef(oldCh[i].vkey) && oldCh[i].vkey === newStartVnode.vkey) {
+            idxInOld = i;
+            break;
           }
         }
 
-        idxInOld = oldKeyToIdx[newStartVnode.vkey];
-
-        if (!isDef(idxInOld)) {
-          // new element
-          node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm);
-          newStartVnode = newCh[++newStartIdx];
-
-        } else {
+        if (isDef(idxInOld)) {
           elmToMove = oldCh[idxInOld];
 
           if (elmToMove.vtag !== newStartVnode.vtag) {
@@ -303,6 +301,11 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
             node = elmToMove.elm;
           }
 
+          newStartVnode = newCh[++newStartIdx];
+
+        } else {
+          // new element
+          node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm);
           newStartVnode = newCh[++newStartIdx];
         }
 
@@ -378,9 +381,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
         updateElement(plt, oldVNode, newVNode, isSvgMode);
-
-      } else {
-        putBackInOriginalLocation(domApi.$parentNode(elm));
       }
 
       if (isDef(oldChildren) && isDef(newChildren)) {
