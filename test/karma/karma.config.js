@@ -1,5 +1,5 @@
 var path = require('path');
-const browserStack = false;
+const browserStack = !!process.env.CI;
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 var browserStackLaunchers = {
@@ -32,13 +32,15 @@ var browserStackLaunchers = {
     browser: 'safari',
     os: 'OS X',
     os_version: 'High Sierra'
-  },
+  }
+  /*,
   bs_iphone8: {
     base: 'BrowserStack',
     device: 'iPhone 8',
     os: 'ios',
     os_version: '11.0'
   }
+  */
 };
 
 const localLaunchers = {
