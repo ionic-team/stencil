@@ -6,11 +6,11 @@ jobs:
       - image: circleci/node:6
     steps:
       - checkout
-      - wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
+      - run: wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
       # Unzip the browserstack binary file
-      - unzip BrowserStackLocal-linux-x64.zip
+      - run: unzip BrowserStackLocal-linux-x64.zip
       # Run the file with your access key
-      - ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY
+      - run: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY
 
       - restore_cache:
           keys:
