@@ -32,43 +32,54 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
 
     url = '/base/www' + url;
 
-    return new Promise<HTMLElement>(resolve => {
+    return new Promise<HTMLElement>((resolve, reject) => {
+      try {
+        const indexLoaded = function() {
+          const frag = document.createDocumentFragment();
+          const elm = document.createElement('div');
+          elm.innerHTML = this.responseText;
+          frag.appendChild(elm);
 
-      async function indexLoaded() {
-        const frag = document.createDocumentFragment();
-        const elm = document.createElement('div');
-        elm.innerHTML = this.responseText;
-        frag.appendChild(elm);
+          const scripts = frag.querySelectorAll('script');
+          for (let i = 0; i < scripts.length; i++) {
+            scripts[i].parentNode.removeChild(scripts[i]);
+          }
 
-        const scripts = frag.querySelectorAll('script');
-        for (let i = 0; i < scripts.length; i++) {
-          scripts[i].remove();
+          scratch.innerHTML = elm.innerHTML;
+
+          const promises: Promise<any>[] = [];
+          loadPromises(promises, scratch);
+
+          Promise.all(promises).then(() => {
+            const component = scratch.querySelector('.hydrated') as any;
+            resolve(component);
+
+          }).catch(err => {
+            reject(err);
+          });
         }
 
-        scratch.innerHTML = elm.innerHTML;
-
-        const promises: Promise<any>[] = [];
-
-        loadPromises(promises, scratch);
-
-        Promise.all(promises).then(() => {
-          const component = scratch.querySelector('.hydrated') as any;
-          resolve(component);
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener('load', indexLoaded);
+        oReq.addEventListener('error', (err) => {
+          reject(err);
         });
-      }
+        oReq.open('GET', url);
+        oReq.send();
 
-      var oReq = new XMLHttpRequest();
-      oReq.addEventListener('load', indexLoaded);
-      oReq.open('GET', url);
-      oReq.send();
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 
   function loadPromises(promises: Promise<any>[], component: any) {
-    promises.push((component as any).componentOnReady());
+    if (component.componentOnReady) {
+      promises.push(component.componentOnReady());
+    }
 
-    for (let i = 0; i < component.children.length; i++) {
-      loadPromises(promises, component.children[i]);
+    for (let i = 0; i < component.childNodes.length; i++) {
+      loadPromises(promises, component.childNodes[i]);
     }
   }
 
@@ -78,11 +89,14 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
   function flush() {
     return new Promise((resolve) => {
 
+      let tmr = setTimeout(resolve, 750);
+
       const observer = new MutationObserver(function(mutations: MutationRecord[]) {
         mutations;
         observer.disconnect();
         setTimeout(() => {
           (window as any).App.Context.queue.write(() => {
+            clearTimeout(tmr);
             resolve();
           });
         }, 100);

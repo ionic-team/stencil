@@ -18,9 +18,9 @@ export class SvgClass {
           <button onClick={this.testClick.bind(this)}>Test</button>
         </div>
         <div>
-          <svg class={this.hasColor ? 'red' : null}>
-            <circle class={this.hasColor ? 'green' : null}/>
-            <line class={this.hasColor ? 'blue' : null}/>
+          <svg viewBox="0 0 54 54" class={this.hasColor ? 'primary' : null}>
+            <circle cx="8" cy="18" width="54" height="8" r="2" class={this.hasColor ? 'red' : null}/>
+            <rect y="2" width="54" height="8" rx="2" class={this.hasColor ? 'blue' : null}/>
           </svg>
         </div>
       </div>

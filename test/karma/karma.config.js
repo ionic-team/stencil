@@ -63,7 +63,8 @@ module.exports = function(config) {
       'karma-chrome-launcher',
       'karma-browserstack-launcher',
       'karma-jasmine',
-      'karma-typescript'
+      'karma-typescript',
+      'karma-polyfill'
     ],
     browsers: browserStack
       ? Object.keys(browserStackLaunchers)
@@ -71,8 +72,15 @@ module.exports = function(config) {
 
     singleRun: true, // set this to false to leave the browser open
 
-    frameworks: ['jasmine', 'karma-typescript'],
+    frameworks: [
+      'jasmine',
+      'karma-typescript',
+      'polyfill'
+    ],
 
+    polyfill: [
+      'Promise'
+    ],
 
     browserStack: {
       project: 'stencil_core'

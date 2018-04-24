@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initEventEmitters } from './init-event-emitters';
-import { RUNTIME_ERROR } from '../util/constants';
+import { RUNTIME_ERROR, NODE_TYPE } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
@@ -138,15 +138,18 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 
 
 function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
-  for (let i = 0; i < elm.children.length; i++) {
-    if (plt.getComponentMeta(elm.children[i]) && !plt.hasConnectedMap.has(elm.children[i] as d.HostElement)) {
-      // this is a defined componnent
-      // but it hasn't connected yet
-      return false;
-    }
-    if (!allChildrenHaveConnected(plt, elm.children[i] as d.HostElement)) {
-      // one of the defined child components hasn't connected yet
-      return false;
+  // Note: in IE11 <svg> does not have the "children" property
+  for (let i = 0; i < elm.childNodes.length; i++) {
+    if (elm.childNodes[i].nodeType === NODE_TYPE.ElementNode) {
+      if (plt.getComponentMeta(elm.childNodes[i] as any) && !plt.hasConnectedMap.has(elm.childNodes[i] as d.HostElement)) {
+        // this is a defined componnent
+        // but it hasn't connected yet
+        return false;
+      }
+      if (!allChildrenHaveConnected(plt, elm.childNodes[i] as d.HostElement)) {
+        // one of the defined child components hasn't connected yet
+        return false;
+      }
     }
   }
   // everything has connected, we're good
