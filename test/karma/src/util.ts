@@ -97,5 +97,5 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
     });
   }
 
-  return { setupDom, tearDownDom, renderTest, flush };
+  return { setupDom, tearDownDom, renderTest, flush, app };
 }

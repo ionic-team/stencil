@@ -17,7 +17,6 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
-import { toDashCase } from '../util/helpers';
 import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
@@ -179,12 +178,22 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     // each key in moduleImports is a PascalCased tag name
     if (!name.startsWith('chunk')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
-        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
-        if (cmpMeta) {
-          // get the component constructor from the module
-          cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
+        const normalizedTagName = pascalCasedTagName.replace(/-/g, '').toLowerCase();
 
-          initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
+        const registryTags = Object.keys(cmpRegistry);
+        for (let i = 0; i < registryTags.length; i++) {
+          const normalizedRegistryTag = registryTags[i].replace(/-/g, '').toLowerCase();
+
+          if (normalizedRegistryTag === normalizedTagName) {
+            const cmpMeta = cmpRegistry[registryTags[i]];
+            if (cmpMeta) {
+              // get the component constructor from the module
+              cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
+
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
+            }
+            break;
+          }
         }
       });
     }
