@@ -184,17 +184,27 @@ export function createPlatformServer(
     // each key in moduleImports is a PascalCased tag name
     if (!name.startsWith('chunk')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
-        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
-        if (cmpMeta) {
-          // connect the component's constructor to its metadata
-          const componentConstructor = bundleExports[pascalCasedTagName];
+        const normalizedTagName = pascalCasedTagName.replace(/-/g, '').toLowerCase();
 
-          if (!cmpMeta.componentConstructor) {
-            fillCmpMetaFromConstructor(componentConstructor, cmpMeta);
-          }
+        const registryTags = Object.keys(cmpRegistry);
+        for (let i = 0; i < registryTags.length; i++) {
+          const normalizedRegistryTag = registryTags[i].replace(/-/g, '').toLowerCase();
 
-          if (componentConstructor.style) {
-            styles[cmpMeta.tagNameMeta] = componentConstructor.style;
+          if (normalizedRegistryTag === normalizedTagName) {
+            const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+            if (cmpMeta) {
+              // connect the component's constructor to its metadata
+              const componentConstructor = bundleExports[pascalCasedTagName];
+
+              if (!cmpMeta.componentConstructor) {
+                fillCmpMetaFromConstructor(componentConstructor, cmpMeta);
+              }
+
+              if (componentConstructor.style) {
+                styles[cmpMeta.tagNameMeta] = componentConstructor.style;
+              }
+            }
+            break;
           }
         }
       });

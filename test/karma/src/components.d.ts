@@ -592,4 +592,70 @@ declare global {
   }
 }
 
+
+declare global {
+
+  namespace StencilComponents {
+    interface Tag3dComponent {
+
+    }
+  }
+
+  interface HTMLTag3dComponentElement extends StencilComponents.Tag3dComponent, HTMLStencilElement {}
+
+  var HTMLTag3dComponentElement: {
+    prototype: HTMLTag3dComponentElement;
+    new (): HTMLTag3dComponentElement;
+  };
+  interface HTMLElementTagNameMap {
+    'tag-3d-component': HTMLTag3dComponentElement;
+  }
+  interface ElementTagNameMap {
+    'tag-3d-component': HTMLTag3dComponentElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'tag-3d-component': JSXElements.Tag3dComponentAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface Tag3dComponentAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface Tag88 {
+
+    }
+  }
+
+  interface HTMLTag88Element extends StencilComponents.Tag88, HTMLStencilElement {}
+
+  var HTMLTag88Element: {
+    prototype: HTMLTag88Element;
+    new (): HTMLTag88Element;
+  };
+  interface HTMLElementTagNameMap {
+    'tag-88': HTMLTag88Element;
+  }
+  interface ElementTagNameMap {
+    'tag-88': HTMLTag88Element;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'tag-88': JSXElements.Tag88Attributes;
+    }
+  }
+  namespace JSXElements {
+    export interface Tag88Attributes extends HTMLAttributes {
+
+    }
+  }
+}
+
 declare global { namespace JSX { interface StencilJSX {} } }
