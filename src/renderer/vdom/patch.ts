@@ -185,6 +185,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // $defaultHolder deprecated 2018-04-02
     const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
     containerElm = (contentRef && domApi.$parentNode(contentRef)) || parentElm;
+    if ((containerElm as any).shadowRoot) {
+      containerElm = (containerElm as any).shadowRoot;
+    }
 
     for (; startIdx <= endIdx; ++startIdx) {
       if (vnodes[startIdx]) {
