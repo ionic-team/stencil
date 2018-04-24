@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as d from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
@@ -9,7 +10,7 @@ export class TestingConfig implements d.Config {
   sys = new TestingSystem();
 
   namespace: string;
-  rootDir = '/';
+  rootDir = path.resolve('/');
   suppressTypeScriptErrors = true;
   devMode = true;
   enableCache = false;

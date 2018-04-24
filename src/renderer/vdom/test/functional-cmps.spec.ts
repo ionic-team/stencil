@@ -12,7 +12,7 @@ describe('functional components', () => {
 
   let c: TestingCompiler;
   let config: d.Config;
-
+  const root = path.resolve('/');
 
   it('should handle functional cmp which returns null', async () => {
     config = new TestingConfig();
@@ -28,15 +28,15 @@ describe('functional components', () => {
 
     c = new TestingCompiler(config);
 
-    await c.fs.writeFile(path.join('/', 'src', 'index.html'), `
+    await c.fs.writeFile(path.join(root, 'src', 'index.html'), `
       <script src="/build/app.js"></script>
       <cmp-a></cmp-a>
     `);
 
-    await c.fs.writeFile(path.join('/', 'src', 'my-functional-component.tsx'), `
+    await c.fs.writeFile(path.join(root, 'src', 'my-functional-component.tsx'), `
     export default () => null;`);
 
-    await c.fs.writeFile(path.join('/', 'src', 'cmp-a.tsx'), `
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `
     import MyFunctionalComponent from './my-functional-component';
     @Component({ tag: 'cmp-a' }) export class CmpA {
       render() {
@@ -49,7 +49,7 @@ describe('functional components', () => {
     expect(r.diagnostics).toEqual([]);
 
     const doc = mockDocument();
-    doc.body.innerHTML = c.fs.readFileSync(path.join('/', 'www', 'index.html'));
+    doc.body.innerHTML = c.fs.readFileSync(path.join(root, 'www', 'index.html'));
 
     const cmpA = doc.querySelector('cmp-a');
     expect(cmpA.textContent).toBe('');
@@ -69,17 +69,17 @@ describe('functional components', () => {
 
     c = new TestingCompiler(config);
 
-    await c.fs.writeFile(path.join('/', 'src', 'index.html'), `
+    await c.fs.writeFile(path.join(root, 'src', 'index.html'), `
       <script src="/build/app.js"></script>
       <cmp-a></cmp-a>
     `);
 
-    await c.fs.writeFile(path.join('/', 'src', 'my-functional-component.tsx'), `
+    await c.fs.writeFile(path.join(root, 'src', 'my-functional-component.tsx'), `
     export default () => {
       return <div id="fn-cmp">fn-cmp</div>
     };`);
 
-    await c.fs.writeFile(path.join('/', 'src', 'cmp-a.tsx'), `
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `
     import MyFunctionalComponent from './my-functional-component';
     @Component({ tag: 'cmp-a' }) export class CmpA {
       render() {
@@ -92,7 +92,7 @@ describe('functional components', () => {
     expect(r.diagnostics).toEqual([]);
 
     const doc = mockDocument();
-    doc.body.innerHTML = c.fs.readFileSync(path.join('/', 'www', 'index.html'));
+    doc.body.innerHTML = c.fs.readFileSync(path.join(root, 'www', 'index.html'));
 
     const cmpA = doc.querySelector('cmp-a');
     expect(cmpA.textContent.trim()).toBe('fn-cmp');

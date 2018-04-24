@@ -25,9 +25,9 @@ describe('vnode-slot transform', async () => {
 
       const output = await transformSourceString(fileName, source, [upgradeJsxProps]);
       expect(
-        output
+        output.replace(/\r\n|\r|\n/g, '')
       ).toEqual(
-        final
+        final.replace(/\r\n|\r|\n/g, '')
       );
     });
 

@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as d from '../../../declarations';
 import { getFilePath } from '../node-http-server';
 import { TestingConfig } from '../../../testing/testing-config';
@@ -9,6 +10,7 @@ describe('node-http-server', () => {
 
   let config: d.Config;
   let outputTarget: d.OutputTargetWww;
+  const root = path.resolve('/');
 
 
   it('getFilePath w/ baseUrl and dir', () => {
@@ -43,7 +45,7 @@ describe('node-http-server', () => {
 
     const p = getFilePath(outputTarget, url);
     const normalizedPath = normalizePath(p);
-    expect(normalizedPath).toBe('/www/data.json');
+    expect(normalizedPath).toBe(normalizePath(path.join(root, 'www', 'data.json')));
   });
 
   it('getFilePath, defaults w/ querystring and hash', () => {
@@ -54,7 +56,7 @@ describe('node-http-server', () => {
 
     const p = getFilePath(outputTarget, url);
     const normalizedPath = normalizePath(p);
-    expect(normalizedPath).toBe('/www/data.json');
+    expect(normalizedPath).toBe(normalizePath(path.join(root, 'www', 'data.json')));
   });
 
   it('getFilePath, defaults', () => {
@@ -65,7 +67,7 @@ describe('node-http-server', () => {
 
     const p = getFilePath(outputTarget, url);
     const normalizedPath = normalizePath(p);
-    expect(normalizedPath).toBe('/www/data.json');
+    expect(normalizedPath).toBe(normalizePath(path.join(root, 'www', 'data.json')));
   });
 
 });

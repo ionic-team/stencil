@@ -1,10 +1,14 @@
+import * as path from 'path';
 import * as d from '../../../declarations';
 import { getWritePathFromUrl, isValidCrawlableAnchor } from '../prerender-utils';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';
+import { normalizePath } from '../../util';
 
 
 describe('isValidCrawlableAnchor', () => {
+
+  const root = path.resolve('/');
 
   it('true for non _self target attr', () => {
     const r = isValidCrawlableAnchor({
@@ -75,20 +79,21 @@ describe('getWritePathFromUrl', () => {
 
   let config: d.Config;
   let outputTarget: d.OutputTargetWww;
+  const root = path.resolve('/');
 
   it('custom www dir with sub directories', () => {
     config = new TestingConfig();
     config.outputTargets = [
       {
         type: 'www',
-        dir: 'some/crazy/path'
+        dir: path.join('some', 'crazy', 'path')
       } as d.OutputTargetWww
     ];
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/some/crazy/path/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'some', 'crazy', 'path', 'index.html')));
   });
 
   it('custom www dir', () => {
@@ -103,7 +108,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/docs/about/#safetydance';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/somepath/docs/about/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'somepath', 'docs', 'about', 'index.html')));
   });
 
   it('custom baseUrl, trailing slash', () => {
@@ -119,7 +124,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/base-url/';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/custom-dir/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'custom-dir', 'index.html')));
   });
 
   it('custom baseUrl, no trailing slash', () => {
@@ -135,7 +140,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/base-url';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/custom-dir/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'custom-dir', 'index.html')));
   });
 
   it('defaults, ignore hash', () => {
@@ -144,7 +149,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/docs/about/#safetydance';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/www/docs/about/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'about', 'index.html')));
   });
 
   it('defaults, ignore querystring', () => {
@@ -153,7 +158,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/docs/about?tainted=love';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/www/docs/about/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'about', 'index.html')));
   });
 
   it('defaults, sub dir with trailing slash', () => {
@@ -162,7 +167,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/docs/';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/www/docs/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'index.html')));
   });
 
   it('defaults, sub dir no trailing slash', () => {
@@ -171,7 +176,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/docs';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/www/docs/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'index.html')));
   });
 
   it('defaults, root dir', () => {
@@ -180,7 +185,7 @@ describe('getWritePathFromUrl', () => {
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/';
     const p = getWritePathFromUrl(config, outputTarget, url);
-    expect(p).toBe('/www/index.html');
+    expect(p).toBe(normalizePath(path.join(root, 'www', 'index.html')));
   });
 
 });

@@ -10,11 +10,12 @@ describe('www loader/core resourcesUrl', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
+  const root = path.resolve('/');
 
   it('default config w/ external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join('/', 'User', 'testing', '/');
+    config.rootDir = path.join(root, 'User', 'testing', '/');
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
@@ -27,7 +28,7 @@ describe('www loader/core resourcesUrl', () => {
 
     const { win, doc } = mockDom(wwwOutput.indexHtml);
 
-    const loaderContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app.js'));
+    const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="app"]');
@@ -37,7 +38,7 @@ describe('www loader/core resourcesUrl', () => {
     expect(resourcesUrl).toBe('http://emmitts-garage.com/build/app/');
     expect(coreScriptSrc).toBe('http://emmitts-garage.com/build/app/app.core.js');
 
-    const coreContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
+    const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
     execScript(win, doc, coreContent);
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
@@ -47,15 +48,15 @@ describe('www loader/core resourcesUrl', () => {
   it('custom resourcesUrl config w/ external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join('/', 'User', 'testing', '/');
+    config.rootDir = path.join(root, 'User', 'testing', '/');
     config.outputTargets = [{
       type: 'www',
-      resourcesUrl: path.join('/', 'some', 'resource', 'config', 'path')
+      resourcesUrl: '/some/resource/config/path'
     } as d.OutputTargetWww];
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcesUrl).toBe(path.join('/', 'some', 'resource', 'config', 'path', '/'));
+    expect(wwwOutput.resourcesUrl).toBe('/some/resource/config/path/');
 
     await setupFs(c, '<script src="build/app.js"></script>');
 
@@ -64,17 +65,17 @@ describe('www loader/core resourcesUrl', () => {
 
     const { win, doc } = mockDom(wwwOutput.indexHtml);
 
-    const loaderContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app.js'));
+    const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace][data-namespace="app"]');
     const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcesUrl).toBe(path.join('/', 'some', 'resource', 'config', 'path', '/'));
-    expect(coreScriptSrc).toBe(path.join('/', 'some', 'resource', 'config', 'path', 'app.core.js'));
+    expect(resourcesUrl).toBe('/some/resource/config/path/');
+    expect(coreScriptSrc).toBe('/some/resource/config/path/app.core.js');
 
-    const coreContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
+    const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
     execScript(win, doc, coreContent);
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
@@ -84,7 +85,7 @@ describe('www loader/core resourcesUrl', () => {
   it('custom data-resources-url attr on external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join('/', 'User', 'testing', '/');
+    config.rootDir = path.join(root, 'User', 'testing', '/');
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
@@ -97,17 +98,17 @@ describe('www loader/core resourcesUrl', () => {
 
     const { win, doc } = mockDom(wwwOutput.indexHtml);
 
-    const loaderContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app.js'));
+    const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="app"]');
     const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcesUrl).toBe(path.join('/', 'some', 'resource', 'attr', 'path', '/'));
-    expect(coreScriptSrc).toBe(path.join('/', 'some', 'resource', 'attr', 'path', 'app.core.js'));
+    expect(resourcesUrl).toBe('/some/resource/attr/path/');
+    expect(coreScriptSrc).toBe('/some/resource/attr/path/app.core.js');
 
-    const coreContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
+    const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
     execScript(win, doc, coreContent);
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
@@ -163,10 +164,10 @@ describe('www loader/core resourcesUrl', () => {
 
 
   async function setupFs(c: TestingCompiler, loaderSrc: string) {
-    await c.fs.writeFile(path.join('/', 'User', 'testing', 'src', 'components', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await c.fs.writeFile(path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
     await c.fs.writeFile(
-      path.join('/', 'User', 'testing', 'src', 'index.html'), `
+      path.join(root, 'User', 'testing', 'src', 'index.html'), `
         <!DOCTYPE html>
         <html>
         <head>

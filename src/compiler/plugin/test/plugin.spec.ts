@@ -5,11 +5,12 @@ import * as path from 'path';
 
 describe('plugin', () => {
   let c: TestingCompiler;
+  const root = path.resolve('/');
 
   beforeEach(async () => {
     c = new TestingCompiler();
     await c.fs.writeFiles({
-      [path.join('src', 'index.html')]: `<cmp-a></cmp-a>`
+      [path.join(root, 'src', 'index.html')]: `<cmp-a></cmp-a>`
     });
     await c.fs.commit();
   });
@@ -18,7 +19,7 @@ describe('plugin', () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
 
     await c.fs.writeFiles({
-      'stencil.config.js': `
+      [path.join(root, 'stencil.config.js')]: `
 
         function myPlugin() {
           return {
@@ -35,7 +36,7 @@ describe('plugin', () => {
           plugins: [myPlugin()]
         };
       `,
-      [path.join('/src', 'cmp-a.tsx')]: `
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
         @Component({ tag: 'cmp-a' }) export class CmpA {
           constructor() { }
         }
@@ -43,12 +44,12 @@ describe('plugin', () => {
     }, { clearFileCache: true });
     await c.fs.commit();
 
-    c.loadConfigFile('stencil.config.js');
+    c.loadConfigFile(path.join(root, 'stencil.config.js'));
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
     expect(cmpA).toContain('transformed!');
   });
 
@@ -56,7 +57,7 @@ describe('plugin', () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
 
     await c.fs.writeFiles({
-      [path.join('/', 'stencil.config.js')]: `
+      [path.join(root, 'stencil.config.js')]: `
 
         function myPlugin() {
           return {
@@ -71,7 +72,7 @@ describe('plugin', () => {
           plugins: [myPlugin()]
         };
       `,
-      [path.join('/', 'src', 'cmp-a.tsx')]: `
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
         @Component({ tag: 'cmp-a' }) export class CmpA {
           constructor() { }
         }
@@ -79,12 +80,12 @@ describe('plugin', () => {
     }, { clearFileCache: true });
     await c.fs.commit();
 
-    c.loadConfigFile('/stencil.config.js');
+    c.loadConfigFile(path.join(root, 'stencil.config.js'));
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
     expect(cmpA).toContain('transformed!');
   });
 
@@ -92,13 +93,13 @@ describe('plugin', () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
 
     await c.fs.writeFiles({
-      [path.join('/', 'stencil.config.js')]: `
+      [path.join(root, 'stencil.config.js')]: `
 
         function myPlugin() {
           return {
             resolveId: function(importee, importer) {
               if (importee === '#crazy-path!') {
-                return Promise.resolve('/dist/my-dep-fn.js');
+                return Promise.resolve('${path.join(root, 'dist', 'my-dep-fn.js')}');
               }
             },
             name: 'myPlugin'
@@ -109,7 +110,7 @@ describe('plugin', () => {
           plugins: [myPlugin()]
         };
       `,
-      [path.join('/', 'src', 'cmp-a.tsx')]: `
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
         import { depFn } '#crazy-path!'
         @Component({ tag: 'cmp-a' }) export class CmpA {
           constructor() {
@@ -117,7 +118,7 @@ describe('plugin', () => {
           }
         }
       `,
-      [path.join('/', 'dist', 'my-dep-fn.js')]: `
+      [path.join(root, 'dist', 'my-dep-fn.js')]: `
         export function depFn(){
           console.log('imported depFun()');
         }
@@ -125,12 +126,12 @@ describe('plugin', () => {
     }, { clearFileCache: true });
     await c.fs.commit();
 
-    c.loadConfigFile(path.join('/', 'stencil.config.js'));
+    c.loadConfigFile(path.join(root, 'stencil.config.js'));
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
     expect(cmpA).toContain('imported depFun()');
   });
 
@@ -138,13 +139,13 @@ describe('plugin', () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
 
     await c.fs.writeFiles({
-      [path.join('/', 'stencil.config.js')]: `
+      [path.join(root, 'stencil.config.js')]: `
 
         function myPlugin() {
           return {
             resolveId: function(importee, importer) {
               if (importee === '#crazy-path!') {
-                return '/dist/my-dep-fn.js';
+                return '${path.join(root, 'dist', 'my-dep-fn.js')}';
               }
             },
             name: 'myPlugin'
@@ -155,7 +156,7 @@ describe('plugin', () => {
           plugins: [myPlugin()]
         };
       `,
-      [path.join('/', 'src', 'cmp-a.tsx')]: `
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
         import { depFn } '#crazy-path!'
         @Component({ tag: 'cmp-a' }) export class CmpA {
           constructor() {
@@ -163,7 +164,7 @@ describe('plugin', () => {
           }
         }
       `,
-      [path.join('/', 'dist', 'my-dep-fn.js')]: `
+      [path.join(root, 'dist', 'my-dep-fn.js')]: `
         export function depFn(){
           console.log('imported depFun()');
         }
@@ -171,12 +172,12 @@ describe('plugin', () => {
     }, { clearFileCache: true });
     await c.fs.commit();
 
-    c.loadConfigFile('/stencil.config.js');
+    c.loadConfigFile(path.join(root, 'stencil.config.js'));
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join('/', 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
     expect(cmpA).toContain('imported depFun()');
   });
 

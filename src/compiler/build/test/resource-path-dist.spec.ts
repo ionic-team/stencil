@@ -9,12 +9,13 @@ describe('dist loader/core resourcesUrl', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
+  const root = path.resolve('/');
 
 
   it('default config', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join('/', 'User', 'testing', '/');
+    config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'MyApp';
     config.outputTargets = [
       {
@@ -37,9 +38,9 @@ describe('dist loader/core resourcesUrl', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const { win, doc } = mockDom(path.join('/', 'User', 'testing', 'www', 'index.html'));
+    const { win, doc } = mockDom(path.join(root, 'User', 'testing', 'www', 'index.html'));
 
-    const loaderContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'dist', 'myapp.js'));
+    const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'dist', 'myapp.js'));
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="myapp"]');
@@ -49,7 +50,7 @@ describe('dist loader/core resourcesUrl', () => {
     expect(resourcesUrl).toBe('http://cdn.stenciljs.com/dist/myapp/');
     expect(coreScriptSrc).toBe('http://cdn.stenciljs.com/dist/myapp/myapp.core.js');
 
-    const coreContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'dist', 'myapp', 'myapp.core.js'));
+    const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'dist', 'myapp', 'myapp.core.js'));
     execScript(win, doc, coreContent);
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
@@ -59,7 +60,7 @@ describe('dist loader/core resourcesUrl', () => {
   it('custom buildDir config', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join('/', 'User', 'testing', '/');
+    config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'MyApp';
     config.outputTargets = [
       {
@@ -83,9 +84,9 @@ describe('dist loader/core resourcesUrl', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const { win, doc } = mockDom(path.join('/', 'User', 'testing', 'www', 'index.html'));
+    const { win, doc } = mockDom(path.join(root, 'User', 'testing', 'www', 'index.html'));
 
-    const loaderContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'dist', 'some-build', 'myapp.js'));
+    const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'dist', 'some-build', 'myapp.js'));
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="myapp"]');
@@ -95,7 +96,7 @@ describe('dist loader/core resourcesUrl', () => {
     expect(resourcesUrl).toBe('http://cdn.stenciljs.com/dist/some-build/myapp/');
     expect(coreScriptSrc).toBe('http://cdn.stenciljs.com/dist/some-build/myapp/myapp.core.js');
 
-    const coreContent = await c.fs.readFile(path.join('/', 'User', 'testing', 'dist', 'some-build', 'myapp', 'myapp.core.js'));
+    const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'dist', 'some-build', 'myapp', 'myapp.core.js'));
     execScript(win, doc, coreContent);
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
@@ -151,10 +152,10 @@ describe('dist loader/core resourcesUrl', () => {
 
 
   async function setupFs(c: TestingCompiler, loaderSrc: string, packageJson: string) {
-    await c.fs.writeFile(path.join('/', 'User', 'testing', 'src', 'components', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await c.fs.writeFile(path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
     await c.fs.writeFile(
-      path.join('/', 'User', 'testing', 'www', 'index.html'), `
+      path.join(root, 'User', 'testing', 'www', 'index.html'), `
         <!DOCTYPE html>
         <html>
         <head>
@@ -177,7 +178,7 @@ describe('dist loader/core resourcesUrl', () => {
     );
 
     if (packageJson) {
-      await c.fs.writeFile(path.join('/', 'User', 'testing', 'package.json'), packageJson);
+      await c.fs.writeFile(path.join(root, 'User', 'testing', 'package.json'), packageJson);
     }
 
     await c.fs.commit();
