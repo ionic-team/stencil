@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "sd concurrent \"../../bin/stencil build --dev --watch\" \"stencil-dev-server\" ",
+    "build.stencil": "node ../../bin/stencil build --dev --watch",
+    "dev": "sd concurrent \"npm run build.stencil\" \"stencil-dev-server\" ",
     "karma": " karma start karma.config.js",
     "karma.prod": "npm run tsc && ../../bin/stencil build && karma start karma.config.js",
     "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
