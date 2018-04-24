@@ -34,24 +34,16 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 }
 
 
-export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
-  let globalJsContents: string[] = [];
-
-  const results = await Promise.all([
+export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+  const [projectGlobalJsContent, dependentGlobalJsContents] = await Promise.all([
+    bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, config.namespace, config.globalScript),
     loadDependentGlobalJsContents(config, compilerCtx, buildCtx, sourceTarget),
-    bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, config.namespace, config.globalScript)
   ]);
 
-  const dependentGlobalJsContents = results[0];
-  const projectGlobalJsContent = results[1];
-
-  globalJsContents = globalJsContents.concat(dependentGlobalJsContents);
-
-  if (projectGlobalJsContent) {
-    globalJsContents.push(projectGlobalJsContent);
-  }
-
-  return globalJsContents;
+  return [
+    projectGlobalJsContent,
+    ...dependentGlobalJsContents
+  ];
 }
 
 
@@ -73,7 +65,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
 
   if (!entry) {
     // looks like they never provided an entry file, which is fine, so let's skip this
-    return null;
+    return '';
   }
 
   const cacheKey = compilerCtx.cache.createKey('bundleProjectGlobal', namespace, entry, sourceTarget);
