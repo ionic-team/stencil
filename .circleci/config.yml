@@ -24,5 +24,7 @@ jobs:
       - run: npm install npm@latest
       - run: npm run build
       - run: npm run test.jest -- --maxWorkers=4
-      - run: cd test/karma && npm install
-      - run: npm run karma.prod
+      - run: |
+          cd test/karma &&
+          npm install &&
+          npm run karma.prod
