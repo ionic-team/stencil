@@ -10,7 +10,7 @@ jobs:
       # Unzip the browserstack binary file
       - run: unzip BrowserStackLocal-linux-x64.zip
       # Run the file with your access key
-      - run: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY
+      - run: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
 
       - restore_cache:
           keys:
