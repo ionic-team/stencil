@@ -530,6 +530,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotReorderRoot {
+
+    }
+  }
+
+  interface HTMLSlotReorderRootElement extends StencilComponents.SlotReorderRoot, HTMLStencilElement {}
+
+  var HTMLSlotReorderRootElement: {
+    prototype: HTMLSlotReorderRootElement;
+    new (): HTMLSlotReorderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-reorder-root': HTMLSlotReorderRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-reorder-root': HTMLSlotReorderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-reorder-root': JSXElements.SlotReorderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotReorderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotReorder {
+      'reordered': boolean;
+    }
+  }
+
+  interface HTMLSlotReorderElement extends StencilComponents.SlotReorder, HTMLStencilElement {}
+
+  var HTMLSlotReorderElement: {
+    prototype: HTMLSlotReorderElement;
+    new (): HTMLSlotReorderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-reorder': HTMLSlotReorderElement;
+  }
+  interface ElementTagNameMap {
+    'slot-reorder': HTMLSlotReorderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-reorder': JSXElements.SlotReorderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotReorderAttributes extends HTMLAttributes {
+      'reordered'?: boolean;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SvgAttr {
 
     }

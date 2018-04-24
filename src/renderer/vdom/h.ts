@@ -59,6 +59,7 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
   }
 
   let vkey: any;
+  let vname: string;
 
   if (vnodeData != null) {
     // normalize class / classname attributes
@@ -80,6 +81,10 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     if (vnodeData.key != null) {
       vkey = vnodeData.key;
     }
+
+    if (vnodeData.name != null) {
+      vname = vnodeData.name;
+    }
   }
 
   if (typeof nodeName === 'function') {
@@ -96,6 +101,7 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     vtext: undefined,
     vattrs: vnodeData,
     vkey: vkey,
+    vname: vname,
     elm: undefined,
     ishost: false
   } as d.VNode;

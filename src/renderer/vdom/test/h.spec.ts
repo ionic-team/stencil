@@ -262,48 +262,87 @@ describe('h()', () => {
     expect(vnode.vchildren[0].vtext).toEqual('I am a string');
   });
 
-  it('should not be same vnode with same tag and different key', () => {
-    const vnode1 = h('a', { attr: '1', key: 'mykey1' }, '1');
-    const vnode2 = h('a', { attr: '2', key: 'mykey2' }, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(false);
-  });
+  describe('isSameVnode', () => {
 
-  it('should not be same vnode with different tag and same key', () => {
-    const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
-    const vnode2 = h('b', { attr: '2', key: 'mykey' }, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(false);
-  });
+    it('should not be same vnode with slot and no vnode2 name', () => {
+      const vnode1 = h('slot', { name: 'start' }, '1');
+      const vnode2 = h('slot', {}, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
 
-  it('should not be same vnode with different tag and no key', () => {
-    const vnode1 = h('a', null, '1');
-    const vnode2 = h('b', null, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(false);
-  });
+    it('should not be same vnode with slot and no vnode1 name', () => {
+      const vnode1 = h('slot', {}, '1');
+      const vnode2 = h('slot', { name: 'end' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
 
-  it('should be same vnode with same tag and same key', () => {
-    const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
-    const vnode2 = h('a', { attr: '2', key: 'mykey' }, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(true);
-  });
+    it('should not be same vnode with slot and different vname', () => {
+      const vnode1 = h('slot', { name: 'start' }, '1');
+      const vnode2 = h('slot', { name: 'end' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
 
-  it('should be same vnode with same tag and defined data, but no key', () => {
-    const vnode1 = h('a', { attr: '1' }, '1');
-    const vnode2 = h('a', { attr: '2' }, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(true);
-  });
+    it('should be same vnode with slot and same vname', () => {
+      const vnode1 = h('slot', { name: 'start' }, '1');
+      const vnode2 = h('slot', { name: 'start' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    });
 
-  it('should be same vnode with same tag and undefined data', () => {
-    const vnode1 = h('a', null, '1');
-    const vnode2 = h('a', null, '2');
-    expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    it('should be same vnode with slot and no vname', () => {
+      const vnode1 = h('slot', {}, '1');
+      const vnode2 = h('slot', {}, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    });
+
+    it('should not be same vnode with same tag and different key', () => {
+      const vnode1 = h('a', { attr: '1', key: 'mykey1' }, '1');
+      const vnode2 = h('a', { attr: '2', key: 'mykey2' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
+
+    it('should not be same vnode with different tag and same key', () => {
+      const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
+      const vnode2 = h('b', { attr: '2', key: 'mykey' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
+
+    it('should not be same vnode with different tag and no key', () => {
+      const vnode1 = h('a', null, '1');
+      const vnode2 = h('b', null, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(false);
+    });
+
+    it('should be same vnode with same tag and same key', () => {
+      const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
+      const vnode2 = h('a', { attr: '2', key: 'mykey' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    });
+
+    it('should be same vnode with same tag and defined data, but no key', () => {
+      const vnode1 = h('a', { attr: '1' }, '1');
+      const vnode2 = h('a', { attr: '2' }, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    });
+
+    it('should be same vnode with same tag and undefined data', () => {
+      const vnode1 = h('a', null, '1');
+      const vnode2 = h('a', null, '2');
+      expect(isSameVnode(vnode1, vnode2)).toBe(true);
+    });
+
   });
 
 });
 
 
 function isSameVnode(vnode1: d.VNode, vnode2: d.VNode) {
-  // same function that's used within the patch() function
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
-  return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
+  if (vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey) {
+    if (vnode1.vtag === 'slot') {
+      return vnode1.vname === vnode2.vname;
+    }
+    return true;
+  }
+  return false;
 }

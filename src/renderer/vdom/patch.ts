@@ -129,40 +129,47 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         newVNode.elm['s-cr'] = contentRef;
 
         // remember the slot name, or empty string for default slot
-        newVNode.elm['s-sn'] = (newVNode.vattrs && newVNode.vattrs.name) || '';
+        newVNode.elm['s-sn'] = newVNode.vname || '';
 
         // check if we've got an old vnode for this slot
         oldVNode = oldParentVNode && oldParentVNode.vchildren && oldParentVNode.vchildren[childIndex];
         if (oldVNode && oldVNode.vtag === newVNode.vtag && oldParentVNode.elm) {
           // we've got an old slot vnode and the wrapper is being replaced
           // so let's move the old slot content back to it's original location
-          plt.tmpDisconnected = true;
-
-          const oldSlotChildNodes = domApi.$childNodes(oldParentVNode.elm);
-          for (i = oldSlotChildNodes.length - 1; i >= 0; i--) {
-            childNode = oldSlotChildNodes[i] as any;
-            if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
-              // this child node in the old element is from another component
-              // remove this node from the old slot's parent
-              domApi.$remove(childNode);
-
-              // and relocate it back to it's original location
-              domApi.$insertBefore(parentReferenceNode(childNode), childNode, referenceNode(childNode));
-
-              // remove the old original location comment entirely
-              // later on the patch function will know what to do
-              // and move this to the correct spot in need be
-              domApi.$remove(childNode['s-ol']);
-              childNode['s-ol'] = null;
-            }
-          }
-
-          plt.tmpDisconnected = false;
+          putBackInOriginalLocation(oldParentVNode.elm);
         }
       }
     }
 
     return newVNode.elm;
+  }
+
+  function putBackInOriginalLocation(parentElm: Node, i?: number, childNode?: d.RenderNode) {
+    plt.tmpDisconnected = true;
+
+    const oldSlotChildNodes = domApi.$childNodes(parentElm);
+    for (i = oldSlotChildNodes.length - 1; i >= 0; i--) {
+      childNode = oldSlotChildNodes[i] as any;
+      if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
+
+        // this child node in the old element is from another component
+        // remove this node from the old slot's parent
+        domApi.$remove(childNode);
+
+        // and relocate it back to it's original location
+        domApi.$insertBefore(parentReferenceNode(childNode), childNode, referenceNode(childNode));
+
+        // remove the old original location comment entirely
+        // later on the patch function will know what to do
+        // and move this to the correct spot in need be
+        domApi.$remove(childNode['s-ol']);
+        childNode['s-ol'] = null;
+
+        checkSlotRelocate = true;
+      }
+    }
+
+    plt.tmpDisconnected = false;
   }
 
   function addVnodes(
@@ -319,7 +326,15 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   function isSameVnode(vnode1: d.VNode, vnode2: d.VNode) {
     // compare if two vnode to see if they're "technically" the same
     // need to have the same element tag, and same key to be the same
-    return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
+    if (vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey) {
+      if (Build.slotPolyfill) {
+        if (vnode1.vtag === 'slot') {
+          return vnode1.vname === vnode2.vname;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   function referenceNode(node: d.RenderNode) {
@@ -360,6 +375,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
         updateElement(plt, oldVNode, newVNode, isSvgMode);
+
+      } else {
+        putBackInOriginalLocation(domApi.$parentNode(elm));
       }
 
       if (isDef(oldChildren) && isDef(newChildren)) {

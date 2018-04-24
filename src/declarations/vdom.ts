@@ -29,6 +29,7 @@ export interface VNode {
   vtext?: string;
   vchildren?: VNode[];
   vattrs?: any;
+  vname?: string;
   elm?: d.RenderNode;
   ishost?: boolean;
   isSlotFallback?: boolean;
