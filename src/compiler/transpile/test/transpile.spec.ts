@@ -160,8 +160,8 @@ describe('transpile', () => {
     // this one takes a bit longer
     jest.setTimeout(20 * 1000);
 
-    const nodeModulesDir = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'node_modules'));
-    const distDir = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'dist'));
+    const nodeModulesDir = normalizePath(path.resolve(path.join(__dirname, '..', '..', '..', '..', 'node_modules')));
+    const distDir = normalizePath(path.resolve(path.join(__dirname, '..', '..', '..', '..', 'dist')));
 
     c.config.suppressTypeScriptErrors = false;
     c.config.buildAppCore = true;
@@ -187,14 +187,21 @@ describe('transpile', () => {
       return originalStatSync(itemPath);
     };
 
+    const stencilPath =
+      normalizePath(
+        path.join(
+          path.relative(nodeModulesDir, distDir),
+          'index.d.ts'
+        )
+      );
+
+    console.log(stencilPath);
+
     const tsConfig = JSON.stringify({
       compilerOptions: {
         baseUrl: nodeModulesDir,
         paths: {
-          '@stencil/core': [path.join(
-            path.relative(nodeModulesDir, distDir),
-            'index.d.ts'
-          )]
+          '@stencil/core': [stencilPath]
         }
       }
     });
