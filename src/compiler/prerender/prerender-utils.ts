@@ -148,7 +148,8 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
   }
 
   // figure out the directory where this file will be saved
-  const dir = config.sys.path.join(
+  const dir = pathJoin(
+    config,
     outputTarget.dir,
     pathName
   );
