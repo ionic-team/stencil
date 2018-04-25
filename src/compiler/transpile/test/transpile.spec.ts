@@ -160,8 +160,10 @@ describe('transpile', () => {
     // this one takes a bit longer
     jest.setTimeout(20 * 1000);
 
-    const nodeModulesDir = normalizePath(path.resolve(path.join(__dirname, '..', '..', '..', '..', 'node_modules')));
-    const distDir = normalizePath(path.resolve(path.join(__dirname, '..', '..', '..', '..', 'dist')));
+    const nodeModulesDir = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'node_modules'));
+    const distDir = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'dist'));
+    const normalizedNodeModulesDir = normalizePath(nodeModulesDir);
+    const normalizedDistDir = normalizePath(distDir);
 
     c.config.suppressTypeScriptErrors = false;
     c.config.buildAppCore = true;
@@ -172,7 +174,7 @@ describe('transpile', () => {
     const originalStatSync = c.fs.statSync.bind(c.fs);
     c.fs.readFileSync = (filePath) => {
       filePath = normalizePath(filePath);
-      if (filePath.indexOf(nodeModulesDir) === 0 || filePath.indexOf(distDir) === 0) {
+      if (filePath.indexOf(normalizedNodeModulesDir) === 0 || filePath.indexOf(normalizedDistDir) === 0) {
         return fs.readFileSync(filePath).toString();
       }
 
@@ -180,7 +182,7 @@ describe('transpile', () => {
     };
     c.fs.statSync = (itemPath) => {
       itemPath = normalizePath(itemPath);
-      if (itemPath.indexOf(nodeModulesDir) === 0 || itemPath.indexOf(distDir) === 0) {
+      if (itemPath.indexOf(normalizedNodeModulesDir) === 0 || itemPath.indexOf(normalizedDistDir) === 0) {
         return fs.statSync(itemPath);
       }
 
@@ -188,14 +190,10 @@ describe('transpile', () => {
     };
 
     const stencilPath =
-      normalizePath(
-        path.join(
-          path.relative(nodeModulesDir, distDir),
-          'index.d.ts'
-        )
+      path.join(
+        path.relative(nodeModulesDir, distDir),
+        'index.d.ts'
       );
-
-    console.log(stencilPath);
 
     const tsConfig = JSON.stringify({
       compilerOptions: {
@@ -207,7 +205,7 @@ describe('transpile', () => {
     });
 
     await c.fs.writeFiles({
-      '/tsconfig.json': tsConfig,
+      [path.join(root, 'tsconfig.json')]: tsConfig,
       [path.join(root, 'src', 'cmp-a.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-a' }) export class CmpA {}`,
       [path.join(root, 'src', 'some-dir', 'cmp-b.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'some-dir', 'cmp-c.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-c' }) export class CmpC {}`
