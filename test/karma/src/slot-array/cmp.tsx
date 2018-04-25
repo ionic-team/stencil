@@ -4,7 +4,7 @@ import { Component } from '../../../../dist/index';
   tag: 'slot-array',
   shadow: true
 })
-export class SvgAttr {
+export class SlotArray {
 
   render() {
     return [

@@ -550,7 +550,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       contentRef: d.RenderNode;
 
 
-  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, slotParentNode?: d.RenderNode, nodeToRelocateParent?: d.RenderNode) {
+  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -610,17 +610,14 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
         for (i = 0; i < relocateNodes.length; i++) {
           relocateNode = relocateNodes[i];
-          nodeToRelocateParent = domApi.$parentNode(relocateNode.nodeToRelocate) as any;
 
-          if (nodeToRelocateParent !== domApi.$parentNode(relocateNode.slotRefNode)) {
-            // add a reference node marking this node's original location
-            // keep a reference to this node for later lookups
-            domApi.$insertBefore(
-              nodeToRelocateParent,
-              (relocateNode.nodeToRelocate['s-ol'] = domApi.$createTextNode('') as any),
-              relocateNode.nodeToRelocate
-            );
-          }
+          // add a reference node marking this node's original location
+          // keep a reference to this node for later lookups
+          domApi.$insertBefore(
+            domApi.$parentNode(relocateNode.nodeToRelocate),
+            (relocateNode.nodeToRelocate['s-ol'] = domApi.$createTextNode('') as any),
+            relocateNode.nodeToRelocate
+          );
         }
 
         // while we're moving nodes around existing nodes, temporarily disable
@@ -629,21 +626,17 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
         for (i = 0; i < relocateNodes.length; i++) {
           relocateNode = relocateNodes[i];
-          slotParentNode = domApi.$parentNode(relocateNode.slotRefNode) as any;
-          nodeToRelocateParent = domApi.$parentNode(relocateNode.nodeToRelocate) as any;
 
-          if (nodeToRelocateParent !== slotParentNode) {
-            // remove the node from the dom
-            domApi.$remove(relocateNode.nodeToRelocate);
+          // remove the node from the dom
+          domApi.$remove(relocateNode.nodeToRelocate);
 
-            // now let's add it back to the dom, but
-            // put it right below the slot comment reference
-            domApi.$insertBefore(
-              slotParentNode,
-              relocateNode.nodeToRelocate,
-              domApi.$nextSibling(relocateNode.slotRefNode)
-            );
-          }
+          // now let's add it back to the dom, but
+          // put it right below the slot comment reference
+          domApi.$insertBefore(
+            domApi.$parentNode(relocateNode.slotRefNode),
+            relocateNode.nodeToRelocate,
+            domApi.$nextSibling(relocateNode.slotRefNode)
+          );
         }
 
         // done moving nodes around

@@ -210,6 +210,14 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
 
     domApi.$supportsShadowDom = !!domApi.$documentElement.attachShadow;
+
+    if (Build.isDev) {
+      if ((win as Window).location.search.indexOf('shadow=false') > 0) {
+        // by adding ?shadow=false it'll force the slot polyfill
+        // only add this check when in dev mode
+        domApi.$supportsShadowDom = false;
+      }
+    }
   }
 
   if (Build.es5) {
