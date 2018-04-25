@@ -23,7 +23,18 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm
       // this component should use shadow dom
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
-      (elm as any).shadowRoot = elm;
+
+      if (Build.isDev && Build.clientSide) {
+        // it's possible we're manually forcing the slot polyfill
+        // but this browser may already support the read-only shadowRoot
+        // do an extra check here, but only for dev mode on the client
+        if (!('shadowRoot' in HTMLElement.prototype)) {
+          (elm as any).shadowRoot = elm;
+        }
+
+      } else {
+        (elm as any).shadowRoot = elm;
+      }
     }
   }
 
