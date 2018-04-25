@@ -1,6 +1,7 @@
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { wroteFile } from '../../../testing/utils';
 import * as path from 'path';
+import { normalizePath } from '../../util';
 
 
 describe('plugin', () => {
@@ -91,6 +92,7 @@ describe('plugin', () => {
 
   it('resolveId, async', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
+    const filePath = normalizePath(path.join(root, 'dist', 'my-dep-fn.js'));
 
     await c.fs.writeFiles({
       [path.join(root, 'stencil.config.js')]: `
@@ -99,7 +101,7 @@ describe('plugin', () => {
           return {
             resolveId: function(importee, importer) {
               if (importee === '#crazy-path!') {
-                return Promise.resolve('${path.join(root, 'dist', 'my-dep-fn.js')}');
+                return Promise.resolve('${filePath}');
               }
             },
             name: 'myPlugin'
@@ -118,7 +120,7 @@ describe('plugin', () => {
           }
         }
       `,
-      [path.join(root, 'dist', 'my-dep-fn.js')]: `
+      [filePath]: `
         export function depFn(){
           console.log('imported depFun()');
         }
@@ -137,6 +139,7 @@ describe('plugin', () => {
 
   it('resolveId, sync', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
+    const filePath = normalizePath(path.join(root, 'dist', 'my-dep-fn.js'));
 
     await c.fs.writeFiles({
       [path.join(root, 'stencil.config.js')]: `
@@ -145,7 +148,7 @@ describe('plugin', () => {
           return {
             resolveId: function(importee, importer) {
               if (importee === '#crazy-path!') {
-                return '${path.join(root, 'dist', 'my-dep-fn.js')}';
+                return '${filePath}';
               }
             },
             name: 'myPlugin'
@@ -164,7 +167,7 @@ describe('plugin', () => {
           }
         }
       `,
-      [path.join(root, 'dist', 'my-dep-fn.js')]: `
+      [filePath]: `
         export function depFn(){
           console.log('imported depFun()');
         }
