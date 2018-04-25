@@ -205,7 +205,7 @@ describe('transpile', () => {
     });
 
     await c.fs.writeFiles({
-      '/tsconfig.json': tsConfig,
+      [path.join(root, 'tsconfig.json')]: tsConfig,
       [path.join(root, 'src', 'cmp-a.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-a' }) export class CmpA {}`,
       [path.join(root, 'src', 'some-dir', 'cmp-b.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'some-dir', 'cmp-c.tsx')]: `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-c' }) export class CmpC {}`
