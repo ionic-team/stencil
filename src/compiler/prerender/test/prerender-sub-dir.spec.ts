@@ -21,7 +21,7 @@ describe('prerender', () => {
     outputTarget = {
       type: 'www',
       dir: path.join('www', 'docs'),
-      baseUrl: path.join(root, 'docs')
+      baseUrl: '/docs'
     };
     config.outputTargets = [outputTarget];
 
