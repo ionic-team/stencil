@@ -1,3 +1,22 @@
+<a name="0.7.27-3"></a>
+## 🐣 [0.7.27-3](https://github.com/ionic-team/stencil/compare/v0.7.27-2...v0.7.27-3) (2018-04-26)
+
+
+### Bug Fixes
+
+* **karma:** make `npm run dev` work on Windows ([097799f](https://github.com/ionic-team/stencil/commit/097799f))
+* **polyfill:** change promise polyfill from a UMD to a simple global polyfill. ([ffcbb14](https://github.com/ionic-team/stencil/commit/ffcbb14))
+* **slot:** fix slot reordering on async update ([39d1afe](https://github.com/ionic-team/stencil/commit/39d1afe))
+* **slot:** relocate slot content at component root ([f1598fd](https://github.com/ionic-team/stencil/commit/f1598fd))
+
+
+### Features
+
+* **bundling:** expose Rollup node-resolve plugin configuration ([a7a2c6e](https://github.com/ionic-team/stencil/commit/a7a2c6e))
+* **polyfill:** add Object.entries to polyfills ([fcc649f](https://github.com/ionic-team/stencil/commit/fcc649f))
+
+
+
 <a name="0.7.27-2"></a>
 ## 🏖 [0.7.27-2](https://github.com/ionic-team/stencil/compare/v0.7.27-1...v0.7.27-2) (2018-04-24)
 
