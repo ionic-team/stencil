@@ -661,11 +661,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
             // since that the node to relocate
             // has a different next sibling or parent relocated
 
-            // remove the node from the dom
-            domApi.$remove(relocateNode.nodeToRelocate);
+            if (relocateNode.nodeToRelocate !== insertBeforeNode) {
+              // remove the node from the dom
+              domApi.$remove(relocateNode.nodeToRelocate);
 
-            // add it back to the dom but in its new home
-            domApi.$insertBefore(parentNodeRef, relocateNode.nodeToRelocate, insertBeforeNode);
+              // add it back to the dom but in its new home
+              domApi.$insertBefore(parentNodeRef, relocateNode.nodeToRelocate, insertBeforeNode);
+            }
           }
         }
 

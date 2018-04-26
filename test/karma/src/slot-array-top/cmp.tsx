@@ -1,10 +1,10 @@
 import { Component } from '../../../../dist/index';
 
 @Component({
-  tag: 'slot-array',
+  tag: 'slot-array-top',
   shadow: true
 })
-export class SlotArray {
+export class SlotArrayTop {
 
   render() {
     return [

@@ -464,30 +464,96 @@ declare global {
 declare global {
 
   namespace StencilComponents {
-    interface SlotArray {
+    interface SlotArrayComplexRoot {
 
     }
   }
 
-  interface HTMLSlotArrayElement extends StencilComponents.SlotArray, HTMLStencilElement {}
+  interface HTMLSlotArrayComplexRootElement extends StencilComponents.SlotArrayComplexRoot, HTMLStencilElement {}
 
-  var HTMLSlotArrayElement: {
-    prototype: HTMLSlotArrayElement;
-    new (): HTMLSlotArrayElement;
+  var HTMLSlotArrayComplexRootElement: {
+    prototype: HTMLSlotArrayComplexRootElement;
+    new (): HTMLSlotArrayComplexRootElement;
   };
   interface HTMLElementTagNameMap {
-    'slot-array': HTMLSlotArrayElement;
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
   }
   interface ElementTagNameMap {
-    'slot-array': HTMLSlotArrayElement;
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
   }
   namespace JSX {
     interface IntrinsicElements {
-      'slot-array': JSXElements.SlotArrayAttributes;
+      'slot-array-complex-root': JSXElements.SlotArrayComplexRootAttributes;
     }
   }
   namespace JSXElements {
-    export interface SlotArrayAttributes extends HTMLAttributes {
+    export interface SlotArrayComplexRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotArrayComplex {
+
+    }
+  }
+
+  interface HTMLSlotArrayComplexElement extends StencilComponents.SlotArrayComplex, HTMLStencilElement {}
+
+  var HTMLSlotArrayComplexElement: {
+    prototype: HTMLSlotArrayComplexElement;
+    new (): HTMLSlotArrayComplexElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-array-complex': HTMLSlotArrayComplexElement;
+  }
+  interface ElementTagNameMap {
+    'slot-array-complex': HTMLSlotArrayComplexElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-array-complex': JSXElements.SlotArrayComplexAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotArrayComplexAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotArrayTop {
+
+    }
+  }
+
+  interface HTMLSlotArrayTopElement extends StencilComponents.SlotArrayTop, HTMLStencilElement {}
+
+  var HTMLSlotArrayTopElement: {
+    prototype: HTMLSlotArrayTopElement;
+    new (): HTMLSlotArrayTopElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-array-top': HTMLSlotArrayTopElement;
+  }
+  interface ElementTagNameMap {
+    'slot-array-top': HTMLSlotArrayTopElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-array-top': JSXElements.SlotArrayTopAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotArrayTopAttributes extends HTMLAttributes {
 
     }
   }
