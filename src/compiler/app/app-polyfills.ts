@@ -33,4 +33,5 @@ const POLYFILLS = [
   'closest.js',
   'performance-now.js',
   'remove-element.js',
+  'object-entries.js',
 ];
