@@ -299,6 +299,105 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface LifecycleUnloadA {
+
+    }
+  }
+
+  interface HTMLLifecycleUnloadAElement extends StencilComponents.LifecycleUnloadA, HTMLStencilElement {}
+
+  var HTMLLifecycleUnloadAElement: {
+    prototype: HTMLLifecycleUnloadAElement;
+    new (): HTMLLifecycleUnloadAElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-unload-a': JSXElements.LifecycleUnloadAAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleUnloadAAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface LifecycleUnloadB {
+
+    }
+  }
+
+  interface HTMLLifecycleUnloadBElement extends StencilComponents.LifecycleUnloadB, HTMLStencilElement {}
+
+  var HTMLLifecycleUnloadBElement: {
+    prototype: HTMLLifecycleUnloadBElement;
+    new (): HTMLLifecycleUnloadBElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-unload-b': JSXElements.LifecycleUnloadBAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleUnloadBAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface LifecycleUnloadRoot {
+
+    }
+  }
+
+  interface HTMLLifecycleUnloadRootElement extends StencilComponents.LifecycleUnloadRoot, HTMLStencilElement {}
+
+  var HTMLLifecycleUnloadRootElement: {
+    prototype: HTMLLifecycleUnloadRootElement;
+    new (): HTMLLifecycleUnloadRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-unload-root': JSXElements.LifecycleUnloadRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleUnloadRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ShadowDomArrayRoot {
 
     }

@@ -21,7 +21,7 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
    * Run this after each test
    */
   function tearDownDom() {
-    scratch.remove();
+    scratch.parentNode.removeChild(scratch);
     scratch = null;
   };
 
