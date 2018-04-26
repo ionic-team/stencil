@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList, NodeResolveConfig } from '../../declarations';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import bundleJson from './rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
@@ -23,16 +23,19 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     ...config.commonjs
   };
 
+  const nodeResolveConfig: NodeResolveConfig = {
+    jsnext: true,
+    main: true,
+    ...config.nodeResolve
+  };
+
   const rollupConfig: RollupDirOptions = {
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
     plugins: [
       resolveCollections(compilerCtx),
-      config.sys.rollup.plugins.nodeResolve({
-        jsnext: true,
-        main: true
-      }),
+      config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       globals(),

@@ -9,6 +9,7 @@ export interface Config {
   buildLogFilePath?: string;
   bundles?: ConfigBundle[];
   commonjs?: BundlingConfig;
+  nodeResolve?: NodeResolveConfig;
   configPath?: string;
   copy?: CopyTasks;
   devInspector?: boolean;
@@ -53,6 +54,21 @@ export interface Config {
 export interface BundlingConfig {
   namedExports?: {
     [key: string]: string[];
+  };
+}
+
+export interface NodeResolveConfig {
+  module?: boolean;
+  jsnext?: boolean;
+  main?: boolean;
+  browser?: boolean;
+  extensions?: string[];
+  preferBuiltins?: boolean;
+  jail?: string;
+  only?: Array<string | RegExp>;
+  modulesOnly?: boolean;
+  customResolveOptions?: {
+    [key: string]: string
   };
 }
 
