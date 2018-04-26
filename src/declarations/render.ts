@@ -151,9 +151,16 @@ export interface RenderNode extends d.HostElement {
    * Original Location Reference:
    * A reference pointing to the comment
    * which represents the original location
-   * before it was moved to its slot
+   * before it was moved to its slot.
    */
   ['s-ol']?: RenderNode;
+
+  /**
+   * Node reference:
+   * This is a reference for a original location node
+   * back to the node that's been moved around.
+   */
+  ['s-nr']?: RenderNode;
 
   /**
    * Scope Id

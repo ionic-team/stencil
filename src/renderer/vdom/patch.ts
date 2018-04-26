@@ -179,12 +179,12 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     vnodes: d.VNode[],
     startIdx: number,
     endIdx: number,
-    containerElm?: Node,
+    containerElm?: d.RenderNode,
     childNode?: Node
   ) {
     // $defaultHolder deprecated 2018-04-02
     const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
-    containerElm = (contentRef && domApi.$parentNode(contentRef)) || parentElm;
+    containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
     if ((containerElm as any).shadowRoot) {
       containerElm = (containerElm as any).shadowRoot;
     }
@@ -344,13 +344,16 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   }
 
   function referenceNode(node: d.RenderNode) {
-    if (node && node['s-ol']) {
-      // this node was relocated to a new location in the dom
-      // because of some other component's slot
-      // but we still have an html comment in place of where
-      // it's original location was according to it's original vdom
-      return node['s-ol'];
+    if (Build.slotPolyfill) {
+      if (node && node['s-ol']) {
+        // this node was relocated to a new location in the dom
+        // because of some other component's slot
+        // but we still have an html comment in place of where
+        // it's original location was according to it's original vdom
+        return node['s-ol'];
+      }
     }
+
     return node;
   }
 
@@ -504,7 +507,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         for (j = hostContentNodes.length - 1; j >= 0; j--) {
           node = hostContentNodes[j] as d.RenderNode;
 
-          if (!node['s-cn'] && node['s-hn'] !== childNode['s-hn']) {
+          if (!node['s-cn'] && !node['s-nr'] && node['s-hn'] !== childNode['s-hn']) {
             // let's do some relocating to its new home
             // but never relocate a content reference node
             // that is suppose to always represent the original content location
@@ -521,6 +524,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
                 // let's make sure we also double check
                 // fallbacks are correctly hidden or shown
                 checkSlotFallbackVisibility = true;
+                node['s-sn'] = slotNameAttr;
 
                 // add to our list of nodes to relocate
                 relocateNodes.push({
@@ -550,7 +554,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       contentRef: d.RenderNode;
 
 
-  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode) {
+  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -611,13 +615,18 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         for (i = 0; i < relocateNodes.length; i++) {
           relocateNode = relocateNodes[i];
 
-          // add a reference node marking this node's original location
-          // keep a reference to this node for later lookups
-          domApi.$insertBefore(
-            domApi.$parentNode(relocateNode.nodeToRelocate),
-            (relocateNode.nodeToRelocate['s-ol'] = domApi.$createTextNode('') as any),
-            relocateNode.nodeToRelocate
-          );
+          if (!relocateNode.nodeToRelocate['s-ol']) {
+            // add a reference node marking this node's original location
+            // keep a reference to this node for later lookups
+            orgLocationNode = domApi.$createTextNode('') as any;
+            orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
+
+            domApi.$insertBefore(
+              domApi.$parentNode(relocateNode.nodeToRelocate),
+              (relocateNode.nodeToRelocate['s-ol'] = orgLocationNode),
+              relocateNode.nodeToRelocate
+            );
+          }
         }
 
         // while we're moving nodes around existing nodes, temporarily disable
@@ -627,16 +636,37 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         for (i = 0; i < relocateNodes.length; i++) {
           relocateNode = relocateNodes[i];
 
-          // remove the node from the dom
-          domApi.$remove(relocateNode.nodeToRelocate);
+          // by default we're just going to insert it directly
+          // after the slot reference node
+          const parentNodeRef = domApi.$parentNode(relocateNode.slotRefNode);
+          let insertBeforeNode = domApi.$nextSibling(relocateNode.slotRefNode);
 
-          // now let's add it back to the dom, but
-          // put it right below the slot comment reference
-          domApi.$insertBefore(
-            domApi.$parentNode(relocateNode.slotRefNode),
-            relocateNode.nodeToRelocate,
-            domApi.$nextSibling(relocateNode.slotRefNode)
-          );
+          orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
+
+          while (orgLocationNode = domApi.$previousSibling(orgLocationNode) as any) {
+            refNode = orgLocationNode['s-nr'];
+            if (refNode && refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
+              if (parentNodeRef === domApi.$parentNode(refNode)) {
+                insertBeforeNode = domApi.$nextSibling(refNode);
+                break;
+              }
+            }
+          }
+
+          if (
+            (!insertBeforeNode && parentNodeRef !== domApi.$parentNode(relocateNode.nodeToRelocate)) ||
+            (domApi.$nextSibling(relocateNode.nodeToRelocate) !== insertBeforeNode)
+          ) {
+            // we've checked that it's worth while to relocate
+            // since that the node to relocate
+            // has a different next sibling or parent relocated
+
+            // remove the node from the dom
+            domApi.$remove(relocateNode.nodeToRelocate);
+
+            // add it back to the dom but in its new home
+            domApi.$insertBefore(parentNodeRef, relocateNode.nodeToRelocate, insertBeforeNode);
+          }
         }
 
         // done moving nodes around

@@ -1,5 +1,23 @@
 <script src="/build/app.js"></script>
 
+<style>
+  body {
+    color: darkgray;
+  }
+  div article span {
+    background: darkred;
+    color: white;
+  }
+  div {
+    background: darkgreen;
+    color: white;
+  }
+  div section {
+    background: darkblue;
+    color: white;
+  }
+</style>
+
 
 <slot-html class="results1"></slot-html>
 
@@ -67,4 +85,14 @@
   <content-default>default slot 2</content-default>
   <content-start slot="start">start slot 2</content-start>
   default slot text node
+</slot-html>
+
+<slot-html class="results12">
+  default slot text node
+  <content-end slot="end">end slot 1</content-end>
+  <content-start slot="start">start slot 1</content-start>
+  <content-end slot="end">end slot 2</content-end>
+  <content-default>default slot 1</content-default>
+  <content-default>default slot 2</content-default>
+  <content-start slot="start">start slot 2</content-start>
 </slot-html>

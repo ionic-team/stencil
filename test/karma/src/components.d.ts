@@ -130,6 +130,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface ConditionalRerenderRoot {
+
+    }
+  }
+
+  interface HTMLConditionalRerenderRootElement extends StencilComponents.ConditionalRerenderRoot, HTMLStencilElement {}
+
+  var HTMLConditionalRerenderRootElement: {
+    prototype: HTMLConditionalRerenderRootElement;
+    new (): HTMLConditionalRerenderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
+  }
+  interface ElementTagNameMap {
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'conditional-rerender-root': JSXElements.ConditionalRerenderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ConditionalRerenderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ConditionalRerender {
+
+    }
+  }
+
+  interface HTMLConditionalRerenderElement extends StencilComponents.ConditionalRerender, HTMLStencilElement {}
+
+  var HTMLConditionalRerenderElement: {
+    prototype: HTMLConditionalRerenderElement;
+    new (): HTMLConditionalRerenderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'conditional-rerender': HTMLConditionalRerenderElement;
+  }
+  interface ElementTagNameMap {
+    'conditional-rerender': HTMLConditionalRerenderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'conditional-rerender': JSXElements.ConditionalRerenderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ConditionalRerenderAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface LifecycleBasicA {
 
     }

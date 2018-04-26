@@ -15,6 +15,7 @@ export interface DomApi {
   $appendChild(parentNode: Node, childNode: Node): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
+  $previousSibling(node: Node): Node;
   $nextSibling(node: Node): Node;
   $tagName(elm: any): string;
   $getTextContent(node: any): string;

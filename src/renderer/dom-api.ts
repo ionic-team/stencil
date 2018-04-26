@@ -57,6 +57,9 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $nextSibling: (node: Node) =>
       node.nextSibling,
 
+    $previousSibling: (node: Node) =>
+      node.previousSibling,
+
     $tagName: (elm: Element) =>
       toLowerCase(elm.nodeName),
 
