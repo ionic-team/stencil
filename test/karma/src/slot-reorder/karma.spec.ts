@@ -2,14 +2,16 @@ import { setupDomTests } from '../util';
 
 
 describe('slot-reorder', () => {
-  const { app, setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/slot-reorder/index.html');
+  });
   afterEach(tearDownDom);
 
 
   it('renders', async () => {
-    await renderTest('/slot-reorder/index.html');
     let r: HTMLElement;
     const button = app.querySelector('button');
 
@@ -122,17 +124,17 @@ describe('slot-reorder', () => {
     ordered();
 
     button.click();
-    await flush();
+    await flush(app);
 
     reordered();
 
     button.click();
-    await flush();
+    await flush(app);
 
     ordered();
 
     button.click();
-    await flush();
+    await flush(app);
 
     reordered();
   });

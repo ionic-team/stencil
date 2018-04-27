@@ -1,24 +1,25 @@
 import { setupDomTests } from '../util';
 
 describe('svg attr', () => {
-  const { setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/svg-attr/index.html');
+  });
   afterEach(tearDownDom);
 
-  it('adds and removes attribute', async function() {
-    const component = await renderTest('/svg-attr/index.html');
-
-    const rect = component.querySelector('rect');
+  it('adds and removes attribute', async () => {
+    const rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe(null);
 
-    const button = component.querySelector('button');
+    const button = app.querySelector('button');
     button.click();
-    await flush();
+    await flush(app);
     expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
 
     button.click();
-    await flush();
+    await flush(app);
     expect(rect.getAttribute('transform')).toBe(null);
   });
 

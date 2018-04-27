@@ -2,15 +2,16 @@ import { setupDomTests } from '../util';
 
 
 describe('lifecycle-basic', function() {
-  const { setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/lifecycle-basic/index.html');
+  });
   afterEach(tearDownDom);
 
-  it('fire load methods in order', async function() {
-    const component = await renderTest('/lifecycle-basic/index.html');
-
-    let loads = component.querySelectorAll('.lifecycle-loads-a li');
+  it('fire load methods in order', async () => {
+    let loads = app.querySelectorAll('.lifecycle-loads-a li');
     expect(loads.length).toBe(6);
     expect(loads[0].textContent).toBe('componentWillLoad-a');
     expect(loads[1].textContent).toBe('componentWillLoad-b');
@@ -19,14 +20,14 @@ describe('lifecycle-basic', function() {
     expect(loads[4].textContent).toBe('componentDidLoad-b');
     expect(loads[5].textContent).toBe('componentDidLoad-a');
 
-    let updates = component.querySelectorAll('.lifecycle-updates-a li');
+    let updates = app.querySelectorAll('.lifecycle-updates-a li');
     expect(updates.length).toBe(0);
 
-    const button = component.querySelector('button');
+    const button = app.querySelector('button');
     button.click();
-    await flush();
+    await flush(app);
 
-    loads = component.querySelectorAll('.lifecycle-loads-a li');
+    loads = app.querySelectorAll('.lifecycle-loads-a li');
     expect(loads.length).toBe(6);
     expect(loads[0].textContent).toBe('componentWillLoad-a');
     expect(loads[1].textContent).toBe('componentWillLoad-b');
@@ -35,7 +36,7 @@ describe('lifecycle-basic', function() {
     expect(loads[4].textContent).toBe('componentDidLoad-b');
     expect(loads[5].textContent).toBe('componentDidLoad-a');
 
-    updates = component.querySelectorAll('.lifecycle-updates-a li');
+    updates = app.querySelectorAll('.lifecycle-updates-a li');
     expect(updates.length).toBe(6);
     expect(updates[0].textContent).toBe('componentWillUpdate-a');
     expect(updates[1].textContent).toBe('componentDidUpdate-a');

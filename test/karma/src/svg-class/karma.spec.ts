@@ -1,26 +1,27 @@
 import { setupDomTests } from '../util';
 
 describe('svg class', () => {
-  const { setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/svg-class/index.html');
+  });
   afterEach(tearDownDom);
 
   it('toggles svg class', async () => {
-    const component = await renderTest('/svg-class/index.html');
-
-    const svg = component.querySelector('svg');
-    const circle = component.querySelector('circle');
-    const rect = component.querySelector('rect');
+    const svg = app.querySelector('svg');
+    const circle = app.querySelector('circle');
+    const rect = app.querySelector('rect');
 
     expect(svg.getAttribute('class')).toBe('');
     expect(circle.getAttribute('class')).toBe('');
     expect(rect.getAttribute('class')).toBe('');
 
-    const button = component.querySelector('button');
+    const button = app.querySelector('button');
     button.click();
 
-    await flush();
+    await flush(app);
 
     expect(svg.getAttribute('class')).toBe('primary');
     expect(circle.getAttribute('class')).toBe('red');

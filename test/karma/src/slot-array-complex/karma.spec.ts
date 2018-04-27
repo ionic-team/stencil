@@ -1,15 +1,16 @@
 import { setupDomTests } from '../util';
 
 describe('slot array complex', () => {
-  const { setupDom, tearDownDom, renderTest } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/slot-array-complex/index.html');
+  });
   afterEach(tearDownDom);
 
   it('renders slotted content', async () => {
-    const component = await renderTest('/slot-array-complex/index.html');
-
-    let result = component.querySelector('main slot-array-complex');
+    let result = app.querySelector('main slot-array-complex');
     expect(result.children[0].textContent.trim()).toBe('slot - start');
     expect(result.children[1].textContent.trim()).toBe('slot - default');
     expect(result.children[2].textContent.trim()).toBe('slot - end');

@@ -2,26 +2,27 @@ import { setupDomTests } from '../util';
 
 
 describe('attribute-basic', function() {
-  const { setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/attribute-basic/index.html');
+  });
   afterEach(tearDownDom);
 
-  it('button click rerenders', async function() {
-    const component = await renderTest('/attribute-basic/index.html');
+  it('button click rerenders', async () => {
+    expect(app.querySelector('.single').textContent).toBe('single');
+    expect(app.querySelector('.multiWord').textContent).toBe('multiWord');
+    expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr');
 
-    expect(component.querySelector('.single').textContent).toBe('single');
-    expect(component.querySelector('.multiWord').textContent).toBe('multiWord');
-    expect(component.querySelector('.customAttr').textContent).toBe('my-custom-attr');
-
-    const button = component.querySelector('button');
+    const button = app.querySelector('button');
     button.click();
 
-    await flush();
+    await flush(app);
 
-    expect(component.querySelector('.single').textContent).toBe('single-update');
-    expect(component.querySelector('.multiWord').textContent).toBe('multiWord-update');
-    expect(component.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
+    expect(app.querySelector('.single').textContent).toBe('single-update');
+    expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');
+    expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
   });
 
 });

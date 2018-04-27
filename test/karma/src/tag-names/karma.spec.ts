@@ -1,14 +1,15 @@
 import { setupDomTests } from '../util';
 
 describe('tag-names', () => {
-  const { app, setupDom, tearDownDom, renderTest } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/tag-names/index.html');
+  });
   afterEach(tearDownDom);
 
-  it('should load tags with numbers in them', async function() {
-    await renderTest('/tag-names/index.html');
-
+  it('should load tags with numbers in them', async () => {
     const tag3d = app.querySelector('tag-3d-component');
     expect(tag3d.textContent.trim()).toBe('tag-3d-component');
 

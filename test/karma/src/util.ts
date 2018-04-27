@@ -3,56 +3,68 @@ export type AddComponentFn = <T extends Element>(childHtml: string) => T;
 /**
  * Create setup methods for dom based tests.
  */
-export function setupDomTests(document: Document, scratch: HTMLDivElement = null) {
-  const testDiv = document.createElement('div');
-  testDiv.className = 'test-app';
-  let app = document.body.appendChild(testDiv);
+export function setupDomTests(document: Document) {
+  let testBed = document.getElementById('test-app');
+  if (!testBed) {
+    testBed = document.createElement('div');
+    testBed.id = 'test-bed';
+    document.body.appendChild(testBed);
+  }
 
   /**
    * Run this before each test
    */
-  function setupDom() {
-    const div = document.createElement('div');
-    div.className = 'scratch';
-    scratch = app.appendChild(div);
+  async function setupDom(url?: string) {
+    const app = document.createElement('div');
+    app.className = 'test-spec';
+    testBed.appendChild(app)
+
+    if (url) {
+      app.setAttribute('data-url', url);
+      await renderTest(url, app);
+    }
+
+    return app;
   };
 
   /**
    * Run this after each test
    */
   function tearDownDom() {
-    scratch.parentNode.removeChild(scratch);
-    scratch = null;
+    testBed.innerHTML = '';
   };
 
   /**
    * Create web component for executing tests against
    */
-  function renderTest(url: string) {
-
+  function renderTest(url: string, app: HTMLElement) {
     url = '/base/www' + url;
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
         const indexLoaded = function() {
+          if (this.status !== 200) {
+            reject(`404: ${url}`);
+            return;
+          }
           const frag = document.createDocumentFragment();
           const elm = document.createElement('div');
           elm.innerHTML = this.responseText;
           frag.appendChild(elm);
 
-          const scripts = frag.querySelectorAll('script');
-          for (let i = 0; i < scripts.length; i++) {
-            scripts[i].parentNode.removeChild(scripts[i]);
+          const removeElms = frag.querySelectorAll('script,meta');
+          for (let i = 0; i < removeElms.length; i++) {
+            removeElms[i].parentNode.removeChild(removeElms[i]);
           }
 
-          scratch.innerHTML = elm.innerHTML;
+          app.innerHTML = elm.innerHTML;
+          elm.innerHTML = '';
 
           const promises: Promise<any>[] = [];
-          loadPromises(promises, scratch);
+          loadPromises(promises, app);
 
           Promise.all(promises).then(() => {
-            const component = scratch.querySelector('.hydrated') as any;
-            resolve(component);
+            resolve(app);
 
           }).catch(err => {
             reject(err);
@@ -86,23 +98,24 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
   /**
    * Wait for the component to asynchronously update
    */
-  function flush() {
-    return new Promise((resolve) => {
+  function flush(app: HTMLElement) {
+    return new Promise(resolve => {
 
-      let tmr = setTimeout(resolve, 750);
+      function done() {
+        observer && observer.disconnect();
+        clearTimeout(tmr);
+        resolve();
+      }
 
-      const observer = new MutationObserver(function(mutations: MutationRecord[]) {
-        mutations;
-        observer.disconnect();
+      let tmr = setTimeout(done, 750);
+
+      var observer = new MutationObserver(() => {
         setTimeout(() => {
-          (window as any).App.Context.queue.write(() => {
-            clearTimeout(tmr);
-            resolve();
-          });
+          (window as any).App.Context.queue.write(done);
         }, 100);
       });
 
-      observer.observe(scratch, {
+      observer.observe(app, {
         childList: true,
         attributes: true,
         characterData: true,
@@ -111,5 +124,5 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
     });
   }
 
-  return { setupDom, tearDownDom, renderTest, flush, app };
+  return { setupDom, tearDownDom, flush };
 }

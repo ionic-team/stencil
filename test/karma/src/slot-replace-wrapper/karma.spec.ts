@@ -1,48 +1,66 @@
 import { setupDomTests } from '../util';
 
 describe('slot replace wrapper', () => {
-  const { setupDom, tearDownDom, renderTest } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async (done) => {
+    app = await setupDom('/slot-replace-wrapper/index.html');
+    setTimeout(done, 150);
+  });
   afterEach(tearDownDom);
 
-  it('renders', async () => {
-    const component = await renderTest('/slot-replace-wrapper/index.html');
 
-    let result = component.querySelector('.results1 a');
+  it('renders A', async () => {
+    const result = app.querySelector('.results1 a');
     expect(result.textContent.trim()).toBe('A');
     expect(result.children[0].textContent.trim()).toBe('A');
+  });
 
-    result = component.querySelector('.results2 a');
+  it('renders B', async () => {
+    const result = app.querySelector('.results2 a');
     expect(result.textContent.trim()).toBe('B');
     expect(result.children[0].children[0].textContent.trim()).toBe('B');
+  });
 
-    result = component.querySelector('.results3 a');
+  it('renders C', async () => {
+    const result = app.querySelector('.results3 a');
     expect(result.textContent.trim()).toBe('C');
     expect(result.children[0].children[0].children[0].textContent.trim()).toBe('C');
+  });
 
-    result = component.querySelector('.results4 a');
+  it('renders ABC from ABC', async () => {
+    const result = app.querySelector('.results4 a');
     expect(result.textContent.trim()).toBe('ABC');
     expect(result.children[0].textContent.trim()).toBe('A');
     expect(result.children[1].children[0].textContent.trim()).toBe('B');
     expect(result.children[1].children[1].children[0].textContent.trim()).toBe('C');
+  });
 
-    result = component.querySelector('.results5 a');
+  it('renders ABC from BCA', async () => {
+    const result = app.querySelector('.results5 a');
     expect(result.textContent.trim()).toBe('ABC');
     expect(result.children[0].textContent.trim()).toBe('A');
     expect(result.children[1].children[0].textContent.trim()).toBe('B');
     expect(result.children[1].children[1].children[0].textContent.trim()).toBe('C');
+  });
 
-    result = component.querySelector('.results6 a');
+  it('renders ABC from CAB', async () => {
+    const result = app.querySelector('.results6 a');
     expect(result.textContent.trim()).toBe('ABC');
     expect(result.children[0].textContent.trim()).toBe('A');
     expect(result.children[1].children[0].textContent.trim()).toBe('B');
     expect(result.children[1].children[1].children[0].textContent.trim()).toBe('C');
+  });
 
-    result = component.querySelector('.results7 a');
-    expect(result.textContent.trim()).toBe('A1A2B1B2C1C2');
-
-    result = component.querySelector('.results8 a');
+  it('renders A1A2B1B2C1C2 from A1A2B1B2C1C2', async () => {
+    const result = app.querySelector('.results7 a');
     expect(result.textContent.trim()).toBe('A1A2B1B2C1C2');
   });
+
+  it('renders A1A2B1B2C1C2 from A1A2B1B2C1C2', async () => {
+    const result = app.querySelector('.results8 a');
+    expect(result.textContent.trim()).toBe('A1A2B1B2C1C2');
+  });
+
 });

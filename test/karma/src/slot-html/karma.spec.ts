@@ -2,15 +2,16 @@ import { setupDomTests } from '../util';
 
 
 describe('slot-html', () => {
-  const { app, setupDom, tearDownDom, renderTest } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/slot-html/index.html');
+  });
   afterEach(tearDownDom);
 
 
   it('renders', async () => {
-    await renderTest('/slot-html/index.html');
-
     let result: HTMLElement;
     let results: NodeListOf<HTMLElement>;
 

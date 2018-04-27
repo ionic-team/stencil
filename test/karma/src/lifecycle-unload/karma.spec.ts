@@ -2,14 +2,15 @@ import { setupDomTests } from '../util';
 
 
 describe('lifecycle-unload', function() {
-  const { app, setupDom, tearDownDom, renderTest, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/lifecycle-unload/index.html');
+  });
   afterEach(tearDownDom);
 
   it('fire unload methods', async () => {
-    await renderTest('/lifecycle-unload/index.html');
-
     if ('shadowRoot' in HTMLElement.prototype) {
       await testNativeShadowDom();
 
@@ -33,7 +34,7 @@ describe('lifecycle-unload', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await flush();
+    await flush(app);
 
     const cmpA = app.querySelector('lifecycle-unload-a');
     expect(cmpA).toBe(null);
@@ -44,7 +45,7 @@ describe('lifecycle-unload', function() {
     expect(unload.children.length).toBe(2);
 
     button.click();
-    await flush();
+    await flush(app);
 
     main = app.querySelector('lifecycle-unload-a').shadowRoot.querySelector('main');
     expect(main.children[0].textContent.trim()).toBe('cmp-a - top');
@@ -55,7 +56,7 @@ describe('lifecycle-unload', function() {
     expect(main.children[1].shadowRoot.children[2].textContent.trim()).toBe('cmp-b - bottom');
 
     button.click();
-    await flush();
+    await flush(app);
 
     unload = app.querySelector('#lifecycle-unload-results');
     expect(unload.children[0].textContent.trim()).toBe('cmp-a unload');
@@ -78,7 +79,7 @@ describe('lifecycle-unload', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await flush();
+    await flush(app);
 
     const cmpA = app.querySelector('lifecycle-unload-a');
     expect(cmpA).toBe(null);
@@ -89,7 +90,7 @@ describe('lifecycle-unload', function() {
     expect(unload.children.length).toBe(2);
 
     button.click();
-    await flush();
+    await flush(app);
 
     main = app.querySelector('lifecycle-unload-a main');
     expect(main.children[0].textContent.trim()).toBe('cmp-a - top');
@@ -99,7 +100,7 @@ describe('lifecycle-unload', function() {
     expect(main.children[2].textContent.trim()).toBe('cmp-a - bottom');
 
     button.click();
-    await flush();
+    await flush(app);
 
     unload = app.querySelector('#lifecycle-unload-results');
     expect(unload.children[0].textContent.trim()).toBe('cmp-a unload');

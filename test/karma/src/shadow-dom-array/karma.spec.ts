@@ -1,14 +1,15 @@
 import { setupDomTests } from '../util';
 
 describe('shadow-dom-array', () => {
-  const { app, setupDom, tearDownDom, renderTest } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
 
-  beforeEach(setupDom);
+  beforeEach(async () => {
+    app = await setupDom('/shadow-dom-array/index.html');
+  });
   afterEach(tearDownDom);
 
   it('renders children', async (done) => {
-    await renderTest('/shadow-dom-array/index.html');
-
     let r = app.querySelector('shadow-dom-array');
     expect(r.shadowRoot.children.length).toBe(1);
     expect(r.shadowRoot.children[0].textContent.trim()).toBe('0');

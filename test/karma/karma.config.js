@@ -33,14 +33,6 @@ var browserStackLaunchers = {
     os: 'OS X',
     os_version: 'High Sierra'
   }
-  /*,
-  bs_iphone8: {
-    base: 'BrowserStack',
-    device: 'iPhone 8',
-    os: 'ios',
-    os_version: '11.0'
-  }
-  */
 };
 
 const localLaunchers = {
@@ -87,7 +79,7 @@ module.exports = function(config) {
     },
 
     preprocessors: {
-      "**/*.ts": "karma-typescript"
+      '**/*.ts': 'karma-typescript'
     },
 
     customLaunchers: browserStack ? browserStackLaunchers : {},
@@ -114,7 +106,7 @@ module.exports = function(config) {
       : []),
 
     karmaTypescriptConfig: {
-      tsconfig: "./tsconfig.json"
+      tsconfig: './tsconfig.json'
     },
   });
 };
