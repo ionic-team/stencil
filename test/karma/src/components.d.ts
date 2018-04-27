@@ -926,6 +926,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotReplaceWrapperRoot {
+
+    }
+  }
+
+  interface HTMLSlotReplaceWrapperRootElement extends StencilComponents.SlotReplaceWrapperRoot, HTMLStencilElement {}
+
+  var HTMLSlotReplaceWrapperRootElement: {
+    prototype: HTMLSlotReplaceWrapperRootElement;
+    new (): HTMLSlotReplaceWrapperRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-replace-wrapper-root': JSXElements.SlotReplaceWrapperRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotReplaceWrapperRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotReplaceWrapper {
+      'href': string;
+    }
+  }
+
+  interface HTMLSlotReplaceWrapperElement extends StencilComponents.SlotReplaceWrapper, HTMLStencilElement {}
+
+  var HTMLSlotReplaceWrapperElement: {
+    prototype: HTMLSlotReplaceWrapperElement;
+    new (): HTMLSlotReplaceWrapperElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
+  }
+  interface ElementTagNameMap {
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-replace-wrapper': JSXElements.SlotReplaceWrapperAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotReplaceWrapperAttributes extends HTMLAttributes {
+      'href'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SvgAttr {
 
     }

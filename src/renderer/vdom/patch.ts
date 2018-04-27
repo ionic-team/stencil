@@ -144,7 +144,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     return newVNode.elm;
   }
 
-  function putBackInOriginalLocation(parentElm: Node, i?: number, childNode?: d.RenderNode) {
+  function putBackInOriginalLocation(parentElm: Node, recursive?: boolean, i?: number, childNode?: d.RenderNode) {
     plt.tmpDisconnected = true;
 
     const oldSlotChildNodes = domApi.$childNodes(parentElm);
@@ -166,6 +166,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         childNode['s-ol'] = null;
 
         checkSlotRelocate = true;
+      }
+
+      if (recursive) {
+        putBackInOriginalLocation(childNode, recursive);
       }
     }
 
@@ -217,6 +221,11 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
           if (node['s-ol']) {
             // remove the original location comment
             domApi.$remove(node['s-ol']);
+
+          } else {
+            // it's possible that child nodes of the node
+            // that's being removed are slot nodes
+            putBackInOriginalLocation(node, true);
           }
         }
 
