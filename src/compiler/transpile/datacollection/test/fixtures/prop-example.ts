@@ -27,4 +27,10 @@ class ActionSheet {
   }) withOptions = 88;
 
   @Prop() width?: number;
+
+  @Prop() setting?: 'auto' | 'manual';
+
+  @Prop() values?: number | number[];
+
+  @Prop() enabled?: boolean | string;
 }

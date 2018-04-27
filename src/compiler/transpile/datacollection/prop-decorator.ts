@@ -155,7 +155,7 @@ function propTypeFromTSType(type: ts.Type, text: string) {
   if (checkType(type, isBoolean)) {
     return PROP_TYPE.Boolean;
   }
-  if (text === 'any') {
+  if (text === 'any' || (type.flags & ts.TypeFlags.Union)) {
     return PROP_TYPE.Any;
   }
   return PROP_TYPE.Unknown;
@@ -164,7 +164,9 @@ function propTypeFromTSType(type: ts.Type, text: string) {
 function checkType(type: ts.Type, check: (type: ts.Type) => boolean ): boolean {
   if (type.flags & ts.TypeFlags.Union) {
     const union = type as ts.UnionType;
-    return union.types.some(type => checkType(type, check));
+    if (union.types.every(type => checkType(type, check))) {
+      return true;
+    }
   }
   return check(type);
 }

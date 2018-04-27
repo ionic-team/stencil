@@ -81,6 +81,51 @@ describe('props decorator', () => {
         propType: PROP_TYPE.Number,
         reflectToAttr: false
       },
+      setting: {
+        attribName: 'setting',
+        attribType: {
+          text: `'auto' | 'manual'`,
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'setting',
+          type: `"auto" | "manual"`,
+        },
+        memberType: 1,
+        propType: PROP_TYPE.String,
+        reflectToAttr: false
+      },
+      values: {
+        attribName: 'values',
+        attribType: {
+          text: `number | number[]`,
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'values',
+          type: `number | {}`,
+        },
+        memberType: 1,
+        propType: PROP_TYPE.Any,
+        reflectToAttr: false
+      },
+      enabled: {
+        attribName: 'enabled',
+        attribType: {
+          text: `boolean | string`,
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'enabled',
+          type: `string | boolean`,
+        },
+        memberType: 1,
+        propType: PROP_TYPE.Any,
+        reflectToAttr: false
+      },
     });
   });
 
