@@ -3,6 +3,54 @@ import { parsePropertyValue } from '../data-parse';
 
 describe('parsePropertyValue', () => {
 
+  describe('any', () => {
+
+    it('should keep boolean false', () => {
+      expect(parsePropertyValue('Any', false)).toBe(false);
+    });
+
+    it('should keep boolean true', () => {
+      expect(parsePropertyValue('Any', true)).toBe(true);
+    });
+
+    it('should keep number 1', () => {
+      expect(parsePropertyValue('Any', 1)).toBe(1);
+    });
+
+    it('should keep number 0', () => {
+      expect(parsePropertyValue('Any', 0)).toBe(0);
+    });
+
+    it('should keep number -1', () => {
+      expect(parsePropertyValue('Any', -1)).toBe(-1);
+    });
+
+    it('should keep NaN', () => {
+      expect(parsePropertyValue('Any', NaN)).toBe(NaN);
+    });
+
+    it('should keep string', () => {
+      expect(parsePropertyValue('Any', 'str')).toBe('str');
+    });
+
+    it('should keep null', () => {
+      expect(parsePropertyValue('Any', null)).toBe(null);
+    });
+
+    it('should keep undefined', () => {
+      expect(parsePropertyValue('Any', undefined)).toBe(undefined);
+    });
+
+    it('should keep Array', () => {
+      expect(parsePropertyValue('Any', [88, 'mph'])).toEqual([88, 'mph']);
+    });
+
+    it('should keep Object', () => {
+      expect(parsePropertyValue('Any', { mph: 88 })).toEqual({ mph: 88 });
+    });
+
+  });
+
   describe('string', () => {
 
     it('should convert boolean false to string', () => {
