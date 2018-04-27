@@ -1,3 +1,15 @@
+<a name="0.7.27-4"></a>
+## 🐱 [0.7.27-4](https://github.com/ionic-team/stencil/compare/v0.7.27-3...v0.7.27-4) (2018-04-27)
+
+
+### Bug Fixes
+
+* **polyfill:** fix ie promise polyfill ([723b76d](https://github.com/ionic-team/stencil/commit/723b76d))
+* **slot:** fix first child slot in child component w/ array slots ([f0ac435](https://github.com/ionic-team/stencil/commit/f0ac435))
+* **slot:** move slot content to original location before removing ([7ef8afe](https://github.com/ionic-team/stencil/commit/7ef8afe))
+
+
+
 <a name="0.7.27-3"></a>
 ## 🐣 [0.7.27-3](https://github.com/ionic-team/stencil/compare/v0.7.27-2...v0.7.27-3) (2018-04-26)
 
