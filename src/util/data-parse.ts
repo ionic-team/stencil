@@ -76,6 +76,12 @@ export function parsePropertyValue(propType: PropertyType | PROP_TYPE, propValue
       // force it to be a number
       return parseFloat(propValue);
     }
+
+    if ((propType as PropertyType) === String || (propType as PROP_TYPE) === PROP_TYPE.String) {
+      // could have been passed as a number or boolean
+      // but we still want it as a string
+      return propValue.toString();
+    }
   }
 
   // not sure exactly what type we want
