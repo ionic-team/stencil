@@ -137,7 +137,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
   }).join('\n');
 
   if (sourceTarget === 'es5') {
-    // global could already be in es2015
+    // global could already be in es2017
     // transpile it down to es5
     config.logger.debug(`transpile global to es5: ${globalJsName}`);
     const transpileResults = await transpileToEs5(compilerCtx, jsContent);

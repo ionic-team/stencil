@@ -149,4 +149,4 @@ export interface JSModuleMap {
 }
 
 
-export type SourceTarget = 'es5' | 'es2015';
+export type SourceTarget = 'es5' | 'es2017';

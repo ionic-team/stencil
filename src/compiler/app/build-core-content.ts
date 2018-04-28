@@ -15,7 +15,7 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
 
   coreContent = transpileResults.code;
 
-  const sourceTarget: d.SourceTarget = coreBuild.es5 ? 'es5' : 'es2015';
+  const sourceTarget: d.SourceTarget = coreBuild.es5 ? 'es5' : 'es2017';
 
   const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
 

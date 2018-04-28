@@ -42,7 +42,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
       .filter(m => m.startsWith('chunk'))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
-        const sourceTarget = moduleType === 'es5' ? 'es5' : 'es2015';
+        const sourceTarget = moduleType === 'es5' ? 'es5' : 'es2017';
         const minifyJsResults = await minifyJs(config, compilerCtx, chunk.code, sourceTarget, true);
 
         if (minifyJsResults.diagnostics.length) {

@@ -194,7 +194,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
   // register all the components now that everything's ready
-  // standard es2015 class extends HTMLElement
+  // standard es2017 class extends HTMLElement
   (App.components || [])
     .map(data => parseComponentLoader(data, cmpRegistry))
     .forEach(cmpMeta => plt.defineComponent(cmpMeta, class extends HTMLElement {}));

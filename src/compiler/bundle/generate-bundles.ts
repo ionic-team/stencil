@@ -42,7 +42,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     .filter(key => !bundleKeys[key])
     .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
     .map(async ([key, value]) => {
-      const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2015');
+      const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2017');
       const jsText = replaceBundleIdPlaceholder(value.code, key);
       await writeBundleJSFile(config, compilerCtx, fileName, jsText);
     });

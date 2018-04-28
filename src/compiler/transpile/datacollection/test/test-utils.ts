@@ -17,7 +17,7 @@ const compilerOptions: ts.CompilerOptions = {
   'jsxFactory': 'h',
   'lib': [
     'dom',
-    'es2015'
+    'es2017'
   ],
   'module': ts.ModuleKind.ES2015,
   'moduleResolution': ts.ModuleResolutionKind.NodeJs,
@@ -28,7 +28,7 @@ const compilerOptions: ts.CompilerOptions = {
   'outDir': '.tmp',
   'pretty': true,
   'removeComments': false,
-  'target': ts.ScriptTarget.ES2015
+  'target': ts.ScriptTarget.ES2017
 };
 
 export type GatherMetadataCallback = (
