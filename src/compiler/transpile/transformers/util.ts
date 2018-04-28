@@ -145,7 +145,7 @@ function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
  * @returns a string
  */
 export async function transformSourceString(fileName: string, sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
-  const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.ES2015), transformers);
+  const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.ES2017), transformers);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
       onEmitNode: transformed.emitNodeWithNotification,
       substituteNode: transformed.substituteNode

@@ -39,7 +39,7 @@ export function getTsHost(config: d.Config, ctx: d.CompilerCtx, writeQueue: Prom
         }
       }
 
-      tsSourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.ES2015);
+      tsSourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.ES2017);
 
     } catch (e) {
       config.logger.error(`tsHost.getSourceFile unable to find: ${filePath}`, e);

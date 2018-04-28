@@ -97,7 +97,7 @@ function getCompilerOptions(coreBuild: d.BuildConditionals) {
     opts.target = ts.ScriptTarget.ES5;
 
   } else {
-    opts.target = ts.ScriptTarget.ES2015;
+    opts.target = ts.ScriptTarget.ES2017;
   }
 
   return opts;

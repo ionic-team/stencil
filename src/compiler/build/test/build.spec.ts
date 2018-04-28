@@ -31,7 +31,7 @@ describe('build', () => {
     expect(output).toContain('App.loadBundle(\"cmp-a\",[\"exports\"],function(e){window.App.h;var n=function(){function e(){}return Object.defineProperty(e,\"is\",{get:function(){return\"cmp-a\"},enumerable:!0,configurable:!0}),e}();e.CmpA=n,Object.defineProperty(e,\"__esModule\",{value:!0})});');
   });
 
-  it('should minify es2015 build', async () => {
+  it('should minify es2017 build', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.minifyJs = true;
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
