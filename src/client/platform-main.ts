@@ -43,6 +43,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   // add the h() fn to the app's global namespace
   App.h = h;
   App.Context = Context;
+  App.registerComponents = registerComponents;
 
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
@@ -185,6 +186,13 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     }
   }
 
+  function registerComponents(components: d.LoadComponentRegistry[]) {
+    (components || [])
+        .map(data => parseComponentLoader(data, cmpRegistry))
+        .forEach(cmpMeta => plt.defineComponent(cmpMeta, class extends HTMLElement {
+    }));
+  }
+
   if (Build.styles) {
     plt.attachStyles = attachStyles;
   }
@@ -195,10 +203,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // register all the components now that everything's ready
   // standard es2015 class extends HTMLElement
-  (App.components || [])
-    .map(data => parseComponentLoader(data, cmpRegistry))
-    .forEach(cmpMeta => plt.defineComponent(cmpMeta, class extends HTMLElement {}));
-
+  registerComponents(App.components);
+  
   // create the componentOnReady fn
   initCoreComponentOnReady(plt, App);
 

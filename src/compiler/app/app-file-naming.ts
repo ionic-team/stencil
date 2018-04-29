@@ -16,14 +16,17 @@ export function getRegistryJson(config: d.Config, outputTarget: d.OutputTargetWw
   return pathJoin(config, getAppBuildDir(config, outputTarget), getRegistryFileName(config));
 }
 
+export function getLoaders(config: d.Config) {
+  return config.loaders ? Object.keys(config.loaders) : [config.fsNamespace];
+}
 
-export function getLoaderFileName(config: d.Config) {
-  return `${config.fsNamespace}.js`;
+export function getLoaderFileName(loader: string) {
+  return `${loader}.js`;
 }
 
 
-export function getLoaderPath(config: d.Config, outputTarget: d.OutputTargetWww) {
-  return pathJoin(config, outputTarget.buildDir, getLoaderFileName(config));
+export function getLoaderPath(config: d.Config, outputTarget: d.OutputTargetWww, loader: string) {
+  return pathJoin(config, outputTarget.buildDir, getLoaderFileName(loader));
 }
 
 

@@ -47,6 +47,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   // add the h() fn to the app's global namespace
   App.h = h;
   App.Context = Context;
+  App.registerComponents = registerComponents;
 
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
@@ -343,6 +344,24 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
+  function registerComponents(components: d.LoadComponentRegistry[]) {
+    (components || [])
+      .map(data => parseComponentLoader(data, cmpRegistry))
+      .forEach(cmpMeta => {
+        // es5 way of extending HTMLElement
+        function HostElement(self: any) {
+          return HTMLElement.call(this, self);
+        }
+
+        HostElement.prototype = Object.create(
+          HTMLElement.prototype,
+          { constructor: { value: HostElement, configurable: true } }
+        );
+
+        plt.defineComponent(cmpMeta, HostElement);
+      });
+  }
+
   if (Build.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
       attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
@@ -354,21 +373,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   // register all the components now that everything's ready
-  (App.components || [])
-    .map(data => parseComponentLoader(data, cmpRegistry))
-    .forEach(cmpMeta => {
-    // es5 way of extending HTMLElement
-    function HostElement(self: any) {
-      return HTMLElement.call(this, self);
-    }
-
-    HostElement.prototype = Object.create(
-      HTMLElement.prototype,
-      { constructor: { value: HostElement, configurable: true } }
-    );
-
-    plt.defineComponent(cmpMeta, HostElement);
-  });
+  registerComponents(App.components);
+    
 
   // create the componentOnReady fn
   initCoreComponentOnReady(plt, App);
