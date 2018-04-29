@@ -196,6 +196,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface DynamicImport {
+      'update': () => Promise<void>;
+    }
+  }
+
+  interface HTMLDynamicImportElement extends StencilComponents.DynamicImport, HTMLStencilElement {}
+
+  var HTMLDynamicImportElement: {
+    prototype: HTMLDynamicImportElement;
+    new (): HTMLDynamicImportElement;
+  };
+  interface HTMLElementTagNameMap {
+    'dynamic-import': HTMLDynamicImportElement;
+  }
+  interface ElementTagNameMap {
+    'dynamic-import': HTMLDynamicImportElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'dynamic-import': JSXElements.DynamicImportAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface DynamicImportAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface LifecycleBasicA {
 
     }

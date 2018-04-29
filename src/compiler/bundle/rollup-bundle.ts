@@ -33,6 +33,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
+    experimentalDynamicImport: true,
     plugins: [
       resolveCollections(compilerCtx),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
