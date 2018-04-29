@@ -6,6 +6,8 @@ import * as ts from 'typescript';
 
 const compilerOptions: ts.CompilerOptions = {
   'allowJs': true,
+  'string': true,
+  'strictPropertyInitialization': false,
   'allowSyntheticDefaultImports': true,
   'allowUnreachableCode': false,
   'alwaysStrict': true,
