@@ -77,6 +77,14 @@ describe('parsePropertyValue', () => {
       expect(parsePropertyValue(String, NaN)).toBe('NaN');
     });
 
+    it('should keep leave object as is', () => {
+      expect(parsePropertyValue(String, {'mph': 88})).toEqual({'mph': 88});
+    });
+
+    it('should keep leave array as is', () => {
+      expect(parsePropertyValue(String, [88, 'mph'])).toEqual([88, 'mph']);
+    });
+
     it('should keep empty string ""', () => {
       expect(parsePropertyValue(String, '')).toEqual('');
     });
@@ -121,6 +129,14 @@ describe('parsePropertyValue', () => {
       expect(parsePropertyValue(Number, 'anyword')).toEqual(NaN);
     });
 
+    it('should keep leave object as is', () => {
+      expect(parsePropertyValue(Number, {'mph': 88})).toEqual({'mph': 88});
+    });
+
+    it('should keep leave array as is', () => {
+      expect(parsePropertyValue(Number, [88, 'mph'])).toEqual([88, 'mph']);
+    });
+
     it('should keep number undefined as undefined', () => {
       expect(parsePropertyValue(Number, undefined)).toEqual(undefined);
     });
@@ -163,6 +179,14 @@ describe('parsePropertyValue', () => {
 
     it('should convert any string "anyword" to boolean true', () => {
       expect(parsePropertyValue(Boolean, 'anyword')).toBe(true);
+    });
+
+    it('should keep leave object as is', () => {
+      expect(parsePropertyValue(Boolean, {'mph': 88})).toEqual({'mph': 88});
+    });
+
+    it('should keep leave array as is', () => {
+      expect(parsePropertyValue(Boolean, [88, 'mph'])).toEqual([88, 'mph']);
     });
 
     it('should keep boolean undefined as undefined', () => {
