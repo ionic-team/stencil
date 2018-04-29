@@ -108,7 +108,7 @@ describe('props decorator', () => {
           type: `number | {}`,
         },
         memberType: 1,
-        propType: PROP_TYPE.Any,
+        propType: PROP_TYPE.Number,
         reflectToAttr: false
       },
       enabled: {
@@ -137,23 +137,23 @@ describe('props decorator', () => {
     });
 
     // check strings
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       expect(response[`text${i}`].propType).toEqual(PROP_TYPE.String);
     }
 
     // number
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       expect(response[`nu${i}`].propType).toEqual(PROP_TYPE.Number);
     }
 
     // boolean
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) {
       expect(response[`bool${i}`].propType).toEqual(PROP_TYPE.Boolean);
     }
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 11; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
 
