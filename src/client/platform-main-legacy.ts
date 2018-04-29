@@ -151,17 +151,28 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     return loadedBundles[bundleId.replace(/^\.\//, '')];
   }
 
+  function isLoadedBundle(id: string) {
+    if (id === 'exports' || id === 'require') {
+      return true;
+    }
+    return !!getLoadedBundle(id);
+  }
+
   /**
    * Execute a bundle queue item
    * @param name
    * @param deps
    * @param callback
    */
-  function execBundleCallback(name: string, deps: string[], callback: Function) {
+  function execBundleCallback(name: string, deps: string[], isComponent: boolean, callback: Function) {
     const bundleExports: d.CjsExports = {};
 
     try {
-      callback(bundleExports, ...deps.map(d => getLoadedBundle(d)));
+      callback.apply(null, deps.map(d => {
+        if (d === 'exports') return bundleExports;
+        if (d === 'require') return userRequire;
+        return getLoadedBundle(d);
+      }));
     } catch (e) {
       console.error(e);
     }
@@ -176,7 +187,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     // If name contains chunk then this callback was associated with a dependent bundle loading
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    if (!name.startsWith('chunk')) {
+    if (isComponent) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const normalizedTagName = pascalCasedTagName.replace(/-/g, '').toLowerCase();
 
@@ -199,15 +210,18 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
+  function userRequire(ids: string[], resolve: Function) {
+    loadBundle(undefined, ids, resolve, false);
+  }
 
   /**
    * Check to see if any items in the bundle queue can be executed
    */
   function checkQueue() {
     for (let i = bundleQueue.length - 1; i > -1; i--) {
-      const [bundleId, dependentsList, importer] = bundleQueue[i];
-      if (dependentsList.every(dep => !!getLoadedBundle(dep)) && !getLoadedBundle(bundleId)) {
-        execBundleCallback(bundleId, dependentsList, importer);
+      const [bundleId, dependentsList, isComponent, importer] = bundleQueue[i];
+      if (dependentsList.every(dep => isLoadedBundle(dep)) && !isLoadedBundle(bundleId)) {
+        execBundleCallback(bundleId, dependentsList, isComponent, importer);
       }
     }
   }
@@ -215,20 +229,19 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   /**
    * This function is called anytime a JS file is loaded
    */
-  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
-
-    const missingDependents = dependentsList.filter(d => !getLoadedBundle(d));
+  function loadBundle(bundleId: string | undefined, dependentsList: string[], importer: Function, isComponent = !bundleId.startsWith('chunk')) {
+    const missingDependents = dependentsList.filter(d => !isLoadedBundle(d));
     missingDependents.forEach(d => {
-        const url = resourcesUrl + d.replace('.js', '.es5.js');
-        requestUrl(url);
-      });
-    bundleQueue.push([bundleId, dependentsList, importer]);
+      requestUrl(resourcesUrl + d.replace('.js', '.es5.js'));
+    });
+    bundleQueue.push([bundleId, dependentsList, isComponent, importer]);
 
     // If any dependents are not yet met then queue the bundle execution
     if (missingDependents.length === 0) {
       checkQueue();
     }
-  };
+  }
+  App.loadBundle = loadBundle;
 
 
   let customStyle: CustomStyle;
@@ -271,7 +284,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
-      bundleQueue.push([undefined, [bundleId], () => {
+      bundleQueue.push([undefined, [bundleId], false, () => {
         queueUpdate(plt, elm);
       }]);
 
@@ -298,18 +311,18 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
 
-  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
+  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    url = resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
-
-    requestUrl(url, tmrId, scriptElm);
+    requestUrl(resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js'));
   }
 
 
   // Use JSONP to load in bundles
-  function requestUrl(url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
+  function requestUrl(url: string) {
 
+    let tmrId: any;
+    let scriptElm: HTMLScriptElement;
     function onScriptComplete() {
       clearTimeout(tmrId);
       scriptElm.onerror = scriptElm.onload = null;

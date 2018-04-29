@@ -19,7 +19,7 @@ const compilerOptions: ts.CompilerOptions = {
     'dom',
     'es2017'
   ],
-  'module': ts.ModuleKind.ES2015,
+  'module': ts.ModuleKind.ESNext,
   'moduleResolution': ts.ModuleResolutionKind.NodeJs,
   'noImplicitAny': true,
   'noImplicitReturns': true,
