@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { fillCmpMetaFromConstructor } from '../server/cmp-meta';
+import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
 import { TestWindowLogger } from './test-window-logger';
