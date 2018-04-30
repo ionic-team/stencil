@@ -1,66 +1,35 @@
-<a name="0.7.27-4"></a>
-## 🐱 [0.7.27-4](https://github.com/ionic-team/stencil/compare/v0.7.27-3...v0.7.27-4) (2018-04-27)
-
-
-### Bug Fixes
-
-* **polyfill:** fix ie promise polyfill ([723b76d](https://github.com/ionic-team/stencil/commit/723b76d))
-* **slot:** fix first child slot in child component w/ array slots ([f0ac435](https://github.com/ionic-team/stencil/commit/f0ac435))
-* **slot:** move slot content to original location before removing ([7ef8afe](https://github.com/ionic-team/stencil/commit/7ef8afe))
-
-
-
-<a name="0.7.27-3"></a>
-## 🐣 [0.7.27-3](https://github.com/ionic-team/stencil/compare/v0.7.27-2...v0.7.27-3) (2018-04-26)
-
-
-### Bug Fixes
-
-* **karma:** make `npm run dev` work on Windows ([097799f](https://github.com/ionic-team/stencil/commit/097799f))
-* **polyfill:** change promise polyfill from a UMD to a simple global polyfill. ([ffcbb14](https://github.com/ionic-team/stencil/commit/ffcbb14))
-* **slot:** fix slot reordering on async update ([39d1afe](https://github.com/ionic-team/stencil/commit/39d1afe))
-* **slot:** relocate slot content at component root ([f1598fd](https://github.com/ionic-team/stencil/commit/f1598fd))
+<a name="0.8.0"></a>
+# 🐅 [0.8.0](https://github.com/ionic-team/stencil/compare/v0.7.26...v0.8.0) (2018-04-30)
 
 
 ### Features
 
-* **bundling:** expose Rollup node-resolve plugin configuration ([a7a2c6e](https://github.com/ionic-team/stencil/commit/a7a2c6e))
+* **bundler:** using es2017 in esm mode ([7e80772](https://github.com/ionic-team/stencil/commit/7e80772))
+* **bundler:** support for dynamic import ([d68d5c1](https://github.com/ionic-team/stencil/commit/d68d5c1))
+* **bundler:** expose Rollup node-resolve plugin configuration ([a7a2c6e](https://github.com/ionic-team/stencil/commit/a7a2c6e))
 * **polyfill:** add Object.entries to polyfills ([fcc649f](https://github.com/ionic-team/stencil/commit/fcc649f))
-
-
-
-<a name="0.7.27-2"></a>
-## 🏖 [0.7.27-2](https://github.com/ionic-team/stencil/compare/v0.7.27-1...v0.7.27-2) (2018-04-24)
 
 
 ### Bug Fixes
 
 * **global:** bundle global script goes first ([0b9fdd4](https://github.com/ionic-team/stencil/commit/0b9fdd4))
-* **shadowDom:** fix render() returning array to update shadowRoot ([af87219](https://github.com/ionic-team/stencil/commit/af87219)), closes [#727](https://github.com/ionic-team/stencil/issues/727)
-* **slot:** fix slot reordering ([7af3c6c](https://github.com/ionic-team/stencil/commit/7af3c6c))
-
-
-
-<a name="0.7.27-1"></a>
-## ⛺️ [0.7.27-1](https://github.com/ionic-team/stencil/compare/v0.7.27-0...v0.7.27-1) (2018-04-24)
-
-
-### Bug Fixes
-
+* **karma:** make `npm run dev` work on Windows ([097799f](https://github.com/ionic-team/stencil/commit/097799f))
 * **lifecycle:** ensure child components have connected before lifecycle checks ([5a1377f](https://github.com/ionic-team/stencil/commit/5a1377f)), closes [#747](https://github.com/ionic-team/stencil/issues/747)
-* **slot:** fix conditional slot reordering ([6489f8e](https://github.com/ionic-team/stencil/commit/6489f8e))
-* **tag:** fix legacy module lookups when using tags with numbers ([e918f48](https://github.com/ionic-team/stencil/commit/e918f48)), closes [#753](https://github.com/ionic-team/stencil/issues/753)
-
-
-
-<a name="0.7.27-0"></a>
-## 🚣 [0.7.27-0](https://github.com/ionic-team/stencil/compare/v0.7.26...v0.7.27-0) (2018-04-23)
-
-
-### Bug Fixes
-
+* **prop:** prop type metadata ([2b638e0](https://github.com/ionic-team/stencil/commit/2b638e0))
+* **props:** do not auto force prop types on objects ([6b94bf6](https://github.com/ionic-team/stencil/commit/6b94bf6))
+* **props:** do not force a type when using mixed union types ([3bf75f7](https://github.com/ionic-team/stencil/commit/3bf75f7))
+* **props:** force string types toString ([9e6f66a](https://github.com/ionic-team/stencil/commit/9e6f66a))
+* **polyfill:** change promise polyfill from a UMD to a simple global polyfill. ([ffcbb14](https://github.com/ionic-team/stencil/commit/ffcbb14))
+* **polyfill:** fix ie promise polyfill ([723b76d](https://github.com/ionic-team/stencil/commit/723b76d))
+* **shadowDom:** fix render() returning array to update shadowRoot ([af87219](https://github.com/ionic-team/stencil/commit/af87219)), closes [#727](https://github.com/ionic-team/stencil/issues/727)
 * **slot:** conditionally render slot and fallback slot content ([294c559](https://github.com/ionic-team/stencil/commit/294c559)), closes [#721](https://github.com/ionic-team/stencil/issues/721)
-
+* **slot:** fix conditional slot reordering ([6489f8e](https://github.com/ionic-team/stencil/commit/6489f8e))
+* **slot:** fix first child slot in child component w/ array slots ([f0ac435](https://github.com/ionic-team/stencil/commit/f0ac435))
+* **tag:** fix legacy module lookups when using tags with numbers ([e918f48](https://github.com/ionic-team/stencil/commit/e918f48)), closes [#753](https://github.com/ionic-team/stencil/issues/753)
+* **slot:** fix slot reordering ([7af3c6c](https://github.com/ionic-team/stencil/commit/7af3c6c))
+* **slot:** move slot content to original location before removing ([7ef8afe](https://github.com/ionic-team/stencil/commit/7ef8afe))
+* **slot:** fix slot reordering on async update ([39d1afe](https://github.com/ionic-team/stencil/commit/39d1afe))
+* **slot:** relocate slot content at component root ([f1598fd](https://github.com/ionic-team/stencil/commit/f1598fd))
 
 
 <a name="0.7.26"></a>
