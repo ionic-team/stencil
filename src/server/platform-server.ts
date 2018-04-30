@@ -4,7 +4,7 @@ import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { enableEventListener } from '../core/listeners';
-import { fillCmpMetaFromConstructor } from './cmp-meta';
+import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
