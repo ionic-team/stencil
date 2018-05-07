@@ -91,7 +91,6 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
       moduleGraph(config, buildCtx),
       componentDependencies(compilerCtx, buildCtx)
     ]
-
   });
 
   if (!config.suppressTypeScriptErrors) {

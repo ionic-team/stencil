@@ -73,6 +73,10 @@ export interface OutputTargetAngular extends OutputTarget {
   excludeComponents?: string[];
 }
 
+export interface OutputTargetCustomElements extends OutputTarget {
+
+}
+
 
 export interface OutputTarget {
   type?: 'angular' | 'dist' | 'docs' | 'stats' | 'www';
