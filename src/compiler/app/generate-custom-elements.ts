@@ -52,7 +52,8 @@ export async function generateCustomElements(config: d.Config, compilerCtx: d.Co
 
   const componentClassList: string[] = [];
 
-  let fileContents = Object.entries(cmpRegistry).map(([tagName, cmpMeta]) => {
+  let fileContents = Object.keys(cmpRegistry).map(tagName => {
+    const cmpMeta = cmpRegistry[tagName];
     const isScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
     componentClassList.push(cmpMeta.componentClass);
 
@@ -62,7 +63,8 @@ var ${cmpMeta.componentClass}Component = /** @class **/ (function() {
   }
   ${cmpMeta.componentClass}.is = '${tagName}';
   ${cmpMeta.componentClass}.getModule = function(opts) {
-    ${Object.entries(cmpMeta.bundleIds).map(([styleMode, fileName]) => {
+    ${Object.keys(cmpMeta.bundleIds).map(styleMode => {
+      const fileName = (typeof cmpMeta.bundleIds !== 'string') ? cmpMeta.bundleIds[styleMode] : cmpMeta.bundleIds;
       return thing(styleMode, fileName, isScoped, cmpMeta.componentClass);
     }).join('')}
   }
