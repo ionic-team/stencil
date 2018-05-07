@@ -12,7 +12,6 @@ import { moduleGraph } from './transformers/module-graph';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import { createCustomElements } from './transformers/create-custom-element';
 import * as ts from 'typescript';
 
 
@@ -90,8 +89,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
       removeStencilImports(),
       removeCollectionImports(compilerCtx),
       moduleGraph(config, buildCtx),
-      componentDependencies(compilerCtx, buildCtx),
-      createCustomElements(compilerCtx, buildCtx)
+      componentDependencies(compilerCtx, buildCtx)
     ]
   });
 
