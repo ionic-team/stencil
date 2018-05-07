@@ -1,11 +1,8 @@
 import * as d from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
+import { getComponentsEsmBuildPath } from '../../compiler/app/app-file-naming';
 
-export async function generateCustomElements(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, entryModules: d.EntryModule[]) {
-  config;
-  compilerCtx;
-  cmpRegistry;
-  entryModules;
+export async function generateCustomElements(config: d.Config, cmpRegistry: d.ComponentRegistry) {
 
   function thing(styleMode: string, fileName: string, isScoped: boolean, className: string) {
     if (styleMode === '$' && isScoped) {
@@ -55,7 +52,7 @@ export async function generateCustomElements(config: d.Config, compilerCtx: d.Co
 
   const componentClassList: string[] = [];
 
-  let stuff = Object.entries(cmpRegistry).map(([tagName, cmpMeta]) => {
+  let fileContents = Object.entries(cmpRegistry).map(([tagName, cmpMeta]) => {
     const isScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
     componentClassList.push(cmpMeta.componentClass);
 
@@ -71,9 +68,9 @@ var ${cmpMeta.componentClass}Component = /** @class **/ (function() {
   }
 });
 `;
-  }).join('\n');
+  }).join('');
 
-  stuff += `
+  fileContents += `
 export {
   ${componentClassList.map(className => {
     return `
@@ -82,6 +79,7 @@ export {
 };
   `;
 
+  const fileName = getComponentsEsmBuildPath(config, outputTarget);
 
-  process.stdout.write(stuff);
+  return config.sys.fs.writeFile(fileName, fileContents);
 }
