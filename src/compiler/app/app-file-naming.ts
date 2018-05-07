@@ -57,3 +57,7 @@ export function getGlobalStyleFilename(config: d.Config) {
 export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
   return `${bundleId}${isScopedStyles ? '.sc' : ''}${sourceTarget === 'es5' ? '.es5' : ''}.js`;
 }
+
+export function getComponentsEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetDist) {
+  return pathJoin(config, getAppBuildDir(config, outputTarget), `components.esm.js`);
+}

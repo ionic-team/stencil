@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
 import { getComponentsEsmBuildPath } from '../../compiler/app/app-file-naming';
 
-export async function generateCustomElements(config: d.Config, cmpRegistry: d.ComponentRegistry) {
+export async function generateCustomElements(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTarget) {
 
   function thing(styleMode: string, fileName: string, isScoped: boolean, className: string) {
     if (styleMode === '$' && isScoped) {
@@ -81,5 +81,5 @@ export {
 
   const fileName = getComponentsEsmBuildPath(config, outputTarget);
 
-  return config.sys.fs.writeFile(fileName, fileContents);
+  return compilerCtx.fs.writeFile(fileName, fileContents);
 }

@@ -51,8 +51,8 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
       // create the global styles
       generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget),
 
-      // create the custom elements
-      generateCustomElements(config, cmpRegistry)
+      // create the custom elements file
+      generateCustomElements(config, compilerCtx, cmpRegistry, outputTarget)
     ]);
 
   } catch (e) {
