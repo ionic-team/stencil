@@ -6,7 +6,6 @@ export function createCustomElements(compilerCtx: d.CompilerCtx): ts.Transformer
   return (transformContext) => {
 
     function visitComponentClass(classNode: ts.ClassDeclaration) {
-      console.log('visit class');
       return ts.updateClassDeclaration(
         classNode,
         classNode.decorators,
