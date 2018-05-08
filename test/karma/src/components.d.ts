@@ -97,6 +97,52 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface AttributeComplex {
+      'bool0': boolean;
+      'bool1': boolean;
+      'bool2': boolean;
+      'getInstance': () => this;
+      'nu0': number;
+      'nu1': number;
+      'str0': string;
+      'str1': string;
+    }
+  }
+
+  interface HTMLAttributeComplexElement extends StencilComponents.AttributeComplex, HTMLStencilElement {}
+
+  var HTMLAttributeComplexElement: {
+    prototype: HTMLAttributeComplexElement;
+    new (): HTMLAttributeComplexElement;
+  };
+  interface HTMLElementTagNameMap {
+    'attribute-complex': HTMLAttributeComplexElement;
+  }
+  interface ElementTagNameMap {
+    'attribute-complex': HTMLAttributeComplexElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'attribute-complex': JSXElements.AttributeComplexAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface AttributeComplexAttributes extends HTMLAttributes {
+      'bool0'?: boolean;
+      'bool1'?: boolean;
+      'bool2'?: boolean;
+      'nu0'?: number;
+      'nu1'?: number;
+      'str0'?: string;
+      'str1'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ConditionalBasic {
 
     }

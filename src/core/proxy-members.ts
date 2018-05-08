@@ -63,7 +63,7 @@ export function defineMember(
           // property values on the host element should override
           // any default values on the component instance
           if (values[memberName] === undefined) {
-            values[memberName] = (elm as any)[memberName];
+            values[memberName] = parsePropertyValue(property.type, (elm as any)[memberName]);
           }
 
           // for the client only, let's delete its "own" property
