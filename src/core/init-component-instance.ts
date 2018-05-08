@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initEventEmitters } from './init-event-emitters';
-import { RUNTIME_ERROR, NODE_TYPE } from '../util/constants';
+import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
