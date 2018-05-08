@@ -39,7 +39,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     const jsModuleList = results[moduleType];
 
     const promises = Object.keys(jsModuleList)
-      .filter(m => m.startsWith('chunk'))
+      .filter(m => !m.startsWith('entry:'))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
         const sourceTarget = moduleType === 'es5' ? 'es5' : 'es2017';
