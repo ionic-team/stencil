@@ -1,3 +1,21 @@
+<a name="0.8.1"></a>
+## 🚕 [0.8.1](https://github.com/ionic-team/stencil/compare/v0.8.0...v0.8.1) (2018-05-09)
+
+
+### Bug Fixes
+
+* **bundler:** minify dynamic imports ([1ef8e91](https://github.com/ionic-team/stencil/commit/1ef8e91)), closes [#773](https://github.com/ionic-team/stencil/issues/773)
+* **host:** set host prop are properly casted ([64ee27a](https://github.com/ionic-team/stencil/commit/64ee27a))
+* **loader:** set crossorigin to use-credentials ([351fd73](https://github.com/ionic-team/stencil/commit/351fd73))
+
+
+### Features
+
+* add custom element target output. ([8bec1d4](https://github.com/ionic-team/stencil/commit/8bec1d4))
+* **component:** add functional component utilities to update child attributes ([8730333](https://github.com/ionic-team/stencil/commit/8730333))
+
+
+
 <a name="0.8.0"></a>
 # 🐅 [0.8.0](https://github.com/ionic-team/stencil/compare/v0.7.26...v0.8.0) (2018-04-30)
 
