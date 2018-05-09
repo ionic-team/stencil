@@ -9,7 +9,8 @@ export {
   ComponentWillUpdate,
   Config,
   EventEmitter,
-  EventListenerEnable
+  EventListenerEnable,
+  FunctionalComponent
 } from './declarations';
 
 /**

@@ -92,7 +92,7 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     return (nodeName as d.FunctionalComponent<any>)({
       ...vnodeData,
       children: children
-    });
+    }, utils);
   }
 
   return {
@@ -106,3 +106,12 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     ishost: false
   } as d.VNode;
 }
+
+const utils = {
+  'getAttributes': function(vnode: d.VNode) {
+    return vnode.vattrs;
+  },
+  'replaceAttributes': function(vnode: d.VNode, attributes: any) {
+    vnode.vattrs = attributes;
+  }
+};

@@ -53,9 +53,13 @@ export interface ComponentProps {
   key?: string | number | any;
 }
 
+export interface FunctionalUtilities {
+  getAttributes: (vnode: VNode) => any;
+  replaceAttributes: (vnode: VNode, attributes: any) => void;
+}
 
 export interface FunctionalComponent<PropsType> {
-  (props?: PropsType & ComponentProps): VNode;
+  (props?: PropsType & ComponentProps, utils?: FunctionalUtilities): VNode;
 }
 
 
