@@ -543,6 +543,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotArrayBasic {
+
+    }
+  }
+
+  interface HTMLSlotArrayBasicElement extends StencilComponents.SlotArrayBasic, HTMLStencilElement {}
+
+  var HTMLSlotArrayBasicElement: {
+    prototype: HTMLSlotArrayBasicElement;
+    new (): HTMLSlotArrayBasicElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-array-basic': HTMLSlotArrayBasicElement;
+  }
+  interface ElementTagNameMap {
+    'slot-array-basic': HTMLSlotArrayBasicElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-array-basic': JSXElements.SlotArrayBasicAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotArrayBasicAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotArrayComplexRoot {
 
     }
