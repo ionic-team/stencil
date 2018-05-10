@@ -45,6 +45,11 @@ describe('parsePropertyValue', () => {
       expect(parsePropertyValue('Any', [88, 'mph'])).toEqual([88, 'mph']);
     });
 
+    it('should keep Function', () => {
+      const a = function() { return; };
+      expect(parsePropertyValue('Any', a)).toEqual(a);
+    });
+
     it('should keep Object', () => {
       expect(parsePropertyValue('Any', { mph: 88 })).toEqual({ mph: 88 });
     });
@@ -75,6 +80,11 @@ describe('parsePropertyValue', () => {
 
     it('should convert NaN to string', () => {
       expect(parsePropertyValue(String, NaN)).toBe('NaN');
+    });
+
+    it('should keep Function', () => {
+      const a = function() { return; };
+      expect(parsePropertyValue(String, a)).toEqual(a);
     });
 
     it('should keep leave object as is', () => {
@@ -137,6 +147,11 @@ describe('parsePropertyValue', () => {
       expect(parsePropertyValue(Number, [88, 'mph'])).toEqual([88, 'mph']);
     });
 
+    it('should keep Function', () => {
+      const a = function() { return; };
+      expect(parsePropertyValue(Number, a)).toEqual(a);
+    });
+
     it('should keep number undefined as undefined', () => {
       expect(parsePropertyValue(Number, undefined)).toEqual(undefined);
     });
@@ -179,6 +194,11 @@ describe('parsePropertyValue', () => {
 
     it('should convert any string "anyword" to boolean true', () => {
       expect(parsePropertyValue(Boolean, 'anyword')).toBe(true);
+    });
+
+    it('should keep Function', () => {
+      const a = function() { return; };
+      expect(parsePropertyValue(Boolean, a)).toEqual(a);
     });
 
     it('should keep leave object as is', () => {

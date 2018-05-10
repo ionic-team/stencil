@@ -65,11 +65,11 @@ export function parsePropertyValue(propType: PropertyType | PROP_TYPE, propValue
   // which wouldn't have Constructor data yet, and because this method is reused
   // within proxy where we don't have meta data, but only constructor data
 
-  if (isDef(propValue) && typeof propValue !== 'object') {
+  if (isDef(propValue) && typeof propValue !== 'object' && typeof propValue !== 'function') {
     if ((propType as PropertyType) === Boolean || (propType as PROP_TYPE) === PROP_TYPE.Boolean) {
       // per the HTML spec, any string value means it is a boolean true value
       // but we'll cheat here and say that the string "false" is the boolean false
-      return (propValue === 'false' ? false :  propValue === '' || !!propValue);
+      return (propValue === 'false' ? false : propValue === '' || !!propValue);
     }
 
     if ((propType as PropertyType) === Number || (propType as PROP_TYPE) === PROP_TYPE.Number) {
