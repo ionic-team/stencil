@@ -110,7 +110,7 @@ export function init(
     // let's do this!
     x.src = resourcesUrl + appCore;
     x.setAttribute('type', 'module');
-    x.setAttribute('crossorigin', 'use-credentials');
+    x.setAttribute('crossorigin', true);
   }
 
   x.setAttribute('data-resources-url', resourcesUrl);
