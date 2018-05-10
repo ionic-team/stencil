@@ -6,6 +6,7 @@ import { getGlobalBuildPath, getGlobalFileName } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
+import { RollupFileOptions, rollup } from 'rollup';
 
 
 export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
@@ -81,8 +82,11 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
   let output = '';
 
   try {
-    const rollup = await config.sys.rollup.rollup({
+    const rollupConfig: RollupFileOptions = {
       input: entry,
+      experimentalCodeSplitting: true,
+      preserveSymlinks: false,
+      experimentalDynamicImport: true,
       plugins: [
         resolveCollections(compilerCtx),
         config.sys.rollup.plugins.nodeResolve({
@@ -97,9 +101,10 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
-    });
+    };
 
-    const results = await rollup.generate({ format: 'es' });
+    const rollupBundle = await rollup(rollupConfig);
+    const results = await rollupBundle.generate({ format: 'es' });
 
     // cool, so we balled up all of the globals into one string
 
