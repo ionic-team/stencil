@@ -1,3 +1,14 @@
+<a name="0.8.2"></a>
+## 🎡 [0.8.2](https://github.com/ionic-team/stencil/compare/v0.8.1...v0.8.2) (2018-05-10)
+
+
+### Bug Fixes
+
+* **host:** functions must not be casted ([d8ff355](https://github.com/ionic-team/stencil/commit/d8ff355))
+* **loader:** fixes CORS issue in unpkg ([dc482f3](https://github.com/ionic-team/stencil/commit/dc482f3))
+
+
+
 <a name="0.8.1"></a>
 ## 🚕 [0.8.1](https://github.com/ionic-team/stencil/compare/v0.8.0...v0.8.1) (2018-05-09)
 
