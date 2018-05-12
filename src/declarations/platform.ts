@@ -95,6 +95,5 @@ export interface IdleOptions {
 export type BundleCallback = [
   string | undefined,
   string[],
-  boolean,
   Function
 ];
