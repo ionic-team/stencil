@@ -23,8 +23,8 @@ import { useScopedCss } from '../renderer/vdom/encapsulation';
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
-  const loadedBundles: {[bundleId: string]: d.CjsExports} = {};
-  const pendingBundleRequests: {[url: string]: boolean} = {};
+  const loadedBundles = new Map<string, d.CjsExports>();
+  const pendingBundleRequests = new Set<string>();
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
@@ -141,14 +141,14 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   function setLoadedBundle(bundleId: string, value: d.CjsExports) {
-    loadedBundles[bundleId] = value;
+    loadedBundles.set(bundleId, value);
   }
 
   function getLoadedBundle(bundleId: string) {
     if (bundleId == null) {
       return null;
     }
-    return loadedBundles[bundleId.replace(/^\.\//, '')];
+    return loadedBundles.get(bundleId.replace(/^\.\//, ''));
   }
 
   function isLoadedBundle(id: string) {
@@ -164,7 +164,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
    * @param deps
    * @param callback
    */
-  function execBundleCallback(name: string, deps: string[], isComponent: boolean, callback: Function) {
+  function execBundleCallback(name: string, deps: string[], callback: Function) {
     const bundleExports: d.CjsExports = {};
 
     try {
@@ -187,7 +187,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     // If name contains chunk then this callback was associated with a dependent bundle loading
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    if (isComponent) {
+    if (name && !name.endsWith('.js')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const normalizedTagName = pascalCasedTagName.replace(/-/g, '').toLowerCase();
 
@@ -211,17 +211,18 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   function userRequire(ids: string[], resolve: Function) {
-    loadBundle(undefined, ids, resolve, false);
+    loadBundle(undefined, ids, resolve);
   }
 
   /**
    * Check to see if any items in the bundle queue can be executed
    */
   function checkQueue() {
-    for (let i = bundleQueue.length - 1; i > -1; i--) {
-      const [bundleId, dependentsList, isComponent, importer] = bundleQueue[i];
-      if (dependentsList.every(dep => isLoadedBundle(dep)) && !isLoadedBundle(bundleId)) {
-        execBundleCallback(bundleId, dependentsList, isComponent, importer);
+    for (let i = bundleQueue.length - 1; i >= 0; i--) {
+      const [bundleId, dependentsList, importer] = bundleQueue[i];
+      if (dependentsList.every(isLoadedBundle) && !isLoadedBundle(bundleId)) {
+        bundleQueue.splice(i, 1);
+        execBundleCallback(bundleId, dependentsList, importer);
       }
     }
   }
@@ -229,12 +230,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   /**
    * This function is called anytime a JS file is loaded
    */
-  function loadBundle(bundleId: string | undefined, dependentsList: string[], importer: Function, isComponent = !bundleId.startsWith('chunk')) {
+  function loadBundle(bundleId: string | undefined, dependentsList: string[], importer: Function) {
     const missingDependents = dependentsList.filter(d => !isLoadedBundle(d));
     missingDependents.forEach(d => {
       requestUrl(resourcesUrl + d.replace('.js', '.es5.js'));
     });
-    bundleQueue.push([bundleId, dependentsList, isComponent, importer]);
+    bundleQueue.push([bundleId, dependentsList, importer]);
 
     // If any dependents are not yet met then queue the bundle execution
     if (missingDependents.length === 0) {
@@ -284,7 +285,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
-      bundleQueue.push([undefined, [bundleId], false, () => {
+      bundleQueue.push([undefined, [bundleId], () => {
         queueUpdate(plt, elm);
       }]);
 
@@ -329,14 +330,14 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       domApi.$remove(scriptElm);
 
       // remove from our list of active requests
-      pendingBundleRequests[url] = false;
+      pendingBundleRequests.delete(url);
     }
 
-    if (!pendingBundleRequests[url]) {
+    if (!pendingBundleRequests.has(url)) {
       // we're not already actively requesting this url
       // let's kick off the bundle request and
       // remember that we're now actively requesting this url
-      pendingBundleRequests[url] = true;
+      pendingBundleRequests.add(url);
 
       // create a sript element to add to the document.head
       scriptElm = domApi.$createElement('script');
