@@ -82,7 +82,6 @@ function testPackage(testPkg) {
       "bin/",
       "dist/",
       "compiler/",
-      "polyfills/",
       "server/",
       "sys/",
       "testing/"
