@@ -87,8 +87,8 @@ module.exports = function(config) {
     files: [
       'src/**/*.spec.ts',
       'src/util.ts',
-      'www/build/app.js',
-      { pattern: 'www/build/app/*.js', watched: false, included: false, served: true, nocache: false },
+      'www/build/testapp.js',
+      { pattern: 'www/build/testapp/*.js', watched: false, included: false, served: true, nocache: false },
       { pattern: 'www/**/*.html', watched: false, included: false, served: true, nocache: false },
     ],
 

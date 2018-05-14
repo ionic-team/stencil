@@ -1,9 +1,15 @@
 {
+  "module": "test-dist/esm/index.js",
+  "main": "test-dist/index.js",
+  "types": "test-dist/types/components.d.ts",
+  "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
-    "build.stencil": "node ../../bin/stencil build --dev --watch --es5",
+    "build.stencil": "node ../../bin/stencil build --debug --watch --es5",
     "dev": "sd concurrent \"npm run build.stencil\" \"stencil-dev-server\" ",
-    "karma": " karma start karma.config.js",
-    "karma.prod": "npm run tsc && ../../bin/stencil build && karma start karma.config.js",
+    "karma": "npm run karma.webpack && karma start karma.config.js",
+    "karma.debug": "npm run karma.webpack && karma start karma.config.js --browsers=Chrome --single-run=false",
+    "karma.prod": "npm run tsc && ../../bin/stencil build --debug && npm run karma.webpack && karma start karma.config.js",
+    "karma.webpack": "webpack --config src/esm-webpack/webpack.config.js",
     "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
   },
   "private": true,
@@ -18,6 +24,8 @@
     "karma-polyfill": "^1.0.0",
     "karma-sauce-launcher": "^1.2.0",
     "karma-typescript": "^3.0.12",
-    "puppeteer": "^1.2.0"
+    "puppeteer": "^1.2.0",
+    "webpack": "^4.8.0",
+    "webpack-cli": "^2.1.2"
   }
 }

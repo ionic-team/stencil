@@ -275,6 +275,41 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface EsmImport {
+      'propVal': number;
+      'someMethod': () => void;
+    }
+  }
+
+  interface HTMLEsmImportElement extends StencilComponents.EsmImport, HTMLStencilElement {}
+
+  var HTMLEsmImportElement: {
+    prototype: HTMLEsmImportElement;
+    new (): HTMLEsmImportElement;
+  };
+  interface HTMLElementTagNameMap {
+    'esm-import': HTMLEsmImportElement;
+  }
+  interface ElementTagNameMap {
+    'esm-import': HTMLEsmImportElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'esm-import': JSXElements.EsmImportAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface EsmImportAttributes extends HTMLAttributes {
+      'onSomeEvent'?: (event: CustomEvent) => void;
+      'propVal'?: number;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface LifecycleBasicA {
 
     }
@@ -1200,3 +1235,5 @@ declare global {
 }
 
 declare global { namespace JSX { interface StencilJSX {} } }
+
+export declare function defineCustomElements(window: any): void;

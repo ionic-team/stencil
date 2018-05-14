@@ -1,7 +1,7 @@
-import { setupDomTests } from '../util';
+import { setupDomTests, flush } from '../util';
 
 describe('tag-names', () => {
-  const { setupDom, tearDownDom, flush } = setupDomTests(document);
+  const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
   beforeEach(async () => {

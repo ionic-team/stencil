@@ -95,34 +95,34 @@ export function setupDomTests(document: Document) {
     }
   }
 
-  /**
-   * Wait for the component to asynchronously update
-   */
-  function flush(app: HTMLElement) {
-    return new Promise(resolve => {
+  return { setupDom, tearDownDom };
+}
 
-      function done() {
-        observer && observer.disconnect();
-        clearTimeout(tmr);
-        resolve();
-      }
+/**
+ * Wait for the component to asynchronously update
+ */
+export function flush(app: HTMLElement) {
+  return new Promise(resolve => {
 
-      let tmr = setTimeout(done, 750);
+    function done() {
+      observer && observer.disconnect();
+      clearTimeout(tmr);
+      resolve();
+    }
 
-      var observer = new MutationObserver(() => {
-        setTimeout(() => {
-          (window as any).App.Context.queue.write(done);
-        }, 100);
-      });
+    let tmr = setTimeout(done, 750);
 
-      observer.observe(app, {
-        childList: true,
-        attributes: true,
-        characterData: true,
-        subtree: true
-      });
+    var observer = new MutationObserver(() => {
+      setTimeout(() => {
+        (window as any).TestApp.Context.queue.write(done);
+      }, 100);
     });
-  }
 
-  return { setupDom, tearDownDom, flush };
+    observer.observe(app, {
+      childList: true,
+      attributes: true,
+      characterData: true,
+      subtree: true
+    });
+  });
 }
