@@ -8,6 +8,7 @@ export function validateOutputTargetDist(config: d.Config) {
   const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
 
   distOutputTargets.forEach(outputTarget => {
+
     if (!outputTarget.dir) {
       outputTarget.dir = DEFAULT_DIR;
     }

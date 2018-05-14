@@ -1,6 +1,6 @@
 import { Build } from '../util/build-conditionals';
 import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../declarations';
-import { CustomStyle } from '../client/css-shim/custom-style';
+import { CustomStyle } from '../client/polyfills/css-shim/custom-style';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
 
 

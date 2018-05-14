@@ -1,11 +1,13 @@
 
 
 export interface BuildConditionals {
-  coreId?: 'core' | 'core.pf';
+  coreId?: 'core' | 'core.pf' | 'esm.es5';
   polyfills?: boolean;
   es5?: boolean;
   cssVarShim?: boolean;
   clientSide?: boolean;
+  browserModuleLoader?: boolean;
+  externalModuleLoader?: boolean;
 
   // dev
   isDev: boolean;

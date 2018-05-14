@@ -159,7 +159,7 @@ function getComponentMeta(plt: d.PlatformApi, tagName: string): Promise<d.DevIns
 
   const meta: d.DevInspectorComponentMeta = {
     tag: cmpCtr.is,
-    bundle: internalMeta.bundleIds || 'unknown',
+    bundle: (internalMeta.bundleIds || 'unknown') as d.BundleIds,
     encapsulation: cmpCtr.encapsulation || 'none',
     ...members,
     events: {

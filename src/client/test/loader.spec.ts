@@ -1,5 +1,5 @@
 import { init } from '../loader';
-import { LoadComponentRegistry } from '../../declarations';
+import { ComponentHostData } from '../../declarations';
 import { mockWindow } from '../../testing/mocks';
 
 
@@ -13,7 +13,7 @@ describe('loader', () => {
   let appCore: string;
   let appCorePolyfilled: string;
   let hydratedCssClass: string;
-  let components: LoadComponentRegistry[];
+  let components: ComponentHostData[];
   let HTMLElementPrototype: any;
 
   beforeEach(() => {

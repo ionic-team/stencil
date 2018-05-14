@@ -39,7 +39,7 @@ export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
   const appRegistryComponents: AppRegistryComponents = {};
 
   Object.keys(cmpRegistry).sort().forEach(tagName => {
-    appRegistryComponents[tagName] = cmpRegistry[tagName].bundleIds;
+    appRegistryComponents[tagName] = cmpRegistry[tagName].bundleIds as any;
   });
 
   return appRegistryComponents;

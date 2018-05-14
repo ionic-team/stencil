@@ -6,12 +6,11 @@ export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta:
   if (!cmpMeta.tagNameMeta) {
     cmpMeta.tagNameMeta = cmp.is;
   }
+
   if (!cmpMeta.bundleIds) {
     cmpMeta.bundleIds = cmp.is;
   }
-  if (!cmpMeta.componentConstructor) {
-    cmpMeta.componentConstructor = cmp;
-  }
+
   cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
   if (!cmpMeta.membersMeta.color) {
@@ -75,17 +74,15 @@ export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta:
     });
   }
 
-  if (cmp.listeners && cmp.listeners.length > 0) {
+  if (cmp.listeners) {
     cmpMeta.listenersMeta = cmp.listeners.map(listener => {
-      const listenerMeta: d.ListenMeta = {
+      return {
         eventName: listener.name,
         eventMethodName: listener.method,
         eventCapture: listener.capture,
         eventDisabled: listener.disabled,
         eventPassive: listener.passive
-      };
-
-      return listenerMeta;
+      } as d.ListenMeta;
     });
   }
 

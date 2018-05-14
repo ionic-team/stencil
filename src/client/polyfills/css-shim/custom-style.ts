@@ -1,3 +1,4 @@
+import { loadLinkStyles } from './load-link-styles';
 import { StyleInfo, StyleNode } from './css-parse';
 import { StyleProperties } from './style-properties';
 import * as StyleUtil from './style-util';
@@ -13,7 +14,7 @@ export class CustomStyle {
   supportsCssVars: boolean;
 
 
-  constructor(private win: Window, doc: Document) {
+  constructor(private win: Window, private doc: Document) {
     this.supportsCssVars = !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
 
     if (!this.supportsCssVars) {
@@ -22,6 +23,31 @@ export class CustomStyle {
       ast.rules = [];
       this.documentOwnerStyleInfo = StyleInfo.set(this.documentOwner, new StyleInfo(ast));
       this.styleProperties = new StyleProperties(win);
+    }
+  }
+
+  init(cb?: Function) {
+    if (this.supportsCssVars) {
+      cb && cb();
+
+    } else {
+      this.win.requestAnimationFrame(() => {
+        const promises: Promise<any>[] = [];
+
+        const linkElms = this.doc.querySelectorAll('link[rel="stylesheet"][href]');
+        for (var i = 0; i < linkElms.length; i++) {
+          promises.push(loadLinkStyles(this.doc, this, linkElms[i] as any));
+        }
+
+        const styleElms = this.doc.querySelectorAll('style');
+        for (i = 0; i < styleElms.length; i++) {
+          promises.push(this.addStyle(styleElms[i]));
+        }
+
+        Promise.all(promises).then(() => {
+          cb && cb();
+        });
+      });
     }
   }
 

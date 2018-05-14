@@ -1,10 +1,12 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
+import { getPolyfillsEsmBuildPath } from './app-file-naming';
+import { pathJoin } from '../util';
 
 
-export async function getAppCorePolyfills(config: Config) {
+export async function getAppBrowserCorePolyfills(config: d.Config) {
   // first load up all of the polyfill content
   const readFilePromises = POLYFILLS.map(polyfillFile => {
-    const staticName = config.sys.path.join('polyfills', polyfillFile);
+    const staticName = config.sys.path.join('polyfills', 'es5', polyfillFile);
     return config.sys.getClientCoreFile({ staticName: staticName });
   });
 
@@ -16,22 +18,27 @@ export async function getAppCorePolyfills(config: Config) {
 }
 
 
+export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget);
+
+  await POLYFILLS.map(async polyfillFile => {
+    const staticName = config.sys.path.join('polyfills', 'esm', polyfillFile);
+    const polyfillsContent = await config.sys.getClientCoreFile({ staticName: staticName });
+
+    const polyfillDst = pathJoin(config, polyfillsBuildDir, polyfillFile);
+    await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);
+  });
+}
+
+
+
 // order of the polyfills matters!! test test test
-// actual source of the polyfills are found in /scripts/polyfills/
-// during the end user's app build they're read from /dist/client/polyfills/
+// actual source of the polyfills are found in /src/client/polyfills/
 const POLYFILLS = [
-  'template.js',
-  'document-register-element.js',
-  'array-find.js',
-  'array-includes.js',
-  'object-assign.js',
-  'string-startswith.js',
-  'string-endswith.js',
+  'dom.js',
+  'array.js',
+  'object.js',
+  'string.js',
   'promise.js',
   'fetch.js',
-  'request-animation-frame.js',
-  'closest.js',
-  'performance-now.js',
-  'remove-element.js',
-  'object-entries.js',
 ];

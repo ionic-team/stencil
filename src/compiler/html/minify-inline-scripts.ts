@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { minifyJs } from '../util';
+import { minifyJs } from '../minifier';
 
 
 export async function minifyInlineScripts(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, diagnostics: d.Diagnostic[]) {

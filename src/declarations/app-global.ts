@@ -3,7 +3,7 @@ import * as d from './index';
 
 export interface AppGlobal {
   ael?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
-  components?: d.LoadComponentRegistry[];
+  components?: d.ComponentHostData[];
   componentOnReady?: (elm: d.HostElement, resolve: (elm: d.HostElement) => void) => void;
   Context?: any;
   loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;

@@ -1,9 +1,10 @@
 import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../declarations';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import { generatePreamble, minifyJs } from '../util';
-import { getGlobalBuildPath, getGlobalFileName } from './app-file-naming';
+import { generatePreamble } from '../util';
+import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
+import { minifyJs } from '../minifier';
 import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
 
@@ -15,19 +16,23 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
     appRegistry.global = getGlobalFileName(config);
 
     const globalJsContent = generateGlobalJs(config, globalJsContents);
+    const globalEsmContent = generateGlobalEsm(config, globalJsContents);
 
     compilerCtx.appFiles.global = globalJsContent;
 
-    const outputTargets = config.outputTargets.filter(outputTarget => {
-      return outputTarget.appBuild;
+    const promises: Promise<any>[] = [];
+
+    config.outputTargets.filter(o => o.appBuild).forEach(outputTarget => {
+      const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget);
+      promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent));
     });
 
-    await Promise.all(outputTargets.map(outputTarget => {
-      const appGlobalWWWFilePath = getGlobalBuildPath(config, outputTarget);
+    config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
+      const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget, 'es5');
+      promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
+    });
 
-      config.logger.debug(`build, app global www: ${appGlobalWWWFilePath}`);
-      return compilerCtx.fs.writeFile(appGlobalWWWFilePath, globalJsContent);
-    }));
+    await Promise.all(promises);
   }
 
   return globalJsContents.join('\n').trim();
@@ -168,6 +173,18 @@ export function generateGlobalJs(config: Config, globalJsContents: string[]) {
     `"use strict";\n`,
     globalJsContents.join('\n').trim(),
     `\n})("${config.namespace}");`
+  ].join('');
+
+  return output;
+}
+
+
+export function generateGlobalEsm(config: Config, globalJsContents: string[]) {
+  const output = [
+    generatePreamble(config) + '\n',
+    `export default function appGlobal(namespace, Context, window, document, resourcesUrl, hydratedCssClass) {`,
+    globalJsContents.join('\n').trim(),
+    `\n}`
   ].join('');
 
   return output;

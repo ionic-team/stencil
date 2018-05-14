@@ -75,11 +75,6 @@ describe('fillCmpMetaFromConstructor', () => {
     expect(cmpMeta.listenersMeta[2].eventPassive).toBe(undefined);
   });
 
-  it('componentConstructor', () => {
-    const cmpMeta = fillCmpMetaFromConstructor(cmp, {});
-    expect(cmpMeta.componentConstructor).toBe(cmp);
-  });
-
   it('tag', () => {
     cmp.is = 'cmp-a';
     const cmpMeta = fillCmpMetaFromConstructor(cmp, {});

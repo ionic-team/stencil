@@ -1,8 +1,15 @@
 import * as d from '../../declarations';
 import { buildError, isDtsFile, pathJoin } from '../util';
+import { validateTypes } from '../distribution/validate-package-json';
 
 
-export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData) {
+export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData) {
+
+  const isValid = await validateTypes(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
+  if (!isValid) {
+    return;
+  }
+
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
 
@@ -81,7 +88,7 @@ async function copyCoreDts(config: d.Config, compilerCtx: d.CompilerCtx, outputT
    staticName: 'declarations/stencil.core.d.ts'
   });
 
-  const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);
+  const coreDtsFilePath = pathJoin(config, outputTarget.typesDir, CORE_DTS);
   await compilerCtx.fs.writeFile(coreDtsFilePath, srcDts);
 }
 

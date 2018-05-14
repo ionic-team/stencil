@@ -5,12 +5,11 @@ import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
-import { CustomStyle } from './css-shim/custom-style';
+import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
-import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/init-host-element';
 import { initHostSnapshot } from '../core/host-snapshot';
 import { initStyleTemplate } from '../core/styles';
@@ -20,7 +19,7 @@ import { queueUpdate } from '../core/update';
 import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
+export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle: CustomStyle) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles = new Map<string, d.CjsExports>();
@@ -112,7 +111,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       globalDefined[cmpMeta.tagNameMeta] = true;
 
       // initialize the members on the host element prototype
-      initHostElement(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
+      // keep a ref to the metadata with the tag as the key
+      initHostElement(plt,
+        (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
+        HostElementConstructor.prototype,
+        hydratedCssClass
+      );
 
       if (Build.observeAttr) {
         // add which attributes should be observed
@@ -245,12 +249,9 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   App.loadBundle = loadBundle;
 
 
-  let customStyle: CustomStyle;
   let requestBundleQueue: Function[] = [];
-  if (Build.cssVarShim) {
-    customStyle = new CustomStyle(win, doc);
-
-    initCssVarShim(win, doc, customStyle, () => {
+  if (Build.cssVarShim && customStyle) {
+    customStyle.init(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
         requestBundleQueue.shift()();
@@ -276,7 +277,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
-      cmpMeta.bundleIds[elm.mode];
+      (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
     if (getLoadedBundle(bundleId)) {
       // sweet, we've already loaded this bundle
@@ -290,13 +291,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
-      if (Build.cssVarShim && !customStyle.supportsCssVars) {
+      if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
-          requestBundleQueue.push(() => {
-            requestComponentBundle(cmpMeta, bundleId);
-          });
+          requestBundleQueue.push(() => requestComponentBundle(cmpMeta, bundleId));
 
         } else {
           // css already all loaded
@@ -364,12 +363,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   if (Build.devInspector) {
-    generateDevInspector(App, namespace, window, plt);
+    generateDevInspector(App, namespace, win, plt);
   }
 
   // register all the components now that everything's ready
   (App.components || [])
-    .map(data => parseComponentLoader(data, cmpRegistry))
+    .map(data => parseComponentLoader(data))
     .forEach(cmpMeta => {
     // es5 way of extending HTMLElement
     function HostElement(self: any) {
@@ -381,7 +380,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       { constructor: { value: HostElement, configurable: true } }
     );
 
-    plt.defineComponent(cmpMeta, HostElement);
+    defineComponent(cmpMeta, HostElement);
   });
 
   // create the componentOnReady fn

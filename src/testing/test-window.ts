@@ -55,6 +55,7 @@ export class TestWindow {
         if (testCmp) {
           const cmpMeta = fillCmpMetaFromConstructor(testCmp, {});
           registry[cmpMeta.tagNameMeta] = cmpMeta;
+          cmpMeta.componentConstructor = testCmp;
         }
       });
 

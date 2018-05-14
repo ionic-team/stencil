@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
-import { generateDistributions } from '../collections/distribution';
+import { generateDistributions } from '../distribution/distribution';
 import { writeAppCollections } from '../collections/collection-data';
 
 

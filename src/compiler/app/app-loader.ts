@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
-import { formatComponentLoaderRegistry } from '../../util/data-serialize';
-import { generatePreamble, minifyJs } from '../util';
+import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
+import { generatePreamble } from '../util';
 import { getLoaderFileName, getLoaderPath } from './app-file-naming';
+import { minifyJs } from '../minifier';
 
 
 export async function generateLoader(
@@ -64,7 +65,7 @@ export function injectAppIntoLoader(
   cmpRegistry: d.ComponentRegistry,
   loaderContent: string
 ) {
-  const cmpLoaderRegistry = formatComponentLoaderRegistry(cmpRegistry);
+  const cmpLoaderRegistry = formatBrowserLoaderComponentRegistry(cmpRegistry);
 
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 

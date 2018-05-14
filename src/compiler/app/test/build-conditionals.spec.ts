@@ -26,7 +26,7 @@ describe('build conditionals', () => {
 
     it('use last build cuz only a css/html file changes', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionalsEsm = {
+      compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/app.css', '/src/index.html'];
@@ -36,7 +36,7 @@ describe('build conditionals', () => {
 
     it('no last build cuz a tsx file change', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionalsEsm = {
+      compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/cmp.tsx'];
@@ -46,7 +46,7 @@ describe('build conditionals', () => {
 
     it('no last build cuz a ts file change', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionalsEsm = {
+      compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/cmp.ts', '/src/app.css', '/src/index.html'];
@@ -54,9 +54,9 @@ describe('build conditionals', () => {
       expect(b).toBe(null);
     });
 
-    it('no last build cuz no compilerCtx.lastBuildConditionalsEsm', () => {
+    it('no last build cuz no compilerCtx.lastBuildConditionalsBrowserEsm', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionalsEsm = null;
+      compilerCtx.lastBuildConditionalsBrowserEsm = null;
       const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
@@ -110,15 +110,15 @@ describe('build conditionals', () => {
       expect(bc.isProd).toBe(true);
     });
 
-    it('set compilerCtx lastBuildConditionalsEs5', async () => {
+    it('set compilerCtx lastBuildConditionalsBrowserEs5', async () => {
       const bc = await setBuildConditionals(config, compilerCtx, 'core.pf', buildCtx, []);
-      expect(compilerCtx.lastBuildConditionalsEs5).toBe(bc);
+      expect(compilerCtx.lastBuildConditionalsBrowserEs5).toBe(bc);
     });
 
-    it('set compilerCtx lastBuildConditionalsEsm', async () => {
+    it('set compilerCtx lastBuildConditionalsBrowserEsm', async () => {
       const compilerCtx: d.CompilerCtx = {};
       const bc = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, []);
-      expect(compilerCtx.lastBuildConditionalsEsm).toBe(bc);
+      expect(compilerCtx.lastBuildConditionalsBrowserEsm).toBe(bc);
     });
 
   });

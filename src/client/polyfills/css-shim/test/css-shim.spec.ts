@@ -1,5 +1,5 @@
 import { CustomStyle } from '../custom-style';
-import { mockWindow } from '../../../testing/mocks';
+import { mockWindow } from '../../../../testing/mocks';
 
 
 describe('css-shim', () => {

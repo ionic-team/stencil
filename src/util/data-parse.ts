@@ -1,13 +1,12 @@
-import { ComponentListenersData, ComponentMemberData, ComponentMeta,
-  ComponentRegistry, LoadComponentRegistry, PropertyType } from '../declarations';
+import * as d from '../declarations';
 import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
-export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmpRegistry: ComponentRegistry, i?: number, d?: ComponentMemberData) {
+export function parseComponentLoader(cmpData: d.ComponentHostData, i?: number, d?: d.ComponentMemberData) {
   // tag name will always be lower case
-  const cmpMeta: ComponentMeta = {
-    tagNameMeta: cmpRegistryData[0],
+  const cmpMeta: d.ComponentMeta = {
+    tagNameMeta: cmpData[0],
     membersMeta: {
       // every component defaults to always have
       // the mode and color properties
@@ -18,12 +17,12 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
 
   // map of the bundle ids
   // can contain modes, and array of esm and es5 bundle ids
-  cmpMeta.bundleIds = cmpRegistryData[1] as any;
+  cmpMeta.bundleIds = cmpData[1] as any;
 
   // parse member meta
   // this data only includes props that are attributes that need to be observed
   // it does not include all of the props yet
-  const memberData = cmpRegistryData[3];
+  const memberData = cmpData[3];
   if (memberData) {
     for (i = 0; i < memberData.length; i++) {
       d = memberData[i];
@@ -37,17 +36,17 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
   }
 
   // encapsulation
-  cmpMeta.encapsulation = cmpRegistryData[4];
+  cmpMeta.encapsulation = cmpData[4];
 
-  if (cmpRegistryData[5]) {
+  if (cmpData[5]) {
     // parse listener meta
-    cmpMeta.listenersMeta = cmpRegistryData[5].map(parseListenerData);
+    cmpMeta.listenersMeta = cmpData[5].map(parseListenerData);
   }
 
-  return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
+  return cmpMeta;
 }
 
-function parseListenerData(listenerData: ComponentListenersData) {
+function parseListenerData(listenerData: d.ComponentListenersData) {
   return {
     eventName: listenerData[0],
     eventMethodName: listenerData[1],
@@ -58,7 +57,7 @@ function parseListenerData(listenerData: ComponentListenersData) {
 }
 
 
-export function parsePropertyValue(propType: PropertyType | PROP_TYPE, propValue: any) {
+export function parsePropertyValue(propType: d.PropertyType | PROP_TYPE, propValue: any) {
   // ensure this value is of the correct prop type
   // we're testing both formats of the "propType" value because
   // we could have either gotten the data from the attribute changed callback,
@@ -66,18 +65,18 @@ export function parsePropertyValue(propType: PropertyType | PROP_TYPE, propValue
   // within proxy where we don't have meta data, but only constructor data
 
   if (isDef(propValue) && typeof propValue !== 'object' && typeof propValue !== 'function') {
-    if ((propType as PropertyType) === Boolean || (propType as PROP_TYPE) === PROP_TYPE.Boolean) {
+    if ((propType as d.PropertyType) === Boolean || (propType as PROP_TYPE) === PROP_TYPE.Boolean) {
       // per the HTML spec, any string value means it is a boolean true value
       // but we'll cheat here and say that the string "false" is the boolean false
       return (propValue === 'false' ? false : propValue === '' || !!propValue);
     }
 
-    if ((propType as PropertyType) === Number || (propType as PROP_TYPE) === PROP_TYPE.Number) {
+    if ((propType as d.PropertyType) === Number || (propType as PROP_TYPE) === PROP_TYPE.Number) {
       // force it to be a number
       return parseFloat(propValue);
     }
 
-    if ((propType as PropertyType) === String || (propType as PROP_TYPE) === PROP_TYPE.String) {
+    if ((propType as d.PropertyType) === String || (propType as PROP_TYPE) === PROP_TYPE.String) {
       // could have been passed as a number or boolean
       // but we still want it as a string
       return propValue.toString();

@@ -1,6 +1,7 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../declarations';
-import { catchError, minifyJs } from '../util';
-import { createBundle, writeEsModules, writeLegacyModules  } from './rollup-bundle';
+import { catchError } from '../util';
+import { createBundle, writeEsModules, writeEsmEs5Modules, writeLegacyModules  } from './rollup-bundle';
+import { minifyJs } from '../minifier';
 
 
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
@@ -22,6 +23,10 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
       results.es5 = await writeLegacyModules(config, rollupBundle, entryModules);
     }
 
+    if (config.outputTargets.some(o => o.type === 'dist')) {
+      results.esmEs5 = await writeEsmEs5Modules(config, rollupBundle);
+    }
+
     if (config.minifyJs) {
       await minifyChunks(config, compilerCtx, buildCtx, results);
     }
@@ -35,14 +40,14 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
 
 
 async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, results: JSModuleMap) {
-  const promises = Object.keys(results).map((moduleType: 'esm' | 'es5') => {
+  const promises = Object.keys(results).map((moduleType: 'esm' | 'es5' | 'esmEs5') => {
     const jsModuleList = results[moduleType];
 
     const promises = Object.keys(jsModuleList)
       .filter(m => !m.startsWith('entry:'))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
-        const sourceTarget = moduleType === 'es5' ? 'es5' : 'es2017';
+        const sourceTarget = (moduleType === 'es5' || moduleType === 'esmEs5') ? 'es5' : 'es2017';
         const minifyJsResults = await minifyJs(config, compilerCtx, chunk.code, sourceTarget, true);
 
         if (minifyJsResults.diagnostics.length) {

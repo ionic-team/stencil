@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { convertValueToLiteral } from './util';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
-import { getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
+import { DEFAULT_STYLE_MODE } from '../../../util/constants';
 import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';
+import { formatConstructorEncapsulation, getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
@@ -55,11 +55,9 @@ export function addStaticMeta(cmpMeta: d.ComponentMeta) {
 
   staticMembers.is = convertValueToLiteral(cmpMeta.tagNameMeta);
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-    staticMembers.encapsulation = convertValueToLiteral('shadow');
-
-  } else if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-    staticMembers.encapsulation = convertValueToLiteral('scoped');
+  const encapsulation = formatConstructorEncapsulation(cmpMeta.encapsulation);
+  if (encapsulation) {
+    staticMembers.encapsulation = convertValueToLiteral(encapsulation);
   }
 
   if (cmpMeta.hostMeta && Object.keys(cmpMeta.hostMeta).length > 0) {

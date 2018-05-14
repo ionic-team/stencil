@@ -10,11 +10,10 @@ export function init(
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
-  components: d.LoadComponentRegistry[],
+  components: d.ComponentHostData[],
   HTMLElementPrototype: any,
   App?: d.AppGlobal,
-  x?: any, y?: any, scriptElm?: HTMLScriptElement,
-  orgComponentOnReady?: Function
+  x?: any, y?: any, scriptElm?: HTMLScriptElement
 ) {
   // create global namespace if it doesn't already exist
   App = win[namespace] = win[namespace] || {};
@@ -30,48 +29,7 @@ export function init(
     doc.head.insertBefore(x, doc.head.firstChild);
   }
 
-  // create a temporary array to store the resolves
-  // before the core file has fully loaded
-  App.$r = [];
-
-  // add componentOnReady to HTMLElement.prototype
-  orgComponentOnReady = HTMLElementPrototype.componentOnReady;
-  HTMLElementPrototype.componentOnReady = function componentOnReady(cb?: () => void): any {
-    const elm = this;
-
-    // there may be more than one app on the window so
-    // call original HTMLElement.prototype.componentOnReady
-    // if one exists already
-    orgComponentOnReady && orgComponentOnReady.call(elm);
-
-    function executor(resolve: () => void) {
-      if (App.$r) {
-        // core file hasn't loaded yet
-        // so let's throw it in this temporary queue
-        // and when the core does load it'll handle these
-        App.$r.push([elm, resolve]);
-
-      } else {
-        // core has finished loading because there's no temporary queue
-        // call the core's logic to handle this
-        App.componentOnReady(elm, resolve);
-      }
-    }
-
-    if (cb) {
-      // just a callback
-      return executor(cb);
-    }
-
-    // callback wasn't provided, let's return a promise
-    if (win.Promise) {
-      // use native/polyfilled promise
-      return new Promise(executor);
-    }
-
-    // promise may not have been polyfilled yet
-    return { then: executor } as Promise<any>;
-  };
+  createComponentOnReadyPrototype(win, HTMLElementPrototype, App);
 
   // figure out the script element for this current script
   y = doc.querySelectorAll('script');
@@ -151,4 +109,50 @@ function doesNotSupportsDynamicImports(dynamicImportTest: string) {
     return false;
   } catch (e) {}
   return true;
+}
+
+
+export function createComponentOnReadyPrototype(win: any, HTMLElementPrototype: any, App: d.AppGlobal) {
+  // create a temporary array to store the resolves
+  // before the core file has fully loaded
+  App.$r = [];
+
+  // add componentOnReady to HTMLElement.prototype
+  const orgComponentOnReady = HTMLElementPrototype.componentOnReady;
+  HTMLElementPrototype.componentOnReady = function componentOnReady(cb?: () => void): any {
+    const elm = this;
+
+    // there may be more than one app on the window so
+    // call original HTMLElement.prototype.componentOnReady
+    // if one exists already
+    orgComponentOnReady && orgComponentOnReady.call(elm);
+
+    function executor(resolve: () => void) {
+      if (App.$r) {
+        // core file hasn't loaded yet
+        // so let's throw it in this temporary queue
+        // and when the core does load it'll handle these
+        App.$r.push([elm, resolve]);
+
+      } else {
+        // core has finished loading because there's no temporary queue
+        // call the core's logic to handle this
+        App.componentOnReady(elm, resolve);
+      }
+    }
+
+    if (cb) {
+      // just a callback
+      return executor(cb);
+    }
+
+    // callback wasn't provided, let's return a promise
+    if (win.Promise) {
+      // use native/polyfilled promise
+      return new Promise(executor);
+    }
+
+    // promise may not have been polyfilled yet
+    return { then: executor } as Promise<any>;
+  };
 }

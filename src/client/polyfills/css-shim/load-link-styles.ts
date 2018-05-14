@@ -1,33 +1,7 @@
 import { CustomStyle } from './custom-style';
 
 
-export function initCssVarShim(win: any, doc: Document, customStyle: CustomStyle, callback: Function) {
-  if (customStyle.supportsCssVars) {
-    callback();
-
-  } else {
-    win.requestAnimationFrame(() => {
-      const promises: Promise<any>[] = [];
-
-      const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]');
-      for (var i = 0; i < linkElms.length; i++) {
-        promises.push(loadLinkStyles(doc, customStyle, linkElms[i] as any));
-      }
-
-      const styleElms = doc.querySelectorAll('style');
-      for (i = 0; i < styleElms.length; i++) {
-        promises.push(customStyle.addStyle(styleElms[i]));
-      }
-
-      Promise.all(promises).then(() => {
-        callback();
-      });
-    });
-  }
-}
-
-
-function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLinkElement) {
+export function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLinkElement) {
   const url = linkElm.href;
 
   return fetch(url).then(rsp => rsp.text()).then(text => {
@@ -75,15 +49,16 @@ export function hasRelativeUrls(css: string) {
   return CSS_URL_REGEXP.test(css);
 }
 
-export function fixRelativeUrls(css: string, originalUrl: string) {
-  //Get the basepath from the original import url
-  let basePath = originalUrl.replace(/[^/]*$/, '');
 
-  //Replace the relative url, with the new relative url
+export function fixRelativeUrls(css: string, originalUrl: string) {
+  // get the basepath from the original import url
+  const basePath = originalUrl.replace(/[^/]*$/, '');
+
+  // replace the relative url, with the new relative url
   return css.replace(CSS_URL_REGEXP, (fullMatch, url) => {
-    //The new relative path is the base path + uri
-    //TODO: normalize relative URL
-    let relativeUrl = basePath + url;
+    // rhe new relative path is the base path + uri
+    // TODO: normalize relative URL
+    const relativeUrl = basePath + url;
     return fullMatch.replace(url, relativeUrl);
   });
 }

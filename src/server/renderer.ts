@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { catchError } from '../compiler/util';
 import { getCompilerCtx } from '../compiler/build/compiler-ctx';
-import { getGlobalBuildPath } from '../compiler/app/app-file-naming';
+import { getGlobalJsBuildPath } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
@@ -74,7 +74,7 @@ function loadAppGlobal(config: d.Config, compilerCtx: d.CompilerCtx, outputTarge
   }
 
   // let's load the app global js content
-  const appGlobalPath = getGlobalBuildPath(config, outputTarget);
+  const appGlobalPath = getGlobalJsBuildPath(config, outputTarget);
   try {
     compilerCtx.appFiles.global = compilerCtx.fs.readFileSync(appGlobalPath);
 

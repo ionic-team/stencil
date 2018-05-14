@@ -1,17 +1,17 @@
-import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRegistry, Config, EntryBundle, EntryModule, JSModuleMap, ModuleFile, SourceTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { getAppBuildDir, getBundleFilename } from '../app/app-file-naming';
+import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename } from '../app/app-file-naming';
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
-import { hasError, minifyJs, pathJoin } from '../util';
+import { hasError, pathJoin } from '../util';
+import { minifyJs } from '../minifier';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export async function generateBundles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[], jsModules: JSModuleMap) {
+export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
   // both styles and modules are done bundling
   // combine the styles and modules together
   // generate the actual files to write
   const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
-  config.logger.debug(`generate bundles started`);
 
   const bundleKeys: { [key: string]: string } = {};
 
@@ -23,39 +23,61 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
 
       return Promise.all(
         entryModule.modeNames.map(async modeName => {
-          const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5') => {
+          const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5' | 'esmEs5') => {
             return {
               ...all,
               [moduleType]: jsModules[moduleType][bundleKeyPath].code
             };
           }, {} as {[key: string]: string});
 
-          return await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode);
+          return await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
         })
       );
     })
   );
   config.logger.debug(`bundle mode finished`);
 
+  await Promise.all([
+    genereateBrowserEsm(config, compilerCtx, jsModules, bundleKeys),
+    genereateBrowserEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys),
+    genereateEsmEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys)
+  ]);
+
+  // create the registry of all the components
+  const cmpRegistry = createComponentRegistry(entryModules);
+
+  timeSpan.finish(`generate bundles finished`);
+
+  return cmpRegistry;
+}
+
+
+async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
   const esmModules = jsModules.esm;
+
   const esmPromises = Object.keys(esmModules)
     .filter(key => !bundleKeys[key])
     .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
     .map(async ([key, value]) => {
-      const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2017');
+      const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es2017');
       const jsText = replaceBundleIdPlaceholder(value.code, key);
       await writeBundleJSFile(config, compilerCtx, fileName, jsText);
     });
-  await Promise.all(esmPromises);
-  config.logger.debug(`generate esm finished`);
 
+  await Promise.all(esmPromises);
+
+  config.logger.debug(`generate esm finished`);
+}
+
+
+async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
   if (config.buildEs5) {
     const es5Modules = jsModules.es5;
     const es5Promises = Object.keys(es5Modules)
       .filter(key => !bundleKeys[key])
       .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
       .map(async ([key, value]) => {
-        const fileName = getBundleFilename(key.replace('.js', ''), false, 'es5');
+        const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
         await writeBundleJSFile(config, compilerCtx, fileName, jsText);
@@ -63,19 +85,39 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     await Promise.all(es5Promises);
     config.logger.debug(`generate es5 finished`);
   }
-
-
-  // create the registry of all the components
-  const cmpRegistry = createComponentRegistry(entryModules);
-
-  timeSpan.finish(`generate bundles finished`);
-  config.logger.debug(`generate bundles finished`);
-
-  return cmpRegistry;
 }
 
-async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
+async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  if (!distOutputs.length) {
+    return;
+  }
+
+  await Promise.all(distOutputs.map(async distOutput => {
+
+    const es5Modules = jsModules.esmEs5;
+    const es5Promises = Object.keys(es5Modules)
+      .filter(key => !bundleKeys[key])
+      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
+      .map(async ([key, value]) => {
+        const fileName = getBrowserFilename(key.replace('.js', ''), false);
+        let jsText = replaceBundleIdPlaceholder(value.code, key);
+        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+
+        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
+        return compilerCtx.fs.writeFile(distBuildPath, jsText);
+      });
+
+    await Promise.all(es5Promises);
+
+  }));
+
+  config.logger.debug(`generate esmEs5 finished`);
+}
+
+
+async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.appBuild;
   });
@@ -89,10 +131,10 @@ async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileN
   }));
 }
 
-async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModule: EntryModule, modeName: string, jsCode: { [key: string]: string }) {
+async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModule: d.EntryModule, modeName: string, jsCode: { esm: string, es5: string, esmEs5: string }) {
 
   // create js text for: mode, no scoped styles and esm
-  let jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode['esm'], modeName, false);
+  let jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esm, modeName, false);
 
   // the only bundle id comes from mode, no scoped styles and esm
   const bundleId = getBundleId(config, entryModule, modeName, jsText);
@@ -107,35 +149,46 @@ async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buil
   });
 
   // generate the bundle build for mode, no scoped styles, and esm
-  await generateBundleBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false);
+  await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false);
 
   if (entryModule.requiresScopedStyles) {
     // create js text for: mode, scoped styles, esm
-    jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode['esm'], modeName, true);
+    jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esm, modeName, true);
 
     // generate the bundle build for: mode, esm and scoped styles
-    await generateBundleBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true);
+    await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true);
   }
 
   if (config.buildEs5) {
     // create js text for: mode, no scoped styles, es5
-    jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode['es5'], modeName, false, 'es5');
+    jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.es5, modeName, false, 'es5');
 
     // generate the bundle build for: mode, no scoped styles and es5
-    await generateBundleBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
+    await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
 
     if (entryModule.requiresScopedStyles) {
       // create js text for: mode, scoped styles, es5
-      jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode['es5'], modeName, true, 'es5');
+      jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.es5, modeName, true, 'es5');
 
       // generate the bundle build for: mode, es5 and scoped styles
-      await generateBundleBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true, 'es5');
+      await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true, 'es5');
+    }
+  }
+
+  if (config.outputTargets.some(o => o.type === 'dist')) {
+    // esm module with es5 target, not scoped
+    jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, false, 'es5');
+    await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
+
+    if (entryModule.requiresScopedStyles) {
+      jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, true, 'es5');
+      await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true, 'es5');
     }
   }
 }
 
 
-async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule, jsText: string, modeName: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+async function createBundleJsText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule, jsText: string, modeName: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
 
   if (sourceTarget === 'es5') {
     // use legacy bundling with commonjs/jsonp modules
@@ -160,15 +213,15 @@ async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buil
 }
 
 
-async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, entryModule: EntryModule, jsText: string, bundleId: string, modeName: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, jsText: string, bundleId: string, modeName: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
   // create the file name
-  const fileName = getBundleFilename(bundleId, isScopedStyles, sourceTarget);
+  const fileName = getBrowserFilename(bundleId, isScopedStyles, sourceTarget);
 
   // update the bundle id placeholder with the actual bundle id
   // this is used by jsonp callbacks to know which bundle loaded
   jsText = replaceBundleIdPlaceholder(jsText, bundleId);
 
-  const entryBundle: EntryBundle = {
+  const entryBundle: d.EntryBundle = {
     fileName: fileName,
     text: jsText,
     outputs: [],
@@ -195,7 +248,40 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
 }
 
 
-function injectStyleMode(moduleFiles: ModuleFile[], jsText: string, modeName: string, isScopedStyles: boolean) {
+async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, jsText: string, bundleId: string, modeName: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
+  // create the file name
+  const fileName = getEsmFilename(bundleId, isScopedStyles);
+
+  // update the bundle id placeholder with the actual bundle id
+  // this is used by jsonp callbacks to know which bundle loaded
+  jsText = replaceBundleIdPlaceholder(jsText, bundleId);
+
+  const entryBundle: d.EntryBundle = {
+    fileName: fileName,
+    text: jsText,
+    outputs: [],
+    modeName: modeName,
+    sourceTarget: sourceTarget,
+    isScopedStyles: isScopedStyles
+  };
+
+  entryModule.entryBundles = entryModule.entryBundles || [];
+  entryModule.entryBundles.push(entryBundle);
+
+  const outputTargets = config.outputTargets.filter(o => o.type === 'dist');
+
+  return Promise.all(outputTargets.map(async outputTarget => {
+    // get the absolute path to where it'll be saved
+    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', fileName);
+
+    // write to the build
+    await compilerCtx.fs.writeFile(esmBuildPath, jsText);
+    entryBundle.outputs.push(esmBuildPath);
+  }));
+}
+
+
+function injectStyleMode(moduleFiles: d.ModuleFile[], jsText: string, modeName: string, isScopedStyles: boolean) {
   moduleFiles.forEach(moduleFile => {
     jsText = injectComponentStyleMode(moduleFile.cmpMeta, modeName, jsText, isScopedStyles);
   });
@@ -203,7 +289,7 @@ function injectStyleMode(moduleFiles: ModuleFile[], jsText: string, modeName: st
   return jsText;
 }
 
-export function injectComponentStyleMode(cmpMeta: ComponentMeta, modeName: string, jsText: string, isScopedStyles: boolean) {
+export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: string, jsText: string, isScopedStyles: boolean) {
   const stylePlaceholder = getStylePlaceholder(cmpMeta.tagNameMeta);
   const stylePlaceholderId = getStyleIdPlaceholder(cmpMeta.tagNameMeta);
 
@@ -250,7 +336,7 @@ export function injectComponentStyleMode(cmpMeta: ComponentMeta, modeName: strin
   return jsText;
 }
 
-async function transpileEs5Bundle(compilerCtx: CompilerCtx, buildCtx: BuildCtx, jsText: string) {
+async function transpileEs5Bundle(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsText: string) {
   // use typescript to convert this js text into es5
   const transpileResults = await transpileToEs5(compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
@@ -263,7 +349,7 @@ async function transpileEs5Bundle(compilerCtx: CompilerCtx, buildCtx: BuildCtx, 
 }
 
 
-export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bundleId: string) {
+export function setBundleModeIds(moduleFiles: d.ModuleFile[], modeName: string, bundleId: string) {
   // assign the bundle id build from the
   // mode, no scoped styles and esm to each of the components
   moduleFiles.forEach(moduleFile => {
@@ -275,7 +361,7 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
 }
 
 
-export function getBundleId(config: Config, entryModule: EntryModule, modeName: string, jsText: string) {
+export function getBundleId(config: d.Config, entryModule: d.EntryModule, modeName: string, jsText: string) {
   if (config.hashFileNames) {
     // create style id from hashing the content
     return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
@@ -285,12 +371,12 @@ export function getBundleId(config: Config, entryModule: EntryModule, modeName: 
 }
 
 
-export function getBundleIdHashed(config: Config, jsText: string) {
+export function getBundleIdHashed(config: d.Config, jsText: string) {
   return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
 }
 
 
-export function getBundleIdDev(entryModule: EntryModule, modeName: string) {
+export function getBundleIdDev(entryModule: d.EntryModule, modeName: string) {
   const tags = entryModule.moduleFiles
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
@@ -313,9 +399,9 @@ export function getBundleIdDev(entryModule: EntryModule, modeName: string) {
   return `${tags[0]}.${modeName}`;
 }
 
-function createComponentRegistry(entryModules: EntryModule[]) {
-  const registryComponents: ComponentMeta[] = [];
-  const cmpRegistry: ComponentRegistry = {};
+function createComponentRegistry(entryModules: d.EntryModule[]) {
+  const registryComponents: d.ComponentMeta[] = [];
+  const cmpRegistry: d.ComponentRegistry = {};
 
   return entryModules
     .reduce((rcs, bundle) => {

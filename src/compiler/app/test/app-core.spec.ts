@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { generatePreamble } from '../../util';
 import { mockConfig } from '../../../testing/mocks';
-import * as core from '../app-core';
+import * as core from '../app-core-browser';
 
 
 describe('app-core', () => {

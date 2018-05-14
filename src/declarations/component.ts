@@ -58,7 +58,7 @@ export interface ComponentConstructorHost {
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
-  bundleIds?: string | BundleIds;
+  bundleIds?: string | BundleIds | GetModuleFn;
   stylesMeta?: d.StylesMeta;
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
@@ -70,6 +70,15 @@ export interface ComponentMeta {
   componentClass?: string;
   dependencies?: ComponentDependencies;
   jsdoc?: JSDoc;
+}
+
+
+export type GetModuleFn = (opts?: GetModuleOptions) => Promise<ComponentConstructor>;
+
+
+export interface GetModuleOptions {
+  scoped?: boolean;
+  mode?: string;
 }
 
 
@@ -319,7 +328,7 @@ export interface ComponentAppliedStyles {
 export type OnReadyCallback = ((elm: d.HostElement) => void);
 
 
-export interface LoadComponentRegistry {
+export interface ComponentHostData {
   /**
    * tag name (ion-badge)
    */

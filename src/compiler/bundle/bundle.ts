@@ -8,7 +8,6 @@ export async function generateModuleMap(config: Config, compilerCtx: CompilerCtx
   let jsModules: JSModuleMap;
 
   try {
-    // kick off style and module bundling at the same time
     jsModules = await generateBundleModules(config, compilerCtx, buildCtx, entryModules);
 
   } catch (e) {

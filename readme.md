@@ -155,7 +155,6 @@ For the small minority of browsers that do not support modern browser features a
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) *(transpiled to promises)*
  - [fetch()](https://github.com/github/fetch)
- - [&lt;template&gt;](https://github.com/webcomponents/template)
  - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
  - [Object.entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries)
  - [performance.now()](https://gist.github.com/paulirish/5438650)

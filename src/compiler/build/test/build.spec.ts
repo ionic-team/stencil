@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { expectFiles } from '../../../testing/utils';
+import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 
 
@@ -10,8 +10,9 @@ describe('build', () => {
 
   beforeEach(async () => {
     c = new TestingCompiler();
-    await c.fs.writeFile(path.join(root,, 'src', 'index.html'), `<cmp-a></cmp-a>`);
+    await c.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
     await c.fs.commit();
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
   });
 
 
@@ -32,7 +33,6 @@ describe('build', () => {
   });
 
   it('should minify es2017 build', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.minifyJs = true;
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
     await c.fs.commit();
@@ -47,23 +47,44 @@ describe('build', () => {
     expect(output).toContain('/*! Built with http://stenciljs.com */\nconst{h:t}=window.App;class s{static get is(){return"cmp-a"}}export{s as CmpA};');
   });
 
-  it('should build one component', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
+  it('should build app files, app global and component', async () => {
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await c.fs.writeFile(path.join(root, 'src', 'global.ts'), `export const MyGlobal: any = {};`);
     await c.fs.commit();
+
+    c.config.globalScript = path.join(root, 'src', 'global.ts');
+    c.config.buildAppCore = true;
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
     expect(r.entries).toHaveLength(1);
     expect(r.entries[0].components[0].tag).toContain('cmp-a');
-    expect(r.transpileBuildCount).toBe(1);
+    expect(r.transpileBuildCount).toBe(2);
     expect(r.bundleBuildCount).toBe(1);
-    expect(r.filesWritten.length).toBe(2);
+    expect(r.filesWritten).toHaveLength(7);
 
     expectFiles(c.fs, [
       path.join(root, 'src', 'components.d.ts'),
+      path.join(root, 'www', 'build', 'app.js'),
+      path.join(root, 'www', 'build', 'app', 'app.core.js'),
+      path.join(root, 'www', 'build', 'app', 'app.global.js'),
+      path.join(root, 'www', 'build', 'app', 'app.registry.json'),
       path.join(root, 'www', 'build', 'app', 'cmp-a.js'),
       path.join(root, 'www', 'index.html')
+    ]);
+
+    // double check we're not saving dist files in the wrong locations
+    doNotExpectFiles(c.fs, [
+      path.join(root, 'build'),
+      path.join(root, 'dist'),
+      path.join(root, 'esm'),
+      path.join(root, 'es5'),
+      path.join(root, 'www', 'dist'),
+      path.join(root, 'www', 'esm'),
+      path.join(root, 'www', 'es5'),
+      path.join(root, 'www', 'build', 'dist'),
+      path.join(root, 'www', 'build', 'esm'),
+      path.join(root, 'www', 'build', 'es5'),
     ]);
   });
 

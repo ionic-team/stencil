@@ -12,7 +12,7 @@
       "dom",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -20,11 +20,11 @@
     "noUnusedParameters": true,
     "outDir": "../dist/transpiled-core",
     "pretty": true,
-    "target": "es2015"
+    "target": "es2017"
   },
   "include": [
     "index.ts",
     "../types/*.d.ts",
-    "client/*.ts"
+    "client/**/*.ts"
   ]
 }

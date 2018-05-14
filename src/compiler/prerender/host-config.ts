@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { getAppBuildDir, getBundleFilename } from '../app/app-file-naming';
+import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
 import { pathJoin } from '../util';
 
 
@@ -98,9 +98,9 @@ export function getBundleIds(entryModules: d.EntryModule[], components: d.Hydrat
         bundleId = moduleFile.cmpMeta.bundleIds;
       } else {
 
-        bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_MODE];
+        bundleId = (moduleFile.cmpMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
         if (!bundleId) {
-          bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
+          bundleId = (moduleFile.cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
         }
       }
 
@@ -115,7 +115,7 @@ export function getBundleIds(entryModules: d.EntryModule[], components: d.Hydrat
 
 
 function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, bundleId: string) {
-  const unscopedFileName = getBundleFilename(bundleId, false);
+  const unscopedFileName = getBrowserFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), unscopedFileName);
   return getUrlFromFilePath(config, outputTarget, unscopedWwwBuildPath);
 }

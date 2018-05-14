@@ -1,4 +1,4 @@
-import { hasCssVariables, hasRelativeUrls, fixRelativeUrls } from '../init-css-shim';
+import { fixRelativeUrls, hasCssVariables, hasRelativeUrls } from '../load-link-styles';
 
 
 describe('hasCssVariables', () => {
@@ -11,7 +11,7 @@ describe('hasCssVariables', () => {
     #myid {
       color: brown;
     }
-    [my="attr"] {
+    [my='attr'] {
       color: brown;
     }
     `;
@@ -23,7 +23,7 @@ describe('hasCssVariables', () => {
     .my--classname {
       color: brown;
     }
-    [my="attr--ibute"] {
+    [my='attr--ibute'] {
       color: brown;
     }
     `;
@@ -82,7 +82,7 @@ describe('hasCssVariables', () => {
     const text = `element{--main-text-color: black}`;
     expect(hasCssVariables(text)).toBe(true);
   });
-   
+
   it('true for var()', () => {
     const text = `
       element {
@@ -95,7 +95,7 @@ describe('hasCssVariables', () => {
 });
 
 describe('hasRelativeUrls', () => {
-  it("false for absolute urls", () => {
+  it('false for absolute urls', () => {
     const text = `
       div {
         background-image: url('http://example.com/mytestimage.jpg');
@@ -105,7 +105,7 @@ describe('hasRelativeUrls', () => {
     expect(hasRelativeUrls(text)).toBe(false);
   });
 
-  it("true for relative urls", () => {
+  it('true for relative urls', () => {
     const text = `
       div {
         background-image: url('assets/images/mytestimage.jpg');
@@ -117,31 +117,32 @@ describe('hasRelativeUrls', () => {
 });
 
 describe('fixRelativeUrls', () => {
-  it("should transform prepend relative urls with base path", () => {
+  it('should transform prepend relative urls with base path', () => {
     const text = `
       div {
         background-image: url('../images/mytestimage.jpg');
       }
     `;
 
-    expect(fixRelativeUrls(text, "/assets/css/styles.css")).toBe(`
+    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
       div {
         background-image: url('/assets/css/../images/mytestimage.jpg');
       }
     `);
   });
 
-  it("should keep absolute urls", () => {
+  it('should keep absolute urls', () => {
     const text = `
       div {
         background-image: url('http://www.example.com/assets/images/mytestimage.jpg');
       }
     `;
 
-    expect(fixRelativeUrls(text, "/assets/css/styles.css")).toBe(`
+    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
       div {
         background-image: url('http://www.example.com/assets/images/mytestimage.jpg');
       }
     `);
   });
+
 });

@@ -9,8 +9,9 @@
   },
   "files": [
     "bin/",
-    "dist/",
     "compiler/",
+    "dist/",
+    "polyfills/",
     "server/",
     "sys/",
     "testing/"
@@ -20,6 +21,7 @@
     "build.cli": "node scripts/build-cli.js",
     "build.compiler": "node scripts/build-compiler.js",
     "build.core": "node scripts/build-core.js",
+    "build.polyfills": "node scripts/build-polyfills.js",
     "build.renderer.vdom": "node scripts/build-renderer-vdom.js",
     "build.server": "node scripts/build-server.js",
     "build.submodules": "node scripts/build-submodules.js",

@@ -3,6 +3,7 @@ import { MEMBER_TYPE } from '../../util/constants';
 import { basename, dirname, relative } from 'path';
 import { dashToPascalCase } from '../../util/helpers';
 
+
 export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
   const angularOuputTargets = (config.outputTargets as d.OutputTargetAngular[])
     .filter(o => o.type === 'angular' && o.directivesProxyFile);
@@ -11,6 +12,7 @@ export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.Co
     return angularDirectiveProxyOutput(config, compilerCtx, angularOuputTarget, cmpRegistry);
   }));
 }
+
 
 function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegistry): d.ComponentMeta[] {
   return Object.keys(cmpRegistry)
@@ -25,28 +27,28 @@ function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegi
 
 async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, cmpRegistry: d.ComponentRegistry) {
   const components = getComponents(outputTarget.excludeComponents, cmpRegistry);
-  const { hasDirectives, hasOutputs, hasMethods, proxies } = generateProxies(components);
+  const { hasDirectives, hasOutputs, proxies } = generateProxies(components);
 
-  const auxFunctions: string[] = [];
+  const auxFunctions: string[] = [
+    inputsAuxFunction(),
+    outputsAuxFunction(),
+    methodsAuxFunction()
+  ];
   const angularImports = [
     'ElementRef'
   ];
 
   if (hasDirectives) {
-    auxFunctions.push(inputsAuxFunction());
     angularImports.push('Directive');
   }
+
   if (hasOutputs) {
-    auxFunctions.push(outputsAuxFunction());
     angularImports.push('EventEmitter');
-  }
-  if (hasMethods) {
-    auxFunctions.push(methodsAuxFunction());
   }
 
   const imports = `import { ${angularImports.sort().join(', ')} } from '@angular/core';`;
   const final: string[] = [
-    '/* angular directive proxies */',
+    '/* auto-generated angular directive proxies */',
     imports,
     auxFunctions.join('\n'),
     proxies,
@@ -64,7 +66,7 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
 
 function inputsAuxFunction() {
   return `
-function inputs(instance: any, el: ElementRef, props: string[]) {
+export function proxyInputs(instance: any, el: ElementRef, props: string[]) {
   props.forEach(propName => {
     Object.defineProperty(instance, propName, {
       get: () => el.nativeElement[propName], set: (val: any) => el.nativeElement[propName] = val
@@ -76,25 +78,22 @@ function inputs(instance: any, el: ElementRef, props: string[]) {
 
 function outputsAuxFunction() {
   return `
-function outputs(instance: any, events: string[]) {
-  events.forEach(eventName => {
-    instance[eventName] = new EventEmitter();
-  });
+export function proxyOutputs(instance: any, events: string[]) {
+  events.forEach(eventName => instance[eventName] = new EventEmitter());
 }`;
 }
 
 
 function methodsAuxFunction() {
   return `
-function methods(instance: any, ref: ElementRef, methods: string[]) {
+export function proxyMethods(instance: any, ref: ElementRef, methods: string[]) {
   const el = ref.nativeElement;
   methods.forEach(methodName => {
     Object.defineProperty(instance, methodName, {
       get: function() {
         return function() {
           const args = arguments;
-          return el.componentOnReady()
-            .then((el: any) => el[methodName].apply(el, args));
+          return el.componentOnReady().then((el: any) => el[methodName].apply(el, args));
         };
       }
     });
@@ -104,14 +103,13 @@ function methods(instance: any, ref: ElementRef, methods: string[]) {
 }
 
 function generateProxies(components: d.ComponentMeta[]) {
-  const namingSet = new Set<string>();
   let hasDirectives = false;
   let hasMethods = false;
   let hasOutputs = false;
   let hasInputs = false;
 
   const lines = components.map(cmpMeta => {
-    const proxy = generateProxy(namingSet, cmpMeta);
+    const proxy = generateProxy(cmpMeta);
     hasDirectives = true;
     if (proxy.hasInputs) {
       hasInputs = true;
@@ -125,13 +123,8 @@ function generateProxies(components: d.ComponentMeta[]) {
     return proxy.text;
   });
 
-  const instanceMembers = Array.from(namingSet)
-    .sort()
-    .map(v => `${v} = '${v}'`)
-    .join(', ');
-
   return {
-    proxies: `const ${instanceMembers};\n` + lines.join('\n'),
+    proxies: lines.join('\n'),
     hasDirectives,
     hasInputs,
     hasMethods,
@@ -139,11 +132,11 @@ function generateProxies(components: d.ComponentMeta[]) {
   };
 }
 
-function generateProxy(namingSet: Set<string>, cmpMeta: d.ComponentMeta) {
+function generateProxy(cmpMeta: d.ComponentMeta) {
   // Collect component meta
-  const inputs = collectNames(getInputs(cmpMeta), namingSet);
-  const outputs = collectNames(getOutputs(cmpMeta), namingSet);
-  const methods = collectNames(getMethods(cmpMeta), namingSet);
+  const inputs = getInputs(cmpMeta);
+  const outputs = getOutputs(cmpMeta);
+  const methods = getMethods(cmpMeta);
 
   // Process meta
   const hasInputs = inputs.length > 0;
@@ -156,10 +149,10 @@ function generateProxy(namingSet: Set<string>, cmpMeta: d.ComponentMeta) {
     `selector: \'${cmpMeta.tagNameMeta}\'`
   ];
   if (inputs.length > 0) {
-    directiveOpts.push(`inputs: [${inputs.join(', ')}]`);
+    directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
   if (outputs.length > 0) {
-    directiveOpts.push(`outputs: [${outputs.join(', ')}]`);
+    directiveOpts.push(`outputs: ['${outputs.join(`', '`)}']`);
   }
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
@@ -179,18 +172,23 @@ export class ${cmpMeta.componentClass} {`];
   } else if (hasOutputs) {
     lines.push(`  constructor() {`);
   }
+
   if (hasMethods) {
-    lines.push(`    methods(this, r, [${methods.join(`, `)}]);`);
+    lines.push(`    proxyMethods(this, r, ['${methods.join(`', '`)}']);`);
   }
+
   if (hasInputs) {
-    lines.push(`    inputs(this, r, [${inputs.join(`, `)}]);`);
+    lines.push(`    proxyInputs(this, r, ['${inputs.join(`', '`)}']);`);
   }
+
   if (hasOutputs) {
-    lines.push(`    outputs(this, [${outputs.join(`, `)}]);`);
+    lines.push(`    proxyOutputs(this, ['${outputs.join(`', '`)}']);`);
   }
+
   if (hasContructor) {
     lines.push(`  }`);
   }
+
   lines.push(`}`);
 
   return {
@@ -199,17 +197,6 @@ export class ${cmpMeta.componentClass} {`];
     hasMethods,
     hasOutputs
   };
-}
-
-function collectNames(names: string[], namingSet: Set<string>) {
-  return names.map(name => {
-    if (RESERVED_KEYWORDS.includes(name)) {
-      name = `'${name}'`;
-    } else {
-      namingSet.add(name);
-    }
-    return name;
-  });
 }
 
 function getInputs(cmpMeta: d.ComponentMeta) {
@@ -247,7 +234,3 @@ export const DIRECTIVES = [
 ];
 `;
 }
-
-const RESERVED_KEYWORDS = [
-  'interface'
-];

@@ -6,7 +6,7 @@ import { isTsFile } from '../util';
 export async function setBuildConditionals(
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  coreId: 'core' | 'core.pf',
+  coreId: 'core' | 'core.pf' | 'esm.es5',
   buildCtx: d.BuildCtx,
   entryModules: d.EntryModule[]
 ) {
@@ -44,18 +44,27 @@ export async function setBuildConditionals(
   await Promise.all(promises);
 
   if (coreId === 'core') {
+    coreBuild.browserModuleLoader = true;
     coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
     if (coreBuild.slotPolyfill) {
       coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
     }
-    compilerCtx.lastBuildConditionalsEsm = coreBuild;
+    compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
+    coreBuild.browserModuleLoader = true;
     coreBuild.es5 = true;
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-    compilerCtx.lastBuildConditionalsEs5 = coreBuild;
+    compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
+
+  } else if (coreId === 'esm.es5') {
+    coreBuild.es5 = true;
+    coreBuild.externalModuleLoader = true;
+    coreBuild.cssVarShim = true;
+    coreBuild.slotPolyfill = true;
+    compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
   }
 
   coreBuild.slotPolyfill = true;
@@ -65,7 +74,7 @@ export async function setBuildConditionals(
 }
 
 
-export function getLastBuildConditionals(compilerCtx: d.CompilerCtx, coreId: 'core' | 'core.pf', buildCtx: d.BuildCtx) {
+export function getLastBuildConditionals(compilerCtx: d.CompilerCtx, coreId: 'core' | 'core.pf' | 'esm.es5', buildCtx: d.BuildCtx) {
   if (compilerCtx.isRebuild && Array.isArray(buildCtx.filesChanged)) {
     // this is a rebuild and we do have lastBuildConditionals already
     const hasChangedTsFile = buildCtx.filesChanged.some(filePath => {
@@ -75,12 +84,16 @@ export function getLastBuildConditionals(compilerCtx: d.CompilerCtx, coreId: 'co
     if (!hasChangedTsFile) {
       // we didn't have a typescript change
       // so it's ok to use the lastBuildConditionals
-      if (coreId === 'core' && compilerCtx.lastBuildConditionalsEsm) {
-        return compilerCtx.lastBuildConditionalsEsm;
+      if (coreId === 'core' && compilerCtx.lastBuildConditionalsBrowserEsm) {
+        return compilerCtx.lastBuildConditionalsBrowserEsm;
       }
 
-      if (coreId === 'core.pf' && compilerCtx.lastBuildConditionalsEs5) {
-        return compilerCtx.lastBuildConditionalsEs5;
+      if (coreId === 'core.pf' && compilerCtx.lastBuildConditionalsBrowserEs5) {
+        return compilerCtx.lastBuildConditionalsBrowserEs5;
+      }
+
+      if (coreId === 'esm.es5' && compilerCtx.lastBuildConditionalsEsmEs5) {
+        return compilerCtx.lastBuildConditionalsEsmEs5;
       }
     }
   }

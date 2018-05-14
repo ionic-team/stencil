@@ -11,6 +11,7 @@ export class TestingConfig implements d.Config {
 
   namespace: string;
   rootDir = path.resolve('/');
+  globalScript: string;
   suppressTypeScriptErrors = true;
   devMode = true;
   enableCache = false;

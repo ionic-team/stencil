@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
-import { angularDirectiveProxyOutputs } from '../output-targets/angular';
+import { angularDirectiveProxyOutputs } from '../distribution/dist-angular';
+import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { gatherMetadata } from './datacollection/index';
-import { getComponentsDtsTypesFilePath } from '../collections/distribution';
+import { getComponentsDtsTypesFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizePath } from '../util';
@@ -49,12 +50,19 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   });
 
   // Generate d.ts files for component types
-  const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
+  let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
+
+  // get all the output targets that require types
+  const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
+
+  if (typesOutputTargets.length > 0) {
+    // we're building a dist output target(s)
+    // so let's also add the types for the defineCustomElements
+    componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
+  }
 
   // queue the components.d.ts async file write and put it into memory
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
-
-  const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
 
   await Promise.all(typesOutputTargets.map(async outputTarget => {
     const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);

@@ -108,10 +108,6 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
 }
 
 const utils = {
-  'getAttributes': function(vnode: d.VNode) {
-    return vnode.vattrs;
-  },
-  'replaceAttributes': function(vnode: d.VNode, attributes: any) {
-    vnode.vattrs = attributes;
-  }
+  'getAttributes': (vnode: d.VNode) => vnode.vattrs,
+  'replaceAttributes': (vnode: d.VNode, attributes: any) => vnode.vattrs = attributes
 };

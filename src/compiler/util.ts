@@ -1,5 +1,5 @@
+import * as d from '../declarations';
 import { BANNER } from '../util/constants';
-import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../declarations';
 
 
 /**
@@ -70,66 +70,17 @@ export function isWebDevFile(filePath: string) {
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 
 
-export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
-  const opts: any = { output: {}, compress: {}, mangle: true };
-
-  if (sourceTarget === 'es5') {
-    opts.ecma = 5;
-    opts.output.ecma = 5;
-    opts.compress.ecma = 5;
-    opts.compress.arrows = false;
-    opts.output.beautify = false;
-
-  } else {
-    opts.ecma = 6;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
-    opts.toplevel = true;
-    opts.compress.arrows = true;
-    opts.output.beautify = false;
-  }
-
-  if (config.logLevel === 'debug') {
-    opts.mangle = {};
-    opts.mangle.keep_fnames = true;
-    opts.compress.drop_console = false;
-    opts.compress.drop_debugger = false;
-    opts.output.beautify = true;
-    opts.output.bracketize = true;
-    opts.output.indent_level = 2;
-    opts.output.comments = 'all';
-    opts.output.preserve_line = true;
-  } else {
-    opts.compress.pure_funcs = ['assert', 'console.debug'];
-  }
-
-  opts.compress.passes = 2;
-
-  if (preamble) {
-    opts.output.preamble = generatePreamble(config);
-  }
-
-  const cacheKey = compilerCtx.cache.createKey('minifyJs', opts, jsText);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
-  if (cachedContent != null) {
-    return {
-      output: cachedContent,
-      diagnostics: []
-    };
-  }
-
-  const r = config.sys.minifyJs(jsText, opts);
-  if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
-    await compilerCtx.cache.put(cacheKey, r.output);
-  }
-  return r;
-}
-
-export function generatePreamble(config: Config) {
+export function generatePreamble(config: d.Config, content?: string) {
   let preamble: string[] = [];
 
   if (config.preamble) {
     preamble = config.preamble.split('\n');
+  }
+
+  if (content) {
+    content.split('\n').forEach(c => {
+      preamble.push(c);
+    });
   }
 
   preamble.push(BANNER);
@@ -147,8 +98,8 @@ export function generatePreamble(config: Config) {
 }
 
 
-export function buildError(diagnostics: Diagnostic[]) {
-  const d: Diagnostic = {
+export function buildError(diagnostics: d.Diagnostic[]) {
+  const d: d.Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'build error',
@@ -164,8 +115,8 @@ export function buildError(diagnostics: Diagnostic[]) {
 }
 
 
-export function buildWarn(diagnostics: Diagnostic[]) {
-  const d: Diagnostic = {
+export function buildWarn(diagnostics: d.Diagnostic[]) {
+  const diagnostic: d.Diagnostic = {
     level: 'warn',
     type: 'build',
     header: 'build warn',
@@ -175,14 +126,14 @@ export function buildWarn(diagnostics: Diagnostic[]) {
     lines: []
   };
 
-  diagnostics.push(d);
+  diagnostics.push(diagnostic);
 
-  return d;
+  return diagnostic;
 }
 
 
-export function catchError(diagnostics: Diagnostic[], err: Error) {
-  const d: Diagnostic = {
+export function catchError(diagnostics: d.Diagnostic[], err: Error) {
+  const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'build error',
@@ -194,25 +145,25 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 
   if (err) {
     if (err.stack) {
-      d.messageText = err.stack.toString();
+      diagnostic.messageText = err.stack.toString();
 
     } else {
       if (err.message) {
-        d.messageText = err.message.toString();
+        diagnostic.messageText = err.message.toString();
 
       } else {
-        d.messageText = err.toString();
+        diagnostic.messageText = err.toString();
       }
     }
   }
 
-  diagnostics.push(d);
+  diagnostics.push(diagnostic);
 
-  return d;
+  return diagnostic;
 }
 
 
-export function hasError(diagnostics: Diagnostic[]): boolean {
+export function hasError(diagnostics: d.Diagnostic[]): boolean {
   if (!diagnostics) {
     return false;
   }
@@ -220,7 +171,7 @@ export function hasError(diagnostics: Diagnostic[]): boolean {
 }
 
 
-export function pathJoin(config: Config, ...paths: string[]) {
+export function pathJoin(config: d.Config, ...paths: string[]) {
   return normalizePath(config.sys.path.join.apply(config.sys.path, paths));
 }
 

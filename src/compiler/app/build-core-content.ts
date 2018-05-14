@@ -30,7 +30,7 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
+export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
   const opts: any = Object.assign({}, config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
 
   if (sourceTarget === 'es5') {
@@ -68,17 +68,20 @@ async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, sourceTa
     }
   }
 
-  const cacheKey = compilerCtx.cache.createKey('minifyCore', opts, input);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
-  if (cachedContent != null) {
-    return {
-      output: cachedContent,
-      diagnostics: [] as d.Diagnostic[]
-    };
+  let cacheKey: string;
+  if (compilerCtx) {
+    cacheKey = compilerCtx.cache.createKey('minifyCore', opts, input);
+    const cachedContent = await compilerCtx.cache.get(cacheKey);
+    if (cachedContent != null) {
+      return {
+        output: cachedContent,
+        diagnostics: [] as d.Diagnostic[]
+      };
+    }
   }
 
   const results = config.sys.minifyJs(input, opts);
-  if (results && results.diagnostics.length === 0) {
+  if (results && results.diagnostics.length === 0 && compilerCtx) {
     await compilerCtx.cache.put(cacheKey, results.output);
   }
 
@@ -203,7 +206,8 @@ const PROD_MINIFY_OPTS: any = {
       builtins: false,
       debug: false,
       keep_quoted: true
-    }
+    },
+    toplevel: true
   },
   output: {
     ascii_only: false,
