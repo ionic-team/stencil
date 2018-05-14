@@ -3,9 +3,9 @@ const path = require('path');
 const rollup = require('rollup');
 const transpile = require('./transpile');
 
-const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-cli');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli/index.js');
-const DEST_FILE = path.join(__dirname, '../dist/cli/index.js');
+const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-cli');
+const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli', 'index.js');
+const DEST_FILE = path.join(__dirname, '..', 'dist', 'cli', 'index.js');
 
 
 const success = transpile('../src/cli/tsconfig.json');

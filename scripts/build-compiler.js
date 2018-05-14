@@ -5,12 +5,12 @@ const cp = require('child_process');
 const transpile = require('./transpile');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-compiler');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'compiler/index.js');
-const DEST_DIR = path.join(__dirname, '../dist/compiler');
+const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
+const ENTRY_FILE = path.join(TRANSPILED_DIR, 'compiler', 'index.js');
+const DEST_DIR = path.join(__dirname, '..', 'dist', 'compiler');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
-const DECLARATIONS_DST_DIR = path.join(__dirname, '../dist/declarations');
+const DECLARATIONS_DST_DIR = path.join(__dirname, '..', 'dist', 'declarations');
 
 
 const success = transpile('../src/compiler/tsconfig.json');

@@ -5,9 +5,9 @@ const rollup = require('rollup');
 const transpile = require('./transpile');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-sys-node');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'sys/node/index.js');
-const DEST_FILE = path.join(__dirname, '../dist/sys/node/index.js');
+const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-sys-node');
+const ENTRY_FILE = path.join(TRANSPILED_DIR, 'sys', 'node', 'index.js');
+const DEST_FILE = path.join(__dirname, '..', 'dist', 'sys', 'node', 'index.js');
 
 
 const success = transpile('../src/sys/node/tsconfig.json');

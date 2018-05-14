@@ -5,9 +5,9 @@ const rollupResolve = require('rollup-plugin-node-resolve');
 const transpile = require('./transpile');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-server');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server/index.js');
-const DEST_DIR = path.join(__dirname, '../dist/server');
+const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-server');
+const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
+const DEST_DIR = path.join(__dirname, '..', 'dist', 'server');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 

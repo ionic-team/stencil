@@ -1,5 +1,5 @@
 
-import * as d from './declarations';
+import * as d from './declarations/index';
 
 export {
   ComponentDidLoad,
@@ -11,7 +11,8 @@ export {
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent
-} from './declarations';
+} from './declarations/index';
+
 
 /**
  * Build
