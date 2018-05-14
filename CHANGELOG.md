@@ -1,3 +1,17 @@
+<a name="0.9.0-0"></a>
+# 🎹 [0.9.0-0](https://github.com/ionic-team/stencil/compare/v0.8.2...v0.9.0-0) (2018-05-14)
+
+### Features
+
+* **esm:** generate dist/esm distribution for external bundlers ([fed958d](https://github.com/ionic-team/stencil/commit/fed958d))
+
+
+### Bug Fixes
+
+* **platform:** leaking loaded bundles ([370ab1a](https://github.com/ionic-team/stencil/commit/370ab1a))
+
+
+
 <a name="0.8.2"></a>
 ## 🎡 [0.8.2](https://github.com/ionic-team/stencil/compare/v0.8.1...v0.8.2) (2018-05-10)
 
