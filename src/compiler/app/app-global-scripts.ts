@@ -22,12 +22,14 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 
     const promises: Promise<any>[] = [];
 
-    config.outputTargets.filter(o => o.appBuild).forEach(outputTarget => {
-      const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget);
-      promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent));
-    });
+    if (sourceTarget !== 'es5') {
+      config.outputTargets.filter(o => o.appBuild).forEach(outputTarget => {
+        const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget);
+        promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent));
+      });
+    }
 
-    config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
+    config.outputTargets.filter(o => o.type === 'dist' || o.type === 'angular').forEach(outputTarget => {
       const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget, 'es5');
       promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
     });
