@@ -85,8 +85,8 @@ module.exports = function(config) {
     customLaunchers: browserStack ? browserStackLaunchers : {},
 
     files: [
-      'src/**/*.spec.ts',
-      'src/util.ts',
+      'test-app/**/*.spec.ts',
+      'test-app/util.ts',
       'www/build/testapp.js',
       { pattern: 'www/build/testapp/*.js', watched: false, included: false, served: true, nocache: false },
       { pattern: 'www/**/*.html', watched: false, included: false, served: true, nocache: false },

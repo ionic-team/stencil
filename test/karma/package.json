@@ -9,7 +9,7 @@
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.debug": "npm run karma.webpack && karma start karma.config.js --browsers=Chrome --single-run=false",
     "karma.prod": "npm run tsc && ../../bin/stencil build --debug && npm run karma.webpack && karma start karma.config.js",
-    "karma.webpack": "webpack --config src/esm-webpack/webpack.config.js",
+    "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
     "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
   },
   "private": true,

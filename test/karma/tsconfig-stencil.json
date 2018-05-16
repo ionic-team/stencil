@@ -23,8 +23,8 @@
     "outDir": "www"
   },
   "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.tsx",
-    "src/util.ts"
+    "test-app/**/*.spec.ts",
+    "test-app/**/*.tsx",
+    "test-app/util.ts"
   ]
 }

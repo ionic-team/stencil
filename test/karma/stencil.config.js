@@ -1,6 +1,7 @@
 
 exports.config = {
   namespace: 'TestApp',
+  srcDir: 'test-app',
   tsconfig: 'tsconfig-stencil.json',
   outputTargets: [
     {
