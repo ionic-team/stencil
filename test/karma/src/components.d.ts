@@ -559,6 +559,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface ShadowDomAux {
+
+    }
+  }
+
+  interface HTMLShadowDomAuxElement extends StencilComponents.ShadowDomAux, HTMLStencilElement {}
+
+  var HTMLShadowDomAuxElement: {
+    prototype: HTMLShadowDomAuxElement;
+    new (): HTMLShadowDomAuxElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-aux': HTMLShadowDomAuxElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-aux': HTMLShadowDomAuxElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-aux': JSXElements.ShadowDomAuxAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomAuxAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ShadowDomChild {
+
+    }
+  }
+
+  interface HTMLShadowDomChildElement extends StencilComponents.ShadowDomChild, HTMLStencilElement {}
+
+  var HTMLShadowDomChildElement: {
+    prototype: HTMLShadowDomChildElement;
+    new (): HTMLShadowDomChildElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-child': HTMLShadowDomChildElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-child': HTMLShadowDomChildElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-child': JSXElements.ShadowDomChildAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomChildAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ShadowDomArrayRoot {
 
     }
