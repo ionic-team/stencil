@@ -10,6 +10,7 @@ describe('validate-package-json', () => {
   let diagnostics: d.Diagnostic[];
   let packageJsonData: d.PackageJsonData;
   let outputTarget: d.OutputTargetDist;
+  const root = path.resolve('/');
 
   beforeEach(() => {
     outputTarget = {
@@ -65,7 +66,7 @@ describe('validate-package-json', () => {
   describe('module', () => {
 
     it('validate module', async () => {
-      compilerCtx.fs.writeFile('/dist/index.esm.js', '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.esm.js'), '');
       packageJsonData.module = 'dist/index.esm.js';
       await v.validateModule(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(0);
@@ -87,15 +88,15 @@ describe('validate-package-json', () => {
   describe('main', () => {
 
     it('main cannot be the old loader', async () => {
-      compilerCtx.fs.writeFile('/dist/somenamespace.js', '');
-      compilerCtx.fs.writeFile('/dist/index.js', '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'somenamespace.js'), '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       packageJsonData.main = 'dist/somenamespace.js';
       await v.validateMain(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
     });
 
     it('validate main', async () => {
-      compilerCtx.fs.writeFile('/dist/index.js', '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       packageJsonData.main = 'dist/index.js';
       await v.validateMain(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(0);
@@ -117,14 +118,14 @@ describe('validate-package-json', () => {
   describe('types', () => {
 
     it('validate types', async () => {
-      compilerCtx.fs.writeFile('/dist/types/components.d.ts', '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
       packageJsonData.types = 'dist/types/components.d.ts';
       await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(0);
     });
 
     it('not d.ts file', async () => {
-      compilerCtx.fs.writeFile('/dist/types/components.ts', '');
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
       packageJsonData.types = 'dist/types/components.ts';
       await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
