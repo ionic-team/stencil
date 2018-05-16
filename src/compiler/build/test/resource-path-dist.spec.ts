@@ -13,6 +13,7 @@ describe('dist loader/core resourcesUrl', () => {
 
 
   it('default config', async () => {
+    jest.setTimeout(15000);
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = path.join(root, 'User', 'testing', '/');
@@ -59,6 +60,7 @@ describe('dist loader/core resourcesUrl', () => {
 
 
   it('custom buildDir config', async () => {
+    jest.setTimeout(15000);
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = path.join(root, 'User', 'testing', '/');
