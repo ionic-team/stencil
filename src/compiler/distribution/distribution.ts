@@ -36,6 +36,7 @@ async function generateDistribution(config: d.Config, compilerCtx: d.CompilerCtx
 
   await v.validateModule(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
   await v.validateMain(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
+  v.validateBrowser(buildCtx.diagnostics, pkgData);
 }
 
 

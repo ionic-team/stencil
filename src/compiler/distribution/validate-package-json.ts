@@ -33,7 +33,6 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 
   if (typeof pkgData.module !== 'string') {
     const err = buildWarn(diagnostics);
-    err.header = `package.json error`;
     err.messageText = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
@@ -42,7 +41,6 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
-    err.header = `package.json error`;
     err.messageText = `package.json "module" property is set to "${pkgData.module}" but cannot be found. It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
@@ -112,6 +110,15 @@ export function validateCollection(config: d.Config, outputTarget: d.OutputTarge
       const err = buildWarn(diagnostics);
       err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
     }
+  }
+}
+
+
+export function validateBrowser(diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+  if (typeof pkgData.browser === 'string') {
+    const err = buildWarn(diagnostics);
+    err.messageText = `package.json "browser" property is set to "${pkgData.browser}". However, for maximum compatibility with all bundlers it's recommended to not set the "browser" property and instead ensure both "module" and "main" properties are set.`;
+    return;
   }
 }
 
