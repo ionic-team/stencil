@@ -40,7 +40,7 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
         memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
-        memberData.reflectToAttr = getReflectToAttr(propOptions);
+        memberData.reflectToAttrib = getReflectToAttr(propOptions);
         memberData.propType = propTypeFromTSType(type, memberData.attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }

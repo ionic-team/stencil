@@ -125,7 +125,7 @@ describe('data serialize/parse', () => {
       const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.PropMutable,
-          reflectToAttr: true
+          reflectToAttrib: true
         }
       };
       const properties = formatComponentConstructorProperties(membersMeta);
@@ -137,7 +137,7 @@ describe('data serialize/parse', () => {
         key: {
           memberType: MEMBER_TYPE.PropMutable,
           attribName: 'attr-name',
-          reflectToAttr: true
+          reflectToAttrib: true
         }
       };
       const properties = formatComponentConstructorProperties(membersMeta);

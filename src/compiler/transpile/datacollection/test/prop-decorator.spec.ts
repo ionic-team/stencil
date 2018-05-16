@@ -35,7 +35,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.Unknown,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
       size: {
         attribName: 'size',
@@ -50,7 +50,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.String,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
       withOptions: {
         attribName: 'my-custom-attr-name',
@@ -64,7 +64,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.Number,
-        reflectToAttr: true
+        reflectToAttrib: true
       },
       width: {
         attribName: 'width',
@@ -79,7 +79,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.Number,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
       setting: {
         attribName: 'setting',
@@ -94,7 +94,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.String,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
       values: {
         attribName: 'values',
@@ -109,7 +109,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.Number,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
       enabled: {
         attribName: 'enabled',
@@ -124,7 +124,7 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: PROP_TYPE.Any,
-        reflectToAttr: false
+        reflectToAttrib: false
       },
     });
   });

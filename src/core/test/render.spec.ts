@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { mockElement, mockPlatform } from '../../testing/mocks';
 import { h } from '../../renderer/vdom/h';
 import { render } from '../render';
+import { PROP_TYPE } from '../../util/constants';
 
 
 describe('instance render', () => {
@@ -30,6 +31,18 @@ describe('instance render', () => {
       }
     }
 
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        checked: {
+          propType: PROP_TYPE.Boolean,
+          attribName: 'checked',
+          reflectToAttrib: true
+        }
+      }
+    });
+
     elm.setAttribute('checked', '');
 
     doRender(MyComponent);
@@ -53,6 +66,18 @@ describe('instance render', () => {
       }
     }
 
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        checked: {
+          propType: PROP_TYPE.Boolean,
+          attribName: 'checked',
+          reflectToAttrib: true
+        }
+      }
+    });
+
     doRender(MyComponent);
 
     const vnode = plt.vnodeMap.get(elm);
@@ -74,10 +99,22 @@ describe('instance render', () => {
       }
     }
 
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        rflBool: {
+          propType: PROP_TYPE.Boolean,
+          attribName: 'my-attr-name',
+          reflectToAttrib: true
+        }
+      }
+    });
+
     doRender(MyComponent);
 
     const vnode = plt.vnodeMap.get(elm);
-    expect(elm.getAttribute('my-attr-name')).toBe('false');
+    expect(elm.hasAttribute('my-attr-name')).toBe(false);
   });
 
   it('should reflect non-standardized boolean attribute, truthy w/ value', () => {
@@ -95,10 +132,22 @@ describe('instance render', () => {
       }
     }
 
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        rflBool: {
+          propType: PROP_TYPE.Boolean,
+          attribName: 'my-attr-name',
+          reflectToAttrib: true
+        }
+      }
+    });
+
     doRender(MyComponent);
 
     const vnode = plt.vnodeMap.get(elm);
-    expect(elm.getAttribute('my-attr-name')).toBe('true');
+    expect(elm.getAttribute('my-attr-name')).toBe('');
   });
 
   it('should reflect boolean property value to attribute, but not a standardized Boolean attribute, no render()', () => {
@@ -116,10 +165,22 @@ describe('instance render', () => {
       }
     }
 
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        rflBool: {
+          propType: PROP_TYPE.Boolean,
+          attribName: 'my-attr-name',
+          reflectToAttrib: true
+        }
+      }
+    });
+
     doRender(MyComponent);
 
     const vnode = plt.vnodeMap.get(elm);
-    expect(elm.getAttribute('my-attr-name')).toBe('true');
+    expect(elm.getAttribute('my-attr-name')).toBe('');
   });
 
   it('should reflect number property value to attribute, w/ render()', () => {
@@ -140,6 +201,18 @@ describe('instance render', () => {
         };
       }
     }
+
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        rflNum: {
+          propType: PROP_TYPE.Number,
+          attribName: 'my-attr-name',
+          reflectToAttrib: true
+        }
+      }
+    });
 
     doRender(MyComponent);
 
@@ -167,6 +240,18 @@ describe('instance render', () => {
         };
       }
     }
+
+    plt.defineComponent({
+      tagNameMeta: 'ion-tag',
+      componentConstructor: MyComponent,
+      membersMeta: {
+        rflStr: {
+          propType: PROP_TYPE.String,
+          attribName: 'my-attr-name',
+          reflectToAttrib: true
+        }
+      }
+    });
 
     doRender(MyComponent);
 

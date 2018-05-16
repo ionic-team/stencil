@@ -512,6 +512,53 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface ReflectToAttr {
+      'bool': boolean;
+      'dynamicNu': number;
+      'dynamicStr': string;
+      'nu': number;
+      'null': string;
+      'otherBool': boolean;
+      'str': string;
+      'undef': string;
+    }
+  }
+
+  interface HTMLReflectToAttrElement extends StencilComponents.ReflectToAttr, HTMLStencilElement {}
+
+  var HTMLReflectToAttrElement: {
+    prototype: HTMLReflectToAttrElement;
+    new (): HTMLReflectToAttrElement;
+  };
+  interface HTMLElementTagNameMap {
+    'reflect-to-attr': HTMLReflectToAttrElement;
+  }
+  interface ElementTagNameMap {
+    'reflect-to-attr': HTMLReflectToAttrElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'reflect-to-attr': JSXElements.ReflectToAttrAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ReflectToAttrAttributes extends HTMLAttributes {
+      'bool'?: boolean;
+      'dynamicNu'?: number;
+      'dynamicStr'?: string;
+      'nu'?: number;
+      'null'?: string;
+      'otherBool'?: boolean;
+      'str'?: string;
+      'undef'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ShadowDomArrayRoot {
 
     }

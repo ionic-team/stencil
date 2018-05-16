@@ -164,7 +164,7 @@ function formatMembers(membersMeta: d.MembersMeta) {
     if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String || memberMeta.propType === PROP_TYPE.Any) {
       // observe the attribute
 
-      if (memberMeta.reflectToAttr) {
+      if (memberMeta.reflectToAttrib) {
         d.push(1); /* 2 - reflectToAttr */
       } else {
         d.push(0); /* 2 - reflectToAttr */
@@ -340,7 +340,7 @@ function formatComponentConstructorProperty(memberMeta: d.MemberMeta, stringify?
     if (typeof memberMeta.attribName === 'string') {
       property.attr = memberMeta.attribName;
 
-      if (memberMeta.reflectToAttr) {
+      if (memberMeta.reflectToAttrib) {
         property.reflectToAttr = true;
       }
     }

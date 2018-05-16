@@ -33,11 +33,11 @@ describe('fillCmpMetaFromConstructor', () => {
     expect(cmpMeta.membersMeta.propA.propType).toBe(PROP_TYPE.String);
     expect(cmpMeta.membersMeta.propA.memberType).toBe(MEMBER_TYPE.PropMutable);
     expect(cmpMeta.membersMeta.propA.attribName).toBe('prop-a');
-    expect(cmpMeta.membersMeta.propA.reflectToAttr).toBe(false);
+    expect(cmpMeta.membersMeta.propA.reflectToAttrib).toBe(false);
     expect(cmpMeta.membersMeta.propB.memberType).toBe(MEMBER_TYPE.Prop);
     expect(cmpMeta.membersMeta.propB.propType).toBe(PROP_TYPE.Boolean);
     expect(cmpMeta.membersMeta.propB.attribName).toBe('propB');
-    expect(cmpMeta.membersMeta.propB.reflectToAttr).toBe(true);
+    expect(cmpMeta.membersMeta.propB.reflectToAttrib).toBe(true);
     expect(cmpMeta.membersMeta.propC.memberType).toBe(MEMBER_TYPE.State);
   });
 

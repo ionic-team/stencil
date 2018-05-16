@@ -156,7 +156,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
         coreBuild.watchCallback = true;
       }
 
-      if (memberMeta.reflectToAttr) {
+      if (memberMeta.reflectToAttrib) {
         coreBuild.reflectToAttr = true;
       }
     });
