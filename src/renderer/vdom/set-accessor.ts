@@ -97,7 +97,7 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
 
       if (Build.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttr) {
         // we also want to set this data to the attribute
-        updateAttribute(elm, cmpMeta.membersMeta[memberName].attribName, newValue);
+        updateAttribute(elm, cmpMeta.membersMeta[memberName].attribName, newValue, (newValue == null));
       }
 
     } else if (memberName !== 'ref') {

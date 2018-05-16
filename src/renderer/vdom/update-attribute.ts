@@ -1,11 +1,11 @@
 import { toLowerCase } from '../../util/helpers';
 
 
-export function updateAttribute(elm: HTMLElement, memberName: string, newValue: any) {
+export function updateAttribute(elm: HTMLElement, memberName: string, newValue: any, forceRemove?: boolean) {
   const isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
   const isBooleanAttr = BOOLEAN_ATTRS[memberName];
 
-  if (isBooleanAttr && (!newValue || newValue === 'false')) {
+  if ((isBooleanAttr && (!newValue || newValue === 'false')) || forceRemove) {
     if (isXlinkNs) {
       elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
 

@@ -27,20 +27,21 @@ describe('reflect-to-attr', function() {
     expect(cmp.getAttribute('nu')).toEqual('2');
     expect(cmp.hasAttribute('undef')).toEqual(false);
     expect(cmp.hasAttribute('null')).toEqual(false);
-    expect(cmp.hasAttribute('bool')).toEqual(false);
+    expect(cmp.getAttribute('bool')).toEqual('false');
 
-    expect(cmp.hasAttribute('bool-2')).toEqual('');
-    expect(cmp.getAttribute('bool-2')).toEqual('');
+    expect(cmp.getAttribute('bool-2')).toEqual('true');
 
     cmp.str = 'second';
     cmp.nu = -12.2;
     cmp.undef = 'no undef';
+    cmp.null = 'no null';
 
     await flush(app);
 
     expect(cmp.getAttribute('str')).toEqual('second');
     expect(cmp.getAttribute('nu')).toEqual('-12.2');
     expect(cmp.getAttribute('undef')).toEqual('no undef');
+    expect(cmp.getAttribute('null')).toEqual('no null');
 
     expect(cmp.getAttribute('dynamic-str')).toEqual('value');
     expect(cmp.getAttribute('dynamic-nu')).toEqual('123');
