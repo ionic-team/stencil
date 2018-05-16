@@ -17,6 +17,7 @@ describe('build', () => {
 
 
   it('should minify es5 build', async () => {
+    jest.setTimeout(15000);
     c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.minifyJs = true;
     c.config.buildEs5 = true;
@@ -33,6 +34,7 @@ describe('build', () => {
   });
 
   it('should minify es2017 build', async () => {
+    jest.setTimeout(15000);
     c.config.minifyJs = true;
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
     await c.fs.commit();

@@ -1,5 +1,5 @@
-<a name="0.9.0-0"></a>
-# 🎹 [0.9.0-0](https://github.com/ionic-team/stencil/compare/v0.8.2...v0.9.0-0) (2018-05-14)
+<a name="0.9.0"></a>
+# 🚌 [0.9.0](https://github.com/ionic-team/stencil/compare/v0.8.2...v0.9.0) (2018-05-16)
 
 ### Features
 
@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+* **global:** fix doubling up global script output ([557e470](https://github.com/ionic-team/stencil/commit/557e470))
 * **platform:** leaking loaded bundles ([370ab1a](https://github.com/ionic-team/stencil/commit/370ab1a))
 
 
