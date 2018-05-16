@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
 import { elementHasProperty } from '../../core/proxy-members';
-import { EMPTY_ARR, EMPTY_OBJ } from '../../util/constants';
+import { EMPTY_ARR, EMPTY_OBJ, PROP_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
 import { updateAttribute } from './update-attribute';
 
 
-export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg?: boolean, isHostElement?: boolean, i?: any, ilen?: number) {
+export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg?: boolean, isHostElement?: boolean, i?: any, ilen?: number, cmpMeta?: d.ComponentMeta) {
   if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
@@ -87,7 +87,7 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
-    const cmpMeta = plt.getComponentMeta(elm);
+    cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
       // we know for a fact that this element is a known component
       // and this component has this member name as a property,
@@ -95,9 +95,15 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
       // set it directly as property on the element
       setProperty(elm, memberName, newValue);
 
-      if (Build.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttr) {
+      if (Build.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
         // we also want to set this data to the attribute
-        updateAttribute(elm, cmpMeta.membersMeta[memberName].attribName, newValue, (newValue == null));
+        updateAttribute(
+          elm,
+          cmpMeta.membersMeta[memberName].attribName,
+          newValue,
+          cmpMeta.membersMeta[memberName].propType === PROP_TYPE.Boolean,
+          (newValue == null)
+        );
       }
 
     } else if (memberName !== 'ref') {
@@ -116,7 +122,7 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
 
   } else if (isSvg && (newValue == null || newValue === false)) {
     // remove svg attribute
-    elm.removeAttribute(memberName);
+    plt.domApi.$removeAttribute(elm, memberName);
   }
 }
 

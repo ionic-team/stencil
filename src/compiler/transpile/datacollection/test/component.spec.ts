@@ -130,7 +130,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'animationCtrl': {
             'ctrlId': 'ion-animation-controller',
@@ -153,7 +153,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'config': {
             'ctrlId': 'config',
@@ -172,7 +172,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'el': {
             'memberType': MEMBER_TYPE.Element,
@@ -190,7 +190,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Boolean,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'enterAnimation': {
             'attribName': 'enter-animation',
@@ -210,7 +210,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'exitAnimation': {
             'attribName': 'exit-animation',
@@ -230,7 +230,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
           'subTitle': {
             'attribName': 'sub-title',
@@ -245,7 +245,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
-            'reflectToAttr': true,
+            'reflectToAttrib': true,
           },
           'title': {
             'attribName': 'title',
@@ -260,7 +260,7 @@ describe('component', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
-            'reflectToAttr': false,
+            'reflectToAttrib': false,
           },
         },
         'stylesMeta': {

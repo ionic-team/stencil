@@ -28,7 +28,7 @@ export function parseComponentLoader(cmpData: d.ComponentHostData, i?: number, d
       d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        reflectToAttr: !!d[2],
+        reflectToAttrib: !!d[2],
         attribName: typeof d[3] === 'string' ? d[3] as string : d[3] ? d[0] : 0 as any,
         propType: d[4]
       };

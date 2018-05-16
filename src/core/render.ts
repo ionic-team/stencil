@@ -158,11 +158,9 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
   if (properties) {
 
     Object.keys(properties).forEach(memberName => {
-      const property = properties[memberName];
-
-      if (property.reflectToAttr) {
+      if (properties[memberName].reflectToAttr) {
         reflectHostAttr = reflectHostAttr || {};
-        reflectHostAttr[property.attr] = instance[memberName];
+        reflectHostAttr[memberName] = instance[memberName];
       }
     });
 

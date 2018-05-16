@@ -514,11 +514,11 @@ declare global {
   namespace StencilComponents {
     interface ReflectToAttr {
       'bool': boolean;
-      'bool2': boolean;
       'dynamicNu': number;
       'dynamicStr': string;
       'nu': number;
       'null': string;
+      'otherBool': boolean;
       'str': string;
       'undef': string;
     }
@@ -544,11 +544,11 @@ declare global {
   namespace JSXElements {
     export interface ReflectToAttrAttributes extends HTMLAttributes {
       'bool'?: boolean;
-      'bool2'?: boolean;
       'dynamicNu'?: number;
       'dynamicStr'?: string;
       'nu'?: number;
       'null'?: string;
+      'otherBool'?: boolean;
       'str'?: string;
       'undef'?: string;
     }

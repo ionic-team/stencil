@@ -63,7 +63,7 @@ export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta:
           memberMeta.attribName = memberName;
         }
 
-        memberMeta.reflectToAttr = !!property.reflectToAttr;
+        memberMeta.reflectToAttrib = !!property.reflectToAttr;
 
         if (property.mutable) {
           memberMeta.memberType = MEMBER_TYPE.PropMutable;

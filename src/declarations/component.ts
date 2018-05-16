@@ -97,7 +97,7 @@ export interface MemberMeta {
   propType?: number;
   attribName?: string;
   attribType?: AttributeTypeInfo;
-  reflectToAttr?: boolean;
+  reflectToAttrib?: boolean;
   ctrlId?: string;
   jsdoc?: JSDoc;
   watchCallbacks?: string[];
