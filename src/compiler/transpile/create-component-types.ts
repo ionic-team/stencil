@@ -22,6 +22,10 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   // run the first program that only does the checking
   const checkProgram = ts.createProgram(checkProgramTsFiles, tsOptions, tsHost);
 
+  // program's source files also include imported files.
+  // let's filter them, we only want to gather metadata from .ts/.tsx files in project's src
+  const sourceFiles = checkProgram.getSourceFiles().filter(sf => checkProgramTsFiles.includes(sf.fileName));
+
   // gather component metadata and type info
   const metadata = gatherMetadata(
     config,
@@ -29,7 +33,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
     buildCtx.diagnostics,
     buildCtx.collections,
     checkProgram.getTypeChecker(),
-    checkProgram.getSourceFiles()
+    sourceFiles
   );
 
   // create angular directive proxy outputs
