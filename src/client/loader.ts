@@ -31,6 +31,8 @@ export function init(
 
   createComponentOnReadyPrototype(win, HTMLElementPrototype, App);
 
+  resourcesUrl = resourcesUrl || App.resourcesUrl;
+ 
   // figure out the script element for this current script
   y = doc.querySelectorAll('script');
   for (x = y.length - 1; x >= 0; x--) {
@@ -43,7 +45,7 @@ export function init(
   // get the resource path attribute on this script element
   y = scriptElm.getAttribute('data-resources-url');
 
-  if (y) {
+  if (!resourcesUrl && y) {
     // the script element has a data-resources-url attribute, always use that
     resourcesUrl = y;
   }
