@@ -563,7 +563,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       contentRef: d.RenderNode;
 
 
-  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode) {
+  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -647,17 +647,20 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
           // by default we're just going to insert it directly
           // after the slot reference node
-          const parentNodeRef = domApi.$parentNode(relocateNode.slotRefNode);
-          let insertBeforeNode = domApi.$nextSibling(relocateNode.slotRefNode);
+          parentNodeRef = domApi.$parentNode(relocateNode.slotRefNode);
+          insertBeforeNode = domApi.$nextSibling(relocateNode.slotRefNode);
 
           orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
 
           while (orgLocationNode = domApi.$previousSibling(orgLocationNode) as any) {
-            refNode = orgLocationNode['s-nr'];
-            if (refNode && refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
-              if (parentNodeRef === domApi.$parentNode(refNode)) {
-                insertBeforeNode = domApi.$nextSibling(refNode);
-                break;
+            if ((refNode = orgLocationNode['s-nr']) && refNode) {
+              if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
+                if (parentNodeRef === domApi.$parentNode(refNode)) {
+                  if ((refNode = domApi.$nextSibling(refNode) as any) && refNode && !refNode['s-nr']) {
+                    insertBeforeNode = refNode;
+                    break;
+                  }
+                }
               }
             }
           }
