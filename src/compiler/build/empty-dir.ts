@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import * as p from 'path';
 
 
 export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.CompilerCtx) {
@@ -17,7 +16,7 @@ export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.Com
     // Check if there is a .gitkeep file
     // We want to keep it so people don't have to readd manually
     // to their projects each time.
-    const gitkeepPath = p.join(outputTarget.dir, '.gitkeep');
+    const gitkeepPath = config.sys.path.join(outputTarget.dir, '.gitkeep');
     const existsGitkeep = await compilerCtx.fs.access(gitkeepPath);
 
     await compilerCtx.fs.emptyDir(outputTarget.dir);
