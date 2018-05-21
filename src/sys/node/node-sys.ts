@@ -148,7 +148,7 @@ export class NodeSystem implements d.StencilSystem {
           hasConfigFile = fileStat.isFile();
         }
       } catch (e) {
-        hasConfigFile = false;
+        throw new Error(`Invalid Stencil configuration file "${configPath}".`);
       }
     }
 
