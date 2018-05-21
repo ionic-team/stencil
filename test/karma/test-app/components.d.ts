@@ -1120,6 +1120,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotMapOrderRoot {
+
+    }
+  }
+
+  interface HTMLSlotMapOrderRootElement extends StencilComponents.SlotMapOrderRoot, HTMLStencilElement {}
+
+  var HTMLSlotMapOrderRootElement: {
+    prototype: HTMLSlotMapOrderRootElement;
+    new (): HTMLSlotMapOrderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-map-order-root': HTMLSlotMapOrderRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-map-order-root': HTMLSlotMapOrderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-map-order-root': JSXElements.SlotMapOrderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotMapOrderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotMapOrder {
+
+    }
+  }
+
+  interface HTMLSlotMapOrderElement extends StencilComponents.SlotMapOrder, HTMLStencilElement {}
+
+  var HTMLSlotMapOrderElement: {
+    prototype: HTMLSlotMapOrderElement;
+    new (): HTMLSlotMapOrderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-map-order': HTMLSlotMapOrderElement;
+  }
+  interface ElementTagNameMap {
+    'slot-map-order': HTMLSlotMapOrderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-map-order': JSXElements.SlotMapOrderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotMapOrderAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotReorderRoot {
 
     }
