@@ -757,6 +757,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotBasicOrderRoot {
+
+    }
+  }
+
+  interface HTMLSlotBasicOrderRootElement extends StencilComponents.SlotBasicOrderRoot, HTMLStencilElement {}
+
+  var HTMLSlotBasicOrderRootElement: {
+    prototype: HTMLSlotBasicOrderRootElement;
+    new (): HTMLSlotBasicOrderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-basic-order-root': JSXElements.SlotBasicOrderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotBasicOrderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SlotBasicOrder {
+
+    }
+  }
+
+  interface HTMLSlotBasicOrderElement extends StencilComponents.SlotBasicOrder, HTMLStencilElement {}
+
+  var HTMLSlotBasicOrderElement: {
+    prototype: HTMLSlotBasicOrderElement;
+    new (): HTMLSlotBasicOrderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-basic-order': HTMLSlotBasicOrderElement;
+  }
+  interface ElementTagNameMap {
+    'slot-basic-order': HTMLSlotBasicOrderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-basic-order': JSXElements.SlotBasicOrderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotBasicOrderAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotBasicRoot {
 
     }
