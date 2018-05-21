@@ -11,7 +11,10 @@ export class NodeLogger implements d.Logger {
   buildLogFilePath: string = null;
 
   constructor() {
-    const sysUtil = require(path.join(__dirname, './sys-util.js'));
+    const rootDir = path.join(__dirname, '../../..');
+    const distDir = path.join(rootDir, 'dist');
+    const sysUtil = require(path.join(distDir, 'sys/node/sys-util.js'));
+
     this.chalk = sysUtil.chalk;
   }
 
