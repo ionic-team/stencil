@@ -1,3 +1,13 @@
+<a name="0.9.2"></a>
+## 🌳 [0.9.2](https://github.com/ionic-team/stencil/compare/v0.9.1...v0.9.2) (2018-05-21)
+
+
+### Bug Fixes
+
+* **slot:** fix slot order when using an array at the root ([9a36b0c](https://github.com/ionic-team/stencil/commit/9a36b0c))
+
+
+
 <a name="0.9.1"></a>
 ## 🍁 [0.9.1](https://github.com/ionic-team/stencil/compare/v0.9.0...v0.9.1) (2018-05-16)
 
