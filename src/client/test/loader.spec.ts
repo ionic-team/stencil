@@ -86,14 +86,41 @@ describe('loader', () => {
       expect(coreScript.getAttribute('src')).toBe('/build/app-namespace/app.core.pf.js');
     });
 
+    it('set resourcesUrl from namespace object resourcesUrl', () => {
+      win.AppNameSpace = {
+        resourcesUrl: '/namespace/property/resources-url/'
+      };
+      const loaderScript = doc.createElement('script');
+      loaderScript.setAttribute('data-resources-url', '/custom/resources-url/');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
+
+      const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
+      expect(coreScript.getAttribute('data-resources-url')).toBe('/namespace/property/resources-url/');
+    });
+
+    it('set resourcesUrl from data-resources-url attribute', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.setAttribute('data-resources-url', '/custom/attr/resources-url/');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
+
+      const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
+      expect(coreScript.getAttribute('data-resources-url')).toBe('/custom/attr/resources-url/');
+    });
+
     it('set script resource path data attribute from defaults', () => {
       const loaderScript = doc.createElement('script');
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
 
       init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
-      const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
 
+      const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
       expect(coreScript.getAttribute('data-resources-url')).toBe('/build/app-namespace/');
     });
 
