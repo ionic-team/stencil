@@ -1,3 +1,20 @@
+<a name="0.9.3"></a>
+## 🏓 [0.9.3](https://github.com/ionic-team/stencil/compare/v0.9.2...v0.9.3) (2018-05-22)
+
+
+### Bug Fixes
+
+* **app:** allow multiple apps to work w/ componentOnReady() ([162ad68](https://github.com/ionic-team/stencil/commit/162ad68))
+* **cli:** throw an error if passed an invalid config file arg ([deef15f](https://github.com/ionic-team/stencil/commit/deef15f))
+
+
+### Features
+
+* **build:** keep gitkeep files when emptying a directory ([375e9c2](https://github.com/ionic-team/stencil/commit/375e9c2))
+* **loader:** allow using an explicit resources url setting ([383db85](https://github.com/ionic-team/stencil/commit/383db85))
+
+
+
 <a name="0.9.2"></a>
 ## 🌳 [0.9.2](https://github.com/ionic-team/stencil/compare/v0.9.1...v0.9.2) (2018-05-21)
 
