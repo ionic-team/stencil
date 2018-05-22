@@ -32,7 +32,13 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
         (cmpMeta as any)[styleModeId] = templateElm;
 
         // add the style text to the template element's innerHTML
-        templateElm.innerHTML = `<style>${style}</style>`;
+        if (Build.isDev) {
+          // add a style id attribute, but only useful during dev
+          domApi.$setAttribute(templateElm, 'data-tmpl-style-id', styleModeId);
+          templateElm.innerHTML = `<style data-style-id="${styleModeId}">${style}</style>`;
+        } else {
+          templateElm.innerHTML = `<style>${style}</style>`;
+        }
 
         // add our new template element to the head
         // so it can be cloned later
@@ -93,6 +99,11 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
         // create a new style element and add as innerHTML
         styleElm = domApi.$createElement('style');
         styleElm.innerHTML = styleTemplate;
+
+        if (Build.isDev) {
+          // add a style id attribute, but only useful during dev
+          domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+        }
 
         if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
           customStyle.addStyle(styleElm);
