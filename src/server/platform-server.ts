@@ -137,7 +137,7 @@ export function createPlatformServer(
 
   function getComponentMeta(elm: Element) {
     // registry tags are always lower-case
-    return cmpRegistry[elm.tagName.toLowerCase()];
+    return cmpRegistry[elm.nodeName.toLowerCase()];
   }
 
   function defineComponent(cmpMeta: d.ComponentMeta) {

@@ -72,17 +72,10 @@ function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlob
 
 
 export function connectComponentOnReady(App: d.AppGlobal, elm: d.HostElement) {
-  (elm as any).componentOnReady = function componentOnReady(cb?: () => void): any {
-    const elm = this;
-
-    if (cb) {
-      App.componentOnReady(elm, cb);
-
-    } else {
-      return new Promise(resolve => {
-        App.componentOnReady(elm, resolve);
-      });
-    }
+  elm.componentOnReady = function componentOnReady(): any {
+    return new Promise(resolve => {
+      App.componentOnReady(elm, resolve);
+    });
   };
 }
 

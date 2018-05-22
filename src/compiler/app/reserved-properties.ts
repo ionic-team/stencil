@@ -30,8 +30,6 @@ export const RESERVED_PROPERTIES: string[] = [
   'resourcesUrl',
   'tick',
   'write',
-  '$definedCmps',
-  '$r',
 
 
   /**

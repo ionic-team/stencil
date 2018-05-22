@@ -19,7 +19,7 @@ import { queueUpdate } from '../core/update';
 import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle: CustomStyle) {
+export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle: CustomStyle) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles = new Map<string, d.CjsExports>();
@@ -48,7 +48,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
+  // DEPRECATED $definedCmps 2018-05-17
+  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || (win as any).$definedCmps || {});
 
   // internal id increment for unique ids
   let ids = 0;
@@ -384,7 +385,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   });
 
   // create the componentOnReady fn
-  initCoreComponentOnReady(plt, App);
+  initCoreComponentOnReady(plt, App, win, win['s-apps'], win['s-cr']);
 
   // notify that the app has initialized and the core script is ready
   // but note that the components have not fully loaded yet
