@@ -512,6 +512,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface MultipleAppsCmp {
+
+    }
+  }
+
+  interface HTMLMultipleAppsCmpElement extends StencilComponents.MultipleAppsCmp, HTMLStencilElement {}
+
+  var HTMLMultipleAppsCmpElement: {
+    prototype: HTMLMultipleAppsCmpElement;
+    new (): HTMLMultipleAppsCmpElement;
+  };
+  interface HTMLElementTagNameMap {
+    'multiple-apps-cmp': HTMLMultipleAppsCmpElement;
+  }
+  interface ElementTagNameMap {
+    'multiple-apps-cmp': HTMLMultipleAppsCmpElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'multiple-apps-cmp': JSXElements.MultipleAppsCmpAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface MultipleAppsCmpAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ReflectToAttr {
       'bool': boolean;
       'dynamicNu': number;

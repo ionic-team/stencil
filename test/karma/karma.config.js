@@ -46,6 +46,9 @@ const localLaunchers = {
 			// Without a remote debugging port, Google Chrome exits immediately.
 			'--remote-debugging-port=9333'
 		]
+  },
+  'Firefox': {
+    base: 'Firefox'
   }
 };
 
@@ -53,6 +56,7 @@ module.exports = function(config) {
   config.set({
     plugins: [
       'karma-chrome-launcher',
+      'karma-firefox-launcher',
       'karma-browserstack-launcher',
       'karma-jasmine',
       'karma-typescript',
@@ -88,7 +92,9 @@ module.exports = function(config) {
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
       'www/build/testapp.js',
+      'www/build/testsibling.js',
       { pattern: 'www/build/testapp/*.js', watched: false, included: false, served: true, nocache: false },
+      { pattern: 'www/build/testsibling/*.js', watched: false, included: false, served: true, nocache: false },
       { pattern: 'www/**/*.html', watched: false, included: false, served: true, nocache: false },
     ],
 

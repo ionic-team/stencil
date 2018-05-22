@@ -25,6 +25,8 @@
   "include": [
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
-    "test-app/util.ts"
+    "test-app/util.ts",
+    "test-sibling/**/*.spec.ts",
+    "test-sibling/**/*.tsx"
   ]
 }
