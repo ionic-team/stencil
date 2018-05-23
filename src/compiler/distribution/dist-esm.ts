@@ -114,8 +114,5 @@ async function patchCollection(config: d.Config, compilerCtx: d.CompilerCtx, out
   // so let's just make this work by putting in empty js files
   // and call it a day
   const collectionInterfacePath = pathJoin(config, outputTarget.collectionDir, 'interface.js');
-  const exists = await compilerCtx.fs.access(collectionInterfacePath);
-  if (!exists) {
-    await compilerCtx.fs.writeFile(collectionInterfacePath, '');
-  }
+  await compilerCtx.fs.writeFile(collectionInterfacePath, '');
 }
