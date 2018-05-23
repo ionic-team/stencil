@@ -155,17 +155,17 @@ For the small minority of browsers that do not support modern browser features a
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) *(transpiled to promises)*
  - [fetch()](https://github.com/github/fetch)
- - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
- - [Object.entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries)
- - [performance.now()](https://gist.github.com/paulirish/5438650)
- - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
  - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+ - [Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
  - [Array.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
  - [Element.closest](https://github.com/jonathantneal/closest)
  - [Element.matches](https://github.com/jonathantneal/closest)
  - [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove)
+ - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+ - [Object.entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries)
  - [String.startsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
  - [String.endsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
+ - [String.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes)
 
 
 ## Related
