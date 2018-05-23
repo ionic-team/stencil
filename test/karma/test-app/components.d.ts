@@ -625,6 +625,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface ShadowDomBasicRoot {
+
+    }
+  }
+
+  interface HTMLShadowDomBasicRootElement extends StencilComponents.ShadowDomBasicRoot, HTMLStencilElement {}
+
+  var HTMLShadowDomBasicRootElement: {
+    prototype: HTMLShadowDomBasicRootElement;
+    new (): HTMLShadowDomBasicRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-basic-root': JSXElements.ShadowDomBasicRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomBasicRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ShadowDomBasic {
+
+    }
+  }
+
+  interface HTMLShadowDomBasicElement extends StencilComponents.ShadowDomBasic, HTMLStencilElement {}
+
+  var HTMLShadowDomBasicElement: {
+    prototype: HTMLShadowDomBasicElement;
+    new (): HTMLShadowDomBasicElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-basic': HTMLShadowDomBasicElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-basic': HTMLShadowDomBasicElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-basic': JSXElements.ShadowDomBasicAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomBasicAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotArrayBasic {
 
     }
