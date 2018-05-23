@@ -40,4 +40,7 @@ export async function testEsmImport(app: HTMLElement) {
 
   expect(propVal.textContent.trim()).toBe('propVal: 90');
   expect(listenVal.textContent.trim()).toBe('listenVal: 2');
+
+  const isReady = elm.querySelector('#isReady');
+  expect(isReady.textContent.trim()).toBe('componentOnReady: true');
 }

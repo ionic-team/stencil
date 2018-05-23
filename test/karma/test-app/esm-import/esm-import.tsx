@@ -8,6 +8,7 @@ export class EsmImport {
 
   @Element() el: any;
   @Prop() propVal = 0;
+  @State() isReady = 'false';
   @State() stateVal: string;
   @State() listenVal = 0;
   @State() someEventInc = 0;
@@ -29,6 +30,9 @@ export class EsmImport {
 
   componentWillLoad() {
     this.stateVal = 'mph';
+    this.el.componentOnReady().then(() => {
+      this.isReady = 'true';
+    });
   }
 
   componentDidLoad() {
@@ -45,6 +49,7 @@ export class EsmImport {
         <p id="stateVal">stateVal: {this.stateVal}</p>
         <p id="listenVal">listenVal: {this.listenVal}</p>
         <p><button onClick={this.testMethod.bind(this)}>Test</button></p>
+        <p id="isReady">componentOnReady: {this.isReady}</p>
       </div>
     );
   }

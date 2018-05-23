@@ -3,3 +3,16 @@
 <script src="/esm-webpack/main.js"></script>
 
 <esm-import prop-val="88"></esm-import>
+
+<style>
+  .componentOnReady {
+    color: blue;
+  }
+</style>
+
+<script>
+  var elm = document.querySelector('esm-import');
+  elm.componentOnReady().then(function(readyElm) {
+    readyElm.classList.add('componentOnReady');
+  });
+</script>
