@@ -111,7 +111,7 @@ describe('styles', () => {
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
-    expect(template.innerHTML).toBe(`<style>${cmpConstructor.style}</style>`);
+    expect(template.innerHTML).toBe(`<style data-style-id="cmp-aios">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-aios`]).toBe(template);
   });
 
@@ -128,7 +128,7 @@ describe('styles', () => {
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
-    expect(template.innerHTML).toBe(`<style>${cmpConstructor.style}</style>`);
+    expect(template.innerHTML).toBe(`<style data-style-id="cmp-a$">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-a$`]).toBe(template);
   });
 
