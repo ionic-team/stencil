@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
 import { getGlobalStyleFilename } from './app-file-naming';
+import { minifyStyle } from '../style/minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  const filePaths = config.globalStyle;
-  if (!filePaths || !filePaths.length) {
+  if (typeof config.globalStyle !== 'string') {
     config.logger.debug(`"config.globalStyle" not found`);
     return;
   }
@@ -14,11 +14,7 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
   const timeSpan = config.logger.createTimeSpan(`compile global style start`);
 
   try {
-    const styles = await Promise.all(filePaths.map(filePath => {
-      return loadGlobalStyle(config, compilerCtx, buildCtx, filePath);
-    }));
-
-    const styleText = styles.join('\n').trim();
+    const styleText = await loadGlobalStyle(config, compilerCtx, buildCtx, config.globalStyle);
 
     const fileName = getGlobalStyleFilename(config);
 
@@ -43,6 +39,8 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
 
     style = transformResults.code;
+
+    style = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, style, filePath);
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);

@@ -209,10 +209,27 @@ export class NodeSystem implements d.StencilSystem {
     return result.css;
   }
 
-  minifyCss(input: string) {
+  async minifyCss(input: string, filePath?: string, opts: any = {}) {
     const cleanCssModule = path.join(this.distDir, 'sys', 'node', 'clean-css.js');
     const CleanCSS = require(cleanCssModule).cleanCss;
-    const result = new CleanCSS().minify(input);
+
+    opts.returnPromise = true;
+
+    let minifyInput: any;
+
+    if (typeof filePath === 'string') {
+      filePath = normalizePath(filePath);
+      minifyInput = {
+        [filePath]: {
+          styles: input
+        }
+      };
+    } else {
+      minifyInput = input;
+    }
+
+    const cleanCss = new CleanCSS(opts);
+    const result = await cleanCss.minify(minifyInput);
     const diagnostics: d.Diagnostic[] = [];
 
     if (result.errors) {

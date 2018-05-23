@@ -17,16 +17,10 @@ export function validatePaths(config: Config) {
   }
 
   if (typeof config.globalStyle === 'string') {
-    config.globalStyle = [config.globalStyle];
-  }
-  if (Array.isArray(config.globalStyle)) {
-    config.globalStyle = config.globalStyle.filter(globalStyle => typeof globalStyle === 'string');
-    config.globalStyle = config.globalStyle.map(globalStyle => {
-      if (path.isAbsolute(globalStyle)) {
-        return normalizePath(globalStyle);
-      }
-      return normalizePath(path.join(config.rootDir, globalStyle));
-    });
+    if (!path.isAbsolute(config.globalStyle)) {
+      config.globalStyle = path.join(config.rootDir, config.globalStyle);
+    }
+    config.globalStyle = normalizePath(config.globalStyle);
   }
 
   setStringConfig(config, 'srcDir', DEFAULT_SRC_DIR);

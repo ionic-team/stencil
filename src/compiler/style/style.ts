@@ -154,10 +154,14 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
     styleMeta.compiledStyleText = await config.sys.autoprefixCss(styleMeta.compiledStyleText, autoprefixConfig);
   }
 
-  // minify css
-  if (config.minifyCss) {
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText);
+  let filePath: string = null;
+  const externalStyle = styleMeta.externalStyles && styleMeta.externalStyles.length && styleMeta.externalStyles[0];
+  if (externalStyle && externalStyle.absolutePath) {
+    filePath = externalStyle.absolutePath;
   }
+
+  // minify css
+  styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to

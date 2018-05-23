@@ -20,11 +20,11 @@ export interface StencilSystem {
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string): d.Config;
   autoprefixCss?(input: string, opts?: any): Promise<string>;
-  minifyCss?(input: string, opts?: any): {
+  minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
     output: string;
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
-  };
+  }>;
   minifyJs?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;

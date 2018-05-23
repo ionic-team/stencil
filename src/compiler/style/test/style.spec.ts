@@ -58,7 +58,7 @@ describe('component-styles', () => {
       expect(r.diagnostics).toEqual([]);
 
       const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
-      expect(content).toContain('body { color: red; }');
+      expect(content).toContain('color: red');
     });
 
     it('should add mode styles to hashed filename/minified builds', async () => {
@@ -144,7 +144,7 @@ describe('component-styles', () => {
       expect(r.bundleBuildCount).toBe(1);
 
       const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
-      expect(content).toContain(`body { color: red; }`);
+      expect(content).toContain(`color: red`);
     });
 
   });
