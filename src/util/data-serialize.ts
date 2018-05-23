@@ -27,7 +27,7 @@ export function formatBrowserLoaderComponent(cmpMeta: d.ComponentMeta): d.Compon
 }
 
 
-export function formatEsmLoaderComponent(config: d.Config, cmpMeta: d.ComponentMeta) {
+export async function formatEsmLoaderComponent(config: d.Config, cmpMeta: d.ComponentMeta) {
   const d: any[] = [
     /* 0 */ cmpMeta.tagNameMeta,
     /* 1 */ '__GET_MODULE_FN__',
@@ -41,7 +41,7 @@ export function formatEsmLoaderComponent(config: d.Config, cmpMeta: d.ComponentM
 
   const str = JSON.stringify(d);
 
-  const importFn = formatEsmLoaderImportFns(config, cmpMeta);
+  const importFn = await formatEsmLoaderImportFns(config, cmpMeta);
 
   return str.replace(`"__GET_MODULE_FN__"`, importFn);
 }
@@ -75,19 +75,23 @@ export function formatBrowserLoaderBundleIds(bundleIds: string | d.BundleIds): a
 }
 
 
-export function formatEsmLoaderImportFns(config: d.Config, cmpMeta: d.ComponentMeta): any {
+export async function formatEsmLoaderImportFns(config: d.Config, cmpMeta: d.ComponentMeta): Promise<string> {
   const modes = Object.keys(cmpMeta.bundleIds).sort((a, b) => {
     if (a === '$' || a === 'md') return 1;
     if (a < b) return -1;
     if (a > b) return 1;
     return 0;
   });
+
   const moduleImports = modes.map(styleMode => {
     return getModuleImport(cmpMeta, styleMode);
   }).join('');
 
   let importFn = `(function(){${moduleImports}})()`;
-  importFn = config.sys.minifyJs(importFn).output;
+
+  const minifyResults = await config.sys.minifyJs(importFn);
+
+  importFn = minifyResults.output;
   if (importFn.endsWith(';')) {
     importFn = importFn.substring(0, importFn.length - 1);
   }

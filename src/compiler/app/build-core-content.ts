@@ -80,7 +80,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
     }
   }
 
-  const results = config.sys.minifyJs(input, opts);
+  const results = await config.sys.minifyJs(input, opts);
   if (results && results.diagnostics.length === 0 && compilerCtx) {
     await compilerCtx.cache.put(cacheKey, results.output);
   }

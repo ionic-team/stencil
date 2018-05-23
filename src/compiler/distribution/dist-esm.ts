@@ -90,16 +90,13 @@ export function appendDefineCustomElementsType(content: string) {
 
 
 async function generateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist) {
-  const c: string[] = [
-    `// ${config.namespace}: Host Data, ES Module/ES5 Target`
-  ];
-
-  Object.keys(cmpRegistry).sort().forEach(tagName => {
+  const c = await Promise.all(Object.keys(cmpRegistry).sort().map(async tagName => {
     const cmpMeta = cmpRegistry[tagName];
+    const data = await formatEsmLoaderComponent(config, cmpMeta);
+    return `export var ${cmpMeta.componentClass} = ${data};`;
+  }));
 
-    const data = formatEsmLoaderComponent(config, cmpMeta);
-    c.push(`export var ${cmpMeta.componentClass} = ${data};`);
-  });
+  c.unshift(`// ${config.namespace}: Host Data, ES Module/ES5 Target`);
 
   const componentsEsmFilePath = getComponentsEsmBuildPath(config, outputTarget, 'es5');
 

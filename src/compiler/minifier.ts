@@ -57,7 +57,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     }
   }
 
-  const r = config.sys.minifyJs(jsText, opts);
+  const r = await config.sys.minifyJs(jsText, opts);
 
   if (compilerCtx) {
     if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {

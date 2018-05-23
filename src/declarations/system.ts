@@ -25,11 +25,11 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
   }>;
-  minifyJs?(input: string, opts?: any): {
+  minifyJs?(input: string, opts?: any): Promise<{
     output: string;
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
-  };
+  }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   resolveModule?(fromDir: string, moduleId: string): string;
   path?: Path;
