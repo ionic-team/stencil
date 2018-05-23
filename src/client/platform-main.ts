@@ -46,8 +46,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  // DEPRECATED $definedCmps 2018-05-17
-  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || (win as any).$definedCmps || {});
+  // DEPRECATED $definedCmps 2018-05-22
+  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win as any)['$definedCmps'] = (win['s-defined'] || (win as any)['$definedCmps'] || {});
 
   // internal id increment for unique ids
   let ids = 0;
@@ -110,7 +110,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
 
-    if (!globalDefined[cmpMeta.tagNameMeta]) {
+    if (!win.customElements.get(cmpMeta.tagNameMeta)) {
       // keep a map of all the defined components
       globalDefined[cmpMeta.tagNameMeta] = true;
 
