@@ -31,8 +31,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
 
   if (!initCmpOnReady) {
     initCmpOnReady = true;
-    const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
-    createComponentOnReadyPrototype(win, (win as any).HTMLElement.prototype, App);
+    createComponentOnReadyPrototype(win, namespace, (win as any).HTMLElement.prototype);
   }
 
   applyPolyfills(win, () => {
