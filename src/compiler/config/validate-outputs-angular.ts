@@ -49,6 +49,10 @@ export function validateOutputTargetAngular(config: d.Config) {
     if (!path.isAbsolute(outputTarget.directivesProxyFile)) {
       outputTarget.directivesProxyFile = normalizePath(path.join(config.rootDir, outputTarget.directivesProxyFile));
     }
+
+    if (!path.isAbsolute(outputTarget.directivesArrayFile)) {
+      outputTarget.directivesArrayFile = normalizePath(path.join(config.rootDir, outputTarget.directivesArrayFile));
+    }
   });
 }
 
