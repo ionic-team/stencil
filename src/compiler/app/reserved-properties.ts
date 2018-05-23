@@ -136,6 +136,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'error',
   'Event',
   'fetch',
+  'firstChild',
   'firstElementChild',
   'getAttribute',
   'getAttributeNS',
