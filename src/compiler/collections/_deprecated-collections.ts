@@ -38,7 +38,7 @@ async function loadConfigCollection(config: Config, compilerCtx: CompilerCtx, bu
   }
 
   // figure out the path to the dependent collection's package.json
-  const collectionJsonFilePath = config.sys.resolveModule(config.rootDir, configCollection.name);
+  const collectionJsonFilePath = normalizePath(config.sys.resolveModule(config.rootDir, configCollection.name));
 
   // parse the dependent collection's package.json
   const packageJsonStr = await compilerCtx.fs.readFile(collectionJsonFilePath);

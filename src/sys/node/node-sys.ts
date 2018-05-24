@@ -320,11 +320,9 @@ export class NodeSystem implements d.StencilSystem {
         continue;
       }
 
-      const resolvedModulePath = normalizePath(packageJsonFilePath);
+      this.resolveModuleCache[cacheKey] = packageJsonFilePath;
 
-      this.resolveModuleCache[cacheKey] = resolvedModulePath;
-
-      return resolvedModulePath;
+      return packageJsonFilePath;
     }
 
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);

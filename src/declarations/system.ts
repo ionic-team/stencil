@@ -31,9 +31,9 @@ export interface StencilSystem {
     diagnostics?: d.Diagnostic[];
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
-  resolveModule?(fromDir: string, moduleId: string): string;
   path?: Path;
   platform?: string;
+  resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
     rollup: {
       (config: RollupInputConfig): Promise<RollupBundle>;
