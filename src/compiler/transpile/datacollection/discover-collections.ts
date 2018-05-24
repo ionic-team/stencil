@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { normalizePath } from '../../util';
 import { parseCollectionModule } from '../../collections/parse-collection-module';
 import * as ts from 'typescript';
 
@@ -32,7 +33,7 @@ function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, collections
   let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
-    pkgJsonFilePath = config.sys.resolveModule(resolveFromDir, moduleId);
+    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId));
 
   } catch (e) {
     // it's someone else's job to handle unresolvable paths

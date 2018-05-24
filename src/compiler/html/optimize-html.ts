@@ -7,7 +7,7 @@ import { inlineExternalAssets } from './inline-external-assets';
 import { inlineLoaderScript } from './inline-loader-script';
 import { updateCanonicalLink } from './canonical-link';
 import { minifyInlineScripts } from './minify-inline-scripts';
-import { minifyInlineStyles } from '../style/minify-inline-styles';
+import { minifyInlineStyles } from '../style/minify-style';
 
 
 export async function optimizeHtml(

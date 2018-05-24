@@ -77,20 +77,20 @@ describe('component-styles', () => {
         })
         export class CmpA {}`,
 
-        [path.join(root, 'src', 'cmp-a.ios.css')]: `body{font:ios}`,
-        [path.join(root, 'src', 'cmp-a.md.css')]: `body{font:md}`
+        [path.join(root, 'src', 'cmp-a.ios.css')]: `body{font-family:Helvetica}`,
+        [path.join(root, 'src', 'cmp-a.md.css')]: `body{font-family:Roboto}`
       });
       await c.fs.commit();
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 't.js'));
-      expect(iosContent).toContain(`body{font:ios}`);
+      const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.js'));
+      expect(iosContent).toContain(`body{font-family:Helvetica}`);
       expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-      const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'x.js'));
-      expect(mdContent).toContain(`body{font:md}`);
+      const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'd.js'));
+      expect(mdContent).toContain(`body{font-family:Roboto}`);
       expect(mdContent).toContain(`static get styleMode(){return"md"}`);
     });
 
