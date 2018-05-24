@@ -120,6 +120,7 @@ export function getNodeImports(styleText: string ) {
 
 export function replaceNodeModuleUrl(config: d.Config, baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
   nodeModulePath = normalizePath(config.sys.path.dirname(nodeModulePath));
+  url = normalizePath(url);
 
   const absPathToNodeModuleCss = normalizePath(url.replace(`~${moduleId}`, nodeModulePath));
 

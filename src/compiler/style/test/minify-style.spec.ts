@@ -105,7 +105,7 @@ describe('replaceNodeModuleUrl', () => {
     const baseCssFilePath = path.join(root, 'my-app', 'src', 'global', 'app.css');
     const importCssUrl = path.join('~@ionic', 'core', 'dist', 'ionic.css');
     const newUrl = replaceNodeModuleUrl(config, baseCssFilePath, moduleId, nodeModulePath, importCssUrl);
-    expect(newUrl).toBe(path.join('..', 'node_modules', '@ionic', 'core', 'dist', 'ionic.css'));
+    expect(newUrl).toBe('../node_modules/@ionic/core/dist/ionic.css');
   });
 
 });
