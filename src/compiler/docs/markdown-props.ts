@@ -43,7 +43,7 @@ class Row {
 
     content.push(`#### ${this.memberName}`);
     content.push(``);
-    content.push(getPropType(this.memberMeta.propType));
+    content.push(getPropType(this.memberMeta));
     content.push(``);
 
     const doc = getMemberDocumentation(this.memberMeta.jsdoc);
@@ -59,7 +59,8 @@ class Row {
 }
 
 
-function getPropType(propType: PROP_TYPE) {
+function getPropType(prop: d.MemberMeta) {
+  const propType = prop.propType;
   switch (propType) {
     case PROP_TYPE.Any:
       return 'any';
@@ -70,6 +71,6 @@ function getPropType(propType: PROP_TYPE) {
     case PROP_TYPE.String:
       return 'string';
   }
-  return '';
+  return prop.attribType.text;
 }
 

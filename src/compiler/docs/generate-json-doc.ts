@@ -83,6 +83,8 @@ function generateJsDocMembers(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompo
 
       } else if (memberMeta.propType === PROP_TYPE.Any) {
         propData.type = 'any';
+      } else {
+        propData.type = memberMeta.attribType.text;
       }
 
       if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
