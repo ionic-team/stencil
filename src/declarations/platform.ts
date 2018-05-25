@@ -51,8 +51,7 @@ export interface QueueApi {
 
 export interface PropConnect {
   create(opts?: any): Promise<any>;
-  componentOnReady(): Promise<any>;
-  componentOnReady(done: (cmp: any) => void): any;
+  componentOnReady(): Promise<any|null>;
 }
 
 
