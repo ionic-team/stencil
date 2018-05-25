@@ -70,6 +70,6 @@ function getPropType(propType: PROP_TYPE) {
     case PROP_TYPE.String:
       return 'string';
   }
-  return '';
+  return ''
 }
 
