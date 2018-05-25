@@ -10,6 +10,12 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
   if (entryModules.length === 0) {
     // no entry modules, so don't bother
     results.esm = {};
+    if (config.buildEs5) {
+      results.es5 = {};
+    }
+    if (config.outputTargets.some(o => o.type === 'dist')) {
+      results.esmEs5 = {};
+    }
     return results;
   }
 
