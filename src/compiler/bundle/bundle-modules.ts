@@ -60,6 +60,10 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
       .filter(m => !m.startsWith('entry:'))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
+        if (!chunk || !chunk.code) {
+          return;
+        }
+
         const sourceTarget = (moduleType === 'es5' || moduleType === 'esmEs5') ? 'es5' : 'es2017';
         const minifyJsResults = await minifyJs(config, compilerCtx, chunk.code, sourceTarget, true);
 
