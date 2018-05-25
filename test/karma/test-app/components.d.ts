@@ -14,8 +14,7 @@ declare global {
   namespace JSXElements {}
 
   interface HTMLStencilElement extends HTMLElement {
-    componentOnReady(): Promise<this>;
-    componentOnReady(done: (ele?: this) => void): void;
+    componentOnReady(): Promise<this|null>;
 
     forceUpdate(): void;
   }

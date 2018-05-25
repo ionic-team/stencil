@@ -26,6 +26,8 @@
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/util.ts",
+    "test-prerender/**/*.spec.ts",
+    "test-prerender/**/*.tsx",
     "test-sibling/**/*.spec.ts",
     "test-sibling/**/*.tsx"
   ]

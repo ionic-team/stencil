@@ -7,11 +7,12 @@
     "build.app": "node ../../bin/stencil build --debug --es5",
     "build.app.watch": "node ../../bin/stencil build --debug --watch --es5",
     "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
+    "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender",
     "dev": "sd concurrent \"npm run build.app.watch\" \"stencil-dev-server\" ",
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",
     "karma.firefox": "karma start karma.config.js --browsers=Firefox --single-run=false",
-    "karma.prod": "npm run tsc && npm run build.app && npm run build.sibling && npm run karma.webpack && karma start karma.config.js",
+    "karma.prod": "npm run tsc && npm run build.app && npm run build.sibling && npm run build.prerender && npm run karma.webpack && karma start karma.config.js",
     "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
     "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
   },
