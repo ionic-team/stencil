@@ -6,7 +6,7 @@
 
 <script>
   var el = document.querySelector('attribute-complex');
-  el.componentOnReady(() => {
-    el.getInstance();
+  el.componentOnReady().then(function(el) {
+    var instance = el.getInstance();
   });
 </script>

@@ -6,8 +6,8 @@
   "scripts": {
     "build.app": "node ../../bin/stencil build --debug --es5",
     "build.app.watch": "node ../../bin/stencil build --debug --watch --es5",
-    "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
     "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender",
+    "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
     "dev": "sd concurrent \"npm run build.app.watch\" \"stencil-dev-server\" ",
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",

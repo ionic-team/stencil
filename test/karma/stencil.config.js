@@ -14,7 +14,8 @@ exports.config = {
     }
   ],
   copy: [
-    { src: '**/*.html' }
+    { src: '**/*.html' },
+    { src: 'noscript.js' }
   ],
   excludeSrc: []
 };

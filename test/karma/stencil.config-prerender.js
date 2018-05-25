@@ -8,7 +8,8 @@ exports.config = {
     {
       type: 'www',
       dir: 'www/prerender',
-      baseUrl: '/prerender'
+      baseUrl: '/prerender',
+      serviceWorker: false
     }
   ],
   excludeSrc: []

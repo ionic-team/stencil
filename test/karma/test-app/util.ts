@@ -52,12 +52,19 @@ export function setupDomTests(document: Document) {
           elm.innerHTML = this.responseText;
           frag.appendChild(elm);
 
-          const removeElms = frag.querySelectorAll('script,meta');
-          for (let i = 0; i < removeElms.length; i++) {
-            removeElms[i].parentNode.removeChild(removeElms[i]);
+          app.innerHTML = elm.innerHTML;
+
+          const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
+          for (let i = 0; i < tmpScripts.length; i++) {
+            const script = document.createElement('script') as HTMLScriptElement;
+            if (tmpScripts[i].src) {
+              script.src = tmpScripts[i].src;
+            }
+            script.innerHTML = tmpScripts[i].innerHTML;
+            tmpScripts[i].parentNode.insertBefore(script, tmpScripts[i]);
+            tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
           }
 
-          app.innerHTML = elm.innerHTML;
           elm.innerHTML = '';
 
           const promises: Promise<any>[] = [];
@@ -67,6 +74,7 @@ export function setupDomTests(document: Document) {
             resolve(app);
 
           }).catch(err => {
+            console.error('Promise.all error', err);
             reject(err);
           });
         }
@@ -74,12 +82,14 @@ export function setupDomTests(document: Document) {
         var oReq = new XMLHttpRequest();
         oReq.addEventListener('load', indexLoaded);
         oReq.addEventListener('error', (err) => {
+          console.error('error oReq.addEventListener', err);
           reject(err);
         });
         oReq.open('GET', url);
         oReq.send();
 
       } catch (e) {
+        console.error('catch error', e);
         reject(e);
       }
     });

@@ -93,19 +93,19 @@ module.exports = function(config) {
       'test-app/util.ts',
       'www/build/testapp.js',
       'www/build/testsibling.js',
-      { pattern: 'www/build/testapp/*.js', watched: false, included: false, served: true, nocache: false },
-      { pattern: 'www/build/testsibling/*.js', watched: false, included: false, served: true, nocache: false },
-      { pattern: 'www/**/*.html', watched: false, included: false, served: true, nocache: false },
+      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true }
     ],
+
+    proxies: {
+      '/www/': '/base/www/',
+      '/build/testapp.js': '/base/www/noscript.js',
+      '/build/testsibling.js': '/base/www/noscript.js',
+      '/prerender/': '/base/www/prerender/'
+    },
 
     colors: true,
 
     logLevel: config.LOG_INFO,
-
-    proxies: {
-      '/www/app/*.js': '/base/www/app/*.js',
-      '/www/**/*.html': '/base/www/**/*.html'
-    },
 
     reporters: ['progress'].concat(browserStack
       ? [ 'BrowserStack' ]
