@@ -75,13 +75,6 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
     return '';
   }
 
-  const cacheKey = compilerCtx.cache.createKey('bundleProjectGlobal', namespace, entry, sourceTarget);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
-  if (cachedContent != null) {
-    buildCtx.global = compilerCtx.moduleFiles[config.globalScript];
-    return cachedContent;
-  }
-
   // ok, so the project also provided an entry file, so let's bundle it up and
   // the output from this can be tacked onto the top of the project's core file
   // start the bundler on our temporary file
@@ -116,8 +109,6 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
 
     // wrap our globals code with our own iife
     output = await wrapGlobalJs(config, compilerCtx, buildCtx, sourceTarget, namespace, results.code);
-
-    await compilerCtx.cache.put(cacheKey, output);
 
     buildCtx.global = compilerCtx.moduleFiles[config.globalScript];
 
