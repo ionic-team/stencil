@@ -9,16 +9,16 @@ import * as ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(rootDir: string, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(cwd: string, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (var i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadDiagnostic(rootDir, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadDiagnostic(cwd, tsDiagnostics[i]));
   }
 }
 
 
-function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
+function loadDiagnostic(cwd: string, tsDiagnostic: ts.Diagnostic) {
   const d: d.Diagnostic = {
     level: 'error',
     type: 'typescript',
@@ -33,7 +33,7 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
 
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
-    d.relFilePath = formatFileName(rootDir, d.absFilePath);
+    d.relFilePath = formatFileName(cwd, d.absFilePath);
 
     const sourceText = tsDiagnostic.file.getText();
     const srcLines = splitLineBreaks(sourceText);
@@ -67,7 +67,7 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
       errorLine.errorCharStart--;
     }
 
-    d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, rootDir, errorLine.lineNumber);
+    d.header = formatHeader('typescript', tsDiagnostic.file.fileName, cwd, errorLine.lineNumber, errorLine.errorCharStart + 1);
 
     if (errorLine.lineIndex > 0) {
       const previousLine: d.PrintLine = {

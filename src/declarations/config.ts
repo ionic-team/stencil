@@ -9,6 +9,7 @@ export interface Config {
   buildLogFilePath?: string;
   bundles?: ConfigBundle[];
   commonjs?: BundlingConfig;
+  cwd?: string;
   nodeResolve?: NodeResolveConfig;
   configPath?: string;
   copy?: CopyTasks;

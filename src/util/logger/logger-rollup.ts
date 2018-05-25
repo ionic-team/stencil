@@ -60,7 +60,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLine.errorCharStart--;
       }
 
-      d.header =  formatHeader('bundling', d.absFilePath, config.rootDir, errorLine.lineNumber);
+      d.header = formatHeader('bundling', d.absFilePath, config.cwd, errorLine.lineNumber, errorLine.errorCharStart);
 
       if (errorLine.lineIndex > 0) {
         const previousLine: PrintLine = {

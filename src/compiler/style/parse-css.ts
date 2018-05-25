@@ -105,7 +105,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
       }]
     };
 
-    d.header = formatHeader('CSS', filePath, config.rootDir, lineno);
+    d.header = formatHeader('CSS', filePath, config.cwd, lineno);
 
     if (lineno > 1) {
       const previousLine: PrintLine = {

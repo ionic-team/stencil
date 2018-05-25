@@ -32,32 +32,30 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
 }
 
 
-export function formatFileName(rootDir: string, fileName: string) {
-  if (!rootDir || !fileName) return '';
+export function formatFileName(cwd: string, fileName: string, startLineNumber: number = null, startCharNumber: number = null) {
+  if (!fileName) return '';
 
-  fileName = fileName.replace(rootDir, '');
-  if (/\/|\\/.test(fileName.charAt(0))) {
-    fileName = fileName.substr(1);
+  if (cwd) {
+    fileName = fileName.replace(cwd, '');
+    if (/\/|\\/.test(fileName.charAt(0))) {
+      fileName = fileName.substr(1);
+    }
   }
-  if (fileName.length > 80) {
-    fileName = '...' + fileName.substr(fileName.length - 80);
+
+  if (startLineNumber != null && typeof startLineNumber === 'number' && startLineNumber >= 0) {
+    fileName += ':' + startLineNumber;
+
+    if (startCharNumber != null && typeof startCharNumber === 'number' && startCharNumber >= 0) {
+      fileName += ':' + startCharNumber;
+    }
   }
+
   return fileName;
 }
 
 
-export function formatHeader(type: string, fileName: string, rootDir: string, startLineNumber: number = null, endLineNumber: number = null) {
-  let header = `${type}: ${formatFileName(rootDir, fileName)}`;
-
-  if (startLineNumber !== null && startLineNumber > 0) {
-    if (endLineNumber !== null && endLineNumber > startLineNumber) {
-      header += `, lines: ${startLineNumber} - ${endLineNumber}`;
-    } else {
-      header += `, line: ${startLineNumber}`;
-    }
-  }
-
-  return header;
+export function formatHeader(type: string, fileName: string, cwd: string, startLineNumber: number = null, startCharNumber: number = null) {
+  return `${type}: ${formatFileName(cwd, fileName, startLineNumber, startCharNumber)}`;
 }
 
 

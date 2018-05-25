@@ -100,6 +100,6 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
     program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
-    loadTypeScriptDiagnostics(config.rootDir, buildCtx.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(config.cwd, buildCtx.diagnostics, tsDiagnostics);
   }
 }

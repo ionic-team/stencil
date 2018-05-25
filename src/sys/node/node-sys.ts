@@ -125,8 +125,18 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.isGlob(str);
   }
 
-  loadConfigFile(configPath: string) {
+  loadConfigFile(configPath: string, process?: NodeJS.Process) {
     let config: d.Config;
+
+    let cwd = '';
+    if (process) {
+      if (process.cwd) {
+        cwd = process.cwd();
+      }
+      if (process.env && typeof process.env.PWD === 'string') {
+        cwd = process.env.PWD;
+      }
+    }
 
     let hasConfigFile = false;
 
@@ -171,13 +181,15 @@ export class NodeSystem implements d.StencilSystem {
     } else {
       // no stencil.config.js file, which is fine
       config = {
-        rootDir: process.cwd()
+        rootDir: cwd
       };
     }
 
     if (!config.sys) {
       config.sys = this;
     }
+
+    config.cwd = cwd;
 
     return config;
   }

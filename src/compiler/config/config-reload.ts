@@ -42,6 +42,7 @@ export function configFileReload(config: Config, compilerCtx: CompilerCtx) {
 const CONFIG_RELOAD_KEEPERS: Config = {
   sys: null,
   logger: null,
+  cwd: null,
   devMode: null,
   watch: null,
   outputTargets: null
