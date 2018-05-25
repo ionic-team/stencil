@@ -24,10 +24,16 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
       return Promise.all(
         entryModule.modeNames.map(async modeName => {
           const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5' | 'esmEs5') => {
+
+            if (!jsModules[moduleType][bundleKeyPath] || !jsModules[moduleType][bundleKeyPath].code) {
+              return all;
+            }
+
             return {
               ...all,
               [moduleType]: jsModules[moduleType][bundleKeyPath].code
             };
+
           }, {} as {[key: string]: string});
 
           return await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
