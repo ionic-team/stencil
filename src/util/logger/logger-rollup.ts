@@ -17,8 +17,8 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
     lines: []
   };
 
-  if (rollupError.loc && rollupError.loc.file) {
-    d.absFilePath = rollupError.loc.file;
+  if (rollupError.loc && rollupError.id) {
+    d.absFilePath = rollupError.id;
     d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
 
     try {
