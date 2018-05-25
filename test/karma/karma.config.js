@@ -100,6 +100,7 @@ module.exports = function(config) {
       '/www/': '/base/www/',
       '/build/testapp.js': '/base/www/noscript.js',
       '/build/testsibling.js': '/base/www/noscript.js',
+      '/esm-webpack/main.js': '/base/www/noscript.js',
       '/prerender/': '/base/www/prerender/'
     },
 
