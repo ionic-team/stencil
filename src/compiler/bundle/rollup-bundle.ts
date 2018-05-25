@@ -2,7 +2,7 @@ import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList, NodeResolveCo
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import bundleJson from './rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import { generatePreamble, hasError } from '../util';
+import { generatePreamble } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import { getHyperScriptFnEsmFileName } from '../app/app-file-naming';
 import localResolution from './rollup-plugins/local-resolution';
@@ -58,10 +58,6 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
   } catch (err) {
     console.log(err);
     loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
-  }
-
-  if (hasError(buildCtx.diagnostics) || !rollupBundle) {
-    throw new Error('rollup died');
   }
 
   return rollupBundle;

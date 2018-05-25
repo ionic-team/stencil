@@ -5,17 +5,14 @@ import { minifyJs } from '../minifier';
 
 
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
-  const results: JSModuleMap = {};
+  const results: JSModuleMap = {
+    esm: {},
+    es5: {},
+    esmEs5: {}
+  };
 
   if (entryModules.length === 0) {
     // no entry modules, so don't bother
-    results.esm = {};
-    if (config.buildEs5) {
-      results.es5 = {};
-    }
-    if (config.outputTargets.some(o => o.type === 'dist')) {
-      results.esmEs5 = {};
-    }
     return results;
   }
 
@@ -23,6 +20,10 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
     const rollupBundle = await createBundle(config, compilerCtx, buildCtx, entryModules);
+    if (buildCtx.shouldAbort()) {
+      // rollup errored, so let's not continue
+      return results;
+    }
 
     // bundle using only es modules and dynamic imports
     results.esm = await writeEsModules(config, rollupBundle);
