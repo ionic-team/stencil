@@ -7,6 +7,12 @@ import { minifyJs } from '../minifier';
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
   const results: JSModuleMap = {};
 
+  if (entryModules.length === 0) {
+    // no entry modules, so don't bother
+    results.esm = {};
+    return results;
+  }
+
   try {
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
