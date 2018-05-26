@@ -10,7 +10,7 @@ const DEST_DIR = path.join(__dirname, '..', 'dist', 'renderer', 'vdom');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
-const success = transpile('../src/renderer/vdom/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'renderer', 'vdom', 'tsconfig.json'));
 
 if (success) {
 

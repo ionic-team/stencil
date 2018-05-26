@@ -13,7 +13,7 @@ const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
 const DECLARATIONS_DST_DIR = path.join(__dirname, '..', 'dist', 'declarations');
 
 
-const success = transpile('../src/compiler/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
 if (success) {
 

@@ -26,7 +26,7 @@ const outputCoreEsmFile = path.join(DIST_CLIENT_DIR, 'core.esm.js');
 const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
 
 
-const success = transpile('../src/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'tsconfig.json'));
 
 if (success) {
 

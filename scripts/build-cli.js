@@ -8,7 +8,7 @@ const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli', 'index.js');
 const DEST_FILE = path.join(__dirname, '..', 'dist', 'cli', 'index.js');
 
 
-const success = transpile('../src/cli/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'cli', 'tsconfig.json'));
 
 if (success) {
 

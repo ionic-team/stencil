@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const packageJsonPath = path.join(__dirname, '../package.json');
-const packageLockPath = path.join(__dirname, '../package-lock.json');
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageLockPath = path.join(__dirname, '..', 'package-lock.json');
 
 
 function getVersion() {

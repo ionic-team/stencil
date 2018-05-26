@@ -11,7 +11,7 @@ const DEST_DIR = path.join(__dirname, '..', 'dist', 'testing');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
-const success = transpile('../src/testing/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'testing', 'tsconfig.json'));
 
 if (success) {
 

@@ -338,7 +338,7 @@ changelog = changelog.replace(/\# \[/, '# ' + vermoji + ' [');
 
 fs.writeFileSync(changelogPath, changelog);
 
-const compilerPath = path.join(__dirname, '../dist/compiler/index.js');
+const compilerPath = path.join(__dirname, '..', 'dist', 'compiler', 'index.js');
 let compiler = fs.readFileSync(compilerPath, 'utf-8');
 
 compiler = compiler.replace(/\💎/g, vermoji);
