@@ -315,7 +315,7 @@ export interface HostElement extends HTMLElement {
    */
   ['s-init']?: () => void;
 
-  componentOnReady?: () => Promise<d.HostElement>;
+  componentOnReady?: () => Promise<this>;
   color?: string;
   mode?: string;
 }

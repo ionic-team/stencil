@@ -102,7 +102,7 @@ declare global {
   namespace JSXElements {}
 
   interface HTMLElement {
-    componentOnReady(): Promise<this | null>;
+    componentOnReady?: () => Promise<this | null>;
   }
 
   interface HTMLStencilElement extends HTMLElement {
