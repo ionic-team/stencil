@@ -72,30 +72,7 @@ export class NodeSystemMain implements d.StencilSystem {
   }
 
   async autoprefixCss(input: string, opts: any): Promise<string> {
-    const modulePath = path.join(this.distDir, 'sys', 'node', 'auto-prefixer.js');
-    const module = require(modulePath);
-
-    const postcss = module.postcss;
-    const autoprefixer = module.autoprefixer;
-    if (typeof opts !== 'object') {
-      opts = {
-        browsers: [
-          'last 2 versions',
-          'iOS >= 8',
-          'Android >= 4.4',
-          'Explorer >= 11',
-          'ExplorerMobile >= 11'
-        ],
-        cascade: false,
-        remove: false
-      };
-    }
-    const prefixer = postcss([autoprefixer(opts)]);
-    const result = await prefixer.process(input, {
-      map: false,
-      from: undefined
-    });
-    return result.css;
+    return this.sysWorker.run('autoprefixCss', [input, opts]);
   }
 
   private _existingDom: () => d.CreateDom;

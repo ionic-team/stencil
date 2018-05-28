@@ -14,7 +14,6 @@ const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json')
 
 if (success) {
 
-  bundle('auto-prefixer.js');
   bundle('clean-css.js');
   bundle('node-fetch.js');
   bundle('sys-util.js');
@@ -29,7 +28,10 @@ if (success) {
         filename: entryFileName,
         libraryTarget: 'commonjs'
       },
-      target: 'node'
+      target: 'node',
+      optimization: {
+        minimize: false
+      }
     }, (err) => {
       if (err) {
         console.error(err);
