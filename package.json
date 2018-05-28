@@ -38,6 +38,7 @@
     "test.jest": "jest",
     "test.karma": "cd test/karma && npm run karma.prod",
     "test.server": "cd test/server && npm run test.prod",
+    "test.sys.node": "cd test/sys/node && npm run test.prod",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },
@@ -70,6 +71,7 @@
     "execa": "^0.8.0",
     "fs-extra": "^5.0.0",
     "glob": "^7.1.2",
+    "gzip-size": "^4.1.0",
     "inquirer": "^3.3.0",
     "is-glob": "^4.0.0",
     "jest": "^22.4.3",
@@ -85,7 +87,7 @@
     "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
     "tslint-ionic-rules": "0.0.13",
-    "webpack": "^3.10.0"
+    "webpack": "^4.9.1 "
   },
   "repository": {
     "type": "git",

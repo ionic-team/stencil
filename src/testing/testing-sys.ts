@@ -5,7 +5,7 @@ import * as path from 'path';
 
 
 const nodeSys = require('../sys/node/index');
-export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystem;
+export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystemMain;
 
 export interface NodeSystemSystemConstructor {
   new (fs: any): StencilSystem;

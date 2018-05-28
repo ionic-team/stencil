@@ -2,6 +2,7 @@ import * as d from './index';
 
 
 export interface StencilSystem {
+  autoprefixCss?(input: string, opts?: any): Promise<string>;
   compiler?: {
     name: string;
     version: string;
@@ -10,16 +11,17 @@ export interface StencilSystem {
   };
   createDom?(): CreateDom;
   createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
-  generateContentHash?(content: string, length: number): string;
+  destroy?(): void;
   fs?: d.FileSystem;
+  generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
+  gzipSize?(text: string): Promise<number>;
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string, process?: any): d.Config;
-  autoprefixCss?(input: string, opts?: any): Promise<string>;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
     output: string;
     sourceMap?: any;

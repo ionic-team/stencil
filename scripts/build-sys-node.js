@@ -10,27 +10,25 @@ const ENTRY_FILE = path.join(TRANSPILED_DIR, 'sys', 'node', 'index.js');
 const DEST_FILE = path.join(__dirname, '..', 'dist', 'sys', 'node', 'index.js');
 
 
-const success = transpile('../src/sys/node/tsconfig.json');
+const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
 if (success) {
 
+  bundle('auto-prefixer.js');
   bundle('clean-css.js');
   bundle('node-fetch.js');
   bundle('sys-util.js');
-  bundle('auto-prefixer.js');
+  bundle('sys-worker.js');
 
 
   function bundle(entryFileName) {
     webpack({
       entry: path.join(__dirname, 'bundles', entryFileName),
       output: {
-        path: path.join(__dirname, '../dist/sys/node'),
+        path: path.join(__dirname, '..', 'dist', 'sys', 'node'),
         filename: entryFileName,
         libraryTarget: 'commonjs'
       },
-      plugins: [
-        new webpack.optimize.ModuleConcatenationPlugin()
-      ],
       target: 'node'
     }, (err) => {
       if (err) {
@@ -39,7 +37,7 @@ if (success) {
     });
   }
 
-  function bundleSysNode() {
+  function bundleNodeSysMain() {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
@@ -71,7 +69,7 @@ if (success) {
     });
   }
 
-  bundleSysNode();
+  bundleNodeSysMain();
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);

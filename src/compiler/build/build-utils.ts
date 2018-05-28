@@ -74,7 +74,7 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
 
 
 async function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  const buildResults = generateBuildResults(config, compilerCtx, buildCtx);
+  const buildResults = await generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
   config.logger.printDiagnostics(buildResults.diagnostics);

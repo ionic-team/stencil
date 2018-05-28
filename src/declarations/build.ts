@@ -105,8 +105,9 @@ export interface BuildEntry {
 
 export interface BuildBundle {
   fileName: string;
-  size: number;
   outputs: string[];
+  size?: number;
+  gzip?: number;
   mode?: string;
   scopedStyles?: boolean;
   target?: string;

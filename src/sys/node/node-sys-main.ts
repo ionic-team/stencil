@@ -3,6 +3,7 @@ import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
 import { normalizePath } from '../../compiler/util';
+import { WorkerFarm } from './worker-farm/main';
 
 import * as crypto from 'crypto';
 import * as fs from 'fs';
@@ -11,11 +12,11 @@ import * as path from 'path';
 import * as url from 'url';
 
 
-export class NodeSystem implements d.StencilSystem {
+export class NodeSystemMain implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
   private distDir: string;
-  private runtime: string;
   private sysUtil: any;
+  private sysWorker: WorkerFarm;
   private typescriptPackageJson: d.PackageJsonData;
   private resolveModuleCache: { [cacheKey: string]: string } = {};
 
@@ -31,7 +32,6 @@ export class NodeSystem implements d.StencilSystem {
     this.distDir = path.join(rootDir, 'dist');
 
     this.sysUtil = require(path.join(this.distDir, 'sys', 'node', 'sys-util.js'));
-    this.runtime = path.join(this.distDir, 'compiler', 'index.js');
 
     try {
       this.packageJsonData = require(path.join(rootDir, 'package.json'));
@@ -44,15 +44,58 @@ export class NodeSystem implements d.StencilSystem {
     } catch (e) {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
+
+    this.initWorkerFarm();
+
+    process.once('exit', this.destroy.bind(this));
+  }
+
+  private initWorkerFarm() {
+    const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
+    this.sysWorker = new WorkerFarm(workerModulePath);
+  }
+
+  destroy() {
+    if (this.sysWorker) {
+      this.sysWorker.destroy();
+      this.sysWorker = null;
+    }
   }
 
   get compiler() {
     return {
       name: this.packageJsonData.name,
       version: this.packageJsonData.version,
-      runtime: this.runtime,
+      runtime: path.join(this.distDir, 'compiler', 'index.js'),
       typescriptVersion: this.typescriptPackageJson.version
     };
+  }
+
+  async autoprefixCss(input: string, opts: any): Promise<string> {
+    const modulePath = path.join(this.distDir, 'sys', 'node', 'auto-prefixer.js');
+    const module = require(modulePath);
+
+    const postcss = module.postcss;
+    const autoprefixer = module.autoprefixer;
+    if (typeof opts !== 'object') {
+      opts = {
+        browsers: [
+          'last 2 versions',
+          'iOS >= 8',
+          'Android >= 4.4',
+          'Explorer >= 11',
+          'ExplorerMobile >= 11'
+        ],
+        cascade: false,
+        remove: false
+      };
+    }
+    const prefixer = postcss([autoprefixer(opts)]);
+    const result = await prefixer.process(input, {
+      map: false,
+      from: undefined
+    });
+    return result.css;
   }
 
   private _existingDom: () => d.CreateDom;
@@ -119,6 +162,10 @@ export class NodeSystem implements d.StencilSystem {
         }
       });
     });
+  }
+
+  gzipSize(text: string) {
+    return this.sysWorker.run('gzipSize', [text]);
   }
 
   isGlob(str: string) {
@@ -192,33 +239,6 @@ export class NodeSystem implements d.StencilSystem {
     config.cwd = cwd;
 
     return config;
-  }
-
-  async autoprefixCss(input: string, opts: any): Promise<string> {
-    const modulePath = path.join(this.distDir, 'sys', 'node', 'auto-prefixer.js');
-    const module = require(modulePath);
-
-    const postcss = module.postcss;
-    const autoprefixer = module.autoprefixer;
-    if (typeof opts !== 'object') {
-      opts = {
-        browsers: [
-          'last 2 versions',
-          'iOS >= 8',
-          'Android >= 4.4',
-          'Explorer >= 11',
-          'ExplorerMobile >= 11'
-        ],
-        cascade: false,
-        remove: false
-      };
-    }
-    const prefixer = postcss([autoprefixer(opts)]);
-    const result = await prefixer.process(input, {
-      map: false,
-      from: undefined
-    });
-    return result.css;
   }
 
   async minifyCss(input: string, filePath?: string, opts: any = {}) {

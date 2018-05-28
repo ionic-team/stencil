@@ -1,3 +1,3 @@
 
 export { NodeLogger } from './node-logger';
-export { NodeSystem } from './node-sys';
+export { NodeSystemMain } from './node-sys-main';

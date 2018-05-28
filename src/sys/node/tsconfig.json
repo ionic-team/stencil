@@ -23,6 +23,7 @@
     "target": "es2015"
   },
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "./node-sys-worker.ts"
   ]
 }
