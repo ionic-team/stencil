@@ -14,12 +14,16 @@
 
 import { CompilerCtx, ComponentMeta } from '../../../declarations';
 import { parseCss } from '../parse-css';
-import { getHostScopeAttribute, getScopeAttribute, scopeCss } from '../scope-css';
+import { getHostScopeAttribute, getScopeAttribute } from '../scope-css';
+import { ShadowCss } from '../shadow-css';
+
 
 describe('ShadowCss', function() {
 
-  function s(css: string, contentAttr: string, hostAttr = '', slotAttr = '') {
-    const shim = scopeCss(css, contentAttr, hostAttr, slotAttr);
+  function s(cssText: string, scopeAttribute: string, hostScopeAttr = '', slotScopeAttr = '') {
+    const sc = new ShadowCss();
+    const shim = sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));
   }

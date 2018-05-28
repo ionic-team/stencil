@@ -1,4 +1,5 @@
 import { attachMessageHandler } from './worker-farm/worker';
+import { ShadowCss } from '../../compiler/style/shadow-css';
 
 const autoprefixer = require('autoprefixer');
 const gzipSize = require('gzip-size');
@@ -12,7 +13,7 @@ class NodeSystemWorker {
       opts = {
         browsers: [
           'last 2 versions',
-          'iOS >= 8',
+          'iOS >= 9',
           'Android >= 4.4',
           'Explorer >= 11',
           'ExplorerMobile >= 11'
@@ -26,11 +27,16 @@ class NodeSystemWorker {
       map: false,
       from: undefined
     });
-    return result.css;
+    return result.css as string;
   }
 
   gzipSize(text: string) {
     return gzipSize(text);
+  }
+
+  scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
+    const sc = new ShadowCss();
+    return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
   }
 
 }

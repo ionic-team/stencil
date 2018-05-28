@@ -44,4 +44,14 @@ describe('test/sys/node', () => {
     expect(size).toBe(23);
   });
 
+  it('scopeCss', async () => {
+    const cssText = `::slotted(*) {}`;
+    const scopeAttribute = `data-ion-tag`;
+    const hostScopeAttr = `data-ion-tag-host`;
+    const slotScopeAttr = `data-ion-tag-slot`;
+
+    const scopeCss = await sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+    expect(scopeCss).toBe(`[data-ion-tag-slot] > * {}`);
+  });
+
 });
