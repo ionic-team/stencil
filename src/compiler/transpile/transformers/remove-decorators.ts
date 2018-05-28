@@ -1,8 +1,10 @@
 import { isComponentClass } from './util';
 import * as ts from 'typescript';
 
+const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
+
 // same as the "declare" variables in the root index.ts file
-const DECORATORS_TO_REMOVE = [
+const DECORATORS_TO_REMOVE = new Set([
   'Element',
   'Event',
   'Listen',
@@ -12,7 +14,8 @@ const DECORATORS_TO_REMOVE = [
   'PropWillChange',
   'State',
   'Watch'
-];
+]);
+
 
 /**
  * Remove all decorators that are for metadata purposes
@@ -43,7 +46,7 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
  * @param classNode
  */
 function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
-  classNode.decorators = removeDecoratorsByName(classNode.decorators, ['Component']);
+  classNode.decorators = removeDecoratorsByName(classNode.decorators, CLASS_DECORATORS_TO_REMOVE);
 
   classNode.members.forEach((member) => {
     if (Array.isArray(member.decorators)) {
@@ -59,11 +62,11 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
  * @param decorators array of decorators
  * @param name name to remove
  */
-function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names: string[]): ts.NodeArray<ts.Decorator> {
+function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names: Set<string>): ts.NodeArray<ts.Decorator> {
   const updatedDecoratorList = decoratorList.filter(dec => {
     const toRemove = ts.isCallExpression(dec.expression) &&
       ts.isIdentifier(dec.expression.expression) &&
-      names.indexOf(dec.expression.expression.text) >= 0;
+      names.has(dec.expression.expression.text);
     return !toRemove;
   });
 
