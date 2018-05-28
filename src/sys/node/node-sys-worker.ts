@@ -1,7 +1,10 @@
+import * as d from '../../declarations';
 import { attachMessageHandler } from './worker-farm/worker';
+import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 
 const autoprefixer = require('autoprefixer');
+const CleanCSS = require('clean-css');
 const gzipSize = require('gzip-size');
 const postcss = require('postcss');
 
@@ -32,6 +35,55 @@ class NodeSystemWorker {
 
   gzipSize(text: string) {
     return gzipSize(text);
+  }
+
+  async minifyCss(input: string, filePath?: string, opts: any = {}) {
+    opts.returnPromise = true;
+
+    let minifyInput: any;
+
+    if (typeof filePath === 'string') {
+      filePath = normalizePath(filePath);
+      minifyInput = {
+        [filePath]: {
+          styles: input
+        }
+      };
+    } else {
+      minifyInput = input;
+    }
+
+    const cleanCss = new CleanCSS(opts);
+    const result = await cleanCss.minify(minifyInput);
+    const diagnostics: d.Diagnostic[] = [];
+
+    if (result.errors) {
+      result.errors.forEach((msg: string) => {
+        diagnostics.push({
+          header: 'Minify CSS',
+          messageText: msg,
+          level: 'error',
+          type: 'build'
+        });
+      });
+    }
+
+    if (result.warnings) {
+      result.warnings.forEach((msg: string) => {
+        diagnostics.push({
+          header: 'Minify CSS',
+          messageText: msg,
+          level: 'warn',
+          type: 'build'
+        });
+      });
+    }
+
+    return {
+      output: result.styles,
+      sourceMap: result.sourceMap,
+      diagnostics: diagnostics
+    };
   }
 
   scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {

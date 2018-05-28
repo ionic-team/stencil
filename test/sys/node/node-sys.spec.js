@@ -44,6 +44,17 @@ describe('test/sys/node', () => {
     expect(size).toBe(23);
   });
 
+  it('minifyCss', async () => {
+    const input = `
+      /** comment **/
+      body {
+        color: #FF0000;
+      }
+    `;
+    const results = await sys.minifyCss(input);
+    expect(results.output).toBe(`body{color:red}`);
+  });
+
   it('scopeCss', async () => {
     const cssText = `::slotted(*) {}`;
     const scopeAttribute = `data-ion-tag`;

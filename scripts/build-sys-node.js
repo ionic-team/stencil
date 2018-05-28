@@ -13,8 +13,6 @@ const DEST_FILE = path.join(__dirname, '..', 'dist', 'sys', 'node', 'index.js');
 const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
 if (success) {
-
-  bundle('clean-css.js');
   bundle('node-fetch.js');
   bundle('sys-util.js');
   bundle('sys-worker.js');

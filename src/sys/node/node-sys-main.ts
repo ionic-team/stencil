@@ -218,56 +218,8 @@ export class NodeSystemMain implements d.StencilSystem {
     return config;
   }
 
-  async minifyCss(input: string, filePath?: string, opts: any = {}) {
-    const cleanCssModule = path.join(this.distDir, 'sys', 'node', 'clean-css.js');
-    const CleanCSS = require(cleanCssModule).cleanCss;
-
-    opts.returnPromise = true;
-
-    let minifyInput: any;
-
-    if (typeof filePath === 'string') {
-      filePath = normalizePath(filePath);
-      minifyInput = {
-        [filePath]: {
-          styles: input
-        }
-      };
-    } else {
-      minifyInput = input;
-    }
-
-    const cleanCss = new CleanCSS(opts);
-    const result = await cleanCss.minify(minifyInput);
-    const diagnostics: d.Diagnostic[] = [];
-
-    if (result.errors) {
-      result.errors.forEach((msg: string) => {
-        diagnostics.push({
-          header: 'Minify CSS',
-          messageText: msg,
-          level: 'error',
-          type: 'build'
-        });
-      });
-    }
-
-    if (result.warnings) {
-      result.warnings.forEach((msg: string) => {
-        diagnostics.push({
-          header: 'Minify CSS',
-          messageText: msg,
-          level: 'warn',
-          type: 'build'
-        });
-      });
-    }
-
-    return {
-      output: result.styles,
-      sourceMap: result.sourceMap,
-      diagnostics: diagnostics
-    };
+  minifyCss(input: string, filePath?: string, opts: any = {}) {
+    return this.sysWorker.run('minifyCss', [input, filePath, opts]);
   }
 
   async minifyJs(input: string, opts?: any) {
