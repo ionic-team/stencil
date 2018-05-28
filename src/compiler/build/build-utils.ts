@@ -60,11 +60,13 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
       catchError(buildCtx.diagnostics, e);
     }
 
+    const results = await finishBuild(config, compilerCtx, buildCtx);
+
     if (!config.watch) {
       config.sys.destroy();
     }
 
-    return finishBuild(config, compilerCtx, buildCtx);
+    return results;
   };
 
   if (watcher) {

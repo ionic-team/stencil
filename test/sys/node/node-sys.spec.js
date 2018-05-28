@@ -5,7 +5,7 @@ describe('test/sys/node', () => {
   let sys;
 
   beforeEach(() => {
-    sys = new nodeSys.NodeSystemMain();
+    sys = new nodeSys.NodeSystem();
   });
 
   afterEach(() => {

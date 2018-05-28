@@ -5,7 +5,7 @@ import * as path from 'path';
 
 
 const nodeSys = require('../sys/node/index');
-export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystemMain;
+export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystem;
 
 export interface NodeSystemSystemConstructor {
   new (fs: any): StencilSystem;
@@ -27,7 +27,7 @@ export class TestingSystem extends NodeSystem {
   }
 
   getClientCoreFile(opts: any) {
-    const filePath = path.join(__dirname, '../../dist/client', opts.staticName);
+    const filePath = path.join(__dirname, '..', '..', 'dist', 'client', opts.staticName);
 
     return new Promise<string>((resolve, reject) => {
       fs.readFile(filePath, 'utf-8', (err, data) => {

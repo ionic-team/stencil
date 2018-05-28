@@ -12,7 +12,7 @@ import * as path from 'path';
 import * as url from 'url';
 
 
-export class NodeSystemMain implements d.StencilSystem {
+export class NodeSystem implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
   private distDir: string;
   private sysUtil: any;
