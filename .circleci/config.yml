@@ -1,33 +1,101 @@
 version: 2
+
+aliases:
+  - &install-browserstack
+      name: Install BrowserStack
+      command: |
+        wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip" &&
+        unzip BrowserStackLocal-linux-x64.zip
+
+  - &run-browserstack
+      name: Run BrowserStack
+      command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
+
+  - &restore-cache-deps
+      key: dependency-cache-{{ checksum "package.json" }}
+
+  - &save-cache-deps
+      key: dependency-cache-{{ checksum "package.json" }}
+      paths:
+        - node_modules
+
+defaults: &defaults
+  working_directory: ~/stencil
+  docker:
+    - image: circleci/node:6
+
 jobs:
   build:
-    working_directory: ~/stencil
-    docker:
-      - image: circleci/node:6
+    <<: *defaults
     steps:
       - checkout
-      - run: wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
-      # Unzip the browserstack binary file
-      - run: unzip BrowserStackLocal-linux-x64.zip
-      # Run the file with your access key
-      - run: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
-
-      - restore_cache:
-          keys:
-            - npm-cache-{{ checksum "package-lock.json" }}
-      - run: npm install --no-save
-      - save_cache:
-          key: npm-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ./node_modules
-
+      - restore_cache: *restore-cache-deps
+      - run: npm install
+      - save_cache: *save-cache-deps
       - run: npm install npm@latest
       - run: npm run build
+      - persist_to_workspace:
+          root: ~/stencil
+          paths:
+            - "*"
+
+  test_dist:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
       - run: npm run test.dist
+
+  test_jest:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
       - run: npm run test.jest -- --maxWorkers=4
+
+  test_server:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
       - run: npm run test.server
+
+  test_sys_node:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
       - run: npm run test.sys.node
+
+  test_karma:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: *install-browserstack
+      - run: *run-browserstack
       - run: |
           cd test/karma &&
           npm install &&
           npm run karma.prod
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - test_dist:
+          requires:
+            - build
+      - test_jest:
+          requires:
+            - build
+      - test_server:
+          requires:
+            - build
+      - test_sys_node:
+          requires:
+            - build
+      - test_karma:
+          requires:
+            - build
