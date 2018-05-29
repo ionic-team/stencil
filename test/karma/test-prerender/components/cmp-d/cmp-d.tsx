@@ -9,13 +9,14 @@ import { printLifecycle } from '../../global/util';
 export class CmpD {
 
   @Prop({ context: 'isClient' }) isClient: boolean;
+  @Prop() uniqueId: string = '';
 
   componentWillLoad() {
-    printLifecycle(this.isClient, 'CmpD', 'componentWillLoad');
+    printLifecycle(this.isClient, `CmpD - ${this.uniqueId}`, 'componentWillLoad');
   }
 
   componentDidLoad() {
-    printLifecycle(this.isClient, 'CmpD', 'componentDidLoad');
+    printLifecycle(this.isClient, `CmpD - ${this.uniqueId}`, 'componentDidLoad');
   }
 
   render() {

@@ -11,7 +11,12 @@ export class AppRoot {
     return (
       <main>
         <header>App Root</header>
-        <cmp-a/>
+        <cmp-a>
+          <cmp-d unique-id="a1-child"/>
+          <cmp-d unique-id="a2-child"/>
+          <cmp-d unique-id="a3-child"/>
+          <cmp-d unique-id="a4-child"/>
+        </cmp-a>
         <div class="server">
           <div id="server-componentWillLoad"/>
           <div id="server-componentDidLoad"/>

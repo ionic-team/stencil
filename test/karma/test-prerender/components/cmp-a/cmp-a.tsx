@@ -23,6 +23,7 @@ export class CmpA {
       <div>
         <div>CmpA</div>
         <cmp-b/>
+        <slot/>
       </div>
     );
   }
