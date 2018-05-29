@@ -24,7 +24,7 @@ export class NodeSystem implements d.StencilSystem {
   path: d.Path;
 
 
-  constructor(fs?: d.FileSystem) {
+  constructor(fs?: d.FileSystem, maxConcurrentWorkers?: number) {
     this.fs = fs || new NodeFs();
     this.path = path;
 
@@ -45,14 +45,19 @@ export class NodeSystem implements d.StencilSystem {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
 
-    this.initWorkerFarm();
+    if (typeof maxConcurrentWorkers !== 'number') {
+      maxConcurrentWorkers = os.cpus().length;
+    }
 
-    process.once('exit', this.destroy.bind(this));
+    this.initWorkerFarm(maxConcurrentWorkers);
   }
 
-  private initWorkerFarm() {
+  initWorkerFarm(maxConcurrentWorkers: number) {
     const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
-    this.sysWorker = new WorkerFarm(workerModulePath);
+
+    this.sysWorker = new WorkerFarm(workerModulePath, {
+      maxConcurrentWorkers: maxConcurrentWorkers
+    });
   }
 
   destroy() {

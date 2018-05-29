@@ -1,9 +1,18 @@
-import { WorkerFarm } from '../main';
+import { WorkerFarm, nextAvailableWorker } from '../main';
 import { MessageData, Worker, WorkerOptions } from '../interface';
 import { TestWorkerFarm } from './test-worker-farm';
 
 
 describe('WorkerFarm', () => {
+
+  it('use single instance', async () => {
+    const opts: WorkerOptions = {
+      maxConcurrentWorkers: 0
+    };
+    const wf = new TestWorkerFarm(opts);
+    expect(wf.workers).toHaveLength(0);
+    expect(wf.singleThreadRunner).toBeDefined();
+  });
 
   it('run returning value', async () => {
     const opts: WorkerOptions = {
@@ -25,25 +34,25 @@ describe('WorkerFarm', () => {
       wf.receiveFromWorker({
         workerId: w0.workerId,
         callId: w0.calls[0].callId,
-        returnedValue: 0
+        value: 0
       });
 
       wf.receiveFromWorker({
         workerId: w1.workerId,
         callId: w1.calls[0].callId,
-        returnedValue: 1
+        value: 1
       });
 
       wf.receiveFromWorker({
         workerId: w0.workerId,
         callId: w0.calls[0].callId,
-        returnedValue: 2
+        value: 2
       });
 
       wf.receiveFromWorker({
         workerId: w1.workerId,
         callId: w1.calls[0].callId,
-        returnedValue: 3
+        value: 3
       });
     }, 10);
 
@@ -62,8 +71,8 @@ describe('WorkerFarm', () => {
     expect(w0.calls).toHaveLength(0);
     expect(w1.calls).toHaveLength(0);
 
-    expect(w0.callsAssigned).toBe(2);
-    expect(w1.callsAssigned).toBe(2);
+    expect(w0.totalCallsAssigned).toBe(2);
+    expect(w1.totalCallsAssigned).toBe(2);
   });
 
   it('run returning value', async () => {
@@ -77,7 +86,7 @@ describe('WorkerFarm', () => {
     wf.receiveFromWorker({
       workerId: worker.workerId,
       callId: call.callId,
-      returnedValue: 88
+      value: 88
     });
 
     const rtnVal = await p;
@@ -87,16 +96,16 @@ describe('WorkerFarm', () => {
   it('run returning void', async () => {
     const wf = new TestWorkerFarm();
 
-    expect(wf.workers).toHaveLength(0);
+    expect(wf.workers).toHaveLength(4);
 
     const p = wf.run('runFn');
 
-    expect(wf.workers).toHaveLength(1);
+    expect(wf.workers).toHaveLength(4);
 
     const worker = wf.workers[0];
     expect(worker).toBeDefined();
     expect(worker.calls).toHaveLength(1);
-    expect(worker.callsAssigned).toBe(1);
+    expect(worker.totalCallsAssigned).toBe(1);
 
     const call = worker.calls[0];
     expect(call.callId).toBe(0);
@@ -111,91 +120,119 @@ describe('WorkerFarm', () => {
 
     expect(worker.calls).toHaveLength(0);
 
-    expect(wf.workers).toHaveLength(1);
+    expect(wf.workers).toHaveLength(4);
   });
 
 });
 
 
 describe('nextAvailableWorker', () => {
+  let workers: Worker[];
+  const maxConcurrentWorkers = 4;
 
-  it('do not get worker if none available', () => {
-    const opts: WorkerOptions = {
-      maxConcurrentWorkers: 2
-    };
-    const wf = new TestWorkerFarm(opts);
-    wf.nextAvailableWorker();
-    wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
-
-    wf.workers[0].calls.length = 5;
-    wf.workers[1].calls.length = 5;
-
-    const w = wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
-    expect(w).toBe(null);
+  beforeAll(() => {
+    workers = [];
+    for (let i = 0; i < maxConcurrentWorkers; i++) {
+      workers.push({
+        workerId: i,
+        calls: [],
+        totalCallsAssigned: 0,
+        callIds: 0
+      });
+    }
   });
 
-  it('get worker with the fewest calls assigned', () => {
-    const opts: WorkerOptions = {
-      maxConcurrentWorkers: 2
-    };
-    const wf = new TestWorkerFarm(opts);
-    wf.nextAvailableWorker();
-    wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
+  it('get worker with fewest total calls assigned when all the same number of calls', () => {
+    workers[0].calls.length = 3;
+    workers[0].totalCallsAssigned = 50;
+    workers[1].calls.length = 3;
+    workers[1].totalCallsAssigned = 40;
 
-    wf.workers[0].calls.length = 3;
-    wf.workers[1].calls.length = 3;
+    // this one is tied for fewest active calls (3)
+    // but has the fewest total calls assigned (30)
+    workers[2].calls.length = 3;
+    workers[2].totalCallsAssigned = 30;
 
-    wf.workers[0].callsAssigned = 88;
-    wf.workers[1].callsAssigned = 5;
+    workers[3].calls.length = 5;
+    workers[3].totalCallsAssigned = 20;
 
-    const w = wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
-
-    expect(w.workerId).toBe(1);
-    expect(w.callsAssigned).toBe(5);
-    expect(w.calls).toHaveLength(3);
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(2);
   });
 
-  it('get worker with the fewest active calls assigned', () => {
-    const opts: WorkerOptions = {
-      maxConcurrentWorkers: 2
-    };
-    const wf = new TestWorkerFarm(opts);
-    wf.nextAvailableWorker();
-    wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
+  it('get first worker when all the same', () => {
+    workers[0].calls.length = 1;
+    workers[0].totalCallsAssigned = 1;
+    workers[1].calls.length = 1;
+    workers[1].totalCallsAssigned = 1;
+    workers[2].calls.length = 1;
+    workers[2].totalCallsAssigned = 1;
+    workers[3].calls.length = 1;
+    workers[3].totalCallsAssigned = 1;
 
-    wf.workers[0].calls.length = 4;
-    wf.workers[1].calls.length = 2;
-
-    wf.workers[0].callsAssigned = 88;
-    wf.workers[1].callsAssigned = 88;
-
-    const w = wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
-
-    expect(w.workerId).toBe(1);
-    expect(w.calls).toHaveLength(2);
-  });
-
-  it('start new workers', () => {
-    const opts: WorkerOptions = {
-      maxConcurrentWorkers: 2
-    };
-    const wf = new TestWorkerFarm(opts);
-
-    expect(wf.workers).toHaveLength(0);
-
-    let w = wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(1);
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(0);
+  });
 
-    w = wf.nextAvailableWorker();
-    expect(wf.workers).toHaveLength(2);
+  it('forth call', () => {
+    workers[0].calls.length = 1;
+    workers[1].calls.length = 1;
+    workers[2].calls.length = 1;
+    workers[3].calls.length = 0;
+
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(3);
+  });
+
+  it('third call', () => {
+    workers[0].calls.length = 1;
+    workers[1].calls.length = 1;
+    workers[2].calls.length = 0;
+    workers[3].calls.length = 0;
+
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(2);
+  });
+
+  it('second call', () => {
+    workers[0].calls.length = 1;
+    workers[1].calls.length = 0;
+    workers[2].calls.length = 0;
+    workers[3].calls.length = 0;
+
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(1);
+  });
+
+  it('first call', () => {
+    workers[0].calls.length = 0;
+    workers[1].calls.length = 0;
+    workers[2].calls.length = 0;
+    workers[3].calls.length = 0;
+
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(0);
+  });
+
+  it('get the only available worker', () => {
+    workers[0].calls.length = 4;
+    workers[1].calls.length = 4;
+
+    // this one has the fewest active calls
+    workers[2].calls.length = 3;
+
+    workers[3].calls.length = 4;
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(2);
+  });
+
+  it('no available worker', () => {
+    workers[0].calls.length = 5;
+    workers[1].calls.length = 5;
+    workers[2].calls.length = 5;
+    workers[3].calls.length = 5;
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w).toBe(null);
   });
 
 });

@@ -10,7 +10,7 @@ const postcss = require('postcss');
 const UglifyJS = require('uglify-es');
 
 
-class NodeSystemWorker {
+export class NodeSystemWorker {
 
   async autoprefixCss(input: string, opts: any) {
     if (opts == null || typeof opts !== 'object') {
@@ -113,7 +113,26 @@ class NodeSystemWorker {
 }
 
 
-export function init(process: NodeJS.Process) {
-  const workerModule = new NodeSystemWorker();
-  attachMessageHandler(process, workerModule);
+export function createRunner() {
+  const instance: any = new NodeSystemWorker();
+
+  return (methodName: string, args: any[]) => {
+    // get the method on the loaded module
+    const workerFn = instance[methodName];
+    if (typeof workerFn !== 'function') {
+      throw new Error(`invalid method: ${methodName}`);
+    }
+
+    // call the method on the loaded module
+    const rtn = workerFn.apply(instance, args);
+    if (rtn == null || typeof rtn.then !== 'function') {
+      // sync function returned void or a value that's not a promise
+      return Promise.resolve(rtn);
+    }
+
+    return rtn as Promise<any>;
+  };
 }
+
+
+export { attachMessageHandler };

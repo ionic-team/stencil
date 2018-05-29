@@ -1,7 +1,7 @@
-import { MessageData } from './interface';
+import { MessageData, Runner } from './interface';
 
 
-export function attachMessageHandler(process: NodeJS.Process, workerModule: any) {
+export function attachMessageHandler(process: NodeJS.Process, runner: Runner) {
 
   function handleMessage(receivedMsg: MessageData) {
     if (receivedMsg.exitProcess) {
@@ -15,37 +15,20 @@ export function attachMessageHandler(process: NodeJS.Process, workerModule: any)
       callId: receivedMsg.callId
     };
 
-    // get the method on the loaded module
-    const workerFn = workerModule[receivedMsg.methodName];
-    if (typeof workerFn !== 'function') {
-      responseMsg.error = {
-        message: `invalid method: ${receivedMsg.methodName}`
-      };
-      process.send(responseMsg);
-      return;
-    }
-
     // call the method on the loaded module
     try {
-      const rtn = workerFn.apply(workerModule, receivedMsg.args);
-      if (rtn == null || typeof rtn.then !== 'function') {
-        // sync function returned void or a value that's not a promise
-        responseMsg.returnedValue = rtn;
+      const rtn = runner(receivedMsg.methodName, receivedMsg.args);
+      rtn.then((value: any) => {
+        responseMsg.value = value;
         process.send(responseMsg);
 
-      } else {
-        // async function returned a promise
-        rtn.then((value: any) => {
-          responseMsg.returnedValue = value;
-          process.send(responseMsg);
-
-        }).catch((err: any) => {
-          // returned a rejected promise
-          responseMsg.error = {
-            message: err
-          };
-        });
-      }
+      }).catch((err: any) => {
+        // returned a rejected promise
+        responseMsg.error = {
+          message: err
+        };
+        process.send(responseMsg);
+      });
 
     } catch (e) {
       // method call had an error

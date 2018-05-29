@@ -4,11 +4,11 @@ const nodeSys = require('../../../sys/node/index.js');
 describe('test/sys/node', () => {
   let sys;
 
-  beforeEach(() => {
-    sys = new nodeSys.NodeSystem();
+  beforeAll(() => {
+    sys = new nodeSys.NodeSystem(2);
   });
 
-  afterEach(() => {
+  afterAll(() => {
     sys.destroy();
   });
 

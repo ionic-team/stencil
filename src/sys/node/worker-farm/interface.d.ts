@@ -22,10 +22,10 @@ export interface CallItem {
 export interface Worker {
   workerId: number;
   callIds: number;
-  send(msg: MessageData): void;
-  kill(signal?: string): void;
+  send?(msg: MessageData): void;
+  kill?(signal?: string): void;
   calls?: CallItem[];
-  callsAssigned?: number;
+  totalCallsAssigned?: number;
   exitCode?: number;
   isExisting?: boolean;
 }
@@ -35,7 +35,7 @@ export interface MessageData {
   modulePath?: string;
   methodName?: string;
   args?: any[];
-  returnedValue?: any;
+  value?: any;
   exitProcess?: boolean;
   workerId?: number;
   error?: {
@@ -44,3 +44,5 @@ export interface MessageData {
     stack?: string;
   }
 }
+
+export type Runner = (methodName: string, args: any[]) => Promise<any>;

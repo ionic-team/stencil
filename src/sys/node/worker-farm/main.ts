@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { CallItem, MessageData, Worker, WorkerOptions } from './interface';
+import { CallItem, MessageData, Runner, Worker, WorkerOptions } from './interface';
 import { cpus } from 'os';
 import { fork } from 'child_process';
 
@@ -7,11 +7,12 @@ import { fork } from 'child_process';
 export class WorkerFarm {
   options: WorkerOptions;
   modulePath: string;
-  workers: Worker[];
-  callQueue: CallItem[];
-  isExisting: boolean;
-  workerIds: number;
+  workerModule: any;
+  workers: Worker[] = [];
+  callQueue: CallItem[] = [];
+  isExisting = false;
   logger: d.Logger;
+  singleThreadRunner: Runner;
 
   constructor(modulePath: string, options: WorkerOptions = {}) {
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -22,16 +23,22 @@ export class WorkerFarm {
       }
     } as any;
 
-    // init values
-    this.workers = [];
-    this.callQueue = [];
-    this.isExisting = false;
-    this.workerIds = 0;
+    if (this.options.maxConcurrentWorkers > 1) {
+      this.startWorkers();
+
+    } else {
+      this.workerModule = require(modulePath);
+      this.singleThreadRunner = new this.workerModule.createRunner();
+    }
   }
 
   run(methodName: string, args?: any[]) {
     if (this.isExisting) {
       return Promise.reject(`process exited`);
+    }
+
+    if (this.singleThreadRunner) {
+      return this.singleThreadRunner(methodName, args);
     }
 
     return new Promise<any>((resolve, reject) => {
@@ -41,21 +48,22 @@ export class WorkerFarm {
         resolve: resolve,
         reject: reject
       };
-
       this.callQueue.push(call);
       this.processQueue();
     });
   }
 
-  startWorker() {
-    const workerId = this.workerIds++;
-    const worker = this.createWorker(workerId);
+  startWorkers() {
+    for (let workerId = 0; workerId < this.options.maxConcurrentWorkers; workerId++) {
+      const worker = this.createWorker(workerId);
 
-    worker.calls = [];
-    worker.callsAssigned = 0;
+      worker.calls = [];
+      worker.totalCallsAssigned = 0;
 
-    this.workers.push(worker);
-    return worker;
+      this.workers.push(worker);
+    }
+
+    process.once('exit', this.destroy.bind(this));
   }
 
   createWorker(workerId: number) {
@@ -64,7 +72,11 @@ export class WorkerFarm {
       cwd: process.cwd()
     }, this.options.forkOptions);
 
-    const childProcess = fork(this.modulePath, process.argv, options);
+    const argv = [
+      '--start-worker'
+    ];
+
+    const childProcess = fork(this.modulePath, argv, options);
 
     const worker: Worker = {
       workerId: workerId,
@@ -106,11 +118,12 @@ export class WorkerFarm {
         });
       }
 
-      this.stopWorker(worker);
+      this.stopWorker(workerId);
     }, 10);
   }
 
-  stopWorker(worker: Worker) {
+  stopWorker(workerId: number) {
+    const worker = this.workers.find(w => w.workerId === workerId);
     if (worker && !worker.isExisting) {
       worker.isExisting = true;
 
@@ -161,7 +174,7 @@ export class WorkerFarm {
       if (msg.error) {
         call.reject(msg.error.message);
       } else {
-        call.resolve(msg.returnedValue);
+        call.resolve(msg.value);
       }
 
       // overkill yes, but let's ensure we've cleaned up this call
@@ -191,12 +204,12 @@ export class WorkerFarm {
       });
     });
 
-    this.stopWorker(worker);
+    this.stopWorker(workerId);
   }
 
   processQueue() {
     while (this.callQueue.length > 0) {
-      const worker = this.nextAvailableWorker();
+      const worker = nextAvailableWorker(this.workers, this.options.maxConcurrentCallsPerWorker);
       if (worker) {
         this.send(worker, this.callQueue.shift());
 
@@ -207,33 +220,6 @@ export class WorkerFarm {
     }
   }
 
-  nextAvailableWorker() {
-    if (this.workers.length < this.options.maxConcurrentWorkers) {
-      // still haven't reached our potential number of concurrent workers
-      return this.startWorker();
-    }
-
-    const availableWorkers = this.workers.filter(w => w.calls.length < this.options.maxConcurrentCallsPerWorker);
-    if (availableWorkers.length === 0) {
-      // we're pretty tasked at the moment, please come back later
-      return null;
-    }
-
-    const sorted = availableWorkers.sort((a, b) => {
-      // worker with the fewest active calls first
-      if (a.calls.length < b.calls.length) return -1;
-      if (a.calls.length > b.calls.length) return 1;
-
-      // worker with the fewest calls that have been assigned next
-      if (a.callsAssigned < b.callsAssigned) return -1;
-      if (a.callsAssigned > b.callsAssigned) return 1;
-
-      return 0;
-    });
-
-    return sorted[0];
-  }
-
   send(worker: Worker, call: CallItem) {
     if (!worker || !call) {
       return;
@@ -242,7 +228,7 @@ export class WorkerFarm {
     call.callId = worker.callIds++;
 
     worker.calls.push(call);
-    worker.callsAssigned++;
+    worker.totalCallsAssigned++;
 
     worker.send({
       workerId: worker.workerId,
@@ -264,11 +250,35 @@ export class WorkerFarm {
       this.isExisting = true;
 
       for (let i = this.workers.length - 1; i >= 0; i--) {
-        this.stopWorker(this.workers[i]);
+        this.stopWorker(this.workers[i].workerId);
       }
     }
   }
 
+}
+
+
+export function nextAvailableWorker(workers: Worker[], maxConcurrentCallsPerWorker: number) {
+  const availableWorkers = workers.filter(w => w.calls.length < maxConcurrentCallsPerWorker);
+  if (availableWorkers.length === 0) {
+    // all workers are pretty tasked at the moment, please come back later. Thank you.
+    return null;
+  }
+
+  const sorted = availableWorkers.sort((a, b) => {
+    // worker with the fewest active calls first
+    if (a.calls.length < b.calls.length) return -1;
+    if (a.calls.length > b.calls.length) return 1;
+
+    // all workers have the same number of active calls, so next sort
+    // by worker with the fewest total calls that have been assigned
+    if (a.totalCallsAssigned < b.totalCallsAssigned) return -1;
+    if (a.totalCallsAssigned > b.totalCallsAssigned) return 1;
+
+    return 0;
+  });
+
+  return sorted[0];
 }
 
 
