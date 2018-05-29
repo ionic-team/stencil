@@ -19,6 +19,14 @@ aliases:
       paths:
         - node_modules
 
+  - &restore-karma-cache-deps
+      key: dependency-cache-{{ checksum "test/karma/package.json" }}
+
+  - &save-karma-cache-deps
+      key: dependency-cache-{{ checksum "test/karma/package.json" }}
+      paths:
+        - test/karma/node_modules
+
 defaults: &defaults
   working_directory: ~/stencil
   docker:
@@ -29,10 +37,10 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run: npm install -g npm@latest
       - restore_cache: *restore-cache-deps
       - run: npm install
       - save_cache: *save-cache-deps
-      - run: npm install npm@latest
       - run: npm run build
       - persist_to_workspace:
           root: ~/stencil
@@ -69,15 +77,16 @@ jobs:
 
   test_karma:
     <<: *defaults
+    working_directory: ~/stencil/test/karma
     steps:
       - attach_workspace:
           at: ~/stencil
       - run: *install-browserstack
       - run: *run-browserstack
-      - run: |
-          cd test/karma &&
-          npm install &&
-          npm run karma.prod
+      - restore_cache: *restore-karma-cache-deps
+      - run: npm install
+      - save_cache: *save-karma-cache-deps
+      - run: npm run karma.prod
 
 workflows:
   version: 2
