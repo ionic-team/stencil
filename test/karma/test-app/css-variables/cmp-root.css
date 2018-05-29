@@ -1,0 +1,34 @@
+
+:root {
+  --font-size: 22px;
+  --background: yellow;
+  --color: maroon;
+}
+
+.dark {
+  --font-size: 18px;
+  --background: black;
+  --color: white;
+}
+
+.light {
+  --font-size: 18px;
+  --background: #eee;
+  --color: black;
+}
+
+header {
+  background: var(--background);
+  color: var(--color);
+  border-bottom: 2px solid var(--color);
+}
+
+main {
+  background: var(--background);
+  color: var(--color);
+}
+
+button {
+  background: var(--color);
+  color: var(--background);
+}

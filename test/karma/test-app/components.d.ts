@@ -245,6 +245,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface CssVariablesRoot {
+
+    }
+  }
+
+  interface HTMLCssVariablesRootElement extends StencilComponents.CssVariablesRoot, HTMLStencilElement {}
+
+  var HTMLCssVariablesRootElement: {
+    prototype: HTMLCssVariablesRootElement;
+    new (): HTMLCssVariablesRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'css-variables-root': HTMLCssVariablesRootElement;
+  }
+  interface ElementTagNameMap {
+    'css-variables-root': HTMLCssVariablesRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'css-variables-root': JSXElements.CssVariablesRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CssVariablesRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface CssVariables {
+
+    }
+  }
+
+  interface HTMLCssVariablesElement extends StencilComponents.CssVariables, HTMLStencilElement {}
+
+  var HTMLCssVariablesElement: {
+    prototype: HTMLCssVariablesElement;
+    new (): HTMLCssVariablesElement;
+  };
+  interface HTMLElementTagNameMap {
+    'css-variables': HTMLCssVariablesElement;
+  }
+  interface ElementTagNameMap {
+    'css-variables': HTMLCssVariablesElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'css-variables': JSXElements.CssVariablesAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CssVariablesAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface DynamicImport {
       'update': () => Promise<void>;
     }
