@@ -37,9 +37,7 @@ class NodeSystemWorker {
     return gzipSize(text);
   }
 
-  async minifyCss(input: string, filePath?: string, opts: any = {}) {
-    opts.returnPromise = true;
-
+  minifyCss(input: string, filePath?: string, opts: any = {}) {
     let minifyInput: any;
 
     if (typeof filePath === 'string') {
@@ -54,7 +52,7 @@ class NodeSystemWorker {
     }
 
     const cleanCss = new CleanCSS(opts);
-    const result = await cleanCss.minify(minifyInput);
+    const result = cleanCss.minify(minifyInput);
     const diagnostics: d.Diagnostic[] = [];
 
     if (result.errors) {

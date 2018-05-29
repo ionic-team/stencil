@@ -148,13 +148,13 @@ export class WorkerFarm {
       return;
     }
 
+    if (call.timer) {
+      clearTimeout(call.timer);
+    }
+
     const index = worker.calls.indexOf(call);
     if (index > -1) {
       worker.calls.splice(index, 1);
-    }
-
-    if (call.timer) {
-      clearTimeout(call.timer);
     }
 
     process.nextTick(() => {
@@ -163,6 +163,12 @@ export class WorkerFarm {
       } else {
         call.resolve(msg.returnedValue);
       }
+
+      // overkill yes, but let's ensure we've cleaned up this call
+      call.args = null;
+      call.reject = null;
+      call.resolve = null;
+      call.timer = null;
     });
 
     // allow any outstanding calls to be processed
@@ -189,7 +195,7 @@ export class WorkerFarm {
   }
 
   processQueue() {
-    while (this.callQueue.length) {
+    while (this.callQueue.length > 0) {
       const worker = this.nextAvailableWorker();
       if (worker) {
         this.send(worker, this.callQueue.shift());
@@ -207,13 +213,13 @@ export class WorkerFarm {
       return this.startWorker();
     }
 
-    const available = this.workers.filter(w => w.calls.length < this.options.maxConcurrentCallsPerWorker);
-    if (available.length === 0) {
+    const availableWorkers = this.workers.filter(w => w.calls.length < this.options.maxConcurrentCallsPerWorker);
+    if (availableWorkers.length === 0) {
       // we're pretty tasked at the moment, please come back later
       return null;
     }
 
-    const sorted = available.sort((a, b) => {
+    const sorted = availableWorkers.sort((a, b) => {
       // worker with the fewest active calls first
       if (a.calls.length < b.calls.length) return -1;
       if (a.calls.length > b.calls.length) return 1;
@@ -245,6 +251,7 @@ export class WorkerFarm {
       args: call.args
     });
 
+    // no need to keep these args in memory at this point
     call.args = null;
 
     if (this.options.maxCallTime !== Infinity) {

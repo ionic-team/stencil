@@ -8,7 +8,9 @@ export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, 
     return styleText;
   }
 
-  if (!config.minifyCss && !styleText.includes('@import')) {
+  const hasCssImport = styleText.includes('@import');
+
+  if (!config.minifyCss && !hasCssImport) {
     // if we're not minifying the css (dev mode basically)
     // we still need to using clean-css to figure out all the
     // css @import rules and concatenate them, but don't
@@ -20,16 +22,20 @@ export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, 
   // config.minifyCss is basically for production
   const opts = config.minifyCss ? MINIFY_CSS_PROD : MINIFY_CSS_DEV;
 
-  const cacheKey = compilerCtx.cache.createKey('minifyStyle', styleText, opts);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  let cacheKey: string = null;
+  if (!hasCssImport) {
+    // only can use cache if there's no @import
+    cacheKey = compilerCtx.cache.createKey('minifyStyle', styleText, opts);
+    const cachedContent = await compilerCtx.cache.get(cacheKey);
 
-  if (cachedContent != null) {
-    // let's use the cached data we already figured out
-    return cachedContent;
+    if (cachedContent != null) {
+      // let's use the cached data we already figured out
+      return cachedContent;
+    }
   }
 
   // update any CSS @imports pointing to node_modules, if any
-  styleText = resolveNodeModuleCssImports(config, diagnostics, styleText, filePath);
+  styleText = resolveNodeModuleCssImports(config, diagnostics, styleText, filePath, hasCssImport);
 
   const minifyResults = await config.sys.minifyCss(styleText, filePath, opts);
   minifyResults.diagnostics.forEach(d => {
@@ -39,7 +45,12 @@ export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   if (typeof minifyResults.output === 'string') {
     // cool, we got valid minified output
-    await compilerCtx.cache.put(cacheKey, minifyResults.output);
+
+    if (cacheKey != null) {
+      // only cache if we got a cache key, if not it probably has an @import
+      await compilerCtx.cache.put(cacheKey, minifyResults.output);
+    }
+
     return minifyResults.output;
   }
 
@@ -57,11 +68,11 @@ const MINIFY_CSS_DEV: any = {
 };
 
 
-export function resolveNodeModuleCssImports(config: d.Config, diagnostics: d.Diagnostic[], styleText: string, filePath: string) {
+export function resolveNodeModuleCssImports(config: d.Config, diagnostics: d.Diagnostic[], styleText: string, filePath: string, hasCssImport: boolean) {
   // only bother figuring out node module import paths
   // if we have a valid file path and we see that the
   // input style text actually has a @import rule
-  if (typeof filePath === 'string' && styleText.includes('@import')) {
+  if (typeof filePath === 'string' && hasCssImport) {
     const imports = getNodeImports(styleText);
     const dir = config.sys.path.dirname(filePath);
 
