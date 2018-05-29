@@ -37,7 +37,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm install -g npm@latest
+      - run: sudo npm install -g npm@latest
       - restore_cache: *restore-cache-deps
       - run: npm install
       - save_cache: *save-cache-deps
