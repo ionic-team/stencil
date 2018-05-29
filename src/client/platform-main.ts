@@ -111,8 +111,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
 
     if (!win.customElements.get(cmpMeta.tagNameMeta)) {
-      // keep a map of all the defined components
-      globalDefined[cmpMeta.tagNameMeta] = true;
 
       // define the custom element
       // initialize the members on the host element prototype
@@ -251,7 +249,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
     (App.components || [])
-      .map(data => parseComponentLoader(data))
+      .map(data => {
+        const cmpMeta = parseComponentLoader(data);
+        return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
+      })
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
   }
 

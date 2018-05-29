@@ -369,7 +369,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // register all the components now that everything's ready
   (App.components || [])
-    .map(data => parseComponentLoader(data))
+    .map(data => {
+      const cmpMeta = parseComponentLoader(data);
+      return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
+    })
     .forEach(cmpMeta => {
     // es5 way of extending HTMLElement
     function HostElement(self: any) {
