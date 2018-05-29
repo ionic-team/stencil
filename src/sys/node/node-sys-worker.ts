@@ -7,6 +7,7 @@ const autoprefixer = require('autoprefixer');
 const CleanCSS = require('clean-css');
 const gzipSize = require('gzip-size');
 const postcss = require('postcss');
+const UglifyJS = require('uglify-es');
 
 
 class NodeSystemWorker {
@@ -79,6 +80,26 @@ class NodeSystemWorker {
 
     return {
       output: result.styles,
+      sourceMap: result.sourceMap,
+      diagnostics: diagnostics
+    };
+  }
+
+  minifyJs(input: string, opts?: any) {
+    const result = UglifyJS.minify(input, opts);
+    const diagnostics: d.Diagnostic[] = [];
+
+    if (result.error) {
+      diagnostics.push({
+        header: 'Minify JS',
+        messageText: result.error.message,
+        level: 'error',
+        type: 'build'
+      });
+    }
+
+    return {
+      output: (result.code as string),
       sourceMap: result.sourceMap,
       diagnostics: diagnostics
     };

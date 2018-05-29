@@ -222,25 +222,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('minifyCss', [input, filePath, opts]);
   }
 
-  async minifyJs(input: string, opts?: any) {
-    const UglifyJS = require('uglify-es');
-    const result = UglifyJS.minify(input, opts);
-    const diagnostics: d.Diagnostic[] = [];
-
-    if (result.error) {
-      diagnostics.push({
-        header: 'Minify JS',
-        messageText: result.error.message,
-        level: 'error',
-        type: 'build'
-      });
-    }
-
-    return {
-      output: (result.code as string),
-      sourceMap: result.sourceMap,
-      diagnostics: diagnostics
-    };
+  minifyJs(input: string, opts?: any) {
+    return this.sysWorker.run('minifyJs', [input, opts]);
   }
 
   minimatch(filePath: string, pattern: string, opts: any) {

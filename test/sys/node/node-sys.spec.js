@@ -45,6 +45,20 @@ describe('test/sys/node', () => {
     });
   });
 
+  it('minifyJs', () => {
+    const input = `
+      /** plz minify me **/
+      (function($$WINDOW$$) {
+        // be gone with you!!!
+        /****/$$WINDOW$$.test      =      'yup'   ;;;;;;;;;;
+      })(window)
+    `;
+
+    return sys.minifyJs(input).then(results => {
+      expect(results.output).toBe(`window.test="yup";`);
+    });
+  });
+
   it('scopeCss', () => {
     const cssText = `::slotted(*) {}`;
     const scopeAttribute = `data-ion-tag`;

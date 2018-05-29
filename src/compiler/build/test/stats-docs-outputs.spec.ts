@@ -12,6 +12,8 @@ describe('stats and docs', () => {
   let config: TestingConfig;
 
   it('build multiple stats and docs', async () => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+
     config = new TestingConfig();
     config.flags.docs = true;
     config.buildAppCore = true;
