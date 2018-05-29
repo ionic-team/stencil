@@ -12,20 +12,12 @@ aliases:
       command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
 
   - &restore-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}
+      key: dependency-cache-{{ checksum "package.json" }}-2
 
   - &save-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}
+      key: dependency-cache-{{ checksum "package.json" }}-2
       paths:
         - node_modules
-
-  - &restore-karma-cache-deps
-      key: dependency-cache-{{ checksum "test/karma/package.json" }}
-
-  - &save-karma-cache-deps
-      key: dependency-cache-{{ checksum "test/karma/package.json" }}
-      paths:
-        - test/karma/node_modules
 
 defaults: &defaults
   working_directory: ~/stencil
@@ -38,6 +30,7 @@ jobs:
     steps:
       - checkout
       - restore_cache: *restore-cache-deps
+      - run: npm install npm@latest
       - run: npm install
       - save_cache: *save-cache-deps
       - run: npm run build
@@ -82,9 +75,10 @@ jobs:
           at: ~/stencil
       - run: *install-browserstack
       - run: *run-browserstack
-      - restore_cache: *restore-karma-cache-deps
+      - restore_cache: *restore-cache-deps # works because of working_directory
+      - run: npm install npm@latest
       - run: npm install
-      - save_cache: *save-karma-cache-deps
+      - save_cache: *save-cache-deps # works because of working_directory
       - run: npm run karma.prod
 
 workflows:
