@@ -9,38 +9,30 @@ describe('prerender', () => {
   });
   afterAll(tearDownDom);
 
-
-  it('client componentWillLoad Order', () => {
-    const elm = app.querySelector('#client-componentWillLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpA client componentWillLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpB client componentWillLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpC client componentWillLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD client componentWillLoad');
-  });
-
-  it('client componentDidLoad Order', () => {
-    const elm = app.querySelector('#client-componentDidLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpD client componentDidLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpC client componentDidLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpB client componentDidLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpA client componentDidLoad');
-  });
-
   it('server componentWillLoad Order', () => {
     const elm = app.querySelector('#server-componentWillLoad');
     expect(elm.children[0].textContent.trim()).toBe('CmpA server componentWillLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpB server componentWillLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpC server componentWillLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD server componentWillLoad');
+    expect(elm.children[1].textContent.trim()).toBe('CmpD - a1-child server componentWillLoad');
+    expect(elm.children[2].textContent.trim()).toBe('CmpD - a2-child server componentWillLoad');
+    expect(elm.children[3].textContent.trim()).toBe('CmpD - a3-child server componentWillLoad');
+    expect(elm.children[4].textContent.trim()).toBe('CmpD - a4-child server componentWillLoad');
+    expect(elm.children[5].textContent.trim()).toBe('CmpB server componentWillLoad');
+    expect(elm.children[6].textContent.trim()).toBe('CmpC server componentWillLoad');
+    expect(elm.children[7].textContent.trim()).toBe('CmpD - c-child server componentWillLoad');
   });
 
   it('server componentDidLoad Order', () => {
     const elm = app.querySelector('#server-componentDidLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpD server componentDidLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpC server componentDidLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpB server componentDidLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpA server componentDidLoad');
+    expect(elm.children[0].textContent.trim()).toBe('CmpD - a1-child server componentDidLoad');
+    expect(elm.children[1].textContent.trim()).toBe('CmpD - a2-child server componentDidLoad');
+    expect(elm.children[2].textContent.trim()).toBe('CmpD - a3-child server componentDidLoad');
+    expect(elm.children[3].textContent.trim()).toBe('CmpD - a4-child server componentDidLoad');
+    expect(elm.children[4].textContent.trim()).toBe('CmpD - c-child server componentDidLoad');
+    expect(elm.children[5].textContent.trim()).toBe('CmpC server componentDidLoad');
+    expect(elm.children[6].textContent.trim()).toBe('CmpB server componentDidLoad');
+    expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
   });
+
 
   it('set data-ssrv', () => {
     const appRoot = app.querySelector('app-root');
