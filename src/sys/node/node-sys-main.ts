@@ -61,9 +61,8 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   destroy() {
-    if (this.sysWorker) {
+    if (this.sysWorker && this.sysWorker.destroy) {
       this.sysWorker.destroy();
-      this.sysWorker = null;
     }
   }
 

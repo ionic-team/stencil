@@ -62,6 +62,12 @@ export class Renderer {
     return this.ctx.fs;
   }
 
+  destroy() {
+    if (this.config && this.config.sys && this.config.sys.destroy) {
+      this.config.sys.destroy();
+    }
+  }
+
 }
 
 

@@ -13,11 +13,12 @@ describe('test/server', () => {
 
     it('multiple components w/ styles and multiple requests', done => {
 
+      jest.resetModules();
       const app = express();
 
       // load the stencil config and
       // intialize serve-side rendering
-      const { wwwDir } = stencil.initApp({
+      const { wwwDir, destroy } = stencil.initApp({
         app: app,
         configPath: path.join(__dirname, 'stencil.config.js')
       });
@@ -49,6 +50,7 @@ describe('test/server', () => {
               .expect(testResponse)
               .end(err => {
                 if (err) throw err;
+                destroy();
                 server.close(done);
               });
           });
@@ -65,6 +67,7 @@ describe('test/server', () => {
     it('multiple components w/ styles and multiple requests', done => {
 
       // load the config
+      jest.resetModules();
       const config = stencil.loadConfig(__dirname);
 
       // ensure ssr flag is set on the config
@@ -124,6 +127,7 @@ describe('test/server', () => {
 
           res.on('end', () => {
             testResponse(body);
+            renderer.destroy();
             server.close(done);
           });
 

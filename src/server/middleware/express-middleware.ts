@@ -37,7 +37,10 @@ export function initApp(ssrConfig: d.ServerConfigInput) {
   return {
     config: (middlewareConfig.config as d.Config),
     logger: (middlewareConfig.config as d.Config).logger,
-    wwwDir: wwwOutput.dir
+    wwwDir: wwwOutput.dir,
+    destroy: () => {
+      (middlewareConfig.config as d.Config).sys.destroy();
+    }
   } as d.ServerConfigOutput;
 }
 
@@ -45,7 +48,7 @@ export function initApp(ssrConfig: d.ServerConfigInput) {
 export function ssrMiddleware(middlewareConfig: d.MiddlewareConfig) {
   // load up the config
   const path = require('path');
-  const nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
+  const nodeSys = require(path.join(__dirname, '..', 'sys', 'node', 'index.js'));
   middlewareConfig.config = compilerLoadConfig(nodeSys.sys, middlewareConfig.config);
 
   const config: d.Config = middlewareConfig.config;
@@ -56,6 +59,12 @@ export function ssrMiddleware(middlewareConfig: d.MiddlewareConfig) {
 
   // create the renderer
   const renderer = new Renderer(middlewareConfig.config);
+
+  // add the destroy fn to the middleware config
+  // this will exit all forked workers
+  middlewareConfig.destroy = () => {
+    (middlewareConfig.config as d.Config).sys.destroy();
+  };
 
   let srcIndexHtml: string;
   try {

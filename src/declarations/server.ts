@@ -11,6 +11,7 @@ export interface ServerConfigOutput {
   config: d.Config;
   logger: d.Logger;
   wwwDir: string;
+  destroy?: () => void;
 }
 
 
@@ -21,4 +22,5 @@ export interface ExpressApp {
 
 export interface MiddlewareConfig {
   config: string | d.Config;
+  destroy?: () => void;
 }
