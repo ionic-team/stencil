@@ -49,6 +49,9 @@ const localLaunchers = {
   },
   'Firefox': {
     base: 'Firefox'
+  },
+  Safari: {
+    base: 'Safari'
   }
 };
 
@@ -57,6 +60,7 @@ module.exports = function(config) {
     plugins: [
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-safari-launcher',
       'karma-browserstack-launcher',
       'karma-jasmine',
       'karma-typescript',
