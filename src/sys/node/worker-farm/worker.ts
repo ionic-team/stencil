@@ -3,57 +3,62 @@ import { MessageData, Runner } from './interface';
 
 export function attachMessageHandler(process: NodeJS.Process, runner: Runner) {
 
-  function handleMessage(receivedMsg: MessageData) {
-    if (receivedMsg.exitProcess) {
+  function handleMessageFromMain(receivedFromMain: MessageData) {
+    if (receivedFromMain.exitProcess) {
       // main thread said to have this worker exit
       process.exit(0);
     }
 
     // build a message to send back to main
-    const responseMsg: MessageData = {
-      workerId: receivedMsg.workerId,
-      callId: receivedMsg.callId
+    const sendToMain: MessageData = {
+      workerId: receivedFromMain.workerId,
+      taskId: receivedFromMain.taskId
     };
 
     // call the method on the loaded module
+    // using the received task data
     try {
-      const rtn = runner(receivedMsg.methodName, receivedMsg.args);
+      const rtn = runner(receivedFromMain.methodName, receivedFromMain.args);
+
+      // clear out the args since we no longer need the data
+      receivedFromMain.args = null;
+
       rtn.then((value: any) => {
-        responseMsg.value = value;
-        process.send(responseMsg);
+        sendToMain.value = value;
+        process.send(sendToMain);
 
       }).catch((err: any) => {
         // returned a rejected promise
-        responseMsg.error = {
+        sendToMain.error = {
           message: err
         };
-        process.send(responseMsg);
+        process.send(sendToMain);
       });
 
     } catch (e) {
       // method call had an error
       if (typeof e === 'string') {
-        responseMsg.error = {
+        sendToMain.error = {
           message: e
         };
 
       } else if (e) {
-        responseMsg.error = {
+        sendToMain.error = {
           type: e.type,
           message: e.message,
           stack: e.stack
         };
 
       } else {
-        responseMsg.error = {
+        sendToMain.error = {
           message: 'worker error'
         };
       }
 
-      process.send(responseMsg);
+      process.send(sendToMain);
     }
   }
 
   // handle receiving a message from main
-  process.on('message', handleMessage);
+  process.on('message', handleMessageFromMain);
 }

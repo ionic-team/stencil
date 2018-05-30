@@ -16,7 +16,7 @@ export class TestWorkerFarm extends WorkerFarm {
   createWorker(workerId: number) {
     const worker: Worker = {
       workerId: workerId,
-      callIds: 0,
+      taskIds: 0,
       send: (msg: MessageData) => {/**/},
       kill: () => {/**/},
     };

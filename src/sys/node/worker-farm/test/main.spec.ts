@@ -31,27 +31,27 @@ describe('WorkerFarm', () => {
     const w1 = wf.workers[1];
 
     setTimeout(() => {
-      wf.receiveFromWorker({
+      wf.receiveMessageFromWorker({
         workerId: w0.workerId,
-        callId: w0.calls[0].callId,
+        taskId: w0.tasks[0].taskId,
         value: 0
       });
 
-      wf.receiveFromWorker({
+      wf.receiveMessageFromWorker({
         workerId: w1.workerId,
-        callId: w1.calls[0].callId,
+        taskId: w1.tasks[0].taskId,
         value: 1
       });
 
-      wf.receiveFromWorker({
+      wf.receiveMessageFromWorker({
         workerId: w0.workerId,
-        callId: w0.calls[0].callId,
+        taskId: w0.tasks[0].taskId,
         value: 2
       });
 
-      wf.receiveFromWorker({
+      wf.receiveMessageFromWorker({
         workerId: w1.workerId,
-        callId: w1.calls[0].callId,
+        taskId: w1.tasks[0].taskId,
         value: 3
       });
     }, 10);
@@ -68,11 +68,11 @@ describe('WorkerFarm', () => {
     const rtnVal3 = await p3;
     expect(rtnVal3).toBe(3);
 
-    expect(w0.calls).toHaveLength(0);
-    expect(w1.calls).toHaveLength(0);
+    expect(w0.tasks).toHaveLength(0);
+    expect(w1.tasks).toHaveLength(0);
 
-    expect(w0.totalCallsAssigned).toBe(2);
-    expect(w1.totalCallsAssigned).toBe(2);
+    expect(w0.totalTasksAssigned).toBe(2);
+    expect(w1.totalTasksAssigned).toBe(2);
   });
 
   it('run returning value', async () => {
@@ -81,11 +81,11 @@ describe('WorkerFarm', () => {
     const p = wf.run('runFn');
 
     const worker = wf.workers[0];
-    const call = worker.calls[0];
+    const task = worker.tasks[0];
 
-    wf.receiveFromWorker({
+    wf.receiveMessageFromWorker({
       workerId: worker.workerId,
-      callId: call.callId,
+      taskId: task.taskId,
       value: 88
     });
 
@@ -104,21 +104,21 @@ describe('WorkerFarm', () => {
 
     const worker = wf.workers[0];
     expect(worker).toBeDefined();
-    expect(worker.calls).toHaveLength(1);
-    expect(worker.totalCallsAssigned).toBe(1);
+    expect(worker.tasks).toHaveLength(1);
+    expect(worker.totalTasksAssigned).toBe(1);
 
-    const call = worker.calls[0];
-    expect(call.callId).toBe(0);
+    const task = worker.tasks[0];
+    expect(task.taskId).toBe(0);
 
-    wf.receiveFromWorker({
+    wf.receiveMessageFromWorker({
       workerId: worker.workerId,
-      callId: call.callId
+      taskId: task.taskId
     });
 
     const rtnVal = await p;
     expect(rtnVal).toBeUndefined();
 
-    expect(worker.calls).toHaveLength(0);
+    expect(worker.tasks).toHaveLength(0);
 
     expect(wf.workers).toHaveLength(4);
   });
@@ -135,102 +135,124 @@ describe('nextAvailableWorker', () => {
     for (let i = 0; i < maxConcurrentWorkers; i++) {
       workers.push({
         workerId: i,
-        calls: [],
-        totalCallsAssigned: 0,
-        callIds: 0
+        tasks: [],
+        totalTasksAssigned: 0,
+        taskIds: 0
       });
     }
   });
 
-  it('get worker with fewest total calls assigned when all the same number of calls', () => {
-    workers[0].calls.length = 3;
-    workers[0].totalCallsAssigned = 50;
-    workers[1].calls.length = 3;
-    workers[1].totalCallsAssigned = 40;
+  it('get worker with fewest total tasks assigned when all the same number of tasks', () => {
+    workers[0].tasks.length = 3;
+    workers[0].totalTasksAssigned = 50;
+    workers[1].tasks.length = 3;
+    workers[1].totalTasksAssigned = 40;
 
-    // this one is tied for fewest active calls (3)
-    // but has the fewest total calls assigned (30)
-    workers[2].calls.length = 3;
-    workers[2].totalCallsAssigned = 30;
+    // this one is tied for fewest active tasks (3)
+    // but has the fewest total tasks assigned (30)
+    workers[2].tasks.length = 3;
+    workers[2].totalTasksAssigned = 30;
 
-    workers[3].calls.length = 5;
-    workers[3].totalCallsAssigned = 20;
+    workers[3].tasks.length = 5;
+    workers[3].totalTasksAssigned = 20;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(2);
   });
 
   it('get first worker when all the same', () => {
-    workers[0].calls.length = 1;
-    workers[0].totalCallsAssigned = 1;
-    workers[1].calls.length = 1;
-    workers[1].totalCallsAssigned = 1;
-    workers[2].calls.length = 1;
-    workers[2].totalCallsAssigned = 1;
-    workers[3].calls.length = 1;
-    workers[3].totalCallsAssigned = 1;
+    workers[0].tasks.length = 1;
+    workers[0].totalTasksAssigned = 1;
+    workers[1].tasks.length = 1;
+    workers[1].totalTasksAssigned = 1;
+    workers[2].tasks.length = 1;
+    workers[2].totalTasksAssigned = 1;
+    workers[3].tasks.length = 1;
+    workers[3].totalTasksAssigned = 1;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(0);
   });
 
-  it('forth call', () => {
-    workers[0].calls.length = 1;
-    workers[1].calls.length = 1;
-    workers[2].calls.length = 1;
-    workers[3].calls.length = 0;
+  it('do not use a worker that has a long running task', () => {
+    workers[0].tasks.length = 4;
+    workers[1].tasks.length = 4;
+    workers[2].tasks = [{ isLongRunningTask: true } ] as any;
+    workers[3].tasks.length = 3;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(3);
   });
 
-  it('third call', () => {
-    workers[0].calls.length = 1;
-    workers[1].calls.length = 1;
-    workers[2].calls.length = 0;
-    workers[3].calls.length = 0;
+  it('forth task', () => {
+    workers[0].tasks.length = 1;
+    workers[1].tasks.length = 1;
+    workers[2].tasks.length = 1;
+    workers[3].tasks.length = 0;
+
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(3);
+  });
+
+  it('third task', () => {
+    workers[0].tasks.length = 1;
+    workers[1].tasks.length = 1;
+    workers[2].tasks.length = 0;
+    workers[3].tasks.length = 0;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(2);
   });
 
-  it('second call', () => {
-    workers[0].calls.length = 1;
-    workers[1].calls.length = 0;
-    workers[2].calls.length = 0;
-    workers[3].calls.length = 0;
+  it('second task', () => {
+    workers[0].tasks.length = 1;
+    workers[1].tasks.length = 0;
+    workers[2].tasks.length = 0;
+    workers[3].tasks.length = 0;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(1);
   });
 
-  it('first call', () => {
-    workers[0].calls.length = 0;
-    workers[1].calls.length = 0;
-    workers[2].calls.length = 0;
-    workers[3].calls.length = 0;
+  it('first task', () => {
+    workers[0].tasks.length = 0;
+    workers[1].tasks.length = 0;
+    workers[2].tasks.length = 0;
+    workers[3].tasks.length = 0;
 
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(0);
   });
 
   it('get the only available worker', () => {
-    workers[0].calls.length = 4;
-    workers[1].calls.length = 4;
+    workers[0].tasks.length = 4;
+    workers[1].tasks.length = 4;
 
-    // this one has the fewest active calls
-    workers[2].calls.length = 3;
+    // this one has the fewest active tasks
+    workers[2].tasks.length = 3;
 
-    workers[3].calls.length = 4;
+    workers[3].tasks.length = 4;
+    const w = nextAvailableWorker(workers, maxConcurrentWorkers);
+    expect(w.workerId).toBe(2);
+  });
+
+  it('get the only available worker', () => {
+    workers[0].tasks.length = 4;
+    workers[1].tasks.length = 4;
+
+    // this one has the fewest active tasks
+    workers[2].tasks.length = 3;
+
+    workers[3].tasks.length = 4;
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w.workerId).toBe(2);
   });
 
   it('no available worker', () => {
-    workers[0].calls.length = 5;
-    workers[1].calls.length = 5;
-    workers[2].calls.length = 5;
-    workers[3].calls.length = 5;
+    workers[0].tasks.length = 5;
+    workers[1].tasks.length = 5;
+    workers[2].tasks.length = 5;
+    workers[3].tasks.length = 5;
     const w = nextAvailableWorker(workers, maxConcurrentWorkers);
     expect(w).toBe(null);
   });

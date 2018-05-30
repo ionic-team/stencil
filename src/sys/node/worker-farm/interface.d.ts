@@ -4,16 +4,17 @@ import { WorkerFarm } from "./main";
 
 export interface WorkerOptions {
   maxConcurrentWorkers?: number;
-  maxConcurrentCallsPerWorker?: number;
-  maxCallTime?: number;
+  maxConcurrentTasksPerWorker?: number;
+  maxTaskTime?: number;
   forkOptions?: ForkOptions;
   forcedKillTime?: number;
 }
 
-export interface CallItem {
-  callId?: number;
+export interface Task {
+  taskId?: number;
   methodName: string;
   args: any[];
+  isLongRunningTask: boolean;
   resolve: (val: any) => any;
   reject: (msg: string) => any;
   timer?: any;
@@ -21,23 +22,23 @@ export interface CallItem {
 
 export interface Worker {
   workerId: number;
-  callIds: number;
+  taskIds: number;
   send?(msg: MessageData): void;
   kill?(signal?: string): void;
-  calls?: CallItem[];
-  totalCallsAssigned?: number;
+  tasks?: Task[];
+  totalTasksAssigned?: number;
   exitCode?: number;
   isExisting?: boolean;
 }
 
 export interface MessageData {
-  callId?: number;
+  workerId?: number;
+  taskId?: number;
   modulePath?: string;
   methodName?: string;
   args?: any[];
   value?: any;
   exitProcess?: boolean;
-  workerId?: number;
   error?: {
     type?: string;
     message?: string;
