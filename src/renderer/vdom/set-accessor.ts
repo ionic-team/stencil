@@ -116,7 +116,7 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
       }
     }
 
-  } else if (newValue != null) {
+  } else if (newValue != null && memberName !== 'key') {
     // Element Attributes
     updateAttribute(elm, memberName, newValue);
 

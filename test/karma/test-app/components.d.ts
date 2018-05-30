@@ -379,6 +379,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface KeyReorderRoot {
+
+    }
+  }
+
+  interface HTMLKeyReorderRootElement extends StencilComponents.KeyReorderRoot, HTMLStencilElement {}
+
+  var HTMLKeyReorderRootElement: {
+    prototype: HTMLKeyReorderRootElement;
+    new (): HTMLKeyReorderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'key-reorder-root': HTMLKeyReorderRootElement;
+  }
+  interface ElementTagNameMap {
+    'key-reorder-root': HTMLKeyReorderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'key-reorder-root': JSXElements.KeyReorderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface KeyReorderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface KeyReorder {
+      'num': number;
+    }
+  }
+
+  interface HTMLKeyReorderElement extends StencilComponents.KeyReorder, HTMLStencilElement {}
+
+  var HTMLKeyReorderElement: {
+    prototype: HTMLKeyReorderElement;
+    new (): HTMLKeyReorderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'key-reorder': HTMLKeyReorderElement;
+  }
+  interface ElementTagNameMap {
+    'key-reorder': HTMLKeyReorderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'key-reorder': JSXElements.KeyReorderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface KeyReorderAttributes extends HTMLAttributes {
+      'num'?: number;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface LifecycleBasicA {
 
     }

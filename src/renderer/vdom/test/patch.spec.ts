@@ -441,8 +441,8 @@ describe('renderer', () => {
         });
 
         it('adds children to parent with no children', () => {
-          const vnode1 = h('span', {k: 'span'});
-          const vnode2 = h('span', {k: 'span'}, ...[1, 2, 3].map(spanNum));
+          const vnode1 = h('span', {key: 'span'});
+          const vnode2 = h('span', {key: 'span'}, ...[1, 2, 3].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(0);
@@ -452,8 +452,8 @@ describe('renderer', () => {
         });
 
         it('removes all children from parent', () => {
-          const vnode1 = h('span', {k: 'span'}, ...[1, 2, 3].map(spanNum));
-          const vnode2 = h('span', {k: 'span'});
+          const vnode1 = h('span', {key: 'span'}, ...[1, 2, 3].map(spanNum));
+          const vnode2 = h('span', {key: 'span'});
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
           elm = patch(vnode1, vnode2).elm;
@@ -461,8 +461,8 @@ describe('renderer', () => {
         });
 
         it('update one child with same key but different sel', () => {
-          const vnode1 = h('span', {k: 'spans'}, ...[1, 2, 3].map(spanNum));
-          const vnode2 = h('span', {k: 'span'}, ...[spanNum(1), h('i', {k: 2}, '2'), spanNum(3)]);
+          const vnode1 = h('span', {key: 'spans'}, ...[1, 2, 3].map(spanNum));
+          const vnode2 = h('span', {key: 'span'}, ...[spanNum(1), h('i', {key: 2}, '2'), spanNum(3)]);
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
           elm = patch(vnode1, vnode2).elm;
@@ -549,15 +549,19 @@ describe('renderer', () => {
 
           expect(elm.children[0].innerHTML).toEqual('2');
           expect(elm.children[0].instance).toEqual(2);
+          expect(elm.children[0].hasAttribute('key')).toBe(false);
 
           expect(elm.children[1].innerHTML).toEqual('3');
           expect(elm.children[1].instance).toEqual(3);
+          expect(elm.children[1].hasAttribute('key')).toBe(false);
 
           expect(elm.children[2].innerHTML).toEqual('1');
           expect(elm.children[2].instance).toEqual(1);
+          expect(elm.children[2].hasAttribute('key')).toBe(false);
 
           expect(elm.children[3].innerHTML).toEqual('4');
           expect(elm.children[3].instance).toEqual(4);
+          expect(elm.children[3].hasAttribute('key')).toBe(false);
         });
 
         it('moves element to end', () => {
@@ -691,7 +695,7 @@ describe('renderer', () => {
         const arr = [], opacities: any[] = [], elms = 14, samples = 5;
 
         function spanNumWithOpacity(n: any, o: any) {
-          return h('span', {k: n, s: {opacity: o}}, n.toString());
+          return h('span', {key: n, s: {opacity: o}}, n.toString());
         }
 
         for (n = 0; n < elms; ++n) {

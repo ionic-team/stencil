@@ -18,6 +18,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'isClient',
   'isPrerender',
   'isServer',
+  'key',
   'loaded',
   'mode',
   'namespace',
