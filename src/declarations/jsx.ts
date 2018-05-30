@@ -584,6 +584,7 @@ declare global {
       // vdom specific
       innerHTML?: string;
       ref?: (elm?: HTMLElement) => void;
+      key?: string | number;
 
       // Standard HTML Attributes
       accessKey?: string;
