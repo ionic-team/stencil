@@ -51,7 +51,7 @@
     "rollup-plugin-node-globals": "1.2.1",
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-pluginutils": "2.3.0",
-    "typescript": "^2.8.3",
+    "typescript": "~2.9.1",
     "uglify-es": "3.3.9",
     "workbox-build": "^3.1.0"
   },
