@@ -31,6 +31,7 @@ const READ_ONLY_PROPERTIES = [
   'firstChild',
   'firstElementChild',
   'host',
+  'is',
   'isConnected',
   'isContentEditable',
   'lastChild',
