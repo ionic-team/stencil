@@ -8,70 +8,70 @@ describe('renderer', () => {
   const patch = mockRenderer();
   const domApi = mockDomApi();
 
-  var elm: any;
-  var vnode0: d.VNode;
+  let hostElm: any;
+  let vnode0: d.VNode;
 
-  beforeEach(function() {
-    elm = mockElement('div');
+  beforeEach(() => {
+    hostElm = mockElement('div');
     vnode0 = {};
-    vnode0.elm = elm;
+    vnode0.elm = hostElm;
   });
 
   describe('created element', () => {
 
     it('has tag', () => {
-      elm = patch(vnode0, h('div', null)).elm;
-      expect(elm.tagName).toEqual('DIV');
+      hostElm = patch(hostElm, vnode0, h('div', null)).elm;
+      expect(hostElm.tagName).toEqual('DIV');
     });
 
-    it('should automatically get svg namespace', function() {
+    it('should automatically get svg namespace', () => {
       const SVGNamespace = 'http://www.w3.org/2000/svg';
       const XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
 
       const svgElm = mockSVGElement();
       const vnode1 = toVNode(domApi, svgElm);
-      elm = patch(vnode1, h('svg', null,
+      hostElm = patch(hostElm, vnode1, h('svg', null,
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
         )
       )).elm;
 
-      expect(elm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(elm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
+      expect(hostElm.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
     });
 
-    it('should not affect subsequence element', function() {
-      elm = patch(vnode0, h('div', null, [
+    it('should not affect subsequence element', () => {
+      hostElm = patch(hostElm, vnode0, h('div', null, [
         h('svg', null, [
           h('title', null, 'Title'),
           h('circle', null)
-        ]),
+        ] as any),
         h('div', null)
-      ])).elm;
+      ] as any)).elm;
 
-      expect(elm.constructor.name).toEqual('HTMLDivElement');
-      expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement');
-      expect(elm.firstChild.firstChild.constructor.name).toEqual('SVGElement');
-      expect(elm.firstChild.lastChild.constructor.name).toEqual('SVGElement');
-      expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement');
+      expect(hostElm.constructor.name).toEqual('HTMLDivElement');
+      expect(hostElm.firstChild.constructor.name).toEqual('SVGSVGElement');
+      expect(hostElm.firstChild.firstChild.constructor.name).toEqual('SVGElement');
+      expect(hostElm.firstChild.lastChild.constructor.name).toEqual('SVGElement');
+      expect(hostElm.lastChild.constructor.name).toEqual('HTMLDivElement');
     });
   });
 
   describe('created trailing svg element', () => {
 
-    it('should not affect subsequent created element', function() {
+    it('should not affect subsequent created element', () => {
 
-      const divWithSVGChild = patch(vnode0,  h('div', null,
+      const divWithSVGChild = patch(hostElm, vnode0,  h('div', null,
         h('div', null,
           h('svg', null)
         )
       ));
-      const oneMoreChildAdded = patch(divWithSVGChild, h('div', null, [
+      const oneMoreChildAdded = patch(hostElm, divWithSVGChild, h('div', null, [
           h('div', null,
             h('svg', null)
           ),
           h('div', null)
-        ]
+        ] as any
       ));
       expect(oneMoreChildAdded.vchildren[1].elm.constructor.name).toEqual('HTMLDivElement');
     });

@@ -1,25 +1,32 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
-  // MAIN THREAD
+export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
+  // the host element has connected to the dom
+  // and we've waited a tick to make sure all frameworks
+  // have finished adding attributes and child nodes to the host
+  // before we go all out and hydrate this beast
+  // let's first take a snapshot of its original layout before render
+
   if (Build.slotPolyfill) {
+    // if the slot polyfill is required we'll need to put some nodes
+    // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
-    if (!elm['s-cr'] && !domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
+    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_VNODE_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom)) {
       // only required when we're NOT using native shadow dom (slot)
-      // this host element was NOT created with SSR
+      // or this browser doesn't support native shadow dom
+      // and this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
       // create a node to represent where the original
       // content was first placed, which is useful later on
-      elm['s-cr'] = domApi.$createTextNode('') as any;
-      elm['s-cr']['s-cn'] = true;
-      domApi.$insertBefore(elm, elm['s-cr'], domApi.$childNodes(elm)[0]);
+      hostElm['s-cr'] = domApi.$createTextNode('') as any;
+      hostElm['s-cr']['s-cn'] = true;
+      domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
     }
 
-    if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+    if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom as number) {
       // this component should use shadow dom
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
@@ -29,23 +36,44 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm
         // but this browser may already support the read-only shadowRoot
         // do an extra check here, but only for dev mode on the client
         if (!('shadowRoot' in HTMLElement.prototype)) {
-          (elm as any).shadowRoot = elm;
+          (hostElm as any).shadowRoot = hostElm;
         }
 
       } else {
-        (elm as any).shadowRoot = elm;
+        (hostElm as any).shadowRoot = hostElm;
       }
+    }
+
+    if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
+      // either this host element should use scoped css
+      // or it wants to use shadow dom but the browser doesn't support it
+      // create a scope id which is useful for scoped css
+      // and add the scope attribute to the host
+      domApi.$setAttribute(hostElm, (hostElm['s-sc'] = 'data-' + cmpMeta.tagNameMeta) + '-host', '');
     }
   }
 
+  if (Build.shadowDom) {
+    if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom) {
+      // this component is using shadow dom
+      // and this browser supports shadow dom
+      // add the read-only property "shadowRoot" to the host element
+       !hostElm.shadowRoot && domApi.$attachShadow(hostElm, { mode: 'open' });
+    }
+  }
+
+  // create a host snapshot object we'll
+  // use to store all host data about to be read later
   hostSnapshot = {
-    $id: elm['s-id'],
+    $id: hostElm['s-id'],
     $attributes: {}
   };
 
+  // loop through and gather up all the original attributes on the host
+  // this is useful later when we're creating the component instance
   cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     if (attribName = cmpMeta.membersMeta[memberName].attribName) {
-      hostSnapshot.$attributes[attribName] = domApi.$getAttribute(elm, attribName);
+      hostSnapshot.$attributes[attribName] = domApi.$getAttribute(hostElm, attribName);
     }
   });
 

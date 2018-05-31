@@ -54,8 +54,8 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
 
   const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(oldVNode, newVNode, isUpdate, encapsulation) {
-    return renderer(oldVNode, newVNode, isUpdate, encapsulation);
+  plt.render = function(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation) {
+    return renderer(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation);
   };
 
   return plt as MockedPlatform;

@@ -140,12 +140,12 @@ describe('ssr', () => {
     var oldVnode: d.VNode;
     var newVnode: d.VNode;
     var ssrVNode: d.VNode;
-    var elm: d.RenderNode;
+    var hostElm: d.RenderNode;
 
     beforeEach(() => {
       oldVnode = {};
-      elm = domApi.$createElement('ion-test');
-      oldVnode.elm = elm;
+      hostElm = domApi.$createElement('ion-test');
+      oldVnode.elm = hostElm;
     });
 
     it('should add default slot comments', () => {
@@ -155,17 +155,17 @@ describe('ssr', () => {
         )
       );
 
-      initHostSnapshot(domApi, {}, elm as d.HostElement);
+      initHostSnapshot(domApi, {}, hostElm as d.HostElement);
 
       const defaultContentNode = domApi.$createElement('child-a');
-      elm.appendChild(defaultContentNode);
+      hostElm.appendChild(defaultContentNode);
 
-      ssrVNode = patch(oldVnode, newVnode, false, 'none', 1);
-      elm = removeWhitespaceFromNodes(ssrVNode.elm);
+      ssrVNode = patch(hostElm, oldVnode, newVnode, false, 'none', 1);
+      hostElm = removeWhitespaceFromNodes(ssrVNode.elm);
 
-      expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
-      expect(elm.firstElementChild.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
-      expect(elm.firstElementChild.innerHTML).toBe('<child-a></child-a>');
+      expect(hostElm.getAttribute(SSR_VNODE_ID)).toBe('1');
+      expect(hostElm.firstElementChild.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
+      expect(hostElm.firstElementChild.innerHTML).toBe('<child-a></child-a>');
     });
 
     it('should add same ssr to all elements', () => {
@@ -176,15 +176,15 @@ describe('ssr', () => {
         )
       );
 
-      ssrVNode = patch(oldVnode, newVnode, false, 'none', 1);
-      elm = <any>ssrVNode.elm;
+      ssrVNode = patch(hostElm, oldVnode, newVnode, false, 'none', 1);
+      hostElm = <any>ssrVNode.elm;
 
-      expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
-      expect(elm.querySelector('div').getAttribute(SSR_CHILD_ID)).toBe('1.0');
-      expect(elm.querySelector('button').getAttribute(SSR_CHILD_ID)).toBe('1.0');
-      expect(elm.querySelector('button').innerHTML).toBe('<!--s.1.0-->Text 1<!--/--> ');
-      expect(elm.querySelector('span').getAttribute(SSR_CHILD_ID)).toBe('1.1');
-      expect(elm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/--> ');
+      expect(hostElm.getAttribute(SSR_VNODE_ID)).toBe('1');
+      expect(hostElm.querySelector('div').getAttribute(SSR_CHILD_ID)).toBe('1.0');
+      expect(hostElm.querySelector('button').getAttribute(SSR_CHILD_ID)).toBe('1.0');
+      expect(hostElm.querySelector('button').innerHTML).toBe('<!--s.1.0-->Text 1<!--/--> ');
+      expect(hostElm.querySelector('span').getAttribute(SSR_CHILD_ID)).toBe('1.1');
+      expect(hostElm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/--> ');
     });
 
   });

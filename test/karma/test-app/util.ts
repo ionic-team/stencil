@@ -1,6 +1,4 @@
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
-
 
 export type AddComponentFn = <T extends Element>(childHtml: string) => T;
 

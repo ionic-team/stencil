@@ -5,13 +5,13 @@ import { mockElement, mockRenderer } from '../../../testing/mocks';
 
 describe('event listeners', () => {
   const patch = mockRenderer();
-  let elm: any;
+  let hostElm: any;
   let vnode0: d.VNode;
 
   beforeEach(() => {
-    elm = mockElement('div');
+    hostElm = mockElement('div');
     vnode0 = {};
-    vnode0.elm = elm;
+    vnode0.elm = hostElm;
   });
 
   it('attaches click event handler to element', () => {
@@ -23,8 +23,8 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent')
     );
 
-    elm = patch(vnode0, vnode).elm;
-    elm.click();
+    hostElm = patch(hostElm, vnode0, vnode).elm;
+    hostElm.click();
 
     expect(result.length).toBe(1);
   });
@@ -40,11 +40,11 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    elm = patch(vnode0, vnode1).elm;
-    elm.click();
+    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    hostElm.click();
 
-    elm = patch(vnode1, vnode2).elm;
-    elm.click();
+    hostElm = patch(hostElm, vnode1, vnode2).elm;
+    hostElm.click();
 
     expect(result[0]).toBe(1);
     expect(result[1]).toBe(2);
@@ -59,9 +59,9 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    elm = patch(vnode0, vnode1).elm;
-    elm.click();
-    elm.click();
+    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    hostElm.click();
+    hostElm.click();
 
     expect(result.length).toBe(2);
 
@@ -69,9 +69,9 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    elm = patch(vnode1, vnode2).elm;
-    elm.click();
-    elm.click();
+    hostElm = patch(hostElm, vnode1, vnode2).elm;
+    hostElm.click();
+    hostElm.click();
 
     expect(result.length).toBe(2);
   });
@@ -87,11 +87,11 @@ describe('event listeners', () => {
       h('a', { onclick: click }, 'Click my parent'),
     );
 
-    elm = patch(vnode0, vnode1).elm;
-    elm.click();
+    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    hostElm.click();
 
     expect(result.length).toBe(1);
-    elm.firstChild.click();
+    hostElm.firstChild.click();
     expect(result.length).toBe(3);
   });
 });

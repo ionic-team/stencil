@@ -308,6 +308,13 @@ export interface HostElement extends HTMLElement {
   ['s-rc']?: (() => void)[];
 
   /**
+   * Scope Id
+   * The scope id of this component when using scoped css encapsulation
+   * or using shadow dom but the browser doesn't support it
+   */
+  ['s-sc']?: string;
+
+  /**
    * Component Initial Load:
    * The component has fully loaded, instance creatd,
    * and has rendered. Method is on the host element prototype.

@@ -7,6 +7,7 @@ import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
+import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -16,7 +17,6 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
-import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle: CustomStyle) {
@@ -315,7 +315,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    requestUrl(resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js'));
+    const useScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+    requestUrl(resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js');
   }
 
 

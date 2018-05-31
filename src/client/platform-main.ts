@@ -8,6 +8,7 @@ import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
+import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -17,7 +18,6 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
-import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle?: CustomStyle) {
@@ -167,7 +167,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // static function as a the bundleIds that returns the module
       const moduleOpts: d.GetModuleOptions = {
         mode: elm.mode,
-        scoped: useScopedCss(domApi.$supportsShadowDom, cmpMeta)
+        scoped: cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)
       };
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
@@ -204,7 +204,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
-      const url = resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
+      const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+      const url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
 
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {

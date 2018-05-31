@@ -112,7 +112,7 @@ export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: b
 export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d.ComponentInstance, isInitialLoad: boolean) {
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
-  render(plt, plt.getComponentMeta(elm), elm, instance, !isInitialLoad);
+  render(plt, plt.getComponentMeta(elm), elm, instance);
 
   try {
     if (isInitialLoad) {

@@ -85,9 +85,10 @@ export interface HydrateOptions extends RenderOptions {
 
 export interface RendererApi {
   (
+    hostElm: d.HostElement,
     oldVNode: d.VNode | Element,
     newVNode: d.VNode,
-    isUpdate?: boolean,
+    useNativeShadowDom?: boolean,
     encapsulation?: d.Encapsulation,
     ssrId?: number
   ): d.VNode;

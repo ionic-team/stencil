@@ -4,18 +4,41 @@ import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, instance: d.ComponentInstance, isUpdateRender: boolean) {
+export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
   try {
     // if this component has a render function, let's fire
     // it off and generate the child vnodes for this host element
     // note that we do not create the host element cuz it already exists
     const hostMeta = cmpMeta.componentConstructor.host;
 
+    const encapsulation = cmpMeta.componentConstructor.encapsulation;
+
+    // test if this component should be shadow dom
+    // and if so does the browser supports it
+    const useNativeShadowDom = (encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
+
     let reflectHostAttr: d.VNodeData;
+    let rootElm: HTMLElement;
 
     if (Build.reflectToAttr) {
       reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpMeta.componentConstructor.properties, instance);
     }
+
+    if (useNativeShadowDom) {
+      // this component SHOULD use native slot/shadow dom
+      // this browser DOES support native shadow dom
+      // and this is the first render
+      // let's create that shadow root
+      if (Build.shadowDom) {
+        rootElm = hostElm.shadowRoot as any;
+      }
+
+    } else {
+      // not using, or can't use shadow dom
+      // set the root element, which will be the shadow root when enabled
+      rootElm = hostElm;
+    }
+
 
     if (instance.render || instance.hostData || hostMeta || reflectHostAttr) {
       // tell the platform we're actively rendering
@@ -51,8 +74,8 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
 
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
-      const oldVNode = plt.vnodeMap.get(elm) || ({} as d.VNode);
-      oldVNode.elm = elm;
+      const oldVNode = plt.vnodeMap.get(hostElm) || ({} as d.VNode);
+      oldVNode.elm = rootElm;
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
@@ -64,11 +87,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      plt.vnodeMap.set(elm, plt.render(
+      plt.vnodeMap.set(hostElm, plt.render(
+        hostElm,
         oldVNode,
         hostVNode,
-        isUpdateRender,
-        cmpMeta.componentConstructor.encapsulation
+        useNativeShadowDom,
+        encapsulation
       ));
     }
 
@@ -76,28 +100,28 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
-      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, elm);
+      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, hostElm);
     }
 
     // it's official, this element has rendered
-    elm['s-rn'] = true;
+    hostElm['s-rn'] = true;
 
-    if ((elm as any)['$onRender']) {
+    if ((hostElm as any)['$onRender']) {
       // $onRender deprecated 2018-04-02
-      elm['s-rc'] = (elm as any)['$onRender'];
+      hostElm['s-rc'] = (hostElm as any)['$onRender'];
     }
 
-    if (elm['s-rc']) {
+    if (hostElm['s-rc']) {
       // ok, so turns out there are some child host elements
       // waiting on this parent element to load
       // let's fire off all update callbacks waiting
-      elm['s-rc'].forEach(cb => cb());
-      elm['s-rc'] = null;
+      hostElm['s-rc'].forEach(cb => cb());
+      hostElm['s-rc'] = null;
     }
 
   } catch (e) {
     plt.activeRender = false;
-    plt.onError(e, RUNTIME_ERROR.RenderError, elm, true);
+    plt.onError(e, RUNTIME_ERROR.RenderError, hostElm, true);
   }
 }
 

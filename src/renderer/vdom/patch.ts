@@ -556,20 +556,19 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   let useNativeShadowDom: boolean,
       ssrId: number,
       scopeId: string,
-      isUpdate: boolean,
       checkSlotFallbackVisibility: boolean,
       checkSlotRelocate: boolean,
       hostTagName: string,
       contentRef: d.RenderNode;
 
 
-  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdatePatch?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
+  return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, encapsulation: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    isUpdate = isUpdatePatch;
-    hostTagName = domApi.$tagName(oldVNode.elm);
-    contentRef = (oldVNode.elm as d.HostElement)['s-cr'];
+    hostTagName = domApi.$tagName(hostElm);
+    contentRef = hostElm['s-cr'];
+    useNativeShadowDom = useNativeShadowDomVal;
 
     if (Build.ssrServerSide) {
       if (encapsulation !== 'shadow') {
@@ -581,31 +580,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     if (Build.slotPolyfill) {
       // get the scopeId
-      scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
+      scopeId = hostElm['s-sc'];
 
       // always reset
       checkSlotRelocate = checkSlotFallbackVisibility = false;
-    }
-
-    if (Build.shadowDom) {
-      // use native shadow dom only if the component wants to use it
-      // and if this browser supports native shadow dom
-      useNativeShadowDom = (encapsulation === 'shadow' && domApi.$supportsShadowDom);
-    }
-
-    if (!isUpdate) {
-      if (Build.shadowDom && useNativeShadowDom) {
-        // this component SHOULD use native slot/shadow dom
-        // this browser DOES support native shadow dom
-        // and this is the first render
-        // let's create that shadow root
-        oldVNode.elm = domApi.$attachShadow(oldVNode.elm, { mode: 'open' });
-
-      } else if (Build.slotPolyfill && scopeId) {
-        // this host element should use scoped css
-        // add the scope attribute to the host
-        domApi.$setAttribute(oldVNode.elm, scopeId + '-host', '');
-      }
     }
 
     // synchronous patch
