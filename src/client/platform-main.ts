@@ -13,7 +13,6 @@ import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { initHostElement } from '../core/init-host-element';
-import { initHostSnapshot } from '../core/host-snapshot';
 import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
@@ -152,9 +151,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // next check the app's global
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
-
-    // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
-    initHostSnapshot(plt.domApi, cmpMeta, elm);
 
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
