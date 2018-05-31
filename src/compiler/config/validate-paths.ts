@@ -16,6 +16,14 @@ export function validatePaths(config: Config) {
     config.globalScript = normalizePath(path.join(config.rootDir, config.globalScript));
   }
 
+  if (Array.isArray(config.globalStyle)) {
+    // DEPRECATED 2018-05-31
+    config.logger.warn(`"globalStyle" config no longer accepts an array. Please update to only use a single entry point for a global style css file.`);
+    if (config.globalStyle.length > 0) {
+      config.globalStyle = config.globalStyle[0];
+    }
+  }
+
   if (typeof config.globalStyle === 'string') {
     if (!path.isAbsolute(config.globalStyle)) {
       config.globalStyle = path.join(config.rootDir, config.globalStyle);
