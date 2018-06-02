@@ -74,7 +74,7 @@
     "gzip-size": "^4.1.0",
     "inquirer": "^3.3.0",
     "is-glob": "^4.0.0",
-    "jest": "^22.4.3",
+    "jest": "^23.1.0",
     "jest-environment-node-debug": "^2.0.0",
     "knuth-shuffle": "1.0.1",
     "listr": "^0.13.0",

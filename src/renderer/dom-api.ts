@@ -81,6 +81,9 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $removeAttribute: (elm, key) =>
       elm.removeAttribute(key),
 
+    $hasAttribute: (elm: Element, key) =>
+      elm.hasAttribute(key),
+
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {
         return elm.firstElementChild;

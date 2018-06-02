@@ -143,6 +143,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'getAttributeNS',
   'getRootNode',
   'getStyle',
+  'hasAttribute',
   'head',
   'hidden',
   'host',

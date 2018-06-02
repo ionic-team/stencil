@@ -120,7 +120,7 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
     // Element Attributes
     updateAttribute(elm, memberName, newValue);
 
-  } else if (isSvg && (newValue == null || newValue === false)) {
+  } else if (isSvg || plt.domApi.$hasAttribute(elm, memberName) && (newValue == null || newValue === false)) {
     // remove svg attribute
     plt.domApi.$removeAttribute(elm, memberName);
   }

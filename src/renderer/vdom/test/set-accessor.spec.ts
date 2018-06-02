@@ -4,7 +4,7 @@ import { PROP_TYPE } from '../../../util/constants';
 import { setAccessor } from '../set-accessor';
 
 
-describe('setAccessor', () => {
+describe('setAccessor for custom elements', () => {
 
   var elm: any;
   let plt: d.PlatformApi;
@@ -298,7 +298,6 @@ describe('setAccessor', () => {
 
 });
 
-
 describe('setAccessor for inputs', () => {
   const plt: any = mockPlatform();
 
@@ -380,7 +379,6 @@ describe('setAccessor for inputs', () => {
       });
     });
   });
-
 
   describe('special attributes', () => {
 
@@ -558,4 +556,102 @@ describe('setAccessor for inputs', () => {
     });
   });
 
+});
+
+describe('setAccessor for standard html elements', () => {
+  const plt: any = mockPlatform();
+
+  describe('simple global attributes', () => {
+
+    it('should not add attribute when prop is undefined or null', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'title', undefined, undefined, false);
+
+      expect(inputElm.hasAttribute('title')).toBe(false);
+    });
+
+    it('should add attribute when prop is string', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'title', undefined, 'lime', false);
+
+      expect(inputElm.hasAttribute('title')).toBe(true);
+    });
+
+    it('should add attribute when prop is boolean', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, true, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(true);
+    });
+
+    it('should add attribute when prop is number', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, 1, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(true);
+    });
+
+    it('should remove attribute when prop is undefined', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'title', undefined, 'lime', false);
+      setAccessor(plt, inputElm, 'title', 'lime', undefined, false);
+
+      expect(inputElm.hasAttribute('title')).toBe(false);
+    });
+
+    it('should remove attribute when prop is null', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'title', undefined, 'lime', false);
+      setAccessor(plt, inputElm, 'title', 'lime', null, false);
+
+      expect(inputElm.hasAttribute('title')).toBe(false);
+    });
+  });
+
+  describe('simple nonstandard attributes', () => {
+
+    it('should not add attribute when prop is undefined or null', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, undefined, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(false);
+    });
+
+    it('should add attribute when prop is string', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, 'lime', false);
+
+      expect(inputElm.hasAttribute('color')).toBe(true);
+    });
+
+    it('should add attribute when prop is boolean', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, true, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(true);
+    });
+
+    it('should add attribute when prop is number', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, 1, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(true);
+    });
+
+    it('should remove attribute when prop is undefined', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, 1, false);
+      setAccessor(plt, inputElm, 'color', 1, undefined, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(false);
+    });
+
+    it('should remove attribute when prop is null', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'color', undefined, 1, false);
+      setAccessor(plt, inputElm, 'color', 1, null, false);
+
+      expect(inputElm.hasAttribute('color')).toBe(false);
+    });
+  });
 });

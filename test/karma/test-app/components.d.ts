@@ -146,6 +146,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface AttributeHost {
+
+    }
+  }
+
+  interface HTMLAttributeHostElement extends StencilComponents.AttributeHost, HTMLStencilElement {}
+
+  var HTMLAttributeHostElement: {
+    prototype: HTMLAttributeHostElement;
+    new (): HTMLAttributeHostElement;
+  };
+  interface HTMLElementTagNameMap {
+    'attribute-host': HTMLAttributeHostElement;
+  }
+  interface ElementTagNameMap {
+    'attribute-host': HTMLAttributeHostElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'attribute-host': JSXElements.AttributeHostAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface AttributeHostAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ConditionalBasic {
 
     }
@@ -851,72 +884,6 @@ declare global {
   namespace JSXElements {
     export interface ShadowDomSlotBasicAttributes extends HTMLAttributes {
 
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomSlotNestedRoot {
-
-    }
-  }
-
-  interface HTMLShadowDomSlotNestedRootElement extends StencilComponents.ShadowDomSlotNestedRoot, HTMLStencilElement {}
-
-  var HTMLShadowDomSlotNestedRootElement: {
-    prototype: HTMLShadowDomSlotNestedRootElement;
-    new (): HTMLShadowDomSlotNestedRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-slot-nested-root': JSXElements.ShadowDomSlotNestedRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface ShadowDomSlotNestedRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomSlotNested {
-      'i': number;
-    }
-  }
-
-  interface HTMLShadowDomSlotNestedElement extends StencilComponents.ShadowDomSlotNested, HTMLStencilElement {}
-
-  var HTMLShadowDomSlotNestedElement: {
-    prototype: HTMLShadowDomSlotNestedElement;
-    new (): HTMLShadowDomSlotNestedElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-slot-nested': JSXElements.ShadowDomSlotNestedAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface ShadowDomSlotNestedAttributes extends HTMLAttributes {
-      'i'?: number;
     }
   }
 }

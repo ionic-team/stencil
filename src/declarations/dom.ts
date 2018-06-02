@@ -24,6 +24,7 @@ export interface DomApi {
   $setAttribute(elm: any, key: string, val: any): void;
   $setAttributeNS(elm: any, namespaceURI: string, qualifiedName: string, value: string): void;
   $removeAttribute(elm: any, key: string): void;
+  $hasAttribute(elm: any, key: string): boolean;
   $elementRef?(elm: any, referenceName: string): any;
   $parentElement?(node: Node): any;
   $addEventListener?(elm: any, eventName: string, eventListener: any, useCapture?: boolean, usePassive?: boolean, attachTo?: string|Element): void;
