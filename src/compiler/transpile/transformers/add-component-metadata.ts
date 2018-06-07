@@ -6,43 +6,41 @@ import { formatConstructorEncapsulation, getStyleIdPlaceholder, getStylePlacehol
 import * as ts from 'typescript';
 
 
+function visitClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentMeta) {
+  const staticMembers = addStaticMeta(cmpMeta);
+
+  const newMembers = Object.keys(staticMembers).map(memberName => {
+    return createGetter(memberName, (staticMembers as any)[memberName]);
+  });
+
+  return ts.updateClassDeclaration(
+    classNode,
+    classNode.decorators,
+    classNode.modifiers,
+    classNode.name,
+    classNode.typeParameters,
+    classNode.heritageClauses,
+    [ ...classNode.members, ...newMembers]
+  );
+}
+
+function visit(node: ts.Node, cmpMeta: d.ComponentMeta, transformContext: any): ts.VisitResult<ts.Node> {
+  switch (node.kind) {
+    case ts.SyntaxKind.ClassDeclaration:
+    return visitClass(node as ts.ClassDeclaration, cmpMeta);
+    default:
+    return ts.visitEachChild(node, (node) => {
+      return visit(node, cmpMeta, transformContext);
+    }, transformContext);
+  }
+}
+
 export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
-
   return (transformContext) => {
-
-    function visitClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentMeta) {
-      const staticMembers = addStaticMeta(cmpMeta);
-
-      const newMembers = Object.keys(staticMembers).map(memberName => {
-        return createGetter(memberName, (staticMembers as any)[memberName]);
-      });
-
-      return ts.updateClassDeclaration(
-        classNode,
-        classNode.decorators,
-        classNode.modifiers,
-        classNode.name,
-        classNode.typeParameters,
-        classNode.heritageClauses,
-        [ ...classNode.members, ...newMembers]
-      );
-    }
-
-    function visit(node: ts.Node, cmpMeta: d.ComponentMeta): ts.VisitResult<ts.Node> {
-      switch (node.kind) {
-        case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(node as ts.ClassDeclaration, cmpMeta);
-        default:
-          return ts.visitEachChild(node, (node) => {
-            return visit(node, cmpMeta);
-          }, transformContext);
-      }
-    }
-
     return (tsSourceFile) => {
       const moduleFile = moduleFiles[tsSourceFile.fileName];
       if (moduleFile && moduleFile.cmpMeta) {
-        return visit(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
+        return visit(tsSourceFile, moduleFile.cmpMeta, transformContext) as ts.SourceFile;
       }
       return tsSourceFile;
     };
