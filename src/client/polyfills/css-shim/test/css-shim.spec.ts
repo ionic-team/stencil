@@ -12,14 +12,14 @@ describe('css-shim', () => {
       --custom-a: red;
     }
     `);
-    await customStyle.addStyle(rootElm);
+    await customStyle.addGlobalStyle(rootElm);
 
     const styleElm = style(`
     p {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -38,14 +38,14 @@ describe('css-shim', () => {
       --custom-a: red;
     }
     `);
-    customStyle.addStyle(rootElm);
+    customStyle.addGlobalStyle(rootElm);
 
     const styleElm = style(`
     p {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -68,7 +68,7 @@ describe('css-shim', () => {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -92,7 +92,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -113,7 +113,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -136,7 +136,7 @@ describe('css-shim', () => {
       background-image: var(--stencil-logo);
     }
     `);
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -160,7 +160,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -180,7 +180,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
 
@@ -202,7 +202,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
 
@@ -227,7 +227,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -249,7 +249,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -272,7 +272,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -297,7 +297,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -309,11 +309,7 @@ describe('css-shim', () => {
     );
   });
 
-  it('should set value in @media when matchMedia doesnt match', async () => {
-    (window as any).matchMedia = () => {
-      return { matches: false
-      };
-    };
+  it('should set value in @media', async () => {
     const customStyle = new CustomStyle(window, document);
 
     const styleElm = style(`
@@ -327,30 +323,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
-
-    expect(css(styleElm.innerHTML)).toBe('');
-  });
-
-  it('should set value in @media when matchMedia matches', async () => {
-    (window as any).matchMedia = () => {
-      return { matches: true
-      };
-    };
-    const customStyle = new CustomStyle(window, document);
-
-    const styleElm = style(`
-      html {
-        --custom: red;
-      }
-      @media only screen {
-        body {
-          color: var(--custom);
-        }
-      }
-    `);
-
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
@@ -381,7 +354,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addStyle(styleElm);
+    await customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`

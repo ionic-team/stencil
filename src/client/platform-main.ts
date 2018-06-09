@@ -118,7 +118,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass
+        hydratedCssClass,
+        customStyle
       );
 
       if (Build.observeAttr) {

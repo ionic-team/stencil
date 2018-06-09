@@ -1,30 +1,48 @@
-import { CustomStyle } from './custom-style';
+import { CSSScope } from './interfaces';
+import { addGlobalStyle } from './scope';
 
+export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
+  return loadDocumentLinks(doc, globalScopes).then(() => {
+    loadDocumentStyles(doc, globalScopes);
+  });
+}
 
-export function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLinkElement) {
+export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
+  const promises: Promise<any>[] = [];
+
+  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]');
+  for (let i = 0; i < linkElms.length; i++) {
+    promises.push(addGlobalLink(doc, globalScopes, linkElms[i] as HTMLLinkElement));
+  }
+  return Promise.all(promises);
+}
+
+export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
+  const styleElms = doc.querySelectorAll('style');
+  for (let i = 0; i < styleElms.length; i++) {
+    addGlobalStyle(globalScopes, styleElms[i]);
+  }
+}
+
+export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
   const url = linkElm.href;
-
   return fetch(url).then(rsp => rsp.text()).then(text => {
-
-    if (hasCssVariables(text)) {
-      const styleElm = doc.createElement('style');
+    if (hasCssVariables(text) && linkElm.parentNode) {
       if (hasRelativeUrls(text)) {
         text = fixRelativeUrls(text, url);
       }
-      styleElm.innerHTML = text;
-      linkElm.parentNode.insertBefore(styleElm, linkElm);
+      const styleEl = doc.createElement('style');
+      styleEl.innerHTML = text;
 
-      return customStyle.addStyle(styleElm).then(() => {
-        linkElm.parentNode.removeChild(linkElm);
-      });
+      addGlobalStyle(globalScopes, styleEl);
+      linkElm.parentNode.insertBefore(styleEl, linkElm);
+      linkElm.remove();
     }
-
-    return Promise.resolve();
-
   }).catch(err => {
     console.error(err);
   });
 }
+
 
 // This regexp tries to determine when a variable is declared, for example:
 //

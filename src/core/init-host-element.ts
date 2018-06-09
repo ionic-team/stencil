@@ -6,9 +6,16 @@ import { disconnectedCallback } from './disconnected';
 import { initComponentLoaded } from './init-component-instance';
 import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
+import { CustomStyle } from '../client/polyfills/css-shim/custom-style';
 
 
-export function initHostElement(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, HostElementConstructor: d.HostElement, hydratedCssClass: string) {
+export function initHostElement(
+  plt: d.PlatformApi,
+  cmpMeta: d.ComponentMeta,
+  HostElementConstructor: d.HostElement,
+  hydratedCssClass: string,
+  customStyle?: CustomStyle
+) {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
   // note: these cannot be arrow functions cuz "this" is important here hombre
@@ -28,7 +35,7 @@ export function initHostElement(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, Ho
 
   HostElementConstructor.disconnectedCallback = function() {
     // the element has left the builing
-    disconnectedCallback(plt, (this as d.HostElement));
+    disconnectedCallback(plt, (this as d.HostElement), customStyle);
   };
 
   HostElementConstructor['s-init'] = function() {

@@ -115,7 +115,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       initHostElement(plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass
+        hydratedCssClass,
+        customStyle
       );
 
       if (Build.observeAttr) {
@@ -251,7 +252,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   let requestBundleQueue: Function[] = [];
   if (Build.cssVarShim && customStyle) {
-    customStyle.init(() => {
+    customStyle.init().then(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
         requestBundleQueue.shift()();

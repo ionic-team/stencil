@@ -39,6 +39,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       rootElm = hostElm;
     }
 
+    if (Build.styles) {
+      // attach the styles this component needs, if any
+      // this fn figures out if the styles should go in a
+      // shadow root or if they should be global
+      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, hostElm);
+    }
 
     if (instance.render || instance.hostData || hostMeta || reflectHostAttr) {
       // tell the platform we're actively rendering
@@ -94,13 +100,6 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         useNativeShadowDom,
         encapsulation
       ));
-    }
-
-    if (Build.styles) {
-      // attach the styles this component needs, if any
-      // this fn figures out if the styles should go in a
-      // shadow root or if they should be global
-      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, hostElm);
     }
 
     // it's official, this element has rendered

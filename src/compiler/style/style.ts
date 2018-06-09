@@ -29,7 +29,7 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
     const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
     // format and set the styles for use later
-    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], styles);
+    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], modeName, styles);
   }));
 }
 
@@ -144,7 +144,7 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, styles: string[]) {
+export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, mode: string, styles: string[]) {
   // join all the component's styles for this mode together into one line
   styleMeta.compiledStyleText = styles.join('\n\n').trim();
 
@@ -165,7 +165,7 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
-    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, mode, styleMeta.compiledStyleText);
   }
 
   styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);

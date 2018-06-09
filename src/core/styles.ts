@@ -49,7 +49,7 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
 }
 
 
-export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
+export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, hostElm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
   let styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpMeta as any)[styleModeId];
@@ -71,15 +71,15 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
       if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
-        styleContainerNode = elm.shadowRoot as any;
+        styleContainerNode = hostElm.shadowRoot as any;
 
       } else {
         // climb up the dom and see if we're in a shadow dom
-        while ((elm as Node) = domApi.$parentNode(elm)) {
-          if (elm.host && elm.host.shadowRoot) {
+        while ((hostElm as Node) = domApi.$parentNode(hostElm)) {
+          if (hostElm.host && hostElm.host.shadowRoot) {
             // looks like we are in shadow dom, let's use
             // this shadow root as the container for these styles
-            styleContainerNode = (elm.host.shadowRoot) as any;
+            styleContainerNode = (hostElm.host.shadowRoot) as any;
             break;
           }
         }
@@ -90,32 +90,43 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
     // then there's no need to apply them again
     // create an object to keep track if we'ready applied this component style
     const appliedStyles = plt.componentAppliedStyles.get(styleContainerNode) || {};
-    if (!appliedStyles[styleModeId]) {
-      // looks like we haven't applied these styles to this container yet
 
-      if (Build.es5) {
-        // es5 builds are not usig <template> because of ie11 issues
-        // instead the "template" is just the style text as a string
-        // create a new style element and add as innerHTML
+    // looks like we haven't applied these styles to this container yet
+    if (Build.es5) {
+      // es5 builds are not usig <template> because of ie11 issues
+      // instead the "template" is just the style text as a string
+      // create a new style element and add as innerHTML
+
+      if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
+
+        const scopeID = (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom))
+          ? 'data-' + cmpMeta.tagNameMeta
+          : undefined;
+
+        if (scopeID) {
+          hostElm['s-sc'] = scopeID;
+          domApi.$setAttribute(hostElm, scopeID + '-host', '');
+        }
+        styleElm = customStyle.createHostStyle(hostElm, styleModeId, styleTemplate, scopeID);
+
+      } else if (!appliedStyles[styleModeId]) {
         styleElm = domApi.$createElement('style');
         styleElm.innerHTML = styleTemplate;
-
-        if (Build.isDev) {
-          // add a style id attribute, but only useful during dev
-          domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
-        }
-
-        if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
-          customStyle.addStyle(styleElm);
-        }
-
-      } else {
-        // this browser supports the <template> element
-        // and all its native content.cloneNode() goodness
-        // clone the template element to create a new <style> element
-        styleElm = styleTemplate.content.cloneNode(true);
       }
 
+      if (Build.isDev && styleElm) {
+        // add a style id attribute, but only useful during dev
+        domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+      }
+
+    } else {
+      // this browser supports the <template> element
+      // and all its native content.cloneNode() goodness
+      // clone the template element to create a new <style> element
+      styleElm = styleTemplate.content.cloneNode(true);
+    }
+
+    if (!Build.cssVarShim || styleElm) {
       // let's make sure we put the styles below the <style data-styles> element
       // so any visibility css overrides the default
       const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
