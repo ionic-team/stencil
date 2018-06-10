@@ -103,7 +103,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     }
 
     // update styles!
-    if (Build.styles && Build.cssVarShim && plt.customStyle && !plt.customStyle.supportsCssVars) {
+    if (Build.styles && Build.cssVarShim && plt.customStyle) {
       plt.customStyle.updateHost(hostElm);
     }
 

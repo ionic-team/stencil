@@ -22,24 +22,17 @@ export class CustomStyle {
 
   private globalScopes: CSSScope[] = [];
   private scopesMap = new Map<string, CSSScope>();
-  public supportsCssVars: boolean;
 
   constructor(
     private win: Window,
     private doc: Document,
-  ) {
-    this.supportsCssVars = supportsCssVars(win);
-  }
+  ) {}
 
   init() {
     return new Promise(resolve => {
-      if (this.supportsCssVars) {
-        resolve();
-      } else {
-        this.win.requestAnimationFrame(() => {
-          loadDocument(this.doc, this.globalScopes).then(() => resolve());
-        });
-      }
+      this.win.requestAnimationFrame(() => {
+        loadDocument(this.doc, this.globalScopes).then(() => resolve());
+      });
     });
   }
 

@@ -89,44 +89,52 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
     // if this container element already has these styles
     // then there's no need to apply them again
     // create an object to keep track if we'ready applied this component style
-    const appliedStyles = plt.componentAppliedStyles.get(styleContainerNode) || {};
-    let styleElm: HTMLStyleElement;
-    // looks like we haven't applied these styles to this container yet
-    if (Build.es5) {
-      // es5 builds are not usig <template> because of ie11 issues
-      // instead the "template" is just the style text as a string
-      // create a new style element and add as innerHTML
-
-      if (Build.cssVarShim && plt.customStyle && !plt.customStyle.supportsCssVars) {
-
-        styleElm = plt.customStyle.createHostStyle(hostElm, styleModeId, styleTemplate);
-
-      } else if (!appliedStyles[styleModeId]) {
-        styleElm = domApi.$createElement('style');
-        styleElm.innerHTML = styleTemplate;
-      }
-
-      if (Build.isDev && styleElm) {
-        // add a style id attribute, but only useful during dev
-        domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
-      }
-
-    } else if (!appliedStyles[styleModeId]) {
-      // this browser supports the <template> element
-      // and all its native content.cloneNode() goodness
-      // clone the template element to create a new <style> element
-      styleElm = styleTemplate.content.cloneNode(true);
+    let appliedStyles = plt.componentAppliedStyles.get(styleContainerNode);
+    if (!appliedStyles) {
+      plt.componentAppliedStyles.set(styleContainerNode, appliedStyles = {});
     }
 
-    if (styleElm) {
-      // let's make sure we put the styles below the <style data-styles> element
-      // so any visibility css overrides the default
-      const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
-      domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
+    // check if we haven't applied these styles to this container yet
+    if (!appliedStyles[styleModeId]) {
+      let styleElm: HTMLStyleElement;
+      if (Build.es5) {
+        // es5 builds are not usig <template> because of ie11 issues
+        // instead the "template" is just the style text as a string
+        // create a new style element and add as innerHTML
 
-      // remember we don't need to do this again for this element
-      appliedStyles[styleModeId] = true;
-      plt.componentAppliedStyles.set(styleContainerNode, appliedStyles);
+        if (Build.cssVarShim && plt.customStyle) {
+          styleElm = plt.customStyle.createHostStyle(hostElm, styleModeId, styleTemplate);
+
+        } else {
+          styleElm = domApi.$createElement('style');
+          styleElm.innerHTML = styleTemplate;
+
+          // remember we don't need to do this again for this element
+          appliedStyles[styleModeId] = true;
+
+          if (Build.isDev) {
+            // add a style id attribute, but only useful during dev
+            domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+          }
+        }
+
+        const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+        domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
+
+      } else {
+        // this browser supports the <template> element
+        // and all its native content.cloneNode() goodness
+        // clone the template element to create a new <style> element
+        styleElm = styleTemplate.content.cloneNode(true);
+
+        // remember we don't need to do this again for this element
+        appliedStyles[styleModeId] = true;
+
+        // let's make sure we put the styles below the <style data-styles> element
+        // so any visibility css overrides the default
+        const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+        domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
+      }
     }
   }
 }

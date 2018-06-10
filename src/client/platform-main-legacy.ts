@@ -281,7 +281,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
-      if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
+      if (Build.cssVarShim && customStyle) {
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready

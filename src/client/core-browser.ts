@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { createPlatformMain } from './platform-main';
 import { createPlatformMainLegacy } from './platform-main-legacy';
-import { CustomStyle } from './polyfills/css-shim/custom-style';
+import { CustomStyle, supportsCssVars } from './polyfills/css-shim/custom-style';
 
 
 declare const namespace: string;
@@ -16,7 +16,7 @@ if (Build.polyfills) {
   // and requires the es5 way of extending HTMLElement
 
   let customStyle: CustomStyle;
-  if (Build.cssVarShim) {
+  if (Build.cssVarShim && !supportsCssVars(window)) {
     customStyle = new CustomStyle(window, document);
   }
 

@@ -40,7 +40,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     }
 
     // clear CSS var-shim tracking
-    if (Build.cssVarShim && plt.customStyle && plt.customStyle.supportsCssVars) {
+    if (Build.cssVarShim && plt.customStyle) {
       plt.customStyle.removeHost(elm);
     }
 

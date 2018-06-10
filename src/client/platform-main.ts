@@ -5,7 +5,6 @@ import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
-import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION } from '../util/constants';
@@ -19,7 +18,7 @@ import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 
 
-export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle?: CustomStyle) {
+export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -53,7 +52,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
-    customStyle,
     domApi,
     defineComponent,
     emitEvent: Context.emit,
@@ -102,10 +100,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     // if the HTML was generated from SSR
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);
-  }
-
-  if (Build.cssVarShim && customStyle) {
-    customStyle.init();
   }
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
