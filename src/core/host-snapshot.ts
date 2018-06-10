@@ -10,6 +10,12 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   // have finished adding attributes and child nodes to the host
   // before we go all out and hydrate this beast
   // let's first take a snapshot of its original layout before render
+  if (!hostElm.mode) {
+    // looks like mode wasn't set as a property directly yet
+    // first check if there's an attribute
+    // next check the app's global
+    hostElm.mode = domApi.$getMode(hostElm);
+  }
 
   if (Build.slotPolyfill) {
     // if the slot polyfill is required we'll need to put some nodes

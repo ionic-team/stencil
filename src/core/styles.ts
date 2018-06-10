@@ -1,6 +1,5 @@
 import { Build } from '../util/build-conditionals';
 import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../declarations';
-import { CustomStyle } from '../client/polyfills/css-shim/custom-style';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
 
 
@@ -49,7 +48,7 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
 }
 
 
-export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, hostElm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
+export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, hostElm: HostElement, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
   let styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpMeta as any)[styleModeId];
@@ -75,7 +74,8 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
 
       } else {
         // climb up the dom and see if we're in a shadow dom
-        while ((hostElm as Node) = domApi.$parentNode(hostElm)) {
+        let root: Node = hostElm;
+        while (root = domApi.$parentNode(root)) {
           if (hostElm.host && hostElm.host.shadowRoot) {
             // looks like we are in shadow dom, let's use
             // this shadow root as the container for these styles
@@ -97,17 +97,9 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
       // instead the "template" is just the style text as a string
       // create a new style element and add as innerHTML
 
-      if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
+      if (Build.cssVarShim && plt.customStyle && !plt.customStyle.supportsCssVars) {
 
-        const scopeID = (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom))
-          ? 'data-' + cmpMeta.tagNameMeta
-          : undefined;
-
-        if (scopeID) {
-          hostElm['s-sc'] = scopeID;
-          domApi.$setAttribute(hostElm, scopeID + '-host', '');
-        }
-        styleElm = customStyle.createHostStyle(hostElm, styleModeId, styleTemplate, scopeID);
+        styleElm = plt.customStyle.createHostStyle(hostElm, styleModeId, styleTemplate);
 
       } else if (!appliedStyles[styleModeId]) {
         styleElm = domApi.$createElement('style');

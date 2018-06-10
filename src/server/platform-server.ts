@@ -243,14 +243,6 @@ export function createPlatformServer(
     // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
     plt.hostSnapshotMap.set(elm, hostSnapshot);
 
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
     // It is possible the data was loaded from an outside source like tests
     if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
       if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style) {

@@ -3,10 +3,9 @@ import { callNodeRefs } from '../renderer/vdom/patch';
 import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
 import { propagateComponentLoaded } from './init-component-instance';
-import { CustomStyle } from '../client/polyfills/css-shim/custom-style';
 
 
-export function disconnectedCallback(plt: PlatformApi, elm: HostElement, customStyle: CustomStyle) {
+export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
@@ -41,8 +40,8 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, customS
     }
 
     // clear CSS var-shim tracking
-    if (Build.cssVarShim && customStyle && customStyle.supportsCssVars) {
-      customStyle.removeHost(elm);
+    if (Build.cssVarShim && plt.customStyle && plt.customStyle.supportsCssVars) {
+      plt.customStyle.removeHost(elm);
     }
 
     // clear any references to other elements

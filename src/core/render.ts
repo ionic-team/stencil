@@ -102,6 +102,11 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       ));
     }
 
+    // update styles!
+    if (Build.styles && Build.cssVarShim && plt.customStyle && !plt.customStyle.supportsCssVars) {
+      plt.customStyle.updateHost(hostElm);
+    }
+
     // it's official, this element has rendered
     hostElm['s-rn'] = true;
 

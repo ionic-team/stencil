@@ -5,9 +5,14 @@ import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
 import { getHostScopeAttribute } from '../../../util/scope';
 
-export function supportsCssVars(win: Window) {
-  return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
+// export function supportsCssVars(win: Window) {
+//   return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
+// }
+
+export function supportsCssVars(_win: Window) {
+  return false;
 }
+
 
 export class CustomStyle {
 
@@ -53,8 +58,11 @@ export class CustomStyle {
     hostEl: HTMLElement,
     templateName: string,
     cssText: string,
-    cssScopeId?: string,
   ) {
+    if (this.hostScopeMap.has(hostEl)) {
+      return null;
+    }
+    const cssScopeId = (hostEl as any)['s-sc'];
     const baseScope = this.registerHostTemplate(cssText, templateName, cssScopeId);
 
     const needStyleEl = baseScope.isDynamic || !baseScope.styleEl;
@@ -75,6 +83,7 @@ export class CustomStyle {
 
     } else {
       baseScope.styleEl = styleEl;
+      styleEl.innerHTML = cssText;
       this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;

@@ -53,6 +53,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
+    customStyle,
     domApi,
     defineComponent,
     emitEvent: Context.emit,
@@ -119,7 +120,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
         hydratedCssClass,
-        customStyle
       );
 
       if (Build.observeAttr) {
@@ -145,14 +145,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
 
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
       queueUpdate(plt, elm);
@@ -235,7 +227,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   if (Build.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
+      attachStyles(plt, domApi, cmpMeta, modeName, elm);
     };
   }
 

@@ -60,8 +60,12 @@ export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
 }
 
 export function replaceScope(original: string, oldScopeId: string, newScopeId: string) {
-  return original
-    .replace(`[${getHostScopeAttribute(oldScopeId)}]`, `[${getHostScopeAttribute(newScopeId)}]`)
-    .replace(`[${getChildScopeAttribute(oldScopeId)}]`, `[${getChildScopeAttribute(newScopeId)}]`)
-    .replace(`[${getSlotScopeAttribute(oldScopeId)}]`, `[${getSlotScopeAttribute(newScopeId)}]`);
+  original = replaceAll(original, `\\[${getHostScopeAttribute(oldScopeId)}\\]`, `[${getHostScopeAttribute(newScopeId)}]`);
+  original = replaceAll(original, `\\[${getChildScopeAttribute(oldScopeId)}\\]`, `[${getChildScopeAttribute(newScopeId)}]`);
+  original = replaceAll(original, `\\[${getSlotScopeAttribute(oldScopeId)}\\]`, `[${getSlotScopeAttribute(newScopeId)}]`);
+  return original;
+}
+
+export function replaceAll(input: string, find: string, replace: string) {
+  return input.replace(new RegExp(find, 'g'), replace);
 }

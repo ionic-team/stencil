@@ -58,6 +58,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     domApi,
     defineComponent,
     emitEvent: Context.emit,
+    customStyle,
     getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
@@ -115,8 +116,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       initHostElement(plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass,
-        customStyle
+        hydratedCssClass
       );
 
       if (Build.observeAttr) {
@@ -265,14 +265,6 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // This is executed by the component's connected callback.
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
@@ -357,7 +349,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   if (Build.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
+      attachStyles(plt, domApi, cmpMeta, modeName, elm);
     };
   }
 
