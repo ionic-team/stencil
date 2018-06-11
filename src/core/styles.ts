@@ -112,14 +112,16 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
           // remember we don't need to do this again for this element
           appliedStyles[styleModeId] = true;
 
+        }
+
+        if (styleElm) {
           if (Build.isDev) {
             // add a style id attribute, but only useful during dev
             domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
           }
+          const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+          domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
         }
-
-        const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
-        domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
 
       } else {
         // this browser supports the <template> element

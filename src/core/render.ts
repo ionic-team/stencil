@@ -39,7 +39,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       rootElm = hostElm;
     }
 
-    if (Build.styles) {
+    if (Build.styles && !hostElm['s-rn']) {
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
@@ -103,7 +103,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     }
 
     // update styles!
-    if (Build.styles && Build.cssVarShim && plt.customStyle) {
+    if (Build.cssVarShim && plt.customStyle) {
       plt.customStyle.updateHost(hostElm);
     }
 
