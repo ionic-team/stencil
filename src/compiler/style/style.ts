@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, hasFileExtension, normalizePath } from '../util';
+import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
@@ -77,20 +77,33 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     checkPluginHelpers(config, buildCtx, extStylePath);
   }
 
-  const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
+  try {
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
 
-  if (!moduleFile.isCollectionDependency) {
-    const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+    if (!moduleFile.isCollectionDependency) {
+      const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
-    const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
+      const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
 
-    await Promise.all(collectionDirs.map(async outputTarget => {
-      const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
-      await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
-    }));
+      await Promise.all(collectionDirs.map(async outputTarget => {
+        const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+        await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+      }));
+    }
+
+    return transformResults.code;
+
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      const d = buildError(buildCtx.diagnostics);
+      const relExtStyle = config.sys.path.relative(config.cwd, extStylePath);
+      const relSrc = config.sys.path.relative(config.cwd, moduleFile.sourceFilePath);
+      d.messageText = `Unable to load style ${relExtStyle} from ${relSrc}`;
+    } else {
+      catchError(buildCtx.diagnostics, e);
+    }
+    return '';
   }
-
-  return transformResults.code;
 }
 
 
