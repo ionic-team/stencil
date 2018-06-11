@@ -2,6 +2,7 @@ import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from
 import { buildWarn } from '../../compiler/util';
 import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
 import { highlight } from './highlight/highlight';
+import { toTitleCase } from '../helpers';
 
 
 export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, rollupError: any) {
@@ -17,8 +18,8 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
     lines: []
   };
 
-  if (rollupError.loc && rollupError.id) {
-    d.absFilePath = rollupError.id;
+  if (rollupError.loc && rollupError.loc.file) {
+    d.absFilePath = rollupError.loc.file;
     d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
 
     try {
@@ -60,7 +61,9 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLine.errorCharStart--;
       }
 
-      d.header = formatHeader('bundling', d.absFilePath, config.cwd, errorLine.lineNumber, errorLine.errorCharStart);
+      const type = formatErrorCode(rollupError.code);
+
+      d.header = formatHeader(type, d.absFilePath, config.cwd, errorLine.lineNumber, errorLine.errorCharStart);
 
       if (errorLine.lineIndex > 0) {
         const previousLine: PrintLine = {
@@ -150,3 +153,14 @@ const INGORE_WARNING_CODES = [
 const SUPPRESS_WARNING_CODES = [
   `CIRCULAR_DEPENDENCY`
 ];
+
+
+function formatErrorCode(errorCode: string) {
+  if (typeof errorCode === 'string') {
+    return errorCode.split('_').map(c => {
+      return toTitleCase(c.toLowerCase());
+    }).join(' ');
+  }
+
+  return errorCode;
+}

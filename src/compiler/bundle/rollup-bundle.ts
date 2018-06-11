@@ -56,7 +56,6 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     rollupBundle = await rollup(rollupConfig);
 
   } catch (err) {
-    console.log(err);
     loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
   }
 
