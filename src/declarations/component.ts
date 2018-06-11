@@ -58,6 +58,7 @@ export interface ComponentConstructorHost {
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
+  originalTagNameMeta?: string,
   bundleIds?: string | BundleIds | GetModuleFn;
   stylesMeta?: d.StylesMeta;
   membersMeta?: MembersMeta;

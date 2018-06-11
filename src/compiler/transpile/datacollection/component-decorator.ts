@@ -24,7 +24,8 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
   const symbol = checker.getSymbolAtLocation(node.name);
 
   const cmpMeta: d.ComponentMeta = {
-    tagNameMeta: componentOptions.tag,
+    tagNameMeta: `SCOPED-${componentOptions.tag}`,
+    originalTagNameMeta: componentOptions.tag,
     stylesMeta: {},
     assetsDirsMeta: [],
     hostMeta: getHostMeta(diagnostics, componentOptions.host),
