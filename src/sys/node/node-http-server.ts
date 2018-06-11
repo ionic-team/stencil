@@ -10,7 +10,7 @@ export function createServer(compilerCtx: d.CompilerCtx, outputTarget: d.OutputT
   compilerCtx.localPrerenderServer = http.createServer((request: any, response: any) => {
     const filePath = getFilePath(outputTarget, request.url);
 
-    fs.readFile(filePath, 'utf-8', (err: any, data: any) => {
+    fs.readFile(filePath, 'utf8', (err: any, data: any) => {
       if (err) {
         response.write(`<!--localPrerenderServer, error fetching: ${request.url} : ${err} -->`);
       } else {

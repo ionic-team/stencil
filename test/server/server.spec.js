@@ -77,7 +77,7 @@ describe('test/server', () => {
       const renderer = new stencil.Renderer(config);
 
       // load the source index.html
-      const srcIndexHtml = fs.readFileSync(config.srcIndexHtml, 'utf-8');
+      const srcIndexHtml = fs.readFileSync(config.srcIndexHtml, 'utf8');
 
       // create a request handler
       function requestHandler(req, res) {

@@ -248,7 +248,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       }
     }
 
-    const fileContent = await this.disk.readFile(filePath, 'utf-8');
+    const fileContent = await this.disk.readFile(filePath, 'utf8');
 
     if (fileContent.length < MAX_TEXT_CACHE) {
       const item = this.getItem(filePath);
@@ -272,7 +272,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       return item.fileText;
     }
 
-    const fileContent = this.disk.readFileSync(filePath, 'utf-8');
+    const fileContent = this.disk.readFileSync(filePath, 'utf8');
 
     if (fileContent.length < MAX_TEXT_CACHE) {
       item.exists = true;

@@ -22,7 +22,7 @@ module.exports = function buildPolyfills(outputPolyfillsDir) {
     const esmFilePath = path.join(esmDir, fileName);
     const es5FilePath = path.join(es5Dir, fileName);
 
-    const polyfillContent = fs.readFileSync(srcFilePath, 'utf-8');
+    const polyfillContent = fs.readFileSync(srcFilePath, 'utf8');
 
     const esmWrapped = [
       'export function applyPolyfill(window, document) {',

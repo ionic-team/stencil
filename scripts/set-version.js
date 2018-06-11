@@ -9,10 +9,10 @@ function getVersion() {
   return process.argv[process.argv.length - 1];
 }
 
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 packageJson.version = getVersion();
 
-const packageLock = JSON.parse(fs.readFileSync(packageLockPath, 'utf-8'));
+const packageLock = JSON.parse(fs.readFileSync(packageLockPath, 'utf8'));
 packageLock.version = packageJson.version;
 
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');

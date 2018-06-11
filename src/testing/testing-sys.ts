@@ -32,7 +32,7 @@ export class TestingSystem extends NodeSystem {
     const filePath = path.join(relDistPath, 'client', opts.staticName);
 
     return new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf-8', (err, data) => {
+      fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           reject(err);
         } else {
