@@ -5,7 +5,7 @@ import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './u
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
+export function getComponentDecoratorMeta(config: d.Config, diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
   if (!node.decorators) {
     return undefined;
   }
@@ -24,7 +24,7 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
   const symbol = checker.getSymbolAtLocation(node.name);
 
   const cmpMeta: d.ComponentMeta = {
-    tagNameMeta: `SCOPED-${componentOptions.tag}`,
+    tagNameMeta: config.componentsPrefix ? `${config.componentsPrefix}-${componentOptions.tag}` : componentOptions.tag,
     originalTagNameMeta: componentOptions.tag,
     stylesMeta: {},
     assetsDirsMeta: [],

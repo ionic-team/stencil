@@ -35,7 +35,7 @@ function visitFactory(config: d.Config, diagnostics: d.Diagnostic[], compilerCtx
     }
 
     if (ts.isClassDeclaration(node)) {
-      const cmpMeta = visitClass(diagnostics, checker, node as ts.ClassDeclaration, sourceFile);
+      const cmpMeta = visitClass(config, diagnostics, checker, node as ts.ClassDeclaration, sourceFile);
       if (cmpMeta) {
         const tsFilePath = normalizePath(sourceFile.getSourceFile().fileName);
         componentMetaList[tsFilePath] = cmpMeta;
@@ -48,8 +48,8 @@ function visitFactory(config: d.Config, diagnostics: d.Diagnostic[], compilerCtx
   };
 }
 
-export function visitClass(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.ComponentMeta | undefined {
-  let cmpMeta = getComponentDecoratorMeta(diagnostics, checker, classNode);
+export function visitClass(config: d.Config, diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.ComponentMeta | undefined {
+  let cmpMeta = getComponentDecoratorMeta(config, diagnostics, checker, classNode);
 
   if (!cmpMeta) {
     return undefined;
