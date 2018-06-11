@@ -134,7 +134,7 @@ function getMembersMeta(properties: d.ComponentConstructorProperties): d.DevInsp
 
 
 function getComponentMeta(plt: d.PlatformApi, tagName: string): Promise<d.DevInspectorComponentMeta> {
-  const elm = { tagName: tagName } as any;
+  const elm = { nodeName: tagName } as any;
   const internalMeta = plt.getComponentMeta(elm);
 
   if (!internalMeta || !internalMeta.componentConstructor) {
