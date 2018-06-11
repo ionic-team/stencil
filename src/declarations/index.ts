@@ -26,5 +26,7 @@ export * from './render';
 export * from './server';
 export * from './style';
 export * from './system';
+export * from './transpile';
 export * from './vdom';
 export * from './watcher';
+export * from './worker';
