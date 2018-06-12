@@ -3,10 +3,11 @@ import * as d from '../../../declarations';
 
 export default  (moduleFiles: d.ModuleFiles): ts.TransformerFactory<ts.SourceFile> => {
   const convertibleTagNames: { [key: string]: d.ComponentMeta } = {};
-
   Object.keys(moduleFiles).map(key => {
-    convertibleTagNames[moduleFiles[key].cmpMeta.originalTagNameMeta] =
-      moduleFiles[key].cmpMeta;
+    const metas = moduleFiles[key].cmpMeta
+    if(metas) {
+      convertibleTagNames[metas.originalTagNameMeta] = metas
+    }
   });
 
   function getNewTagName(tagName: string) {
