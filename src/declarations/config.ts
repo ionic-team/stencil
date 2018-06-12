@@ -11,6 +11,7 @@ export interface Config {
   commonjs?: BundlingConfig;
   cwd?: string;
   nodeResolve?: NodeResolveConfig;
+  componentsPrefix?: string;
   configPath?: string;
   copy?: CopyTasks;
   devInspector?: boolean;

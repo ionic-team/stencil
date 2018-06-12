@@ -12,6 +12,7 @@ import { moduleGraph } from './transformers/module-graph';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
+import scopedTagNames from './transformers/scope-tag-names';
 import * as ts from 'typescript';
 
 
@@ -81,6 +82,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
 
     // NOTE! order of transforms and being in either "before" or "after" is very important!!!!
     before: [
+      scopedTagNames(compilerCtx.moduleFiles),
       removeDecorators(),
       addComponentMetadata(compilerCtx.moduleFiles),
       buildConditionalsTransform(buildConditionals)
