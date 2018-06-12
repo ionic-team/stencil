@@ -301,10 +301,10 @@ export class NodeSystem implements d.StencilSystem {
     return url;
   }
 
-  validateTypes(compilerOptions: any, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
     return this.sysWorker.run(
       'validateTypes',
-      [compilerOptions, currentWorkingDir, collectionNames, rootTsFiles],
+      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
       { isLongRunningTask: true, workerId: 0 }
     );
   }

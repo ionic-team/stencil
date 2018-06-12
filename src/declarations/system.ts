@@ -55,7 +55,7 @@ export interface StencilSystem {
     format(url: Url): string;
     resolve(from: string, to: string): string;
   };
-  validateTypes(compilerOptions: any, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.Diagnostic[]>;
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.Diagnostic[]>;
   vm?: {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;

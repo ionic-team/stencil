@@ -112,8 +112,8 @@ export class NodeSystemWorker {
     return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
   }
 
-  validateTypes(compilerOptions: any, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
-    return validateTypesWorker(this.workerContext, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
   }
 
 }

@@ -7,7 +7,7 @@ import { removeStencilImports } from './transformers/remove-stencil-imports';
 import * as ts from 'typescript';
 
 
-export function validateTypesWorker(workerCtx: d.WorkerContext, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
   const diagnostics: d.Diagnostic[] = [];
 
   if (!workerCtx.tsHost) {
@@ -16,6 +16,9 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, compilerOptions:
     const tsHost = ts.createCompilerHost(compilerOptions);
 
     tsHost.writeFile = (outputFileName: string, data: string, writeByteOrderMark: boolean) => {
+      if (!emitDtsFiles) {
+        return;
+      }
       if (!outputFileName.endsWith('.d.ts')) {
         return;
       }

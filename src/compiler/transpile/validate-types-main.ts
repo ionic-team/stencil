@@ -5,6 +5,11 @@ import { getUserTsConfig } from './compiler-options';
 
 
 export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  // send data over to our worker process to validate types
+  // don't let this block the main thread and we'll check
+  // its response sometime later
+  const timeSpan = buildCtx.createTimeSpan(`validateTypes started`, true);
+
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   const rootTsFiles = compilerCtx.rootTsFiles.slice();
 
@@ -13,14 +18,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
     rootTsFiles.push(componentsDtsSrcFilePath);
   }
 
-  const options = await getUserTsConfig(config, compilerCtx);
-
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
-
-  // send data over to our worker process to validate types
-  // don't let this block the main thread and we'll check
-  // its response sometime later
-  const timeSpan = buildCtx.createTimeSpan(`validateTypes started`, true);
 
   buildCtx.validateTypesHandler = (diagnostics: d.Diagnostic[]) => {
     timeSpan.finish(`validateTypes finished`);
@@ -56,8 +54,16 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
     }
   };
 
-  // kick off validating types by sending the data over to the worker process
-  buildCtx.validateTypesPromise = config.sys.validateTypes(options, config.cwd, collectionNames, rootTsFiles);
+  // get the typescript compiler options
+  const compilerOptions = await getUserTsConfig(config, compilerCtx);
 
+  // only write dts files when we have an output target with a types directory
+  const emitDtsFiles = (config.outputTargets as d.OutputTargetDist[]).some(o => !!o.typesDir);
+
+  // kick off validating types by sending the data over to the worker process
+  buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);
+
+  // when the validate types build finishes
+  // let's run the handler we put on the build context
   buildCtx.validateTypesPromise.then(buildCtx.validateTypesHandler.bind(buildCtx));
 }

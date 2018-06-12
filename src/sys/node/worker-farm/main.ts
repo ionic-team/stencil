@@ -106,7 +106,15 @@ export class WorkerFarm {
       this.onWorkerExit(workerId, code);
     });
 
-    childProcess.on('error', () => {/**/});
+    childProcess.on('error', err => {
+      this.receiveMessageFromWorker({
+        workerId: workerId,
+        error: {
+          message: `Worker (${workerId}) process error: ${err.message}`,
+          stack: err.stack
+        }
+      });
+    });
 
     return worker;
   }
@@ -127,7 +135,7 @@ export class WorkerFarm {
             workerId: workerId,
             taskId: task.taskId,
             error: {
-              message: `Worker exited. Canceled "${task.methodName}" task.`
+              message: `Worker (${workerId}) exited with code (${exitCode}). Canceled "${task.methodName}" task.`
             }
           });
         });
@@ -165,13 +173,13 @@ export class WorkerFarm {
     // message sent back from a worker process
     const worker = this.workers.find(w => w.workerId === msg.workerId);
     if (!worker) {
-      this.logger.error(`Worker Farm: Received message for unknown worker (${msg.workerId})`);
+      this.logger.error(`Received message for unknown worker (${msg.workerId})`);
       return;
     }
 
     const task = worker.tasks.find(w => w.taskId === msg.taskId);
     if (!task) {
-      this.logger.error(`Worker Farm: Received message for unknown taskId (${msg.taskId}) for worker (${worker.workerId})`);
+      this.logger.error(`Worker (${worker.workerId}) received message for unknown taskId (${msg.taskId})`);
       return;
     }
 
@@ -213,7 +221,7 @@ export class WorkerFarm {
         taskId: task.taskId,
         workerId: workerId,
         error: {
-          message: `worker timed out! Canceled "${task.methodName}" task`
+          message: `Worker (${workerId}) timed out! Canceled "${task.methodName}" task.`
         }
       });
     });
@@ -316,6 +324,6 @@ export function nextAvailableWorker(workers: d.WorkerProcess[], maxConcurrentTas
 const DEFAULT_OPTIONS: d.WorkerOptions = {
   maxConcurrentWorkers: (cpus() || { length: 1 }).length,
   maxConcurrentTasksPerWorker: 5,
-  maxTaskTime: 90000,
+  maxTaskTime: 120000,
   forcedKillTime: 100
 };
