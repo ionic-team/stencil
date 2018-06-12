@@ -11,7 +11,7 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`generateStyles started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
   await Promise.all(entryModules.map(async bundle => {
 
@@ -21,7 +21,7 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 
   }));
 
-  timeSpan.finish(`generateStyles finished`);
+  timeSpan.finish(`generate styles finished`);
 }
 
 
