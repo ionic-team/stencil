@@ -133,12 +133,6 @@ export interface FilesMap {
 
 export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'build' | 'rebuild';
 
-export interface TranspileResults {
-  code?: string;
-  diagnostics?: d.Diagnostic[];
-  cmpMeta?: d.ComponentMeta;
-}
-
 
 export interface JSModuleList {
   [key: string]: { code: string };
