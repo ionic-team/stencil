@@ -19,17 +19,23 @@ export function loadTypeScriptDiagnostics(currentWorkingDir: string, resultsDiag
 
 
 function loadDiagnostic(currentWorkingDir: string, tsDiagnostic: ts.Diagnostic) {
+
   const d: d.Diagnostic = {
-    level: 'error',
+    level: 'warn',
     type: 'typescript',
     language: 'typescript',
-    header: 'typescript error',
+    header: 'typescript warn',
     code: tsDiagnostic.code.toString(),
     messageText: ts.flattenDiagnosticMessageText(tsDiagnostic.messageText, '\n'),
     relFilePath: null,
     absFilePath: null,
     lines: []
   };
+
+  if (tsDiagnostic.category === ts.DiagnosticCategory.Error) {
+    d.level = 'error';
+    d.header = 'typescript error';
+  }
 
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
