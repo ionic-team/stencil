@@ -2,18 +2,23 @@ import * as d from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
 import { generatePreamble } from '../util';
-import { getLoaderFileName, getLoaderPath } from './app-file-naming';
+import { getLoaderPath } from './app-file-naming';
 import { minifyJs } from '../minifier';
 
 
 export async function generateLoader(
   config: d.Config,
   compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
   outputTarget: d.OutputTarget,
   appRegistry: d.AppRegistry,
   cmpRegistry: d.ComponentRegistry
 ) {
-  const appLoaderFileName = getLoaderFileName(config);
+  if (buildCtx.shouldAbort()) {
+    return null;
+  }
+
+  const timeSpan = buildCtx.createTimeSpan(`generateLoader started`, true);
 
   const clientLoaderSource = `loader.js`;
 
@@ -28,10 +33,6 @@ export async function generateLoader(
     cmpRegistry,
     loaderContent
   );
-
-  // write the app loader file
-  // app loader file is actually different from our last saved version
-  config.logger.debug(`build, app loader: ${appLoaderFileName}`);
 
   if (config.minifyJs) {
     // minify the loader
@@ -51,6 +52,8 @@ export async function generateLoader(
 
   const appLoadPath = getLoaderPath(config, outputTarget);
   await compilerCtx.fs.writeFile(appLoadPath, loaderContent);
+
+  timeSpan.finish(`generateLoader finished`);
 
   return loaderContent;
 }

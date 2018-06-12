@@ -1,4 +1,3 @@
-import * as d from './index';
 
 export interface WorkerOptions {
   maxConcurrentWorkers?: number;
@@ -51,9 +50,6 @@ export interface WorkerRunnerOptions {
 }
 
 export interface WorkerContext {
-  collections?: d.Collection[];
-  compilerOptions?: any;
-  cwd?: string;
-  rootTsFiles?: any;
-  tsService?: (tsFilePaths: string[]) => d.Diagnostic[];
+  tsHost?: any;
+  tsProgram?: any;
 }

@@ -2,6 +2,18 @@ import * as d from '../../declarations';
 import { BuildEvents } from '../events';
 import { Cache } from '../cache';
 import { InMemoryFileSystem } from '../../util/in-memory-fs';
+import { normalizePath } from '../util';
+
+
+export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+  sourceFilePath = normalizePath(sourceFilePath);
+  return compilerCtx.moduleFiles[sourceFilePath] = compilerCtx.moduleFiles[sourceFilePath] || {
+    sourceFilePath: sourceFilePath,
+    localImports: [],
+    externalImports: [],
+    potentialCmpRefs: []
+  };
+}
 
 
 export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {

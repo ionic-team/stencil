@@ -301,6 +301,14 @@ export class NodeSystem implements d.StencilSystem {
     return url;
   }
 
+  validateTypes(compilerOptions: any, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return this.sysWorker.run(
+      'validateTypes',
+      [compilerOptions, currentWorkingDir, collectionNames, rootTsFiles],
+      { isLongRunningTask: true, workerId: 0 }
+    );
+  }
+
   get vm(): any {
     return {
       createContext,

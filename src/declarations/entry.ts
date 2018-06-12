@@ -36,7 +36,6 @@ export interface ComponentRef {
 export interface PotentialComponentRef {
   tag?: string;
   html?: string;
-  filePath: string;
 }
 
 export interface ModuleGraph {

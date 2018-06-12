@@ -4,7 +4,11 @@ import { generateBundleModules } from './bundle-modules';
 
 
 export async function generateModuleMap(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  const timeSpan = config.logger.createTimeSpan(`module map started`);
+  if (buildCtx.shouldAbort()) {
+    return null;
+  }
+
+  const timeSpan = buildCtx.createTimeSpan(`module map started`);
   let jsModules: JSModuleMap;
 
   try {
@@ -15,7 +19,6 @@ export async function generateModuleMap(config: Config, compilerCtx: CompilerCtx
   }
 
   timeSpan.finish(`module map finished`);
-  config.logger.debug(`module map finished`);
 
   return jsModules;
 }

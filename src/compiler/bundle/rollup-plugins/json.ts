@@ -1,7 +1,5 @@
 import * as d from '../../../declarations';
 import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
-import { IN_MEMORY_DIR } from '../../../util/in-memory-fs';
-import { pathJoin } from '../../util';
 
 
 export default function bundleJson(config: d.Config, options: Options = {}) {
@@ -9,9 +7,6 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
   const filter = createFilter(options.include, options.exclude);
 
   const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir).map(o => o.collectionDir);
-
-  const inMemoryDir = pathJoin(config, config.rootDir, IN_MEMORY_DIR);
-  collectionDirs.push(inMemoryDir);
 
   return {
     name: 'json',

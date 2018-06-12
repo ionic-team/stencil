@@ -13,6 +13,7 @@ const DEST_FILE = path.join(__dirname, '..', 'dist', 'sys', 'node', 'index.js');
 const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
 const whitelist = [
+  'typescript',
   'uglify-es'
 ];
 
@@ -24,7 +25,7 @@ if (success) {
 
   function bundle(entryFileName) {
     webpack({
-      entry: path.join(__dirname, 'bundles', entryFileName),
+      entry: path.join(__dirname, '..', 'src', 'sys', 'node', 'bundles', entryFileName),
       output: {
         path: path.join(__dirname, '..', 'dist', 'sys', 'node'),
         filename: entryFileName,
@@ -48,11 +49,26 @@ if (success) {
       },
       optimization: {
         minimize: false
-      }
-    }, (err) => {
+      },
+      mode: 'production'
+    }, (err, stats) => {
       if (err) {
-        console.error(err);
+        console.error(err.stack || err);
+        if (err.details) {
+          console.error(err.details);
+        }
+        return;
       }
+
+      const info = stats.toJson();
+
+      if (stats.hasErrors()) {
+        console.error(info.errors);
+      }
+
+      // if (stats.hasWarnings()) {
+      //   console.warn(info.warnings);
+      // }
     });
   }
 
@@ -60,6 +76,7 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'child_process',
         'crypto',
         'fs',
         'path',

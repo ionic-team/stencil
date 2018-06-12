@@ -1,60 +1,61 @@
 import * as d from '../../../declarations';
+import { getModuleFile } from '../../build/compiler-ctx';
 import { MEMBER_TYPE } from '../../../util/constants';
-import { normalizePath } from '../../util';
 import * as ts from 'typescript';
 
 
-export function componentDependencies(compilerCtx: d.CompilerCtx, buildCtx:  d.BuildCtx): ts.TransformerFactory<ts.SourceFile> {
+export function componentDependencies(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
-    function visit(node: ts.Node, filePath: string): ts.VisitResult<ts.Node> {
+    function visit(node: ts.Node, moduleFile: d.ModuleFile): ts.VisitResult<ts.Node> {
       if (node.kind === ts.SyntaxKind.CallExpression) {
-        callExpression(buildCtx, filePath, node as ts.CallExpression);
+        callExpression(moduleFile, node as ts.CallExpression);
 
       } else if (node.kind === ts.SyntaxKind.StringLiteral) {
-        stringLiteral(buildCtx, filePath, node as ts.StringLiteral);
+        stringLiteral(moduleFile, node as ts.StringLiteral);
       }
 
       return ts.visitEachChild(node, (node) => {
-        return visit(node, filePath);
+        return visit(node, moduleFile);
       }, transformContext);
     }
 
     return (tsSourceFile) => {
-      const filePath = normalizePath(tsSourceFile.fileName);
+      const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
 
-      addPropConnects(compilerCtx, buildCtx.componentRefs, filePath);
+      // reset since we're doing a full parse again
+      moduleFile.potentialCmpRefs.length = 0;
+      moduleFile.hasSlot = false;
+      moduleFile.hasSvg = false;
 
-      return visit(tsSourceFile, filePath) as ts.SourceFile;
+      addPropConnects(compilerCtx, moduleFile);
+
+      return visit(tsSourceFile, moduleFile) as ts.SourceFile;
     };
   };
 }
 
 
-function addPropConnects(compilerCtx:  d.CompilerCtx, sourceStrings:  d.PotentialComponentRef[], filePath: string) {
-  const moduleFile = compilerCtx.moduleFiles[filePath];
-
-  const cmpMeta = (moduleFile && moduleFile.cmpMeta);
-  if (!cmpMeta) {
+function addPropConnects(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile) {
+  if (!moduleFile.cmpMeta) {
     return;
   }
 
-  if (cmpMeta.membersMeta) {
-    Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-      const memberMeta = cmpMeta.membersMeta[memberName];
+  if (moduleFile.cmpMeta.membersMeta) {
+    Object.keys(moduleFile.cmpMeta.membersMeta).forEach(memberName => {
+      const memberMeta = moduleFile.cmpMeta.membersMeta[memberName];
       if (memberMeta.memberType === MEMBER_TYPE.PropConnect) {
-        addPropConnect(compilerCtx, sourceStrings, filePath, memberMeta.ctrlId);
+        addPropConnect(compilerCtx, moduleFile, memberMeta.ctrlId);
       }
     });
   }
 }
 
 
-function addPropConnect(compilerCtx:  d.CompilerCtx, sourceStrings:  d.PotentialComponentRef[], filePath: string, tag: string) {
-  sourceStrings.push({
-    tag: tag,
-    filePath: filePath
+function addPropConnect(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, tag: string) {
+  moduleFile.potentialCmpRefs.push({
+    tag: tag
   });
 
   compilerCtx.collections.forEach(collection => {
@@ -63,9 +64,8 @@ function addPropConnect(compilerCtx:  d.CompilerCtx, sourceStrings:  d.Potential
       if (bundle.components.includes(tag)) {
         bundle.components.forEach(bundleTag => {
           if (bundleTag !== tag) {
-            sourceStrings.push({
-              tag: bundleTag,
-              filePath: filePath
+            moduleFile.potentialCmpRefs.push({
+              tag: bundleTag
             });
           }
         });
@@ -76,47 +76,65 @@ function addPropConnect(compilerCtx:  d.CompilerCtx, sourceStrings:  d.Potential
 }
 
 
-function callExpression(buildCtx:  d.BuildCtx, filePath: string, node: ts.CallExpression) {
+function callExpression(moduleFile: d.ModuleFile, node: ts.CallExpression) {
   if (node.arguments && node.arguments[0]) {
 
     if (node.expression.kind === ts.SyntaxKind.Identifier) {
       // h('tag')
-      callExpressionArg(buildCtx, filePath, node.expression as ts.Identifier, node.arguments);
+      callExpressionArg(moduleFile, node.expression as ts.Identifier, node.arguments);
 
     } else if (node.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
       // document.createElement('tag')
       if ((node.expression as ts.PropertyAccessExpression).name) {
-        // const
-        callExpressionArg(buildCtx, filePath, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
+        callExpressionArg(moduleFile, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
       }
     }
   }
 }
 
 
-function callExpressionArg(buildCtx:  d.BuildCtx, filePath: string, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+function callExpressionArg(moduleFile: d.ModuleFile, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+
   if (TAG_CALL_EXPRESSIONS.includes(callExpressionName.escapedText as string)) {
 
     if (args[0].kind === ts.SyntaxKind.StringLiteral) {
-      const tag = (args[0] as ts.StringLiteral).text;
+      let tag = (args[0] as ts.StringLiteral).text;
 
       if (typeof tag === 'string') {
-        buildCtx.componentRefs.push({
-          tag: tag,
-          filePath: filePath
-        });
+        tag = tag.toLowerCase();
+        if (tag.includes('-')) {
+          moduleFile.potentialCmpRefs.push({
+            tag: tag
+          });
+
+        } else if (tag === 'slot') {
+          moduleFile.hasSlot = true;
+
+        } else if (tag === 'svg') {
+          moduleFile.hasSvg = true;
+        }
       }
     }
   }
 }
 
 
-function stringLiteral(buildCtx:  d.BuildCtx, filePath: string, node: ts.StringLiteral) {
-  if (typeof node.text === 'string' && node.text.includes('<')) {
-    buildCtx.componentRefs.push({
-      html: node.text,
-      filePath: filePath
-    });
+function stringLiteral(moduleFile: d.ModuleFile, node: ts.StringLiteral) {
+  if (typeof node.text === 'string' && node.text.includes('</')) {
+
+    if (node.text.includes('-')) {
+      moduleFile.potentialCmpRefs.push({
+        html: node.text
+      });
+    }
+
+    if (!moduleFile.hasSlot && node.text.includes('<slot')) {
+      moduleFile.hasSlot = true;
+    }
+
+    if (!moduleFile.hasSvg && node.text.includes('<svg')) {
+      moduleFile.hasSvg = true;
+    }
   }
 }
 

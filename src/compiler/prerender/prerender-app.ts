@@ -59,7 +59,7 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
 
 async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], prerenderQueue: d.PrerenderLocation[], indexHtml: string) {
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`prerendering started`, !outputTarget.hydrateComponents);
+  const timeSpan = buildCtx.createTimeSpan(`prerendering started`, !outputTarget.hydrateComponents);
 
   const hydrateResults: d.HydrateResults[] = [];
 

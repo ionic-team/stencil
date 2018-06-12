@@ -5,7 +5,7 @@ import { Renderer } from '../../server/index';
 
 export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string, prerenderLocation: d.PrerenderLocation) {
   const msg = outputTarget.hydrateComponents ? 'prerender' : 'optimize html';
-  const timeSpan = config.logger.createTimeSpan(`${msg}, started: ${prerenderLocation.path}`);
+  const timeSpan = buildCtx.createTimeSpan(`${msg}, started: ${prerenderLocation.path}`);
 
   const results: d.HydrateResults = {
     diagnostics: []

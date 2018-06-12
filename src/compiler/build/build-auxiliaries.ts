@@ -5,6 +5,10 @@ import { prerenderOutputTargets } from '../prerender/prerender-app';
 
 
 export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+  if (buildCtx.shouldAbort()) {
+    return;
+  }
+
   // generate component docs
   // and prerender can run in parallel
   await Promise.all([

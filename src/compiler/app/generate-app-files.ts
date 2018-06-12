@@ -12,14 +12,18 @@ import { setBuildConditionals } from './build-conditionals';
 
 
 export async function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
+  if (buildCtx.shouldAbort()) {
+    return;
+  }
+
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.appBuild;
   });
 
-  const timespan = config.logger.createTimeSpan(`generate app files started`);
+  const timespan = buildCtx.createTimeSpan(`generate app files started`);
 
-  await Promise.all(outputTargets.map(outputTarget => {
-    return generateAppFilesOutputTarget(config, compilerCtx, buildCtx, outputTarget, entryModules, cmpRegistry);
+  await Promise.all(outputTargets.map(async outputTarget => {
+    await generateAppFilesOutputTarget(config, compilerCtx, buildCtx, outputTarget, entryModules, cmpRegistry);
   }));
 
   timespan.finish(`generate app files finished`);
@@ -28,7 +32,6 @@ export async function generateAppFiles(config: d.Config, compilerCtx: d.Compiler
 
 export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   if (!config.buildAppCore) {
-    config.logger.createTimeSpan(`generate app files skipped`, true);
     return;
   }
 
@@ -49,10 +52,10 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 
     await Promise.all([
       // create a json file for the app registry
-      writeAppRegistry(config, compilerCtx, outputTarget, appRegistry, cmpRegistry),
+      writeAppRegistry(config, compilerCtx, buildCtx, outputTarget, appRegistry, cmpRegistry),
 
       // create the loader(s) after creating the loader file name
-      generateLoader(config, compilerCtx, outputTarget, appRegistry, cmpRegistry),
+      generateLoader(config, compilerCtx, buildCtx, outputTarget, appRegistry, cmpRegistry),
 
       // create the global styles
       generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget),

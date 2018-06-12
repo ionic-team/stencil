@@ -63,16 +63,20 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         })
       };
 
-      buildCtx.moduleGraphs
+      const moduleFiles = compilerCtx.rootTsFiles.map(rootTsFile => {
+        return compilerCtx.moduleFiles[rootTsFile];
+      });
+
+      moduleFiles
         .sort((a, b) => {
-          if (a.filePath < b.filePath) return -1;
-          if (a.filePath > b.filePath) return 1;
+          if (a.sourceFilePath < b.sourceFilePath) return -1;
+          if (a.sourceFilePath > b.sourceFilePath) return 1;
           return 0;
 
-        }).forEach(mg => {
-          const key = normalizePath(config.sys.path.relative(config.rootDir, mg.filePath));
-          stats.sourceGraph[key] = mg.importPaths.map(importPath => {
-            return normalizePath(config.sys.path.relative(config.rootDir, importPath));
+        }).forEach(moduleFile => {
+          const key = normalizePath(config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
+          stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
+            return normalizePath(config.sys.path.relative(config.rootDir, localImport));
           }).sort();
         });
 

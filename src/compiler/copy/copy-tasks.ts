@@ -4,7 +4,6 @@ import { catchError, normalizePath } from '../util';
 
 export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], commit: boolean) {
   if (!config.copy) {
-    config.logger.debug(`copy tasks disabled`);
     return;
   }
 

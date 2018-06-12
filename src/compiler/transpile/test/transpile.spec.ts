@@ -48,6 +48,7 @@ describe('transpile', () => {
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(false);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(false);
 
+    expect(r.entries[0].components).toHaveLength(1);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
   });
 
@@ -87,7 +88,6 @@ describe('transpile', () => {
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.entries[1].components[0].tag).toEqual('cmp-b');
     expect(r.entries[2].components[0].tag).toEqual('cmp-c');
-    expect(r.hasChangedJsText).toBe(true);
   });
 
   it('should rebuild transpile for changed typescript file', async () => {
@@ -115,10 +115,10 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.buildId).toBe(1);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
-    expect(r.hasChangedJsText).toBe(true);
   });
 
   it('should not rebuild transpile for unchanged typescript file', async () => {
@@ -152,8 +152,7 @@ describe('transpile', () => {
     expect(r.buildId).toBe(1);
     expect(r.isRebuild).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
-    expect(r.transpileBuildCount).toBe(1);
-    expect(r.hasChangedJsText).toBe(false);
+    expect(r.transpileBuildCount).toBe(0);
   });
 
   it('should transpile with core and without typescript errors', async () => {

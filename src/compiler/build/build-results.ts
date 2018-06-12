@@ -17,7 +17,6 @@ export async function generateBuildResults(config: d.Config, compilerCtx: d.Comp
     isRebuild: compilerCtx.isRebuild,
     transpileBuildCount: buildCtx.transpileBuildCount,
     bundleBuildCount: buildCtx.bundleBuildCount,
-    hasChangedJsText: buildCtx.hasChangedJsText,
     filesWritten: buildCtx.filesWritten.sort(),
     filesChanged: buildCtx.filesChanged.slice().sort(),
     filesUpdated: buildCtx.filesUpdated.slice().sort(),

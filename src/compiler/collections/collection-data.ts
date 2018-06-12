@@ -206,9 +206,13 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
 
 export function parseComponentDataToModuleFile(config: d.Config, collection: d.Collection, collectionDir: string, cmpData: d.ComponentData) {
   const moduleFile: d.ModuleFile = {
+    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath)),
     cmpMeta: {},
     isCollectionDependency: true,
-    excludeFromCollection: excludeFromCollection(config, cmpData)
+    excludeFromCollection: excludeFromCollection(config, cmpData),
+    localImports: [],
+    externalImports: [],
+    potentialCmpRefs: []
   };
   const cmpMeta = moduleFile.cmpMeta;
 
@@ -864,7 +868,11 @@ export function parseGlobal(config: d.Config, collectionDir: string, collectionD
   if (typeof collectionData.global !== 'string') return;
 
   collection.global = {
-    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global))
+    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global)),
+    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global)),
+    localImports: [],
+    externalImports: [],
+    potentialCmpRefs: []
   };
 }
 

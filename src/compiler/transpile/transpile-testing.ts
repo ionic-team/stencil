@@ -39,7 +39,11 @@ export function transpileModuleForTesting(config: d.Config, compilerOptions: ts.
 
     // assign metadata to module files
     moduleFiles['module.tsx'] = {
-      cmpMeta: fileMetadata
+      sourceFilePath: 'module.tsx',
+      cmpMeta: fileMetadata,
+      localImports: [],
+      externalImports: [],
+      potentialCmpRefs: []
     };
   }
 

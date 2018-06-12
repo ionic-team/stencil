@@ -45,12 +45,18 @@ export interface ModuleFiles {
 
 
 export interface ModuleFile {
+  sourceFilePath: string;
   jsFilePath?: string;
   dtsFilePath?: string;
   cmpMeta?: d.ComponentMeta;
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;
+  externalImports?: string[];
+  localImports?: string[];
+  potentialCmpRefs?: d.PotentialComponentRef[];
+  hasSlot?: boolean;
+  hasSvg?: boolean;
 }
 
 
