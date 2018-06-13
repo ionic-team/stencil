@@ -17,7 +17,7 @@ fs.removeSync(DIST_DIR);
   'build-renderer-vdom.js',
   'build-server.js',
   'build-submodules.js',
-  'build-sys-node',
+  'build-sys-node.js',
   'build-testing.js'
 
 ].forEach(script => fork(path.join(SCRIPTS_DIR, script)));
