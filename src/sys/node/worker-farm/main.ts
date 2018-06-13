@@ -128,19 +128,6 @@ export class WorkerFarm {
     worker.exitCode = exitCode;
 
     setTimeout(() => {
-      const worker = this.workers.find(w => w.workerId === workerId);
-      if (worker) {
-        worker.tasks.forEach(task => {
-          this.receiveMessageFromWorker({
-            workerId: workerId,
-            taskId: task.taskId,
-            error: {
-              message: `Worker (${workerId}) exited with code (${exitCode}). Canceled "${task.methodName}" task.`
-            }
-          });
-        });
-      }
-
       this.stopWorker(workerId);
     }, 10);
   }
@@ -149,6 +136,11 @@ export class WorkerFarm {
     const worker = this.workers.find(w => w.workerId === workerId);
     if (worker && !worker.isExisting) {
       worker.isExisting = true;
+
+      worker.tasks.forEach(task => {
+        task.reject(`worker (${workerId}) has exited`);
+      });
+      worker.tasks.length = 0;
 
       worker.send({
         exitProcess: true
@@ -171,6 +163,11 @@ export class WorkerFarm {
 
   receiveMessageFromWorker(msg: d.WorkerMessageData) {
     // message sent back from a worker process
+    if (this.isExisting) {
+      // already exiting, don't bother
+      return;
+    }
+
     const worker = this.workers.find(w => w.workerId === msg.workerId);
     if (!worker) {
       this.logger.error(`Received message for unknown worker (${msg.workerId})`);
@@ -272,9 +269,16 @@ export class WorkerFarm {
     if (!this.isExisting) {
       this.isExisting = true;
 
-      for (let i = this.workers.length - 1; i >= 0; i--) {
-        this.stopWorker(this.workers[i].workerId);
-      }
+      // workers may already be getting removed
+      // so doing it this way cuz we don't know if the
+      // order of the workers array is consisten
+      const workerIds = this.workers.map(worker => worker.workerId);
+      workerIds.forEach(workerId => {
+        const worker = this.workers.find(w => w.workerId === workerId);
+        if (worker) {
+          this.stopWorker(worker.workerId);
+        }
+      });
     }
   }
 
