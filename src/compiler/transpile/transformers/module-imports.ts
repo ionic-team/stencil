@@ -42,10 +42,6 @@ export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): 
     return (tsSourceFile) => {
       const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
 
-      // reset data
-      moduleFile.localImports.length = 0;
-      moduleFile.externalImports.length = 0;
-
       const dirPath = config.sys.path.dirname(tsSourceFile.fileName);
 
       return visit(moduleFile, dirPath, tsSourceFile) as ts.SourceFile;

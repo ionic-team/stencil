@@ -19,15 +19,15 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   return (transformContext) => {
 
-    function visit(node: ts.Node, tsSourceFile: ts.SourceFile): ts.VisitResult<ts.Node> {
+    function visit(node: ts.Node, tsSourceFile: ts.SourceFile, moduleFile: d.ModuleFile): ts.VisitResult<ts.Node> {
+
       if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-        getCollections(config, compilerCtx, buildCtx.collections, node as ts.ImportDeclaration);
+        getCollections(config, compilerCtx, buildCtx.collections, moduleFile, node as ts.ImportDeclaration);
       }
 
       if (ts.isClassDeclaration(node)) {
         const cmpMeta = visitClass(buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
         if (cmpMeta) {
-          const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
           moduleFile.cmpMeta = cmpMeta;
 
           cmpMeta.stylesMeta = normalizeStyles(config, moduleFile.sourceFilePath, cmpMeta.stylesMeta);
@@ -36,11 +36,17 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
       }
 
       return ts.visitEachChild(node, (node) => {
-        return visit(node, tsSourceFile);
+        return visit(node, tsSourceFile, moduleFile);
       }, transformContext);
     }
 
-    return (tsSourceFile) => visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
+    return (tsSourceFile) => {
+      const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
+      moduleFile.externalImports.length = 0;
+      moduleFile.localImports.length = 0;
+
+      return visit(tsSourceFile, tsSourceFile, moduleFile) as ts.SourceFile;
+    };
   };
 }
 

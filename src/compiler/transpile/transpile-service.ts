@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { addCollection } from './datacollection/discover-collections';
 import addComponentMetadata from './transformers/add-component-metadata';
 import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { componentDependencies } from './transformers/component-dependencies';
@@ -60,7 +61,12 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
 
 
 async function buildTsService(config: d.Config) {
-  const ctx: { compilerCtx: d.CompilerCtx; buildCtx: d.BuildCtx } = { compilerCtx: null, buildCtx: null };
+  const ctx: TranspileContext = {
+    compilerCtx: null,
+    buildCtx: null,
+    configKey: null,
+    snapshotVersions: new Map<string, string>()
+  };
 
   const options = Object.assign({}, await getUserTsConfig(config, ctx.compilerCtx));
 
@@ -81,19 +87,13 @@ async function buildTsService(config: d.Config) {
   options.out = undefined;
   options.outFile = undefined;
   options.outDir = undefined;
-  // We are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
-  options.noResolve = true;
 
-  const snapshotVersions = new Map<string, string>();
+  // create a config key that will be used as part of the file's cache key
+  ctx.configKey = createConfiKey(config, options);
 
   const servicesHost: ts.LanguageServiceHost = {
-    getScriptFileNames: () => {
-      return ctx.compilerCtx.rootTsFiles;
-    },
-    getScriptVersion: (filePath) => {
-      return snapshotVersions.get(filePath);
-    },
+    getScriptFileNames: () => ctx.compilerCtx.rootTsFiles,
+    getScriptVersion: (filePath) => ctx.snapshotVersions.get(filePath),
     getScriptSnapshot: (filePath) => {
       try {
         const sourceText = ctx.compilerCtx.fs.readFileSync(filePath);
@@ -104,9 +104,7 @@ async function buildTsService(config: d.Config) {
     getCurrentDirectory: () => config.cwd,
     getCompilationSettings: () => options,
     getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
-    fileExists: (filePath) => {
-      return ctx.compilerCtx.fs.accessSync(filePath);
-    },
+    fileExists: (filePath) => ctx.compilerCtx.fs.accessSync(filePath),
     readFile: (filePath) => {
       try {
         return ctx.compilerCtx.fs.readFileSync(filePath);
@@ -138,95 +136,140 @@ async function buildTsService(config: d.Config) {
     }
   };
 
+  // create our typescript language service to be reused
   const services = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
 
+  // return the function we'll continually use on each rebuild
   return async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => {
     ctx.compilerCtx = compilerCtx;
     ctx.buildCtx = buildCtx;
 
-    // do the snapshot verion checking here to avoid doing
-    // the same work on source files that have already been modified (and cached)
-    tsFilePaths = await Promise.all(tsFilePaths.map(async tsFilePath => {
-      const oldHash = snapshotVersions.get(tsFilePath);
-      const newHash = config.sys.generateContentHash(await compilerCtx.fs.readFile(tsFilePath), 32);
-
-      snapshotVersions.set(tsFilePath, newHash);
-
-      if (oldHash === newHash) {
-        // file is unchanged
-        return null;
-      }
-
-      return tsFilePath;
-    }));
-
-    // filter out unchanged so we don't even bother running
-    // the service, which is important so we don't gather metadata
-    // on ts files that have already been modified from previous transpiling
-    tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath != null);
-
     // ensure components.d.ts isn't in the transpile (for now)
-    const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
-    tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== componentsDtsSrcFilePath);
+    const cmpDts = getComponentsDtsSrcFilePath(config);
+    tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
     // loop through each ts file that has changed
     await Promise.all(tsFilePaths.map(async tsFilePath => {
-      await emitOutput(config, compilerCtx, buildCtx, services, tsFilePath);
+      await tranpsileTsFile(config, services, ctx, tsFilePath);
     }));
   };
 }
 
 
-async function emitOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, services: ts.LanguageService, tsFilePath: string) {
-  const output = services.getEmitOutput(tsFilePath);
+interface TranspileContext {
+  compilerCtx: d.CompilerCtx;
+  buildCtx: d.BuildCtx;
+  configKey: string;
+  snapshotVersions: Map<string, string>;
+}
 
-  // keep track of how many files we transpiled (great for debugging/testing)
-  buildCtx.transpileBuildCount++;
 
-  if (output.emitSkipped) {
-    const tsDiagnostics = services.getCompilerOptionsDiagnostics()
-      .concat(services.getSyntacticDiagnostics(tsFilePath));
+async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, tsFilePath: string) {
+  // look up the old cache key using the ts file path
+  const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
 
-    loadTypeScriptDiagnostics(config.cwd, buildCtx.diagnostics, tsDiagnostics);
+  // read the file content to be transpiled
+  const content = await ctx.compilerCtx.fs.readFile(tsFilePath);
+
+  // create a cache key out of the content and compiler options
+  const cacheKey = `transpileService_${config.sys.generateContentHash(content + tsFilePath + ctx.configKey, 32)}` ;
+
+  if (oldCacheKey === cacheKey) {
+    // file is unchanged, thanks typescript caching!
     return;
   }
 
-  await Promise.all(output.outputFiles.map(async outputFile => {
-    await writeOutput(config, compilerCtx, tsFilePath, outputFile);
+  // save the cache key for future lookups
+  ctx.snapshotVersions.set(tsFilePath, cacheKey);
+
+  if (config.enableCache && !ctx.compilerCtx.isRebuild) {
+    // let's check to see if we've already cached this in our filesystem
+    // but only bother for the very first build
+    const cachedStr = await ctx.compilerCtx.cache.get(cacheKey);
+    if (cachedStr != null) {
+      // whoa cool, we found we already cached this in our filesystem
+      const cachedModuleFile = JSON.parse(cachedStr) as CachedModuleFile;
+
+      // and there you go, thanks fs cache!
+      // put the cached module file data in our context
+      ctx.compilerCtx.moduleFiles[tsFilePath] = cachedModuleFile.moduleFile;
+
+      // add any collections to the context which this cached file may know about
+      cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
+        addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+      });
+
+      // write the cached js output too
+      await outputFile(config, ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
+      return;
+    }
+  }
+
+  // let's do this!
+  const output = services.getEmitOutput(tsFilePath);
+
+  // keep track of how many files we transpiled (great for debugging/testing)
+  ctx.buildCtx.transpileBuildCount++;
+
+  if (output.emitSkipped) {
+    // oh no! we've got some typescript diagnostics for this file!
+    const tsDiagnostics = services.getCompilerOptionsDiagnostics()
+      .concat(services.getSyntacticDiagnostics(tsFilePath));
+
+    loadTypeScriptDiagnostics(config.cwd, ctx.buildCtx.diagnostics, tsDiagnostics);
+    return;
+  }
+
+  await Promise.all(output.outputFiles.map(async tsOutput => {
+    const outputFilePath = normalizePath(tsOutput.name);
+
+    if (outputFilePath.endsWith('.js')) {
+      // this is the JS output of the typescript file transpiling
+      const moduleFile = getModuleFile(ctx.compilerCtx, tsFilePath);
+      moduleFile.jsFilePath = outputFilePath;
+
+      if (config.enableCache) {
+        // cache this module file and js text for later
+        const cacheModuleFile: CachedModuleFile = {
+          moduleFile: moduleFile,
+          jsText: tsOutput.text
+        };
+
+        // let's turn our data into a string to be cached for later fs lookups
+        const cachedStr = JSON.stringify(cacheModuleFile);
+        await ctx.compilerCtx.cache.put(cacheKey, cachedStr);
+      }
+    }
+
+    // write the text to our in-memory fs and output targets
+    await outputFile(config, ctx, outputFilePath, tsOutput.text);
   }));
 }
 
 
-async function writeOutput(config: d.Config, compilerCtx: d.CompilerCtx, tsFilePath: string, outputFile: ts.OutputFile) {
-  const outputPath = normalizePath(outputFile.name);
-
+async function outputFile(config: d.Config, ctx: TranspileContext, outputFilePath: string, outputText: string) {
   // the in-memory .js version is be virtually next to the source ts file
   // but it never actually gets written to disk, just there in spirit
-  await compilerCtx.fs.writeFile(
-    outputPath,
-    outputFile.text,
+  await ctx.compilerCtx.fs.writeFile(
+    outputFilePath,
+    outputText,
     { inMemoryOnly: true }
   );
 
-  const moduleFile = getModuleFile(compilerCtx, tsFilePath);
-  moduleFile.jsFilePath = outputPath;
-
   // also write the output to each of the output targets
-  await Promise.all(config.outputTargets.map(async outputTarget => {
-    if (outputTarget.type === 'dist') {
-      await writeOutputTargetDist(config, compilerCtx, outputTarget, outputFile);
-    }
+  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
+  await Promise.all(outputTargets.map(async outputTarget => {
+    const relPath = config.sys.path.relative(config.srcDir, outputFilePath);
+    const outputTargetFilePath = pathJoin(config, outputTarget.collectionDir, relPath);
+
+    await ctx.compilerCtx.fs.writeFile(outputTargetFilePath, outputText);
   }));
 }
 
 
-async function writeOutputTargetDist(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputFile: ts.OutputFile) {
-  const filePath = normalizePath(outputFile.name);
-
-  const relPath = config.sys.path.relative(config.srcDir, filePath);
-  const outputPath = pathJoin(config, outputTarget.collectionDir, relPath);
-
-  await compilerCtx.fs.writeFile(outputPath, outputFile.text);
+interface CachedModuleFile {
+  moduleFile: d.ModuleFile;
+  jsText: string;
 }
 
 
@@ -259,12 +302,6 @@ async function scanDirForTsFiles(config: d.Config, compilerCtx: d.CompilerCtx, b
     return item.isFile && isFileIncludePath(config, item.absPath);
   });
 
-  // let's async read and cache the source file so it get's loaded up
-  // into our in-memory file system to be used later during the actual transpile
-  await Promise.all(tsFileItems.map(async tsFileItem => {
-    await compilerCtx.fs.readFile(tsFileItem.absPath);
-  }));
-
   scanDirTimeSpan.finish(`scan for ts files finished`);
 
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
@@ -296,4 +333,33 @@ export function isFileIncludePath(config: d.Config, readPath: string) {
 
   // not a file we want to include, let's not add it
   return false;
+}
+
+
+function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
+  // create a unique config key with stuff that "might" matter for typescript builds
+  // not using the entire config object
+  // since not everything is a primitive and could have circular references
+  return config.sys.generateContentHash(JSON.stringify(
+    [
+      config.devMode,
+      config.minifyCss,
+      config.minifyJs,
+      config.buildEs5,
+      config.rootDir,
+      config.srcDir,
+      config.autoprefixCss,
+      config.preamble,
+      config.namespace,
+      config.hashedFileNameLength,
+      config.hashFileNames,
+      config.outputTargets,
+      config.enableCache,
+      config.assetVersioning,
+      config.buildAppCore,
+      config.excludeSrc,
+      config.includeSrc,
+      compilerOptions
+    ]
+  ), 32);
 }
