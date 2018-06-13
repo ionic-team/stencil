@@ -89,7 +89,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
     }
 
   } catch (e) {
-    config.logger.error('uncaught cli error', e);
+    config.logger.error('uncaught cli error: ' + e);
     process.exit(1);
   }
 }

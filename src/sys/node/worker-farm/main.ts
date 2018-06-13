@@ -271,13 +271,10 @@ export class WorkerFarm {
 
       // workers may already be getting removed
       // so doing it this way cuz we don't know if the
-      // order of the workers array is consisten
+      // order of the workers array is consistent
       const workerIds = this.workers.map(worker => worker.workerId);
       workerIds.forEach(workerId => {
-        const worker = this.workers.find(w => w.workerId === workerId);
-        if (worker) {
-          this.stopWorker(worker.workerId);
-        }
+        this.stopWorker(workerId);
       });
     }
   }

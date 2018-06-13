@@ -69,9 +69,6 @@ async function buildTsService(config: d.Config) {
   options.suppressOutputPathCheck = true;
   // Filename can be non-ts file.
   options.allowNonTsExtensions = true;
-  // We are not returning a sourceFile for lib file when asked by the program,
-  // so pass --noLib to avoid reporting a file not found error.
-  options.noLib = true;
   // Clear out other settings that would not be used in transpiling this module
   options.lib = undefined;
   options.types = undefined;
