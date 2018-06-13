@@ -294,7 +294,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   tmpdir() {
-    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}`);
+    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}-__BUILDID__`);
   }
 
   get url() {

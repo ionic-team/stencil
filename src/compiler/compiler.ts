@@ -24,6 +24,7 @@ export class Compiler {
 
      this.config.logger.info(this.config.logger.cyan(startupMsg));
      this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
+     this.config.logger.debug(`compiler build: __BUILDID__`);
     }
   }
 

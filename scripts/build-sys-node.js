@@ -5,10 +5,11 @@ const rollup = require('rollup');
 const transpile = require('./transpile');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-sys-node');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'sys', 'node', 'index.js');
-const DEST_FILE = path.join(__dirname, '..', 'dist', 'sys', 'node', 'index.js');
+const ROOT_DIR = path.join(__dirname, '..');
+const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
 
+let buildId = process.argv.find(a => a.startsWith('--build-id='));
+buildId = buildId.replace('--build-id=', '');
 
 const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
@@ -62,19 +63,25 @@ if (success) {
 
       const info = stats.toJson();
 
-      if (stats.hasErrors()) {
-        console.error(info.errors);
-      }
-
       // if (stats.hasWarnings()) {
       //   console.warn(info.warnings);
       // }
+
+      if (stats.hasErrors()) {
+        console.error(info.errors);
+      } else {
+        console.log(`✅ sys.node: ${entryFileName}`);
+      }
     });
   }
 
   function bundleNodeSysMain() {
+    const fileName = 'index.js';
+    const inputPath = path.join(TRANSPILED_DIR, 'sys', 'node', fileName);
+    const outputPath = path.join(ROOT_DIR, 'dist', 'sys', 'node', fileName);
+
     rollup.rollup({
-      input: ENTRY_FILE,
+      input: inputPath,
       external: [
         'child_process',
         'crypto',
@@ -91,16 +98,31 @@ if (success) {
 
     }).then(bundle => {
 
-      bundle.write({
+      return bundle.generate({
         format: 'cjs',
-        file: DEST_FILE
+        file: outputPath
+
+      }).then(output => {
+        try {
+          let outputText = output.code;
+          outputText = outputText.replace(/__BUILDID__/g, buildId);
+          fs.ensureDirSync(path.dirname(outputPath));
+          fs.writeFileSync(outputPath, outputText);
+
+        } catch (e) {
+          console.error(`build sys.node error: ${e}`);
+        }
+
+      }).then(() => {
+        console.log(`✅ sys.node: ${fileName}`);
 
       }).catch(err => {
-        console.log(`build sys.node error: ${err}`);
+        console.error(`build sys.node error: ${err}`);
         process.exit(1);
       });
+
     }).catch(err => {
-      console.log(`build sys.node error: ${err}`);
+      console.error(`build sys.node error: ${err}`);
       process.exit(1);
     });
   }
@@ -109,7 +131,6 @@ if (success) {
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ sys.node: ${DEST_FILE}`);
   });
 
 }
