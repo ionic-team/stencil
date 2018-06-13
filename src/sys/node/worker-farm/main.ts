@@ -138,7 +138,7 @@ export class WorkerFarm {
       worker.isExisting = true;
 
       worker.tasks.forEach(task => {
-        task.reject(`worker (${workerId}) has exited`);
+        task.reject(WORKER_EXITED_MSG);
       });
       worker.tasks.length = 0;
 
@@ -328,3 +328,5 @@ const DEFAULT_OPTIONS: d.WorkerOptions = {
   maxTaskTime: 120000,
   forcedKillTime: 100
 };
+
+export const WORKER_EXITED_MSG = `worker has exited`;
