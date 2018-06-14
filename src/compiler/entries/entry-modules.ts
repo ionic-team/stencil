@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
+import { buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
-import { catchError } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
 import { requiresScopedStyles } from '../style/style';
@@ -20,7 +20,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
   try {
     const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => compilerCtx.moduleFiles[filePath]);
 
-    const userConfigEntryModulesTags = getUserConfigEntryTags(config.bundles, allModules);
+    const userConfigEntryModulesTags = getUserConfigEntryTags(buildCtx, config.bundles, allModules);
 
     const appEntryTags = getAppEntryTags(allModules);
 
@@ -217,7 +217,7 @@ export function getAppEntryTags(allModules: d.ModuleFile[]) {
 }
 
 
-export function getUserConfigEntryTags(configBundles: d.ConfigBundle[], allModules: d.ModuleFile[]) {
+export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.ConfigBundle[], allModules: d.ModuleFile[]) {
   configBundles = (configBundles || [])
     .filter(b => b.components && b.components.length > 0)
     .sort((a, b) => {
@@ -235,11 +235,15 @@ export function getUserConfigEntryTags(configBundles: d.ConfigBundle[], allModul
 
         const moduleFile = allModules.find(m => m.cmpMeta && m.cmpMeta.tagNameMeta === tag);
         if (!moduleFile) {
-          throw new Error(`Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`);
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.header = `Stencil Config`;
+          warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
         }
 
         if (definedTags.includes(tag)) {
-          throw new Error(`Component tag "${tag}" has been defined multiple times in the "bundles" config.`);
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.header = `Stencil Config`;
+          warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
         }
 
         definedTags.push(tag);
