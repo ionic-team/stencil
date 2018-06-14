@@ -10,7 +10,6 @@ import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { BundleSet, OutputChunk, RollupDirOptions, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
-import resolveCollections from './rollup-plugins/resolve-collections';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
@@ -36,7 +35,6 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     preserveSymlinks: false,
     experimentalDynamicImport: true,
     plugins: [
-      resolveCollections(compilerCtx),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
