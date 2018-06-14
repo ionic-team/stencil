@@ -71,7 +71,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
               throw new Error(
               `The following keys were attempted to be set with hostData() from the ` +
               `${cmpMeta.tagNameMeta} component: ${foundHostKeys.join(', ')}. ` +
-              `If you would like to modify these please set @Prop({ reflectToAttr: true}) ` +
+              `If you would like to modify these please set @Prop({ mutable: true, reflectToAttr: true}) ` +
               `on the @Prop() decorator.`
               );
             }
