@@ -16,7 +16,6 @@ describe('bundle', () => {
 
 
   it('should resolve directory index w/ exports', async () => {
-    c.config.bundles = [ { components: ['x-bar']} ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'components', 'bar', 'bar.tsx')]: `
         import { foo } from '../../utils';
@@ -48,7 +47,6 @@ describe('bundle', () => {
   });
 
   it('wildcard imports should remain within component files', async () => {
-    c.config.bundles = [ { components: ['cmp-a']}, { components: ['cmp-b'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-a.tsx')]: `
         import * as file from './file';
@@ -77,7 +75,6 @@ describe('bundle', () => {
   });
 
   it('get component dependencies from imports', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,

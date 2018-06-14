@@ -53,7 +53,6 @@ describe('transpile', () => {
   });
 
   it('should rebuild transpile for added directory', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.watch = true;
     await c.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`

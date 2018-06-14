@@ -45,7 +45,6 @@ describe('entries', () => {
   });
 
   it('get component dependencies from imports w/ circular dependencies', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
@@ -90,7 +89,6 @@ describe('entries', () => {
   });
 
   it('get component dependencies from imports', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
@@ -146,7 +144,6 @@ describe('entries', () => {
   });
 
   it('get CallExpression component dependencies', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
@@ -178,7 +175,6 @@ describe('entries', () => {
   });
 
   it('get CallExpression PropertyAccessExpression component dependencies', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
@@ -206,7 +202,6 @@ describe('entries', () => {
   });
 
   it('get component dependencies from html string literals', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       [path.join(root, 'src', 'new-dir', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       [path.join(root, 'src', 'new-dir', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
