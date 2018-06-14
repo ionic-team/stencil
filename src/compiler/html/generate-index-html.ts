@@ -48,6 +48,6 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
 
   } catch (e) {
     // it's ok if there's no index file
-    config.logger.debug(`no index html: ${config.srcIndexHtml}: ${e}`);
+    config.logger.debug(`no index html: ${config.srcIndexHtml}`);
   }
 }

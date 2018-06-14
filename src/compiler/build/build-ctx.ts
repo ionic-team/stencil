@@ -69,12 +69,12 @@ export class BuildContext implements d.BuildCtx {
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if (!this.hasLoggedFinish) {
+    if (!this.hasLoggedFinish || debug) {
       const timeSpan = this.config.logger.createTimeSpan(msg, debug);
 
       return {
         finish: (msg: string) => {
-          if (!this.hasLoggedFinish) {
+          if (!this.hasLoggedFinish || debug) {
             timeSpan.finish(msg);
           }
         }
@@ -189,19 +189,12 @@ export class BuildContext implements d.BuildCtx {
       return;
     }
 
-    if (this.config.watch) {
-      // we're using watch builds
-      if (!this.compilerCtx.isRebuild) {
-        // this is a watch build and it's not a rebuild
-        // so it must be the FIRST build
-        // the very first build should wait on the validation to finish
-        await this.validateTypesPromise;
-      }
-
-    } else {
+    if (!this.config.watch) {
       // this is not a watch build, so we need to make
       // sure that the type validation has finished
+      this.config.logger.debug(`build, non-watch, waiting on validateTypes`);
       await this.validateTypesPromise;
+      this.config.logger.debug(`build, non-watch, finished waiting on validateTypes`);
     }
   }
 
