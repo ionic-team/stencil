@@ -1,81 +1,67 @@
-import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRef, ModuleFiles, ModuleGraph } from '../../declarations';
+import * as d from '../../declarations';
 import { getComponentRefsFromSourceStrings } from './component-references';
 
 
-export function calcModuleGraphImportPaths(compilerCtx: CompilerCtx, moduleGraphs: ModuleGraph[]) {
-  // figure out the actual source's file path
-  // cuz right now the import paths probably don't have the extension on them
-  moduleGraphs.forEach(mg => {
-    mg.importPaths = mg.importPaths.map(importPath => {
-      if (importPath.startsWith('.') || importPath.startsWith('/')) {
-        for (const srcExt of SRC_EXTS) {
-          const srcFilePath = importPath + srcExt;
-          if (compilerCtx.moduleFiles[srcFilePath]) {
-            return srcFilePath;
-          }
-        }
-      }
-      return importPath;
-    });
-  });
-}
-
-const SRC_EXTS = ['.tsx', '.ts', '.js'];
-
-
-export function calcComponentDependencies(allModuleFiles: ModuleFiles, buildCtx: BuildCtx) {
+export function calcComponentDependencies(moduleFiles: d.ModuleFile[]) {
   // figure out all the component references seen in each file
-  const componentRefs = getComponentRefsFromSourceStrings(allModuleFiles, buildCtx);
+  // these are all the the components found in the app, and which file it was found in
+  const componentRefs = getComponentRefsFromSourceStrings(moduleFiles);
 
-  Object.keys(allModuleFiles).forEach(filePath => {
-    const moduleFile = allModuleFiles[filePath];
+  // go through all the module files in the app
+  moduleFiles.forEach(moduleFile => {
     if (moduleFile.cmpMeta) {
-      getComponentDependencies(buildCtx.moduleGraphs, componentRefs, filePath, moduleFile.cmpMeta);
+      // if this module file has component metadata
+      // then let's figure out which dependencies it has
+      getComponentDependencies(moduleFiles, componentRefs, moduleFile);
     }
   });
 }
 
 
-function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: ComponentRef[], filePath: string, cmpMeta: ComponentMeta) {
-  // we may have already figured out some dependencies (collections aready have this info)
-  cmpMeta.dependencies = cmpMeta.dependencies || [];
+function getComponentDependencies(moduleFiles: d.ModuleFile[], componentRefs: d.ComponentRef[], moduleFile: d.ModuleFile) {
+  // build a list of all the component dependencies this has, using their tag as the key
+  moduleFile.cmpMeta.dependencies = moduleFile.cmpMeta.dependencies || [];
 
   // figure out if this file has any components in it
-  const refTags = componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag);
+  // get all the component references for this file path
+  const componentRefsOfFile = componentRefs.filter(cr => cr.filePath === moduleFile.sourceFilePath);
+
+  // get the tags for the component references with this file path
+  const refTags = componentRefsOfFile.map(cr => cr.tag);
+
+  // for each component ref of this file
+  // go ahead and add the tag to the cmp metadata dependencies
   refTags.forEach(tag => {
-    if (tag !== cmpMeta.tagNameMeta && !cmpMeta.dependencies.includes(tag)) {
-      cmpMeta.dependencies.push(tag);
+    if (tag !== moduleFile.cmpMeta.tagNameMeta && !moduleFile.cmpMeta.dependencies.includes(tag)) {
+      moduleFile.cmpMeta.dependencies.push(tag);
     }
   });
 
   const importsInspected: string[] = [];
 
-  const moduleGraph = moduleGraphs.find(mg => mg.filePath === filePath);
-  if (moduleGraph) {
-    getComponentDepsFromImports(moduleGraphs, componentRefs, importsInspected, moduleGraph, cmpMeta);
-  }
+  getComponentDepsFromImports(moduleFiles, componentRefs, importsInspected, moduleFile, moduleFile.cmpMeta);
 
-  cmpMeta.dependencies.sort();
+  moduleFile.cmpMeta.dependencies.sort();
 }
 
 
-function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs: ComponentRef[], importsInspected: string[], moduleGraph: ModuleGraph, cmpMeta: ComponentMeta) {
-  moduleGraph.importPaths.forEach(importPath => {
-    if (importsInspected.includes(importPath)) {
+function getComponentDepsFromImports(moduleFiles: d.ModuleFile[], componentRefs: d.ComponentRef[], importsInspected: string[], inspectModuleFile: d.ModuleFile, cmpMeta: d.ComponentMeta) {
+  inspectModuleFile.localImports.forEach(localImport => {
+    if (importsInspected.includes(localImport)) {
       return;
     }
 
-    importsInspected.push(importPath);
+    importsInspected.push(localImport);
 
-    const subModuleGraph = moduleGraphs.find(mg => {
-      return (mg.filePath === importPath) ||
-             (mg.filePath === importPath + '.ts') ||
-             (mg.filePath === importPath + '.tsx') ||
-             (mg.filePath === importPath + '.js');
+    const subModuleFile = moduleFiles.find(moduleFile => {
+      return (moduleFile.sourceFilePath === localImport) ||
+             (moduleFile.sourceFilePath === localImport + '.ts') ||
+             (moduleFile.sourceFilePath === localImport + '.tsx') ||
+             (moduleFile.sourceFilePath === localImport + '.js');
     });
 
-    if (subModuleGraph) {
-      const tags = componentRefs.filter(cr => cr.filePath === subModuleGraph.filePath).map(cr => cr.tag);
+    if (subModuleFile) {
+      const tags = componentRefs.filter(cr => cr.filePath === subModuleFile.sourceFilePath).map(cr => cr.tag);
 
       tags.forEach(tag => {
         if (!cmpMeta.dependencies.includes(tag)) {
@@ -83,7 +69,7 @@ function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs:
         }
       });
 
-      getComponentDepsFromImports(moduleGraphs, componentRefs, importsInspected, subModuleGraph, cmpMeta);
+      getComponentDepsFromImports(moduleFiles, componentRefs, importsInspected, subModuleFile, cmpMeta);
     }
   });
 }

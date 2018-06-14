@@ -9,7 +9,7 @@ import { upgradeCollection } from './upgrade-collection';
  * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
  */
 export async function _deprecatedConfigCollections(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  const timeSpan = config.logger.createTimeSpan(`load collections started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`load collections started`, true);
 
   try {
     buildCtx.collections = await loadConfigCollections(config, compilerCtx, buildCtx);

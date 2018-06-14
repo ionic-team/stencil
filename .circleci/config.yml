@@ -22,7 +22,7 @@ aliases:
 defaults: &defaults
   working_directory: ~/stencil
   docker:
-    - image: circleci/node:6
+    - image: circleci/node:8.5
 
 jobs:
   build:
@@ -44,7 +44,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/stencil
-      - run: npm run test.dist
+      - run: npm run test.dist && npm run test.testing
 
   test_jest:
     <<: *defaults

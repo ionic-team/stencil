@@ -1,12 +1,12 @@
+import * as d from '../../../../declarations';
 import { WorkerFarm, nextAvailableWorker } from '../main';
-import { MessageData, Worker, WorkerOptions } from '../interface';
 import { TestWorkerFarm } from './test-worker-farm';
 
 
 describe('WorkerFarm', () => {
 
   it('use single instance', async () => {
-    const opts: WorkerOptions = {
+    const opts: d.WorkerOptions = {
       maxConcurrentWorkers: 0
     };
     const wf = new TestWorkerFarm(opts);
@@ -15,7 +15,7 @@ describe('WorkerFarm', () => {
   });
 
   it('run returning value', async () => {
-    const opts: WorkerOptions = {
+    const opts: d.WorkerOptions = {
       maxConcurrentWorkers: 2
     };
     const wf = new TestWorkerFarm(opts);
@@ -127,7 +127,7 @@ describe('WorkerFarm', () => {
 
 
 describe('nextAvailableWorker', () => {
-  let workers: Worker[];
+  let workers: d.WorkerProcess[];
   const maxConcurrentWorkers = 4;
 
   beforeAll(() => {

@@ -11,9 +11,114 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
   // both styles and modules are done bundling
   // combine the styles and modules together
   // generate the actual files to write
-  const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
+  const timeSpan = buildCtx.createTimeSpan(`generate bundles started`);
 
   const bundleKeys: { [key: string]: string } = {};
+
+  await generateBundleModes(config, compilerCtx, buildCtx, entryModules, jsModules, bundleKeys);
+
+  await Promise.all([
+    genereateBrowserEsm(config, compilerCtx, buildCtx, jsModules, bundleKeys),
+    genereateBrowserEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys),
+    genereateEsmEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys)
+  ]);
+
+  // create the registry of all the components
+  const cmpRegistry = createComponentRegistry(entryModules);
+
+  timeSpan.finish(`generate bundles finished`);
+
+  return cmpRegistry;
+}
+
+
+async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEsm started`, true);
+  const esmModules = jsModules.esm;
+
+  const esmPromises = Object.keys(esmModules)
+    .filter(key => !bundleKeys[key])
+    .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
+    .map(async ([key, value]) => {
+      const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es2017');
+      const jsText = replaceBundleIdPlaceholder(value.code, key);
+      await writeBundleJSFile(config, compilerCtx, fileName, jsText);
+    });
+
+  await Promise.all(esmPromises);
+
+  timeSpan.finish(`genereateBrowserEsm finished`);
+}
+
+
+async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (config.buildEs5) {
+    const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEs5 started`, true);
+
+    const es5Modules = jsModules.es5;
+    const es5Promises = Object.keys(es5Modules)
+      .filter(key => !bundleKeys[key])
+      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
+      .map(async ([key, value]) => {
+        const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es5');
+        let jsText = replaceBundleIdPlaceholder(value.code, key);
+        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+        await writeBundleJSFile(config, compilerCtx, fileName, jsText);
+      });
+    await Promise.all(es5Promises);
+    timeSpan.finish(`genereateBrowserEs5 finished`);
+  }
+}
+
+
+async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  if (!distOutputs.length) {
+    return;
+  }
+
+  const timeSpan = buildCtx.createTimeSpan(`genereateEsmEs5 started`, true);
+
+  await Promise.all(distOutputs.map(async distOutput => {
+
+    const es5Modules = jsModules.esmEs5;
+    const es5Promises = Object.keys(es5Modules)
+      .filter(key => !bundleKeys[key])
+      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
+      .map(async ([key, value]) => {
+        const fileName = getBrowserFilename(key.replace('.js', ''), false);
+        let jsText = replaceBundleIdPlaceholder(value.code, key);
+        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+
+        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
+        return compilerCtx.fs.writeFile(distBuildPath, jsText);
+      });
+
+    await Promise.all(es5Promises);
+
+  }));
+
+  timeSpan.finish(`genereateEsmEs5 finished`);
+}
+
+
+async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
+  const outputTargets = config.outputTargets.filter(outputTarget => {
+    return outputTarget.appBuild;
+  });
+
+  return Promise.all(outputTargets.map(outputTarget => {
+    // get the absolute path to where it'll be saved in www
+    const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
+
+    // write to the www build
+    return compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+  }));
+}
+
+
+async function generateBundleModes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  const timeSpan = buildCtx.createTimeSpan(`generateBundleModes started`, true);
 
   await Promise.all(
     entryModules.map(async entryModule => {
@@ -41,101 +146,10 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
       );
     })
   );
-  config.logger.debug(`bundle mode finished`);
 
-  await Promise.all([
-    genereateBrowserEsm(config, compilerCtx, jsModules, bundleKeys),
-    genereateBrowserEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys),
-    genereateEsmEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys)
-  ]);
-
-  // create the registry of all the components
-  const cmpRegistry = createComponentRegistry(entryModules);
-
-  timeSpan.finish(`generate bundles finished`);
-
-  return cmpRegistry;
+  timeSpan.finish(`generateBundleModes finished`);
 }
 
-
-async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  const esmModules = jsModules.esm;
-
-  const esmPromises = Object.keys(esmModules)
-    .filter(key => !bundleKeys[key])
-    .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
-    .map(async ([key, value]) => {
-      const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es2017');
-      const jsText = replaceBundleIdPlaceholder(value.code, key);
-      await writeBundleJSFile(config, compilerCtx, fileName, jsText);
-    });
-
-  await Promise.all(esmPromises);
-
-  config.logger.debug(`generate esm finished`);
-}
-
-
-async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  if (config.buildEs5) {
-    const es5Modules = jsModules.es5;
-    const es5Promises = Object.keys(es5Modules)
-      .filter(key => !bundleKeys[key])
-      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
-      .map(async ([key, value]) => {
-        const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es5');
-        let jsText = replaceBundleIdPlaceholder(value.code, key);
-        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
-        await writeBundleJSFile(config, compilerCtx, fileName, jsText);
-      });
-    await Promise.all(es5Promises);
-    config.logger.debug(`generate es5 finished`);
-  }
-}
-
-
-async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
-  if (!distOutputs.length) {
-    return;
-  }
-
-  await Promise.all(distOutputs.map(async distOutput => {
-
-    const es5Modules = jsModules.esmEs5;
-    const es5Promises = Object.keys(es5Modules)
-      .filter(key => !bundleKeys[key])
-      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
-      .map(async ([key, value]) => {
-        const fileName = getBrowserFilename(key.replace('.js', ''), false);
-        let jsText = replaceBundleIdPlaceholder(value.code, key);
-        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
-
-        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
-        return compilerCtx.fs.writeFile(distBuildPath, jsText);
-      });
-
-    await Promise.all(es5Promises);
-
-  }));
-
-  config.logger.debug(`generate esmEs5 finished`);
-}
-
-
-async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
-  const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
-
-  return Promise.all(outputTargets.map(outputTarget => {
-    // get the absolute path to where it'll be saved in www
-    const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
-
-    // write to the www build
-    return compilerCtx.fs.writeFile(wwwBuildPath, jsText);
-  }));
-}
 
 async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModule: d.EntryModule, modeName: string, jsCode: { esm: string, es5: string, esmEs5: string }) {
 

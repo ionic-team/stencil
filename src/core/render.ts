@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
+import { dashToPascalCase } from '../util/helpers';
 
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
@@ -53,6 +54,29 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         // user component provided a "hostData()" method
         // the returned data/attributes are used on the host element
         vnodeHostData = instance.hostData && instance.hostData();
+
+        if (Build.isDev) {
+          if (vnodeHostData && cmpMeta.membersMeta) {
+            const foundHostKeys = Object.keys(vnodeHostData).reduce((err, k) => {
+              if (cmpMeta.membersMeta[k]) {
+                return err.concat(k);
+              }
+              if (cmpMeta.membersMeta[dashToPascalCase(k)]) {
+                return err.concat(dashToPascalCase(k));
+              }
+              return err;
+            }, <string[]>[]);
+
+            if (foundHostKeys.length > 0) {
+              throw new Error(
+              `The following keys were attempted to be set with hostData() from the ` +
+              `${cmpMeta.tagNameMeta} component: ${foundHostKeys.join(', ')}. ` +
+              `If you would like to modify these please set @Prop({ reflectToAttr: true}) ` +
+              `on the @Prop() decorator.`
+              );
+            }
+          }
+        }
       }
 
       if (Build.reflectToAttr && reflectHostAttr) {

@@ -72,6 +72,7 @@ describe('build conditionals', () => {
   });
 
   it('svg and slot in render()', async () => {
+    c.config.watch = true;
     c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `
       @Component({ tag: 'cmp-a' }) export class CmpA {
@@ -83,7 +84,24 @@ describe('build conditionals', () => {
     `, { clearFileCache: true });
     await c.fs.commit();
 
-    const r = await c.build();
+    let r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    expect(r.hasSlot).toBe(true);
+    expect(r.hasSvg).toBe(true);
+
+    // create a rebuild listener
+    const rebuildListener = c.once('rebuild');
+
+    await c.fs.writeFile(path.join(root, 'src', 'global.css'), '/**css**/');
+    await c.fs.commit();
+
+    // kick off a rebuild
+    c.trigger('fileAdd', path.join(root, 'src', 'global.css'));
+
+    // wait for the rebuild to finish
+    // get the rebuild results
+    r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
     expect(r.hasSlot).toBe(true);

@@ -1,5 +1,5 @@
 
-const sysWorker = require('../../dist/transpiled-sys-node/sys/node/node-sys-worker');
+const sysWorker = require('../../../../dist/transpiled-sys-node/sys/node/node-sys-worker');
 
 exports.createRunner = sysWorker.createRunner;
 exports.attachMessageHandler = sysWorker.attachMessageHandler;

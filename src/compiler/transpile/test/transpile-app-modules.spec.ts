@@ -1,5 +1,5 @@
 import { Config } from '../../../declarations';
-import { isFileIncludePath } from '../transpile-app-modules';
+import { isFileIncludePath } from '../transpile-service';
 import { mockConfig } from '../../../testing/mocks';
 
 

@@ -157,7 +157,7 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error) {
     }
   }
 
-  diagnostics.push(diagnostic);
+  diagnostics && diagnostics.push(diagnostic);
 
   return diagnostic;
 }

@@ -6,10 +6,14 @@ import { writeAppCollections } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (buildCtx.shouldAbort()) {
+    return;
+  }
+
   // serialize and write the manifest file if need be
   await writeAppCollections(config, compilerCtx, buildCtx);
 
-  const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   // kick off copying component assets
   // and copy www/build to dist/ if generateDistribution is enabled

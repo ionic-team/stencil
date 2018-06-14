@@ -14,7 +14,7 @@ export async function copyComponentAssets(config: d.Config, compilerCtx: d.Compi
     return outputTarget.appBuild;
   });
 
-  config.logger.debug(`copy assets`);
+  const timeSpan = buildCtx.createTimeSpan(`copyComponentAssets started`, true);
 
   try {
     // get a list of all the directories to copy
@@ -80,6 +80,8 @@ export async function copyComponentAssets(config: d.Config, compilerCtx: d.Compi
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
+
+  timeSpan.finish(`copyComponentAssets finished`);
 }
 
 

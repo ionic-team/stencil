@@ -1,10 +1,10 @@
+import * as d from '../../../../declarations';
 import { WorkerFarm } from '../main';
-import { MessageData, Worker, WorkerOptions } from '../interface';
 import * as path from 'path';
 
 
 export class TestWorkerFarm extends WorkerFarm {
-  constructor(options: WorkerOptions = {}) {
+  constructor(options: d.WorkerOptions = {}) {
     if (typeof options.maxConcurrentWorkers !== 'number') {
       options.maxConcurrentWorkers = 4;
     }
@@ -14,10 +14,10 @@ export class TestWorkerFarm extends WorkerFarm {
   }
 
   createWorker(workerId: number) {
-    const worker: Worker = {
+    const worker: d.WorkerProcess = {
       workerId: workerId,
       taskIds: 0,
-      send: (msg: MessageData) => {/**/},
+      send: (msg: d.WorkerMessageData) => {/**/},
       kill: () => {/**/},
     };
     return worker;

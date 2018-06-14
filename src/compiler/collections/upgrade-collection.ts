@@ -17,7 +17,7 @@ export async function upgradeCollection(config: d.Config, compilerCtx: d.Compile
       return;
     }
 
-    const timeSpan = config.logger.createTimeSpan(`upgrade ${collection.collectionName} started`, true);
+    const timeSpan = buildCtx.createTimeSpan(`upgrade ${collection.collectionName} started`, true);
 
     const doUpgrade = createDoUpgrade(config, compilerCtx, buildCtx);
 
@@ -55,7 +55,7 @@ function createDoUpgrade(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
         case CompilerUpgrade.Add_Component_Dependencies:
           config.logger.debug(`Add_Component_Dependencies, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
-            return componentDependencies(compilerCtx, buildCtx)(transformContext);
+            return componentDependencies(compilerCtx)(transformContext);
           };
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);

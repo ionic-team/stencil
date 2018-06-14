@@ -3,7 +3,7 @@ import { buildAuxiliaries } from './build-auxiliaries';
 import { catchError } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
 import { emptyOutputTargetDirs } from './empty-dir';
-import { getBuildContext } from './build-utils';
+import { BuildContext } from './build-ctx';
 import { getCompilerCtx } from './compiler-ctx';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateBundles } from '../bundle/generate-bundles';
@@ -13,7 +13,7 @@ import { generateModuleMap } from '../bundle/bundle';
 import { generateStyles } from '../style/style';
 import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
-import { transpileAppModules } from '../transpile/transpile-app-modules';
+import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
 import { _deprecatedConfigCollections } from '../collections/_deprecated-collections';
 
@@ -25,7 +25,7 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
   compilerCtx = getCompilerCtx(config, compilerCtx);
 
   // reset the build context, this is important for rebuilds
-  const buildCtx = getBuildContext(config, compilerCtx, watcher);
+  const buildCtx = new BuildContext(config, compilerCtx, watcher);
 
   try {
     // create an initial index.html file if one doesn't already exist
@@ -43,7 +43,7 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
 
     // async scan the src directory for ts files
     // then transpile them all in one go
-    await transpileAppModules(config, compilerCtx, buildCtx);
+    await transpileApp(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // initialize all the collections we found when transpiling
@@ -88,10 +88,15 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     await generateIndexHtmls(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
+    // await on the validate types build to finish
+    // do this before we attempt to write build files
+    await buildCtx.validateTypesBuild();
+
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
+    // await on our other optional stuff like docs, service workers, etc.
     await buildAuxiliaries(config, compilerCtx, buildCtx, entryModules);
 
   } catch (e) {

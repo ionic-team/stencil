@@ -1,10 +1,10 @@
-import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 
-export function createAppRegistry(config: Config) {
+export function createAppRegistry(config: d.Config) {
   // create the shared app registry object
-  const appRegistry: AppRegistry = {
+  const appRegistry: d.AppRegistry = {
     namespace: config.namespace,
     fsNamespace: config.fsNamespace,
     loader: `../${getLoaderFileName(config)}`
@@ -14,9 +14,9 @@ export function createAppRegistry(config: Config) {
 }
 
 
-export function getAppRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+export function getAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTarget) {
   const registryJsonFilePath = getRegistryJson(config, outputTarget);
-  let appRegistry: AppRegistry;
+  let appRegistry: d.AppRegistry;
 
   try {
     // open up the app registry json file
@@ -35,8 +35,8 @@ export function getAppRegistry(config: Config, compilerCtx: CompilerCtx, outputT
 }
 
 
-export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
-  const appRegistryComponents: AppRegistryComponents = {};
+export function serializeComponentRegistry(cmpRegistry: d.ComponentRegistry) {
+  const appRegistryComponents: d.AppRegistryComponents = {};
 
   Object.keys(cmpRegistry).sort().forEach(tagName => {
     appRegistryComponents[tagName] = cmpRegistry[tagName].bundleIds as any;
@@ -46,7 +46,11 @@ export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
 }
 
 
-export async function writeAppRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
+export async function writeAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, appRegistry: d.AppRegistry, cmpRegistry: d.ComponentRegistry) {
+  if (buildCtx.shouldAbort()) {
+    return;
+  }
+
   if (outputTarget.type !== 'www') {
     // only create a registry for www builds
     return;

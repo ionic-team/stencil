@@ -12,6 +12,8 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
 const DECLARATIONS_DST_DIR = path.join(__dirname, '..', 'dist', 'declarations');
 
+let buildId = process.argv.find(a => a.startsWith('--build-id='));
+buildId = buildId.replace('--build-id=', '');
 
 const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
@@ -52,18 +54,32 @@ if (success) {
         }
       });
 
-
       // bundle up the compiler into one js file
-      bundle.write({
+      return bundle.generate({
         format: 'cjs',
         file: DEST_FILE
 
+      }).then(output => {
+        try {
+          let outputText = output.code;
+          outputText = outputText.replace(/__BUILDID__/g, buildId);
+          fs.ensureDirSync(path.dirname(DEST_FILE));
+          fs.writeFileSync(DEST_FILE, outputText);
+
+        } catch (e) {
+          console.error(`build compiler error: ${e}`);
+        }
+
+      }).then(() => {
+        console.log(`✅ compiler: ${DEST_FILE}`);
+
       }).catch(err => {
-        console.log(`build compiler error: ${err}`);
+        console.error(`build compiler error: ${err}`);
+        process.exit(1);
       });
 
     }).catch(err => {
-      console.log(`build compiler error: ${err}`);
+      console.error(`build compiler error: ${err}`);
       process.exit(1);
     });
   }
@@ -74,7 +90,6 @@ if (success) {
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ compiler: ${DEST_FILE}`);
   });
 
 }

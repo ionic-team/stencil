@@ -1,5 +1,5 @@
-import { BuildCtx, CompilerCtx, ComponentMeta, Config, ConfigBundle, EntryModule, EntryPoint, ModuleFile } from '../../declarations';
-import { calcComponentDependencies, calcModuleGraphImportPaths } from './component-dependencies';
+import * as d from '../../declarations';
+import { calcComponentDependencies } from './component-dependencies';
 import { catchError } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
@@ -7,14 +7,15 @@ import { requiresScopedStyles } from '../style/style';
 import { validateComponentTag } from '../config/validate-component';
 
 
-export function generateEntryModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   buildCtx.entryModules = [];
 
-  // figure out all the actual import paths (basically which extension each import uses)
-  calcModuleGraphImportPaths(compilerCtx, buildCtx.moduleGraphs);
+  const moduleFiles = Object.keys(compilerCtx.moduleFiles).map(filePath => {
+    return compilerCtx.moduleFiles[filePath];
+  });
 
   // figure out how modules and components connect
-  calcComponentDependencies(compilerCtx.moduleFiles, buildCtx);
+  calcComponentDependencies(moduleFiles);
 
   try {
     const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => compilerCtx.moduleFiles[filePath]);
@@ -46,7 +47,7 @@ export function generateEntryModules(config: Config, compilerCtx: CompilerCtx, b
 }
 
 
-export function getEntryEncapsulations(entryModule: EntryModule) {
+export function getEntryEncapsulations(entryModule: d.EntryModule) {
   const encapsulations: ENCAPSULATION[] = [];
 
   entryModule.moduleFiles.forEach(m => {
@@ -67,7 +68,7 @@ export function getEntryEncapsulations(entryModule: EntryModule) {
 }
 
 
-export function getEntryModes(moduleFiles: ModuleFile[]) {
+export function getEntryModes(moduleFiles: d.ModuleFile[]) {
   const styleModeNames: string[] = [];
 
   moduleFiles.forEach(m => {
@@ -93,7 +94,7 @@ export function getEntryModes(moduleFiles: ModuleFile[]) {
 }
 
 
-export function getComponentStyleModes(cmpMeta: ComponentMeta) {
+export function getComponentStyleModes(cmpMeta: d.ComponentMeta) {
   return (cmpMeta && cmpMeta.stylesMeta) ? Object.keys(cmpMeta.stylesMeta) : [];
 }
 
@@ -103,12 +104,12 @@ export function entryRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
 }
 
 
-export function regroupEntryModules(allModules: ModuleFile[], entryPoints: EntryPoint[]) {
-  const outtedNoEncapsulation: ModuleFile[] = [];
-  const outtedScopedCss: ModuleFile[] = [];
-  const outtedShadowDom: ModuleFile[] = [];
+export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.EntryPoint[]) {
+  const outtedNoEncapsulation: d.ModuleFile[] = [];
+  const outtedScopedCss: d.ModuleFile[] = [];
+  const outtedShadowDom: d.ModuleFile[] = [];
 
-  const cleanedEntryModules: ModuleFile[][] = [
+  const cleanedEntryModules: d.ModuleFile[][] = [
     outtedNoEncapsulation,
     outtedScopedCss,
     outtedShadowDom
@@ -163,8 +164,8 @@ export function regroupEntryModules(allModules: ModuleFile[], entryPoints: Entry
 }
 
 
-export function createEntryModule(moduleFiles: ModuleFile[]) {
-  const entryModule: EntryModule = {
+export function createEntryModule(moduleFiles: d.ModuleFile[]) {
+  const entryModule: d.EntryModule = {
     moduleFiles: moduleFiles
   };
 
@@ -201,7 +202,7 @@ export function createEntryModule(moduleFiles: ModuleFile[]) {
 }
 
 
-export function getAppEntryTags(allModules: ModuleFile[]) {
+export function getAppEntryTags(allModules: d.ModuleFile[]) {
   return allModules
     .filter(m => m.cmpMeta && !m.isCollectionDependency)
     .map(m => m.cmpMeta.tagNameMeta)
@@ -215,7 +216,7 @@ export function getAppEntryTags(allModules: ModuleFile[]) {
 }
 
 
-export function getUserConfigEntryTags(configBundles: ConfigBundle[], allModules: ModuleFile[]) {
+export function getUserConfigEntryTags(configBundles: d.ConfigBundle[], allModules: d.ModuleFile[]) {
   configBundles = (configBundles || [])
     .filter(b => b.components && b.components.length > 0)
     .sort((a, b) => {

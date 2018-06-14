@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath } from '../util';
 import * as ts from 'typescript';
 
 
@@ -34,13 +33,9 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
   // apply user config to tsconfig
   compilerOptions.rootDir = config.srcDir;
 
-  const collectionOutputTarget = (config.outputTargets as d.OutputTargetDist[]).find(o => !!o.collectionDir);
-  if (collectionOutputTarget) {
-    compilerOptions.outDir = collectionOutputTarget.collectionDir;
-
-  } else {
-    compilerOptions.outDir = pathJoin(config, config.rootDir, IN_MEMORY_DIR);
-  }
+  // during the transpile we'll write the output
+  // to the correct location(s)
+  compilerOptions.outDir = undefined;
 
 
   // generate .d.ts files when generating a distribution and in prod mode

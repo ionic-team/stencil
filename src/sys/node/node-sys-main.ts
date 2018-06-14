@@ -294,11 +294,19 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   tmpdir() {
-    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}`);
+    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}-__BUILDID__`);
   }
 
   get url() {
     return url;
+  }
+
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return this.sysWorker.run(
+      'validateTypes',
+      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
+      { isLongRunningTask: true, workerId: 0 }
+    );
   }
 
   get vm(): any {

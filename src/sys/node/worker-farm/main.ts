@@ -106,7 +106,15 @@ export class WorkerFarm {
       this.onWorkerExit(workerId, code);
     });
 
-    childProcess.on('error', () => {/**/});
+    childProcess.on('error', err => {
+      this.receiveMessageFromWorker({
+        workerId: workerId,
+        error: {
+          message: `Worker (${workerId}) process error: ${err.message}`,
+          stack: err.stack
+        }
+      });
+    });
 
     return worker;
   }
@@ -120,19 +128,6 @@ export class WorkerFarm {
     worker.exitCode = exitCode;
 
     setTimeout(() => {
-      const worker = this.workers.find(w => w.workerId === workerId);
-      if (worker) {
-        worker.tasks.forEach(task => {
-          this.receiveMessageFromWorker({
-            workerId: workerId,
-            taskId: task.taskId,
-            error: {
-              message: `Worker exited. Canceled "${task.methodName}" task.`
-            }
-          });
-        });
-      }
-
       this.stopWorker(workerId);
     }, 10);
   }
@@ -141,6 +136,11 @@ export class WorkerFarm {
     const worker = this.workers.find(w => w.workerId === workerId);
     if (worker && !worker.isExisting) {
       worker.isExisting = true;
+
+      worker.tasks.forEach(task => {
+        task.reject(WORKER_EXITED_MSG);
+      });
+      worker.tasks.length = 0;
 
       worker.send({
         exitProcess: true
@@ -163,15 +163,20 @@ export class WorkerFarm {
 
   receiveMessageFromWorker(msg: d.WorkerMessageData) {
     // message sent back from a worker process
+    if (this.isExisting) {
+      // already exiting, don't bother
+      return;
+    }
+
     const worker = this.workers.find(w => w.workerId === msg.workerId);
     if (!worker) {
-      this.logger.error(`Worker Farm: Received message for unknown worker (${msg.workerId})`);
+      this.logger.error(`Received message for unknown worker (${msg.workerId})`);
       return;
     }
 
     const task = worker.tasks.find(w => w.taskId === msg.taskId);
     if (!task) {
-      this.logger.error(`Worker Farm: Received message for unknown taskId (${msg.taskId}) for worker (${worker.workerId})`);
+      this.logger.error(`Worker (${worker.workerId}) received message for unknown taskId (${msg.taskId})`);
       return;
     }
 
@@ -213,7 +218,7 @@ export class WorkerFarm {
         taskId: task.taskId,
         workerId: workerId,
         error: {
-          message: `worker timed out! Canceled "${task.methodName}" task`
+          message: `Worker (${workerId}) timed out! Canceled "${task.methodName}" task.`
         }
       });
     });
@@ -264,9 +269,13 @@ export class WorkerFarm {
     if (!this.isExisting) {
       this.isExisting = true;
 
-      for (let i = this.workers.length - 1; i >= 0; i--) {
-        this.stopWorker(this.workers[i].workerId);
-      }
+      // workers may already be getting removed
+      // so doing it this way cuz we don't know if the
+      // order of the workers array is consistent
+      const workerIds = this.workers.map(worker => worker.workerId);
+      workerIds.forEach(workerId => {
+        this.stopWorker(workerId);
+      });
     }
   }
 
@@ -316,6 +325,8 @@ export function nextAvailableWorker(workers: d.WorkerProcess[], maxConcurrentTas
 const DEFAULT_OPTIONS: d.WorkerOptions = {
   maxConcurrentWorkers: (cpus() || { length: 1 }).length,
   maxConcurrentTasksPerWorker: 5,
-  maxTaskTime: 90000,
+  maxTaskTime: 120000,
   forcedKillTime: 100
 };
+
+export const WORKER_EXITED_MSG = `worker has exited`;

@@ -6,12 +6,15 @@ import { runPluginTransforms } from '../plugin/plugin';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (typeof config.globalStyle !== 'string') {
-    config.logger.debug(`"config.globalStyle" not found`);
+  if (buildCtx.shouldAbort()) {
     return;
   }
 
-  const timeSpan = config.logger.createTimeSpan(`compile global style start`);
+  if (typeof config.globalStyle !== 'string') {
+    return;
+  }
+
+  const timeSpan = buildCtx.createTimeSpan(`compile global style start`);
 
   try {
     const styleText = await loadGlobalStyle(config, compilerCtx, buildCtx, config.globalStyle);

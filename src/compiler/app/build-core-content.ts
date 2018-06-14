@@ -4,7 +4,11 @@ import { transpileCoreBuild } from '../transpile/core-build';
 
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
-  const timespan = config.logger.createTimeSpan(`buildCoreContent ${coreBuild.coreId} start`, true);
+  if (buildCtx.shouldAbort()) {
+    return null;
+  }
+
+  const timespan = buildCtx.createTimeSpan(`buildCoreContent ${coreBuild.coreId} started`, true);
 
   const transpileResults = await transpileCoreBuild(compilerCtx, coreBuild, coreContent);
 

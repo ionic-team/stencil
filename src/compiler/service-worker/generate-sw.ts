@@ -30,7 +30,7 @@ async function generateServiceWorker(config: d.Config, compilerCtx: d.CompilerCt
 
 
 async function copyLib(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`copy service worker library started`, true);
 
   try {
     await config.sys.workbox.copyWorkboxLibraries(outputTarget.dir);
@@ -46,7 +46,7 @@ async function copyLib(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.O
 
 
 async function generateSW(config: d.Config, buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig) {
-  const timeSpan = config.logger.createTimeSpan(`generate service worker started`);
+  const timeSpan = buildCtx.createTimeSpan(`generate service worker started`);
 
   try {
     await config.sys.workbox.generateSW(serviceWorker);
@@ -59,7 +59,7 @@ async function generateSW(config: d.Config, buildCtx: d.BuildCtx, serviceWorker:
 
 
 async function injectManifest(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  const timeSpan = config.logger.createTimeSpan(`inject manifest into service worker started`);
+  const timeSpan = buildCtx.createTimeSpan(`inject manifest into service worker started`);
 
   try {
     await config.sys.workbox.injectManifest(outputTarget.serviceWorker);

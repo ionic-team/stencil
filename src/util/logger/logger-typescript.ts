@@ -9,21 +9,22 @@ import * as ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(cwd: string, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(currentWorkingDir: string, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (var i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadDiagnostic(cwd, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadDiagnostic(currentWorkingDir, tsDiagnostics[i]));
   }
 }
 
 
-function loadDiagnostic(cwd: string, tsDiagnostic: ts.Diagnostic) {
+function loadDiagnostic(currentWorkingDir: string, tsDiagnostic: ts.Diagnostic) {
+
   const d: d.Diagnostic = {
-    level: 'error',
+    level: 'warn',
     type: 'typescript',
     language: 'typescript',
-    header: 'typescript error',
+    header: 'typescript warn',
     code: tsDiagnostic.code.toString(),
     messageText: ts.flattenDiagnosticMessageText(tsDiagnostic.messageText, '\n'),
     relFilePath: null,
@@ -31,9 +32,14 @@ function loadDiagnostic(cwd: string, tsDiagnostic: ts.Diagnostic) {
     lines: []
   };
 
+  if (tsDiagnostic.category === ts.DiagnosticCategory.Error) {
+    d.level = 'error';
+    d.header = 'typescript error';
+  }
+
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
-    d.relFilePath = formatFileName(cwd, d.absFilePath);
+    d.relFilePath = formatFileName(currentWorkingDir, d.absFilePath);
 
     const sourceText = tsDiagnostic.file.getText();
     const srcLines = splitLineBreaks(sourceText);
@@ -67,7 +73,7 @@ function loadDiagnostic(cwd: string, tsDiagnostic: ts.Diagnostic) {
       errorLine.errorCharStart--;
     }
 
-    d.header = formatHeader('typescript', tsDiagnostic.file.fileName, cwd, errorLine.lineNumber, errorLine.errorCharStart + 1);
+    d.header = formatHeader('typescript', tsDiagnostic.file.fileName, currentWorkingDir, errorLine.lineNumber, errorLine.errorCharStart + 1);
 
     if (errorLine.lineIndex > 0) {
       const previousLine: d.PrintLine = {

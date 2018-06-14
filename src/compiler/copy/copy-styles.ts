@@ -3,8 +3,7 @@ import { catchError } from '../util';
 
 
 export async function copyComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-
-  config.logger.debug(`copy styles`);
+  const timeSpan = buildCtx.createTimeSpan(`copyComponentStyles started`, true);
 
   try {
     const absSrcStylePaths: string[] = [];
@@ -46,4 +45,6 @@ export async function copyComponentStyles(config: d.Config, compilerCtx: d.Compi
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
+
+  timeSpan.finish(`copyComponentStyles finished`);
 }

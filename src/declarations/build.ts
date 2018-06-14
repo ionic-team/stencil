@@ -2,37 +2,40 @@ import * as d from './index';
 
 
 export interface BuildCtx {
-  graphData?: GraphData;
-  componentRefs?: d.PotentialComponentRef[];
-  moduleGraphs?: d.ModuleGraph[];
-  collections?: d.Collection[];
+  aborted: boolean;
+  appFileBuildCount: number;
   buildId: number;
-  requiresFullBuild: boolean;
+  buildResults: d.BuildResults;
+  bundleBuildCount: number;
+  collections: d.Collection[];
+  components: string[];
+  createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
+  data: any;
   diagnostics: d.Diagnostic[];
+  dirsAdded: string[];
+  dirsDeleted: string[];
   entryModules: d.EntryModule[];
   entryPoints: d.EntryPoint[];
-  global?: d.ModuleFile;
-  transpileBuildCount: number;
-  bundleBuildCount: number;
-  appFileBuildCount: number;
-  indexBuildCount: number;
-  components: string[];
-  aborted: boolean;
-  timeSpan: d.LoggerTimeSpan;
-  startTime: number;
-  hasChangedJsText: boolean;
-  filesWritten: string[];
-  filesDeleted: string[];
-  dirsDeleted: string[];
-  dirsAdded: string[];
-  filesChanged: string[];
-  filesUpdated: string[];
   filesAdded: string[];
-  shouldAbort?(): boolean;
-  data?: any;
-  hasSlot?: boolean;
-  hasSvg?: boolean;
-  finish?(): Promise<BuildResults>;
+  filesChanged: string[];
+  filesDeleted: string[];
+  filesUpdated: string[];
+  filesWritten: string[];
+  finish(): Promise<BuildResults>;
+  global: d.ModuleFile;
+  graphData: GraphData;
+  hasFinished: boolean;
+  hasSlot: boolean;
+  hasSvg: boolean;
+  indexBuildCount: number;
+  requiresFullBuild: boolean;
+  shouldAbort(): boolean;
+  startTime: number;
+  timeSpan: d.LoggerTimeSpan;
+  transpileBuildCount: number;
+  validateTypesHandler?: (diagnostics: d.Diagnostic[]) => void;
+  validateTypesPromise?: Promise<d.Diagnostic[]>;
+  validateTypesBuild?(): Promise<void>;
 }
 
 
@@ -48,7 +51,6 @@ export interface BuildResults {
   isRebuild: boolean;
   transpileBuildCount: number;
   bundleBuildCount: number;
-  hasChangedJsText: boolean;
   dirsAdded: string[];
   dirsDeleted: string[];
   filesWritten: string[];
