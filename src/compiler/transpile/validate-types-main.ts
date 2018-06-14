@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
-import { getUserTsConfig } from './compiler-options';
+import { getUserCompilerOptions } from './compiler-options';
 
 
 export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -55,7 +55,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   };
 
   // get the typescript compiler options
-  const compilerOptions = await getUserTsConfig(config, compilerCtx);
+  const compilerOptions = await getUserCompilerOptions(config, compilerCtx);
 
   // only write dts files when we have an output target with a types directory
   const emitDtsFiles = (config.outputTargets as d.OutputTargetDist[]).some(o => !!o.typesDir);

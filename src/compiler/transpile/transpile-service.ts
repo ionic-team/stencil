@@ -7,7 +7,7 @@ import { gatherMetadata } from './datacollection/gather-metadata';
 import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { getModuleFile } from '../build/compiler-ctx';
 import { getModuleImports } from './transformers/module-imports';
-import { getUserTsConfig } from './compiler-options';
+import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { normalizePath, pathJoin } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
@@ -41,7 +41,7 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
   if (!compilerCtx.tsService) {
     // create the typescript language service
     const timeSpan = buildCtx.createTimeSpan(`buildTsService started`, true);
-    compilerCtx.tsService = await buildTsService(config);
+    compilerCtx.tsService = await buildTsService(config, compilerCtx, buildCtx);
     timeSpan.finish(`buildTsService finished`);
   }
 
@@ -60,36 +60,34 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-async function buildTsService(config: d.Config) {
+async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const ctx: TranspileContext = {
-    compilerCtx: null,
-    buildCtx: null,
+    compilerCtx: compilerCtx,
+    buildCtx: buildCtx,
     configKey: null,
     snapshotVersions: new Map<string, string>()
   };
 
-  const options = Object.assign({}, await getUserTsConfig(config, ctx.compilerCtx));
+  const userCompilerOptions = await getUserCompilerOptions(config, ctx.compilerCtx);
+  const compilerOptions = Object.assign({}, userCompilerOptions);
 
-  options.isolatedModules = true;
-  // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
-  options.suppressOutputPathCheck = true;
-  // Filename can be non-ts file.
-  options.allowNonTsExtensions = true;
-  // Clear out other settings that would not be used in transpiling this module
-  options.lib = undefined;
-  options.types = undefined;
-  options.noEmit = undefined;
-  options.noEmitOnError = undefined;
-  options.paths = undefined;
-  options.rootDirs = undefined;
-  options.declaration = undefined;
-  options.declarationDir = undefined;
-  options.out = undefined;
-  options.outFile = undefined;
-  options.outDir = undefined;
+  compilerOptions.isolatedModules = true;
+  compilerOptions.suppressOutputPathCheck = true;
+  compilerOptions.allowNonTsExtensions = true;
+  compilerOptions.lib = undefined;
+  compilerOptions.types = undefined;
+  compilerOptions.noEmit = undefined;
+  compilerOptions.noEmitOnError = undefined;
+  compilerOptions.paths = undefined;
+  compilerOptions.rootDirs = undefined;
+  compilerOptions.declaration = undefined;
+  compilerOptions.declarationDir = undefined;
+  compilerOptions.out = undefined;
+  compilerOptions.outFile = undefined;
+  compilerOptions.outDir = undefined;
 
   // create a config key that will be used as part of the file's cache key
-  ctx.configKey = createConfiKey(config, options);
+  ctx.configKey = createConfiKey(config, compilerOptions);
 
   const servicesHost: ts.LanguageServiceHost = {
     getScriptFileNames: () => ctx.compilerCtx.rootTsFiles,
@@ -102,7 +100,7 @@ async function buildTsService(config: d.Config) {
       return undefined;
     },
     getCurrentDirectory: () => config.cwd,
-    getCompilationSettings: () => options,
+    getCompilationSettings: () => compilerOptions,
     getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
     fileExists: (filePath) => ctx.compilerCtx.fs.accessSync(filePath),
     readFile: (filePath) => {

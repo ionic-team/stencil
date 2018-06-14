@@ -3,7 +3,11 @@ import { normalizePath } from '../util';
 import * as ts from 'typescript';
 
 
-export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx) {
+  if (compilerCtx.compilerOptions) {
+    return compilerCtx.compilerOptions;
+  }
+
   let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
@@ -24,7 +28,9 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
       config.logger.warn('tsconfig.json is malformed, using default settings');
     }
 
-  } catch (e) {}
+  } catch (e) {
+    config.logger.debug(`getUserCompilerOptions: ${e}`);
+  }
 
   if (config._isTesting) {
     compilerOptions.module = ts.ModuleKind.CommonJS;
@@ -49,6 +55,8 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
   }
 
   validateCompilerOptions(compilerOptions);
+
+  compilerCtx.compilerOptions = compilerOptions;
 
   return compilerOptions;
 }

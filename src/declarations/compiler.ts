@@ -29,6 +29,8 @@ export interface CompilerCtx {
   hasWatcher?: boolean;
   tsService?: TsService;
   rootTsFiles?: string[];
+
+  compilerOptions?: any;
 }
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => Promise<any>;
