@@ -36,7 +36,7 @@ export async function generateLoader(
 
   if (config.minifyJs) {
     // minify the loader
-    const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true);
+    const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true, buildCtx.timestamp);
     minifyJsResults.diagnostics.forEach(d => {
       (config.logger as any)[d.level](d.messageText);
     });
@@ -47,7 +47,7 @@ export async function generateLoader(
 
   } else {
     // dev
-    loaderContent = generatePreamble(config) + '\n' + loaderContent;
+    loaderContent = generatePreamble(config, { suffix: buildCtx.timestamp }) + '\n' + loaderContent;
   }
 
   const appLoadPath = getLoaderPath(config, outputTarget);

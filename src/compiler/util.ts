@@ -70,20 +70,26 @@ export function isWebDevFile(filePath: string) {
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 
 
-export function generatePreamble(config: d.Config, content?: string) {
+export function generatePreamble(config: d.Config, opts: { prefix?: string; suffix?: string } = {}) {
   let preamble: string[] = [];
 
   if (config.preamble) {
     preamble = config.preamble.split('\n');
   }
 
-  if (content) {
-    content.split('\n').forEach(c => {
+  if (typeof opts.prefix === 'string') {
+    opts.prefix.split('\n').forEach(c => {
       preamble.push(c);
     });
   }
 
   preamble.push(BANNER);
+
+  if (typeof opts.suffix === 'string') {
+    opts.suffix.split('\n').forEach(c => {
+      preamble.push(c);
+    });
+  }
 
   if (preamble.length > 1) {
     preamble = preamble.map(l => ` * ${l}`);

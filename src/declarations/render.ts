@@ -80,6 +80,7 @@ export interface HydrateOptions extends RenderOptions {
     [level: string]: (...msgs: string[]) => void;
   };
   hydrateComponents?: boolean;
+  timestamp?: string;
 }
 
 

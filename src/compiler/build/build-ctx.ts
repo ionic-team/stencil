@@ -9,6 +9,7 @@ export class BuildContext implements d.BuildCtx {
   aborted = false;
   appFileBuildCount = 0;
   buildId = -1;
+  timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
@@ -39,6 +40,8 @@ export class BuildContext implements d.BuildCtx {
   validateTypesPromise: Promise<d.Diagnostic[]>;
 
   constructor(private config: d.Config, private compilerCtx: d.CompilerCtx, watcher: d.WatcherResults) {
+    this.setBuildTimestamp();
+
     // do a full build if there is no watcher
     // or the watcher said the config has updated
     // or we've never had a successful build yet
@@ -66,6 +69,18 @@ export class BuildContext implements d.BuildCtx {
         (watcher as any)[key] = {};
       });
     }
+  }
+
+  setBuildTimestamp() {
+    const d = new Date();
+
+    // YYYY-MM-DDThh:mm:ss
+    this.timestamp = d.getUTCFullYear() + '-';
+    this.timestamp += ('0' + d.getUTCMonth()).slice(-2) + '-';
+    this.timestamp += ('0' + d.getUTCDate()).slice(-2) + 'T';
+    this.timestamp += ('0' + d.getUTCHours()).slice(-2) + ':';
+    this.timestamp += ('0' + d.getUTCMinutes()).slice(-2) + ':';
+    this.timestamp += ('0' + d.getUTCSeconds()).slice(-2);
   }
 
   createTimeSpan(msg: string, debug?: boolean) {

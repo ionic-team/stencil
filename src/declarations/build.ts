@@ -6,6 +6,7 @@ export interface BuildCtx {
   appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
+  timestamp: string;
   bundleBuildCount: number;
   collections: d.Collection[];
   components: string[];

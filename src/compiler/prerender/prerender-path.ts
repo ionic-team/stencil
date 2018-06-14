@@ -19,6 +19,7 @@ export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx
     const hydrateOpts: d.HydrateOptions = {};
     hydrateOpts.url = prerenderLocation.url;
     hydrateOpts.isPrerender = true;
+    hydrateOpts.timestamp = buildCtx.timestamp;
 
     // set the input html which we just read from the src index html file
     hydrateOpts.html = indexSrcHtml;
