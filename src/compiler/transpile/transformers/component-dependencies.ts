@@ -54,9 +54,11 @@ function addPropConnects(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile) {
 
 
 function addPropConnect(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, tag: string) {
-  moduleFile.potentialCmpRefs.push({
-    tag: tag
-  });
+  if (!moduleFile.potentialCmpRefs.some(cr => cr.tag === tag)) {
+    moduleFile.potentialCmpRefs.push({
+      tag: tag
+    });
+  }
 
   compilerCtx.collections.forEach(collection => {
 
@@ -64,9 +66,11 @@ function addPropConnect(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, ta
       if (bundle.components.includes(tag)) {
         bundle.components.forEach(bundleTag => {
           if (bundleTag !== tag) {
-            moduleFile.potentialCmpRefs.push({
-              tag: bundleTag
-            });
+            if (!moduleFile.potentialCmpRefs.some(cr => cr.tag === bundleTag)) {
+              moduleFile.potentialCmpRefs.push({
+                tag: bundleTag
+              });
+            }
           }
         });
       }
@@ -103,9 +107,11 @@ function callExpressionArg(moduleFile: d.ModuleFile, callExpressionName: ts.Iden
       if (typeof tag === 'string') {
         tag = tag.toLowerCase();
         if (tag.includes('-')) {
-          moduleFile.potentialCmpRefs.push({
-            tag: tag
-          });
+          if (!moduleFile.potentialCmpRefs.some(cr => cr.tag === tag)) {
+            moduleFile.potentialCmpRefs.push({
+              tag: tag
+            });
+          }
 
         } else if (tag === 'slot') {
           moduleFile.hasSlot = true;

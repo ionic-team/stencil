@@ -25,6 +25,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     const appEntryTags = getAppEntryTags(allModules);
 
     buildCtx.entryPoints = generateComponentEntries(
+      buildCtx,
       allModules,
       userConfigEntryModulesTags,
       appEntryTags
