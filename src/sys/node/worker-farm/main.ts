@@ -55,7 +55,7 @@ export class WorkerFarm {
         // the same worker, this way it can reuse that worker's cache again
         // let's figure out its worker id which should always be
         // the same id number for the same worker key string
-        const workerId = getWorkerIdFromKey(opts.workerKey, this.workers.length);
+        const workerId = getWorkerIdFromKey(opts.workerKey, this.workers);
         const worker = this.workers.find(w => w.workerId === workerId);
         if (!worker) {
           task.reject(`invalid worker id for task: ${task}`);
@@ -327,18 +327,20 @@ export function nextAvailableWorker(workers: d.WorkerProcess[], maxConcurrentTas
 }
 
 
-function getWorkerIdFromKey(workerKey: string, totalWorkers: number) {
+function getWorkerIdFromKey(workerKey: string, workers: d.WorkerProcess[]) {
   const hashChar = createHash('sha1')
                      .update(workerKey)
                      .digest('base64')
                      .charAt(0);
 
+  const workerIds = workers.map(w => w.workerId);
+
   const b64Int = B64_TABLE[hashChar];
   const dv = b64Int / 64;
-  const mt = (totalWorkers - 1) * dv;
-  const id = Math.round(mt);
+  const mt = (workerIds.length - 1) * dv;
+  const workerIndex = Math.round(mt);
 
-  return id;
+  return workerIds[workerIndex];
 }
 
 const B64_TABLE: { [char: string]: number } = {
