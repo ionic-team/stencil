@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { cpus } from 'os';
+import { createHash } from 'crypto';
 import { ForkOptions, fork } from 'child_process';
 
 
@@ -49,9 +50,13 @@ export class WorkerFarm {
         reject: reject
       };
 
-      if (typeof opts.workerId === 'number') {
-        // this task should use a specific worker process
-        const worker = this.workers.find(w => w.workerId === opts.workerId);
+      if (typeof opts.workerKey === 'string') {
+        // this tasl has a worker key so that it always uses
+        // the same worker, this way it can reuse that worker's cache again
+        // let's figure out its worker id which should always be
+        // the same id number for the same worker key string
+        const workerId = getWorkerIdFromKey(opts.workerKey, this.workers.length);
+        const worker = this.workers.find(w => w.workerId === workerId);
         if (!worker) {
           task.reject(`invalid worker id for task: ${task}`);
         } else {
@@ -320,6 +325,30 @@ export function nextAvailableWorker(workers: d.WorkerProcess[], maxConcurrentTas
 
   return sorted[0];
 }
+
+
+function getWorkerIdFromKey(workerKey: string, totalWorkers: number) {
+  const hashChar = createHash('sha1')
+                     .update(workerKey)
+                     .digest('base64')
+                     .charAt(0);
+
+  const b64Int = B64_TABLE[hashChar];
+  const dv = b64Int / 64;
+  const mt = (totalWorkers - 1) * dv;
+  const id = Math.round(mt);
+
+  return id;
+}
+
+const B64_TABLE: { [char: string]: number } = {
+  'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
+  'N': 13, 'O': 14, 'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23,
+  'Y': 24, 'Z': 25, 'a': 26, 'b': 27, 'c': 28, 'd': 29, 'e': 30, 'f': 31, 'g': 32, 'h': 33, 'i': 34,
+  'j': 35, 'k': 36, 'l': 37, 'm': 38, 'n': 39, 'o': 40, 'p': 41, 'q': 42, 'r': 43, 's': 44, 't': 45,
+  'u': 46, 'v': 47, 'w': 48, 'x': 49, 'y': 50, 'z': 51, '0': 52, '1': 53, '2': 54, '3': 55, '4': 56,
+  '5': 57, '6': 58, '7': 59, '8': 60, '9': 61, '+': 62, '/': 63,
+};
 
 
 const DEFAULT_OPTIONS: d.WorkerOptions = {

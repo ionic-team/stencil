@@ -305,7 +305,7 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run(
       'validateTypes',
       [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
-      { isLongRunningTask: true, workerId: 0 }
+      { isLongRunningTask: true, workerKey: 'validateTypes' }
     );
   }
 

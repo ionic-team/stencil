@@ -46,7 +46,7 @@ export type WorkerRunner = (methodName: string, args: any[]) => Promise<any>;
 
 export interface WorkerRunnerOptions {
   isLongRunningTask?: boolean;
-  workerId?: number;
+  workerKey?: string;
 }
 
 export interface WorkerContext {
