@@ -4,11 +4,19 @@ import { removeCollectionImports } from './transformers/remove-collection-import
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
 
+import * as path from 'path';
 import * as ts from 'typescript';
 
 
 export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
   const diagnostics: d.Diagnostic[] = [];
+
+  const config: d.Config = {
+    cwd: currentWorkingDir,
+    sys: {
+      path: path
+    } as any
+  };
 
   if (!workerCtx.tsHost) {
     compilerOptions.outDir = undefined;
@@ -52,7 +60,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
   program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
-  loadTypeScriptDiagnostics(currentWorkingDir, diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(config, diagnostics, tsDiagnostics);
 
   return diagnostics;
 }

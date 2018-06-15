@@ -1,17 +1,16 @@
 import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from '../../declarations';
-import { buildWarn } from '../../compiler/util';
-import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
-import { highlight } from './highlight/highlight';
+import { buildWarn, normalizePath } from '../../compiler/util';
+import { splitLineBreaks } from './logger-util';
 import { toTitleCase } from '../helpers';
 
 
 export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, rollupError: any) {
   const d: Diagnostic = {
     level: 'error',
-    type: 'build',
+    type: 'bundling',
     language: 'javascript',
-    header: 'build error',
     code: rollupError.code,
+    header: formatErrorCode(rollupError.code),
     messageText: rollupError.message,
     relFilePath: null,
     absFilePath: null,
@@ -19,26 +18,25 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
   };
 
   if (rollupError.loc && rollupError.loc.file) {
-    d.absFilePath = rollupError.loc.file;
-    d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
+    d.absFilePath = normalizePath(rollupError.loc.file);
+    if (config) {
+      d.relFilePath = normalizePath(config.sys.path.relative(config.cwd, d.absFilePath));
+    }
 
     try {
       const sourceText = compilerCtx.fs.readFileSync(d.absFilePath);
       const srcLines = splitLineBreaks(sourceText);
-      let htmlLines = srcLines;
-
-      try {
-        htmlLines = splitLineBreaks(highlight(d.language, sourceText, true).value);
-      } catch (e) {}
 
       const errorLine: PrintLine = {
         lineIndex: rollupError.loc.line - 1,
         lineNumber: rollupError.loc.line,
         text: srcLines[rollupError.loc.line - 1],
-        html: htmlLines[rollupError.loc.line - 1],
         errorCharStart: rollupError.loc.column,
         errorLength: 0
       };
+
+      d.lineNumber = errorLine.lineNumber;
+      d.columnNumber = errorLine.errorCharStart;
 
       const highlightLine = errorLine.text.substr(rollupError.loc.column);
       for (var i = 0; i < highlightLine.length; i++) {
@@ -48,12 +46,6 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLine.errorLength++;
       }
 
-      if (errorLine.html && errorLine.html.indexOf('class="hljs') === -1) {
-        try {
-          errorLine.html = highlight(d.language, errorLine.text, true).value;
-        } catch (e) {}
-      }
-
       d.lines.push(errorLine);
 
       if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
@@ -61,25 +53,14 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLine.errorCharStart--;
       }
 
-      const type = formatErrorCode(rollupError.code);
-
-      d.header = formatHeader(type, d.absFilePath, config.cwd, errorLine.lineNumber, errorLine.errorCharStart);
-
       if (errorLine.lineIndex > 0) {
         const previousLine: PrintLine = {
           lineIndex: errorLine.lineIndex - 1,
           lineNumber: errorLine.lineNumber - 1,
           text: srcLines[errorLine.lineIndex - 1],
-          html: htmlLines[errorLine.lineIndex - 1],
           errorCharStart: -1,
           errorLength: -1
         };
-
-        if (previousLine.html && previousLine.html.indexOf('class="hljs') === -1) {
-          try {
-            previousLine.html = highlight(d.language, previousLine.text, true).value;
-          } catch (e) {}
-        }
 
         d.lines.unshift(previousLine);
       }
@@ -89,16 +70,9 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
           lineIndex: errorLine.lineIndex + 1,
           lineNumber: errorLine.lineNumber + 1,
           text: srcLines[errorLine.lineIndex + 1],
-          html: htmlLines[errorLine.lineIndex + 1],
           errorCharStart: -1,
           errorLength: -1
         };
-
-        if (nextLine.html && nextLine.html.indexOf('class="hljs') === -1) {
-          try {
-            nextLine.html = highlight(d.language, nextLine.text, true).value;
-          } catch (e) {}
-        }
 
         d.lines.push(nextLine);
       }

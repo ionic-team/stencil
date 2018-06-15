@@ -10,7 +10,7 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
 
   const timespan = buildCtx.createTimeSpan(`buildCoreContent ${coreBuild.coreId} started`, true);
 
-  const transpileResults = await transpileCoreBuild(compilerCtx, coreBuild, coreContent);
+  const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, coreContent);
 
   if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);

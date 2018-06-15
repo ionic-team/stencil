@@ -97,7 +97,7 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
 
   const tsDiagnostics = program.getOptionsDiagnostics().concat(program.getSyntacticDiagnostics());
 
-  loadTypeScriptDiagnostics('', buildCtx.diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(config, buildCtx.diagnostics, tsDiagnostics);
 
   results.diagnostics.push(...buildCtx.diagnostics);
 

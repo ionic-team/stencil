@@ -214,7 +214,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     const tsDiagnostics = services.getCompilerOptionsDiagnostics()
       .concat(services.getSyntacticDiagnostics(tsFilePath));
 
-    loadTypeScriptDiagnostics(config.cwd, ctx.buildCtx.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(config, ctx.buildCtx.diagnostics, tsDiagnostics);
     return;
   }
 

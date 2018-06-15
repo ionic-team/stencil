@@ -62,7 +62,7 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
       .map(async ([key, value]) => {
         const fileName = getBrowserFilename(key.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, key);
-        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+        jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
         await writeBundleJSFile(config, compilerCtx, fileName, jsText);
       });
     await Promise.all(es5Promises);
@@ -88,7 +88,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
       .map(async ([key, value]) => {
         const fileName = getBrowserFilename(key.replace('.js', ''), false);
         let jsText = replaceBundleIdPlaceholder(value.code, key);
-        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+        jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
 
         const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
         return compilerCtx.fs.writeFile(distBuildPath, jsText);
@@ -213,7 +213,7 @@ async function createBundleJsText(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (sourceTarget === 'es5') {
     // use legacy bundling with commonjs/jsonp modules
     // and transpile the build to es5
-    jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+    jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
   }
 
   if (config.minifyJs) {
@@ -356,9 +356,9 @@ export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: str
   return jsText;
 }
 
-async function transpileEs5Bundle(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsText: string) {
+async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsText: string) {
   // use typescript to convert this js text into es5
-  const transpileResults = await transpileToEs5(compilerCtx, jsText);
+  const transpileResults = await transpileToEs5(config, compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
   }

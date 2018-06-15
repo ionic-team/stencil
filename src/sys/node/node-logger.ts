@@ -280,14 +280,38 @@ export class NodeLogger implements d.Logger {
   printDiagnostic(d: d.Diagnostic) {
     const outputLines = wordWrap([d.messageText], getColumns());
 
-    if (d.header && d.header !== 'build error' && d.header !== 'build warn') {
-      outputLines.unshift(INDENT + d.header);
+    let header = '';
+
+    if (d.header) {
+      header += d.header;
+    }
+
+    if (d.relFilePath) {
+      if (header.length > 0) {
+        header += ': ';
+      }
+
+      header += this.chalk.cyan(d.relFilePath);
+
+      if (typeof d.lineNumber === 'number' && d.lineNumber > -1) {
+        header += this.chalk.dim(`:`);
+        header += this.chalk.yellow(`${d.lineNumber}`);
+
+        if (typeof d.columnNumber === 'number' && d.columnNumber > -1) {
+          header += this.chalk.dim(`:`);
+          header += this.chalk.yellow(`${d.columnNumber}`);
+        }
+      }
+    }
+
+    if (header.length > 0) {
+      outputLines.unshift(INDENT + header);
     }
 
     outputLines.push('');
 
     if (d.lines && d.lines.length) {
-      const lines = prepareLines(d.lines, 'text');
+      const lines = prepareLines(d.lines);
 
       lines.forEach(l => {
         if (!isMeaningfulLine(l.text)) {
@@ -306,8 +330,8 @@ export class NodeLogger implements d.Logger {
 
         msg = this.dim(msg);
 
-        if (d.language === 'javascript') {
-          msg += this.jsSyntaxHighlight(text);
+        if (d.language === 'typescript' || d.language === 'javascript') {
+          msg += this.javaScriptSyntaxHighlight(text);
         } else if (d.language === 'scss' || d.language === 'css') {
           msg += this.cssSyntaxHighlight(text);
         } else {
@@ -367,7 +391,7 @@ export class NodeLogger implements d.Logger {
     return lineChars.join('');
   }
 
-  jsSyntaxHighlight(text: string) {
+  javaScriptSyntaxHighlight(text: string) {
     if (text.trim().startsWith('//')) {
       return this.dim(text);
     }
@@ -540,17 +564,17 @@ export function wordWrap(msg: any[], columns: number) {
 }
 
 
-function prepareLines(orgLines: d.PrintLine[], code: 'text'|'html') {
+function prepareLines(orgLines: d.PrintLine[]) {
   const lines: d.PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
   for (let i = 0; i < 100; i++) {
-    if (!eachLineHasLeadingWhitespace(lines, code)) {
+    if (!eachLineHasLeadingWhitespace(lines)) {
       return lines;
     }
     for (let i = 0; i < lines.length; i++) {
-      (<any>lines[i])[code] = (<any>lines[i])[code].substr(1);
+      lines[i].text = lines[i].text.substr(1);
       lines[i].errorCharStart--;
-      if (!(<any>lines[i])[code].length) {
+      if (!(lines[i]).text.length) {
         return lines;
       }
     }
@@ -560,19 +584,21 @@ function prepareLines(orgLines: d.PrintLine[], code: 'text'|'html') {
 }
 
 
-function eachLineHasLeadingWhitespace(lines: d.PrintLine[], code: 'text'|'html') {
+function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
   if (!lines.length) {
     return false;
   }
+
   for (var i = 0; i < lines.length; i++) {
-    if ( !(<any>lines[i])[code] || (<any>lines[i])[code].length < 1) {
+    if (!lines[i].text || lines[i].text.length < 1) {
       return false;
     }
-    const firstChar = (<any>lines[i])[code].charAt(0);
+    const firstChar = lines[i].text.charAt(0);
     if (firstChar !== ' ' && firstChar !== '\t') {
       return false;
     }
   }
+
   return true;
 }
 
