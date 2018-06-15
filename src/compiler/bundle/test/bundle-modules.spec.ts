@@ -37,7 +37,7 @@ describe('bundle-module', () => {
       const firstBuildText = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
 
       // create a rebuild listener
-      const rebuildListener = c.once('rebuild');
+      const rebuildListener = c.once('buildFinish');
 
       // write the same darn thing, no actual change
       await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });

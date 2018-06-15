@@ -1,4 +1,4 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic, InMemoryFileSystem } from '../declarations';
+import * as d from '../declarations';
 import { build } from './build/build';
 import { catchError } from './util';
 import { docs } from './docs/docs';
@@ -7,11 +7,11 @@ import { validateConfig } from '../compiler/config/validate-config';
 
 
 export class Compiler {
-  protected ctx: CompilerCtx;
+  protected ctx: d.CompilerCtx;
   isValid: boolean;
-  config: Config;
+  config: d.Config;
 
-  constructor(rawConfig: Config) {
+  constructor(rawConfig: d.Config) {
     [ this.isValid, this.config ] = isValid(rawConfig);
 
     if (this.isValid) {
@@ -25,6 +25,10 @@ export class Compiler {
      this.config.logger.info(this.config.logger.cyan(startupMsg));
      this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
      this.config.logger.debug(`compiler build: __BUILDID__`);
+
+     this.ctx.events.subscribe('buildStart', (watcherResults) => {
+      build(this.config, this.ctx, watcherResults);
+     });
     }
   }
 
@@ -32,15 +36,15 @@ export class Compiler {
     return build(this.config, this.ctx);
   }
 
-  on(eventName: 'build', cb: (buildResults: BuildResults) => void): Function;
-  on(eventName: 'rebuild', cb: (buildResults: BuildResults) => void): Function;
-  on(eventName: any, cb: any) {
-    return this.ctx.events.subscribe(eventName, cb);
+  on(eventName: 'buildStart', cb: () => void): Function;
+  on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
+  on(eventName: d.CompilerEventName, cb: any) {
+    return this.ctx.events.subscribe(eventName as any, cb);
   }
 
-  once(eventName: 'build'): Promise<BuildResults>;
-  once(eventName: 'rebuild'): Promise<BuildResults>;
-  once(eventName: CompilerEventName) {
+  once(eventName: 'buildStart'): Promise<void>;
+  once(eventName: 'buildFinish'): Promise<d.BuildResults>;
+  once(eventName: d.CompilerEventName) {
     return new Promise<any>(resolve => {
       const off = this.ctx.events.subscribe(eventName as any, (...args: any[]) => {
         off();
@@ -58,7 +62,7 @@ export class Compiler {
   trigger(eventName: 'fileDelete', path: string): void;
   trigger(eventName: 'dirAdd', path: string): void;
   trigger(eventName: 'dirDelete', path: string): void;
-  trigger(eventName: CompilerEventName, ...args: any[]) {
+  trigger(eventName: d.CompilerEventName, ...args: any[]) {
     args.unshift(eventName);
     this.ctx.events.emit.apply(this.ctx.events, args);
   }
@@ -67,7 +71,7 @@ export class Compiler {
     return docs(this.config, this.ctx);
   }
 
-  get fs(): InMemoryFileSystem {
+  get fs(): d.InMemoryFileSystem {
     return this.ctx.fs;
   }
 
@@ -81,7 +85,7 @@ export class Compiler {
 
 }
 
-function isValid(config: Config): [ boolean, Config | null] {
+function isValid(config: d.Config): [ boolean, d.Config | null] {
   try {
     // validate the build config
     validateConfig(config, true);
@@ -89,7 +93,7 @@ function isValid(config: Config): [ boolean, Config | null] {
 
   } catch (e) {
     if (config.logger) {
-      const diagnostics: Diagnostic[] = [];
+      const diagnostics: d.Diagnostic[] = [];
       catchError(diagnostics, e);
       config.logger.printDiagnostics(diagnostics);
 

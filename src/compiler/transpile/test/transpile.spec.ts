@@ -31,7 +31,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     await c.fs.remove(path.join(root, 'src', 'some-dir'));
     await c.fs.commit();
@@ -64,7 +64,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     // add directory
     await c.fs.writeFiles({
@@ -100,7 +100,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     // write an actual change
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { constructor() { console.log('changed!!'); } }`, { clearFileCache: true });
@@ -135,7 +135,7 @@ describe('transpile', () => {
     expect(r.isRebuild).toBe(false);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     // write the same darn thing, no actual change
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });

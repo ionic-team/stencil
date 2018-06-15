@@ -154,12 +154,7 @@ export class BuildContext implements d.BuildCtx {
       this.config.logger.writeLogs(this.compilerCtx.isRebuild);
 
       // emit a build event, which happens for inital build and rebuilds
-      this.compilerCtx.events.emit('build', this.buildResults);
-
-      if (this.compilerCtx.isRebuild) {
-        // emit a rebuild event, which happens only for rebuilds
-        this.compilerCtx.events.emit('rebuild', this.buildResults);
-      }
+      this.compilerCtx.events.emit('buildFinish', this.buildResults);
 
       if (!this.config.watch) {
         this.config.sys.destroy();

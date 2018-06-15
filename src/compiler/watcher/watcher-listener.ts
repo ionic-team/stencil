@@ -1,6 +1,6 @@
-import { CompilerCtx, Config, WatcherResults } from '../../declarations';
+import * as d from '../../declarations';
 import { COMPONENTS_DTS } from '../distribution/distribution';
-import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
+import { isCopyTaskFile } from '../copy/copy-tasks';
 import { isDtsFile, isWebDevFile, normalizePath } from '../util';
 import { rebuild } from './rebuild';
 
@@ -12,13 +12,10 @@ export class WatcherListener {
   private filesDeleted: string[];
   private filesUpdated: string[];
   private configUpdated = false;
-  private recentChanges: RecentChange[] = [];
+  private hasCopyChanges = false;
+  private watchTmr: number;
 
-  private watchTmr: NodeJS.Timer;
-  private copyTaskTmr: NodeJS.Timer;
-
-
-  constructor(private config: Config, private compilerCtx: CompilerCtx) {
+  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
     this.resetWatcher();
   }
 
@@ -44,14 +41,20 @@ export class WatcherListener {
         // the actual stencil config file changed
         // this is a big deal, so do a full rebuild
         this.configUpdated = true;
+
         if (!this.filesUpdated.includes(filePath)) {
           this.filesUpdated.push(filePath);
         }
-        this.queue(filePath);
+        this.queue();
 
       } else if (isCopyTaskFile(this.config, filePath)) {
         this.config.logger.debug(`watcher, fileUpdate, copy task file: ${relPath}, ${Date.now().toString().substring(5)}`);
-        this.queueCopyTasks();
+        this.hasCopyChanges = true;
+
+        if (!this.filesUpdated.includes(filePath)) {
+          this.filesUpdated.push(filePath);
+        }
+        this.queue();
       }
 
       if (isWebDevFileToWatch(filePath)) {
@@ -70,7 +73,7 @@ export class WatcherListener {
         if (!this.filesUpdated.includes(filePath)) {
           this.filesUpdated.push(filePath);
         }
-        this.queue(filePath);
+        this.queue();
 
       } else {
         // always clear the cache if it wasn't a web dev file
@@ -95,7 +98,11 @@ export class WatcherListener {
       this.config.logger.debug(`watcher, fileAdd: ${relPath}, ${Date.now().toString().substring(5)}`);
 
       if (isCopyTaskFile(this.config, filePath)) {
-        this.queueCopyTasks();
+        if (!this.filesAdded.includes(filePath)) {
+          this.filesAdded.push(filePath);
+        }
+        this.hasCopyChanges = true;
+        this.queue();
       }
 
       if (isWebDevFileToWatch(filePath)) {
@@ -107,7 +114,7 @@ export class WatcherListener {
         if (!this.filesAdded.includes(filePath)) {
           this.filesAdded.push(filePath);
         }
-        this.queue(filePath);
+        this.queue();
 
       } else {
         // always clear the cache if it wasn't a web dev file
@@ -135,7 +142,11 @@ export class WatcherListener {
       this.compilerCtx.fs.clearFileCache(filePath);
 
       if (isCopyTaskFile(this.config, filePath)) {
-        this.queueCopyTasks();
+        if (!this.filesDeleted.includes(filePath)) {
+          this.filesDeleted.push(filePath);
+        }
+        this.hasCopyChanges = true;
+        this.queue();
       }
 
       if (isWebDevFileToWatch(filePath)) {
@@ -143,7 +154,7 @@ export class WatcherListener {
         if (!this.filesDeleted.includes(filePath)) {
           this.filesDeleted.push(filePath);
         }
-        this.queue(filePath);
+        this.queue();
       }
 
     } catch (e) {
@@ -161,23 +172,22 @@ export class WatcherListener {
       // clear this directory's cache for good measure
       this.compilerCtx.fs.clearDirCache(dirPath);
 
+      // recursively drill down and get all of the
+      // files paths that were just added
+      const addedItems = await this.compilerCtx.fs.readdir(dirPath, { recursive: true });
+
+      addedItems.forEach(item => {
+        if (!this.filesAdded.includes(item.absPath)) {
+          this.filesAdded.push(item.absPath);
+        }
+      });
+      this.dirsAdded.push(dirPath);
+
       if (isCopyTaskFile(this.config, dirPath)) {
-        this.queueCopyTasks();
-
-      } else {
-        // recursively drill down and get all of the
-        // files paths that were just added
-        const addedItems = await this.compilerCtx.fs.readdir(dirPath, { recursive: true });
-
-        addedItems.forEach(item => {
-          if (!this.filesAdded.includes(item.absPath)) {
-            this.filesAdded.push(item.absPath);
-          }
-        });
-
-        this.dirsAdded.push(dirPath);
-        this.queue(dirPath);
+        this.hasCopyChanges = true;
       }
+
+      this.queue();
 
     } catch (e) {
       this.config.logger.error(`watcher, dirAdd`, e);
@@ -194,15 +204,15 @@ export class WatcherListener {
       // clear this directory's cache
       this.compilerCtx.fs.clearDirCache(dirPath);
 
-      if (isCopyTaskFile(this.config, dirPath)) {
-        this.queueCopyTasks();
-
-      } else {
-        if (!this.dirsDeleted.includes(dirPath)) {
-          this.dirsDeleted.push(dirPath);
-        }
-        this.queue(dirPath);
+      if (!this.dirsDeleted.includes(dirPath)) {
+        this.dirsDeleted.push(dirPath);
       }
+
+      if (isCopyTaskFile(this.config, dirPath)) {
+        this.hasCopyChanges = true;
+      }
+
+      this.queue();
 
     } catch (e) {
       this.config.logger.error(`watcher, dirDelete`, e);
@@ -228,50 +238,28 @@ export class WatcherListener {
   }
 
   generateWatcherResults() {
-    const watcher: WatcherResults = {
+    const watcher: d.WatcherResults = {
       dirsAdded: this.dirsAdded.slice(),
       dirsDeleted: this.dirsDeleted.slice(),
       filesAdded: this.filesAdded.slice(),
       filesDeleted: this.filesDeleted.slice(),
       filesUpdated: this.filesUpdated.slice(),
-      filesChanged: this.filesUpdated.concat(this.filesAdded, this.filesDeleted),
-      configUpdated: this.configUpdated
+      configUpdated: this.configUpdated,
+      hasCopyChanges: this.hasCopyChanges,
+      filesChanged: [],
+      changedExtensions: [],
+      hasBuildChanges: false,
+      hasScriptChanges: false,
+      hasStyleChanges: false,
+      hasImageChanges: false,
     };
     return watcher;
   }
 
-  queue(absPath: string) {
-    this.recentChanges = this.recentChanges.filter(rc => {
-      // only keep changes that happened in the last XX milliseconds
-      return (Date.now() - 500) < rc.timestamp;
-    });
-
-    if (this.recentChanges.some(rc => rc.filePath === absPath)) {
-      // we already kicked off a build for this path
-      // within the last XX milliseconds, let's just ignore the subsequent changes
-      this.config.logger.debug(`skipping recent subsequent file change: ${absPath}`);
-      return;
-    }
-
-    // debounce builds
+  queue() {
     clearTimeout(this.watchTmr);
 
-    this.recentChanges.push({
-      filePath: absPath,
-      timestamp: Date.now()
-    });
-
-    this.watchTmr = setTimeout(() => {
-      this.startRebuild();
-    }, 20);
-  }
-
-  queueCopyTasks() {
-    clearTimeout(this.copyTaskTmr);
-
-    this.copyTaskTmr = setTimeout(async () => {
-      await copyTasks(this.config, this.compilerCtx, [], true);
-    }, 100);
+    this.watchTmr = setTimeout(this.startRebuild.bind(this), 20);
   }
 
   resetWatcher() {
@@ -281,18 +269,20 @@ export class WatcherListener {
     this.filesDeleted = [];
     this.filesUpdated = [];
     this.configUpdated = false;
+    this.hasCopyChanges = false;
   }
 
 }
 
 
-function shouldRebuild(watcher: WatcherResults) {
+function shouldRebuild(watcher: d.WatcherResults) {
   return watcher.configUpdated ||
-  watcher.dirsAdded.length > 0 ||
-  watcher.dirsDeleted.length > 0 ||
-  watcher.filesAdded.length > 0 ||
-  watcher.filesDeleted.length > 0 ||
-  watcher.filesUpdated.length > 0;
+    watcher.hasCopyChanges ||
+    watcher.dirsAdded.length > 0 ||
+    watcher.dirsDeleted.length > 0 ||
+    watcher.filesAdded.length > 0 ||
+    watcher.filesDeleted.length > 0 ||
+    watcher.filesUpdated.length > 0;
 }
 
 
@@ -306,10 +296,4 @@ function isWebDevFileToWatch(filePath: string) {
 
 function isComponentsDtsFile(filePath: string) {
   return filePath.endsWith(COMPONENTS_DTS);
-}
-
-
-interface RecentChange {
-  filePath: string;
-  timestamp: number;
 }

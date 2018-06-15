@@ -5,7 +5,7 @@ import { normalizePath } from '../compiler/util';
 export class InMemoryFileSystem implements d.InMemoryFileSystem {
   private items: d.FsItems = {};
 
-  constructor(public disk: d.FileSystem, private path: d.Path) {}
+  constructor(public disk: d.FileSystem, private sys: d.StencilSystem) {}
 
   async accessData(filePath: string) {
     const item = this.getItem(filePath);
@@ -92,7 +92,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     await Promise.all(dirItems.map(async dirItem => {
       const srcPath = dirItem.absPath;
-      const destPath = normalizePath(this.path.join(dest, dirItem.relPath));
+      const destPath = normalizePath(this.sys.path.join(dest, dirItem.relPath));
 
       if (dirItem.isDirectory) {
         await this.copyDir(srcPath, destPath, opts);
@@ -212,8 +212,8 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     await Promise.all(dirItems.map(async dirItem => {
       // let's loop through each of the files we've found so far
       // create an absolute path of the item inside of this directory
-      const absPath = normalizePath(this.path.join(dirPath, dirItem));
-      const relPath = normalizePath(this.path.relative(initPath, absPath));
+      const absPath = normalizePath(this.sys.path.join(dirPath, dirItem));
+      const relPath = normalizePath(this.sys.path.relative(initPath, absPath));
 
       // get the fs stats for the item, could be either a file or directory
       const stats = await this.stat(absPath);
@@ -243,14 +243,18 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     let hasFileChanged = true;
 
     try {
-      const item = this.getItem(filePath);
-      const fileExists = item.exists && item.isFile;
-      const oldContent = item.fileText;
+      let oldHash: string = null;
 
-      const newContent = await this.readFile(filePath, { useCache: false });
+      const oldItem = this.getItem(filePath);
+      if (oldItem.exists && oldItem.isFile && oldItem.hash) {
+        oldHash = oldItem.hash;
+      }
 
-      if (fileExists) {
-        hasFileChanged = (oldContent !== newContent);
+      await this.readFile(filePath, { useCache: false });
+
+      if (oldHash != null) {
+        const newItem = this.getItem(filePath);
+        hasFileChanged = (oldHash !== newItem.hash);
       }
 
     } catch (e) {}
@@ -274,6 +278,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
+
+      if (this.sys.generateContentHash) {
+        item.hash = this.sys.generateContentHash(fileContent, 32);
+      }
     }
 
     return fileContent;
@@ -297,6 +305,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
+
+      if (this.sys.generateContentHash) {
+        item.hash = this.sys.generateContentHash(fileContent, 32);
+      }
     }
 
     return fileContent;
@@ -448,7 +460,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   async commit() {
-    const instructions = getCommitInstructions(this.path, this.items);
+    const instructions = getCommitInstructions(this.sys.path, this.items);
 
     // ensure directories we need exist
     const dirsAdded = await this.commitEnsureDirs(instructions.dirsToEnsure);
@@ -560,7 +572,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     const filePaths = Object.keys(this.items);
 
     filePaths.forEach(f => {
-      const filePath = this.path.relative(dirPath, f).split('/')[0];
+      const filePath = this.sys.path.relative(dirPath, f).split('/')[0];
       if (!filePath.startsWith('.') && !filePath.startsWith('/')) {
         this.clearFileCache(f);
       }

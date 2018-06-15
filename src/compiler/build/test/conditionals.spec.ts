@@ -91,7 +91,7 @@ describe('build conditionals', () => {
     expect(r.hasSvg).toBe(true);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     await c.fs.writeFile(path.join(root, 'src', 'global.css'), '/**css**/');
     await c.fs.commit();

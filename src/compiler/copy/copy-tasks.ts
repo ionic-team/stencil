@@ -1,13 +1,19 @@
 import * as d from '../../declarations';
-import { catchError, normalizePath } from '../util';
+import { buildError, normalizePath } from '../util';
 
 
-export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], commit: boolean) {
+export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, watcherResults: d.WatcherResults) {
   if (!config.copy) {
     return;
   }
 
-  const timeSpan = config.logger.createTimeSpan(`copy task started`, true);
+  if (compilerCtx.isRebuild && watcherResults && !watcherResults.hasCopyChanges) {
+    // don't bother copying if this was from a watch change
+    // but the change didn't include any copy task files
+    return;
+  }
+
+  const timeSpan = buildCtx.createTimeSpan(`copyTasks started`, true);
 
   try {
     const allCopyTasks: d.CopyTask[] = [];
@@ -22,16 +28,16 @@ export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, di
       await compilerCtx.fs.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
     }));
 
-    if (commit && allCopyTasks.length > 0) {
-      config.logger.debug(`copy task commit, tasks: ${allCopyTasks.length}`);
+    if (allCopyTasks.length > 0) {
       await compilerCtx.fs.commit();
     }
 
   } catch (e) {
-    catchError(diagnostics, e);
+    const err = buildError(buildCtx.diagnostics);
+    err.messageText = e.message;
   }
 
-  timeSpan.finish(`copy task finished`);
+  timeSpan.finish(`copyTasks finished`);
 }
 
 
@@ -54,7 +60,6 @@ export async function processCopyTasks(config: d.Config, compilerCtx: d.Compiler
   });
 
   if (config.sys.isGlob(copyTask.src)) {
-
     const copyTasks = await processGlob(config, outputTargets, copyTask);
     allCopyTasks.push(...copyTasks);
     return;
@@ -77,7 +82,11 @@ async function processCopyTaskDestDir(config: d.Config, compilerCtx: d.CompilerC
   try {
     const stats = await compilerCtx.fs.stat(processedCopyTask.src);
     processedCopyTask.isDirectory = stats.isDirectory;
-    config.logger.debug(`copy, ${processedCopyTask.src} to ${processedCopyTask.dest}, isDirectory: ${processedCopyTask.isDirectory}`);
+
+    const relSrc = config.sys.path.relative(config.rootDir, processedCopyTask.src);
+    const relDest = config.sys.path.relative(config.rootDir, processedCopyTask.dest);
+
+    config.logger.debug(`copy, ${relSrc} to ${relDest}, isDirectory: ${processedCopyTask.isDirectory}`);
     allCopyTasks.push(processedCopyTask);
 
   } catch (e) {

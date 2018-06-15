@@ -19,9 +19,9 @@ export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string
 export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   // reusable data between builds
   compilerCtx = compilerCtx || {};
-  compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys.path);
-  compilerCtx.cache = compilerCtx.cache || new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys.path), config.sys.tmpdir());
-  compilerCtx.events = compilerCtx.events || new BuildEvents(config);
+  compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys);
+  compilerCtx.cache = compilerCtx.cache || new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys), config.sys.tmpdir());
+  compilerCtx.events = compilerCtx.events || new BuildEvents();
   compilerCtx.appFiles = compilerCtx.appFiles || {};
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
   compilerCtx.collections = compilerCtx.collections || [];

@@ -77,7 +77,7 @@ export function mockConfig(opts = { enableLogger: false }): d.Config {
 export function mockCompilerCtx() {
   const compilerCtx: d.CompilerCtx = {
     activeBuildId: 0,
-    fs: new InMemoryFileSystem(mockFs(), require('path')),
+    fs: new InMemoryFileSystem(mockFs(), { path: require('path') } as any),
     collections: [],
     appFiles: {},
     cache: mockCache()
@@ -122,7 +122,7 @@ export function mockLogger() {
 
 
 export function mockCache() {
-  const fs = new InMemoryFileSystem(mockFs(), require('path'));
+  const fs = new InMemoryFileSystem(mockFs(), { path: require('path') } as any);
   const config = mockConfig();
   config.enableCache = true;
   return new Cache(config, fs, '/tmp/mock-cache');

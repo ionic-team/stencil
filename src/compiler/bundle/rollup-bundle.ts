@@ -13,6 +13,8 @@ import pathsResolution from './rollup-plugins/paths-resolution';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+  const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
+
   const builtins = require('rollup-plugin-node-builtins');
   const globals = require('rollup-plugin-node-globals');
   let rollupBundle: BundleSet;
@@ -56,6 +58,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
   } catch (err) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
   }
+
+  timeSpan.finish(`createBundle finished`);
 
   return rollupBundle;
 }

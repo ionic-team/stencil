@@ -42,7 +42,6 @@ export interface BuildCtx {
 
 export type GraphData = Map<string, string[]>;
 
-
 export interface BuildResults {
   buildId: number;
   diagnostics: d.Diagnostic[];
@@ -134,7 +133,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'build' | 'rebuild';
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish';
 
 
 export interface JSModuleList {

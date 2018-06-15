@@ -87,4 +87,5 @@ export interface FsItem {
   exists?: boolean;
   queueWriteToDisk?: boolean;
   queueDeleteFromDisk?: boolean;
+  hash?: string;
 }

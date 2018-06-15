@@ -18,7 +18,7 @@ import { writeBuildFiles } from './write-build';
 import { _deprecatedConfigCollections } from '../collections/_deprecated-collections';
 
 
-export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watcher?: d.WatcherResults): Promise<d.BuildResults> {
+export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watcher?: d.WatcherResults) {
   // create the build context if it doesn't exist
   // the buid context is the same object used for all builds and rebuilds
   // ctx is where stuff is cached for fast in-memory lookups later
@@ -35,6 +35,10 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
 
     // empty the directories on the first build
     await emptyOutputTargetDirs(config, compilerCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
+    // copy tasks
+    await copyTasks(config, compilerCtx, buildCtx, watcher);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // DEPRECATED config.colllections 2018-02-13
@@ -75,14 +79,6 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     // generate the app files, such as app.js, app.core.js
     await generateAppFiles(config, compilerCtx, buildCtx, entryModules, cmpRegistry);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
-
-    // copy all assets
-    if (!compilerCtx.hasSuccessfulBuild) {
-      // only do the initial copy on the first build
-      // watcher handles any re-copies
-      await copyTasks(config, compilerCtx, buildCtx.diagnostics, false);
-      if (buildCtx.shouldAbort()) return buildCtx.finish();
-    }
 
     // build index file and service worker
     await generateIndexHtmls(config, compilerCtx, buildCtx);

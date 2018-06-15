@@ -1,20 +1,41 @@
-import { build } from '../build/build';
-import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
+import { CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { configFileReload } from  '../../compiler/config/config-reload';
 
 
-export function rebuild(config: Config, compilerCtx: CompilerCtx, watcher: WatcherResults): Promise<BuildResults> {
+export function rebuild(config: Config, compilerCtx: CompilerCtx, w: WatcherResults) {
+
+  // files changed include updated, added and deleted
+  w.filesChanged = w.filesUpdated.concat(w.filesAdded, w.filesDeleted),
+
+  // collect up all the file extensions from changed files
+  w.filesChanged.forEach(filePath => {
+    const ext = config.sys.path.extname(filePath).toLowerCase();
+    if (!w.changedExtensions.includes(ext)) {
+      w.changedExtensions.push(ext);
+    }
+  });
+
+  // figure out what type of changes this watch build has from the changed file extension
+  w.hasScriptChanges = w.changedExtensions.some(ext => SCRIPT_EXT.includes(ext));
+  w.hasStyleChanges = w.changedExtensions.some(ext => STYLE_EXT.includes(ext));
+
+  // a script change or style change is a "build" change
+  w.hasBuildChanges = (w.hasScriptChanges || w.hasStyleChanges);
 
   // print out a pretty message about the changed files
-  printWatcherMessage(config, watcher);
+  printWatcherMessage(config, w);
 
-  if (watcher.configUpdated) {
+  if (w.configUpdated) {
     configFileReload(config, compilerCtx);
   }
 
   // kick off the rebuild
-  return build(config, compilerCtx, watcher);
+  compilerCtx.events.emit('buildStart', w);
 }
+
+
+const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
+const STYLE_EXT = ['css', 'scss', 'pcss', 'styl', 'stylus', 'less'];
 
 
 function printWatcherMessage(config: Config, watcherResults: WatcherResults) {
