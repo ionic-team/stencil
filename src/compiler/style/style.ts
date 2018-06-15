@@ -4,22 +4,31 @@ import { ENCAPSULATION } from '../../util/constants';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
+import { generateGlobalStyles } from '../app/app-global-styles';
 
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
-  if (buildCtx.shouldAbort()) {
+  if (canSkipBuild(compilerCtx, buildCtx)) {
     return;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
-  await Promise.all(entryModules.map(async bundle => {
-
+  const componentStyles = await Promise.all(entryModules.map(async bundle => {
     await Promise.all(bundle.moduleFiles.map(async moduleFile => {
       await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
     }));
-
   }));
+
+  // create the global styles
+  const globalStyles = await Promise.all(config.outputTargets.map(async outputTarget => {
+    await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
+  }));
+
+  await Promise.all([
+    componentStyles,
+    globalStyles
+  ]);
 
   timeSpan.finish(`generate styles finished`);
 }
@@ -207,7 +216,7 @@ export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
 }
 
 
-const PLUGIN_HELPERS = [
+export const PLUGIN_HELPERS = [
   {
     pluginName: 'PostCSS',
     pluginId: 'postcss',
@@ -228,3 +237,24 @@ const PLUGIN_HELPERS = [
     pluginExts: ['less']
   }
 ];
+
+
+function canSkipBuild(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (buildCtx.shouldAbort()) {
+    return true;
+  }
+
+  if (compilerCtx.isRebuild) {
+    if (buildCtx.filesChanged.some(f => f.endsWith('.css'))) {
+      return false;
+    }
+
+    if (buildCtx.filesChanged.some(f => PLUGIN_HELPERS.some(p => p.pluginExts.some(ext => f.endsWith('.' + ext))))) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return false;
+}

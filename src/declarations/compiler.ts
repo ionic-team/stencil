@@ -30,6 +30,7 @@ export interface CompilerCtx {
   tsService?: TsService;
   rootTsFiles?: string[];
 
+  lastJsModules?: d.JSModuleMap;
   compilerOptions?: any;
 }
 

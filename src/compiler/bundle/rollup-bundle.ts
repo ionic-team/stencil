@@ -72,6 +72,11 @@ export async function writeEsModules(config: Config, rollupBundle: BundleSet) {
 
 
 export async function writeLegacyModules(config: Config, rollupBundle: BundleSet, entryModules: EntryModule[]) {
+  if (!config.buildEs5) {
+    // only create legacy modules when generating es5 fallbacks
+    return null;
+  }
+
   rollupBundle.cache.modules.forEach(module => {
     const key = module.id;
     const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
@@ -96,12 +101,16 @@ export async function writeLegacyModules(config: Config, rollupBundle: BundleSet
 
 
 export async function writeEsmEs5Modules(config: Config, rollupBundle: BundleSet) {
-  const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
-    format: 'es',
-    banner: generatePreamble(config),
-    intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
-    strict: false,
-  });
+  if (config.outputTargets.some(o => o.type === 'dist')) {
+    const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
+      format: 'es',
+      banner: generatePreamble(config),
+      intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
+      strict: false,
+    });
 
-  return <any>results as JSModuleList;
+    return <any>results as JSModuleList;
+  }
+
+  return null;
 }

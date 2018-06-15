@@ -25,19 +25,32 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
       return results;
     }
 
-    // bundle using only es modules and dynamic imports
-    results.esm = await writeEsModules(config, rollupBundle);
+    const asyncResults = await Promise.all([
+      // [0] bundle using only es modules and dynamic imports
+      await writeEsModules(config, rollupBundle),
 
-    buildCtx.bundleBuildCount = Object.keys(results.esm).length;
+      // [1] bundle using commonjs using jsonp callback
+      await writeLegacyModules(config, rollupBundle, entryModules),
 
-    if (config.buildEs5) {
-      // only create legacy modules when generating es5 fallbacks
-      // bundle using commonjs using jsonp callback
-      results.es5 = await writeLegacyModules(config, rollupBundle, entryModules);
+      // [2] write the esm/es5 version when doing dist builds
+      await writeEsmEs5Modules(config, rollupBundle)
+    ]);
+
+    if (buildCtx.shouldAbort()) {
+      // someone could have errored
+      return results;
     }
 
-    if (config.outputTargets.some(o => o.type === 'dist')) {
-      results.esmEs5 = await writeEsmEs5Modules(config, rollupBundle);
+    if (asyncResults[0]) {
+      results.esm = asyncResults[0];
+    }
+
+    if (asyncResults[1]) {
+      results.es5 = asyncResults[1];
+    }
+
+    if (asyncResults[2]) {
+      results.esmEs5 = asyncResults[2];
     }
 
     if (config.minifyJs) {
@@ -53,8 +66,11 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
 
 
 async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, results: JSModuleMap) {
-  const promises = Object.keys(results).map((moduleType: 'esm' | 'es5' | 'esmEs5') => {
+  const promises = Object.keys(results).map(async (moduleType: 'esm' | 'es5' | 'esmEs5') => {
     const jsModuleList = results[moduleType];
+    if (jsModuleList == null) {
+      return null;
+    }
 
     const promises = Object.keys(jsModuleList)
       .filter(m => !m.startsWith('entry:'))
@@ -80,5 +96,5 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     return Promise.all(promises);
   });
 
-  return Promise.all(promises);
+  await Promise.all(promises);
 }
