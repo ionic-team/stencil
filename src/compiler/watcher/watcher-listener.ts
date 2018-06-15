@@ -251,7 +251,6 @@ export class WatcherListener {
       hasBuildChanges: false,
       hasScriptChanges: false,
       hasStyleChanges: false,
-      hasImageChanges: false,
     };
     return watcher;
   }
