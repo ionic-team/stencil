@@ -21,7 +21,8 @@ if (success) {
       external: [
         'fs',
         'path',
-        'chalk'
+        'chalk',
+        'child_process'
       ],
       plugins: [
         rollupResolve()

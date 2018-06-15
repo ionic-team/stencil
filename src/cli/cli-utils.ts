@@ -1,8 +1,8 @@
-import { Diagnostic, StencilSystem } from '../declarations';
+import * as d from '../declarations';
 import { normalizePath } from '../compiler/util';
 
 
-export function getConfigFilePath(process: NodeJS.Process, sys: StencilSystem, configArg: string) {
+export function getConfigFilePath(process: NodeJS.Process, sys: d.StencilSystem, configArg: string) {
   if (configArg) {
     if (!sys.path.isAbsolute(configArg)) {
       // passed in a custom stencil config location
@@ -19,7 +19,7 @@ export function getConfigFilePath(process: NodeJS.Process, sys: StencilSystem, c
 }
 
 
-export function hasError(diagnostics: Diagnostic[]): boolean {
+export function hasError(diagnostics: d.Diagnostic[]): boolean {
   if (!diagnostics) {
     return false;
   }
