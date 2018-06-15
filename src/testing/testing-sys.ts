@@ -44,7 +44,7 @@ export class TestingSystem extends NodeSystem {
   }
 
   tmpdir() {
-    return '/tmp/testing';
+    return path.join(path.resolve('/'), 'tmp', 'testing');
   }
 
 }

@@ -19,6 +19,7 @@ export interface InMemoryFileSystem {
       filter?: (src: string, dest?: string) => boolean;
   }): Promise<void>;
   emptyDir(dirPath: string): Promise<void>;
+  hasFileChanged(filePath: string): Promise<boolean>;
   readdir(dirPath: string, opts?: d.FsReaddirOptions): Promise<d.FsReaddirItem[]>;
   readFile(filePath: string, opts?: d.FsReadOptions): Promise<string>;
   /**

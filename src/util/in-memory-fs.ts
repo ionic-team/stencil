@@ -174,7 +174,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
           const d = this.items[filePath];
 
           if (d.exists) {
-            // console.log(filePath, d)
             const item: d.FsReaddirItem = {
               absPath: filePath,
               relPath: parts[inMemoryDirs.length],
@@ -238,6 +237,25 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         await this.readDirectory(initPath, absPath, opts, collectedPaths);
       }
     }));
+  }
+
+  async hasFileChanged(filePath: string) {
+    let hasFileChanged = true;
+
+    try {
+      const item = this.getItem(filePath);
+      const fileExists = item.exists && item.isFile;
+      const oldContent = item.fileText;
+
+      const newContent = await this.readFile(filePath, { useCache: false });
+
+      if (fileExists) {
+        hasFileChanged = (oldContent !== newContent);
+      }
+
+    } catch (e) {}
+
+    return hasFileChanged;
   }
 
   async readFile(filePath: string, opts?: d.FsReadOptions) {
@@ -330,11 +348,14 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.exists = true;
       item.isDirectory = s.isDirectory();
       item.isFile = s.isFile();
+      item.size = s.size;
     }
 
     return {
-      isFile: item.isFile,
-      isDirectory: item.isDirectory
+      exists: !!item.exists,
+      isFile: !!item.isFile,
+      isDirectory: !!item.isDirectory,
+      size: typeof item.size === 'number' ? item.size : 0
     };
   }
 

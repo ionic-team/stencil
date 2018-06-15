@@ -1,8 +1,8 @@
-import { FileSystem } from '../../declarations';
+import * as d from '../../declarations';
 import * as fs from 'fs';
 
 
-export class NodeFs implements FileSystem {
+export class NodeFs implements d.FileSystem {
 
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
@@ -15,6 +15,10 @@ export class NodeFs implements FileSystem {
 
       rd.pipe(wr);
     });
+  }
+
+  createReadStream(path: string) {
+    return fs.createReadStream(path);
   }
 
   mkdir(filePath: string) {
@@ -70,8 +74,8 @@ export class NodeFs implements FileSystem {
   }
 
   stat(itemPath: string) {
-    return new Promise<any>((resolve, reject) => {
-      fs.stat(itemPath, (err: any, stats: any) => {
+    return new Promise<d.FsStats>((resolve, reject) => {
+      fs.stat(itemPath, (err, stats) => {
         if (err) {
           reject(err);
         } else {
@@ -81,7 +85,7 @@ export class NodeFs implements FileSystem {
     });
   }
 
-  statSync(itemPath: string) {
+  statSync(itemPath: string): d.FsStats {
     return fs.statSync(itemPath);
   }
 
