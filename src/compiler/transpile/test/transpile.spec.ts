@@ -17,6 +17,29 @@ describe('transpile', () => {
   });
 
 
+  it('should transpile enums', async () => {
+    c.config.minifyJs = true;
+    await c.fs.writeFiles({
+      [path.join(root, 'src', 'my-enum.tsx')]: `export const enum MyEnum { A = 1, B = 2, C = 3 }`,
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
+        import { MyEnum } from './my-enum';
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          constructor() {
+            console.log(MyEnum.A, MyEnum.B, MyEnum.C);
+          }
+        }
+      `
+    });
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(content).toContain('console.log(1,2,3)');
+  });
+
+
   it('should rebuild transpile for deleted directory', async () => {
     c.config.watch = true;
     await c.fs.writeFiles({

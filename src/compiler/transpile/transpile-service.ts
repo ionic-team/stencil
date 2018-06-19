@@ -71,7 +71,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   const userCompilerOptions = await getUserCompilerOptions(config, ctx.compilerCtx);
   const compilerOptions = Object.assign({}, userCompilerOptions);
 
-  compilerOptions.isolatedModules = true;
+  compilerOptions.isolatedModules = false;
   compilerOptions.suppressOutputPathCheck = true;
   compilerOptions.allowNonTsExtensions = true;
   compilerOptions.lib = undefined;
