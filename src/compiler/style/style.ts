@@ -21,9 +21,11 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
   }));
 
   // create the global styles
-  const globalStyles = await Promise.all(config.outputTargets.map(async outputTarget => {
-    await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
-  }));
+  const globalStyles = await Promise.all(config.outputTargets
+    .filter(outputTarget => outputTarget.type !== 'stats')
+    .map(async outputTarget => {
+      await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
+    }));
 
   await Promise.all([
     componentStyles,
