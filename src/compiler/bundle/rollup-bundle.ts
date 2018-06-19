@@ -49,14 +49,17 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       nodeEnvVars(config),
       ...config.plugins
     ],
-    onwarn: createOnWarnFn(config, buildCtx.diagnostics)
+    onwarn: createOnWarnFn(config, buildCtx.diagnostics),
+    cache: compilerCtx.entryBundleCache
   };
 
   try {
     rollupBundle = await rollup(rollupConfig);
+    compilerCtx.entryBundleCache = rollupBundle;
 
   } catch (err) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
+    compilerCtx.entryBundleCache = null;
   }
 
   timeSpan.finish(`createBundle finished`);
