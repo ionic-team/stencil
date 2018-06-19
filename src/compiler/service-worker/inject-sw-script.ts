@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { appendSwScript, generateServiceWorkerUrl } from './service-worker-util';
 
 
-export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
+export async function updateIndexHtmlServiceWorker(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexHtml: string) {
   if (!outputTarget.serviceWorker && config.devMode) {
     // if we're not generating a sw, and this is a dev build
     // then let's inject a script that always unregisters any service workers
@@ -10,18 +10,18 @@ export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarge
 
   } else if (outputTarget.serviceWorker) {
     // we have a valid sw config, so we'll need to inject the register sw script
-    indexHtml = await injectRegisterServiceWorker(config, outputTarget, indexHtml);
+    indexHtml = await injectRegisterServiceWorker(config, buildCtx, outputTarget, indexHtml);
   }
 
   return indexHtml;
 }
 
 
-export async function injectRegisterServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
+export async function injectRegisterServiceWorker(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexHtml: string) {
   const swUrl = generateServiceWorkerUrl(config, outputTarget);
 
   const serviceWorker = getRegisterSwScript(swUrl);
-  const swHtml = `<script>${serviceWorker}</script>`;
+  const swHtml = `<script data-build="${buildCtx.timestamp}">${serviceWorker}</script>`;
 
   return appendSwScript(indexHtml, swHtml);
 }
@@ -35,14 +35,11 @@ export function injectUnregisterServiceWorker(indexHtml: string) {
 function getRegisterSwScript(swUrl: string) {
   return `
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      window.addEventListener('load', function(){
+      window.addEventListener('load', function() {
         navigator.serviceWorker.register('${swUrl}')
           .then(function(reg) {
-            console.log('service worker registered', reg);
-
             reg.onupdatefound = function() {
               var installingWorker = reg.installing;
-
               installingWorker.onstatechange = function() {
                 if (installingWorker.state === 'installed') {
                   window.dispatchEvent(new Event('swUpdate'))
@@ -50,7 +47,7 @@ function getRegisterSwScript(swUrl: string) {
               }
             }
           })
-          .catch(function(err) { console.log('service worker error', err) });
+          .catch(function(err) { console.error('service worker error', err) });
       });
     }
 `;

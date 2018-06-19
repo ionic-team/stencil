@@ -1,27 +1,27 @@
 import * as d from '../../declarations';
-import { catchError, hasError } from '../util';
+import { catchError } from '../util';
 import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script';
 
 
-export function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort()) {
-    return null;
+    return;
   }
 
   const indexHtmlOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.indexHtml);
 
-  return Promise.all(indexHtmlOutputs.map(outputTarget => {
-    return generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+  await Promise.all(indexHtmlOutputs.map(async outputTarget => {
+    await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
 
 export async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (hasError(buildCtx.diagnostics)) {
+  if (!outputTarget.indexHtml || !config.srcIndexHtml) {
     return;
   }
 
-  if (!outputTarget.indexHtml || !config.srcIndexHtml) {
+  if (buildCtx.shouldAbort()) {
     return;
   }
 
@@ -35,7 +35,7 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
     let indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
 
     try {
-      indexSrcHtml = await updateIndexHtmlServiceWorker(config, outputTarget, indexSrcHtml);
+      indexSrcHtml = await updateIndexHtmlServiceWorker(config, buildCtx, outputTarget, indexSrcHtml);
 
       // add the prerendered html to our list of files to write
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
