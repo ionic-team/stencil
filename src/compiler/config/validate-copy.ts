@@ -1,23 +1,27 @@
-import { Config, CopyTasks } from '../../declarations';
+import * as d from '../../declarations';
 
 
-export function validateCopy(config: Config) {
-  if (config.copy) {
-    // merge user copy tasks into the default
-    config.copy = Object.assign({}, DEFAULT_COPY_TASKS, config.copy);
-
-  } else if (config.copy === null || (config.copy as any) === false) {
+export function validateCopy(config: d.Config) {
+  if (config.copy === null || (config.copy as any) === false) {
     // manually forcing to skip the copy task
     config.copy = null;
-
-  } else {
-    // use the default copy tasks
-    config.copy = Object.assign({}, DEFAULT_COPY_TASKS);
+    return;
   }
+
+  if (!Array.isArray(config.copy)) {
+    config.copy = [];
+  }
+
+  if (!config.copy.some(c => c.src === DEFAULT_ASSETS.src)) {
+    config.copy.push(DEFAULT_ASSETS);
+  }
+
+  if (!config.copy.some(c => c.src === DEFAULT_MANIFEST.src)) {
+    config.copy.push(DEFAULT_MANIFEST);
+  }
+
 }
 
 
-const DEFAULT_COPY_TASKS: CopyTasks = {
-  assets: { src: 'assets', warn: false },
-  manifestJson: { src: 'manifest.json', warn: false }
-};
+const DEFAULT_ASSETS = { src: 'assets', warn: false };
+const DEFAULT_MANIFEST = { src: 'manifest.json', warn: false };

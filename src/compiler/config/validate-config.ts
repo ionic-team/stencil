@@ -72,8 +72,6 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
-  config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}`);
-
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
 
   setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
@@ -87,7 +85,6 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
       throw new Error(`config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`);
     }
   }
-  config.logger.debug(`hashFileNames: ${config.hashFileNames}, hashedFileNameLength: ${config.hashedFileNameLength}`);
 
   validateCopy(config);
 
@@ -123,8 +120,6 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
-
-  config.logger.debug(`validated build config`);
 
   if (setEnvVariables !== false) {
     setProcessEnvironment(config);

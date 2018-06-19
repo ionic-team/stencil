@@ -163,7 +163,7 @@ describe(`in-memory-fs`, () => {
 
   beforeEach(() => {
     mockedFs = mockFs();
-    fs = new InMemoryFileSystem(mockedFs, path);
+    fs = new InMemoryFileSystem(mockedFs, { path: path } as any);
   });
 
 
@@ -215,65 +215,6 @@ describe(`in-memory-fs`, () => {
     result = fs.accessSync(`/file`);
     expect(result).toBe(false);
     expect(mockedFs.diskReads).toBe(1);
-  });
-
-  it(`copyDir`, async () => {
-    await fs.writeFile(`/src/file1.js`, '1');
-    await fs.writeFile(`/src/file2.js`, '2');
-    await fs.commit();
-
-    await fs.copy(`/src`, `/some/path`);
-
-    const result = await fs.commit();
-    expect(result.filesWritten[0]).toBe(`/some/path/file1.js`);
-    expect(result.filesWritten[1]).toBe(`/some/path/file2.js`);
-    expect(result.filesWritten).toHaveLength(2);
-    expect(result.dirsDeleted).toHaveLength(0);
-    expect(result.dirsAdded[0]).toBe(`/some`);
-    expect(result.dirsAdded[1]).toBe(`/some/path`);
-  });
-
-  it(`copyFile`, async () => {
-    await fs.writeFile(`/src/file1.js`, '1');
-    await fs.writeFile(`/src/file2.js`, '2');
-    await fs.commit();
-
-    await fs.copy(`/src/file1.js`, `/some/path/file1.js`);
-
-    const result = await fs.commit();
-    expect(result.filesWritten[0]).toBe(`/some/path/file1.js`);
-    expect(result.filesWritten).toHaveLength(1);
-    expect(result.dirsDeleted).toHaveLength(0);
-    expect(result.dirsAdded[0]).toBe(`/some`);
-    expect(result.dirsAdded[1]).toBe(`/some/path`);
-  });
-
-  it(`copyFile, do copy w/ filter`, async () => {
-    await fs.writeFile(`/src/file.js`, 'content');
-    await fs.commit();
-
-    await fs.copy(`/src/file.js`, `/some/path/whatever.js`, { filter: (src, dest) => {
-      return src === `/src/file.js` && dest === `/some/path/whatever.js`;
-    }});
-
-    const result = await fs.commit();
-    expect(result.filesWritten[0]).toBe(`/some/path/whatever.js`);
-    expect(result.filesWritten).toHaveLength(1);
-  });
-
-  it(`copyFile, do not copy w/ filter`, async () => {
-    await fs.writeFile(`/src/file.js`, 'content');
-    await fs.commit();
-
-    await fs.copy(`/src/file.js`, `/some/path/whatever.js`, { filter: () => {
-      return false;
-    }});
-
-    const i = await fs.commit();
-    expect(i.filesWritten).toHaveLength(0);
-    expect(i.filesDeleted).toHaveLength(0);
-    expect(i.dirsAdded).toHaveLength(0);
-    expect(i.dirsDeleted).toHaveLength(0);
   });
 
   it(`readdir combines both in-memory read w/ inMemoryOnly option and disk readdir reads`, async () => {

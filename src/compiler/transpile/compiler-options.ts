@@ -1,10 +1,13 @@
 import * as d from '../../declarations';
-import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath } from '../util';
 import * as ts from 'typescript';
 
 
-export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx) {
+  if (compilerCtx.compilerOptions) {
+    return compilerCtx.compilerOptions;
+  }
+
   let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
@@ -25,7 +28,9 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
       config.logger.warn('tsconfig.json is malformed, using default settings');
     }
 
-  } catch (e) {}
+  } catch (e) {
+    config.logger.debug(`getUserCompilerOptions: ${e}`);
+  }
 
   if (config._isTesting) {
     compilerOptions.module = ts.ModuleKind.CommonJS;
@@ -34,13 +39,9 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
   // apply user config to tsconfig
   compilerOptions.rootDir = config.srcDir;
 
-  const collectionOutputTarget = (config.outputTargets as d.OutputTargetDist[]).find(o => !!o.collectionDir);
-  if (collectionOutputTarget) {
-    compilerOptions.outDir = collectionOutputTarget.collectionDir;
-
-  } else {
-    compilerOptions.outDir = pathJoin(config, config.rootDir, IN_MEMORY_DIR);
-  }
+  // during the transpile we'll write the output
+  // to the correct location(s)
+  compilerOptions.outDir = undefined;
 
 
   // generate .d.ts files when generating a distribution and in prod mode
@@ -54,6 +55,8 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
   }
 
   validateCompilerOptions(compilerOptions);
+
+  compilerCtx.compilerOptions = compilerOptions;
 
   return compilerOptions;
 }

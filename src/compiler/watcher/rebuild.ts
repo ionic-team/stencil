@@ -1,30 +1,51 @@
-import { build } from '../build/build';
-import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
+import { CompilerCtx, Config, WatchResults } from '../../declarations';
 import { configFileReload } from  '../../compiler/config/config-reload';
 
 
-export function rebuild(config: Config, compilerCtx: CompilerCtx, watcher: WatcherResults): Promise<BuildResults> {
+export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: WatchResults) {
+
+  // files changed include updated, added and deleted
+  watchResults.filesChanged = watchResults.filesUpdated.concat(watchResults.filesAdded, watchResults.filesDeleted),
+
+  // collect up all the file extensions from changed files
+  watchResults.filesChanged.forEach(filePath => {
+    const ext = filePath.split('.').pop().toLowerCase();
+    if (!watchResults.changedExtensions.includes(ext)) {
+      watchResults.changedExtensions.push(ext);
+    }
+  });
+  watchResults.changedExtensions.sort();
+
+  // figure out what type of changes this watch build has from the changed file extension
+  watchResults.hasScriptChanges = watchResults.changedExtensions.some(ext => SCRIPT_EXT.includes(ext));
+  watchResults.hasStyleChanges = watchResults.changedExtensions.some(ext => STYLE_EXT.includes(ext));
+  watchResults.hasImageChanges = watchResults.changedExtensions.some(ext => IMAGE_EXT.includes(ext));
 
   // print out a pretty message about the changed files
-  printWatcherMessage(config, watcher);
+  printWatcherMessage(config, watchResults);
 
-  if (watcher.configUpdated) {
+  if (watchResults.configUpdated) {
     configFileReload(config, compilerCtx);
   }
 
   // kick off the rebuild
-  return build(config, compilerCtx, watcher);
+  compilerCtx.events.emit('build', watchResults);
 }
 
 
-function printWatcherMessage(config: Config, watcherResults: WatcherResults) {
+const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
+const STYLE_EXT = ['css', 'scss', 'pcss', 'styl', 'stylus', 'less'];
+const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico', 'svg'];
+
+
+function printWatcherMessage(config: Config, watcherResults: WatchResults) {
   const changedFiles = watcherResults.filesChanged;
 
   const totalChangedFiles = changedFiles.length;
   let msg: string = null;
 
-  if (totalChangedFiles > 6) {
-    const trimmedChangedFiles = changedFiles.slice(0, 5);
+  if (totalChangedFiles > MAX_FILE_PRINT) {
+    const trimmedChangedFiles = changedFiles.slice(0, MAX_FILE_PRINT - 1);
     const otherFilesTotal = totalChangedFiles - trimmedChangedFiles.length;
     msg = `changed files: ${trimmedChangedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
     if (otherFilesTotal > 0) {
@@ -54,3 +75,5 @@ function printWatcherMessage(config: Config, watcherResults: WatcherResults) {
     config.logger.info(config.logger.cyan(msg));
   }
 }
+
+const MAX_FILE_PRINT = 5;

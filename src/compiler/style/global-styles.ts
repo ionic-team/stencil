@@ -1,17 +1,16 @@
 import * as d from '../../declarations';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
-import { getGlobalStyleFilename } from './app-file-naming';
+import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { minifyStyle } from '../style/minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (typeof config.globalStyle !== 'string') {
-    config.logger.debug(`"config.globalStyle" not found`);
+  if (canSkipGlobalStyles(config, buildCtx)) {
     return;
   }
 
-  const timeSpan = config.logger.createTimeSpan(`compile global style start`);
+  const timeSpan = buildCtx.createTimeSpan(`compile global style start`);
 
   try {
     const styleText = await loadGlobalStyle(config, compilerCtx, buildCtx, config.globalStyle);
@@ -48,4 +47,25 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
   }
 
   return style;
+}
+
+
+function canSkipGlobalStyles(config: d.Config, buildCtx: d.BuildCtx) {
+  if (typeof config.globalStyle !== 'string') {
+    return true;
+  }
+
+  if (buildCtx.shouldAbort()) {
+    return true;
+  }
+
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+
+  if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
+    return true;
+  }
+
+  return false;
 }

@@ -9,6 +9,7 @@ export interface StencilSystem {
     typescriptVersion?: string;
     runtime?: string;
   };
+  copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   createDom?(): CreateDom;
   createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   destroy?(): void;
@@ -55,6 +56,7 @@ export interface StencilSystem {
     format(url: Url): string;
     resolve(from: string, to: string): string;
   };
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
   vm?: {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;

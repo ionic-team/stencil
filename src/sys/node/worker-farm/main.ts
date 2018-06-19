@@ -1,20 +1,20 @@
 import * as d from '../../../declarations';
-import { MessageData, Runner, Task, Worker, WorkerOptions } from './interface';
 import { cpus } from 'os';
-import { fork } from 'child_process';
+import { createHash } from 'crypto';
+import { ForkOptions, fork } from 'child_process';
 
 
 export class WorkerFarm {
-  options: WorkerOptions;
+  options: d.WorkerOptions;
   modulePath: string;
   workerModule: any;
-  workers: Worker[] = [];
-  taskQueue: Task[] = [];
+  workers: d.WorkerProcess[] = [];
+  taskQueue: d.WorkerTask[] = [];
   isExisting = false;
   logger: d.Logger;
-  singleThreadRunner: Runner;
+  singleThreadRunner: d.WorkerRunner;
 
-  constructor(modulePath: string, options: WorkerOptions = {}) {
+  constructor(modulePath: string, options: d.WorkerOptions = {}) {
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
     this.modulePath = modulePath;
     this.logger = {
@@ -32,7 +32,7 @@ export class WorkerFarm {
     }
   }
 
-  run(methodName: string, args?: any[], isLongRunningTask = false) {
+  run(methodName: string, args?: any[], opts: d.WorkerRunnerOptions = {}) {
     if (this.isExisting) {
       return Promise.reject(`process exited`);
     }
@@ -42,15 +42,33 @@ export class WorkerFarm {
     }
 
     return new Promise<any>((resolve, reject) => {
-      const task: Task = {
+      const task: d.WorkerTask = {
         methodName: methodName,
         args: args,
-        isLongRunningTask: isLongRunningTask,
+        isLongRunningTask: !!opts.isLongRunningTask,
         resolve: resolve,
         reject: reject
       };
-      this.taskQueue.push(task);
-      this.processTaskQueue();
+
+      if (typeof opts.workerKey === 'string') {
+        // this tasl has a worker key so that it always uses
+        // the same worker, this way it can reuse that worker's cache again
+        // let's figure out its worker id which should always be
+        // the same id number for the same worker key string
+        const workerId = getWorkerIdFromKey(opts.workerKey, this.workers);
+        const worker = this.workers.find(w => w.workerId === workerId);
+        if (!worker) {
+          task.reject(`invalid worker id for task: ${task}`);
+        } else {
+          this.send(worker, task);
+        }
+
+      } else {
+        // add this task to the queue to be processed
+        // and assigned to the next available worker
+        this.taskQueue.push(task);
+        this.processTaskQueue();
+      }
     });
   }
 
@@ -68,21 +86,22 @@ export class WorkerFarm {
   }
 
   createWorker(workerId: number) {
-    const options = Object.assign({
+    const argv = [
+      `--start-worker`,
+      `--worker-id=${workerId}`
+    ];
+
+    const options: ForkOptions = {
       env: process.env,
       cwd: process.cwd()
-    }, this.options.forkOptions);
-
-    const argv = [
-      '--start-worker'
-    ];
+    };
 
     const childProcess = fork(this.modulePath, argv, options);
 
-    const worker: Worker = {
+    const worker: d.WorkerProcess = {
       workerId: workerId,
       taskIds: 0,
-      send: (msg: MessageData) => childProcess.send(msg),
+      send: (msg: d.WorkerMessageData) => childProcess.send(msg),
       kill: () => childProcess.kill('SIGKILL')
     };
 
@@ -92,7 +111,15 @@ export class WorkerFarm {
       this.onWorkerExit(workerId, code);
     });
 
-    childProcess.on('error', () => {/**/});
+    childProcess.on('error', err => {
+      this.receiveMessageFromWorker({
+        workerId: workerId,
+        error: {
+          message: `Worker (${workerId}) process error: ${err.message}`,
+          stack: err.stack
+        }
+      });
+    });
 
     return worker;
   }
@@ -106,19 +133,6 @@ export class WorkerFarm {
     worker.exitCode = exitCode;
 
     setTimeout(() => {
-      const worker = this.workers.find(w => w.workerId === workerId);
-      if (worker) {
-        worker.tasks.forEach(task => {
-          this.receiveMessageFromWorker({
-            workerId: workerId,
-            taskId: task.taskId,
-            error: {
-              message: `Worker exited. Canceled "${task.methodName}" task.`
-            }
-          });
-        });
-      }
-
       this.stopWorker(workerId);
     }, 10);
   }
@@ -127,6 +141,11 @@ export class WorkerFarm {
     const worker = this.workers.find(w => w.workerId === workerId);
     if (worker && !worker.isExisting) {
       worker.isExisting = true;
+
+      worker.tasks.forEach(task => {
+        task.reject(WORKER_EXITED_MSG);
+      });
+      worker.tasks.length = 0;
 
       worker.send({
         exitProcess: true
@@ -147,17 +166,22 @@ export class WorkerFarm {
     }
   }
 
-  receiveMessageFromWorker(msg: MessageData) {
+  receiveMessageFromWorker(msg: d.WorkerMessageData) {
     // message sent back from a worker process
+    if (this.isExisting) {
+      // already exiting, don't bother
+      return;
+    }
+
     const worker = this.workers.find(w => w.workerId === msg.workerId);
     if (!worker) {
-      this.logger.error(`Worker Farm: Received message for unknown worker (${msg.workerId})`);
+      this.logger.error(`Received message for unknown worker (${msg.workerId})`);
       return;
     }
 
     const task = worker.tasks.find(w => w.taskId === msg.taskId);
     if (!task) {
-      this.logger.error(`Worker Farm: Received message for unknown taskId (${msg.taskId}) for worker (${worker.workerId})`);
+      this.logger.error(`Worker (${worker.workerId}) received message for unknown taskId (${msg.taskId})`);
       return;
     }
 
@@ -199,7 +223,7 @@ export class WorkerFarm {
         taskId: task.taskId,
         workerId: workerId,
         error: {
-          message: `worker timed out! Canceled "${task.methodName}" task`
+          message: `Worker (${workerId}) timed out! Canceled "${task.methodName}" task.`
         }
       });
     });
@@ -221,7 +245,7 @@ export class WorkerFarm {
     }
   }
 
-  send(worker: Worker, task: Task) {
+  send(worker: d.WorkerProcess, task: d.WorkerTask) {
     if (!worker || !task) {
       return;
     }
@@ -250,16 +274,20 @@ export class WorkerFarm {
     if (!this.isExisting) {
       this.isExisting = true;
 
-      for (let i = this.workers.length - 1; i >= 0; i--) {
-        this.stopWorker(this.workers[i].workerId);
-      }
+      // workers may already be getting removed
+      // so doing it this way cuz we don't know if the
+      // order of the workers array is consistent
+      const workerIds = this.workers.map(worker => worker.workerId);
+      workerIds.forEach(workerId => {
+        this.stopWorker(workerId);
+      });
     }
   }
 
 }
 
 
-export function nextAvailableWorker(workers: Worker[], maxConcurrentTasksPerWorker: number) {
+export function nextAvailableWorker(workers: d.WorkerProcess[], maxConcurrentTasksPerWorker: number) {
   const availableWorkers = workers.filter(w => {
     if (w.tasks.length >= maxConcurrentTasksPerWorker) {
       // do not use this worker if it's at its max
@@ -299,10 +327,37 @@ export function nextAvailableWorker(workers: Worker[], maxConcurrentTasksPerWork
 }
 
 
-const DEFAULT_OPTIONS: WorkerOptions = {
-  forkOptions: {},
+function getWorkerIdFromKey(workerKey: string, workers: d.WorkerProcess[]) {
+  const hashChar = createHash('sha1')
+                     .update(workerKey)
+                     .digest('base64')
+                     .charAt(0);
+
+  const workerIds = workers.map(w => w.workerId);
+
+  const b64Int = B64_TABLE[hashChar];
+  const dv = b64Int / 64;
+  const mt = (workerIds.length - 1) * dv;
+  const workerIndex = Math.round(mt);
+
+  return workerIds[workerIndex];
+}
+
+const B64_TABLE: { [char: string]: number } = {
+  'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
+  'N': 13, 'O': 14, 'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23,
+  'Y': 24, 'Z': 25, 'a': 26, 'b': 27, 'c': 28, 'd': 29, 'e': 30, 'f': 31, 'g': 32, 'h': 33, 'i': 34,
+  'j': 35, 'k': 36, 'l': 37, 'm': 38, 'n': 39, 'o': 40, 'p': 41, 'q': 42, 'r': 43, 's': 44, 't': 45,
+  'u': 46, 'v': 47, 'w': 48, 'x': 49, 'y': 50, 'z': 51, '0': 52, '1': 53, '2': 54, '3': 55, '4': 56,
+  '5': 57, '6': 58, '7': 59, '8': 60, '9': 61, '+': 62, '/': 63,
+};
+
+
+const DEFAULT_OPTIONS: d.WorkerOptions = {
   maxConcurrentWorkers: (cpus() || { length: 1 }).length,
   maxConcurrentTasksPerWorker: 5,
-  maxTaskTime: 90000,
+  maxTaskTime: 120000,
   forcedKillTime: 100
 };
+
+export const WORKER_EXITED_MSG = `worker has exited`;

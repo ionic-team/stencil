@@ -1,8 +1,8 @@
-import { Diagnostic, PrintLine } from '../../declarations';
+import * as d from '../../declarations';
 
 
-export function cleanDiagnostics(diagnostics: Diagnostic[]) {
-  const cleaned: Diagnostic[] = [];
+export function cleanDiagnostics(diagnostics: d.Diagnostic[]) {
+  const cleaned: d.Diagnostic[] = [];
 
   const maxErrors = Math.min(diagnostics.length, MAX_ERRORS);
   const dups: {[key: string]: boolean} = {};
@@ -29,70 +29,6 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
   }
 
   return cleaned;
-}
-
-
-export function formatFileName(cwd: string, fileName: string, startLineNumber: number = null, startCharNumber: number = null) {
-  if (!fileName) return '';
-
-  if (cwd) {
-    fileName = fileName.replace(cwd, '');
-    if (/\/|\\/.test(fileName.charAt(0))) {
-      fileName = fileName.substr(1);
-    }
-  }
-
-  if (startLineNumber != null && typeof startLineNumber === 'number' && startLineNumber >= 0) {
-    fileName += ':' + startLineNumber;
-
-    if (startCharNumber != null && typeof startCharNumber === 'number' && startCharNumber >= 0) {
-      fileName += ':' + startCharNumber;
-    }
-  }
-
-  return fileName;
-}
-
-
-export function formatHeader(type: string, fileName: string, cwd: string, startLineNumber: number = null, startCharNumber: number = null) {
-  return `${type}: ${formatFileName(cwd, fileName, startLineNumber, startCharNumber)}`;
-}
-
-
-export function prepareLines(orgLines: PrintLine[], code: 'text'|'html') {
-  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
-
-  for (let i = 0; i < 100; i++) {
-    if (!eachLineHasLeadingWhitespace(lines, code)) {
-      return lines;
-    }
-    for (let i = 0; i < lines.length; i++) {
-      (<any>lines[i])[code] = (<any>lines[i])[code].substr(1);
-      lines[i].errorCharStart--;
-      if (!(<any>lines[i])[code].length) {
-        return lines;
-      }
-    }
-  }
-
-  return lines;
-}
-
-
-function eachLineHasLeadingWhitespace(lines: PrintLine[], code: 'text'|'html') {
-  if (!lines.length) {
-    return false;
-  }
-  for (let i = 0; i < lines.length; i++) {
-    if ( !(<any>lines[i])[code] || (<any>lines[i])[code].length < 1) {
-      return false;
-    }
-    const firstChar = (<any>lines[i])[code].charAt(0);
-    if (firstChar !== ' ' && firstChar !== '\t') {
-      return false;
-    }
-  }
-  return true;
 }
 
 

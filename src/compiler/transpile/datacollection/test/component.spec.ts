@@ -1,6 +1,6 @@
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import { gatherMetadata } from './test-utils';
-import { visitClass } from '../index';
+import { visitClass } from '../gather-metadata';
 import * as path from 'path';
 
 

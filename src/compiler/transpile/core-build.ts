@@ -4,7 +4,7 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import * as ts from 'typescript';
 
 
-export async function transpileCoreBuild(compilerCtx: d.CompilerCtx, coreBuild: d.BuildConditionals, input: string) {
+export async function transpileCoreBuild(config: d.Config, compilerCtx: d.CompilerCtx, coreBuild: d.BuildConditionals, input: string) {
   const results: d.TranspileResults = {
     code: null,
     diagnostics: null
@@ -34,7 +34,7 @@ export async function transpileCoreBuild(compilerCtx: d.CompilerCtx, coreBuild: 
 
   const tsResults = ts.transpileModule(input, transpileOpts);
 
-  loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
+  loadTypeScriptDiagnostics(config, diagnostics, tsResults.diagnostics);
 
   if (diagnostics.length) {
     results.diagnostics = diagnostics;
@@ -52,7 +52,7 @@ export async function transpileCoreBuild(compilerCtx: d.CompilerCtx, coreBuild: 
 }
 
 
-export async function transpileToEs5(compilerCtx: d.CompilerCtx, input: string) {
+export async function transpileToEs5(config: d.Config, compilerCtx: d.CompilerCtx, input: string) {
   const diagnostics: d.Diagnostic[] = [];
   const results: d.TranspileResults = {
     code: null,
@@ -78,7 +78,7 @@ export async function transpileToEs5(compilerCtx: d.CompilerCtx, input: string) 
 
   const tsResults = ts.transpileModule(input, transpileOpts);
 
-  loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
+  loadTypeScriptDiagnostics(config, diagnostics, tsResults.diagnostics);
 
   if (diagnostics.length > 0) {
     results.diagnostics = diagnostics;

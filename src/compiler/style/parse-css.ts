@@ -5,20 +5,19 @@
  * Licensed under the MIT License
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
-import { Config, Diagnostic, PrintLine } from '../../declarations';
-import { formatHeader } from '../../util/logger/logger-util';
+import * as d from '../../declarations';
 
 // http://www.w3.org/TR/CSS21/grammar.html
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
 const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
 
-export function parseCss(config: Config, css: string, filePath?: string): {
+export function parseCss(_config: d.Config, css: string, filePath?: string): {
   type: string;
   stylesheet: {
     source: string;
     rules: any[];
-    diagnostics: Diagnostic[]
+    diagnostics: d.Diagnostic[]
   }
 } {
 
@@ -83,14 +82,14 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    * Error `msg`.
    */
 
-  const diagnostics: Diagnostic[] = [];
+  const diagnostics: d.Diagnostic[] = [];
 
   function error(msg: string) {
     if (!srcLines) {
       srcLines = css.split('\n');
     }
 
-    const d: Diagnostic = {
+    const d: d.Diagnostic = {
       level: 'error',
       type: 'css',
       language: 'css',
@@ -105,10 +104,8 @@ export function parseCss(config: Config, css: string, filePath?: string): {
       }]
     };
 
-    d.header = formatHeader('CSS', filePath, config.cwd, lineno);
-
     if (lineno > 1) {
-      const previousLine: PrintLine = {
+      const previousLine: d.PrintLine = {
         lineIndex: lineno - 1,
         lineNumber: lineno - 1,
         text: css[lineno - 2],
@@ -119,7 +116,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
     }
 
     if (lineno + 2 < srcLines.length) {
-      const nextLine: PrintLine = {
+      const nextLine: d.PrintLine = {
         lineIndex: lineno,
         lineNumber: lineno + 1,
         text: srcLines[lineno],

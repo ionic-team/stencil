@@ -1,16 +1,16 @@
-import { MessageData, Runner } from './interface';
+import * as d from '../../../declarations';
 
 
-export function attachMessageHandler(process: NodeJS.Process, runner: Runner) {
+export function attachMessageHandler(process: NodeJS.Process, runner: d.WorkerRunner) {
 
-  function handleMessageFromMain(receivedFromMain: MessageData) {
+  function handleMessageFromMain(receivedFromMain: d.WorkerMessageData) {
     if (receivedFromMain.exitProcess) {
       // main thread said to have this worker exit
       process.exit(0);
     }
 
     // build a message to send back to main
-    const sendToMain: MessageData = {
+    const sendToMain: d.WorkerMessageData = {
       workerId: receivedFromMain.workerId,
       taskId: receivedFromMain.taskId
     };
@@ -20,45 +20,46 @@ export function attachMessageHandler(process: NodeJS.Process, runner: Runner) {
     try {
       const rtn = runner(receivedFromMain.methodName, receivedFromMain.args);
 
-      // clear out the args since we no longer need the data
-      receivedFromMain.args = null;
-
       rtn.then((value: any) => {
         sendToMain.value = value;
         process.send(sendToMain);
 
       }).catch((err: any) => {
         // returned a rejected promise
-        sendToMain.error = {
-          message: err
-        };
+        addErrorToMsg(sendToMain, err);
         process.send(sendToMain);
       });
 
     } catch (e) {
       // method call had an error
-      if (typeof e === 'string') {
-        sendToMain.error = {
-          message: e
-        };
-
-      } else if (e) {
-        sendToMain.error = {
-          type: e.type,
-          message: e.message,
-          stack: e.stack
-        };
-
-      } else {
-        sendToMain.error = {
-          message: 'worker error'
-        };
-      }
-
+      addErrorToMsg(sendToMain, e);
       process.send(sendToMain);
     }
   }
 
   // handle receiving a message from main
   process.on('message', handleMessageFromMain);
+}
+
+
+function addErrorToMsg(msg: d.WorkerMessageData, e: any) {
+  // parse the error into an object that can go between processes
+  msg.error = {
+    message: 'worker error'
+  };
+
+  if (typeof e === 'string') {
+    msg.error.message = e;
+
+  } else if (e) {
+    if (e.message) {
+      msg.error.message = e.message + '';
+    }
+    if (e.stack) {
+      msg.error.stack = e.stack + '';
+    }
+    if (e.type) {
+      msg.error.type = e.type + '';
+    }
+  }
 }

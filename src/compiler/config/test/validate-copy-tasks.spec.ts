@@ -1,9 +1,22 @@
-import { Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateConfig } from '../validate-config';
 
 
 describe('copy tasks', () => {
+
+  let config: d.Config;
+  const sys = mockStencilSystem();
+  const logger = mockLogger();
+
+  beforeEach(() => {
+    config = {
+      sys: sys,
+      logger: logger,
+      rootDir: '/User/some/path/',
+      suppressTypeScriptErrors: true
+    };
+  });
 
   it('should disable copy task with null', () => {
     config.copy = null;
@@ -18,65 +31,33 @@ describe('copy tasks', () => {
   });
 
   it('should remove default copy task', () => {
-    config.copy = {
-      assets: null
-    };
+    config.copy = null;
     validateConfig(config);
-    expect(config.copy.assets).toBe(null);
-    expect(config.copy.manifestJson.src).toBe('manifest.json');
+    expect(config.copy).toBe(null);
   });
 
   it('should add copy task and keep defaults', () => {
-    config.copy = {
-      someTask: { src: 'some-dir' }
-    };
+    config.copy = [
+      { src: 'some-dir' }
+    ];
     validateConfig(config);
-    expect(config.copy.someTask.src).toBe('some-dir');
-    expect(config.copy.assets.src).toBe('assets');
-    expect(config.copy.manifestJson.src).toBe('manifest.json');
-  });
-
-  it('should override "assets" copy task default', () => {
-    config.copy = {
-      assets: { src: 'my-assets', dest: 'some-assets' }
-    };
-    validateConfig(config);
-    expect(config.copy.assets.src).toBe('my-assets');
-    expect(config.copy.assets.dest).toBe('some-assets');
+    expect(config.copy.some(c => c.src === 'some-dir')).toBe(true);
+    expect(config.copy.some(c => c.src === 'assets')).toBe(true);
+    expect(config.copy.some(c => c.src === 'manifest.json')).toBe(true);
   });
 
   it('should set "assets" copy task default', () => {
     validateConfig(config);
-    expect(config.copy.assets.src).toBe('assets');
-    expect(config.copy.assets.dest).toBeUndefined();
+    const assetsTask = config.copy.find(c => c.src === 'assets');
+    expect(assetsTask.src).toBe('assets');
+    expect(assetsTask.dest).toBeUndefined();
   });
 
-  it('should override "manifestJson" copy task default', () => {
-    config.copy = {
-      manifestJson: { src: 'my-manifestJson', dest: 'some-manifestJson' }
-    };
+  it('should set "manifest" copy task default', () => {
     validateConfig(config);
-    expect(config.copy.manifestJson.src).toBe('my-manifestJson');
-    expect(config.copy.manifestJson.dest).toBe('some-manifestJson');
-  });
-
-  it('should set "manifestJson" copy task default', () => {
-    validateConfig(config);
-    expect(config.copy.manifestJson.src).toBe('manifest.json');
-    expect(config.copy.manifestJson.dest).toBeUndefined();
-  });
-
-  var config: Config;
-  const sys = mockStencilSystem();
-  const logger = mockLogger();
-
-  beforeEach(() => {
-    config = {
-      sys: sys,
-      logger: logger,
-      rootDir: '/User/some/path/',
-      suppressTypeScriptErrors: true
-    };
+    const assetsTask = config.copy.find(c => c.src === 'manifest.json');
+    expect(assetsTask.src).toBe('manifest.json');
+    expect(assetsTask.dest).toBeUndefined();
   });
 
 });

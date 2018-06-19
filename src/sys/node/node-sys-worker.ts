@@ -1,7 +1,9 @@
 import * as d from '../../declarations';
 import { attachMessageHandler } from './worker-farm/worker';
+import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
+import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 const autoprefixer = require('autoprefixer');
 const CleanCSS = require('clean-css');
@@ -11,6 +13,7 @@ const UglifyJS = require('uglify-es');
 
 
 export class NodeSystemWorker {
+  workerContext: d.WorkerContext = {};
 
   async autoprefixCss(input: string, opts: any) {
     if (opts == null || typeof opts !== 'object') {
@@ -32,6 +35,10 @@ export class NodeSystemWorker {
       from: undefined
     });
     return result.css as string;
+  }
+
+  copy(copyTasks: d.CopyTask[]) {
+    return copyTasksWorker(copyTasks);
   }
 
   gzipSize(text: string) {
@@ -108,6 +115,10 @@ export class NodeSystemWorker {
   scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
     const sc = new ShadowCss();
     return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+  }
+
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
   }
 
 }

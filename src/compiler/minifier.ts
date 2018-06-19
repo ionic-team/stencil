@@ -5,7 +5,7 @@ import { generatePreamble } from './util';
 /**
  * Interal minifier, not exposed publicly.
  */
-export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsText: string, sourceTarget: d.SourceTarget, preamble: boolean) {
+export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string) {
   const opts: any = { output: {}, compress: {}, mangle: true };
 
   if (sourceTarget === 'es5') {
@@ -41,7 +41,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
   opts.compress.passes = 2;
 
   if (preamble) {
-    opts.output.preamble = generatePreamble(config);
+    opts.output.preamble = generatePreamble(config, { suffix: buildTimestamp });
   }
 
   let cacheKey: string;

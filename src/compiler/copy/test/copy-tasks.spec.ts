@@ -1,12 +1,12 @@
-import { Config, CopyTask } from '../../../declarations';
-import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTask, processCopyTasks } from '../copy-tasks';
+import * as d from '../../../declarations';
+import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTasks } from '../config-copy-tasks';
 import { mockConfig } from '../../../testing/mocks';
 import { normalizePath } from '../../util';
 
 
 describe('copy tasks', () => {
 
-  let config: Config;
+  let config: d.Config;
 
   beforeEach(() => {
     config = mockConfig();
@@ -19,11 +19,11 @@ describe('copy tasks', () => {
 
     it('should throw error when dest is a glob', async () => {
       try {
-        const copyTask: CopyTask = {
+        const copyTask: d.CopyTask = {
           src: 'assets',
           dest: '**/*'
         };
-        await processCopyTasks(config, {}, [], copyTask);
+        await processCopyTasks(config, [], copyTask);
         expect('this should').toBe('get called');
 
       } catch (e) {}
@@ -31,14 +31,14 @@ describe('copy tasks', () => {
 
     it('should throw error when missing src', async () => {
       try {
-        const copyTask: CopyTask = {};
-        await processCopyTasks(config, {}, [], copyTask);
+        const copyTask: d.CopyTask = {};
+        await processCopyTasks(config, [], copyTask);
 
       } catch (e) {}
     });
 
     it('should resolve with null copy task', async () => {
-      const r = await processCopyTasks(config, {}, [], null);
+      const r = await processCopyTasks(config, [], null);
       expect(r).toBeUndefined();
     });
 
@@ -47,7 +47,7 @@ describe('copy tasks', () => {
   describe('createGlobCopyTask', () => {
 
     it('should get glob files and set absolute dest with absolute dest', () => {
-      const copyTask: CopyTask = {
+      const copyTask: d.CopyTask = {
         src: 'assets/**/*.js',
         dest: '/User/marty/my-app/www/abs-images'
       };
@@ -59,7 +59,7 @@ describe('copy tasks', () => {
     });
 
     it('should get glob files and set absolute dest with relative dest', () => {
-      const copyTask: CopyTask = {
+      const copyTask: d.CopyTask = {
         src: 'assets/**/*.js',
         dest: 'images'
       };
@@ -70,29 +70,13 @@ describe('copy tasks', () => {
     });
 
     it('should get glob files and set absolute dest when missing dest', () => {
-      const copyTask: CopyTask = {
+      const copyTask: d.CopyTask = {
         src: 'assets/**/*.js'
       };
       const destDir = '/User/marty/my-app/www';
       const p = createGlobCopyTask(config, copyTask, destDir, 'assets/bear.js');
       const normalizedDest = normalizePath(p.dest);
       expect(normalizedDest).toBe('/User/marty/my-app/www/assets/bear.js');
-    });
-
-  });
-
-  describe('filter', () => {
-
-    it('should filter via function', () => {
-      const copyTask: CopyTask = {
-        src: '/User/marty/my-app/src/assets/readme.md',
-        dest: '/User/marty/my-app/www/images/readme.md',
-        filter: function(src) {
-          return (/\.js$/i).test(src);
-        }
-      };
-      const p = processCopyTask(config, copyTask, config.outputTargets['www'].dir);
-      expect(p.filter()).toBe(false);
     });
 
   });
@@ -162,111 +146,89 @@ describe('copy tasks', () => {
   describe('isCopyTaskFile', () => {
 
     it('not copy abs path src file', () => {
-      config.copy = {
-        assets: {
-          src: '/User/marty/my-app/src/assets/image.jpg'
-        }
-      };
+      config.copy = [
+        { src: '/User/marty/my-app/src/assets/image.jpg' }
+      ];
       const filePath = '/User/marty/my-app/src/something-else/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });
 
     it('copy abs path src file', () => {
-      config.copy = {
-        assets: {
-          src: '/User/marty/my-app/src/assets/image.jpg'
-        }
-      };
+      config.copy = [
+        { src: '/User/marty/my-app/src/assets/image.jpg' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('not copy relative path src file', () => {
-      config.copy = {
-        assets: {
-          src: './assets/image.jpg'
-        }
-      };
+      config.copy = [
+        { src: './assets/image.jpg' }
+      ];
       const filePath = '/User/marty/my-app/src/something-else/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });
 
     it('copy relative path src file', () => {
-      config.copy = {
-        assets: {
-          src: './assets/image.jpg'
-        }
-      };
+      config.copy = [
+        { src: './assets/image.jpg' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('not copy abs path src dir', () => {
-      config.copy = {
-        assets: {
-          src: '/User/marty/my-app/src/assets'
-        }
-      };
+      config.copy = [
+        { src: '/User/marty/my-app/src/assets' }
+      ];
       const filePath = '/User/marty/my-app/src/something-else/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });
 
     it('copy abs path src dir', () => {
-      config.copy = {
-        assets: {
-          src: '/User/marty/my-app/src/assets'
-        }
-      };
+      config.copy = [
+        { src: '/User/marty/my-app/src/assets' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('not copy relative path src dir', () => {
-      config.copy = {
-        assets: {
-          src: 'assets'
-        }
-      };
+      config.copy = [
+        { src: 'assets' }
+      ];
       const filePath = '/User/marty/my-app/src/something-else/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });
 
     it('copy relative path src dir', () => {
-      config.copy = {
-        assets: {
-          src: 'assets'
-        }
-      };
+      config.copy = [
+        { src: 'assets' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('copy assets glob file', () => {
-      config.copy = {
-        assets: {
-          src: 'assets/**/*.jpg'
-        }
-      };
+      config.copy = [
+        { src: 'assets/**/*.jpg' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('copy assets glob wildcard', () => {
-      config.copy = {
-        assets: {
-          src: 'assets/*'
-        }
-      };
+      config.copy = [
+        { src: 'assets/*' }
+      ];
       const filePath = '/User/marty/my-app/src/assets/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(true);
     });
 
     it('not copy assets glob wildcard', () => {
-      config.copy = {
-        assets: {
-          src: 'assets/*'
-        }
-      };
+      config.copy = [
+        { src: 'assets/*' }
+      ];
       const filePath = '/User/marty/my-app/src/something-else/image.jpg';
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });

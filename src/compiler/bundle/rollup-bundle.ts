@@ -10,10 +10,11 @@ import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { BundleSet, OutputChunk, RollupDirOptions, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
-import resolveCollections from './rollup-plugins/resolve-collections';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+  const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
+
   const builtins = require('rollup-plugin-node-builtins');
   const globals = require('rollup-plugin-node-globals');
   let rollupBundle: BundleSet;
@@ -36,14 +37,13 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     preserveSymlinks: false,
     experimentalDynamicImport: true,
     plugins: [
-      resolveCollections(compilerCtx),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       globals(),
       builtins(),
       bundleEntryFile(config, entryModules),
-      inMemoryFsRead(config, config.sys.path, compilerCtx),
+      inMemoryFsRead(config, compilerCtx),
       await pathsResolution(config, compilerCtx),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
@@ -56,9 +56,10 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     rollupBundle = await rollup(rollupConfig);
 
   } catch (err) {
-    console.log(err);
     loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
   }
+
+  timeSpan.finish(`createBundle finished`);
 
   return rollupBundle;
 }
@@ -75,6 +76,11 @@ export async function writeEsModules(config: Config, rollupBundle: BundleSet) {
 
 
 export async function writeLegacyModules(config: Config, rollupBundle: BundleSet, entryModules: EntryModule[]) {
+  if (!config.buildEs5) {
+    // only create legacy modules when generating es5 fallbacks
+    return null;
+  }
+
   rollupBundle.cache.modules.forEach(module => {
     const key = module.id;
     const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
@@ -99,12 +105,16 @@ export async function writeLegacyModules(config: Config, rollupBundle: BundleSet
 
 
 export async function writeEsmEs5Modules(config: Config, rollupBundle: BundleSet) {
-  const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
-    format: 'es',
-    banner: generatePreamble(config),
-    intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
-    strict: false,
-  });
+  if (config.outputTargets.some(o => o.type === 'dist')) {
+    const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
+      format: 'es',
+      banner: generatePreamble(config),
+      intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
+      strict: false,
+    });
 
-  return <any>results as JSModuleList;
+    return <any>results as JSModuleList;
+  }
+
+  return null;
 }

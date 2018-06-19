@@ -4,6 +4,7 @@ import { getConfigFilePath, hasError } from './cli-utils';
 import { help } from './task-help';
 import { initApp } from './task-init';
 import { parseFlags } from './parse-flags';
+import { WORKER_EXITED_MSG } from '../sys/node/worker-farm/main';
 
 
 export async function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger) {
@@ -89,7 +90,9 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
     }
 
   } catch (e) {
-    config.logger.error('uncaught cli error', e);
-    process.exit(1);
+    if (e !== WORKER_EXITED_MSG) {
+      config.logger.error('uncaught cli error: ' + e);
+      process.exit(1);
+    }
   }
 }

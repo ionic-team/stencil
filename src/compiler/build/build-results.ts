@@ -4,7 +4,7 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { hasError, normalizePath } from '../util';
 
 
-export async function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function generateBuildResults(config: d.Config, buildCtx: d.BuildCtx) {
   // create the build results that get returned
   const getGzipSize = config.outputTargets.some(o => o.type === 'stats');
 
@@ -12,12 +12,11 @@ export async function generateBuildResults(config: d.Config, compilerCtx: d.Comp
     buildId: buildCtx.buildId,
     diagnostics: cleanDiagnostics(buildCtx.diagnostics),
     hasError: hasError(buildCtx.diagnostics),
-    aborted: buildCtx.aborted,
     duration: Date.now() - buildCtx.startTime,
-    isRebuild: compilerCtx.isRebuild,
+    isRebuild: buildCtx.isRebuild,
     transpileBuildCount: buildCtx.transpileBuildCount,
     bundleBuildCount: buildCtx.bundleBuildCount,
-    hasChangedJsText: buildCtx.hasChangedJsText,
+    styleBuildCount: buildCtx.styleBuildCount,
     filesWritten: buildCtx.filesWritten.sort(),
     filesChanged: buildCtx.filesChanged.slice().sort(),
     filesUpdated: buildCtx.filesUpdated.slice().sort(),

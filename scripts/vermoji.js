@@ -321,7 +321,7 @@ const VERMOJIS = [
 ];
 
 const changelogPath = path.join(__dirname, '../CHANGELOG.md');
-let changelog = fs.readFileSync(changelogPath, 'utf-8');
+let changelog = fs.readFileSync(changelogPath, 'utf8');
 
 function getNextVermoji() {
   while (true) {
@@ -339,7 +339,7 @@ changelog = changelog.replace(/\# \[/, '# ' + vermoji + ' [');
 fs.writeFileSync(changelogPath, changelog);
 
 const compilerPath = path.join(__dirname, '..', 'dist', 'compiler', 'index.js');
-let compiler = fs.readFileSync(compilerPath, 'utf-8');
+let compiler = fs.readFileSync(compilerPath, 'utf8');
 
 compiler = compiler.replace(/\💎/g, vermoji);
 fs.writeFileSync(compilerPath, compiler);

@@ -103,8 +103,10 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
   // Loop through all top level imports to find any reference to the type for 'import' reference location
   const importTypeDeclaration = sourceFileObj.statements.find(st => {
     const statement = ts.isImportDeclaration(st) &&
+      st.importClause &&
       ts.isImportClause(st.importClause) &&
-      st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
+      st.importClause.namedBindings &&
+      ts.isNamedImports(st.importClause.namedBindings) &&
       Array.isArray(st.importClause.namedBindings.elements) &&
       st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
     if (!statement) {

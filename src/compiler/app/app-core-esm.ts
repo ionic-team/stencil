@@ -48,7 +48,7 @@ async function generateEsmCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   jsContent = jsContent.replace('__APP__HYDRATED__CSS__PLACEHOLDER__', config.hydratedCssClass);
 
-  jsContent = generatePreamble(config, `${config.namespace}: Core, ES5`) + '\n' + jsContent;
+  jsContent = generatePreamble(config, { prefix: `${config.namespace}: Core, ES5` }) + '\n' + jsContent;
 
   await compilerCtx.fs.writeFile(coreEsm, jsContent);
 }

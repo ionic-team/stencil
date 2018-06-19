@@ -25,7 +25,7 @@ describe('build conditionals', () => {
   describe('getlastBuildConditionalsEsm',  () => {
 
     it('use last build cuz only a css/html file changes', () => {
-      compilerCtx.isRebuild = true;
+      buildCtx.isRebuild = true;
       compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
@@ -35,7 +35,7 @@ describe('build conditionals', () => {
     });
 
     it('no last build cuz a tsx file change', () => {
-      compilerCtx.isRebuild = true;
+      buildCtx.isRebuild = true;
       compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
@@ -45,7 +45,7 @@ describe('build conditionals', () => {
     });
 
     it('no last build cuz a ts file change', () => {
-      compilerCtx.isRebuild = true;
+      buildCtx.isRebuild = true;
       compilerCtx.lastBuildConditionalsBrowserEsm = {
         svg: true
       } as any;
@@ -55,14 +55,14 @@ describe('build conditionals', () => {
     });
 
     it('no last build cuz no compilerCtx.lastBuildConditionalsBrowserEsm', () => {
-      compilerCtx.isRebuild = true;
+      buildCtx.isRebuild = true;
       compilerCtx.lastBuildConditionalsBrowserEsm = null;
       const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
 
     it('no last build cuz not rebuild', () => {
-      compilerCtx.isRebuild = false;
+      buildCtx.isRebuild = false;
       const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });

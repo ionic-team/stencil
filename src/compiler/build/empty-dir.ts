@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 
 
-export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.CompilerCtx) {
-  if (compilerCtx.isRebuild) {
+export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (buildCtx.isRebuild) {
     // only empty the directories on the first build
     return;
   }

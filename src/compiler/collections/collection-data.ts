@@ -26,8 +26,6 @@ async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
   // create an absolute file path to the actual collection json file
   const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
 
-  config.logger.debug(`collection, serialize: ${collectionFilePath}`);
-
   // serialize the collection into a json string and
   // add it to the list of files we need to write when we're ready
   const collectionData = serializeAppCollection(config, compilerCtx, collectionDir, buildCtx.entryModules, buildCtx.global);
@@ -206,9 +204,13 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
 
 export function parseComponentDataToModuleFile(config: d.Config, collection: d.Collection, collectionDir: string, cmpData: d.ComponentData) {
   const moduleFile: d.ModuleFile = {
+    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath)),
     cmpMeta: {},
     isCollectionDependency: true,
-    excludeFromCollection: excludeFromCollection(config, cmpData)
+    excludeFromCollection: excludeFromCollection(config, cmpData),
+    localImports: [],
+    externalImports: [],
+    potentialCmpRefs: []
   };
   const cmpMeta = moduleFile.cmpMeta;
 
@@ -864,7 +866,11 @@ export function parseGlobal(config: d.Config, collectionDir: string, collectionD
   if (typeof collectionData.global !== 'string') return;
 
   collection.global = {
-    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global))
+    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global)),
+    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global)),
+    localImports: [],
+    externalImports: [],
+    potentialCmpRefs: []
   };
 }
 

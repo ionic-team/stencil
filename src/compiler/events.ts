@@ -4,21 +4,16 @@ import * as d from '../declarations';
 export class BuildEvents implements d.BuildEvents {
   private evCallbacks: { [eventName: string]: Function[] } = {};
 
-  constructor(private config: d.Config) {}
-
   subscribe(eventName: 'fileUpdate', cb: (path: string) => void): Function;
   subscribe(eventName: 'fileAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'fileDelete', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirDelete', cb: (path: string) => void): Function;
-  subscribe(eventName: 'build', cb: (buildResults: d.BuildResults) => void): Function;
-  subscribe(eventName: 'rebuild', cb: (buildResults: d.BuildResults) => void): Function;
+  subscribe(eventName: 'build', cb: (watcherResults: d.WatchResults) => void): Function;
+  subscribe(eventName: 'buildStart', cb: (buildStartData: d.BuildStartData) => void): Function;
+  subscribe(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   subscribe(eventName: d.CompilerEventName, cb: Function): Function {
     const evName = getEventName(eventName);
-
-    if (eventName === 'rebuild' && !this.config.watch) {
-      throw new Error(`config must set "watch" to "true" in order to enable "rebuild" events`);
-    }
 
     if (!this.evCallbacks[evName]) {
       this.evCallbacks[evName] = [];

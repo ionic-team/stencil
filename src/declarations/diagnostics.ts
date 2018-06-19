@@ -2,13 +2,15 @@
 
 export interface Diagnostic {
   level: 'error'|'warn'|'info'|'log'|'debug';
-  type: string;
+  type: 'typescript'|'bundling'|'build'|'runtime'|'hydrate'|'css';
   header?: string;
-  messageText: string;
   language?: 'javascript'|'typescript'|'scss'|'css';
+  messageText: string;
   code?: string;
   absFilePath?: string;
   relFilePath?: string;
+  lineNumber?: number;
+  columnNumber?: number;
   lines?: PrintLine[];
 }
 
@@ -17,7 +19,6 @@ export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
   text?: string;
-  html?: string;
   errorCharStart: number;
   errorLength?: number;
 }

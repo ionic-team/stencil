@@ -17,6 +17,29 @@ describe('transpile', () => {
   });
 
 
+  it('should transpile enums', async () => {
+    c.config.minifyJs = true;
+    await c.fs.writeFiles({
+      [path.join(root, 'src', 'my-enum.tsx')]: `export const enum MyEnum { A = 1, B = 2, C = 3 }`,
+      [path.join(root, 'src', 'cmp-a.tsx')]: `
+        import { MyEnum } from './my-enum';
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          constructor() {
+            console.log(MyEnum.A, MyEnum.B, MyEnum.C);
+          }
+        }
+      `
+    });
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(content).toContain('console.log(1,2,3)');
+  });
+
+
   it('should rebuild transpile for deleted directory', async () => {
     c.config.watch = true;
     await c.fs.writeFiles({
@@ -31,7 +54,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     await c.fs.remove(path.join(root, 'src', 'some-dir'));
     await c.fs.commit();
@@ -48,11 +71,11 @@ describe('transpile', () => {
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(false);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(false);
 
+    expect(r.entries[0].components).toHaveLength(1);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
   });
 
   it('should rebuild transpile for added directory', async () => {
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.watch = true;
     await c.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`
@@ -64,7 +87,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     // add directory
     await c.fs.writeFiles({
@@ -87,7 +110,6 @@ describe('transpile', () => {
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.entries[1].components[0].tag).toEqual('cmp-b');
     expect(r.entries[2].components[0].tag).toEqual('cmp-c');
-    expect(r.hasChangedJsText).toBe(true);
   });
 
   it('should rebuild transpile for changed typescript file', async () => {
@@ -101,7 +123,7 @@ describe('transpile', () => {
     expect(r.diagnostics).toEqual([]);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const rebuildListener = c.once('buildFinish');
 
     // write an actual change
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { constructor() { console.log('changed!!'); } }`, { clearFileCache: true });
@@ -115,10 +137,10 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.buildId).toBe(1);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
-    expect(r.hasChangedJsText).toBe(true);
   });
 
   it('should not rebuild transpile for unchanged typescript file', async () => {
@@ -128,7 +150,7 @@ describe('transpile', () => {
     await c.fs.commit();
 
     // kick off the build, wait for it to finish
-    let r = await c.build();
+    const r = await c.build();
 
     // initial build finished
     expect(r.diagnostics).toEqual([]);
@@ -136,7 +158,7 @@ describe('transpile', () => {
     expect(r.isRebuild).toBe(false);
 
     // create a rebuild listener
-    const rebuildListener = c.once('rebuild');
+    const buildNoChange = c.once('buildNoChange');
 
     // write the same darn thing, no actual change
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
@@ -147,13 +169,8 @@ describe('transpile', () => {
 
     // wait for the rebuild to finish
     // get the rebuild results
-    r = await rebuildListener;
-    expect(r.diagnostics).toEqual([]);
-    expect(r.buildId).toBe(1);
-    expect(r.isRebuild).toBe(true);
-    expect(r.entries[0].components[0].tag).toEqual('cmp-a');
-    expect(r.transpileBuildCount).toBe(1);
-    expect(r.hasChangedJsText).toBe(false);
+    const nc = await buildNoChange;
+    expect(nc.noChange).toEqual(true);
   });
 
   it('should transpile with core and without typescript errors', async () => {

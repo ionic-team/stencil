@@ -3,13 +3,13 @@ import * as d from './index';
 
 export interface CompilerCtx {
   activeBuildId?: number;
-  isRebuild?: boolean;
   fs?: d.InMemoryFileSystem;
   cache?: d.Cache;
   events?: d.BuildEvents;
   moduleFiles?: d.ModuleFiles;
   compiledModuleJsText?: d.ModuleBundles;
   compiledModuleLegacyJsText?: d.ModuleBundles;
+  compilerOptions?: any;
   collections?: d.Collection[];
   appFiles?: {
     core?: string;
@@ -20,11 +20,20 @@ export interface CompilerCtx {
   appCoreWWWPath?: string;
   resolvedCollections?: string[];
 
+  hasSuccessfulBuild?: boolean;
+  localPrerenderServer?: any;
+  lastBuildResults?: d.BuildResults;
+  hasWatcher?: boolean;
+  tsService?: TsService;
+  rootTsFiles?: string[];
+
   lastBuildHadError?: boolean;
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
-  hasSuccessfulBuild?: boolean;
-  localPrerenderServer?: any;
-  hasWatcher?: boolean;
+  lastJsModules?: d.JSModuleMap;
+  lastBuildStyles?: { [styleId: string]: string };
+  lastStyleText?: { [absPath: string]: string };
 }
+
+export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => Promise<any>;

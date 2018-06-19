@@ -1,3 +1,24 @@
+<a name="0.9.8"></a>
+## ⛴ [0.9.8](https://github.com/ionic-team/stencil/compare/v0.9.7...v0.9.8) (2018-06-19)
+
+
+### Performance Improvements
+
+* **build:** improve parallelization and caching ([a7f4768](https://github.com/ionic-team/stencil/commit/a7f4768))
+* **transpile:** cache transpiled files ([c7050ee](https://github.com/ionic-team/stencil/commit/c7050ee))
+* **typescript:** improve typescript build times ([b6b7eb3](https://github.com/ionic-team/stencil/commit/b6b7eb3))
+
+
+### Bug Fixes
+
+* **attributes:** properly remove unknown html attributes on standard html elements ([75836c5](https://github.com/ionic-team/stencil/commit/75836c5))
+* **build:** reset typescript service cache on config change ([008a0a7](https://github.com/ionic-team/stencil/commit/008a0a7))
+* **dev-inspector:** correct dev server source to use nodeName instead of tagName. ([45ed330](https://github.com/ionic-team/stencil/commit/45ed330))
+* **dist:** wait on validate types build to finish for dist builds ([b46e9a7](https://github.com/ionic-team/stencil/commit/b46e9a7))
+* **polyfill:** ensure custom element polyfill does not run more than once ([13192d4](https://github.com/ionic-team/stencil/commit/13192d4))
+* **service-worker:** insert build timestamp for index cache busting ([3008db7]
+
+
 <a name="0.9.7"></a>
 ## 🍺 [0.9.7](https://github.com/ionic-team/stencil/compare/v0.9.6...v0.9.7) (2018-05-31)
 

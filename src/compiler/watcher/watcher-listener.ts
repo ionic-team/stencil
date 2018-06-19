@@ -1,6 +1,6 @@
-import { CompilerCtx, Config, WatcherResults } from '../../declarations';
+import * as d from '../../declarations';
 import { COMPONENTS_DTS } from '../distribution/distribution';
-import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
+import { isCopyTaskFile } from '../copy/config-copy-tasks';
 import { isDtsFile, isWebDevFile, normalizePath } from '../util';
 import { rebuild } from './rebuild';
 
@@ -12,13 +12,10 @@ export class WatcherListener {
   private filesDeleted: string[];
   private filesUpdated: string[];
   private configUpdated = false;
-  private recentChanges: RecentChange[] = [];
+  private hasCopyChanges = false;
+  private watchTmr: number;
 
-  private watchTmr: NodeJS.Timer;
-  private copyTaskTmr: NodeJS.Timer;
-
-
-  constructor(private config: Config, private compilerCtx: CompilerCtx) {
+  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
     this.resetWatcher();
   }
 
@@ -30,41 +27,76 @@ export class WatcherListener {
     this.compilerCtx.events.subscribe('dirDelete', this.dirDelete.bind(this));
   }
 
-  async fileUpdate(path: string) {
+  fileUpdate(filePath: string) {
     try {
-      path = normalizePath(path);
+      filePath = normalizePath(filePath);
+      const relPath = this.config.sys.path.relative(this.config.rootDir, filePath);
 
-      this.config.logger.debug(`watcher, fileUpdate: ${path}, ${Date.now()}`);
-
-      if (path === this.config.configPath) {
-        // the actual stencil config file changed
-        // this is a big deal, so do a full rebuild
-        this.configUpdated = true;
-        if (!this.filesUpdated.includes(path)) {
-          this.filesUpdated.push(path);
-        }
-        this.queue(path);
-
-      } else if (isCopyTaskFile(this.config, path)) {
-        this.queueCopyTasks();
+      if (isComponentsDtsFile(filePath)) {
+        // don't bother any of this for the components.d.ts file
+        // which the change came from us anyways
+        return;
       }
 
-      if (isWebDevFileToWatch(path)) {
-        // read the file, but without using
-        // the cache so we get the latest change
-        await this.compilerCtx.fs.readFile(path, { useCache: false });
+      const ext = this.config.sys.path.extname(filePath).toLowerCase();
+      const isTextFile = TXT_EXT.includes(ext);
 
-        // web dev file was updaed
-        // queue change build
-        if (!this.filesUpdated.includes(path)) {
-          this.filesUpdated.push(path);
+      if (isTextFile) {
+        // only bother checking if a file changed if it's
+        // a well known text file we're probably editing
+        // otherwise for things like images/pdfs/xls/etc don't bother
+        if (!this.compilerCtx.fs.hasFileChanged(filePath)) {
+          // the content hasn't actually changed from the last
+          // time we did a build so don't even bother doing another build
+          this.config.logger.debug(`watcher, fileUpdate, file unchanged: ${relPath}, ${Date.now().toString().substring(5)}`);
+          this.queue();
+          return;
         }
-        this.queue(path);
+      }
 
-      } else {
-        // always clear the cache if it wasn't a web dev file
-        this.compilerCtx.fs.clearFileCache(path);
-        this.config.logger.debug(`clear file cache: ${path}`);
+      if (filePath === this.config.configPath) {
+        // the actual stencil config file changed
+        // this is a big deal, so do a full rebuild
+        this.config.logger.debug(`watcher, fileUpdate, config: ${relPath}, ${Date.now().toString().substring(5)}`);
+        this.configUpdated = true;
+        this.compilerCtx.fs.clearFileCache(filePath);
+
+        if (!this.filesUpdated.includes(filePath)) {
+          this.filesUpdated.push(filePath);
+        }
+        this.queue();
+        return;
+      }
+
+      // could be both a copy task and a web dev file
+      const isCopy = isCopyTaskFile(this.config, filePath);
+      const isWebDev = isWebDevFileToWatch(filePath);
+
+      if (isCopy) {
+        // this file is one of the files in our copy tasks
+        this.config.logger.debug(`watcher, fileUpdate, copy task file: ${relPath}, ${Date.now().toString().substring(5)}`);
+        this.hasCopyChanges = true;
+      }
+
+      if (isWebDev) {
+        // this is a web dev file like .ts or .css
+        this.config.logger.debug(`watcher, fileUpdate: ${relPath}, ${Date.now().toString().substring(5)}`);
+      }
+
+      if (isCopy || isWebDev) {
+        // if it's a copy or web dev file let's add it to the queue
+        if (!this.filesUpdated.includes(filePath)) {
+          this.filesUpdated.push(filePath);
+        }
+        this.queue();
+      }
+
+      if (!isTextFile && !isCopy && !isWebDev) {
+        // only clear the cache if it's not a text file or web dev file
+        // because earlier we already read and cached the new content
+        // otherwise it's probably best to clear this file's cache now
+        this.compilerCtx.fs.clearFileCache(filePath);
+        this.config.logger.debug(`watcher, fileUpdate, clear file cache: ${relPath}`);
       }
 
     } catch (e) {
@@ -72,31 +104,40 @@ export class WatcherListener {
     }
   }
 
-  async fileAdd(path: string) {
+  fileAdd(filePath: string) {
     try {
-      path = normalizePath(path);
+      filePath = normalizePath(filePath);
+      const relPath = this.config.sys.path.relative(this.config.rootDir, filePath);
 
-      this.config.logger.debug(`watcher, fileAdd: ${path}, ${Date.now()}`);
-
-      if (isCopyTaskFile(this.config, path)) {
-        this.queueCopyTasks();
+      if (isComponentsDtsFile(filePath)) {
+        return;
       }
 
-      if (isWebDevFileToWatch(path)) {
+      this.config.logger.debug(`watcher, fileAdd: ${relPath}, ${Date.now().toString().substring(5)}`);
+
+      if (isCopyTaskFile(this.config, filePath)) {
+        if (!this.filesAdded.includes(filePath)) {
+          this.filesAdded.push(filePath);
+        }
+        this.hasCopyChanges = true;
+        this.queue();
+      }
+
+      if (isWebDevFileToWatch(filePath)) {
         // read the file, but without using
         // the cache so we get the latest change
-        await this.compilerCtx.fs.readFile(path, { useCache: false });
+        this.compilerCtx.fs.readFileSync(filePath, { useCache: false });
 
         // new web dev file was added
-        if (!this.filesAdded.includes(path)) {
-          this.filesAdded.push(path);
+        if (!this.filesAdded.includes(filePath)) {
+          this.filesAdded.push(filePath);
         }
-        this.queue(path);
+        this.queue();
 
       } else {
         // always clear the cache if it wasn't a web dev file
-        this.compilerCtx.fs.clearFileCache(path);
-        this.config.logger.debug(`clear file cache: ${path}`);
+        this.compilerCtx.fs.clearFileCache(filePath);
+        this.config.logger.debug(`watcher, fileAdd, clear file cache: ${relPath}`);
       }
 
     } catch (e) {
@@ -104,25 +145,34 @@ export class WatcherListener {
     }
   }
 
-  fileDelete(path: string) {
+  fileDelete(filePath: string) {
     try {
-      path = normalizePath(path);
+      filePath = normalizePath(filePath);
+      const relPath = this.config.sys.path.relative(this.config.rootDir, filePath);
 
-      this.config.logger.debug(`watcher, fileDelete: ${path}, ${Date.now()}`);
-
-      // clear this file's cache
-      this.compilerCtx.fs.clearFileCache(path);
-
-      if (isCopyTaskFile(this.config, path)) {
-        this.queueCopyTasks();
+      if (isComponentsDtsFile(filePath)) {
+        return;
       }
 
-      if (isWebDevFileToWatch(path)) {
-        // web dev file was delete
-        if (!this.filesDeleted.includes(path)) {
-          this.filesDeleted.push(path);
+      this.config.logger.debug(`watcher, fileDelete: ${relPath}, ${Date.now().toString().substring(5)}`);
+
+      // clear this file's cache
+      this.compilerCtx.fs.clearFileCache(filePath);
+
+      if (isCopyTaskFile(this.config, filePath)) {
+        if (!this.filesDeleted.includes(filePath)) {
+          this.filesDeleted.push(filePath);
         }
-        this.queue(path);
+        this.hasCopyChanges = true;
+        this.queue();
+      }
+
+      if (isWebDevFileToWatch(filePath)) {
+        // web dev file was delete
+        if (!this.filesDeleted.includes(filePath)) {
+          this.filesDeleted.push(filePath);
+        }
+        this.queue();
       }
 
     } catch (e) {
@@ -130,56 +180,57 @@ export class WatcherListener {
     }
   }
 
-  async dirAdd(path: string) {
+  async dirAdd(dirPath: string) {
     try {
-      path = normalizePath(path);
+      dirPath = normalizePath(dirPath);
+      const relPath = this.config.sys.path.relative(this.config.rootDir, dirPath);
 
-      this.config.logger.debug(`watcher, dirAdd: ${path}, ${Date.now()}`);
+      this.config.logger.debug(`watcher, dirAdd: ${relPath}, ${Date.now().toString().substring(5)}`);
 
       // clear this directory's cache for good measure
-      this.compilerCtx.fs.clearDirCache(path);
+      this.compilerCtx.fs.clearDirCache(dirPath);
 
-      if (isCopyTaskFile(this.config, path)) {
-        this.queueCopyTasks();
+      // recursively drill down and get all of the
+      // files paths that were just added
+      const addedItems = await this.compilerCtx.fs.readdir(dirPath, { recursive: true });
 
-      } else {
-        // recursively drill down and get all of the
-        // files paths that were just added
-        const addedItems = await this.compilerCtx.fs.readdir(path, { recursive: true });
+      addedItems.forEach(item => {
+        if (!this.filesAdded.includes(item.absPath)) {
+          this.filesAdded.push(item.absPath);
+        }
+      });
+      this.dirsAdded.push(dirPath);
 
-        addedItems.forEach(item => {
-          if (!this.filesAdded.includes(item.absPath)) {
-            this.filesAdded.push(item.absPath);
-          }
-        });
-
-        this.dirsAdded.push(path);
-        this.queue(path);
+      if (isCopyTaskFile(this.config, dirPath)) {
+        this.hasCopyChanges = true;
       }
+
+      this.queue();
 
     } catch (e) {
       this.config.logger.error(`watcher, dirAdd`, e);
     }
   }
 
-  async dirDelete(path: string) {
+  async dirDelete(dirPath: string) {
     try {
-      path = normalizePath(path);
+      dirPath = normalizePath(dirPath);
+      const relPath = this.config.sys.path.relative(this.config.rootDir, dirPath);
 
-      this.config.logger.debug(`watcher, dirDelete: ${path}, ${Date.now()}`);
+      this.config.logger.debug(`watcher, dirDelete: ${relPath}, ${Date.now().toString().substring(5)}`);
 
       // clear this directory's cache
-      this.compilerCtx.fs.clearDirCache(path);
+      this.compilerCtx.fs.clearDirCache(dirPath);
 
-      if (isCopyTaskFile(this.config, path)) {
-        this.queueCopyTasks();
-
-      } else {
-        if (!this.dirsDeleted.includes(path)) {
-          this.dirsDeleted.push(path);
-        }
-        this.queue(path);
+      if (!this.dirsDeleted.includes(dirPath)) {
+        this.dirsDeleted.push(dirPath);
       }
+
+      if (isCopyTaskFile(this.config, dirPath)) {
+        this.hasCopyChanges = true;
+      }
+
+      this.queue();
 
     } catch (e) {
       this.config.logger.error(`watcher, dirDelete`, e);
@@ -189,14 +240,31 @@ export class WatcherListener {
   startRebuild() {
     try {
       // create a copy of all that we've learned today
-      const watcher = this.generateWatcherResults();
+      const watchResults: d.WatchResults = {
+        dirsAdded: this.dirsAdded.slice(),
+        dirsDeleted: this.dirsDeleted.slice(),
+        filesAdded: this.filesAdded.slice(),
+        filesDeleted: this.filesDeleted.slice(),
+        filesUpdated: this.filesUpdated.slice(),
+        configUpdated: this.configUpdated,
+        hasCopyChanges: this.hasCopyChanges,
+        filesChanged: [],
+        changedExtensions: [],
+        hasScriptChanges: false,
+        hasStyleChanges: false,
+        hasImageChanges: false
+      };
 
       // reset the watcher data for next time
       this.resetWatcher();
 
-      if (shouldRebuild(watcher)) {
+      if (shouldRebuild(watchResults)) {
         // kick off the rebuild
-        rebuild(this.config, this.compilerCtx, watcher);
+        rebuild(this.config, this.compilerCtx, watchResults);
+
+      } else {
+        // never was a change
+        this.compilerCtx.events.emit('buildNoChange', { noChange: true });
       }
 
     } catch (e) {
@@ -204,51 +272,9 @@ export class WatcherListener {
     }
   }
 
-  generateWatcherResults() {
-    const watcher: WatcherResults = {
-      dirsAdded: this.dirsAdded.slice(),
-      dirsDeleted: this.dirsDeleted.slice(),
-      filesAdded: this.filesAdded.slice(),
-      filesDeleted: this.filesDeleted.slice(),
-      filesUpdated: this.filesUpdated.slice(),
-      filesChanged: this.filesUpdated.concat(this.filesAdded, this.filesDeleted),
-      configUpdated: this.configUpdated
-    };
-    return watcher;
-  }
-
-  queue(path: string) {
-    this.recentChanges = this.recentChanges.filter(rc => {
-      // only keep changes that happened in the last XX milliseconds
-      return (Date.now() - 2000) < rc.timestamp;
-    });
-
-    if (this.recentChanges.some(rc => rc.filePath === path)) {
-      // we already kicked off a build for this path
-      // within the last XX milliseconds, let's just ignore the subsequent changes
-      this.config.logger.debug(`skipping recent subsequent file change: ${path}`);
-      return;
-    }
-
-    // debounce builds
+  queue() {
     clearTimeout(this.watchTmr);
-
-    this.recentChanges.push({
-      filePath: path,
-      timestamp: Date.now()
-    });
-
-    this.watchTmr = setTimeout(() => {
-      this.startRebuild();
-    }, 20);
-  }
-
-  queueCopyTasks() {
-    clearTimeout(this.copyTaskTmr);
-
-    this.copyTaskTmr = setTimeout(async () => {
-      await copyTasks(this.config, this.compilerCtx, [], true);
-    }, 100);
+    this.watchTmr = setTimeout(this.startRebuild.bind(this), 20);
   }
 
   resetWatcher() {
@@ -258,18 +284,23 @@ export class WatcherListener {
     this.filesDeleted = [];
     this.filesUpdated = [];
     this.configUpdated = false;
+    this.hasCopyChanges = false;
   }
 
 }
 
 
-function shouldRebuild(watcher: WatcherResults) {
+const TXT_EXT = ['.ts', '.tsx', '.js', '.jsx', '.html', '.html', '.css', '.scss', '.pcss', '.styl', '.stylus', '.less', '.md', '.xml', '.svg', '.json', '.txt'];
+
+
+function shouldRebuild(watcher: d.WatchResults) {
   return watcher.configUpdated ||
-  watcher.dirsAdded.length > 0 ||
-  watcher.dirsDeleted.length > 0 ||
-  watcher.filesAdded.length > 0 ||
-  watcher.filesDeleted.length > 0 ||
-  watcher.filesUpdated.length > 0;
+    watcher.hasCopyChanges ||
+    watcher.dirsAdded.length > 0 ||
+    watcher.dirsDeleted.length > 0 ||
+    watcher.filesAdded.length > 0 ||
+    watcher.filesDeleted.length > 0 ||
+    watcher.filesUpdated.length > 0;
 }
 
 
@@ -277,11 +308,10 @@ function isWebDevFileToWatch(filePath: string) {
   // ts, tsx, css, scss, js, html
   // but don't worry about jpg, png, gif, svgs
   // also don't bother rebuilds when the components.d.ts file gets updated
-  return isWebDevFile(filePath) || (isDtsFile(filePath) && filePath.indexOf(COMPONENTS_DTS) === -1);
+  return isWebDevFile(filePath) || (isDtsFile(filePath) && !isComponentsDtsFile(filePath));
 }
 
 
-interface RecentChange {
-  filePath: string;
-  timestamp: number;
+function isComponentsDtsFile(filePath: string) {
+  return filePath.endsWith(COMPONENTS_DTS);
 }

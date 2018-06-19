@@ -385,7 +385,7 @@ const isVersionLower = (oldVersion, newVersion) => {
 const satisfies = (version, range) => semver.satisfies(version, range);
 
 const readPkg = () => {
-  return JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  return JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 };
 
 function prettyVersionDiff(oldVersion, inc) {

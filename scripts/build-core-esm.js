@@ -51,7 +51,7 @@ function dynamicImportFnHack(input) {
 
 function polyfillsHack(input) {
   const promiseFile = path.join(__dirname, '..', 'src', 'client', 'polyfills', 'index.js');
-  const promiseContent = fs.readFileSync(promiseFile, 'utf-8');
+  const promiseContent = fs.readFileSync(promiseFile, 'utf8');
 
   return promiseContent + '\n' + input;
 }

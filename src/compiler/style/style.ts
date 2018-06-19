@@ -1,23 +1,36 @@
 import * as d from '../../declarations';
-import { buildError, hasFileExtension, normalizePath } from '../util';
+import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
+import { generateGlobalStyles } from './global-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+  if (canSkipGenerateStyles(buildCtx)) {
+    return;
+  }
 
-  config.logger.debug(`generate styles started`);
-  await Promise.all(entryModules.map(async bundle => {
+  const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
+  const componentStyles = await Promise.all(entryModules.map(async bundle => {
     await Promise.all(bundle.moduleFiles.map(async moduleFile => {
       await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
     }));
-
   }));
 
-  config.logger.debug(`generate styles ended`);
+  // create the global styles
+  const globalStyles = await Promise.all(config.outputTargets.map(async outputTarget => {
+    await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
+  }));
+
+  await Promise.all([
+    componentStyles,
+    globalStyles
+  ]);
+
+  timeSpan.finish(`generate styles finished`);
 }
 
 
@@ -29,7 +42,7 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
     const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
     // format and set the styles for use later
-    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], modeName, styles);
+    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, stylesMeta[modeName], styles);
   }));
 }
 
@@ -56,7 +69,18 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 
 async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
+  let styleText: string;
+
   extStylePath = normalizePath(extStylePath);
+
+  if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
+    // watched file must have only been a script change and not style change
+    // let's see if we cached anything for this file path
+    styleText = compilerCtx.lastStyleText[extStylePath];
+    if (typeof styleText === 'string') {
+      return styleText;
+    }
+  }
 
   if (moduleFile.isCollectionDependency) {
     // if it's a collection dependency and it's a preprocessor file like sass
@@ -77,20 +101,43 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     checkPluginHelpers(config, buildCtx, extStylePath);
   }
 
-  const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
+  try {
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
 
-  if (!moduleFile.isCollectionDependency) {
-    const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+    if (!moduleFile.isCollectionDependency) {
+      const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
-    const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
+      const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
 
-    await Promise.all(collectionDirs.map(async outputTarget => {
-      const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
-      await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
-    }));
+      await Promise.all(collectionDirs.map(async outputTarget => {
+        const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+        await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+      }));
+    }
+
+    styleText = transformResults.code;
+
+    if (config.watch && !extStylePath.endsWith('.js.css')) {
+      // only cache if it's a watch build
+      // but don't cache any css that was inlined in a .tsx file
+      compilerCtx.lastStyleText[extStylePath] = styleText;
+    }
+
+    buildCtx.styleBuildCount++;
+
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      const d = buildError(buildCtx.diagnostics);
+      const relExtStyle = config.sys.path.relative(config.cwd, extStylePath);
+      const relSrc = config.sys.path.relative(config.cwd, moduleFile.sourceFilePath);
+      d.messageText = `Unable to load style ${relExtStyle} from ${relSrc}`;
+    } else {
+      catchError(buildCtx.diagnostics, e);
+    }
+    styleText = '';
   }
 
-  return transformResults.code;
+  return styleText;
 }
 
 
@@ -144,7 +191,7 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, mode: string, styles: string[]) {
+export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, styleMeta: d.StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
   styleMeta.compiledStyleText = styles.join('\n\n').trim();
 
@@ -165,7 +212,29 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
-    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, mode, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
+  }
+
+  compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || {};
+  // test to see if the last styles are different
+  let styleId = getStyleId(cmpMeta, modeName, false);
+  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleText) {
+    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleText;
+
+    if (buildCtx.isRebuild) {
+      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
+      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleText;
+    }
+  }
+
+  styleId = getStyleId(cmpMeta, modeName, true);
+  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleTextScoped) {
+    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleTextScoped;
+
+    if (buildCtx.isRebuild) {
+      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
+      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleTextScoped;
+    }
   }
 
   styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
@@ -173,6 +242,11 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
   if (styleMeta.compiledStyleTextScoped) {
     styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
   }
+}
+
+
+function getStyleId(cmpMeta: d.ComponentMeta, modeName: string, isScopedStyles: boolean) {
+  return `${cmpMeta.tagNameMeta}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 
 
@@ -190,7 +264,7 @@ export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
 }
 
 
-const PLUGIN_HELPERS = [
+export const PLUGIN_HELPERS = [
   {
     pluginName: 'PostCSS',
     pluginId: 'postcss',
@@ -211,3 +285,24 @@ const PLUGIN_HELPERS = [
     pluginExts: ['less']
   }
 ];
+
+
+function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
+  if (buildCtx.shouldAbort()) {
+    return true;
+  }
+
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return false;
+}

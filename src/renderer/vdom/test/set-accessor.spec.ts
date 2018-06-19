@@ -240,6 +240,27 @@ describe('setAccessor for custom elements', () => {
     expect(elm).toMatchAttributes({ 'myprop': 'false' });
   });
 
+  it('should add aria role attribute', () => {
+    setAccessor(plt, elm, 'role', undefined, 'tab', true);
+    expect(elm.hasAttribute('role')).toBe(true);
+    expect(elm.getAttribute('role')).toBe('tab');
+  });
+
+  it('should update aria role attribute', () => {
+    elm.setAttribute('role', 'tab');
+
+    setAccessor(plt, elm, 'role', 'tab', 'other', true);
+    expect(elm.getAttribute('role')).toBe('other');
+  });
+
+  it('should remove aria role attribute', () => {
+    elm.setAttribute('role', 'tab');
+
+    setAccessor(plt, elm, 'role', 'tab', undefined, true);
+    expect(elm.hasAttribute('role')).toBe(false);
+  });
+
+
   it('should update svg attribute', () => {
     elm.setAttribute('transform', 'rotate(45 72 72)');
     const oldValue: any = 'rotate(45 72 72)';
@@ -638,6 +659,13 @@ describe('setAccessor for standard html elements', () => {
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
+    it('should aria role attribute', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'role', undefined, 'main', false);
+
+      expect(inputElm.hasAttribute('role')).toBe(true);
+    });
+
     it('should remove attribute when prop is undefined', () => {
       const inputElm = mockElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 1, false);
@@ -652,6 +680,13 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(plt, inputElm, 'color', 1, null, false);
 
       expect(inputElm.hasAttribute('color')).toBe(false);
+    });
+    it('should remove aria role attribute', () => {
+      const inputElm = mockElement('section');
+      setAccessor(plt, inputElm, 'role', undefined, 'main', false);
+      setAccessor(plt, inputElm, 'role', 'main', undefined, false);
+
+      expect(inputElm.hasAttribute('role')).toBe(false);
     });
   });
 });

@@ -22,7 +22,10 @@ export async function optimizeHtml(
   const promises: Promise<any>[] = [];
 
   if (hydrateTarget.hydrateComponents) {
-    doc.documentElement.setAttribute('data-ssr', '');
+    doc.documentElement.setAttribute(
+      'data-ssr',
+      (typeof hydrateTarget.timestamp === 'string' ? hydrateTarget.timestamp : '')
+    );
   }
 
   if (hydrateTarget.canonicalLink) {

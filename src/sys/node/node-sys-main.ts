@@ -79,6 +79,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('autoprefixCss', [input, opts]);
   }
 
+  async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
+    return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
+  }
+
   private _existingDom: () => d.CreateDom;
 
   get createDom() {
@@ -294,11 +298,19 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   tmpdir() {
-    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}`);
+    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}-__BUILDID__`);
   }
 
   get url() {
     return url;
+  }
+
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return this.sysWorker.run(
+      'validateTypes',
+      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
+      { isLongRunningTask: true, workerKey: 'validateTypes' }
+    );
   }
 
   get vm(): any {

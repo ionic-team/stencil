@@ -4,11 +4,15 @@
 [![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
 
 
-# Stencil: A Compiler for Web Components
+# Stencil: A Compiler for Web Components and PWAs
+
+```bash
+npm init stencil
+```
 
 [Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and progressive web apps (PWA). Stencil was built by the [Ionic Framework](http://ionicframework.com/) team for its next generation of performant mobile and desktop Web Components.
 
-Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool.  Stencil takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that run in any browser supporting the Custom Elements v1 spec.
+Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool. It takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that runs on both [modern browsers and legacy browsers](#browser-support) back to Internet Explorer 11.
 
 Stencil components are just Web Components, so they work in any major framework or with no framework at all. In many cases, Stencil can be used as a drop in replacement for traditional frontend frameworks given the capabilities now available in the browser, though using it as such is certainly not required.
 
@@ -28,16 +32,13 @@ Compared to using Custom Elements directly, inside of every Stencil component is
 
 ## Getting Started
 
-To start a new project using Stencil, clone the starter project and get to work:
+To create a new project using an interactive cli, run:
 
 ```bash
-git clone https://github.com/ionic-team/stencil-starter.git my-app
-cd my-app
-git remote rm origin
-npm install
+npm init stencil
 ```
 
-To build your new Stencil project, just run
+To start developing your new Stencil project, run:
 
 ```bash
 npm start

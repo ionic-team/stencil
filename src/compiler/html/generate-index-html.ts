@@ -4,6 +4,10 @@ import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script
 
 
 export function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (buildCtx.shouldAbort()) {
+    return null;
+  }
+
   const indexHtmlOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.indexHtml);
 
   return Promise.all(indexHtmlOutputs.map(outputTarget => {
@@ -44,6 +48,6 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
 
   } catch (e) {
     // it's ok if there's no index file
-    config.logger.debug(`no index html: ${config.srcIndexHtml}: ${e}`);
+    config.logger.debug(`no index html: ${config.srcIndexHtml}`);
   }
 }

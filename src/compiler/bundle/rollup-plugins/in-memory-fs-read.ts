@@ -2,7 +2,8 @@ import * as d from '../../../declarations';
 import { normalizePath } from '../../util';
 
 
-export default function inMemoryFsRead(config: d.Config, path: d.Path, compilerCtx: d.CompilerCtx) {
+export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const path = config.sys.path;
   const assetsCache: d.FilesMap = {};
   let tsFileNames: string[];
 

@@ -5,7 +5,6 @@ import { generatePreamble } from '../util';
 import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import { minifyJs } from '../minifier';
-import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -84,7 +83,6 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
     const rollup = await config.sys.rollup.rollup({
       input: entry,
       plugins: [
-        resolveCollections(compilerCtx),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -93,7 +91,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(config, config.sys.path, compilerCtx),
+        inMemoryFsRead(config, compilerCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
@@ -138,7 +136,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     // global could already be in es2017
     // transpile it down to es5
     config.logger.debug(`transpile global to es5: ${globalJsName}`);
-    const transpileResults = await transpileToEs5(compilerCtx, jsContent);
+    const transpileResults = await transpileToEs5(config, compilerCtx, jsContent);
     if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
       buildCtx.diagnostics.push(...transpileResults.diagnostics);
     } else {

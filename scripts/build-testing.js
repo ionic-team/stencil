@@ -70,7 +70,7 @@ if (success) {
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ compiler: ${DEST_FILE}`);
+    console.log(`✅ testing: ${DEST_FILE}`);
   });
 
 }

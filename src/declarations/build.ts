@@ -2,53 +2,61 @@ import * as d from './index';
 
 
 export interface BuildCtx {
-  graphData?: GraphData;
-  componentRefs?: d.PotentialComponentRef[];
-  moduleGraphs?: d.ModuleGraph[];
-  collections?: d.Collection[];
+  appFileBuildCount: number;
   buildId: number;
-  requiresFullBuild: boolean;
+  buildResults: d.BuildResults;
+  timestamp: string;
+  bundleBuildCount: number;
+  collections: d.Collection[];
+  components: string[];
+  createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
+  data: any;
   diagnostics: d.Diagnostic[];
+  dirsAdded: string[];
+  dirsDeleted: string[];
   entryModules: d.EntryModule[];
   entryPoints: d.EntryPoint[];
-  global?: d.ModuleFile;
-  transpileBuildCount: number;
-  bundleBuildCount: number;
-  appFileBuildCount: number;
-  indexBuildCount: number;
-  components: string[];
-  aborted: boolean;
-  timeSpan: d.LoggerTimeSpan;
-  startTime: number;
-  hasChangedJsText: boolean;
-  filesWritten: string[];
-  filesDeleted: string[];
-  dirsDeleted: string[];
-  dirsAdded: string[];
-  filesChanged: string[];
-  filesUpdated: string[];
   filesAdded: string[];
-  shouldAbort?(): boolean;
-  data?: any;
-  hasSlot?: boolean;
-  hasSvg?: boolean;
-  finish?(): Promise<BuildResults>;
+  filesChanged: string[];
+  filesDeleted: string[];
+  filesUpdated: string[];
+  filesWritten: string[];
+  finish(): Promise<BuildResults>;
+  global: d.ModuleFile;
+  graphData: GraphData;
+  hasCopyChanges: boolean;
+  hasFinished: boolean;
+  hasImageChanges: boolean;
+  hasScriptChanges: boolean;
+  hasSlot: boolean;
+  hasStyleChanges: boolean;
+  hasSvg: boolean;
+  indexBuildCount: number;
+  isActiveBuild: boolean;
+  isRebuild: boolean;
+  requiresFullBuild: boolean;
+  shouldAbort(): boolean;
+  startTime: number;
+  styleBuildCount: number;
+  stylesUpdated: { [styleId: string]: string };
+  timeSpan: d.LoggerTimeSpan;
+  transpileBuildCount: number;
+  validateTypesHandler?: (results: d.ValidateTypesResults) => void;
+  validateTypesPromise?: Promise<d.ValidateTypesResults>;
+  validateTypesBuild?(): Promise<void>;
 }
 
 
 export type GraphData = Map<string, string[]>;
 
-
 export interface BuildResults {
   buildId: number;
   diagnostics: d.Diagnostic[];
   hasError: boolean;
-  aborted?: boolean;
   duration: number;
   isRebuild: boolean;
   transpileBuildCount: number;
   bundleBuildCount: number;
-  hasChangedJsText: boolean;
   dirsAdded: string[];
   dirsDeleted: string[];
   filesWritten: string[];
@@ -60,6 +68,24 @@ export interface BuildResults {
   entries: BuildEntry[];
   hasSlot: boolean;
   hasSvg: boolean;
+  styleBuildCount: number;
+}
+
+
+export interface BuildStartData {
+  buildId: number;
+  isRebuild: boolean;
+  startTime: number;
+  dirsAdded: string[];
+  dirsDeleted: string[];
+  filesChanged: string[];
+  filesUpdated: string[];
+  filesAdded: string[];
+  filesDeleted: string[];
+}
+
+export interface BuildNoChangeResults {
+  noChange: boolean;
 }
 
 
@@ -131,13 +157,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'build' | 'rebuild';
-
-export interface TranspileResults {
-  code?: string;
-  diagnostics?: d.Diagnostic[];
-  cmpMeta?: d.ComponentMeta;
-}
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish' | 'build' | 'buildNoChange';
 
 
 export interface JSModuleList {

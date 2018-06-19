@@ -31,13 +31,13 @@ describe('bundle-module', () => {
       await c.fs.commit();
 
       // initial build
-      let r = await c.build();
+      const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
       const firstBuildText = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
 
       // create a rebuild listener
-      const rebuildListener = c.once('rebuild');
+      const noChangeListener = c.once('buildNoChange');
 
       // write the same darn thing, no actual change
       await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
@@ -48,16 +48,8 @@ describe('bundle-module', () => {
 
       // wait for the rebuild to finish
       // get the rebuild results
-      r = await rebuildListener;
-
-      expect(r.diagnostics).toEqual([]);
-      expect(r.components.length).toBe(3);
-      expect(r.components[0].tag).toBe('cmp-a');
-      expect(r.components[1].tag).toBe('cmp-b');
-      expect(r.components[2].tag).toBe('cmp-c');
-
-      const secondBuildText = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
-      expect(firstBuildText).toBe(secondBuildText);
+      const nc = await noChangeListener;
+      expect(nc.noChange).toEqual(true);
     });
 
     it('should build 2 bundles of 3 components', async () => {
