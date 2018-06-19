@@ -1,10 +1,8 @@
 import * as d from '../../declarations';
 import { buildAuxiliaries } from './build-auxiliaries';
 import { catchError } from '../util';
-import { copyTasks } from '../copy/copy-tasks';
+import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
-import { BuildContext } from './build-ctx';
-import { getCompilerCtx } from './compiler-ctx';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateBundles } from '../bundle/generate-bundles';
 import { generateEntryModules } from '../entries/entry-modules';
@@ -15,18 +13,9 @@ import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
-import { _deprecatedConfigCollections } from '../collections/_deprecated-collections';
 
 
-export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watcher?: d.WatcherResults) {
-  // create the build context if it doesn't exist
-  // the buid context is the same object used for all builds and rebuilds
-  // ctx is where stuff is cached for fast in-memory lookups later
-  compilerCtx = getCompilerCtx(config, compilerCtx);
-
-  // reset the build context, this is important for rebuilds
-  const buildCtx = new BuildContext(config, compilerCtx, watcher);
-
+export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
     // create an initial index.html file if one doesn't already exist
     // this is synchronous on purpose
@@ -34,15 +23,7 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // empty the directories on the first build
-    await emptyOutputTargetDirs(config, compilerCtx);
-    if (buildCtx.shouldAbort()) return buildCtx.finish();
-
-    // copy tasks
-    await copyTasks(config, compilerCtx, buildCtx, watcher);
-    if (buildCtx.shouldAbort()) return buildCtx.finish();
-
-    // DEPRECATED config.colllections 2018-02-13
-    await _deprecatedConfigCollections(config, compilerCtx, buildCtx);
+    await emptyOutputTargetDirs(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // async scan the src directory for ts files
@@ -58,6 +39,11 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
     const entryModules = generateEntryModules(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
+    // start copy tasks from the config.copy and component assets
+    // but don't wait right now (running in worker)
+    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // bundle js modules and create each of the components's styles
@@ -88,12 +74,20 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     // do this before we attempt to write build files
     await buildCtx.validateTypesBuild();
 
+    // we started the copy tasks long ago
+    // i'm sure it's done by now, but let's double check
+    // make sure this finishes before the write build files
+    // so they're not stepping on each other writing files
+    await copyTaskPromise;
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // await on our other optional stuff like docs, service workers, etc.
     await buildAuxiliaries(config, compilerCtx, buildCtx, entryModules);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
   } catch (e) {
     // ¯\_(ツ)_/¯

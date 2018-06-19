@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistributions } from '../distribution/distribution';
 import { writeAppCollections } from '../collections/collection-data';
 
@@ -15,12 +14,8 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
-  // kick off copying component assets
-  // and copy www/build to dist/ if generateDistribution is enabled
-  await Promise.all([
-    copyComponentAssets(config, compilerCtx, buildCtx),
-    generateDistributions(config, compilerCtx, buildCtx)
-  ]);
+  // copy www/build to dist/ if generateDistribution is enabled
+  await generateDistributions(config, compilerCtx, buildCtx);
 
   let totalFilesWrote = 0;
 

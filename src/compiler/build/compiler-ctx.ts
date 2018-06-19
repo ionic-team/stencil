@@ -28,6 +28,7 @@ export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || [];
   compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
   compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
+  compilerCtx.lastStyleText = compilerCtx.lastStyleText || {};
 
   if (typeof compilerCtx.activeBuildId !== 'number') {
     compilerCtx.activeBuildId = -1;
@@ -47,6 +48,7 @@ export function resetCompilerCtx(compilerCtx: d.CompilerCtx) {
   compilerCtx.compiledModuleJsText = {};
   compilerCtx.compiledModuleLegacyJsText = {};
   compilerCtx.compilerOptions = null;
+  compilerCtx.lastStyleText = {};
   compilerCtx.tsService = null;
   compilerCtx.rootTsFiles = null;
 

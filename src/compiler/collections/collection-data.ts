@@ -26,8 +26,6 @@ async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
   // create an absolute file path to the actual collection json file
   const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
 
-  config.logger.debug(`collection, serialize: ${collectionFilePath}`);
-
   // serialize the collection into a json string and
   // add it to the list of files we need to write when we're ready
   const collectionData = serializeAppCollection(config, compilerCtx, collectionDir, buildCtx.entryModules, buildCtx.global);

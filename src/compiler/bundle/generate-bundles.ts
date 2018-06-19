@@ -9,7 +9,7 @@ import { transpileToEs5 } from '../transpile/core-build';
 
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
-  if (canSkipBuild(compilerCtx, buildCtx)) {
+  if (canSkipGenerateBundles(buildCtx)) {
     return null;
   }
 
@@ -457,13 +457,13 @@ function createComponentRegistry(entryModules: d.EntryModule[]) {
 }
 
 
-function canSkipBuild(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+function canSkipGenerateBundles(buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort()) {
     return true;
   }
 
-  if (compilerCtx.isRebuild) {
-    if (buildCtx.filesChanged.some(f => EXTS.some(ext => f.endsWith('.' + ext)))) {
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
       return false;
     }
 

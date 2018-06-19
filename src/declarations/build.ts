@@ -2,7 +2,6 @@ import * as d from './index';
 
 
 export interface BuildCtx {
-  aborted: boolean;
   appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
@@ -25,13 +24,20 @@ export interface BuildCtx {
   finish(): Promise<BuildResults>;
   global: d.ModuleFile;
   graphData: GraphData;
+  hasCopyChanges: boolean;
   hasFinished: boolean;
+  hasImageChanges: boolean;
+  hasScriptChanges: boolean;
   hasSlot: boolean;
+  hasStyleChanges: boolean;
   hasSvg: boolean;
   indexBuildCount: number;
+  isActiveBuild: boolean;
+  isRebuild: boolean;
   requiresFullBuild: boolean;
   shouldAbort(): boolean;
   startTime: number;
+  styleBuildCount: number;
   timeSpan: d.LoggerTimeSpan;
   transpileBuildCount: number;
   validateTypesHandler?: (diagnostics: d.Diagnostic[]) => void;
@@ -46,7 +52,6 @@ export interface BuildResults {
   buildId: number;
   diagnostics: d.Diagnostic[];
   hasError: boolean;
-  aborted?: boolean;
   duration: number;
   isRebuild: boolean;
   transpileBuildCount: number;
@@ -62,6 +67,24 @@ export interface BuildResults {
   entries: BuildEntry[];
   hasSlot: boolean;
   hasSvg: boolean;
+  styleBuildCount: number;
+}
+
+
+export interface BuildStartData {
+  buildId: number;
+  isRebuild: boolean;
+  startTime: number;
+  dirsAdded: string[];
+  dirsDeleted: string[];
+  filesChanged: string[];
+  filesUpdated: string[];
+  filesAdded: string[];
+  filesDeleted: string[];
+}
+
+export interface BuildNoChangeResults {
+  noChange: boolean;
 }
 
 
@@ -133,7 +156,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish';
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish' | 'build' | 'buildNoChange';
 
 
 export interface JSModuleList {

@@ -8,6 +8,7 @@ export * from './collection';
 export * from './compiler';
 export * from './component';
 export * from './config';
+export * from './copy';
 export * from './decorators';
 export * from './dev-inspector';
 export * from './diagnostics';

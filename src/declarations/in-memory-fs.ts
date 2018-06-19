@@ -15,11 +15,8 @@ export interface InMemoryFileSystem {
    * @param filePath
    */
   accessSync(filePath: string): boolean;
-  copy(src: string, dest: string, opts?: {
-      filter?: (src: string, dest?: string) => boolean;
-  }): Promise<void>;
   emptyDir(dirPath: string): Promise<void>;
-  hasFileChanged(filePath: string): Promise<boolean>;
+  hasFileChanged(filePath: string): boolean;
   readdir(dirPath: string, opts?: d.FsReaddirOptions): Promise<d.FsReaddirItem[]>;
   readFile(filePath: string, opts?: d.FsReadOptions): Promise<string>;
   /**
@@ -27,8 +24,9 @@ export interface InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param filePath
    */
-  readFileSync(filePath: string): string;
+  readFileSync(filePath: string, opts?: d.FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
+  setBuildHashes(): void;
   stat(itemPath: string): Promise<{
       isFile: boolean;
       isDirectory: boolean;
@@ -52,6 +50,8 @@ export interface InMemoryFileSystem {
       dirsDeleted: string[];
       dirsAdded: string[];
   }>;
+  cancelDeleteFileFromDisk(filePaths: string[]): void;
+  cancelDeleteDirectoriesFromDisk(filePaths: string[]): void;
   clearDirCache(dirPath: string): void;
   clearFileCache(filePath: string): void;
   getItem(itemPath: string): d.FsItem;

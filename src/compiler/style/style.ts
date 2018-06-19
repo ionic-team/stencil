@@ -1,14 +1,14 @@
 import * as d from '../../declarations';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
+import { generateGlobalStyles } from './global-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
-import { generateGlobalStyles } from '../app/app-global-styles';
 
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
-  if (canSkipBuild(compilerCtx, buildCtx)) {
+  if (canSkipGenerateStyles(buildCtx)) {
     return;
   }
 
@@ -69,7 +69,18 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 
 async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
+  let styleText: string;
+
   extStylePath = normalizePath(extStylePath);
+
+  if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
+    // watched file must have only been a script change and not style change
+    // let's see if we cached anything for this file path
+    styleText = compilerCtx.lastStyleText[extStylePath];
+    if (typeof styleText === 'string') {
+      return styleText;
+    }
+  }
 
   if (moduleFile.isCollectionDependency) {
     // if it's a collection dependency and it's a preprocessor file like sass
@@ -104,7 +115,15 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
       }));
     }
 
-    return transformResults.code;
+    styleText = transformResults.code;
+
+    if (config.watch && !extStylePath.endsWith('.js.css')) {
+      // only cache if it's a watch build
+      // but don't cache any css that was inlined in a .tsx file
+      compilerCtx.lastStyleText[extStylePath] = styleText;
+    }
+
+    buildCtx.styleBuildCount++;
 
   } catch (e) {
     if (e.code === 'ENOENT') {
@@ -115,8 +134,10 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     } else {
       catchError(buildCtx.diagnostics, e);
     }
-    return '';
+    styleText = '';
   }
+
+  return styleText;
 }
 
 
@@ -239,17 +260,13 @@ export const PLUGIN_HELPERS = [
 ];
 
 
-function canSkipBuild(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort()) {
     return true;
   }
 
-  if (compilerCtx.isRebuild) {
-    if (buildCtx.filesChanged.some(f => f.endsWith('.css'))) {
-      return false;
-    }
-
-    if (buildCtx.filesChanged.some(f => PLUGIN_HELPERS.some(p => p.pluginExts.some(ext => f.endsWith('.' + ext))))) {
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
       return false;
     }
 

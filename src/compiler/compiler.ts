@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { build } from './build/build';
+import { BuildContext } from './build/build-ctx';
 import { catchError } from './util';
 import { docs } from './docs/docs';
 import { getCompilerCtx } from './build/compiler-ctx';
@@ -22,27 +23,31 @@ export class Compiler {
         startupMsg += `💎`;
       }
 
-     this.config.logger.info(this.config.logger.cyan(startupMsg));
-     this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
-     this.config.logger.debug(`compiler build: __BUILDID__`);
+      this.config.logger.info(this.config.logger.cyan(startupMsg));
+      this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
+      this.config.logger.debug(`compiler build: __BUILDID__`);
 
-     this.ctx.events.subscribe('buildStart', (watcherResults) => {
-      build(this.config, this.ctx, watcherResults);
+      this.ctx.events.subscribe('build', (watchResults) => {
+        const buildCtx = new BuildContext(this.config, this.ctx, watchResults);
+        build(this.config, this.ctx, buildCtx);
      });
     }
   }
 
   build() {
-    return build(this.config, this.ctx);
+    const buildCtx = new BuildContext(this.config, this.ctx);
+    return build(this.config, this.ctx, buildCtx);
   }
 
   on(eventName: 'buildStart', cb: () => void): Function;
+  on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   on(eventName: d.CompilerEventName, cb: any) {
     return this.ctx.events.subscribe(eventName as any, cb);
   }
 
   once(eventName: 'buildStart'): Promise<void>;
+  once(eventName: 'buildNoChange'): Promise<d.BuildNoChangeResults>;
   once(eventName: 'buildFinish'): Promise<d.BuildResults>;
   once(eventName: d.CompilerEventName) {
     return new Promise<any>(resolve => {
@@ -62,6 +67,7 @@ export class Compiler {
   trigger(eventName: 'fileDelete', path: string): void;
   trigger(eventName: 'dirAdd', path: string): void;
   trigger(eventName: 'dirDelete', path: string): void;
+  trigger(eventName: 'build', watchResults?: d.WatchResults): void;
   trigger(eventName: d.CompilerEventName, ...args: any[]) {
     args.unshift(eventName);
     this.ctx.events.emit.apply(this.ctx.events, args);

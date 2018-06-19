@@ -11,7 +11,7 @@ import { setBuildConditionals } from './build-conditionals';
 
 
 export async function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
-  if (canSkipBuild(compilerCtx, buildCtx, cmpRegistry)) {
+  if (canSkipAppFiles(buildCtx, cmpRegistry)) {
     return;
   }
 
@@ -99,13 +99,13 @@ async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-function canSkipBuild(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpRegistry: d.ComponentRegistry) {
+function canSkipAppFiles(buildCtx: d.BuildCtx, cmpRegistry: d.ComponentRegistry) {
   if (buildCtx.shouldAbort() || !cmpRegistry) {
     return true;
   }
 
-  if (compilerCtx.isRebuild) {
-    if (buildCtx.filesChanged.some(f => f.endsWith('.tsx') || f.endsWith('.ts') || f.endsWith('.js'))) {
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasScriptChanges) {
       return false;
     }
 

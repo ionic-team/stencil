@@ -3,6 +3,7 @@ export interface FileSystem {
   copyFile(src: string, dest: string): Promise<void>;
   createReadStream(filePath: string): any;
   mkdir(dirPath: string): Promise<void>;
+  mkdirSync(dirPath: string): void;
   readdir(dirPath: string): Promise<string[]>;
   readFile(filePath: string, encoding?: string): Promise<string>;
   readFileSync(filePath: string, encoding?: string): string;
@@ -11,6 +12,7 @@ export interface FileSystem {
   statSync(path: string): FsStats;
   unlink(filePath: string): Promise<void>;
   writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
+  writeFileSync(filePath: string, content: string, opts?: FsWriteOptions): void;
 }
 
 
@@ -41,6 +43,7 @@ export interface FsStats {
 
 export interface FsReadOptions {
   useCache?: boolean;
+  setHash?: boolean;
 }
 
 
@@ -79,6 +82,7 @@ export interface FsItems {
 
 export interface FsItem {
   fileText?: string;
+  hash?: string;
   fileSrc?: string;
   isFile?: boolean;
   isDirectory?: boolean;
@@ -87,5 +91,4 @@ export interface FsItem {
   exists?: boolean;
   queueWriteToDisk?: boolean;
   queueDeleteFromDisk?: boolean;
-  hash?: string;
 }

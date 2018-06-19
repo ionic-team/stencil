@@ -73,70 +73,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return hasAccess;
   }
 
-  async copy(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
-    const stats = await this.stat(src);
-
-    if (stats.isDirectory) {
-      await this.copyDir(src, dest, opts);
-
-    } else if (stats.isFile) {
-      await this.copyFile(src, dest, opts);
-    }
-  }
-
-  private async copyDir(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
-    src = normalizePath(src);
-    dest = normalizePath(dest);
-
-    const dirItems = await this.readdir(src, { recursive: true });
-
-    await Promise.all(dirItems.map(async dirItem => {
-      const srcPath = dirItem.absPath;
-      const destPath = normalizePath(this.sys.path.join(dest, dirItem.relPath));
-
-      if (dirItem.isDirectory) {
-        await this.copyDir(srcPath, destPath, opts);
-
-      } else if (dirItem.isFile) {
-        await this.copyFile(srcPath, destPath, opts);
-      }
-    }));
-  }
-
-  private async copyFile(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
-    src = normalizePath(src);
-    dest = normalizePath(dest);
-
-    if (opts && typeof opts.filter === 'function' && !opts.filter(src, dest)) {
-      return;
-    }
-
-    if (shouldIgnore(src)) {
-      return;
-    }
-
-    const srcItem = this.getItem(src);
-    srcItem.isFile = true;
-    srcItem.isDirectory = false;
-
-    const destItem = this.getItem(dest);
-    destItem.isFile = true;
-    destItem.isDirectory = false;
-    destItem.queueDeleteFromDisk = false;
-
-    if (isTextFile(src)) {
-      const srcFileText = await this.readFile(src);
-      if (srcFileText !== destItem.fileText) {
-        destItem.fileText = srcFileText;
-        destItem.queueWriteToDisk = true;
-      }
-
-    } else {
-      destItem.fileSrc = src;
-      destItem.queueWriteToDisk = true;
-    }
-  }
-
   async emptyDir(dirPath: string) {
     const item = this.getItem(dirPath);
 
@@ -239,27 +175,43 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     }));
   }
 
-  async hasFileChanged(filePath: string) {
+  hasFileChanged(filePath: string) {
     let hasFileChanged = true;
 
     try {
       let oldHash: string = null;
-
       const oldItem = this.getItem(filePath);
-      if (oldItem.exists && oldItem.isFile && oldItem.hash) {
+
+      if (oldItem.exists && oldItem.isFile && typeof oldItem.hash === 'string') {
         oldHash = oldItem.hash;
       }
 
-      await this.readFile(filePath, { useCache: false });
+      this.readFileSync(filePath, { useCache: false, setHash: true });
 
       if (oldHash != null) {
         const newItem = this.getItem(filePath);
-        hasFileChanged = (oldHash !== newItem.hash);
+
+        if (typeof newItem.hash === 'string') {
+          hasFileChanged = (newItem.hash !== oldHash);
+        }
       }
 
     } catch (e) {}
 
     return hasFileChanged;
+  }
+
+  setBuildHashes() {
+    Object.keys(this.items).forEach(itemKey => {
+      const item = this.items[itemKey];
+      if (item && item.isFile && typeof item.fileText === 'string') {
+        item.hash = this.getContentHash(item.fileText);
+      }
+    });
+  }
+
+  getContentHash(content: string) {
+    return this.sys.generateContentHash(content, 32);
   }
 
   async readFile(filePath: string, opts?: d.FsReadOptions) {
@@ -272,16 +224,16 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     const fileContent = await this.disk.readFile(filePath, 'utf8');
 
+    const item = this.getItem(filePath);
     if (fileContent.length < MAX_TEXT_CACHE) {
-      const item = this.getItem(filePath);
       item.exists = true;
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
+    }
 
-      if (this.sys.generateContentHash) {
-        item.hash = this.sys.generateContentHash(fileContent, 32);
-      }
+    if (opts && opts.setHash && typeof fileContent === 'string') {
+      item.hash = this.getContentHash(fileContent);
     }
 
     return fileContent;
@@ -292,23 +244,26 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param filePath
    */
-  readFileSync(filePath: string) {
-    const item = this.getItem(filePath);
-    if (item.exists && typeof item.fileText === 'string') {
-      return item.fileText;
+  readFileSync(filePath: string, opts?: d.FsReadOptions) {
+    if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
+      const item = this.getItem(filePath);
+      if (item.exists && typeof item.fileText === 'string') {
+        return item.fileText;
+      }
     }
 
     const fileContent = this.disk.readFileSync(filePath, 'utf8');
 
+    const item = this.getItem(filePath);
     if (fileContent.length < MAX_TEXT_CACHE) {
       item.exists = true;
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
+    }
 
-      if (this.sys.generateContentHash) {
-        item.hash = this.sys.generateContentHash(fileContent, 32);
-      }
+    if (opts && opts.setHash && typeof fileContent === 'string') {
+      item.hash = this.getContentHash(fileContent);
     }
 
     return fileContent;
@@ -585,6 +540,24 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     if (item && !item.queueWriteToDisk) {
       delete this.items[filePath];
     }
+  }
+
+  cancelDeleteFileFromDisk(filePaths: string[]) {
+    filePaths.forEach(filePath => {
+      const item = this.getItem(filePath);
+      if (item.isFile && item.queueDeleteFromDisk) {
+        item.queueDeleteFromDisk = false;
+      }
+    });
+  }
+
+  cancelDeleteDirectoriesFromDisk(dirPaths: string[]) {
+    dirPaths.forEach(dirPath => {
+      const item = this.getItem(dirPath);
+      if (item.queueDeleteFromDisk) {
+        item.queueDeleteFromDisk = false;
+      }
+    });
   }
 
   getItem(itemPath: string): d.FsItem {

@@ -127,7 +127,7 @@ describe('transpile', () => {
     await c.fs.commit();
 
     // kick off the build, wait for it to finish
-    let r = await c.build();
+    const r = await c.build();
 
     // initial build finished
     expect(r.diagnostics).toEqual([]);
@@ -135,7 +135,7 @@ describe('transpile', () => {
     expect(r.isRebuild).toBe(false);
 
     // create a rebuild listener
-    const rebuildListener = c.once('buildFinish');
+    const buildNoChange = c.once('buildNoChange');
 
     // write the same darn thing, no actual change
     await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
@@ -146,12 +146,8 @@ describe('transpile', () => {
 
     // wait for the rebuild to finish
     // get the rebuild results
-    r = await rebuildListener;
-    expect(r.diagnostics).toEqual([]);
-    expect(r.buildId).toBe(1);
-    expect(r.isRebuild).toBe(true);
-    expect(r.entries[0].components[0].tag).toEqual('cmp-a');
-    expect(r.transpileBuildCount).toBe(0);
+    const nc = await buildNoChange;
+    expect(nc.noChange).toEqual(true);
   });
 
   it('should transpile with core and without typescript errors', async () => {

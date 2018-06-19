@@ -6,12 +6,12 @@ import { initWatcher } from '../watcher/watcher-init';
 
 
 export class BuildContext implements d.BuildCtx {
-  aborted = false;
   appFileBuildCount = 0;
   buildId = -1;
   timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
+  changedExtensions: string[] = [];
   collections: d.Collection[] = [];
   components: string[] = [];
   data: any = {};
@@ -27,48 +27,76 @@ export class BuildContext implements d.BuildCtx {
   filesWritten: string[] = [];
   global: d.ModuleFile = null;
   graphData: d.GraphData = null;
+  hasCopyChanges = false;
   hasFinished = false;
-  hasLoggedFinish = false;
+  hasImageChanges = false;
+  hasScriptChanges = true;
   hasSlot: boolean = null;
+  hasStyleChanges = true;
   hasSvg: boolean = null;
   indexBuildCount = 0;
   isRebuild = false;
   requiresFullBuild = true;
   startTime = Date.now();
+  styleBuildCount = 0;
   timeSpan: d.LoggerTimeSpan = null;
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.Diagnostic[]>;
 
-  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx, watcher: d.WatcherResults) {
+  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx, watchResults: d.WatchResults = null) {
     this.setBuildTimestamp();
 
     // do a full build if there is no watcher
     // or the watcher said the config has updated
     // or we've never had a successful build yet
-    this.requiresFullBuild = !watcher || watcher.configUpdated || !compilerCtx.hasSuccessfulBuild;
+    this.requiresFullBuild = (!watchResults || watchResults.configUpdated || !compilerCtx.hasSuccessfulBuild);
 
-    this.isRebuild = !!watcher;
-    compilerCtx.isRebuild = this.isRebuild;
-
-    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
-    this.timeSpan = config.logger.createTimeSpan(msg);
+    this.isRebuild = !!watchResults;
 
     // increment the active build id
     compilerCtx.activeBuildId++;
     this.buildId = compilerCtx.activeBuildId;
 
-    if (watcher) {
-      this.filesChanged.push(...watcher.filesChanged);
-      this.filesUpdated.push(...watcher.filesUpdated);
-      this.filesAdded.push(...watcher.filesAdded);
-      this.filesDeleted.push(...watcher.filesDeleted);
-      this.dirsDeleted.push(...watcher.dirsDeleted);
-      this.dirsAdded.push(...watcher.dirsAdded);
+    this.config.logger.debug(`start build: ${this.buildId}, ${this.timestamp}`);
 
-      Object.keys(watcher).forEach(key => {
-        (watcher as any)[key] = {};
-      });
+    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
+    this.timeSpan = this.createTimeSpan(msg);
+
+    const buildStartData: d.BuildStartData = {
+      buildId: this.buildId,
+      isRebuild: this.isRebuild,
+      startTime: Date.now(),
+      filesChanged: null,
+      filesUpdated: null,
+      filesAdded: null,
+      filesDeleted: null,
+      dirsDeleted: null,
+      dirsAdded: null,
+    };
+
+    if (watchResults != null) {
+      this.hasCopyChanges = watchResults.hasCopyChanges;
+      this.hasImageChanges = watchResults.hasImageChanges;
+      this.hasScriptChanges = watchResults.hasScriptChanges;
+      this.hasStyleChanges = watchResults.hasStyleChanges;
+
+      this.filesChanged.push(...watchResults.filesChanged);
+      this.filesUpdated.push(...watchResults.filesUpdated);
+      this.filesAdded.push(...watchResults.filesAdded);
+      this.filesDeleted.push(...watchResults.filesDeleted);
+      this.dirsDeleted.push(...watchResults.dirsDeleted);
+      this.dirsAdded.push(...watchResults.dirsAdded);
+
+      buildStartData.filesChanged = this.filesChanged.slice();
+      buildStartData.filesUpdated = this.filesUpdated.slice();
+      buildStartData.filesAdded = this.filesAdded.slice();
+      buildStartData.filesDeleted = this.filesDeleted.slice();
+      buildStartData.dirsDeleted = this.dirsDeleted.slice();
+      buildStartData.dirsAdded = this.dirsAdded.slice();
     }
+
+    // emit a buildStart event for anyone who cares
+    this.compilerCtx.events.emit('buildStart', buildStartData);
   }
 
   setBuildTimestamp() {
@@ -84,13 +112,13 @@ export class BuildContext implements d.BuildCtx {
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if (!this.hasLoggedFinish || debug) {
+    if (this.buildId === this.compilerCtx.activeBuildId || debug) {
       const timeSpan = this.config.logger.createTimeSpan(msg, debug);
 
       return {
-        finish: (msg: string) => {
-          if (!this.hasLoggedFinish || debug) {
-            timeSpan.finish(msg);
+        finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
+          if (this.buildId === this.compilerCtx.activeBuildId || debug) {
+            timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
           }
         }
       };
@@ -101,62 +129,71 @@ export class BuildContext implements d.BuildCtx {
     };
   }
 
+  get isActiveBuild() {
+    return this.compilerCtx.activeBuildId === this.buildId;
+  }
+
   async finish() {
-    try {
-      // setup watcher if need be
-      initWatcher(this.config, this.compilerCtx);
-    } catch (e) {
-      catchError(this.diagnostics, e);
-    }
+    this.config.logger.debug(`finished build: ${this.buildId}, ${this.timestamp}`);
 
     if (this.hasFinished && this.buildResults) {
       return this.buildResults;
     }
 
-    this.buildResults = await generateBuildResults(this.config, this.compilerCtx, this as any);
+    this.buildResults = await generateBuildResults(this.config, this as any);
 
     // log any errors/warnings
-    if (!this.hasLoggedFinish) {
-      this.hasLoggedFinish = true;
+    if (!this.hasFinished) {
+      // haven't set this build as finished yet
       this.config.logger.printDiagnostics(this.buildResults.diagnostics);
 
       // create a nice pretty message stating what happend
       const buildText = this.isRebuild ? 'rebuild' : 'build';
-      let watchText = this.config.watch ? ', watching for changes...' : '';
+      const watchText = this.config.watch ? ', watching for changes...' : '';
       let buildStatus = 'finished';
       let statusColor = 'green';
-      let bold = true;
 
       if (this.buildResults.hasError) {
+        // gosh darn, build had errors :(
         this.compilerCtx.lastBuildHadError = true;
         buildStatus = 'failed';
         statusColor = 'red';
 
-      } else if (this.buildResults.aborted) {
-        buildStatus = 'aborted';
-        watchText = '';
-        statusColor = 'dim';
-        bold = false;
-
       } else {
+        // successful build!
         this.compilerCtx.hasSuccessfulBuild = true;
         this.compilerCtx.lastBuildHadError = false;
+
+        if (!this.isRebuild && this.config.watch) {
+          // successful first time build and we're watching the files
+          // so let's hash all of the source files content so we can
+          // do great file change detection to know when files actually change
+          this.compilerCtx.fs.setBuildHashes();
+        }
       }
 
       // print out the time it took to build
       // and add the duration to the build results
-      this.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, bold, true);
+      this.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
 
       // write the build stats
       await generateBuildStats(this.config, this.compilerCtx, this as any, this.buildResults);
 
       // write all of our logs to disk if config'd to do so
-      this.config.logger.writeLogs(this.compilerCtx.isRebuild);
+      this.config.logger.writeLogs(this.isRebuild);
 
-      // emit a build event, which happens for inital build and rebuilds
+      // emit a buildFinish event for anyone who cares
       this.compilerCtx.events.emit('buildFinish', this.buildResults);
 
-      if (!this.config.watch) {
+      if (this.config.watch) {
+        try {
+          // setup watcher if need be
+          initWatcher(this.config, this.compilerCtx);
+        } catch (e) {
+          catchError(this.diagnostics, e);
+        }
+
+      } else {
         this.config.sys.destroy();
       }
     }
@@ -167,18 +204,10 @@ export class BuildContext implements d.BuildCtx {
   }
 
   shouldAbort() {
-    if (this.aborted || this.compilerCtx.activeBuildId > this.buildId) {
-      // already aborted this build
-      // or this is no longer the compiler's active build :(
-      this.aborted = true;
-      return true;
-    }
-
     if (hasError(this.diagnostics)) {
       // remember if the last build had an error or not
       // this is useful if the next build should do a full build or not
       this.compilerCtx.lastBuildHadError = true;
-      this.aborted = true;
       return true;
     }
 

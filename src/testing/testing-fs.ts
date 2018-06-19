@@ -25,7 +25,7 @@ export class TestingFs implements d.FileSystem {
     });
   }
 
-  createReadStream(_filePath: string) {
+  createReadStream(_filePath: string): any {
     return {};
   }
 
@@ -46,6 +46,20 @@ export class TestingFs implements d.FileSystem {
         }
       }, this.resolveTime);
     });
+  }
+
+  mkdirSync(dirPath: string) {
+    dirPath = normalizePath(dirPath);
+    this.diskWrites++;
+
+    if (this.data[dirPath]) {
+      throw new Error(`mkdir, dir already exists: ${dirPath}`);
+    } else {
+      this.data[dirPath] = {
+        isDirectory: true,
+        isFile: false
+      };
+    }
   }
 
   readdir(dirPath: string) {
@@ -175,6 +189,15 @@ export class TestingFs implements d.FileSystem {
         resolve();
       }, this.resolveTime);
     });
+  }
+
+  writeFileSync(filePath: string, content: string) {
+    this.diskWrites++;
+    this.data[filePath] = {
+      isDirectory: false,
+      isFile: true,
+      content: content
+    };
   }
 
   writeFiles(files: { [filePath: string]: string }) {

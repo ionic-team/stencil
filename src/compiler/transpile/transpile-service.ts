@@ -180,7 +180,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // save the cache key for future lookups
   ctx.snapshotVersions.set(tsFilePath, cacheKey);
 
-  if (config.enableCache && !ctx.compilerCtx.isRebuild) {
+  if (config.enableCache && !ctx.buildCtx.isRebuild) {
     // let's check to see if we've already cached this in our filesystem
     // but only bother for the very first build
     const cachedStr = await ctx.compilerCtx.cache.get(cacheKey);

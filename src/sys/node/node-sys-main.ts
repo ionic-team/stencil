@@ -79,6 +79,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('autoprefixCss', [input, opts]);
   }
 
+  async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
+    return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
+  }
+
   private _existingDom: () => d.CreateDom;
 
   get createDom() {

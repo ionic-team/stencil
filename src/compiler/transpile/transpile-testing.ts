@@ -3,6 +3,7 @@ import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildContext } from '../build/build-ctx';
 import { gatherMetadata } from './datacollection/gather-metadata';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { noop } from '../../util/helpers';
 import { normalizePath } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
@@ -17,7 +18,13 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
   const compilerCtx: d.CompilerCtx = {
     collections: [],
     moduleFiles: {},
-    resolvedCollections: []
+    resolvedCollections: [],
+    events: {
+      emit: noop,
+      subscribe: noop,
+      unsubscribe: noop,
+      unsubscribeAll: noop
+    }
   };
   const buildCtx = new BuildContext(config, compilerCtx, null);
 

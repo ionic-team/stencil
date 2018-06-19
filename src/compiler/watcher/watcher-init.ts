@@ -10,7 +10,7 @@ export function initWatcher(config: Config, compilerCtx: CompilerCtx) {
     return false;
   }
 
-  config.logger.debug(`initWatcher: ${config.srcDir}`);
+  config.logger.debug(`initWatcher: ${config.sys.path.relative(config.rootDir, config.srcDir)}`);
 
   const watcherListener = new WatcherListener(config, compilerCtx);
   watcherListener.subscribe();
@@ -24,7 +24,6 @@ export function initWatcher(config: Config, compilerCtx: CompilerCtx) {
 
     if (watcher && config.configPath) {
       config.configPath = normalizePath(config.configPath);
-      config.logger.debug(`watch configPath: ${config.configPath}`);
       watcher.add(config.configPath);
     }
   }

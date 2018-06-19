@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { attachMessageHandler } from './worker-farm/worker';
+import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
@@ -34,6 +35,10 @@ export class NodeSystemWorker {
       from: undefined
     });
     return result.css as string;
+  }
+
+  copy(copyTasks: d.CopyTask[]) {
+    return copyTasksWorker(copyTasks);
   }
 
   gzipSize(text: string) {

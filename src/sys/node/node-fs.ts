@@ -6,24 +6,24 @@ export class NodeFs implements d.FileSystem {
 
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      const rd = fs.createReadStream(src);
-      rd.on('error', reject);
+      const readStream = fs.createReadStream(src);
+      readStream.on('error', reject);
 
-      const wr = fs.createWriteStream(dest);
-      wr.on('error', reject);
-      wr.on('close', resolve);
+      const writeStream = fs.createWriteStream(dest);
+      writeStream.on('error', reject);
+      writeStream.on('close', resolve);
 
-      rd.pipe(wr);
+      readStream.pipe(writeStream);
     });
   }
 
-  createReadStream(path: string) {
-    return fs.createReadStream(path);
+  createReadStream(filePath: string) {
+    return fs.createReadStream(filePath);
   }
 
-  mkdir(filePath: string) {
+  mkdir(dirPath: string) {
     return new Promise<void>((resolve, reject) => {
-      fs.mkdir(filePath, (err: any) => {
+      fs.mkdir(dirPath, (err: any) => {
         if (err) {
           reject(err);
         } else {
@@ -31,6 +31,10 @@ export class NodeFs implements d.FileSystem {
         }
       });
     });
+  }
+
+  mkdirSync(dirPath: string) {
+    fs.mkdirSync(dirPath);
   }
 
   readdir(dirPath: string) {
@@ -61,9 +65,9 @@ export class NodeFs implements d.FileSystem {
     return fs.readFileSync(filePath, 'utf8');
   }
 
-  rmdir(filePath: string) {
+  rmdir(dirPath: string) {
     return new Promise<void>((resolve, reject) => {
-      fs.rmdir(filePath, (err: any) => {
+      fs.rmdir(dirPath, (err: any) => {
         if (err) {
           reject(err);
         } else {

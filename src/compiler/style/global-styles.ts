@@ -1,16 +1,12 @@
 import * as d from '../../declarations';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
-import { getGlobalStyleFilename } from './app-file-naming';
+import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { minifyStyle } from '../style/minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (buildCtx.shouldAbort()) {
-    return;
-  }
-
-  if (typeof config.globalStyle !== 'string') {
+  if (canSkipGlobalStyles(config, buildCtx)) {
     return;
   }
 
@@ -51,4 +47,21 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
   }
 
   return style;
+}
+
+
+function canSkipGlobalStyles(config: d.Config, buildCtx: d.BuildCtx) {
+  if (typeof config.globalStyle !== 'string') {
+    return true;
+  }
+
+  if (buildCtx.shouldAbort()) {
+    return true;
+  }
+
+  if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
+    return true;
+  }
+
+  return false;
 }

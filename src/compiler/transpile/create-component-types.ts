@@ -35,7 +35,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
-  config.logger.debug(`generated ${componentsDtsSrcFilePath}`);
+  config.logger.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsSrcFilePath)}`);
 
   await Promise.all(typesOutputTargets.map(async outputTarget => {
     const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);

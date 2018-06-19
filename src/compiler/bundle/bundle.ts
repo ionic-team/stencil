@@ -8,7 +8,7 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
     return null;
   }
 
-  if (compilerCtx.isRebuild && compilerCtx.lastJsModules) {
+  if (buildCtx.isRebuild && compilerCtx.lastJsModules) {
     const hasScriptFileChanges = buildCtx.filesChanged.some(f => f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js'));
     if (!hasScriptFileChanges) {
       return compilerCtx.lastJsModules;

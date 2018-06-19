@@ -75,7 +75,7 @@ export async function setBuildConditionals(
 
 
 export function getLastBuildConditionals(compilerCtx: d.CompilerCtx, coreId: 'core' | 'core.pf' | 'esm.es5', buildCtx: d.BuildCtx) {
-  if (compilerCtx.isRebuild && Array.isArray(buildCtx.filesChanged)) {
+  if (buildCtx.isRebuild && Array.isArray(buildCtx.filesChanged)) {
     // this is a rebuild and we do have lastBuildConditionals already
     const hasChangedTsFile = buildCtx.filesChanged.some(filePath => {
       return isTsFile(filePath);
