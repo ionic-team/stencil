@@ -22,6 +22,7 @@ export interface CompilerCtx {
 
   hasSuccessfulBuild?: boolean;
   localPrerenderServer?: any;
+  lastBuildResults?: d.BuildResults;
   hasWatcher?: boolean;
   tsService?: TsService;
   rootTsFiles?: string[];
@@ -31,6 +32,7 @@ export interface CompilerCtx {
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
   lastJsModules?: d.JSModuleMap;
+  lastBuildStyles?: { [styleId: string]: string };
   lastStyleText?: { [absPath: string]: string };
 }
 

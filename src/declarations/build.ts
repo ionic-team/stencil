@@ -38,6 +38,7 @@ export interface BuildCtx {
   shouldAbort(): boolean;
   startTime: number;
   styleBuildCount: number;
+  stylesUpdated: { [styleId: string]: string };
   timeSpan: d.LoggerTimeSpan;
   transpileBuildCount: number;
   validateTypesHandler?: (results: d.ValidateTypesResults) => void;

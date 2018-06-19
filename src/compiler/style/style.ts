@@ -42,7 +42,7 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
     const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
     // format and set the styles for use later
-    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], styles);
+    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, stylesMeta[modeName], styles);
   }));
 }
 
@@ -191,7 +191,7 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, styles: string[]) {
+export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, styleMeta: d.StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
   styleMeta.compiledStyleText = styles.join('\n\n').trim();
 
@@ -215,11 +215,38 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
     styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, styleMeta.compiledStyleText);
   }
 
+  compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || {};
+  // test to see if the last styles are different
+  let styleId = getStyleId(cmpMeta, modeName, false);
+  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleText) {
+    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleText;
+
+    if (buildCtx.isRebuild) {
+      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
+      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleText;
+    }
+  }
+
+  styleId = getStyleId(cmpMeta, modeName, true);
+  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleTextScoped) {
+    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleTextScoped;
+
+    if (buildCtx.isRebuild) {
+      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
+      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleTextScoped;
+    }
+  }
+
   styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
 
   if (styleMeta.compiledStyleTextScoped) {
     styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
   }
+}
+
+
+function getStyleId(cmpMeta: d.ComponentMeta, modeName: string, isScopedStyles: boolean) {
+  return `${cmpMeta.tagNameMeta}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 
 

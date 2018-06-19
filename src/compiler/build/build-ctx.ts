@@ -20,6 +20,7 @@ export class BuildContext implements d.BuildCtx {
   dirsDeleted: string[] = [];
   entryModules: d.EntryModule[] = [];
   entryPoints: d.EntryPoint[] = [];
+  externalStylesUpdated: string[] = [];
   filesAdded: string[] = [];
   filesChanged: string[] = [];
   filesDeleted: string[] = [];
@@ -39,6 +40,7 @@ export class BuildContext implements d.BuildCtx {
   requiresFullBuild = true;
   startTime = Date.now();
   styleBuildCount = 0;
+  stylesUpdated: { [styleId: string]: string } = {};
   timeSpan: d.LoggerTimeSpan = null;
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
