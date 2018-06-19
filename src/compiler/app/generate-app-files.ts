@@ -104,6 +104,10 @@ function canSkipAppFiles(buildCtx: d.BuildCtx, cmpRegistry: d.ComponentRegistry)
     return true;
   }
 
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+
   if (buildCtx.isRebuild) {
     if (buildCtx.hasScriptChanges) {
       return false;

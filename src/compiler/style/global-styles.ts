@@ -59,6 +59,10 @@ function canSkipGlobalStyles(config: d.Config, buildCtx: d.BuildCtx) {
     return true;
   }
 
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+
   if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
     return true;
   }

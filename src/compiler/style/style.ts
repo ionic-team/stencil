@@ -292,6 +292,10 @@ function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
     return true;
   }
 
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+
   if (buildCtx.isRebuild) {
     if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
       return false;
