@@ -172,8 +172,12 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
   const cmpData: d.ComponentData = {};
   const cmpMeta = moduleFile.cmpMeta;
 
-  // get the absolute path to the compiled component's output javascript file
-  const compiledComponentAbsoluteFilePath = normalizePath(moduleFile.jsFilePath);
+  // get the current absolute path to our built js file
+  // and figure out the relative path from the src dir
+  const relToSrc = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.jsFilePath));
+
+  // figure out the absolute path when it's in the collection dir
+  const compiledComponentAbsoluteFilePath = normalizePath(config.sys.path.join(collectionDir, relToSrc));
 
   // create a relative path from the collection file to the compiled component's output javascript file
   const compiledComponentRelativeFilePath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
@@ -858,7 +862,15 @@ export function serializeAppGlobal(config: d.Config, collectionDir: string, coll
     return;
   }
 
-  collectionData.global = normalizePath(config.sys.path.relative(collectionDir, globalModule.jsFilePath));
+  // get the current absolute path to our built js file
+  // and figure out the relative path from the src dir
+  const relToSrc = normalizePath(config.sys.path.relative(config.srcDir, globalModule.jsFilePath));
+
+  // figure out the absolute path when it's in the collection dir
+  const compiledComponentAbsoluteFilePath = normalizePath(config.sys.path.join(collectionDir, relToSrc));
+
+  // create a relative path from the collection file to the compiled output javascript file
+  collectionData.global = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
 }
 
 
