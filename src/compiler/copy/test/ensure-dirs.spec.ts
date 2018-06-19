@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { ensureDirs } from '../copy-tasks-worker';
-import { mockFs } from '../../../testing/mocks';
+import { normalizePath } from '../../util';
 import * as path from 'path';
 
 const ROOT = path.resolve('/');
@@ -18,9 +18,9 @@ describe('ensureDirs', () => {
     ];
     const mkDirs = ensureDirs(copyTasks);
     expect(mkDirs).toHaveLength(3);
-    expect(mkDirs[0]).toBe(path.join(ROOT, 'dist'));
-    expect(mkDirs[1]).toBe(path.join(ROOT, 'dist', 'imgs'));
-    expect(mkDirs[2]).toBe(path.join(ROOT, 'dist', 'imgs', 'icons'));
+    expect(mkDirs[0]).toBe(normalizePath(path.join(ROOT, 'dist')));
+    expect(mkDirs[1]).toBe(normalizePath(path.join(ROOT, 'dist', 'imgs')));
+    expect(mkDirs[2]).toBe(normalizePath(path.join(ROOT, 'dist', 'imgs', 'icons')));
   });
 
 });
