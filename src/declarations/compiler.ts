@@ -35,7 +35,7 @@ export interface CompilerCtx {
   lastBuildStyles?: { [styleId: string]: string };
   lastStyleText?: { [absPath: string]: string };
 
-  rollupCache?: any;
+  entryBundleCache?: any;
 }
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => Promise<any>;
