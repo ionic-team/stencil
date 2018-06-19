@@ -1,3 +1,17 @@
+<a name="0.9.9"></a>
+## 🐍 [0.9.9](https://github.com/ionic-team/stencil/compare/v0.9.8...v0.9.9) (2018-06-19)
+
+
+### Bug Fixes
+
+* **collection:** set paths relative to collection manifest json ([bcf4a29](https://github.com/ionic-team/stencil/commit/bcf4a29))
+* **service-worker:** finish prerender first, then run service workers ([787a9be](https://github.com/ionic-team/stencil/commit/787a9be))
+* **stats:** stats should build when defined as an output target. ([cf506c5](https://github.com/ionic-team/stencil/commit/cf506c5))
+* **transpile:** do not isolate modules in ts service ([2b71d15](https://github.com/ionic-team/stencil/commit/2b71d15))
+* **watch:** recover from errors from initial build ([8a42cf1](https://github.com/ionic-team/stencil/commit/8a42cf1))
+
+
+
 <a name="0.9.8"></a>
 ## ⛴ [0.9.8](https://github.com/ionic-team/stencil/compare/v0.9.7...v0.9.8) (2018-06-19)
 
