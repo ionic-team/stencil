@@ -20,10 +20,13 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
 
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
 
-  buildCtx.validateTypesHandler = (diagnostics: d.Diagnostic[]) => {
+  buildCtx.validateTypesHandler = (results: d.ValidateTypesResults) => {
     timeSpan.finish(`validateTypes finished`);
 
-    if (diagnostics.length === 0) {
+    compilerCtx.fs.cancelDeleteDirectoriesFromDisk(results.dirPaths);
+    compilerCtx.fs.cancelDeleteFilesFromDisk(results.filePaths);
+
+    if (results.diagnostics.length === 0) {
       // no harm, no foul
       // null it out so we know there's nothing to wait on
       buildCtx.validateTypesHandler = null;
@@ -35,16 +38,18 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       // the build has already finished before the
       // type checking transpile finished, which is fine for watch
       // we'll need to create build to show the diagnostics
-      config.logger.debug(`validateTypesHandler, build already finished, creating a new build`);
-      const diagnosticsBuildCtx = new BuildContext(config, compilerCtx, null);
-      diagnosticsBuildCtx.diagnostics.push(...diagnostics);
-      diagnosticsBuildCtx.finish();
+      if (buildCtx.isActiveBuild) {
+        config.logger.debug(`validateTypesHandler, build already finished, creating a new build`);
+        const diagnosticsBuildCtx = new BuildContext(config, compilerCtx, null);
+        diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
+        diagnosticsBuildCtx.finish();
+      }
 
     } else {
       // cool the build hasn't finished yet
       // so let's add the diagnostics to the build now
       // so that the current build will print these
-      buildCtx.diagnostics.push(...diagnostics);
+      buildCtx.diagnostics.push(...results.diagnostics);
 
       // null out so we don't try this again
       buildCtx.validateTypesHandler = null;

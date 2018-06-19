@@ -6,10 +6,15 @@ import { removeStencilImports } from './transformers/remove-stencil-imports';
 
 import * as path from 'path';
 import * as ts from 'typescript';
+import { normalizePath } from '../util';
 
 
 export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
-  const diagnostics: d.Diagnostic[] = [];
+  const results: d.ValidateTypesResults = {
+    diagnostics: [],
+    dirPaths: [],
+    filePaths: []
+  };
 
   const config: d.Config = {
     cwd: currentWorkingDir,
@@ -27,9 +32,20 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       if (!emitDtsFiles) {
         return;
       }
-      if (!outputFileName.endsWith('.d.ts')) {
+      const filePath = normalizePath(outputFileName);
+      if (!filePath.endsWith('.d.ts')) {
         return;
       }
+
+      if (!results.filePaths.includes(filePath)) {
+        results.filePaths.push(filePath);
+      }
+
+      const dir = normalizePath(path.dirname(filePath));
+      if (!results.dirPaths.includes(dir)) {
+        results.dirPaths.push(dir);
+      }
+
       ts.sys.writeFile(outputFileName, data, writeByteOrderMark);
     };
 
@@ -60,7 +76,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
   program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
-  loadTypeScriptDiagnostics(config, diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(config, results.diagnostics, tsDiagnostics);
 
-  return diagnostics;
+  return results;
 }

@@ -542,7 +542,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     }
   }
 
-  cancelDeleteFileFromDisk(filePaths: string[]) {
+  cancelDeleteFilesFromDisk(filePaths: string[]) {
     filePaths.forEach(filePath => {
       const item = this.getItem(filePath);
       if (item.isFile && item.queueDeleteFromDisk) {

@@ -21,8 +21,8 @@ export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx
 
       buildCtx.diagnostics.push(...copyResults.diagnostics);
 
-      compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.copiedDirectories);
-      compilerCtx.fs.cancelDeleteFileFromDisk(copyResults.copiedFiles);
+      compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
+      compilerCtx.fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
 
       timeSpan.finish(`copyTasks finished`);
     }

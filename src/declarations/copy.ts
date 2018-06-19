@@ -10,6 +10,6 @@ export interface CopyTask {
 
 export interface CopyResults {
   diagnostics: d.Diagnostic[];
-  copiedFiles: string[];
-  copiedDirectories: string[];
+  filePaths: string[];
+  dirPaths: string[];
 }

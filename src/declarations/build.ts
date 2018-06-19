@@ -40,8 +40,8 @@ export interface BuildCtx {
   styleBuildCount: number;
   timeSpan: d.LoggerTimeSpan;
   transpileBuildCount: number;
-  validateTypesHandler?: (diagnostics: d.Diagnostic[]) => void;
-  validateTypesPromise?: Promise<d.Diagnostic[]>;
+  validateTypesHandler?: (results: d.ValidateTypesResults) => void;
+  validateTypesPromise?: Promise<d.ValidateTypesResults>;
   validateTypesBuild?(): Promise<void>;
 }
 

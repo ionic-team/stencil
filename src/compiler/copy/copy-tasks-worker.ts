@@ -7,8 +7,8 @@ import * as path from 'path';
 export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
   const results: d.CopyResults = {
     diagnostics: [],
-    copiedDirectories: [],
-    copiedFiles: []
+    dirPaths: [],
+    filePaths: []
   };
 
   try {
@@ -52,16 +52,16 @@ async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks:
     const stats = await fs.stat(copyTask.src);
     if (stats.isDirectory()) {
       // still a directory, keep diggin down
-      if (!results.copiedDirectories.includes(copyTask.dest)) {
-        results.copiedDirectories.push(copyTask.dest);
+      if (!results.dirPaths.includes(copyTask.dest)) {
+        results.dirPaths.push(copyTask.dest);
       }
 
       await processCopyTaskDirectory(fs, results, allCopyTasks, copyTask);
 
     } else if (!shouldIgnore(copyTask.src)) {
       // this is a file we should copy
-      if (!results.copiedFiles.includes(copyTask.dest)) {
-        results.copiedFiles.push(copyTask.dest);
+      if (!results.filePaths.includes(copyTask.dest)) {
+        results.filePaths.push(copyTask.dest);
       }
 
       allCopyTasks.push(copyTask);

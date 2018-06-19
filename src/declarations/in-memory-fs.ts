@@ -50,7 +50,7 @@ export interface InMemoryFileSystem {
       dirsDeleted: string[];
       dirsAdded: string[];
   }>;
-  cancelDeleteFileFromDisk(filePaths: string[]): void;
+  cancelDeleteFilesFromDisk(filePaths: string[]): void;
   cancelDeleteDirectoriesFromDisk(filePaths: string[]): void;
   clearDirCache(dirPath: string): void;
   clearFileCache(filePath: string): void;
