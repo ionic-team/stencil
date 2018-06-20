@@ -52,25 +52,23 @@ Stencil components are plain ES6/TypeScript classes with some decorator metadata
 Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
 
 ```typescript
-import { Component, Prop, State } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
-  styleUrl: 'my-component.scss'
+  styleUrl: 'my-component.css'
 })
 export class MyComponent {
-  // Indicate that name should be a property on our new component
+
   @Prop() first: string;
 
   @Prop() last: string;
 
-  @State() isVisible: boolean = true;
-
   render() {
     return (
-      <p>
+      <div>
         Hello, my name is {this.first} {this.last}
-      </p>
+      </div>
     );
   }
 }
@@ -78,7 +76,7 @@ export class MyComponent {
 
 Note: the `.tsx` extension is required, as this is the standard for TypeScript classes that use JSX.
 
-To use this component, just use it like any other HTML tag:
+To use this component, just use it like any other HTML element:
 
 ```html
 <my-component first="Stencil" last="JS"></my-component>
