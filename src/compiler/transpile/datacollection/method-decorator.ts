@@ -18,8 +18,14 @@ export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.
       const methodName = member.name.getText();
       const methodSignature = checker.getSignatureFromDeclaration(member);
 
+      const flags = ts.TypeFormatFlags.WriteArrowStyleSignature;
       const returnType = checker.getReturnTypeOfSignature(methodSignature);
-      const typeString = checker.signatureToString(methodSignature, undefined, ts.TypeFormatFlags.WriteArrowStyleSignature, ts.SignatureKind.Call);
+      const typeString = checker.signatureToString(
+        methodSignature,
+        classNode,
+        flags,
+        ts.SignatureKind.Call
+      );
 
       let methodReturnTypes: d.AttributeTypeReferences = {};
       const returnTypeNode = checker.typeToTypeNode(returnType);
