@@ -891,6 +891,138 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface ShadowDomSlotMappedOrderRoot {
+
+    }
+  }
+
+  interface HTMLShadowDomSlotMappedOrderRootElement extends StencilComponents.ShadowDomSlotMappedOrderRoot, HTMLStencilElement {}
+
+  var HTMLShadowDomSlotMappedOrderRootElement: {
+    prototype: HTMLShadowDomSlotMappedOrderRootElement;
+    new (): HTMLShadowDomSlotMappedOrderRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-slot-mapped-order-root': HTMLShadowDomSlotMappedOrderRootElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-slot-mapped-order-root': HTMLShadowDomSlotMappedOrderRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-slot-mapped-order-root': JSXElements.ShadowDomSlotMappedOrderRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomSlotMappedOrderRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ShadowDomSlotMappedOrder {
+
+    }
+  }
+
+  interface HTMLShadowDomSlotMappedOrderElement extends StencilComponents.ShadowDomSlotMappedOrder, HTMLStencilElement {}
+
+  var HTMLShadowDomSlotMappedOrderElement: {
+    prototype: HTMLShadowDomSlotMappedOrderElement;
+    new (): HTMLShadowDomSlotMappedOrderElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-slot-mapped-order': HTMLShadowDomSlotMappedOrderElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-slot-mapped-order': HTMLShadowDomSlotMappedOrderElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-slot-mapped-order': JSXElements.ShadowDomSlotMappedOrderAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomSlotMappedOrderAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ShadowDomSlotMappedRoot {
+
+    }
+  }
+
+  interface HTMLShadowDomSlotMappedRootElement extends StencilComponents.ShadowDomSlotMappedRoot, HTMLStencilElement {}
+
+  var HTMLShadowDomSlotMappedRootElement: {
+    prototype: HTMLShadowDomSlotMappedRootElement;
+    new (): HTMLShadowDomSlotMappedRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-slot-mapped-root': HTMLShadowDomSlotMappedRootElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-slot-mapped-root': HTMLShadowDomSlotMappedRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-slot-mapped-root': JSXElements.ShadowDomSlotMappedRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomSlotMappedRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface ShadowDomSlotMapped {
+
+    }
+  }
+
+  interface HTMLShadowDomSlotMappedElement extends StencilComponents.ShadowDomSlotMapped, HTMLStencilElement {}
+
+  var HTMLShadowDomSlotMappedElement: {
+    prototype: HTMLShadowDomSlotMappedElement;
+    new (): HTMLShadowDomSlotMappedElement;
+  };
+  interface HTMLElementTagNameMap {
+    'shadow-dom-slot-mapped': HTMLShadowDomSlotMappedElement;
+  }
+  interface ElementTagNameMap {
+    'shadow-dom-slot-mapped': HTMLShadowDomSlotMappedElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'shadow-dom-slot-mapped': JSXElements.ShadowDomSlotMappedAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface ShadowDomSlotMappedAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface ShadowDomSlotNestedRoot {
 
     }
