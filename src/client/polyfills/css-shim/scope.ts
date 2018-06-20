@@ -4,9 +4,9 @@ import { getSelectors, getSelectorsForScopes, resolveValues } from './selectors'
 import { compileTemplate, executeTemplate } from './template';
 import { getChildScopeAttribute, getHostScopeAttribute, getSlotScopeAttribute } from '../../../util/scope';
 
-export function parseCSS(original: string, compile = true): CSSScope {
+export function parseCSS(original: string): CSSScope {
   const ast = parse(original);
-  const template = (compile) ? compileTemplate(original) : [original];
+  const template = compileTemplate(original);
   const selectors = getSelectors(ast);
   return {
     original,
@@ -29,7 +29,7 @@ export function getScopesForElement(hostTemplateMap: WeakMap<HTMLElement, CSSSco
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  const css = parseCSS(styleEl.innerHTML, true);
+  const css = parseCSS(styleEl.innerHTML);
   css.styleEl = styleEl;
   globalScopes.push(css);
 }
