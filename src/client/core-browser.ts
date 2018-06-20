@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { createPlatformMain } from './platform-main';
 import { createPlatformMainLegacy } from './platform-main-legacy';
-import { CustomStyle } from './polyfills/css-shim/custom-style';
+import { CustomStyle, supportsCssVars } from './polyfills/css-shim/custom-style';
 
 
 declare const namespace: string;
@@ -17,7 +17,17 @@ if (Build.polyfills) {
 
   let customStyle: CustomStyle;
   if (Build.cssVarShim) {
-    customStyle = new CustomStyle(window, document);
+    let needShim = !supportsCssVars(window);
+    if (Build.isDev) {
+      if (window.location.search.indexOf('cssvars=false') > 0) {
+        // by adding ?shadow=false it'll force the slot polyfill
+        // only add this check when in dev mode
+        needShim = true;
+      }
+    }
+    if (needShim) {
+      customStyle = new CustomStyle(window, document);
+    }
   }
 
   createPlatformMainLegacy(namespace, Context, window, document, resourcesUrl, hydratedCssClass, customStyle);

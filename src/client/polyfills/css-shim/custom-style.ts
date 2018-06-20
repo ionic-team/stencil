@@ -1,162 +1,111 @@
-import { loadLinkStyles } from './load-link-styles';
-import { StyleInfo, StyleNode } from './css-parse';
-import { StyleProperties } from './style-properties';
-import * as StyleUtil from './style-util';
+import { addGlobalLink, loadDocument } from './load-link-styles';
+import { executeTemplate } from './template';
+import { CSSScope } from './interfaces';
+import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
+import { getActiveSelectors, resolveValues } from './selectors';
 
+export function supportsCssVars(win: Window) {
+  return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
+}
 
 export class CustomStyle {
-  private customStyles: StyleElement[] = [];
-  private documentOwner: HTMLElement;
-  private documentOwnerStyleInfo: any;
-  private enqueued = false;
-  private flushCallbacks: Function[] = [];
-  private styleProperties: StyleProperties;
-  supportsCssVars: boolean;
 
+  private count = 0;
+  private hostStyleMap = new WeakMap<HTMLElement, HTMLStyleElement>();
+  private hostScopeMap = new WeakMap<HTMLElement, CSSScope>();
 
-  constructor(private win: Window, private doc: Document) {
-    this.supportsCssVars = !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
+  private globalScopes: CSSScope[] = [];
+  private scopesMap = new Map<string, CSSScope>();
 
-    if (!this.supportsCssVars) {
-      this.documentOwner = doc.documentElement;
-      const ast = new StyleNode();
-      ast.rules = [];
-      this.documentOwnerStyleInfo = StyleInfo.set(this.documentOwner, new StyleInfo(ast));
-      this.styleProperties = new StyleProperties(win);
-    }
-  }
+  constructor(
+    private win: Window,
+    private doc: Document,
+  ) {}
 
-  init(cb?: Function) {
-    if (this.supportsCssVars) {
-      cb && cb();
-
-    } else {
-      this.win.requestAnimationFrame(() => {
-        const promises: Promise<any>[] = [];
-
-        const linkElms = this.doc.querySelectorAll('link[rel="stylesheet"][href]');
-        for (var i = 0; i < linkElms.length; i++) {
-          promises.push(loadLinkStyles(this.doc, this, linkElms[i] as any));
-        }
-
-        const styleElms = this.doc.querySelectorAll('style');
-        for (i = 0; i < styleElms.length; i++) {
-          promises.push(this.addStyle(styleElms[i]));
-        }
-
-        Promise.all(promises).then(() => {
-          cb && cb();
-        });
-      });
-    }
-  }
-
-  private flushCustomStyles() {
-    const customStyles = this.processStyles();
-
-    // early return if custom-styles don't need validation
-    if (!this.enqueued) {
-      return;
-    }
-
-    this.updateProperties(this.documentOwner, this.documentOwnerStyleInfo);
-    this.applyCustomStyles(customStyles);
-    this.enqueued = false;
-
-    while (this.flushCallbacks.length) {
-      this.flushCallbacks.shift()();
-    }
-  }
-
-  private applyCustomStyles(customStyles: any) {
-    for (let i = 0; i < customStyles.length; i++) {
-      const c = customStyles[i];
-      const s = this.getStyleForCustomStyle(c);
-      if (s) {
-        this.styleProperties.applyCustomStyle(s, this.documentOwnerStyleInfo.styleProperties);
-      }
-    }
-  }
-
-  private updateProperties(host: any, styleInfo: any) {
-    const owner = this.documentOwner;
-    const ownerStyleInfo = StyleInfo.get(owner);
-    const ownerProperties = ownerStyleInfo.styleProperties;
-    const props = Object.create(ownerProperties || null);
-    const propertyData = this.styleProperties.propertyDataFromStyles(ownerStyleInfo.styleRules, host);
-    const propertiesMatchingHost = propertyData.properties;
-
-    Object.assign(
-      props,
-      propertiesMatchingHost
-    );
-
-    this.styleProperties.reify(props);
-
-    styleInfo.styleProperties = props;
-  }
-
-  addStyle(style: any) {
+  init() {
     return new Promise(resolve => {
-      if (!(style as StyleElement).__seen) {
-        (style as StyleElement).__seen = true;
-
-        this.customStyles.push(style);
-        this.flushCallbacks.push(resolve);
-
-        if (!this.enqueued) {
-          this.enqueued = true;
-
-          this.win.requestAnimationFrame(() => {
-            if (this.enqueued) {
-              this.flushCustomStyles();
-            }
-          });
-        }
-
-      } else {
-        resolve();
-      }
+      this.win.requestAnimationFrame(() => {
+        loadDocument(this.doc, this.globalScopes).then(() => resolve());
+      });
     });
   }
 
-  private getStyleForCustomStyle(customStyle: StyleElement) {
-    if (customStyle.__cached) {
-      return customStyle.__cached;
+  addLink(linkEl: HTMLLinkElement) {
+    return addGlobalLink(this.doc, this.globalScopes, linkEl).then(() => {
+      this.updateGlobal();
+    });
+  }
+
+  addGlobalStyle(styleEl: HTMLStyleElement) {
+    addGlobalStyle(this.globalScopes, styleEl);
+    this.updateGlobal();
+  }
+
+  createHostStyle(
+    hostEl: HTMLElement,
+    templateName: string,
+    cssText: string,
+  ) {
+    if (this.hostScopeMap.has(hostEl)) {
+      return null;
+    }
+    const cssScopeId = (hostEl as any)['s-sc'];
+    const baseScope = this.registerHostTemplate(cssText, templateName, cssScopeId);
+
+    const needStyleEl = baseScope.isDynamic || !baseScope.styleEl;
+    if (!needStyleEl) {
+      return null;
     }
 
-    return (customStyle.getStyle) ? customStyle.getStyle() : customStyle;
+    const styleEl = this.doc.createElement('style');
+    if (baseScope.isDynamic) {
+      this.hostStyleMap.set(hostEl, styleEl);
+      const newScopeId = `${baseScope.cssScopeId}-${this.count}`;
+      (hostEl as any)['s-sc'] = newScopeId;
+
+      this.hostScopeMap.set(hostEl, reScope(baseScope, newScopeId));
+      this.count++;
+
+    } else {
+      baseScope.styleEl = styleEl;
+      styleEl.innerHTML = executeTemplate(baseScope.template, {});
+      this.hostScopeMap.set(hostEl, baseScope);
+    }
+    return styleEl;
   }
 
-  private processStyles() {
-    const cs = this.customStyles;
+  removeHost(hostEl: HTMLElement) {
+    const css = this.hostStyleMap.get(hostEl);
+    if (css) {
+      css.remove();
+    }
+    this.hostStyleMap.delete(hostEl);
+    this.hostScopeMap.delete(hostEl);
+  }
 
-    for (let i = 0; i < cs.length; i++) {
-      const customStyle = cs[i];
-
-      if (customStyle.__cached) {
-        continue;
-      }
-
-      const style: any = this.getStyleForCustomStyle(customStyle);
-      if (style) {
-        this.transformCustomStyleForDocument(style);
-        customStyle.__cached = style;
+  updateHost(hostEl: HTMLElement) {
+    const scope = this.hostScopeMap.get(hostEl);
+    if (scope && scope.isDynamic) {
+      const styleEl = this.hostStyleMap.get(hostEl);
+      if (styleEl) {
+        const selectors = getActiveSelectors(hostEl, this.hostScopeMap, this.globalScopes);
+        const props = resolveValues(selectors);
+        styleEl.innerHTML = executeTemplate(scope.template, props);
       }
     }
-    return cs;
   }
 
-  private transformCustomStyleForDocument(style: StyleElement) {
-    const ast = StyleUtil.rulesForStyle(style);
-    this.documentOwnerStyleInfo.styleRules.rules.push(ast);
+  updateGlobal() {
+    updateGlobalScopes(this.globalScopes);
   }
-}
 
-
-export interface StyleElement extends HTMLStyleElement {
-  __seen: boolean;
-  __cached: string;
-  __cssRules: StyleNode;
-  getStyle: () => string;
+  private registerHostTemplate(cssText: string, scopeName: string, cssScopeId: string) {
+    let scope = this.scopesMap.get(scopeName);
+    if (!scope) {
+      scope = parseCSS(cssText, !!cssScopeId);
+      scope.cssScopeId = cssScopeId;
+      this.scopesMap.set(scopeName, scope);
+    }
+    return scope;
+  }
 }

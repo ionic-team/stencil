@@ -1,7 +1,7 @@
 import { Build } from '../util/build-conditionals';
 import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../declarations';
-import { CustomStyle } from '../client/polyfills/css-shim/custom-style';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
+import { getScopeId } from '../util/scope';
 
 
 export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpConstructor: ComponentConstructor) {
@@ -48,18 +48,19 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
   }
 }
 
-
-export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
+export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, hostElm: HostElement) {
   // first see if we've got a style for a specific mode
-  let styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
-  let styleTemplate = (cmpMeta as any)[styleModeId];
-
-  if (!styleTemplate) {
-    // didn't find a style for this mode
-    // now let's check if there's a default style for this component
-    styleModeId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
-    styleTemplate = (cmpMeta as any)[styleModeId];
+  const modeName = cmpMeta.componentConstructor.styleMode;
+  const encapsulation = cmpMeta.encapsulation;
+  if (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom)) {
+    // either this host element should use scoped css
+    // or it wants to use shadow dom but the browser doesn't support it
+    // create a scope id which is useful for scoped css
+    // and add the scope attribute to the host
+    hostElm['s-sc'] = getScopeId(cmpMeta, modeName);
   }
+  const styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
+  const styleTemplate = (cmpMeta as any)[styleModeId];
 
   if (styleTemplate) {
     // cool, we found a style template element for this component
@@ -68,18 +69,19 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
     if (domApi.$supportsShadowDom) {
-      if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+      if (encapsulation === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
-        styleContainerNode = elm.shadowRoot as any;
+        styleContainerNode = hostElm.shadowRoot as any;
 
       } else {
         // climb up the dom and see if we're in a shadow dom
-        while ((elm as Node) = domApi.$parentNode(elm)) {
-          if (elm.host && elm.host.shadowRoot) {
+        let root: HostElement = hostElm;
+        while (root = domApi.$parentNode(root) as HostElement) {
+          if (root.host && root.host.shadowRoot) {
             // looks like we are in shadow dom, let's use
             // this shadow root as the container for these styles
-            styleContainerNode = (elm.host.shadowRoot) as any;
+            styleContainerNode = (root.host.shadowRoot) as any;
             break;
           }
         }
@@ -89,24 +91,38 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
     // if this container element already has these styles
     // then there's no need to apply them again
     // create an object to keep track if we'ready applied this component style
-    const appliedStyles = plt.componentAppliedStyles.get(styleContainerNode) || {};
-    if (!appliedStyles[styleModeId]) {
-      // looks like we haven't applied these styles to this container yet
+    let appliedStyles = plt.componentAppliedStyles.get(styleContainerNode);
+    if (!appliedStyles) {
+      plt.componentAppliedStyles.set(styleContainerNode, appliedStyles = {});
+    }
 
+    // check if we haven't applied these styles to this container yet
+    if (!appliedStyles[styleModeId]) {
+      let styleElm: HTMLStyleElement;
       if (Build.es5) {
         // es5 builds are not usig <template> because of ie11 issues
         // instead the "template" is just the style text as a string
         // create a new style element and add as innerHTML
-        styleElm = domApi.$createElement('style');
-        styleElm.innerHTML = styleTemplate;
 
-        if (Build.isDev) {
-          // add a style id attribute, but only useful during dev
-          domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+        if (Build.cssVarShim && plt.customStyle) {
+          styleElm = plt.customStyle.createHostStyle(hostElm, styleModeId, styleTemplate);
+
+        } else {
+          styleElm = domApi.$createElement('style');
+          styleElm.innerHTML = styleTemplate;
+
+          // remember we don't need to do this again for this element
+          appliedStyles[styleModeId] = true;
+
         }
 
-        if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
-          customStyle.addStyle(styleElm);
+        if (styleElm) {
+          if (Build.isDev) {
+            // add a style id attribute, but only useful during dev
+            domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+          }
+          const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+          domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
         }
 
       } else {
@@ -114,16 +130,15 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
         // and all its native content.cloneNode() goodness
         // clone the template element to create a new <style> element
         styleElm = styleTemplate.content.cloneNode(true);
+
+        // remember we don't need to do this again for this element
+        appliedStyles[styleModeId] = true;
+
+        // let's make sure we put the styles below the <style data-styles> element
+        // so any visibility css overrides the default
+        const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+        domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
       }
-
-      // let's make sure we put the styles below the <style data-styles> element
-      // so any visibility css overrides the default
-      const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
-      domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
-
-      // remember we don't need to do this again for this element
-      appliedStyles[styleModeId] = true;
-      plt.componentAppliedStyles.set(styleContainerNode, appliedStyles);
     }
   }
 }

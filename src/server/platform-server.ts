@@ -235,7 +235,7 @@ export function createPlatformServer(
   }
 
 
-  plt.attachStyles = function attachStyles(_domApi, _cmpMeta, _modeName, _elm) {/**/};
+  plt.attachStyles = function attachStyles(_domApi, _cmpMeta, _elm) {/**/};
 
 
   // This is executed by the component's connected callback.

@@ -5,7 +5,6 @@ import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
-import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION } from '../util/constants';
@@ -19,7 +18,7 @@ import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 
 
-export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle?: CustomStyle) {
+export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -103,10 +102,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     createVNodesFromSsr(plt, domApi, rootElm);
   }
 
-  if (Build.cssVarShim && customStyle) {
-    customStyle.init();
-  }
-
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
 
     if (!win.customElements.get(cmpMeta.tagNameMeta)) {
@@ -118,7 +113,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass
+        hydratedCssClass,
       );
 
       if (Build.observeAttr) {
@@ -144,14 +139,6 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
 
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
       queueUpdate(plt, elm);
@@ -233,8 +220,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
   if (Build.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
+    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
+      attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 

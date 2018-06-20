@@ -11,11 +11,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-
-import { CompilerCtx, ComponentMeta } from '../../../declarations';
-import { parseCss } from '../parse-css';
-import { getHostScopeAttribute, getScopeAttribute } from '../scope-css';
 import { ShadowCss } from '../shadow-css';
+import { getChildScopeAttribute, getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../../../util/scope';
+import { DEFAULT_STYLE_MODE } from '../../../util/constants';
 
 
 describe('ShadowCss', function() {
@@ -222,6 +220,39 @@ describe('ShadowCss', function() {
 
   });
 
+  describe('getScopeId', () => {
+    it('should work without mode', () => {
+      expect(getScopeId({ tagNameMeta: 'my-tag' })).toBe('data-my-tag');
+    });
+
+    it('should work with default mode', () => {
+      expect(getScopeId({ tagNameMeta: 'my-tag' }, DEFAULT_STYLE_MODE)).toBe('data-my-tag');
+    });
+
+    it('should work with md mode', () => {
+      expect(getScopeId({ tagNameMeta: 'my-tag' }, 'md')).toBe('data-my-tag-md');
+    });
+  });
+
+
+  describe('getHostScopeAttribute', () => {
+    it('should add -host suffix', () => {
+      expect(getHostScopeAttribute('data-my-tag')).toBe('data-my-tag-host');
+    });
+  });
+
+  describe('getChildScopeAttribute', () => {
+    it('should add not add any subfix', () => {
+      expect(getChildScopeAttribute('data-my-tag')).toBe('data-my-tag');
+    });
+  });
+
+  describe('getSlotScopeAttribute', () => {
+    it('should add -slot suffix', () => {
+      expect(getSlotScopeAttribute('data-my-tag')).toBe('data-my-tag-slot');
+    });
+  });
+
   it('should support polyfill-next-selector', () => {
     let css = s('polyfill-next-selector {content: \'x > y\'} z {}', 'a');
     expect(css).toEqual('x[a] > y[a]{}');
@@ -310,10 +341,6 @@ describe('ShadowCss', function() {
         .toEqual('b[a] {c}/*# sourceMappingURL=data:x */');
     expect(s('b {c}/* #sourceMappingURL=data:x */', 'a'))
         .toEqual('b[a] {c}/* #sourceMappingURL=data:x */');
-  });
-
-  it('add data- prefix to tag and -host suffix', () => {
-    expect(getHostScopeAttribute({ tagNameMeta: 'my-tag' })).toBe('data-my-tag-host');
   });
 
 
