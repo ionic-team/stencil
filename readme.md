@@ -122,7 +122,7 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 |                |                                         |
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
 | `@State()`     | Creates a local state variable that will not be placed on the element. |
-| `@Method()`    | Expose specifc methods to be publicly accessible. |
+| `@Method()`    | Expose specific methods to be publicly accessible. |
 
 
 ## Why "Stencil?"
