@@ -21,7 +21,7 @@ function normalizePath(str) {
   return str;
 }
 
-var stencilTestingPath = path.resolve(__dirname, '../dist/testing/index.js')
+var stencilTestingPath = path.resolve(__dirname, '..', 'dist', 'testing', 'index.js');
 try {
   fs.accessSync(stencilTestingPath);
 } catch (e) {
@@ -33,10 +33,10 @@ try {
 var injectTestingScript = [
   'var StencilTesting = require("' + normalizePath(stencilTestingPath) + '");',
   'var h = StencilTesting.h;',
-  'var resourcesUrl = "build/"',
-  'var Context = {}',
-  'expect.extend(StencilTesting.expect)'
-].join('\n');
+  'var resourcesUrl = "build/";',
+  'var Context = {};',
+  'expect.extend(StencilTesting.expect);'
+].join('');
 
 
 module.exports = {
@@ -62,7 +62,7 @@ module.exports = {
 
       var results = testing.transpile(sourceText, opts, filePath);
       if (results.diagnostics && results.diagnostics.length > 0) {
-        var msg = results.diagnostics.map(d => d.messageText).join('\n\n');
+        var msg = results.diagnostics.map(formatDiagnostics).join('\n\n');
         throw new Error(msg);
       }
 
@@ -73,3 +73,22 @@ module.exports = {
     return ts.transpile(sourceText, {}, filePath, []);
   }
 };
+
+function formatDiagnostics(d) {
+  var m = '';
+
+  if (d.relFilePath) {
+    m += d.relFilePath;
+    if (typeof d.lineNumber === 'number') {
+      m += ':' + d.lineNumber + 1;
+      if (typeof d.columnNumber === 'number') {
+        m += ':' + d.columnNumber;
+      }
+    }
+    m += '\n';
+  }
+
+  m += d.messageText;
+
+  return m;
+}
