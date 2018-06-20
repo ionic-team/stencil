@@ -4,28 +4,29 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { hasError, normalizePath } from '../util';
 
 
-export async function generateBuildResults(config: d.Config, buildCtx: d.BuildCtx) {
+export async function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // create the build results that get returned
   const getGzipSize = config.outputTargets.some(o => o.type === 'stats');
 
   const buildResults: d.BuildResults = {
     buildId: buildCtx.buildId,
-    diagnostics: cleanDiagnostics(buildCtx.diagnostics),
-    hasError: hasError(buildCtx.diagnostics),
-    duration: Date.now() - buildCtx.startTime,
-    isRebuild: buildCtx.isRebuild,
-    transpileBuildCount: buildCtx.transpileBuildCount,
     bundleBuildCount: buildCtx.bundleBuildCount,
-    styleBuildCount: buildCtx.styleBuildCount,
-    filesWritten: buildCtx.filesWritten.sort(),
-    filesChanged: buildCtx.filesChanged.slice().sort(),
-    filesUpdated: buildCtx.filesUpdated.slice().sort(),
-    filesAdded: buildCtx.filesAdded.slice().sort(),
-    filesDeleted: buildCtx.filesDeleted.slice().sort(),
+    diagnostics: cleanDiagnostics(buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
-    hasSlot: !!buildCtx.hasSlot,
-    hasSvg: !!buildCtx.hasSvg,
+    duration: Date.now() - buildCtx.startTime,
+    filesAdded: buildCtx.filesAdded.slice().sort(),
+    filesChanged: buildCtx.filesChanged.slice().sort(),
+    filesDeleted: buildCtx.filesDeleted.slice().sort(),
+    filesUpdated: buildCtx.filesUpdated.slice().sort(),
+    filesWritten: buildCtx.filesWritten.sort(),
+    hasError: hasError(buildCtx.diagnostics),
+    hasSlot: buildCtx.hasSlot,
+    hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
+    hasSvg: buildCtx.hasSvg,
+    isRebuild: buildCtx.isRebuild,
+    styleBuildCount: buildCtx.styleBuildCount,
+    transpileBuildCount: buildCtx.transpileBuildCount,
 
     components: [],
 

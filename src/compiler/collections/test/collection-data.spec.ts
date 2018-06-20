@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
   serializeAppCollection, serializeAppGlobal } from '../collection-data';
 import { mockConfig } from '../../../testing/mocks';
+import { normalizePath } from '../../util';
 import * as path from 'path';
 
 
@@ -12,17 +12,17 @@ describe('manifest-data serialize/parse', () => {
   let collection: d.Collection;
   let a: d.ComponentMeta;
   let moduleFile: d.ModuleFile;
-  const ROOT = path.resolve('/');
-  const manifestDir = path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection');
+  const ROOT = normalizePath(path.resolve('/'));
+  const manifestDir = normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection'));
   const config = mockConfig();
 
   beforeEach(() => {
     collection = {};
-    config.srcDir = path.join(ROOT, 'User', 'me', 'myapp', 'src');
+    config.srcDir = normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src'));
     a = {};
     moduleFile = {
-      sourceFilePath: path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js'),
-      jsFilePath: path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js'),
+      sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
+      jsFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
       cmpMeta: a
     };
   });
@@ -34,7 +34,7 @@ describe('manifest-data serialize/parse', () => {
     };
     const manifest: d.Collection = {};
     parseGlobal(config, manifestDir, collectionData, manifest);
-    expect(manifest.global.jsFilePath).toBe(path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection', 'global', 'my-global.js'));
+    expect(manifest.global.jsFilePath).toBe(normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection', 'global', 'my-global.js')));
   });
 
   it('serializeAppCollection', () => {
@@ -51,7 +51,7 @@ describe('manifest-data serialize/parse', () => {
           collectionName: 'ionicons',
           moduleFiles: [
             {
-              sourceFilePath: path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js'),
+              sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
               cmpMeta: {
                 tagNameMeta: 'ion-icon'
               }
@@ -74,8 +74,8 @@ describe('manifest-data serialize/parse', () => {
     const collectionData: d.CollectionData = {};
     const collection: d.Collection = {
       global: {
-        sourceFilePath: path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js'),
-        jsFilePath: path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js')
+        sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js')),
+        jsFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js'))
       }
     };
 

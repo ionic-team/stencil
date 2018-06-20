@@ -121,7 +121,7 @@ export function ensureDirs(copyTasks: d.CopyTask[]) {
 function addMkDir(mkDirs: string[], destDir: string) {
   destDir = normalizePath(destDir);
 
-  if (destDir === ROOT_DIR || destDir === '') {
+  if (destDir === ROOT_DIR || (destDir + '/') === ROOT_DIR || destDir === '') {
     return;
   }
 

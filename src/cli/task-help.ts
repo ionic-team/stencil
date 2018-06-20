@@ -1,7 +1,7 @@
-import { Logger } from '../declarations';
+import * as d from '../declarations';
 
 
-export function help(process: NodeJS.Process, logger: Logger) {
+export function helpTask(process: NodeJS.Process, logger: d.Logger) {
   const p = logger.dim((process.platform === 'win32') ? '>' : '$');
 
   console.log(`
@@ -22,7 +22,6 @@ export function help(process: NodeJS.Process, logger: Logger) {
 
     ${p} ${logger.green('stencil build --dev --watch')}
     ${p} ${logger.green('stencil build --prerender')}
-    ${p} ${logger.green('stencil init')}
 
 `);
 }

@@ -16,6 +16,7 @@ export interface BuildCtx {
   dirsDeleted: string[];
   entryModules: d.EntryModule[];
   entryPoints: d.EntryPoint[];
+  externalStylesUpdated: string[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
@@ -51,24 +52,25 @@ export type GraphData = Map<string, string[]>;
 
 export interface BuildResults {
   buildId: number;
-  diagnostics: d.Diagnostic[];
-  hasError: boolean;
-  duration: number;
-  isRebuild: boolean;
-  transpileBuildCount: number;
   bundleBuildCount: number;
+  components: BuildComponent[];
+  diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
-  filesWritten: string[];
-  filesChanged: string[];
-  filesUpdated: string[];
-  filesAdded: string[];
-  filesDeleted: string[];
-  components: BuildComponent[];
+  duration: number;
   entries: BuildEntry[];
+  filesAdded: string[];
+  filesChanged: string[];
+  filesDeleted: string[];
+  filesUpdated: string[];
+  filesWritten: string[];
+  hasError: boolean;
+  hasSuccessfulBuild: boolean;
   hasSlot: boolean;
   hasSvg: boolean;
+  isRebuild: boolean;
   styleBuildCount: number;
+  transpileBuildCount: number;
 }
 
 
