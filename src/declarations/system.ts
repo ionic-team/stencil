@@ -34,6 +34,7 @@ export interface StencilSystem {
     diagnostics?: d.Diagnostic[];
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
+  name: string;
   path?: Path;
   platform?: string;
   resolveModule?(fromDir: string, moduleId: string): string;

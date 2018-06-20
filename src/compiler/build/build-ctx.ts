@@ -142,7 +142,7 @@ export class BuildContext implements d.BuildCtx {
       return this.buildResults;
     }
 
-    this.buildResults = await generateBuildResults(this.config, this as any);
+    this.buildResults = await generateBuildResults(this.config, this.compilerCtx, this as any);
 
     // log any errors/warnings
     if (!this.hasFinished) {
