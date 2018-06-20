@@ -174,6 +174,7 @@ For the small minority of browsers that do not support modern browser features a
  - [Ionic](https://ionicframework.com/)
  - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
  - [Ionicons](http://ionicons.com/)
+ - [Capacitor](https://capacitor.ionicframework.com/)
 
 
 ## License
