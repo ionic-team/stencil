@@ -3,7 +3,8 @@ import * as d from './index';
 
 export interface PlatformApi {
   activeRender?: boolean;
-  attachStyles?: (plt: PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, modeName: string, elm: d.HostElement, customStyle?: any) => void;
+  attachStyles?: (plt: PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) => void;
+  customStyle?: any;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: d.DomApi;
   emitEvent: (elm: Element, eventName: string, data: d.EventEmitterData) => void;

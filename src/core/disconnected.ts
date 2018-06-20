@@ -1,11 +1,11 @@
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
-import { ComponentInstance, DomApi, HostElement, PlatformApi } from '../declarations';
+import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
 import { propagateComponentLoaded } from './init-component-instance';
 
 
-export function disconnectedCallback(plt: PlatformApi, elm: HostElement, instance?: ComponentInstance) {
+export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
@@ -32,11 +32,16 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, instanc
     if (Build.cmpDidUnload) {
       // call instance componentDidUnload
       // if we've created an instance for this
-      instance = plt.instanceMap.get(elm);
+      const instance = plt.instanceMap.get(elm);
       if (instance) {
         // call the user's componentDidUnload if there is one
         instance.componentDidUnload && instance.componentDidUnload();
       }
+    }
+
+    // clear CSS var-shim tracking
+    if (Build.cssVarShim && plt.customStyle) {
+      plt.customStyle.removeHost(elm);
     }
 
     // clear any references to other elements

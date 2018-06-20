@@ -214,7 +214,7 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
-    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
   }
 
   compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || {};

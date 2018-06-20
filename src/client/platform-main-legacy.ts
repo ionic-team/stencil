@@ -27,6 +27,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
+  if (Build.isDev && Build.shadowDom && domApi.$supportsShadowDom && customStyle) {
+    console.error('Unsupported browser. Native shadow-dom available but CSS Custom Properites are not.');
+  }
+
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
   Context.window = win;
@@ -58,6 +62,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     domApi,
     defineComponent,
     emitEvent: Context.emit,
+    customStyle,
     getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
@@ -251,7 +256,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   let requestBundleQueue: Function[] = [];
   if (Build.cssVarShim && customStyle) {
-    customStyle.init(() => {
+    customStyle.init().then(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
         requestBundleQueue.shift()();
@@ -264,14 +269,6 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // This is executed by the component's connected callback.
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
@@ -288,7 +285,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
-      if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
+      if (Build.cssVarShim && customStyle) {
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
@@ -355,8 +352,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   if (Build.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
+    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
+      attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 

@@ -69,7 +69,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $setTextContent: (node: Node, text: string) =>
       node.textContent = text,
 
-    $getAttribute: (elm: Element, key: any) =>
+    $getAttribute: (elm: Element, key: string) =>
       elm.getAttribute(key),
 
     $setAttribute: (elm: Element, key: string, val: string) =>
@@ -83,6 +83,9 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
     $hasAttribute: (elm: Element, key) =>
       elm.hasAttribute(key),
+
+    $getMode: (elm: Element) =>
+      elm.getAttribute('mode') || (App.Context || {}).mode,
 
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {

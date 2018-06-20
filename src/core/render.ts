@@ -1,8 +1,9 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { h } from '../renderer/vdom/h';
-import { RUNTIME_ERROR } from '../util/constants';
+import { ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { dashToPascalCase } from '../util/helpers';
+import { getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../util/scope';
 
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
@@ -40,6 +41,21 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       rootElm = hostElm;
     }
 
+    if (Build.styles && !hostElm['s-rn']) {
+      // attach the styles this component needs, if any
+      // this fn figures out if the styles should go in a
+      // shadow root or if they should be global
+      plt.attachStyles(plt, plt.domApi, cmpMeta, hostElm);
+
+      // if no render function
+      const scopeId = hostElm['s-sc'];
+      if (scopeId) {
+        plt.domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
+        if (!instance.render) {
+          plt.domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
+        }
+      }
+    }
 
     if (instance.render || instance.hostData || hostMeta || reflectHostAttr) {
       // tell the platform we're actively rendering
@@ -120,11 +136,9 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       ));
     }
 
-    if (Build.styles) {
-      // attach the styles this component needs, if any
-      // this fn figures out if the styles should go in a
-      // shadow root or if they should be global
-      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, hostElm);
+    // update styles!
+    if (Build.cssVarShim && plt.customStyle) {
+      plt.customStyle.updateHost(hostElm);
     }
 
     // it's official, this element has rendered
@@ -215,4 +229,21 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
   }
 
   return reflectHostAttr;
+}
+
+export function applyHostScope(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
+  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
+    // either this host element should use scoped css
+    // or it wants to use shadow dom but the browser doesn't support it
+    // create a scope id which is useful for scoped css
+    // and add the scope attribute to the host
+    const scopeId = getScopeId(cmpMeta, cmpMeta.componentConstructor.styleMode);
+    hostElm['s-sc'] = scopeId;
+    domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
+
+    // if no render function
+    if (!instance.render) {
+      domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
+    }
+  }
 }
