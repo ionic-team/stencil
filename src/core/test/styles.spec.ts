@@ -28,7 +28,6 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
-    const modeName = null;
 
     const visibilityStyles = domApi.$createElement('style');
     visibilityStyles.setAttribute('data-styles', '');
@@ -41,7 +40,7 @@ describe('styles', () => {
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(plt, domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(3);
@@ -60,7 +59,6 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
-    const modeName = null;
 
     const prerenderStyles = domApi.$createElement('style');
     prerenderStyles.setAttribute('data-styles', '');
@@ -68,7 +66,7 @@ describe('styles', () => {
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(plt, domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(2);
@@ -86,10 +84,9 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
-    const modeName = null;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(plt, domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, elm);
 
     const style = domApi.$head.querySelector('style');
     expect(style.innerHTML).toBe(cmpConstructor.style);

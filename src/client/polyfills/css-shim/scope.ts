@@ -52,9 +52,17 @@ export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
       : segment;
   });
 
+  const selectors = scope.selectors.map(sel => {
+    return {
+      ...sel,
+      selector: replaceScope(sel.selector, scope.cssScopeId, cssScopeId)
+    };
+  });
+
   return {
     ...scope,
     template,
+    selectors,
     cssScopeId,
   };
 }

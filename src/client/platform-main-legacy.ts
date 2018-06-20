@@ -27,6 +27,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
+  if (Build.isDev && Build.shadowDom && domApi.$supportsShadowDom && customStyle) {
+    console.error('Unsupported browser. Native shadow-dom available but CSS Custom Properites are not.');
+  }
+
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
   Context.window = win;
@@ -348,8 +352,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   if (Build.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm);
+    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
+      attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 

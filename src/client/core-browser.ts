@@ -16,8 +16,18 @@ if (Build.polyfills) {
   // and requires the es5 way of extending HTMLElement
 
   let customStyle: CustomStyle;
-  if (Build.cssVarShim && !supportsCssVars(window)) {
-    customStyle = new CustomStyle(window, document);
+  if (Build.cssVarShim) {
+    let needShim = !supportsCssVars(window);
+    if (Build.isDev) {
+      if (window.location.search.indexOf('cssvars=false') > 0) {
+        // by adding ?shadow=false it'll force the slot polyfill
+        // only add this check when in dev mode
+        needShim = true;
+      }
+    }
+    if (needShim) {
+      customStyle = new CustomStyle(window, document);
+    }
   }
 
   createPlatformMainLegacy(namespace, Context, window, document, resourcesUrl, hydratedCssClass, customStyle);

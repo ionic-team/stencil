@@ -220,8 +220,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
   if (Build.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
-      attachStyles(plt, domApi, cmpMeta, modeName, elm);
+    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
+      attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 

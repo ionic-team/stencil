@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { getHostScopeAttribute, getScopeId } from '../util/scope';
 
 
 export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
@@ -49,15 +48,6 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       } else {
         (hostElm as any).shadowRoot = hostElm;
       }
-    }
-
-    if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
-      // either this host element should use scoped css
-      // or it wants to use shadow dom but the browser doesn't support it
-      // create a scope id which is useful for scoped css
-      // and add the scope attribute to the host
-      hostElm['s-sc'] = getScopeId(cmpMeta, hostElm.mode);
-      domApi.$setAttribute(hostElm, getHostScopeAttribute(hostElm['s-sc']), '');
     }
   }
 

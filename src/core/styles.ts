@@ -1,6 +1,7 @@
 import { Build } from '../util/build-conditionals';
 import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../declarations';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
+import { getScopeId } from '../util/scope';
 
 
 export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpConstructor: ComponentConstructor) {
@@ -47,18 +48,19 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
   }
 }
 
-
-export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, hostElm: HostElement) {
+export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, hostElm: HostElement) {
   // first see if we've got a style for a specific mode
-  let styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
-  let styleTemplate = (cmpMeta as any)[styleModeId];
-
-  if (!styleTemplate) {
-    // didn't find a style for this mode
-    // now let's check if there's a default style for this component
-    styleModeId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
-    styleTemplate = (cmpMeta as any)[styleModeId];
+  const modeName = cmpMeta.componentConstructor.styleMode;
+  const encapsulation = cmpMeta.encapsulation;
+  if (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom)) {
+    // either this host element should use scoped css
+    // or it wants to use shadow dom but the browser doesn't support it
+    // create a scope id which is useful for scoped css
+    // and add the scope attribute to the host
+    hostElm['s-sc'] = getScopeId(cmpMeta, modeName);
   }
+  const styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
+  const styleTemplate = (cmpMeta as any)[styleModeId];
 
   if (styleTemplate) {
     // cool, we found a style template element for this component
@@ -67,7 +69,7 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
     if (domApi.$supportsShadowDom) {
-      if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+      if (encapsulation === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
         styleContainerNode = hostElm.shadowRoot as any;

@@ -3,16 +3,10 @@ import { executeTemplate } from './template';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
-import { getHostScopeAttribute } from '../../../util/scope';
 
 export function supportsCssVars(win: Window) {
   return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
 }
-
-// export function supportsCssVars(_win: Window) {
-//   return false;
-// }
-
 
 export class CustomStyle {
 
@@ -67,16 +61,14 @@ export class CustomStyle {
     if (baseScope.isDynamic) {
       this.hostStyleMap.set(hostEl, styleEl);
       const newScopeId = `${baseScope.cssScopeId}-${this.count}`;
-      hostEl.removeAttribute(baseScope.cssScopeId);
       (hostEl as any)['s-sc'] = newScopeId;
-      hostEl.setAttribute(getHostScopeAttribute(newScopeId), '');
 
       this.hostScopeMap.set(hostEl, reScope(baseScope, newScopeId));
       this.count++;
 
     } else {
       baseScope.styleEl = styleEl;
-      styleEl.innerHTML = cssText;
+      styleEl.innerHTML = executeTemplate(baseScope.template, {});
       this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;
