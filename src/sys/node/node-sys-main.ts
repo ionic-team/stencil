@@ -22,7 +22,7 @@ export class NodeSystem implements d.StencilSystem {
 
   fs: d.FileSystem;
   path: d.Path;
-
+  name = 'node';
 
   constructor(fs?: d.FileSystem, maxConcurrentWorkers?: number) {
     this.fs = fs || new NodeFs();

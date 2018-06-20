@@ -499,7 +499,6 @@ declare global {
       name?: string;
       required?: boolean;
       size?: number;
-      value?: string | string[] | number;
     }
 
     export interface SourceHTMLAttributes extends HTMLAttributes {

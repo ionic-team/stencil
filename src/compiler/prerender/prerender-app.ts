@@ -162,5 +162,9 @@ async function writePrerenderDest(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   // add the prerender html content it to our collection of
   // files that need to be saved when we're all ready
-  await compilerCtx.fs.writeFile(filePath, results.html);
+  await compilerCtx.fs.writeFile(filePath, results.html, { useCache: false });
+
+  // write the files now
+  // and since we're not using cache it'll free up its memory
+  await compilerCtx.fs.commit();
 }

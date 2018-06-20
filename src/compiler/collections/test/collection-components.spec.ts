@@ -1,4 +1,4 @@
-import { Collection, CollectionData, ComponentMeta, ModuleFile } from '../../../declarations';
+import * as d from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { mockConfig } from '../../../testing/mocks';
 import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeComponent } from '../collection-data';
@@ -6,18 +6,20 @@ import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecat
 
 describe('collection components', () => {
 
-  let collection: Collection;
-  let a: ComponentMeta;
-  let b: ModuleFile;
-  let moduleFile: ModuleFile;
+  let collection: d.Collection;
+  let a: d.ComponentMeta;
+  let b: d.ModuleFile;
+  let moduleFile: d.ModuleFile;
   const collectionDir = '/User/me/myapp/dist/collection/';
   const config = mockConfig();
 
   beforeEach(() => {
     collection = {};
     a = {};
+    config.srcDir = '/User/me/myapp/src/';
     moduleFile = {
-      jsFilePath: '/User/me/myapp/dist/collection/components/cmp-a.js',
+      sourceFilePath: '/User/me/myapp/src/components/cmp-a.js',
+      jsFilePath: '/User/me/myapp/src/components/cmp-a.js',
       cmpMeta: a
     };
   });
@@ -154,7 +156,7 @@ describe('collection components', () => {
         }
       ]
     };
-    const cmpMeta: ComponentMeta = {};
+    const cmpMeta: d.ComponentMeta = {};
     parseDidChangeDeprecated(cmpData, cmpMeta);
     expect(cmpMeta.membersMeta.nameA.watchCallbacks[0]).toBe('methodA');
     expect(cmpMeta.membersMeta.nameB.watchCallbacks[0]).toBe('methodB');
@@ -173,7 +175,7 @@ describe('collection components', () => {
         }
       ]
     };
-    const cmpMeta: ComponentMeta = {};
+    const cmpMeta: d.ComponentMeta = {};
     parseWillChangeDeprecated(cmpData, cmpMeta);
     expect(cmpMeta.membersMeta.nameA.watchCallbacks[0]).toBe('methodA');
     expect(cmpMeta.membersMeta.nameB.watchCallbacks[0]).toBe('methodB');

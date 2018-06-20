@@ -4,8 +4,10 @@ import { normalizePath } from '../util';
 
 
 export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  return Promise.all(config.outputTargets.map(outputTarget => {
-    return writeAppCollection(config, compilerCtx, buildCtx, outputTarget);
+  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+
+  await Promise.all(outputTargets.map(async outputTarget => {
+    await writeAppCollection(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
@@ -15,11 +17,6 @@ export async function writeAppCollections(config: d.Config, compilerCtx: d.Compi
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
 async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist) {
-
-  if (!outputTarget.collectionDir) {
-    return Promise.resolve();
-  }
-
   // get the absolute path to the directory where the collection will be saved
   const collectionDir = normalizePath(outputTarget.collectionDir);
 
@@ -32,8 +29,6 @@ async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   // don't bother serializing/writing the collection if we're not creating a distribution
   await compilerCtx.fs.writeFile(collectionFilePath, JSON.stringify(collectionData, null, 2));
-
-  return collectionData;
 }
 
 
@@ -172,8 +167,12 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
   const cmpData: d.ComponentData = {};
   const cmpMeta = moduleFile.cmpMeta;
 
-  // get the absolute path to the compiled component's output javascript file
-  const compiledComponentAbsoluteFilePath = normalizePath(moduleFile.jsFilePath);
+  // get the current absolute path to our built js file
+  // and figure out the relative path from the src dir
+  const relToSrc = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.jsFilePath));
+
+  // figure out the absolute path when it's in the collection dir
+  const compiledComponentAbsoluteFilePath = normalizePath(config.sys.path.join(collectionDir, relToSrc));
 
   // create a relative path from the collection file to the compiled component's output javascript file
   const compiledComponentRelativeFilePath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
@@ -858,7 +857,15 @@ export function serializeAppGlobal(config: d.Config, collectionDir: string, coll
     return;
   }
 
-  collectionData.global = normalizePath(config.sys.path.relative(collectionDir, globalModule.jsFilePath));
+  // get the current absolute path to our built js file
+  // and figure out the relative path from the src dir
+  const relToSrc = normalizePath(config.sys.path.relative(config.srcDir, globalModule.jsFilePath));
+
+  // figure out the absolute path when it's in the collection dir
+  const compiledComponentAbsoluteFilePath = normalizePath(config.sys.path.join(collectionDir, relToSrc));
+
+  // create a relative path from the collection file to the compiled output javascript file
+  collectionData.global = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
 }
 
 

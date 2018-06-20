@@ -9,12 +9,15 @@ export async function buildAuxiliaries(config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
+  // let's prerender this first
+  // and run service workers on top of this when it's done
+  await prerenderOutputTargets(config, compilerCtx, buildCtx, entryModules);
+
   // generate component docs
-  // and prerender can run in parallel
+  // and service workers can run in parallel
   await Promise.all([
     generateDocs(config, compilerCtx),
-    generateServiceWorkers(config, compilerCtx, buildCtx),
-    prerenderOutputTargets(config, compilerCtx, buildCtx, entryModules)
+    generateServiceWorkers(config, compilerCtx, buildCtx)
   ]);
 
   if (!buildCtx.shouldAbort()) {

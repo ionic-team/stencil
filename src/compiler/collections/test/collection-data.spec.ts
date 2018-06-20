@@ -1,36 +1,40 @@
-import { Collection, CollectionData, CompilerCtx, ComponentData, ComponentMeta, Config, EntryModule, ModuleFile } from '../../../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
+import * as d from '../../../declarations';
 import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
   serializeAppCollection, serializeAppGlobal } from '../collection-data';
 import { mockConfig } from '../../../testing/mocks';
+import { normalizePath } from '../../util';
+import * as path from 'path';
 
 
 describe('manifest-data serialize/parse', () => {
 
-  let collection: Collection;
-  let a: ComponentMeta;
-  let moduleFile: ModuleFile;
-  const manifestDir = '/User/me/myapp/dist/collection/';
+  let collection: d.Collection;
+  let a: d.ComponentMeta;
+  let moduleFile: d.ModuleFile;
+  const ROOT = normalizePath(path.resolve('/'));
+  const manifestDir = normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection'));
   const config = mockConfig();
 
   beforeEach(() => {
     collection = {};
+    config.srcDir = normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src'));
     a = {};
     moduleFile = {
-      jsFilePath: '/User/me/myapp/dist/collection/components/cmp-a.js',
+      sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
+      jsFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
       cmpMeta: a
     };
   });
 
 
   it('parseGlobal', () => {
-    const collectionData: CollectionData = {
+    const collectionData: d.CollectionData = {
       global: 'global/my-global.js'
     };
-    const manifest: Collection = {};
+    const manifest: d.Collection = {};
     parseGlobal(config, manifestDir, collectionData, manifest);
-    expect(manifest.global.jsFilePath).toBe('/User/me/myapp/dist/collection/global/my-global.js');
+    expect(manifest.global.jsFilePath).toBe(normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'dist', 'collection', 'global', 'my-global.js')));
   });
 
   it('serializeAppCollection', () => {
@@ -38,15 +42,16 @@ describe('manifest-data serialize/parse', () => {
       { components: ['cmp-a', 'cmp-b'] },
       { components: ['cmp-c'] }
     ];
-    const entryModules: EntryModule[] = [{
+    const entryModules: d.EntryModule[] = [{
       moduleFiles: [moduleFile]
     }];
-    const compilerCtx: CompilerCtx = {
+    const compilerCtx: d.CompilerCtx = {
       collections: [
         {
           collectionName: 'ionicons',
           moduleFiles: [
             {
+              sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'components', 'cmp-a.js')),
               cmpMeta: {
                 tagNameMeta: 'ion-icon'
               }
@@ -66,10 +71,11 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('serializeAppGlobal', () => {
-    const collectionData: CollectionData = {};
-    const collection: Collection = {
+    const collectionData: d.CollectionData = {};
+    const collection: d.Collection = {
       global: {
-        jsFilePath: '/User/me/myapp/dist/collection/global/my-global.js'
+        sourceFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js')),
+        jsFilePath: normalizePath(path.join(ROOT, 'User', 'me', 'myapp', 'src', 'global', 'my-global.js'))
       }
     };
 
@@ -78,12 +84,12 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection false if tag is in bundles', () => {
-    const config: Config = {
+    const config: d.Config = {
       bundles: [
         { components: ['cmp-a', 'cmp-b'] }
       ]
     };
-    const cmpData: ComponentData = {
+    const cmpData: d.ComponentData = {
       tag: 'cmp-b'
     };
     const r = excludeFromCollection(config, cmpData);
@@ -91,12 +97,12 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection true if tag not in bundles', () => {
-    const config: Config = {
+    const config: d.Config = {
       bundles: [
         { components: ['cmp-a', 'cmp-b'] }
       ]
     };
-    const cmpData: ComponentData = {
+    const cmpData: d.ComponentData = {
       tag: 'cmp-c'
     };
     const r = excludeFromCollection(config, cmpData);
@@ -104,8 +110,8 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection defaults true', () => {
-    const config: Config = {};
-    const cmpData: ComponentData = {};
+    const config: d.Config = {};
+    const cmpData: d.ComponentData = {};
     const r = excludeFromCollection(config, cmpData);
     expect(r).toBe(true);
   });

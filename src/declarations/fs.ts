@@ -65,6 +65,7 @@ export interface FsWriteOptions {
   inMemoryOnly?: boolean;
   clearFileCache?: boolean;
   immediateWrite?: boolean;
+  useCache?: boolean;
 }
 
 
@@ -83,7 +84,6 @@ export interface FsItems {
 export interface FsItem {
   fileText?: string;
   hash?: string;
-  fileSrc?: string;
   isFile?: boolean;
   isDirectory?: boolean;
   size?: number;
@@ -91,4 +91,5 @@ export interface FsItem {
   exists?: boolean;
   queueWriteToDisk?: boolean;
   queueDeleteFromDisk?: boolean;
+  useCache?: boolean;
 }

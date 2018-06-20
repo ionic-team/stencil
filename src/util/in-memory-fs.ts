@@ -374,6 +374,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     item.fileText = content;
 
+    if (opts && opts.useCache === false) {
+      item.useCache = false;
+    }
+
     if (opts && opts.inMemoryOnly) {
       // we don't want to actually write this to disk
       // just keep it in memory
@@ -484,16 +488,15 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   private async commitWriteFile(filePath: string) {
     const item = this.getItem(filePath);
 
-    if (typeof item.fileSrc === 'string') {
-      await this.disk.copyFile(item.fileSrc, filePath);
-      return filePath;
-    }
-
     if (item.fileText == null) {
       throw new Error(`unable to find item fileText to write: ${filePath}`);
     }
 
     await this.disk.writeFile(filePath, item.fileText);
+
+    if (item.useCache === false) {
+      this.clearFileCache(filePath);
+    }
 
     return filePath;
   }

@@ -34,6 +34,8 @@ export interface CompilerCtx {
   lastJsModules?: d.JSModuleMap;
   lastBuildStyles?: { [styleId: string]: string };
   lastStyleText?: { [absPath: string]: string };
+
+  entryBundleCache?: any;
 }
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => Promise<any>;

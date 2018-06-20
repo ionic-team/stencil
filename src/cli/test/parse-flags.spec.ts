@@ -170,6 +170,26 @@ describe('parseFlags', () => {
     expect(flags.log).toBe(true);
   });
 
+  it('should parse --no-open', () => {
+    process.argv[2] = '--no-open';
+    const flags = parseFlags(process);
+    expect(flags.open).toBe(false);
+  });
+
+  it('should parse --port', () => {
+    process.argv[2] = '--port';
+    process.argv[3] = '8888';
+    const flags = parseFlags(process);
+    expect(flags.port).toBe(8888);
+  });
+
+  it('should parse -p', () => {
+    process.argv[2] = '-p';
+    process.argv[3] = '4444';
+    const flags = parseFlags(process);
+    expect(flags.port).toBe(4444);
+  });
+
   it('should parse --prod', () => {
     process.argv[2] = '--prod';
     const flags = parseFlags(process);
@@ -180,6 +200,12 @@ describe('parseFlags', () => {
     process.argv[2] = '--prerender';
     const flags = parseFlags(process);
     expect(flags.prerender).toBe(true);
+  });
+
+  it('should parse --serve', () => {
+    process.argv[2] = '--serve';
+    const flags = parseFlags(process);
+    expect(flags.serve).toBe(true);
   });
 
   it('should parse --stats', () => {

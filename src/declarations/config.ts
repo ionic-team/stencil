@@ -70,7 +70,8 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'init';
+  task?: 'build' | 'docs' | 'help' | 'serve';
+  cache?: boolean;
   config?: string;
   debug?: boolean;
   dev?: boolean;
@@ -80,9 +81,11 @@ export interface ConfigFlags {
   help?: boolean;
   log?: boolean;
   logLevel?: string;
-  cache?: boolean;
+  open?: boolean;
+  port?: number;
   prerender?: boolean;
   prod?: boolean;
+  serve?: boolean;
   ssr?: boolean;
   stats?: boolean;
   version?: boolean;

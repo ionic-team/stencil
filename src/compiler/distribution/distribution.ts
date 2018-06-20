@@ -20,9 +20,9 @@ export async function generateDistributions(config: d.Config, compilerCtx: d.Com
     // got a validate types build running then
     // we need to wait on it to finish first since the
     // validate types build is writing all the types to disk
-    config.logger.debug(`generateDistributions waiting on validateTypes`);
+    const timeSpan = buildCtx.createTimeSpan(`generateDistributions waiting on validateTypes`, true);
     await buildCtx.validateTypesPromise;
-    config.logger.debug(`generateDistributions finished waiting on validateTypes`);
+    timeSpan.finish(`generateDistributions finished waiting on validateTypes`);
   }
 
   await Promise.all(distOutputs.map(async outputTarget => {
