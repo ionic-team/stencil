@@ -51,24 +51,27 @@ export class CustomStyle {
     }
     const cssScopeId = (hostEl as any)['s-sc'];
     const baseScope = this.registerHostTemplate(cssText, templateName, cssScopeId);
-
-    const needStyleEl = baseScope.isDynamic || !baseScope.styleEl;
+    const isDynamicScoped = baseScope.isDynamic && baseScope.cssScopeId;
+    const needStyleEl = isDynamicScoped || !baseScope.styleEl;
     if (!needStyleEl) {
       return null;
     }
 
     const styleEl = this.doc.createElement('style');
-    if (baseScope.isDynamic) {
-      this.hostStyleMap.set(hostEl, styleEl);
+    if (isDynamicScoped) {
       const newScopeId = `${baseScope.cssScopeId}-${this.count}`;
       (hostEl as any)['s-sc'] = newScopeId;
 
+      this.hostStyleMap.set(hostEl, styleEl);
       this.hostScopeMap.set(hostEl, reScope(baseScope, newScopeId));
       this.count++;
-
     } else {
       baseScope.styleEl = styleEl;
-      styleEl.innerHTML = executeTemplate(baseScope.template, {});
+      if (!baseScope.isDynamic) {
+        styleEl.innerHTML = executeTemplate(baseScope.template, {});
+      }
+      this.globalScopes.push(baseScope);
+      this.updateGlobal();
       this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;
@@ -85,7 +88,7 @@ export class CustomStyle {
 
   updateHost(hostEl: HTMLElement) {
     const scope = this.hostScopeMap.get(hostEl);
-    if (scope && scope.isDynamic) {
+    if (scope && scope.isDynamic && scope.cssScopeId) {
       const styleEl = this.hostStyleMap.get(hostEl);
       if (styleEl) {
         const selectors = getActiveSelectors(hostEl, this.hostScopeMap, this.globalScopes);
@@ -102,7 +105,7 @@ export class CustomStyle {
   private registerHostTemplate(cssText: string, scopeName: string, cssScopeId: string) {
     let scope = this.scopesMap.get(scopeName);
     if (!scope) {
-      scope = parseCSS(cssText, !!cssScopeId);
+      scope = parseCSS(cssText);
       scope.cssScopeId = cssScopeId;
       this.scopesMap.set(scopeName, scope);
     }
