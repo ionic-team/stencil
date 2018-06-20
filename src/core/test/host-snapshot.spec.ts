@@ -43,35 +43,6 @@ describe('host-snapshot', () => {
     expect(wasAttached).toBe(true);
   });
 
-  it('do not set scope id when no encapsulation', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-sc']).toBeUndefined();
-  });
-
-  it('do not set scope id when shadow w/ support', () => {
-    domApi.$attachShadow = () => {/**/};
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
-    domApi.$supportsShadowDom = true;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-sc']).toBeUndefined();
-  });
-
-  it('set scope id to host element when shadow but no shadow support', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
-    domApi.$supportsShadowDom = false;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-sc']).toBe('data-ion-tag');
-    expect(hostElm.hasAttribute('data-ion-tag-host')).toBe(true);
-  });
-
-  it('set scope id to host element when scoped encapsulation', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-sc']).toBe('data-ion-tag');
-    expect(hostElm.hasAttribute('data-ion-tag-host')).toBe(true);
-  });
-
   it('manually set shadowRoot to host element if no shadow dom $supportsShadowDom', () => {
     domApi.$supportsShadowDom = false;
     cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;

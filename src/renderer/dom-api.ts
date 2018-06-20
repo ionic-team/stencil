@@ -85,7 +85,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       elm.hasAttribute(key),
 
     $getMode: (elm: Element) =>
-      elm.getAttribute('mode') || App.Context.mode,
+      elm.getAttribute('mode') || (App.Context || {}).mode,
 
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {

@@ -28,6 +28,7 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     const visibilityStyles = domApi.$createElement('style');
     visibilityStyles.setAttribute('data-styles', '');
@@ -59,6 +60,7 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     const prerenderStyles = domApi.$createElement('style');
     prerenderStyles.setAttribute('data-styles', '');
@@ -84,6 +86,7 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
     attachStyles(plt, domApi, cmpMeta, elm);
@@ -104,6 +107,7 @@ describe('styles', () => {
         return `ios`;
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
@@ -121,6 +125,7 @@ describe('styles', () => {
         return `my-style { color: red; }`;
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
@@ -135,6 +140,7 @@ describe('styles', () => {
         return 'cmp-a';
       }
     };
+    cmpMeta.componentConstructor = cmpConstructor;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
