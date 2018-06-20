@@ -1,24 +1,21 @@
+import * as d from '../declarations';
 import { Compiler as CompilerType } from '../compiler';
-import { Config, Logger, StencilSystem } from '../declarations';
-import { getConfigFilePath, hasError } from './cli-utils';
-import { help } from './task-help';
-import { initApp } from './task-init';
+import { getConfigFilePath } from './cli-utils';
+import { helpTask } from './task-help';
 import { parseFlags } from './parse-flags';
+import { runTask } from './run-task';
 import { WORKER_EXITED_MSG } from '../sys/node/worker-farm/main';
 
 
-export async function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger) {
-  process.on('unhandledRejection', (r: any) => logger.error(r));
+export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
+  process.on(`unhandledRejection`, (r: any) => logger.error(`unhandledRejection`, r));
+
+  process.title = `Stencil`;
 
   const flags = parseFlags(process);
 
-  if (flags.help || flags.task === 'help') {
-    help(process, logger);
-    process.exit(0);
-  }
-
-  if (flags.task === 'init') {
-    initApp(process, sys, logger);
+  if (flags.help || flags.task === `help`) {
+    helpTask(process, logger);
     process.exit(0);
   }
 
@@ -28,7 +25,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
   }
 
   // load the config file
-  let config: Config;
+  let config: d.Config;
   try {
     const configPath = getConfigFilePath(process, sys, flags.config);
     config = sys.loadConfigFile(configPath, process);
@@ -65,29 +62,9 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
 
     process.title = `Stencil: ${config.namespace}`;
 
-    switch (flags.task) {
-      case 'build':
-        const results = await compiler.build();
-        if (!config.watch && hasError(results && results.diagnostics)) {
-          process.exit(1);
-        }
-
-        if (config.watch) {
-          process.once('SIGINT', () => {
-            process.exit(0);
-          });
-        }
-        break;
-
-      case 'docs':
-        await compiler.docs();
-        break;
-
-      default:
-        config.logger.error(`Invalid stencil command, please see the options below:`);
-        help(process, logger);
-        process.exit(1);
-    }
+    runTask(process, config, compiler, flags).catch(err => {
+      config.logger.error(`uncaught cli task error`, err);
+    });
 
   } catch (e) {
     if (e !== WORKER_EXITED_MSG) {
