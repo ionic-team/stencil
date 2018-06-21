@@ -52,25 +52,23 @@ Stencil components are plain ES6/TypeScript classes with some decorator metadata
 Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
 
 ```typescript
-import { Component, Prop, State } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
-  styleUrl: 'my-component.scss'
+  styleUrl: 'my-component.css'
 })
 export class MyComponent {
-  // Indicate that name should be a property on our new component
+
   @Prop() first: string;
 
   @Prop() last: string;
 
-  @State() isVisible: boolean = true;
-
   render() {
     return (
-      <p>
+      <div>
         Hello, my name is {this.first} {this.last}
-      </p>
+      </div>
     );
   }
 }
@@ -78,7 +76,7 @@ export class MyComponent {
 
 Note: the `.tsx` extension is required, as this is the standard for TypeScript classes that use JSX.
 
-To use this component, just use it like any other HTML tag:
+To use this component, just use it like any other HTML element:
 
 ```html
 <my-component first="Stencil" last="JS"></my-component>
@@ -124,7 +122,7 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 |                |                                         |
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
 | `@State()`     | Creates a local state variable that will not be placed on the element. |
-| `@Method()`    | Expose specifc methods to be publicly accessible. |
+| `@Method()`    | Expose specific methods to be publicly accessible. |
 
 
 ## Why "Stencil?"
@@ -176,6 +174,7 @@ For the small minority of browsers that do not support modern browser features a
  - [Ionic](https://ionicframework.com/)
  - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
  - [Ionicons](http://ionicons.com/)
+ - [Capacitor](https://capacitor.ionicframework.com/)
 
 
 ## License

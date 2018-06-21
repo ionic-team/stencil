@@ -27,7 +27,9 @@ export function transpile(input: string, opts: TranspileOptions = {}, path?: str
   const config = validateConfig({
     sys: sys,
     logger: logger,
+    cwd: process.cwd(),
     rootDir: '/',
+    srcDir: '/',
     devMode: true,
     _isTesting: true
   });

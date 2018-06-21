@@ -131,13 +131,19 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
       Array.isArray(st.modifiers) &&
       st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword));
 
+    const isTypeAliasDeclarationExported = ((ts.isTypeAliasDeclaration(st) &&
+      (<ts.Identifier>st.name).getText() === typeName) &&
+      Array.isArray(st.modifiers) &&
+      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword));
+
     // Is the interface exported through a named export
     const isTypeInExportDeclaration = ts.isExportDeclaration(st) &&
       ts.isNamedExports(st.exportClause) &&
       st.exportClause.elements.some(nee => nee.name.getText() === typeName);
 
-    return isInterfaceDeclarationExported || isTypeInExportDeclaration;
+    return isInterfaceDeclarationExported || isTypeAliasDeclarationExported || isTypeInExportDeclaration;
   });
+
 
   if (isExported) {
     return {

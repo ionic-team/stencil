@@ -21,6 +21,7 @@ export interface StencilSystem {
     nodir?: boolean;
   }): Promise<string[]>;
   gzipSize?(text: string): Promise<number>;
+  initWorkers?(maxConcurrentWorkers: number): number;
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
@@ -35,8 +36,8 @@ export interface StencilSystem {
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   name: string;
+  os?: OperatingSystem;
   path?: Path;
-  platform?: string;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
     rollup: {
@@ -63,6 +64,15 @@ export interface StencilSystem {
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
   workbox?: Workbox;
+}
+
+
+export interface OperatingSystem {
+  cpu: string;
+  cpus: number;
+  freemem: number;
+  platform: string;
+  release: string;
 }
 
 

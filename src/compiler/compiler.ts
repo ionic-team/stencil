@@ -16,16 +16,24 @@ export class Compiler {
     [ this.isValid, this.config ] = isValid(rawConfig);
 
     if (this.isValid) {
-      this.ctx = getCompilerCtx(this.config);
+      const os = this.config.sys.os;
 
       let startupMsg = `${this.config.sys.compiler.name} v${this.config.sys.compiler.version} `;
-      if (this.config.sys.platform !== 'win32') {
+      if (os.platform !== 'win32') {
         startupMsg += `💎`;
       }
 
       this.config.logger.info(this.config.logger.cyan(startupMsg));
+
+      this.config.logger.debug(`${os.platform}, ${os.cpu}, cpus: ${os.cpus}, freemem: ${os.freemem}`);
+
       this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
       this.config.logger.debug(`compiler build: __BUILDID__`);
+
+      const workers = this.config.sys.initWorkers(this.config.maxConcurrentWorkers);
+      this.config.logger.debug(`compiler workers: ${workers}`);
+
+      this.ctx = getCompilerCtx(this.config);
 
       this.on('build', watchResults => {
         const buildCtx = new BuildContext(this.config, this.ctx, watchResults);

@@ -27,6 +27,7 @@ export interface Config {
   includeSrc?: string[];
   logger?: d.Logger;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  maxConcurrentWorkers?: number;
   minifyCss?: boolean;
   minifyJs?: boolean;
   namespace?: string;

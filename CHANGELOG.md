@@ -1,3 +1,21 @@
+<a name="0.9.10"></a>
+## 🐼 [0.9.10](https://github.com/ionic-team/stencil/compare/v0.9.9...v0.9.10) (2018-06-20)
+
+
+### Bug Fixes
+
+* **cssvars:** implement scoped css var shim ([f6e75cf](https://github.com/ionic-team/stencil/commit/f6e75cf))
+* **cssvars:** non-scoped components are global scoped ([d8d6176](https://github.com/ionic-team/stencil/commit/d8d6176))
+* **types:** remove value from jsx tyles for select elements. ([020dda0](https://github.com/ionic-team/stencil/commit/020dda0))
+
+
+### Performance Improvements
+
+* **bundling:** cache bundle builds ([27083d1](https://github.com/ionic-team/stencil/commit/27083d1))
+* **watch:** do not wait on dist outputs for rebuilds ([a57f7bb](https://github.com/ionic-team/stencil/commit/a57f7bb))
+
+
+
 <a name="0.9.9"></a>
 ## 🐍 [0.9.9](https://github.com/ionic-team/stencil/compare/v0.9.8...v0.9.9) (2018-06-19)
 
