@@ -58,26 +58,26 @@ function getDisabledMessageScript() {
 
   <h2>Current Browser's Support:</h2>
   <ul>
-    <li>ES Module Imports: <span id="esModules"></span></li>
-    <li>Custom Elements: <span id="customElements"></span></li>
-    <li>fetch(): <span id="fetch"></span></li>
-    <li>CSS Variables: <span id="cssVariables"></span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">ES Module Imports</a>: <span id="es-modules-test"></span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements">Custom Elements</a>: <span id="custom-elements-test"></span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a>: <span id="fetch-test"></span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables">CSS Variables</a>: <span id="css-variables-test"></span></li>
   </ul>
 
   <h2>Current Browser:</h2>
   <pre>
-    <code id="currentBrowser"></code>
+    <code id="current-browser-output"></code>
   </pre>
   `;
 
   const script = `
     document.body.innerHTML = '${html.replace(/\r\n|\r|\n/g, '').replace(/\'/g, `\\'`).trim()}';
 
-    document.getElementById('currentBrowser').textContent = window.navigator.userAgent;
-    document.getElementById('esModules').textContent = !!('noModule' in document.createElement('script'));
-    document.getElementById('customElements').textContent = !!(window.customElements);
-    document.getElementById('fetch').textContent = !!(window.fetch);
-    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
+    document.getElementById('current-browser-output').textContent = window.navigator.userAgent;
+    document.getElementById('es-modules-test').textContent = !!('noModule' in document.createElement('script'));
+    document.getElementById('custom-elements-test').textContent = !!(window.customElements);
+    document.getElementById('css-variables-test').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
+    document.getElementById('fetch-test').textContent = !!(window.fetch);
   `;
 
   // timeout just to ensure <body> is ready
