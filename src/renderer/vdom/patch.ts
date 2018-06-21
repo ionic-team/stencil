@@ -189,7 +189,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // $defaultHolder deprecated 2018-04-02
     const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
     containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
-    if ((containerElm as any).shadowRoot) {
+    if ((containerElm as any).shadowRoot && domApi.$tagName(containerElm) === hostTagName) {
       containerElm = (containerElm as any).shadowRoot;
     }
 
