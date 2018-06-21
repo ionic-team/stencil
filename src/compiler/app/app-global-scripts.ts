@@ -5,7 +5,7 @@ import { generatePreamble } from '../util';
 import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import { minifyJs } from '../minifier';
-import { transpileToEs5 } from '../transpile/core-build';
+import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 
 export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
@@ -136,7 +136,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     // global could already be in es2017
     // transpile it down to es5
     config.logger.debug(`transpile global to es5: ${globalJsName}`);
-    const transpileResults = await transpileToEs5(config, compilerCtx, jsContent);
+    const transpileResults = await transpileToEs5Main(config, compilerCtx, jsContent);
     if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
       buildCtx.diagnostics.push(...transpileResults.diagnostics);
     } else {

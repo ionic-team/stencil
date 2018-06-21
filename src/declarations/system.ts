@@ -53,6 +53,7 @@ export interface StencilSystem {
     lte: (a: string, b: string, loose?: boolean) => boolean;
   };
   tmpdir?(): string;
+  transpileToEs5?(cwd: string, input: string): Promise<d.TranspileResults>;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
     format(url: Url): string;

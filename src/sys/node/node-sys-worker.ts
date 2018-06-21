@@ -3,6 +3,7 @@ import { attachMessageHandler } from './worker-farm/worker';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
+import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 const autoprefixer = require('autoprefixer');
@@ -115,6 +116,10 @@ export class NodeSystemWorker {
   scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
     const sc = new ShadowCss();
     return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+  }
+
+  transpileToEs5(cwd: string, input: string) {
+    return transpileToEs5Worker(cwd, input);
   }
 
   validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {

@@ -5,7 +5,7 @@ import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder 
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
 import { PLUGIN_HELPERS } from '../style/style';
-import { transpileToEs5 } from '../transpile/core-build';
+import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
@@ -379,7 +379,7 @@ export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: str
 
 async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsText: string) {
   // use typescript to convert this js text into es5
-  const transpileResults = await transpileToEs5(config, compilerCtx, jsText);
+  const transpileResults = await transpileToEs5Main(config, compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
   }

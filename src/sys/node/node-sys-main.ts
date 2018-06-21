@@ -318,6 +318,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.semver;
   }
 
+  async transpileToEs5(cwd: string, input: string) {
+    return this.sysWorker.run('transpileToEs5', [cwd, input]);
+  }
+
   tmpdir() {
     return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}-__BUILDID__`);
   }
