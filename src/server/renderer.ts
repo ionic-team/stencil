@@ -16,6 +16,9 @@ export class Renderer {
   constructor(public config: d.Config, registry?: d.ComponentRegistry, ctx?: d.CompilerCtx, outputTarget?: d.OutputTargetWww) {
     this.config = validateConfig(config);
 
+    // do not allow more than one worker when prerendering
+    config.sys.initWorkers(1);
+
     // init the build context
     this.ctx = getCompilerCtx(config, ctx);
 
