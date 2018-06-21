@@ -74,7 +74,16 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
       .map(async ([entryKey, value]) => {
         const fileName = getBrowserFilename(entryKey.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, entryKey);
+
         jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
+
+        if (config.minifyJs) {
+          const results = await minifyJs(config, compilerCtx, jsText, 'es5', true);
+          if (results.diagnostics.length === 0) {
+            jsText = results.output;
+          }
+        }
+
         await writeBundleJSFile(config, compilerCtx, fileName, jsText);
       });
     await Promise.all(es5Promises);

@@ -18,19 +18,58 @@ describe('build', () => {
 
   it('should minify es5 build', async () => {
     jest.setTimeout(15000);
-    c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.minifyJs = true;
     c.config.buildEs5 = true;
-    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
+    await c.fs.writeFile(path.join(root, 'src', 'some-fn.ts'), `
+      export function someFn(val: boolean) {
+        if (val) {
+          console.log(true);
+        } else {
+          console.log(false);
+        }
+      }
+    `);
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `
+      import { someFn } from './some-fn';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
+        /** minify me plz **/
+        constructor() {
+          someFn(true);
+        }
+      }
+    `);
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-b.tsx'), `
+      import { someFn } from './some-fn';
+      @Component({ tag: 'cmp-b' }) export class CmpB {
+        /** minify me plz **/
+        constructor() {
+          someFn(true);
+        }
+      }
+    `);
 
     await c.fs.commit();
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const output = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.js'));
-    /*! Built with http://stenciljs.com */
-    expect(output).toContain('App.loadBundle(\"cmp-a\",[\"exports\"],function(e){window.App.h;var n=function(){function e(){}return Object.defineProperty(e,\"is\",{get:function(){return\"cmp-a\"},enumerable:!0,configurable:!0}),e}();e.CmpA=n,Object.defineProperty(e,\"__esModule\",{value:!0})});');
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.js'));
+    expect(cmpA).toContain('Built with http://stenciljs.com');
+    expect(cmpA).toContain('App.loadBundle("cmp-a"');
+    expect(cmpA).toContain('someFn(!0)');
+    expect(cmpA).not.toContain('/** minify me plz **/');
+
+    const cmpB = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-b.es5.js'));
+    expect(cmpB).toContain('Built with http://stenciljs.com');
+    expect(cmpB).toContain('App.loadBundle("cmp-b"');
+    expect(cmpB).toContain('someFn(!0)');
+    expect(cmpB).not.toContain('/** minify me plz **/');
+
+    const chunkFileName = r.filesWritten.find(f => f.includes('chunk') && f.includes('es5'));
+    const chunk = await c.fs.readFile(chunkFileName);
+    expect(chunk).toContain('Built with http://stenciljs.com');
+    expect(chunk).toContain('.someFn=function(');
+    expect(chunk).toContain('console.log(!0)');
   });
 
   it('should minify es2017 build', async () => {
