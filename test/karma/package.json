@@ -14,7 +14,7 @@
     "karma.firefox": "karma start karma.config.js --browsers=Firefox --single-run=false",
     "karma.prod": "npm run tsc && npm run build.app && npm run build.sibling && npm run build.prerender && npm run karma.webpack && karma start karma.config.js",
     "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
-    "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
+    "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "private": true,
   "devDependencies": {
