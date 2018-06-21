@@ -278,10 +278,10 @@ function shouldScanForTsChanges(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx
   if (buildCtx.requiresFullBuild) {
     return true;
   }
-  if (buildCtx.dirsAdded.length > 0) {
+  if (buildCtx.filesAdded.length > 0 || buildCtx.filesDeleted.length > 0) {
     return true;
   }
-  if (buildCtx.dirsDeleted.length > 0) {
+  if (buildCtx.dirsAdded.length > 0 || buildCtx.dirsDeleted.length > 0) {
     return true;
   }
   return false;
