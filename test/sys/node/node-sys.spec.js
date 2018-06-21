@@ -5,7 +5,8 @@ describe('test/sys/node', () => {
   let sys;
 
   beforeAll(() => {
-    sys = new nodeSys.NodeSystem(2);
+    sys = new nodeSys.NodeSystem();
+    sys.initWorkers(2);
   });
 
   afterAll(() => {
