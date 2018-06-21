@@ -10,16 +10,16 @@ const nodeSys = require('../sys/node/index');
 export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystem;
 
 export interface NodeSystemSystemConstructor {
-  new (fs: any, maxConcurrentWorkers: number): StencilSystem;
-  initWorkerFarm(): any;
+  new (fs: any): StencilSystem;
 }
 
 export class TestingSystem extends NodeSystem {
 
   constructor() {
     const fs = new TestingFs();
-    super(fs, 0);
+    super(fs);
     this.createWatcher = null;
+    this.initWorkers(1);
   }
 
   get compiler() {

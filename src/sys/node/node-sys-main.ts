@@ -24,7 +24,7 @@ export class NodeSystem implements d.StencilSystem {
   path: d.Path;
   name = 'node';
 
-  constructor(fs?: d.FileSystem, maxConcurrentWorkers?: number) {
+  constructor(fs?: d.FileSystem) {
     this.fs = fs || new NodeFs();
     this.path = path;
 
@@ -44,20 +44,26 @@ export class NodeSystem implements d.StencilSystem {
     } catch (e) {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
-
-    if (typeof maxConcurrentWorkers !== 'number') {
-      maxConcurrentWorkers = os.cpus().length;
-    }
-
-    this.initWorkerFarm(maxConcurrentWorkers);
   }
 
-  initWorkerFarm(maxConcurrentWorkers: number) {
+  initWorkers(maxConcurrentWorkers: number) {
+    if (this.sysWorker) {
+      return maxConcurrentWorkers;
+    }
     const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
+
+    const availableCpus = os.cpus().length;
+    if (typeof maxConcurrentWorkers === 'number') {
+      maxConcurrentWorkers = Math.max(1, Math.min(availableCpus, maxConcurrentWorkers));
+    } else {
+      maxConcurrentWorkers = availableCpus;
+    }
 
     this.sysWorker = new WorkerFarm(workerModulePath, {
       maxConcurrentWorkers: maxConcurrentWorkers
     });
+
+    return maxConcurrentWorkers;
   }
 
   destroy() {
@@ -238,8 +244,23 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.minimatch(filePath, pattern, opts);
   }
 
-  get platform() {
-    return os.platform();
+  get os() {
+    const operatingSystem: d.OperatingSystem = {
+      cpu: '',
+      cpus: -1,
+      freemem: -1,
+      platform: '',
+      release: ''
+    };
+    try {
+      const cpus = os.cpus();
+      operatingSystem.cpu = cpus[0].model;
+      operatingSystem.cpus = cpus.length;
+      operatingSystem.freemem = os.freemem();
+      operatingSystem.platform = os.platform();
+      operatingSystem.release = os.release();
+    } catch (e) {}
+    return operatingSystem;
   }
 
   resolveModule(fromDir: string, moduleId: string) {

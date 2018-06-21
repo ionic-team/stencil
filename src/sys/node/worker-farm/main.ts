@@ -1,5 +1,4 @@
 import * as d from '../../../declarations';
-import { cpus } from 'os';
 import { createHash } from 'crypto';
 import { ForkOptions, fork } from 'child_process';
 
@@ -354,7 +353,7 @@ const B64_TABLE: { [char: string]: number } = {
 
 
 const DEFAULT_OPTIONS: d.WorkerOptions = {
-  maxConcurrentWorkers: (cpus() || { length: 1 }).length,
+  maxConcurrentWorkers: 1,
   maxConcurrentTasksPerWorker: 5,
   maxTaskTime: 120000,
   forcedKillTime: 100

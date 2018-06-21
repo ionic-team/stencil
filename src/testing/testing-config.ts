@@ -22,6 +22,7 @@ export class TestingConfig implements d.Config {
   outputTargets: d.OutputTarget[];
   buildEs5: boolean;
   hashFileNames: boolean;
+  maxConcurrentWorkers = 1;
   minifyCss: boolean;
   minifyJs: boolean;
 }
