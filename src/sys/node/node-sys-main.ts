@@ -22,7 +22,6 @@ export class NodeSystem implements d.StencilSystem {
 
   fs: d.FileSystem;
   path: d.Path;
-  name = 'node';
 
   constructor(fs?: d.FileSystem) {
     this.fs = fs || new NodeFs();
@@ -244,23 +243,26 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.minimatch(filePath, pattern, opts);
   }
 
-  get os() {
-    const operatingSystem: d.OperatingSystem = {
-      cpu: '',
+  get details() {
+    const details: d.SystemDetails = {
+      cpuModel: '',
       cpus: -1,
       freemem: -1,
       platform: '',
-      release: ''
+      release: '',
+      runtime: 'node',
+      runtimeVersion: ''
     };
     try {
       const cpus = os.cpus();
-      operatingSystem.cpu = cpus[0].model;
-      operatingSystem.cpus = cpus.length;
-      operatingSystem.freemem = os.freemem();
-      operatingSystem.platform = os.platform();
-      operatingSystem.release = os.release();
+      details.cpuModel = cpus[0].model;
+      details.cpus = cpus.length;
+      details.freemem = os.freemem();
+      details.platform = os.platform();
+      details.release = os.release();
+      details.runtimeVersion = process.version;
     } catch (e) {}
-    return operatingSystem;
+    return details;
   }
 
   resolveModule(fromDir: string, moduleId: string) {
@@ -320,10 +322,6 @@ export class NodeSystem implements d.StencilSystem {
 
   async transpileToEs5(cwd: string, input: string) {
     return this.sysWorker.run('transpileToEs5', [cwd, input]);
-  }
-
-  tmpdir() {
-    return path.join(os.tmpdir(), `stencil-${this.packageJsonData.version}-__BUILDID__`);
   }
 
   get url() {

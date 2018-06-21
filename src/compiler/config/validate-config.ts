@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateCopy } from './validate-copy';
@@ -9,7 +9,7 @@ import { validatePlugins } from './validate-plugins';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
-export function validateConfig(config: Config, setEnvVariables?: boolean) {
+export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -129,7 +129,7 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
 }
 
 
-export function setProcessEnvironment(config: Config) {
+export function setProcessEnvironment(config: d.Config) {
   process.env.NODE_ENV = config.devMode ? 'development' : 'production';
 }
 

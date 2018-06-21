@@ -47,7 +47,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
   let cacheKey: string;
 
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyJs', opts, jsText);
+    cacheKey = compilerCtx.cache.createKey('minifyJs', '__BUILDID:MINIFYJS__', opts, jsText);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return {

@@ -20,7 +20,12 @@ export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   // reusable data between builds
   compilerCtx = compilerCtx || {};
   compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys);
-  compilerCtx.cache = compilerCtx.cache || new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys), config.sys.tmpdir());
+
+  if (!compilerCtx.cache) {
+    compilerCtx.cache = new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys));
+    compilerCtx.cache.initCacheDir();
+  }
+
   compilerCtx.events = compilerCtx.events || new BuildEvents();
   compilerCtx.appFiles = compilerCtx.appFiles || {};
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};

@@ -36,6 +36,11 @@ export function validatePaths(config: Config) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
+  setStringConfig(config, 'cacheDir', DEFAULT_CACHE_DIR);
+  if (!path.isAbsolute(config.cacheDir)) {
+    config.cacheDir = normalizePath(path.join(config.rootDir, config.cacheDir));
+  }
+
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
   if (!path.isAbsolute(config.tsconfig)) {
     config.tsconfig = normalizePath(path.join(config.rootDir, config.tsconfig));
@@ -56,7 +61,8 @@ export function validatePaths(config: Config) {
 }
 
 
+const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
+const DEFAULT_CACHE_DIR = '.stencil';
 const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_TSCONFIG = 'tsconfig.json';
-const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';

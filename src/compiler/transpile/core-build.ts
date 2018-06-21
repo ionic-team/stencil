@@ -12,7 +12,7 @@ export async function transpileCoreBuild(config: d.Config, compilerCtx: d.Compil
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('transpileCoreBuild', coreBuild, input);
+    cacheKey = compilerCtx.cache.createKey('transpileCoreBuild', '__BUILDID:TRANSPILE__', coreBuild, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       results.code = cachedContent;

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 
 
 export async function transpileToEs5Main(config: d.Config, compilerCtx: d.CompilerCtx, input: string) {
-  const cacheKey = compilerCtx.cache.createKey('transpileToEs5', input);
+  const cacheKey = compilerCtx.cache.createKey('transpileToEs5', '__BUILDID:TRANSPILE__', input);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     const results: d.TranspileResults = {

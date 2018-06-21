@@ -8,7 +8,7 @@ const transpile = require('./transpile');
 const ROOT_DIR = path.join(__dirname, '..');
 const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
 
-let buildId = process.argv.find(a => a.startsWith('--build-id='));
+let buildId = process.argv.find(a => a.startsWith('--build-id=')) || '';
 buildId = buildId.replace('--build-id=', '');
 
 const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));

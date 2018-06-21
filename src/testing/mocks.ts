@@ -125,7 +125,10 @@ export function mockCache() {
   const fs = new InMemoryFileSystem(mockFs(), { path: require('path') } as any);
   const config = mockConfig();
   config.enableCache = true;
-  return new Cache(config, fs, '/tmp/mock-cache');
+
+  const cache = new Cache(config, fs);
+  cache.initCacheDir();
+  return cache;
 }
 
 

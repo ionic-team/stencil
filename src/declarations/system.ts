@@ -13,6 +13,7 @@ export interface StencilSystem {
   createDom?(): CreateDom;
   createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   destroy?(): void;
+  details?: SystemDetails;
   fs?: d.FileSystem;
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
@@ -35,8 +36,6 @@ export interface StencilSystem {
     diagnostics?: d.Diagnostic[];
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
-  name: string;
-  os?: OperatingSystem;
   path?: Path;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
@@ -52,7 +51,6 @@ export interface StencilSystem {
     lt: (a: string, b: string, loose?: boolean) => boolean;
     lte: (a: string, b: string, loose?: boolean) => boolean;
   };
-  tmpdir?(): string;
   transpileToEs5?(cwd: string, input: string): Promise<d.TranspileResults>;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -68,11 +66,13 @@ export interface StencilSystem {
 }
 
 
-export interface OperatingSystem {
-  cpu: string;
+export interface SystemDetails {
+  cpuModel: string;
   cpus: number;
   freemem: number;
   platform: string;
+  runtime: string;
+  runtimeVersion: string;
   release: string;
 }
 

@@ -74,7 +74,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyCore', opts, input);
+    cacheKey = compilerCtx.cache.createKey('minifyCore', '__BUILDID__', opts, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return {

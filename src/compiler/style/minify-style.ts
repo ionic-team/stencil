@@ -25,7 +25,7 @@ export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, 
   let cacheKey: string = null;
   if (!hasCssImport) {
     // only can use cache if there's no @import
-    cacheKey = compilerCtx.cache.createKey('minifyStyle', styleText, opts);
+    cacheKey = compilerCtx.cache.createKey('minifyStyle', '__BUILDID:MINIFYSTYLE__', styleText, opts);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
 
     if (cachedContent != null) {

@@ -8,6 +8,7 @@ export interface Config {
   buildEs5?: boolean;
   buildLogFilePath?: string;
   bundles?: ConfigBundle[];
+  cacheDir?: string;
   commonjs?: BundlingConfig;
   cwd?: string;
   nodeResolve?: NodeResolveConfig;

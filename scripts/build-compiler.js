@@ -12,8 +12,9 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
 const DECLARATIONS_DST_DIR = path.join(__dirname, '..', 'dist', 'declarations');
 
-let buildId = process.argv.find(a => a.startsWith('--build-id='));
+let buildId = process.argv.find(a => a.startsWith('--build-id=')) || '';
 buildId = buildId.replace('--build-id=', '');
+
 
 const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
@@ -61,8 +62,8 @@ if (success) {
 
       }).then(output => {
         try {
-          let outputText = output.code;
-          outputText = outputText.replace(/__BUILDID__/g, buildId);
+          let outputText = updateBuildIds(buildId, output.code);
+
           fs.ensureDirSync(path.dirname(DEST_FILE));
           fs.writeFileSync(DEST_FILE, outputText);
 
@@ -92,4 +93,36 @@ if (success) {
     fs.removeSync(TRANSPILED_DIR);
   });
 
+}
+
+
+function updateBuildIds(buildId, input) {
+  // __BUILDID__
+  // __BUILDID:TRANSPILE__
+  // __BUILDID:MINIFYSTYLE__
+  // __BUILDID:MINIFYJS__
+  // __BUILDID:AUTOPREFIXCSS__
+
+  let output = input;
+
+  output = output.replace(/__BUILDID__/g, buildId);
+
+  let tsPkg = require('../node_modules/typescript/package.json');
+  let transpileId = tsPkg.name + tsPkg.version;
+  output = output.replace(/__BUILDID:TRANSPILE__/g, transpileId);
+
+  let cleanCssPkg = require('../node_modules/clean-css/package.json');
+  let minifyStyleId = cleanCssPkg.name + cleanCssPkg.version;
+  output = output.replace(/__BUILDID:MINIFYSTYLE__/g, minifyStyleId);
+
+  let uglifyPkg = require('../node_modules/uglify-es/package.json');
+  let minifyJsId = uglifyPkg.name + uglifyPkg.version;
+  output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
+
+  let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
+  let postcssPkg = require('../node_modules/postcss/package.json');
+  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version;
+  output = output.replace(/__BUILDID:AUTOPREFIXCSS__/g, autoPrefixerId);
+
+  return output;
 }

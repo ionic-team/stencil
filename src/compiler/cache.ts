@@ -5,13 +5,28 @@ export class Cache implements d.Cache {
   private failed = 0;
   private skip = false;
 
-  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem, private tmpDir: string) {
-    if (config.enableCache) {
-      config.logger.debug(`cache enabled, tmpdir: ${tmpDir}`);
+  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem) {}
 
-    } else {
-      config.logger.debug(`cache disabled, empty tmpdir: ${tmpDir}`);
+  async initCacheDir() {
+    if (this.config._isTesting) {
+      return;
+    }
+
+    if (!this.config.enableCache) {
+      this.config.logger.debug(`cache disabled, cacheDir: ${this.config.cacheDir}`);
       this.clearDiskCache();
+      return;
+    }
+
+    this.config.logger.debug(`cache enabled, cacheDir: ${this.config.cacheDir}`);
+
+    try {
+      const readmeFilePath = this.config.sys.path.join(this.config.cacheDir, '_README.log');
+      await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
+
+    } catch (e) {
+      this.config.logger.error(`Cache, initCacheDir: ${e}`);
+      this.config.enableCache = false;
     }
   }
 
@@ -80,12 +95,12 @@ export class Cache implements d.Cache {
   }
 
   async clearDiskCache() {
-    await this.cacheFs.emptyDir(this.tmpDir);
+    await this.cacheFs.remove(this.config.cacheDir);
     await this.cacheFs.commit();
   }
 
   private getCacheFilePath(key: string) {
-    return this.config.sys.path.join(this.tmpDir, key);
+    return this.config.sys.path.join(this.config.cacheDir, key) + '.log';
   }
 
   getMemoryStats() {
@@ -95,4 +110,15 @@ export class Cache implements d.Cache {
 }
 
 
-const MAX_FAILED = 20;
+const MAX_FAILED = 100;
+
+
+const CACHE_DIR_README = `# Stencil Cache Directory
+
+This directory contains files which the compiler has
+cached for faster builds. To disable caching, please set
+"enableCache: false" within the stencil.config.js file.
+
+To change the cache directory, please update the
+"cacheDir" property within the stencil.config.js file.
+`;

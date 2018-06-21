@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { generateGlobalStyles } from './global-styles';
@@ -200,7 +201,7 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
   // auto add css prefixes
   const autoprefixConfig = config.autoprefixCss;
   if (autoprefixConfig !== false) {
-    styleMeta.compiledStyleText = await config.sys.autoprefixCss(styleMeta.compiledStyleText, autoprefixConfig);
+    styleMeta.compiledStyleText = await autoprefixCssMain(config, compilerCtx, styleMeta.compiledStyleText, autoprefixConfig);
   }
 
   let filePath: string = null;

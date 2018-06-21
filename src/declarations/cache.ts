@@ -8,4 +8,5 @@ export interface Cache {
   clear(): void;
   clearDiskCache(): Promise<void>;
   getMemoryStats(): string;
+  initCacheDir(): Promise<void>;
 }
