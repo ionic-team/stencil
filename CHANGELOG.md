@@ -1,3 +1,22 @@
+<a name="0.9.11"></a>
+## 🏙 [0.9.11](https://github.com/ionic-team/stencil/compare/v0.9.10...v0.9.11) (2018-06-21)
+
+
+### Bug Fixes
+
+* **build:** fix file renaming/deleting during watch builds ([e5aa212](https://github.com/ionic-team/stencil/commit/e5aa212)), closes [#754](https://github.com/ionic-team/stencil/issues/754)
+* **minify:** ensure es5 chunks are minified ([4f3eecd](https://github.com/ionic-team/stencil/commit/4f3eecd)), closes [#794](https://github.com/ionic-team/stencil/issues/794)
+* **slot:** only update shadowRoot for host elm patch ([2fddcbd](https://github.com/ionic-team/stencil/commit/2fddcbd))
+* **ssr:** do not leave worker processes hanging during ssr ([bfe666b](https://github.com/ionic-team/stencil/commit/bfe666b)), closes [#856](https://github.com/ionic-team/stencil/issues/856)
+
+
+### Performance Improvements
+
+* **build:** move es5 transpile to workers ([dc6c986](https://github.com/ionic-team/stencil/commit/dc6c986))
+* **cache:** improve build times w/ consistent cache dir between releases ([82373cc](https://github.com/ionic-team/stencil/commit/82373cc))
+
+
+
 <a name="0.9.10"></a>
 ## 🐼 [0.9.10](https://github.com/ionic-team/stencil/compare/v0.9.9...v0.9.10) (2018-06-20)
 
