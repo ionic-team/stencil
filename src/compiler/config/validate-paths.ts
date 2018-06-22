@@ -6,14 +6,11 @@ import { setStringConfig } from './config-utils';
 export function validatePaths(config: Config) {
   const path = config.sys.path;
 
-  if (typeof (config as any).global === 'string') {
-    // deprecated: 2017-12-12
-    config.logger.warn(`stencil config property "global" has been renamed to "globalScript"`);
-    config.globalScript = (config as any).global;
-  }
-
   if (typeof config.globalScript === 'string' && !path.isAbsolute(config.globalScript)) {
-    config.globalScript = normalizePath(path.join(config.rootDir, config.globalScript));
+    if (!path.isAbsolute(config.globalScript)) {
+      config.globalScript = path.join(config.rootDir, config.globalScript);
+    }
+    config.globalScript = normalizePath(config.globalScript);
   }
 
   if (Array.isArray(config.globalStyle)) {
@@ -33,29 +30,34 @@ export function validatePaths(config: Config) {
 
   setStringConfig(config, 'srcDir', DEFAULT_SRC_DIR);
   if (!path.isAbsolute(config.srcDir)) {
-    config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
+    config.srcDir = path.join(config.rootDir, config.srcDir);
   }
+  config.srcDir = normalizePath(config.srcDir);
 
   setStringConfig(config, 'cacheDir', DEFAULT_CACHE_DIR);
   if (!path.isAbsolute(config.cacheDir)) {
-    config.cacheDir = normalizePath(path.join(config.rootDir, config.cacheDir));
+    config.cacheDir = path.join(config.rootDir, config.cacheDir);
   }
+  config.cacheDir = normalizePath(config.cacheDir);
 
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
   if (!path.isAbsolute(config.tsconfig)) {
-    config.tsconfig = normalizePath(path.join(config.rootDir, config.tsconfig));
+    config.tsconfig = path.join(config.rootDir, config.tsconfig);
   }
+  config.tsconfig = normalizePath(config.tsconfig);
 
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.srcIndexHtml)) {
-    config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
+    config.srcIndexHtml = path.join(config.rootDir, config.srcIndexHtml);
   }
+  config.srcIndexHtml = normalizePath(config.srcIndexHtml);
 
   if (config.writeLog) {
     setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
     if (!path.isAbsolute(config.buildLogFilePath)) {
-      config.buildLogFilePath = normalizePath(path.join(config.rootDir, config.buildLogFilePath));
+      config.buildLogFilePath = path.join(config.rootDir, config.buildLogFilePath);
     }
+    config.buildLogFilePath = normalizePath(config.buildLogFilePath);
     config.logger.buildLogFilePath = config.buildLogFilePath;
   }
 }
