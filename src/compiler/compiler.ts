@@ -48,7 +48,7 @@ export class Compiler {
     return build(this.config, this.ctx, buildCtx);
   }
 
-  on(eventName: 'build', cb: (watchResults: d.WatchResults) => void): Function;
+  on(eventName: 'build', cb: (watchResults?: d.WatchResults) => void): Function;
   on(eventName: 'buildStart', cb: () => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;

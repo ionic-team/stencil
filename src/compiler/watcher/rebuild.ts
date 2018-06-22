@@ -19,7 +19,10 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
   // figure out what type of changes this watch build has from the changed file extension
   watchResults.hasScriptChanges = watchResults.changedExtensions.some(ext => SCRIPT_EXT.includes(ext));
   watchResults.hasStyleChanges = watchResults.changedExtensions.some(ext => STYLE_EXT.includes(ext));
-  watchResults.hasImageChanges = watchResults.changedExtensions.some(ext => IMAGE_EXT.includes(ext));
+
+  watchResults.hasIndexHtmlChanges = watchResults.filesChanged.some(fileChanged => {
+    return fileChanged === config.srcIndexHtml;
+  });
 
   // print out a pretty message about the changed files
   printWatcherMessage(config, watchResults);
@@ -35,7 +38,6 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
 
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
 const STYLE_EXT = ['css', 'scss', 'pcss', 'styl', 'stylus', 'less'];
-const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico', 'svg'];
 
 
 function printWatcherMessage(config: Config, watcherResults: WatchResults) {

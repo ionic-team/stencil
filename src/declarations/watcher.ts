@@ -12,6 +12,7 @@ export interface WatchResults {
   filesUpdated: string[];
   filesAdded: string[];
   filesDeleted: string[];
+  hasIndexHtmlChanges: boolean;
 
   /**
    * Changed files include files that are in copy tasks
@@ -32,11 +33,6 @@ export interface WatchResults {
    * Changes to css/sass/less/pcss/styl files
    */
   hasStyleChanges: boolean;
-
-  /**
-   * Changes to png/jpg/gif files
-   */
-  hasImageChanges: boolean;
 
   /**
    * Change to stencil.config.js

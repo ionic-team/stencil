@@ -25,7 +25,7 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  if (compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) {
+  if (compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0 && !buildCtx.hasIndexHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }

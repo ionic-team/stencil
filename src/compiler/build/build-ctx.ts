@@ -20,7 +20,6 @@ export class BuildContext implements d.BuildCtx {
   dirsDeleted: string[] = [];
   entryModules: d.EntryModule[] = [];
   entryPoints: d.EntryPoint[] = [];
-  externalStylesUpdated: string[] = [];
   filesAdded: string[] = [];
   filesChanged: string[] = [];
   filesDeleted: string[] = [];
@@ -30,7 +29,7 @@ export class BuildContext implements d.BuildCtx {
   graphData: d.GraphData = null;
   hasCopyChanges = false;
   hasFinished = false;
-  hasImageChanges = false;
+  hasIndexHtmlChanges = false;
   hasScriptChanges = true;
   hasSlot: boolean = null;
   hasStyleChanges = true;
@@ -78,9 +77,9 @@ export class BuildContext implements d.BuildCtx {
 
     if (watchResults != null) {
       this.hasCopyChanges = watchResults.hasCopyChanges;
-      this.hasImageChanges = watchResults.hasImageChanges;
       this.hasScriptChanges = watchResults.hasScriptChanges;
       this.hasStyleChanges = watchResults.hasStyleChanges;
+      this.hasIndexHtmlChanges = watchResults.hasIndexHtmlChanges;
 
       this.filesChanged.push(...watchResults.filesChanged);
       this.filesUpdated.push(...watchResults.filesUpdated);

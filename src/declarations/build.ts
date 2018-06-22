@@ -16,7 +16,6 @@ export interface BuildCtx {
   dirsDeleted: string[];
   entryModules: d.EntryModule[];
   entryPoints: d.EntryPoint[];
-  externalStylesUpdated: string[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
@@ -27,7 +26,7 @@ export interface BuildCtx {
   graphData: GraphData;
   hasCopyChanges: boolean;
   hasFinished: boolean;
-  hasImageChanges: boolean;
+  hasIndexHtmlChanges: boolean;
   hasScriptChanges: boolean;
   hasSlot: boolean;
   hasStyleChanges: boolean;
