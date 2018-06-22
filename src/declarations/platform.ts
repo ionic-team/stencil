@@ -14,7 +14,7 @@ export interface PlatformApi {
   isDefinedComponent?: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  requestBundle: (cmpMeta: d.ComponentMeta, elm: d.HostElement, hostSnapshot: d.HostSnapshot) => void;
+  requestBundle: (cmpMeta: d.ComponentMeta, elm: d.HostElement) => void;
   onAppLoad?: (rootElm: d.HostElement, styles: string[], failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded?: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;

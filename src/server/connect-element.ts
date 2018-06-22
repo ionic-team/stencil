@@ -39,9 +39,11 @@ export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppG
 
 
 function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta) {
+  const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
+  plt.hostSnapshotMap.set(elm, hostSnapshot);
+
   if (!cmpMeta.componentConstructor) {
-    const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
-    plt.requestBundle(cmpMeta, elm, hostSnapshot);
+    plt.requestBundle(cmpMeta, elm);
   }
 
   if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {

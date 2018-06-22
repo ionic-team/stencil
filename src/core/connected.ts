@@ -42,10 +42,12 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
     // ensure the "mode" attribute has been added to the element
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
-    plt.queue.tick(() =>
+    plt.queue.tick(() => {
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.requestBundle(cmpMeta, elm, initHostSnapshot(plt.domApi, cmpMeta, elm)));
+      plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
+      plt.requestBundle(cmpMeta, elm);
+    });
   }
 }
 

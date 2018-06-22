@@ -239,9 +239,7 @@ export function createPlatformServer(
 
 
   // This is executed by the component's connected callback.
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hostSnapshot: d.HostSnapshot) {
-    // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
-    plt.hostSnapshotMap.set(elm, hostSnapshot);
+  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
 
     // set the "mode" property
     if (!elm.mode) {
