@@ -95,8 +95,10 @@ export class Cache implements d.Cache {
   }
 
   async clearDiskCache() {
-    await this.cacheFs.remove(this.config.cacheDir);
-    await this.cacheFs.commit();
+    if (await this.cacheFs.access(this.config.cacheDir)) {
+      await this.cacheFs.remove(this.config.cacheDir);
+      await this.cacheFs.commit();
+    }
   }
 
   private getCacheFilePath(key: string) {
