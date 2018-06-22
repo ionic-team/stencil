@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { normalizePath } from '../../util';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
 
@@ -25,18 +26,18 @@ describe('validatePaths', () => {
   it('should set absolute cacheDir', () => {
     config.cacheDir = path.join(ROOT, 'some', 'custom', 'cache');
     validateConfig(config);
-    expect(config.cacheDir).toBe(path.join(ROOT, 'some', 'custom', 'cache'));
+    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'some', 'custom', 'cache')));
   });
 
   it('should set relative cacheDir', () => {
     config.cacheDir = 'custom-cache';
     validateConfig(config);
-    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', 'custom-cache'));
+    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'User', 'my-app', 'custom-cache')));
   });
 
   it('should set default cacheDir', () => {
     validateConfig(config);
-    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', '.stencil'));
+    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'User', 'my-app', '.stencil')));
   });
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
