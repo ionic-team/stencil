@@ -29,6 +29,7 @@ export async function setBuildConditionals(
   coreBuild.hasSvg = !!buildCtx.hasSvg;
 
   coreBuild.devInspector = config.devInspector;
+  coreBuild.hotModuleReplacement = config.devMode;
   coreBuild.verboseError = config.devMode;
 
   const promises: Promise<void>[] = [];

@@ -70,6 +70,7 @@ export interface ComponentMeta {
   componentClass?: string;
   dependencies?: ComponentDependencies;
   jsdoc?: JSDoc;
+  hmrUrl?: string;
 }
 
 
@@ -321,6 +322,11 @@ export interface HostElement extends HTMLElement {
    * (deprecated $initLoad)
    */
   ['s-init']?: () => void;
+
+  /**
+   * Hot Module Replacement, dev mode only
+   */
+  ['s-hmr']?: (versionId: string) => void;
 
   componentOnReady?: () => Promise<this>;
   color?: string;

@@ -73,6 +73,22 @@ export interface BuildResults {
 }
 
 
+export interface HotModuleReplacement {
+  componentsUpdated?: string[];
+  externalStylesUpdated?: string[];
+  imagesUpdated?: string[];
+  indexHtmlUpdated?: boolean;
+  inlineStylesUpdated?: HmrStylesUpdate;
+  versionId?: string;
+  windowReload?: boolean;
+}
+
+
+export interface HmrStylesUpdate {
+  [styleId: string]: string;
+}
+
+
 export interface BuildStartData {
   buildId: number;
   isRebuild: boolean;

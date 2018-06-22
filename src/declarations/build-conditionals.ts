@@ -13,6 +13,7 @@ export interface BuildConditionals {
   isDev: boolean;
   isProd: boolean;
   devInspector: boolean;
+  hotModuleReplacement: boolean;
   verboseError: boolean;
 
   // ssr

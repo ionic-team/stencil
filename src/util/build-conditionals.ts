@@ -8,6 +8,7 @@ export const Build: BuildConditionals = {
   ssrServerSide: true,
 
   devInspector: true,
+  hotModuleReplacement: true,
   verboseError: true,
 
   styles: true,

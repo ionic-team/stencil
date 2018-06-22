@@ -3,6 +3,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { Build } from '../util/build-conditionals';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
+import { hotModuleReplacement } from './hot-module-replacement';
 import { initComponentLoaded } from './init-component-instance';
 import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
@@ -39,6 +40,12 @@ export function initHostElement(
   HostElementConstructor['s-init'] = function() {
     initComponentLoaded(plt, (this as d.HostElement), hydratedCssClass);
   };
+
+  if (Build.hotModuleReplacement) {
+    HostElementConstructor['s-hmr'] = function(versionId: string) {
+      hotModuleReplacement(plt, (this as d.HostElement), versionId);
+    };
+  }
 
   HostElementConstructor.forceUpdate = function() {
     queueUpdate(plt, (this as d.HostElement));

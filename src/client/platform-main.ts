@@ -190,6 +190,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
       const url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
 
+      if (Build.hotModuleReplacement) {
+        cmpMeta.hmrUrl = url;
+      }
+
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {
         // async loading of the module is done
