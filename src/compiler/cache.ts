@@ -13,7 +13,7 @@ export class Cache implements d.Cache {
     }
 
     if (!this.config.enableCache) {
-      this.config.logger.debug(`cache disabled, cacheDir: ${this.config.cacheDir}`);
+      this.config.logger.info(`cache optimizations disabled`);
       this.clearDiskCache();
       return;
     }
