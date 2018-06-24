@@ -1,0 +1,228 @@
+#dev-server-modal * {
+  box-sizing: border-box;
+}
+
+#dev-server-modal {
+  direction: ltr;
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100000;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  text-size-adjust: none;
+  word-wrap: break-word;
+  color: #333;
+  background-color: white;
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: auto;
+}
+
+#dev-server-modal-inner {
+  position: relative;
+  padding: 0 0 30px 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dev-server-diagnostic {
+  margin: 20px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.dev-server-diagnostic-masthead {
+  padding: 8px 12px 12px 12px;
+}
+
+.dev-server-diagnostic-title {
+  margin: 0;
+  font-weight: bold;
+  color: #222;
+}
+
+.dev-server-diagnostic-message {
+  margin-top: 4px;
+  color: #666;
+}
+
+.dev-server-diagnostic-file {
+  position: relative;
+  border-top: 1px solid #ddd;
+  overflow: scroll;
+}
+
+.dev-server-diagnostic-file-header {
+  padding: 5px 10px;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  background-color: #f8f8f8;
+}
+
+.dev-server-diagnostic-file-name {
+  font-weight: bold;
+}
+
+.dev-server-diagnostic-blob {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.dev-server-diagnostic-table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  -moz-tab-size: 2;
+  tab-size: 2;
+}
+
+.dev-server-diagnostic-table td,
+.dev-server-diagnostic-table th {
+  padding: 0;
+}
+
+td.dev-server-diagnostic-blob-num {
+  padding-right: 10px;
+  padding-left: 10px;
+  width: 1%;
+  min-width: 50px;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.3);
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: top;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: solid #eee;
+  border-width: 0 1px 0 0;
+}
+
+td.dev-server-diagnostic-blob-num::before {
+  content: attr(data-line-number);
+}
+
+.dev-server-diagnostic-error-line td.dev-server-diagnostic-blob-num {
+  background-color: #ffdddd;
+  border-color: #ffc9c9;
+}
+
+.dev-server-diagnostic-error-line td.dev-server-diagnostic-blob-code {
+  background: rgba(255, 221, 221, 0.25);
+  z-index: -1;
+}
+
+td.dev-server-diagnostic-blob-code {
+  position: relative;
+  padding-right: 10px;
+  padding-left: 10px;
+  line-height: 20px;
+  vertical-align: top;
+  overflow: visible;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+  color: #333;
+  word-wrap: normal;
+  white-space: pre;
+}
+
+td.dev-server-diagnostic-blob-code::before {
+  content: "";
+}
+
+.dev-server-diagnostic-error-chr {
+  position: relative;
+}
+
+.dev-server-diagnostic-error-chr::before {
+  position: absolute;
+  z-index: -1;
+  top: -3px;
+  left: 0px;
+  width: 8px;
+  height: 20px;
+  background-color: #ffdddd;
+  content: "";
+}
+
+/**
+ * GitHub Gist Theme
+ * Author : Louis Barranqueiro - https://github.com/LouisBarranqueiro
+ * https://highlightjs.org/
+ */
+.hljs-comment,
+.hljs-meta {
+  color: #969896;
+}
+
+.hljs-string,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-strong,
+.hljs-emphasis,
+.hljs-quote {
+  color: #df5000;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-type {
+  color: #a71d5d;
+}
+
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-attribute {
+  color: #0086b3;
+}
+
+.hljs-section,
+.hljs-name {
+  color: #63a35c;
+}
+
+.hljs-tag {
+  color: #333333;
+}
+
+.hljs-title,
+.hljs-attr,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #795da3;
+}
+
+.hljs-addition {
+  color: #55a532;
+  background-color: #eaffea;
+}
+
+.hljs-deletion {
+  color: #bd2c00;
+  background-color: #ffecec;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}

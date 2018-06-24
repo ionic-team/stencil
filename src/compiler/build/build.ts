@@ -17,10 +17,11 @@ import { writeBuildFiles } from './write-build';
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
-    // create an initial index.html file if one doesn't already exist
-    // this is synchronous on purpose
-    await initIndexHtmls(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort()) return buildCtx.finish();
+    if (!config.devServer || !config.flags.serve) {
+      // create an initial index.html file if one doesn't already exist
+      await initIndexHtmls(config, compilerCtx, buildCtx);
+      if (buildCtx.shouldAbort()) return buildCtx.finish();
+    }
 
     // empty the directories on the first build
     await emptyOutputTargetDirs(config, compilerCtx, buildCtx);

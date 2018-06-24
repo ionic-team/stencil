@@ -11,6 +11,7 @@ export * from './config';
 export * from './copy';
 export * from './decorators';
 export * from './dev-inspector';
+export * from './dev-server';
 export * from './diagnostics';
 export * from './docs';
 export * from './dom';

@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { genereateHmr } from './build-hmr';
 import { hasError, normalizePath } from '../util';
 
 
@@ -34,6 +35,11 @@ export async function generateBuildResults(config: d.Config, compilerCtx: d.Comp
       return getEntryModule(config, buildCtx, getGzipSize, en);
     }))
   };
+
+  const hmr = genereateHmr(config, compilerCtx, buildCtx);
+  if (hmr) {
+    buildResults.hmr = hmr;
+  }
 
   buildResults.entries.forEach(en => {
     buildResults.components.push(...en.components);

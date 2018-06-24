@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>{{title}}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        padding: 20px 60px;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        font-size: 14px;
+        background: #f3f3f3;
+      }
+      h1 {
+        margin-bottom: 15px;
+        font-size: 18px;
+        color: #343434;
+      }
+      h1 span {
+        padding: 0 6px;
+        font-weight: normal;
+        color: #9e9b9b;
+      }
+      a {
+        color: #555;
+        text-decoration: none;
+      }
+      a:hover {
+        color: #303030;
+      }
+      ul {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      li {
+        list-style: none;
+        float: left;
+        width: 30%;
+        line-height: 25px;
+        margin: 1px;
+      }
+      li a {
+        display: block;
+        height: 28px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      li a:focus,
+      li a:hover {
+        background: rgba(255,255,255,0.65);
+        border: 1px solid #ececec;
+      }
+      li a span {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-indent: 10px;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          font-size: 13px;
+          line-height: 16px;
+          padding: 0;
+        }
+        h1 {
+          font-size: 2em;
+          line-height: 1.5em;
+          color: #fff;
+          background: #000;
+          padding: 15px 10px;
+          margin: 0;
+        }
+        ul {
+          border-top: 1px solid #cacaca;
+        }
+        li {
+          float: none;
+          width: auto !important;
+          display: block;
+          border-bottom: 1px solid #cacaca;
+          font-size: 2em;
+          line-height: 1.2em;
+          text-indent: 0;
+          margin: 0;
+        }
+        li:nth-child(odd) {
+          background: #e0e0e0;
+        }
+        li a {
+          height: auto;
+          border: 0;
+          border-radius: 0;
+          padding: 15px 10px;
+        }
+        li a:focus,
+        li a:hover {
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{{nav}}</h1>
+      <ul>{{files}}
+      </ul>
+    </main>
+  </body>
+</html>

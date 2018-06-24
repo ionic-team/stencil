@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateCopy } from './validate-copy';
+import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
@@ -91,6 +92,8 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   validatePlugins(config);
 
   validateAssetVerioning(config);
+
+  validateDevServer(config);
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;

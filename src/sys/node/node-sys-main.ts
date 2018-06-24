@@ -19,6 +19,7 @@ export class NodeSystem implements d.StencilSystem {
   private sysWorker: WorkerFarm;
   private typescriptPackageJson: d.PackageJsonData;
   private resolveModuleCache: { [cacheKey: string]: string } = {};
+  private destroys: Function[] = [];
 
   fs: d.FileSystem;
   path: d.Path;
@@ -62,13 +63,24 @@ export class NodeSystem implements d.StencilSystem {
       maxConcurrentWorkers: maxConcurrentWorkers
     });
 
+    this.addDestroy(() => {
+      if (this.sysWorker && this.sysWorker.destroy) {
+        this.sysWorker.destroy();
+      }
+    });
+
     return maxConcurrentWorkers;
   }
 
   destroy() {
-    if (this.sysWorker && this.sysWorker.destroy) {
-      this.sysWorker.destroy();
-    }
+    this.destroys.forEach(destroyFn => {
+      destroyFn();
+    });
+    this.destroys.length = 0;
+  }
+
+  addDestroy(fn: Function) {
+    this.destroys.push(fn);
   }
 
   get compiler() {
@@ -241,6 +253,10 @@ export class NodeSystem implements d.StencilSystem {
 
   minimatch(filePath: string, pattern: string, opts: any) {
     return this.sysUtil.minimatch(filePath, pattern, opts);
+  }
+
+  open(p: string) {
+    return this.sysUtil.opn(p);
   }
 
   get details() {

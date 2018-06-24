@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const webpack = require('webpack');
 const rollup = require('rollup');
+const glob = require('glob');
 const transpile = require('./transpile');
 
 
@@ -14,6 +15,8 @@ buildId = buildId.replace('--build-id=', '');
 const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
 const whitelist = [
+  'child_process',
+  'os',
   'typescript',
   'uglify-es'
 ];
@@ -128,6 +131,20 @@ if (success) {
   }
 
   bundleNodeSysMain();
+
+
+  // copy opn's xdg-open file
+  const xdgOpenSrcPath = glob.sync('xdg-open', {
+    cwd: path.join(__dirname, '..', 'node_modules', 'opn'),
+    absolute: true
+  });
+  if (xdgOpenSrcPath.length !== 1) {
+    throw new Error(`build-sys-node cannot find xdg-open`);
+  }
+
+  const xdgOpenDestPath = path.join(__dirname, '..', 'dist', 'sys', 'node', 'xdg-open');
+  fs.copySync(xdgOpenSrcPath[0], xdgOpenDestPath);
+
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);

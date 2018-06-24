@@ -67,6 +67,7 @@ export interface BuildResults {
   hasSuccessfulBuild: boolean;
   hasSlot: boolean;
   hasSvg: boolean;
+  hmr?: HotModuleReplacement;
   isRebuild: boolean;
   styleBuildCount: number;
   transpileBuildCount: number;

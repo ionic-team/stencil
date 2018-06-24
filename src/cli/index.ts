@@ -68,7 +68,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
 
   } catch (e) {
     if (e !== WORKER_EXITED_MSG) {
-      config.logger.error('uncaught cli error: ' + e);
+      config.logger.error(`uncaught cli error: ${e}`);
       process.exit(1);
     }
   }

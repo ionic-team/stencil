@@ -16,6 +16,7 @@ export interface Config {
   copy?: d.CopyTask[];
   devInspector?: boolean;
   devMode?: boolean;
+  devServer?: d.DevServerConfig;
   enableCache?: boolean;
   excludeSrc?: string[];
   flags?: ConfigFlags;

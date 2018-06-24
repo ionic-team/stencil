@@ -4,6 +4,7 @@ import { BuildContext } from './build/build-ctx';
 import { catchError } from './util';
 import { docs } from './docs/docs';
 import { getCompilerCtx } from './build/compiler-ctx';
+import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
@@ -40,7 +41,23 @@ export class Compiler {
         const buildCtx = new BuildContext(this.config, this.ctx, watchResults);
         build(this.config, this.ctx, buildCtx);
       });
+
+      if (this.config.flags.serve) {
+        this.startDevServer();
+      }
     }
+  }
+
+  async startDevServer() {
+    if (this.config.sys.details.runtime !== 'node') {
+      throw new Error(`Dev Server only availabe in node`);
+    }
+
+    // start up the dev server
+    const devServerConfig = await startDevServerMain(this.config, this.ctx);
+
+    // get the browser url to be logged out at the end of the build
+    this.config.devServer.browserUrl = devServerConfig.browserUrl;
   }
 
   build() {

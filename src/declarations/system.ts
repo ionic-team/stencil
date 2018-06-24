@@ -13,6 +13,7 @@ export interface StencilSystem {
   createDom?(): CreateDom;
   createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   destroy?(): void;
+  addDestroy?(fn: Function): void;
   details?: SystemDetails;
   fs?: d.FileSystem;
   generateContentHash?(content: string, length: number): string;
@@ -36,6 +37,7 @@ export interface StencilSystem {
     diagnostics?: d.Diagnostic[];
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
+  open?: (p: string) => Promise<void>;
   path?: Path;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {

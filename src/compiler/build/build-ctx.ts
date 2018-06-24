@@ -135,41 +135,48 @@ export class BuildContext implements d.BuildCtx {
   }
 
   async finish() {
-    this.config.logger.debug(`finished build: ${this.buildId}, ${this.timestamp}`);
+    const config = this.config;
+    const compilerCtx = this.compilerCtx;
+
+    config.logger.debug(`finished build: ${this.buildId}, ${this.timestamp}`);
 
     if (this.hasFinished && this.buildResults) {
       return this.buildResults;
     }
 
-    this.buildResults = await generateBuildResults(this.config, this.compilerCtx, this as any);
+    this.buildResults = await generateBuildResults(config, compilerCtx, this as any);
 
     // log any errors/warnings
     if (!this.hasFinished) {
       // haven't set this build as finished yet
-      this.config.logger.printDiagnostics(this.buildResults.diagnostics);
+      config.logger.printDiagnostics(this.buildResults.diagnostics);
+
+      if (!this.isRebuild && config.devServer && config.devServer.browserUrl && config.flags.serve) {
+        config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
+      }
 
       // create a nice pretty message stating what happend
       const buildText = this.isRebuild ? 'rebuild' : 'build';
-      const watchText = this.config.watch ? ', watching for changes...' : '';
+      const watchText = config.watch ? ', watching for changes...' : '';
       let buildStatus = 'finished';
       let statusColor = 'green';
 
       if (this.buildResults.hasError) {
         // gosh darn, build had errors :(
-        this.compilerCtx.lastBuildHadError = true;
+        compilerCtx.lastBuildHadError = true;
         buildStatus = 'failed';
         statusColor = 'red';
 
       } else {
         // successful build!
-        this.compilerCtx.hasSuccessfulBuild = true;
-        this.compilerCtx.lastBuildHadError = false;
+        compilerCtx.hasSuccessfulBuild = true;
+        compilerCtx.lastBuildHadError = false;
 
-        if (!this.isRebuild && this.config.watch) {
+        if (!this.isRebuild && config.watch) {
           // successful first time build and we're watching the files
           // so let's hash all of the source files content so we can
           // do great file change detection to know when files actually change
-          this.compilerCtx.fs.setBuildHashes();
+          compilerCtx.fs.setBuildHashes();
         }
       }
 
@@ -178,24 +185,24 @@ export class BuildContext implements d.BuildCtx {
       this.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
 
       // write the build stats
-      await generateBuildStats(this.config, this.compilerCtx, this as any, this.buildResults);
+      await generateBuildStats(config, compilerCtx, this as any, this.buildResults);
 
       // write all of our logs to disk if config'd to do so
-      this.config.logger.writeLogs(this.isRebuild);
+      config.logger.writeLogs(this.isRebuild);
 
       // emit a buildFinish event for anyone who cares
-      this.compilerCtx.events.emit('buildFinish', this.buildResults);
+      compilerCtx.events.emit('buildFinish', this.buildResults);
 
-      if (this.config.watch) {
+      if (config.watch) {
         try {
           // setup watcher if need be
-          initWatcher(this.config, this.compilerCtx);
+          initWatcher(config, compilerCtx);
         } catch (e) {
           catchError(this.diagnostics, e);
         }
 
       } else {
-        this.config.sys.destroy();
+        config.sys.destroy();
       }
     }
 
