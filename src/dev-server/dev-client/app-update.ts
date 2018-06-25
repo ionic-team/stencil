@@ -42,22 +42,12 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
 
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   // let's do some hot module replacement shall we
-  if (hmr.windowReload) {
-    win.location.reload(true);
-    return;
-  }
-
-  if (hmr.indexHtmlUpdated) {
+  if (hmr.windowReload || hmr.indexHtmlUpdated) {
     win.location.reload(true);
     return;
   }
 
   if (hmr.componentsUpdated) {
-    if (!supportsComponentHmr()) {
-      win.location.reload(true);
-      return;
-    }
-
     hmrComponents(doc.documentElement, hmr.versionId, hmr.componentsUpdated);
   }
 
@@ -97,13 +87,4 @@ export function appReset(win: d.DevClientWindow) {
     }
     return Promise.resolve();
   });
-}
-
-
-function supportsComponentHmr() {
-  try {
-    new Function('import("")');
-    return true;
-  } catch (e) {}
-  return false;
 }

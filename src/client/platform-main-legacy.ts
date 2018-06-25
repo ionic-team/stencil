@@ -149,14 +149,15 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
-  function setLoadedBundle(bundleId: string, value: d.CjsExports) {
-    loadedBundles.set(bundleId, value);
-  }
+  function getLoadedBundle(bundleId: string, hmrVersionId?: string) {
+    if (Build.hotModuleReplacement && hmrVersionId) {
+      loadedBundles.delete(bundleId.replace(/^\.\//, ''));
+    }
 
-  function getLoadedBundle(bundleId: string) {
     if (bundleId == null) {
       return null;
     }
+
     return loadedBundles.get(bundleId.replace(/^\.\//, ''));
   }
 
@@ -167,13 +168,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     return !!getLoadedBundle(id);
   }
 
-  /**
-   * Execute a bundle queue item
-   * @param name
-   * @param deps
-   * @param callback
-   */
-  function execBundleCallback(name: string, deps: string[], callback: Function) {
+  function execBundleCallback(bundleId: string, deps: string[], callback: Function) {
     const bundleExports: d.CjsExports = {};
 
     try {
@@ -187,16 +182,16 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
 
     // If name is undefined then this callback was fired by component callback
-    if (name === undefined) {
+    if (bundleId === undefined) {
       return;
     }
 
-    setLoadedBundle(name, bundleExports);
+    loadedBundles.set(bundleId, bundleExports);
 
     // If name contains chunk then this callback was associated with a dependent bundle loading
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    if (name && !name.endsWith('.js')) {
+    if (bundleId && !bundleId.endsWith('.js')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const normalizedTagName = pascalCasedTagName.replace(/-/g, '').toLowerCase();
 
@@ -268,12 +263,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   // This is executed by the component's connected callback.
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-    if (getLoadedBundle(bundleId)) {
+    if (getLoadedBundle(bundleId, hmrVersionId)) {
       // sweet, we've already loaded this bundle
       queueUpdate(plt, elm);
 
@@ -289,33 +284,38 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
-          requestBundleQueue.push(() => requestComponentBundle(cmpMeta, bundleId));
+          requestBundleQueue.push(() => requestComponentBundle(cmpMeta, bundleId, hmrVersionId));
 
         } else {
           // css already all loaded
-          requestComponentBundle(cmpMeta, bundleId);
+          requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
         }
 
       } else {
         // not using css shim, so no need to wait on css shim to finish
         // figure out which bundle to request and kick it off
-        requestComponentBundle(cmpMeta, bundleId);
+        requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
       }
     }
   }
 
 
-  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string) {
+  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
     const useScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
-    requestUrl(resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js');
+    let url = resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js';
+
+    if (Build.hotModuleReplacement && hmrVersionId) {
+      url += '?s-hmr=' + hmrVersionId;
+    }
+
+    requestUrl(url);
   }
 
 
   // Use JSONP to load in bundles
   function requestUrl(url: string) {
-
     let tmrId: any;
     let scriptElm: HTMLScriptElement;
     function onScriptComplete() {

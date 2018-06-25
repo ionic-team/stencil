@@ -3,7 +3,6 @@ import { attributeChangedCallback } from './attribute-changed';
 import { Build } from '../util/build-conditionals';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { hotModuleReplacement } from './hot-module-replacement';
 import { initComponentLoaded } from './init-component-instance';
 import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
@@ -42,8 +41,20 @@ export function initHostElement(
   };
 
   if (Build.hotModuleReplacement) {
-    HostElementConstructor['s-hmr'] = function(versionId: string) {
-      hotModuleReplacement(plt, (this as d.HostElement), versionId);
+    HostElementConstructor['s-hmr'] = function(hmrVersionId) {
+      // keep the existing state
+      // forget the constructor
+      cmpMeta.componentConstructor = null;
+
+      // forget the instance
+      const instance = plt.instanceMap.get((this as d.HostElement));
+      if (instance) {
+        plt.hostElementMap.delete(instance);
+        plt.instanceMap.delete((this as d.HostElement));
+      }
+
+      // request the bundle again
+      plt.requestBundle(cmpMeta, (this as d.HostElement), hmrVersionId);
     };
   }
 

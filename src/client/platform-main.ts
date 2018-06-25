@@ -138,7 +138,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
 
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
       queueUpdate(plt, elm);
@@ -185,13 +185,14 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // and components are able to lazy load themselves
       // through standardized browser APIs
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
-      cmpMeta.bundleIds :
-      (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
-      const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
-      const url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
+                        cmpMeta.bundleIds :
+                        (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      if (Build.hotModuleReplacement) {
-        cmpMeta.hmrUrl = url;
+      const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+      let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
+
+      if (Build.hotModuleReplacement && hmrVersionId) {
+        url += '?s-hmr=' + hmrVersionId;
       }
 
       // dynamic es module import() => woot!
