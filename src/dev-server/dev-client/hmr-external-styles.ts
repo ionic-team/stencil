@@ -26,4 +26,5 @@ export function hmrStylesheetLink(styleSheetElm: HTMLLinkElement, versionId: str
   }
 
   styleSheetElm.href = updateHmrHref(versionId, cssFileName, styleSheetElm.href);
+  styleSheetElm.setAttribute('data-hmr', versionId);
 }

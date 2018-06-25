@@ -12,8 +12,9 @@ function hmrComponent(elm: Element, versionId: string, hmrTagName: string) {
   // drill down through every node in the page
   // to include shadow roots and look for this
   // component tag to run hmr() on
-  if (elm.nodeName.toLowerCase() === hmrTagName) {
-    (elm as d.HostElement)['s-hmr'] && (elm as d.HostElement)['s-hmr'](versionId);
+  if (elm.nodeName.toLowerCase() === hmrTagName && (elm as d.HostElement)['s-hmr']) {
+    (elm as d.HostElement)['s-hmr'](versionId);
+    elm.setAttribute('data-hmr', versionId);
   }
 
   if (elm.shadowRoot) {
