@@ -9,11 +9,13 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
   try {
     devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
 
-    const server = await createHttpServer(devServerConfig, fs);
+    const serverCtx: d.DevServerContext = {};
 
-    createWebSocketServer(server);
+    const httpServer = await createHttpServer(devServerConfig, serverCtx, fs);
 
-    server.listen(devServerConfig.port, devServerConfig.address);
+    createWebSocketServer(serverCtx, httpServer);
+
+    httpServer.listen(devServerConfig.port, devServerConfig.address);
 
     sendMsg(process, {
       serverStated: {
@@ -23,7 +25,14 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
     });
 
     process.once('SIGINT', () => {
-      server.close();
+      if (serverCtx.webSocketServer) {
+        serverCtx.webSocketServer.close(1000);
+        serverCtx.webSocketServer = null;
+      }
+      if (serverCtx.httpServer) {
+        serverCtx.httpServer.close();
+        serverCtx.httpServer = null;
+      }
     });
 
   } catch (e) {

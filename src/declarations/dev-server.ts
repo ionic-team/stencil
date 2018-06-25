@@ -67,3 +67,8 @@ export interface DevServerMessage {
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
 }
+
+export interface DevServerContext {
+  httpServer?: any;
+  webSocketServer?: any;
+}
