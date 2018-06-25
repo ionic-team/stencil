@@ -43,6 +43,8 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
 
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   // let's do some hot module replacement shall we
+  doc.documentElement.setAttribute('data-hmr', hmr.versionId);
+
   if (hmr.excludeHmr) {
     logBuild(`ExcludeHmr, reloading page...`);
     win.location.reload(true);
@@ -61,7 +63,7 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   }
 
   if (hmr.inlineStylesUpdated) {
-    logBuild(`Updated styles: ${hmr.inlineStylesUpdated.map(s => s.tagName).reduce((arr, v) => {
+    logBuild(`Updated styles: ${hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
       if (!arr.includes(v)) {
         arr.push(v);
       }

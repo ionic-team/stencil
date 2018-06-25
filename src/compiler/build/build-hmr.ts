@@ -25,9 +25,10 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
     hmr.inlineStylesUpdated = buildCtx.stylesUpdated.map(s => {
       return {
-        tagName: s.tagName,
-        styleId: s.styleId,
-        styleText: s.styleText
+        styleTag: s.styleTag,
+        styleMode: s.styleMode,
+        styleText: s.styleText,
+        isScoped: s.isScoped
       } as d.HmrStyleUpdate;
     });
   }
@@ -46,7 +47,7 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
     return null;
   }
 
-  hmr.versionId = Date.now().toString().substring(5);
+  hmr.versionId = Date.now().toString().substring(6);
 
   return hmr;
 }

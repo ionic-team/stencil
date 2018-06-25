@@ -33,10 +33,28 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
 
         // add the style text to the template element's innerHTML
         if (Build.isDev) {
+          // dev mode
           // add a style id attribute, but only useful during dev
-          domApi.$setAttribute(templateElm, 'data-tmpl-style-id', styleModeId);
-          templateElm.innerHTML = `<style data-style-id="${styleModeId}">${style}</style>`;
+          const styleContent: string[] = [`<style`, ` data-style-tag="${cmpMeta.tagNameMeta}"`];
+          domApi.$setAttribute(templateElm, 'data-tmpl-style-tag', cmpMeta.tagNameMeta);
+
+          if (cmpConstructor.styleMode) {
+            styleContent.push(` data-style-mode="${cmpConstructor.styleMode}"`);
+            domApi.$setAttribute(templateElm, 'data-tmpl-style-mode', cmpConstructor.styleMode);
+          }
+
+          if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
+            styleContent.push(` data-style-scoped="true"`);
+            domApi.$setAttribute(templateElm, 'data-tmpl-style-scoped', 'true');
+          }
+          styleContent.push(`>`);
+          styleContent.push(style);
+          styleContent.push(`</style>`);
+
+          templateElm.innerHTML = styleContent.join('');
+
         } else {
+          // prod mode, no style id data attributes
           templateElm.innerHTML = `<style>${style}</style>`;
         }
 
@@ -118,8 +136,14 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
 
         if (styleElm) {
           if (Build.isDev) {
-            // add a style id attribute, but only useful during dev
-            domApi.$setAttribute(styleElm, 'data-style-id', styleModeId);
+            // add a style attributes, but only useful during dev
+            domApi.$setAttribute(styleElm, 'data-style-tag', cmpMeta.tagNameMeta);
+            if (modeName) {
+              domApi.$setAttribute(styleElm, 'data-style-mode', cmpMeta.tagNameMeta);
+            }
+            if (hostElm['s-sc']) {
+              domApi.$setAttribute(styleElm, 'data-style-scoped', 'true');
+            }
           }
           const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
           domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);

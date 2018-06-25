@@ -48,9 +48,10 @@ export interface BuildCtx {
 
 
 export interface BuildStyleUpdate {
-  styleId: string;
+  styleTag: string;
   styleText: string;
-  tagName: string;
+  styleMode: string;
+  isScoped: boolean;
 }
 
 
@@ -93,9 +94,10 @@ export interface HotModuleReplacement {
 
 
 export interface HmrStyleUpdate {
-  styleId: string;
+  styleTag: string;
   styleText: string;
-  tagName: string;
+  styleMode: string;
+  isScoped: boolean;
 }
 
 
