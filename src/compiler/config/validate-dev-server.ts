@@ -33,12 +33,16 @@ export function validateDevServer(config: d.Config) {
 
     if (config.flags.serve) {
       let wwwDir: string = null;
-      const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
-      if (!outputTarget) {
-        throw new Error(`dev server missing www output target`);
-      }
+      const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
 
-      wwwDir = outputTarget.dir;
+      if (wwwOutputTarget) {
+        wwwDir = wwwOutputTarget.dir;
+        config.logger.debug(`dev server www root: ${wwwDir}`);
+
+      } else {
+        wwwDir = config.rootDir;
+        config.logger.debug(`dev server missing www output target, serving root directory: ${wwwDir}`);
+      }
 
       setStringConfig(config.devServer, 'root', wwwDir);
 
