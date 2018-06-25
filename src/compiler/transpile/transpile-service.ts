@@ -51,7 +51,11 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
     // or at least one ts file has changed
     const timeSpan = buildCtx.createTimeSpan(`transpile started`);
 
-    await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles);
+    // only use the file system cache when it's enabled and this is the first build
+    const useFsCache = config.enableCache && !buildCtx.isRebuild;
+
+    // go ahead and kick off the ts service
+    await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles, true, useFsCache);
 
     timeSpan.finish(`transpile finished`);
   }
@@ -61,14 +65,16 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
 
 
 async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const ctx: TranspileContext = {
+  const transpileCtx: TranspileContext = {
     compilerCtx: compilerCtx,
     buildCtx: buildCtx,
     configKey: null,
-    snapshotVersions: new Map<string, string>()
+    snapshotVersions: new Map<string, string>(),
+    filesFromFsCache: [],
+    hasQueuedTsServicePrime: false
   };
 
-  const userCompilerOptions = await getUserCompilerOptions(config, ctx.compilerCtx);
+  const userCompilerOptions = await getUserCompilerOptions(config, transpileCtx.compilerCtx);
   const compilerOptions = Object.assign({}, userCompilerOptions);
 
   compilerOptions.isolatedModules = false;
@@ -87,14 +93,14 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.outDir = undefined;
 
   // create a config key that will be used as part of the file's cache key
-  ctx.configKey = createConfiKey(config, compilerOptions);
+  transpileCtx.configKey = createConfiKey(config, compilerOptions);
 
   const servicesHost: ts.LanguageServiceHost = {
-    getScriptFileNames: () => ctx.compilerCtx.rootTsFiles,
-    getScriptVersion: (filePath) => ctx.snapshotVersions.get(filePath),
+    getScriptFileNames: () => transpileCtx.compilerCtx.rootTsFiles,
+    getScriptVersion: (filePath) => transpileCtx.snapshotVersions.get(filePath),
     getScriptSnapshot: (filePath) => {
       try {
-        const sourceText = ctx.compilerCtx.fs.readFileSync(filePath);
+        const sourceText = transpileCtx.compilerCtx.fs.readFileSync(filePath);
         return ts.ScriptSnapshot.fromString(sourceText);
       } catch (e) {}
       return undefined;
@@ -102,10 +108,10 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     getCurrentDirectory: () => config.cwd,
     getCompilationSettings: () => compilerOptions,
     getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
-    fileExists: (filePath) => ctx.compilerCtx.fs.accessSync(filePath),
+    fileExists: (filePath) => transpileCtx.compilerCtx.fs.accessSync(filePath),
     readFile: (filePath) => {
       try {
-        return ctx.compilerCtx.fs.readFileSync(filePath);
+        return transpileCtx.compilerCtx.fs.readFileSync(filePath);
       } catch (e) {}
       return undefined;
     },
@@ -119,16 +125,16 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
       return {
         before: [
-          gatherMetadata(config, ctx.compilerCtx, ctx.buildCtx, typeChecker),
+          gatherMetadata(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker),
           removeDecorators(),
-          addComponentMetadata(ctx.compilerCtx.moduleFiles),
+          addComponentMetadata(transpileCtx.compilerCtx.moduleFiles),
           buildConditionalsTransform(buildConditionals)
         ],
         after: [
           removeStencilImports(),
-          removeCollectionImports(ctx.compilerCtx),
-          getModuleImports(config, ctx.compilerCtx),
-          componentDependencies(ctx.compilerCtx)
+          removeCollectionImports(transpileCtx.compilerCtx),
+          getModuleImports(config, transpileCtx.compilerCtx),
+          componentDependencies(transpileCtx.compilerCtx)
         ]
       };
     }
@@ -138,9 +144,9 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   const services = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
 
   // return the function we'll continually use on each rebuild
-  return async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => {
-    ctx.compilerCtx = compilerCtx;
-    ctx.buildCtx = buildCtx;
+  return async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => {
+    transpileCtx.compilerCtx = compilerCtx;
+    transpileCtx.buildCtx = buildCtx;
 
     // ensure components.d.ts isn't in the transpile (for now)
     const cmpDts = getComponentsDtsSrcFilePath(config);
@@ -148,8 +154,14 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
     // loop through each ts file that has changed
     await Promise.all(tsFilePaths.map(async tsFilePath => {
-      await tranpsileTsFile(config, services, ctx, tsFilePath);
+      await tranpsileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
     }));
+
+    if (config.watch && !transpileCtx.hasQueuedTsServicePrime) {
+      // prime the ts service cache for all the ts files pulled from the file system cache
+      transpileCtx.hasQueuedTsServicePrime = true;
+      primeTsServiceCache(transpileCtx);
+    }
   };
 }
 
@@ -159,10 +171,12 @@ interface TranspileContext {
   buildCtx: d.BuildCtx;
   configKey: string;
   snapshotVersions: Map<string, string>;
+  filesFromFsCache: string[];
+  hasQueuedTsServicePrime: boolean;
 }
 
 
-async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, tsFilePath: string) {
+async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, tsFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
   // look up the old cache key using the ts file path
   const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
 
@@ -172,7 +186,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // create a cache key out of the content and compiler options
   const cacheKey = `transpileService_${config.sys.generateContentHash(content + tsFilePath + ctx.configKey, 32)}` ;
 
-  if (oldCacheKey === cacheKey) {
+  if (oldCacheKey === cacheKey && checkCacheKey) {
     // file is unchanged, thanks typescript caching!
     return;
   }
@@ -180,11 +194,15 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // save the cache key for future lookups
   ctx.snapshotVersions.set(tsFilePath, cacheKey);
 
-  if (config.enableCache && !ctx.buildCtx.isRebuild) {
+  if (useFsCache) {
     // let's check to see if we've already cached this in our filesystem
     // but only bother for the very first build
     const cachedStr = await ctx.compilerCtx.cache.get(cacheKey);
     if (cachedStr != null) {
+      // remember which files we were able to get from cached versions
+      // so we can later fully prime the ts service cache
+      ctx.filesFromFsCache.push(tsFilePath);
+
       // whoa cool, we found we already cached this in our filesystem
       const cachedModuleFile = JSON.parse(cachedStr) as CachedModuleFile;
 
@@ -311,6 +329,32 @@ async function scanDirForTsFiles(config: d.Config, compilerCtx: d.CompilerCtx, b
     .filter(tsFilePath => {
       return tsFilePath !== componentsDtsSrcFilePath;
     });
+}
+
+
+function primeTsServiceCache(transpileCtx: TranspileContext) {
+  if (transpileCtx.filesFromFsCache.length === 0) {
+    return;
+  }
+
+  // if this is a watch build and we have files that were pulled directly from the cache
+  // let's go through and run the ts service on these files again again so
+  // that the ts service cache is all updated and ready to go. But this can
+  // happen after the first build since so far we're good to go w/ the fs cache
+  const unsubscribe = transpileCtx.compilerCtx.events.subscribe('buildFinish' as any, () => {
+    unsubscribe();
+
+    // we can wait a bit and let things cool down on the main thread first
+    setTimeout(async () => {
+      const timeSpan = transpileCtx.buildCtx.createTimeSpan(`prime ts service cache started, ${transpileCtx.filesFromFsCache.length}`, true);
+
+      // loop through each file system cached ts files and run the transpile again
+      // so that we get the ts service's cache all up to speed
+      await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
+
+      timeSpan.finish(`prime ts service cache finished`);
+    }, 1500);
+  });
 }
 
 
