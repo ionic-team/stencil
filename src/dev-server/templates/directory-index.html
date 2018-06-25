@@ -10,7 +10,7 @@
         box-sizing: border-box;
       }
       body {
-        padding: 20px 60px;
+        padding: 40px 140px;
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         font-size: 14px;
@@ -36,35 +36,26 @@
       ul {
         margin: 0;
         padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
       }
       li {
         list-style: none;
-        float: left;
-        width: 30%;
-        line-height: 25px;
-        margin: 1px;
+        margin: 0;
+        padding: 0;
       }
       li a {
-        display: block;
-        height: 28px;
+        display: inline-block;
+        margin: 0;
+        padding: 6px 12px;
+        min-width: 50%;
         border: 1px solid transparent;
-        border-radius: 5px;
+        border-radius: 4px;
         overflow: hidden;
         white-space: nowrap;
       }
       li a:focus,
       li a:hover {
-        background: rgba(255,255,255,0.65);
+        background: rgba(255, 255, 255, 0.65);
         border: 1px solid #ececec;
-      }
-      li a span {
-        display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-indent: 10px;
       }
 
       @media (max-width: 768px) {
@@ -85,20 +76,16 @@
           border-top: 1px solid #cacaca;
         }
         li {
-          float: none;
-          width: auto !important;
           display: block;
           border-bottom: 1px solid #cacaca;
           font-size: 2em;
           line-height: 1.2em;
-          text-indent: 0;
-          margin: 0;
         }
         li:nth-child(odd) {
           background: #e0e0e0;
         }
         li a {
-          height: auto;
+          display: block;
           border: 0;
           border-radius: 0;
           padding: 15px 10px;
