@@ -1,10 +1,10 @@
 import  * as d from '../../declarations';
 
 
-export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: d.HmrStylesUpdate) {
+export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate[]) {
   if (elm.nodeName.toLowerCase() === 'style') {
-    Object.keys(stylesUpdated).forEach(styleId => {
-      hmrStyleElement(elm, versionId, styleId, stylesUpdated[styleId]);
+    stylesUpdated.forEach(styleUpdated => {
+      hmrStyleElement(elm, versionId, styleUpdated.styleId, styleUpdated.styleText);
     });
   }
 

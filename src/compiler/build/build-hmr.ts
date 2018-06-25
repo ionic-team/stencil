@@ -23,7 +23,13 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
   }
 
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
-    hmr.inlineStylesUpdated = Object.assign({}, buildCtx.stylesUpdated);
+    hmr.inlineStylesUpdated = buildCtx.stylesUpdated.map(s => {
+      return {
+        tagName: s.tagName,
+        styleId: s.styleId,
+        styleText: s.styleText
+      } as d.HmrStyleUpdate;
+    });
   }
 
   const externalStylesUpdated = getExternalStylesUpdated(config, buildCtx);

@@ -225,8 +225,12 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
     compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleText;
 
     if (buildCtx.isRebuild) {
-      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
-      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleText;
+      buildCtx.stylesUpdated = buildCtx.stylesUpdated || [];
+      buildCtx.stylesUpdated.push({
+        styleId: styleId,
+        styleText: styleMeta.compiledStyleText,
+        tagName: cmpMeta.tagNameMeta,
+      });
     }
   }
 
@@ -235,8 +239,11 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
     compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleTextScoped;
 
     if (buildCtx.isRebuild) {
-      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
-      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleTextScoped;
+      buildCtx.stylesUpdated.push({
+        styleId: styleId,
+        styleText: styleMeta.compiledStyleText,
+        tagName: cmpMeta.tagNameMeta,
+      });
     }
   }
 

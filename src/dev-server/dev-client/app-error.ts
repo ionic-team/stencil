@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { DEV_SERVER_URL } from '../util';
+import { logDiagnostic } from './logger';
 
 
 export function appError(doc: Document, buildResults: d.BuildResults) {
@@ -10,7 +11,7 @@ export function appError(doc: Document, buildResults: d.BuildResults) {
   const modal = getDevServerModal(doc);
 
   buildResults.diagnostics.forEach(diagnostic => {
-    consoleLogDiagnostics(diagnostic);
+    logDiagnostic(diagnostic);
     appendDiagnostic(doc, modal, diagnostic);
   });
 }
@@ -111,46 +112,6 @@ function getDevServerModal(doc: Document) {
   return doc.getElementById(`${DEV_SERVER_MODAL}-inner`);
 }
 
-const YELLOW = `#f39c12`;
-const RED = `#c0392b`;
-
-function consoleLogDiagnostics(diagnostic: d.Diagnostic) {
-  let color = RED;
-  let prefix = 'Error';
-
-  if (diagnostic.level === 'warn') {
-    color = YELLOW;
-    prefix = 'Warning';
-  }
-
-  if (diagnostic.header) {
-    prefix = diagnostic.header;
-  }
-
-  const styledPrefix = [
-    '%c' + prefix,
-    `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`
-  ];
-
-  let msg = ``;
-
-  if (diagnostic.relFilePath) {
-    msg += diagnostic.relFilePath;
-
-    if (typeof diagnostic.lineNumber === 'number' && diagnostic.lineNumber > 0) {
-      msg += ', line ' + diagnostic.lineNumber;
-
-      if (typeof diagnostic.columnNumber === 'number' && diagnostic.columnNumber > 0) {
-        msg += ', column ' + diagnostic.columnNumber;
-      }
-    }
-    msg += `\n`;
-  }
-
-  msg += diagnostic.messageText;
-
-  console.log(...styledPrefix, msg);
-}
 
 
 export function clearDevServerModal(doc: Document) {

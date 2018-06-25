@@ -39,7 +39,7 @@ export class BuildContext implements d.BuildCtx {
   requiresFullBuild = true;
   startTime = Date.now();
   styleBuildCount = 0;
-  stylesUpdated: { [styleId: string]: string } = {};
+  stylesUpdated = [] as d.BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan = null;
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
