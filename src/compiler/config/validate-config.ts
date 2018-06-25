@@ -7,6 +7,7 @@ import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
+import { validateCustomTransformers } from './validate-custom-transformers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
@@ -89,11 +90,14 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   validateCopy(config);
 
+  validateCustomTransformers(config);
+  
   validatePlugins(config);
 
   validateAssetVerioning(config);
 
   validateDevServer(config);
+
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;

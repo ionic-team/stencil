@@ -1,5 +1,5 @@
 import * as d from './index';
-
+import * as ts from 'typescript';
 
 export interface Config {
   assetVersioning?: ConfigAssetVersioning;
@@ -12,6 +12,7 @@ export interface Config {
   commonjs?: BundlingConfig;
   cwd?: string;
   nodeResolve?: NodeResolveConfig;
+  customTransformers?: CustomTransformersConfig;
   configPath?: string;
   copy?: d.CopyTask[];
   devInspector?: boolean;
@@ -54,6 +55,13 @@ export interface BundlingConfig {
   namedExports?: {
     [key: string]: string[];
   };
+}
+
+export interface CustomTransformersConfig {
+  prependBefore: Array<ts.TransformerFactory<ts.SourceFile>>
+  appendBefore: Array<ts.TransformerFactory<ts.SourceFile>>
+  prependAfter: Array<ts.TransformerFactory<ts.SourceFile>>
+  appendAfter: Array<ts.TransformerFactory<ts.SourceFile>>
 }
 
 export interface NodeResolveConfig {
