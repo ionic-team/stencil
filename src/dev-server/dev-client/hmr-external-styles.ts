@@ -8,6 +8,10 @@ export function hmrExternalStyles(elm: Element, versionId: string, cssFileNames:
     });
   }
 
+  if (elm.nodeName.toLowerCase() === 'template' && (elm as HTMLTemplateElement).content) {
+    hmrExternalStyles((elm as HTMLTemplateElement).content as any, versionId, cssFileNames);
+  }
+
   if (elm.shadowRoot) {
     hmrExternalStyles(elm.shadowRoot as any, versionId, cssFileNames);
   }
