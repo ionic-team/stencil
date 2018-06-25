@@ -76,12 +76,12 @@ export interface BuildResults {
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
+  excludeHmr?: boolean;
   externalStylesUpdated?: string[];
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStylesUpdate;
   versionId?: string;
-  windowReload?: boolean;
 }
 
 

@@ -6,6 +6,7 @@ export interface DevServerConfig {
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
+  excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
   hotReplacement?: boolean;

@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { normalizePath } from '../util';
 
 
 export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,6 +8,10 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
   }
 
   const hmr: d.HotModuleReplacement = {};
+
+  if (changesShouldExcludeHmr(config, config.devServer.excludeHmr, buildCtx.filesChanged)) {
+    hmr.excludeHmr = true;
+  }
 
   if (buildCtx.hasIndexHtmlChanges) {
     hmr.indexHtmlUpdated = true;
@@ -150,6 +155,33 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
   }
 
   return imageFiles.sort();
+}
+
+
+function changesShouldExcludeHmr(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+  if (!excludeHmr || excludeHmr.length === 0) {
+    return false;
+  }
+
+  return excludeHmr.some(excludeHmr => {
+
+    return filesChanged.map(fileChanged => {
+      let exclude = false;
+
+      if (config.sys.isGlob(excludeHmr)) {
+        exclude = config.sys.minimatch(fileChanged, excludeHmr);
+      } else {
+        exclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
+      }
+
+      if (exclude) {
+        config.logger.debug(`excludeHmr: ${fileChanged}`);
+      }
+
+      return exclude;
+
+    }).some(r => r);
+  });
 }
 
 

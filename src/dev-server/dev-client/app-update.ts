@@ -42,7 +42,12 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
 
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   // let's do some hot module replacement shall we
-  if (hmr.windowReload || hmr.indexHtmlUpdated) {
+  if (hmr.excludeHmr) {
+    win.location.reload(true);
+    return;
+  }
+
+  if (hmr.indexHtmlUpdated) {
     win.location.reload(true);
     return;
   }
