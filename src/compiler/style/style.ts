@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
-import { ENCAPSULATION } from '../../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateGlobalStyles } from './global-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
@@ -216,27 +216,32 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
     styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
+    if (config.devMode) {
+      styleMeta.compiledStyleTextScoped = '\n' + styleMeta.compiledStyleTextScoped + '\n';
+    }
   }
 
+  let addStylesUpdate = false;
+  let addScopedStylesUpdate = false;
+
   compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || {};
+
   // test to see if the last styles are different
-  let styleId = getStyleId(cmpMeta, modeName, false);
+  const styleId = getStyleId(cmpMeta, modeName, false);
   if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleText) {
     compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleText;
 
     if (buildCtx.isRebuild) {
-      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
-      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleText;
+      addStylesUpdate = true;
     }
   }
 
-  styleId = getStyleId(cmpMeta, modeName, true);
-  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleTextScoped) {
-    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleTextScoped;
+  const scopedStyleId = getStyleId(cmpMeta, modeName, true);
+  if (compilerCtx.lastBuildStyles[scopedStyleId] !== styleMeta.compiledStyleTextScoped) {
+    compilerCtx.lastBuildStyles[scopedStyleId] = styleMeta.compiledStyleTextScoped;
 
     if (buildCtx.isRebuild) {
-      buildCtx.stylesUpdated = buildCtx.stylesUpdated || {};
-      buildCtx.stylesUpdated[styleId] = styleMeta.compiledStyleTextScoped;
+      addScopedStylesUpdate = true;
     }
   }
 
@@ -244,6 +249,28 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (styleMeta.compiledStyleTextScoped) {
     styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
+  }
+
+  const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
+
+  if (addStylesUpdate) {
+    buildCtx.stylesUpdated = buildCtx.stylesUpdated || [];
+
+    buildCtx.stylesUpdated.push({
+      styleTag: cmpMeta.tagNameMeta,
+      styleMode: styleMode,
+      styleText: styleMeta.compiledStyleText,
+      isScoped: false
+    });
+  }
+
+  if (addScopedStylesUpdate) {
+    buildCtx.stylesUpdated.push({
+      styleTag: cmpMeta.tagNameMeta,
+      styleMode: styleMode,
+      styleText: styleMeta.compiledStyleTextScoped,
+      isScoped: true
+    });
   }
 }
 

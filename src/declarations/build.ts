@@ -38,12 +38,20 @@ export interface BuildCtx {
   shouldAbort(): boolean;
   startTime: number;
   styleBuildCount: number;
-  stylesUpdated: { [styleId: string]: string };
+  stylesUpdated: BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan;
   transpileBuildCount: number;
   validateTypesHandler?: (results: d.ValidateTypesResults) => void;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
   validateTypesBuild?(): Promise<void>;
+}
+
+
+export interface BuildStyleUpdate {
+  styleTag: string;
+  styleText: string;
+  styleMode: string;
+  isScoped: boolean;
 }
 
 
@@ -76,17 +84,20 @@ export interface BuildResults {
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
+  excludeHmr?: boolean;
   externalStylesUpdated?: string[];
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
-  inlineStylesUpdated?: HmrStylesUpdate;
+  inlineStylesUpdated?: HmrStyleUpdate[];
   versionId?: string;
-  windowReload?: boolean;
 }
 
 
-export interface HmrStylesUpdate {
-  [styleId: string]: string;
+export interface HmrStyleUpdate {
+  styleTag: string;
+  styleText: string;
+  styleMode: string;
+  isScoped: boolean;
 }
 
 

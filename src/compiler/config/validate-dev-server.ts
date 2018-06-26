@@ -32,24 +32,33 @@ export function validateDevServer(config: d.Config) {
     }
 
     if (config.flags.serve) {
-      let wwwDir: string = null;
+      let serveDir: string = null;
       const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
 
       if (wwwOutputTarget) {
-        wwwDir = wwwOutputTarget.dir;
-        config.logger.debug(`dev server www root: ${wwwDir}`);
+        serveDir = wwwOutputTarget.dir;
+        config.logger.debug(`dev server www root: ${serveDir}`);
 
       } else {
-        wwwDir = config.rootDir;
-        config.logger.debug(`dev server missing www output target, serving root directory: ${wwwDir}`);
+        serveDir = config.rootDir;
+        config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
       }
 
-      setStringConfig(config.devServer, 'root', wwwDir);
+      setStringConfig(config.devServer, 'root', serveDir);
 
       if (!config.sys.path.isAbsolute(config.devServer.root)) {
         config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
       }
     }
+  }
+
+  if (config.devServer.excludeHmr) {
+    if (!Array.isArray(config.devServer.excludeHmr)) {
+      config.logger.error(`dev server excludeHmr must be an array of glob strings`);
+    }
+
+  } else {
+    config.devServer.excludeHmr = [];
   }
 
   return config.devServer;

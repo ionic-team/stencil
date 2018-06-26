@@ -67,9 +67,11 @@ export function hmrImagesElements(win: Window, elm: Element, versionId: string, 
     hmrImgElement(elm as HTMLImageElement, versionId, imageFileNames);
   }
 
-  const styleAttr = elm.getAttribute('style');
-  if (styleAttr) {
-    hmrUpdateStyleAttr(elm, versionId, imageFileNames, styleAttr);
+  if (elm.getAttribute) {
+    const styleAttr = elm.getAttribute('style');
+    if (styleAttr) {
+      hmrUpdateStyleAttr(elm, versionId, imageFileNames, styleAttr);
+    }
   }
 
   if (elm.nodeName.toLowerCase() === 'style') {
@@ -83,7 +85,7 @@ export function hmrImagesElements(win: Window, elm: Element, versionId: string, 
   }
 
   if (elm.nodeName.toLowerCase() === 'template' && (elm as HTMLTemplateElement).content) {
-    hmrImagesElements(win, elm.shadowRoot as any, versionId, imageFileNames);
+    hmrImagesElements(win, (elm as HTMLTemplateElement).content as any, versionId, imageFileNames);
   }
 
   if (elm.shadowRoot) {
@@ -101,6 +103,7 @@ export function hmrImagesElements(win: Window, elm: Element, versionId: string, 
 function hmrImgElement(imgElm: HTMLImageElement, versionId: string, imageFileNames: string[]) {
   imageFileNames.forEach(imageFileName => {
     imgElm.src = updateHmrHref(versionId, imageFileName, imgElm.src);
+    imgElm.setAttribute('data-hmr', versionId);
   });
 }
 
@@ -111,6 +114,7 @@ function hmrUpdateStyleAttr(elm: Element, versionId: string, imageFileNames: str
 
     if (newSstyleAttr !== oldStyleAttr) {
       elm.setAttribute('style', newSstyleAttr);
+      elm.setAttribute('data-hmr', versionId);
     }
   });
 }
@@ -119,6 +123,7 @@ function hmrUpdateStyleAttr(elm: Element, versionId: string, imageFileNames: str
 function hmrUpdateStyleElementUrl(styleElm: HTMLStyleElement, versionId: string, imageFileNames: string[]) {
   imageFileNames.forEach(imageFileName => {
     styleElm.innerHTML = updateCssUrlValue(versionId, imageFileName, styleElm.innerHTML);
+    styleElm.setAttribute('data-hmr', versionId);
   });
 }
 
@@ -137,4 +142,5 @@ function hmrUpdateLinkElementUrl(linkElm: HTMLLinkElement, versionId: string, im
   newQs['s-hmr-urls'] = imageFileNames.join(',');
 
   linkElm.href = hrefFileName + '?' + stringifyQuerystring(newQs);
+  linkElm.setAttribute('data-hmr', versionId);
 }

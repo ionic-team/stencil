@@ -95,7 +95,7 @@ describe('styles', () => {
     expect(style.innerHTML).toBe(cmpConstructor.style);
   });
 
-  it('should append component styles template to head, with styleMode', () => {
+  it('should append component styles template to head, with styleMode and scoped css', () => {
     const cmpConstructor: ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
@@ -106,13 +106,16 @@ describe('styles', () => {
       static get styleMode() {
         return `ios`;
       }
+      static get encapsulation() {
+        return `scoped` as any;
+      }
     };
     cmpMeta.componentConstructor = cmpConstructor;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
-    expect(template.innerHTML).toBe(`<style data-style-id="cmp-aios">${cmpConstructor.style}</style>`);
+    expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a" data-style-mode="ios" data-style-scoped="true">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-aios`]).toBe(template);
   });
 
@@ -130,7 +133,7 @@ describe('styles', () => {
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
-    expect(template.innerHTML).toBe(`<style data-style-id="cmp-a$">${cmpConstructor.style}</style>`);
+    expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-a$`]).toBe(template);
   });
 

@@ -4,6 +4,7 @@ import { hmrComponents } from './hmr-components';
 import { hmrExternalStyles } from './hmr-external-styles';
 import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
+import { logBuild } from './logger';
 
 
 export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d.BuildResults) {
@@ -42,24 +43,42 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
 
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   // let's do some hot module replacement shall we
-  if (hmr.windowReload || hmr.indexHtmlUpdated) {
+  doc.documentElement.setAttribute('data-hmr', hmr.versionId);
+
+  if (hmr.excludeHmr) {
+    logBuild(`ExcludeHmr, reloading page...`);
+    win.location.reload(true);
+    return;
+  }
+
+  if (hmr.indexHtmlUpdated) {
+    logBuild(`Updated index.html, reloading page...`);
     win.location.reload(true);
     return;
   }
 
   if (hmr.componentsUpdated) {
+    logBuild(`Updated components: ${hmr.componentsUpdated.sort().join(', ')}`);
     hmrComponents(doc.documentElement, hmr.versionId, hmr.componentsUpdated);
   }
 
   if (hmr.inlineStylesUpdated) {
+    logBuild(`Updated styles: ${hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
+      if (!arr.includes(v)) {
+        arr.push(v);
+      }
+      return arr;
+    }, []).sort().join(', ')}`);
     hmrInlineStyles(doc.documentElement, hmr.versionId, hmr.inlineStylesUpdated);
   }
 
   if (hmr.externalStylesUpdated) {
+    logBuild(`Updated stylesheets: ${hmr.externalStylesUpdated.sort().join(', ')}`);
     hmrExternalStyles(doc.documentElement, hmr.versionId, hmr.externalStylesUpdated);
   }
 
   if (hmr.imagesUpdated) {
+    logBuild(`Updated images: ${hmr.imagesUpdated.sort().join(', ')}`);
     hmrImages(win, doc, hmr.versionId, hmr.imagesUpdated);
   }
 }

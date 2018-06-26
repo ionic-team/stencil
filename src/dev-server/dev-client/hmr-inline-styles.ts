@@ -1,10 +1,10 @@
 import  * as d from '../../declarations';
 
 
-export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: d.HmrStylesUpdate) {
+export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate[]) {
   if (elm.nodeName.toLowerCase() === 'style') {
-    Object.keys(stylesUpdated).forEach(styleId => {
-      hmrStyleElement(elm, versionId, styleId, stylesUpdated[styleId]);
+    stylesUpdated.forEach(styleUpdated => {
+      hmrStyleElement(elm, versionId, styleUpdated);
     });
   }
 
@@ -24,9 +24,32 @@ export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: 
 }
 
 
-function hmrStyleElement(elm: Element, versionId: string, styleId: string, styleText: string) {
-  if (elm.getAttribute && elm.getAttribute('data-style-id') === styleId) {
-    elm.innerHTML = styleText;
-    elm.setAttribute('data-hmr', versionId);
+function hmrStyleElement(elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate) {
+  if (!elm.getAttribute) {
+    return;
   }
+
+  const styleTag = elm.getAttribute('data-style-tag');
+  if (styleTag !== stylesUpdated.styleTag || !stylesUpdated.styleText) {
+    return;
+  }
+
+  const elmStyleMode = elm.getAttribute('data-style-mode');
+  const elmIsScoped = elm.hasAttribute('data-style-scoped');
+
+  if (stylesUpdated.styleMode && elmStyleMode !== stylesUpdated.styleMode) {
+    // this updating style has a style mode
+    // but this element does not have the same style mode
+    return;
+  }
+
+  if (stylesUpdated.isScoped !== elmIsScoped) {
+    // the style scope and the element scope are not the same
+    return;
+  }
+
+  // if we made it this far then it's a match!
+  // update the new style text
+  elm.innerHTML = stylesUpdated.styleText.replace(/\\n/g, '\n');
+  elm.setAttribute('data-hmr', versionId);
 }

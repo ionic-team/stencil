@@ -47,7 +47,6 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   function onMessage(event: any) {
     // the browser's web socket received a message from the server
     const msg: d.DevServerMessage = JSON.parse(event.data);
-    console.log('browserReceivedMessageFromServer', msg);
 
     if (msg.buildResults) {
       appUpdate(win, doc, msg.buildResults);

@@ -6,6 +6,7 @@ export interface DevServerConfig {
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
+  excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
   hotReplacement?: boolean;
@@ -69,6 +70,6 @@ export interface DevServerMessage {
 }
 
 export interface DevServerContext {
-  httpServer?: any;
-  webSocketServer?: any;
+  httpServer: any;
+  wsConnections: d.DevServerSocket[];
 }
