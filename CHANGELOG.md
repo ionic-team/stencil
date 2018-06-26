@@ -1,3 +1,13 @@
+<a name="0.10.0-2"></a>
+# 🎙 [0.10.0-2](https://github.com/ionic-team/stencil/compare/v0.10.0-1...v0.10.0-2) (2018-06-26)
+
+
+### Bug Fixes
+
+* **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
+
+
+
 <a name="0.10.0-1"></a>
 # 🐆 [0.10.0-1](https://github.com/ionic-team/stencil/compare/v0.10.0-0...v0.10.0-1) (2018-06-26)
 
