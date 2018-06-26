@@ -22,6 +22,7 @@ const whitelist = [
 ];
 
 if (success) {
+  bundle('faye-websocket.js');
   bundle('node-fetch.js');
   bundle('sys-util.js');
   bundle('sys-worker.js');

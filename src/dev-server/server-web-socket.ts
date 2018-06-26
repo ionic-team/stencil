@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import * as http from 'http';
 
 
-const WebSocket: d.DevServerSocketConstructor = require('faye-websocket');
+const WebSocket: d.DevServerSocketConstructor = require('../sys/node/faye-websocket').fayeWebSocket;
 
 
 export function initWebSocketUpgrads(devServerContext: d.DevServerContext, httpServer: http.Server) {
