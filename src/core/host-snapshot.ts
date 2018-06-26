@@ -52,15 +52,10 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   }
 
   if (Build.shadowDom) {
-    if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom) {
+    if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom && !hostElm.shadowRoot) {
       // this component is using shadow dom
       // and this browser supports shadow dom
       // add the read-only property "shadowRoot" to the host element
-      if (Build.isDev) {
-        if (hostElm.shadowRoot) {
-          console.error(`shadowRoot already attached to: ${cmpMeta.tagNameMeta}`);
-        }
-      }
       domApi.$attachShadow(hostElm, { mode: 'open' });
     }
   }
