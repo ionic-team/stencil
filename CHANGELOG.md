@@ -1,33 +1,22 @@
 <a name="0.10.0-2"></a>
 # 🎙 [0.10.0-2](https://github.com/ionic-team/stencil/compare/v0.10.0-1...v0.10.0-2) (2018-06-26)
 
+`@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
-### Bug Fixes
+The new `@stencil/core` integrated dev-server is a replacement for the external `@stencil/dev-server` package, but the previous package will continue to work if no changes are made to an app's npm scripts. To start testing out the new dev-server, within the app's `package.json` scripts:
 
-* **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
+**Update:**
 
+`sd concurrent \"stencil build --dev --watch\" \"stencil-dev-server\"`
 
+**To:**
 
-<a name="0.10.0-1"></a>
-# 🐆 [0.10.0-1](https://github.com/ionic-team/stencil/compare/v0.10.0-0...v0.10.0-1) (2018-06-26)
+`stencil build --dev --watch --serve`
 
+Note that the updated command is no longer requiring `sd concurrent`, which is from the `@stencil/utils` package, and no longer requires `stencil-dev-server`, which is from the `@stencil/dev-server` package. Unless the app is using these packages elsewhere, both can
+safely be removed as a dependency.
 
-### Bug Fixes
-
-* **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
-* **dependencies:** fix web socket dev dep
-
-
-<a name="0.10.0-0"></a>
-# 🧀 [0.10.0-0](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-0) (2018-06-26)
-
-
-### Bug Fixes
-
-* **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
-* **dev-server:** fix img reloading ([0d39f7b](https://github.com/ionic-team/stencil/commit/0d39f7b))
-* **scoped-css:** descendant selectors ([9e7fffb](https://github.com/ionic-team/stencil/commit/9e7fffb))
-* **styles:** update scoped styles on dev server reload ([607b93e](https://github.com/ionic-team/stencil/commit/607b93e))
+Next, the `stencil.config.js` file can also remove the entire `exports.devServer = {...}` config since it is no longer used.
 
 
 ### Features
@@ -37,6 +26,16 @@
 * **hmr:** enable hot module replacement for legacy builds ([8533ec6](https://github.com/ionic-team/stencil/commit/8533ec6))
 * **hmr:** init dev-mode hot module replacement ([b698710](https://github.com/ionic-team/stencil/commit/b698710))
 
+
+
+### Bug Fixes
+
+* **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
+* **dev-server:** fix img reloading ([0d39f7b](https://github.com/ionic-team/stencil/commit/0d39f7b))
+* **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
+* **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
+* **scoped-css:** descendant selectors ([9e7fffb](https://github.com/ionic-team/stencil/commit/9e7fffb))
+* **styles:** update scoped styles on dev server reload ([607b93e](https://github.com/ionic-team/stencil/commit/607b93e))
 
 
 <a name="0.9.11"></a>
