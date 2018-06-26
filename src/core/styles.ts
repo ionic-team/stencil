@@ -35,15 +35,15 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
         if (Build.isDev) {
           // dev mode
           // add a style id attribute, but only useful during dev
-          const styleContent: string[] = [`<style`, ` data-style-tag="${cmpMeta.tagNameMeta}"`];
-          domApi.$setAttribute(templateElm, 'data-tmpl-style-tag', cmpMeta.tagNameMeta);
+          const styleContent: string[] = [`<style`, ` data-style-tag="${cmpConstructor.is}"`];
+          domApi.$setAttribute(templateElm, 'data-tmpl-style-tag', cmpConstructor.is);
 
           if (cmpConstructor.styleMode) {
             styleContent.push(` data-style-mode="${cmpConstructor.styleMode}"`);
             domApi.$setAttribute(templateElm, 'data-tmpl-style-mode', cmpConstructor.styleMode);
           }
 
-          if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
+          if (cmpConstructor.encapsulation === 'scoped' || (cmpConstructor.encapsulation === 'shadow' && !domApi.$supportsShadowDom)) {
             styleContent.push(` data-style-scoped="true"`);
             domApi.$setAttribute(templateElm, 'data-tmpl-style-scoped', 'true');
           }
