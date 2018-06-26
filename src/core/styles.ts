@@ -32,8 +32,8 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
         (cmpMeta as any)[styleModeId] = templateElm;
 
         // add the style text to the template element's innerHTML
-        if (Build.isDev) {
-          // dev mode
+        if (Build.hotModuleReplacement) {
+          // hot module replacement enabled
           // add a style id attribute, but only useful during dev
           const styleContent: string[] = [`<style`, ` data-style-tag="${cmpConstructor.is}"`];
           domApi.$setAttribute(templateElm, 'data-tmpl-style-tag', cmpConstructor.is);
@@ -135,7 +135,7 @@ export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: Componen
         }
 
         if (styleElm) {
-          if (Build.isDev) {
+          if (Build.hotModuleReplacement) {
             // add a style attributes, but only useful during dev
             domApi.$setAttribute(styleElm, 'data-style-tag', cmpMeta.tagNameMeta);
             if (modeName) {
