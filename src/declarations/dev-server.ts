@@ -70,6 +70,6 @@ export interface DevServerMessage {
 }
 
 export interface DevServerContext {
-  httpServer?: any;
-  webSocketServer?: any;
+  httpServer: any;
+  wsConnections: d.DevServerSocket[];
 }
