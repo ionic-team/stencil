@@ -8,6 +8,7 @@ const root = path.resolve('/');
 
 describe('outputTargets', () => {
 
+  jest.setTimeout(20000);
   let c: TestingCompiler;
   let config: TestingConfig;
 
