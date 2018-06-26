@@ -1,6 +1,7 @@
 import { createRequestHandler } from '../request-handler';
 import { DevServerConfig } from '../../declarations';
 import { mockConfig } from '../../testing/mocks';
+import { normalizePath } from '../../compiler/util';
 import { TestingFs } from '../../testing/testing-fs';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import * as nodeFs from 'fs';
@@ -15,8 +16,8 @@ describe('request-handler', async () => {
   let req: http.ServerRequest;
   let res: TestServerResponse;
   const root = path.resolve('/');
-  const tmplDirPath = path.join(__dirname, '..', 'templates', 'directory-index.html');
-  const tmpl404Path = path.join(__dirname, '..', 'templates', '404.html');
+  const tmplDirPath = normalizePath(path.join(__dirname, '..', 'templates', 'directory-index.html'));
+  const tmpl404Path = normalizePath(path.join(__dirname, '..', 'templates', '404.html'));
   const tmplDir = nodeFs.readFileSync(tmplDirPath, 'utf8');
   const tmpl404 = nodeFs.readFileSync(tmpl404Path, 'utf8');
   const contentTypes = {
@@ -34,8 +35,8 @@ describe('request-handler', async () => {
 
     stencilConfig.devServer = {
       contentTypes: contentTypes,
-      devServerDir: path.join(__dirname, '..'),
-      root: path.join(root, 'www')
+      devServerDir: normalizePath(path.join(__dirname, '..')),
+      root: normalizePath(path.join(root, 'www'))
     };
 
     await fs.mkdir(stencilConfig.devServer.root);

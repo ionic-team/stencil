@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { isStaticDevClient } from './util';
+import { normalizePath } from '../compiler/util';
 import { serveFile, serveStaticDevClient } from './serve-file';
 import { serve404, serve500 } from './serve-error';
 import { serveDirectoryIndex } from './serve-directory-index';
@@ -70,11 +71,11 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
 
   req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
 
-  req.filePath = path.normalize(
+  req.filePath = normalizePath(path.normalize(
     path.join(devServerConfig.root,
       path.relative('/', req.pathname)
     )
-  );
+  ));
 
   return req;
 }
