@@ -8,14 +8,14 @@ export function initComponentHmr(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, e
   cmpMeta.componentConstructor = null;
 
   // forget the instance
-  const instance = plt.instanceMap.get((this as d.HostElement));
+  const instance = plt.instanceMap.get(elm);
   if (instance) {
     plt.hostElementMap.delete(instance);
-    plt.instanceMap.delete((this as d.HostElement));
+    plt.instanceMap.delete(elm);
   }
 
   plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
 
   // request the bundle again
-  plt.requestBundle(cmpMeta, (this as d.HostElement), hmrVersionId);
+  plt.requestBundle(cmpMeta, elm, hmrVersionId);
 }
