@@ -1,3 +1,13 @@
+<a name="0.10.0-1"></a>
+# 🐆 [0.10.0-1](https://github.com/ionic-team/stencil/compare/v0.10.0-0...v0.10.0-1) (2018-06-26)
+
+
+### Bug Fixes
+
+* **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
+* **dependencies:** fix web socket dev dep
+
+
 <a name="0.10.0-0"></a>
 # 🧀 [0.10.0-0](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-0) (2018-06-26)
 
