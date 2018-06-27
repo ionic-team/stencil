@@ -1,5 +1,5 @@
-<a name="0.10.0-2"></a>
-# 🎙 [0.10.0-2](https://github.com/ionic-team/stencil/compare/v0.10.0-1...v0.10.0-2) (2018-06-26)
+<a name="0.10.0-3"></a>
+# 🌅 [0.10.0-3](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-3) (2018-06-27)
 
 `@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
@@ -25,12 +25,13 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **hmr:** add devServer.excludeHmr config glob ([e46f0d0](https://github.com/ionic-team/stencil/commit/e46f0d0))
 * **hmr:** enable hot module replacement for legacy builds ([8533ec6](https://github.com/ionic-team/stencil/commit/8533ec6))
 * **hmr:** init dev-mode hot module replacement ([b698710](https://github.com/ionic-team/stencil/commit/b698710))
-
+* **serve:** create `stencil serve` for stand-alone http server ([33056ac](https://github.com/ionic-team/stencil/commit/33056ac))
 
 
 ### Bug Fixes
 
 * **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
+* **css-shim:** CSS_URL_REGEXP check relative to root paths ([77a9b5f](https://github.com/ionic-team/stencil/commit/77a9b5f))
 * **dev-server:** fix img reloading ([0d39f7b](https://github.com/ionic-team/stencil/commit/0d39f7b))
 * **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
 * **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
