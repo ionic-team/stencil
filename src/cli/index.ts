@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Compiler as CompilerType } from '../compiler';
 import { getConfigFilePath } from './cli-utils';
 import { helpTask } from './task-help';
 import { parseFlags } from './parse-flags';
@@ -55,7 +54,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
 
     const { Compiler } = require('../compiler/index.js');
 
-    const compiler: CompilerType = new Compiler(config);
+    const compiler: d.Compiler = new Compiler(config);
     if (!compiler.isValid) {
       process.exit(1);
     }
