@@ -1,5 +1,5 @@
-<a name="0.10.0-5"></a>
-# 🌈 [0.10.0-5](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-5) (2018-06-27)
+<a name="0.10.0-6"></a>
+# ✨ [0.10.0-6](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-6) (2018-06-27)
 
 `@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
@@ -37,6 +37,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
 * **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
 * **hmr:** reload page when app adds or deletes scripts ([6352ead](https://github.com/ionic-team/stencil/commit/6352ead))
+* **props:** ensure mode value set to host element is not deleted ([0671ea1](https://github.com/ionic-team/stencil/commit/0671ea1))
 * **scoped-css:** descendant selectors ([9e7fffb](https://github.com/ionic-team/stencil/commit/9e7fffb))
 * **styles:** fix race condition w/ multiple modes for same component ([50307bd](https://github.com/ionic-team/stencil/commit/50307bd))
 * **styles:** update scoped styles on dev server reload ([607b93e](https://github.com/ionic-team/stencil/commit/607b93e))
