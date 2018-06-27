@@ -1,35 +1,24 @@
 import * as d from '../declarations';
-import { hasError } from './cli-utils';
-import { helpTask } from './task-help';
-import { serverTask } from './task-serve';
+import { taskBuild } from './task-build';
+import { taskDocs } from './task-docs';
+import { taskHelp } from './task-help';
+import { taskServe } from './task-serve';
 
 
-export async function runTask(process: NodeJS.Process, config: d.Config, compiler: any, flags: d.ConfigFlags) {
+export async function runTask(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
   switch (flags.task) {
     case 'build':
-      const results = await compiler.build();
-      if (!config.watch && hasError(results && results.diagnostics)) {
-        config.sys.destroy();
-        process.exit(1);
-      }
-
-      if (config.watch || (config.devServer && config.flags.serve)) {
-        process.once('SIGINT', () => {
-          config.sys.destroy();
-          process.exit(0);
-        });
-      }
-      return results;
+      return taskBuild(process, config, flags);
 
     case 'docs':
-      return compiler.docs();
+      return taskDocs(process, config);
 
     case 'serve':
-      return serverTask(config, compiler);
+      return taskServe(process, config, flags);
 
     default:
       config.logger.error(`Invalid stencil command, please see the options below:`);
-      helpTask(process, config.logger);
+      taskHelp(process, config.logger);
       process.exit(1);
   }
 }

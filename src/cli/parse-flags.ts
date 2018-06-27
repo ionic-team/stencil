@@ -3,23 +3,35 @@ import { dashToPascalCase } from '../util/helpers';
 
 
 export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
-  const cmdArgs = getCmdArgs(process);
-  const flags: any = {};
+  const flags: any = {
+    task: null
+  };
 
-  if (cmdArgs[0] && !cmdArgs[0].startsWith('-')) {
+  // cmd line has more priority over npm scripts cmd
+  const cmdArgs = process.argv.slice(2);
+  if (cmdArgs.length > 0 && cmdArgs[0] && !cmdArgs[0].startsWith('-')) {
     flags.task = cmdArgs[0];
-  } else {
-    flags.task = null;
   }
+  parseArgs(flags, cmdArgs);
 
+  const npmScriptCmdArgs = getNpmScriptArgs(process);
+  parseArgs(flags, npmScriptCmdArgs);
+
+  return flags;
+}
+
+
+export function parseArgs(flags: any, args: string[]): d.ConfigFlags {
   ARG_OPTS.boolean.forEach(booleanName => {
 
     const alias = (ARG_OPTS.alias as any)[booleanName];
     const flagKey = configCase(booleanName);
 
-    flags[flagKey] = null;
+    if (typeof flags[flagKey] !== 'boolean') {
+      flags[flagKey] = null;
+    }
 
-    cmdArgs.forEach(cmdArg => {
+    args.forEach(cmdArg => {
       if (cmdArg === `--${booleanName}`) {
         flags[flagKey] = true;
 
@@ -37,10 +49,12 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
     const alias = (ARG_OPTS.alias as any)[stringName];
     const flagKey = configCase(stringName);
 
-    flags[flagKey] = null;
+    if (typeof flags[flagKey] !== 'string') {
+      flags[flagKey] = null;
+    }
 
-    for (let i = 0; i < cmdArgs.length; i++) {
-      const cmdArg = cmdArgs[i];
+    for (let i = 0; i < args.length; i++) {
+      const cmdArg = args[i];
 
       if (cmdArg.startsWith(`--${stringName}=`)) {
         const values = cmdArg.split('=');
@@ -48,7 +62,7 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
         flags[flagKey] = values.join('=');
 
       } else if (cmdArg === `--${stringName}`) {
-        flags[flagKey] = cmdArgs[i + 1];
+        flags[flagKey] = args[i + 1];
 
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
@@ -57,7 +71,7 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
           flags[flagKey] = values.join('=');
 
         } else if (cmdArg === `-${alias}`) {
-          flags[flagKey] = cmdArgs[i + 1];
+          flags[flagKey] = args[i + 1];
         }
       }
     }
@@ -68,10 +82,12 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
     const alias = (ARG_OPTS.alias as any)[numberName];
     const flagKey = configCase(numberName);
 
-    flags[flagKey] = null;
+    if (typeof flags[flagKey] !== 'number') {
+      flags[flagKey] = null;
+    }
 
-    for (let i = 0; i < cmdArgs.length; i++) {
-      const cmdArg = cmdArgs[i];
+    for (let i = 0; i < args.length; i++) {
+      const cmdArg = args[i];
 
       if (cmdArg.startsWith(`--${numberName}=`)) {
         const values = cmdArg.split('=');
@@ -79,7 +95,7 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
         flags[flagKey] = parseInt(values.join(''), 10);
 
       } else if (cmdArg === `--${numberName}`) {
-        flags[flagKey] = parseInt(cmdArgs[i + 1], 10);
+        flags[flagKey] = parseInt(args[i + 1], 10);
 
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
@@ -88,7 +104,7 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
           flags[flagKey] = parseInt(values.join(''), 10);
 
         } else if (cmdArg === `-${alias}`) {
-          flags[flagKey] = parseInt(cmdArgs[i + 1], 10);
+          flags[flagKey] = parseInt(args[i + 1], 10);
         }
       }
     }
@@ -96,6 +112,7 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
 
   return flags;
 }
+
 
 function configCase(prop: string) {
   prop = dashToPascalCase(prop);
@@ -125,6 +142,7 @@ const ARG_OPTS = {
     'port'
   ],
   string: [
+    'address',
     'config',
     'docs-json',
     'log-level'
@@ -138,18 +156,18 @@ const ARG_OPTS = {
 };
 
 
-export function getCmdArgs(process: NodeJS.Process) {
-  let cmdArgs = process.argv.slice(2);
-
+export function getNpmScriptArgs(process: NodeJS.Process) {
+  // process.env.npm_config_argv
+  // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
+  let args: string[] = [];
   try {
     if (process.env) {
       const npmConfigArgs = process.env.npm_config_argv;
       if (npmConfigArgs) {
-        const npmOrginalFlags = (JSON.parse(npmConfigArgs).original as string[]).filter(arg => arg.startsWith('-'));
-        cmdArgs = cmdArgs.concat(npmOrginalFlags);
+        args = (JSON.parse(npmConfigArgs).original as string[]);
+        args.shift();
       }
     }
   } catch (e) {}
-
-  return cmdArgs;
+  return args;
 }

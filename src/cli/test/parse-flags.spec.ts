@@ -1,4 +1,4 @@
-import { getCmdArgs, parseFlags } from '../parse-flags';
+import { parseFlags } from '../parse-flags';
 
 
 describe('parseFlags', () => {
@@ -11,23 +11,74 @@ describe('parseFlags', () => {
     process.argv = ['/node', '/stencil'];
   });
 
-  it('should append npm run flags when provided', () => {
-    process.argv.push('build', '--a', '--b');
+  it('should use cli args, no npm cmds', () => {
+    // user command line args
+    // $ npm run serve --port 4444
+
+    // process.argv.slice(2)
+    // [ 'serve', '--address', '127.0.0.1', '--port', '4444' ]
+
+    process.argv.push('serve', '--address', '127.0.0.1', '--port', '4444');
+
+    const flags = parseFlags(process);
+    expect(flags.task).toBe('serve');
+    expect(flags.address).toBe('127.0.0.1');
+    expect(flags.port).toBe(4444);
+  });
+
+  it('should use cli args first, then npm cmds', () => {
+    // user command line args
+    // $ npm run serve --port 4444
+
+    // npm script
+    // "serve": "stencil serve --address 127.0.0.1 --port 8888"
+
+    // process.argv.slice(2)
+    // [ 'serve', '--address', '127.0.0.1', '--port', '8888', '4444' ]
+
+    // process.env.npm_config_argv
+    // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
+
+    process.argv.push('serve', '--address', '127.0.0.1', '--port', '8888', '4444');
 
     process.env = {
       npm_config_argv: JSON.stringify({
-        original: ['run', 'build', '--c', '--d', '--a']
+        original: ['run', 'serve', '--port', '4444']
       })
     };
 
-    const cmdArgs = getCmdArgs(process);
-    expect(cmdArgs).toHaveLength(6);
-    expect(cmdArgs[0]).toBe('build');
-    expect(cmdArgs[1]).toBe('--a');
-    expect(cmdArgs[2]).toBe('--b');
-    expect(cmdArgs[3]).toBe('--c');
-    expect(cmdArgs[4]).toBe('--d');
-    expect(cmdArgs[5]).toBe('--a');
+    const flags = parseFlags(process);
+    expect(flags.task).toBe('serve');
+    expect(flags.address).toBe('127.0.0.1');
+    expect(flags.port).toBe(4444);
+  });
+
+  it('run stencil cmd from npm scripts', () => {
+    // user command line args
+    // $ npm run dev
+
+    // npm script
+    // "dev": "stencil build --dev --watch --serve"
+
+    // process.argv.slice(2)
+    // [ 'build', '--dev', '--watch', '--serve' ]
+
+    // process.env.npm_config_argv
+    // {"remain":[],"cooked":["run","dev"],"original":["run","dev"]}
+
+    process.argv.push('build', '--dev', '--watch', '--serve');
+
+    process.env = {
+      npm_config_argv: JSON.stringify({
+        original: ['run', 'dev']
+      })
+    };
+
+    const flags = parseFlags(process);
+    expect(flags.task).toBe('build');
+    expect(flags.dev).toBe(true);
+    expect(flags.watch).toBe(true);
+    expect(flags.serve).toBe(true);
   });
 
   it('should parse task', () => {

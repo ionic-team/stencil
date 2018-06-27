@@ -70,6 +70,8 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
     sendMsg(serverProcess, {
       startServer: config.devServer
     });
+
+    return config.devServer;
   });
 }
 

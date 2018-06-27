@@ -206,9 +206,7 @@ export class NodeSystem implements d.StencilSystem {
           fileStat = this.fs.statSync(configPath);
           hasConfigFile = fileStat.isFile();
         }
-      } catch (e) {
-        throw new Error(`Invalid Stencil configuration file "${configPath}".`);
-      }
+      } catch (e) {}
     }
 
     if (hasConfigFile) {

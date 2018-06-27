@@ -8,7 +8,7 @@ import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
-export class Compiler {
+export class Compiler implements d.Compiler {
   protected ctx: d.CompilerCtx;
   isValid: boolean;
   config: d.Config;
@@ -58,6 +58,10 @@ export class Compiler {
 
     // get the browser url to be logged out at the end of the build
     this.config.devServer.browserUrl = devServerConfig.browserUrl;
+
+    return {
+      browserUrl: this.config.devServer.browserUrl
+    };
   }
 
   build() {

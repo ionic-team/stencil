@@ -38,6 +38,12 @@ describe('validateDevServer', () => {
     expect(config.devServer.address).toBe('123.123.123.123');
   });
 
+  it('should set address from flags', () => {
+    config.flags.address = '123.123.123.123';
+    validateConfig(config);
+    expect(config.devServer.address).toBe('123.123.123.123');
+  });
+
   it('should default root', () => {
     validateConfig(config);
     expect(config.devServer.root).toBe(normalizePath(path.join(root, 'some', 'path', 'www')));
@@ -73,6 +79,12 @@ describe('validateDevServer', () => {
 
   it('should set port', () => {
     config.devServer.port = 4444;
+    validateConfig(config);
+    expect(config.devServer.port).toBe(4444);
+  });
+
+  it('should set port from flags', () => {
+    config.flags.port = 4444;
     validateConfig(config);
     expect(config.devServer.port).toBe(4444);
   });

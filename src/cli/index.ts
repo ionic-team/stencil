@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { getConfigFilePath } from './cli-utils';
-import { helpTask } from './task-help';
+import { taskHelp } from './task-help';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
 import { WORKER_EXITED_MSG } from '../sys/node/worker-farm/main';
@@ -14,7 +14,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   const flags = parseFlags(process);
 
   if (flags.help || flags.task === `help`) {
-    helpTask(process, logger);
+    taskHelp(process, logger);
     process.exit(0);
   }
 
@@ -52,16 +52,9 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
 
     config.flags = flags;
 
-    const { Compiler } = require('../compiler/index.js');
-
-    const compiler: d.Compiler = new Compiler(config);
-    if (!compiler.isValid) {
-      process.exit(1);
-    }
-
     process.title = `Stencil: ${config.namespace}`;
 
-    runTask(process, config, compiler, flags).catch(err => {
+    runTask(process, config, flags).catch(err => {
       config.logger.error(`uncaught cli task error`, err);
     });
 
