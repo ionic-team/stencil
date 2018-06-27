@@ -7,6 +7,14 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
   // files changed include updated, added and deleted
   watchResults.filesChanged = watchResults.filesUpdated.concat(watchResults.filesAdded, watchResults.filesDeleted),
 
+  watchResults.scriptsAdded = watchResults.filesAdded.filter(f => {
+    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+  }).map(f => config.sys.path.basename(f));
+
+  watchResults.scriptsDeleted = watchResults.filesDeleted.filter(f => {
+    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+  }).map(f => config.sys.path.basename(f));
+
   // collect up all the file extensions from changed files
   watchResults.filesChanged.forEach(filePath => {
     const ext = filePath.split('.').pop().toLowerCase();

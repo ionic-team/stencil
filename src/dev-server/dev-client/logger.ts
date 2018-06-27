@@ -6,6 +6,11 @@ export function logBuild(msg: string) {
 }
 
 
+export function logReload(msg: string) {
+  log(YELLOW, 'Reload', msg);
+}
+
+
 export function logDiagnostic(diagnostic: d.Diagnostic) {
   let color = RED;
   let prefix = 'Error';

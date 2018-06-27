@@ -35,6 +35,8 @@ export interface BuildCtx {
   isActiveBuild: boolean;
   isRebuild: boolean;
   requiresFullBuild: boolean;
+  scriptsAdded: string[];
+  scriptsDeleted: string[];
   shouldAbort(): boolean;
   startTime: number;
   styleBuildCount: number;
@@ -84,11 +86,13 @@ export interface BuildResults {
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
-  excludeHmr?: boolean;
+  excludeHmr?: string[];
   externalStylesUpdated?: string[];
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  scriptsAdded?: string[];
+  scriptsDeleted?: string[];
   versionId?: string;
 }
 

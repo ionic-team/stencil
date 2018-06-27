@@ -37,6 +37,8 @@ export class BuildContext implements d.BuildCtx {
   indexBuildCount = 0;
   isRebuild = false;
   requiresFullBuild = true;
+  scriptsAdded: string[] = [];
+  scriptsDeleted: string[] = [];
   startTime = Date.now();
   styleBuildCount = 0;
   stylesUpdated = [] as d.BuildStyleUpdate[];
@@ -76,6 +78,8 @@ export class BuildContext implements d.BuildCtx {
     };
 
     if (watchResults != null) {
+      this.scriptsAdded = watchResults.scriptsAdded.slice();
+      this.scriptsDeleted = watchResults.scriptsAdded.slice();
       this.hasCopyChanges = watchResults.hasCopyChanges;
       this.hasScriptChanges = watchResults.hasScriptChanges;
       this.hasStyleChanges = watchResults.hasStyleChanges;

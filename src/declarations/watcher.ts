@@ -38,4 +38,7 @@ export interface WatchResults {
    * Change to stencil.config.js
    */
   configUpdated: boolean;
+
+  scriptsAdded: string[];
+  scriptsDeleted: string[];
 }

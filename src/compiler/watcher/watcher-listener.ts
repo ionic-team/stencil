@@ -250,6 +250,8 @@ export class WatcherListener {
         hasCopyChanges: this.hasCopyChanges,
         filesChanged: [],
         changedExtensions: [],
+        scriptsAdded: [],
+        scriptsDeleted: [],
         hasScriptChanges: false,
         hasStyleChanges: false,
         hasIndexHtmlChanges: false

@@ -4,7 +4,7 @@ import { hmrComponents } from './hmr-components';
 import { hmrExternalStyles } from './hmr-external-styles';
 import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
-import { logBuild } from './logger';
+import { logBuild, logReload } from './logger';
 
 
 export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d.BuildResults) {
@@ -26,6 +26,7 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
       // and we've unregistered any existing service workers
       // then let's refresh the page from the root of the server
       appReset(win).then(() => {
+        logReload(`Initial load`);
         win.location.reload(true);
       });
       return;
@@ -42,20 +43,35 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
 
 
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
-  // let's do some hot module replacement shall we
-  doc.documentElement.setAttribute('data-hmr', hmr.versionId);
-
-  if (hmr.excludeHmr) {
-    logBuild(`ExcludeHmr, reloading page...`);
-    win.location.reload(true);
-    return;
-  }
+  let shouldWindowReload = false;
 
   if (hmr.indexHtmlUpdated) {
-    logBuild(`Updated index.html, reloading page...`);
+    logReload(`Updated index.html`);
+    shouldWindowReload = true;
+  }
+
+  if (hmr.scriptsAdded && hmr.scriptsAdded.length > 0) {
+    logReload(`Added scripts: ${hmr.scriptsAdded.join(', ')}`);
+    shouldWindowReload = true;
+  }
+
+  if (hmr.scriptsDeleted && hmr.scriptsDeleted.length > 0) {
+    logReload(`Deleted scripts: ${hmr.scriptsDeleted.join(', ')}`);
+    shouldWindowReload = true;
+  }
+
+  if (hmr.excludeHmr && hmr.excludeHmr.length > 0) {
+    logReload(`Excluded From Hmr: ${hmr.excludeHmr.join(', ')}`);
+    shouldWindowReload = true;
+  }
+
+  if (shouldWindowReload) {
     win.location.reload(true);
     return;
   }
+
+  // let's do some hot module replacement shall we
+  doc.documentElement.setAttribute('data-hmr', hmr.versionId);
 
   if (hmr.componentsUpdated) {
     logBuild(`Updated components: ${hmr.componentsUpdated.sort().join(', ')}`);

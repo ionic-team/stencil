@@ -9,8 +9,17 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
 
   const hmr: d.HotModuleReplacement = {};
 
-  if (changesShouldExcludeHmr(config, config.devServer.excludeHmr, buildCtx.filesChanged)) {
-    hmr.excludeHmr = true;
+  if (buildCtx.scriptsAdded.length > 0) {
+    hmr.scriptsAdded = buildCtx.scriptsAdded.slice();
+  }
+
+  if (buildCtx.scriptsDeleted.length > 0) {
+    hmr.scriptsDeleted = buildCtx.scriptsDeleted.slice();
+  }
+
+  const excludeHmr = excludeHmrFiles(config, config.devServer.excludeHmr, buildCtx.filesChanged);
+  if (excludeHmr.length > 0) {
+    hmr.excludeHmr = excludeHmr.slice();
   }
 
   if (buildCtx.hasIndexHtmlChanges) {
@@ -165,30 +174,35 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-function changesShouldExcludeHmr(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+  const excludeFiles: string[] = [];
+
   if (!excludeHmr || excludeHmr.length === 0) {
-    return false;
+    return excludeFiles;
   }
 
-  return excludeHmr.some(excludeHmr => {
+  excludeHmr.forEach(excludeHmr => {
 
     return filesChanged.map(fileChanged => {
-      let exclude = false;
+      let shouldExclude = false;
 
       if (config.sys.isGlob(excludeHmr)) {
-        exclude = config.sys.minimatch(fileChanged, excludeHmr);
+        shouldExclude = config.sys.minimatch(fileChanged, excludeHmr);
       } else {
-        exclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
+        shouldExclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
       }
 
-      if (exclude) {
+      if (shouldExclude) {
         config.logger.debug(`excludeHmr: ${fileChanged}`);
+        excludeFiles.push(config.sys.path.basename(fileChanged));
       }
 
-      return exclude;
+      return shouldExclude;
 
     }).some(r => r);
   });
+
+  return excludeFiles;
 }
 
 
