@@ -1,15 +1,15 @@
+import * as d from '../../declarations';
 import { attachStyles, initStyleTemplate } from '../styles';
-import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../../declarations';
 import { mockDomApi, mockElement, mockPlatform } from '../../testing/mocks';
 import { ENCAPSULATION } from '../../util/constants';
 
 
 describe('styles', () => {
 
-  let plt: PlatformApi;
-  let domApi: DomApi;
-  let elm: HostElement;
-  let cmpMeta: ComponentMeta;
+  let plt: d.PlatformApi;
+  let domApi: d.DomApi;
+  let elm: d.HostElement;
+  let cmpMeta: d.ComponentMeta;
 
   beforeEach(() => {
     plt = mockPlatform();
@@ -21,7 +21,7 @@ describe('styles', () => {
   });
 
   it('should place the styles in the head below multiple existing <styles data-styles>', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }
@@ -53,7 +53,7 @@ describe('styles', () => {
   });
 
   it('should place the styles in the head below an existing <styles data-styles>', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }
@@ -79,7 +79,7 @@ describe('styles', () => {
   });
 
   it('should place the styles in the head w/out an existing <styles data-styles>', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }
@@ -96,8 +96,76 @@ describe('styles', () => {
     expect(style.innerHTML).toBe(cmpConstructor.style);
   });
 
+  it('should use all styles templates for each mode', () => {
+    const mdStyle = '.md { color: green; }';
+    const mdMode = 'md';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, mdStyle, mdMode);
+
+    const iosStyle = '.ios { color: blue; }';
+    const iosMode = 'ios';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, iosStyle, iosMode);
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, defaultStyle, defaultMode);
+
+    elm.mode = 'ios';
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    elm.mode = 'md';
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    elm.mode = null;
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    const styles = domApi.$head.querySelectorAll('style');
+    expect(styles[0].innerHTML).toBe(':host { color: red; }');
+    expect(styles[1].innerHTML).toBe('.md { color: green; }');
+    expect(styles[2].innerHTML).toBe('.ios { color: blue; }');
+  });
+
+  it('should use the style template w/ a ios mode', () => {
+    const mdStyle = '.md { color: green; }';
+    const mdMode = 'md';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, mdStyle, mdMode);
+
+    const iosStyle = '.ios { color: blue; }';
+    const iosMode = 'ios';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, iosStyle, iosMode);
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, defaultStyle, defaultMode);
+
+    elm.mode = 'ios';
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    const style = domApi.$head.querySelector('style');
+    expect(style.innerHTML).toBe('.ios { color: blue; }');
+  });
+
+  it('should use the style template w/ a default mode', () => {
+    const mdStyle = '.md { color: green; }';
+    const mdMode = 'md';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, mdStyle, mdMode);
+
+    const iosStyle = '.ios { color: blue; }';
+    const iosMode = 'ios';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, iosStyle, iosMode);
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, defaultStyle, defaultMode);
+
+    elm.mode = undefined;
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    const style = domApi.$head.querySelector('style');
+    expect(style.innerHTML).toBe(':host { color: red; }');
+  });
+
   it('should append component styles template to head, with styleMode and scoped css', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }
@@ -121,7 +189,7 @@ describe('styles', () => {
   });
 
   it('should append component styles template to head, no styleMode', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }
@@ -139,7 +207,7 @@ describe('styles', () => {
   });
 
   it('should not append component styles template when no styles', () => {
-    const cmpConstructor: ComponentConstructor = class {
+    const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
         return 'cmp-a';
       }

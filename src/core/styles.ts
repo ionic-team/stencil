@@ -75,8 +75,17 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     // and add the scope attribute to the host
     hostElm['s-sc'] = getScopeId(cmpMeta, hostElm.mode);
   }
-  const styleModeId = cmpMeta.tagNameMeta + (hostElm.mode || DEFAULT_STYLE_MODE);
-  const styleTemplate = (cmpMeta as any)[styleModeId];
+
+  // create the style id w/ the host element's mode
+  let styleId = cmpMeta.tagNameMeta + hostElm.mode;
+  let styleTemplate = (cmpMeta as any)[styleId];
+
+  if (!styleTemplate) {
+    // doesn't look like there's a style template with the mode
+    // create the style id using the default style mode and try again
+    styleId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
+    styleTemplate = (cmpMeta as any)[styleId];
+  }
 
   if (styleTemplate) {
     // cool, we found a style template element for this component
@@ -113,7 +122,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     }
 
     // check if we haven't applied these styles to this container yet
-    if (!appliedStyles[styleModeId]) {
+    if (!appliedStyles[styleId]) {
       let styleElm: HTMLStyleElement;
       if (Build.es5) {
         // es5 builds are not usig <template> because of ie11 issues
@@ -121,14 +130,14 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
         // create a new style element and add as innerHTML
 
         if (Build.cssVarShim && plt.customStyle) {
-          styleElm = plt.customStyle.createHostStyle(hostElm, styleModeId, styleTemplate);
+          styleElm = plt.customStyle.createHostStyle(hostElm, styleId, styleTemplate);
 
         } else {
           styleElm = domApi.$createElement('style');
           styleElm.innerHTML = styleTemplate;
 
           // remember we don't need to do this again for this element
-          appliedStyles[styleModeId] = true;
+          appliedStyles[styleId] = true;
 
         }
 
@@ -154,7 +163,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
         styleElm = styleTemplate.content.cloneNode(true);
 
         // remember we don't need to do this again for this element
-        appliedStyles[styleModeId] = true;
+        appliedStyles[styleId] = true;
 
         // let's make sure we put the styles below the <style data-styles> element
         // so any visibility css overrides the default
