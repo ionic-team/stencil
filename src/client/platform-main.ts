@@ -159,10 +159,13 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // get the component constructor from the module
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
+          cmpMeta.componentConstructor = cmpConstructor;
           initStyleTemplate(
             domApi,
             cmpMeta,
-            (cmpMeta.componentConstructor = cmpConstructor)
+            cmpMeta.encapsulation,
+            cmpConstructor.style,
+            cmpConstructor.styleMode
           );
 
         } catch (e) {
@@ -202,10 +205,13 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // get the component constructor from the module
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
+          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
           initStyleTemplate(
             domApi,
             cmpMeta,
-            (cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)])
+            cmpMeta.encapsulation,
+            cmpMeta.componentConstructor.style,
+            cmpMeta.componentConstructor.styleMode
           );
 
         } catch (e) {

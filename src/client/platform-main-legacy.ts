@@ -205,7 +205,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulation, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
             }
             break;
           }

@@ -1,6 +1,7 @@
 import { attachStyles, initStyleTemplate } from '../styles';
 import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../../declarations';
 import { mockDomApi, mockElement, mockPlatform } from '../../testing/mocks';
+import { ENCAPSULATION } from '../../util/constants';
 
 
 describe('styles', () => {
@@ -40,7 +41,7 @@ describe('styles', () => {
     prerenderStyles.innerHTML = `body { color: blue; }`;
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
@@ -67,7 +68,7 @@ describe('styles', () => {
     prerenderStyles.innerHTML = `body { color: blue; }`;
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
@@ -88,7 +89,7 @@ describe('styles', () => {
     };
     cmpMeta.componentConstructor = cmpConstructor;
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
     const style = domApi.$head.querySelector('style');
@@ -112,7 +113,7 @@ describe('styles', () => {
     };
     cmpMeta.componentConstructor = cmpConstructor;
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, cmpConstructor.style, cmpConstructor.styleMode);
 
     const template = domApi.$head.querySelector('template');
     expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a" data-style-mode="ios" data-style-scoped="true">${cmpConstructor.style}</style>`);
@@ -130,7 +131,7 @@ describe('styles', () => {
     };
     cmpMeta.componentConstructor = cmpConstructor;
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
 
     const template = domApi.$head.querySelector('template');
     expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a">${cmpConstructor.style}</style>`);
@@ -145,7 +146,7 @@ describe('styles', () => {
     };
     cmpMeta.componentConstructor = cmpConstructor;
 
-    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
 
     const template = domApi.$head.querySelector('template');
     expect(template).toBe(null);
