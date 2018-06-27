@@ -74,6 +74,7 @@ async function getFiles(fs: d.FileSystem, filePath: string, urlPathName: string,
       return (`
         <li class="${item.isDirectory ? 'directory' : 'file'}">
           <a href="${item.pathname}">
+            <span class="icon"></span>
             <span>${item.name}</span>
           </a>
         </li>`
