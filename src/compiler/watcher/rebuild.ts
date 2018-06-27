@@ -20,9 +20,19 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
   watchResults.hasScriptChanges = watchResults.changedExtensions.some(ext => SCRIPT_EXT.includes(ext));
   watchResults.hasStyleChanges = watchResults.changedExtensions.some(ext => STYLE_EXT.includes(ext));
 
-  watchResults.hasIndexHtmlChanges = watchResults.filesChanged.some(fileChanged => {
+  const srcIndexHtmlChanged = watchResults.filesChanged.some(fileChanged => {
+    // the src index index.html file has changed
+    // this file name could be something other than index.html
     return fileChanged === config.srcIndexHtml;
   });
+
+  const anyIndexHtmlChanged = watchResults.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
+  if (anyIndexHtmlChanged) {
+    // any index.html in any directory that changes counts too
+    watchResults.hasIndexHtmlChanges = true;
+  }
+
+  watchResults.hasIndexHtmlChanges = anyIndexHtmlChanged || srcIndexHtmlChanged;
 
   // print out a pretty message about the changed files
   printWatcherMessage(config, watchResults);
