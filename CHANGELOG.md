@@ -1,5 +1,5 @@
-<a name="0.10.0-7"></a>
-# 🐱 [0.10.0-7](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-7) (2018-06-28)
+<a name="0.10.0-8"></a>
+# 🤓 [0.10.0-8](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-8) (2018-06-28)
 
 `@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
