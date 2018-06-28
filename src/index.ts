@@ -10,7 +10,8 @@ export {
   Config,
   EventEmitter,
   EventListenerEnable,
-  FunctionalComponent
+  FunctionalComponent,
+  QueueApi
 } from './declarations/index';
 
 
