@@ -7,7 +7,12 @@ export function logBuild(msg: string) {
 
 
 export function logReload(msg: string) {
-  log(YELLOW, 'Reload', msg);
+  logWarn('Reload', msg);
+}
+
+
+export function logWarn(prefix: string, msg: string) {
+  log(YELLOW, prefix, msg);
 }
 
 

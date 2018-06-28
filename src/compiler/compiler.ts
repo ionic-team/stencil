@@ -70,14 +70,13 @@ export class Compiler implements d.Compiler {
   }
 
   on(eventName: 'build', cb: (watchResults?: d.WatchResults) => void): Function;
-  on(eventName: 'buildStart', cb: () => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
+  on(eventName: 'buildLog', cb: (buildResults: d.BuildLog) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   on(eventName: d.CompilerEventName, cb: any) {
     return this.ctx.events.subscribe(eventName as any, cb);
   }
 
-  once(eventName: 'buildStart'): Promise<void>;
   once(eventName: 'buildFinish'): Promise<d.BuildResults>;
   once(eventName: 'buildNoChange'): Promise<d.BuildNoChangeResults>;
   once(eventName: d.CompilerEventName) {

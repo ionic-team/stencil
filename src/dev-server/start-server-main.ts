@@ -50,7 +50,7 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
 
     serverProcess.on('message', (msg: d.DevServerMessage) => {
       // main process has received a message from the child server process
-      mainReceivedMessageFromServer(config, compilerCtx, serverProcess, msg, resolve);
+      mainReceivedMessageFromWorker(config, compilerCtx, serverProcess, msg, resolve);
     });
 
     compilerCtx.events.subscribe('buildFinish', buildResults => {
@@ -61,6 +61,14 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
       };
       delete msg.buildResults.entries;
       delete msg.buildResults.components;
+
+      sendMsg(serverProcess, msg);
+    });
+
+    compilerCtx.events.subscribe('buildLog', buildLog => {
+      const msg: d.DevServerMessage = {
+        buildLog: Object.assign({}, buildLog)
+      };
 
       sendMsg(serverProcess, msg);
     });
@@ -76,7 +84,7 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
 }
 
 
-function mainReceivedMessageFromServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess: any, msg: d.DevServerMessage, resolve: (devServerConfig: any) => void) {
+function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess: any, msg: d.DevServerMessage, resolve: (devServerConfig: any) => void) {
   if (msg.serverStated) {
     // received a message from the child process that the server has successfully started
     if (config.devServer.openBrowser && msg.serverStated.initialLoadUrl) {
@@ -100,6 +108,12 @@ function mainReceivedMessageFromServer(config: d.Config, compilerCtx: d.Compiler
       delete msg.buildResults.entries;
       delete msg.buildResults.components;
 
+      serverProcess.send(msg);
+
+    } else {
+      const msg: d.DevServerMessage = {
+        buildResults: null
+      };
       serverProcess.send(msg);
     }
     return;

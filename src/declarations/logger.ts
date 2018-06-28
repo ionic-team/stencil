@@ -7,7 +7,7 @@ export interface Logger {
   info(...msg: any[]): void;
   warn(...msg: any[]): void;
   error(...msg: any[]): void;
-  createTimeSpan(startMsg: string, debug?: boolean): LoggerTimeSpan;
+  createTimeSpan(startMsg: string, debug?: boolean, appendTo?: string[]): LoggerTimeSpan;
   printDiagnostics(diagnostics: d.Diagnostic[]): void;
   red(msg: string): string;
   green(msg: string): string;

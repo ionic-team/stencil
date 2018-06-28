@@ -10,8 +10,8 @@ export class BuildEvents implements d.BuildEvents {
   subscribe(eventName: 'dirAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirDelete', cb: (path: string) => void): Function;
   subscribe(eventName: 'build', cb: (watcherResults: d.WatchResults) => void): Function;
-  subscribe(eventName: 'buildStart', cb: (buildStartData: d.BuildStartData) => void): Function;
   subscribe(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
+  subscribe(eventName: 'buildLog', cb: (buildLog: d.BuildLog) => void): Function;
   subscribe(eventName: d.CompilerEventName, cb: Function): Function {
     const evName = getEventName(eventName);
 

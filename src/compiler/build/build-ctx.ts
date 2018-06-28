@@ -8,6 +8,7 @@ import { initWatcher } from '../watcher/watcher-init';
 export class BuildContext implements d.BuildCtx {
   appFileBuildCount = 0;
   buildId = -1;
+  buildMessages: string[] = [];
   timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
@@ -65,18 +66,6 @@ export class BuildContext implements d.BuildCtx {
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
     this.timeSpan = this.createTimeSpan(msg);
 
-    const buildStartData: d.BuildStartData = {
-      buildId: this.buildId,
-      isRebuild: this.isRebuild,
-      startTime: Date.now(),
-      filesChanged: null,
-      filesUpdated: null,
-      filesAdded: null,
-      filesDeleted: null,
-      dirsDeleted: null,
-      dirsAdded: null,
-    };
-
     if (watchResults != null) {
       this.scriptsAdded = watchResults.scriptsAdded.slice();
       this.scriptsDeleted = watchResults.scriptsAdded.slice();
@@ -91,17 +80,7 @@ export class BuildContext implements d.BuildCtx {
       this.filesDeleted.push(...watchResults.filesDeleted);
       this.dirsDeleted.push(...watchResults.dirsDeleted);
       this.dirsAdded.push(...watchResults.dirsAdded);
-
-      buildStartData.filesChanged = this.filesChanged.slice();
-      buildStartData.filesUpdated = this.filesUpdated.slice();
-      buildStartData.filesAdded = this.filesAdded.slice();
-      buildStartData.filesDeleted = this.filesDeleted.slice();
-      buildStartData.dirsDeleted = this.dirsDeleted.slice();
-      buildStartData.dirsAdded = this.dirsAdded.slice();
     }
-
-    // emit a buildStart event for anyone who cares
-    this.compilerCtx.events.emit('buildStart', buildStartData);
   }
 
   setBuildTimestamp() {
@@ -118,12 +97,24 @@ export class BuildContext implements d.BuildCtx {
 
   createTimeSpan(msg: string, debug?: boolean) {
     if (this.buildId === this.compilerCtx.activeBuildId || debug) {
-      const timeSpan = this.config.logger.createTimeSpan(msg, debug);
+      const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
+
+      if (!debug) {
+        this.compilerCtx.events.emit('buildLog', {
+          messages: this.buildMessages.slice()
+        } as d.BuildLog);
+      }
 
       return {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
           if (this.buildId === this.compilerCtx.activeBuildId || debug) {
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
+
+            if (!debug) {
+              this.compilerCtx.events.emit('buildLog', {
+                messages: this.buildMessages.slice()
+              } as d.BuildLog);
+            }
           }
         }
       };

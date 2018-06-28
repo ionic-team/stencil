@@ -5,6 +5,7 @@ export interface BuildCtx {
   appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
+  buildMessages: string[];
   timestamp: string;
   bundleBuildCount: number;
   collections: d.Collection[];
@@ -59,6 +60,12 @@ export interface BuildStyleUpdate {
 
 export type GraphData = Map<string, string[]>;
 
+
+export interface BuildLog {
+  messages: string[];
+}
+
+
 export interface BuildResults {
   buildId: number;
   bundleBuildCount: number;
@@ -104,18 +111,6 @@ export interface HmrStyleUpdate {
   isScoped: boolean;
 }
 
-
-export interface BuildStartData {
-  buildId: number;
-  isRebuild: boolean;
-  startTime: number;
-  dirsAdded: string[];
-  dirsDeleted: string[];
-  filesChanged: string[];
-  filesUpdated: string[];
-  filesAdded: string[];
-  filesDeleted: string[];
-}
 
 export interface BuildNoChangeResults {
   noChange: boolean;
@@ -190,7 +185,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish' | 'build' | 'buildNoChange';
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildFinish' | 'build' | 'buildNoChange' | 'buildLog';
 
 
 export interface JSModuleList {
