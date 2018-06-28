@@ -128,12 +128,12 @@ async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, f
     return outputTarget.appBuild;
   });
 
-  return Promise.all(outputTargets.map(outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved in www
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 
     // write to the www build
-    return compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+    await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }));
 }
 
@@ -147,7 +147,7 @@ async function generateBundleModes(config: d.Config, compilerCtx: d.CompilerCtx,
       bundleKeys[bundleKeyPath] = entryModule.entryKey;
       entryModule.modeNames = entryModule.modeNames || [];
 
-      return Promise.all(
+      await Promise.all(
         entryModule.modeNames.map(async modeName => {
           const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5' | 'esmEs5') => {
 
@@ -162,7 +162,7 @@ async function generateBundleModes(config: d.Config, compilerCtx: d.CompilerCtx,
 
           }, {} as {[key: string]: string});
 
-          return await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
+          await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
         })
       );
     })
@@ -278,7 +278,7 @@ async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.Compi
     return outputTarget.appBuild;
   });
 
-  return Promise.all(outputTargets.map(async outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 
@@ -311,7 +311,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 
   const outputTargets = config.outputTargets.filter(o => o.type === 'dist');
 
-  return Promise.all(outputTargets.map(async outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
     const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', fileName);
 

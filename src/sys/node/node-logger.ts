@@ -615,14 +615,10 @@ function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
 function isMeaningfulLine(line: string) {
   if (line) {
     line = line.trim();
-    if (line.length) {
-      return (MEH_LINES.indexOf(line) < 0);
-    }
+    return line.length > 0;
   }
   return false;
 }
-
-const MEH_LINES = [';', ':', '{', '}', '(', ')', '/**', '/*', '*/', '*', '({', '})'];
 
 
 const JS_KEYWORDS = [
