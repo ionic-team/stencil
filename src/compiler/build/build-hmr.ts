@@ -39,6 +39,10 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
         styleText: s.styleText,
         isScoped: s.isScoped
       } as d.HmrStyleUpdate;
+    }).sort((a, b) => {
+      if (a.styleTag < b.styleTag) return -1;
+      if (a.styleTag > b.styleTag) return 1;
+      return 0;
     });
   }
 
@@ -202,7 +206,7 @@ function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: s
     }).some(r => r);
   });
 
-  return excludeFiles;
+  return excludeFiles.sort();
 }
 
 

@@ -150,6 +150,34 @@ export class BuildContext implements d.BuildCtx {
         config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
       }
 
+      if (this.isRebuild && this.buildResults.hmr) {
+        const hmr = this.buildResults.hmr;
+        if (hmr.componentsUpdated) {
+          const components = hmr.componentsUpdated.join(', ');
+          config.logger.info(`Updated components: ${config.logger.cyan(components)}`);
+        }
+
+        if (hmr.inlineStylesUpdated) {
+          const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
+            if (!arr.includes(v)) {
+              arr.push(v);
+            }
+            return arr;
+          }, []).join(', ');
+          config.logger.info(`Updated styles: ${config.logger.cyan(inlineStyles)}`);
+        }
+
+        if (hmr.externalStylesUpdated) {
+          const extStyles = hmr.externalStylesUpdated.join(', ');
+          config.logger.info(`Updated stylesheets: ${config.logger.cyan(extStyles)}`);
+        }
+
+        if (hmr.imagesUpdated) {
+          const images = hmr.imagesUpdated.join(', ');
+          config.logger.info(`Updated images: ${config.logger.cyan(images)}`);
+        }
+      }
+
       // create a nice pretty message stating what happend
       const buildText = this.isRebuild ? 'rebuild' : 'build';
       const watchText = config.watch ? ', watching for changes...' : '';
