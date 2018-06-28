@@ -34,17 +34,17 @@ describe('styles', () => {
     const visibilityStyles = domApi.$createElement('style');
     visibilityStyles.setAttribute('data-styles', '');
     visibilityStyles.innerHTML = `cmp-a { visibility: hidden; }`;
-    domApi.$appendChild(domApi.$head, visibilityStyles);
+    domApi.$appendChild(domApi.$doc.head, visibilityStyles);
 
     const prerenderStyles = domApi.$createElement('style');
     prerenderStyles.setAttribute('data-styles', '');
     prerenderStyles.innerHTML = `body { color: blue; }`;
-    domApi.$appendChild(domApi.$head, prerenderStyles);
+    domApi.$appendChild(domApi.$doc.head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const styles = domApi.$head.querySelectorAll('style');
+    const styles = domApi.$doc.head.querySelectorAll('style');
     expect(styles).toHaveLength(3);
 
     expect(styles[0].innerHTML).toBe('cmp-a { visibility: hidden; }');
@@ -66,12 +66,12 @@ describe('styles', () => {
     const prerenderStyles = domApi.$createElement('style');
     prerenderStyles.setAttribute('data-styles', '');
     prerenderStyles.innerHTML = `body { color: blue; }`;
-    domApi.$appendChild(domApi.$head, prerenderStyles);
+    domApi.$appendChild(domApi.$doc.head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const styles = domApi.$head.querySelectorAll('style');
+    const styles = domApi.$doc.head.querySelectorAll('style');
     expect(styles).toHaveLength(2);
 
     expect(styles[0].innerHTML).toBe('body { color: blue; }');
@@ -92,7 +92,7 @@ describe('styles', () => {
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const style = domApi.$head.querySelector('style');
+    const style = domApi.$doc.head.querySelector('style');
     expect(style.innerHTML).toBe(cmpConstructor.style);
   });
 
@@ -118,7 +118,7 @@ describe('styles', () => {
     elm.mode = null;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const styles = domApi.$head.querySelectorAll('style');
+    const styles = domApi.$doc.head.querySelectorAll('style');
     expect(styles[0].innerHTML).toBe(':host { color: red; }');
     expect(styles[1].innerHTML).toBe('.md { color: green; }');
     expect(styles[2].innerHTML).toBe('.ios { color: blue; }');
@@ -140,7 +140,7 @@ describe('styles', () => {
     elm.mode = 'ios';
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const style = domApi.$head.querySelector('style');
+    const style = domApi.$doc.head.querySelector('style');
     expect(style.innerHTML).toBe('.ios { color: blue; }');
   });
 
@@ -160,7 +160,7 @@ describe('styles', () => {
     elm.mode = undefined;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    const style = domApi.$head.querySelector('style');
+    const style = domApi.$doc.head.querySelector('style');
     expect(style.innerHTML).toBe(':host { color: red; }');
   });
 
@@ -183,7 +183,7 @@ describe('styles', () => {
 
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, cmpConstructor.style, cmpConstructor.styleMode);
 
-    const template = domApi.$head.querySelector('template');
+    const template = domApi.$doc.head.querySelector('template');
     expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a" data-style-mode="ios" data-style-scoped="true">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-aios`]).toBe(template);
   });
@@ -201,7 +201,7 @@ describe('styles', () => {
 
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
 
-    const template = domApi.$head.querySelector('template');
+    const template = domApi.$doc.head.querySelector('template');
     expect(template.innerHTML).toBe(`<style data-style-tag="cmp-a">${cmpConstructor.style}</style>`);
     expect(cmpMeta[`cmp-a$`]).toBe(template);
   });
@@ -216,7 +216,7 @@ describe('styles', () => {
 
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.NoEncapsulation, cmpConstructor.style, cmpConstructor.styleMode);
 
-    const template = domApi.$head.querySelector('template');
+    const template = domApi.$doc.head.querySelector('template');
     expect(template).toBe(null);
   });
 

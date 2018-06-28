@@ -86,7 +86,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
-  const rootElm = domApi.$documentElement as d.HostElement;
+  const rootElm = domApi.$doc.documentElement as d.HostElement;
   rootElm['s-ld'] = [];
   rootElm['s-rn'] = true;
 

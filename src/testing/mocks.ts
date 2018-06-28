@@ -224,7 +224,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: d.ComponentMeta) {
 }
 
 export function mockEvent(domApi: d.DomApi, name: string, detail: any = {}): CustomEvent {
-  const evt = (domApi.$documentElement.parentNode as Document).createEvent('CustomEvent');
+  const evt = (domApi.$doc.documentElement.parentNode as Document).createEvent('CustomEvent');
   evt.initCustomEvent(name, false, false, detail);
   return evt;
 }

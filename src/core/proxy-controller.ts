@@ -20,12 +20,16 @@ function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostEl
 
 export function loadComponent(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string): Promise<any> {
   let ctrlElm = controllerComponents[ctrlTag];
-  if (!ctrlElm) {
-    ctrlElm = domApi.$body.querySelector(ctrlTag) as HostElement;
+  const body = domApi.$doc.body;
+  if (body) {
+    if (!ctrlElm) {
+      ctrlElm = body.querySelector(ctrlTag) as HostElement;
+    }
+    if (!ctrlElm) {
+      ctrlElm = controllerComponents[ctrlTag] = domApi.$createElement(ctrlTag) as any;
+      domApi.$appendChild(body, ctrlElm);
+    }
+    return ctrlElm.componentOnReady();
   }
-  if (!ctrlElm) {
-    ctrlElm = controllerComponents[ctrlTag] = domApi.$createElement(ctrlTag) as any;
-    domApi.$appendChild(domApi.$body, ctrlElm);
-  }
-  return ctrlElm.componentOnReady();
+  return Promise.resolve();
 }

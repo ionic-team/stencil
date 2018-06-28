@@ -59,7 +59,7 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
 
         // add our new template element to the head
         // so it can be cloned later
-        domApi.$appendChild(domApi.$head, templateElm);
+        domApi.$appendChild(domApi.$doc.head, templateElm);
       }
     }
   }
@@ -89,7 +89,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
   if (styleTemplate) {
     // cool, we found a style template element for this component
-    let styleContainerNode: HTMLElement = domApi.$head;
+    let styleContainerNode: HTMLElement = domApi.$doc.head;
 
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
