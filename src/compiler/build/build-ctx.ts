@@ -154,7 +154,7 @@ export class BuildContext implements d.BuildCtx {
         const hmr = this.buildResults.hmr;
         if (hmr.componentsUpdated) {
           const components = hmr.componentsUpdated.join(', ');
-          config.logger.info(`Updated components: ${config.logger.cyan(components)}`);
+          config.logger.info(`updated components: ${config.logger.cyan(components)}`);
         }
 
         if (hmr.inlineStylesUpdated) {
@@ -164,17 +164,17 @@ export class BuildContext implements d.BuildCtx {
             }
             return arr;
           }, []).join(', ');
-          config.logger.info(`Updated styles: ${config.logger.cyan(inlineStyles)}`);
+          config.logger.info(`updated styles: ${config.logger.cyan(inlineStyles)}`);
         }
 
         if (hmr.externalStylesUpdated) {
           const extStyles = hmr.externalStylesUpdated.join(', ');
-          config.logger.info(`Updated stylesheets: ${config.logger.cyan(extStyles)}`);
+          config.logger.info(`updated stylesheets: ${config.logger.cyan(extStyles)}`);
         }
 
         if (hmr.imagesUpdated) {
           const images = hmr.imagesUpdated.join(', ');
-          config.logger.info(`Updated images: ${config.logger.cyan(images)}`);
+          config.logger.info(`updated images: ${config.logger.cyan(images)}`);
         }
       }
 
