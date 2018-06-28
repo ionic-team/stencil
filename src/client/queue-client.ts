@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export function createQueueClient(App: d.AppGlobal, win: Window) {
+export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
   const now: d.Now = () => win.performance.now();
 
   const resolved = Promise.resolve();
@@ -103,6 +103,5 @@ export function createQueueClient(App: d.AppGlobal, win: Window) {
         App.raf(flush);
       }
     }
-
-  } as d.QueueApi;
+  };
 }
