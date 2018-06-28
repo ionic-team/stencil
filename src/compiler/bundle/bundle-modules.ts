@@ -93,7 +93,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
         }
       });
 
-    return Promise.all(promises);
+    await Promise.all(promises);
   });
 
   await Promise.all(promises);

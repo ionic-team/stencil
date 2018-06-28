@@ -84,7 +84,7 @@ async function getFiles(fs: d.FileSystem, filePath: string, urlPathName: string,
 
 
 async function getDirectoryItems(fs: d.FileSystem, filePath: string, urlPathName: string, dirItemNames: string[]) {
-  return Promise.all(dirItemNames.map(async dirItemName => {
+  const items = await Promise.all(dirItemNames.map(async dirItemName => {
     const absPath = path.join(filePath, dirItemName);
 
     const stats = await fs.stat(absPath);
@@ -97,6 +97,7 @@ async function getDirectoryItems(fs: d.FileSystem, filePath: string, urlPathName
 
     return item;
   }));
+  return items;
 }
 
 

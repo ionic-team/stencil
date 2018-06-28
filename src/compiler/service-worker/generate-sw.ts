@@ -5,8 +5,8 @@ import { buildWarn, catchError, hasError } from '../util';
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker);
 
-  return Promise.all(wwwServiceOutputs.map(outputTarget => {
-    return generateServiceWorker(config, compilerCtx, buildCtx, outputTarget);
+  await Promise.all(wwwServiceOutputs.map(async outputTarget => {
+    await generateServiceWorker(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 

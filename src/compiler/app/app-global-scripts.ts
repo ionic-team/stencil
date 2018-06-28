@@ -40,7 +40,7 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 }
 
 
-export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
   const [projectGlobalJsContent, dependentGlobalJsContents] = await Promise.all([
     bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, config.namespace, config.globalScript),
     loadDependentGlobalJsContents(config, compilerCtx, buildCtx, sourceTarget),
@@ -53,12 +53,15 @@ export async function generateAppGlobalContents(config: Config, compilerCtx: Com
 }
 
 
-async function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+async function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
   const collections = compilerCtx.collections.filter(m => m.global && m.global.jsFilePath);
 
-  return Promise.all(collections.map(collectionManifest => {
-    return bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, collectionManifest.collectionName, collectionManifest.global.jsFilePath);
+  const dependentGlobalJsContents = await Promise.all(collections.map(async collectionManifest => {
+    const dependentGlobalJsContent = await bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, collectionManifest.collectionName, collectionManifest.global.jsFilePath);
+    return dependentGlobalJsContent;
   }));
+
+  return dependentGlobalJsContents;
 }
 
 

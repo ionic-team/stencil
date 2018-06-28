@@ -2,9 +2,9 @@ import * as d from '../../declarations';
 import { catchError } from '../util';
 
 
-export function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  return Promise.all(config.outputTargets.map(outputTarget => {
-    return initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+export async function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  await Promise.all(config.outputTargets.map(async outputTarget => {
+    await initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 

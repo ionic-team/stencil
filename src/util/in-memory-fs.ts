@@ -412,10 +412,12 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return results;
   }
 
-  writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
-    return Promise.all(Object.keys(files).map(filePath => {
-      return this.writeFile(filePath, files[filePath], opts);
+  async writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
+    const writtenFiles = await Promise.all(Object.keys(files).map(async filePath => {
+      const writtenFile = await this.writeFile(filePath, files[filePath], opts);
+      return writtenFile;
     }));
+    return writtenFiles;
   }
 
   async commit() {
@@ -477,12 +479,13 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   private commitWriteFiles(filesToWrite: string[]) {
-    return Promise.all(filesToWrite.map(async filePath => {
+    const writtenFiles = Promise.all(filesToWrite.map(async filePath => {
       if (typeof filePath !== 'string') {
         throw new Error(`unable to writeFile without filePath`);
       }
       return this.commitWriteFile(filePath);
     }));
+    return writtenFiles;
   }
 
   private async commitWriteFile(filePath: string) {
@@ -501,14 +504,15 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return filePath;
   }
 
-  private commitDeleteFiles(filesToDelete: string[]) {
-    return Promise.all(filesToDelete.map(async filePath => {
+  private async commitDeleteFiles(filesToDelete: string[]) {
+    const deletedFiles = await Promise.all(filesToDelete.map(async filePath => {
       if (typeof filePath !== 'string') {
         throw new Error(`unable to unlink without filePath`);
       }
       await this.disk.unlink(filePath);
       return filePath;
     }));
+    return deletedFiles;
   }
 
   private async commitDeleteDirs(dirsToDelete: string[]) {
