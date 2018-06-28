@@ -74,7 +74,6 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   doc.documentElement.setAttribute('data-hmr', hmr.versionId);
 
   if (hmr.componentsUpdated) {
-    logBuild(`Updated components: ${hmr.componentsUpdated.sort().join(', ')}`);
     hmrComponents(doc.documentElement, hmr.versionId, hmr.componentsUpdated);
   }
 

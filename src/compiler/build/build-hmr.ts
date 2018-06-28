@@ -72,63 +72,91 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
     return null;
   }
 
-  const changedScriptFiles = buildCtx.filesChanged.filter(f => {
+  const filesToLookForImporters = buildCtx.filesChanged.filter(f => {
     return f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js') || f.endsWith('.jsx');
   });
 
-  if (changedScriptFiles.length === 0) {
+  if (filesToLookForImporters.length === 0) {
     return null;
   }
 
-  const componentsUpdated: string[] = [];
-  const allModuleFiles = Object.keys(compilerCtx.moduleFiles).map(tsFilePath => compilerCtx.moduleFiles[tsFilePath]);
+  const changedScriptFiles: string[] = [];
+  const checkedFiles: string[] = [];
 
-  changedScriptFiles.forEach(changedScriptFile => {
-    addComponentsUpdated(allModuleFiles, componentsUpdated, changedScriptFile);
-  });
+  const allModuleFiles = Object.keys(compilerCtx.moduleFiles)
+    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
+    .filter(moduleFile => moduleFile.localImports && moduleFile.localImports.length > 0);
 
-  if (componentsUpdated.length === 0) {
-    return null;
+  while (filesToLookForImporters.length > 0) {
+    const scriptFile = filesToLookForImporters.shift();
+    addTsFileImporters(allModuleFiles, filesToLookForImporters, checkedFiles, changedScriptFiles, scriptFile);
   }
 
-  return componentsUpdated.sort();
-}
-
-
-function addComponentsUpdated(allModuleFiles: d.ModuleFile[], componentsUpdated: string[], changedScriptFile: string) {
-  allModuleFiles.forEach(moduleFile => {
-    if (moduleFile.cmpMeta) {
-      const checkedFiles: string[] = [];
-      const shouldAdd = addComponentUpdated(allModuleFiles, componentsUpdated, changedScriptFile, checkedFiles, moduleFile);
-
-      if (shouldAdd && !componentsUpdated.includes(moduleFile.cmpMeta.tagNameMeta)) {
-        componentsUpdated.push(moduleFile.cmpMeta.tagNameMeta);
+  const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
+    const moduleFile = compilerCtx.moduleFiles[changedTsFile];
+    if (moduleFile && moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta) {
+      if (!tags.includes(moduleFile.cmpMeta.tagNameMeta)) {
+        tags.push(moduleFile.cmpMeta.tagNameMeta);
       }
     }
-  });
+    return tags;
+  }, [] as string[]);
+
+  if (tags.length === 0) {
+    return null;
+  }
+
+  return tags.sort();
 }
 
 
-function addComponentUpdated(allModuleFiles: d.ModuleFile[], componentsUpdated: string[], changedScriptFile: string, checkedFiles: string[], moduleFile: d.ModuleFile): boolean {
-  if (checkedFiles.includes(changedScriptFile)) {
-    return false;
-  }
-  checkedFiles.push(changedScriptFile);
-
-  if (moduleFile.sourceFilePath === changedScriptFile) {
-    return true;
+function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: string[], changedScriptFiles: string[], scriptFile: string) {
+  if (!changedScriptFiles.includes(scriptFile)) {
+    // add it to our list of files to transpile
+    changedScriptFiles.push(scriptFile);
   }
 
-  if (moduleFile.jsFilePath === changedScriptFile) {
-    return true;
+  if (checkedFiles.includes(scriptFile)) {
+    // already checked this file
+    return;
   }
+  checkedFiles.push(scriptFile);
 
-  return moduleFile.localImports.some(localImport => {
-    const localImportModuleFile = allModuleFiles.find(m => m.sourceFilePath === localImport);
-    if (localImportModuleFile) {
-      return addComponentUpdated(allModuleFiles, componentsUpdated, changedScriptFile, checkedFiles, localImportModuleFile);
-    }
-    return false;
+  // get all the ts files that import this ts file
+  const tsFilesThatImportsThisTsFile = allModuleFiles.reduce((arr, moduleFile) => {
+    moduleFile.localImports.forEach(localImport => {
+      let checkFile = localImport;
+
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.tsx';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.ts';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.js';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+    });
+    return arr;
+  }, [] as string[]);
+
+  // add all the files that import this ts file to the list of ts files we need to look through
+  tsFilesThatImportsThisTsFile.forEach(tsFileThatImportsThisTsFile => {
+    // if we add to this array, then the while look will keep working until it's empty
+    filesToLookForImporters.push(tsFileThatImportsThisTsFile);
   });
 }
 
