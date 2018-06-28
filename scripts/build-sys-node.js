@@ -37,6 +37,11 @@ if (success) {
         libraryTarget: 'commonjs'
       },
       target: 'node',
+      node: {
+        __dirname: false,
+        __filename: false,
+        process: false
+      },
       externals: function(context, request, callback) {
         if (request.match(/^(\.{0,2})\//)) {
           // absolute and relative paths are not externals
