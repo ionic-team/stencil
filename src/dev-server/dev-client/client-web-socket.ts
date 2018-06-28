@@ -113,7 +113,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     clearTimeout(reconnectTmrId);
 
     if (reconnectAttempts > RECONNECT_ATTEMPTS) {
-      console.warn(`Canceling dev server reconnect attempts`);
+      logWarn(`Dev Server`, `Canceling reconnect attempts`);
 
     } else {
       // keep track how many times we tried to reconnect
