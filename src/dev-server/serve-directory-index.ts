@@ -53,7 +53,7 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs
     }
 
   } catch (e) {
-    serve404(devServerConfig, fs, req, res);
+    serve404(req, res);
   }
 }
 

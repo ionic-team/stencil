@@ -84,7 +84,7 @@ export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, f
       req.stats = await fs.stat(req.filePath);
       return serveFile(devServerConfig, fs, req, res);
     } catch (e) {
-      return serve404(devServerConfig, fs, req, res);
+      return serve404(req, res);
     }
 
   } catch (e) {

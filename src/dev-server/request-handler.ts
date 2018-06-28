@@ -50,7 +50,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         } catch (e) {}
       }
 
-      return serve404(devServerConfig, fs, req, res);
+      return serve404(req, res);
 
     } catch (e) {
       return serve500(res, e);
