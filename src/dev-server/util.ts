@@ -30,6 +30,18 @@ export function sendError(process: NodeJS.Process, e: any) {
 }
 
 
+export function responseHeaders(headers: d.DevResponseHeaders): any {
+  return Object.assign({}, DEFAULT_HEADERS, headers);
+}
+
+
+const DEFAULT_HEADERS: d.DevResponseHeaders = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+  'Expires': '0',
+  'X-Powered-By': 'Stencil Dev Server'
+};
+
+
 export function getBrowserUrl(devServerConfig: d.DevServerConfig, pathname = '/') {
   const address = (devServerConfig.address === `0.0.0.0`) ? `localhost` : devServerConfig.address;
   const port = (devServerConfig.port === 80 || devServerConfig.port === 443) ? '' : (':' + devServerConfig.port);

@@ -1,6 +1,7 @@
 import * as d from '../declarations';
-import { DEV_SERVER_URL, getContentType, isCssFile, isDevServerClient, isHtmlFile, isInitialDevServerLoad, isSimpleText, shouldCompress } from './util';
-import { serve404, serve500 } from './serve-error';
+import { DEV_SERVER_URL, getContentType, isCssFile, isDevServerClient, isHtmlFile, isInitialDevServerLoad, isSimpleText, responseHeaders, shouldCompress } from './util';
+import { serve404 } from './serve-404';
+import { serve500 } from './serve-500';
 import * as http  from 'http';
 import * as path from 'path';
 import * as querystring from 'querystring';
@@ -27,23 +28,17 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
 
       if (shouldCompress(devServerConfig, req, contentLength)) {
         // let's gzip this well known web dev text file
-        res.writeHead(200, {
-          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-          'Expires': '0',
-          'Content-Type': getContentType(devServerConfig, req.filePath),
-          'X-Powered-By': 'Stencil Dev Server'
-        });
+        res.writeHead(200, responseHeaders({
+          'Content-Type': getContentType(devServerConfig, req.filePath)
+        }));
         zlib.createGzip().pipe(res);
 
       } else {
         // let's not gzip this file
-        res.writeHead(200, {
-          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-          'Expires': '0',
+        res.writeHead(200, responseHeaders({
           'Content-Type': getContentType(devServerConfig, req.filePath),
-          'Content-Length': contentLength,
-          'X-Powered-By': 'Stencil Dev Server'
-        });
+          'Content-Length': contentLength
+        }));
         res.write(content);
         res.end();
       }
@@ -51,13 +46,10 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
     } else {
       // non-well-known text file or other file, probably best we use a stream
       // but don't bother trying to gzip this file for the dev server
-      res.writeHead(200, {
-        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-        'Expires': '0',
+      res.writeHead(200, responseHeaders({
         'Content-Type': getContentType(devServerConfig, req.filePath),
-        'Content-Length': req.stats.size,
-        'X-Powered-By': 'Stencil Dev Server'
-      });
+        'Content-Length': req.stats.size
+      }));
       fs.createReadStream(req.filePath).pipe(res);
     }
 
@@ -84,7 +76,7 @@ export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, f
       req.stats = await fs.stat(req.filePath);
       return serveFile(devServerConfig, fs, req, res);
     } catch (e) {
-      return serve404(req, res);
+      return serve404(devServerConfig, fs, req, res);
     }
 
   } catch (e) {

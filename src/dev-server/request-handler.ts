@@ -2,7 +2,8 @@ import * as d from '../declarations';
 import { isStaticDevClient } from './util';
 import { normalizePath } from '../compiler/util';
 import { serveFile, serveStaticDevClient } from './serve-file';
-import { serve404, serve500 } from './serve-error';
+import { serve404 } from './serve-404';
+import { serve500 } from './serve-500';
 import { serveDirectoryIndex } from './serve-directory-index';
 import * as http from 'http';
 import * as path from 'path';
@@ -50,7 +51,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         } catch (e) {}
       }
 
-      return serve404(req, res);
+      return serve404(devServerConfig, fs, req, res);
 
     } catch (e) {
       return serve500(res, e);
