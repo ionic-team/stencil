@@ -62,7 +62,6 @@
 .dev-server-diagnostic-file {
   position: relative;
   border-top: 1px solid #ddd;
-  overflow: scroll;
 }
 
 .dev-server-diagnostic-file-header {
