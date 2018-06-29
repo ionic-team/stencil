@@ -15,34 +15,36 @@ export class Compiler implements d.Compiler {
 
   constructor(rawConfig: d.Config) {
     [ this.isValid, this.config ] = isValid(rawConfig);
+    const config = this.config;
 
     if (this.isValid) {
-      const details = this.config.sys.details;
+      const details = config.sys.details;
 
-      let startupMsg = `${this.config.sys.compiler.name} v${this.config.sys.compiler.version} `;
+      let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
       if (details.platform !== 'win32') {
         startupMsg += `💎`;
       }
 
-      this.config.logger.info(this.config.logger.cyan(startupMsg));
+      config.logger.info(config.logger.cyan(startupMsg));
 
-      this.config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}, freemem: ${details.freemem}`);
-      this.config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
+      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}, freemem: ${details.freemem}`);
+      config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
-      this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
-      this.config.logger.debug(`compiler build: __BUILDID__`);
+      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
 
-      const workers = this.config.sys.initWorkers(this.config.maxConcurrentWorkers);
-      this.config.logger.debug(`compiler workers: ${workers}`);
+      const workers = config.sys.initWorkers(config.maxConcurrentWorkers);
+      config.logger.debug(`compiler workers: ${workers}`);
 
-      this.ctx = getCompilerCtx(this.config);
+      config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
+
+      this.ctx = getCompilerCtx(config);
 
       this.on('build', watchResults => {
-        const buildCtx = new BuildContext(this.config, this.ctx, watchResults);
+        const buildCtx = new BuildContext(config, this.ctx, watchResults);
         build(this.config, this.ctx, buildCtx);
       });
 
-      if (this.config.flags.serve) {
+      if (config.flags.serve) {
         this.startDevServer();
       }
     }
