@@ -8,11 +8,11 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
     return null;
   }
 
-  if (buildCtx.isRebuild && compilerCtx.lastJsModules && !buildCtx.requiresFullBuild) {
-    const hasScriptFileChanges = buildCtx.filesChanged.some(f => f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js'));
-    if (!hasScriptFileChanges) {
-      return compilerCtx.lastJsModules;
-    }
+  if (buildCtx.isRebuild && !buildCtx.requiresFullBuild && !buildCtx.hasScriptChanges && compilerCtx.lastJsModules) {
+    // this is a rebuild, it doesn't require a full build
+    // there were no script changes, and we've got a good cache of the last js modules
+    // let's skip this
+    return compilerCtx.lastJsModules;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`module map started`);
