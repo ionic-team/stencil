@@ -96,7 +96,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if (this.buildId === this.compilerCtx.activeBuildId || debug) {
+    if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
       const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
 
       if (!debug) {
@@ -107,7 +107,7 @@ export class BuildContext implements d.BuildCtx {
 
       return {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
-          if (this.buildId === this.compilerCtx.activeBuildId || debug) {
+          if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
