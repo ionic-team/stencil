@@ -5,6 +5,11 @@ import { normalizePath } from '../compiler/util';
 export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
   const { Compiler } = require('../compiler/index.js');
 
+  const compiler: d.Compiler = new Compiler(config);
+  if (!compiler.isValid) {
+    process.exit(1);
+  }
+
   config.flags.serve = true;
   config.devServer.openBrowser = false;
   config.devServer.hotReplacement = false;
@@ -18,11 +23,6 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
     }
   }
   config.devServer.root = normalizePath(config.devServer.root);
-
-  const compiler: d.Compiler = new Compiler(config);
-  if (!compiler.isValid) {
-    process.exit(1);
-  }
 
   const clientConfig = await compiler.startDevServer();
   compiler.config.logger.info(`dev server: ${clientConfig.browserUrl}`);
