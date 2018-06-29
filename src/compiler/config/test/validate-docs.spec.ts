@@ -15,7 +15,6 @@ describe('validateDocs', () => {
       sys: sys,
       logger: logger,
       rootDir: '/User/some/path/',
-      suppressTypeScriptErrors: true,
       flags: {},
       outputTargets: [
         { type: 'www' }

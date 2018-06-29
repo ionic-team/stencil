@@ -13,8 +13,7 @@ describe('validateConfig', () => {
     config = {
       sys: sys,
       logger: logger,
-      rootDir: '/User/some/path/',
-      suppressTypeScriptErrors: true,
+      rootDir: '/User/some/path/'
     };
   });
 

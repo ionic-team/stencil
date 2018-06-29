@@ -39,7 +39,6 @@ export interface Config {
   rootDir?: string;
   srcDir?: string;
   srcIndexHtml?: string;
-  suppressTypeScriptErrors?: boolean;
   sys?: d.StencilSystem;
   tsconfig?: string;
   watch?: boolean;

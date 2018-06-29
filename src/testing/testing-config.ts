@@ -13,7 +13,6 @@ export class TestingConfig implements d.Config {
   rootDir = path.resolve('/');
   cwd = path.resolve('/');
   globalScript: string;
-  suppressTypeScriptErrors = true;
   devMode = true;
   enableCache = false;
   buildAppCore = false;
