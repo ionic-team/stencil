@@ -1,4 +1,4 @@
-import { ICON_DEFAULT, ICON_ERROR, ICON_PENDING, ICON_TYPE, updateFavIcon } from '../build-status';
+import { ICON_DEFAULT, ICON_DISABLED, ICON_ERROR, ICON_PENDING, ICON_TYPE, updateFavIcon } from '../build-status';
 
 
 describe('build-status', () => {
@@ -8,6 +8,16 @@ describe('build-status', () => {
     linkElm = {
       dataset: {}
     } as any;
+  });
+
+  it('should set disabled and remember org href', () => {
+    linkElm.href = 'org-icon';
+    linkElm.type = 'org-type';
+    updateFavIcon(linkElm, 'disabled');
+    expect(linkElm.dataset.href).toBe('org-icon');
+    expect(linkElm.dataset.type).toBe('org-type');
+    expect(linkElm.href).toBe(ICON_DISABLED);
+    expect(linkElm.type).toBe(ICON_TYPE);
   });
 
   it('should set pending and remember org href', () => {

@@ -37,7 +37,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   }
 
   function onClose(event: { code: number; reason: string }) {
-    updateBuildStatus(doc, 'pending');
+    updateBuildStatus(doc, 'disabled');
 
     if (event.code > NORMAL_CLOSURE_CODE) {
       // the browser's web socket has closed w/ an unexpected code
@@ -121,6 +121,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
 
       // queue up a reconnect in a few seconds
       reconnectTmrId = setTimeout(connect, RECONNECT_RETRY_MS);
+
+      updateBuildStatus(doc, 'disabled');
     }
   }
 
