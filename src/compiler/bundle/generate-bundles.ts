@@ -136,9 +136,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
 
 async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
-  const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
+  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild);
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved in www
@@ -394,9 +392,10 @@ async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, 
   const transpileResults = await transpileToEs5Main(config, compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
-  }
-  if (hasError(transpileResults.diagnostics)) {
-    return jsText;
+
+    if (hasError(transpileResults.diagnostics)) {
+      return jsText;
+    }
   }
   return transpileResults.code;
 }
