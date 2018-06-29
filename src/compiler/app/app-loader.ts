@@ -14,7 +14,8 @@ export async function generateLoader(
   appRegistry: d.AppRegistry,
   cmpRegistry: d.ComponentRegistry
 ) {
-  if (buildCtx.shouldAbort()) {
+
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return null;
   }
 

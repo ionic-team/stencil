@@ -479,7 +479,7 @@ function createComponentRegistry(entryModules: d.EntryModule[]) {
 
 
 function canSkipGenerateBundles(buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return true;
   }
 

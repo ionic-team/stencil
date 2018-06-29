@@ -45,7 +45,7 @@ export function serializeComponentRegistry(cmpRegistry: d.ComponentRegistry) {
 
 
 export async function writeAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, appRegistry: d.AppRegistry, cmpRegistry: d.ComponentRegistry) {
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -62,7 +62,9 @@ export async function writeAppRegistry(config: d.Config, compilerCtx: d.Compiler
   compilerCtx.appFiles.registryJson = registryJson;
 
   const appRegistryWWW = getRegistryJson(config, outputTarget);
-  buildCtx.debug(`build, app www registry: ${appRegistryWWW}`);
 
   await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
+
+  const relPath = config.sys.path.relative(config.rootDir, appRegistryWWW);
+  buildCtx.debug(`writeAppRegistry: ${relPath}`);
 }
