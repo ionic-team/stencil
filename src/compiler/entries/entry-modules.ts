@@ -173,7 +173,7 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
   };
 
   // generate a unique entry key based on the components within this entry module
-  entryModule.entryKey = 'entry:' + entryModule.moduleFiles
+  entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
         return 1;
@@ -199,6 +199,9 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
 
   return entryModule;
 }
+
+
+export const ENTRY_KEY_PREFIX = 'entry:';
 
 
 export function getAppEntryTags(allModules: d.ModuleFile[]) {
