@@ -35,10 +35,13 @@ export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerC
 
 
 async function generateEsmCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, buildConditionals: d.BuildConditionals, jsContent: string) {
+  const coreEsm = getCoreEsmBuildPath(config, outputTarget, 'es5');
+  const relPath = config.sys.path.relative(config.rootDir, coreEsm);
+
+  const timespan = buildCtx.createTimeSpan(`generateEsmCoreEs5 started, ${relPath}`, true);
+
   buildConditionals.es5 = true;
   jsContent = await buildCoreContent(config, compilerCtx, buildCtx, buildConditionals, jsContent);
-
-  const coreEsm = getCoreEsmBuildPath(config, outputTarget, 'es5');
 
   // fighting with typescript/webpack/es5 builds too much
   // #dealwithit
@@ -51,4 +54,6 @@ async function generateEsmCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, 
   jsContent = generatePreamble(config, { prefix: `${config.namespace}: Core, ES5` }) + '\n' + jsContent;
 
   await compilerCtx.fs.writeFile(coreEsm, jsContent);
+
+  timespan.finish(`generateEsmCoreEs5 finished, ${relPath}`);
 }
