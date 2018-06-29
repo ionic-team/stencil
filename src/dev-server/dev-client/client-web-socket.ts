@@ -9,6 +9,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   let clientWs: WebSocket;
   let reconnectTmrId: any;
   let reconnectAttempts = 0;
+  let requestBuildResultsTmrId: any;
+  let hasGottenBuildResults = false;
 
   function onOpen(this: WebSocket) {
     if (reconnectAttempts > 0) {
@@ -17,13 +19,18 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
       updateBuildStatus(doc, 'pending');
     }
 
-    // now that we've got a good web socket connection opened
-    // let's request the latest build results if they exist
-    // but if a build is still happening that's fine
-    const msg: d.DevServerMessage = {
-      requestBuildResults: true
-    };
-    this.send(JSON.stringify(msg));
+    if (!hasGottenBuildResults) {
+      requestBuildResultsTmrId = setInterval(() => {
+        if (!hasGottenBuildResults) {
+          const msg: d.DevServerMessage = {
+            requestBuildResults: true
+          };
+          this.send(JSON.stringify(msg));
+        } else {
+          clearInterval(requestBuildResultsTmrId);
+        }
+      }, 1000);
+    }
 
     // we just connected, let's just
     // double check we don't have a reconnect queued
@@ -57,6 +64,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
       // or we at least know there are was build result at all cuz it's specifically null
       // so it's probably safe to do a full page refresh
       logReload(`Reconnected to dev server`);
+      hasGottenBuildResults = true;
+      clearInterval(requestBuildResultsTmrId);
       win.location.reload(true);
       return;
     }
@@ -71,6 +80,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     if (msg.buildResults) {
       // we just got build results from the server
       // let's update our app with the data received
+      hasGottenBuildResults = true;
+      clearInterval(requestBuildResultsTmrId);
       updateBuildStatus(doc, 'default');
       appUpdate(win, doc, msg.buildResults);
       return;
@@ -93,6 +104,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
 
   function queueReconnect() {
     // either it closed or was a connection error
+    hasGottenBuildResults = false;
 
     // let's clear out the existing web socket
     if (clientWs) {
