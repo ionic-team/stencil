@@ -9,7 +9,9 @@ export function hmrComponents(elm: Element, versionId: string, hmrTagNames: stri
     hmrComponent(updatedTags, elm, versionId, hmrTagName);
   });
 
-  logBuild(`Updated components: ${updatedTags.sort().join(', ')}`);
+  if (updatedTags.length > 0) {
+    logBuild(`Updated components: ${updatedTags.sort().join(', ')}`);
+  }
 }
 
 
