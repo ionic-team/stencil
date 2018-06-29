@@ -31,6 +31,7 @@ export class Compiler implements d.Compiler {
       config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
       config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
+      config.logger.debug(`compiler build: __BUILDID__`);
 
       const workers = config.sys.initWorkers(config.maxConcurrentWorkers);
       config.logger.debug(`compiler workers: ${workers}`);
