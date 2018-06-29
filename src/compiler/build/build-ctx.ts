@@ -1,8 +1,6 @@
 import * as d from '../../declarations';
-import { catchError, hasError } from '../util';
-import { generateBuildResults } from './build-results';
-import { generateBuildStats } from './build-stats';
-import { initWatcher } from '../watcher/watcher-init';
+import { buildFinish } from './build-finish';
+import { hasError } from '../util';
 
 
 export class BuildContext implements d.BuildCtx {
@@ -61,7 +59,7 @@ export class BuildContext implements d.BuildCtx {
     compilerCtx.activeBuildId++;
     this.buildId = compilerCtx.activeBuildId;
 
-    this.config.logger.debug(`start build: ${this.buildId}, ${this.timestamp}`);
+    this.debug(`start build, ${this.timestamp}`);
 
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
     this.timeSpan = this.createTimeSpan(msg);
@@ -97,9 +95,12 @@ export class BuildContext implements d.BuildCtx {
 
   createTimeSpan(msg: string, debug?: boolean) {
     if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+      if (debug) {
+        msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
+      }
       const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
 
-      if (!debug) {
+      if (!debug && this.compilerCtx.events) {
         this.compilerCtx.events.emit('buildLog', {
           messages: this.buildMessages.slice()
         } as d.BuildLog);
@@ -108,6 +109,10 @@ export class BuildContext implements d.BuildCtx {
       return {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
           if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+            if (debug) {
+              finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
+            }
+
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
@@ -125,113 +130,20 @@ export class BuildContext implements d.BuildCtx {
     };
   }
 
+  debug(msg: string) {
+    this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
+  }
+
   get isActiveBuild() {
     return this.compilerCtx.activeBuildId === this.buildId;
   }
 
+  async abort() {
+    return buildFinish(this.config, this.compilerCtx, this as any, true);
+  }
+
   async finish() {
-    const config = this.config;
-    const compilerCtx = this.compilerCtx;
-
-    config.logger.debug(`finished build: ${this.buildId}, ${this.timestamp}`);
-
-    if (this.hasFinished && this.buildResults) {
-      return this.buildResults;
-    }
-
-    this.buildResults = await generateBuildResults(config, compilerCtx, this as any);
-
-    // log any errors/warnings
-    if (!this.hasFinished) {
-      // haven't set this build as finished yet
-      config.logger.printDiagnostics(this.buildResults.diagnostics);
-
-      if (!this.isRebuild && config.devServer && config.devServer.browserUrl && config.flags.serve) {
-        config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
-      }
-
-      if (this.isRebuild && this.buildResults.hmr) {
-        const hmr = this.buildResults.hmr;
-        if (hmr.componentsUpdated) {
-          const components = hmr.componentsUpdated.join(', ');
-          config.logger.info(`updated components: ${config.logger.cyan(components)}`);
-        }
-
-        if (hmr.inlineStylesUpdated) {
-          const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
-            if (!arr.includes(v)) {
-              arr.push(v);
-            }
-            return arr;
-          }, []).join(', ');
-          config.logger.info(`updated styles: ${config.logger.cyan(inlineStyles)}`);
-        }
-
-        if (hmr.externalStylesUpdated) {
-          const extStyles = hmr.externalStylesUpdated.join(', ');
-          config.logger.info(`updated stylesheets: ${config.logger.cyan(extStyles)}`);
-        }
-
-        if (hmr.imagesUpdated) {
-          const images = hmr.imagesUpdated.join(', ');
-          config.logger.info(`updated images: ${config.logger.cyan(images)}`);
-        }
-      }
-
-      // create a nice pretty message stating what happend
-      const buildText = this.isRebuild ? 'rebuild' : 'build';
-      const watchText = config.watch ? ', watching for changes...' : '';
-      let buildStatus = 'finished';
-      let statusColor = 'green';
-
-      if (this.buildResults.hasError) {
-        // gosh darn, build had errors :(
-        compilerCtx.lastBuildHadError = true;
-        buildStatus = 'failed';
-        statusColor = 'red';
-
-      } else {
-        // successful build!
-        compilerCtx.hasSuccessfulBuild = true;
-        compilerCtx.lastBuildHadError = false;
-
-        if (!this.isRebuild && config.watch) {
-          // successful first time build and we're watching the files
-          // so let's hash all of the source files content so we can
-          // do great file change detection to know when files actually change
-          compilerCtx.fs.setBuildHashes();
-        }
-      }
-
-      // print out the time it took to build
-      // and add the duration to the build results
-      this.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-
-      // write the build stats
-      await generateBuildStats(config, compilerCtx, this as any, this.buildResults);
-
-      // write all of our logs to disk if config'd to do so
-      config.logger.writeLogs(this.isRebuild);
-
-      // emit a buildFinish event for anyone who cares
-      compilerCtx.events.emit('buildFinish', this.buildResults);
-
-      if (config.watch) {
-        try {
-          // setup watcher if need be
-          initWatcher(config, compilerCtx);
-        } catch (e) {
-          catchError(this.diagnostics, e);
-        }
-
-      } else {
-        config.sys.destroy();
-      }
-    }
-
-    this.hasFinished = true;
-
-    return this.buildResults;
+    return buildFinish(this.config, this.compilerCtx, this as any, false);
   }
 
   shouldAbort() {
@@ -246,7 +158,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   async validateTypesBuild() {
-    if (this.shouldAbort()) {
+    if (this.shouldAbort() || !this.isActiveBuild) {
       // no need to wait on this one since
       // we already aborted this build
       return;
@@ -262,9 +174,9 @@ export class BuildContext implements d.BuildCtx {
     if (!this.config.watch) {
       // this is not a watch build, so we need to make
       // sure that the type validation has finished
-      this.config.logger.debug(`build, non-watch, waiting on validateTypes`);
+      this.debug(`build, non-watch, waiting on validateTypes`);
       await this.validateTypesPromise;
-      this.config.logger.debug(`build, non-watch, finished waiting on validateTypes`);
+      this.debug(`build, non-watch, finished waiting on validateTypes`);
     }
   }
 

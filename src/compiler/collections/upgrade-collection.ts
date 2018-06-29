@@ -19,7 +19,7 @@ export async function upgradeCollection(config: d.Config, compilerCtx: d.Compile
 
     const timeSpan = buildCtx.createTimeSpan(`upgrade ${collection.collectionName} started`, true);
 
-    const doUpgrade = createDoUpgrade(config, compilerCtx, buildCtx);
+    const doUpgrade = createDoUpgrade(compilerCtx, buildCtx);
 
     await doUpgrade(collection, upgradeTransforms);
 
@@ -31,29 +31,29 @@ export async function upgradeCollection(config: d.Config, compilerCtx: d.Compile
 }
 
 
-function createDoUpgrade(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+function createDoUpgrade(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
   return async (collection: d.Collection, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
       switch (upgrade) {
         case CompilerUpgrade.JSX_Upgrade_From_0_0_5:
-          config.logger.debug(`JSX_Upgrade_From_0_0_5, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
+        buildCtx.debug(`JSX_Upgrade_From_0_0_5, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return upgradeFrom0_0_5 as ts.TransformerFactory<ts.SourceFile>;
 
         case CompilerUpgrade.Metadata_Upgrade_From_0_1_0:
-          config.logger.debug(`Metadata_Upgrade_From_0_1_0, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
+        buildCtx.debug(`Metadata_Upgrade_From_0_1_0, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return () => {
             return upgradeFromMetadata(compilerCtx.moduleFiles);
           };
 
         case CompilerUpgrade.Remove_Stencil_Imports:
-          config.logger.debug(`Remove_Stencil_Imports, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
+        buildCtx.debug(`Remove_Stencil_Imports, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
             return removeStencilImports()(transformContext);
           };
 
         case CompilerUpgrade.Add_Component_Dependencies:
-          config.logger.debug(`Add_Component_Dependencies, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
+        buildCtx.debug(`Add_Component_Dependencies, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
             return componentDependencies(compilerCtx)(transformContext);
           };

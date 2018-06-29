@@ -11,7 +11,7 @@ export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.Com
   const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.empty === true);
 
   await Promise.all(outputTargets.map(async outputTarget => {
-    config.logger.debug(`empty dir: ${outputTarget.dir}`);
+    buildCtx.debug(`empty dir: ${outputTarget.dir}`);
 
     // Check if there is a .gitkeep file
     // We want to keep it so people don't have to readd manually

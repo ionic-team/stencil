@@ -94,7 +94,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(config, compilerCtx),
+        inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
@@ -138,7 +138,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
   if (sourceTarget === 'es5') {
     // global could already be in es2017
     // transpile it down to es5
-    config.logger.debug(`transpile global to es5: ${globalJsName}`);
+    buildCtx.debug(`transpile global to es5: ${globalJsName}`);
     const transpileResults = await transpileToEs5Main(config, compilerCtx, jsContent);
     if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
       buildCtx.diagnostics.push(...transpileResults.diagnostics);

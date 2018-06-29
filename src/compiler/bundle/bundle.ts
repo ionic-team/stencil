@@ -12,7 +12,7 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
     // this is a rebuild, it doesn't require a full build
     // there were no script changes, and we've got a good cache of the last js modules
     // let's skip this
-    config.logger.debug(`generateModuleMap, using lastJsModules cache`);
+    buildCtx.debug(`generateModuleMap, using lastJsModules cache`);
     return compilerCtx.lastJsModules;
   }
 

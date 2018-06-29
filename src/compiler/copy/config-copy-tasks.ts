@@ -25,7 +25,7 @@ export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx)
     err.messageText = e.message;
   }
 
-  config.logger.debug(`getConfigCopyTasks: ${copyTasks.length}`);
+  buildCtx.debug(`getConfigCopyTasks: ${copyTasks.length}`);
 
   return copyTasks;
 }

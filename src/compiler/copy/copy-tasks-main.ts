@@ -6,7 +6,7 @@ import { getConfigCopyTasks } from './config-copy-tasks';
 
 export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
   try {
-    const cmpAssetsCopyTasks = getComponentAssetsCopyTasks(config, compilerCtx, entryModules, buildCtx.filesChanged);
+    const cmpAssetsCopyTasks = getComponentAssetsCopyTasks(config, compilerCtx, buildCtx, entryModules, buildCtx.filesChanged);
     const configCopyTasks = await getConfigCopyTasks(config, buildCtx);
 
     const copyTasks = [

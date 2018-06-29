@@ -44,7 +44,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     catchError(buildCtx.diagnostics, e);
   }
 
-  config.logger.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
+  buildCtx.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
 
   return buildCtx.entryModules;
 }

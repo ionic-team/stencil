@@ -6,7 +6,7 @@ import { MEMBER_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
-export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const rootTsFiles = compilerCtx.rootTsFiles.slice();
 
   // only gather components that are still root ts files we've found and have component metadata
@@ -35,7 +35,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
-  config.logger.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsSrcFilePath)}`);
+  buildCtx.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsSrcFilePath)}`);
 
   await Promise.all(typesOutputTargets.map(async outputTarget => {
     const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);

@@ -2,6 +2,7 @@ import * as d from './index';
 
 
 export interface BuildCtx {
+  abort(): Promise<BuildResults>;
   appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
@@ -12,6 +13,7 @@ export interface BuildCtx {
   components: string[];
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
+  debug: (msg: string) => void;
   diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];

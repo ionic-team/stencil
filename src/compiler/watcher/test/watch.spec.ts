@@ -1,34 +1,36 @@
+import * as d from '../../../declarations';
 import { BuildEvents } from '../../events';
-import { CompilerCtx, Config } from '../../../declarations';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import { initWatcher } from '../watcher-init';
 import { validateConfig } from '../../../compiler/config/validate-config';
 
 
 describe('watcher', () => {
 
-  let config: Config;
-  let compilerCtx: CompilerCtx;
+  let config: d.Config;
+  let compilerCtx: d.CompilerCtx;
+  let buildCtx: d.BuildCtx;
 
   beforeEach(() => {
     config = mockConfig();
     config.watch = true;
     compilerCtx = mockCompilerCtx();
-    compilerCtx.events = new BuildEvents(config);
+    buildCtx = mockBuildCtx(config, compilerCtx);
+    compilerCtx.events = new BuildEvents();
   });
 
 
   it('should only create the watch listener once', () => {
-    let didCreateWatcher = initWatcher(config, compilerCtx);
+    let didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(true);
 
-    didCreateWatcher = initWatcher(config, compilerCtx);
+    didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 
   it('should not create watcher if config.watch falsy', () => {
     config.watch = false;
-    const didCreateWatcher = initWatcher(config, compilerCtx);
+    const didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 

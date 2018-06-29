@@ -3,7 +3,7 @@ import { getAppBuildDir } from '../app/app-file-naming';
 import { normalizePath, pathJoin } from '../util';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
+export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
   const copyTasks: d.CopyTask[] = [];
 
   if (canSkipAssetsCopy(config, compilerCtx, entryModules, filesChanged)) {
@@ -72,7 +72,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     }
   });
 
-  config.logger.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);
+  buildCtx.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);
 
   return copyTasks;
 }

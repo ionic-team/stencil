@@ -14,6 +14,10 @@ import pathsResolution from './rollup-plugins/paths-resolution';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+  if (!buildCtx.isActiveBuild) {
+    buildCtx.debug(`createBundle aborted, not active build`);
+  }
+
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
   const builtins = require('rollup-plugin-node-builtins');
@@ -45,8 +49,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       bundleJson(config),
       globals(),
       builtins(),
-      bundleEntryFile(config, entryModules),
-      inMemoryFsRead(config, compilerCtx),
+      bundleEntryFile(config, buildCtx, entryModules),
+      inMemoryFsRead(config, compilerCtx, buildCtx),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
@@ -61,8 +65,12 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     compilerCtx.entryBundleCache = rollupBundle;
 
   } catch (err) {
-    loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
-    compilerCtx.entryBundleCache = null;
+    if (buildCtx.isActiveBuild) {
+      loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
+      compilerCtx.entryBundleCache = null;
+    } else {
+      buildCtx.debug(`createBundle errors ignored, not active build`);
+    }
   }
 
   timeSpan.finish(`createBundle finished`);

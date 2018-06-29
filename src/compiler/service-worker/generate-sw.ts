@@ -92,7 +92,7 @@ async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
   if (!hasSrcIndexHtml) {
-    config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
+    buildCtx.debug(`generateServiceWorker, no index.html, so skipping sw build`);
     return true;
   }
 

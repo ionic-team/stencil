@@ -38,6 +38,10 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
 
 
 async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEsm started`, true);
   const esmModules = jsModules.esm;
 
@@ -61,6 +65,10 @@ async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   if (config.buildEs5) {
     const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEs5 started`, true);
 
@@ -93,6 +101,10 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
   if (!distOutputs.length) {
     return;

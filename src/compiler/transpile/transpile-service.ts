@@ -177,6 +177,16 @@ interface TranspileContext {
 
 
 async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, tsFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
+  if (!ctx.buildCtx.isActiveBuild) {
+    ctx.buildCtx.debug(`tranpsileTsFile aborted, not active build: ${tsFilePath}`);
+    return;
+  }
+
+  if (ctx.buildCtx.shouldAbort()) {
+    ctx.buildCtx.debug(`tranpsileTsFile aborted: ${tsFilePath}`);
+    return;
+  }
+
   // look up the old cache key using the ts file path
   const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
 
@@ -238,6 +248,16 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
   await Promise.all(output.outputFiles.map(async tsOutput => {
     const outputFilePath = normalizePath(tsOutput.name);
+
+    if (!ctx.buildCtx.isActiveBuild) {
+      ctx.buildCtx.debug(`tranpsileTsFile write aborted, not active build: ${tsFilePath}`);
+      return;
+    }
+
+    if (ctx.buildCtx.shouldAbort()) {
+      ctx.buildCtx.debug(`tranpsileTsFile write aborted: ${tsFilePath}`);
+      return;
+    }
 
     if (outputFilePath.endsWith('.js')) {
       // this is the JS output of the typescript file transpiling

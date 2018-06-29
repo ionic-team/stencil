@@ -12,6 +12,7 @@ import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { validateConfig } from '../compiler/config/validate-config';
+import { BuildContext } from '../compiler/build/build-ctx';
 
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
@@ -84,6 +85,13 @@ export function mockCompilerCtx() {
   };
 
   return compilerCtx;
+}
+
+
+export function mockBuildCtx(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const buildCtx = new BuildContext(config, compilerCtx);
+
+  return buildCtx as d.BuildCtx;
 }
 
 

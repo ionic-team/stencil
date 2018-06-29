@@ -40,7 +40,7 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
       // add the prerendered html to our list of files to write
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
 
-      config.logger.debug(`optimizeHtml, write: ${outputTarget.indexHtml}`);
+      buildCtx.debug(`optimizeHtml, write: ${outputTarget.indexHtml}`);
 
     } catch (e) {
       catchError(buildCtx.diagnostics, e);
@@ -48,6 +48,6 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
 
   } catch (e) {
     // it's ok if there's no index file
-    config.logger.debug(`no index html: ${config.srcIndexHtml}`);
+    buildCtx.debug(`no index html: ${config.srcIndexHtml}`);
   }
 }

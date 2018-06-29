@@ -25,8 +25,6 @@ export function getAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, out
     // parse the json into app registry data
     appRegistry = JSON.parse(appRegistryJson);
 
-    config.logger.debug(`parsed app registry: ${registryJsonFilePath}`);
-
   } catch (e) {
     throw new Error(`Error parsing app registry, ${registryJsonFilePath}: ${e}`);
   }
@@ -64,7 +62,7 @@ export async function writeAppRegistry(config: d.Config, compilerCtx: d.Compiler
   compilerCtx.appFiles.registryJson = registryJson;
 
   const appRegistryWWW = getRegistryJson(config, outputTarget);
-  config.logger.debug(`build, app www registry: ${appRegistryWWW}`);
+  buildCtx.debug(`build, app www registry: ${appRegistryWWW}`);
 
   await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
 }
