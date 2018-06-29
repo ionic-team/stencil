@@ -1,12 +1,9 @@
 import * as d from '../../../declarations';
-import { getUserCompilerOptions } from '../../transpile/compiler-options';
 import { normalizePath } from '../../util';
 import * as ts from 'typescript';
 
 
-export default async function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, testTsconfig?: ts.CompilerOptions) {
-  const tsconfig: ts.CompilerOptions = testTsconfig || await getUserCompilerOptions(config, compilerCtx);
-
+export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, tsCompilerOptions: ts.CompilerOptions) {
   const extensions = [
     'ts',
     'tsx'
@@ -23,7 +20,7 @@ export default async function pathsResolver(config: d.Config, compilerCtx: d.Com
         return null;
       }
 
-      const paths = tsconfig.paths || {};
+      const paths = tsCompilerOptions.paths || {};
 
       // Parse each rule from tsconfig
       for (const rule in paths) {

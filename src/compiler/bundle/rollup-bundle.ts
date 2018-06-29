@@ -5,6 +5,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 import { generatePreamble } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import { getHyperScriptFnEsmFileName } from '../app/app-file-naming';
+import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { BundleSet, OutputChunk, RollupDirOptions, rollup } from 'rollup';
@@ -31,6 +32,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     ...config.nodeResolve
   };
 
+  const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
+
   const rollupConfig: RollupDirOptions = {
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
@@ -44,7 +47,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       builtins(),
       bundleEntryFile(config, entryModules),
       inMemoryFsRead(config, compilerCtx),
-      await pathsResolution(config, compilerCtx),
+      pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
       ...config.plugins
