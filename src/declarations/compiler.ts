@@ -27,6 +27,7 @@ export interface CompilerCtx {
   entryBundleCache?: any;
   events?: d.BuildEvents;
   fs?: d.InMemoryFileSystem;
+  hasLoggedServerUrl?: boolean;
   hasSuccessfulBuild?: boolean;
   hasWatch?: boolean;
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;

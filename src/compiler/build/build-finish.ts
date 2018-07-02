@@ -21,10 +21,11 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     // haven't set this build as finished yet
     config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
 
-    if (!buildCtx.isRebuild && config.devServer && config.devServer.browserUrl && config.flags.serve) {
+    if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {
       // we've opened up the dev server
       // let's print out the dev server url
       config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
+      compilerCtx.hasLoggedServerUrl = true;
     }
 
     if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted) {
