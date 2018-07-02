@@ -1,9 +1,7 @@
 
 
 export interface DomApi {
-  $documentElement: HTMLElement;
-  $head: HTMLHeadElement;
-  $body: HTMLElement;
+  $doc: HTMLDocument;
   $nodeType(node: any): number;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
   $createElement(tagName: any): HTMLElement;

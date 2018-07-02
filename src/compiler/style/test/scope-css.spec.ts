@@ -188,6 +188,11 @@ describe('ShadowCss', function() {
       expect(r).toEqual('[data-ion-tag-slot] > * {}');
     });
 
+    it('should handle * descendant', () => {
+      const r = s('::slotted(*) .my-class {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-slot] .my-class {}');
+    });
+
     it('should handle :host complex selector', () => {
       const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
       expect(r).toEqual('[data-ion-tag-host] > [data-ion-tag-slot] > *:nth-of-type(2n - 1) {}');

@@ -9,8 +9,17 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
 
   const hmr: d.HotModuleReplacement = {};
 
-  if (changesShouldExcludeHmr(config, config.devServer.excludeHmr, buildCtx.filesChanged)) {
-    hmr.excludeHmr = true;
+  if (buildCtx.scriptsAdded.length > 0) {
+    hmr.scriptsAdded = buildCtx.scriptsAdded.slice();
+  }
+
+  if (buildCtx.scriptsDeleted.length > 0) {
+    hmr.scriptsDeleted = buildCtx.scriptsDeleted.slice();
+  }
+
+  const excludeHmr = excludeHmrFiles(config, config.devServer.excludeHmr, buildCtx.filesChanged);
+  if (excludeHmr.length > 0) {
+    hmr.excludeHmr = excludeHmr.slice();
   }
 
   if (buildCtx.hasIndexHtmlChanges) {
@@ -30,6 +39,10 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
         styleText: s.styleText,
         isScoped: s.isScoped
       } as d.HmrStyleUpdate;
+    }).sort((a, b) => {
+      if (a.styleTag < b.styleTag) return -1;
+      if (a.styleTag > b.styleTag) return 1;
+      return 0;
     });
   }
 
@@ -59,63 +72,91 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
     return null;
   }
 
-  const changedScriptFiles = buildCtx.filesChanged.filter(f => {
+  const filesToLookForImporters = buildCtx.filesChanged.filter(f => {
     return f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js') || f.endsWith('.jsx');
   });
 
-  if (changedScriptFiles.length === 0) {
+  if (filesToLookForImporters.length === 0) {
     return null;
   }
 
-  const componentsUpdated: string[] = [];
-  const allModuleFiles = Object.keys(compilerCtx.moduleFiles).map(tsFilePath => compilerCtx.moduleFiles[tsFilePath]);
+  const changedScriptFiles: string[] = [];
+  const checkedFiles: string[] = [];
 
-  changedScriptFiles.forEach(changedScriptFile => {
-    addComponentsUpdated(allModuleFiles, componentsUpdated, changedScriptFile);
-  });
+  const allModuleFiles = Object.keys(compilerCtx.moduleFiles)
+    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
+    .filter(moduleFile => moduleFile.localImports && moduleFile.localImports.length > 0);
 
-  if (componentsUpdated.length === 0) {
-    return null;
+  while (filesToLookForImporters.length > 0) {
+    const scriptFile = filesToLookForImporters.shift();
+    addTsFileImporters(allModuleFiles, filesToLookForImporters, checkedFiles, changedScriptFiles, scriptFile);
   }
 
-  return componentsUpdated.sort();
-}
-
-
-function addComponentsUpdated(allModuleFiles: d.ModuleFile[], componentsUpdated: string[], changedScriptFile: string) {
-  allModuleFiles.forEach(moduleFile => {
-    if (moduleFile.cmpMeta) {
-      const checkedFiles: string[] = [];
-      const shouldAdd = addComponentUpdated(allModuleFiles, componentsUpdated, changedScriptFile, checkedFiles, moduleFile);
-
-      if (shouldAdd && !componentsUpdated.includes(moduleFile.cmpMeta.tagNameMeta)) {
-        componentsUpdated.push(moduleFile.cmpMeta.tagNameMeta);
+  const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
+    const moduleFile = compilerCtx.moduleFiles[changedTsFile];
+    if (moduleFile && moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta) {
+      if (!tags.includes(moduleFile.cmpMeta.tagNameMeta)) {
+        tags.push(moduleFile.cmpMeta.tagNameMeta);
       }
     }
-  });
+    return tags;
+  }, [] as string[]);
+
+  if (tags.length === 0) {
+    return null;
+  }
+
+  return tags.sort();
 }
 
 
-function addComponentUpdated(allModuleFiles: d.ModuleFile[], componentsUpdated: string[], changedScriptFile: string, checkedFiles: string[], moduleFile: d.ModuleFile): boolean {
-  if (checkedFiles.includes(changedScriptFile)) {
-    return false;
-  }
-  checkedFiles.push(changedScriptFile);
-
-  if (moduleFile.sourceFilePath === changedScriptFile) {
-    return true;
+function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: string[], changedScriptFiles: string[], scriptFile: string) {
+  if (!changedScriptFiles.includes(scriptFile)) {
+    // add it to our list of files to transpile
+    changedScriptFiles.push(scriptFile);
   }
 
-  if (moduleFile.jsFilePath === changedScriptFile) {
-    return true;
+  if (checkedFiles.includes(scriptFile)) {
+    // already checked this file
+    return;
   }
+  checkedFiles.push(scriptFile);
 
-  return moduleFile.localImports.some(localImport => {
-    const localImportModuleFile = allModuleFiles.find(m => m.sourceFilePath === localImport);
-    if (localImportModuleFile) {
-      return addComponentUpdated(allModuleFiles, componentsUpdated, changedScriptFile, checkedFiles, localImportModuleFile);
-    }
-    return false;
+  // get all the ts files that import this ts file
+  const tsFilesThatImportsThisTsFile = allModuleFiles.reduce((arr, moduleFile) => {
+    moduleFile.localImports.forEach(localImport => {
+      let checkFile = localImport;
+
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.tsx';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.ts';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+
+      checkFile = localImport + '.js';
+      if (checkFile === scriptFile) {
+        arr.push(moduleFile.sourceFilePath);
+        return;
+      }
+    });
+    return arr;
+  }, [] as string[]);
+
+  // add all the files that import this ts file to the list of ts files we need to look through
+  tsFilesThatImportsThisTsFile.forEach(tsFileThatImportsThisTsFile => {
+    // if we add to this array, then the while look will keep working until it's empty
+    filesToLookForImporters.push(tsFileThatImportsThisTsFile);
   });
 }
 
@@ -165,30 +206,35 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-function changesShouldExcludeHmr(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+  const excludeFiles: string[] = [];
+
   if (!excludeHmr || excludeHmr.length === 0) {
-    return false;
+    return excludeFiles;
   }
 
-  return excludeHmr.some(excludeHmr => {
+  excludeHmr.forEach(excludeHmr => {
 
     return filesChanged.map(fileChanged => {
-      let exclude = false;
+      let shouldExclude = false;
 
       if (config.sys.isGlob(excludeHmr)) {
-        exclude = config.sys.minimatch(fileChanged, excludeHmr);
+        shouldExclude = config.sys.minimatch(fileChanged, excludeHmr);
       } else {
-        exclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
+        shouldExclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
       }
 
-      if (exclude) {
+      if (shouldExclude) {
         config.logger.debug(`excludeHmr: ${fileChanged}`);
+        excludeFiles.push(config.sys.path.basename(fileChanged));
       }
 
-      return exclude;
+      return shouldExclude;
 
     }).some(r => r);
   });
+
+  return excludeFiles.sort();
 }
 
 

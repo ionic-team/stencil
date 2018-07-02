@@ -1,13 +1,12 @@
 import * as d from '../../declarations';
-import { catchError, hasError } from '../util';
-import { generateBuildResults } from './build-results';
-import { generateBuildStats } from './build-stats';
-import { initWatcher } from '../watcher/watcher-init';
+import { buildFinish } from './build-finish';
+import { hasError } from '../util';
 
 
 export class BuildContext implements d.BuildCtx {
   appFileBuildCount = 0;
   buildId = -1;
+  buildMessages: string[] = [];
   timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
@@ -37,6 +36,8 @@ export class BuildContext implements d.BuildCtx {
   indexBuildCount = 0;
   isRebuild = false;
   requiresFullBuild = true;
+  scriptsAdded: string[] = [];
+  scriptsDeleted: string[] = [];
   startTime = Date.now();
   styleBuildCount = 0;
   stylesUpdated = [] as d.BuildStyleUpdate[];
@@ -58,24 +59,14 @@ export class BuildContext implements d.BuildCtx {
     compilerCtx.activeBuildId++;
     this.buildId = compilerCtx.activeBuildId;
 
-    this.config.logger.debug(`start build: ${this.buildId}, ${this.timestamp}`);
+    this.debug(`start build, ${this.timestamp}`);
 
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
     this.timeSpan = this.createTimeSpan(msg);
 
-    const buildStartData: d.BuildStartData = {
-      buildId: this.buildId,
-      isRebuild: this.isRebuild,
-      startTime: Date.now(),
-      filesChanged: null,
-      filesUpdated: null,
-      filesAdded: null,
-      filesDeleted: null,
-      dirsDeleted: null,
-      dirsAdded: null,
-    };
-
     if (watchResults != null) {
+      this.scriptsAdded = watchResults.scriptsAdded.slice();
+      this.scriptsDeleted = watchResults.scriptsAdded.slice();
       this.hasCopyChanges = watchResults.hasCopyChanges;
       this.hasScriptChanges = watchResults.hasScriptChanges;
       this.hasStyleChanges = watchResults.hasStyleChanges;
@@ -87,17 +78,7 @@ export class BuildContext implements d.BuildCtx {
       this.filesDeleted.push(...watchResults.filesDeleted);
       this.dirsDeleted.push(...watchResults.dirsDeleted);
       this.dirsAdded.push(...watchResults.dirsAdded);
-
-      buildStartData.filesChanged = this.filesChanged.slice();
-      buildStartData.filesUpdated = this.filesUpdated.slice();
-      buildStartData.filesAdded = this.filesAdded.slice();
-      buildStartData.filesDeleted = this.filesDeleted.slice();
-      buildStartData.dirsDeleted = this.dirsDeleted.slice();
-      buildStartData.dirsAdded = this.dirsAdded.slice();
     }
-
-    // emit a buildStart event for anyone who cares
-    this.compilerCtx.events.emit('buildStart', buildStartData);
   }
 
   setBuildTimestamp() {
@@ -113,13 +94,32 @@ export class BuildContext implements d.BuildCtx {
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if (this.buildId === this.compilerCtx.activeBuildId || debug) {
-      const timeSpan = this.config.logger.createTimeSpan(msg, debug);
+    if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+      if (debug) {
+        msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
+      }
+      const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
+
+      if (!debug && this.compilerCtx.events) {
+        this.compilerCtx.events.emit('buildLog', {
+          messages: this.buildMessages.slice()
+        } as d.BuildLog);
+      }
 
       return {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
-          if (this.buildId === this.compilerCtx.activeBuildId || debug) {
+          if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+            if (debug) {
+              finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
+            }
+
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
+
+            if (!debug) {
+              this.compilerCtx.events.emit('buildLog', {
+                messages: this.buildMessages.slice()
+              } as d.BuildLog);
+            }
           }
         }
       };
@@ -130,85 +130,20 @@ export class BuildContext implements d.BuildCtx {
     };
   }
 
+  debug(msg: string) {
+    this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
+  }
+
   get isActiveBuild() {
     return this.compilerCtx.activeBuildId === this.buildId;
   }
 
+  async abort() {
+    return buildFinish(this.config, this.compilerCtx, this as any, true);
+  }
+
   async finish() {
-    const config = this.config;
-    const compilerCtx = this.compilerCtx;
-
-    config.logger.debug(`finished build: ${this.buildId}, ${this.timestamp}`);
-
-    if (this.hasFinished && this.buildResults) {
-      return this.buildResults;
-    }
-
-    this.buildResults = await generateBuildResults(config, compilerCtx, this as any);
-
-    // log any errors/warnings
-    if (!this.hasFinished) {
-      // haven't set this build as finished yet
-      config.logger.printDiagnostics(this.buildResults.diagnostics);
-
-      if (!this.isRebuild && config.devServer && config.devServer.browserUrl && config.flags.serve) {
-        config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
-      }
-
-      // create a nice pretty message stating what happend
-      const buildText = this.isRebuild ? 'rebuild' : 'build';
-      const watchText = config.watch ? ', watching for changes...' : '';
-      let buildStatus = 'finished';
-      let statusColor = 'green';
-
-      if (this.buildResults.hasError) {
-        // gosh darn, build had errors :(
-        compilerCtx.lastBuildHadError = true;
-        buildStatus = 'failed';
-        statusColor = 'red';
-
-      } else {
-        // successful build!
-        compilerCtx.hasSuccessfulBuild = true;
-        compilerCtx.lastBuildHadError = false;
-
-        if (!this.isRebuild && config.watch) {
-          // successful first time build and we're watching the files
-          // so let's hash all of the source files content so we can
-          // do great file change detection to know when files actually change
-          compilerCtx.fs.setBuildHashes();
-        }
-      }
-
-      // print out the time it took to build
-      // and add the duration to the build results
-      this.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-
-      // write the build stats
-      await generateBuildStats(config, compilerCtx, this as any, this.buildResults);
-
-      // write all of our logs to disk if config'd to do so
-      config.logger.writeLogs(this.isRebuild);
-
-      // emit a buildFinish event for anyone who cares
-      compilerCtx.events.emit('buildFinish', this.buildResults);
-
-      if (config.watch) {
-        try {
-          // setup watcher if need be
-          initWatcher(config, compilerCtx);
-        } catch (e) {
-          catchError(this.diagnostics, e);
-        }
-
-      } else {
-        config.sys.destroy();
-      }
-    }
-
-    this.hasFinished = true;
-
-    return this.buildResults;
+    return buildFinish(this.config, this.compilerCtx, this as any, false);
   }
 
   shouldAbort() {
@@ -223,7 +158,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   async validateTypesBuild() {
-    if (this.shouldAbort()) {
+    if (this.shouldAbort() || !this.isActiveBuild) {
       // no need to wait on this one since
       // we already aborted this build
       return;
@@ -239,9 +174,9 @@ export class BuildContext implements d.BuildCtx {
     if (!this.config.watch) {
       // this is not a watch build, so we need to make
       // sure that the type validation has finished
-      this.config.logger.debug(`build, non-watch, waiting on validateTypes`);
+      this.debug(`build, non-watch, waiting on validateTypes`);
       await this.validateTypesPromise;
-      this.config.logger.debug(`build, non-watch, finished waiting on validateTypes`);
+      this.debug(`build, non-watch, finished waiting on validateTypes`);
     }
   }
 

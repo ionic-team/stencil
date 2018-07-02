@@ -38,6 +38,11 @@ export class WatcherListener {
         return;
       }
 
+      if (this.filesUpdated.includes(filePath)) {
+        this.config.logger.debug(`watcher, fileUpdate, already queued: ${relPath}, ${Date.now().toString().substring(5)}`);
+        return;
+      }
+
       const ext = this.config.sys.path.extname(filePath).toLowerCase();
       const isTextFile = TXT_EXT.includes(ext);
 
@@ -113,6 +118,11 @@ export class WatcherListener {
         return;
       }
 
+      if (this.filesAdded.includes(filePath)) {
+        this.config.logger.debug(`watcher, fileAdd, already queued: ${relPath}, ${Date.now().toString().substring(5)}`);
+        return;
+      }
+
       this.config.logger.debug(`watcher, fileAdd: ${relPath}, ${Date.now().toString().substring(5)}`);
 
       if (isCopyTaskFile(this.config, filePath)) {
@@ -151,6 +161,11 @@ export class WatcherListener {
       const relPath = this.config.sys.path.relative(this.config.rootDir, filePath);
 
       if (isComponentsDtsFile(filePath)) {
+        return;
+      }
+
+      if (this.filesDeleted.includes(filePath)) {
+        this.config.logger.debug(`watcher, fileDelete, already queued: ${relPath}, ${Date.now().toString().substring(5)}`);
         return;
       }
 
@@ -250,6 +265,8 @@ export class WatcherListener {
         hasCopyChanges: this.hasCopyChanges,
         filesChanged: [],
         changedExtensions: [],
+        scriptsAdded: [],
+        scriptsDeleted: [],
         hasScriptChanges: false,
         hasStyleChanges: false,
         hasIndexHtmlChanges: false
@@ -274,7 +291,7 @@ export class WatcherListener {
 
   queue() {
     clearTimeout(this.watchTmr);
-    this.watchTmr = setTimeout(this.startRebuild.bind(this), 20);
+    this.watchTmr = setTimeout(this.startRebuild.bind(this), 50);
   }
 
   resetWatcher() {

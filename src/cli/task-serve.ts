@@ -1,20 +1,34 @@
 import * as d from '../declarations';
+import { normalizePath } from '../compiler/util';
 
 
-export async function serverTask(config: d.Config, compiler: any) {
-  config.devServer = config.devServer || {};
-  config.flags = config.flags || {};
-  config.flags.serve = true;
+export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
+  const { Compiler } = require('../compiler/index.js');
 
-  if (typeof config.devServer.openBrowser !== 'boolean') {
-    config.devServer.openBrowser = false;
+  const compiler: d.Compiler = new Compiler(config);
+  if (!compiler.isValid) {
+    process.exit(1);
   }
 
+  config.flags.serve = true;
+  config.devServer.openBrowser = false;
+  config.devServer.hotReplacement = false;
+  config.maxConcurrentWorkers = 1;
+
+  config.devServer.root = process.cwd();
+
+  if (typeof flags.root === 'string') {
+    if (!config.sys.path.isAbsolute(config.flags.root)) {
+      config.devServer.root = config.sys.path.relative(process.cwd(), flags.root);
+    }
+  }
+  config.devServer.root = normalizePath(config.devServer.root);
+
   const clientConfig = await compiler.startDevServer();
-  config.logger.info(`dev server: ${clientConfig.browserUrl}`);
+  compiler.config.logger.info(`dev server: ${clientConfig.browserUrl}`);
 
   process.once('SIGINT', () => {
-    config.sys.destroy();
+    compiler.config.sys.destroy();
     process.exit(0);
   });
 }

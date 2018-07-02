@@ -114,6 +114,17 @@ describe('hasRelativeUrls', () => {
 
     expect(hasRelativeUrls(text)).toBe(true);
   });
+
+  it('false for relative urls without domain', () => {
+    const text = `
+      div {
+        background-image: url('/assets/images/mytestimage.jpg');
+      }
+    `;
+
+    expect(hasRelativeUrls(text)).toBe(false);
+  });
+
 });
 
 describe('fixRelativeUrls', () => {
@@ -141,6 +152,20 @@ describe('fixRelativeUrls', () => {
     expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
       div {
         background-image: url('http://www.example.com/assets/images/mytestimage.jpg');
+      }
+    `);
+  });
+
+  it('should keep absolute urls', () => {
+    const text = `
+      div {
+        background-image: url('/assets/images/mytestimage.jpg');
+      }
+    `;
+
+    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
+      div {
+        background-image: url('/assets/images/mytestimage.jpg');
       }
     `);
   });

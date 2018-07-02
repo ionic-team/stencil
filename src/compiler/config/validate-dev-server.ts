@@ -6,8 +6,18 @@ import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-uti
 export function validateDevServer(config: d.Config) {
   config.devServer = config.devServer || {};
 
-  setStringConfig(config.devServer, 'address', '0.0.0.0');
-  setNumberConfig(config.devServer, 'port', null, 3333);
+  if (typeof config.flags.address === 'string') {
+    config.devServer.address = config.flags.address;
+  } else {
+    setStringConfig(config.devServer, 'address', '0.0.0.0');
+  }
+
+  if (typeof config.flags.port === 'number') {
+    config.devServer.port = config.flags.port;
+  } else {
+    setNumberConfig(config.devServer, 'port', null, 3333);
+  }
+
   setBooleanConfig(config.devServer, 'gzip', null, true);
   setBooleanConfig(config.devServer, 'hotReplacement', null, true);
   setBooleanConfig(config.devServer, 'openBrowser', null, true);
@@ -26,30 +36,26 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
-  if (config.flags) {
-    if (config.flags.open === false) {
-      config.devServer.openBrowser = false;
-    }
+  if (config.flags && config.flags.open === false) {
+    config.devServer.openBrowser = false;
+  }
 
-    if (config.flags.serve) {
-      let serveDir: string = null;
-      const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+  let serveDir: string = null;
+  const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
 
-      if (wwwOutputTarget) {
-        serveDir = wwwOutputTarget.dir;
-        config.logger.debug(`dev server www root: ${serveDir}`);
+  if (wwwOutputTarget) {
+    serveDir = wwwOutputTarget.dir;
+    config.logger.debug(`dev server www root: ${serveDir}`);
 
-      } else {
-        serveDir = config.rootDir;
-        config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
-      }
+  } else {
+    serveDir = config.rootDir;
+    config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
+  }
 
-      setStringConfig(config.devServer, 'root', serveDir);
+  setStringConfig(config.devServer, 'root', serveDir);
 
-      if (!config.sys.path.isAbsolute(config.devServer.root)) {
-        config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
-      }
-    }
+  if (!config.sys.path.isAbsolute(config.devServer.root)) {
+    config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
   }
 
   if (config.devServer.excludeHmr) {

@@ -19,6 +19,16 @@ export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, doTranspile: boolean) {
+  if (!buildCtx.isActiveBuild) {
+    buildCtx.debug(`processMetadata aborted, not active build`);
+    return;
+  }
+
+  if (buildCtx.shouldAbort()) {
+    buildCtx.debug(`processMetadata aborted`);
+    return;
+  }
+
   // let's clean up the module file cache so we only
   // hold on to stuff we know is being used
   cleanModuleFileCache(compilerCtx);
@@ -34,7 +44,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   if (doTranspile && !buildCtx.shouldAbort()) {
     // ts changes have happened!!
     // create the components.d.ts file and write to disk
-    await generateComponentTypes(config, compilerCtx);
+    await generateComponentTypes(config, compilerCtx, buildCtx);
 
     if (!config._isTesting) {
       // now that we've updated teh components.d.ts file

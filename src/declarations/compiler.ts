@@ -1,6 +1,15 @@
 import * as d from './index';
 
 
+export interface Compiler {
+  build(): Promise<d.BuildResults>;
+  config: d.Config;
+  docs(): Promise<void>;
+  isValid: boolean;
+  startDevServer(): Promise<{ browserUrl: string }>;
+}
+
+
 export interface CompilerCtx {
   activeBuildId?: number;
   fs?: d.InMemoryFileSystem;

@@ -5,6 +5,16 @@ import { getUserCompilerOptions } from './compiler-options';
 
 
 export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (!buildCtx.isActiveBuild) {
+    buildCtx.debug(`validateTypesMain aborted, not active build`);
+    return;
+  }
+
+  if (buildCtx.shouldAbort()) {
+    buildCtx.debug(`validateTypesMain aborted`);
+    return;
+  }
+
   // send data over to our worker process to validate types
   // don't let this block the main thread and we'll check
   // its response sometime later
@@ -39,7 +49,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       // type checking transpile finished, which is fine for watch
       // we'll need to create build to show the diagnostics
       if (buildCtx.isActiveBuild) {
-        config.logger.debug(`validateTypesHandler, build already finished, creating a new build`);
+        buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
         const diagnosticsBuildCtx = new BuildContext(config, compilerCtx, null);
         diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
         diagnosticsBuildCtx.finish();

@@ -4,15 +4,13 @@ import { transpileCoreBuild } from '../transpile/core-build';
 
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return null;
   }
 
-  const timespan = buildCtx.createTimeSpan(`buildCoreContent ${coreBuild.coreId} started`, true);
-
   const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, coreContent);
 
-  if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
+  if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
     return coreContent;
   }
@@ -23,12 +21,10 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
 
   const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
 
-  if (minifyResults.diagnostics && minifyResults.diagnostics.length) {
+  if (minifyResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...minifyResults.diagnostics);
     return coreContent;
   }
-
-  timespan.finish(`buildCoreContent ${coreBuild.coreId} finished`);
 
   return minifyResults.output;
 }

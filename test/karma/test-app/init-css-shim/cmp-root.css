@@ -1,0 +1,10 @@
+
+div#relativeToRoot {
+  background-image: url("/path/to/image.png");
+}
+div#relative {
+  background-image: url("../path/to/image.png");
+}
+div#absolute {
+  background-image: url("http://domain/path/to/image.png");
+}

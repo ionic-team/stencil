@@ -17,8 +17,7 @@ describe('validatePaths', () => {
     config = {
       sys: sys,
       logger: logger,
-      rootDir: path.join(ROOT, 'User', 'my-app'),
-      suppressTypeScriptErrors: true
+      rootDir: path.join(ROOT, 'User', 'my-app')
     };
   });
 

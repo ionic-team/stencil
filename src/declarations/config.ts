@@ -40,7 +40,6 @@ export interface Config {
   rootDir?: string;
   srcDir?: string;
   srcIndexHtml?: string;
-  suppressTypeScriptErrors?: boolean;
   sys?: d.StencilSystem;
   tsconfig?: string;
   watch?: boolean;
@@ -82,6 +81,7 @@ export interface NodeResolveConfig {
 
 export interface ConfigFlags {
   task?: 'build' | 'docs' | 'help' | 'serve';
+  address?: string;
   cache?: boolean;
   config?: string;
   debug?: boolean;
@@ -96,6 +96,7 @@ export interface ConfigFlags {
   port?: number;
   prerender?: boolean;
   prod?: boolean;
+  root?: string;
   serve?: boolean;
   ssr?: boolean;
   stats?: boolean;

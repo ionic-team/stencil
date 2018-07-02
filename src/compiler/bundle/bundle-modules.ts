@@ -20,7 +20,7 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
     const rollupBundle = await createBundle(config, compilerCtx, buildCtx, entryModules);
-    if (buildCtx.shouldAbort()) {
+    if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
       // rollup errored, so let's not continue
       return results;
     }
@@ -36,7 +36,7 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
       await writeEsmEs5Modules(config, rollupBundle)
     ]);
 
-    if (buildCtx.shouldAbort()) {
+    if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
       // someone could have errored
       return results;
     }
@@ -93,7 +93,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
         }
       });
 
-    return Promise.all(promises);
+    await Promise.all(promises);
   });
 
   await Promise.all(promises);

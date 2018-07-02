@@ -64,12 +64,23 @@ export interface DevServerSocket {
 export interface DevServerMessage {
   startServer?: DevServerConfig;
   serverStated?: DevServerStartResponse;
+  buildLog?: d.BuildLog;
   buildResults?: d.BuildResults;
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
 }
 
+
 export interface DevServerContext {
   httpServer: any;
   wsConnections: d.DevServerSocket[];
+}
+
+
+export interface DevResponseHeaders {
+  'Cache-Control'?: string;
+  'Expires'?: string;
+  'Content-Type'?: string;
+  'Content-Length'?: number;
+  'X-Powered-By'?: string;
 }

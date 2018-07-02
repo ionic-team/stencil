@@ -7,6 +7,14 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
   // files changed include updated, added and deleted
   watchResults.filesChanged = watchResults.filesUpdated.concat(watchResults.filesAdded, watchResults.filesDeleted),
 
+  watchResults.scriptsAdded = watchResults.filesAdded.filter(f => {
+    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+  }).map(f => config.sys.path.basename(f));
+
+  watchResults.scriptsDeleted = watchResults.filesDeleted.filter(f => {
+    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+  }).map(f => config.sys.path.basename(f));
+
   // collect up all the file extensions from changed files
   watchResults.filesChanged.forEach(filePath => {
     const ext = filePath.split('.').pop().toLowerCase();
@@ -20,9 +28,19 @@ export function rebuild(config: Config, compilerCtx: CompilerCtx, watchResults: 
   watchResults.hasScriptChanges = watchResults.changedExtensions.some(ext => SCRIPT_EXT.includes(ext));
   watchResults.hasStyleChanges = watchResults.changedExtensions.some(ext => STYLE_EXT.includes(ext));
 
-  watchResults.hasIndexHtmlChanges = watchResults.filesChanged.some(fileChanged => {
+  const srcIndexHtmlChanged = watchResults.filesChanged.some(fileChanged => {
+    // the src index index.html file has changed
+    // this file name could be something other than index.html
     return fileChanged === config.srcIndexHtml;
   });
+
+  const anyIndexHtmlChanged = watchResults.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
+  if (anyIndexHtmlChanged) {
+    // any index.html in any directory that changes counts too
+    watchResults.hasIndexHtmlChanges = true;
+  }
+
+  watchResults.hasIndexHtmlChanges = anyIndexHtmlChanged || srcIndexHtmlChanged;
 
   // print out a pretty message about the changed files
   printWatcherMessage(config, watchResults);

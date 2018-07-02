@@ -40,7 +40,7 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 }
 
 
-export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
   const [projectGlobalJsContent, dependentGlobalJsContents] = await Promise.all([
     bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, config.namespace, config.globalScript),
     loadDependentGlobalJsContents(config, compilerCtx, buildCtx, sourceTarget),
@@ -53,12 +53,15 @@ export async function generateAppGlobalContents(config: Config, compilerCtx: Com
 }
 
 
-async function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+async function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
   const collections = compilerCtx.collections.filter(m => m.global && m.global.jsFilePath);
 
-  return Promise.all(collections.map(collectionManifest => {
-    return bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, collectionManifest.collectionName, collectionManifest.global.jsFilePath);
+  const dependentGlobalJsContents = await Promise.all(collections.map(async collectionManifest => {
+    const dependentGlobalJsContent = await bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, collectionManifest.collectionName, collectionManifest.global.jsFilePath);
+    return dependentGlobalJsContent;
   }));
+
+  return dependentGlobalJsContents;
 }
 
 
@@ -91,7 +94,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(config, compilerCtx),
+        inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
@@ -135,7 +138,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
   if (sourceTarget === 'es5') {
     // global could already be in es2017
     // transpile it down to es5
-    config.logger.debug(`transpile global to es5: ${globalJsName}`);
+    buildCtx.debug(`transpile global to es5: ${globalJsName}`);
     const transpileResults = await transpileToEs5Main(config, compilerCtx, jsContent);
     if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
       buildCtx.diagnostics.push(...transpileResults.diagnostics);

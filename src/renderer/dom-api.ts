@@ -17,11 +17,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
   const domApi: DomApi = {
 
-    $documentElement: doc.documentElement,
-
-    $head: doc.head,
-
-    $body: doc.body,
+    $doc: doc,
 
     $supportsEventOptions: false,
 
@@ -95,7 +91,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         return domApi.$parentElement(elm);
       }
       if (referenceName === 'body') {
-        return domApi.$body;
+        return doc.body;
       }
       if (referenceName === 'document') {
         return doc;
@@ -218,7 +214,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   if (Build.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
 
-    domApi.$supportsShadowDom = !!domApi.$documentElement.attachShadow;
+    domApi.$supportsShadowDom = !!domApi.$doc.documentElement.attachShadow;
 
     if (Build.isDev) {
       if ((win as Window).location.search.indexOf('shadow=false') > 0) {

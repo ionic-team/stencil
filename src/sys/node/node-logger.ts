@@ -121,7 +121,7 @@ export class NodeLogger implements d.Logger {
     }
   }
 
-  timespanStart(startMsg: string, debug: boolean) {
+  timespanStart(startMsg: string, debug: boolean, appendTo: string[]) {
     const msg = [`${startMsg} ${this.dim('...')}`];
 
     if (debug) {
@@ -137,10 +137,13 @@ export class NodeLogger implements d.Logger {
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${startMsg} ...`]);
+      if (appendTo) {
+        appendTo.push(`${startMsg} ...`);
+      }
     }
   }
 
-  timespanFinish(finishMsg: string, timeSuffix: string, color: 'red', bold: boolean, newLineSuffix: boolean, debug: boolean) {
+  timespanFinish(finishMsg: string, timeSuffix: string, color: 'red', bold: boolean, newLineSuffix: boolean, debug: boolean, appendTo: string[]) {
     let msg = finishMsg;
 
     if (color) {
@@ -165,6 +168,10 @@ export class NodeLogger implements d.Logger {
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${finishMsg} ${timeSuffix}`]);
+
+      if (appendTo) {
+        appendTo.push(`${finishMsg} ${timeSuffix}`);
+      }
     }
 
     if (newLineSuffix) {
@@ -261,8 +268,8 @@ export class NodeLogger implements d.Logger {
     return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.level);
   }
 
-  createTimeSpan(startMsg: string, debug = false): d.LoggerTimeSpan {
-    return new CmdTimeSpan(this, startMsg, debug);
+  createTimeSpan(startMsg: string, debug = false, appendTo?: string[]): d.LoggerTimeSpan {
+    return new CmdTimeSpan(this, startMsg, debug, appendTo);
   }
 
   printDiagnostics(diagnostics: d.Diagnostic[]) {
@@ -441,11 +448,12 @@ class CmdTimeSpan {
   constructor(
     logger: NodeLogger,
     startMsg: string,
-    private debug: boolean
+    private debug: boolean,
+    private appendTo: string[]
   ) {
     this.logger = logger;
     this.start = Date.now();
-    this.logger.timespanStart(startMsg, debug);
+    this.logger.timespanStart(startMsg, debug, this.appendTo);
   }
 
   finish(msg: string, color?: 'red', bold?: boolean, newLineSuffix?: boolean) {
@@ -470,7 +478,8 @@ class CmdTimeSpan {
       color,
       bold,
       newLineSuffix,
-      this.debug
+      this.debug,
+      this.appendTo
     );
   }
 
@@ -606,14 +615,10 @@ function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
 function isMeaningfulLine(line: string) {
   if (line) {
     line = line.trim();
-    if (line.length) {
-      return (MEH_LINES.indexOf(line) < 0);
-    }
+    return line.length > 0;
   }
   return false;
 }
-
-const MEH_LINES = [';', ':', '{', '}', '(', ')', '/**', '/*', '*/', '*', '({', '})'];
 
 
 const JS_KEYWORDS = [

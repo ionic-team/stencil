@@ -27,7 +27,7 @@ export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
 }
 
 
-export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement, userPromise?: Promise<void>) {
+export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement, userPromise?: Promise<void> | void) {
   // no longer queued for update
   plt.isQueuedForUpdate.delete(elm);
 

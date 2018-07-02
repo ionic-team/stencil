@@ -68,7 +68,10 @@ export function defineMember(
 
           // for the client only, let's delete its "own" property
           // this way our already assigned getter/setter on the prototype kicks in
-          delete (elm as any)[memberName];
+          // the very special case is to NOT do this for "mode"
+          if (memberName !== 'mode') {
+            delete (elm as any)[memberName];
+          }
         }
 
       } else {

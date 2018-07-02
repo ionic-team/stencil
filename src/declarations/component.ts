@@ -206,13 +206,59 @@ export type ComponentDependencies = string[];
 
 
 export interface ComponentInstance {
-  componentWillLoad?: () => Promise<void>;
+  /**
+   * The component is about to load and it has not
+   * rendered yet.
+   *
+   * This is the best place to make any data updates
+   * before the first render.
+   *
+   * componentWillLoad will only be called once.
+   */
+  componentWillLoad?: () => Promise<void> | void;
+
+  /**
+   * The component has loaded and has already rendered.
+   *
+   * Updating data in this method will cause the
+   * component to re-render.
+   *
+   * componentDidLoad will only be called once.
+   */
   componentDidLoad?: () => void;
-  componentWillUpdate?: () => Promise<void>;
+
+  /**
+   * The component is about to update and re-render.
+   *
+   * Called multiple times throughout the life of
+   * the component as it updates.
+   *
+   * componentWillUpdate is not called on the first render.
+   */
+  componentWillUpdate?: () => Promise<void> | void;
+
+  /**
+   * The component has just re-rendered.
+   *
+   * Called multiple times throughout the life of
+   * the component as it updates.
+   *
+   * componentWillUpdate is not called on the
+   * first render.
+   */
   componentDidUpdate?: () => void;
+
+  /**
+   * The component did unload and the element
+   * will be destroyed.
+   */
   componentDidUnload?: () => void;
 
   render?: () => any;
+  /**
+   * Used to dynamically set host element attributes.
+   * Should be placed directly above render()
+   */
   hostData?: () => d.VNodeData;
 
   mode?: string;
@@ -223,9 +269,9 @@ export interface ComponentInstance {
 
 
 export abstract class ComponentModule {
-  abstract componentWillLoad?: () => Promise<void>;
+  abstract componentWillLoad?: () => Promise<void> | void;
   abstract componentDidLoad?: () => void;
-  abstract componentWillUpdate?: () => Promise<void>;
+  abstract componentWillUpdate?: () => Promise<void> | void;
   abstract componentDidUpdate?: () => void;
   abstract componentDidUnload?: () => void;
 

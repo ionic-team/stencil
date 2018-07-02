@@ -1,9 +1,11 @@
 import * as d from '../declarations';
-import { serve404, serve500 } from './serve-error';
+import { serve404 } from './serve-404';
+import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import * as http from 'http';
 import * as path from 'path';
 import * as url from 'url';
+import { responseHeaders } from './util';
 
 
 export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
@@ -38,12 +40,9 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs
         .replace('{{nav}}', getName(req.pathname))
         .replace('{{files}}', files);
 
-      res.writeHead(200, {
-        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-        'Expires': '0',
-        'Content-Type': 'text/html',
-        'X-Powered-By': 'Stencil Dev Server'
-      });
+      res.writeHead(200, responseHeaders({
+        'Content-Type': 'text/html'
+      }));
 
       res.write(templateHtml);
       res.end();
@@ -74,6 +73,7 @@ async function getFiles(fs: d.FileSystem, filePath: string, urlPathName: string,
       return (`
         <li class="${item.isDirectory ? 'directory' : 'file'}">
           <a href="${item.pathname}">
+            <span class="icon"></span>
             <span>${item.name}</span>
           </a>
         </li>`
@@ -84,7 +84,7 @@ async function getFiles(fs: d.FileSystem, filePath: string, urlPathName: string,
 
 
 async function getDirectoryItems(fs: d.FileSystem, filePath: string, urlPathName: string, dirItemNames: string[]) {
-  return Promise.all(dirItemNames.map(async dirItemName => {
+  const items = await Promise.all(dirItemNames.map(async dirItemName => {
     const absPath = path.join(filePath, dirItemName);
 
     const stats = await fs.stat(absPath);
@@ -97,6 +97,7 @@ async function getDirectoryItems(fs: d.FileSystem, filePath: string, urlPathName
 
     return item;
   }));
+  return items;
 }
 
 

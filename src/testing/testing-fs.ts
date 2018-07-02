@@ -178,6 +178,7 @@ export class TestingFs implements d.FileSystem {
   }
 
   writeFile(filePath: string, content: string) {
+    filePath = normalizePath(filePath);
     return new Promise<void>(resolve => {
       setTimeout(() => {
         this.diskWrites++;
@@ -192,6 +193,7 @@ export class TestingFs implements d.FileSystem {
   }
 
   writeFileSync(filePath: string, content: string) {
+    filePath = normalizePath(filePath);
     this.diskWrites++;
     this.data[filePath] = {
       isDirectory: false,

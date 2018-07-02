@@ -12,6 +12,7 @@ import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { validateConfig } from '../compiler/config/validate-config';
+import { BuildContext } from '../compiler/build/build-ctx';
 
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
@@ -84,6 +85,13 @@ export function mockCompilerCtx() {
   };
 
   return compilerCtx;
+}
+
+
+export function mockBuildCtx(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const buildCtx = new BuildContext(config, compilerCtx);
+
+  return buildCtx as d.BuildCtx;
 }
 
 
@@ -224,7 +232,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: d.ComponentMeta) {
 }
 
 export function mockEvent(domApi: d.DomApi, name: string, detail: any = {}): CustomEvent {
-  const evt = (domApi.$documentElement.parentNode as Document).createEvent('CustomEvent');
+  const evt = (domApi.$doc.documentElement.parentNode as Document).createEvent('CustomEvent');
   evt.initCustomEvent(name, false, false, detail);
   return evt;
 }

@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { DEV_SERVER_URL } from '../util';
 import { logDiagnostic } from './logger';
+import { updateBuildStatus } from './build-status';
 
 
 export function appError(doc: Document, buildResults: d.BuildResults) {
@@ -14,6 +15,8 @@ export function appError(doc: Document, buildResults: d.BuildResults) {
     logDiagnostic(diagnostic);
     appendDiagnostic(doc, modal, diagnostic);
   });
+
+  updateBuildStatus(doc, 'error');
 }
 
 

@@ -38,6 +38,10 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
     return;
   }
 
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   try {
     // generate the shared app registry object
     const appRegistry = createAppRegistry(config);

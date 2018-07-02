@@ -2,15 +2,18 @@ import * as d from './index';
 
 
 export interface BuildCtx {
+  abort(): Promise<BuildResults>;
   appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
+  buildMessages: string[];
   timestamp: string;
   bundleBuildCount: number;
   collections: d.Collection[];
   components: string[];
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
+  debug: (msg: string) => void;
   diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -35,6 +38,8 @@ export interface BuildCtx {
   isActiveBuild: boolean;
   isRebuild: boolean;
   requiresFullBuild: boolean;
+  scriptsAdded: string[];
+  scriptsDeleted: string[];
   shouldAbort(): boolean;
   startTime: number;
   styleBuildCount: number;
@@ -56,6 +61,12 @@ export interface BuildStyleUpdate {
 
 
 export type GraphData = Map<string, string[]>;
+
+
+export interface BuildLog {
+  messages: string[];
+}
+
 
 export interface BuildResults {
   buildId: number;
@@ -84,11 +95,13 @@ export interface BuildResults {
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
-  excludeHmr?: boolean;
+  excludeHmr?: string[];
   externalStylesUpdated?: string[];
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  scriptsAdded?: string[];
+  scriptsDeleted?: string[];
   versionId?: string;
 }
 
@@ -100,18 +113,6 @@ export interface HmrStyleUpdate {
   isScoped: boolean;
 }
 
-
-export interface BuildStartData {
-  buildId: number;
-  isRebuild: boolean;
-  startTime: number;
-  dirsAdded: string[];
-  dirsDeleted: string[];
-  filesChanged: string[];
-  filesUpdated: string[];
-  filesAdded: string[];
-  filesDeleted: string[];
-}
 
 export interface BuildNoChangeResults {
   noChange: boolean;
@@ -186,7 +187,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildStart' | 'buildFinish' | 'build' | 'buildNoChange';
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildFinish' | 'build' | 'buildNoChange' | 'buildLog';
 
 
 export interface JSModuleList {

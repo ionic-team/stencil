@@ -1,3 +1,52 @@
+<a name="0.10.0-9"></a>
+# 🏃 [0.10.0-9](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-9) (2018-06-28)
+
+`@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
+
+The new `@stencil/core` integrated dev-server is a replacement for the external `@stencil/dev-server` package, but the previous package will continue to work if no changes are made to an app's npm scripts. To start testing out the new dev-server, within the app's `package.json` scripts:
+
+**Update:**
+
+`sd concurrent \"stencil build --dev --watch\" \"stencil-dev-server\"`
+
+**To:**
+
+`stencil build --dev --watch --serve`
+
+Note that the updated command is no longer requiring `sd concurrent`, which is from the `@stencil/utils` package, and no longer requires `stencil-dev-server`, which is from the `@stencil/dev-server` package. Unless the app is using these packages elsewhere, both can
+safely be removed as a dependency.
+
+Next, the `stencil.config.js` file can also remove the entire `exports.devServer = {...}` config since it is no longer used.
+
+
+### Features
+
+* **dev-server:** integrate dev server w/ build and hot module replacement ([b8f56b4](https://github.com/ionic-team/stencil/commit/b8f56b4))
+* **dev-server:** initial build logs w/in browser ([5cc8821](https://github.com/ionic-team/stencil/commit/5cc8821))
+* **hmr:** add devServer.excludeHmr config glob ([e46f0d0](https://github.com/ionic-team/stencil/commit/e46f0d0))
+* **hmr:** enable hot module replacement for legacy builds ([8533ec6](https://github.com/ionic-team/stencil/commit/8533ec6))
+* **hmr:** init dev-mode hot module replacement ([b698710](https://github.com/ionic-team/stencil/commit/b698710))
+* **serve:** create `stencil serve` for stand-alone http server ([33056ac](https://github.com/ionic-team/stencil/commit/33056ac))
+* **styles:** ensure multiple style modes can be used on same page ([26a40f5](https://github.com/ionic-team/stencil/commit/26a40f5))
+
+
+### Bug Fixes
+
+* **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
+* **client:** fix possibility of document.body not being available yet ([0f1393e](https://github.com/ionic-team/stencil/commit/0f1393e))
+* **css-shim:** CSS_URL_REGEXP check relative to root paths ([77a9b5f](https://github.com/ionic-team/stencil/commit/77a9b5f))
+* **dev-server:** fix img reloading ([0d39f7b](https://github.com/ionic-team/stencil/commit/0d39f7b))
+* **hmr:** always init host snapshot ([da7f961](https://github.com/ionic-team/stencil/commit/da7f961))
+* **hmr:** ensure shadowRoot not already added ([25efff6](https://github.com/ionic-team/stencil/commit/25efff6))
+* **hmr:** reload page when app adds or deletes scripts ([6352ead](https://github.com/ionic-team/stencil/commit/6352ead))
+* **hmr:** update components when imported files change ([954618a](https://github.com/ionic-team/stencil/commit/954618a))
+* **props:** ensure mode value set to host element is not deleted ([0671ea1](https://github.com/ionic-team/stencil/commit/0671ea1))
+* **scoped-css:** descendant selectors ([9e7fffb](https://github.com/ionic-team/stencil/commit/9e7fffb))
+* **styles:** fix race condition w/ multiple modes for same component ([50307bd](https://github.com/ionic-team/stencil/commit/50307bd))
+* **styles:** update scoped styles on dev server reload ([607b93e](https://github.com/ionic-team/stencil/commit/607b93e))
+* **sys.node:** do not reset __dirname during bundling ([3c953c5](https://github.com/ionic-team/stencil/commit/3c953c5))
+
+
 <a name="0.9.11"></a>
 ## 🏙 [0.9.11](https://github.com/ionic-team/stencil/compare/v0.9.10...v0.9.11) (2018-06-21)
 

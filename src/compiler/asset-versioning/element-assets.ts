@@ -31,7 +31,7 @@ async function versionElementTypeAssets(config: d.Config, compilerCtx: d.Compile
     promises.push(versionElementAsset(config, compilerCtx, outputTarget, windowLocationHref, elements[i], attrName));
   }
 
-  return Promise.all(promises);
+  await Promise.all(promises);
 }
 
 

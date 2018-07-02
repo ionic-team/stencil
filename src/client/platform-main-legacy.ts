@@ -94,7 +94,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
-  const rootElm = domApi.$documentElement as d.HostElement;
+  const rootElm = domApi.$doc.documentElement as d.HostElement;
   rootElm['s-ld'] = [];
   rootElm['s-rn'] = true;
 
@@ -205,7 +205,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulation, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
             }
             break;
           }
@@ -347,7 +347,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
       // inject a script tag in the head
       // kick off the actual request
-      domApi.$appendChild(domApi.$head, scriptElm);
+      domApi.$appendChild(domApi.$doc.head, scriptElm);
     }
   }
 

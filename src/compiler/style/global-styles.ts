@@ -18,7 +18,7 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
     const fileName = getGlobalStyleFilename(config);
 
     const filePath = pathJoin(config, outputTarget.buildDir, fileName);
-    config.logger.debug(`global style: ${filePath}`);
+    buildCtx.debug(`global style: ${filePath}`);
     await compilerCtx.fs.writeFile(filePath, styleText);
 
   } catch (e) {
@@ -55,7 +55,7 @@ function canSkipGlobalStyles(config: d.Config, buildCtx: d.BuildCtx) {
     return true;
   }
 
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return true;
   }
 

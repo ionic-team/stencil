@@ -44,6 +44,8 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     catchError(buildCtx.diagnostics, e);
   }
 
+  buildCtx.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
+
   return buildCtx.entryModules;
 }
 
@@ -171,9 +173,7 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
   };
 
   // generate a unique entry key based on the components within this entry module
-
-
-  entryModule.entryKey = 'entry:' + entryModule.moduleFiles
+  entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
         return 1;
@@ -186,9 +186,7 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
       if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
       return 0;
     })
-    .map(m => {
-      return m.cmpMeta.tagNameMeta;
-    }).join('.');
+    .map(m => m.cmpMeta.tagNameMeta).join('.');
 
   // get the modes used in this bundle
   entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
@@ -201,6 +199,9 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
 
   return entryModule;
 }
+
+
+export const ENTRY_KEY_PREFIX = 'entry:';
 
 
 export function getAppEntryTags(allModules: d.ModuleFile[]) {

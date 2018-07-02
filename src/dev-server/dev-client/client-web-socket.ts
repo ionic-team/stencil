@@ -1,5 +1,7 @@
 import * as d from '../../declarations';
 import { appUpdate } from './app-update';
+import { logReload, logWarn } from './logger';
+import { updateBuildStatus } from './build-status';
 
 
 export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
@@ -7,21 +9,28 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   let clientWs: WebSocket;
   let reconnectTmrId: any;
   let reconnectAttempts = 0;
+  let requestBuildResultsTmrId: any;
+  let hasGottenBuildResults = false;
 
   function onOpen(this: WebSocket) {
     if (reconnectAttempts > 0) {
-      // this is from a reconnect, so it's probably safe to do a full refresh
-      win.location.reload(true);
-      return;
+      // we just reconnected
+      // we'll request the build results and wait on its response
+      updateBuildStatus(doc, 'pending');
     }
 
-    // now that we've got a good web socket connection opened
-    // let's request the latest build results if they exist
-    // but if a build is still happening that's fine
-    const msg: d.DevServerMessage = {
-      requestBuildResults: true
-    };
-    this.send(JSON.stringify(msg));
+    if (!hasGottenBuildResults) {
+      requestBuildResultsTmrId = setInterval(() => {
+        if (!hasGottenBuildResults) {
+          const msg: d.DevServerMessage = {
+            requestBuildResults: true
+          };
+          this.send(JSON.stringify(msg));
+        } else {
+          clearInterval(requestBuildResultsTmrId);
+        }
+      }, 1000);
+    }
 
     // we just connected, let's just
     // double check we don't have a reconnect queued
@@ -35,9 +44,11 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   }
 
   function onClose(event: { code: number; reason: string }) {
+    updateBuildStatus(doc, 'disabled');
+
     if (event.code > NORMAL_CLOSURE_CODE) {
       // the browser's web socket has closed w/ an unexpected code
-      console.warn(`dev server web socket closed: ${event.code} ${event.reason}`);
+      logWarn(`Dev Server`, `web socket closed: ${event.code} ${event.reason}`);
     }
 
     // web socket closed, let's try to reconnect
@@ -48,8 +59,32 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     // the browser's web socket received a message from the server
     const msg: d.DevServerMessage = JSON.parse(event.data);
 
+    if (reconnectAttempts > 0 && (msg.buildResults || msg.buildResults === null)) {
+      // this is from a reconnect, and we were just notified w/ build results
+      // or we at least know there are was build result at all cuz it's specifically null
+      // so it's probably safe to do a full page refresh
+      logReload(`Reconnected to dev server`);
+      hasGottenBuildResults = true;
+      clearInterval(requestBuildResultsTmrId);
+      win.location.reload(true);
+      return;
+    }
+
+    if (msg.buildLog) {
+      const statusMsg = new CustomEvent('buildLog', { detail: msg.buildLog });
+      win.dispatchEvent(statusMsg);
+      updateBuildStatus(doc, 'pending');
+      return;
+    }
+
     if (msg.buildResults) {
+      // we just got build results from the server
+      // let's update our app with the data received
+      hasGottenBuildResults = true;
+      clearInterval(requestBuildResultsTmrId);
+      updateBuildStatus(doc, 'default');
       appUpdate(win, doc, msg.buildResults);
+      return;
     }
   }
 
@@ -69,6 +104,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
 
   function queueReconnect() {
     // either it closed or was a connection error
+    hasGottenBuildResults = false;
 
     // let's clear out the existing web socket
     if (clientWs) {
@@ -89,7 +125,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     clearTimeout(reconnectTmrId);
 
     if (reconnectAttempts > RECONNECT_ATTEMPTS) {
-      console.warn(`Canceling dev server reconnect attempts`);
+      logWarn(`Dev Server`, `Canceling reconnect attempts`);
 
     } else {
       // keep track how many times we tried to reconnect
@@ -97,6 +133,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
 
       // queue up a reconnect in a few seconds
       reconnectTmrId = setTimeout(connect, RECONNECT_RETRY_MS);
+
+      updateBuildStatus(doc, 'disabled');
     }
   }
 

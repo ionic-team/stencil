@@ -38,6 +38,10 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
 
 
 async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEsm started`, true);
   const esmModules = jsModules.esm;
 
@@ -61,6 +65,10 @@ async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   if (config.buildEs5) {
     const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEs5 started`, true);
 
@@ -93,6 +101,10 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+    return;
+  }
+
   const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
   if (!distOutputs.length) {
     return;
@@ -124,16 +136,14 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
 
 async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
-  const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
+  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild);
 
-  return Promise.all(outputTargets.map(outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved in www
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 
     // write to the www build
-    return compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+    await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }));
 }
 
@@ -147,7 +157,7 @@ async function generateBundleModes(config: d.Config, compilerCtx: d.CompilerCtx,
       bundleKeys[bundleKeyPath] = entryModule.entryKey;
       entryModule.modeNames = entryModule.modeNames || [];
 
-      return Promise.all(
+      await Promise.all(
         entryModule.modeNames.map(async modeName => {
           const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5' | 'esmEs5') => {
 
@@ -162,7 +172,7 @@ async function generateBundleModes(config: d.Config, compilerCtx: d.CompilerCtx,
 
           }, {} as {[key: string]: string});
 
-          return await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
+          await generateBundleMode(config, compilerCtx, buildCtx, entryModule, modeName, jsCode as any);
         })
       );
     })
@@ -278,7 +288,7 @@ async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.Compi
     return outputTarget.appBuild;
   });
 
-  return Promise.all(outputTargets.map(async outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 
@@ -311,7 +321,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 
   const outputTargets = config.outputTargets.filter(o => o.type === 'dist');
 
-  return Promise.all(outputTargets.map(async outputTarget => {
+  await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
     const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', fileName);
 
@@ -382,9 +392,10 @@ async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, 
   const transpileResults = await transpileToEs5Main(config, compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
-  }
-  if (hasError(transpileResults.diagnostics)) {
-    return jsText;
+
+    if (hasError(transpileResults.diagnostics)) {
+      return jsText;
+    }
   }
   return transpileResults.code;
 }
@@ -467,7 +478,7 @@ function createComponentRegistry(entryModules: d.EntryModule[]) {
 
 
 function canSkipGenerateBundles(buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return true;
   }
 

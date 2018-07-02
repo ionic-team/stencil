@@ -5,8 +5,8 @@ import { buildWarn, catchError, hasError } from '../util';
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker);
 
-  return Promise.all(wwwServiceOutputs.map(outputTarget => {
-    return generateServiceWorker(config, compilerCtx, buildCtx, outputTarget);
+  await Promise.all(wwwServiceOutputs.map(async outputTarget => {
+    await generateServiceWorker(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
@@ -92,7 +92,7 @@ async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
   if (!hasSrcIndexHtml) {
-    config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
+    buildCtx.debug(`generateServiceWorker, no index.html, so skipping sw build`);
     return true;
   }
 

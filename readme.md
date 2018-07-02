@@ -170,7 +170,7 @@ For the small minority of browsers that do not support modern browser features a
 ## Related
 
  - [Stencil Documentation](https://stenciljs.com/)
- - [Stencil Worldwide Slack](https://stencil-worldwide.slack.com)
+ - [Stencil Worldwide Slack](https://stencil-worldwide.herokuapp.com)
  - [Ionic](https://ionicframework.com/)
  - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
  - [Ionicons](http://ionicons.com/)

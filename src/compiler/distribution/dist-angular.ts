@@ -4,12 +4,12 @@ import { basename, dirname, relative } from 'path';
 import { dashToPascalCase } from '../../util/helpers';
 
 
-export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
+export async function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
   const angularOuputTargets = (config.outputTargets as d.OutputTargetAngular[])
     .filter(o => o.type === 'angular' && o.directivesProxyFile);
 
-  return Promise.all(angularOuputTargets.map(angularOuputTarget => {
-    return angularDirectiveProxyOutput(config, compilerCtx, angularOuputTarget, cmpRegistry);
+  await Promise.all(angularOuputTargets.map(async angularOuputTarget => {
+    await angularDirectiveProxyOutput(config, compilerCtx, angularOuputTarget, cmpRegistry);
   }));
 }
 

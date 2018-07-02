@@ -1,6 +1,7 @@
 import { createRequestHandler } from '../request-handler';
 import { DevServerConfig } from '../../declarations';
 import { mockConfig } from '../../testing/mocks';
+import { normalizePath } from '../../compiler/util';
 import { TestingFs } from '../../testing/testing-fs';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import * as nodeFs from 'fs';
@@ -15,10 +16,8 @@ describe('request-handler', async () => {
   let req: http.ServerRequest;
   let res: TestServerResponse;
   const root = path.resolve('/');
-  const tmplDirPath = path.join(__dirname, '..', 'templates', 'directory-index.html');
-  const tmpl404Path = path.join(__dirname, '..', 'templates', '404.html');
+  const tmplDirPath = normalizePath(path.join(__dirname, '..', 'templates', 'directory-index.html'));
   const tmplDir = nodeFs.readFileSync(tmplDirPath, 'utf8');
-  const tmpl404 = nodeFs.readFileSync(tmpl404Path, 'utf8');
   const contentTypes = {
     'html': 'text/html',
     'css': 'text/css',
@@ -34,12 +33,11 @@ describe('request-handler', async () => {
 
     stencilConfig.devServer = {
       contentTypes: contentTypes,
-      devServerDir: path.join(__dirname, '..'),
-      root: path.join(root, 'www')
+      devServerDir: normalizePath(path.join(__dirname, '..')),
+      root: normalizePath(path.join(root, 'www'))
     };
 
     await fs.mkdir(stencilConfig.devServer.root);
-    await fs.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', '404.html'), tmpl404);
     await fs.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'directory-index.html'), tmplDir);
 
     config = validateDevServer(stencilConfig);
@@ -256,31 +254,7 @@ describe('request-handler', async () => {
 
   describe('error not found static files', () => {
 
-    it('not find js file', async () => {
-      await fs.mkdir(path.join(root, 'www', 'scripts'));
-      const handler = createRequestHandler(config, fs);
-
-      req.url = '/scripts/file2.js';
-
-      await handler(req, res);
-      expect(res.$statusCode).toBe(404);
-      expect(res.$content).toContain('/scripts/file2.js');
-      expect(res.$contentType).toBe('text/plain');
-    });
-
-    it('not find css file', async () => {
-      await fs.mkdir(path.join(root, 'www', 'scripts'));
-      const handler = createRequestHandler(config, fs);
-
-      req.url = '/styles/file2.css';
-
-      await handler(req, res);
-      expect(res.$statusCode).toBe(404);
-      expect(res.$content).toContain('/styles/file2.css');
-      expect(res.$contentType).toBe('text/plain');
-    });
-
-    it('not find html file', async () => {
+    it('not find file', async () => {
       const handler = createRequestHandler(config, fs);
 
       req.url = '/www/index.html';
@@ -288,7 +262,7 @@ describe('request-handler', async () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(404);
       expect(res.$content).toContain('/index.html');
-      expect(res.$contentType).toBe('text/html');
+      expect(res.$contentType).toBe('text/plain');
     });
 
   });

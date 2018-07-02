@@ -8,41 +8,44 @@ import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
-export class Compiler {
+export class Compiler implements d.Compiler {
   protected ctx: d.CompilerCtx;
   isValid: boolean;
   config: d.Config;
 
   constructor(rawConfig: d.Config) {
     [ this.isValid, this.config ] = isValid(rawConfig);
+    const config = this.config;
 
     if (this.isValid) {
-      const details = this.config.sys.details;
+      const details = config.sys.details;
 
-      let startupMsg = `${this.config.sys.compiler.name} v${this.config.sys.compiler.version} `;
+      let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
       if (details.platform !== 'win32') {
         startupMsg += `💎`;
       }
 
-      this.config.logger.info(this.config.logger.cyan(startupMsg));
+      config.logger.info(config.logger.cyan(startupMsg));
 
-      this.config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}, freemem: ${details.freemem}`);
-      this.config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
+      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}, freemem: ${details.freemem}`);
+      config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
-      this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
-      this.config.logger.debug(`compiler build: __BUILDID__`);
+      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
+      config.logger.debug(`compiler build: __BUILDID__`);
 
-      const workers = this.config.sys.initWorkers(this.config.maxConcurrentWorkers);
-      this.config.logger.debug(`compiler workers: ${workers}`);
+      const workers = config.sys.initWorkers(config.maxConcurrentWorkers);
+      config.logger.debug(`compiler workers: ${workers}`);
 
-      this.ctx = getCompilerCtx(this.config);
+      config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
+
+      this.ctx = getCompilerCtx(config);
 
       this.on('build', watchResults => {
-        const buildCtx = new BuildContext(this.config, this.ctx, watchResults);
+        const buildCtx = new BuildContext(config, this.ctx, watchResults);
         build(this.config, this.ctx, buildCtx);
       });
 
-      if (this.config.flags.serve) {
+      if (config.flags.serve) {
         this.startDevServer();
       }
     }
@@ -58,6 +61,10 @@ export class Compiler {
 
     // get the browser url to be logged out at the end of the build
     this.config.devServer.browserUrl = devServerConfig.browserUrl;
+
+    return {
+      browserUrl: this.config.devServer.browserUrl
+    };
   }
 
   build() {
@@ -66,14 +73,13 @@ export class Compiler {
   }
 
   on(eventName: 'build', cb: (watchResults?: d.WatchResults) => void): Function;
-  on(eventName: 'buildStart', cb: () => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
+  on(eventName: 'buildLog', cb: (buildResults: d.BuildLog) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   on(eventName: d.CompilerEventName, cb: any) {
     return this.ctx.events.subscribe(eventName as any, cb);
   }
 
-  once(eventName: 'buildStart'): Promise<void>;
   once(eventName: 'buildFinish'): Promise<d.BuildResults>;
   once(eventName: 'buildNoChange'): Promise<d.BuildNoChangeResults>;
   once(eventName: d.CompilerEventName) {

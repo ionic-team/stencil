@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { attachMessageHandler } from './worker-farm/worker';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
+import { loadUglifyDiagnostics } from '../../util/logger/logger-uglify';
 import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
@@ -94,17 +95,10 @@ export class NodeSystemWorker {
   }
 
   minifyJs(input: string, opts?: any) {
-    const result = UglifyJS.minify(input, opts);
+    const result: d.UglifyResult = UglifyJS.minify(input, opts);
     const diagnostics: d.Diagnostic[] = [];
 
-    if (result.error) {
-      diagnostics.push({
-        header: 'Minify JS',
-        messageText: result.error.message,
-        level: 'error',
-        type: 'build'
-      });
-    }
+    loadUglifyDiagnostics(input, result, diagnostics);
 
     return {
       output: (result.code as string),

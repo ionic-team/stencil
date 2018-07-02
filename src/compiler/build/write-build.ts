@@ -5,7 +5,7 @@ import { writeAppCollections } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -40,13 +40,16 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     buildCtx.dirsAdded = commitResults.dirsAdded;
     totalFilesWrote = commitResults.filesWritten.length;
 
-    // successful write
-    // kick off writing the cached file stuff
-    // no need to wait on it finishing
-    compilerCtx.cache.commit();
+    if (buildCtx.isActiveBuild) {
+      // successful write
+      // kick off writing the cached file stuff
+      // no need to wait on it finishing
+      buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
+      buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    config.logger.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
-    config.logger.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+    } else {
+      buildCtx.debug(`commit cache aborted, not active build`);
+    }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

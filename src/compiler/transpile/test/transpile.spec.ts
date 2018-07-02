@@ -182,7 +182,6 @@ describe('transpile', () => {
     const normalizedNodeModulesDir = normalizePath(nodeModulesDir);
     const normalizedDistDir = normalizePath(distDir);
 
-    c.config.suppressTypeScriptErrors = false;
     c.config.buildAppCore = true;
 
     // typescript needs real node modules and stencil dist files

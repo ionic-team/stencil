@@ -411,6 +411,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface InitCssRoot {
+
+    }
+  }
+
+  interface HTMLInitCssRootElement extends StencilComponents.InitCssRoot, HTMLStencilElement {}
+
+  var HTMLInitCssRootElement: {
+    prototype: HTMLInitCssRootElement;
+    new (): HTMLInitCssRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'init-css-root': HTMLInitCssRootElement;
+  }
+  interface ElementTagNameMap {
+    'init-css-root': HTMLInitCssRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'init-css-root': JSXElements.InitCssRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface InitCssRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface KeyReorderRoot {
 
     }

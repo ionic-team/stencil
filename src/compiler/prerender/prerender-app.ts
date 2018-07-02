@@ -40,7 +40,7 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
 
   if (typeof indexHtml !== 'string') {
     // looks like we don't have an index html file, which is fine
-    config.logger.debug(`prerenderApp, missing index.html for prerendering`);
+    buildCtx.debug(`prerenderApp, missing index.html for prerendering`);
     return [];
   }
 
