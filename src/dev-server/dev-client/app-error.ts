@@ -143,59 +143,33 @@ function titleCase(str: string) {
   return str.charAt(0).toUpperCase() + str.substr(1);
 }
 
-function highlightError(htmlInput: string, errorCharStart: number, errorLength: number) {
-  if (errorCharStart < 0 || errorLength < 1 || !htmlInput) return htmlInput;
+function highlightError(text: string, errorCharStart: number, errorLength: number) {
+  const errorCharEnd = errorCharStart + errorLength;
 
-  const chars = htmlInput.split('');
-  let inTag = false;
-  let textIndex = -1;
-  for (var htmlIndex = 0; htmlIndex < chars.length; htmlIndex++) {
-    if (chars[htmlIndex] === '<') {
-      inTag = true;
-      continue;
+  return text.split('').map((inputChar, charIndex) => {
+    let outputChar: string;
 
-    } else if (chars[htmlIndex] === '>') {
-      inTag = false;
-      continue;
-
-    } else if (inTag) {
-      continue;
-
-    } else if (chars[htmlIndex] === '&') {
-
-      var isValidEscape = true;
-      var escapeChars = '&';
-      for (var i = htmlIndex + 1; i < chars.length; i++) {
-        if (!chars[i] || chars[i] === ' ') {
-          isValidEscape = false;
-          break;
-        } else if (chars[i] === ';') {
-          escapeChars += ';';
-          break;
-        } else {
-          escapeChars += chars[i];
-        }
-      }
-      isValidEscape = (isValidEscape && escapeChars.length > 1 && escapeChars.length < 9 && escapeChars[escapeChars.length - 1] === ';');
-
-      if (isValidEscape) {
-        chars[htmlIndex] = escapeChars;
-        for (let i = 0; i < escapeChars.length - 1; i++) {
-          chars.splice(htmlIndex + 1, 1);
-        }
-      }
+    if (inputChar === `<`) {
+      outputChar = `&lt;`;
+    } else if (inputChar === `>`) {
+      outputChar = `&gt;`;
+    } else if (inputChar === `"`) {
+      outputChar = `&quot;`;
+    } else if (inputChar === `'`) {
+      outputChar = `&#039;`;
+    } else if (inputChar === `&`) {
+      outputChar = `&amp;`;
+    } else {
+      outputChar = inputChar;
     }
 
-    textIndex++;
-
-    if (textIndex < errorCharStart || textIndex >= errorCharStart + errorLength) {
-      continue;
+    if (charIndex >= errorCharStart && charIndex < errorCharEnd) {
+      outputChar = `<span class="dev-server-diagnostic-error-chr">${outputChar}</span>`;
     }
 
-    chars[htmlIndex] = `<span class="dev-server-diagnostic-error-chr">${chars[htmlIndex]}</span>`;
-  }
+    return outputChar;
 
-  return chars.join('');
+  }).join('');
 }
 
 
