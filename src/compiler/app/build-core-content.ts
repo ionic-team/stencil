@@ -5,7 +5,7 @@ import { transpileCoreBuild } from '../transpile/core-build';
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
   if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-    return null;
+    return '';
   }
 
   const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, coreContent);

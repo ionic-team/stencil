@@ -51,6 +51,10 @@ export async function generateCoreBrowser(config: Config, compilerCtx: CompilerC
 
 
 export function wrapCoreJs(config: Config, jsContent: string) {
+  if (typeof jsContent !== 'string') {
+    jsContent = '';
+  }
+
   const output = [
     generatePreamble(config) + '\n',
     `(function(Context,namespace,hydratedCssClass,resourcesUrl,s){`,
