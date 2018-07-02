@@ -71,7 +71,7 @@ describe('watch-rebuild', () => {
     await compilerCtx.fs.disk.writeFile(path.join(root, 'added-1', 'added-2', 'file-2.tsx'), '');
     await compilerCtx.fs.disk.writeFile(path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx'), '');
 
-    fsWatchResults.dirsAdded = [path.join(root, 'added-1')];
+    fsWatchResults.dirsAdded = [normalizePath(path.join(root, 'added-1'))];
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
     expect(buildCtx).toBeDefined();
 
