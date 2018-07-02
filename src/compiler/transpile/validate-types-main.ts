@@ -51,6 +51,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       if (buildCtx.isActiveBuild) {
         buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
         const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
+        diagnosticsBuildCtx.start();
         diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
         diagnosticsBuildCtx.finish();
       }
