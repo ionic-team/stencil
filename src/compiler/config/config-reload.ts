@@ -1,11 +1,9 @@
-import { CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
 import { resetCompilerCtx } from '../build/compiler-ctx';
 import { validateConfig } from './validate-config';
 
 
-export function configFileReload(config: Config, compilerCtx: CompilerCtx) {
-  config.logger.debug(`reload config file: ${config.configPath}`);
-
+export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
   try {
     const updatedConfig = config.sys.loadConfigFile(config.configPath);
 
@@ -39,7 +37,7 @@ export function configFileReload(config: Config, compilerCtx: CompilerCtx) {
 // stuff that should be constant between config updates
 // implementing the Config interface to make sure we're
 // using the correct keys, but the value doesn't matter here
-const CONFIG_RELOAD_KEEPERS: Config = {
+const CONFIG_RELOAD_KEEPERS: d.Config = {
   sys: null,
   logger: null,
   cwd: null,

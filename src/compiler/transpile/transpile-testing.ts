@@ -26,7 +26,7 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
       unsubscribeAll: noop
     }
   };
-  const buildCtx = new BuildContext(config, compilerCtx, null);
+  const buildCtx = new BuildContext(config, compilerCtx);
 
   sourceFilePath = normalizePath(sourceFilePath);
 

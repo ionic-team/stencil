@@ -27,6 +27,7 @@ export interface BuildCtx {
   finish(): Promise<BuildResults>;
   global: d.ModuleFile;
   graphData: GraphData;
+  hasConfigChanges: boolean;
   hasCopyChanges: boolean;
   hasFinished: boolean;
   hasIndexHtmlChanges: boolean;
@@ -40,7 +41,7 @@ export interface BuildCtx {
   requiresFullBuild: boolean;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  shouldAbort(): boolean;
+  hasError: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesUpdated: BuildStyleUpdate[];
@@ -115,6 +116,7 @@ export interface HmrStyleUpdate {
 
 
 export interface BuildNoChangeResults {
+  buildId: number;
   noChange: boolean;
 }
 
@@ -187,7 +189,7 @@ export interface FilesMap {
 }
 
 
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'buildFinish' | 'build' | 'buildNoChange' | 'buildLog';
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'fsChange' | 'buildFinish' | 'buildNoChange' | 'buildLog';
 
 
 export interface JSModuleList {

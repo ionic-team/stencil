@@ -24,7 +24,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
     return;
   }
 
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.hasError) {
     buildCtx.debug(`processMetadata aborted`);
     return;
   }
@@ -41,7 +41,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   buildCtx.hasSlot = moduleFiles.some(mf => mf.hasSlot);
   buildCtx.hasSvg = moduleFiles.some(mf => mf.hasSvg);
 
-  if (doTranspile && !buildCtx.shouldAbort()) {
+  if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!
     // create the components.d.ts file and write to disk
     await generateComponentTypes(config, compilerCtx, buildCtx);

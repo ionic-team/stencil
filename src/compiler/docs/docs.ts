@@ -9,7 +9,7 @@ import { transpileApp } from '../transpile/transpile-app';
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   compilerCtx = getCompilerCtx(config, compilerCtx);
-  const buildCtx = new BuildContext(config, compilerCtx, null);
+  const buildCtx = new BuildContext(config, compilerCtx);
 
   config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
 

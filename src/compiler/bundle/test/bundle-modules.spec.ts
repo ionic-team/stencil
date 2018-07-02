@@ -17,41 +17,6 @@ describe('bundle-module', () => {
     });
 
 
-    it('should not rebuild without js changes', async () => {
-      c.config.watch = true;
-      c.config.bundles = [
-        { components: ['cmp-a', 'cmp-b'] },
-        { components: ['cmp-c'] }
-      ];
-      await c.fs.writeFiles({
-        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-        [path.join(root, 'src', 'cmp-b.tsx')]: `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
-        [path.join(root, 'src', 'cmp-c.tsx')]: `@Component({ tag: 'cmp-c' }) export class CmpC {}`
-      });
-      await c.fs.commit();
-
-      // initial build
-      const r = await c.build();
-      expect(r.diagnostics).toEqual([]);
-
-      const firstBuildText = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
-
-      // create a rebuild listener
-      const noChangeListener = c.once('buildNoChange');
-
-      // write the same darn thing, no actual change
-      await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
-      await c.fs.commit();
-
-      // kick off a rebuild
-      c.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
-
-      // wait for the rebuild to finish
-      // get the rebuild results
-      const nc = await noChangeListener;
-      expect(nc.noChange).toEqual(true);
-    });
-
     it('should build 2 bundles of 3 components', async () => {
       c.config.bundles = [
         { components: ['cmp-a', 'cmp-b'] },

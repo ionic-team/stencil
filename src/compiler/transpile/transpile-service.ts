@@ -182,7 +182,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     return;
   }
 
-  if (ctx.buildCtx.shouldAbort()) {
+  if (ctx.buildCtx.hasError) {
     ctx.buildCtx.debug(`tranpsileTsFile aborted: ${tsFilePath}`);
     return;
   }
@@ -254,7 +254,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
       return;
     }
 
-    if (ctx.buildCtx.shouldAbort()) {
+    if (ctx.buildCtx.hasError) {
       ctx.buildCtx.debug(`tranpsileTsFile write aborted: ${tsFilePath}`);
       return;
     }

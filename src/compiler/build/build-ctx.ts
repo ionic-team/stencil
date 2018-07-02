@@ -10,7 +10,6 @@ export class BuildContext implements d.BuildCtx {
   timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
-  changedExtensions: string[] = [];
   collections: d.Collection[] = [];
   components: string[] = [];
   data: any = {};
@@ -26,6 +25,7 @@ export class BuildContext implements d.BuildCtx {
   filesWritten: string[] = [];
   global: d.ModuleFile = null;
   graphData: d.GraphData = null;
+  hasConfigChanges = false;
   hasCopyChanges = false;
   hasFinished = false;
   hasIndexHtmlChanges = false;
@@ -45,56 +45,27 @@ export class BuildContext implements d.BuildCtx {
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
-  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx, watchResults: d.WatchResults = null) {
-    this.setBuildTimestamp();
+  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {}
 
-    // do a full build if there is no watcher
-    // or the watcher said the config has updated
-    // or we've never had a successful build yet
-    this.requiresFullBuild = (!watchResults || watchResults.configUpdated || !compilerCtx.hasSuccessfulBuild);
+  start() {
+    // get the build id from the incremented activeBuildId
+    this.buildId = ++this.compilerCtx.activeBuildId;
 
-    this.isRebuild = !!watchResults;
+    // print out a good message
+    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
 
-    // increment the active build id
-    compilerCtx.activeBuildId++;
-    this.buildId = compilerCtx.activeBuildId;
-
-    this.debug(`start build, ${this.timestamp}`);
-
-    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`;
+    // create a timespan for this build
     this.timeSpan = this.createTimeSpan(msg);
 
-    if (watchResults != null) {
-      this.scriptsAdded = watchResults.scriptsAdded.slice();
-      this.scriptsDeleted = watchResults.scriptsAdded.slice();
-      this.hasCopyChanges = watchResults.hasCopyChanges;
-      this.hasScriptChanges = watchResults.hasScriptChanges;
-      this.hasStyleChanges = watchResults.hasStyleChanges;
-      this.hasIndexHtmlChanges = watchResults.hasIndexHtmlChanges;
+    // create a build timestamp for this build
+    this.timestamp = getBuildTimestamp();
 
-      this.filesChanged.push(...watchResults.filesChanged);
-      this.filesUpdated.push(...watchResults.filesUpdated);
-      this.filesAdded.push(...watchResults.filesAdded);
-      this.filesDeleted.push(...watchResults.filesDeleted);
-      this.dirsDeleted.push(...watchResults.dirsDeleted);
-      this.dirsAdded.push(...watchResults.dirsAdded);
-    }
-  }
-
-  setBuildTimestamp() {
-    const d = new Date();
-
-    // YYYY-MM-DDThh:mm:ss
-    this.timestamp = d.getUTCFullYear() + '-';
-    this.timestamp += ('0' + d.getUTCMonth()).slice(-2) + '-';
-    this.timestamp += ('0' + d.getUTCDate()).slice(-2) + 'T';
-    this.timestamp += ('0' + d.getUTCHours()).slice(-2) + ':';
-    this.timestamp += ('0' + d.getUTCMinutes()).slice(-2) + ':';
-    this.timestamp += ('0' + d.getUTCSeconds()).slice(-2);
+    // debug log our new build
+    this.debug(`start build, ${this.timestamp}`);
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+    if ((this.isActiveBuild && !this.hasFinished) || debug) {
       if (debug) {
         msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
       }
@@ -108,7 +79,7 @@ export class BuildContext implements d.BuildCtx {
 
       return {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
-          if ((this.buildId === this.compilerCtx.activeBuildId && !this.hasFinished) || debug) {
+          if ((this.isActiveBuild && !this.hasFinished) || debug) {
             if (debug) {
               finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
             }
@@ -135,18 +106,10 @@ export class BuildContext implements d.BuildCtx {
   }
 
   get isActiveBuild() {
-    return this.compilerCtx.activeBuildId === this.buildId;
+    return (this.compilerCtx.activeBuildId === this.buildId);
   }
 
-  async abort() {
-    return buildFinish(this.config, this.compilerCtx, this as any, true);
-  }
-
-  async finish() {
-    return buildFinish(this.config, this.compilerCtx, this as any, false);
-  }
-
-  shouldAbort() {
+  get hasError() {
     if (hasError(this.diagnostics)) {
       // remember if the last build had an error or not
       // this is useful if the next build should do a full build or not
@@ -157,8 +120,16 @@ export class BuildContext implements d.BuildCtx {
     return false;
   }
 
+  async abort() {
+    return buildFinish(this.config, this.compilerCtx, this as any, true);
+  }
+
+  async finish() {
+    return buildFinish(this.config, this.compilerCtx, this as any, false);
+  }
+
   async validateTypesBuild() {
-    if (this.shouldAbort() || !this.isActiveBuild) {
+    if (this.hasError || !this.isActiveBuild) {
       // no need to wait on this one since
       // we already aborted this build
       return;
@@ -180,4 +151,19 @@ export class BuildContext implements d.BuildCtx {
     }
   }
 
+}
+
+
+function getBuildTimestamp() {
+  const d = new Date();
+
+  // YYYY-MM-DDThh:mm:ss
+  let timestamp = d.getUTCFullYear() + '-';
+  timestamp += ('0' + d.getUTCMonth()).slice(-2) + '-';
+  timestamp += ('0' + d.getUTCDate()).slice(-2) + 'T';
+  timestamp += ('0' + d.getUTCHours()).slice(-2) + ':';
+  timestamp += ('0' + d.getUTCMinutes()).slice(-2) + ':';
+  timestamp += ('0' + d.getUTCSeconds()).slice(-2);
+
+  return timestamp;
 }

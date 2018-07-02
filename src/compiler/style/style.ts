@@ -41,7 +41,11 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
   const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
 
   await Promise.all(Object.keys(stylesMeta).map(async modeName => {
-    // compile each style mode's sass/css
+    if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+      return;
+    }
+
+    // compile each mode style
     const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
     // format and set the styles for use later
@@ -51,9 +55,8 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
 
 
 async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta) {
-  const extStylePaths = styleMeta.externalStyles.map(extStyle => {
-    return extStyle.absolutePath;
-  });
+  // get all the absolute paths for each style
+  const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
   if (typeof styleMeta.styleStr === 'string') {
     // plain styles just in a string
@@ -63,6 +66,7 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
     await compilerCtx.fs.writeFile(inlineAbsPath, styleMeta.styleStr, { inMemoryOnly: true });
   }
 
+  // build an array of style strings
   const styles = await Promise.all(extStylePaths.map(extStylePath => {
     return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, extStylePath);
   }));
@@ -72,6 +76,10 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 
 async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+    return '/* build aborted */';
+  }
+
   let styleText: string;
 
   extStylePath = normalizePath(extStylePath);
@@ -318,7 +326,7 @@ export const PLUGIN_HELPERS = [
 
 
 function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return true;
   }
 

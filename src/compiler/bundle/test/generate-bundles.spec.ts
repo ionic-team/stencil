@@ -14,16 +14,16 @@ describe('generate-bundles', () => {
       config.sys = mockStencilSystem();
 
       const id = getBundleIdHashed(config, 'abcdefg');
-      expect(id).toBe('l7xh');
+      expect(id).toBe('eszs');
     });
 
     it('get bundle id and sort with collection dependencies at the end', () => {
       const entryModule: EntryModule = {
         moduleFiles: [
-          { cmpMeta: { tagNameMeta: 'cmp-z' } },
-          { cmpMeta: { tagNameMeta: 'cmp-x' } },
-          { cmpMeta: { tagNameMeta: 'cmp-b' }, isCollectionDependency: true },
-          { cmpMeta: { tagNameMeta: 'cmp-a' }, isCollectionDependency: true }
+          { cmpMeta: { tagNameMeta: 'cmp-z' }, sourceFilePath: 'cmp-z' },
+          { cmpMeta: { tagNameMeta: 'cmp-x' }, sourceFilePath: 'cmp-x' },
+          { cmpMeta: { tagNameMeta: 'cmp-b' }, isCollectionDependency: true, sourceFilePath: 'cmp-b' },
+          { cmpMeta: { tagNameMeta: 'cmp-a' }, isCollectionDependency: true, sourceFilePath: 'cmp-a' }
         ]
       };
       const id = getBundleIdDev(entryModule, null);
@@ -33,8 +33,8 @@ describe('generate-bundles', () => {
     it('get bundle id from components and mode', () => {
       const entryModule: EntryModule = {
         moduleFiles: [
-          { cmpMeta: { tagNameMeta: 'cmp-a' } },
-          { cmpMeta: { tagNameMeta: 'cmp-b' } }
+          { cmpMeta: { tagNameMeta: 'cmp-a' }, sourceFilePath: 'cmp-a' },
+          { cmpMeta: { tagNameMeta: 'cmp-b' }, sourceFilePath: 'cmp-b' }
         ]
       };
       const id = getBundleIdDev(entryModule, 'ios');
@@ -44,8 +44,8 @@ describe('generate-bundles', () => {
     it('get bundle id from components and default mode mode', () => {
       const entryModule: EntryModule = {
         moduleFiles: [
-          { cmpMeta: { tagNameMeta: 'cmp-a' } },
-          { cmpMeta: { tagNameMeta: 'cmp-b' } }
+          { cmpMeta: { tagNameMeta: 'cmp-a' }, sourceFilePath: 'cmp-a' },
+          { cmpMeta: { tagNameMeta: 'cmp-b' }, sourceFilePath: 'cmp-b' }
         ]
       };
       const id = getBundleIdDev(entryModule, null);

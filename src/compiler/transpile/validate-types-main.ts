@@ -10,7 +10,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  if (buildCtx.shouldAbort()) {
+  if (buildCtx.hasError) {
     buildCtx.debug(`validateTypesMain aborted`);
     return;
   }
@@ -50,7 +50,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       // we'll need to create build to show the diagnostics
       if (buildCtx.isActiveBuild) {
         buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
-        const diagnosticsBuildCtx = new BuildContext(config, compilerCtx, null);
+        const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
         diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
         diagnosticsBuildCtx.finish();
       }

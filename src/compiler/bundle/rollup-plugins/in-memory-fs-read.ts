@@ -13,6 +13,9 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
     async resolveId(importee: string, importer: string) {
       // note: node-resolve plugin has already ran
       // we can assume the importee is a file path
+      if (!buildCtx.isActiveBuild) {
+        return importee;
+      }
 
       const orgImportee = importee;
 
@@ -131,6 +134,10 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
     },
 
     async load(sourcePath: string) {
+      if (!buildCtx.isActiveBuild) {
+        return `/* build aborted */`;
+      }
+
       sourcePath = normalizePath(sourcePath);
 
       if (typeof assetsCache[sourcePath] === 'string') {

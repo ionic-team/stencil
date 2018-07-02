@@ -175,45 +175,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     }));
   }
 
-  hasFileChanged(filePath: string) {
-    let hasFileChanged = true;
-
-    try {
-      let oldHash: string = null;
-      const oldItem = this.getItem(filePath);
-
-      if (oldItem.exists && oldItem.isFile && typeof oldItem.hash === 'string') {
-        oldHash = oldItem.hash;
-      }
-
-      this.readFileSync(filePath, { useCache: false, setHash: true });
-
-      if (oldHash != null) {
-        const newItem = this.getItem(filePath);
-
-        if (typeof newItem.hash === 'string') {
-          hasFileChanged = (newItem.hash !== oldHash);
-        }
-      }
-
-    } catch (e) {}
-
-    return hasFileChanged;
-  }
-
-  setBuildHashes() {
-    Object.keys(this.items).forEach(itemKey => {
-      const item = this.items[itemKey];
-      if (item && item.isFile && typeof item.fileText === 'string') {
-        item.hash = this.getContentHash(item.fileText);
-      }
-    });
-  }
-
-  getContentHash(content: string) {
-    return this.sys.generateContentHash(content, 32);
-  }
-
   async readFile(filePath: string, opts?: d.FsReadOptions) {
     if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
@@ -222,7 +183,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       }
     }
 
-    const fileContent = await this.disk.readFile(filePath, 'utf8');
+    const fileContent = await this.disk.readFile(filePath);
 
     const item = this.getItem(filePath);
     if (fileContent.length < MAX_TEXT_CACHE) {
@@ -230,10 +191,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
-    }
-
-    if (opts && opts.setHash && typeof fileContent === 'string') {
-      item.hash = this.getContentHash(fileContent);
     }
 
     return fileContent;
@@ -252,7 +209,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       }
     }
 
-    const fileContent = this.disk.readFileSync(filePath, 'utf8');
+    const fileContent = this.disk.readFileSync(filePath);
 
     const item = this.getItem(filePath);
     if (fileContent.length < MAX_TEXT_CACHE) {
@@ -260,10 +217,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isFile = true;
       item.isDirectory = false;
       item.fileText = fileContent;
-    }
-
-    if (opts && opts.setHash && typeof fileContent === 'string') {
-      item.hash = this.getContentHash(fileContent);
     }
 
     return fileContent;

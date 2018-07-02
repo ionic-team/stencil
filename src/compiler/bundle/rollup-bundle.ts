@@ -1,4 +1,5 @@
-import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList, NodeResolveConfig } from '../../declarations';
+import * as d from '../../declarations';
+import abortPlugin from './rollup-plugins/abort-plugin';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import bundleJson from './rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
@@ -13,7 +14,7 @@ import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
 
 
-export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
   if (!buildCtx.isActiveBuild) {
     buildCtx.debug(`createBundle aborted, not active build`);
   }
@@ -30,7 +31,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     ...config.commonjs
   };
 
-  const nodeResolveConfig: NodeResolveConfig = {
+  const nodeResolveConfig: d.NodeResolveConfig = {
     jsnext: true,
     main: true,
     ...config.nodeResolve
@@ -44,6 +45,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     preserveSymlinks: false,
     experimentalDynamicImport: true,
     plugins: [
+      abortPlugin(buildCtx),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
@@ -54,7 +56,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
-      ...config.plugins
+      ...config.plugins,
+      abortPlugin(buildCtx)
     ],
     onwarn: createOnWarnFn(config, buildCtx.diagnostics),
     cache: compilerCtx.entryBundleCache
@@ -62,12 +65,23 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
 
   try {
     rollupBundle = await rollup(rollupConfig);
-    compilerCtx.entryBundleCache = rollupBundle;
+
+    if (config.watch) {
+      if (!buildCtx.hasError && buildCtx.isActiveBuild) {
+        // only remember the cache if this is the active build and no errors
+        compilerCtx.entryBundleCache = rollupBundle;
+
+      } else {
+        buildCtx.debug(`createBundle saving cache skipping, not active build`);
+      }
+    }
 
   } catch (err) {
+    // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
       compilerCtx.entryBundleCache = null;
+
     } else {
       buildCtx.debug(`createBundle errors ignored, not active build`);
     }
@@ -79,17 +93,17 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-export async function writeEsModules(config: Config, rollupBundle: BundleSet) {
+export async function writeEsModules(config: d.Config, rollupBundle: BundleSet) {
   const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
     intro: `const { h } = window.${config.namespace};`,
   });
-  return <any>results as JSModuleList;
+  return <any>results as d.JSModuleList;
 }
 
 
-export async function writeLegacyModules(config: Config, rollupBundle: BundleSet, entryModules: EntryModule[]) {
+export async function writeLegacyModules(config: d.Config, rollupBundle: BundleSet, entryModules: d.EntryModule[]) {
   if (!config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
     return null;
@@ -114,11 +128,11 @@ export async function writeLegacyModules(config: Config, rollupBundle: BundleSet
     strict: false,
   });
 
-  return <any>results as JSModuleList;
+  return <any>results as d.JSModuleList;
 }
 
 
-export async function writeEsmEs5Modules(config: Config, rollupBundle: BundleSet) {
+export async function writeEsmEs5Modules(config: d.Config, rollupBundle: BundleSet) {
   if (config.outputTargets.some(o => o.type === 'dist')) {
     const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
       format: 'es',
@@ -127,7 +141,7 @@ export async function writeEsmEs5Modules(config: Config, rollupBundle: BundleSet
       strict: false,
     });
 
-    return <any>results as JSModuleList;
+    return <any>results as d.JSModuleList;
   }
 
   return null;

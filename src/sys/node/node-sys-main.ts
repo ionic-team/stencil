@@ -140,13 +140,18 @@ export class NodeSystem implements d.StencilSystem {
     return watcher;
   }
 
-  generateContentHash(content: string, length: number): string {
-    return crypto.createHash('sha1')
+  generateContentHash(content: any, length: number) {
+    let hash = crypto.createHash('md5')
                      .update(content)
-                     .digest('base64')
-                     .replace(/\W/g, '')
-                     .substr(0, length)
-                     .toLowerCase();
+                     .digest('base64');
+
+    if (typeof length === 'number') {
+      hash = hash.replace(/\W/g, '')
+                 .substr(0, length)
+                 .toLowerCase();
+    }
+
+    return hash;
   }
 
   getClientCoreFile(opts: any) {

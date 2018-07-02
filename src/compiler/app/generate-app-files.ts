@@ -38,7 +38,7 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
     return;
   }
 
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -104,7 +104,7 @@ async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerC
 
 
 function canSkipAppFiles(buildCtx: d.BuildCtx, cmpRegistry: d.ComponentRegistry) {
-  if (buildCtx.shouldAbort() || !cmpRegistry) {
+  if (buildCtx.hasError || !cmpRegistry) {
     return true;
   }
 

@@ -16,7 +16,6 @@ export interface InMemoryFileSystem {
    */
   accessSync(filePath: string): boolean;
   emptyDir(dirPath: string): Promise<void>;
-  hasFileChanged(filePath: string): boolean;
   readdir(dirPath: string, opts?: d.FsReaddirOptions): Promise<d.FsReaddirItem[]>;
   readFile(filePath: string, opts?: d.FsReadOptions): Promise<string>;
   /**
@@ -26,7 +25,6 @@ export interface InMemoryFileSystem {
    */
   readFileSync(filePath: string, opts?: d.FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
-  setBuildHashes(): void;
   stat(itemPath: string): Promise<{
       isFile: boolean;
       isDirectory: boolean;

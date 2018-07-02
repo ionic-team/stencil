@@ -55,7 +55,7 @@ function canSkipGlobalStyles(config: d.Config, buildCtx: d.BuildCtx) {
     return true;
   }
 
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return true;
   }
 

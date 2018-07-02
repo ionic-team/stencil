@@ -12,39 +12,36 @@ export interface Compiler {
 
 export interface CompilerCtx {
   activeBuildId?: number;
-  fs?: d.InMemoryFileSystem;
-  cache?: d.Cache;
-  events?: d.BuildEvents;
-  moduleFiles?: d.ModuleFiles;
-  compiledModuleJsText?: d.ModuleBundles;
-  compiledModuleLegacyJsText?: d.ModuleBundles;
-  compilerOptions?: any;
-  collections?: d.Collection[];
+  appCoreWWWPath?: string;
   appFiles?: {
     core?: string;
     corePolyfilled?: string;
     global?: string;
     registryJson?: string;
   };
-  appCoreWWWPath?: string;
-  resolvedCollections?: string[];
-
+  cache?: d.Cache;
+  collections?: d.Collection[];
+  compiledModuleJsText?: d.ModuleBundles;
+  compiledModuleLegacyJsText?: d.ModuleBundles;
+  compilerOptions?: any;
+  entryBundleCache?: any;
+  events?: d.BuildEvents;
+  fs?: d.InMemoryFileSystem;
   hasSuccessfulBuild?: boolean;
-  localPrerenderServer?: any;
-  lastBuildResults?: d.BuildResults;
-  hasWatcher?: boolean;
-  tsService?: TsService;
-  rootTsFiles?: string[];
-
-  lastBuildHadError?: boolean;
+  hasWatch?: boolean;
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
-  lastJsModules?: d.JSModuleMap;
+  lastBuildHadError?: boolean;
+  lastBuildResults?: d.BuildResults;
   lastBuildStyles?: { [styleId: string]: string };
+  lastJsModules?: d.JSModuleMap;
   lastStyleText?: { [absPath: string]: string };
-
-  entryBundleCache?: any;
+  localPrerenderServer?: any;
+  moduleFiles?: d.ModuleFiles;
+  resolvedCollections?: string[];
+  rootTsFiles?: string[];
+  tsService?: TsService;
 }
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<any>;

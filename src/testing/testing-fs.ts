@@ -65,31 +65,42 @@ export class TestingFs implements d.FileSystem {
   readdir(dirPath: string) {
     return new Promise<string[]>((resolve, reject) => {
       setTimeout(() => {
-        dirPath = normalizePath(dirPath);
-        this.diskReads++;
+        try {
 
-        if (!this.data[dirPath]) {
-          reject(`readdir, dir doesn't exists: ${dirPath}`);
-        } else {
-          const filePaths = Object.keys(this.data);
-          const dirs: string[] = [];
-
-          filePaths.forEach(f => {
-            const pathRelative = path.relative(dirPath, f);
-            // Windows: pathRelative =  ..\dir2\dir3\dir4\file2.js
-            const dirItem = normalizePath(pathRelative).split('/')[0];
-
-            if (!dirItem.startsWith('.') && !dirItem.startsWith('/')) {
-              if (dirItem !== '' && !dirs.includes(dirItem)) {
-                dirs.push(dirItem);
-              }
-            }
-          });
-
+          const dirs = this.readdirSync(dirPath);
           resolve(dirs.sort());
+
+        } catch (e) {
+          reject(e);
         }
       }, this.resolveTime);
     });
+  }
+
+  readdirSync(dirPath: string) {
+    dirPath = normalizePath(dirPath);
+    this.diskReads++;
+
+    if (!this.data[dirPath]) {
+      throw new Error(`readdir, dir doesn't exists: ${dirPath}`);
+    }
+
+    const filePaths = Object.keys(this.data);
+    const dirs: string[] = [];
+
+    filePaths.forEach(f => {
+      const pathRelative = path.relative(dirPath, f);
+      // Windows: pathRelative =  ..\dir2\dir3\dir4\file2.js
+      const dirItem = normalizePath(pathRelative).split('/')[0];
+
+      if (!dirItem.startsWith('.') && !dirItem.startsWith('/')) {
+        if (dirItem !== '' && !dirs.includes(dirItem)) {
+          dirs.push(dirItem);
+        }
+      }
+    });
+
+    return dirs;
   }
 
   readFile(filePath: string) {

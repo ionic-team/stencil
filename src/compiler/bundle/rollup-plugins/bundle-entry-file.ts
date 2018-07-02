@@ -10,12 +10,16 @@ export default function bundleEntryFile(config: d.Config, buildCtx: d.BuildCtx, 
     name: 'bundleEntryFilePlugin',
 
     resolveId(importee: string) {
-      const bundle = entryModules.find(b => b.entryKey === importee);
-      if (bundle) {
-        return bundle.entryKey;
+      if (!buildCtx.isActiveBuild) {
+        return `_not_active_build.js`;
       }
 
       if (importee.startsWith(ENTRY_KEY_PREFIX)) {
+        const bundle = entryModules.find(b => b.entryKey === importee);
+        if (bundle) {
+          return bundle.entryKey;
+        }
+
         buildCtx.debug(`bundleEntryFilePlugin resolveId, unable to find entry key: ${importee}`);
         buildCtx.debug(`entryModules entryKeys: ${entryModules.map(em => em.entryKey).join(', ')}`);
       }
@@ -24,12 +28,16 @@ export default function bundleEntryFile(config: d.Config, buildCtx: d.BuildCtx, 
     },
 
     load(id: string) {
-      const bundle = entryModules.find(b => b.entryKey === id);
-      if (bundle) {
-        return createEntryPointString(config, bundle);
+      if (!buildCtx.isActiveBuild) {
+        return `/* build aborted */`;
       }
 
       if (id.startsWith(ENTRY_KEY_PREFIX)) {
+        const bundle = entryModules.find(b => b.entryKey === id);
+        if (bundle) {
+          return createEntryPointString(config, bundle);
+        }
+
         buildCtx.debug(`bundleEntryFilePlugin load, unable to find entry key: ${id}`);
         buildCtx.debug(`entryModules entryKeys: ${entryModules.map(em => em.entryKey).join(', ')}`);
       }

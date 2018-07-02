@@ -1,17 +1,19 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
-import { initWatcher } from '../watcher/watcher-init';
+import { initFsWatch } from '../fs-watch/fs-watch-init';
 
 
 export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
+    // we've already marked this build as finished and
+    // already created the build results, just return these
     return buildCtx.buildResults;
   }
 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
 
+  // create the build results data
   buildCtx.buildResults = await generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
@@ -20,35 +22,15 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
 
     if (!buildCtx.isRebuild && config.devServer && config.devServer.browserUrl && config.flags.serve) {
+      // we've opened up the dev server
+      // let's print out the dev server url
       config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
     }
 
     if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted) {
-      const hmr = buildCtx.buildResults.hmr;
-      if (hmr.componentsUpdated) {
-        const components = hmr.componentsUpdated.join(', ');
-        config.logger.info(`updated components: ${config.logger.cyan(components)}`);
-      }
-
-      if (hmr.inlineStylesUpdated) {
-        const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
-          if (!arr.includes(v)) {
-            arr.push(v);
-          }
-          return arr;
-        }, []).join(', ');
-        config.logger.info(`updated styles: ${config.logger.cyan(inlineStyles)}`);
-      }
-
-      if (hmr.externalStylesUpdated) {
-        const extStyles = hmr.externalStylesUpdated.join(', ');
-        config.logger.info(`updated stylesheets: ${config.logger.cyan(extStyles)}`);
-      }
-
-      if (hmr.imagesUpdated) {
-        const images = hmr.imagesUpdated.join(', ');
-        config.logger.info(`updated images: ${config.logger.cyan(images)}`);
-      }
+      // this is a rebuild, and we've got hmr data
+      // and this build hasn't been aborted
+      logHmr(config, buildCtx);
     }
 
     // create a nice pretty message stating what happend
@@ -57,23 +39,18 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     let buildStatus = 'finished';
     let statusColor = 'green';
 
-    if (buildCtx.buildResults.hasError) {
-      // gosh darn, build had errors :(
+    if (buildCtx.hasError) {
+      // gosh darn, build had errors
+      // ಥ_ಥ
       compilerCtx.lastBuildHadError = true;
       buildStatus = 'failed';
       statusColor = 'red';
 
     } else {
       // successful build!
+      // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
       compilerCtx.hasSuccessfulBuild = true;
       compilerCtx.lastBuildHadError = false;
-
-      if (!buildCtx.isRebuild && config.watch) {
-        // successful first time build and we're watching the files
-        // so let's hash all of the source files content so we can
-        // do great file change detection to know when files actually change
-        compilerCtx.fs.setBuildHashes();
-      }
     }
 
     if (!aborted) {
@@ -83,30 +60,59 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
 
       // write the build stats
       await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
-    }
 
-    // write all of our logs to disk if config'd to do so
-    config.logger.writeLogs(buildCtx.isRebuild);
-
-    if (!aborted) {
       // emit a buildFinish event for anyone who cares
       compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
     }
 
+    // write all of our logs to disk if config'd to do so
+    // do this even if there are errors or not the active build
+    config.logger.writeLogs(buildCtx.isRebuild);
+
     if (config.watch) {
-      try {
-        // setup watcher if need be
-        initWatcher(config, compilerCtx, buildCtx);
-      } catch (e) {
-        catchError(buildCtx.diagnostics, e);
-      }
+      // this is a watch build
+      // setup watch if we haven't done so already
+      initFsWatch(config, compilerCtx, buildCtx);
 
     } else {
+      // not a watch build, so lets destroy anything left open
       config.sys.destroy();
     }
   }
 
+  // it's official, this build has finished
   buildCtx.hasFinished = true;
 
   return buildCtx.buildResults;
+}
+
+
+function logHmr(config: d.Config, buildCtx: d.BuildCtx) {
+  // this is a rebuild, and we've got hmr data
+  // and this build hasn't been aborted
+  const hmr = buildCtx.buildResults.hmr;
+  if (hmr.componentsUpdated && hmr.componentsUpdated.length > 0) {
+    const components = hmr.componentsUpdated.join(', ');
+    config.logger.info(`updated components: ${config.logger.cyan(components)}`);
+  }
+
+  if (hmr.inlineStylesUpdated && hmr.inlineStylesUpdated.length > 0) {
+    const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
+      if (!arr.includes(v)) {
+        arr.push(v);
+      }
+      return arr;
+    }, []).join(', ');
+    config.logger.info(`updated styles: ${config.logger.cyan(inlineStyles)}`);
+  }
+
+  if (hmr.externalStylesUpdated && hmr.externalStylesUpdated.length > 0) {
+    const extStyles = hmr.externalStylesUpdated.join(', ');
+    config.logger.info(`updated stylesheets: ${config.logger.cyan(extStyles)}`);
+  }
+
+  if (hmr.imagesUpdated && hmr.imagesUpdated.length > 0) {
+    const images = hmr.imagesUpdated.join(', ');
+    config.logger.info(`updated images: ${config.logger.cyan(images)}`);
+  }
 }

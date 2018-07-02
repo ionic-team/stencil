@@ -5,8 +5,9 @@ export interface FileSystem {
   mkdir(dirPath: string): Promise<void>;
   mkdirSync(dirPath: string): void;
   readdir(dirPath: string): Promise<string[]>;
-  readFile(filePath: string, encoding?: string): Promise<string>;
-  readFileSync(filePath: string, encoding?: string): string;
+  readdirSync(dirPath: string): string[];
+  readFile(filePath: string): Promise<string>;
+  readFileSync(filePath: string): string;
   rmdir(dirPath: string): Promise<void>;
   stat(path: string): Promise<FsStats>;
   statSync(path: string): FsStats;
@@ -83,7 +84,6 @@ export interface FsItems {
 
 export interface FsItem {
   fileText?: string;
-  hash?: string;
   isFile?: boolean;
   isDirectory?: boolean;
   size?: number;

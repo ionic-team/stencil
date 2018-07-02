@@ -38,7 +38,7 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
 
 
 async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -65,7 +65,7 @@ async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -101,7 +101,7 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -478,7 +478,7 @@ function createComponentRegistry(entryModules: d.EntryModule[]) {
 
 
 function canSkipGenerateBundles(buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return true;
   }
 

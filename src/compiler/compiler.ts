@@ -3,7 +3,9 @@ import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
 import { catchError } from './util';
 import { docs } from './docs/docs';
+import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
 import { getCompilerCtx } from './build/compiler-ctx';
+import { logFsWatchMessage } from './fs-watch/fs-watch-log';
 import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
@@ -40,14 +42,29 @@ export class Compiler implements d.Compiler {
 
       this.ctx = getCompilerCtx(config);
 
-      this.on('build', watchResults => {
-        const buildCtx = new BuildContext(config, this.ctx, watchResults);
-        build(this.config, this.ctx, buildCtx);
+      this.on('fsChange', fsWatchResults => {
+        this.rebuild(fsWatchResults);
       });
 
       if (config.flags.serve) {
         this.startDevServer();
       }
+    }
+  }
+
+  build() {
+    const buildCtx = new BuildContext(this.config, this.ctx);
+    buildCtx.start();
+    return build(this.config, this.ctx, buildCtx);
+  }
+
+  rebuild(fsWatchResults: d.FsWatchResults) {
+    const buildCtx = generateBuildFromFsWatch(this.config, this.ctx, fsWatchResults);
+    if (buildCtx) {
+      logFsWatchMessage(this.config, buildCtx);
+      buildCtx.start();
+      updateCacheFromRebuild(this.ctx, buildCtx);
+      build(this.config, this.ctx, buildCtx);
     }
   }
 
@@ -67,12 +84,7 @@ export class Compiler implements d.Compiler {
     };
   }
 
-  build() {
-    const buildCtx = new BuildContext(this.config, this.ctx);
-    return build(this.config, this.ctx, buildCtx);
-  }
-
-  on(eventName: 'build', cb: (watchResults?: d.WatchResults) => void): Function;
+  on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
   on(eventName: 'buildLog', cb: (buildResults: d.BuildLog) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;

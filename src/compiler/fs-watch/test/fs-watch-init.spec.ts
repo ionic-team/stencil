@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { BuildEvents } from '../../events';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
-import { initWatcher } from '../watcher-init';
+import { initFsWatch } from '../fs-watch-init';
 import { validateConfig } from '../../../compiler/config/validate-config';
 
 
@@ -21,16 +21,16 @@ describe('watcher', () => {
 
 
   it('should only create the watch listener once', () => {
-    let didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
+    let didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(true);
 
-    didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
+    didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 
   it('should not create watcher if config.watch falsy', () => {
     config.watch = false;
-    const didCreateWatcher = initWatcher(config, compilerCtx, buildCtx);
+    const didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 

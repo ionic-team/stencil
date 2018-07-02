@@ -9,7 +9,7 @@ export class BuildEvents implements d.BuildEvents {
   subscribe(eventName: 'fileDelete', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirDelete', cb: (path: string) => void): Function;
-  subscribe(eventName: 'build', cb: (watcherResults: d.WatchResults) => void): Function;
+  subscribe(eventName: 'fsChange', cb: (fsChange: d.FsWatchResults) => void): Function;
   subscribe(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   subscribe(eventName: 'buildLog', cb: (buildLog: d.BuildLog) => void): Function;
   subscribe(eventName: d.CompilerEventName, cb: Function): Function {

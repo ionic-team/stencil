@@ -85,6 +85,7 @@ describe('transpile', () => {
     // kick off the initial build, wait for it to finish
     let r = await c.build();
     expect(r.diagnostics).toEqual([]);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
 
     // create a rebuild listener
     const rebuildListener = c.once('buildFinish');
@@ -104,6 +105,10 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.filesAdded).toContain(path.join(root, 'src', 'new-dir', 'cmp-b.tsx'));
+    expect(r.filesAdded).toContain(path.join(root, 'src', 'new-dir', 'cmp-c.tsx'));
+
+    expect(r.transpileBuildCount).toBe(2);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(false);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(true);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(true);
@@ -136,21 +141,24 @@ describe('transpile', () => {
     // get the rebuild results
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
+    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.tsx'));
 
     expect(r.buildId).toBe(1);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
+    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(newJs).toContain('console.log');
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
   });
 
-  it('should not rebuild transpile for unchanged typescript file', async () => {
+  it('should not transpile for unchanged typescript file', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.watch = true;
-    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`, { clearFileCache: true });
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.css'), `body { color: red; }`, { clearFileCache: true });
     await c.fs.commit();
 
     // kick off the build, wait for it to finish
-    const r = await c.build();
+    let r = await c.build();
 
     // initial build finished
     expect(r.diagnostics).toEqual([]);
@@ -158,19 +166,30 @@ describe('transpile', () => {
     expect(r.isRebuild).toBe(false);
 
     // create a rebuild listener
-    const buildNoChange = c.once('buildNoChange');
+    const rebuildListener = c.once('buildFinish');
 
     // write the same darn thing, no actual change
-    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.css'), `body { color: blue; }`, { clearFileCache: true });
     await c.fs.commit();
 
     // kick off a rebuild
+    c.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.css'));
     c.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
 
     // wait for the rebuild to finish
     // get the rebuild results
-    const nc = await buildNoChange;
-    expect(nc.noChange).toEqual(true);
+    r = await rebuildListener;
+    expect(r.diagnostics).toEqual([]);
+
+    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.css'));
+    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.tsx'));
+
+    expect(r.buildId).toBe(1);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
+    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(newJs).not.toContain('@stencil/core');
+    expect(r.transpileBuildCount).toBe(0);
+    expect(r.styleBuildCount).toBe(1);
   });
 
   it('should transpile with core and without typescript errors', async () => {

@@ -49,6 +49,10 @@ export class NodeFs implements d.FileSystem {
     });
   }
 
+  readdirSync(dirPath: string) {
+    return fs.readdirSync(dirPath);
+  }
+
   readFile(filePath: string) {
     return new Promise<string>((resolve, reject) => {
       fs.readFile(filePath, 'utf8', (err: any, content: any) => {

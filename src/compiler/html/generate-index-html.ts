@@ -4,7 +4,7 @@ import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script
 
 
 export async function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -21,7 +21,7 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 

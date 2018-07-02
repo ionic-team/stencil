@@ -5,7 +5,7 @@ import { prerenderOutputTargets } from '../prerender/prerender-app';
 
 
 export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
@@ -20,7 +20,7 @@ export async function buildAuxiliaries(config: d.Config, compilerCtx: d.Compiler
     generateServiceWorkers(config, compilerCtx, buildCtx)
   ]);
 
-  if (!buildCtx.shouldAbort()) {
+  if (!buildCtx.hasError && buildCtx.isActiveBuild) {
     await compilerCtx.fs.commit();
   }
 }

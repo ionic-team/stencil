@@ -15,7 +15,7 @@ export async function generateLoader(
   cmpRegistry: d.ComponentRegistry
 ) {
 
-  if (buildCtx.shouldAbort() || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return null;
   }
 

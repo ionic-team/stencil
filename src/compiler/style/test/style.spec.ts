@@ -96,11 +96,11 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.js'));
+    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'u.js'));
     expect(iosContent).toContain(`body{font-family:Helvetica}`);
     expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'd.js'));
+    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.js'));
     expect(mdContent).toContain(`body{font-family:Roboto}`);
     expect(mdContent).toContain(`static get styleMode(){return"md"}`);
   });
@@ -109,7 +109,10 @@ describe('component-styles', () => {
     c.config.minifyJs = true;
     c.config.minifyCss = true;
     c.config.hashFileNames = true;
-    c.config.hashedFileNameLength = 1;
+    c.config.sys.generateContentHash = function() {
+      return 'hashed';
+    };
+
     await c.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
       [path.join(root, 'src', 'cmp-a.css')]: `body{color:red}`
@@ -119,7 +122,7 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 's.js'));
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'hashed.js'));
     expect(content).toContain(`body{color:red}`);
   });
 
