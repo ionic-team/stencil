@@ -164,6 +164,98 @@ describe('styles', () => {
     expect(style.innerHTML).toBe(':host { color: red; }');
   });
 
+  it('should set scope id if shadom and doesnt supports shadow dom', () => {
+    plt.domApi.$supportsShadowDom = false;
+    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBe('data-cmp-a');
+  });
+
+  it('should not set scope id if shadom and supports shadow dom', () => {
+    plt.domApi.$supportsShadowDom = true;
+    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBeUndefined();
+  });
+
+  it('should not set scope id if no encapsulation', () => {
+    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBeUndefined();
+  });
+
+  it('should set scope id with no mode set', () => {
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, defaultStyle, defaultMode);
+
+    elm.mode = undefined;
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBe('data-cmp-a');
+  });
+
+  it('should set scope id with mode set, but no style mode set', () => {
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, defaultStyle, defaultMode);
+
+    elm.mode = 'md';
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBe('data-cmp-a');
+  });
+
+  it('should set scope id with mode set and style mode set', () => {
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    const mdStyle = '.md { color: green; }';
+    const mdMode = 'md';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, mdStyle, mdMode);
+
+    const iosStyle = '.ios { color: blue; }';
+    const iosMode = 'ios';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, iosStyle, iosMode);
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, defaultStyle, defaultMode);
+
+    elm.mode = 'md';
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBe('data-cmp-a-md');
+  });
+
+  it('should set scope id with no mode set and style mode set', () => {
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    const mdStyle = '.md { color: green; }';
+    const mdMode = 'md';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, mdStyle, mdMode);
+
+    const iosStyle = '.ios { color: blue; }';
+    const iosMode = 'ios';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, iosStyle, iosMode);
+
+    const defaultStyle = ':host { color: red; }';
+    const defaultMode = '$';
+    initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, defaultStyle, defaultMode);
+
+    elm.mode = undefined;
+    attachStyles(plt, domApi, cmpMeta, elm);
+
+    expect(elm['s-sc']).toBe('data-cmp-a');
+  });
+
   it('should append component styles template to head, with styleMode and scoped css', () => {
     const cmpConstructor: d.ComponentConstructor = class {
       static get is() {
