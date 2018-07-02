@@ -91,6 +91,16 @@ export const RESERVED_PROPERTIES: string[] = [
 
 
   /**
+   * Functional Component Util
+   */
+  'getTag',
+  'getChildren',
+  'getText',
+  'getAttributes',
+  'replaceAttributes',
+
+
+  /**
    * Web Standards / DOM
    */
   'add',
