@@ -5,7 +5,7 @@ import * as http from 'http';
 import * as https from 'https';
 
 
-export async function createHttpServer(devServerConfig: d.DevServerConfig, devServerCtx: d.DevServerContext, fs: d.FileSystem) {
+export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
   const reqHandler = createRequestHandler(devServerConfig, fs);
 
   let server: http.Server;
@@ -16,8 +16,6 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, devSe
   } else {
     server = http.createServer(reqHandler);
   }
-
-  devServerCtx.httpServer = server;
 
   return server;
 }

@@ -137,6 +137,10 @@ export class NodeSystem implements d.StencilSystem {
         console.error(err);
       });
 
+    this.addDestroy(() => {
+      watcher.close();
+    });
+
     return watcher;
   }
 

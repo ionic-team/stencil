@@ -13,6 +13,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
   let hasGottenBuildResults = false;
 
   function onOpen(this: WebSocket) {
+
     if (reconnectAttempts > 0) {
       // we just reconnected
       // we'll request the build results and wait on its response
@@ -110,7 +111,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     if (clientWs) {
       if (clientWs.readyState === WebSocket.OPEN || clientWs.readyState === WebSocket.CONNECTING) {
         // probably fine as is, but let's double check we're closed out
-        clientWs.close();
+        clientWs.close(NORMAL_CLOSURE_CODE);
       }
 
       // let's remove all the existing event listeners

@@ -19,7 +19,6 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   if (config.watch || (config.devServer && flags.serve)) {
     process.once('SIGINT', () => {
       config.sys.destroy();
-      process.exit(0);
     });
   }
 

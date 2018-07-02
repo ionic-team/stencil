@@ -18,13 +18,13 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
     devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
 
     // create the http server listening for and responding to requests from the browser
-    const httpServer = await createHttpServer(devServerConfig, devServerContext, fs);
+    devServerContext.httpServer = await createHttpServer(devServerConfig, fs);
 
     // upgrade any web socket requests the server receives
-    initWebSocketUpgrads(devServerContext, httpServer);
+    initWebSocketUpgrads(devServerContext, devServerContext.httpServer);
 
     // start listening!
-    httpServer.listen(devServerConfig.port, devServerConfig.address);
+    devServerContext.httpServer.listen(devServerConfig.port, devServerConfig.address);
 
     // have the server worker send a message to the main cli
     // process that the server has successfully started up
@@ -45,7 +45,7 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
       }
     }
 
-    function onSigInt() {
+    function closeServer() {
       // probably recived a SIGINT message from the parent cli process
       // let's do our best to gracefully close everything down first
       if (devServerContext.wsConnections) {
@@ -61,11 +61,20 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
         devServerContext.httpServer.close();
         devServerContext.httpServer = null;
       }
+
+      process.removeAllListeners('message');
+      process.removeAllListeners('SIGINT');
+
+      setTimeout(() => {
+        process.exit();
+      }, 5000).unref();
     }
 
     // add our listeners to this worker process
     process.addListener('message', onMessageFromCli);
-    process.once('SIGINT', onSigInt);
+    process.once('SIGINT', () => {
+      closeServer();
+    });
 
   } catch (e) {
     sendError(process, e);
