@@ -1,5 +1,5 @@
-<a name="0.10.0-9"></a>
-# 🏃 [0.10.0-9](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-9) (2018-06-28)
+<a name="0.10.0-10"></a>
+# 🎂 [0.10.0-10](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-10) (2018-07-02)
 
 `@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
@@ -32,6 +32,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 
 ### Bug Fixes
 
+* **builds:** overkill async checks w/ multiple builds working in parallel ([aec9e96](https://github.com/ionic-team/stencil/commit/aec9e96))
 * **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
 * **client:** fix possibility of document.body not being available yet ([0f1393e](https://github.com/ionic-team/stencil/commit/0f1393e))
 * **css-shim:** CSS_URL_REGEXP check relative to root paths ([77a9b5f](https://github.com/ionic-team/stencil/commit/77a9b5f))
@@ -41,10 +42,14 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **hmr:** reload page when app adds or deletes scripts ([6352ead](https://github.com/ionic-team/stencil/commit/6352ead))
 * **hmr:** update components when imported files change ([954618a](https://github.com/ionic-team/stencil/commit/954618a))
 * **props:** ensure mode value set to host element is not deleted ([0671ea1](https://github.com/ionic-team/stencil/commit/0671ea1))
+* **serve:** fix serve config from cli ([9ed7ae3](https://github.com/ionic-team/stencil/commit/9ed7ae3))
 * **scoped-css:** descendant selectors ([9e7fffb](https://github.com/ionic-team/stencil/commit/9e7fffb))
 * **styles:** fix race condition w/ multiple modes for same component ([50307bd](https://github.com/ionic-team/stencil/commit/50307bd))
 * **styles:** update scoped styles on dev server reload ([607b93e](https://github.com/ionic-team/stencil/commit/607b93e))
+* **styles:** use default style if host elm mode set, but no mode style set ([c0cf468](https://github.com/ionic-team/stencil/commit/c0cf468))
 * **sys.node:** do not reset __dirname during bundling ([3c953c5](https://github.com/ionic-team/stencil/commit/3c953c5))
+* **watch:** close fs watcher on exit ([9ae0268](https://github.com/ionic-team/stencil/commit/9ae0268))
+* **watch:** refactor fs watch, rebuilds w/ parallel builds ([e855e4f](https://github.com/ionic-team/stencil/commit/e855e4f))
 
 
 <a name="0.9.11"></a>
