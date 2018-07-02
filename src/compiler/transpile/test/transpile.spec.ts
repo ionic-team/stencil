@@ -105,13 +105,13 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
-    expect(r.filesAdded).toContain(path.join(root, 'src', 'new-dir', 'cmp-b.tsx'));
-    expect(r.filesAdded).toContain(path.join(root, 'src', 'new-dir', 'cmp-c.tsx'));
+    expect(r.filesAdded).toContain(normalizePath(path.join(root, 'src', 'new-dir', 'cmp-b.tsx')));
+    expect(r.filesAdded).toContain(normalizePath(path.join(root, 'src', 'new-dir', 'cmp-c.tsx')));
 
     expect(r.transpileBuildCount).toBe(2);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(false);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(true);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(true);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-a.js')))).toBe(false);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-b.js')))).toBe(true);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-c.js')))).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.entries[1].components[0].tag).toEqual('cmp-b');
     expect(r.entries[2].components[0].tag).toEqual('cmp-c');
@@ -141,7 +141,7 @@ describe('transpile', () => {
     // get the rebuild results
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
-    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.tsx'));
+    expect(r.filesChanged).toContain(normalizePath(path.join(root, 'src', 'cmp-a.tsx')));
 
     expect(r.buildId).toBe(1);
     const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
@@ -181,8 +181,8 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
-    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.css'));
-    expect(r.filesChanged).toContain(path.join(root, 'src', 'cmp-a.tsx'));
+    expect(r.filesChanged).toContain(normalizePath(path.join(root, 'src', 'cmp-a.css')));
+    expect(r.filesChanged).toContain(normalizePath(path.join(root, 'src', 'cmp-a.tsx')));
 
     expect(r.buildId).toBe(1);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);

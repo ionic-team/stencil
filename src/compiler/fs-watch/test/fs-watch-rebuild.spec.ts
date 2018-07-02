@@ -3,6 +3,7 @@ import { BuildEvents } from '../../events';
 import { generateBuildFromFsWatch, shouldRebuild } from '../fs-watch-rebuild';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import * as path from 'path';
+import { normalizePath } from '../../util';
 
 
 describe('watch-rebuild', () => {
@@ -75,21 +76,21 @@ describe('watch-rebuild', () => {
     expect(buildCtx).toBeDefined();
 
     expect(buildCtx.dirsAdded).toEqual([
-      path.join(root, 'added-1'),
-      path.join(root, 'added-1', 'added-2'),
-      path.join(root, 'added-1', 'added-2', 'added-3')
+      normalizePath(path.join(root, 'added-1')),
+      normalizePath(path.join(root, 'added-1', 'added-2')),
+      normalizePath(path.join(root, 'added-1', 'added-2', 'added-3'))
     ]);
 
     expect(buildCtx.filesAdded).toEqual([
-      path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx'),
-      path.join(root, 'added-1', 'added-2', 'file-2.tsx'),
-      path.join(root, 'added-1', 'file-1.tsx'),
+      normalizePath(path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx')),
+      normalizePath(path.join(root, 'added-1', 'added-2', 'file-2.tsx')),
+      normalizePath(path.join(root, 'added-1', 'file-1.tsx')),
     ]);
 
     expect(buildCtx.filesChanged).toEqual([
-      path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx'),
-      path.join(root, 'added-1', 'added-2', 'file-2.tsx'),
-      path.join(root, 'added-1', 'file-1.tsx'),
+      normalizePath(path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx')),
+      normalizePath(path.join(root, 'added-1', 'added-2', 'file-2.tsx')),
+      normalizePath(path.join(root, 'added-1', 'file-1.tsx')),
     ]);
   });
 
