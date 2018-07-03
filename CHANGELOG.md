@@ -1,5 +1,5 @@
-<a name="0.10.0-10"></a>
-# 🎂 [0.10.0-10](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-10) (2018-07-02)
+<a name="0.10.0-11"></a>
+# 🎿 [0.10.0-11](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-11) (2018-07-03)
 
 `@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
 
@@ -33,6 +33,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 ### Bug Fixes
 
 * **builds:** overkill async checks w/ multiple builds working in parallel ([aec9e96](https://github.com/ionic-team/stencil/commit/aec9e96))
+* **build:** re-run module map on every change ([4c14c39](https://github.com/ionic-team/stencil/commit/4c14c39))
 * **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
 * **client:** fix possibility of document.body not being available yet ([0f1393e](https://github.com/ionic-team/stencil/commit/0f1393e))
 * **css-shim:** CSS_URL_REGEXP check relative to root paths ([77a9b5f](https://github.com/ionic-team/stencil/commit/77a9b5f))
