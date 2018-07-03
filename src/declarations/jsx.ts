@@ -963,6 +963,7 @@ declare global {
       onKeyUpCapture?: (event: KeyboardEvent) => void;
 
       // MouseEvents
+      onAuxClick?: (event: MouseEvent) => void;
       onClick?: (event: MouseEvent) => void;
       onClickCapture?: (event: MouseEvent) => void;
       onContextMenu?: (event: MouseEvent) => void;
