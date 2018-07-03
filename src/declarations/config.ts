@@ -18,6 +18,7 @@ export interface Config {
   devMode?: boolean;
   devServer?: d.DevServerConfig;
   enableCache?: boolean;
+  enableCacheStats?: boolean;
   excludeSrc?: string[];
   flags?: ConfigFlags;
   fsNamespace?: string;

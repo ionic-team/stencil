@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
 import { initFsWatch } from '../fs-watch/fs-watch-init';
+import { writeCacheStats } from './cache-stats';
 
 
 export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) {
@@ -80,6 +81,9 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       config.sys.destroy();
     }
   }
+
+  // write cache stats only for memory debugging
+  writeCacheStats(config, compilerCtx, buildCtx);
 
   // it's official, this build has finished
   buildCtx.hasFinished = true;
