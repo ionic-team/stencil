@@ -59,28 +59,16 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       ...config.plugins,
       abortPlugin(buildCtx)
     ],
-    onwarn: createOnWarnFn(config, buildCtx.diagnostics),
-    cache: compilerCtx.entryBundleCache
+    onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
   try {
     rollupBundle = await rollup(rollupConfig);
 
-    if (config.watch) {
-      if (!buildCtx.hasError && buildCtx.isActiveBuild) {
-        // only remember the cache if this is the active build and no errors
-        compilerCtx.entryBundleCache = rollupBundle;
-
-      } else {
-        buildCtx.debug(`createBundle saving cache skipping, not active build`);
-      }
-    }
-
   } catch (err) {
     // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
-      compilerCtx.entryBundleCache = null;
 
     } else {
       buildCtx.debug(`createBundle errors ignored, not active build`);

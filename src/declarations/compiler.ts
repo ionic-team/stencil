@@ -24,7 +24,6 @@ export interface CompilerCtx {
   compiledModuleJsText?: d.ModuleBundles;
   compiledModuleLegacyJsText?: d.ModuleBundles;
   compilerOptions?: any;
-  entryBundleCache?: any;
   events?: d.BuildEvents;
   fs?: d.InMemoryFileSystem;
   hasLoggedServerUrl?: boolean;
