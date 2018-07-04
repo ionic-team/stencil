@@ -125,16 +125,20 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
       return {
         before: [
+          ...config.customTransformers.prependBefore,
           gatherMetadata(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker),
           removeDecorators(),
           addComponentMetadata(transpileCtx.compilerCtx.moduleFiles),
-          buildConditionalsTransform(buildConditionals)
+          buildConditionalsTransform(buildConditionals),
+          ...config.customTransformers.appendBefore,
         ],
         after: [
+          ...config.customTransformers.prependAfter,
           removeStencilImports(),
           removeCollectionImports(transpileCtx.compilerCtx),
           getModuleImports(config, transpileCtx.compilerCtx),
-          componentDependencies(transpileCtx.compilerCtx)
+          componentDependencies(transpileCtx.compilerCtx),
+          ...config.customTransformers.appendAfter,
         ]
       };
     }
