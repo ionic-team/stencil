@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
 import { generateDocs } from '../docs/docs';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
+import { generateProxies } from '../distribution/distribution';
 import { prerenderOutputTargets } from '../prerender/prerender-app';
 
 
-export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
@@ -17,7 +18,8 @@ export async function buildAuxiliaries(config: d.Config, compilerCtx: d.Compiler
   // and service workers can run in parallel
   await Promise.all([
     generateDocs(config, compilerCtx),
-    generateServiceWorkers(config, compilerCtx, buildCtx)
+    generateServiceWorkers(config, compilerCtx, buildCtx),
+    generateProxies(config, compilerCtx, cmpRegistry)
   ]);
 
   if (!buildCtx.hasError && buildCtx.isActiveBuild) {
