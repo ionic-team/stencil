@@ -15,7 +15,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
 
   // create the build results data
-  buildCtx.buildResults = await generateBuildResults(config, compilerCtx, buildCtx);
+  buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {
@@ -29,7 +29,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.hasLoggedServerUrl = true;
     }
 
-    if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted) {
+    if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted && buildCtx.isActiveBuild) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
       logHmr(config, buildCtx);

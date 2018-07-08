@@ -19,7 +19,7 @@ export class TestingSystem extends NodeSystem {
     const fs = new TestingFs();
     super(fs);
     this.createWatcher = null;
-    this.initWorkers(1);
+    this.initWorkers(1, 1);
   }
 
   get compiler() {

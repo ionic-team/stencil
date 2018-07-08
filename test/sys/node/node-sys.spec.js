@@ -6,7 +6,7 @@ describe('test/sys/node', () => {
 
   beforeAll(() => {
     sys = new nodeSys.NodeSystem();
-    sys.initWorkers(2);
+    sys.initWorkers(2, 1);
   });
 
   afterAll(() => {

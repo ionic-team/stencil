@@ -1,4 +1,4 @@
-import * as d from './index';
+import * as d from '.';
 
 
 export interface BuildCtx {
@@ -165,7 +165,6 @@ export interface BuildBundle {
   fileName: string;
   outputs: string[];
   size?: number;
-  gzip?: number;
   mode?: string;
   scopedStyles?: boolean;
   target?: string;

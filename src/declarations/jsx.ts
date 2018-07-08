@@ -136,6 +136,7 @@ declare global {
 
     export interface SlotAttributes {
       name?: string;
+      slot?: string;
     }
 
     export interface AnchorHTMLAttributes extends HTMLAttributes {

@@ -3,11 +3,15 @@ import { getConfigFilePath } from './cli-utils';
 import { taskHelp } from './task-help';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
-import { WORKER_EXITED_MSG } from '../sys/node/worker-farm/main';
+import { shouldIgnoreError } from '../compiler/util';
 
 
 export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
-  process.on(`unhandledRejection`, (r: any) => logger.error(`unhandledRejection`, r));
+  process.on(`unhandledRejection`, (r: any) => {
+    if (!shouldIgnoreError(r)) {
+      logger.error(`unhandledRejection`, r);
+    }
+  });
 
   process.title = `Stencil`;
 
@@ -55,11 +59,13 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
     process.title = `Stencil: ${config.namespace}`;
 
     runTask(process, config, flags).catch(err => {
-      config.logger.error(`uncaught cli task error`, err);
+      if (!shouldIgnoreError(err)) {
+        config.logger.error(`uncaught cli task error`, err);
+      }
     });
 
   } catch (e) {
-    if (e !== WORKER_EXITED_MSG) {
+    if (!shouldIgnoreError(e)) {
       config.logger.error(`uncaught cli error: ${e}`);
       process.exit(1);
     }

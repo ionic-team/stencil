@@ -58,8 +58,7 @@ function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
       return new Function(fnStr)();
 
     } catch (e) {
-      const d = catchError(diagnostics, e);
-      d.messageText = `parse prop options: ${e}`;
+      catchError(diagnostics, e, `parse prop options: ${e}`);
     }
   });
 

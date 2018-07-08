@@ -1,7 +1,7 @@
-<a name="0.10.0-11"></a>
-# 🎿 [0.10.0-11](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-11) (2018-07-03)
+<a name="0.10.0-12"></a>
+# 🌲 [0.10.0-12](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-12) (2018-07-08)
 
-`@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the brower, both as an overlay and within console.logs.
+`@stencil/core` now ships with an intergrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the intergrated dev-server include build-time error reporting directly within the browser, both as an overlay and within console.logs.
 
 The new `@stencil/core` integrated dev-server is a replacement for the external `@stencil/dev-server` package, but the previous package will continue to work if no changes are made to an app's npm scripts. To start testing out the new dev-server, within the app's `package.json` scripts:
 
@@ -51,6 +51,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **sys.node:** do not reset __dirname during bundling ([3c953c5](https://github.com/ionic-team/stencil/commit/3c953c5))
 * **watch:** close fs watcher on exit ([9ae0268](https://github.com/ionic-team/stencil/commit/9ae0268))
 * **watch:** refactor fs watch, rebuilds w/ parallel builds ([e855e4f](https://github.com/ionic-team/stencil/commit/e855e4f))
+* **worker:** imporove worker on windows ([32746ca](https://github.com/ionic-team/stencil/commit/32746ca))
 
 
 <a name="0.9.11"></a>

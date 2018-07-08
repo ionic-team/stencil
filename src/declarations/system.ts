@@ -1,8 +1,9 @@
-import * as d from './index';
+import * as d from '.';
 
 
 export interface StencilSystem {
   autoprefixCss?(input: string, opts?: any): Promise<string>;
+  cancelWorkerTasks?(): void;
   compiler?: {
     name: string;
     version: string;
@@ -23,7 +24,7 @@ export interface StencilSystem {
     nodir?: boolean;
   }): Promise<string[]>;
   gzipSize?(text: string): Promise<number>;
-  initWorkers?(maxConcurrentWorkers: number): number;
+  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
