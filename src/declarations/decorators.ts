@@ -1,4 +1,4 @@
-import * as d from './index';
+import * as d from '.';
 
 
 export interface ComponentDecorator {
