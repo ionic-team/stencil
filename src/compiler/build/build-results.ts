@@ -5,9 +5,8 @@ import { genereateHmr } from './build-hmr';
 import { hasError, normalizePath } from '../util';
 
 
-export async function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  // create the build results that get returned
-  const getGzipSize = config.outputTargets.some(o => o.type === 'stats');
+export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const timeSpan = buildCtx.createTimeSpan(`generateBuildResults started`, true);
 
   const buildResults: d.BuildResults = {
     buildId: buildCtx.buildId,
@@ -31,9 +30,7 @@ export async function generateBuildResults(config: d.Config, compilerCtx: d.Comp
 
     components: [],
 
-    entries: await Promise.all(buildCtx.entryModules.map(en => {
-      return getEntryModule(config, buildCtx, getGzipSize, en);
-    }))
+    entries: generateBuildResultsEntries(config, buildCtx)
   };
 
   const hmr = genereateHmr(config, compilerCtx, buildCtx);
@@ -45,11 +42,28 @@ export async function generateBuildResults(config: d.Config, compilerCtx: d.Comp
     buildResults.components.push(...en.components);
   });
 
+  timeSpan.finish(`generateBuildResults finished`);
+
   return buildResults;
 }
 
+function generateBuildResultsEntries(config: d.Config, buildCtx: d.BuildCtx) {
+  if (!buildCtx.isActiveBuild) {
+    return [];
+  }
 
-async function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, getGzipSize: boolean, en: d.EntryModule) {
+  const timeSpan = buildCtx.createTimeSpan(`generateBuildResultsEntries started`, true);
+
+  const entries = buildCtx.entryModules.map(en => {
+    return getEntryModule(config, buildCtx, en);
+  });
+
+  timeSpan.finish(`generateBuildResultsEntries finished`);
+
+  return entries;
+}
+
+function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModule) {
   en.modeNames = en.modeNames || [];
   en.entryBundles = en.entryBundles || [];
   en.moduleFiles = en.moduleFiles || [];
@@ -60,7 +74,7 @@ async function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, getGzipSiz
     entryCmps.push(...ep);
   });
 
-  const buildEntry = await getBuildEntry(config, getGzipSize, entryCmps, en);
+  const buildEntry = getBuildEntry(config, entryCmps, en);
 
   const modes = en.modeNames.slice();
   if (modes.length > 1 || (modes.length === 1 && modes[0] !== DEFAULT_STYLE_MODE)) {
@@ -79,7 +93,7 @@ async function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, getGzipSiz
 }
 
 
-async function getBuildEntry(config: d.Config, getGzipSize: boolean, entryCmps: d.EntryComponent[], en: d.EntryModule) {
+function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.EntryModule) {
   const buildEntry: d.BuildEntry = {
     entryId: en.entryKey,
 
@@ -97,9 +111,9 @@ async function getBuildEntry(config: d.Config, getGzipSize: boolean, entryCmps: 
       return buildCmp;
     }),
 
-    bundles: await Promise.all(en.entryBundles.map(entryBundle => {
-      return getBuildBundle(config, entryBundle, getGzipSize);
-    })),
+    bundles: en.entryBundles.map(entryBundle => {
+      return getBuildBundle(config, entryBundle);
+    }),
 
     inputs: en.moduleFiles.map(m => {
       return normalizePath(config.sys.path.relative(config.rootDir, m.jsFilePath));
@@ -112,7 +126,7 @@ async function getBuildEntry(config: d.Config, getGzipSize: boolean, entryCmps: 
 }
 
 
-async function getBuildBundle(config: d.Config, entryBundle: d.EntryBundle, getGzipSize: boolean) {
+function getBuildBundle(config: d.Config, entryBundle: d.EntryBundle) {
   const buildBundle: d.BuildBundle = {
     fileName: entryBundle.fileName,
     outputs: entryBundle.outputs.map(filePath => {
@@ -121,10 +135,6 @@ async function getBuildBundle(config: d.Config, entryBundle: d.EntryBundle, getG
   };
 
   buildBundle.size = entryBundle.text.length;
-
-  if (getGzipSize) {
-    buildBundle.gzip = await config.sys.gzipSize(entryBundle.text);
-  }
 
   if (typeof entryBundle.sourceTarget === 'string') {
     buildBundle.target = entryBundle.sourceTarget;

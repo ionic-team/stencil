@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { attachMessageHandler } from './worker-farm/worker';
+import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { loadUglifyDiagnostics } from '../../util/logger/logger-uglify';
 import { normalizePath } from '../../compiler/util';

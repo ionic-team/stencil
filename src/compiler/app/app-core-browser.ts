@@ -7,7 +7,7 @@ import { getAppBuildDir, getCoreFilename } from './app-file-naming';
 
 export async function generateCoreBrowser(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, globalJsContent: string, buildConditionals: BuildConditionals) {
   const relPath = config.sys.path.relative(config.rootDir, getAppBuildDir(config, outputTarget));
-  const timespan = buildCtx.createTimeSpan(`generateCoreBrowser started, ${relPath}`, true);
+  const timespan = buildCtx.createTimeSpan(`generateCoreBrowser ${buildConditionals.coreId} started, ${relPath}`, true);
 
   // mega-minify the core w/ property renaming, but not the user's globals
   // hardcode which features should and should not go in the core builds
@@ -44,7 +44,7 @@ export async function generateCoreBrowser(config: Config, compilerCtx: CompilerC
 
   await compilerCtx.fs.writeFile(appCorePath, jsContent);
 
-  timespan.finish(`generateCoreBrowser finished, ${relPath}`);
+  timespan.finish(`generateCoreBrowser ${buildConditionals.coreId} finished, ${relPath}`);
 
   return coreFilename;
 }

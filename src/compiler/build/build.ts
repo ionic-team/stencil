@@ -17,6 +17,10 @@ import { writeBuildFiles } from './write-build';
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
+    // ensure any existing worker tasks are not running
+    // and we've got a clean slate
+    config.sys.cancelWorkerTasks();
+
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist
       await initIndexHtmls(config, compilerCtx, buildCtx);

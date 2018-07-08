@@ -35,8 +35,8 @@ export class Compiler implements d.Compiler {
       config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
       config.logger.debug(`compiler build: __BUILDID__`);
 
-      const workers = config.sys.initWorkers(config.maxConcurrentWorkers);
-      config.logger.debug(`compiler workers: ${workers}`);
+      const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
+      config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
 
       config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
 
