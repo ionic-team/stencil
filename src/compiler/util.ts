@@ -105,7 +105,7 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
 
 
 export function buildError(diagnostics: d.Diagnostic[]) {
-  const d: d.Diagnostic = {
+  const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'build error',
@@ -115,9 +115,9 @@ export function buildError(diagnostics: d.Diagnostic[]) {
     lines: []
   };
 
-  diagnostics.push(d);
+  diagnostics.push(diagnostic);
 
-  return d;
+  return diagnostic;
 }
 
 
@@ -138,7 +138,7 @@ export function buildWarn(diagnostics: d.Diagnostic[]) {
 }
 
 
-export function catchError(diagnostics: d.Diagnostic[], err: Error) {
+export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string) {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -149,7 +149,10 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error) {
     lines: []
   };
 
-  if (err) {
+  if (typeof msg === 'string') {
+    diagnostic.messageText = msg;
+
+  } else if (err) {
     if (err.stack) {
       diagnostic.messageText = err.stack.toString();
 
@@ -163,9 +166,17 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error) {
     }
   }
 
-  diagnostics && diagnostics.push(diagnostic);
+  if (diagnostics && !shouldIgnoreError(diagnostic.messageText)) {
+    diagnostics.push(diagnostic);
+  }
+}
 
-  return diagnostic;
+
+export const TASK_CANCELED_MSG = `task canceled`;
+
+
+export function shouldIgnoreError(msg: any) {
+  return (msg === TASK_CANCELED_MSG);
 }
 
 

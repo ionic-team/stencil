@@ -68,8 +68,7 @@ function createDoUpgrade(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
         await compilerCtx.fs.writeFile(moduleFile.jsFilePath, output, { inMemoryOnly: true });
 
       } catch (e) {
-        const d = catchError(buildCtx.diagnostics, e);
-        d.messageText = `error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`;
+        catchError(buildCtx.diagnostics, e, `error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
       }
     }));
   };
