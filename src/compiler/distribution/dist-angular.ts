@@ -4,7 +4,7 @@ import { basename, dirname, relative } from 'path';
 import { dashToPascalCase } from '../../util/helpers';
 
 
-export async function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
+export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
   const angularOuputTargets = (config.outputTargets as d.OutputTargetAngular[])
     .filter(o => o.type === 'angular' && o.directivesProxyFile);
 
@@ -200,18 +200,18 @@ export class ${cmpMeta.componentClass} {`];
 }
 
 function getInputs(cmpMeta: d.ComponentMeta) {
-  return Object.keys(cmpMeta.membersMeta).filter(memberName => {
+  return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
     return m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable;
   });
 }
 
 function getOutputs(cmpMeta: d.ComponentMeta) {
-  return cmpMeta.eventsMeta.map(eventMeta => eventMeta.eventName);
+  return (cmpMeta.eventsMeta || []).map(eventMeta => eventMeta.eventName);
 }
 
 function getMethods(cmpMeta: d.ComponentMeta) {
-  return Object.keys(cmpMeta.membersMeta).filter(memberName => {
+  return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
     return m.memberType === MEMBER_TYPE.Method;
   });

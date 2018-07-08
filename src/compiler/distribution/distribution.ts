@@ -2,10 +2,17 @@ import * as d from '../../declarations';
 import { copyComponentStyles } from '../copy/copy-styles';
 import { generateCommonJsIndex } from './dist-cjs';
 import { generateEsmIndex } from './dist-esm';
+import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
 import { hasError, pathJoin } from '../util';
 import * as v from './validate-package-json';
 
+
+export async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
+  await Promise.all([
+    generateAngularProxies(config, compilerCtx, cmpRegistry)
+  ]);
+}
 
 export async function generateDistributions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<any> {
   const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
