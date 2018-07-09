@@ -144,6 +144,10 @@ function titleCase(str: string) {
 }
 
 function highlightError(text: string, errorCharStart: number, errorLength: number) {
+  if (typeof text !== 'string') {
+    return '';
+  }
+
   const errorCharEnd = errorCharStart + errorLength;
 
   return text.split('').map((inputChar, charIndex) => {
