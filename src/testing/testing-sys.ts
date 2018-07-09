@@ -18,7 +18,7 @@ export class TestingSystem extends NodeSystem {
   constructor() {
     const fs = new TestingFs();
     super(fs);
-    this.createWatcher = null;
+    this.createFsWatcher = null;
     this.initWorkers(1, 1);
   }
 

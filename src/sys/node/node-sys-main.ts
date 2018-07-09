@@ -1,9 +1,11 @@
 import * as d from '../../declarations';
 import { createContext, runInContext } from './node-context';
+import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
 import { normalizePath } from '../../compiler/util';
 import { WorkerManager } from './worker/index';
+
 
 import * as crypto from 'crypto';
 import * as fs from 'fs';
@@ -120,35 +122,14 @@ export class NodeSystem implements d.StencilSystem {
     this._existingDom = val;
   }
 
-  createWatcher(events: d.BuildEvents, paths: string, opts: any) {
-    const chokidar = require('chokidar');
-    const watcher = chokidar.watch(paths, opts);
-
-    watcher
-      .on('change', (path: string) => {
-        events.emit('fileUpdate', path);
-      })
-      .on('add', (path: string) => {
-        events.emit('fileAdd', path);
-      })
-      .on('unlink', (path: string) => {
-        events.emit('fileDelete', path);
-      })
-      .on('addDir', (path: string) => {
-        events.emit('dirAdd', path);
-      })
-      .on('unlinkDir', (path: string) => {
-        events.emit('dirDelete', path);
-      })
-      .on('error', (err: any) => {
-        console.error(err);
-      });
+  createFsWatcher(events: d.BuildEvents, paths: string, opts: any) {
+    const fsWatcher = createFsWatcher(events, paths, opts);
 
     this.addDestroy(() => {
-      watcher.close();
+      fsWatcher.close();
     });
 
-    return watcher;
+    return fsWatcher;
   }
 
   generateContentHash(content: any, length: number) {

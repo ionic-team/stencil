@@ -12,7 +12,7 @@ export interface StencilSystem {
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   createDom?(): CreateDom;
-  createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
+  createFsWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
