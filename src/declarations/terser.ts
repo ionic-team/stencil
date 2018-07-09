@@ -1,6 +1,6 @@
 
 
-export interface UglifyResult {
+export interface TerserResult {
   code: string;
   sourceMap: any;
   error: {

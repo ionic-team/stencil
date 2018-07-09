@@ -16,9 +16,10 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     opts.output.beautify = false;
 
   } else {
-    opts.ecma = 6;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
+    opts.ecma = 8;
+    opts.output.ecma = 8;
+    opts.compress.ecma = 8;
+    opts.module = true;
     opts.toplevel = true;
     opts.compress.arrows = true;
     opts.output.beautify = false;
@@ -30,7 +31,6 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
     opts.output.beautify = true;
-    opts.output.bracketize = true;
     opts.output.indent_level = 2;
     opts.output.comments = 'all';
     opts.output.preserve_line = true;

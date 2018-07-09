@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { splitLineBreaks } from './logger-util';
 
 
-export function loadUglifyDiagnostics(sourceText: string, result: d.UglifyResult, diagnostics: d.Diagnostic[]) {
+export function loadTerserDiagnostics(sourceText: string, result: d.TerserResult, diagnostics: d.Diagnostic[]) {
   if (!result || !result.error) {
     return;
   }

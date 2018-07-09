@@ -137,7 +137,6 @@ const DEV_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: true,
-    bracketize: true,
     comments: 'all',
     ie8: false,
     indent_level: 2,
@@ -212,7 +211,6 @@ const PROD_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: false,
-    bracketize: false,
     comments: false,
     ie8: false,
     indent_level: 0,

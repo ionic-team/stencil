@@ -30,6 +30,6 @@ export * from './server';
 export * from './style';
 export * from './system';
 export * from './transpile';
-export * from './uglify';
+export * from './terser';
 export * from './vdom';
 export * from './worker';
