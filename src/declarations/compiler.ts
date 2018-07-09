@@ -34,9 +34,10 @@ export interface CompilerCtx {
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
   lastBuildHadError?: boolean;
   lastBuildResults?: d.BuildResults;
-  lastBuildStyles?: { [styleId: string]: string };
+  lastBuildStyles?: Map<string, string>;
   lastJsModules?: d.JSModuleMap;
-  lastStyleText?: { [absPath: string]: string };
+  lastStyleInput?: Map<string, string>;
+  lastStyleOutput?: Map<string, string>;
   localPrerenderServer?: any;
   moduleFiles?: d.ModuleFiles;
   resolvedCollections?: string[];

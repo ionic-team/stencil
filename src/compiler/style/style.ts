@@ -3,6 +3,7 @@ import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateGlobalStyles } from './global-styles';
+import { getStyleCache, setStyleCache } from './cached-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
@@ -80,15 +81,16 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     return '/* build aborted */';
   }
 
-  let styleText: string;
-
   extStylePath = normalizePath(extStylePath);
 
-  if (buildCtx.isRebuild && !buildCtx.hasStyleChanges) {
-    // watched file must have only been a script change and not style change
-    // let's see if we cached anything for this file path
-    styleText = compilerCtx.lastStyleText[extStylePath];
+  // see if we can used a cached style first
+  let styleText: string;
+
+  if (buildCtx.isRebuild) {
+    // only bother checking the cache if it's a rebuild
+    styleText = await getStyleCache(compilerCtx, extStylePath);
     if (typeof styleText === 'string') {
+      // woot! we've got cached styles, no need to do all this work!
       return styleText;
     }
   }
@@ -128,10 +130,10 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
 
     styleText = transformResults.code;
 
-    if (config.watch && !extStylePath.endsWith('.js.css')) {
+    if (config.watch && buildCtx.isActiveBuild) {
+      // all is good, we've successfully compiled this style
       // only cache if it's a watch build
-      // but don't cache any css that was inlined in a .tsx file
-      compilerCtx.lastStyleText[extStylePath] = styleText;
+      await setStyleCache(compilerCtx, extStylePath, styleText);
     }
 
     buildCtx.styleBuildCount++;
@@ -232,12 +234,10 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
   let addStylesUpdate = false;
   let addScopedStylesUpdate = false;
 
-  compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || {};
-
   // test to see if the last styles are different
   const styleId = getStyleId(cmpMeta, modeName, false);
-  if (compilerCtx.lastBuildStyles[styleId] !== styleMeta.compiledStyleText) {
-    compilerCtx.lastBuildStyles[styleId] = styleMeta.compiledStyleText;
+  if (compilerCtx.lastBuildStyles.get(styleId) !== styleMeta.compiledStyleText) {
+    compilerCtx.lastBuildStyles.set(styleId, styleMeta.compiledStyleText);
 
     if (buildCtx.isRebuild) {
       addStylesUpdate = true;
@@ -245,8 +245,8 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   const scopedStyleId = getStyleId(cmpMeta, modeName, true);
-  if (compilerCtx.lastBuildStyles[scopedStyleId] !== styleMeta.compiledStyleTextScoped) {
-    compilerCtx.lastBuildStyles[scopedStyleId] = styleMeta.compiledStyleTextScoped;
+  if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== styleMeta.compiledStyleTextScoped) {
+    compilerCtx.lastBuildStyles.set(scopedStyleId, styleMeta.compiledStyleTextScoped);
 
     if (buildCtx.isRebuild) {
       addScopedStylesUpdate = true;
