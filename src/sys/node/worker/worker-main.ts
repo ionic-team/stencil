@@ -14,13 +14,9 @@ export class WorkerMain extends EventEmitter {
   totalTasksAssigned = 0;
   workerKeys: string[] = [];
 
-  constructor(workerModule: string) {
+  constructor(public id: number, workerModule: string) {
     super();
     this.fork(workerModule);
-  }
-
-  get pid() {
-    return this.childProcess.pid;
   }
 
   fork(workerModule: string) {
