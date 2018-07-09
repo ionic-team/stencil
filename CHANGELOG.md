@@ -1,5 +1,5 @@
-<a name="0.10.0-12"></a>
-# 🌲 [0.10.0-12](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0-12) (2018-07-08)
+<a name="0.10.0"></a>
+# 🚀 [0.10.0](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0) (2018-07-09)
 
 `@stencil/core` now ships with an integrated dev-server which communicates directly with the build process. Stencil's integrated dev-server enables hot module replacement (HMR), which allows components to self-update without requiring a full webpage reload. Additionally, style changes within web components are also able to reload styles without a webpage reload. Other features from the integrated dev-server include build-time error reporting directly within the browser, both as an overlay and within console.logs.
 
@@ -32,6 +32,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 
 ### Bug Fixes
 
+* **angular:** emit proxies ([ae4afd4](https://github.com/ionic-team/stencil/commit/ae4afd4))
 * **builds:** overkill async checks w/ multiple builds working in parallel ([aec9e96](https://github.com/ionic-team/stencil/commit/aec9e96))
 * **build:** re-run module map on every change ([4c14c39](https://github.com/ionic-team/stencil/commit/4c14c39))
 * **cache:** ensure cache dir exists before removing ([58c5a9a](https://github.com/ionic-team/stencil/commit/58c5a9a)), closes [#876](https://github.com/ionic-team/stencil/issues/876)
@@ -50,6 +51,7 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **styles:** use default style if host elm mode set, but no mode style set ([c0cf468](https://github.com/ionic-team/stencil/commit/c0cf468))
 * **sys.node:** do not reset __dirname during bundling ([3c953c5](https://github.com/ionic-team/stencil/commit/3c953c5))
 * **watch:** close fs watcher on exit ([9ae0268](https://github.com/ionic-team/stencil/commit/9ae0268))
+* **watch:** fix rebuild on config file change ([0d30b57](https://github.com/ionic-team/stencil/commit/0d30b57)), closes [#829](https://github.com/ionic-team/stencil/issues/829)
 * **watch:** refactor fs watch, rebuilds w/ parallel builds ([e855e4f](https://github.com/ionic-team/stencil/commit/e855e4f))
 * **worker:** imporove worker on windows ([32746ca](https://github.com/ionic-team/stencil/commit/32746ca))
 
