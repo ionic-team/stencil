@@ -1,3 +1,13 @@
+<a name="0.10.1"></a>
+## 🐵 [0.10.1](https://github.com/ionic-team/stencil/compare/v0.10.0...v0.10.1) (2018-07-09)
+
+
+### Bug Fixes
+
+* **worker:** create unique worker ids ([57b3055](https://github.com/ionic-team/stencil/commit/57b3055))
+
+
+
 <a name="0.10.0"></a>
 # 🚀 [0.10.0](https://github.com/ionic-team/stencil/compare/v0.9.11...v0.10.0) (2018-07-09)
 
