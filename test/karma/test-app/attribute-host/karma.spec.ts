@@ -21,6 +21,15 @@ describe('attribute-host', function() {
     expect(elm.getAttribute('color')).toBe(null);
     expect(elm.getAttribute('no-attr')).toBe(null);
 
+    expect(elm.style.getPropertyValue('border-color')).toEqual('black');
+
+    // this tests CSS custom properties in inline style, but CSS var are
+    // not supported natively in IE11, so let's skip the test
+    const win = window as any;
+    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
+      expect(elm.style.getPropertyValue('--css-var')).toEqual('12');
+    }
+
     button.click();
     await flush(app);
 

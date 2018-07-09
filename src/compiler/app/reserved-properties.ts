@@ -202,6 +202,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'search',
   'setAttribute',
   'setAttributeNS',
+  'setProperty',
   'shadowRoot',
   'src',
   'style',
