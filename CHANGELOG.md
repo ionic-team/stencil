@@ -1,3 +1,17 @@
+<a name="0.10.2"></a>
+## 🍔 [0.10.2](https://github.com/ionic-team/stencil/compare/v0.10.1...v0.10.2) (2018-07-10)
+
+
+### Bug Fixes
+
+* **dist:** fix local core stencil types ([1fdcbdc](https://github.com/ionic-team/stencil/commit/1fdcbdc))
+* **hmr:** add/remove listeners from component changes ([93d7158](https://github.com/ionic-team/stencil/commit/93d7158)), closes [#915](https://github.com/ionic-team/stencil/issues/915)
+* **set-accessor:** css vars in inline style ([cf09375](https://github.com/ionic-team/stencil/commit/cf09375))
+* **types:** root d.ts are properly generated ([3d5a8bc](https://github.com/ionic-team/stencil/commit/3d5a8bc))
+* **worker:** fallback to main thread runner when child processes never startup ([d8cd648](https://github.com/ionic-team/stencil/commit/d8cd648))
+
+
+
 <a name="0.10.1"></a>
 ## 🐵 [0.10.1](https://github.com/ionic-team/stencil/compare/v0.10.0...v0.10.1) (2018-07-09)
 
