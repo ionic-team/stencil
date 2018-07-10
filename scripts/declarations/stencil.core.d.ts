@@ -48,7 +48,6 @@ declare global {
 
   interface HTMLStencilElement extends HTMLElement {
     componentOnReady(): Promise<this>;
-    componentOnReady(done: (ele?: this) => void): void;
   }
 
   interface HTMLAttributes {}
