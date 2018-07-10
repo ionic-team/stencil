@@ -48,17 +48,9 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 function generateBuildResultsEntries(config: d.Config, buildCtx: d.BuildCtx) {
-  if (!buildCtx.isActiveBuild) {
-    return [];
-  }
-
-  const timeSpan = buildCtx.createTimeSpan(`generateBuildResultsEntries started`, true);
-
   const entries = buildCtx.entryModules.map(en => {
     return getEntryModule(config, buildCtx, en);
   });
-
-  timeSpan.finish(`generateBuildResultsEntries finished`);
 
   return entries;
 }
