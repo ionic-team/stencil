@@ -31,7 +31,7 @@ describe('getNextWorker', () => {
     workers[3].totalTasksAssigned = 20;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(2);
+    expect(w.id).toBe(2);
   });
 
   it('get first worker when all the same', () => {
@@ -45,7 +45,7 @@ describe('getNextWorker', () => {
     workers[3].totalTasksAssigned = 1;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(0);
+    expect(w.id).toBe(0);
   });
 
   it('do not use a worker that has a long running task', () => {
@@ -57,7 +57,7 @@ describe('getNextWorker', () => {
     workers[3].tasks.length = 3;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(3);
+    expect(w.id).toBe(3);
   });
 
   it('forth task', () => {
@@ -67,7 +67,7 @@ describe('getNextWorker', () => {
     workers[3].tasks.length = 0;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(3);
+    expect(w.id).toBe(3);
   });
 
   it('third task', () => {
@@ -77,7 +77,7 @@ describe('getNextWorker', () => {
     workers[3].tasks.length = 0;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(2);
+    expect(w.id).toBe(2);
   });
 
   it('second task', () => {
@@ -87,7 +87,7 @@ describe('getNextWorker', () => {
     workers[3].tasks.length = 0;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(1);
+    expect(w.id).toBe(1);
   });
 
   it('first task', () => {
@@ -97,7 +97,7 @@ describe('getNextWorker', () => {
     workers[3].tasks.length = 0;
 
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(0);
+    expect(w.id).toBe(0);
   });
 
   it('get the only available worker', () => {
@@ -109,7 +109,7 @@ describe('getNextWorker', () => {
 
     workers[3].tasks.length = 4;
     const w = getNextWorker(workers, maxConcurrentWorkers);
-    expect(w.pid).toBe(2);
+    expect(w.id).toBe(2);
   });
 
   it('no available worker', () => {

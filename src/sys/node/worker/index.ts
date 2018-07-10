@@ -5,6 +5,7 @@ import { WorkerMain } from './worker-main';
 
 
 export class WorkerManager extends EventEmitter {
+  workerIds = 0;
   taskIds = 0;
   isEnding = false;
   modulePath: string;
@@ -41,16 +42,16 @@ export class WorkerManager extends EventEmitter {
     }
   }
 
-  onError(error: NodeJS.ErrnoException, pid: number) {
+  onError(error: NodeJS.ErrnoException, workerId: number) {
     if (error.code === 'ERR_IPC_CHANNEL_CLOSED') {
-      return this.stopWorker(pid);
+      return this.stopWorker(workerId);
     }
   }
 
-  onExit(pid: number) {
+  onExit(workerId: number) {
     setTimeout(() => {
       let doQueue = false;
-      const worker = this.workers.find(w => w.pid === pid);
+      const worker = this.workers.find(w => w.id === workerId);
 
       if (worker && worker.tasks.length > 0) {
         for (const task of worker.tasks) {
@@ -61,7 +62,7 @@ export class WorkerManager extends EventEmitter {
         worker.tasks.length = 0;
       }
 
-      this.stopWorker(pid);
+      this.stopWorker(workerId);
 
       if (doQueue) {
         this.processTaskQueue();
@@ -76,23 +77,24 @@ export class WorkerManager extends EventEmitter {
   }
 
   startWorker() {
-    const worker = new WorkerMain(this.modulePath);
+    const workerId = this.workerIds++;
+    const worker = new WorkerMain(workerId, this.modulePath);
 
     worker.on('response', this.processTaskQueue.bind(this));
 
     worker.once('exit', () => {
-      this.onExit(worker.pid);
+      this.onExit(workerId);
     });
 
     worker.on('error', err => {
-      this.onError(err, worker.pid);
+      this.onError(err, workerId);
     });
 
     this.workers.push(worker);
   }
 
-  stopWorker(pid: number) {
-    const worker = this.workers.find(w => w.pid === pid);
+  stopWorker(workerId: number) {
+    const worker = this.workers.find(w => w.id === workerId);
     if (worker) {
       worker.stop();
 
@@ -167,9 +169,9 @@ export class WorkerManager extends EventEmitter {
 
       this.taskQueue.length = 0;
 
-      const pids = this.workers.map(w => w.pid);
-      for (const pid of pids) {
-        this.stopWorker(pid);
+      const workerIds = this.workers.map(w => w.id);
+      for (const workerId of workerIds) {
+        this.stopWorker(workerId);
       }
     }
   }
