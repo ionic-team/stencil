@@ -1,23 +1,19 @@
 import * as d from '../../declarations';
 import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
-import { getComponentsDtsSrcFilePath, getComponentsDtsTypesFilePath } from '../distribution/distribution';
+import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const rootTsFiles = compilerCtx.rootTsFiles.slice();
-
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
-  const metadata: d.ModuleFile[] = [];
-  rootTsFiles.sort().forEach(tsFilePath => {
-    const moduleFile = compilerCtx.moduleFiles[tsFilePath];
-    if (moduleFile && moduleFile.cmpMeta) {
-      metadata.push(moduleFile);
-    }
-  });
+  const metadata: d.ModuleFile[] = compilerCtx.rootTsFiles
+    .slice()
+    .sort()
+    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
+    .filter(moduleFile => moduleFile && moduleFile.cmpMeta);
 
   // Generate d.ts files for component types
   let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
@@ -36,11 +32,6 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
   buildCtx.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsSrcFilePath)}`);
-
-  await Promise.all(typesOutputTargets.map(async outputTarget => {
-    const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);
-    await compilerCtx.fs.writeFile(typesFile, componentTypesFileContent);
-  }));
 }
 
 
