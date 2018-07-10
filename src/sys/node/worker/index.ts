@@ -9,10 +9,11 @@ export class WorkerManager extends EventEmitter {
   taskIds = 0;
   isEnding = false;
   modulePath: string;
-  singleThreadRunner: d.WorkerRunner;
+  mainThreadRunner: d.WorkerRunner;
   taskQueue: d.WorkerTask[] = [];
   workers: WorkerMain[] = [];
   options: d.WorkerOptions;
+  useForkedWorkers = false;
 
 
   constructor(modulePath: string, options: d.WorkerOptions = {}) {
@@ -33,12 +34,10 @@ export class WorkerManager extends EventEmitter {
 
     this.modulePath = modulePath;
 
-    if (this.options.maxConcurrentWorkers > 1) {
-      this.startWorkers();
+    this.useForkedWorkers = (this.options.maxConcurrentWorkers > 1);
 
-    } else {
-      const workerModule = require(modulePath);
-      this.singleThreadRunner = new workerModule.createRunner();
+    if (this.useForkedWorkers) {
+      this.startWorkers();
     }
   }
 
@@ -96,6 +95,13 @@ export class WorkerManager extends EventEmitter {
   stopWorker(workerId: number) {
     const worker = this.workers.find(w => w.id === workerId);
     if (worker) {
+      if (!worker.successfulMessage) {
+        // never successfully sent a message
+        // so something must be wrong, let's just
+        // use the main thread runner from now on
+        this.useForkedWorkers = false;
+      }
+
       worker.stop();
 
       const index = this.workers.indexOf(worker);
@@ -127,25 +133,30 @@ export class WorkerManager extends EventEmitter {
       return Promise.reject(TASK_CANCELED_MSG);
     }
 
-    if (this.singleThreadRunner) {
-      return this.singleThreadRunner(method, args);
+    if (this.useForkedWorkers) {
+      return new Promise<any>((resolve, reject) => {
+        const task: d.WorkerTask = {
+          taskId: this.taskIds++,
+          method: method,
+          args: args,
+          retries: 0,
+          resolve: resolve,
+          reject: reject,
+          isLongRunningTask: !!opts.isLongRunningTask,
+          workerKey: opts.workerKey
+        };
+        this.taskQueue.push(task);
+
+        this.processTaskQueue();
+      });
     }
 
-    return new Promise<any>((resolve, reject) => {
-      const task: d.WorkerTask = {
-        taskId: this.taskIds++,
-        method: method,
-        args: args,
-        retries: 0,
-        resolve: resolve,
-        reject: reject,
-        isLongRunningTask: !!opts.isLongRunningTask,
-        workerKey: opts.workerKey
-      };
-      this.taskQueue.push(task);
+    if (!this.mainThreadRunner) {
+      const workerModule = require(this.modulePath);
+      this.mainThreadRunner = new workerModule.createRunner();
+    }
 
-      this.processTaskQueue();
-    });
+    return this.mainThreadRunner(method, args);
   }
 
   cancelTasks() {

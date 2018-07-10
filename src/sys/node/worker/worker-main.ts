@@ -11,6 +11,7 @@ export class WorkerMain extends EventEmitter {
   processQueue = true;
   sendQueue: d.WorkerMessage[] = [];
   stopped = false;
+  successfulMessage = false;
   totalTasksAssigned = 0;
   workerKeys: string[] = [];
 
@@ -83,6 +84,8 @@ export class WorkerMain extends EventEmitter {
   }
 
   receiveFromWorker(responseFromWorker: d.WorkerMessage) {
+    this.successfulMessage = true;
+
     if (this.stopped) {
       return;
     }
@@ -114,14 +117,25 @@ export class WorkerMain extends EventEmitter {
     }
     this.tasks.length = 0;
 
-    this.childProcess.send({
-      exit: true
-    });
+    if (this.successfulMessage) {
+      // we know we've had a successful startup
+      // so let's close it down all nice like
+      this.childProcess.send({
+        exit: true
+      });
 
-    setTimeout(() => {
-      if (this.exitCode === null) {
-        this.childProcess.kill('SIGKILL');
-      }
-    }, 100);
+      setTimeout(() => {
+        if (this.exitCode === null) {
+          // fallback if we weren't able to gracefully exit
+          this.childProcess.kill('SIGKILL');
+        }
+      }, 100);
+
+    } else {
+      // never had a successful message
+      // so something may be hosed up
+      // let's just kill it now
+      this.childProcess.kill('SIGKILL');
+    }
   }
 }
