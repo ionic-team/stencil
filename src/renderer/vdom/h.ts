@@ -14,7 +14,7 @@ const stack: any[] = [];
 
 export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
 export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
-export function h(nodeName: any, vnodeData: any, child?: any) {
+export function h(nodeName: any, vnodeData: any) {
   let children: any[] = null;
   let lastSimple = false;
   let simple = false;
@@ -24,7 +24,8 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
   }
 
   while (stack.length > 0) {
-    if ((child = stack.pop()) && child.pop !== undefined) {
+    let child = stack.pop();
+    if (child && child.pop !== undefined) {
       for (i = child.length; i--;) {
         stack.push(child[i]);
       }
@@ -45,7 +46,7 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
       }
 
       if (simple && lastSimple) {
-        (<d.VNode>children[children.length - 1]).vtext += child;
+        (children[children.length - 1] as d.VNode).vtext += child;
 
       } else if (children === null) {
         children = [simple ? { vtext: child } as d.VNode : child];

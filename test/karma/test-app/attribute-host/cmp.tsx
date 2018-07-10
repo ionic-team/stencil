@@ -49,7 +49,13 @@ export class AttributeHost {
 
     return [
       <button onClick={this.testClick.bind(this)}>{this.attrsAdded ? 'Remove' : 'Add'} Attributes</button>,
-      <section {...propsToRender}/>
+      <section
+        {...propsToRender}
+        style={{
+          'border-color': 'black',
+          '--css-var': '12'
+        }}
+      />
     ]
 
   }

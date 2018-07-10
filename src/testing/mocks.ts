@@ -181,17 +181,17 @@ export function mockQueue() {
 }
 
 
-export function mockHtml(html: string): Element {
+export function mockHtml(html: string): HTMLHtmlElement {
   const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(html.trim()).firstChild;
 }
 
-export function mockSVGElement(): Element {
+export function mockSVGElement(): SVGElement {
   const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`).firstChild;
 }
 
-export function mockElement(tag = 'div'): Element {
+export function mockElement(tag = 'div'): HTMLElement {
   const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
