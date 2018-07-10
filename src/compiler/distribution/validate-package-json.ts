@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { buildWarn, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
-import { COMPONENTS_DTS } from './distribution';
+import { getComponentsDtsTypesFilePath } from './distribution';
 import { getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
 
 
@@ -75,13 +75,11 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 
-export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const typesAbs = config.sys.path.join(outputTarget.typesDir, COMPONENTS_DTS);
-  const typesRel = pathJoin(config, config.sys.path.relative(config.rootDir, typesAbs));
-
+export function validateTypes(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (typeof pkgData.types !== 'string' || pkgData.types === '') {
     const err = buildWarn(diagnostics);
-    err.messageText = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${typesRel}`;
+    const recommendedPath = getRecommendedTypesPath(config, outputTarget);
+    err.messageText = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
     return false;
   }
 
@@ -90,12 +88,16 @@ export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx
     err.messageText = `package.json "types" file must have a ".d.ts" extension: ${pkgData.types}`;
     return false;
   }
+  return true;
+}
 
+export async function validateTypesExist(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const pkgFile = pathJoin(config, config.rootDir, pkgData.types);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
-    err.messageText = `package.json "types" property is set to "${pkgData.types}" but cannot be found. It's recommended to set the "types" property to: ${typesRel}`;
+    const recommendedPath = getRecommendedTypesPath(config, outputTarget);
+    err.messageText = `package.json "types" property is set to "${pkgData.types}" but cannot be found. It's recommended to set the "types" property to: ${recommendedPath}`;
     return false;
   }
 
@@ -128,4 +130,9 @@ export function validateNamespace(config: d.Config, diagnostics: d.Diagnostic[])
     const err = buildWarn(diagnostics);
     err.messageText = `When generating a distribution it is recommended to choose a unique namespace rather than the default setting "App". Please updated the "namespace" config property within the stencil.config.js file.`;
   }
+}
+
+export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDist) {
+  const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
+  return pathJoin(config, config.sys.path.relative(config.rootDir, typesAbs));
 }

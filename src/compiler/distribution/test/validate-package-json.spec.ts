@@ -120,25 +120,27 @@ describe('validate-package-json', () => {
     it('validate types', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
       packageJsonData.types = 'dist/types/components.d.ts';
-      await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
+      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
+      await v.validateTypesExist(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(0);
     });
 
     it('not d.ts file', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
       packageJsonData.types = 'dist/types/components.ts';
-      await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
+      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
     });
 
     it('missing types file', async () => {
       packageJsonData.types = 'dist/types/components.d.ts';
-      await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
+      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
+      await v.validateTypesExist(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
     });
 
     it('missing types', async () => {
-      await v.validateTypes(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
+      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
     });
 
