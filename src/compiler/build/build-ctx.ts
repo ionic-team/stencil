@@ -49,7 +49,14 @@ export class BuildContext implements d.BuildCtx {
 
   start() {
     // get the build id from the incremented activeBuildId
-    this.buildId = ++this.compilerCtx.activeBuildId;
+    ++this.compilerCtx.activeBuildId;
+
+    if (this.compilerCtx.activeBuildId >= 100) {
+      // reset the build id back to 0
+      this.compilerCtx.activeBuildId = 0;
+    }
+
+    this.buildId = this.compilerCtx.activeBuildId;
 
     // print out a good message
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
