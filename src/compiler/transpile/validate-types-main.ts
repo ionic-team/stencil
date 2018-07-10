@@ -30,14 +30,16 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
 
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
 
-  buildCtx.validateTypesHandler = (results: d.ValidateTypesResults) => {
+  buildCtx.validateTypesHandler = async (results: d.ValidateTypesResults) => {
     timeSpan.finish(`validateTypes finished`);
 
     compilerCtx.fs.cancelDeleteDirectoriesFromDisk(results.dirPaths);
     compilerCtx.fs.cancelDeleteFilesFromDisk(results.filePaths);
 
     if (results.diagnostics.length === 0) {
-      // no harm, no foul
+      // ┏(-_-)┛ ┗(-_-)┓ ┗(-_-)┛ ┏(-_-)┓
+      // app successful validated
+      // and types written to disk if it's a dist build
       // null it out so we know there's nothing to wait on
       buildCtx.validateTypesHandler = null;
       buildCtx.validateTypesPromise = null;
@@ -66,7 +68,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       buildCtx.validateTypesHandler = null;
       buildCtx.validateTypesPromise = null;
 
-      buildCtx.finish();
+      await buildCtx.finish();
     }
   };
 

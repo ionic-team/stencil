@@ -3,6 +3,7 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
+import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -32,6 +33,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       if (!emitDtsFiles) {
         return;
       }
+
       const filePath = normalizePath(outputFileName);
       if (!filePath.endsWith('.d.ts')) {
         return;
@@ -44,6 +46,10 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       const dir = normalizePath(path.dirname(filePath));
       if (!results.dirPaths.includes(dir)) {
         results.dirPaths.push(dir);
+      }
+
+      if (typeof compilerOptions.declarationDir === 'string') {
+        data = updateStencilTypesImports(config, compilerOptions.declarationDir, outputFileName, data);
       }
 
       ts.sys.writeFile(outputFileName, data, writeByteOrderMark);

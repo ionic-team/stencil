@@ -47,7 +47,7 @@ export interface BuildCtx {
   stylesUpdated: BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan;
   transpileBuildCount: number;
-  validateTypesHandler?: (results: d.ValidateTypesResults) => void;
+  validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
   validateTypesBuild?(): Promise<void>;
 }
