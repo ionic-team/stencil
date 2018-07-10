@@ -8,31 +8,14 @@ export class WorkerManager extends EventEmitter {
   workerIds = 0;
   taskIds = 0;
   isEnding = false;
-  modulePath: string;
   mainThreadRunner: d.WorkerRunner;
   taskQueue: d.WorkerTask[] = [];
   workers: WorkerMain[] = [];
-  options: d.WorkerOptions;
   useForkedWorkers = false;
 
 
-  constructor(modulePath: string, options: d.WorkerOptions = {}) {
+  constructor(public modulePath: string, public options: d.WorkerOptions) {
     super();
-
-    this.options = {
-      maxConcurrentWorkers: DEFAULT_MAX_WORKERS,
-      maxConcurrentTasksPerWorker: DEFAULT_MAX_TASKS_PER_WORKER
-    };
-
-    if (typeof options.maxConcurrentWorkers === 'number') {
-      this.options.maxConcurrentWorkers = options.maxConcurrentWorkers;
-    }
-
-    if (typeof options.maxConcurrentTasksPerWorker === 'number') {
-      this.options.maxConcurrentTasksPerWorker = options.maxConcurrentTasksPerWorker;
-    }
-
-    this.modulePath = modulePath;
 
     this.useForkedWorkers = (this.options.maxConcurrentWorkers > 1);
 
@@ -265,7 +248,3 @@ export function getNextWorker(workers: WorkerMain[], maxConcurrentTasksPerWorker
 
   return sorted[0];
 }
-
-
-const DEFAULT_MAX_WORKERS = 1;
-const DEFAULT_MAX_TASKS_PER_WORKER = 2;

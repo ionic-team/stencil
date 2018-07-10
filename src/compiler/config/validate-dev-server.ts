@@ -49,7 +49,10 @@ export function validateDevServer(config: d.Config) {
 
   } else {
     serveDir = config.rootDir;
-    config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
+
+    if (config.flags && config.flags.serve) {
+      config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
+    }
   }
 
   setStringConfig(config.devServer, 'root', serveDir);

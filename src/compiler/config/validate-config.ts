@@ -7,6 +7,7 @@ import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
+import { validateWorkers } from './validate-workers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
@@ -64,6 +65,9 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   // setup the outputTargets
   validateOutputTargets(config);
 
+  // validate how many workers we can use
+  validateWorkers(config);
+
   // default devInspector to whatever devMode is
   setBooleanConfig(config, 'devInspector', null, config.devMode);
 
@@ -111,10 +115,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   if (!Array.isArray(config.excludeSrc)) {
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
-  }
-
-  if (typeof config.flags.maxWorkers === 'number') {
-    config.maxConcurrentWorkers = config.flags.maxWorkers;
   }
 
   /**

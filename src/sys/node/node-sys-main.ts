@@ -258,7 +258,6 @@ export class NodeSystem implements d.StencilSystem {
     const details: d.SystemDetails = {
       cpuModel: '',
       cpus: -1,
-      freemem: -1,
       platform: '',
       release: '',
       runtime: 'node',
@@ -268,7 +267,6 @@ export class NodeSystem implements d.StencilSystem {
       const cpus = os.cpus();
       details.cpuModel = cpus[0].model;
       details.cpus = cpus.length;
-      details.freemem = os.freemem();
       details.platform = os.platform();
       details.release = os.release();
       details.runtimeVersion = process.version;

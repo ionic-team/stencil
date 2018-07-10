@@ -29,7 +29,7 @@ export class Compiler implements d.Compiler {
 
       config.logger.info(config.logger.cyan(startupMsg));
 
-      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}, freemem: ${details.freemem}`);
+      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
       config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
       config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);

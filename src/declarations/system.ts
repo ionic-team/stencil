@@ -72,7 +72,6 @@ export interface StencilSystem {
 export interface SystemDetails {
   cpuModel: string;
   cpus: number;
-  freemem: number;
   platform: string;
   runtime: string;
   runtimeVersion: string;
