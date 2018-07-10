@@ -130,6 +130,10 @@ export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d
       callNodeRefs(plt.vnodeMap.get(elm));
     }
 
+    if (Build.hotModuleReplacement) {
+      elm['s-hmr-load'] && elm['s-hmr-load']();
+    }
+
   } catch (e) {
     // derp
     plt.onError(e, RUNTIME_ERROR.DidUpdateError, elm, true);

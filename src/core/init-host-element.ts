@@ -3,7 +3,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { Build } from '../util/build-conditionals';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { initComponentHmr } from './init-component-hmr';
+import { hmrStart } from './hmr-component';
 import { initComponentLoaded } from './init-component-instance';
 import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
@@ -43,7 +43,7 @@ export function initHostElement(
 
   if (Build.hotModuleReplacement) {
     HostElementConstructor['s-hmr'] = function(hmrVersionId) {
-      initComponentHmr(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
+      hmrStart(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
     };
   }
 
