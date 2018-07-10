@@ -113,6 +113,10 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
   }
 
+  if (typeof config.flags.maxWorkers === 'number') {
+    config.maxConcurrentWorkers = config.flags.maxWorkers;
+  }
+
   /**
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */

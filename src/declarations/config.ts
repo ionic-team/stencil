@@ -86,6 +86,7 @@ export interface ConfigFlags {
   help?: boolean;
   log?: boolean;
   logLevel?: string;
+  maxWorkers?: number;
   open?: boolean;
   port?: number;
   prerender?: boolean;

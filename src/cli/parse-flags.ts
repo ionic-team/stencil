@@ -139,6 +139,7 @@ const ARG_OPTS = {
     'watch'
   ],
   number: [
+    'max-workers',
     'port'
   ],
   string: [

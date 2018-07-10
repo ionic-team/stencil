@@ -221,6 +221,24 @@ describe('parseFlags', () => {
     expect(flags.log).toBe(true);
   });
 
+  it('should parse --max-workers 4', () => {
+    process.argv[2] = '--max-workers';
+    process.argv[3] = '4';
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(4);
+  });
+
+  it('should parse --max-workers=1', () => {
+    process.argv[2] = '--max-workers=1';
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(1);
+  });
+
+  it('should not parse --max-workers', () => {
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(null);
+  });
+
   it('should parse --no-open', () => {
     process.argv[2] = '--no-open';
     const flags = parseFlags(process);

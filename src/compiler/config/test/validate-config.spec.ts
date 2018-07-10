@@ -19,6 +19,30 @@ describe('validation', () => {
   });
 
 
+  describe('workers', () => {
+
+    it('override maxConcurrentWorkers w/ flag', () => {
+      config.flags = {
+        maxWorkers: 2
+      };
+      config.maxConcurrentWorkers = 8;
+      validateConfig(config);
+      expect(config.maxConcurrentWorkers).toBe(2);
+    });
+
+    it('set maxConcurrentWorkers', () => {
+      config.maxConcurrentWorkers = 8;
+      validateConfig(config);
+      expect(config.maxConcurrentWorkers).toBe(8);
+    });
+
+    it('should not set maxConcurrentWorkers default', () => {
+      validateConfig(config);
+      expect(config.maxConcurrentWorkers).toBe(undefined);
+    });
+
+  });
+
   describe('enableCache', () => {
 
     it('set enableCache true', () => {
