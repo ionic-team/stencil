@@ -49,11 +49,19 @@ function getDisabledMessageScript() {
   <pre>
     <code>npm run dev --es5</code>
   </pre>
+  <p>For stencil-component-starter, use:</p>
+  <pre>
+    <code>npm start --es5</code>
+  </pre>
 
 
   <h2>Enabling full production builds during development:</h2>
   <pre>
     <code>npm run dev --prod</code>
+  </pre>
+  <p>For stencil-component-starter, use:</p>
+  <pre>
+    <code>npm start --prod</code>
   </pre>
 
   <h2>Current Browser's Support:</h2>
