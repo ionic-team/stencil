@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
-import { loadUglifyDiagnostics } from '../../util/logger/logger-uglify';
+import { loadTerserDiagnostics } from '../../util/logger/logger-uglify';
 import { normalizePath } from '../../compiler/util';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
@@ -11,7 +11,7 @@ const autoprefixer = require('autoprefixer');
 const CleanCSS = require('clean-css');
 const gzipSize = require('gzip-size');
 const postcss = require('postcss');
-const UglifyJS = require('uglify-es');
+const Terser = require('terser');
 
 
 export class NodeSystemWorker {
@@ -95,10 +95,10 @@ export class NodeSystemWorker {
   }
 
   minifyJs(input: string, opts?: any) {
-    const result: d.UglifyResult = UglifyJS.minify(input, opts);
+    const result: d.TerserResult = Terser.minify(input, opts);
     const diagnostics: d.Diagnostic[] = [];
 
-    loadUglifyDiagnostics(input, result, diagnostics);
+    loadTerserDiagnostics(input, result, diagnostics);
 
     return {
       output: (result.code as string),

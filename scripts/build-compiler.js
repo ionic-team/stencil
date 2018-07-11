@@ -115,8 +115,8 @@ function updateBuildIds(buildId, input) {
   let minifyStyleId = cleanCssPkg.name + cleanCssPkg.version;
   output = output.replace(/__BUILDID:MINIFYSTYLE__/g, minifyStyleId);
 
-  let uglifyPkg = require('../node_modules/uglify-es/package.json');
-  let minifyJsId = uglifyPkg.name + uglifyPkg.version;
+  let terserPkg = require('../node_modules/terser/package.json');
+  let minifyJsId = terserPkg.name + terserPkg.version;
   output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
 
   let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');

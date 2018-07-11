@@ -18,7 +18,7 @@ const whitelist = [
   'child_process',
   'os',
   'typescript',
-  'uglify-es'
+  'terser'
 ];
 
 if (success) {
