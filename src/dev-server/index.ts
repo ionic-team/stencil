@@ -10,7 +10,7 @@ async function startServer(devServerConfig: d.DevServerConfig) {
   try {
     const fs = new NodeFs();
     devServerConfig.contentTypes = await loadContentTypes(fs);
-    startDevServerWorker(devServerConfig, fs);
+    startDevServerWorker(process, devServerConfig, fs);
 
   } catch (e) {
     sendError(process, e);

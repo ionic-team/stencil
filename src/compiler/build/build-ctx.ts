@@ -48,6 +48,8 @@ export class BuildContext implements d.BuildCtx {
   constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {}
 
   start() {
+    this.compilerCtx.isActivelyBuilding = true;
+
     // get the build id from the incremented activeBuildId
     ++this.compilerCtx.activeBuildId;
 

@@ -19,6 +19,7 @@ export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string
 export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   // reusable data between builds
   compilerCtx = compilerCtx || {};
+  compilerCtx.isActivelyBuilding = false;
   compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys);
 
   if (!compilerCtx.cache) {

@@ -29,6 +29,7 @@ export interface CompilerCtx {
   hasLoggedServerUrl?: boolean;
   hasSuccessfulBuild?: boolean;
   hasWatch?: boolean;
+  isActivelyBuilding?: boolean;
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { appUpdate } from './app-update';
-import { logReload, logWarn } from './logger';
+import { logDisabled, logReload, logWarn } from './logger';
 import { updateBuildStatus } from './build-status';
 
 
@@ -22,7 +22,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
 
     if (!hasGottenBuildResults) {
       requestBuildResultsTmrId = setInterval(() => {
-        if (!hasGottenBuildResults) {
+        if (!hasGottenBuildResults && this.readyState === WebSocket.OPEN) {
           const msg: d.DevServerMessage = {
             requestBuildResults: true
           };
@@ -50,6 +50,8 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     if (event.code > NORMAL_CLOSURE_CODE) {
       // the browser's web socket has closed w/ an unexpected code
       logWarn(`Dev Server`, `web socket closed: ${event.code} ${event.reason}`);
+    } else {
+      logDisabled(`Dev Server`, `Disconnected, attempting to reconnect...`);
     }
 
     // web socket closed, let's try to reconnect
@@ -60,15 +62,23 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
     // the browser's web socket received a message from the server
     const msg: d.DevServerMessage = JSON.parse(event.data);
 
-    if (reconnectAttempts > 0 && (msg.buildResults || msg.buildResults === null)) {
-      // this is from a reconnect, and we were just notified w/ build results
-      // or we at least know there are was build result at all cuz it's specifically null
-      // so it's probably safe to do a full page refresh
-      logReload(`Reconnected to dev server`);
-      hasGottenBuildResults = true;
-      clearInterval(requestBuildResultsTmrId);
-      win.location.reload(true);
-      return;
+    if (reconnectAttempts > 0) {
+      // we got a message and we know we've been trying to reconnect
+
+      if (msg.isActivelyBuilding) {
+        // looks like there's still an active build
+        return;
+      }
+
+      if (msg.buildResults) {
+        // this is from a reconnect, and we were just notified w/ build results
+        // so it's probably best if we do a full page refresh
+        logReload(`Reconnected to dev server`);
+        hasGottenBuildResults = true;
+        clearInterval(requestBuildResultsTmrId);
+        win.location.reload(true);
+        return;
+      }
     }
 
     if (msg.buildLog) {

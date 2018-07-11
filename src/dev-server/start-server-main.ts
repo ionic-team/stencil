@@ -102,7 +102,8 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
       // we do have build results, so let's send them to the child process
       // but don't send any previous live reload data
       const msg: d.DevServerMessage = {
-        buildResults: Object.assign({}, compilerCtx.lastBuildResults)
+        buildResults: Object.assign({}, compilerCtx.lastBuildResults),
+        isActivelyBuilding: compilerCtx.isActivelyBuilding
       };
       delete msg.buildResults.hmr;
       delete msg.buildResults.entries;
@@ -112,7 +113,7 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
 
     } else {
       const msg: d.DevServerMessage = {
-        buildResults: null
+        isActivelyBuilding: compilerCtx.isActivelyBuilding
       };
       serverProcess.send(msg);
     }

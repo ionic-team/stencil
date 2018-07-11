@@ -22,10 +22,10 @@ const whitelist = [
 ];
 
 if (success) {
-  bundle('faye-websocket.js');
   bundle('node-fetch.js');
   bundle('sys-util.js');
   bundle('sys-worker.js');
+  bundle('websocket.js');
 
 
   function bundle(entryFileName) {
@@ -40,7 +40,8 @@ if (success) {
       node: {
         __dirname: false,
         __filename: false,
-        process: false
+        process: false,
+        Buffer: false
       },
       externals: function(context, request, callback) {
         if (request.match(/^(\.{0,2})\//)) {

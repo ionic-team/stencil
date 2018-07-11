@@ -115,7 +115,7 @@ export function appReset(win: d.DevClientWindow) {
     if (swRegistration) {
       return swRegistration.unregister().then(hasUnregistered => {
         if (hasUnregistered) {
-          console.log(`unregistered service worker`);
+          logBuild(`unregistered service worker`);
         }
       });
     }

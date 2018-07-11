@@ -88,6 +88,10 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   // it's official, this build has finished
   buildCtx.hasFinished = true;
 
+  if (buildCtx.isActiveBuild) {
+    compilerCtx.isActivelyBuilding = false;
+  }
+
   return buildCtx.buildResults;
 }
 

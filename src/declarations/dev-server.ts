@@ -48,19 +48,6 @@ export interface HttpRequest {
 }
 
 
-export interface DevServerSocketConstructor {
-  isWebSocket: (req: any) => boolean;
-  new (request: any, socket: any, body: any, protos: string[]): DevServerSocket;
-}
-
-
-export interface DevServerSocket {
-  on: (type: string, cb: (event: { data: string; }) => void) => void;
-  send: (msg: string) => void;
-  close: (code: number) => void;
-}
-
-
 export interface DevServerMessage {
   startServer?: DevServerConfig;
   serverStated?: DevServerStartResponse;
@@ -68,13 +55,11 @@ export interface DevServerMessage {
   buildResults?: d.BuildResults;
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
+  isActivelyBuilding?: boolean;
 }
 
 
-export interface DevServerContext {
-  httpServer: any;
-  wsConnections: d.DevServerSocket[];
-}
+export type DevServerDestroy = () => void;
 
 
 export interface DevResponseHeaders {

@@ -1,30 +1,21 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
-import { initWebSocketUpgrads } from './server-web-socket';
-import { findClosestOpenPort } from './find-closest-port';
+import { createWebSocket } from './server-web-socket';
 import { UNREGISTER_SW_URL, getBrowserUrl, sendError, sendMsg } from './util';
 
 
-export async function startDevServerWorker(devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
+export async function startDevServerWorker(process: NodeJS.Process, devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
   try {
-    // create the context object that'll be reused throughout the server
-    const devServerContext: d.DevServerContext = {
-      httpServer: null,
-      wsConnections: []
-    };
-
-    // figure out the port to be listening on
-    // by figuring out the first one available
-    devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
+    const destroys: d.DevServerDestroy[] = [];
 
     // create the http server listening for and responding to requests from the browser
-    devServerContext.httpServer = await createHttpServer(devServerConfig, fs);
+    let httpServer = await createHttpServer(devServerConfig, fs, destroys);
 
-    // upgrade any web socket requests the server receives
-    initWebSocketUpgrads(devServerContext, devServerContext.httpServer);
+    // upgrade web socket requests the server receives
+    createWebSocket(process, httpServer, destroys);
 
     // start listening!
-    devServerContext.httpServer.listen(devServerConfig.port, devServerConfig.address);
+    httpServer.listen(devServerConfig.port, devServerConfig.address);
 
     // have the server worker send a message to the main cli
     // process that the server has successfully started up
@@ -35,46 +26,24 @@ export async function startDevServerWorker(devServerConfig: d.DevServerConfig, f
       }
     });
 
-    function onMessageFromCli(msg: d.DevServerMessage) {
-      // the server process has received a message from the cli's main thread
-      // pass the data to each web socket for each browser connect
-      if (devServerContext.wsConnections) {
-        devServerContext.wsConnections.forEach(webSocket => {
-          webSocket.send(JSON.stringify(msg));
-        });
-      }
-    }
-
     function closeServer() {
       // probably recived a SIGINT message from the parent cli process
       // let's do our best to gracefully close everything down first
-      if (devServerContext.wsConnections) {
-        // close every web socket connection we have open
-        devServerContext.wsConnections.forEach(webSocket => {
-          webSocket.close(1000);
-        });
-        devServerContext.wsConnections.length = 0;
-      }
+      destroys.forEach(destroy => {
+        destroy();
+      });
 
-      if (devServerContext.httpServer) {
-        // close the http server
-        devServerContext.httpServer.close();
-        devServerContext.httpServer = null;
-      }
-
-      process.removeAllListeners('message');
-      process.removeAllListeners('SIGINT');
+      destroys.length = 0;
+      httpServer = null;
 
       setTimeout(() => {
         process.exit();
       }, 5000).unref();
+
+      process.removeAllListeners('message');
     }
 
-    // add our listeners to this worker process
-    process.addListener('message', onMessageFromCli);
-    process.once('SIGINT', () => {
-      closeServer();
-    });
+    process.once('SIGINT', closeServer);
 
   } catch (e) {
     sendError(process, e);

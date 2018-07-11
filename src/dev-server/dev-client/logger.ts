@@ -16,6 +16,11 @@ export function logWarn(prefix: string, msg: string) {
 }
 
 
+export function logDisabled(prefix: string, msg: string) {
+  log(GRAY, prefix, msg);
+}
+
+
 export function logDiagnostic(diagnostic: d.Diagnostic) {
   let color = RED;
   let prefix = 'Error';
@@ -63,3 +68,4 @@ function log(color: string, prefix: string, msg: string) {
 const YELLOW = `#f39c12`;
 const RED = `#c0392b`;
 const BLUE = `#3498db`;
+const GRAY = `#717171`;
