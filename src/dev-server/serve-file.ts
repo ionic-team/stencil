@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { DEV_SERVER_URL, getContentType, isCssFile, isDevServerClient, isHtmlFile, isInitialDevServerLoad, isSimpleText, responseHeaders, shouldCompress } from './util';
+import * as util from './util';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
@@ -12,31 +12,31 @@ import { Buffer } from 'buffer';
 
 export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
-    if (isSimpleText(req.filePath)) {
+    if (util.isSimpleText(req.filePath)) {
       // easy text file, use the internal cache
       let content = await fs.readFile(req.filePath);
 
-      if (isHtmlFile(req.filePath) && !isDevServerClient(req.pathname)) {
+      if (util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
-        content += injectDevServerClient();
+        content += getDevServerClientScript(devServerConfig);
 
-      } else if (isCssFile(req.filePath)) {
+      } else if (util.isCssFile(req.filePath)) {
         content = updateStyleUrls(req.url, content);
       }
 
       const contentLength = Buffer.byteLength(content, 'utf8');
 
-      if (shouldCompress(devServerConfig, req, contentLength)) {
+      if (util.shouldCompress(devServerConfig, req, contentLength)) {
         // let's gzip this well known web dev text file
-        res.writeHead(200, responseHeaders({
-          'Content-Type': getContentType(devServerConfig, req.filePath)
+        res.writeHead(200, util.responseHeaders({
+          'Content-Type': util.getContentType(devServerConfig, req.filePath)
         }));
         zlib.createGzip().pipe(res);
 
       } else {
         // let's not gzip this file
-        res.writeHead(200, responseHeaders({
-          'Content-Type': getContentType(devServerConfig, req.filePath),
+        res.writeHead(200, util.responseHeaders({
+          'Content-Type': util.getContentType(devServerConfig, req.filePath),
           'Content-Length': contentLength
         }));
         res.write(content);
@@ -46,8 +46,8 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
     } else {
       // non-well-known text file or other file, probably best we use a stream
       // but don't bother trying to gzip this file for the dev server
-      res.writeHead(200, responseHeaders({
-        'Content-Type': getContentType(devServerConfig, req.filePath),
+      res.writeHead(200, util.responseHeaders({
+        'Content-Type': util.getContentType(devServerConfig, req.filePath),
         'Content-Length': req.stats.size
       }));
       fs.createReadStream(req.filePath).pipe(res);
@@ -61,14 +61,14 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
 
 export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
-    if (isDevServerClient(req.pathname)) {
+    if (util.isDevServerClient(req.pathname)) {
       req.filePath = path.join(devServerConfig.devServerDir, 'static', 'dev-server-client.html');
 
-    } else if (isInitialDevServerLoad(req.pathname)) {
+    } else if (util.isInitialDevServerLoad(req.pathname)) {
       req.filePath = path.join(devServerConfig.devServerDir, 'templates', 'initial-load.html');
 
     } else {
-      const staticFile = req.pathname.replace(DEV_SERVER_URL + '/', '');
+      const staticFile = req.pathname.replace(util.DEV_SERVER_URL + '/', '');
       req.filePath = path.join(devServerConfig.devServerDir, 'static', staticFile);
     }
 
@@ -85,8 +85,9 @@ export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, f
 }
 
 
-function injectDevServerClient() {
-  return `\n<iframe src="${DEV_SERVER_URL}" style="width:0;height:0;border:0"></iframe>`;
+function getDevServerClientScript(devServerConfig: d.DevServerConfig) {
+  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig);
+  return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
 }
 
 
