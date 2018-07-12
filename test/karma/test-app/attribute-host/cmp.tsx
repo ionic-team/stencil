@@ -52,8 +52,10 @@ export class AttributeHost {
       <section
         {...propsToRender}
         style={{
-          'border-color': 'black',
-          '--css-var': '12'
+          'border-color': this.attrsAdded ? 'black' : '',
+          display: this.attrsAdded ? 'block' : 'inline-block',
+          fontSize: this.attrsAdded ? '24px' : '',
+          '--css-var': this.attrsAdded ? '12' : ''
         }}
       />
     ]

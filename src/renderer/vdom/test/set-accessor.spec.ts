@@ -755,20 +755,25 @@ describe('setAccessor for standard html elements', () => {
 
 
   describe('style attribute', () => {
+
     it('should add styles', () => {
-      const elm = mockElement('section');
+      let elm = mockElement('section');
       const newStyles = {
         'box-shadow': '1px',
-        'color': 'blue'
+        'color': 'blue',
+        paddingLeft: '88px'
       };
       setAccessor(plt, elm, 'style', undefined, newStyles, false, false);
-      expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue;');
+      expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue; padding-left: 88px;');
 
+      elm = mockElement('my-tag');
       setAccessor(plt, elm, 'style', {}, {
-        'font-size': '12px'
+        'font-size': '12px',
+        marginRight: '55px'
       }, false, false);
-      expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue; font-size: 12px;');
+      expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
+      elm = mockElement('my-tag');
       setAccessor(plt, elm, 'style', {
         'font-size': '12px',
         'color': 'blue'
@@ -776,7 +781,7 @@ describe('setAccessor for standard html elements', () => {
         'font-size': '20px'
         }, false, false);
 
-      expect(elm.style.cssText).toEqual('box-shadow: 1px; font-size: 20px;');
+      expect(elm.style.cssText).toEqual('font-size: 20px;');
     });
 
     it('should not add styles', () => {
@@ -785,8 +790,8 @@ describe('setAccessor for standard html elements', () => {
       expect(elm.style.cssText).toEqual('');
 
       setAccessor(plt, elm, 'style',
-        { color: 'blue', 'font-size': '12px' },
-        { color: 'blue', 'font-size': '12px' }, false, false);
+        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
+        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' }, false, false);
       expect(elm.style.cssText).toEqual('');
 
       setAccessor(plt, elm, 'style', { color: 'blue', 'font-size': '12px' },
@@ -800,28 +805,28 @@ describe('setAccessor for standard html elements', () => {
       elm.style.setProperty('padding', '20px');
 
       setAccessor(plt, elm, 'style',
-        { color: 'blue', 'padding': '20px' },
-        { color: 'blue', 'padding': '30px' }, false, false);
+        { color: 'blue', 'padding': '20px', marginRight: '88px' },
+        { color: 'blue', 'padding': '30px', marginRight: '55px' }, false, false);
 
-    expect(elm.style.cssText).toEqual('color: black; padding: 30px;');
+      expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');
     });
-
 
     it('should remove styles', () => {
       const elm = mockElement('section');
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
       elm.style.setProperty('margin', '20px');
+      elm.style.setProperty('font-size', '88px');
 
-      expect(elm.style.cssText).toEqual('color: black; padding: 20px; margin: 20px;');
+      expect(elm.style.cssText).toEqual('color: black; padding: 20px; margin: 20px; font-size: 88px;');
 
-      setAccessor(plt, elm, 'style', { color: 'black', padding: '20px' }, undefined, false, false);
+      setAccessor(plt, elm, 'style', { color: 'black', padding: '20px', fontSize: '88px' }, undefined, false, false);
       expect(elm.style.cssText).toEqual('margin: 20px;');
 
       setAccessor(plt, elm, 'style', { margin: '20px' }, { margin: '30px', color: 'orange' }, false, false);
       expect(elm.style.cssText).toEqual('margin: 30px; color: orange;');
-
     });
 
   });
+
 });
