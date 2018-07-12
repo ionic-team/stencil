@@ -1,25 +1,22 @@
 {
+  "private": true,
   "module": "test-dist/esm/index.js",
   "main": "test-dist/index.js",
   "types": "test-dist/types/components.d.ts",
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
     "build.app": "node ../../bin/stencil build --debug --es5",
-    "build.app.watch": "node ../../bin/stencil build --debug --watch --es5",
     "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender",
     "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
-    "dev": "sd concurrent \"npm run build.app.watch\" \"stencil-dev-server\" ",
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",
     "karma.firefox": "karma start karma.config.js --browsers=Firefox --single-run=false",
     "karma.prod": "npm run tsc && npm run build.app && npm run build.sibling && npm run build.prerender && npm run karma.webpack && karma start karma.config.js",
     "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
+    "start": "node ../../bin/stencil build --debug --watch --es5 --serve",
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
-  "private": true,
   "devDependencies": {
-    "@stencil/dev-server": "latest",
-    "@stencil/utils": "latest",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.0",
     "karma-browserstack-launcher": "^1.3.0",
