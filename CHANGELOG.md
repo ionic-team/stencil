@@ -1,3 +1,14 @@
+<a name="0.10.4"></a>
+## 🌷 [0.10.4](https://github.com/ionic-team/stencil/compare/v0.10.3...v0.10.4) (2018-07-12)
+
+
+### Bug Fixes
+
+* **dev-server:** include domain in href to dev server client script ([41c03a8](https://github.com/ionic-team/stencil/commit/41c03a8)), closes [#921](https://github.com/ionic-team/stencil/issues/921)
+* **styles:** fix applying jsCase css properties in style attribute ([f1ea5b0](https://github.com/ionic-team/stencil/commit/f1ea5b0)), closes [#919](https://github.com/ionic-team/stencil/issues/919) [#924](https://github.com/ionic-team/stencil/issues/924)
+
+
+
 <a name="0.10.3"></a>
 ## 🌺 [0.10.3](https://github.com/ionic-team/stencil/compare/v0.10.2...v0.10.3) (2018-07-12)
 
