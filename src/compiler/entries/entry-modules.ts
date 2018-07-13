@@ -186,7 +186,7 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
       if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
       return 0;
     })
-    .map(m => m.cmpMeta.tagNameMeta).join('.');
+    .map(m => m.cmpMeta.tagNameMeta).join('.') + '.js';
 
   // get the modes used in this bundle
   entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
@@ -201,7 +201,7 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
 }
 
 
-export const ENTRY_KEY_PREFIX = 'entry:';
+export const ENTRY_KEY_PREFIX = 'entry.';
 
 
 export function getAppEntryTags(allModules: d.ModuleFile[]) {

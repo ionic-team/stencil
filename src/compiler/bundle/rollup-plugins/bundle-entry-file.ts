@@ -16,6 +16,7 @@ export default function bundleEntryFile(config: d.Config, buildCtx: d.BuildCtx, 
 
       if (importee.startsWith(ENTRY_KEY_PREFIX)) {
         const bundle = entryModules.find(b => b.entryKey === importee);
+        console.log(bundle);
         if (bundle) {
           return bundle.entryKey;
         }
