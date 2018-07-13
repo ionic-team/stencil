@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
-import { minifyStyle } from '../style/minify-style';
+import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 
 

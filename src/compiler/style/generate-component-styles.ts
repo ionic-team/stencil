@@ -2,56 +2,18 @@ import * as d from '../../declarations';
 import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
-import { generateGlobalStyles } from './global-styles';
 import { getStyleCache, setStyleCache } from './cached-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
-  if (canSkipGenerateStyles(buildCtx)) {
-    return;
-  }
+export async function generateComponentStylesModes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, stylesMeta: d.StylesMeta, modeName: string) {
+  // compile each mode style
+  const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
-  const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
-
-  const componentStyles = await Promise.all(entryModules.map(async bundle => {
-    await Promise.all(bundle.moduleFiles.map(async moduleFile => {
-      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
-    }));
-  }));
-
-  // create the global styles
-  const globalStyles = await Promise.all(config.outputTargets
-    .filter(outputTarget => outputTarget.type !== 'stats')
-    .map(async outputTarget => {
-      await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
-    }));
-
-  await Promise.all([
-    componentStyles,
-    globalStyles
-  ]);
-
-  timeSpan.finish(`generate styles finished`);
-}
-
-
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile) {
-  const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
-
-  await Promise.all(Object.keys(stylesMeta).map(async modeName => {
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-      return;
-    }
-
-    // compile each mode style
-    const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
-
-    // format and set the styles for use later
-    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, stylesMeta[modeName], styles);
-  }));
+  // format and set the styles for use later
+  await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, stylesMeta[modeName], styles);
 }
 
 
@@ -323,24 +285,3 @@ export const PLUGIN_HELPERS = [
     pluginExts: ['less']
   }
 ];
-
-
-function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-    return true;
-  }
-
-  if (buildCtx.requiresFullBuild) {
-    return false;
-  }
-
-  if (buildCtx.isRebuild) {
-    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
-      return false;
-    }
-
-    return true;
-  }
-
-  return false;
-}
