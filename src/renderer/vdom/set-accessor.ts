@@ -26,15 +26,24 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
     }
 
   } else if (memberName === 'style') {
+    // update style attribute, css properties and values
     for (const prop in oldValue) {
       if (!newValue || newValue[prop] == null) {
-        elm.style.removeProperty(prop);
+        if (/-/.test(prop)) {
+          elm.style.removeProperty(prop);
+        } else {
+          (elm as any).style[prop] = '';
+        }
       }
     }
 
     for (const prop in newValue) {
       if (!oldValue || newValue[prop] !== oldValue[prop]) {
-        elm.style.setProperty(prop, newValue[prop]);
+        if (/-/.test(prop)) {
+          elm.style.setProperty(prop, newValue[prop]);
+        } else {
+          (elm as any).style[prop] = newValue[prop];
+        }
       }
     }
 

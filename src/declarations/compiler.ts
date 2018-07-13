@@ -20,6 +20,7 @@ export interface CompilerCtx {
     registryJson?: string;
   };
   cache?: d.Cache;
+  cachedStyleMeta?: Map<string, d.StyleMeta>;
   collections?: d.Collection[];
   compiledModuleJsText?: d.ModuleBundles;
   compiledModuleLegacyJsText?: d.ModuleBundles;
@@ -33,12 +34,11 @@ export interface CompilerCtx {
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
+  lastComponentStyleInput?: Map<string, string>;
   lastBuildHadError?: boolean;
   lastBuildResults?: d.BuildResults;
   lastBuildStyles?: Map<string, string>;
   lastJsModules?: d.JSModuleMap;
-  lastStyleInput?: Map<string, string>;
-  lastStyleOutput?: Map<string, string>;
   localPrerenderServer?: any;
   moduleFiles?: d.ModuleFiles;
   resolvedCollections?: string[];

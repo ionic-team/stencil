@@ -8,7 +8,7 @@ import { generateBundles } from '../bundle/generate-bundles';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateIndexHtmls } from '../html/generate-index-html';
 import { generateModuleMap } from '../bundle/bundle';
-import { generateStyles } from '../style/style';
+import { generateStyles } from '../style/generate-styles';
 import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
 import { transpileApp } from '../transpile/transpile-app';

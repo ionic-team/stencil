@@ -36,8 +36,8 @@ export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
 
   compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || new Map();
-  compilerCtx.lastStyleOutput = compilerCtx.lastStyleOutput || new Map();
-  compilerCtx.lastStyleInput = compilerCtx.lastStyleInput || new Map();
+  compilerCtx.cachedStyleMeta = compilerCtx.cachedStyleMeta || new Map();
+  compilerCtx.lastComponentStyleInput = compilerCtx.lastComponentStyleInput || new Map();
 
   if (typeof compilerCtx.activeBuildId !== 'number') {
     compilerCtx.activeBuildId = -1;
@@ -57,8 +57,8 @@ export function resetCompilerCtx(compilerCtx: d.CompilerCtx) {
   compilerCtx.compiledModuleJsText = {};
   compilerCtx.compiledModuleLegacyJsText = {};
   compilerCtx.compilerOptions = null;
-  compilerCtx.lastStyleOutput.clear();
-  compilerCtx.lastStyleInput.clear();
+  compilerCtx.cachedStyleMeta.clear();
+  compilerCtx.lastComponentStyleInput.clear();
   compilerCtx.tsService = null;
   compilerCtx.rootTsFiles = null;
 

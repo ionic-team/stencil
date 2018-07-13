@@ -159,6 +159,48 @@ describe('component-styles', () => {
     expect(content).toContain(`color:green`);
   });
 
+  it('should build one component w/ styleUrl, and re-compile css import of css import changes', async () => {
+    c.config.watch = true;
+    await c.fs.writeFiles({
+      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'file-a.css', shadow: true }) export class CmpA {}`,
+      [path.join(root, 'src', 'file-a.css')]: `@import "file-b.css"; div { color: red; }`,
+      [path.join(root, 'src', 'file-b.css')]: `@import "file-c.css"; span { color: green; }`,
+      [path.join(root, 'src', 'file-c.css')]: `p { color: blue; }`
+    });
+    await c.fs.commit();
+
+    let r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+    expect(r.components).toHaveLength(1);
+    expect(r.transpileBuildCount).toBe(1);
+    expect(r.bundleBuildCount).toBe(1);
+    expect(r.styleBuildCount).toBe(1);
+
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(content).toContain(`color: red`);
+    expect(content).toContain(`color: green`);
+    expect(content).toContain(`color: blue`);
+
+    const rebuildListener = c.once('buildFinish');
+
+    await c.fs.writeFiles({
+      [path.join(root, 'src', 'file-c.css')]: `p { color: yellow; }`,
+    }, { clearFileCache: true });
+    await c.fs.commit();
+
+    c.trigger('fileUpdate', path.join(root, 'src', 'file-c.css'));
+
+    r = await rebuildListener;
+    expect(r.diagnostics).toEqual([]);
+    expect(r.styleBuildCount).toBe(1);
+
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(content).toContain(`color: red`);
+    expect(content).toContain(`color: green`);
+    expect(content).not.toContain(`color: blue`);
+    expect(content).toContain(`color: yellow`);
+  });
+
   it('should build one component w/ styleUrl, and not re-compile styles w/ no style changes', async () => {
     c.config.watch = true;
     await c.fs.writeFiles({
@@ -195,7 +237,7 @@ describe('component-styles', () => {
     expect(content).toContain(`console.log('88')`);
   });
 
-  it('should build one component w/ styleUrl, and re-compile styles w/ style changes', async () => {
+  it('should build one component w/ styleUrl, and re-compile component decorator styles url changes', async () => {
     c.config.watch = true;
     await c.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a-red.css', shadow: true }) export class CmpA {}`,

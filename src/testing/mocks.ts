@@ -88,7 +88,10 @@ export function mockCompilerCtx() {
 }
 
 
-export function mockBuildCtx(config: d.Config, compilerCtx: d.CompilerCtx) {
+export function mockBuildCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
+  if (!compilerCtx) {
+    compilerCtx = mockCompilerCtx();
+  }
   const buildCtx = new BuildContext(config, compilerCtx);
 
   return buildCtx as d.BuildCtx;

@@ -9,7 +9,7 @@ Karma can be used to test final rendered output on various browsers and operatin
 ### Create a test page
 
 1. Create a directory at the root of `test/karma/test-app` (easiest to just copy an existing test directory)
-2. `npm run dev` will fire up a normal Stencil server and browser.
+2. `npm start` will fire up a normal Stencil dev-server and browser.
 3. In the browser, navigate to your new test, and build it out to recreate an issue.
 4. Keep it simple and focused on one thing.
 

@@ -4,13 +4,13 @@ import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename 
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
-import { PLUGIN_HELPERS } from '../style/style';
+import { PLUGIN_HELPERS } from '../style/generate-component-styles';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
   if (canSkipGenerateBundles(buildCtx)) {
-    return null;
+    return {} as d.ComponentRegistry;
   }
 
   // both styles and modules are done bundling

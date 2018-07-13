@@ -1,7 +1,8 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../declarations';
 import { catchError } from '../util';
-import { createBundle, writeEntryModules, writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './rollup-bundle';
+import { createBundle } from './rollup-bundle';
 import { minifyJs } from '../minifier';
+import { writeEntryModules, writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
 import { ENTRY_KEY_PREFIX } from '../entries/entry-modules';
 
 
