@@ -4,9 +4,13 @@ import { initHostSnapshot } from './host-snapshot';
 
 
 export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+  // ¯\_(ツ)_/¯
   // keep the existing state
   // forget the constructor
   cmpMeta.componentConstructor = null;
+
+  // no sir, this component has never loaded, not once, ever
+  plt.hasLoadedMap.delete(elm);
 
   // forget the instance
   const instance = plt.instanceMap.get(elm);
@@ -26,7 +30,7 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
   elm['s-hmr-load'] = () => {
     // finished hmr for this element
     delete elm['s-hmr-load'];
-    hmrFinished(plt, cmpMeta, elm);
+    hmrFinish(plt, cmpMeta, elm);
   };
 
   // create the new host snapshot from the element
@@ -37,7 +41,7 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
 }
 
 
-export function hmrFinished(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+export function hmrFinish(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
   if (!plt.hasListenersMap.has(elm)) {
     plt.hasListenersMap.set(elm, true);
 
