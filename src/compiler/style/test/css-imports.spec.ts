@@ -82,7 +82,7 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
-          filePath: '/src/cmp/file-b.scss',
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.scss')),
           importDeclaration: `@import "file-b";`,
           url: `file-b`
         }
@@ -97,7 +97,7 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
-          filePath: '/src/cmp/file-b.LESS',
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.LESS')),
           importDeclaration: `@import "file-b";`,
           url: `file-b`
         }
@@ -127,17 +127,17 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
-          filePath: `/src/cmp/file-b.css`,
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
           importDeclaration: `@import "file-b.css";`,
           url: `file-b.css`
         },
         {
-          filePath: `/src/cmp/file-c.css`,
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-c.css')),
           importDeclaration: `@import "./file-c.css";`,
           url: `./file-c.css`
         },
         {
-          filePath: `/src/global/file-d.css`,
+          filePath: normalizePath(path.join(root, 'src', 'global', 'file-d.css')),
           importDeclaration: `@import "../global/file-d.css";`,
           url: `../global/file-d.css`
         },
@@ -154,17 +154,17 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
-          filePath: `/src/cmp/file-b.css`,
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
           importDeclaration: `@import 'file-b.css';`,
           url: `file-b.css`
         },
         {
-          filePath: `/src/cmp/file-c.css`,
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-c.css')),
           importDeclaration: `@import './file-c.css';`,
           url: `./file-c.css`
         },
         {
-          filePath: `/src/global/file-d.css`,
+          filePath: normalizePath(path.join(root, 'src', 'global', 'file-d.css')),
           importDeclaration: `@import '../global/file-d.css';`,
           url: `../global/file-d.css`
         },
@@ -194,7 +194,7 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
-          filePath: `/src/file-b.css`,
+          filePath: normalizePath(path.join(root, 'src', 'file-b.css')),
           importDeclaration: `@import '/src/file-b.css';`,
           url: `/src/file-b.css`
         },
