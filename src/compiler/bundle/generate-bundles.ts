@@ -351,6 +351,10 @@ function injectStyleMode(moduleFiles: d.ModuleFile[], jsText: string, modeName: 
 }
 
 export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: string, jsText: string, isScopedStyles: boolean) {
+  if (typeof jsText !== 'string') {
+    return '';
+  }
+
   const stylePlaceholder = getStylePlaceholder(cmpMeta.tagNameMeta);
   const stylePlaceholderId = getStyleIdPlaceholder(cmpMeta.tagNameMeta);
 
