@@ -1,3 +1,18 @@
+<a name="0.10.5"></a>
+## 🚡 [0.10.5](https://github.com/ionic-team/stencil/compare/v0.10.4...v0.10.5) (2018-07-13)
+
+
+### Bug Fixes
+
+* **hmr:** call componentDidLoad on hmr reload ([74f9ad0](https://github.com/ionic-team/stencil/commit/74f9ad0))
+
+
+### Performance Improvements
+
+* **build:** improve style rebuild times ([fbfc237](https://github.com/ionic-team/stencil/commit/fbfc237))
+
+
+
 <a name="0.10.4"></a>
 ## 🌷 [0.10.4](https://github.com/ionic-team/stencil/compare/v0.10.3...v0.10.4) (2018-07-12)
 
