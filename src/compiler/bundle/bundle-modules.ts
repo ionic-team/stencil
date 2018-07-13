@@ -1,7 +1,8 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../declarations';
 import { catchError } from '../util';
-import { createBundle, writeEsModules, writeEsmEs5Modules, writeLegacyModules  } from './rollup-bundle';
+import { createBundle } from './rollup-bundle';
 import { minifyJs } from '../minifier';
+import { writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
 
 
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
