@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
+import { concatCssImports } from './css-imports';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
@@ -30,23 +31,30 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
 
 
 async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string) {
-  let style = '';
+  let styleText = '';
 
   try {
     filePath = normalizePath(filePath);
 
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
 
-    style = transformResults.code;
+    styleText = transformResults.code;
 
-    style = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, style, filePath);
+    if (filePath.toLowerCase().endsWith('.css')) {
+      // concat all the imports and imports of imports into this one string
+      styleText = await concatCssImports(config, compilerCtx, buildCtx, filePath, styleText);
+    }
+
+    if (config.minifyCss) {
+      styleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleText, filePath);
+    }
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);
     d.messageText = `config.globalStyle ${e}`;
   }
 
-  return style;
+  return styleText;
 }
 
 

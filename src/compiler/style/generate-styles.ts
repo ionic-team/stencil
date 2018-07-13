@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateComponentStylesModes } from './generate-component-styles';
+import { generateComponentStylesMode } from './generate-component-styles';
 import { generateGlobalStyles } from './global-styles';
 
 
@@ -36,11 +36,7 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
   const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
 
   await Promise.all(Object.keys(stylesMeta).map(async modeName => {
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-      return;
-    }
-
-    await generateComponentStylesModes(config, compilerCtx, buildCtx, moduleFile, stylesMeta, modeName);
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName], modeName);
   }));
 }
 

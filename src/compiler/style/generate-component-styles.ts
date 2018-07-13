@@ -2,18 +2,41 @@ import * as d from '../../declarations';
 import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
-import { getStyleCache, setStyleCache } from './cached-styles';
+import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
+import { concatCssImports } from './css-imports';
 
 
-export async function generateComponentStylesModes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, stylesMeta: d.StylesMeta, modeName: string) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+    return;
+  }
+
+  if (buildCtx.isRebuild) {
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, styleMeta, modeName);
+    if (cachedCompiledStyles) {
+      styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
+      styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
+      return;
+    }
+  }
+
   // compile each mode style
-  const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
+  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, styleMeta);
 
   // format and set the styles for use later
-  await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, stylesMeta[modeName], styles);
+  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, styleMeta.externalStyles, compiledStyles);
+
+  styleMeta.compiledStyleText = compiledStyleMeta.compiledStyleText;
+  styleMeta.compiledStyleTextScoped = compiledStyleMeta.compiledStyleTextScoped;
+
+  if (config.watch) {
+    // since this is a watch and we'll be checking this again
+    // let's cache what we've learned today
+    setComponentStylesCache(compilerCtx, moduleFile, modeName, styleMeta);
+  }
 }
 
 
@@ -26,15 +49,16 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
     // let's put these file in an in-memory file
     const inlineAbsPath = moduleFile.jsFilePath + '.css';
     extStylePaths.push(inlineAbsPath);
+
     await compilerCtx.fs.writeFile(inlineAbsPath, styleMeta.styleStr, { inMemoryOnly: true });
   }
 
   // build an array of style strings
-  const styles = await Promise.all(extStylePaths.map(extStylePath => {
+  const compiledStyles = await Promise.all(extStylePaths.map(extStylePath => {
     return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, extStylePath);
   }));
 
-  return styles;
+  return compiledStyles;
 }
 
 
@@ -47,15 +71,6 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
 
   // see if we can used a cached style first
   let styleText: string;
-
-  if (buildCtx.isRebuild) {
-    // only bother checking the cache if it's a rebuild
-    styleText = await getStyleCache(compilerCtx, extStylePath);
-    if (typeof styleText === 'string') {
-      // woot! we've got cached styles, no need to do all this work!
-      return styleText;
-    }
-  }
 
   if (moduleFile.isCollectionDependency) {
     // if it's a collection dependency and it's a preprocessor file like sass
@@ -91,12 +106,6 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     }
 
     styleText = transformResults.code;
-
-    if (config.watch && buildCtx.isActiveBuild) {
-      // all is good, we've successfully compiled this style
-      // only cache if it's a watch build
-      await setStyleCache(compilerCtx, extStylePath, styleText);
-    }
 
     buildCtx.styleBuildCount++;
 
@@ -166,9 +175,22 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, styleMeta: d.StyleMeta, styles: string[]) {
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, externalStyles: d.ExternalStyleMeta[], compiledStyles: string[]) {
+  const styleMeta: d.StyleMeta = {};
+
   // join all the component's styles for this mode together into one line
-  styleMeta.compiledStyleText = styles.join('\n\n').trim();
+  styleMeta.compiledStyleText = compiledStyles.join('\n\n').trim();
+
+  let filePath: string = null;
+  const externalStyle = externalStyles && externalStyles.length && externalStyles[0];
+  if (externalStyle && externalStyle.absolutePath) {
+    filePath = externalStyle.absolutePath;
+
+    if (filePath.toLowerCase().endsWith('.css')) {
+      // concat all the imports and imports of imports into this one string
+      styleMeta.compiledStyleText = await concatCssImports(config, compilerCtx, buildCtx, filePath, styleMeta.compiledStyleText);
+    }
+  }
 
   // auto add css prefixes
   const autoprefixConfig = config.autoprefixCss;
@@ -176,14 +198,10 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
     styleMeta.compiledStyleText = await autoprefixCssMain(config, compilerCtx, styleMeta.compiledStyleText, autoprefixConfig);
   }
 
-  let filePath: string = null;
-  const externalStyle = styleMeta.externalStyles && styleMeta.externalStyles.length && styleMeta.externalStyles[0];
-  if (externalStyle && externalStyle.absolutePath) {
-    filePath = externalStyle.absolutePath;
+  if (config.minifyCss) {
+    // minify css
+    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
   }
-
-  // minify css
-  styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
@@ -242,6 +260,8 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
       isScoped: true
     });
   }
+
+  return styleMeta;
 }
 
 
