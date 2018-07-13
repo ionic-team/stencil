@@ -195,8 +195,8 @@ describe('css-imports', () => {
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'file-b.css')),
-          importDeclaration: `@import '/src/file-b.css';`,
-          url: `/src/file-b.css`
+          importDeclaration: `@import '${normalizePath(path.join(root, 'src', 'file-b.css'))}';`,
+          url: `${normalizePath(path.join(root, 'src', 'file-b.css'))}`
         },
       ]);
     });
