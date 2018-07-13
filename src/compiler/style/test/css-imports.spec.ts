@@ -189,7 +189,7 @@ describe('css-imports', () => {
     it('absolute path @import', () => {
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
       const content = `
-        @import '/src/file-b.css';
+        @import '${normalizePath(path.join(root, 'src', 'file-b.css'))}';
       `;
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
