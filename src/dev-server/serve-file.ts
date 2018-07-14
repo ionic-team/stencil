@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import * as util from './util';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
+import { serveOpenInEditor } from './open-in-editor';
 import * as http  from 'http';
 import * as path from 'path';
 import * as querystring from 'querystring';
@@ -61,7 +62,10 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
 
 export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
-    if (util.isDevServerClient(req.pathname)) {
+    if (util.isOpenInEditor(req.pathname)) {
+      return serveOpenInEditor(fs, req, res);
+
+    } else if (util.isDevServerClient(req.pathname)) {
       req.filePath = path.join(devServerConfig.devServerDir, 'static', 'dev-server-client.html');
 
     } else if (util.isInitialDevServerLoad(req.pathname)) {

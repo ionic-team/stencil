@@ -90,6 +90,11 @@ export function isStaticDevClient(req: d.HttpRequest) {
 }
 
 
+export function isOpenInEditor(pathname: string) {
+  return pathname === OPEN_IN_EDITOR_URL;
+}
+
+
 export function isInitialDevServerLoad(pathname: string) {
   return pathname === UNREGISTER_SW_URL;
 }
@@ -103,6 +108,8 @@ export function isDevServerClient(pathname: string) {
 export const DEV_SERVER_URL = '/~dev-server';
 
 export const UNREGISTER_SW_URL = `${DEV_SERVER_URL}-init`;
+
+export const OPEN_IN_EDITOR_URL = `${DEV_SERVER_URL}-open-in-editor`;
 
 
 export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest, contentLength: number) {
