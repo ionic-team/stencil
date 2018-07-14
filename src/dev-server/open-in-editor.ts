@@ -11,7 +11,7 @@ const oie = require(path.join(__dirname, '..', 'sys', 'node', 'open-in-editor.js
 export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   let status = 200;
 
-  const data: OpenInEditorResponse = {};
+  const data: d.OpenInEditorData = {};
 
   try {
     if (devServerConfig.editors.length > 0) {
@@ -35,7 +35,7 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, fs: 
 }
 
 
-async function parseData(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, data: OpenInEditorResponse) {
+async function parseData(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, data: d.OpenInEditorData) {
   const query = url.parse(req.url).query;
   const qs = querystring.parse(query) as any;
 
@@ -79,7 +79,7 @@ async function parseData(devServerConfig: d.DevServerConfig, fs: d.FileSystem, r
 }
 
 
-async function openInEditor(data: OpenInEditorResponse) {
+async function openInEditor(data: d.OpenInEditorData) {
   if (!data.exists || data.error) {
     return;
   }
@@ -170,14 +170,3 @@ const EDITOR_PRIORITY: {[editor: string]: number} = {
   vim: 8,
   emacs: 9,
 };
-
-
-interface OpenInEditorResponse {
-  file?: string;
-  line?: number;
-  column?: number;
-  open?: string;
-  editor?: string;
-  exists?: boolean;
-  error?: string;
-}

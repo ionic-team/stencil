@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
-import { DEV_SERVER_URL } from '../util';
+import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../util';
 import { logDiagnostic } from './logger';
 import { updateBuildStatus } from './build-status';
 
 
-export function appError(doc: Document, _config: d.DevClientConfig, buildResults: d.BuildResults) {
+export function appError(win: Window, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
     return;
   }
@@ -13,14 +13,14 @@ export function appError(doc: Document, _config: d.DevClientConfig, buildResults
 
   buildResults.diagnostics.forEach(diagnostic => {
     logDiagnostic(diagnostic);
-    appendDiagnostic(doc, modal, diagnostic);
+    appendDiagnostic(win, doc, config, modal, diagnostic);
   });
 
   updateBuildStatus(doc, 'error');
 }
 
 
-function appendDiagnostic(doc: Document, modal: HTMLElement, diagnostic: d.Diagnostic) {
+function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig, modal: HTMLElement, diagnostic: d.Diagnostic) {
   const card = doc.createElement('div');
   card.className = 'dev-server-diagnostic';
 
@@ -43,12 +43,23 @@ function appendDiagnostic(doc: Document, modal: HTMLElement, diagnostic: d.Diagn
   file.className = 'dev-server-diagnostic-file';
   card.appendChild(file);
 
+  const canOpenInEditor = isOpenIsEditorEnabled(config, diagnostic);
+
   if (diagnostic.relFilePath) {
-    const fileHeader = doc.createElement('div');
+    const fileHeader = doc.createElement(canOpenInEditor ? 'a' : 'div');
     fileHeader.className = 'dev-server-diagnostic-file-header';
 
     if (diagnostic.absFilePath) {
       fileHeader.title = escapeHtml(diagnostic.absFilePath);
+
+      if (canOpenInEditor) {
+        (fileHeader as HTMLAnchorElement).href = '#open-in-editor';
+        fileHeader.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          openInEditor(win, config, diagnostic);
+        });
+      }
     }
 
     const parts = diagnostic.relFilePath.split('/');
@@ -95,6 +106,30 @@ function appendDiagnostic(doc: Document, modal: HTMLElement, diagnostic: d.Diagn
   }
 
   modal.appendChild(card);
+}
+
+
+function openInEditor(win: Window, config: d.DevClientConfig, diagnostic: d.Diagnostic) {
+  const qs: d.OpenInEditorData = {
+    file: diagnostic.absFilePath,
+    line: diagnostic.lineNumber,
+    column: diagnostic.columnNumber,
+    editor: config.editors[0].id
+  };
+
+  const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
+
+  win.fetch(url);
+}
+
+
+function isOpenIsEditorEnabled(config: d.DevClientConfig, diagnostic: d.Diagnostic) {
+  if (config.editors && config.editors.length > 0) {
+    if (diagnostic && typeof diagnostic.absFilePath === 'string') {
+      return true;
+    }
+  }
+  return false;
 }
 
 

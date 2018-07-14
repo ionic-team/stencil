@@ -56,7 +56,7 @@
 
 .dev-server-diagnostic-message {
   margin-top: 4px;
-  color: #666;
+  color: #555;
 }
 
 .dev-server-diagnostic-file {
@@ -65,11 +65,19 @@
 }
 
 .dev-server-diagnostic-file-header {
+  display: block;
   padding: 5px 10px;
+  color: #555;
   border-bottom: 1px solid #ddd;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   background-color: #f8f8f8;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+a.dev-server-diagnostic-file-header:hover {
+  text-decoration: none;
 }
 
 .dev-server-diagnostic-file-name {

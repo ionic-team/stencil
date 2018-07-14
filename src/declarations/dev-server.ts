@@ -84,3 +84,14 @@ export interface DevServerEditor {
   supported?: boolean;
   priority?: number;
 }
+
+
+export interface OpenInEditorData {
+  file?: string;
+  line?: number;
+  column?: number;
+  open?: string;
+  editor?: string;
+  exists?: boolean;
+  error?: string;
+}

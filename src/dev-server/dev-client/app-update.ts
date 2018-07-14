@@ -15,7 +15,7 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevCl
     if (buildResults.hasError) {
       // looks like we've got an error
       // let's show the error all pretty like
-      appError(doc, config, buildResults);
+      appError(win, doc, config, buildResults);
       return;
     }
 
