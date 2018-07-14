@@ -98,6 +98,9 @@
     "webpack": "^4.9.1 ",
     "ws": "5.2.1"
   },
+  "engines": {
+    "node" : ">=6.11.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ionic-team/stencil.git"
