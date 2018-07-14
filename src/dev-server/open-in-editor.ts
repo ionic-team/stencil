@@ -5,7 +5,7 @@ import * as path  from 'path';
 import * as querystring  from 'querystring';
 import * as url  from 'url';
 
-const oie = require(path.join(__dirname, '..', 'sys', 'node', 'open-in-editor.js'));
+const openInEditorPath = path.join(__dirname, '..', 'sys', 'node', 'open-in-editor.js');
 
 
 export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
@@ -90,6 +90,7 @@ async function openInEditor(data: d.OpenInEditorData) {
       editor: data.editor
     };
 
+    const oie = require(openInEditorPath);
     const editor = oie.openInEditor.configure(opts, (err: any) => data.error = err + '');
 
     if (data.error) {
@@ -109,15 +110,18 @@ async function openInEditor(data: d.OpenInEditorData) {
 export async function getEditors() {
   const editors: d.DevServerEditor[] = [];
 
-  await Promise.all(Object.keys(oie.editors).map(async id => {
-    const isSupported = await isEditorSupported(id);
+  try {
+    const oie = require(openInEditorPath);
+    await Promise.all(Object.keys(oie.editors).map(async id => {
+      const isSupported = await isEditorSupported(oie, id);
 
-    editors.push({
-      id: id,
-      priority: EDITOR_PRIORITY[id],
-      supported: isSupported
-    });
-  }));
+      editors.push({
+        id: id,
+        priority: EDITOR_PRIORITY[id],
+        supported: isSupported
+      });
+    }));
+  } catch (e) {}
 
   return editors
     .filter(e => e.supported)
@@ -134,7 +138,7 @@ export async function getEditors() {
 }
 
 
-async function isEditorSupported(editor: string) {
+async function isEditorSupported(oie: any, editor: string) {
   let isSupported = false;
 
   try {
