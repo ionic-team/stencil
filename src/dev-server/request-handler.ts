@@ -1,7 +1,8 @@
 import * as d from '../declarations';
-import { isStaticDevClient } from './util';
+import { isDevClient } from './util';
 import { normalizePath } from '../compiler/util';
-import { serveFile, serveStaticDevClient } from './serve-file';
+import { serveDevClient } from './serve-dev-client';
+import { serveFile } from './serve-file';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveDirectoryIndex } from './serve-directory-index';
@@ -21,8 +22,8 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         return res.end();
       }
 
-      if (isStaticDevClient(req)) {
-        return serveStaticDevClient(devServerConfig, fs, req, res);
+      if (isDevClient(req.pathname)) {
+        return serveDevClient(devServerConfig, fs, req, res);
       }
 
       try {

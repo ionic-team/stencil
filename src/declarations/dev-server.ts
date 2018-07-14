@@ -6,6 +6,7 @@ export interface DevServerConfig {
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
+  editors?: DevServerEditor[];
   excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
@@ -28,6 +29,12 @@ export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
   WebSocket: new (socketUrl: string, protos: string[]) => WebSocket;
+}
+
+
+export interface DevClientConfig {
+  editors: d.DevServerEditor[];
+  hmr: boolean;
 }
 
 
@@ -68,4 +75,12 @@ export interface DevResponseHeaders {
   'Content-Type'?: string;
   'Content-Length'?: number;
   'X-Powered-By'?: string;
+}
+
+
+export interface DevServerEditor {
+  id: string;
+  name?: string;
+  supported?: boolean;
+  priority?: number;
 }

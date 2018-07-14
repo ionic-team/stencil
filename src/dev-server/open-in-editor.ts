@@ -8,17 +8,17 @@ import * as url  from 'url';
 const oie = require(path.join(__dirname, '..', 'sys', 'node', 'open-in-editor.js'));
 
 
-export async function serveOpenInEditor(fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   let status = 200;
 
   const data: OpenInEditorResponse = {};
 
   try {
-    data.editors = await getEditors();
-
-    if (data.editors.length > 0) {
-      await parseData(fs, req, data);
+    if (devServerConfig.editors.length > 0) {
+      await parseData(devServerConfig, fs, req, data);
       await openInEditor(data);
+    } else {
+      data.error = `no editors available`;
     }
 
   } catch (e) {
@@ -35,11 +35,12 @@ export async function serveOpenInEditor(fs: d.FileSystem, req: d.HttpRequest, re
 }
 
 
-async function parseData(fs: d.FileSystem, req: d.HttpRequest, data: OpenInEditorResponse) {
+async function parseData(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, data: OpenInEditorResponse) {
   const query = url.parse(req.url).query;
   const qs = querystring.parse(query) as any;
 
   if (typeof qs.file !== 'string') {
+    data.error = `missing file`;
     return;
   }
 
@@ -59,14 +60,14 @@ async function parseData(fs: d.FileSystem, req: d.HttpRequest, data: OpenInEdito
 
   if (typeof qs.editor === 'string') {
     qs.editor = qs.editor.trim().toLowerCase();
-    if (data.editors.some(e => e.id === qs.editor)) {
+    if (devServerConfig.editors.some(e => e.id === qs.editor)) {
       data.editor = qs.editor;
     } else {
       data.error = `invalid editor: ${qs.editor}`;
       return;
     }
   } else {
-    data.editor = data.editors[0].id;
+    data.editor = devServerConfig.editors[0].id;
   }
 
   try {
@@ -106,7 +107,7 @@ async function openInEditor(data: OpenInEditorResponse) {
 
 
 export async function getEditors() {
-  const editors: Editor[] = [];
+  const editors: d.DevServerEditor[] = [];
 
   await Promise.all(Object.keys(oie.editors).map(async id => {
     const isSupported = await isEditorSupported(id);
@@ -128,7 +129,7 @@ export async function getEditors() {
       return {
         id: e.id,
         name: EDITORS[e.id]
-      } as Editor;
+      } as d.DevServerEditor;
     });
 }
 
@@ -177,15 +178,6 @@ interface OpenInEditorResponse {
   column?: number;
   open?: string;
   editor?: string;
-  editors?: Editor[];
   exists?: boolean;
   error?: string;
-}
-
-
-interface Editor {
-  id: string;
-  name?: string;
-  supported?: boolean;
-  priority?: number;
 }

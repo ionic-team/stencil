@@ -42,10 +42,10 @@ if (success) {
           '/* Dev Server Client */'
         ].join('\n'),
 
-        intro: '(function(window, document) {\n' +
+        intro: '(function(win, doc, config) {\n' +
               '"use strict";',
 
-        outro: '})(window, document);',
+        outro: '})(window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
 
         footer: '</script>'
 

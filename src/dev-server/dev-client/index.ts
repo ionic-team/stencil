@@ -1,4 +1,8 @@
+import * as d from '../../declarations';
 import { initClient } from './init-client';
 
+declare const win: d.DevClientWindow;
+declare const doc: Document;
+declare const config: d.DevClientConfig;
 
-initClient(window.parent as any, window.parent.document);
+initClient(win, doc, config);

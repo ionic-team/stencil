@@ -7,7 +7,7 @@ import { hmrInlineStyles } from './hmr-inline-styles';
 import { logBuild, logReload } from './logger';
 
 
-export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d.BuildResults) {
+export function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   try {
     // remove any app errors that may already be showing
     clearDevServerModal(doc);
@@ -15,7 +15,7 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, buildResults: d
     if (buildResults.hasError) {
       // looks like we've got an error
       // let's show the error all pretty like
-      appError(doc, buildResults);
+      appError(doc, config, buildResults);
       return;
     }
 

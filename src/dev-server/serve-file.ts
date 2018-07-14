@@ -1,8 +1,7 @@
 import * as d from '../declarations';
 import * as util from './util';
-import { serve404 } from './serve-404';
+import { getDevServerClientScript } from './serve-dev-client';
 import { serve500 } from './serve-500';
-import { serveOpenInEditor } from './open-in-editor';
 import * as http  from 'http';
 import * as path from 'path';
 import * as querystring from 'querystring';
@@ -57,41 +56,6 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
   } catch (e) {
     serve500(res, e);
   }
-}
-
-
-export async function serveStaticDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
-  try {
-    if (util.isOpenInEditor(req.pathname)) {
-      return serveOpenInEditor(fs, req, res);
-
-    } else if (util.isDevServerClient(req.pathname)) {
-      req.filePath = path.join(devServerConfig.devServerDir, 'static', 'dev-server-client.html');
-
-    } else if (util.isInitialDevServerLoad(req.pathname)) {
-      req.filePath = path.join(devServerConfig.devServerDir, 'templates', 'initial-load.html');
-
-    } else {
-      const staticFile = req.pathname.replace(util.DEV_SERVER_URL + '/', '');
-      req.filePath = path.join(devServerConfig.devServerDir, 'static', staticFile);
-    }
-
-    try {
-      req.stats = await fs.stat(req.filePath);
-      return serveFile(devServerConfig, fs, req, res);
-    } catch (e) {
-      return serve404(devServerConfig, fs, req, res);
-    }
-
-  } catch (e) {
-    return serve500(res, e);
-  }
-}
-
-
-function getDevServerClientScript(devServerConfig: d.DevServerConfig) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig);
-  return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
 }
 
 

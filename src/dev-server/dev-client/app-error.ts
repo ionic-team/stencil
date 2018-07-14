@@ -4,7 +4,7 @@ import { logDiagnostic } from './logger';
 import { updateBuildStatus } from './build-status';
 
 
-export function appError(doc: Document, buildResults: d.BuildResults) {
+export function appError(doc: Document, _config: d.DevClientConfig, buildResults: d.BuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
     return;
   }

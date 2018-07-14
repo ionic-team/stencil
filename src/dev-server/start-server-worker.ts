@@ -1,12 +1,15 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
 import { createWebSocket } from './server-web-socket';
+import { getEditors } from './open-in-editor';
 import { UNREGISTER_SW_URL, getBrowserUrl, sendError, sendMsg } from './util';
 
 
 export async function startDevServerWorker(process: NodeJS.Process, devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
   try {
     const destroys: d.DevServerDestroy[] = [];
+
+    devServerConfig.editors = await getEditors();
 
     // create the http server listening for and responding to requests from the browser
     let httpServer = await createHttpServer(devServerConfig, fs, destroys);

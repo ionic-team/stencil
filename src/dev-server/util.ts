@@ -85,8 +85,8 @@ export function isSimpleText(filePath: string) {
 }
 
 
-export function isStaticDevClient(req: d.HttpRequest) {
-  return req.pathname.startsWith(DEV_SERVER_URL);
+export function isDevClient(pathname: string) {
+  return pathname.startsWith(DEV_SERVER_URL);
 }
 
 
