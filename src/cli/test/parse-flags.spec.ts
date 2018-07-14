@@ -271,6 +271,13 @@ describe('parseFlags', () => {
     expect(flags.prerender).toBe(true);
   });
 
+  it('should parse --root', () => {
+    process.argv[2] = '--root';
+    process.argv[3] = 'custom-www';
+    const flags = parseFlags(process);
+    expect(flags.root).toBe('custom-www');
+  });
+
   it('should parse --serve', () => {
     process.argv[2] = '--serve';
     const flags = parseFlags(process);

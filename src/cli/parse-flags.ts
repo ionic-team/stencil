@@ -146,7 +146,8 @@ const ARG_OPTS = {
     'address',
     'config',
     'docs-json',
-    'log-level'
+    'log-level',
+    'root'
   ],
   alias: {
     'config': 'c',
