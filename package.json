@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -99,7 +99,7 @@
     "ws": "5.2.1"
   },
   "engines": {
-    "node" : ">=6.11.0"
+    "node": ">=6.11.0"
   },
   "repository": {
     "type": "git",

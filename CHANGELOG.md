@@ -1,3 +1,13 @@
+<a name="0.10.7"></a>
+## 🚐 [0.10.7](https://github.com/ionic-team/stencil/compare/v0.10.6...v0.10.7) (2018-07-16)
+
+
+### Bug Fixes
+
+* **style:** fix resolving css imports ([268840e](https://github.com/ionic-team/stencil/commit/268840e))
+
+
+
 <a name="0.10.6"></a>
 ## 🎭 [0.10.6](https://github.com/ionic-team/stencil/compare/v0.10.5...v0.10.6) (2018-07-14)
 
