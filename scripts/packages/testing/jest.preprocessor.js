@@ -51,7 +51,7 @@ module.exports = {
       // .tsx file
       var opts = {
         module: 'commonjs',
-        target: 'es5'
+        target: 'es2015'
       };
 
       opts.jsx = ts.JsxEmit.React;
