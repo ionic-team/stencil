@@ -194,28 +194,57 @@ describe('css-imports', () => {
       ]);
     });
 
-    it('url()', () => {
-      const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
+    it('absolute url()', () => {
+      const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.scss'));
       const content = `
-        @import url("http://stenciljs.com/build/app/app.css");
-        @import url("HTTPS://stenciljs.com/build/app/app.css");
-        @import url('//stenciljs.com/build/app/app.css');
-        @import url('/build/app/app.css');
-        @import url('app.css');
+        @import url('${normalizePath(path.join(root, 'build', 'app', 'app.css'))}');
       `;
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'build', 'app', 'app.css')),
-          srcImport: `@import url('/build/app/app.css');`,
-          url: `/build/app/app.css`
-        },
-        {
-          filePath: normalizePath(path.join(root, 'src', 'cmp', 'app.css')),
-          srcImport: `@import url('app.css');`,
-          url: `app.css`
+          srcImport: `@import url('${normalizePath(path.join(root, 'build', 'app', 'app.css'))}');`,
+          url: `${normalizePath(path.join(root, 'build', 'app', 'app.css'))}`
         }
       ]);
+    });
+
+    it('relative url()s', () => {
+      const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
+      const content = `
+        @import url('file-a.css');
+        @import url('./file-b.css');
+        @import url('../file-c.css');
+      `;
+      const results = getCssImports(config, buildCtx, filePath, content);
+      expect(results).toEqual([
+        {
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-a.css')),
+          srcImport: `@import url('file-a.css');`,
+          url: `file-a.css`
+        },
+        {
+          filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
+          srcImport: `@import url('./file-b.css');`,
+          url: `./file-b.css`
+        },
+        {
+          filePath: normalizePath(path.join(root, 'src', 'file-c.css')),
+          srcImport: `@import url('../file-c.css');`,
+          url: `../file-c.css`
+        }
+      ]);
+    });
+
+    it('ignore external url()s', () => {
+      const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
+      const content = `
+        @import url("http://stenciljs.com/build/app/app.css");
+        @import url("HTTPS://stenciljs.com/build/app/app.css");
+        @import url('//stenciljs.com/build/app/app.css');
+      `;
+      const results = getCssImports(config, buildCtx, filePath, content);
+      expect(results).toEqual([]);
     });
 
     it('double quote, relative path @import', () => {
