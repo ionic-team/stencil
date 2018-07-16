@@ -18,7 +18,7 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
     return results;
   }
 
-  await writeEntryModules(config, entryModules);
+  await writeEntryModules(config, compilerCtx, entryModules);
 
   try {
     // run rollup, but don't generate yet

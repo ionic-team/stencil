@@ -1,27 +1,27 @@
 import * as d from '../../declarations';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import { getHyperScriptFnEsmFileName } from '../app/app-file-naming';
-import { OutputChunk, RollupBuild } from 'rollup';
+import { RollupBuild } from 'rollup';
 import { dashToPascalCase } from '../../util/helpers';
 import { EntryModule } from '../../declarations';
 import { generatePreamble, normalizePath } from '../util';
 
 
-export async function writeEntryModules(config: d.Config, entryModules: EntryModule[]) {
+export async function writeEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: EntryModule[]) {
   const path = config.sys.path;
 
-  Promise.all(
-    entryModules.map(entryModule => {
+  await Promise.all(
+    entryModules.map(async (entryModule) => {
       const fileContents = entryModule.moduleFiles
         .map(moduleFile => {
           const originalClassName = moduleFile.cmpMeta.componentClass;
           const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
 
-          const filePath = normalizePath(path.relative(path.dirname(entryModule.entryKey), moduleFile.jsFilePath));
+          const filePath = normalizePath(path.relative(path.dirname(entryModule.filePath), moduleFile.jsFilePath));
           return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;
         })
         .join('\n');
-      return config.sys.fs.writeFile(entryModule.entryKey, fileContents);
+      await compilerCtx.fs.writeFile(entryModule.filePath, fileContents, { inMemoryOnly: true});
     })
   );
 }
@@ -65,16 +65,16 @@ export async function writeLegacyModules(config: d.Config, rollupBundle: RollupB
 }
 
 
-export async function writeEsmEs5Modules(config: d.Config, rollupBundle: BundleSet) {
+export async function writeEsmEs5Modules(config: d.Config, rollupBundle: RollupBuild) {
   if (config.outputTargets.some(o => o.type === 'dist')) {
-    const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
+    const { output } = await rollupBundle.generate({
       format: 'es',
       banner: generatePreamble(config),
       intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
       strict: false,
     });
 
-    return <any>results as d.JSModuleList;
+    return <any>output as d.JSModuleList;
   }
 
   return null;

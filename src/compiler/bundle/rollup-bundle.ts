@@ -36,7 +36,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
   const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
 
   const rollupConfig: RollupDirOptions = {
-    input: entryModules.map(b => b.entryKey),
+    input: entryModules.map(b => b.filePath),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
     plugins: [
@@ -46,7 +46,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       bundleJson(config),
       globals(),
       builtins(),
-      inMemoryFsRead(config, compilerCtx, buildCtx),
+      inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),

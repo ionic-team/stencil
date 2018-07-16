@@ -34,7 +34,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     const cleanedEntryModules = regroupEntryModules(allModules, buildCtx.entryPoints);
 
     buildCtx.entryModules = cleanedEntryModules
-      .map(createEntryModule)
+      .map(createEntryModule(config))
       .filter((entryModule, index, array) => {
         const firstIndex = array.findIndex(e => e.entryKey === entryModule.entryKey);
         return firstIndex === index;
@@ -167,13 +167,14 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
 }
 
 
-export function createEntryModule(moduleFiles: d.ModuleFile[]) {
-  const entryModule: d.EntryModule = {
-    moduleFiles: moduleFiles
-  };
+export function createEntryModule(config: d.Config) {
+  return (moduleFiles: d.ModuleFile[]) => {
+    const entryModule: d.EntryModule = {
+      moduleFiles: moduleFiles
+    };
 
-  // generate a unique entry key based on the components within this entry module
-  entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
+    // generate a unique entry key based on the components within this entry module
+    entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
         return 1;
@@ -186,18 +187,22 @@ export function createEntryModule(moduleFiles: d.ModuleFile[]) {
       if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
       return 0;
     })
-    .map(m => m.cmpMeta.tagNameMeta).join('.') + '.js';
+    .map(m => m.cmpMeta.tagNameMeta).join('.');
 
-  // get the modes used in this bundle
-  entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
+    // generate a unique entry key based on the components within this entry module
+    entryModule.filePath = config.sys.path.join(config.srcDir, entryModule.entryKey + '.js');
 
-  // get the encapsulations used in this bundle
-  const encapsulations = getEntryEncapsulations(entryModule);
+    // get the modes used in this bundle
+    entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
 
-  // figure out if we'll need a scoped css build
-  entryModule.requiresScopedStyles = entryRequiresScopedStyles(encapsulations);
+    // get the encapsulations used in this bundle
+    const encapsulations = getEntryEncapsulations(entryModule);
 
-  return entryModule;
+    // figure out if we'll need a scoped css build
+    entryModule.requiresScopedStyles = entryRequiresScopedStyles(encapsulations);
+
+    return entryModule;
+  };
 }
 
 

@@ -192,7 +192,19 @@ export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAd
 
 
 export interface JSModuleList {
-  [key: string]: { code: string };
+  [key: string]: {
+    code: string,
+    imports?: string[],
+    exports?: string[],
+    modules?: {
+      [modulePath: string]: {
+        renderedExports: string[],
+        removedExports: string[],
+        renderedLength: number,
+        originalLength: number
+      }
+    }
+  };
 }
 
 export interface JSModuleMap {
