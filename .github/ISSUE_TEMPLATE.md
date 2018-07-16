@@ -13,7 +13,7 @@ Before submitting an issue, please consult our docs -> https://stenciljs.com/
 <!-- (check one with "x") -->
 [ ] bug report
 [ ] feature request
-[ ] support request => Please do not submit support requests here, use one of these channels: https://forum.ionicframework.com/ or https://stencil-worldwide.slack.com
+[ ] support request => Please do not submit support requests here, use one of these channels: https://stencil-worldwide.herokuapp.com/ or https://forum.ionicframework.com/
 
 **Current behavior:**
 <!-- Describe how the bug manifests. -->

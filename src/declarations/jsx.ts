@@ -313,7 +313,7 @@ declare global {
       autocomplete?: string;
       autoFocus?: boolean;
       autofocus?: boolean | string;
-      capture?: boolean; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
+      capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
       checked?: boolean;
       crossOrigin?: string;
       crossorigin?: string;

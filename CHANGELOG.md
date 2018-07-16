@@ -1,3 +1,45 @@
+<a name="0.10.7"></a>
+## 🚐 [0.10.7](https://github.com/ionic-team/stencil/compare/v0.10.6...v0.10.7) (2018-07-16)
+
+
+### Bug Fixes
+
+* **style:** fix resolving css imports ([268840e](https://github.com/ionic-team/stencil/commit/268840e))
+
+
+
+<a name="0.10.6"></a>
+## 🎭 [0.10.6](https://github.com/ionic-team/stencil/compare/v0.10.5...v0.10.6) (2018-07-14)
+
+
+### Features
+
+* **dev-server:** open build error in editor and go to line/column ([e37daca](https://github.com/ionic-team/stencil/commit/e37daca))
+* **dev-server:** open file in editor ([78f73fc](https://github.com/ionic-team/stencil/commit/78f73fc))
+
+
+### Bug Fixes
+
+* **dev-server:** fix dev-server --root cmd arg ([43a554b](https://github.com/ionic-team/stencil/commit/43a554b)), closes [#928](https://github.com/ionic-team/stencil/issues/928)
+* **types:** fix input capture attr type ([594683f](https://github.com/ionic-team/stencil/commit/594683f)), closes [#925](https://github.com/ionic-team/stencil/issues/925)
+
+
+
+<a name="0.10.5"></a>
+## 🚡 [0.10.5](https://github.com/ionic-team/stencil/compare/v0.10.4...v0.10.5) (2018-07-13)
+
+
+### Bug Fixes
+
+* **hmr:** call componentDidLoad on hmr reload ([74f9ad0](https://github.com/ionic-team/stencil/commit/74f9ad0))
+
+
+### Performance Improvements
+
+* **build:** improve style rebuild times ([fbfc237](https://github.com/ionic-team/stencil/commit/fbfc237))
+
+
+
 <a name="0.10.4"></a>
 ## 🌷 [0.10.4](https://github.com/ionic-team/stencil/compare/v0.10.3...v0.10.4) (2018-07-12)
 

@@ -5,7 +5,7 @@ export function logFsWatchMessage(config: d.Config, buildCtx: d.BuildCtx) {
   const msg = getMessage(config, buildCtx);
 
   if (msg.length > 0) {
-    config.logger.info(config.logger.cyan(msg.join('\n')));
+    config.logger.info(config.logger.cyan(msg.join(', ')));
   }
 }
 

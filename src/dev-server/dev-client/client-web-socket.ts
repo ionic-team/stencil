@@ -4,7 +4,7 @@ import { logDisabled, logReload, logWarn } from './logger';
 import { updateBuildStatus } from './build-status';
 
 
-export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
+export function initClientWebSocket(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
   const wsUrl = getSocketUrl(win.location);
   let clientWs: WebSocket;
   let reconnectTmrId: any;
@@ -94,7 +94,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document) {
       hasGottenBuildResults = true;
       clearInterval(requestBuildResultsTmrId);
       updateBuildStatus(doc, 'default');
-      appUpdate(win, doc, msg.buildResults);
+      appUpdate(win, doc, config, msg.buildResults);
       return;
     }
   }

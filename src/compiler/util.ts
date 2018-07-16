@@ -108,7 +108,7 @@ export function buildError(diagnostics: d.Diagnostic[]) {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
-    header: 'build error',
+    header: 'Build Error',
     messageText: 'build error',
     relFilePath: null,
     absFilePath: null,
@@ -142,7 +142,7 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
-    header: 'build error',
+    header: 'Build Error',
     messageText: 'build error',
     relFilePath: null,
     absFilePath: null,

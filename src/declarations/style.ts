@@ -28,7 +28,8 @@ export interface ModeStyles {
 
 
 export interface CssImportData {
-  importDeclaration: string;
+  srcImport: string;
+  updatedImport?: string;
   url: string;
   filePath?: string;
   styleText?: string;

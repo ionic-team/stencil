@@ -1,4 +1,4 @@
-import { Component, Element } from '../../../../dist/index';
+import { Component, Element } from '../../../../dist';
 
 @Component({
   tag: 'attribute-basic-root'

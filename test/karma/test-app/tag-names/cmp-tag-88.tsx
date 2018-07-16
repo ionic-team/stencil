@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist/index';
+import { Component } from '../../../../dist';
 
 @Component({
   tag: 'tag-88'

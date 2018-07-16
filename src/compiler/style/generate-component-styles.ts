@@ -6,7 +6,6 @@ import { getComponentStylesCache, setComponentStylesCache } from './cached-style
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
-import { concatCssImports } from './css-imports';
 
 
 export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
@@ -185,11 +184,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   const externalStyle = externalStyles && externalStyles.length && externalStyles[0];
   if (externalStyle && externalStyle.absolutePath) {
     filePath = externalStyle.absolutePath;
-
-    if (filePath.toLowerCase().endsWith('.css')) {
-      // concat all the imports and imports of imports into this one string
-      styleMeta.compiledStyleText = await concatCssImports(config, compilerCtx, buildCtx, filePath, styleMeta.compiledStyleText);
-    }
   }
 
   // auto add css prefixes

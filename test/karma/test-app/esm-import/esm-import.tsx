@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State } from '../../../../dist/index';
+import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State } from '../../../../dist';
 
 
 @Component({

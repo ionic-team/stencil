@@ -1,3 +1,4 @@
+const sass = require('@stencil/sass');
 
 exports.config = {
   namespace: 'TestApp',
@@ -17,5 +18,8 @@ exports.config = {
     { src: '**/*.html' },
     { src: 'noscript.js' }
   ],
-  excludeSrc: []
+  excludeSrc: [],
+  plugins: [
+    sass()
+  ]
 };

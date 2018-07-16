@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError } from '../util';
+import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
@@ -18,7 +18,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
   calcComponentDependencies(moduleFiles);
 
   try {
-    const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => compilerCtx.moduleFiles[filePath]);
+    const allModules = validateComponentEntries(config, compilerCtx, buildCtx);
 
     const userConfigEntryModulesTags = getUserConfigEntryTags(buildCtx, config.bundles, allModules);
 
@@ -259,4 +259,33 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
   });
 
   return entryTags;
+}
+
+
+export function validateComponentEntries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const definedTags: {[tag: string]: string[]} = {};
+
+  const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => {
+    const moduleFile = compilerCtx.moduleFiles[filePath];
+
+    if (moduleFile.cmpMeta) {
+      const tag = moduleFile.cmpMeta.tagNameMeta;
+      definedTags[tag] = definedTags[tag] || [];
+      definedTags[tag].push(moduleFile.sourceFilePath);
+    }
+
+    return moduleFile;
+  });
+
+  Object.keys(definedTags).forEach(tag => {
+    const filePaths = definedTags[tag];
+    if (filePaths.length > 1) {
+      const error = buildError(buildCtx.diagnostics);
+      error.messageText = `Component tag "${tag}" has been defined in multiple files: ${filePaths.map(f => {
+        return config.sys.path.relative(config.rootDir, f);
+      }).join(', ')}`;
+    }
+  });
+
+  return allModules;
 }

@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../../../dist/index';
+import { Component, Prop } from '../../../../dist';
 
 @Component({
   tag: 'slot-html'

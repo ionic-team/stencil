@@ -100,28 +100,47 @@ function logHmr(config: d.Config, buildCtx: d.BuildCtx) {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
-  if (hmr.componentsUpdated && hmr.componentsUpdated.length > 0) {
-    const components = hmr.componentsUpdated.join(', ');
-    config.logger.info(`updated components: ${config.logger.cyan(components)}`);
+  if (hmr.componentsUpdated) {
+    cleanupUpdateMsg(config, `updated component`, hmr.componentsUpdated);
   }
 
-  if (hmr.inlineStylesUpdated && hmr.inlineStylesUpdated.length > 0) {
+  if (hmr.inlineStylesUpdated) {
     const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
       if (!arr.includes(v)) {
         arr.push(v);
       }
       return arr;
-    }, []).join(', ');
-    config.logger.info(`updated styles: ${config.logger.cyan(inlineStyles)}`);
+    }, [] as string[]);
+    cleanupUpdateMsg(config, `updated style`, inlineStyles);
   }
 
-  if (hmr.externalStylesUpdated && hmr.externalStylesUpdated.length > 0) {
-    const extStyles = hmr.externalStylesUpdated.join(', ');
-    config.logger.info(`updated stylesheets: ${config.logger.cyan(extStyles)}`);
+  if (hmr.externalStylesUpdated) {
+    cleanupUpdateMsg(config, `updated stylesheet`, hmr.externalStylesUpdated);
   }
 
-  if (hmr.imagesUpdated && hmr.imagesUpdated.length > 0) {
-    const images = hmr.imagesUpdated.join(', ');
-    config.logger.info(`updated images: ${config.logger.cyan(images)}`);
+  if (hmr.imagesUpdated) {
+    cleanupUpdateMsg(config, `updated image`, hmr.imagesUpdated);
+  }
+}
+
+
+function cleanupUpdateMsg(config: d.Config, msg: string, fileNames: string[]) {
+  if (fileNames.length > 0) {
+    let fileMsg = '';
+
+    if (fileNames.length > 7) {
+      const remaining = fileNames.length - 6;
+      fileNames = fileNames.slice(0, 6);
+      fileMsg = fileNames.join(', ') + `, +${remaining} others`;
+
+    } else {
+      fileMsg = fileNames.join(', ');
+    }
+
+    if (fileNames.length > 1) {
+      msg += 's';
+    }
+
+    config.logger.info(`${msg}: ${config.logger.cyan(fileMsg)}`);
   }
 }

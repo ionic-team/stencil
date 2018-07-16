@@ -289,7 +289,7 @@ export class NodeLogger implements d.Logger {
 
     let header = '';
 
-    if (d.header) {
+    if (d.header && d.header !== 'Build Error') {
       header += d.header;
     }
 

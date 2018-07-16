@@ -4,7 +4,7 @@ import { initClientWebSocket } from './client-web-socket';
 import { isInitialDevServerLoad } from '../util';
 
 
-export function initClient(win: d.DevClientWindow, doc: Document) {
+export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
   try {
     if (win['s-dev-server']) {
       // somehow we've already initialized the dev server client-side script
@@ -23,11 +23,11 @@ export function initClient(win: d.DevClientWindow, doc: Document) {
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
       appReset(win).then(() => {
-        initClientWebSocket(win, doc);
+        initClientWebSocket(win, doc, config);
       });
 
     } else {
-      initClientWebSocket(win, doc);
+      initClientWebSocket(win, doc, config);
     }
 
   } catch (e) {

@@ -23,6 +23,7 @@ const whitelist = [
 
 if (success) {
   bundle('node-fetch.js');
+  bundle('open-in-editor.js');
   bundle('sys-util.js');
   bundle('sys-worker.js');
   bundle('websocket.js');
@@ -148,9 +149,14 @@ if (success) {
   if (xdgOpenSrcPath.length !== 1) {
     throw new Error(`build-sys-node cannot find xdg-open`);
   }
-
   const xdgOpenDestPath = path.join(__dirname, '..', 'dist', 'sys', 'node', 'xdg-open');
   fs.copySync(xdgOpenSrcPath[0], xdgOpenDestPath);
+
+
+  // open-in-editor's visualstudio.vbs file
+  const visualstudioVbsSrc = path.join(__dirname, '..', 'node_modules', 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
+  const visualstudioVbsDesc = path.join(__dirname, '..', 'dist', 'sys', 'node', 'visualstudio.vbs');
+  fs.copySync(visualstudioVbsSrc, visualstudioVbsDesc);
 
 
   process.on('exit', (code) => {

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { hmrFinished, hmrStart } from '../hmr-component';
+import { hmrFinish, hmrStart } from '../hmr-component';
 import { mockElement, mockPlatform } from '../../testing/mocks';
 import { noop } from '../../util/helpers';
 
@@ -18,7 +18,7 @@ describe('hmr-component', () => {
   });
 
 
-  describe('hmrFinished', () => {
+  describe('hmrFinish', () => {
 
     it('should add listeners from constructor', () => {
       const listeners: d.ComponentConstructorListener[] = [
@@ -35,7 +35,7 @@ describe('hmr-component', () => {
         listeners
       } as any;
 
-      hmrFinished(plt, cmpMeta, elm);
+      hmrFinish(plt, cmpMeta, elm);
       expect(plt.hasListenersMap.has(elm)).toBe(true);
       expect(cmpMeta.listenersMeta).toHaveLength(1);
       expect(cmpMeta.listenersMeta[0].eventMethodName).toBe('method');
@@ -70,6 +70,12 @@ describe('hmr-component', () => {
       hmrStart(plt, cmpMeta, elm, '1234');
       expect(plt.instanceMap.has(elm)).toBe(false);
       expect(plt.hostElementMap.has(instance)).toBe(false);
+    });
+
+    it('should remove hasLoaded', () => {
+      plt.hasLoadedMap.set(elm, true);
+      hmrStart(plt, cmpMeta, elm, '1234');
+      expect(plt.hasLoadedMap.has(elm)).toBe(false);
     });
 
     it('should remove old constructor', () => {
