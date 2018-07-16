@@ -1,4 +1,4 @@
-import { Component, Method, State } from '../../../../dist/index';
+import { Component, Method, State } from '../../../../dist';
 
 @Component({
   tag: 'dynamic-import'

@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, State } from '../../../../dist/index';
+import { Component, Event, EventEmitter, Prop, State } from '../../../../dist';
 
 @Component({
   tag: 'lifecycle-basic-c'

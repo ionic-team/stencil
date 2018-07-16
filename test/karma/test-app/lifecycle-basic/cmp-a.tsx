@@ -1,4 +1,4 @@
-import { Component, Listen, State } from '../../../../dist/index';
+import { Component, Listen, State } from '../../../../dist';
 
 @Component({
   tag: 'lifecycle-basic-a'

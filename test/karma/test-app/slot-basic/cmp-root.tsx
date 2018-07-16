@@ -1,4 +1,4 @@
-import { Component, State } from '../../../../dist/index';
+import { Component, State } from '../../../../dist';
 
 
 const textA = 'A';
