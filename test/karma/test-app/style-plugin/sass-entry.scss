@@ -1,0 +1,7 @@
+@import 'sass-importee';
+@import 'css-importee.css';
+
+.sass-entry {
+  color: $sass-entry-color;
+  font-weight: bold;
+}

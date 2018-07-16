@@ -1683,6 +1683,72 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface CssCmp {
+
+    }
+  }
+
+  interface HTMLCssCmpElement extends StencilComponents.CssCmp, HTMLStencilElement {}
+
+  var HTMLCssCmpElement: {
+    prototype: HTMLCssCmpElement;
+    new (): HTMLCssCmpElement;
+  };
+  interface HTMLElementTagNameMap {
+    'css-cmp': HTMLCssCmpElement;
+  }
+  interface ElementTagNameMap {
+    'css-cmp': HTMLCssCmpElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'css-cmp': JSXElements.CssCmpAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CssCmpAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface SassCmp {
+
+    }
+  }
+
+  interface HTMLSassCmpElement extends StencilComponents.SassCmp, HTMLStencilElement {}
+
+  var HTMLSassCmpElement: {
+    prototype: HTMLSassCmpElement;
+    new (): HTMLSassCmpElement;
+  };
+  interface HTMLElementTagNameMap {
+    'sass-cmp': HTMLSassCmpElement;
+  }
+  interface ElementTagNameMap {
+    'sass-cmp': HTMLSassCmpElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'sass-cmp': JSXElements.SassCmpAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SassCmpAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SvgAttr {
 
     }
