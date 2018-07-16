@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateComponentStylesMode } from './generate-component-styles';
+import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
 
 

@@ -4,7 +4,7 @@ import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename 
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
-import { PLUGIN_HELPERS } from '../style/generate-component-styles';
+import { PLUGIN_HELPERS } from '../style/component-styles';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 

@@ -19,6 +19,7 @@ exports.config = {
     { src: 'noscript.js' }
   ],
   excludeSrc: [],
+  globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
   plugins: [
     sass()
   ]
