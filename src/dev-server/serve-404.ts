@@ -18,15 +18,25 @@ export async function serve404(devServerConfig: d.DevServerConfig, fs: d.FileSys
       } catch (e) {}
     }
 
-    const headers = responseHeaders({
-      'Content-Type': 'text/plain'
-    });
-
     const content = [
       '404 File Not Found',
       'Url: ' + req.pathname,
       'File: ' + req.filePath
     ].join('\n');
+
+    serve404Content(res, content);
+
+  } catch (e) {
+    serve500(res, e);
+  }
+}
+
+
+export function serve404Content(res: http.ServerResponse, content: string) {
+  try {
+    const headers = responseHeaders({
+      'Content-Type': 'text/plain'
+    });
 
     res.writeHead(404, headers);
     res.write(content);

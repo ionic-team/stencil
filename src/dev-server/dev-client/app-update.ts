@@ -25,7 +25,7 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevCl
       // let's make sure the url is at the root
       // and we've unregistered any existing service workers
       // then let's refresh the page from the root of the server
-      appReset(win).then(() => {
+      appReset(win, config).then(() => {
         logReload(`Initial load`);
         win.location.reload(true);
       });
@@ -99,10 +99,10 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
 }
 
 
-export function appReset(win: d.DevClientWindow) {
+export function appReset(win: d.DevClientWindow, config: d.DevClientConfig) {
   // we're probably at some ugly url
   // let's update the url to be the expect root url: /
-  win.history.replaceState({}, 'App', '/');
+  win.history.replaceState({}, 'App', config.baseUrl);
 
   if (!win.navigator.serviceWorker) {
     return Promise.resolve();

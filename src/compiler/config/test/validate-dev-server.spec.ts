@@ -1,4 +1,4 @@
-import { Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { normalizePath } from '../../util';
 import { validateConfig } from '../validate-config';
@@ -7,7 +7,7 @@ import * as path from 'path';
 
 describe('validateDevServer', () => {
 
-  let config: Config;
+  let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
   const root = path.resolve('/');
@@ -42,6 +42,22 @@ describe('validateDevServer', () => {
     config.flags.address = '123.123.123.123';
     validateConfig(config);
     expect(config.devServer.address).toBe('123.123.123.123');
+  });
+
+  it('should get custom baseUrl', () => {
+    config.outputTargets = [
+      {
+        type: 'www',
+        baseUrl: '/my-base-url'
+      } as d.OutputTargetWww
+    ];
+    validateConfig(config);
+    expect(config.devServer.baseUrl).toBe('/my-base-url/');
+  });
+
+  it('should default baseUrl', () => {
+    validateConfig(config);
+    expect(config.devServer.baseUrl).toBe('/');
   });
 
   it('should default root', () => {

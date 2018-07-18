@@ -45,7 +45,12 @@ const DEFAULT_HEADERS: d.DevResponseHeaders = {
 export function getBrowserUrl(devServerConfig: d.DevServerConfig, pathname = '/') {
   const address = (devServerConfig.address === `0.0.0.0`) ? `localhost` : devServerConfig.address;
   const port = (devServerConfig.port === 80 || devServerConfig.port === 443) ? '' : (':' + devServerConfig.port);
-  return `${devServerConfig.protocol}://${address}${port}${pathname}`;
+  let path = devServerConfig.baseUrl;
+  if (pathname.startsWith('/')) {
+    pathname = pathname.substring(1);
+  }
+  path += pathname;
+  return `${devServerConfig.protocol}://${address}${port}${path}`;
 }
 
 
@@ -96,7 +101,7 @@ export function isOpenInEditor(pathname: string) {
 
 
 export function isInitialDevServerLoad(pathname: string) {
-  return pathname === UNREGISTER_SW_URL;
+  return pathname === DEV_SERVER_INIT_URL;
 }
 
 
@@ -107,7 +112,7 @@ export function isDevServerClient(pathname: string) {
 
 export const DEV_SERVER_URL = '/~dev-server';
 
-export const UNREGISTER_SW_URL = `${DEV_SERVER_URL}-init`;
+export const DEV_SERVER_INIT_URL = `${DEV_SERVER_URL}-init`;
 
 export const OPEN_IN_EDITOR_URL = `${DEV_SERVER_URL}-open-in-editor`;
 

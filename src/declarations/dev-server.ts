@@ -3,6 +3,7 @@ import * as d from '.';
 
 export interface DevServerConfig {
   address?: string;
+  baseUrl?: string;
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
@@ -33,6 +34,7 @@ export interface DevClientWindow extends Window {
 
 
 export interface DevClientConfig {
+  baseUrl: string;
   editors: d.DevServerEditor[];
   hmr: boolean;
 }

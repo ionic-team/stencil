@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { appReset } from './app-update';
+import { DEV_SERVER_INIT_URL } from '../util';
 import { initClientWebSocket } from './client-web-socket';
-import { isInitialDevServerLoad } from '../util';
 
 
 export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
@@ -13,7 +13,7 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
     }
     win['s-dev-server'] = true;
 
-    if (isInitialDevServerLoad(win.location.pathname)) {
+    if (isInitialDevServerLoad(win, config)) {
       win['s-initial-load'] = true;
       // this page is the initial dev server load page
       // we currently have an ugly url like /~dev-server-init
@@ -22,7 +22,7 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       // what's expected like /
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
-      appReset(win).then(() => {
+      appReset(win, config).then(() => {
         initClientWebSocket(win, doc, config);
       });
 
@@ -33,4 +33,11 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
   } catch (e) {
     console.error(e);
   }
+}
+
+
+function isInitialDevServerLoad(win: d.DevClientWindow, config: d.DevClientConfig) {
+  let pathname = win.location.pathname;
+  pathname = '/' + pathname.substring(config.baseUrl.length);
+  return pathname === DEV_SERVER_INIT_URL;
 }
