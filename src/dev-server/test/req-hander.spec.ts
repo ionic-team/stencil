@@ -18,6 +18,8 @@ describe('request-handler', async () => {
   const root = path.resolve('/');
   const tmplDirPath = normalizePath(path.join(__dirname, '..', 'templates', 'directory-index.html'));
   const tmplDir = nodeFs.readFileSync(tmplDirPath, 'utf8');
+  const tmplDevClientIframePath = normalizePath(path.join(__dirname, '..', 'templates', 'dev-client-iframe.html'));
+  const tmplDevClientIframe = nodeFs.readFileSync(tmplDevClientIframePath, 'utf8');
   const contentTypes = {
     'html': 'text/html',
     'css': 'text/css',
@@ -39,6 +41,7 @@ describe('request-handler', async () => {
 
     await fs.mkdir(stencilConfig.devServer.root);
     await fs.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'directory-index.html'), tmplDir);
+    await fs.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'dev-client-iframe.html'), tmplDevClientIframe);
 
     config = validateDevServer(stencilConfig);
     req = {} as any;

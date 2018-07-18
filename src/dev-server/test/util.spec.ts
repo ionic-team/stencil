@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getBrowserUrl, getDevServerClientUrl } from '../util';
+import { getBrowserUrl } from '../util';
 
 
 describe('dev-server, util', () => {
@@ -42,16 +42,6 @@ describe('dev-server, util', () => {
     };
     const url = getBrowserUrl(devServerConfig);
     expect(url).toBe('http://staging.stenciljs.com:3333/');
-  });
-
-  it('should get path for dev server', () => {
-    const devServerConfig: d.DevServerConfig = {
-      protocol: 'http',
-      address: '0.0.0.0',
-      port: 3333
-    };
-    const url = getDevServerClientUrl(devServerConfig);
-    expect(url).toBe('http://localhost:3333/~dev-server');
   });
 
 });
