@@ -8,6 +8,7 @@
  */
 
 import * as d from '../../declarations';
+import { FunctionalUtilities } from '../../declarations';
 
 const stack: any[] = [];
 
@@ -108,10 +109,33 @@ export function h(nodeName: any, vnodeData: any) {
   } as d.VNode;
 }
 
-const utils = {
-  'getTag': (vnode: d.VNode) => vnode.vtag,
-  'getChildren': (vnode: d.VNode) => vnode.vchildren,
-  'getText': (vnode: d.VNode) => vnode.vtext,
-  'getAttributes': (vnode: d.VNode) => vnode.vattrs,
-  'replaceAttributes': (vnode: d.VNode, attributes: any) => vnode.vattrs = attributes
+function childToVNode(child: d.ChildNode) {
+  return {
+    vtag: child['vtag'],
+    vchildren: child['vchildren'],
+    vtext: child['vtext'],
+    vattrs: child['vattrs'],
+    vkey: child['vkey'],
+    vname: child['vname']
+  };
+}
+
+function VNodeToChild(vnode: d.VNode) {
+  return {
+    'vtag': vnode.vtag,
+    'vchildren': vnode.vchildren,
+    'vtext': vnode.vtext,
+    'vattrs': vnode.vattrs,
+    'vkey': vnode.vkey,
+    'vname': vnode.vname
+  };
+}
+
+const utils: FunctionalUtilities = {
+  'forEach': (children: d.VNode[], cb: (vnode: d.VNode) => void) => {
+    children.forEach((item) => cb(VNodeToChild(item)));
+  },
+  'map': (children: d.VNode[], cb: (vnode: d.VNode) => d.ChildNode): d.VNode[] => {
+    return children.map((item) => childToVNode(cb(item)));
+  }
 };
