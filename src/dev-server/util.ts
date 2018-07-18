@@ -49,11 +49,6 @@ export function getBrowserUrl(devServerConfig: d.DevServerConfig, pathname = '/'
 }
 
 
-export function getDevServerClientUrl(devServerConfig: d.DevServerConfig) {
-  return getBrowserUrl(devServerConfig, DEV_SERVER_URL);
-}
-
-
 export function getContentType(devServerConfig: d.DevServerConfig, filePath: string) {
   const last = filePath.replace(/^.*[/\\]/, '').toLowerCase();
   const ext = last.replace(/^.*\./, '').toLowerCase();

@@ -7,6 +7,8 @@ import { serveOpenInEditor } from './open-in-editor';
 import * as http  from 'http';
 import * as path from 'path';
 
+let cachedDevServerClientScript: string;
+
 
 export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
@@ -59,7 +61,14 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
 }
 
 
-export function getDevServerClientScript(devServerConfig: d.DevServerConfig) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig);
-  return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
+export async function getDevServerClientScript(devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
+  if (!cachedDevServerClientScript) {
+    const dirTemplatePath = path.join(devServerConfig.devServerDir, 'templates', 'dev-client-iframe.html');
+    const dirTemplate = await fs.readFile(dirTemplatePath);
+
+    cachedDevServerClientScript = dirTemplate
+      .replace('{{DEV_SERVER_URL}}', util.DEV_SERVER_URL);
+  }
+
+  return cachedDevServerClientScript;
 }
