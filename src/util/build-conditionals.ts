@@ -2,6 +2,11 @@ import { BuildConditionals } from '../declarations';
 
 
 export const Build: BuildConditionals = {
+  // Required so that Rollup does not remove during preprocessing.
+  polyfills: false,
+  browserModuleLoader: true,
+  externalModuleLoader: false,
+
   cssVarShim: true,
   shadowDom: true,
   slotPolyfill: true,
