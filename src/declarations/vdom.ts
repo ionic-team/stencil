@@ -43,23 +43,32 @@ export interface VNodeData {
   [attrName: string]: any;
 }
 
+export interface ChildNode {
+  vtag?: string | number | Function;
+  vkey?: string | number;
+  vtext?: string;
+  vchildren?: d.VNode[];
+  vattrs?: any;
+  vname?: string;
+}
+
 
 export type PropsType = VNodeProdData | number | string | null;
 export type ChildType = VNode | number | string;
 
 
 export interface ComponentProps {
-  children?: any[];
+  children?: d.VNode[];
   key?: string | number | any;
 }
 
 export interface FunctionalUtilities {
-  getAttributes: (vnode: VNode) => any;
-  replaceAttributes: (vnode: VNode, attributes: any) => void;
+  forEach: (children: d.VNode[], cb: (vnode: d.VNode) => void) => void;
+  map: (children: d.VNode[], cb: (vnode: ChildNode) => ChildNode) => d.VNode[];
 }
 
-export interface FunctionalComponent<PropsType> {
-  (props?: PropsType & ComponentProps, utils?: FunctionalUtilities): VNode;
+export interface FunctionalComponent<PropsType = {}> {
+  (props?: PropsType & ComponentProps, utils?: FunctionalUtilities): VNode | VNode[];
 }
 
 

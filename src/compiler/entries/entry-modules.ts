@@ -3,7 +3,7 @@ import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
-import { requiresScopedStyles } from '../style/generate-component-styles';
+import { requiresScopedStyles } from '../style/component-styles';
 import { validateComponentTag } from '../config/validate-component';
 
 

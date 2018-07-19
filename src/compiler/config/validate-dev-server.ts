@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { pathJoin } from '../util';
+import { normalizePath, pathJoin } from '../util';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 
 
@@ -41,11 +41,13 @@ export function validateDevServer(config: d.Config) {
   }
 
   let serveDir: string = null;
+  let baseUrl: string = null;
   const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
 
   if (wwwOutputTarget) {
     serveDir = wwwOutputTarget.dir;
-    config.logger.debug(`dev server www root: ${serveDir}`);
+    baseUrl = wwwOutputTarget.baseUrl;
+    config.logger.debug(`dev server www root: ${serveDir}, base url: ${baseUrl}`);
 
   } else {
     serveDir = config.rootDir;
@@ -55,7 +57,22 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
+  if (typeof baseUrl !== 'string') {
+    baseUrl = `/`;
+  }
+
+  baseUrl = normalizePath(baseUrl);
+
+  if (!baseUrl.startsWith('/')) {
+    baseUrl = '/' + baseUrl;
+  }
+
+  if (!baseUrl.endsWith('/')) {
+    baseUrl += '/';
+  }
+
   setStringConfig(config.devServer, 'root', serveDir);
+  setStringConfig(config.devServer, 'baseUrl', baseUrl);
 
   if (!config.sys.path.isAbsolute(config.devServer.root)) {
     config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
