@@ -44,12 +44,12 @@ export interface VNodeData {
 }
 
 export interface ChildNode {
-  vtag: string;
-  vchildren: d.VNode[];
-  vtext: string;
-  vattrs: any;
-  vkey: string;
-  vname: string;
+  vtag?: string | number | Function;
+  vkey?: string | number;
+  vtext?: string;
+  vchildren?: d.VNode[];
+  vattrs?: any;
+  vname?: string;
 }
 
 

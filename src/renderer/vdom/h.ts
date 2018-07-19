@@ -120,7 +120,7 @@ function childToVNode(child: d.ChildNode) {
   };
 }
 
-function VNodeToChild(vnode: d.VNode) {
+function VNodeToChild(vnode: d.VNode): d.ChildNode {
   return {
     'vtag': vnode.vtag,
     'vchildren': vnode.vchildren,
@@ -135,7 +135,12 @@ const utils: FunctionalUtilities = {
   'forEach': (children: d.VNode[], cb: (vnode: d.VNode) => void) => {
     children.forEach((item) => cb(VNodeToChild(item)));
   },
-  'map': (children: d.VNode[], cb: (vnode: d.VNode) => d.ChildNode): d.VNode[] => {
-    return children.map((item) => childToVNode(cb(item)));
+  'map': (children: d.VNode[], cb: (vnode: d.ChildNode) => d.ChildNode): d.VNode[] => {
+    return children.map((item) => childToVNode(
+        cb(
+          VNodeToChild(item)
+        )
+      )
+    );
   }
 };
