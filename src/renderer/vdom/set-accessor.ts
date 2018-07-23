@@ -102,7 +102,6 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
           cmpMeta.membersMeta[memberName].attribName,
           newValue,
           cmpMeta.membersMeta[memberName].propType === PROP_TYPE.Boolean,
-          (newValue == null)
         );
       }
 

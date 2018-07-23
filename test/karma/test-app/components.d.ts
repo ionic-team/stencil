@@ -99,6 +99,76 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface AttributeBooleanRoot {
+      'toggleState': () => void;
+    }
+  }
+
+  interface HTMLAttributeBooleanRootElement extends StencilComponents.AttributeBooleanRoot, HTMLStencilElement {}
+
+  var HTMLAttributeBooleanRootElement: {
+    prototype: HTMLAttributeBooleanRootElement;
+    new (): HTMLAttributeBooleanRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
+  }
+  interface ElementTagNameMap {
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'attribute-boolean-root': JSXElements.AttributeBooleanRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface AttributeBooleanRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface AttributeBoolean {
+      'boolState': boolean;
+      'noreflect': boolean;
+      'strState': string;
+    }
+  }
+
+  interface HTMLAttributeBooleanElement extends StencilComponents.AttributeBoolean, HTMLStencilElement {}
+
+  var HTMLAttributeBooleanElement: {
+    prototype: HTMLAttributeBooleanElement;
+    new (): HTMLAttributeBooleanElement;
+  };
+  interface HTMLElementTagNameMap {
+    'attribute-boolean': HTMLAttributeBooleanElement;
+  }
+  interface ElementTagNameMap {
+    'attribute-boolean': HTMLAttributeBooleanElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'attribute-boolean': JSXElements.AttributeBooleanAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface AttributeBooleanAttributes extends HTMLAttributes {
+      'boolState'?: boolean;
+      'noreflect'?: boolean;
+      'strState'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface AttributeComplex {
       'bool0': boolean;
       'bool1': boolean;

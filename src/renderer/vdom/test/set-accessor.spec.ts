@@ -237,7 +237,7 @@ describe('setAccessor for custom elements', () => {
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
 
-    expect(elm).toMatchAttributes({ 'myprop': 'false' });
+    expect(elm).toMatchAttributes({ });
   });
 
   it('should add aria role attribute', () => {
@@ -296,7 +296,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toMatchAttributes({ 'myprop': 'true' });
+    expect(elm).toMatchAttributes({ 'myprop': '' });
   });
 
   it('should set number to attribute', () => {
@@ -371,7 +371,8 @@ describe('setAccessor for inputs', () => {
         const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
-        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
+        const expected = newValue === true ? '' : newValue.toString();
+        expect(inputElm).toMatchAttributes({ [propName]: expected });
       }
 
       it(`aria-disabled should be added when set to true`, () => {
