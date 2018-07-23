@@ -44,7 +44,7 @@ const DEFAULT_HEADERS: d.DevResponseHeaders = {
 
 export function getBrowserUrl(devServerConfig: d.DevServerConfig, pathname = '/') {
   const address = (devServerConfig.address === `0.0.0.0`) ? `localhost` : devServerConfig.address;
-  const port = (devServerConfig.port === 80 || devServerConfig.port === 443) ? '' : (':' + devServerConfig.port);
+  const port = (!devServerConfig.port || devServerConfig.port === 80 || devServerConfig.port === 443) ? '' : (':' + devServerConfig.port);
   let path = devServerConfig.baseUrl;
   if (pathname.startsWith('/')) {
     pathname = pathname.substring(1);

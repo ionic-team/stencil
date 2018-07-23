@@ -60,7 +60,8 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
 }
 
 
-export function getDevServerClientScript(devServerConfig: d.DevServerConfig) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig);
+export function getDevServerClientScript(scriptSourceConfig: d.DevServerConfig) {
+  const baseUrl = scriptSourceConfig.baseUrl || '/';
+  const devServerClientUrl = `//${scriptSourceConfig.address}${baseUrl}${util.DEV_SERVER_URL.replace('/', '')}`;
   return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
 }

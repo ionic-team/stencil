@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getBrowserUrl, getDevServerClientUrl } from '../util';
+import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../util';
 
 
 describe('dev-server, util', () => {
@@ -59,7 +59,7 @@ describe('dev-server, util', () => {
     expect(url).toBe('http://staging.stenciljs.com:3333/');
   });
 
-  it('should get path for dev server w/ base url', () => {
+  it('should get path for dev server w/ base url and port', () => {
     const devServerConfig: d.DevServerConfig = {
       protocol: 'http',
       address: '0.0.0.0',
@@ -67,18 +67,28 @@ describe('dev-server, util', () => {
       baseUrl: '/my-base-url/'
     };
     const url = getDevServerClientUrl(devServerConfig);
-    expect(url).toBe('http://localhost:3333/my-base-url/~dev-server');
+    expect(url).toBe(`${devServerConfig.protocol}://localhost:3333/my-base-url${DEV_SERVER_URL}`);
   });
 
-  it('should get path for dev server', () => {
+  it('should get path for dev server w/ base url and w/out port', () => {
     const devServerConfig: d.DevServerConfig = {
       protocol: 'http',
       address: '0.0.0.0',
-      port: 3333,
-      baseUrl: '/'
+      baseUrl: '/my-base-url/'
     };
     const url = getDevServerClientUrl(devServerConfig);
-    expect(url).toBe('http://localhost:3333/~dev-server');
+    expect(url).toBe(`${devServerConfig.protocol}://localhost/my-base-url${DEV_SERVER_URL}`);
+  });
+
+  it('should get path for dev server w/ custom address, base url and port', () => {
+    const devServerConfig: d.DevServerConfig = {
+      protocol: 'http',
+      address: '1.2.3.4',
+      port: 3333,
+      baseUrl: '/my-base-url/'
+    };
+    const url = getDevServerClientUrl(devServerConfig);
+    expect(url).toBe(`${devServerConfig.protocol}://${devServerConfig.address}:3333/my-base-url${DEV_SERVER_URL}`);
   });
 
 });
