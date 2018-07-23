@@ -3,6 +3,7 @@ import { createContext, runInContext } from './node-context';
 import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
+import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
 import { WorkerManager } from './worker/index';
 
@@ -22,6 +23,7 @@ export class NodeSystem implements d.StencilSystem {
   private typescriptPackageJson: d.PackageJsonData;
   private resolveModuleCache: { [cacheKey: string]: string } = {};
   private destroys: Function[] = [];
+  storage: NodeStorage;
 
   fs: d.FileSystem;
   path: d.Path;
@@ -46,6 +48,8 @@ export class NodeSystem implements d.StencilSystem {
     } catch (e) {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
+
+    this.storage = new NodeStorage(this.fs);
   }
 
   initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number) {
@@ -272,6 +276,10 @@ export class NodeSystem implements d.StencilSystem {
       details.runtimeVersion = process.version;
     } catch (e) {}
     return details;
+  }
+
+  requestLatestCompilerVersion() {
+    return this.sysWorker.run('requestLatestCompilerVersion');
   }
 
   resolveModule(fromDir: string, moduleId: string) {

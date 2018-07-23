@@ -40,6 +40,7 @@ export interface StencilSystem {
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   open?: (p: string) => Promise<void>;
   path?: Path;
+  requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
     rollup: {
@@ -54,6 +55,7 @@ export interface StencilSystem {
     lt: (a: string, b: string, loose?: boolean) => boolean;
     lte: (a: string, b: string, loose?: boolean) => boolean;
   };
+  storage?: Storage;
   transpileToEs5?(cwd: string, input: string): Promise<d.TranspileResults>;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -76,6 +78,12 @@ export interface SystemDetails {
   runtime: string;
   runtimeVersion: string;
   release: string;
+}
+
+
+export interface Storage {
+  get(key: string): Promise<any>;
+  set(key: string, value: any): Promise<void>;
 }
 
 
@@ -150,6 +158,9 @@ export interface PackageJsonData {
   collection?: string;
   types?: string;
   files?: string[];
+  ['dist-tags']: {
+    latest: string;
+  };
 }
 
 
