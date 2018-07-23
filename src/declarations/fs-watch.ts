@@ -16,6 +16,7 @@ export interface FsWatchResults {
 
 export interface FsWatcher {
   add(path: string|string[]): void;
+  close(): void;
 }
 
 

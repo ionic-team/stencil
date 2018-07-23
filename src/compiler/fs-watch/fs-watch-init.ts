@@ -17,7 +17,7 @@ export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   compilerCtx.hasWatch = true;
 
   if (config.sys.createFsWatcher) {
-    const fsWatcher = config.sys.createFsWatcher(compilerCtx.events, config.srcDir, {
+    const fsWatcher = config.sys.createFsWatcher(config.sys.fs, compilerCtx.events, config.srcDir, {
       ignored: config.watchIgnoredRegex,
       ignoreInitial: true
     });

@@ -122,8 +122,8 @@ export class NodeSystem implements d.StencilSystem {
     this._existingDom = val;
   }
 
-  createFsWatcher(events: d.BuildEvents, paths: string, opts: any) {
-    const fsWatcher = createFsWatcher(events, paths, opts);
+  createFsWatcher(fs: d.FileSystem, events: d.BuildEvents, fsPath: string, opts: any) {
+    const fsWatcher = createFsWatcher(fs, events, fsPath, opts);
 
     this.addDestroy(() => {
       fsWatcher.close();
