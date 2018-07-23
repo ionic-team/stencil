@@ -77,6 +77,7 @@ export interface ConfigFlags {
   task?: 'build' | 'docs' | 'help' | 'serve';
   address?: string;
   cache?: boolean;
+  checkVersion?: boolean;
   config?: string;
   debug?: boolean;
   dev?: boolean;

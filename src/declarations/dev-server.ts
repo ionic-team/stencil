@@ -54,6 +54,7 @@ export interface HttpRequest {
   filePath?: string;
   stats?: d.FsStats;
   headers?: {[name: string]: string};
+  host?: string;
 }
 
 

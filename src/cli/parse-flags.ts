@@ -123,6 +123,7 @@ function configCase(prop: string) {
 const ARG_OPTS = {
   boolean: [
     'cache',
+    'check-version',
     'debug',
     'dev',
     'docs',

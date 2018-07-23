@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { getConfigFilePath } from './cli-utils';
-import { taskHelp } from './task-help';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
 import { shouldIgnoreError } from '../compiler/util';
@@ -16,16 +15,6 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   process.title = `Stencil`;
 
   const flags = parseFlags(process);
-
-  if (flags.help || flags.task === `help`) {
-    taskHelp(process, logger);
-    process.exit(0);
-  }
-
-  if (flags.version) {
-    console.log(sys.compiler.version);
-    process.exit(0);
-  }
 
   // load the config file
   let config: d.Config;
@@ -58,11 +47,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
 
     process.title = `Stencil: ${config.namespace}`;
 
-    runTask(process, config, flags).catch(err => {
-      if (!shouldIgnoreError(err)) {
-        config.logger.error(`uncaught cli task error`, err);
-      }
-    });
+    await runTask(process, config, flags);
 
   } catch (e) {
     if (!shouldIgnoreError(e)) {
