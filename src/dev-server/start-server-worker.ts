@@ -24,8 +24,8 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
     // process that the server has successfully started up
     sendMsg(process, {
       serverStated: {
-        browserUrl: getBrowserUrl(devServerConfig),
-        initialLoadUrl: getBrowserUrl(devServerConfig, DEV_SERVER_INIT_URL)
+        browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, '/'),
+        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, DEV_SERVER_INIT_URL)
       }
     });
 

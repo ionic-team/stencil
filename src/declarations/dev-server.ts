@@ -1,5 +1,4 @@
 import * as d from '.';
-import * as http from 'http';
 
 
 export interface DevServerConfig {
@@ -55,7 +54,7 @@ export interface HttpRequest {
   filePath?: string;
   stats?: d.FsStats;
   headers?: {[name: string]: string};
-  originalRequest?: http.IncomingMessage;
+  host?: string;
 }
 
 

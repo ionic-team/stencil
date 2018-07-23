@@ -238,7 +238,7 @@ describe('request-handler', async () => {
       expect(res.$contentType).toBe('text/html');
     });
 
-    fit('get directory index.html with trailing slash and base url', async () => {
+    it('get directory index.html with trailing slash and base url', async () => {
       config.baseUrl = '/my-base-url/';
       await fs.mkdir(path.join(root, 'www', 'about-us'));
       await fs.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
