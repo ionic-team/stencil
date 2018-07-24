@@ -2,7 +2,9 @@ import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State } 
 
 
 @Component({
-  tag: 'esm-import'
+  tag: 'esm-import',
+  styleUrl: 'esm-import.css',
+  shadow: true
 })
 export class EsmImport {
 
@@ -44,7 +46,7 @@ export class EsmImport {
   render() {
     return (
       <div>
-        <p>esm-import</p>
+        <h1>esm-import</h1>
         <p id="propVal">propVal: {this.propVal}</p>
         <p id="stateVal">stateVal: {this.stateVal}</p>
         <p id="listenVal">listenVal: {this.listenVal}</p>

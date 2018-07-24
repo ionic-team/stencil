@@ -107,11 +107,11 @@ function getModuleFileName(cmpMeta: d.ComponentMeta, styleMode: string) {
 
 function getModuleImport(cmpMeta: d.ComponentMeta, styleMode: string) {
   const bundleFileName = getModuleFileName(cmpMeta, styleMode);
-  const isScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
+  const hasScoped = (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom || cmpMeta.encapsulation === ENCAPSULATION.ScopedCss);
 
   if (styleMode === '$' || styleMode === 'md') {
 
-    if (isScoped) {
+    if (hasScoped) {
       return `
         if (o.scoped) {
           return import('./${bundleFileName}.sc.js');
@@ -123,7 +123,7 @@ function getModuleImport(cmpMeta: d.ComponentMeta, styleMode: string) {
     return `return import('./${bundleFileName}.js');`;
   }
 
-  if (isScoped) {
+  if (hasScoped) {
     return `
       if (o.mode == '${styleMode}') {
         if (o.scoped) {

@@ -5,14 +5,14 @@
 <esm-import prop-val="88"></esm-import>
 
 <style>
-  .componentOnReady {
-    color: blue;
+  .esm-import-componentOnReady {
+    font-weight: bold;
   }
 </style>
 
 <script>
   var elm = document.querySelector('esm-import');
   elm.componentOnReady().then(function(readyElm) {
-    readyElm.classList.add('componentOnReady');
+    readyElm.classList.add('esm-import-componentOnReady');
   });
 </script>
