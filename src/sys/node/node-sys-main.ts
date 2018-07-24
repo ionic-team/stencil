@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { createContext, runInContext } from './node-context';
-import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
+import { FsWatcher } from './node-fs-watcher';
 import { NodeFs } from './node-fs';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
@@ -126,8 +126,9 @@ export class NodeSystem implements d.StencilSystem {
     this._existingDom = val;
   }
 
-  createFsWatcher(fs: d.FileSystem, events: d.BuildEvents, fsPath: string, opts: any) {
-    const fsWatcher = createFsWatcher(fs, events, fsPath, opts);
+  async createFsWatcher(fs: d.FileSystem, logger: d.Logger, events: d.BuildEvents, srcDir: string) {
+    const fsWatcher = new FsWatcher(fs, logger, events);
+    await fsWatcher.addDirectory(srcDir);
 
     this.addDestroy(() => {
       fsWatcher.close();

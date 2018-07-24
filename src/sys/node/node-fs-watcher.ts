@@ -1,6 +1,8 @@
 import * as d from '../../declarations';
 import * as ts from 'typescript';
 import { normalizePath } from '../../compiler/util';
+import * as crypto from 'crypto';
+import * as path from 'path';
 
 
 export class FsWatcher implements d.FsWatcher {
@@ -8,114 +10,173 @@ export class FsWatcher implements d.FsWatcher {
   private dirsDeleted: string[] = [];
   private filesAdded: string[] = [];
   private filesDeleted: string[] = [];
-  private filesUpdated: string[] = [];
+  private filesUpdated = new Map<string, string>();
   private flushTmrId: any;
-  private fsItems = new Map<string, FsWatcherItem>();
+  private dirWatchers = new Map<string, d.FsWatcherItem>();
+  private fileWatchers = new Map<string, d.FsWatcherItem>();
 
-  constructor(private fs: d.FileSystem, private logger: d.Logger, private events: d.BuildEvents) {
-
+  constructor(private fs: d.FileSystem, private logger: d.Logger, private events: d.BuildEvents, private rootDir: string) {
+    events.subscribe('buildFinish', this.reset.bind(this));
   }
 
-  add(fsPath: string) {
-    try {
-      fsPath = normalizePath(fsPath);
+  async addDirectory(dirPath: string, emit = false) {
+    dirPath = normalizePath(dirPath);
 
-      const stat = this.fs.statSync(fsPath);
-      const fsItem: FsWatcherItem = {};
+    if (!this.dirWatchers.has(dirPath)) {
+      const watcher = ts.sys.watchDirectory(dirPath, this.onDirectoryWatch.bind(this), true);
+      this.dirWatchers.set(dirPath, watcher);
+    }
 
-      if (stat.isDirectory()) {
-        fsItem.isDirectory = true;
-        fsItem.watcher = ts.sys.watchDirectory(fsPath, this.onDirectoryWatch.bind(this), true);
-        this.fsItems.set(fsPath, fsItem);
+    if (emit && !this.dirsAdded.includes(dirPath)) {
+      this.log('directory added', dirPath);
 
-      } else if (stat.isFile()) {
-        fsItem.isDirectory = false;
-        fsItem.watcher = ts.sys.watchFile(fsPath, this.onFileWatch.bind(this));
-        this.fsItems.set(fsPath, fsItem);
-      }
-
-    } catch (e) {
-      this.logger.error(`FsWatcher add: ${e}`);
+      this.dirsAdded.push(dirPath);
+      this.queue();
     }
   }
 
-  onDirectoryWatch(fsPath: string) {
-    try {
-      fsPath = normalizePath(fsPath);
+  removeDirectory(dirPath: string, emit = false) {
+    dirPath = normalizePath(dirPath);
 
-      this.log('onDirectoryWatch', fsPath);
+    const watcher = this.dirWatchers.get(dirPath);
+    if (watcher) {
+      this.dirWatchers.delete(dirPath);
+      watcher.close();
+    }
 
-      const stat = this.fs.statSync(fsPath);
-      const fsItem: FsWatcherItem = {};
+    if (emit && !this.dirsDeleted.push(dirPath)) {
+      this.log('directory deleted', dirPath);
 
-      if (stat.isDirectory()) {
-        if (!this.fsItems.has(fsPath)) {
-          fsItem.isDirectory = true;
-          fsItem.watcher = ts.sys.watchDirectory(fsPath, this.onDirectoryWatch.bind(this), true);
-          this.fsItems.set(fsPath, fsItem);
-        }
+      this.dirsDeleted.push(dirPath);
+      this.queue();
+    }
+  }
 
-        if (!this.dirsAdded.includes(fsPath)) {
-          this.log('directory added', fsPath);
+  async addFile(filePath: string, emit = false) {
+    filePath = normalizePath(filePath);
 
-          this.dirsAdded.push(fsPath);
-          this.queue();
-        }
+    if (!this.fileWatchers.has(filePath)) {
+      const watcher = ts.sys.watchFile(filePath, this.onFileWatch.bind(this));
+      this.fileWatchers.set(filePath, watcher);
+    }
 
-      } else if (stat.isFile()) {
-        if (!this.fsItems.has(fsPath)) {
-          fsItem.isDirectory = false;
-          fsItem.watcher = ts.sys.watchFile(fsPath, this.onFileWatch.bind(this));
-          this.fsItems.set(fsPath, fsItem);
-        }
+    if (emit) {
+      const buffer = await this.fs.readFile(filePath);
+      const hash = crypto
+                    .createHash('md5')
+                    .update(buffer)
+                    .digest('base64');
 
-        if (!this.filesAdded.push(fsPath)) {
-          this.log('file added', fsPath);
+      const existingHash = this.filesUpdated.get(filePath);
+      if (existingHash === hash) {
+        this.log('file already added', filePath);
 
-          this.filesAdded.push(fsPath);
-          this.queue();
-        }
-      }
-
-    } catch (e) {
-
-      const fsItem = this.fsItems.get(fsPath);
-      if (fsItem) {
-        if (fsItem.isDirectory) {
-          fsItem.watcher && fsItem.watcher.close();
-          this.fsItems.delete(fsPath);
-
-          if (!this.dirsDeleted.push(fsPath)) {
-            this.log('directory deleted', fsPath);
-
-            this.dirsDeleted.push(fsPath);
-            this.queue();
-          }
-
-        } else {
-          fsItem.watcher && fsItem.watcher.close();
-          this.fsItems.delete(fsPath);
-
-          if (!this.filesDeleted.push(fsPath)) {
-            this.log('file deleted', fsPath);
-
-            this.filesDeleted.push(fsPath);
-            this.queue();
-          }
-        }
+      } else {
+        this.log('file added', filePath);
+        this.filesUpdated.set(filePath, hash);
+        this.queue();
       }
     }
   }
 
-  private onFileWatch(fsPath: string, eventKind: ts.FileWatcherEventKind) {
-    this.log('onFileWatch', fsPath);
+  removeFile(filePath: string, emit = false) {
+    filePath = normalizePath(filePath);
 
-    if (eventKind === ts.FileWatcherEventKind.Changed) {
+    const watcher = this.fileWatchers.get(filePath);
+    if (watcher) {
+      this.fileWatchers.delete(filePath);
+      watcher.close();
+    }
 
-    } else if (eventKind === ts.FileWatcherEventKind.Deleted) {
+    if (emit && !this.filesDeleted.push(filePath)) {
+      this.log('file deleted', filePath);
 
-    } else if (eventKind === ts.FileWatcherEventKind.Created) {
+      this.filesDeleted.push(filePath);
+      this.queue();
+    }
+  }
 
+  onFileChanged(fsPath: string) {
+    fsPath = normalizePath(fsPath);
+    this.log('onFileChanged', fsPath);
+
+  }
+
+  onFileDeleted(fsPath: string) {
+    fsPath = normalizePath(fsPath);
+    this.log('onFileDeleted', fsPath);
+
+  }
+
+  onFileCreated(fsPath: string) {
+    fsPath = normalizePath(fsPath);
+    this.log('onFileCreated', fsPath);
+
+  }
+
+  async onDirectoryWatch(fsPath: string) {
+    fsPath = normalizePath(fsPath);
+
+    const dirWatcher = this.dirWatchers.get(fsPath);
+    if (dirWatcher) {
+      // already a directory we're watching
+      try {
+        await this.fs.access(fsPath);
+        // and there's still access, so do nothing
+      } catch (e) {
+        // but there's no longer access
+        // so let's remove it
+        this.removeDirectory(fsPath, true);
+      }
+      return;
+    }
+
+    const fileWatcher = this.fileWatchers.get(fsPath);
+    if (fileWatcher) {
+      // already a file we're watching
+      try {
+        await this.fs.access(fsPath);
+        // and there's still access, so do nothing
+      } catch (e) {
+        // but there's no longer access
+        // so let's remove it
+        this.removeFile(fsPath, true);
+      }
+      return;
+    }
+
+    try {
+      // not already a known watcher
+      const stat = await this.fs.stat(fsPath);
+
+      if (stat.isDirectory()) {
+        this.addDirectory(fsPath, true);
+
+      } else if (stat.isFile()) {
+        this.addFile(fsPath, true);
+      }
+
+    } catch (e) {
+      this.log('onDirectoryWatch, no access', fsPath);
+    }
+  }
+
+  onFileWatch(fsPath: string, fsEvent: ts.FileWatcherEventKind) {
+    switch (fsEvent) {
+      case ts.FileWatcherEventKind.Changed:
+        this.onFileChanged(fsPath);
+        break;
+
+      case ts.FileWatcherEventKind.Deleted:
+        this.onFileDeleted(fsPath);
+        break;
+
+      case ts.FileWatcherEventKind.Created:
+        this.onFileCreated(fsPath);
+        break;
+
+      default:
+        this.log(`onFileWatch, unknown event: ${fsEvent}`, fsPath);
     }
   }
 
@@ -127,7 +188,7 @@ export class FsWatcher implements d.FsWatcher {
   }
 
   flush() {
-    if (this.dirsAdded.length === 0 && this.dirsDeleted.length === 0 && this.filesAdded.length === 0 && this.filesDeleted.length === 0 && this.filesUpdated.length === 0) {
+    if (this.dirsAdded.length === 0 && this.dirsDeleted.length === 0 && this.filesAdded.length === 0 && this.filesDeleted.length === 0 && this.filesUpdated.size === 0) {
       return;
     }
 
@@ -137,8 +198,11 @@ export class FsWatcher implements d.FsWatcher {
       dirsDeleted: this.dirsDeleted.slice(),
       filesAdded: this.filesAdded.slice(),
       filesDeleted: this.filesDeleted.slice(),
-      filesUpdated: this.filesUpdated.slice()
+      filesUpdated: []
     };
+    for (const key in this.filesUpdated.keys()) {
+      fsWatchResults.filesUpdated.push(key);
+    }
 
     // send out the event of what we've learend
     this.events.emit('fsChange', fsWatchResults);
@@ -150,35 +214,31 @@ export class FsWatcher implements d.FsWatcher {
     this.dirsDeleted.length = 0;
     this.filesAdded.length = 0;
     this.filesDeleted.length = 0;
-    this.filesUpdated.length = 0;
+    this.filesUpdated.clear();
   }
 
   close() {
-    this.fsItems.forEach(fsItem => {
-      fsItem.watcher && fsItem.watcher.close();
-      fsItem.watcher = null;
+    this.dirWatchers.forEach(watcher => {
+      watcher.close();
     });
-    this.fsItems.clear();
+    this.dirWatchers.clear();
+
+    this.fileWatchers.forEach(watcher => {
+      watcher.close();
+    });
+    this.fileWatchers.clear();
   }
 
   private log(msg: string, filePath: string) {
-    this.logger.debug(`watch, ${msg}: ${filePath}, ${Date.now().toString().substring(5)}`);
+    const relPath = path.relative(this.rootDir, filePath);
+    this.logger.debug(`fs-watch, ${msg}: ${relPath}, ${Date.now().toString().substring(6)}`);
   }
 
 }
 
-
-const FLUSH_TIMEOUT = 40;
-
-
-interface FsWatcherItem {
-  isDirectory?: boolean;
-  watcher?: ts.FileWatcher;
-}
+const FLUSH_TIMEOUT = 50;
 
 
-export function createFsWatcher(fs: d.FileSystem, logger: d.Logger, events: d.BuildEvents, srcDir: string) {
-  const fsWatcher = new FsWatcher(fs, logger, events);
-  fsWatcher.add(srcDir);
-  return fsWatcher;
-}
+// function shouldIgnore(filePath: string) {
+//   return filePath.endsWith(COMPONENTS_DTS);
+// }

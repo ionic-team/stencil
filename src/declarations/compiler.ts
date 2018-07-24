@@ -29,7 +29,7 @@ export interface CompilerCtx {
   fs?: d.InMemoryFileSystem;
   hasLoggedServerUrl?: boolean;
   hasSuccessfulBuild?: boolean;
-  hasWatch?: boolean;
+  fsWatcher?: d.FsWatcher;
   isActivelyBuilding?: boolean;
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
