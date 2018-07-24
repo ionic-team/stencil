@@ -37,13 +37,13 @@ export async function testEsmImport(app: HTMLElement) {
   const listenVal = host.shadowRoot.querySelector('#listenVal');
   expect(listenVal.textContent.trim()).toBe('listenVal: 0');
 
-  button.click();
+  buttonClick(button);
   await flush(app);
 
   expect(propVal.textContent.trim()).toBe('propVal: 89');
   expect(listenVal.textContent.trim()).toBe('listenVal: 1');
 
-  button.click();
+  buttonClick(button);
   await flush(app);
 
   expect(propVal.textContent.trim()).toBe('propVal: 90');
@@ -51,4 +51,19 @@ export async function testEsmImport(app: HTMLElement) {
 
   const isReady = host.shadowRoot.querySelector('#isReady');
   expect(isReady.textContent.trim()).toBe('componentOnReady: true');
+}
+
+if (typeof (window as any).CustomEvent !== 'function') {
+  // CustomEvent polyfill
+  (window as any).CustomEvent = (event: any, data: any) => {
+    const evt = document.createEvent('CustomEvent');
+    evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+    return evt;
+  };
+  (window as any).CustomEvent.prototype = (window as any).Event.prototype;
+}
+
+function buttonClick(button: HTMLButtonElement) {
+  const event = new (window as any).CustomEvent('click', { 'bubbles': true, composed: true } as any);
+  button.dispatchEvent(event);
 }
