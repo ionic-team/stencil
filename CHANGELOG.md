@@ -1,3 +1,13 @@
+<a name="0.10.9"></a>
+## 🚞 [0.10.9](https://github.com/ionic-team/stencil/compare/v0.10.8...v0.10.9) (2018-07-24)
+
+
+### Bug Fixes
+
+* **esm:** fix esm style imports for browsers w/ no shadow dom support ([610be85](https://github.com/ionic-team/stencil/commit/610be85))
+
+
+
 <a name="0.10.8"></a>
 ## 🎖 [0.10.8](https://github.com/ionic-team/stencil/compare/v0.10.7...v0.10.8) (2018-07-23)
 
