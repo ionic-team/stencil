@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmBuildDir, getDistEsmIndexPath } from '../../compiler/app/app-file-naming';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmBuildDir, getDistEsmIndexPath } from '../app/app-file-naming';
 import { formatEsmLoaderComponent } from '../../util/data-serialize';
 import { normalizePath, pathJoin } from '../util';
 

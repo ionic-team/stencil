@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { dashToPascalCase } from './helpers';
 
 
