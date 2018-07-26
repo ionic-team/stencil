@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "chokidar": "2.0.3",
+    "devcert-san": "0.3.3",
     "jsdom": "11.11.0",
     "rollup": "^0.59.4",
     "rollup-plugin-commonjs": "9.1.3",
