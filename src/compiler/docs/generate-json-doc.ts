@@ -11,7 +11,7 @@ export async function generateJsDocComponent(config: d.Config, compilerCtx: d.Co
     props: [],
     methods: [],
     events: [],
-    cssProps: []
+    styles: []
   };
 
   generateJsDocMembers(cmpMeta, jsonCmp);
@@ -135,20 +135,23 @@ function generateJsDocEvents(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompon
 
 
 function generateJsDocCssProps(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsComponent) {
-  if (!cmpMeta.cssCustomProperties) {
+  if (!cmpMeta.styleDocs) {
     return;
   }
 
-  cmpMeta.cssCustomProperties.sort((a, b) => {
+  cmpMeta.styleDocs.sort((a, b) => {
+    if (a.annotation < b.annotation) return -1;
+    if (a.annotation > b.annotation) return 1;
     if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
     if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
     return 0;
 
-  }).forEach(cssProp => {
-    const cssPropData: d.JsonDocsCssProp = {
-      name: cssProp.name,
-      docs: cssProp.docs || ''
+  }).forEach(styleDoc => {
+    const cssPropData: d.JsonDocsStyle = {
+      annotation: styleDoc.annotation || '',
+      name: styleDoc.name,
+      docs: styleDoc.docs || ''
     };
-    jsonCmp.cssProps.push(cssPropData);
+    jsonCmp.styles.push(cssPropData);
   });
 }

@@ -43,7 +43,6 @@ export interface CompilerCtx {
   moduleFiles?: d.ModuleFiles;
   resolvedCollections?: string[];
   rootTsFiles?: string[];
-  shouldParseCssDocs?: boolean;
   tsService?: TsService;
 }
 

@@ -1,11 +1,9 @@
 import * as d from '../../declarations';
 
 
-export function parseCssCustomProperties(styleText: string) {
-  const cssProps: d.CssCustomProperty[] = [];
-
+export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string) {
   if (typeof styleText !== 'string') {
-    return cssProps;
+    return;
   }
 
   let startIndex: number;
@@ -18,16 +16,14 @@ export function parseCssCustomProperties(styleText: string) {
     }
 
     const comment = styleText.substring(0, endIndex);
-    parseCssComment(cssProps, comment);
+    parseCssComment(styleDocs, comment);
 
     styleText = styleText.substring(endIndex + CSS_DOC_END.length);
   }
-
-  return cssProps;
 }
 
 
-function parseCssComment(cssProps: d.CssCustomProperty[], comment: string) {
+function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
   /**
    * @prop --max-width: Max width of the alert
    */
@@ -48,7 +44,7 @@ function parseCssComment(cssProps: d.CssCustomProperty[], comment: string) {
     comment = comment.replace('  ', ' ');
   }
 
-  const docs = comment.split(CSS_PROP_KEYWORD);
+  const docs = comment.split(CSS_PROP_ANNOTATION);
 
   docs.forEach(d => {
     const doc = d.trim();
@@ -58,19 +54,20 @@ function parseCssComment(cssProps: d.CssCustomProperty[], comment: string) {
     }
 
     const splt = doc.split(`:`);
-    const cssProp: d.CssCustomProperty = {
+    const cssDoc: d.StyleDoc = {
       name: splt[0].trim(),
-      docs: (splt.shift() && splt.join(`:`)).trim()
+      docs: (splt.shift() && splt.join(`:`)).trim(),
+      annotation: 'prop'
     };
 
-    if (!cssProps.some(c => c.name === cssProp.name)) {
-      cssProps.push(cssProp);
+    if (!styleDocs.some(c => c.name === cssDoc.name && c.annotation === 'prop')) {
+      styleDocs.push(cssDoc);
     }
   });
 
-  return cssProps;
+  return styleDocs;
 }
 
 const CSS_DOC_START = `/**`;
 const CSS_DOC_END = `*/`;
-const CSS_PROP_KEYWORD = `@prop`;
+const CSS_PROP_ANNOTATION = `@prop`;

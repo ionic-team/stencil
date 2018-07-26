@@ -1,18 +1,23 @@
 import * as d from '../../declarations';
 import { buildError, normalizePath } from '../util';
+import { parseStyleDocs } from '../docs/style-docs';
 
 
-export async function updateCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string) {
+export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
-  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, []);
+  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, [], styleDocs);
 }
 
 
-async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[]) {
+async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[], styleDocs?: d.StyleDoc[]) {
   if (noLoop.includes(resolvedFilePath)) {
     return styleText;
   }
   noLoop.push(resolvedFilePath);
+
+  if (styleDocs) {
+    parseStyleDocs(styleDocs, styleText);
+  }
 
   const cssImports = getCssImports(config, buildCtx, resolvedFilePath, styleText);
   if (cssImports.length === 0) {
@@ -20,17 +25,18 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   }
 
   await Promise.all(cssImports.map(async cssImportData => {
-    await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop);
+    await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop, styleDocs);
   }));
 
   return replaceImportDeclarations(styleText, cssImports, isCssEntry);
 }
 
 
-async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[]) {
+async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) {
   try {
     cssImportData.styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
-    cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop);
+    cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop, styleDocs);
+
   } catch (e) {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;

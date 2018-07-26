@@ -1,7 +1,14 @@
-import { parseCssCustomProperties } from '../css-docs';
+import * as d from '../../../declarations';
+import { parseStyleDocs } from '../style-docs';
 
 
-describe('css-docs', () => {
+describe('style-docs', () => {
+
+  let styleDocs: d.StyleDoc[];
+
+  beforeEach(() => {
+    styleDocs = [];
+  });
 
   it('no docs', () => {
     const styleText = `
@@ -13,9 +20,9 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([
-      { name: `--max-width`, docs: `` }
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([
+      { name: `--max-width`, docs: ``, annotation: 'prop' }
     ]);
   });
 
@@ -32,10 +39,10 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([
-      { name: `--color`, docs: `This is the docs for color.` },
-      { name: `--background`, docs: `This is the docs for background. It is two sentences and some :: man.` }
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([
+      { name: `--color`, docs: `This is the docs for color.`, annotation: 'prop' },
+      { name: `--background`, docs: `This is the docs for background. It is two sentences and some :: man.`, annotation: 'prop' }
     ]);
   });
 
@@ -63,15 +70,15 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([
-      { name: `--max-width`, docs: `Max width of the alert` },
-      { name: `--color`, docs: `Descript with : in it` },
-      { name: `--background`, docs: `background docs` },
-      { name: `--font-weight`, docs: `font-weight docs` },
-      { name: `--border`, docs: `border docs` },
-      { name: `--font-size`, docs: `font-size docs` },
-      { name: `--padding`, docs: `padding docs` },
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([
+      { name: `--max-width`, docs: `Max width of the alert`, annotation: 'prop' },
+      { name: `--color`, docs: `Descript with : in it`, annotation: 'prop' },
+      { name: `--background`, docs: `background docs`, annotation: 'prop' },
+      { name: `--font-weight`, docs: `font-weight docs`, annotation: 'prop' },
+      { name: `--border`, docs: `border docs`, annotation: 'prop' },
+      { name: `--font-size`, docs: `font-size docs`, annotation: 'prop' },
+      { name: `--padding`, docs: `padding docs`, annotation: 'prop' },
     ]);
   });
 
@@ -90,8 +97,8 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([]);
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([]);
   });
 
   it('no closing comments', () => {
@@ -101,8 +108,8 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([]);
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([]);
   });
 
   it('no comments', () => {
@@ -111,20 +118,20 @@ describe('css-docs', () => {
         color: red;
       }
     `;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([]);
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([]);
   });
 
   it('empty styleText', () => {
     const styleText = ``;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([]);
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([]);
   });
 
   it('null styleText', () => {
     const styleText = null;
-    const cssDocs = parseCssCustomProperties(styleText);
-    expect(cssDocs).toEqual([]);
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([]);
   });
 
 });

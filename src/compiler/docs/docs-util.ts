@@ -151,7 +151,7 @@ interface RowData {
 }
 
 
-export function getMemberDocumentation(jsDoc: d.JSDoc) {
+export function getMemberDocumentation(jsDoc: d.JsDoc) {
   if (jsDoc && jsDoc.documentation) {
     return jsDoc.documentation.trim();
   }

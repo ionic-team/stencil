@@ -50,8 +50,10 @@ function generateMemberMarkdown(cmpMeta: d.ComponentMeta) {
     events.addRow(ev);
   });
 
-  cmpMeta.cssCustomProperties && cmpMeta.cssCustomProperties.forEach(cssProp => {
-    cssCustomProps.addRow(cssProp);
+  cmpMeta.styleDocs && cmpMeta.styleDocs.forEach(styleDoc => {
+    if (styleDoc.annotation === 'prop') {
+      cssCustomProps.addRow(styleDoc);
+    }
   });
 
   return [

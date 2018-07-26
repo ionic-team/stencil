@@ -3,22 +3,22 @@ import { MarkdownTable } from './docs-util';
 
 
 export class MarkdownCssCustomProperties {
-  private cssProps: d.CssCustomProperty[] = [];
+  private styleDocs: d.StyleDoc[] = [];
 
-  addRow(cssProp: d.CssCustomProperty) {
-    this.cssProps.push(cssProp);
+  addRow(styleDoc: d.StyleDoc) {
+    this.styleDocs.push(styleDoc);
   }
 
   toMarkdown() {
     const content: string[] = [];
-    if (!this.cssProps.length) {
+    if (!this.styleDocs.length) {
       return content;
     }
 
     content.push(`## CSS Custom Properties`);
     content.push(``);
 
-    this.cssProps = this.cssProps.sort((a, b) => {
+    this.styleDocs = this.styleDocs.sort((a, b) => {
       if (a.name < b.name) return -1;
       if (a.name > b.name) return 1;
       return 0;
@@ -28,10 +28,10 @@ export class MarkdownCssCustomProperties {
 
     table.addHeader(['Name', 'Description']);
 
-    this.cssProps.forEach(cssProp => {
+    this.styleDocs.forEach(styleDoc => {
       table.addRow([
-        '`' + cssProp.name + '`',
-        cssProp.docs
+        '`' + styleDoc.name + '`',
+        styleDoc.docs
       ]);
     });
 
