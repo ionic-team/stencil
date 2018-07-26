@@ -70,6 +70,7 @@ export interface ComponentMeta {
   componentClass?: string;
   dependencies?: ComponentDependencies;
   jsdoc?: JSDoc;
+  cssCustomProperties?: CssCustomProperty[];
   hmrLoad?: () => void;
 }
 
@@ -200,6 +201,12 @@ export interface JSDoc {
   name: string;
   documentation: string;
   type: string;
+}
+
+
+export interface CssCustomProperty {
+  name: string;
+  docs: string;
 }
 
 

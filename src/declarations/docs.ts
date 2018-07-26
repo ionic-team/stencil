@@ -12,6 +12,7 @@ export interface JsonDocsComponent {
   props?: JsonDocsProp[];
   methods?: JsonDocsMethod[];
   events?: JsonDocsEvent[];
+  cssProps?: JsonDocsCssProp[];
 }
 
 
@@ -41,5 +42,11 @@ export interface JsonDocsEvent {
   bubbles?: boolean;
   cancelable?: boolean;
   composed?: boolean;
+  docs?: string;
+}
+
+
+export interface JsonDocsCssProp {
+  name: string;
   docs?: string;
 }

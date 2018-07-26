@@ -4,6 +4,7 @@ import { buildError, catchError, hasFileExtension, normalizePath } from '../util
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
 import { minifyStyle } from './minify-style';
+import { parseCssCustomProperties } from '../docs/css-docs';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
@@ -184,6 +185,12 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   const externalStyle = externalStyles && externalStyles.length && externalStyles[0];
   if (externalStyle && externalStyle.absolutePath) {
     filePath = externalStyle.absolutePath;
+  }
+
+  if (compilerCtx.shouldParseCssDocs) {
+    // parse the compiled style text for any css docs
+    // do this before minification removes all the comments
+    cmpMeta.cssCustomProperties = parseCssCustomProperties(styleMeta.compiledStyleText);
   }
 
   // auto add css prefixes

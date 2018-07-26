@@ -10,6 +10,8 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
+  compilerCtx.shouldParseCssDocs = config.outputTargets.some(o => o.type === 'docs');
+
   const componentStyles = await Promise.all(entryModules.map(async bundle => {
     await Promise.all(bundle.moduleFiles.map(async moduleFile => {
       await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
