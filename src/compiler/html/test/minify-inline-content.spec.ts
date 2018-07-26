@@ -18,7 +18,7 @@ describe('canMinifyInlineStyle', () => {
 
   it('minify when it has a tab in content', () => {
     const styleElm = mockElement('style') as HTMLStyleElement;
-    styleElm.innerHTML = '\t body { color: red; }\t';
+    styleElm.innerHTML = 'body { \t color: red; }';
     expect(canMinifyInlineStyle(styleElm)).toBe(true);
   });
 
@@ -86,7 +86,7 @@ describe('canMinifyInlineScript', () => {
 
   it('minify when it has a tab in content', () => {
     const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.innerHTML = '\tfunction minifyPlz(){}\t';
+    scriptElm.innerHTML = 'function minifyPlz(){\tconsole.log("hi");}';
     expect(canMinifyInlineScript(scriptElm)).toBe(true);
   });
 
