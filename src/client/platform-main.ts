@@ -150,7 +150,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // static function as a the bundleIds that returns the module
       const moduleOpts: d.GetModuleOptions = {
         mode: elm.mode,
-        scoped: cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)
+        scoped: cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)
       };
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
@@ -163,7 +163,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           initStyleTemplate(
             domApi,
             cmpMeta,
-            cmpMeta.encapsulation,
+            cmpMeta.encapsulationMeta,
             cmpConstructor.style,
             cmpConstructor.styleMode
           );
@@ -191,7 +191,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
                         cmpMeta.bundleIds :
                         (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+      const useScopedCss = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
       let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
 
       if (Build.hotModuleReplacement && hmrVersionId) {
@@ -209,7 +209,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           initStyleTemplate(
             domApi,
             cmpMeta,
-            cmpMeta.encapsulation,
+            cmpMeta.encapsulationMeta,
             cmpMeta.componentConstructor.style,
             cmpMeta.componentConstructor.styleMode
           );

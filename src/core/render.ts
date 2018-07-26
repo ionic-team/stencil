@@ -232,7 +232,7 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
 }
 
 export function applyHostScope(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
+  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
     // either this host element should use scoped css
     // or it wants to use shadow dom but the browser doesn't support it
     // create a scope id which is useful for scoped css

@@ -355,7 +355,7 @@ export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: s
     cmpMeta.bundleIds :
     ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE]);
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';
   }
 

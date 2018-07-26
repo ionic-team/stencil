@@ -64,7 +64,7 @@ export interface ComponentMeta {
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   hostMeta?: HostMeta;
-  encapsulation?: number;
+  encapsulationMeta?: number;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;

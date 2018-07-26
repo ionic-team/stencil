@@ -197,7 +197,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
   }
 
-  if (requiresScopedStyles(cmpMeta.encapsulation)) {
+  if (requiresScopedStyles(cmpMeta.encapsulationMeta)) {
     // only create scoped styles if we need to
     styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
     if (config.devMode) {

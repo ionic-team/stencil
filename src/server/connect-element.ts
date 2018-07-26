@@ -46,7 +46,7 @@ function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlob
     plt.requestBundle(cmpMeta, elm);
   }
 
-  if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom) {
     initHostElement(plt, cmpMeta, elm, config.hydratedCssClass);
 
     connectedCallback(plt, cmpMeta, elm);
