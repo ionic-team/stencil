@@ -3,7 +3,7 @@ import { parseCssCustomProperties } from '../css-docs';
 
 describe('css-docs', () => {
 
-  it('no description', () => {
+  it('no docs', () => {
     const styleText = `
       /**
        * @prop --max-width
@@ -15,16 +15,16 @@ describe('css-docs', () => {
     `;
     const cssDocs = parseCssCustomProperties(styleText);
     expect(cssDocs).toEqual([
-      { name: `--max-width`, description: `` }
+      { name: `--max-width`, docs: `` }
     ]);
   });
 
   it('multiline', () => {
     const styleText = `
       /**
-       * @prop --color:  This is the description
+       * @prop --color:  This is the docs
        * for color.
-       @prop    --background   : This is the description
+       @prop    --background   : This is the docs
                            for background. It is two
                            * sentences and some :: man.
        */
@@ -34,8 +34,8 @@ describe('css-docs', () => {
     `;
     const cssDocs = parseCssCustomProperties(styleText);
     expect(cssDocs).toEqual([
-      { name: `--color`, description: `This is the description for color.` },
-      { name: `--background`, description: `This is the description for background. It is two sentences and some :: man.` }
+      { name: `--color`, docs: `This is the docs for color.` },
+      { name: `--background`, docs: `This is the docs for background. It is two sentences and some :: man.` }
     ]);
   });
 
@@ -44,8 +44,8 @@ describe('css-docs', () => {
       /**
        * @prop --max-width: Max width of the alert
        * @prop --color: Descript with : in it
-       * * @prop --background: background description
-       @prop --font-weight: font-weight description
+       * * @prop --background: background docs
+       @prop --font-weight: font-weight docs
        */
 
       html {
@@ -53,11 +53,11 @@ describe('css-docs', () => {
       }
 
       /**
-       * @prop --border: border description
-       * @prop --font-size: font-size description
+       * @prop --border: border docs
+       * @prop --font-size: font-size docs
        */
 
-      /** @prop --padding: padding description */
+      /** @prop --padding: padding docs */
 
       body {
         color: red;
@@ -65,13 +65,13 @@ describe('css-docs', () => {
     `;
     const cssDocs = parseCssCustomProperties(styleText);
     expect(cssDocs).toEqual([
-      { name: `--max-width`, description: `Max width of the alert` },
-      { name: `--color`, description: `Descript with : in it` },
-      { name: `--background`, description: `background description` },
-      { name: `--font-weight`, description: `font-weight description` },
-      { name: `--border`, description: `border description` },
-      { name: `--font-size`, description: `font-size description` },
-      { name: `--padding`, description: `padding description` },
+      { name: `--max-width`, docs: `Max width of the alert` },
+      { name: `--color`, docs: `Descript with : in it` },
+      { name: `--background`, docs: `background docs` },
+      { name: `--font-weight`, docs: `font-weight docs` },
+      { name: `--border`, docs: `border docs` },
+      { name: `--font-size`, docs: `font-size docs` },
+      { name: `--padding`, docs: `padding docs` },
     ]);
   });
 
