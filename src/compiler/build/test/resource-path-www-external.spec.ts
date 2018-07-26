@@ -1,5 +1,4 @@
 import * as d from '../../../declarations';
-import { mockElement, mockHtml } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 import * as path from 'path';
@@ -135,10 +134,6 @@ describe('www loader/core resourcesUrl', () => {
 
     win.requestAnimationFrame = (cb: Function) => {
       setTimeout(cb);
-    };
-
-    win.performance = {
-      now: () => Date.now()
     };
 
     win.CustomEvent = class {};
