@@ -9,10 +9,6 @@ export function getScopeId(cmpMeta: d.ComponentMeta, mode?: string) {
   return id;
 }
 
-export function getChildScopeAttribute(scopeId: string) {
-  return scopeId;
-}
-
 export function getHostScopeAttribute(scopeId: string) {
   return `${scopeId}-host`;
 }

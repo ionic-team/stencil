@@ -12,7 +12,7 @@
  */
 
 import { ShadowCss } from '../shadow-css';
-import { getChildScopeAttribute, getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../../../util/scope';
+import { getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../../../util/scope';
 import { DEFAULT_STYLE_MODE } from '../../../util/constants';
 
 
@@ -243,12 +243,6 @@ describe('ShadowCss', function() {
   describe('getHostScopeAttribute', () => {
     it('should add -host suffix', () => {
       expect(getHostScopeAttribute('data-my-tag')).toBe('data-my-tag-host');
-    });
-  });
-
-  describe('getChildScopeAttribute', () => {
-    it('should add not add any subfix', () => {
-      expect(getChildScopeAttribute('data-my-tag')).toBe('data-my-tag');
     });
   });
 
