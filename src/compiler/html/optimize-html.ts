@@ -5,9 +5,8 @@ import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
 import { inlineLoaderScript } from './inline-loader-script';
+import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { updateCanonicalLink } from './canonical-link';
-import { minifyInlineScripts } from './minify-inline-scripts';
-import { minifyInlineStyles } from '../style/minify-style';
 
 
 export async function optimizeHtml(

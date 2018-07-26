@@ -1,7 +1,5 @@
 import * as d from '../../../declarations';
-import { canMinifyInlineScript } from '../minify-inline-scripts';
 import { isLoaderScriptSrc, setDataResourcesUrlAttr } from '../inline-loader-script';
-import { mockElement } from '../../../testing/mocks';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';
 
@@ -120,80 +118,6 @@ describe('setDataResourcesUrlAttr',  () => {
   it('defaults', () => {
     const r = setDataResourcesUrlAttr(config, outputTarget);
     expect(r).toBe('/build/app/');
-  });
-
-});
-
-
-describe('canMinifyInlineScript', () => {
-
-  it('do minify when it has an unknown script type', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.setAttribute('type', 'application/ld+json');
-    scriptElm.innerHTML = `
-    {
-      "@context": "http://schema.org",
-      "@type": "WebSite",
-      "url": "https://www.example.com/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://query.example.com/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    `;
-    expect(canMinifyInlineScript(scriptElm)).toBe(false);
-  });
-
-  it('minify when it has type=""', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.setAttribute('type', '');
-    scriptElm.innerHTML = ' /* minifyplz */ ';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('minify when it has type="application/ecmascript"', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.setAttribute('type', 'application/ecmascript');
-    scriptElm.innerHTML = ' /* minifyplz */ ';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('minify when it has type="application/javascript"', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.setAttribute('type', 'application/javascript');
-    scriptElm.innerHTML = ' /* minifyplz */ ';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('minify when it has a comments in content', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.innerHTML = ' /* minifyplz */ ';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('minify when it has a multiple spaces in content', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.innerHTML = '  ';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('minify when it has a tab in content', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.innerHTML = '\t';
-    expect(canMinifyInlineScript(scriptElm)).toBe(true);
-  });
-
-  it('cannot minify when no content', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.innerHTML = '';
-    expect(canMinifyInlineScript(scriptElm)).toBe(false);
-  });
-
-  it('cannot minify when it has a "src" attr', () => {
-    const scriptElm = mockElement('script') as HTMLScriptElement;
-    scriptElm.setAttribute('src', '/external.js');
-    expect(canMinifyInlineScript(scriptElm)).toBe(false);
   });
 
 });
