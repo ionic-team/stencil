@@ -29,6 +29,7 @@ if (success) {
         'fs',
         'http',
         'https',
+        'devcert-san',
         'net',
         'os',
         'path',
