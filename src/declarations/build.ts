@@ -101,10 +101,10 @@ export interface HotModuleReplacement {
   externalStylesUpdated?: string[];
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
-  serviceWorkerUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
+  serviceWorkerUpdated?: boolean;
   versionId?: string;
 }
 

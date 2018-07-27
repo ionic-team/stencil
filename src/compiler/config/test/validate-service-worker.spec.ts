@@ -3,13 +3,13 @@ import { mockStencilSystem } from '../../../testing/mocks';
 import { normalizePath } from '../../../compiler/util';
 import { validateServiceWorker } from '../validate-service-worker';
 
-
 describe('validateServiceWorker', () => {
 
   const config: d.Config = {
     fsNamespace: 'app',
     sys: mockStencilSystem(),
-    devMode: false
+    devMode: false,
+    flags: {}
   };
 
   let outputTarget: d.OutputTargetWww;
@@ -153,6 +153,17 @@ describe('validateServiceWorker', () => {
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
+  });
+
+  it('should create sw config when in devMode if flag serviceWorker', () => {
+    outputTarget = {
+      dir: '/www',
+      serviceWorker: true as any
+    };
+    config.devMode = true;
+    config.flags.serviceWorker = true;
+    validateServiceWorker(config, outputTarget);
+    expect(outputTarget.serviceWorker).not.toBe(null);
   });
 
   it('should do nothing when falsy', () => {

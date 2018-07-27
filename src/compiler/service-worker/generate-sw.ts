@@ -84,7 +84,7 @@ async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, b
     return true;
   }
 
-  const hasServiceWorkerChanged = await hasServiceWorkerChanges(config, buildCtx);
+  const hasServiceWorkerChanged = hasServiceWorkerChanges(config, buildCtx);
   if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0 && !hasServiceWorkerChanged) || hasError(buildCtx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     return true;
