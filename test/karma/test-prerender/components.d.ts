@@ -190,4 +190,70 @@ declare global {
   }
 }
 
+
+declare global {
+
+  namespace StencilComponents {
+    interface CmpScopedA {
+
+    }
+  }
+
+  interface HTMLCmpScopedAElement extends StencilComponents.CmpScopedA, HTMLStencilElement {}
+
+  var HTMLCmpScopedAElement: {
+    prototype: HTMLCmpScopedAElement;
+    new (): HTMLCmpScopedAElement;
+  };
+  interface HTMLElementTagNameMap {
+    'cmp-scoped-a': HTMLCmpScopedAElement;
+  }
+  interface ElementTagNameMap {
+    'cmp-scoped-a': HTMLCmpScopedAElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'cmp-scoped-a': JSXElements.CmpScopedAAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CmpScopedAAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface CmpScopedB {
+
+    }
+  }
+
+  interface HTMLCmpScopedBElement extends StencilComponents.CmpScopedB, HTMLStencilElement {}
+
+  var HTMLCmpScopedBElement: {
+    prototype: HTMLCmpScopedBElement;
+    new (): HTMLCmpScopedBElement;
+  };
+  interface HTMLElementTagNameMap {
+    'cmp-scoped-b': HTMLCmpScopedBElement;
+  }
+  interface ElementTagNameMap {
+    'cmp-scoped-b': HTMLCmpScopedBElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'cmp-scoped-b': JSXElements.CmpScopedBAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CmpScopedBAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
 declare global { namespace JSX { interface StencilJSX {} } }
