@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, hasError } from '../util';
-
+import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '../util';
 
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker);
@@ -85,7 +84,8 @@ async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, b
     return true;
   }
 
-  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics)) {
+  const hasServiceWorkerChanged = await hasServiceWorkerChanges(config, buildCtx);
+  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0 && !hasServiceWorkerChanged) || hasError(buildCtx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     return true;
   }

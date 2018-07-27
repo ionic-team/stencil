@@ -132,6 +132,7 @@ const ARG_OPTS = {
     'log',
     'open',
     'prerender',
+    'service-worker',
     'prod',
     'serve',
     'skip-node-check',

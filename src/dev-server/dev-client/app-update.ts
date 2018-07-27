@@ -50,6 +50,11 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
     shouldWindowReload = true;
   }
 
+  if (hmr.serviceWorkerUpdated) {
+    logReload(`Updated Service Worker: sw.js`);
+    shouldWindowReload = true;
+  }
+
   if (hmr.scriptsAdded && hmr.scriptsAdded.length > 0) {
     logReload(`Added scripts: ${hmr.scriptsAdded.join(', ')}`);
     shouldWindowReload = true;

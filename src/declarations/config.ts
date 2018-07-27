@@ -91,6 +91,7 @@ export interface ConfigFlags {
   open?: boolean;
   port?: number;
   prerender?: boolean;
+  serviceWorker?: boolean;
   prod?: boolean;
   root?: string;
   serve?: boolean;
