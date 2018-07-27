@@ -1,4 +1,4 @@
-exports.chalk = require('chalk');
+exports.turbocolor = require('turbocolor');
 
 exports.glob = require('glob');
 

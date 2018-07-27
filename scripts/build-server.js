@@ -21,7 +21,7 @@ if (success) {
       external: [
         'fs',
         'path',
-        'chalk',
+        'turbocolor',
         'child_process'
       ],
       plugins: [
