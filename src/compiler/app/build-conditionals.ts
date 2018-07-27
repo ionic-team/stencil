@@ -3,6 +3,45 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { isTsFile } from '../util';
 
 
+export function getTestBuildConditionals(): d.BuildConditionals {
+  return {
+    coreId: 'core',
+    polyfills: false,
+    cssVarShim: true,
+    shadowDom: true,
+    slotPolyfill: true,
+    ssrServerSide: true,
+    devInspector: true,
+    hotModuleReplacement: true,
+    verboseError: true,
+    styles: true,
+    hostData: true,
+    hostTheme: true,
+    reflectToAttr: true,
+    hasSlot: true,
+    hasSvg: true,
+    observeAttr: true,
+    isDev: true,
+    isProd: false,
+    element: true,
+    event: true,
+    listener: true,
+    method: true,
+    propConnect: true,
+    propContext: true,
+    watchCallback: true,
+    cmpDidLoad: true,
+    cmpWillLoad: true,
+    cmpDidUpdate: true,
+    cmpWillUpdate: true,
+    cmpDidUnload: true,
+    clientSide: true,
+    externalModuleLoader: false,
+    browserModuleLoader: false,
+    es5: false
+  };
+}
+
 export async function setBuildConditionals(
   config: d.Config,
   compilerCtx: d.CompilerCtx,
