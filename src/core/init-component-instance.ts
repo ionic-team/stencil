@@ -123,7 +123,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     }
 
     // add the css class that this element has officially hydrated
-    elm.classList.add(hydratedCssClass);
+    plt.domApi.$addClass(elm, hydratedCssClass);
 
     // ( •_•)
     // ( •_•)>⌐■-■

@@ -12,7 +12,7 @@ describe('app-core', () => {
 
   beforeEach(() => {
     config = mockConfig();
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     ctx = {};
   });
 

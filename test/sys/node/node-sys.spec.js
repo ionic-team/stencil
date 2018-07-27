@@ -62,12 +62,12 @@ describe('test/sys/node', () => {
 
   it('scopeCss', () => {
     const cssText = `::slotted(*) {}`;
-    const scopeAttribute = `data-ion-tag`;
-    const hostScopeAttr = `data-ion-tag-host`;
-    const slotScopeAttr = `data-ion-tag-slot`;
+    const scopeAttribute = `sc-ion-tag`;
+    const hostScopeAttr = `sc-ion-tag-h`;
+    const slotScopeAttr = `sc-ion-tag-s`;
 
     return sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr).then(scopeCss => {
-      expect(scopeCss).toBe(`[data-ion-tag-slot] > * {}`);
+      expect(scopeCss).toBe(`.sc-ion-tag-s > * {}`);
     });
   });
 

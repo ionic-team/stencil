@@ -19,7 +19,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
-    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_VNODE_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom)) {
+    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_VNODE_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom)) {
       // only required when we're NOT using native shadow dom (slot)
       // or this browser doesn't support native shadow dom
       // and this host element was NOT created with SSR
@@ -31,7 +31,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
     }
 
-    if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom as number) {
+    if (!domApi.$supportsShadowDom && cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom as number) {
       // this component should use shadow dom
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
@@ -51,7 +51,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   }
 
   if (__BUILD_CONDITIONALS__.shadowDom) {
-    if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom && !hostElm.shadowRoot) {
+    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom && !hostElm.shadowRoot) {
       // this component is using shadow dom
       // and this browser supports shadow dom
       // add the read-only property "shadowRoot" to the host element

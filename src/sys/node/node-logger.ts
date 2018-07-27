@@ -1,4 +1,3 @@
-import { Chalk } from 'chalk';
 import * as d from '../../declarations';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -6,7 +5,7 @@ import * as path from 'path';
 
 export class NodeLogger implements d.Logger {
   private _level = 'info';
-  private chalk: Chalk;
+  private turbocolor: any;
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
 
@@ -15,7 +14,7 @@ export class NodeLogger implements d.Logger {
     const distDir = path.join(rootDir, 'dist');
     const sysUtil = require(path.join(distDir, 'sys', 'node', 'sys-util.js'));
 
-    this.chalk = sysUtil.chalk;
+    this.turbocolor = sysUtil.turbocolor;
   }
 
   get level() {
@@ -27,7 +26,7 @@ export class NodeLogger implements d.Logger {
       l = l.toLowerCase().trim();
 
       if (LOG_LEVELS.indexOf(l) === -1) {
-        this.error(`Invalid log level '${this.chalk.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.chalk.bold(l)).join(', ')})`);
+        this.error(`Invalid log level '${this.turbocolor.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.turbocolor.bold(l)).join(', ')})`);
       } else {
         this._level = l;
       }
@@ -68,7 +67,7 @@ export class NodeLogger implements d.Logger {
   warnPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ WARN  ]';
-      lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.turbocolor.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -94,7 +93,7 @@ export class NodeLogger implements d.Logger {
   errorPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ ERROR ]';
-      lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.turbocolor.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -117,7 +116,7 @@ export class NodeLogger implements d.Logger {
         ('0' + d.getSeconds()).slice(-2) + '.' +
         Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
 
-      lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
+      lines[0] = this.turbocolor.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }
 
@@ -225,43 +224,43 @@ export class NodeLogger implements d.Logger {
   }
 
   color(msg: string, color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
-    return (this.chalk as any)[color](msg);
+    return (this.turbocolor as any)[color](msg);
   }
 
   red(msg: string) {
-    return this.chalk.red(msg);
+    return this.turbocolor.red(msg);
   }
 
   green(msg: string) {
-    return this.chalk.green(msg);
+    return this.turbocolor.green(msg);
   }
 
   yellow(msg: string) {
-    return this.chalk.yellow(msg);
+    return this.turbocolor.yellow(msg);
   }
 
   blue(msg: string) {
-    return this.chalk.blue(msg);
+    return this.turbocolor.blue(msg);
   }
 
   magenta(msg: string) {
-    return this.chalk.magenta(msg);
+    return this.turbocolor.magenta(msg);
   }
 
   cyan(msg: string) {
-    return this.chalk.cyan(msg);
+    return this.turbocolor.cyan(msg);
   }
 
   gray(msg: string) {
-    return this.chalk.gray(msg);
+    return this.turbocolor.gray(msg);
   }
 
   bold(msg: string) {
-    return this.chalk.bold(msg);
+    return this.turbocolor.bold(msg);
   }
 
   dim(msg: string) {
-    return this.chalk.dim(msg);
+    return this.turbocolor.dim(msg);
   }
 
   private shouldLog(level: string): boolean {
@@ -298,15 +297,15 @@ export class NodeLogger implements d.Logger {
         header += ': ';
       }
 
-      header += this.chalk.cyan(d.relFilePath);
+      header += this.turbocolor.cyan(d.relFilePath);
 
       if (typeof d.lineNumber === 'number' && d.lineNumber > -1) {
-        header += this.chalk.dim(`:`);
-        header += this.chalk.yellow(`${d.lineNumber}`);
+        header += this.turbocolor.dim(`:`);
+        header += this.turbocolor.yellow(`${d.lineNumber}`);
 
         if (typeof d.columnNumber === 'number' && d.columnNumber > -1) {
-          header += this.chalk.dim(`:`);
-          header += this.chalk.yellow(`${d.columnNumber}`);
+          header += this.turbocolor.dim(`:`);
+          header += this.turbocolor.yellow(`${d.columnNumber}`);
         }
       }
     }
@@ -390,7 +389,7 @@ export class NodeLogger implements d.Logger {
     for (var i = 0; i < lineLength; i++) {
       var chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
-        chr = this.chalk.bgRed(chr === '' ? ' ' : chr);
+        chr = this.turbocolor.bgRed(chr === '' ? ' ' : chr);
       }
       lineChars.push(chr);
     }
@@ -405,7 +404,7 @@ export class NodeLogger implements d.Logger {
 
     const words = text.split(' ').map(word => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
-        return this.chalk.cyan(word);
+        return this.turbocolor.cyan(word);
       }
       return word;
     });
@@ -429,7 +428,7 @@ export class NodeLogger implements d.Logger {
         cssProp = false;
       }
       if (cssProp && safeChars.indexOf(c.toLowerCase()) > -1) {
-        chars.push(this.chalk.cyan(c));
+        chars.push(this.turbocolor.cyan(c));
         continue;
       }
 

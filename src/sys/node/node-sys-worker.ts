@@ -3,6 +3,7 @@ import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { loadUglifyDiagnostics } from '../../util/logger/logger-uglify';
 import { normalizePath } from '../../compiler/util';
+import { requestLatestCompilerVersion } from './check-version';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
@@ -107,9 +108,13 @@ export class NodeSystemWorker {
     };
   }
 
-  scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
+  requestLatestCompilerVersion() {
+    return requestLatestCompilerVersion();
+  }
+
+  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
     const sc = new ShadowCss();
-    return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+    return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
   }
 
   transpileToEs5(cwd: string, input: string) {

@@ -67,13 +67,11 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
 
 export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement) {
   // first see if we've got a style for a specific mode
-  const encapsulation = cmpMeta.encapsulation;
-
   // either this host element should use scoped css
-    // or it wants to use shadow dom but the browser doesn't support it
-    // create a scope id which is useful for scoped css
-    // and add the scope attribute to the host
-  const shouldScopeCss = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
+  // or it wants to use shadow dom but the browser doesn't support it
+  // create a scope id which is useful for scoped css
+  // and add the scope attribute to the host
+  const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
 
   // create the style id w/ the host element's mode
   let styleId = cmpMeta.tagNameMeta + hostElm.mode;
@@ -101,7 +99,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
     if (domApi.$supportsShadowDom) {
-      if (encapsulation === ENCAPSULATION.ShadowDom) {
+      if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
         styleContainerNode = hostElm.shadowRoot as any;

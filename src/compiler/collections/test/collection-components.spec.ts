@@ -25,21 +25,21 @@ describe('collection components', () => {
   });
 
   it('scoped css encapsulation', () => {
-    a.encapsulation = ENCAPSULATION.ScopedCss;
+    a.encapsulationMeta = ENCAPSULATION.ScopedCss;
     const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.scoped).toBe(true);
     expect(cmpData.shadow).toBeFalsy();
     b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
-    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
+    expect(b.cmpMeta.encapsulationMeta).toBe(ENCAPSULATION.ScopedCss);
   });
 
   it('shadow dom encapsulation', () => {
-    a.encapsulation = ENCAPSULATION.ShadowDom;
+    a.encapsulationMeta = ENCAPSULATION.ShadowDom;
     const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.shadow).toBe(true);
     expect(cmpData.scoped).toBeFalsy();
     b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
-    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
+    expect(b.cmpMeta.encapsulationMeta).toBe(ENCAPSULATION.ShadowDom);
   });
 
   it('eventsMeta', () => {

@@ -13,7 +13,7 @@ describe('validateOutputTargetWww', () => {
       },
       rootDir: '/',
       flags: {}
-    };
+    } as any;
   });
 
   it('should www with sub directory', () => {

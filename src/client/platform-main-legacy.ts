@@ -204,7 +204,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulation, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
             }
             break;
           }
@@ -302,7 +302,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    const useScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+    const useScoped = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
     let url = resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js';
 
     if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {

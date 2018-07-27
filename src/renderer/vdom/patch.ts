@@ -29,7 +29,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       if (newVNode.vtag === 'slot') {
         if (scopeId) {
           // scoped css needs to add its scoped id to the parent element
-          domApi.$setAttribute(parentElm, scopeId + '-slot', '');
+          domApi.$addClass(parentElm, scopeId + '-s');
         }
 
         if (!newVNode.vchildren) {
@@ -72,7 +72,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       if (isDef(scopeId) && elm['s-si'] !== scopeId) {
         // if there is a scopeId and this is the initial render
         // then let's add the scopeId as an attribute
-        domApi.$setAttribute(elm, (elm['s-si'] = scopeId), '');
+        domApi.$addClass(elm, (elm['s-si'] = scopeId));
       }
 
       if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {

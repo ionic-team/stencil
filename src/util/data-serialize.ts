@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { dashToPascalCase } from './helpers';
 
 
@@ -19,7 +19,7 @@ export function formatBrowserLoaderComponent(cmpMeta: d.ComponentMeta): d.Compon
     /* 1 */ formatBrowserLoaderBundleIds(cmpMeta.bundleIds as d.BundleIds),
     /* 2 */ formatHasStyles(cmpMeta.stylesMeta),
     /* 3 */ formatMembers(cmpMeta.membersMeta),
-    /* 4 */ formatEncapsulation(cmpMeta.encapsulation),
+    /* 4 */ formatEncapsulation(cmpMeta.encapsulationMeta),
     /* 5 */ formatListeners(cmpMeta.listenersMeta)
   ];
 
@@ -33,7 +33,7 @@ export async function formatEsmLoaderComponent(config: d.Config, cmpMeta: d.Comp
     /* 1 */ '__GET_MODULE_FN__',
     /* 2 */ formatHasStyles(cmpMeta.stylesMeta),
     /* 3 */ formatMembers(cmpMeta.membersMeta),
-    /* 4 */ formatEncapsulation(cmpMeta.encapsulation),
+    /* 4 */ formatEncapsulation(cmpMeta.encapsulationMeta),
     /* 5 */ formatListeners(cmpMeta.listenersMeta)
   ];
 
@@ -107,11 +107,11 @@ function getModuleFileName(cmpMeta: d.ComponentMeta, styleMode: string) {
 
 function getModuleImport(cmpMeta: d.ComponentMeta, styleMode: string) {
   const bundleFileName = getModuleFileName(cmpMeta, styleMode);
-  const isScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
+  const hasScoped = (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss);
 
   if (styleMode === '$' || styleMode === 'md') {
 
-    if (isScoped) {
+    if (hasScoped) {
       return `
         if (o.scoped) {
           return import('./${bundleFileName}.sc.js');
@@ -123,7 +123,7 @@ function getModuleImport(cmpMeta: d.ComponentMeta, styleMode: string) {
     return `return import('./${bundleFileName}.js');`;
   }
 
-  if (isScoped) {
+  if (hasScoped) {
     return `
       if (o.mode == '${styleMode}') {
         if (o.scoped) {

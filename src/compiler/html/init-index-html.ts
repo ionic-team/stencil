@@ -9,44 +9,43 @@ export async function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-async function initIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+async function initIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget) {
   // if there isn't an index.html yet
   // let's generate a slim one quick so that
   // on the first build the user sees a loading indicator
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (outputTarget.type !== 'www') {
+  if (outputTarget.type === 'www') {
     // only worry about this when generating www directory
-    return;
-  }
 
-  // check if there's even a src index.html file
-  const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
-  if (!hasSrcIndexHtml) {
-    // there is no src index.html file in the config, which is fine
-    // since there is no src index file at all, don't bother
-    // this isn't actually an error, don't worry about it
-    return;
-  }
+    // check if there's even a src index.html file
+    const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
+    if (!hasSrcIndexHtml) {
+      // there is no src index.html file in the config, which is fine
+      // since there is no src index file at all, don't bother
+      // this isn't actually an error, don't worry about it
+      return;
+    }
 
-  if (compilerCtx.hasSuccessfulBuild) {
-    // we've already had a successful build, we're good
-    // always recopy index.html (it's all cached if it didn't actually change, all good)
-    const srcIndexHtmlContent = await compilerCtx.fs.readFile(config.srcIndexHtml);
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, srcIndexHtmlContent);
-    return;
-  }
+    if (compilerCtx.hasSuccessfulBuild) {
+      // we've already had a successful build, we're good
+      // always recopy index.html (it's all cached if it didn't actually change, all good)
+      const srcIndexHtmlContent = await compilerCtx.fs.readFile(config.srcIndexHtml);
+      await compilerCtx.fs.writeFile(outputTarget.indexHtml, srcIndexHtmlContent);
+      return;
+    }
 
-  try {
-    // ok, so we haven't written an index.html build file yet
-    // and we do know they have a src one, so let's write a
-    // filler index.html file that shows while the first build is happening
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, APP_LOADING_HTML);
-    await compilerCtx.fs.commit();
+    try {
+      // ok, so we haven't written an index.html build file yet
+      // and we do know they have a src one, so let's write a
+      // filler index.html file that shows while the first build is happening
+      await compilerCtx.fs.writeFile(outputTarget.indexHtml, APP_LOADING_HTML);
+      await compilerCtx.fs.commit();
 
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+    } catch (e) {
+      catchError(buildCtx.diagnostics, e);
+    }
   }
 }
 

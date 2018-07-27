@@ -1,8 +1,8 @@
 import * as d from '../declarations';
-import { h } from '../renderer/vdom/h';
-import { ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { dashToPascalCase } from '../util/helpers';
-import { getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../util/scope';
+import { getElementScopeId } from '../util/scope';
+import { h } from '../renderer/vdom/h';
+import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
@@ -49,9 +49,10 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // if no render function
       const scopeId = hostElm['s-sc'];
       if (scopeId) {
-        plt.domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
+        plt.domApi.$addClass(hostElm, getElementScopeId(scopeId, true));
+
         if (!instance.render) {
-          plt.domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
+          plt.domApi.$addClass(hostElm, getElementScopeId(scopeId));
         }
       }
     }
@@ -228,21 +229,4 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
   }
 
   return reflectHostAttr;
-}
-
-export function applyHostScope(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
-    // either this host element should use scoped css
-    // or it wants to use shadow dom but the browser doesn't support it
-    // create a scope id which is useful for scoped css
-    // and add the scope attribute to the host
-    const scopeId = getScopeId(cmpMeta, cmpMeta.componentConstructor.styleMode);
-    hostElm['s-sc'] = scopeId;
-    domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
-
-    // if no render function
-    if (!instance.render) {
-      domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
-    }
-  }
 }

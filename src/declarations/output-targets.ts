@@ -1,14 +1,16 @@
 import * as d from '.';
 
 
-export interface OutputTargetWww extends OutputTarget {
+export interface OutputTargetWww extends OutputTargetBase {
+  type: 'www';
+
   buildDir?: string;
   dir?: string;
   empty?: boolean;
-  indexHtml?: string;
   resourcesUrl?: string;
-  serviceWorker?: d.ServiceWorkerConfig;
 
+  indexHtml?: string;
+  serviceWorker?: d.ServiceWorkerConfig | null;
   baseUrl?: string;
   canonicalLink?: boolean;
   collapseWhitespace?: boolean;
@@ -25,17 +27,6 @@ export interface OutputTargetWww extends OutputTarget {
   removeUnusedStyles?: boolean;
 }
 
-
-export interface OutputTargetDist extends OutputTarget {
-  buildDir?: string;
-  collectionDir?: string;
-  dir?: string;
-  empty?: boolean;
-  resourcesUrl?: string;
-  typesDir?: string;
-}
-
-
 export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
   html?: string;
   url?: string;
@@ -51,34 +42,66 @@ export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
 }
 
 
-export interface OutputTargetDocs extends OutputTarget {
+export interface OutputTargetDist extends OutputTargetBase {
+  type: 'dist';
+
+  buildDir?: string;
+  dir?: string;
+  empty?: boolean;
+  resourcesUrl?: string;
+
+  collectionDir?: string;
+  typesDir?: string;
+}
+
+
+export interface OutputTargetDocs extends OutputTargetBase {
+  type: 'docs';
+
   readmeDir?: string;
   jsonFile?: string;
 }
 
 
-export interface OutputTargetStats extends OutputTarget {
+export interface OutputTargetStats extends OutputTargetBase {
+  type: 'stats';
+
   file?: string;
 }
 
 
-export interface OutputTargetAngular extends OutputTarget {
+export interface OutputTargetAngular extends OutputTargetBase {
+  type: 'angular';
+
   buildDir?: string;
   dir?: string;
   empty?: boolean;
   resourcesUrl?: string;
+
   typesDir?: string;
   directivesProxyFile?: string;
   directivesArrayFile?: string;
   excludeComponents?: string[];
 }
 
-export interface OutputTargetCustomElements extends OutputTarget {
 
-}
-
-
-export interface OutputTarget {
-  type?: 'angular' | 'dist' | 'docs' | 'stats' | 'www';
+export interface OutputTargetBase {
+  type: string;
   appBuild?: boolean;
 }
+
+
+export type OutputTargetBuild =
+ | OutputTargetAngular
+ | OutputTargetDist
+ | OutputTargetHydrate
+ | OutputTargetWww;
+
+
+export type OutputTarget =
+ | OutputTargetAngular
+ | OutputTargetStats
+ | OutputTargetDocs
+ | OutputTargetHydrate
+ | OutputTargetDist
+ | OutputTargetWww;

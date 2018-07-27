@@ -194,7 +194,7 @@ describe('build conditionals', () => {
     });
 
     it('shadowDom', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
         shadowDom: true,
@@ -207,7 +207,7 @@ describe('build conditionals', () => {
     });
 
     it('slotPolyfill cuz ScopedCss', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
         shadowDom: false,
@@ -220,7 +220,7 @@ describe('build conditionals', () => {
     });
 
     it('slotPolyfill cuz NoEncapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
         shadowDom: false,

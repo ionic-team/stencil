@@ -64,6 +64,8 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
 
 
 const FULL_PRERENDER_DEFAULTS: d.OutputTargetWww = {
+  type: 'www',
+
   baseUrl: '/',
   canonicalLink: true,
   collapseWhitespace: true,
@@ -80,6 +82,8 @@ const FULL_PRERENDER_DEFAULTS: d.OutputTargetWww = {
 
 
 const SSR_DEFAULTS: d.OutputTargetWww = {
+  type: 'www',
+
   baseUrl: '/',
   canonicalLink: true,
   collapseWhitespace: true,
@@ -96,6 +100,8 @@ const SSR_DEFAULTS: d.OutputTargetWww = {
 
 
 const PROD_NON_HYDRATE_DEFAULTS: d.OutputTargetWww = {
+  type: 'www',
+
   baseUrl: '/',
   canonicalLink: false,
   collapseWhitespace: true,
@@ -112,6 +118,8 @@ const PROD_NON_HYDRATE_DEFAULTS: d.OutputTargetWww = {
 
 
 const DEV_MODE_DEFAULTS: d.OutputTargetWww = {
+  type: 'www',
+
   baseUrl: '/',
   canonicalLink: false,
   collapseWhitespace: false,

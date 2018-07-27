@@ -12,6 +12,7 @@ import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
+import { serverAttachStyles, serverInitStyle } from './server-styles';
 import { toDashCase } from '../util/helpers';
 
 
@@ -27,7 +28,7 @@ export function createPlatformServer(
   compilerCtx?: d.CompilerCtx
 ): d.PlatformApi {
   const loadedBundles: {[bundleId: string]:  d.CjsExports} = {};
-  const styles: {[tagName: string]: string} = {};
+  const appliedStyleIds = new Set<string>();
   const controllerComponents: {[tag: string]: d.HostElement} = {};
 
   const domApi = createDomApi(App, win, doc);
@@ -128,10 +129,7 @@ export function createPlatformServer(
   function appLoaded(failureDiagnostic?: d.Diagnostic) {
     if (plt.hasLoadedMap.has(rootElm) || failureDiagnostic) {
       // the root node has loaded
-      // and there are no css files still loading
-      const allStyles = Object.keys(styles).map(tagName => styles[tagName]);
-
-      plt.onAppLoad && plt.onAppLoad(rootElm, allStyles, failureDiagnostic);
+      plt.onAppLoad && plt.onAppLoad(rootElm, failureDiagnostic);
     }
   }
 
@@ -204,9 +202,7 @@ export function createPlatformServer(
                 }
               }
 
-              if (componentConstructor.style) {
-                styles[cmpMeta.tagNameMeta] = componentConstructor.style;
-              }
+              serverInitStyle(domApi, appliedStyleIds, componentConstructor);
             }
             break;
           }
@@ -235,7 +231,9 @@ export function createPlatformServer(
   }
 
 
-  plt.attachStyles = function attachStyles(_domApi, _cmpMeta, _elm) {/**/};
+  plt.attachStyles = (plt, _domApi, cmpMeta, hostElm) => {
+    serverAttachStyles(plt, appliedStyleIds, cmpMeta, hostElm);
+  };
 
 
   // This is executed by the component's connected callback.
@@ -251,9 +249,7 @@ export function createPlatformServer(
 
     // It is possible the data was loaded from an outside source like tests
     if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
-      if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style) {
-        styles[cmpMeta.tagNameMeta] = cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style;
-      }
+      serverInitStyle(domApi, appliedStyleIds, cmpRegistry[cmpMeta.tagNameMeta].componentConstructor);
       queueUpdate(plt, elm);
 
     } else {
@@ -263,9 +259,6 @@ export function createPlatformServer(
 
       if (getLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
-        if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style) {
-          styles[cmpMeta.tagNameMeta] = cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style;
-        }
         queueUpdate(plt, elm);
 
       } else {
@@ -355,7 +348,7 @@ export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: s
     cmpMeta.bundleIds :
     ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE]);
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';
   }
 

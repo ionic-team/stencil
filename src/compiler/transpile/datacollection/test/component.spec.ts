@@ -17,7 +17,7 @@ describe('component', () => {
 
       expect(response).toEqual({
         'componentClass': 'ActionSheet',
-        'encapsulation': ENCAPSULATION.NoEncapsulation,
+        'encapsulationMeta': ENCAPSULATION.NoEncapsulation,
         'assetsDirsMeta': [],
         'dependencies': [],
         'eventsMeta': [

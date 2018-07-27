@@ -36,7 +36,7 @@ describe('validateDistOutputTarget', () => {
       { type: 'dist' }
     ];
     validateOutputTargetDist(config);
-    const outputTarget: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    const outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
     expect(outputTarget.dir).toBe('/dist');
     expect(outputTarget.buildDir).toBe('/dist');

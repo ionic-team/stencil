@@ -42,7 +42,7 @@ export function validateDevServer(config: d.Config) {
 
   let serveDir: string = null;
   let baseUrl: string = null;
-  const wwwOutputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+  const wwwOutputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
 
   if (wwwOutputTarget) {
     serveDir = wwwOutputTarget.dir;

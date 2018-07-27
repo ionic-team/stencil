@@ -149,12 +149,12 @@ export class ShadowCss {
   * - selector is the attribute added to all elements inside the host,
   * - hostSelector is the attribute added to the host itself.
   */
-  shimCssText(cssText: string, selector: string, hostSelector = '', slotSelector = ''): string {
+  shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = ''): string {
     const commentsWithHash = extractCommentsWithHash(cssText);
     cssText = stripComments(cssText);
     cssText = this._insertDirectives(cssText);
 
-    const scopedCssText = this._scopeCssText(cssText, selector, hostSelector, slotSelector);
+    const scopedCssText = this._scopeCssText(cssText, scopeId, hostScopeId, slotScopeId);
     return [scopedCssText, ...commentsWithHash].join('\n');
   }
 
@@ -214,20 +214,20 @@ export class ShadowCss {
    *
    *  scopeName .foo { ... }
   */
-  private _scopeCssText(cssText: string, scopeSelector: string, hostSelector: string, slotSelector: string): string {
+  private _scopeCssText(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string): string {
     const unscopedRules = this._extractUnscopedRulesFromCssText(cssText);
     // replace :host and :host-context -shadowcsshost and -shadowcsshost respectively
     cssText = this._insertPolyfillHostInCssText(cssText);
     cssText = this._convertColonHost(cssText);
     cssText = this._convertColonHostContext(cssText);
-    cssText = this._convertColonSlotted(cssText, slotSelector);
+    cssText = this._convertColonSlotted(cssText, slotScopeId);
     cssText = this._convertShadowDOMSelectors(cssText);
-    if (scopeSelector) {
-      cssText = this._scopeSelectors(cssText, scopeSelector, hostSelector, slotSelector);
+    if (scopeId) {
+      cssText = this._scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId);
     }
     cssText = cssText + '\n' + unscopedRules;
 
-    cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `[${hostSelector}]`);
+    cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
     cssText = cssText.replace(/>\s*\*\s+([^{, ]+)/gm, ' $1 ');
     return cssText.trim();
   }
@@ -281,7 +281,7 @@ export class ShadowCss {
         const compound = m[2].trim();
         const suffix = m[3];
 
-        const sel = '[' + slotAttr + '] > ' + compound + suffix;
+        const sel = '.' + slotAttr + ' > ' + compound + suffix;
 
         return sel;
 
@@ -367,14 +367,15 @@ export class ShadowCss {
   }
 
   private _scopeSelector(
-      selector: string, scopeSelector: string, hostSelector: string, slotSelector: string, strict: boolean): string {
+      selector: string, scopeSelector: string, hostSelector: string, slotSelector: string, strict: boolean) {
+
     return selector.split(',')
         .map(part => part.trim().split(_shadowDeepSelectors))
         .map((deepParts) => {
           const [shallowPart, ...otherParts] = deepParts;
           const applyScope = (shallowPart: string) => {
 
-            if (shallowPart.indexOf('[' + slotSelector + ']') > -1) {
+            if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
               return shallowPart;
             }
 
@@ -391,31 +392,29 @@ export class ShadowCss {
         .join(', ');
   }
 
-  private _selectorNeedsScoping(selector: string, scopeSelector: string): boolean {
+  private _selectorNeedsScoping(selector: string, scopeSelector: string) {
     const re = this._makeScopeMatcher(scopeSelector);
     return !re.test(selector);
   }
 
-  private _makeScopeMatcher(scopeSelector: string): RegExp {
+  private _makeScopeMatcher(scopeSelector: string) {
     const lre = /\[/g;
     const rre = /\]/g;
     scopeSelector = scopeSelector.replace(lre, '\\[').replace(rre, '\\]');
     return new RegExp('^(' + scopeSelector + ')' + _selectorReSuffix, 'm');
   }
 
-  private _applySelectorScope(selector: string, scopeSelector: string, hostSelector: string):
-      string {
+  private _applySelectorScope(selector: string, scopeSelector: string, hostSelector: string) {
     // Difference from webcomponents.js: scopeSelector could not be an array
     return this._applySimpleSelectorScope(selector, scopeSelector, hostSelector);
   }
 
   // scope via name and [is=name]
-  private _applySimpleSelectorScope(selector: string, scopeSelector: string, hostSelector: string):
-      string {
+  private _applySimpleSelectorScope(selector: string, scopeSelector: string, hostSelector: string) {
     // In Android browser, the lastIndex is not reset when the regex is used in String.replace()
     _polyfillHostRe.lastIndex = 0;
     if (_polyfillHostRe.test(selector)) {
-      const replaceBy = this.strictStyling ? `[${hostSelector}]` : scopeSelector;
+      const replaceBy = this.strictStyling ? `.${hostSelector}` : scopeSelector;
       return selector
           .replace(
               _polyfillHostNoCombinatorRe,
@@ -432,14 +431,11 @@ export class ShadowCss {
     return scopeSelector + ' ' + selector;
   }
 
-  // return a selector with [name] suffix on each simple selector
-  // e.g. .foo.bar > .zot becomes .foo[name].bar[name] > .zot[name]  /** @internal */
-  private _applyStrictSelectorScope(selector: string, scopeSelector: string, hostSelector: string):
-      string {
+  private _applyStrictSelectorScope(selector: string, scopeSelector: string, hostSelector: string) {
     const isRe = /\[is=([^\]]*)\]/g;
     scopeSelector = scopeSelector.replace(isRe, (_: string, ...parts: string[]) => parts[0]);
 
-    const attrName = '[' + scopeSelector + ']';
+    const className = '.' + scopeSelector;
 
     const _scopeSelectorPart = (p: string) => {
       let scopedP = p.trim();
@@ -456,7 +452,7 @@ export class ShadowCss {
         if (t.length > 0) {
           const matches = t.match(/([^:]*)(:*)(.*)/);
           if (matches) {
-            scopedP = matches[1] + attrName + matches[2] + matches[3];
+            scopedP = matches[1] + className + matches[2] + matches[3];
           }
         }
       }
@@ -505,10 +501,11 @@ export class ShadowCss {
   }
 
   private _insertPolyfillHostInCssText(selector: string): string {
-    return selector
+    selector = selector
       .replace(_colonHostContextRe, _polyfillHostContext)
       .replace(_colonHostRe, _polyfillHost)
       .replace(_colonSlottedRe, _polyfillSlotted);
+    return selector;
   }
 }
 

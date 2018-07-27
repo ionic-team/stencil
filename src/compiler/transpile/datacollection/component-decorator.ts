@@ -34,7 +34,7 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
   };
 
   // normalizeEncapsulation
-  cmpMeta.encapsulation =
+  cmpMeta.encapsulationMeta =
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;

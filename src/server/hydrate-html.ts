@@ -44,7 +44,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
 
     // fire off this function when the app has finished loading
     // and all components have finished hydrating
-    plt.onAppLoad = async (rootElm, styles, failureDiagnostic) => {
+    plt.onAppLoad = async (rootElm, failureDiagnostic) => {
 
       if (config._isTesting) {
         (hydrateResults as any).__testPlatform = plt;
@@ -61,7 +61,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
       if (rootElm) {
         try {
           // optimize this document!!
-          await optimizeHtml(config, compilerCtx, hydrateTarget, hydrateResults.url, doc, styles, hydrateResults.diagnostics);
+          await optimizeHtml(config, compilerCtx, hydrateTarget, hydrateResults.url, doc, hydrateResults.diagnostics);
 
           // gather up all of the <a> tag information in the doc
           if (hydrateTarget.isPrerender && hydrateTarget.hydrateComponents) {
@@ -103,7 +103,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
     };
 
     if (hydrateTarget.hydrateComponents === false) {
-      plt.onAppLoad(win.document.body as any, []);
+      plt.onAppLoad(win.document.body as any);
       return;
     }
 

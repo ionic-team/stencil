@@ -69,7 +69,8 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
   const req: d.HttpRequest = {
     method: (incomingReq.method || 'GET').toUpperCase() as any,
     acceptHeader: (incomingReq.headers && typeof incomingReq.headers.accept === 'string' && incomingReq.headers.accept) || '',
-    url: (incomingReq.url || '').trim() || ''
+    url: (incomingReq.url || '').trim() || '',
+    host: (incomingReq.headers && typeof incomingReq.headers.host === 'string' && incomingReq.headers.host) || null
   };
 
   const parsedUrl = url.parse(req.url);

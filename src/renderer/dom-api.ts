@@ -43,6 +43,9 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $appendChild: (parentNode: Node, childNode: Node) =>
       parentNode.appendChild(childNode),
 
+    $addClass: (elm: Element, cssClass: string) =>
+      elm.classList.add(cssClass),
+
     $childNodes: (node: Node) =>
       node.childNodes,
 

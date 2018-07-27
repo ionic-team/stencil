@@ -44,12 +44,12 @@ describe('shadow-dom-basic', function() {
   function testPolyfilledShadow(elm: Element) {
     expect(elm.shadowRoot).toBe(elm);
 
-    expect(elm.hasAttribute('data-shadow-dom-basic-root-host')).toBe(true);
+    expect(elm.classList.contains('sc-shadow-dom-basic-root-h')).toBe(true);
 
     expect(elm.children[0].nodeName).toBe('SHADOW-DOM-BASIC');
-    expect(elm.children[0].hasAttribute('data-shadow-dom-basic-root')).toBe(true);
-    expect(elm.children[0].hasAttribute('data-shadow-dom-basic-host')).toBe(true);
-    expect(elm.children[0].hasAttribute('data-shadow-dom-basic-slot')).toBe(true);
+    expect(elm.children[0].classList.contains('sc-shadow-dom-basic-root')).toBe(true);
+    expect(elm.children[0].classList.contains('sc-shadow-dom-basic-h')).toBe(true);
+    expect(elm.children[0].classList.contains('sc-shadow-dom-basic-s')).toBe(true);
 
     expect(elm.children[0].children[0].nodeName).toBe('DIV');
     expect(elm.children[0].children[0].textContent.trim()).toBe('shadow');

@@ -22,7 +22,7 @@ describe('host-config', () => {
         } as d.OutputTargetWww
       ];
       validateConfig(config);
-      outputTarget = config.outputTargets[0];
+      outputTarget = config.outputTargets[0] as d.OutputTargetWww;
       const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
       const url = getUrlFromFilePath(config, outputTarget, filePath);
       expect(url).toBe('/docs/build/app/1234.js');
@@ -37,7 +37,7 @@ describe('host-config', () => {
         } as d.OutputTargetWww
       ];
       validateConfig(config);
-      outputTarget = config.outputTargets[0];
+      outputTarget = config.outputTargets[0] as d.OutputTargetWww;
       const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
       const url = getUrlFromFilePath(config, outputTarget, filePath);
       expect(url).toBe('/build/app/1234.js');
@@ -46,7 +46,7 @@ describe('host-config', () => {
     it('path without baseUrl', () => {
       config = new TestingConfig();
       validateConfig(config);
-      outputTarget = config.outputTargets[0];
+      outputTarget = config.outputTargets[0] as d.OutputTargetWww;
       const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
       const url = getUrlFromFilePath(config, outputTarget, filePath);
       expect(url).toBe('/build/app/1234.js');

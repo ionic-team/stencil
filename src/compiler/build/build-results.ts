@@ -74,7 +74,7 @@ function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModul
   }
 
   en.moduleFiles.forEach(m => {
-    const encap = m.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss ? 'scoped' : m.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom ? 'shadow' : 'none';
+    const encap = m.cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss ? 'scoped' : m.cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom ? 'shadow' : 'none';
     if (!buildEntry.encapsulations.includes(encap)) {
       buildEntry.encapsulations.push(encap);
     }

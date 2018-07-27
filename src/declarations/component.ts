@@ -64,12 +64,13 @@ export interface ComponentMeta {
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   hostMeta?: HostMeta;
-  encapsulation?: number;
+  encapsulationMeta?: number;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;
   dependencies?: ComponentDependencies;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
+  styleDocs?: StyleDoc[];
   hmrLoad?: () => void;
 }
 
@@ -100,7 +101,7 @@ export interface MemberMeta {
   attribType?: AttributeTypeInfo;
   reflectToAttrib?: boolean;
   ctrlId?: string;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
   watchCallbacks?: string[];
 }
 
@@ -182,7 +183,7 @@ export interface EventMeta {
   eventCancelable?: boolean;
   eventComposed?: boolean;
   eventType?: AttributeTypeInfo;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
 }
 
 
@@ -192,14 +193,21 @@ export interface ListenMeta {
   eventCapture?: boolean;
   eventPassive?: boolean;
   eventDisabled?: boolean;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
 }
 
 
-export interface JSDoc {
+export interface JsDoc {
   name: string;
   documentation: string;
   type: string;
+}
+
+
+export interface StyleDoc {
+  name: string;
+  docs: string;
+  annotation: 'prop';
 }
 
 

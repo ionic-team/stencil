@@ -1,5 +1,4 @@
 import * as d from '../../../declarations';
-import { mockElement, mockHtml } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 import * as path from 'path';
@@ -25,7 +24,7 @@ describe('dist loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    const distOutput = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,
@@ -73,7 +72,7 @@ describe('dist loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    const distOutput = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,
@@ -127,10 +126,6 @@ describe('dist loader/core resourcesUrl', () => {
 
     win.requestAnimationFrame = (cb: Function) => {
       setTimeout(cb);
-    };
-
-    win.performance = {
-      now: () => Date.now()
     };
 
     win.CustomEvent = class {};
