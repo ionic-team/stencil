@@ -3,6 +3,7 @@ import { h } from '../h';
 import { mockDomApi, mockElement, mockRenderer, mockTextNode } from '../../../testing/mocks';
 import { SVG_NS } from '../../../util/constants';
 import { toVNode } from '../to-vnode';
+import { getScopeId } from '../../../util/scope';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
 
@@ -142,11 +143,11 @@ describe('renderer', () => {
 
     it('adds scope id to child elements', () => {
       hostElm = mockElement('my-tag');
-      hostElm['s-sc'] = 'data-my-tag';
+      hostElm['s-sc'] = getScopeId({ tagNameMeta: 'my-tag' });
       vnode0 = {};
       vnode0.elm = hostElm;
       hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null)), false, 'scoped').elm;
-      expect(hostElm.firstChild.hasAttribute('data-my-tag')).toBe(true);
+      expect(hostElm.firstChild.classList.contains('sc-my-tag')).toBe(true);
     });
 
   });

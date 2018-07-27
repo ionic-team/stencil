@@ -48,7 +48,7 @@ export interface StencilSystem {
     };
     plugins: RollupPlugins;
   };
-  scopeCss?: (cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) => Promise<string>;
+  scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
   semver?: {
     gt: (a: string, b: string, loose?: boolean) => boolean;
     gte: (a: string, b: string, loose?: boolean) => boolean;

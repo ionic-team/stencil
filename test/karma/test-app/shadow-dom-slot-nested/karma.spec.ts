@@ -56,33 +56,33 @@ describe('shadow-dom-slot-nested', () => {
 
     } else {
       expect(elm.shadowRoot).toBe(elm);
-      expect(elm.hasAttribute('data-shadow-dom-slot-nested-root-host')).toBe(true);
+      expect(elm.classList.contains('sc-shadow-dom-slot-nested-root-host')).toBe(true);
 
       const section = elm.querySelector('section');
-      expect(section.hasAttribute('data-shadow-dom-slot-nested-root')).toBe(true);
+      expect(section.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
       expect(section.textContent.trim()).toBe('shadow-dom-slot-nested');
       expect(window.getComputedStyle(section).color).toBe('rgb(0, 128, 0)');
 
       const article = elm.querySelector('article');
-      expect(article.hasAttribute('data-shadow-dom-slot-nested-root')).toBe(true);
+      expect(article.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
       expect(window.getComputedStyle(article).color).toBe('rgb(0, 128, 0)');
 
       expect(article.children.length).toBe(3);
 
       const testSlotPolyfillNested = function(i: number) {
         const nestedElm = article.children[i];
-        expect(nestedElm.hasAttribute('data-shadow-dom-slot-nested-root')).toBe(true);
-        expect(nestedElm.hasAttribute('data-shadow-dom-slot-nested-host')).toBe(true);
+        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
+        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-host')).toBe(true);
 
         const header = nestedElm.querySelector('header');
-        expect(header.hasAttribute('data-shadow-dom-slot-nested')).toBe(true);
-        expect(header.hasAttribute('data-shadow-dom-slot-nested-slot')).toBe(false);
+        expect(header.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
+        expect(header.classList.contains('sc-shadow-dom-slot-nested-slot')).toBe(false);
         expect(header.textContent.trim()).toBe('shadow dom: ' + i);
         expect(window.getComputedStyle(header).color).toBe('rgb(255, 0, 0)');
 
         const footer = nestedElm.querySelector('footer');
-        expect(footer.hasAttribute('data-shadow-dom-slot-nested')).toBe(true);
-        expect(footer.hasAttribute('data-shadow-dom-slot-nested-slot')).toBe(true);
+        expect(footer.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
+        expect(footer.classList.contains('sc-shadow-dom-slot-nested-slot')).toBe(true);
         expect(footer.textContent.trim()).toBe('light dom: ' + i);
         expect(window.getComputedStyle(footer).color).toBe('rgb(0, 128, 0)');
       };

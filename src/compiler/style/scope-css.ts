@@ -1,19 +1,20 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../../util/scope';
+import { getElementScopeId, getScopeId } from '../../util/scope';
+
 
 export async function scopeComponentCss(config: d.Config, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, mode: string, cssText: string) {
   try {
     const scopeId = getScopeId(cmpMeta, mode);
 
-    const scopeAttribute = scopeId;
-    const hostScopeAttr = getHostScopeAttribute(scopeId);
-    const slotScopeAttr = getSlotScopeAttribute(scopeId);
+    const hostScopeId = getElementScopeId(scopeId, true);
+    const slotScopeId = getElementScopeId(scopeId);
 
-    cssText = await config.sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+    cssText = await config.sys.scopeCss(cssText, scopeId, hostScopeId, slotScopeId);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
+
   return cssText;
 }

@@ -112,9 +112,9 @@ export class NodeSystemWorker {
     return requestLatestCompilerVersion();
   }
 
-  scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
+  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
     const sc = new ShadowCss();
-    return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
+    return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
   }
 
   transpileToEs5(cwd: string, input: string) {
