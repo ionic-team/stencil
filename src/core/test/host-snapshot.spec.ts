@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { initHostSnapshot } from '../host-snapshot';
 import { mockDomApi } from '../../testing/mocks';
 import { ENCAPSULATION } from '../../util/constants';
-
+import { getTestBuildConditionals } from '../../compiler/app/build-conditionals';
 
 describe('host-snapshot', () => {
 
@@ -16,11 +16,17 @@ describe('host-snapshot', () => {
     hostElm = domApi.$createElement('cmp-a') as any;
   });
 
+  afterEach(() => {
+    __BUILD_CONDITIONALS__ = getTestBuildConditionals();
+  });
+
 
   it('do not attach shadow root when not shadow', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
     cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
   });
