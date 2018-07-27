@@ -31,7 +31,7 @@ describe('hydrate', () => {
           }
           static get style() {
             return `
-              .sc-ion-test-host {
+              .sc-ion-test-h {
                 color: red;
               }
             `;
@@ -54,13 +54,13 @@ describe('hydrate', () => {
       <html dir="ltr" data-ssr="">
         <head>
           <style data-styles="">
-            .sc-ion-test-host {
+            .sc-ion-test-h {
               color:red;
             }
           </style>
         </head>
         <body>
-          <ion-test class="sc-ion-test-host ${config.hydratedCssClass}" ssrv="0">
+          <ion-test class="sc-ion-test-h ${config.hydratedCssClass}" ssrv="0">
             <div class="sc-ion-test" ssrc="0.0."></div>
           </ion-test>
         </body>

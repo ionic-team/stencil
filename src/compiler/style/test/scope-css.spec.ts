@@ -117,110 +117,110 @@ describe('ShadowCss', function() {
 
   describe((':host'), () => {
     it('should handle no context',
-        () => { expect(s(':host {}', 'a', 'a-host')).toEqual('.a-host {}'); });
+        () => { expect(s(':host {}', 'a', 'a-h')).toEqual('.a-h {}'); });
 
     it('should handle tag selector',
-        () => { expect(s(':host(ul) {}', 'a', 'a-host')).toEqual('ul.a-host {}'); });
+        () => { expect(s(':host(ul) {}', 'a', 'a-h')).toEqual('ul.a-h {}'); });
 
     it('should handle class selector',
-        () => { expect(s(':host(.x) {}', 'a', 'a-host')).toEqual('.x.a-host {}'); });
+        () => { expect(s(':host(.x) {}', 'a', 'a-h')).toEqual('.x.a-h {}'); });
 
     it('should handle attribute selector', () => {
-      expect(s(':host([a="b"]) {}', 'a', 'a-host')).toEqual('[a="b"].a-host {}');
-      expect(s(':host([a=b]) {}', 'a', 'a-host')).toEqual('[a="b"].a-host {}');
+      expect(s(':host([a="b"]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
+      expect(s(':host([a=b]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
     });
 
     it('should handle multiple tag selectors', () => {
-      expect(s(':host(ul,li) {}', 'a', 'a-host')).toEqual('ul.a-host, li.a-host {}');
-      expect(s(':host(ul,li) > .z {}', 'a', 'a-host'))
-          .toEqual('ul.a-host > .z.a, li.a-host > .z.a {}');
+      expect(s(':host(ul,li) {}', 'a', 'a-h')).toEqual('ul.a-h, li.a-h {}');
+      expect(s(':host(ul,li) > .z {}', 'a', 'a-h'))
+          .toEqual('ul.a-h > .z.a, li.a-h > .z.a {}');
     });
 
     it('should handle multiple class selectors', () => {
-      expect(s(':host(.x,.y) {}', 'a', 'a-host')).toEqual('.x.a-host, .y.a-host {}');
-      expect(s(':host(.x,.y) > .z {}', 'a', 'a-host'))
-          .toEqual('.x.a-host > .z.a, .y.a-host > .z.a {}');
+      expect(s(':host(.x,.y) {}', 'a', 'a-h')).toEqual('.x.a-h, .y.a-h {}');
+      expect(s(':host(.x,.y) > .z {}', 'a', 'a-h'))
+          .toEqual('.x.a-h > .z.a, .y.a-h > .z.a {}');
     });
 
     it('should handle multiple attribute selectors', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-host'))
-          .toEqual('[a="b"].a-host, [c="d"].a-host {}');
+      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h'))
+          .toEqual('[a="b"].a-h, [c="d"].a-h {}');
     });
 
     it('should handle pseudo selectors', () => {
-      expect(s(':host(:before) {}', 'a', 'a-host')).toEqual('.a-host:before {}');
-      expect(s(':host:before {}', 'a', 'a-host')).toEqual('.a-host:before {}');
-      expect(s(':host:nth-child(8n+1) {}', 'a', 'a-host')).toEqual('.a-host:nth-child(8n+1) {}');
-      expect(s(':host:nth-of-type(8n+1) {}', 'a', 'a-host'))
-          .toEqual('.a-host:nth-of-type(8n+1) {}');
-      expect(s(':host(.class):before {}', 'a', 'a-host')).toEqual('.class.a-host:before {}');
-      expect(s(':host.class:before {}', 'a', 'a-host')).toEqual('.class.a-host:before {}');
-      expect(s(':host(:not(p)):before {}', 'a', 'a-host')).toEqual('.a-host:not(p):before {}');
+      expect(s(':host(:before) {}', 'a', 'a-h')).toEqual('.a-h:before {}');
+      expect(s(':host:before {}', 'a', 'a-h')).toEqual('.a-h:before {}');
+      expect(s(':host:nth-child(8n+1) {}', 'a', 'a-h')).toEqual('.a-h:nth-child(8n+1) {}');
+      expect(s(':host:nth-of-type(8n+1) {}', 'a', 'a-h'))
+          .toEqual('.a-h:nth-of-type(8n+1) {}');
+      expect(s(':host(.class):before {}', 'a', 'a-h')).toEqual('.class.a-h:before {}');
+      expect(s(':host.class:before {}', 'a', 'a-h')).toEqual('.class.a-h:before {}');
+      expect(s(':host(:not(p)):before {}', 'a', 'a-h')).toEqual('.a-h:not(p):before {}');
     });
   });
 
   describe((':host-context'), () => {
     it('should handle tag selector', () => {
-      expect(s(':host-context(div) {}', 'a', 'a-host')).toEqual('div.a-host, div .a-host {}');
-      expect(s(':host-context(ul) > .y {}', 'a', 'a-host'))
-          .toEqual('ul.a-host > .y.a, ul .a-host > .y.a {}');
+      expect(s(':host-context(div) {}', 'a', 'a-h')).toEqual('div.a-h, div .a-h {}');
+      expect(s(':host-context(ul) > .y {}', 'a', 'a-h'))
+          .toEqual('ul.a-h > .y.a, ul .a-h > .y.a {}');
     });
 
     it('should handle class selector', () => {
-      expect(s(':host-context(.x) {}', 'a', 'a-host')).toEqual('.x.a-host, .x .a-host {}');
+      expect(s(':host-context(.x) {}', 'a', 'a-h')).toEqual('.x.a-h, .x .a-h {}');
 
-      expect(s(':host-context(.x) > .y {}', 'a', 'a-host'))
-          .toEqual('.x.a-host > .y.a, .x .a-host > .y.a {}');
+      expect(s(':host-context(.x) > .y {}', 'a', 'a-h'))
+          .toEqual('.x.a-h > .y.a, .x .a-h > .y.a {}');
     });
 
     it('should handle attribute selector', () => {
-      expect(s(':host-context([a="b"]) {}', 'a', 'a-host'))
-          .toEqual('[a="b"].a-host, [a="b"] .a-host {}');
-      expect(s(':host-context([a=b]) {}', 'a', 'a-host'))
-          .toEqual('[a=b].a-host, [a="b"] .a-host {}');
+      expect(s(':host-context([a="b"]) {}', 'a', 'a-h'))
+          .toEqual('[a="b"].a-h, [a="b"] .a-h {}');
+      expect(s(':host-context([a=b]) {}', 'a', 'a-h'))
+          .toEqual('[a=b].a-h, [a="b"] .a-h {}');
     });
   });
 
   describe(('::slotted'), () => {
 
     it('should handle *', () => {
-      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-slot > * {}');
+      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-s > * {}');
     });
 
     it('should handle * descendant', () => {
-      const r = s('::slotted(*) .my-class {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-slot .my-class {}');
+      const r = s('::slotted(*) .my-class {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-s .my-class {}');
     });
 
     it('should handle :host complex selector', () => {
-      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-host > .sc-ion-tag-slot > *:nth-of-type(2n - 1) {}');
+      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle host-context complex selector', () => {
-      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-host.red > .sc-ion-tag-slot > *:nth-of-type(2n - 1), .red .sc-ion-tag-host > .sc-ion-tag-slot > *:nth-of-type(2n - 1) {}');
+      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle left side selector', () => {
-      const r = s('div::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('div.sc-ion-tag-slot > ul {}');
+      const r = s('div::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('div.sc-ion-tag-s > ul {}');
     });
 
     it('should handle tag selector', () => {
-      const r = s('::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-slot > ul {}');
+      const r = s('::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-s > ul {}');
     });
 
     it('should handle class selector', () => {
-      const r = s('::slotted(.foo) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-slot > .foo {}');
+      const r = s('::slotted(.foo) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-s > .foo {}');
     });
 
     it('should handle multiple selector', () => {
-      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-host', 'sc-ion-tag-slot');
-      expect(r).toEqual('.sc-ion-tag-slot > ul, .sc-ion-tag-slot > li {}');
+      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      expect(r).toEqual('.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
     });
 
   });
@@ -241,14 +241,14 @@ describe('ShadowCss', function() {
 
 
   describe('getElementScopeId, host', () => {
-    it('should add -host suffix', () => {
-      expect(getElementScopeId('sc-my-tag', true)).toBe('sc-my-tag-host');
+    it('should add -h suffix', () => {
+      expect(getElementScopeId('sc-my-tag', true)).toBe('sc-my-tag-h');
     });
   });
 
   describe('getElementScopeId, slot', () => {
-    it('should add -slot suffix', () => {
-      expect(getElementScopeId('sc-my-tag')).toBe('sc-my-tag-slot');
+    it('should add -s suffix', () => {
+      expect(getElementScopeId('sc-my-tag')).toBe('sc-my-tag-s');
     });
   });
 
@@ -284,13 +284,13 @@ describe('ShadowCss', function() {
   });
 
   it('should support polyfill-rule', () => {
-    let css = s('polyfill-rule {content: \':host.foo .bar\';color: blue;}', 'a', 'a-host');
-    expect(css).toEqual('.foo.a-host .bar.a {;color:blue;}');
+    let css = s('polyfill-rule {content: \':host.foo .bar\';color: blue;}', 'a', 'a-h');
+    expect(css).toEqual('.foo.a-h .bar.a {;color:blue;}');
 
-    css = s('polyfill-rule {content: ":host.foo .bar";color:blue;}', 'a', 'a-host');
-    expect(css).toEqual('.foo.a-host .bar.a {;color:blue;}');
+    css = s('polyfill-rule {content: ":host.foo .bar";color:blue;}', 'a', 'a-h');
+    expect(css).toEqual('.foo.a-h .bar.a {;color:blue;}');
 
-    css = s(`polyfill-rule {content: 'button[priority="1"]'}`, 'a', 'a-host');
+    css = s(`polyfill-rule {content: 'button[priority="1"]'}`, 'a', 'a-h');
     expect(css).toEqual('button[priority="1"].a {}');
   });
 

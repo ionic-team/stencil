@@ -8,5 +8,5 @@ export function getScopeId(cmpMeta: d.ComponentMeta, mode?: string) {
 
 
 export function getElementScopeId(scopeId: string, isHostElement?: boolean) {
-  return scopeId + (isHostElement ? '-host' : '-slot');
+  return scopeId + (isHostElement ? '-h' : '-s');
 }

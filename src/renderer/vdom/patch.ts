@@ -30,7 +30,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       if (newVNode.vtag === 'slot') {
         if (scopeId) {
           // scoped css needs to add its scoped id to the parent element
-          domApi.$addClass(parentElm, scopeId + '-slot');
+          domApi.$addClass(parentElm, scopeId + '-s');
         }
 
         if (!newVNode.vchildren) {

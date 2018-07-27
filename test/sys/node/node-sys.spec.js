@@ -63,11 +63,11 @@ describe('test/sys/node', () => {
   it('scopeCss', () => {
     const cssText = `::slotted(*) {}`;
     const scopeAttribute = `sc-ion-tag`;
-    const hostScopeAttr = `sc-ion-tag-host`;
-    const slotScopeAttr = `sc-ion-tag-slot`;
+    const hostScopeAttr = `sc-ion-tag-h`;
+    const slotScopeAttr = `sc-ion-tag-s`;
 
     return sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr).then(scopeCss => {
-      expect(scopeCss).toBe(`.sc-ion-tag-slot > * {}`);
+      expect(scopeCss).toBe(`.sc-ion-tag-s > * {}`);
     });
   });
 
