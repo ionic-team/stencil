@@ -149,10 +149,10 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
 
   coreBuild.shadowDom = coreBuild.shadowDom || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom;
   coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom;
-  coreBuild.event = coreBuild.event || (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
-  coreBuild.listener = coreBuild.listener || (cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
+  coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
+  coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
   coreBuild.styles = coreBuild.styles || !!cmpMeta.stylesMeta;
-  coreBuild.hostTheme = coreBuild.hostTheme || cmpMeta.hostMeta && cmpMeta.hostMeta.theme;
+  coreBuild.hostTheme = coreBuild.hostTheme || !!(cmpMeta.hostMeta && cmpMeta.hostMeta.theme);
 
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
