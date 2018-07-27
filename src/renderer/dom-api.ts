@@ -1,5 +1,4 @@
 import { AppGlobal, DomApi, EventEmitterData } from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { KEY_CODE_MAP, NODE_TYPE } from '../util/constants';
 import { toLowerCase } from '../util/helpers';
 
@@ -211,12 +210,12 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   };
 
 
-  if (Build.shadowDom) {
+  if (__BUILD_CONDITIONALS__.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
 
     domApi.$supportsShadowDom = !!domApi.$doc.documentElement.attachShadow;
 
-    if (Build.isDev) {
+    if (__BUILD_CONDITIONALS__.isDev) {
       if ((win as Window).location.search.indexOf('shadow=false') > 0) {
         // by adding ?shadow=false it'll force the slot polyfill
         // only add this check when in dev mode
@@ -225,7 +224,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     }
   }
 
-  if (Build.es5) {
+  if (__BUILD_CONDITIONALS__.es5) {
     if (typeof win.CustomEvent !== 'function') {
       // CustomEvent polyfill
       win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
@@ -238,7 +237,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   }
   domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
 
-  if (Build.event || Build.listener) {
+  if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {
     // test if this browser supports event options or not
     try {
       (win as Window).addEventListener('e', null,

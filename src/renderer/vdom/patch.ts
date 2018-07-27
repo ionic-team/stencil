@@ -7,7 +7,6 @@
  * Modified for Stencil's renderer and slot projection
  */
 import * as d from '../../declarations';
-import { Build } from '../../util/build-conditionals';
 import { isDef } from '../../util/helpers';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
@@ -23,7 +22,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) {
     newVNode = newParentVNode.vchildren[childIndex];
 
-    if (Build.slotPolyfill && !useNativeShadowDom) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill && !useNativeShadowDom) {
       // remember for later we need to check to relocate nodes
       checkSlotRelocate = true;
 
@@ -51,19 +50,19 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       // create text node
       newVNode.elm = domApi.$createTextNode(newVNode.vtext) as any;
 
-    } else if (Build.slotPolyfill && newVNode.isSlotReference) {
+    } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
       // create a slot reference html text node
       newVNode.elm = domApi.$createTextNode('') as any;
 
     } else {
       // create element
-      elm = newVNode.elm = ((Build.hasSvg && (isSvgMode || newVNode.vtag === 'svg')) ?
+      elm = newVNode.elm = ((__BUILD_CONDITIONALS__.hasSvg && (isSvgMode || newVNode.vtag === 'svg')) ?
                         domApi.$createElementNS('http://www.w3.org/2000/svg', newVNode.vtag) :
                         domApi.$createElement(
-                          (Build.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag)
+                          (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag)
                         );
 
-      if (Build.hasSvg) {
+      if (__BUILD_CONDITIONALS__.hasSvg) {
         isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
       }
 
@@ -76,7 +75,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         domApi.$setAttribute(elm, (elm['s-si'] = scopeId), '');
       }
 
-      if (Build.ssrServerSide && isDef(ssrId)) {
+      if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
         // SSR ONLY: this is an SSR render and this
         // logic does not run on the client
 
@@ -95,7 +94,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
           // return node could have been null
           if (childNode) {
-            if (Build.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
+            if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
               // SSR ONLY: add the text node's start comment
               domApi.$appendChild(elm, domApi.$createComment('s.' + ssrId + '.' + i));
             }
@@ -103,7 +102,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
             // append our new node
             domApi.$appendChild(elm, childNode);
 
-            if (Build.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
+            if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
               // SSR ONLY: add the text node's end comment
               domApi.$appendChild(elm, domApi.$createComment('/'));
               domApi.$appendChild(elm, domApi.$createTextNode(' '));
@@ -112,13 +111,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         }
       }
 
-      if (Build.hasSvg && newVNode.vtag === 'svg') {
+      if (__BUILD_CONDITIONALS__.hasSvg && newVNode.vtag === 'svg') {
         // Only reset the SVG context when we're exiting SVG element
         isSvgMode = false;
       }
     }
 
-    if (Build.slotPolyfill) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill) {
       newVNode.elm['s-hn'] = hostTagName;
 
       if (newVNode.isSlotFallback || newVNode.isSlotReference) {
@@ -213,7 +212,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
         node = vnodes[startIdx].elm;
 
-        if (Build.slotPolyfill) {
+        if (__BUILD_CONDITIONALS__.slotPolyfill) {
           // we're removing this element
           // so it's possible we need to show slot fallback content now
           checkSlotFallbackVisibility = true;
@@ -342,7 +341,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // compare if two vnode to see if they're "technically" the same
     // need to have the same element tag, and same key to be the same
     if (vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey) {
-      if (Build.slotPolyfill) {
+      if (__BUILD_CONDITIONALS__.slotPolyfill) {
         if (vnode1.vtag === 'slot') {
           return vnode1.vname === vnode2.vname;
         }
@@ -353,7 +352,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   }
 
   function referenceNode(node: d.RenderNode) {
-    if (Build.slotPolyfill) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill) {
       if (node && node['s-ol']) {
         // this node was relocated to a new location in the dom
         // because of some other component's slot
@@ -375,7 +374,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     const oldChildren = oldVNode.vchildren;
     const newChildren = newVNode.vchildren;
 
-    if (Build.hasSvg) {
+    if (__BUILD_CONDITIONALS__.hasSvg) {
       // test if we're rendering an svg element, or still rendering nodes inside of one
       // only add this to the when the compiler sees we're using an svg somewhere
       isSvgMode = newVNode.elm &&
@@ -413,7 +412,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (Build.slotPolyfill && (defaultHolder = (elm['s-cr'] || (elm as any)['$defaultHolder']/* $defaultHolder deprecated 2018-04-02 */))) {
+    } else if (__BUILD_CONDITIONALS__.slotPolyfill && (defaultHolder = (elm['s-cr'] || (elm as any)['$defaultHolder']/* $defaultHolder deprecated 2018-04-02 */))) {
       // this element has slotted content
       domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
 
@@ -423,7 +422,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       domApi.$setTextContent(elm, newVNode.vtext);
     }
 
-    if (Build.hasSvg) {
+    if (__BUILD_CONDITIONALS__.hasSvg) {
       // reset svgMode when svg node is fully patched
       if (isSvgMode && 'svg' === newVNode.vtag) {
         isSvgMode = false;
@@ -570,7 +569,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;
 
-    if (Build.ssrServerSide) {
+    if (__BUILD_CONDITIONALS__.ssrServerSide) {
       if (encapsulation !== 'shadow') {
         ssrId = ssrPatchId;
       } else {
@@ -578,7 +577,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       }
     }
 
-    if (Build.slotPolyfill) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill) {
       // get the scopeId
       scopeId = hostElm['s-sc'];
 
@@ -589,13 +588,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // synchronous patch
     patchVNode(oldVNode, newVNode);
 
-    if (Build.ssrServerSide && isDef(ssrId)) {
+    if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
       // SSR ONLY: we've been given an SSR id, so the host element
       // should be given the ssr id attribute
       domApi.$setAttribute(oldVNode.elm, SSR_VNODE_ID, ssrId);
     }
 
-    if (Build.slotPolyfill) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill) {
       if (checkSlotRelocate) {
         relocateSlotContent(newVNode.elm);
 

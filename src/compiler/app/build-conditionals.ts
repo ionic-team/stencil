@@ -9,7 +9,7 @@ export async function setBuildConditionals(
   coreId: 'core' | 'core.pf' | 'esm.es5',
   buildCtx: d.BuildCtx,
   entryModules: d.EntryModule[]
-) {
+): Promise<d.BuildConditionals> {
   const existingCoreBuild = getLastBuildConditionals(compilerCtx, coreId, buildCtx);
   if (existingCoreBuild) {
     // cool we can use the last build conditionals
@@ -19,18 +19,42 @@ export async function setBuildConditionals(
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild: d.BuildConditionals = ({} as any);
-  coreBuild.coreId = coreId;
-  coreBuild.clientSide = true;
-  coreBuild.isDev = !!config.devMode;
-  coreBuild.isProd = !config.devMode;
-
-  coreBuild.hasSlot = !!buildCtx.hasSlot;
-  coreBuild.hasSvg = !!buildCtx.hasSvg;
-
-  coreBuild.devInspector = config.devInspector;
-  coreBuild.hotModuleReplacement = config.devMode;
-  coreBuild.verboseError = config.devMode;
+  const coreBuild: d.BuildConditionals = {
+    coreId: coreId,
+    isDev: !!config.devMode,
+    isProd: !config.devMode,
+    hasSlot: !!buildCtx.hasSlot,
+    devInspector: config.devInspector,
+    hotModuleReplacement: config.devMode,
+    verboseError: config.devMode,
+    clientSide: true,
+    hasSvg: true,
+    externalModuleLoader: false,
+    browserModuleLoader: false,
+    polyfills: false,
+    es5: false,
+    cssVarShim: false,
+    ssrServerSide: false,
+    shadowDom: false,
+    slotPolyfill: true,
+    event: false,
+    listener: false,
+    styles: false,
+    hostTheme: false,
+    observeAttr: false,
+    propConnect: false,
+    propContext: false,
+    method: false,
+    element: false,
+    watchCallback: false,
+    reflectToAttr: false,
+    cmpWillLoad: false,
+    cmpDidLoad: false,
+    cmpWillUpdate: false,
+    cmpDidUpdate: false,
+    cmpDidUnload: false,
+    hostData: false
+  };
 
   const promises: Promise<void>[] = [];
 
@@ -58,6 +82,7 @@ export async function setBuildConditionals(
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
+
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {
@@ -65,11 +90,9 @@ export async function setBuildConditionals(
     coreBuild.externalModuleLoader = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = true;
+
     compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
   }
-
-  coreBuild.slotPolyfill = true;
-  coreBuild.hasSvg = true;
 
   return coreBuild;
 }
@@ -120,16 +143,20 @@ async function setBuildFromComponent(config: d.Config, compilerCtx: d.CompilerCt
 
 
 export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMeta: d.ComponentMeta) {
-  if (!cmpMeta) return;
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-    coreBuild.shadowDom = true;
-  } else {
-    coreBuild.slotPolyfill = true;
+  if (!cmpMeta) {
+    return;
   }
+
+  coreBuild.shadowDom = coreBuild.shadowDom || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom;
+  coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom;
+  coreBuild.event = coreBuild.event || (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
+  coreBuild.listener = coreBuild.listener || (cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
+  coreBuild.styles = coreBuild.styles || !!cmpMeta.stylesMeta;
+  coreBuild.hostTheme = coreBuild.hostTheme || cmpMeta.hostMeta && cmpMeta.hostMeta.theme;
 
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
+
     memberNames.forEach(memberName => {
       const memberMeta = cmpMeta.membersMeta[memberName];
       const memberType = memberMeta.memberType;
@@ -162,27 +189,13 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
       }
     });
   }
-
-  if (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length) {
-    coreBuild.event = true;
-  }
-
-  if (cmpMeta.listenersMeta && cmpMeta.listenersMeta.length) {
-    coreBuild.listener = true;
-  }
-
-  if (cmpMeta.stylesMeta) {
-    coreBuild.styles = true;
-  }
-
-  if (cmpMeta.hostMeta && cmpMeta.hostMeta.theme) {
-    coreBuild.hostTheme = true;
-  }
 }
 
 
 export function setBuildFromComponentContent(coreBuild: d.BuildConditionals, jsText: string) {
-  if (typeof jsText !== 'string') return;
+  if (typeof jsText !== 'string') {
+    return;
+  }
 
   // hacky to do it this way...yeah
   // but with collections the components may have been
@@ -192,28 +205,10 @@ export function setBuildFromComponentContent(coreBuild: d.BuildConditionals, jsT
   // wouldn't be any harm if a build section was included when it
   // wasn't needed, but these keywords are all pretty unique already
 
-  if (!coreBuild.cmpWillLoad) {
-    coreBuild.cmpWillLoad = (jsText.includes('componentWillLoad'));
-  }
-
-  if (!coreBuild.cmpDidLoad) {
-    coreBuild.cmpDidLoad = (jsText.includes('componentDidLoad'));
-  }
-
-  if (!coreBuild.cmpWillUpdate) {
-    coreBuild.cmpWillUpdate = (jsText.includes('componentWillUpdate'));
-  }
-
-  if (!coreBuild.cmpDidUpdate) {
-    coreBuild.cmpDidUpdate = (jsText.includes('componentDidUpdate'));
-  }
-
-  if (!coreBuild.cmpDidUnload) {
-    coreBuild.cmpDidUnload = (jsText.includes('componentDidUnload'));
-  }
-
-  if (!coreBuild.hostData) {
-    coreBuild.hostData = (jsText.includes('hostData'));
-  }
-
+  coreBuild.cmpWillLoad = coreBuild.cmpWillLoad || jsText.includes('componentWillLoad');
+  coreBuild.cmpDidLoad = coreBuild.cmpDidLoad || jsText.includes('componentDidLoad');
+  coreBuild.cmpWillUpdate = coreBuild.cmpWillLoad || jsText.includes('componentWillUpdate');
+  coreBuild.cmpDidUpdate = coreBuild.cmpDidUpdate || jsText.includes('componentDidUpdate');
+  coreBuild.cmpDidUnload = coreBuild.cmpDidUnload || jsText.includes('componentDidUnload');
+  coreBuild.hostData = coreBuild.hostData || jsText.includes('hostData');
 }

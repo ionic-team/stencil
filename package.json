@@ -83,7 +83,7 @@
     "jest-environment-node-debug": "^2.0.0",
     "knuth-shuffle": "1.0.1",
     "listr": "^0.13.0",
-    "magic-string": "^0.22.4",
+    "magic-string": "^0.22.5",
     "mime-db": "1.32.0",
     "minimatch": "3.0.4",
     "node-fetch": "1.7.3",

@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { addCollection } from './datacollection/discover-collections';
 import addComponentMetadata from './transformers/add-component-metadata';
-import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/gather-metadata';
 import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
@@ -13,7 +12,7 @@ import { normalizePath, pathJoin } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -119,16 +118,11 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     getCustomTransformers: () => {
       const typeChecker = services.getProgram().getTypeChecker();
 
-      const buildConditionals = {
-        isDev: !!config.devMode
-      } as d.BuildConditionals;
-
       return {
         before: [
           gatherMetadata(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker),
           removeDecorators(),
           addComponentMetadata(transpileCtx.compilerCtx.moduleFiles),
-          buildConditionalsTransform(buildConditionals)
         ],
         after: [
           removeStencilImports(),

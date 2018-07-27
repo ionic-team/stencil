@@ -27,6 +27,7 @@ if (success) {
   bundle('sys-util.js');
   bundle('sys-worker.js');
   bundle('websocket.js');
+  bundle('magic-string.js');
 
 
   function bundle(entryFileName) {

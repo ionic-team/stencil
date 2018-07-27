@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initEventEmitters } from './init-event-emitters';
 import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
@@ -27,13 +26,13 @@ export function initComponentInstance(
     // and let the getters/setters do their jobs
     proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot);
 
-    if (Build.event) {
+    if (__BUILD_CONDITIONALS__.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
       initEventEmitters(plt, componentConstructor.events, instance);
     }
 
-    if (Build.listener) {
+    if (__BUILD_CONDITIONALS__.listener) {
       try {
         // replay any event listeners on the instance that
         // were queued up between the time the element was
@@ -74,7 +73,7 @@ export function initComponentInstance(
 
 export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[]): any {
 
-  if (Build.polyfills && !allChildrenHaveConnected(plt, elm)) {
+  if (__BUILD_CONDITIONALS__.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
     // since the polyfill uses MutationObserver which causes the
     // connectedCallbacks to fire async, which isn't ideal for the code below
@@ -111,7 +110,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
         plt.onReadyCallbacksMap.delete(elm);
       }
 
-      if (Build.cmpDidLoad) {
+      if (__BUILD_CONDITIONALS__.cmpDidLoad) {
         // fire off the user's componentDidLoad method (if one was provided)
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called

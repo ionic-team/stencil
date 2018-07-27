@@ -8,12 +8,22 @@ import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { RollupBuild, RollupDirOptions, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
+import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
 
 
 export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
   if (!buildCtx.isActiveBuild) {
     buildCtx.debug(`createBundle aborted, not active build`);
   }
+
+  const buildConditionals = {
+    isDev: !!config.devMode
+  } as d.BuildConditionals;
+
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    return all;
+  }, <{ [key: string]: any}>{});
 
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
@@ -41,6 +51,9 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     preserveSymlinks: false,
     plugins: [
       abortPlugin(buildCtx),
+      rollupPluginReplace({
+        values: replaceObj
+      }),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
