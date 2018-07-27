@@ -15,7 +15,7 @@ import { validateConfig } from '../compiler/config/validate-config';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { getTestBuildConditionals } from '../compiler/app/build-conditionals';
 
-global.__BUILD_CONDITIONALS__ = getTestBuildConditionals();
+(global as any).__BUILD_CONDITIONALS__ = getTestBuildConditionals();
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
   const hydrateResults: d.HydrateResults = {
