@@ -20,10 +20,11 @@ export function validateDocs(config: d.Config) {
         outputTarget.readmeDir = config.srcDir;
       }
 
-      (config.outputTargets as d.OutputTargetDocs[]).push(outputTarget);
+      config.outputTargets.push(outputTarget);
     }
 
-    config.outputTargets.forEach(outputTarget => {
+    const docsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
+    docsOutputs.forEach(outputTarget => {
       validateDocsOutputTarget(config, outputTarget);
     });
 

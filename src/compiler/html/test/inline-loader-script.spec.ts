@@ -94,7 +94,7 @@ describe('setDataResourcesUrlAttr',  () => {
   beforeEach(() => {
     config = new TestingConfig();
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetHydrate;
   });
 
   it('add baseUrl', () => {

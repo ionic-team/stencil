@@ -24,7 +24,7 @@ describe('dist loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    const distOutput = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,
@@ -72,7 +72,7 @@ describe('dist loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    const distOutput = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,

@@ -8,11 +8,11 @@ import { hydrateHtml } from '../hydrate-html';
 describe('hydrate', () => {
 
   let config: Config;
-  let outputTarget: OutputTarget;
+  let outputTarget: OutputTargetHydrate;
 
   beforeEach(() => {
     config = mockConfig();
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as OutputTargetHydrate;
   });
 
   it('should add scope attributes', async () => {

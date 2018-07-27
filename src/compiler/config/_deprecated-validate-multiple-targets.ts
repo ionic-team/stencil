@@ -27,7 +27,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('emptyWWW');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    let o = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     if (!o) {
       o = { type: 'www' };
       config.outputTargets.push(o);
@@ -41,7 +41,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('wwwDir');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    let o = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww ;
     if (!o) {
       o = { type: 'www' };
       config.outputTargets.push(o);
@@ -55,7 +55,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('buildDir');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    let o = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww ;
     if (!o) {
       o = { type: 'www' };
       config.outputTargets.push(o);
@@ -69,7 +69,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('wwwIndexHtml');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    let o = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     if (!o) {
       o = { type: 'www' };
       config.outputTargets.push(o);
@@ -98,7 +98,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('distDir');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    let o = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     if (!o) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
@@ -112,7 +112,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('emptyDist');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    let o = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     if (!o) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
@@ -126,7 +126,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('collectionDir');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    let o = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     if (!o) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
@@ -140,7 +140,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
     deprecatedConfigs.push('typesDir');
 
     config.outputTargets = config.outputTargets || [];
-    let o: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    let o = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     if (!o) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
@@ -155,7 +155,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
 
     config.outputTargets = config.outputTargets || [];
 
-    const www: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const www = config.outputTargets.find(o => o.type === 'www')as d.OutputTargetWww;
     if (www) {
       www.resourcesUrl = (config as any).publicPath;
     }
@@ -168,7 +168,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
 
     config.outputTargets = config.outputTargets || [];
 
-    let o: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    let o = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     if (!o) {
       o = { type: 'www', serviceWorker: (config as any).serviceWorker };
       config.outputTargets.push(o);

@@ -5,7 +5,7 @@ import { normalizePath } from '../util';
 export function validateOutputTargetAngular(config: d.Config) {
   const path = config.sys.path;
 
-  const distOutputTargets = (config.outputTargets as d.OutputTargetAngular[]).filter(o => o.type === 'angular');
+  const distOutputTargets = config.outputTargets.filter(o => o.type === 'angular') as d.OutputTargetAngular[];
 
   distOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];

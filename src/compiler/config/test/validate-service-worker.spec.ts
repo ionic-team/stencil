@@ -129,6 +129,7 @@ describe('validateServiceWorker', () => {
 
   it('should not create default sw config when not www type', () => {
     outputTarget = {
+      type: 'www',
       dir: '/www'
     };
     validateServiceWorker(config, outputTarget);
@@ -137,6 +138,7 @@ describe('validateServiceWorker', () => {
 
   it('should create default sw config when true boolean, even if devMode', () => {
     outputTarget = {
+      type: 'www',
       dir: '/www',
       serviceWorker: true as any
     };
@@ -147,6 +149,7 @@ describe('validateServiceWorker', () => {
 
   it('should not create sw config when in devMode', () => {
     outputTarget = {
+      type: 'www',
       dir: '/www',
       serviceWorker: true as any
     };
@@ -157,12 +160,14 @@ describe('validateServiceWorker', () => {
 
   it('should do nothing when falsy', () => {
     outputTarget = {
+      type: 'www',
       serviceWorker: null
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
 
     outputTarget = {
+      type: 'www',
       serviceWorker: false as any
     };
     validateServiceWorker(config, outputTarget);

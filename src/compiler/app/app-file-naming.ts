@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export function getAppBuildDir(config: d.Config, outputTarget: d.OutputTargetWww) {
+export function getAppBuildDir(config: d.Config, outputTarget: d.OutputTargetBuild) {
   return pathJoin(config, outputTarget.buildDir, config.fsNamespace);
 }
 
@@ -22,7 +22,7 @@ export function getLoaderFileName(config: d.Config) {
 }
 
 
-export function getLoaderPath(config: d.Config, outputTarget: d.OutputTargetWww) {
+export function getLoaderPath(config: d.Config, outputTarget: d.OutputTargetBuild) {
   return pathJoin(config, outputTarget.buildDir, getLoaderFileName(config));
 }
 
@@ -70,7 +70,7 @@ export function getCoreEsmFileName(config: d.Config) {
 }
 
 
-export function getCoreEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetWww, sourceTarget: d.SourceTarget) {
+export function getCoreEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   if (sourceTarget === 'es5') {
     return pathJoin(config, getDistEsmBuildDir(config, outputTarget), `es5`, getCoreEsmFileName(config));
   }
@@ -78,7 +78,7 @@ export function getCoreEsmBuildPath(config: d.Config, outputTarget: d.OutputTarg
 }
 
 
-export function getDefineCustomElementsPath(config: d.Config, outputTarget: d.OutputTargetWww, sourceTarget: d.SourceTarget) {
+export function getDefineCustomElementsPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   if (sourceTarget === 'es5') {
     return pathJoin(config, getDistEsmBuildDir(config, outputTarget), `es5`, `${config.fsNamespace}.define.js`);
   }
@@ -91,7 +91,7 @@ export function getGlobalEsmFileName(config: d.Config) {
 }
 
 
-export function getGlobalEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetWww, sourceTarget: d.SourceTarget) {
+export function getGlobalEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   if (sourceTarget === 'es5') {
     return pathJoin(config, getDistEsmBuildDir(config, outputTarget), `es5`, getGlobalEsmFileName(config));
   }

@@ -27,7 +27,7 @@ describe('www loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const wwwOutput = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(wwwOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c, '<script src="build/app.js" test-inlined></script>');
@@ -75,7 +75,7 @@ describe('www loader/core resourcesUrl', () => {
 
     c = new TestingCompiler(config);
 
-    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const wwwOutput = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(wwwOutput.resourcesUrl).toEqual('/some/resource/config/path/');
 
     await setupFs(c, '<script src="build/app.js" test-inlined></script>');
@@ -120,7 +120,7 @@ describe('www loader/core resourcesUrl', () => {
     ];
 
     c = new TestingCompiler(config);
-    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const wwwOutput = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww ;
     expect(wwwOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c, `<script src="build/app.js" data-resources-url="/some/resource/attr/path/" test-inlined></script>`);
