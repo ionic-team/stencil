@@ -25,10 +25,10 @@ describe('ssr', () => {
     it('should get text from deep nested default slot', () => {
       const rootElm = domApi.$createElement('div');
       rootElm.innerHTML = `
-        <cmp-a data-ssrv="1">
-          <cmp-b data-ssrc="1.0" data-ssrv="4">
-            <cmp-c data-ssrc="4.0">
-              <cmp-d data-ssrc="4.0.">
+        <cmp-a ssrv="1">
+          <cmp-b ssrc="1.0" ssrv="4">
+            <cmp-c ssrc="4.0">
+              <cmp-d ssrc="4.0.">
                 <!--s.1.0-->News<!--/-->
               </cmp-d>
             </cmp-c>
@@ -48,19 +48,19 @@ describe('ssr', () => {
     it('should create a vnode from complex html', () => {
       const rootElm = domApi.$createElement('div');
       rootElm.innerHTML = `
-        <cmp-a data-ssrv="1">
-          <cmp-b data-ssrc="1.0" data-ssrv="2">
+        <cmp-a ssrv="1">
+          <cmp-b ssrc="1.0" ssrv="2">
             <!--s.2.0-->TEXT 1<!--/-->
-            <cmp-c data-ssrc="2.1." data-ssrv="4">
+            <cmp-c ssrc="2.1." ssrv="4">
               <!--s.1.0-->TEXT 2<!--/-->
               <!--s.1.1-->TEXT 3<!--/-->
               <!--s.4.0-->TEXT 7<!--/-->
-              <cmp-d data-ssrc="1.2." data-ssrv="3">
-                <cmp-f data-ssrc="3.0.">
+              <cmp-d ssrc="1.2." ssrv="3">
+                <cmp-f ssrc="3.0.">
                   <!--s.3.0-->TEXT 6<!--/-->
                 </cmp-f>
               </cmp-d>
-              <cmp-e data-ssrc="1.3." data-ssrv="5">
+              <cmp-e ssrc="1.3." ssrv="5">
                 <!--s.1.0-->TEXT 5<!--/-->
               </cmp-e>
               <!--s.1.4-->TEXT 4<!--/-->
@@ -105,12 +105,12 @@ describe('ssr', () => {
     it('should create a vnode from nested default slots html', () => {
       const rootElm = domApi.$createElement('div');
       rootElm.innerHTML = `
-        <cmp-a data-ssrv="0">
-          <cmp-b data-ssrv="1" data-ssrc="0.0">
+        <cmp-a ssrv="0">
+          <cmp-b ssrv="1" ssrc="0.0">
             <!--s.1.0-->
             88
           </cmp-b>
-          <cmp-c data-ssrv="2" data-ssrc="0.1">
+          <cmp-c ssrv="2" ssrc="0.1">
             <!--s.2.0-->
             mph
           </cmp-c>

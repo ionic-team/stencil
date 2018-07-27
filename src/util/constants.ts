@@ -69,8 +69,8 @@ export const enum NODE_TYPE {
 /**
  * SSR Attribute Names
  */
-export const SSR_VNODE_ID = 'data-ssrv';
-export const SSR_CHILD_ID = 'data-ssrc';
+export const SSR_VNODE_ID = 'ssrv';
+export const SSR_CHILD_ID = 'ssrc';
 
 
 /**
