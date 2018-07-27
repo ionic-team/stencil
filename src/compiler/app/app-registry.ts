@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { ENCAPSULATION } from '../../util/constants';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 
@@ -37,7 +38,17 @@ export function serializeComponentRegistry(cmpRegistry: d.ComponentRegistry) {
   const appRegistryComponents: d.AppRegistryComponents = {};
 
   Object.keys(cmpRegistry).sort().forEach(tagName => {
-    appRegistryComponents[tagName] = cmpRegistry[tagName].bundleIds as any;
+    const cmpMeta = cmpRegistry[tagName];
+
+    appRegistryComponents[tagName] = {
+      bundleIds: cmpMeta.bundleIds as any
+    };
+
+    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
+      appRegistryComponents[tagName].encapsulation = 'shadow';
+    } else if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+      appRegistryComponents[tagName].encapsulation = 'scoped';
+    }
   });
 
   return appRegistryComponents;

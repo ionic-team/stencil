@@ -2,10 +2,10 @@ import * as d from '../../declarations';
 import { assetVersioning } from '../asset-versioning/asset-versioning';
 import { catchError } from '../util';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
-import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
 import { inlineLoaderScript } from './inline-loader-script';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
+import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
 
 
@@ -15,7 +15,6 @@ export async function optimizeHtml(
   hydrateTarget: d.OutputTargetHydrate,
   windowLocationPath: string,
   doc: Document,
-  styles: string[],
   diagnostics: d.Diagnostic[]
 ) {
   const promises: Promise<any>[] = [];
@@ -43,7 +42,7 @@ export async function optimizeHtml(
 
   if (hydrateTarget.inlineStyles) {
     try {
-      inlineComponentStyles(config, hydrateTarget, doc, styles, diagnostics);
+      optimizeSsrStyles(config, hydrateTarget, doc, diagnostics);
 
     } catch (e) {
       diagnostics.push({
@@ -117,9 +116,8 @@ export async function optimizeIndexHtml(
       const dom = config.sys.createDom();
       const win = dom.parse(hydrateTarget);
       const doc = win.document;
-      const styles: string[] = [];
 
-      await optimizeHtml(config, compilerCtx, hydrateTarget, windowLocationPath, doc, styles, diagnostics);
+      await optimizeHtml(config, compilerCtx, hydrateTarget, windowLocationPath, doc, diagnostics);
 
       // serialize this dom back into a string
       await compilerCtx.fs.writeFile(hydrateTarget.indexHtml, dom.serialize());

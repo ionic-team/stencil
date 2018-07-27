@@ -1,8 +1,8 @@
 import { compareHtml, mockConfig } from '../../testing/mocks';
 import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { h } from '../../renderer/vdom/h';
 import { hydrateHtml } from '../hydrate-html';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -13,6 +13,59 @@ describe('hydrate', () => {
   beforeEach(() => {
     config = mockConfig();
     outputTarget = config.outputTargets[0];
+  });
+
+  it('should add scope attributes', async () => {
+    const ctx: CompilerCtx = {};
+    const registry: ComponentRegistry = {
+      'ion-test': {
+        bundleIds: 'ion-test',
+        tagNameMeta: 'ion-test',
+        encapsulationMeta: ENCAPSULATION.ScopedCss,
+        componentConstructor: class {
+          static get encapsulation() {
+            return 'scoped';
+          }
+          static get is() {
+            return 'ion-test';
+          }
+          static get style() {
+            return `
+              [data-ion-test-host] {
+                color: red;
+              }
+            `;
+          }
+          render() {
+            return h('div', null);
+          }
+        } as any
+      }
+    };
+    const opts: HydrateOptions = {
+      html: `<ion-test></ion-test>`
+    };
+
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
+
+    expect(hydrateResults.diagnostics).toEqual([]);
+
+    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+      <html dir="ltr" data-ssr="">
+        <head>
+          <style data-styles="">
+            [data-ion-test-host] {
+              color:red;
+            }
+          </style>
+        </head>
+        <body>
+          <ion-test data-ion-test-host="" data-ssrv="0" class="${config.hydratedCssClass}">
+            <div data-ion-test="" data-ssrc="0.0."></div>
+          </ion-test>
+        </body>
+      </html>
+    `));
   });
 
   it('should load content in nested named slots', async () => {
@@ -205,5 +258,3 @@ describe('hydrate', () => {
   });
 
 });
-
-
