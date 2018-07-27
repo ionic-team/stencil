@@ -40,7 +40,7 @@ describe('validateConfig', () => {
     };
     config.outputTargets = [www];
     validateConfig(config);
-    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.dir).toContain('somedir');
     expect(outputTarget.buildDir).toContain('someotherdir');
     expect(outputTarget.indexHtml).toContain('some.html');
@@ -55,7 +55,7 @@ describe('validateConfig', () => {
     config.flags = { ssr: true };
     validateConfig(config);
 
-    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.baseUrl).toBe('/');
     expect(outputTarget.canonicalLink).toBe(true);
     expect(outputTarget.collapseWhitespace).toBe(true);
@@ -75,7 +75,7 @@ describe('validateConfig', () => {
     config.flags = { prerender: true };
     validateConfig(config);
 
-    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.baseUrl).toBe('/');
     expect(outputTarget.canonicalLink).toBe(true);
     expect(outputTarget.collapseWhitespace).toBe(true);
@@ -94,7 +94,7 @@ describe('validateConfig', () => {
   it('defaults, prod mode, no hydrate prerender without prerender flag', () => {
     validateConfig(config);
 
-    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.baseUrl).toBe('/');
     expect(outputTarget.canonicalLink).toBe(false);
     expect(outputTarget.collapseWhitespace).toBe(true);
@@ -114,7 +114,7 @@ describe('validateConfig', () => {
     config.devMode = true;
     validateConfig(config);
 
-    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.baseUrl).toBe('/');
     expect(outputTarget.canonicalLink).toBe(false);
     expect(outputTarget.collapseWhitespace).toBe(false);

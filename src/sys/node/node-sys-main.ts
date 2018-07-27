@@ -14,6 +14,9 @@ import * as os from 'os';
 import * as path from 'path';
 import * as url from 'url';
 
+interface NodeModuleWithCompile extends NodeModule {
+  _compile(code: string, filename: string): any;
+}
 
 export class NodeSystem implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
@@ -175,6 +178,25 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.isGlob(str);
   }
 
+  requireConfigFile(configPath: string) {
+    delete require.cache[path.resolve(configPath)];
+    let code = this.fs.readFileSync(configPath);
+    code = code.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
+
+    const defaultLoader = require.extensions['.js'];
+    require.extensions['.js'] = (module: NodeModuleWithCompile, filename: string) => {
+      if (filename === configPath) {
+        module._compile(code, filename);
+      } else {
+        defaultLoader(module, filename);
+      }
+    };
+
+    const config = require(configPath);
+    require.extensions['.js'] = defaultLoader;
+    return config;
+  }
+
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
     let config: d.Config;
 
@@ -213,9 +235,7 @@ export class NodeSystem implements d.StencilSystem {
     if (hasConfigFile) {
       // the passed in config was a string, so it's probably a path to the config we need to load
       // first clear the require cache so we don't get the same file
-      delete require.cache[path.resolve(configPath)];
-
-      const configFileData = require(configPath);
+      const configFileData = this.requireConfigFile(configPath);
       if (!configFileData.config) {
         throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
       }

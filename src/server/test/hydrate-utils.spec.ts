@@ -10,7 +10,7 @@ describe('normalizeHydrateOptions', () => {
 
   beforeEach(() => {
     config = mockConfig();
-    wwwTarget = config.outputTargets.find(o => o.type === 'www');
+    wwwTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
   });
 
 

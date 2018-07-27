@@ -159,7 +159,8 @@ function getWindowObj(testWindow: TestWindow, key: string) {
   if (!sharedWindow) {
     // we don't have a window created, so use the shared one
     // but first let's create the shared one (which could get reused)
-    const opts: d.HydrateOptions = {
+    const opts: d.OutputTargetHydrate = {
+      type: 'www',
       url: DEFAULT_URL,
       userAgent: DEFAULT_USER_AGENT
     };

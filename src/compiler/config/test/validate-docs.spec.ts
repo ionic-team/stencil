@@ -32,7 +32,7 @@ describe('validateDocs', () => {
       } as d.OutputTargetDocs
     );
     validateConfig(config);
-    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
     expect(o).toBeDefined();
     expect(o.readmeDir).toContain('my-dir');
   });
@@ -46,7 +46,7 @@ describe('validateDocs', () => {
       } as d.OutputTargetDocs
     );
     validateConfig(config);
-    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
     expect(o).toBeDefined();
     expect(o.readmeDir).toContain('my-dir');
   });
@@ -54,7 +54,7 @@ describe('validateDocs', () => {
   it('docs-json flag', () => {
     config.flags.docsJson = 'some/path/docs.json';
     validateConfig(config);
-    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
     expect(o.jsonFile).toContain('docs.json');
   });
 

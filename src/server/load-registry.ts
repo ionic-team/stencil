@@ -1,9 +1,9 @@
-import { CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../declarations';
+import { CompilerCtx, ComponentRegistry, Config, OutputTargetWww } from '../declarations';
 import { getAppRegistry } from '../compiler/app/app-registry';
 import { ENCAPSULATION } from '../util/constants';
 
 
-export function loadComponentRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+export function loadComponentRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetWww) {
   const appRegistry = getAppRegistry(config, compilerCtx, outputTarget);
   const cmpRegistry: ComponentRegistry = {};
 

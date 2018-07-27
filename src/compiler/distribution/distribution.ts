@@ -15,7 +15,7 @@ export async function generateProxies(config: d.Config, compilerCtx: d.CompilerC
 }
 
 export async function generateDistributions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<any> {
-  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
 
   if (distOutputs.length === 0) {
     // not doing any dist builds

@@ -1,11 +1,11 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
+import { BuildConditionals, BuildCtx, CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
 import { getAppBrowserCorePolyfills } from './app-polyfills';
 import { getAppBuildDir, getCoreFilename } from './app-file-naming';
 
 
-export async function generateCoreBrowser(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, globalJsContent: string, buildConditionals: BuildConditionals) {
+export async function generateCoreBrowser(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTargetBuild, globalJsContent: string, buildConditionals: BuildConditionals) {
   const relPath = config.sys.path.relative(config.rootDir, getAppBuildDir(config, outputTarget));
   const timespan = buildCtx.createTimeSpan(`generateCoreBrowser ${buildConditionals.coreId} started, ${relPath}`, true);
 

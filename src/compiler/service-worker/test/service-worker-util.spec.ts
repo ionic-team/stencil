@@ -20,7 +20,7 @@ describe('generateServiceWorkerUrl', () => {
       } as d.OutputTargetWww
     ];
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(config, outputTarget);
     expect(swUrl).toBe('/docs/sw.js');
   });
@@ -29,7 +29,7 @@ describe('generateServiceWorkerUrl', () => {
     config = new TestingConfig();
     config.devMode = false;
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(config, outputTarget);
     expect(swUrl).toBe('/sw.js');
   });
