@@ -49,7 +49,7 @@ describe('graph-dependencies', () => {
     it('should add scoped when using shadow', () => {
       const entryModule: d.EntryModule = {
         moduleFiles: [
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
+          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
         ]
       };
       const modes = getEntryEncapsulations(entryModule);
@@ -61,10 +61,10 @@ describe('graph-dependencies', () => {
     it('get all encapsulations', () => {
       const entryModule: d.EntryModule = {
         moduleFiles: [
-          { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
+          { cmpMeta: { encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
+          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
         ]
       };
       const modes = getEntryEncapsulations(entryModule);
@@ -150,10 +150,10 @@ describe('graph-dependencies', () => {
 
     it('should prefer ShadowDom', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
       ];
 
       const entryPoints: d.EntryPoint[] = [
@@ -173,10 +173,10 @@ describe('graph-dependencies', () => {
 
     it('should prefer ScopedCss', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
       ];
 
       const entryPoints: d.EntryPoint[] = [
@@ -196,10 +196,10 @@ describe('graph-dependencies', () => {
 
     it('should prefer NoEncapsulation', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
       ];
 
       const entryPoints: d.EntryPoint[] = [
@@ -219,9 +219,9 @@ describe('graph-dependencies', () => {
 
     it('should evenly split when all the same', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
       ];
 
       const entryPoints: d.EntryPoint[] = [
@@ -237,8 +237,8 @@ describe('graph-dependencies', () => {
 
     it('should add only ShadowDom', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-b.tsx' },
       ];
       const entryPoints: d.EntryPoint[] = [
         [ { tag: 'cmp-a' }, { tag: 'cmp-b' } ]
@@ -250,8 +250,8 @@ describe('graph-dependencies', () => {
 
     it('should add only ScopedCss', () => {
       const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
       ];
       const entryPoints: d.EntryPoint[] = [
         [ { tag: 'cmp-a' }, { tag: 'cmp-b' } ]

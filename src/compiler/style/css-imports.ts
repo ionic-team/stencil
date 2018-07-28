@@ -1,18 +1,23 @@
 import * as d from '../../declarations';
 import { buildError, normalizePath } from '../util';
+import { parseStyleDocs } from '../docs/style-docs';
 
 
-export async function updateCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string) {
+export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
-  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, []);
+  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, [], styleDocs);
 }
 
 
-async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[]) {
+async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[], styleDocs?: d.StyleDoc[]) {
   if (noLoop.includes(resolvedFilePath)) {
     return styleText;
   }
   noLoop.push(resolvedFilePath);
+
+  if (styleDocs) {
+    parseStyleDocs(styleDocs, styleText);
+  }
 
   const cssImports = getCssImports(config, buildCtx, resolvedFilePath, styleText);
   if (cssImports.length === 0) {
@@ -20,17 +25,18 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   }
 
   await Promise.all(cssImports.map(async cssImportData => {
-    await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop);
+    await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop, styleDocs);
   }));
 
   return replaceImportDeclarations(styleText, cssImports, isCssEntry);
 }
 
 
-async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[]) {
+async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) {
   try {
     cssImportData.styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
-    cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop);
+    cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop, styleDocs);
+
   } catch (e) {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
@@ -47,6 +53,8 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
     // no @import at all, so don't bother
     return imports;
   }
+
+  styleText = stripComments(styleText);
 
   const dir = config.sys.path.dirname(filePath);
   const importeeExt = filePath.split('.').pop().toLowerCase();
@@ -89,7 +97,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
   return imports;
 }
 
-const IMPORT_RE = /(@import)\s(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
+const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
 
 
 export function isCssNodeModule(url: string) {
@@ -172,4 +180,44 @@ export function replaceImportDeclarations(styleText: string, cssImports: d.CssIm
   });
 
   return styleText;
+}
+
+function stripComments(input: string) {
+  let isInsideString = null;
+  let currentCharacter = '';
+  let returnValue = '';
+
+  for (let i = 0; i < input.length; i++) {
+    currentCharacter = input[i];
+
+    if (input[i - 1] !== '\\') {
+      if (currentCharacter === '"' || currentCharacter === '\'') {
+        if (isInsideString === currentCharacter) {
+          isInsideString = null;
+        } else if (!isInsideString) {
+          isInsideString = currentCharacter;
+        }
+      }
+    }
+
+    // Find beginning of /* type comment
+    if (!isInsideString && currentCharacter === '/' && input[i + 1] === '*') {
+      // Ignore important comment when configured to preserve comments using important syntax: /*!
+      let j = i + 2;
+
+      // Iterate over comment
+      for (; j < input.length; j++) {
+        // Find end of comment
+        if (input[j] === '*' && input[j + 1] === '/') {
+          break;
+        }
+      }
+      // Resume iteration over CSS string from the end of the comment
+      i = j + 1;
+      continue;
+    }
+
+    returnValue += currentCharacter;
+  }
+  return returnValue;
 }

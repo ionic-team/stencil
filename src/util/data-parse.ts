@@ -36,7 +36,7 @@ export function parseComponentLoader(cmpData: d.ComponentHostData, i?: number, d
   }
 
   // encapsulation
-  cmpMeta.encapsulation = cmpData[4];
+  cmpMeta.encapsulationMeta = cmpData[4];
 
   if (cmpData[5]) {
     // parse listener meta

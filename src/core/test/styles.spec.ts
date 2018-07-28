@@ -166,16 +166,16 @@ describe('styles', () => {
 
   it('should set scope id if shadom and doesnt supports shadow dom', () => {
     plt.domApi.$supportsShadowDom = false;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
 
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('data-cmp-a');
+    expect(elm['s-sc']).toBe('sc-cmp-a');
   });
 
   it('should not set scope id if shadom and supports shadow dom', () => {
     plt.domApi.$supportsShadowDom = true;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
 
     attachStyles(plt, domApi, cmpMeta, elm);
 
@@ -183,7 +183,7 @@ describe('styles', () => {
   });
 
   it('should not set scope id if no encapsulation', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
 
     attachStyles(plt, domApi, cmpMeta, elm);
 
@@ -191,7 +191,7 @@ describe('styles', () => {
   });
 
   it('should set scope id with no mode set', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
 
     const defaultStyle = ':host { color: red; }';
     const defaultMode = '$';
@@ -200,11 +200,11 @@ describe('styles', () => {
     elm.mode = undefined;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('data-cmp-a');
+    expect(elm['s-sc']).toBe('sc-cmp-a');
   });
 
   it('should set scope id with mode set, but no style mode set', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
 
     const defaultStyle = ':host { color: red; }';
     const defaultMode = '$';
@@ -213,11 +213,11 @@ describe('styles', () => {
     elm.mode = 'md';
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('data-cmp-a');
+    expect(elm['s-sc']).toBe('sc-cmp-a');
   });
 
   it('should set scope id with mode set and style mode set', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
     const mdStyle = '.md { color: green; }';
     const mdMode = 'md';
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, mdStyle, mdMode);
@@ -233,11 +233,11 @@ describe('styles', () => {
     elm.mode = 'md';
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('data-cmp-a-md');
+    expect(elm['s-sc']).toBe('sc-cmp-a-md');
   });
 
   it('should set scope id with no mode set and style mode set', () => {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
     const mdStyle = '.md { color: green; }';
     const mdMode = 'md';
     initStyleTemplate(domApi, cmpMeta, ENCAPSULATION.ScopedCss, mdStyle, mdMode);
@@ -253,7 +253,7 @@ describe('styles', () => {
     elm.mode = undefined;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('data-cmp-a');
+    expect(elm['s-sc']).toBe('sc-cmp-a');
   });
 
   it('should append component styles template to head, with styleMode and scoped css', () => {

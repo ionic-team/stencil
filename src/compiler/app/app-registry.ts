@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { ENCAPSULATION } from '../../util/constants';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 
@@ -14,7 +15,7 @@ export function createAppRegistry(config: d.Config) {
 }
 
 
-export function getAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTarget) {
+export function getAppRegistry(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
   const registryJsonFilePath = getRegistryJson(config, outputTarget);
   let appRegistry: d.AppRegistry;
 
@@ -37,7 +38,17 @@ export function serializeComponentRegistry(cmpRegistry: d.ComponentRegistry) {
   const appRegistryComponents: d.AppRegistryComponents = {};
 
   Object.keys(cmpRegistry).sort().forEach(tagName => {
-    appRegistryComponents[tagName] = cmpRegistry[tagName].bundleIds as any;
+    const cmpMeta = cmpRegistry[tagName];
+
+    appRegistryComponents[tagName] = {
+      bundleIds: cmpMeta.bundleIds as any
+    };
+
+    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
+      appRegistryComponents[tagName].encapsulation = 'shadow';
+    } else if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+      appRegistryComponents[tagName].encapsulation = 'scoped';
+    }
   });
 
   return appRegistryComponents;
@@ -49,22 +60,19 @@ export async function writeAppRegistry(config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
-  if (outputTarget.type !== 'www') {
-    // only create a registry for www builds
-    return;
+  if (outputTarget.type === 'www') {
+    appRegistry.components = serializeComponentRegistry(cmpRegistry);
+
+    const registryJson = JSON.stringify(appRegistry, null, 2);
+
+    // cache so we can check if it changed on rebuilds
+    compilerCtx.appFiles.registryJson = registryJson;
+
+    const appRegistryWWW = getRegistryJson(config, outputTarget);
+
+    await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
+
+    const relPath = config.sys.path.relative(config.rootDir, appRegistryWWW);
+    buildCtx.debug(`writeAppRegistry: ${relPath}`);
   }
-
-  appRegistry.components = serializeComponentRegistry(cmpRegistry);
-
-  const registryJson = JSON.stringify(appRegistry, null, 2);
-
-  // cache so we can check if it changed on rebuilds
-  compilerCtx.appFiles.registryJson = registryJson;
-
-  const appRegistryWWW = getRegistryJson(config, outputTarget);
-
-  await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
-
-  const relPath = config.sys.path.relative(config.rootDir, appRegistryWWW);
-  buildCtx.debug(`writeAppRegistry: ${relPath}`);
 }

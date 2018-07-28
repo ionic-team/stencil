@@ -184,21 +184,21 @@ describe('build conditionals', () => {
     });
 
     it('shadowDom', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.shadowDom).toBeTruthy();
       expect(coreBuild.slotPolyfill).toBeFalsy();
     });
 
     it('slotPolyfill cuz ScopedCss', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.slotPolyfill).toBeTruthy();
       expect(coreBuild.shadowDom).toBeFalsy();
     });
 
     it('slotPolyfill cuz NoEncapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.slotPolyfill).toBeTruthy();
       expect(coreBuild.shadowDom).toBeFalsy();

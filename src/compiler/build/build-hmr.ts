@@ -26,6 +26,10 @@ export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, build
     hmr.indexHtmlUpdated = true;
   }
 
+  if (buildCtx.hasServiceWorkerChanges) {
+    hmr.serviceWorkerUpdated = true;
+  }
+
   const componentsUpdated = getComponentsUpdated(compilerCtx, buildCtx);
   if (componentsUpdated) {
     hmr.componentsUpdated = componentsUpdated;

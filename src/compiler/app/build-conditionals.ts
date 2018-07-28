@@ -122,7 +122,7 @@ async function setBuildFromComponent(config: d.Config, compilerCtx: d.CompilerCt
 export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta) return;
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
     coreBuild.shadowDom = true;
   } else {
     coreBuild.slotPolyfill = true;

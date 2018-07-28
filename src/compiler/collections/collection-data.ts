@@ -830,10 +830,10 @@ function parseHost(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
 
 
 function serializeEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
     cmpData.shadow = true;
 
-  } else if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
+  } else if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
     cmpData.scoped = true;
   }
 }
@@ -841,13 +841,13 @@ function serializeEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMe
 
 function parseEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (cmpData.shadow === true) {
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
 
   } else if (cmpData.scoped === true) {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
 
   } else {
-    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
   }
 }
 

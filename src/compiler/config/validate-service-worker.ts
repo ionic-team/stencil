@@ -4,7 +4,7 @@ import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 
 
 export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
-  if (config.devMode) {
+  if (config.devMode && !config.flags.serviceWorker) {
     outputTarget.serviceWorker = null;
     return;
   }

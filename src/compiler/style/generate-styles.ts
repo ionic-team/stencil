@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateComponentStylesMode } from './generate-component-styles';
+import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
 
 
@@ -19,7 +19,7 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
   // create the global styles
   const globalStyles = await Promise.all(config.outputTargets
     .filter(outputTarget => outputTarget.type !== 'stats')
-    .map(async outputTarget => {
+    .map(async (outputTarget: d.OutputTargetBuild) => {
       await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
     }));
 

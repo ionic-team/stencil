@@ -18,7 +18,7 @@ describe('component decorator', () => {
         tagNameMeta: 'ion-action-sheet',
         hostMeta: {},
         stylesMeta: {},
-        encapsulation: ENCAPSULATION.NoEncapsulation,
+        encapsulationMeta: ENCAPSULATION.NoEncapsulation,
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
@@ -40,7 +40,7 @@ describe('component decorator', () => {
         tagNameMeta: 'ion-action-sheet',
         hostMeta: {},
         stylesMeta: {},
-        encapsulation: ENCAPSULATION.ShadowDom,
+        encapsulationMeta: ENCAPSULATION.ShadowDom,
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
@@ -63,7 +63,7 @@ describe('component decorator', () => {
         hostMeta: {},
         stylesMeta: {},
         assetsDirsMeta: [],
-        encapsulation: ENCAPSULATION.ScopedCss,
+        encapsulationMeta: ENCAPSULATION.ScopedCss,
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
@@ -82,7 +82,7 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
-        encapsulation: ENCAPSULATION.NoEncapsulation,
+        encapsulationMeta: ENCAPSULATION.NoEncapsulation,
         jsdoc: {
           documentation: 'This is an actionSheet class',
           name: 'ActionSheet',

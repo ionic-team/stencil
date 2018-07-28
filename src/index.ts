@@ -16,6 +16,15 @@ export {
 
 
 /**
+ * Public Stencil Config
+ */
+import { StencilConfig as SC } from './declarations/index';
+
+declare global {
+  type StencilConfig = SC;
+}
+
+/**
  * Build
  */
 export declare const Build: d.UserBuildConditionals;

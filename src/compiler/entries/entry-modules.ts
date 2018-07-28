@@ -3,7 +3,7 @@ import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
-import { requiresScopedStyles } from '../style/generate-component-styles';
+import { requiresScopedStyles } from '../style/component-styles';
 import { validateComponentTag } from '../config/validate-component';
 
 
@@ -54,7 +54,7 @@ export function getEntryEncapsulations(entryModule: d.EntryModule) {
   const encapsulations: ENCAPSULATION[] = [];
 
   entryModule.moduleFiles.forEach(m => {
-    const encapsulation = m.cmpMeta.encapsulation || ENCAPSULATION.NoEncapsulation;
+    const encapsulation = m.cmpMeta.encapsulationMeta || ENCAPSULATION.NoEncapsulation;
     if (!encapsulations.includes(encapsulation)) {
       encapsulations.push(encapsulation);
     }
@@ -124,13 +124,13 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
     });
 
     const noEncapsulation = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom;
+      return m.cmpMeta.encapsulationMeta !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
     });
     const scopedCss = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
+      return m.cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss;
     });
     const shadowDom = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom;
+      return m.cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
     });
 
     if ((noEncapsulation.length > 0 && scopedCss.length === 0 && shadowDom.length === 0) ||

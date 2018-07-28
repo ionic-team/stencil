@@ -22,7 +22,7 @@ export class Renderer {
     // init the build context
     this.ctx = getCompilerCtx(config, ctx);
 
-    this.outputTarget = outputTarget || config.outputTargets.find(o => o.type === 'www');
+    this.outputTarget = outputTarget || config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
 
     // load the component registry from the registry.json file
     this.cmpRegistry = registry || loadComponentRegistry(config, this.ctx, this.outputTarget);

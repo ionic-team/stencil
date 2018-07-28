@@ -39,8 +39,8 @@ export function validateOutputTargets(config: d.Config) {
   }
 
   config.outputTargets.forEach(outputTarget => {
-    validateResourcesUrl(outputTarget);
-    validateServiceWorker(config, outputTarget);
+    validateResourcesUrl(outputTarget as d.OutputTargetBuild);
+    validateServiceWorker(config, outputTarget as d.OutputTargetWww);
   });
 }
 

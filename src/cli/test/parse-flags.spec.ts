@@ -284,6 +284,12 @@ describe('parseFlags', () => {
     expect(flags.serve).toBe(true);
   });
 
+  it('should parse --service-worker', () => {
+    process.argv[2] = '--service-worker';
+    const flags = parseFlags(process);
+    expect(flags.serviceWorker).toBe(true);
+  });
+
   it('should parse --stats', () => {
     process.argv[2] = '--stats';
     const flags = parseFlags(process);

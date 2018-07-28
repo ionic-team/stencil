@@ -4,8 +4,9 @@ import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename 
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
-import { PLUGIN_HELPERS } from '../style/generate-component-styles';
+import { PLUGIN_HELPERS } from '../style/component-styles';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
+import { OutputTargetDist } from '../../declarations';
 
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
@@ -105,7 +106,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
     return;
   }
 
-  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
   if (!distOutputs.length) {
     return;
   }
@@ -136,7 +137,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
 
 async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
-  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild);
+  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild) as d.OutputTargetBuild[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved in www
@@ -296,7 +297,7 @@ async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.Compi
 
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.appBuild;
-  });
+  }) as d.OutputTargetBuild[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
@@ -329,7 +330,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
   entryModule.entryBundles = entryModule.entryBundles || [];
   entryModule.entryBundles.push(entryBundle);
 
-  const outputTargets = config.outputTargets.filter(o => o.type === 'dist');
+  const outputTargets = config.outputTargets.filter(o => o.type === 'dist') as OutputTargetDist[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved

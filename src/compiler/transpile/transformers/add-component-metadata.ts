@@ -55,7 +55,7 @@ export function addStaticMeta(cmpMeta: d.ComponentMeta) {
 
   staticMembers.is = convertValueToLiteral(cmpMeta.tagNameMeta);
 
-  const encapsulation = formatConstructorEncapsulation(cmpMeta.encapsulation);
+  const encapsulation = formatConstructorEncapsulation(cmpMeta.encapsulationMeta);
   if (encapsulation) {
     staticMembers.encapsulation = convertValueToLiteral(encapsulation);
   }

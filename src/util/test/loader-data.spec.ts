@@ -67,26 +67,26 @@ describe('data serialize/parse', () => {
     });
 
     it('should set scoped css encapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       const format = formatBrowserLoaderComponent(cmpMeta);
       cmpMeta = parseComponentLoader(format);
 
-      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
+      expect(cmpMeta.encapsulationMeta).toBe(ENCAPSULATION.ShadowDom);
     });
 
     it('should set scoped css encapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+      cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       const format = formatBrowserLoaderComponent(cmpMeta);
       cmpMeta = parseComponentLoader(format);
 
-      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
+      expect(cmpMeta.encapsulationMeta).toBe(ENCAPSULATION.ScopedCss);
     });
 
     it('should set no encapsulation', () => {
       const format = formatBrowserLoaderComponent(cmpMeta);
       cmpMeta = parseComponentLoader(format);
 
-      expect(cmpMeta.encapsulation).toBeFalsy();
+      expect(cmpMeta.encapsulationMeta).toBeFalsy();
     });
 
     it('should add a non-attribute property to the load registry', () => {

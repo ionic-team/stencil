@@ -18,7 +18,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
 
       if (util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
-        content += getDevServerClientScript(devServerConfig);
+        content += getDevServerClientScript(devServerConfig, req);
 
       } else if (util.isCssFile(req.filePath)) {
         content = updateStyleUrls(req.url, content);

@@ -11,6 +11,7 @@ export interface DomApi {
   $insertBefore(parentNode: Node, childNode: Node, referenceNode: Node): void;
   $remove(node: Node): Node;
   $appendChild(parentNode: Node, childNode: Node): void;
+  $addClass(elm: any, cssClass: string): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
   $previousSibling(node: Node): Node;

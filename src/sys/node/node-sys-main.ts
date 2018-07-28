@@ -3,6 +3,7 @@ import { createContext, runInContext } from './node-context';
 import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
+import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
 import { WorkerManager } from './worker/index';
 
@@ -13,6 +14,9 @@ import * as os from 'os';
 import * as path from 'path';
 import * as url from 'url';
 
+interface NodeModuleWithCompile extends NodeModule {
+  _compile(code: string, filename: string): any;
+}
 
 export class NodeSystem implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
@@ -22,6 +26,7 @@ export class NodeSystem implements d.StencilSystem {
   private typescriptPackageJson: d.PackageJsonData;
   private resolveModuleCache: { [cacheKey: string]: string } = {};
   private destroys: Function[] = [];
+  storage: NodeStorage;
 
   fs: d.FileSystem;
   path: d.Path;
@@ -46,6 +51,8 @@ export class NodeSystem implements d.StencilSystem {
     } catch (e) {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
+
+    this.storage = new NodeStorage(this.fs);
   }
 
   initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number) {
@@ -171,6 +178,25 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.isGlob(str);
   }
 
+  requireConfigFile(configPath: string) {
+    delete require.cache[path.resolve(configPath)];
+    let code = this.fs.readFileSync(configPath);
+    code = code.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
+
+    const defaultLoader = require.extensions['.js'];
+    require.extensions['.js'] = (module: NodeModuleWithCompile, filename: string) => {
+      if (filename === configPath) {
+        module._compile(code, filename);
+      } else {
+        defaultLoader(module, filename);
+      }
+    };
+
+    const config = require(configPath);
+    require.extensions['.js'] = defaultLoader;
+    return config;
+  }
+
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
     let config: d.Config;
 
@@ -209,9 +235,7 @@ export class NodeSystem implements d.StencilSystem {
     if (hasConfigFile) {
       // the passed in config was a string, so it's probably a path to the config we need to load
       // first clear the require cache so we don't get the same file
-      delete require.cache[path.resolve(configPath)];
-
-      const configFileData = require(configPath);
+      const configFileData = this.requireConfigFile(configPath);
       if (!configFileData.config) {
         throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
       }
@@ -274,6 +298,10 @@ export class NodeSystem implements d.StencilSystem {
     return details;
   }
 
+  requestLatestCompilerVersion() {
+    return this.sysWorker.run('requestLatestCompilerVersion');
+  }
+
   resolveModule(fromDir: string, moduleId: string) {
     const cacheKey = `${fromDir}:${moduleId}`;
     if (this.resolveModuleCache[cacheKey]) {
@@ -321,8 +349,8 @@ export class NodeSystem implements d.StencilSystem {
     return rollup;
   }
 
-  scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
-    return this.sysWorker.run('scopeCss', [cssText, scopeAttribute, hostScopeAttr, slotScopeAttr]);
+  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
+    return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId]);
   }
 
   get semver() {

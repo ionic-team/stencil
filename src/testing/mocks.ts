@@ -21,9 +21,9 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
   };
   const App: d.AppGlobal = {};
   const config = mockConfig();
-  const outputTarget = config.outputTargets[0];
+  const outputTarget = config.outputTargets[0] as d.OutputTargetWww;
 
-  win = win || config.sys.createDom().parse({html: ''});
+  win = win || config.sys.createDom().parse({type: 'www', html: ''});
   domApi = domApi || createDomApi(App, win, win.document);
   cmpRegistry = cmpRegistry || {};
 
@@ -144,7 +144,8 @@ export function mockCache() {
 
 
 export function mockWindow() {
-  const opts: d.HydrateOptions = {
+  const opts: d.OutputTargetHydrate = {
+    type: 'www',
     userAgent: 'test'
   };
 

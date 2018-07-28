@@ -17,7 +17,7 @@ describe('validateStats', () => {
       outputTargets: [{
         type: 'www',
         dir: '/www'
-      } as d.OutputTargetStats]
+      } as any as d.OutputTargetStats]
     };
   });
 

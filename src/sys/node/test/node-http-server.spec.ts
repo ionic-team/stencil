@@ -23,7 +23,7 @@ describe('node-http-server', () => {
       } as d.OutputTargetWww
     ];
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const url = '/some/web/url/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
@@ -40,7 +40,7 @@ describe('node-http-server', () => {
       } as d.OutputTargetWww
     ];
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const url = '/docs/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
@@ -51,7 +51,7 @@ describe('node-http-server', () => {
   it('getFilePath, defaults w/ querystring and hash', () => {
     config = new TestingConfig();
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const url = '/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
@@ -62,7 +62,7 @@ describe('node-http-server', () => {
   it('getFilePath, defaults', () => {
     config = new TestingConfig();
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const url = '/data.json';
 
     const p = getFilePath(outputTarget, url);

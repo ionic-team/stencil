@@ -123,6 +123,7 @@ function configCase(prop: string) {
 const ARG_OPTS = {
   boolean: [
     'cache',
+    'check-version',
     'debug',
     'dev',
     'docs',
@@ -131,6 +132,7 @@ const ARG_OPTS = {
     'log',
     'open',
     'prerender',
+    'service-worker',
     'prod',
     'serve',
     'skip-node-check',

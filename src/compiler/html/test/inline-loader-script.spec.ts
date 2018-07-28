@@ -1,6 +1,5 @@
 import * as d from '../../../declarations';
 import { isLoaderScriptSrc, setDataResourcesUrlAttr } from '../inline-loader-script';
-import { mockStencilSystem } from '../../../testing/mocks';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';
 
@@ -95,7 +94,7 @@ describe('setDataResourcesUrlAttr',  () => {
   beforeEach(() => {
     config = new TestingConfig();
     validateConfig(config);
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as d.OutputTargetHydrate;
   });
 
   it('add baseUrl', () => {

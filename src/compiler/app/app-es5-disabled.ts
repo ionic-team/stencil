@@ -1,9 +1,9 @@
-import { CompilerCtx, Config, OutputTarget } from '../../declarations';
+import { CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
 import { getAppBuildDir } from './app-file-naming';
 import { pathJoin } from '../util';
 
 
-export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetBuild) {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017

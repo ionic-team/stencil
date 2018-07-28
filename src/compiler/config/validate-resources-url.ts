@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function validateResourcesUrl(outputTarget: d.OutputTargetWww) {
+export function validateResourcesUrl(outputTarget: d.OutputTargetBuild) {
   if (typeof outputTarget.resourcesUrl === 'string') {
     outputTarget.resourcesUrl = normalizePath(outputTarget.resourcesUrl.trim());
 

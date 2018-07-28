@@ -34,7 +34,8 @@ describe('request-handler', async () => {
     stencilConfig.devServer = {
       contentTypes: contentTypes,
       devServerDir: normalizePath(path.join(__dirname, '..')),
-      root: normalizePath(path.join(root, 'www'))
+      root: normalizePath(path.join(root, 'www')),
+      baseUrl: '/'
     };
 
     await fs.mkdir(stencilConfig.devServer.root);
@@ -237,6 +238,20 @@ describe('request-handler', async () => {
       expect(res.$contentType).toBe('text/html');
     });
 
+    it('get directory index.html with trailing slash and base url', async () => {
+      config.baseUrl = '/my-base-url/';
+      await fs.mkdir(path.join(root, 'www', 'about-us'));
+      await fs.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
+      const handler = createRequestHandler(config, fs);
+
+      req.url = '/my-base-url/about-us/';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('aboutus');
+      expect(res.$contentType).toBe('text/html');
+    });
+
     it('get directory index.html with trailing slash', async () => {
       await fs.mkdir(path.join(root, 'www', 'about-us'));
       await fs.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
@@ -288,6 +303,19 @@ describe('request-handler', async () => {
       const handler = createRequestHandler(config, fs);
 
       req.url = '/?qs=123';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('hello');
+      expect(res.$contentType).toBe('text/html');
+    });
+
+    it('serve root index.html w/ base url', async () => {
+      config.baseUrl = '/my-base-url/';
+      await fs.writeFile(path.join(root, 'www', 'index.html'), `hello`);
+      const handler = createRequestHandler(config, fs);
+
+      req.url = '/my-base-url/';
 
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
