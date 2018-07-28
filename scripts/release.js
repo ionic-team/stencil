@@ -2,7 +2,7 @@
  * Deploy script adopted from https://github.com/sindresorhus/np
  * MIT License (c) Sindre Sorhus (sindresorhus.com)
  */
-const turbocolor = require('turbocolor');
+const tc = require('turbocolor');
 const execa = require('execa');
 const inquirer = require('inquirer');
 const Listr = require('listr');
@@ -203,7 +203,7 @@ function runTasks(opts) {
       }
     })
     .catch(err => {
-      console.log('\n', turbocolor.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -213,7 +213,7 @@ function prepareUI() {
   const pkg = readPkg();
   const oldVersion = pkg.version;
 
-  console.log(`\nPrepare to publish a new version of ${turbocolor.bold.magenta(pkg.name)} ${turbocolor.dim(`(${oldVersion})`)}\n`);
+  console.log(`\nPrepare to publish a new version of ${tc.bold.magenta(pkg.name)} ${tc.dim(`(${oldVersion})`)}\n`);
 
   const prompts = [
     {
@@ -255,7 +255,7 @@ function prepareUI() {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
-        return `Will bump from ${turbocolor.cyan(oldVersion)} to ${turbocolor.cyan(answers.version)}. Continue?`;
+        return `Will bump from ${tc.cyan(oldVersion)} to ${tc.cyan(answers.version)}. Continue?`;
       }
     }
   ];
@@ -270,7 +270,7 @@ function prepareUI() {
       }
     })
     .catch(err => {
-      console.log('\n', turbocolor.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -279,7 +279,7 @@ function publishUI() {
   const pkg = readPkg();
   const version = pkg.version;
 
-  console.log(`\nPublish a new version of ${turbocolor.bold.magenta(pkg.name)} ${turbocolor.dim(`(${version})`)}\n`);
+  console.log(`\nPublish a new version of ${tc.bold.magenta(pkg.name)} ${tc.dim(`(${version})`)}\n`);
 
   const prompts = [
     {
@@ -327,7 +327,7 @@ function publishUI() {
         const tag = answers.tag;
         const tagPart = tag ? ` and tag this release in npm as ${tag}` : '';
 
-        return `Will publish ${turbocolor.cyan(version + tagPart)}. Continue?`;
+        return `Will publish ${tc.cyan(version + tagPart)}. Continue?`;
       }
     }
   ];
@@ -343,7 +343,7 @@ function publishUI() {
       }
     })
     .catch(err => {
-      console.log('\n', turbocolor.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -396,17 +396,17 @@ function prettyVersionDiff(oldVersion, inc) {
 
   for (let i = 0; i < newVersion.length; i++) {
     if ((newVersion[i] !== oldVersion[i] && !firstVersionChange)) {
-      output.push(`${turbocolor.dim.cyan(newVersion[i])}`);
+      output.push(`${tc.dim.cyan(newVersion[i])}`);
       firstVersionChange = true;
     } else if (newVersion[i].indexOf('-') >= 1) {
       let preVersion = [];
       preVersion = newVersion[i].split('-');
-      output.push(`${turbocolor.dim.cyan(`${preVersion[0]}-${preVersion[1]}`)}`);
+      output.push(`${tc.dim.cyan(`${preVersion[0]}-${preVersion[1]}`)}`);
     } else {
-      output.push(turbocolor.reset.dim(newVersion[i]));
+      output.push(tc.reset.dim(newVersion[i]));
     }
   }
-  return output.join(turbocolor.reset.dim('.'));
+  return output.join(tc.reset.dim('.'));
 }
 
 const prepare = process.argv.slice(2).indexOf('--prepare') > -1;
