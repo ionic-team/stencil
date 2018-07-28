@@ -185,6 +185,7 @@ export interface ConfigFlags {
   prod?: boolean;
   root?: string;
   serve?: boolean;
+  serviceWorker?: boolean;
   ssr?: boolean;
   stats?: boolean;
   version?: boolean;
