@@ -170,10 +170,6 @@ export class NodeSystem implements d.StencilSystem {
     });
   }
 
-  gzipSize(text: string) {
-    return this.sysWorker.run('gzipSize', [text]);
-  }
-
   isGlob(str: string) {
     return this.sysUtil.isGlob(str);
   }

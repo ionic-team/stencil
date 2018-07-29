@@ -421,7 +421,8 @@ function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
       config.buildAppCore,
       config.excludeSrc,
       config.includeSrc,
-      compilerOptions
+      compilerOptions,
+      '__BUILDID:TRANSPILE__'
     ]
   ), 32);
 }

@@ -61,10 +61,8 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
       opts.compress.drop_console = false;
       opts.compress.drop_debugger = false;
       opts.output.beautify = true;
-      opts.output.bracketize = true;
       opts.output.indent_level = 2;
       opts.output.comments = 'all';
-      opts.output.preserve_line = true;
     }
   }
 
@@ -89,7 +87,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
 }
 
 
-// Documentation of uglify options: https://github.com/mishoo/UglifyJS2
+// https://www.npmjs.com/package/terser
 const DEV_MINIFY_OPTS: any = {
   compress: {
     arrows: false,
@@ -137,7 +135,6 @@ const DEV_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: true,
-    bracketize: true,
     comments: 'all',
     ie8: false,
     indent_level: 2,
@@ -146,7 +143,6 @@ const DEV_MINIFY_OPTS: any = {
     keep_quoted_props: true,
     max_line_len: false,
     preamble: null,
-    preserve_line: true,
     quote_keys: false,
     quote_style: 1,
     semicolons: true,
@@ -212,7 +208,6 @@ const PROD_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: false,
-    bracketize: false,
     comments: false,
     ie8: false,
     indent_level: 0,
@@ -221,7 +216,6 @@ const PROD_MINIFY_OPTS: any = {
     keep_quoted_props: false,
     max_line_len: false,
     preamble: null,
-    preserve_line: false,
     quote_keys: false,
     quote_style: 0,
     semicolons: true,
