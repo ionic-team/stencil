@@ -42,11 +42,16 @@ export interface PlatformApi {
 
 
 export interface QueueApi {
-  tick: (cb: Function) => void;
+  tick: (cb: RafCallback) => void;
   read: (cb: RafCallback) => void;
   write: (cb: RafCallback) => void;
   clear?: () => void;
-  flush?: (cb?: Function) => void;
+  flush?: (cb?: () => void) => void;
+}
+
+
+export interface RafCallback {
+  (timeStamp: number): void;
 }
 
 
@@ -58,11 +63,6 @@ export interface PropConnect {
 
 export interface Now {
   (): number;
-}
-
-
-export interface RafCallback {
-  (timeStamp?: number): void;
 }
 
 
