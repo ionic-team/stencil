@@ -1,6 +1,6 @@
 
 
-export interface UglifyResult {
+export interface MinifyJsResult {
   code: string;
   sourceMap: any;
   error: {
