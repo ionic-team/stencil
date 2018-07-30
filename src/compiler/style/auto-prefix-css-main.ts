@@ -2,6 +2,14 @@ import * as d from '../../declarations';
 
 
 export async function autoprefixCssMain(config: d.Config, compilerCtx: d.CompilerCtx, input: string, autoprefixConfig: any) {
+  if (typeof input !== 'string') {
+    return input;
+  }
+
+  if (input === '') {
+    return input;
+  }
+
   const cacheKey = compilerCtx.cache.createKey('autoprefix', '__BUILDID:AUTOPREFIXCSS__', input, autoprefixConfig);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
 
