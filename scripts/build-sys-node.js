@@ -17,11 +17,8 @@ if (transpileSuccess) {
   bundleExternal('node-fetch.js');
   bundleExternal('open-in-editor.js');
   bundleExternal('sys-util.js');
+  bundleExternal('sys-worker.js');
   bundleExternal('websocket.js');
-
-  bundleExternal('sys-worker.js', () => {
-    copyMinifyJs();
-  });
 
   // bundle sys.node
   bundleNodeSysMain();
@@ -38,7 +35,7 @@ if (transpileSuccess) {
 }
 
 
-function bundleExternal(entryFileName, cb) {
+function bundleExternal(entryFileName) {
   const whitelist = [
     'child_process',
     'os',
@@ -93,7 +90,6 @@ function bundleExternal(entryFileName, cb) {
       console.error(info.errors);
     } else {
       console.log(`✅ sys.node: ${entryFileName}`);
-      cb && cb();
     }
   });
 }
@@ -152,27 +148,6 @@ function bundleNodeSysMain() {
     console.error(`build sys.node error: ${err}`);
     process.exit(1);
   });
-}
-
-
-function copyMinifyJs() {
-  const SRC_DIR = path.join(__dirname, '..', 'node_modules', 'terser');
-  const DST_DIR = path.join(__dirname, '..', 'dist', 'sys', 'node', 'minify-js');
-
-  fs.ensureDirSync(DST_DIR);
-  fs.copySync(path.join(SRC_DIR, 'LICENSE'), path.join(DST_DIR, 'LICENSE'));
-
-  fs.ensureDirSync(path.join(DST_DIR, 'lib'));
-  fs.ensureDirSync(path.join(DST_DIR, 'tools'));
-
-  fs.copySync(path.join(SRC_DIR, 'lib'), path.join(DST_DIR, 'lib'));
-  fs.copySync(path.join(SRC_DIR, 'tools', 'exports.js'), path.join(DST_DIR, 'tools', 'exports.js'));
-  fs.copySync(path.join(SRC_DIR, 'tools', 'node.js'), path.join(DST_DIR, 'tools', 'node.js'));
-
-  const sysWorkerPath = path.join(__dirname, '..', 'dist', 'sys', 'node', 'sys-worker.js');
-  let sysWorkerContent = fs.readFileSync(sysWorkerPath, 'utf8');
-  sysWorkerContent = sysWorkerContent.replace(`REQUIRE_BUILD_RELACE('terser')`, `require('./minify-js/tools/node.js')`);
-  fs.writeFileSync(sysWorkerPath, sysWorkerContent);
 }
 
 

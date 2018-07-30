@@ -12,8 +12,7 @@ const autoprefixer = require('autoprefixer');
 const CleanCSS = require('clean-css');
 const postcss = require('postcss');
 
-declare const REQUIRE_BUILD_RELACE: any;
-const Terser = REQUIRE_BUILD_RELACE('terser');
+const Terser = require('terser/dist/browser.bundle.js');
 
 
 export class NodeSystemWorker {
