@@ -26,6 +26,7 @@
     "build.server": "node scripts/build-server.js",
     "build.dev.server": "node scripts/build-dev-server.js",
     "build.dev.server.client": "node scripts/build-dev-server-client.js",
+    "build.prod": "node scripts/build-prod.js",
     "build.submodules": "node scripts/build-submodules.js",
     "build.sys.node": "node scripts/build-sys-node.js",
     "build.testing": "node scripts/build-testing.js",

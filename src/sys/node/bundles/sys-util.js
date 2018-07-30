@@ -1,4 +1,3 @@
-exports.turbocolor = require('turbocolor');
 
 exports.glob = require('glob');
 
@@ -9,3 +8,5 @@ exports.minimatch = require('minimatch');
 exports.opn = require('opn');
 
 exports.semver = require('semver');
+
+exports.turbocolor = require('turbocolor');

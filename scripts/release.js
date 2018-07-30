@@ -12,7 +12,6 @@ const semver = require('semver');
 
 
 const rootDir = path.join(__dirname, '../');
-const scriptsDir = path.join(rootDir, 'scripts');
 const packageJsonPath = path.join(rootDir, 'package.json');
 
 
@@ -130,6 +129,10 @@ function runTasks(opts) {
       {
         title: 'Build @stencil/core',
         task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
+      },
+      {
+        title: 'Optimize for release',
+        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
       },
       {
         title: 'Run dist tests',
