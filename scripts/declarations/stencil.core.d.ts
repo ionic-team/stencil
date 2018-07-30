@@ -28,15 +28,15 @@ export interface EventListenerEnable {
 }
 
 export interface QueueApi {
-  tick: (cb: Function) => void;
+  tick: (cb: RafCallback) => void;
   read: (cb: RafCallback) => void;
   write: (cb: RafCallback) => void;
   clear?: () => void;
-  flush?: (cb?: Function) => void;
+  flush?: (cb?: () => void) => void;
 }
 
 export interface RafCallback {
-  (timeStamp?: number): void;
+  (timeStamp: number): void;
 }
 
 declare global {
