@@ -1,6 +1,8 @@
 import * as d from '.';
 
-
+/**
+ * https://stenciljs.com/docs/config/
+ */
 export interface StencilConfig {
   /**
    * By default, Stencil will statically analyze the application and generate a component graph of
@@ -103,31 +105,24 @@ export interface StencilConfig {
 
   assetVersioning?: ConfigAssetVersioning;
   autoprefixCss?: boolean | any;
-  buildAppCore?: boolean;
   buildEs5?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
   commonjs?: BundlingConfig;
-  cwd?: string;
   nodeResolve?: NodeResolveConfig;
-  configPath?: string;
   devInspector?: boolean;
   devMode?: boolean;
   devServer?: d.DevServerConfig;
   enableCacheStats?: boolean;
-  flags?: ConfigFlags;
-  fsNamespace?: string;
   globalScript?: string;
   hydratedCssClass?: string;
   includeSrc?: string[];
   logger?: d.Logger;
-  logLevel?: 'error'|'warn'|'info'|'debug'|string;
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
   minifyCss?: boolean;
   minifyJs?: boolean;
   preamble?: string;
-  rootDir?: string;
   srcIndexHtml?: string;
   sys?: d.StencilSystem;
   tsconfig?: string;
@@ -137,6 +132,13 @@ export interface StencilConfig {
 }
 
 export interface Config extends StencilConfig {
+  buildAppCore?: boolean;
+  configPath?: string;
+  cwd?: string;
+  flags?: ConfigFlags;
+  fsNamespace?: string;
+  logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  rootDir?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }

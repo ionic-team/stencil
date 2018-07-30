@@ -172,8 +172,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.isGlob(str);
   }
 
-  loadConfigFile(configPath: string, process?: NodeJS.Process) {
-    const config = loadConfigFile(this.fs, configPath, process);
+  loadConfigFile(logger: d.Logger, configPath: string, process?: NodeJS.Process) {
+    const config = loadConfigFile(logger, this.fs, configPath, process);
 
     if (!config.sys) {
       config.sys = this;

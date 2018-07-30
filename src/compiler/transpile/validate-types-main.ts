@@ -28,6 +28,12 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
     rootTsFiles.push(componentsDtsSrcFilePath);
   }
 
+  if (typeof config.configPath === 'string' && config.configPath.endsWith('.ts')) {
+    if (!rootTsFiles.includes(config.configPath)) {
+      rootTsFiles.push(config.configPath);
+    }
+  }
+
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
 
   buildCtx.validateTypesHandler = async (results: d.ValidateTypesResults) => {

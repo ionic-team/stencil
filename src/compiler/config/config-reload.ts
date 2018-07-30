@@ -5,7 +5,7 @@ import { validateConfig } from './validate-config';
 
 export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
   try {
-    const updatedConfig = config.sys.loadConfigFile(config.configPath);
+    const updatedConfig = config.sys.loadConfigFile(config.logger, config.configPath);
 
     configReload(config, updatedConfig);
 

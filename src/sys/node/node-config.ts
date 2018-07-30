@@ -1,8 +1,10 @@
 import * as d from '../../declarations';
 import * as path from 'path';
+import * as ts from 'typescript';
+import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 
 
-export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: NodeJS.Process) {
+export function loadConfigFile(logger: d.Logger, fs: d.FileSystem, configPath: string, process?: NodeJS.Process) {
   let config: d.Config;
 
   let cwd = '';
@@ -23,16 +25,13 @@ export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: N
     }
 
     try {
-      let fileStat = fs.statSync(configPath);
-      if (fileStat.isFile()) {
+      const stat = fs.statSync(configPath);
+      if (stat.isFile()) {
         hasConfigFile = true;
 
-      } else if (fileStat.isDirectory()) {
-        // this is only a directory, so let's just assume we're looking for in stencil.config.js
-        // otherwise they could pass in an absolute path if it was somewhere else
-        configPath = path.join(configPath, 'stencil.config.js');
-        fileStat = fs.statSync(configPath);
-        hasConfigFile = fileStat.isFile();
+      } else if (stat.isDirectory()) {
+        configPath = getConfigPathFromDirectory(fs, configPath);
+        hasConfigFile = (configPath != null);
       }
     } catch (e) {}
   }
@@ -40,7 +39,7 @@ export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: N
   if (hasConfigFile) {
     // the passed in config was a string, so it's probably a path to the config we need to load
     // first clear the require cache so we don't get the same file
-    const configFileData = requireConfigFile(fs, configPath);
+    const configFileData = requireConfigFile(logger, fs, configPath);
     if (!configFileData.config) {
       throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
     }
@@ -52,7 +51,7 @@ export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: N
     }
 
   } else {
-    // no stencil.config.js or ts file, which is fine
+    // no stencil.config.ts or .js file, which is fine
     // #0CJS
     config = {
       rootDir: cwd
@@ -65,23 +64,106 @@ export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: N
 }
 
 
-export function requireConfigFile(fs: d.FileSystem, configPath: string) {
-  delete require.cache[path.resolve(configPath)];
-  let code = fs.readFileSync(configPath);
-  code = code.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
+function getConfigPathFromDirectory(fs: d.FileSystem, dir: string) {
+  // this is only a directory, so let's make some assumptions
 
+  for (let i = 0; i < CONFIG_FILENAMES.length; i++) {
+    try {
+      const configFilePath = path.join(dir, CONFIG_FILENAMES[i]);
+      const stat = fs.statSync(configFilePath);
+      if (stat.isFile()) {
+        return configFilePath;
+      }
+    } catch (e) {}
+  }
+
+  return null;
+}
+
+const CONFIG_FILENAMES = [
+  'stencil.config.ts',
+  'stencil.config.js'
+];
+
+
+function requireConfigFile(logger: d.Logger, fs: d.FileSystem, configFilePath: string) {
+  // load up the source code
+  let sourceText = fs.readFileSync(configFilePath);
+
+  sourceText = convertSourceConfig(logger, sourceText, configFilePath);
+
+  // ensure we cleared out node's internal require() cache for this file
+  delete require.cache[path.resolve(configFilePath)];
+
+  // let's override node's require for a second
+  // don't worry, we'll revert this when we're done
   const defaultLoader = require.extensions['.js'];
   require.extensions['.js'] = (module: NodeModuleWithCompile, filename: string) => {
-    if (filename === configPath) {
-      module._compile(code, filename);
+    if (filename === configFilePath) {
+      module._compile(sourceText, filename);
     } else {
       defaultLoader(module, filename);
     }
   };
 
-  const config = require(configPath);
+  // let's do this!
+  const config = require(configFilePath);
+
+  // all set, let's go ahead and reset the require back to the default
   require.extensions['.js'] = defaultLoader;
+
+  // good work team
   return config;
+}
+
+
+export function convertSourceConfig(logger: d.Logger, sourceText: string, configFilePath: string) {
+  if (configFilePath.endsWith('.ts')) {
+    // looks like we've got a typed config file
+    // let's transpile it to .js quick
+    sourceText = transpileTypedConfig(logger, sourceText, configFilePath);
+
+  } else {
+    // quick hack to turn a modern es module
+    // into and old school commonjs module
+    sourceText = sourceText.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
+  }
+
+  return sourceText;
+}
+
+
+function transpileTypedConfig(logger: d.Logger, sourceText: string, filePath: string) {
+  // let's transpile an awesome stencil.config.ts file into
+  // a boring stencil.config.js file
+
+  const opts: ts.TranspileOptions = {
+    fileName: filePath,
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      moduleResolution: ts.ModuleResolutionKind.NodeJs,
+      target: ts.ScriptTarget.ES5
+    },
+    reportDiagnostics: true
+  };
+
+  const output = ts.transpileModule(sourceText, opts);
+
+  const diagnostics: d.Diagnostic[] = [];
+  loadTypeScriptDiagnostics(null, diagnostics, output.diagnostics);
+
+  if (diagnostics.length > 0) {
+    // whoops, something is up with this config
+    if (logger) {
+      logger.printDiagnostics(diagnostics);
+    } else {
+      diagnostics.forEach(diagnostic => {
+        console.log(`${diagnostic.messageText}`);
+      });
+    }
+  }
+
+  return output.outputText;
 }
 
 

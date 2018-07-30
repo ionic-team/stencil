@@ -25,7 +25,7 @@ export interface StencilSystem {
   }): Promise<string[]>;
   initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
   isGlob?(str: string): boolean;
-  loadConfigFile?(configPath: string, process?: any): d.Config;
+  loadConfigFile?(logger: d.Logger, configPath: string, process?: any): d.Config;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
     output: string;
     sourceMap?: any;
