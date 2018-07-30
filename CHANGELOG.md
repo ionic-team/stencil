@@ -1,3 +1,32 @@
+<a name="0.11.0-0"></a>
+# 🐡 [0.11.0-0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-0) (2018-07-30)
+
+
+### Features
+
+* **config:** export public config interface ([b15d5e7](https://github.com/ionic-team/stencil/commit/b15d5e7))
+
+
+### Refactor
+
+* **prerender:** css scope ids as classnames instead of attributes
+* **prerender:** use ssrc and ssrv attributes instead of data-ssrc and data-ssrv attributes
+* **set-accesor:** boolean values ([aac503b](https://github.com/ionic-team/stencil/commit/aac503b))
+
+
+### Bug Fixes
+
+* **cache:** bust fs cache for internal encapsulation rename ([9db7d49](https://github.com/ionic-team/stencil/commit/9db7d49))
+* **cache:** commit cache for all builds and clean up fs cache periodically ([5c1a1cc](https://github.com/ionic-team/stencil/commit/5c1a1cc))
+* **cache:** ensure external imports are correctly read from the fs cache ([646314c](https://github.com/ionic-team/stencil/commit/646314c))
+* **css:** strips comments before resolving css imports ([f822c08](https://github.com/ionic-team/stencil/commit/f822c08)), closes [#955](https://github.com/ionic-team/stencil/issues/955)
+* **fs-watch:** reload window if service worker changed ([5c9268b](https://github.com/ionic-team/stencil/commit/5c9268b))
+* **minifier:** migrate js minifier from uglify-es to terser ([cbaa274](https://github.com/ionic-team/stencil/commit/cbaa274)), closes [#913](https://github.com/ionic-team/stencil/issues/913)
+* **prerender:** fix prerendered styles for scoped css ([fd8784f](https://github.com/ionic-team/stencil/commit/fd8784f))
+* **queue:** always pass timestamp ([12a440c](https://github.com/ionic-team/stencil/commit/12a440c))
+
+
+
 <a name="0.10.10"></a>
 ## 📍 [0.10.10](https://github.com/ionic-team/stencil/compare/v0.10.9...v0.10.10) (2018-07-26)
 
