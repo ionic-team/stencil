@@ -87,11 +87,48 @@ export class Cache implements d.Cache {
       this.skip = false;
       this.failed = 0;
       await this.cacheFs.commit();
+      await this.clearExpiredCache();
     }
   }
 
   clear() {
     this.cacheFs.clearCache();
+  }
+
+  async clearExpiredCache() {
+    const now = Date.now();
+
+    const lastClear = await this.config.sys.storage.get(EXP_STORAGE_KEY) as number;
+    if (lastClear != null) {
+      const diff = now - lastClear;
+      if (diff < ONE_DAY) {
+        return;
+      }
+
+      const fs = this.cacheFs.disk;
+      const cachedFileNames = await fs.readdirSync(this.config.cacheDir);
+      const cachedFilePaths = cachedFileNames.map(f => this.config.sys.path.join(this.config.cacheDir, f));
+
+      let totalCleared = 0;
+
+      const promises = cachedFilePaths.map(async filePath => {
+        const stat = await fs.stat(filePath);
+        const lastModified = stat.mtime.getTime();
+
+        const diff = now - lastModified;
+        if (diff > ONE_WEEK) {
+          await fs.unlink(filePath);
+          totalCleared++;
+        }
+      });
+
+      await Promise.all(promises);
+
+      this.config.logger.debug(`clearExpiredCache, cachedFileNames: ${cachedFileNames.length}, totalCleared: ${totalCleared}`);
+    }
+
+    this.config.logger.debug(`clearExpiredCache, set last clear`);
+    await this.config.sys.storage.set(EXP_STORAGE_KEY, now);
   }
 
   async clearDiskCache() {
@@ -113,7 +150,9 @@ export class Cache implements d.Cache {
 
 
 const MAX_FAILED = 100;
-
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const ONE_WEEK = ONE_DAY * 7;
+const EXP_STORAGE_KEY = `last_clear_expired_cache`;
 
 const CACHE_DIR_README = `# Stencil Cache Directory
 
