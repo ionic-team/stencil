@@ -5,7 +5,7 @@ export interface Plugin {
   load?: (id: string, context?: PluginCtx) => Promise<string>;
   name: string;
   resolveId?: (importee: string, importer: string, context?: PluginCtx) => Promise<string>;
-  transform?: (sourceText: string, id?: string, context?: PluginCtx) => Promise<PluginTransformResults>;
+  transform?: (sourceText: string, id: string, context: PluginCtx) => Promise<PluginTransformResults>;
 }
 
 
