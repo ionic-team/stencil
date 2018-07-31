@@ -3,7 +3,7 @@ import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
-import { getTestBuildConditionals } from '../../../compiler/app/build-conditionals';
+import { getDefaultBuildConditionals } from '../../../util/build-conditionals';
 
 
 jest.setTimeout(20000);
@@ -11,7 +11,7 @@ jest.setTimeout(20000);
 describe('prerender index', () => {
 
   beforeEach(() => {
-    __BUILD_CONDITIONALS__ = getTestBuildConditionals();
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
 
 

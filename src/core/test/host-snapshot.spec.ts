@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { initHostSnapshot } from '../host-snapshot';
 import { mockDomApi } from '../../testing/mocks';
 import { ENCAPSULATION } from '../../util/constants';
-import { getTestBuildConditionals } from '../../compiler/app/build-conditionals';
+import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 describe('host-snapshot', () => {
 
@@ -14,7 +14,7 @@ describe('host-snapshot', () => {
     domApi = mockDomApi();
     cmpMeta = { tagNameMeta: 'ion-tag' };
     hostElm = domApi.$createElement('cmp-a') as any;
-    __BUILD_CONDITIONALS__ = getTestBuildConditionals();
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
 
   it('do not attach shadow root when not shadow', () => {

@@ -1,9 +1,9 @@
-import * as d from '../../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
-import { isTsFile } from '../util';
+import * as d from '../declarations';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
+import { isTsFile } from '../compiler/util';
 
 
-export function getTestBuildConditionals(): d.BuildConditionals {
+export function getDefaultBuildConditionals(): d.BuildConditionals {
   return {
     coreId: 'core',
     polyfills: false,

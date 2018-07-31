@@ -3,7 +3,7 @@ import { h } from '../../renderer/vdom/h';
 import { MockedPlatform, mockConnect, mockDefine, mockElement, mockPlatform, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
 import { queueUpdate, renderUpdate } from '../update';
-import { getTestBuildConditionals } from '../../compiler/app/build-conditionals';
+import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 
 describe('instance update', () => {
@@ -12,7 +12,7 @@ describe('instance update', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
-    __BUILD_CONDITIONALS__ = getTestBuildConditionals();
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
 
 

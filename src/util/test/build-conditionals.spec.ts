@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import * as d from '../../declarations';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
 
 

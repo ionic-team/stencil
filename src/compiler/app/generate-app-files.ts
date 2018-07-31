@@ -7,7 +7,7 @@ import { generateEsmCore } from './app-core-esm';
 import { generateEsmHosts } from '../distribution/dist-esm';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateLoader } from './app-loader';
-import { setBuildConditionals } from './build-conditionals';
+import { setBuildConditionals } from '../../util/build-conditionals';
 
 
 export async function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {

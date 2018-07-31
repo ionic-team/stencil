@@ -2,10 +2,6 @@ import * as path from 'path';
 import * as d from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
-import { getTestBuildConditionals } from '../compiler/app/build-conditionals';
-
-(global as any).__BUILD_CONDITIONALS__ = getTestBuildConditionals();
-
 
 export class TestingConfig implements d.Config {
   _isTesting = true;
