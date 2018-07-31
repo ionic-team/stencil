@@ -1,9 +1,9 @@
-<a name="0.11.0-0"></a>
-# 🐡 [0.11.0-0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-0) (2018-07-30)
-
+<a name="0.11.0-1"></a>
+# 🍋 [0.11.0-1](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-1) (2018-07-31)
 
 ### Features
 
+* **config:** typed stencil.config.ts and config error reporting
 * **config:** export public config interface ([b15d5e7](https://github.com/ionic-team/stencil/commit/b15d5e7))
 
 
