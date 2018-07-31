@@ -35,7 +35,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     cmpDidUpdate: true,
     cmpWillUpdate: true,
     cmpDidUnload: true,
-    clientSide: true,
+    clientSide: false,
     externalModuleLoader: false,
     browserModuleLoader: false,
     es5: false
