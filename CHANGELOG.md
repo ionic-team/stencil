@@ -1,5 +1,5 @@
-<a name="0.11.0-2"></a>
-# 🎢 [0.11.0-2](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-2) (2018-07-31)
+<a name="0.11.0"></a>
+# 🍇 [0.11.0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0) (2018-07-31)
 
 ### Features
 
