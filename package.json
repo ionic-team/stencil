@@ -87,7 +87,6 @@
     "open-in-editor": "2.2.0",
     "opn": "5.2.0",
     "postcss": "6.0.21",
-    "rollup-plugin-replace": "^2.0.0",
     "semver": "5.5.0",
     "source-map": "^0.7.0",
     "terser": "3.8.1",
