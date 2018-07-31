@@ -21,7 +21,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
   } as d.BuildConditionals;
 
   const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    all[`Build.${key}`] = buildConditionals[key];
     return all;
   }, <{ [key: string]: any}>{});
 
