@@ -4,7 +4,7 @@ export interface Diagnostic {
   level: 'error'|'warn'|'info'|'log'|'debug';
   type: 'typescript'|'bundling'|'build'|'runtime'|'hydrate'|'css';
   header?: string;
-  language?: 'javascript'|'typescript'|'scss'|'css';
+  language?: string;
   messageText: string;
   code?: string;
   absFilePath?: string;
