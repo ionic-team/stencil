@@ -20,7 +20,9 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
-    config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
+    if (!buildCtx.hasPrintedResults) {
+      config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
+    }
 
     if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {
       // we've opened up the dev server
@@ -59,6 +61,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       // print out the time it took to build
       // and add the duration to the build results
       buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+      buildCtx.hasPrintedResults = true;
 
       // write the build stats
       await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);

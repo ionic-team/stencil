@@ -381,8 +381,16 @@ function primeTsServiceCache(transpileCtx: TranspileContext) {
   const unsubscribe = transpileCtx.compilerCtx.events.subscribe('buildFinish' as any, () => {
     unsubscribe();
 
+    if (transpileCtx.buildCtx.hasError) {
+      return;
+    }
+
     // we can wait a bit and let things cool down on the main thread first
     setTimeout(async () => {
+      if (transpileCtx.buildCtx.hasError) {
+        return;
+      }
+
       const timeSpan = transpileCtx.buildCtx.createTimeSpan(`prime ts service cache started, ${transpileCtx.filesFromFsCache.length} file(s)`, true);
 
       // loop through each file system cached ts files and run the transpile again

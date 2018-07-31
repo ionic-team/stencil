@@ -31,6 +31,7 @@ export interface BuildCtx {
   hasCopyChanges: boolean;
   hasFinished: boolean;
   hasIndexHtmlChanges: boolean;
+  hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
   hasSlot: boolean;
