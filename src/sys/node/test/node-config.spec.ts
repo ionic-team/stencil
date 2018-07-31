@@ -1,10 +1,7 @@
 import { convertSourceConfig } from '../node-config';
-import { mockLogger } from '../../../testing/mocks';
 
 
 describe('node-config', () => {
-
-  const logger = mockLogger();
 
   it('should convert esm to commonjs config', () => {
     const sourceText = `
@@ -14,7 +11,7 @@ describe('node-config', () => {
     `;
     const filePath = 'stencil.config.js';
 
-    const output = convertSourceConfig(logger, sourceText, filePath);
+    const output = convertSourceConfig(sourceText, filePath);
 
     const r = new Function(`exports`, `${output}`);
 
@@ -33,7 +30,7 @@ describe('node-config', () => {
     `;
     const filePath = 'stencil.config.js';
 
-    const output = convertSourceConfig(logger, sourceText, filePath);
+    const output = convertSourceConfig(sourceText, filePath);
 
     const r = new Function(`exports`, `${output}`);
 
@@ -52,7 +49,7 @@ describe('node-config', () => {
     `;
     const filePath = 'stencil.config.ts';
 
-    const output = convertSourceConfig(logger, sourceText, filePath);
+    const output = convertSourceConfig(sourceText, filePath);
 
     const r = new Function(`exports`, `${output}`);
 
