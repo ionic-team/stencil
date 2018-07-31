@@ -1,5 +1,5 @@
-<a name="0.11.0-1"></a>
-# 🍋 [0.11.0-1](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-1) (2018-07-31)
+<a name="0.11.0-2"></a>
+# 🎢 [0.11.0-2](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0-2) (2018-07-31)
 
 ### Features
 
@@ -24,6 +24,7 @@
 * **minifier:** migrate js minifier from uglify-es to terser ([cbaa274](https://github.com/ionic-team/stencil/commit/cbaa274)), closes [#913](https://github.com/ionic-team/stencil/issues/913)
 * **prerender:** fix prerendered styles for scoped css ([fd8784f](https://github.com/ionic-team/stencil/commit/fd8784f))
 * **queue:** always pass timestamp ([12a440c](https://github.com/ionic-team/stencil/commit/12a440c))
+* **types:** relax types for plugins ([c949659](https://github.com/ionic-team/stencil/commit/c949659))
 
 
 
