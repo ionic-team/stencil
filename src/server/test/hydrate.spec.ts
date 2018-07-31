@@ -1,5 +1,5 @@
+import * as d from '../../declarations';
 import { compareHtml, mockConfig } from '../../testing/mocks';
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { h } from '../../renderer/vdom/h';
 import { hydrateHtml } from '../hydrate-html';
@@ -7,17 +7,17 @@ import { hydrateHtml } from '../hydrate-html';
 
 describe('hydrate', () => {
 
-  let config: Config;
-  let outputTarget: OutputTargetHydrate;
+  let config: d.Config;
+  let outputTarget: d.OutputTargetHydrate;
 
   beforeEach(() => {
     config = mockConfig();
-    outputTarget = config.outputTargets[0] as OutputTargetHydrate;
+    outputTarget = config.outputTargets[0] as d.OutputTargetHydrate;
   });
 
   it('should add scope attributes', async () => {
-    const ctx: CompilerCtx = {};
-    const registry: ComponentRegistry = {
+    const ctx: d.CompilerCtx = {};
+    const registry: d.ComponentRegistry = {
       'ion-test': {
         bundleIds: 'ion-test',
         tagNameMeta: 'ion-test',
@@ -42,7 +42,7 @@ describe('hydrate', () => {
         } as any
       }
     };
-    const opts: HydrateOptions = {
+    const opts: d.HydrateOptions = {
       html: `<ion-test></ion-test>`
     };
 
@@ -69,8 +69,8 @@ describe('hydrate', () => {
   });
 
   it('should load content in nested named slots', async () => {
-    const ctx: CompilerCtx = {};
-    const registry: ComponentRegistry = {
+    const ctx: d.CompilerCtx = {};
+    const registry: d.ComponentRegistry = {
       'ion-test': {
         bundleIds: 'ion-test',
         tagNameMeta: 'ion-test',
@@ -103,7 +103,7 @@ describe('hydrate', () => {
         } as any
       }
     };
-    const opts: HydrateOptions = {
+    const opts: d.HydrateOptions = {
       html: `
         <ion-test>
           <div>default slot text</div>
@@ -133,9 +133,9 @@ describe('hydrate', () => {
   });
 
   it('should load content in nested default slot', async () => {
-    const ctx: CompilerCtx = {};
+    const ctx: d.CompilerCtx = {};
 
-    const registry: ComponentRegistry = {
+    const registry: d.ComponentRegistry = {
       'ion-test': {
         bundleIds: 'ion-test',
         tagNameMeta: 'ion-test',
@@ -167,7 +167,7 @@ describe('hydrate', () => {
         } as any
       }
     };
-    const opts: HydrateOptions = {
+    const opts: d.HydrateOptions = {
       html: `
         <ion-test>
           content text
@@ -195,8 +195,8 @@ describe('hydrate', () => {
   });
 
   it('should load one component and assign ssr ids', async () => {
-    const ctx: CompilerCtx = {};
-    const registry: ComponentRegistry = {
+    const ctx: d.CompilerCtx = {};
+    const registry: d.ComponentRegistry = {
       'ion-test': {
         bundleIds: 'ion-test',
         tagNameMeta: 'ion-test',
@@ -225,7 +225,7 @@ describe('hydrate', () => {
         } as any
       }
     };
-    const opts: HydrateOptions = {
+    const opts: d.HydrateOptions = {
       html: `<ion-test></ion-test>`
     };
 
@@ -246,9 +246,9 @@ describe('hydrate', () => {
   });
 
   it('should do nothing when no components registered', async () => {
-    const ctx: CompilerCtx = {};
-    const registry: ComponentRegistry = {};
-    const opts: HydrateOptions = {
+    const ctx: d.CompilerCtx = {};
+    const registry: d.ComponentRegistry = {};
+    const opts: d.HydrateOptions = {
       html: `<body>hello</body>`
     };
 
