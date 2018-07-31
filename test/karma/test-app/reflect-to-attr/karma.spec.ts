@@ -10,24 +10,15 @@ describe('reflect-to-attr', function() {
   });
   afterEach(tearDownDom);
 
-  // @Prop({reflectToAttr: true}) str = 'single';
-  // @Prop({reflectToAttr: true}) nu = 2;
-  // @Prop({reflectToAttr: true}) undef: string;
-  // @Prop({reflectToAttr: true}) null: string = null;
-  // @Prop({reflectToAttr: true}) bool = false;
-  // @Prop({reflectToAttr: true}) otherBool = true;
-
-  // @Prop({reflectToAttr: true, mutable: true}) dynamicStr: string;
-  // @Prop({reflectToAttr: true}) dynamicNu: number;
   it('should have proper attributes', async () => {
 
     const cmp = app.querySelector('reflect-to-attr') as any;
 
     expect(cmp.getAttribute('str')).toEqual('single');
     expect(cmp.getAttribute('nu')).toEqual('2');
-    expect(cmp.hasAttribute('undef')).toEqual(false);
-    expect(cmp.hasAttribute('null')).toEqual(false);
-    expect(cmp.hasAttribute('bool')).toEqual(false);
+    expect(cmp.getAttribute('undef')).toEqual(null);
+    expect(cmp.getAttribute('null')).toEqual(null);
+    expect(cmp.getAttribute('bool')).toEqual(null);
     expect(cmp.getAttribute('other-bool')).toEqual('');
 
     cmp.str = 'second';
@@ -44,7 +35,7 @@ describe('reflect-to-attr', function() {
     expect(cmp.getAttribute('undef')).toEqual('no undef');
     expect(cmp.getAttribute('null')).toEqual('no null');
     expect(cmp.getAttribute('bool')).toEqual('');
-    expect(cmp.hasAttribute('other-bool')).toEqual(false);
+    expect(cmp.getAttribute('other-bool')).toEqual(null);
 
     expect(cmp.getAttribute('dynamic-str')).toEqual('value');
     expect(cmp.getAttribute('dynamic-nu')).toEqual('123');

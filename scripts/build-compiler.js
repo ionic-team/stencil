@@ -105,23 +105,26 @@ function updateBuildIds(buildId, input) {
 
   let output = input;
 
+  // increment this number to bust the cache entirely
+  const CACHE_BUSTER = 0;
+
   output = output.replace(/__BUILDID__/g, buildId);
 
-  let tsPkg = require('../node_modules/typescript/package.json');
-  let transpileId = tsPkg.name + tsPkg.version;
+  let transpilePkg = require('../node_modules/typescript/package.json');
+  let transpileId = transpilePkg.name + transpilePkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:TRANSPILE__/g, transpileId);
 
-  let cleanCssPkg = require('../node_modules/clean-css/package.json');
-  let minifyStyleId = cleanCssPkg.name + cleanCssPkg.version;
+  let minifyStylePkg = require('../node_modules/clean-css/package.json');
+  let minifyStyleId = minifyStylePkg.name + minifyStylePkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYSTYLE__/g, minifyStyleId);
 
-  let uglifyPkg = require('../node_modules/uglify-es/package.json');
-  let minifyJsId = uglifyPkg.name + uglifyPkg.version;
+  let minifyJsPkg = require('../node_modules/terser/package.json');
+  let minifyJsId = minifyJsPkg.name + minifyJsPkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
 
   let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
   let postcssPkg = require('../node_modules/postcss/package.json');
-  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version;
+  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:AUTOPREFIXCSS__/g, autoPrefixerId);
 
   return output;

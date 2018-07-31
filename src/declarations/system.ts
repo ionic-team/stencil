@@ -23,7 +23,6 @@ export interface StencilSystem {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
-  gzipSize?(text: string): Promise<number>;
   initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string, process?: any): d.Config;

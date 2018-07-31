@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
-import { loadUglifyDiagnostics } from '../../util/logger/logger-uglify';
+import { loadMinifyJsDiagnostics } from '../../util/logger/logger-minify-js';
 import { normalizePath } from '../../compiler/util';
 import { requestLatestCompilerVersion } from './check-version';
 import { ShadowCss } from '../../compiler/style/shadow-css';
@@ -10,9 +10,9 @@ import { validateTypesWorker } from '../../compiler/transpile/validate-types-wor
 
 const autoprefixer = require('autoprefixer');
 const CleanCSS = require('clean-css');
-const gzipSize = require('gzip-size');
 const postcss = require('postcss');
-const UglifyJS = require('uglify-es');
+
+const Terser = require('terser/dist/browser.bundle.js');
 
 
 export class NodeSystemWorker {
@@ -42,10 +42,6 @@ export class NodeSystemWorker {
 
   copy(copyTasks: d.CopyTask[]) {
     return copyTasksWorker(copyTasks);
-  }
-
-  gzipSize(text: string) {
-    return gzipSize(text);
   }
 
   minifyCss(input: string, filePath?: string, opts: any = {}) {
@@ -96,10 +92,10 @@ export class NodeSystemWorker {
   }
 
   minifyJs(input: string, opts?: any) {
-    const result: d.UglifyResult = UglifyJS.minify(input, opts);
+    const result: d.MinifyJsResult = Terser.minify(input, opts);
     const diagnostics: d.Diagnostic[] = [];
 
-    loadUglifyDiagnostics(input, result, diagnostics);
+    loadMinifyJsDiagnostics(input, result, diagnostics);
 
     return {
       output: (result.code as string),

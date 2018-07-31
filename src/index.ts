@@ -7,22 +7,13 @@ export {
   ComponentDidUpdate,
   ComponentWillLoad,
   ComponentWillUpdate,
-  Config,
+  StencilConfig as Config,
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
   QueueApi
 } from './declarations/index';
 
-
-/**
- * Public Stencil Config
- */
-import { StencilConfig as SC } from './declarations/index';
-
-declare global {
-  type StencilConfig = SC;
-}
 
 /**
  * Build

@@ -198,6 +198,8 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // save the cache key for future lookups
   ctx.snapshotVersions.set(tsFilePath, cacheKey);
 
+  let ensureExternalImports: string[] = null;
+
   if (useFsCache) {
     // let's check to see if we've already cached this in our filesystem
     // but only bother for the very first build
@@ -222,6 +224,15 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
       // write the cached js output too
       await outputFile(config, ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
       return;
+    }
+
+  } else {
+    // purposely not using the fs cache
+    // this is probably when we want to prime the
+    // in-memory ts cache after the first build has completed
+    const existingModuleFile = ctx.compilerCtx.moduleFiles[tsFilePath];
+    if (existingModuleFile && Array.isArray(existingModuleFile.externalImports)) {
+      ensureExternalImports = existingModuleFile.externalImports.slice();
     }
   }
 
@@ -257,6 +268,12 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
       // this is the JS output of the typescript file transpiling
       const moduleFile = getModuleFile(ctx.compilerCtx, tsFilePath);
       moduleFile.jsFilePath = outputFilePath;
+
+      if (Array.isArray(ensureExternalImports)) {
+        ensureExternalImports.forEach(moduleId => {
+          addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, moduleFile, config.rootDir, moduleId);
+        });
+      }
 
       if (config.enableCache) {
         // cache this module file and js text for later
@@ -358,8 +375,16 @@ function primeTsServiceCache(transpileCtx: TranspileContext) {
   const unsubscribe = transpileCtx.compilerCtx.events.subscribe('buildFinish' as any, () => {
     unsubscribe();
 
+    if (transpileCtx.buildCtx.hasError) {
+      return;
+    }
+
     // we can wait a bit and let things cool down on the main thread first
     setTimeout(async () => {
+      if (transpileCtx.buildCtx.hasError) {
+        return;
+      }
+
       const timeSpan = transpileCtx.buildCtx.createTimeSpan(`prime ts service cache started, ${transpileCtx.filesFromFsCache.length} file(s)`, true);
 
       // loop through each file system cached ts files and run the transpile again
@@ -367,9 +392,13 @@ function primeTsServiceCache(transpileCtx: TranspileContext) {
       await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
 
       timeSpan.finish(`prime ts service cache finished`);
-    }, 1500);
+    }, PRIME_TS_CACHE_TIMEOUT);
   });
 }
+
+// how long we should wait after the first build
+// to go ahead and prime the in-memory TS cache
+const PRIME_TS_CACHE_TIMEOUT = 1000;
 
 
 export function isFileIncludePath(config: d.Config, readPath: string) {
@@ -415,7 +444,8 @@ function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
       config.buildAppCore,
       config.excludeSrc,
       config.includeSrc,
-      compilerOptions
+      compilerOptions,
+      '__BUILDID:TRANSPILE__'
     ]
   ), 32);
 }

@@ -373,8 +373,7 @@ describe('instance render', () => {
         empty: '',
         class: 'a b c my-class',
         number: '12',
-        appear: 'true',
-        'no-appear': 'false'
+        appear: '',
       });
     });
 

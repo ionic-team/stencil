@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.10.10",
+  "version": "0.11.0-1",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,6 +26,7 @@
     "build.server": "node scripts/build-server.js",
     "build.dev.server": "node scripts/build-dev-server.js",
     "build.dev.server.client": "node scripts/build-dev-server-client.js",
+    "build.prod": "node scripts/build-prod.js",
     "build.submodules": "node scripts/build-submodules.js",
     "build.sys.node": "node scripts/build-sys-node.js",
     "build.testing": "node scripts/build-testing.js",
@@ -55,7 +56,6 @@
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-pluginutils": "2.3.0",
     "typescript": "~2.9.1",
-    "uglify-es": "3.3.9",
     "workbox-build": "^3.1.0"
   },
   "devDependencies": {
@@ -74,7 +74,6 @@
     "execa": "^0.8.0",
     "fs-extra": "^5.0.0",
     "glob": "7.1.2",
-    "gzip-size": "4.1.0",
     "inquirer": "^3.3.0",
     "is-glob": "4.0.0",
     "jest": "^23.1.0",
@@ -90,6 +89,7 @@
     "postcss": "6.0.21",
     "semver": "5.5.0",
     "source-map": "^0.7.0",
+    "terser": "3.8.1",
     "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
     "tslint-ionic-rules": "0.0.13",

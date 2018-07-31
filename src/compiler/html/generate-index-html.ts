@@ -40,7 +40,7 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
       // add the prerendered html to our list of files to write
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
 
-      buildCtx.debug(`optimizeHtml, write: ${outputTarget.indexHtml}`);
+      buildCtx.debug(`optimizeHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
     } catch (e) {
       catchError(buildCtx.diagnostics, e);

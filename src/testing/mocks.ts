@@ -90,7 +90,10 @@ export function mockCompilerCtx() {
 }
 
 
-export function mockBuildCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
+export function mockBuildCtx(config?: d.Config, compilerCtx?: d.CompilerCtx) {
+  if (!config) {
+    config = mockConfig();
+  }
   if (!compilerCtx) {
     compilerCtx = mockCompilerCtx();
   }

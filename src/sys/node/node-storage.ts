@@ -22,7 +22,7 @@ export class NodeStorage implements d.Storage {
   async set(key: string, value: any) {
     const data = await this.readData();
     data[key] = value;
-    await this.writeData();
+    this.writeData();
   }
 
   private async readData() {
@@ -37,10 +37,10 @@ export class NodeStorage implements d.Storage {
     return this.data;
   }
 
-  private async writeData() {
+  private writeData() {
     try {
       const dataStr = JSON.stringify(this.data, null, 2);
-      await this.fs.writeFile(this.storagePath, dataStr);
+      this.fs.writeFileSync(this.storagePath, dataStr);
     } catch (e) {}
   }
 
