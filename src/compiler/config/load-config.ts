@@ -7,7 +7,7 @@ export function loadConfig(sys: StencilSystem, config: string | Config) {
   }
 
   if (typeof config === 'string') {
-    return sys.loadConfigFile(null, config);
+    return sys.loadConfigFile(config);
   }
 
   // looks like it's already a build config object

@@ -20,7 +20,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   let config: d.Config;
   try {
     const configPath = getConfigFilePath(process, sys, flags.config);
-    config = sys.loadConfigFile(logger, configPath, process);
+    config = sys.loadConfigFile(configPath, process);
 
   } catch (e) {
     logger.error(e);

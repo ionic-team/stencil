@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 
 
-export function loadConfigFile(logger: d.Logger, fs: d.FileSystem, configPath: string, process?: NodeJS.Process) {
+export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: NodeJS.Process) {
   let config: d.Config;
 
   let cwd = '';
@@ -39,7 +38,7 @@ export function loadConfigFile(logger: d.Logger, fs: d.FileSystem, configPath: s
   if (hasConfigFile) {
     // the passed in config was a string, so it's probably a path to the config we need to load
     // first clear the require cache so we don't get the same file
-    const configFileData = requireConfigFile(logger, fs, configPath);
+    const configFileData = requireConfigFile(fs, configPath);
     if (!configFileData.config) {
       throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
     }
@@ -86,11 +85,11 @@ const CONFIG_FILENAMES = [
 ];
 
 
-function requireConfigFile(logger: d.Logger, fs: d.FileSystem, configFilePath: string) {
+function requireConfigFile(fs: d.FileSystem, configFilePath: string) {
   // load up the source code
   let sourceText = fs.readFileSync(configFilePath);
 
-  sourceText = convertSourceConfig(logger, sourceText, configFilePath);
+  sourceText = convertSourceConfig(sourceText, configFilePath);
 
   // ensure we cleared out node's internal require() cache for this file
   delete require.cache[path.resolve(configFilePath)];
@@ -117,11 +116,11 @@ function requireConfigFile(logger: d.Logger, fs: d.FileSystem, configFilePath: s
 }
 
 
-export function convertSourceConfig(logger: d.Logger, sourceText: string, configFilePath: string) {
+export function convertSourceConfig(sourceText: string, configFilePath: string) {
   if (configFilePath.endsWith('.ts')) {
     // looks like we've got a typed config file
     // let's transpile it to .js quick
-    sourceText = transpileTypedConfig(logger, sourceText, configFilePath);
+    sourceText = transpileTypedConfig(sourceText, configFilePath);
 
   } else {
     // quick hack to turn a modern es module
@@ -133,7 +132,7 @@ export function convertSourceConfig(logger: d.Logger, sourceText: string, config
 }
 
 
-function transpileTypedConfig(logger: d.Logger, sourceText: string, filePath: string) {
+function transpileTypedConfig(sourceText: string, filePath: string) {
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
 
@@ -144,24 +143,10 @@ function transpileTypedConfig(logger: d.Logger, sourceText: string, filePath: st
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
       target: ts.ScriptTarget.ES5
     },
-    reportDiagnostics: true
+    reportDiagnostics: false
   };
 
   const output = ts.transpileModule(sourceText, opts);
-
-  const diagnostics: d.Diagnostic[] = [];
-  loadTypeScriptDiagnostics(null, diagnostics, output.diagnostics);
-
-  if (diagnostics.length > 0) {
-    // whoops, something is up with this config
-    if (logger) {
-      logger.printDiagnostics(diagnostics);
-    } else {
-      diagnostics.forEach(diagnostic => {
-        console.log(`${diagnostic.messageText}`);
-      });
-    }
-  }
 
   return output.outputText;
 }
