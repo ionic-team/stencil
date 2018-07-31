@@ -96,7 +96,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 
-  if (Build.browserModuleLoader) {
+  if (Build.hydrateClientFromSsr) {
     // if the HTML was generated from SSR
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);

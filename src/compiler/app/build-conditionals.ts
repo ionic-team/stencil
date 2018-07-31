@@ -71,6 +71,13 @@ export async function setBuildConditionals(
   coreBuild.slotPolyfill = true;
   coreBuild.hasSvg = true;
 
+  coreBuild.hydrateClientFromSsr = false;
+
+  const wwwOutput = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
+  if (wwwOutput) {
+    coreBuild.hydrateClientFromSsr = !!wwwOutput.hydrateComponents;
+  }
+
   return coreBuild;
 }
 

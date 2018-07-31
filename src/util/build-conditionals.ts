@@ -6,6 +6,7 @@ export const Build: BuildConditionals = {
   shadowDom: true,
   slotPolyfill: true,
   ssrServerSide: true,
+  hydrateClientFromSsr: true,
 
   devInspector: true,
   hotModuleReplacement: true,

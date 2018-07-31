@@ -8,6 +8,7 @@ export interface BuildConditionals {
   clientSide?: boolean;
   browserModuleLoader?: boolean;
   externalModuleLoader?: boolean;
+  hydrateClientFromSsr?: boolean;
 
   // dev
   isDev: boolean;
