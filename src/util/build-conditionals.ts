@@ -58,16 +58,19 @@ export async function setBuildConditionals(
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild: d.BuildConditionals = {
+  const coreBuild = {
     coreId: coreId,
+    clientSide: true,
     isDev: !!config.devMode,
     isProd: !config.devMode,
+
     hasSlot: !!buildCtx.hasSlot,
+    hasSvg: !!buildCtx.hasSvg,
+
     devInspector: config.devInspector,
     hotModuleReplacement: config.devMode,
     verboseError: config.devMode,
-    clientSide: true,
-    hasSvg: true,
+
     externalModuleLoader: false,
     browserModuleLoader: false,
     polyfills: false,
@@ -75,7 +78,7 @@ export async function setBuildConditionals(
     cssVarShim: false,
     ssrServerSide: false,
     shadowDom: false,
-    slotPolyfill: true,
+    slotPolyfill: false,
     event: false,
     listener: false,
     styles: false,
@@ -121,7 +124,6 @@ export async function setBuildConditionals(
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {
@@ -129,9 +131,11 @@ export async function setBuildConditionals(
     coreBuild.externalModuleLoader = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = true;
-
     compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
   }
+
+  coreBuild.slotPolyfill = true;
+  coreBuild.hasSvg = true;
 
   return coreBuild;
 }
