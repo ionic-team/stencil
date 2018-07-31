@@ -3,11 +3,17 @@ import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
+import { getTestBuildConditionals } from '../../../compiler/app/build-conditionals';
 
 
 jest.setTimeout(20000);
 
 describe('prerender index', () => {
+
+  beforeEach(() => {
+    __BUILD_CONDITIONALS__ = getTestBuildConditionals();
+  });
+
 
   let c: TestingCompiler;
   let config: d.Config;
@@ -15,6 +21,9 @@ describe('prerender index', () => {
 
   it('should pass properties down in prerendering', async () => {
     config = new TestingConfig();
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
+    __BUILD_CONDITIONALS__.ssrServerSide = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
 
@@ -63,6 +72,8 @@ describe('prerender index', () => {
 
   it('should prerender w/ defaults', async () => {
     config = new TestingConfig();
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
     config.outputTargets = [
