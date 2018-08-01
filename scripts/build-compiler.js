@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const cp = require('child_process');
 const transpile = require('./transpile');
-const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/Build-conditionals');
+const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
