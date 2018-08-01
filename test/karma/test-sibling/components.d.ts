@@ -5,13 +5,10 @@
 
 import '@stencil/core';
 
-declare global {
-  namespace JSX {
-    interface Element {}
-    export interface IntrinsicElements {}
-  }
-  namespace JSXElements {}
 
+
+
+declare global {
   interface HTMLElement {
     componentOnReady?: () => Promise<this | null>;
   }
@@ -23,39 +20,44 @@ declare global {
   }
 
   interface HTMLAttributes {}
-}
-
-
-declare global {
 
   namespace StencilComponents {
+
     interface SiblingRoot {
 
     }
   }
 
-  interface HTMLSiblingRootElement extends StencilComponents.SiblingRoot, HTMLStencilElement {}
 
-  var HTMLSiblingRootElement: {
-    prototype: HTMLSiblingRootElement;
-    new (): HTMLSiblingRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'sibling-root': HTMLSiblingRootElement;
-  }
-  interface ElementTagNameMap {
-    'sibling-root': HTMLSiblingRootElement;
-  }
+    interface HTMLSiblingRootElement extends StencilComponents.SiblingRoot, HTMLStencilElement {}
+
+    var HTMLSiblingRootElement: {
+      prototype: HTMLSiblingRootElement;
+      new (): HTMLSiblingRootElement;
+    };
+    
+
   namespace JSX {
-    interface IntrinsicElements {
-      'sibling-root': JSXElements.SiblingRootAttributes;
+    interface Element {}
+    export interface IntrinsicElements {
+    'sibling-root': JSXElements.SiblingRootAttributes;
     }
   }
+
   namespace JSXElements {
+
     export interface SiblingRootAttributes extends HTMLAttributes {
 
     }
   }
-}
 
+  interface HTMLElementTagNameMap {
+    'sibling-root': HTMLSiblingRootElement
+  }
+
+  interface ElementTagNameMap {
+    'sibling-root': HTMLSiblingRootElement;
+  }
+}
 declare global { namespace JSX { interface StencilJSX {} } }
+

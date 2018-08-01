@@ -5,13 +5,10 @@
 
 import '@stencil/core';
 
-declare global {
-  namespace JSX {
-    interface Element {}
-    export interface IntrinsicElements {}
-  }
-  namespace JSXElements {}
 
+
+
+declare global {
   interface HTMLElement {
     componentOnReady?: () => Promise<this | null>;
   }
@@ -23,152 +20,29 @@ declare global {
   }
 
   interface HTMLAttributes {}
-}
-
-
-declare global {
 
   namespace StencilComponents {
+
     interface AttributeBasicRoot {
 
     }
-  }
 
-  interface HTMLAttributeBasicRootElement extends StencilComponents.AttributeBasicRoot, HTMLStencilElement {}
-
-  var HTMLAttributeBasicRootElement: {
-    prototype: HTMLAttributeBasicRootElement;
-    new (): HTMLAttributeBasicRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-basic-root': HTMLAttributeBasicRootElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-basic-root': HTMLAttributeBasicRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-basic-root': JSXElements.AttributeBasicRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeBasicRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface AttributeBasic {
       'customAttr': string;
       'multiWord': string;
       'single': string;
     }
-  }
 
-  interface HTMLAttributeBasicElement extends StencilComponents.AttributeBasic, HTMLStencilElement {}
-
-  var HTMLAttributeBasicElement: {
-    prototype: HTMLAttributeBasicElement;
-    new (): HTMLAttributeBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-basic': HTMLAttributeBasicElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-basic': HTMLAttributeBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-basic': JSXElements.AttributeBasicAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeBasicAttributes extends HTMLAttributes {
-      'customAttr'?: string;
-      'multiWord'?: string;
-      'single'?: string;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface AttributeBooleanRoot {
       'toggleState': () => void;
     }
-  }
 
-  interface HTMLAttributeBooleanRootElement extends StencilComponents.AttributeBooleanRoot, HTMLStencilElement {}
-
-  var HTMLAttributeBooleanRootElement: {
-    prototype: HTMLAttributeBooleanRootElement;
-    new (): HTMLAttributeBooleanRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-boolean-root': JSXElements.AttributeBooleanRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeBooleanRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface AttributeBoolean {
       'boolState': boolean;
       'noreflect': boolean;
       'strState': string;
     }
-  }
 
-  interface HTMLAttributeBooleanElement extends StencilComponents.AttributeBoolean, HTMLStencilElement {}
-
-  var HTMLAttributeBooleanElement: {
-    prototype: HTMLAttributeBooleanElement;
-    new (): HTMLAttributeBooleanElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-boolean': HTMLAttributeBooleanElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-boolean': HTMLAttributeBooleanElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-boolean': JSXElements.AttributeBooleanAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeBooleanAttributes extends HTMLAttributes {
-      'boolState'?: boolean;
-      'noreflect'?: boolean;
-      'strState'?: string;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface AttributeComplex {
       'bool0': boolean;
       'bool1': boolean;
@@ -179,609 +53,76 @@ declare global {
       'str0': string;
       'str1': string;
     }
-  }
 
-  interface HTMLAttributeComplexElement extends StencilComponents.AttributeComplex, HTMLStencilElement {}
-
-  var HTMLAttributeComplexElement: {
-    prototype: HTMLAttributeComplexElement;
-    new (): HTMLAttributeComplexElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-complex': HTMLAttributeComplexElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-complex': HTMLAttributeComplexElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-complex': JSXElements.AttributeComplexAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeComplexAttributes extends HTMLAttributes {
-      'bool0'?: boolean;
-      'bool1'?: boolean;
-      'bool2'?: boolean;
-      'nu0'?: number;
-      'nu1'?: number;
-      'str0'?: string;
-      'str1'?: string;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface AttributeHost {
 
     }
-  }
 
-  interface HTMLAttributeHostElement extends StencilComponents.AttributeHost, HTMLStencilElement {}
-
-  var HTMLAttributeHostElement: {
-    prototype: HTMLAttributeHostElement;
-    new (): HTMLAttributeHostElement;
-  };
-  interface HTMLElementTagNameMap {
-    'attribute-host': HTMLAttributeHostElement;
-  }
-  interface ElementTagNameMap {
-    'attribute-host': HTMLAttributeHostElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'attribute-host': JSXElements.AttributeHostAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface AttributeHostAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface ConditionalBasic {
 
     }
-  }
 
-  interface HTMLConditionalBasicElement extends StencilComponents.ConditionalBasic, HTMLStencilElement {}
-
-  var HTMLConditionalBasicElement: {
-    prototype: HTMLConditionalBasicElement;
-    new (): HTMLConditionalBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'conditional-basic': HTMLConditionalBasicElement;
-  }
-  interface ElementTagNameMap {
-    'conditional-basic': HTMLConditionalBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'conditional-basic': JSXElements.ConditionalBasicAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface ConditionalBasicAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface ConditionalRerenderRoot {
 
     }
-  }
 
-  interface HTMLConditionalRerenderRootElement extends StencilComponents.ConditionalRerenderRoot, HTMLStencilElement {}
-
-  var HTMLConditionalRerenderRootElement: {
-    prototype: HTMLConditionalRerenderRootElement;
-    new (): HTMLConditionalRerenderRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
-  }
-  interface ElementTagNameMap {
-    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'conditional-rerender-root': JSXElements.ConditionalRerenderRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface ConditionalRerenderRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface ConditionalRerender {
 
     }
-  }
 
-  interface HTMLConditionalRerenderElement extends StencilComponents.ConditionalRerender, HTMLStencilElement {}
-
-  var HTMLConditionalRerenderElement: {
-    prototype: HTMLConditionalRerenderElement;
-    new (): HTMLConditionalRerenderElement;
-  };
-  interface HTMLElementTagNameMap {
-    'conditional-rerender': HTMLConditionalRerenderElement;
-  }
-  interface ElementTagNameMap {
-    'conditional-rerender': HTMLConditionalRerenderElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'conditional-rerender': JSXElements.ConditionalRerenderAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface ConditionalRerenderAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface CssVariablesRoot {
 
     }
-  }
 
-  interface HTMLCssVariablesRootElement extends StencilComponents.CssVariablesRoot, HTMLStencilElement {}
-
-  var HTMLCssVariablesRootElement: {
-    prototype: HTMLCssVariablesRootElement;
-    new (): HTMLCssVariablesRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'css-variables-root': HTMLCssVariablesRootElement;
-  }
-  interface ElementTagNameMap {
-    'css-variables-root': HTMLCssVariablesRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'css-variables-root': JSXElements.CssVariablesRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface CssVariablesRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface CssVariables {
 
     }
-  }
 
-  interface HTMLCssVariablesElement extends StencilComponents.CssVariables, HTMLStencilElement {}
-
-  var HTMLCssVariablesElement: {
-    prototype: HTMLCssVariablesElement;
-    new (): HTMLCssVariablesElement;
-  };
-  interface HTMLElementTagNameMap {
-    'css-variables': HTMLCssVariablesElement;
-  }
-  interface ElementTagNameMap {
-    'css-variables': HTMLCssVariablesElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'css-variables': JSXElements.CssVariablesAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface CssVariablesAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface DynamicImport {
       'update': () => Promise<void>;
     }
-  }
 
-  interface HTMLDynamicImportElement extends StencilComponents.DynamicImport, HTMLStencilElement {}
-
-  var HTMLDynamicImportElement: {
-    prototype: HTMLDynamicImportElement;
-    new (): HTMLDynamicImportElement;
-  };
-  interface HTMLElementTagNameMap {
-    'dynamic-import': HTMLDynamicImportElement;
-  }
-  interface ElementTagNameMap {
-    'dynamic-import': HTMLDynamicImportElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'dynamic-import': JSXElements.DynamicImportAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface DynamicImportAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface EsmImport {
       'propVal': number;
       'someMethod': () => void;
     }
-  }
 
-  interface HTMLEsmImportElement extends StencilComponents.EsmImport, HTMLStencilElement {}
-
-  var HTMLEsmImportElement: {
-    prototype: HTMLEsmImportElement;
-    new (): HTMLEsmImportElement;
-  };
-  interface HTMLElementTagNameMap {
-    'esm-import': HTMLEsmImportElement;
-  }
-  interface ElementTagNameMap {
-    'esm-import': HTMLEsmImportElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'esm-import': JSXElements.EsmImportAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface EsmImportAttributes extends HTMLAttributes {
-      'onSomeEvent'?: (event: CustomEvent) => void;
-      'propVal'?: number;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface InitCssRoot {
 
     }
-  }
 
-  interface HTMLInitCssRootElement extends StencilComponents.InitCssRoot, HTMLStencilElement {}
-
-  var HTMLInitCssRootElement: {
-    prototype: HTMLInitCssRootElement;
-    new (): HTMLInitCssRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'init-css-root': HTMLInitCssRootElement;
-  }
-  interface ElementTagNameMap {
-    'init-css-root': HTMLInitCssRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'init-css-root': JSXElements.InitCssRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface InitCssRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface KeyReorderRoot {
 
     }
-  }
 
-  interface HTMLKeyReorderRootElement extends StencilComponents.KeyReorderRoot, HTMLStencilElement {}
-
-  var HTMLKeyReorderRootElement: {
-    prototype: HTMLKeyReorderRootElement;
-    new (): HTMLKeyReorderRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'key-reorder-root': HTMLKeyReorderRootElement;
-  }
-  interface ElementTagNameMap {
-    'key-reorder-root': HTMLKeyReorderRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'key-reorder-root': JSXElements.KeyReorderRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface KeyReorderRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface KeyReorder {
       'num': number;
     }
-  }
 
-  interface HTMLKeyReorderElement extends StencilComponents.KeyReorder, HTMLStencilElement {}
-
-  var HTMLKeyReorderElement: {
-    prototype: HTMLKeyReorderElement;
-    new (): HTMLKeyReorderElement;
-  };
-  interface HTMLElementTagNameMap {
-    'key-reorder': HTMLKeyReorderElement;
-  }
-  interface ElementTagNameMap {
-    'key-reorder': HTMLKeyReorderElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'key-reorder': JSXElements.KeyReorderAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface KeyReorderAttributes extends HTMLAttributes {
-      'num'?: number;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleBasicA {
 
     }
-  }
 
-  interface HTMLLifecycleBasicAElement extends StencilComponents.LifecycleBasicA, HTMLStencilElement {}
-
-  var HTMLLifecycleBasicAElement: {
-    prototype: HTMLLifecycleBasicAElement;
-    new (): HTMLLifecycleBasicAElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-basic-a': HTMLLifecycleBasicAElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-basic-a': HTMLLifecycleBasicAElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-basic-a': JSXElements.LifecycleBasicAAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleBasicAAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleBasicB {
       'value': string;
     }
-  }
 
-  interface HTMLLifecycleBasicBElement extends StencilComponents.LifecycleBasicB, HTMLStencilElement {}
-
-  var HTMLLifecycleBasicBElement: {
-    prototype: HTMLLifecycleBasicBElement;
-    new (): HTMLLifecycleBasicBElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-basic-b': HTMLLifecycleBasicBElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-basic-b': HTMLLifecycleBasicBElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-basic-b': JSXElements.LifecycleBasicBAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleBasicBAttributes extends HTMLAttributes {
-      'onLifecycleLoad'?: (event: CustomEvent) => void;
-      'onLifecycleUpdate'?: (event: CustomEvent) => void;
-      'value'?: string;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleBasicC {
       'value': string;
     }
-  }
 
-  interface HTMLLifecycleBasicCElement extends StencilComponents.LifecycleBasicC, HTMLStencilElement {}
-
-  var HTMLLifecycleBasicCElement: {
-    prototype: HTMLLifecycleBasicCElement;
-    new (): HTMLLifecycleBasicCElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-basic-c': HTMLLifecycleBasicCElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-basic-c': HTMLLifecycleBasicCElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-basic-c': JSXElements.LifecycleBasicCAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleBasicCAttributes extends HTMLAttributes {
-      'onLifecycleLoad'?: (event: CustomEvent) => void;
-      'onLifecycleUpdate'?: (event: CustomEvent) => void;
-      'value'?: string;
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleUnloadA {
 
     }
-  }
 
-  interface HTMLLifecycleUnloadAElement extends StencilComponents.LifecycleUnloadA, HTMLStencilElement {}
-
-  var HTMLLifecycleUnloadAElement: {
-    prototype: HTMLLifecycleUnloadAElement;
-    new (): HTMLLifecycleUnloadAElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-unload-a': JSXElements.LifecycleUnloadAAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleUnloadAAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleUnloadB {
 
     }
-  }
 
-  interface HTMLLifecycleUnloadBElement extends StencilComponents.LifecycleUnloadB, HTMLStencilElement {}
-
-  var HTMLLifecycleUnloadBElement: {
-    prototype: HTMLLifecycleUnloadBElement;
-    new (): HTMLLifecycleUnloadBElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-unload-b': JSXElements.LifecycleUnloadBAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleUnloadBAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface LifecycleUnloadRoot {
 
     }
-  }
 
-  interface HTMLLifecycleUnloadRootElement extends StencilComponents.LifecycleUnloadRoot, HTMLStencilElement {}
-
-  var HTMLLifecycleUnloadRootElement: {
-    prototype: HTMLLifecycleUnloadRootElement;
-    new (): HTMLLifecycleUnloadRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
-  }
-  interface ElementTagNameMap {
-    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'lifecycle-unload-root': JSXElements.LifecycleUnloadRootAttributes;
-    }
-  }
-  namespace JSXElements {
-    export interface LifecycleUnloadRootAttributes extends HTMLAttributes {
-
-    }
-  }
-}
-
-
-declare global {
-
-  namespace StencilComponents {
     interface ReflectToAttr {
       'bool': boolean;
       'dynamicNu': number;
@@ -792,26 +133,769 @@ declare global {
       'str': string;
       'undef': string;
     }
-  }
 
-  interface HTMLReflectToAttrElement extends StencilComponents.ReflectToAttr, HTMLStencilElement {}
+    interface ShadowDomArrayRoot {
 
-  var HTMLReflectToAttrElement: {
-    prototype: HTMLReflectToAttrElement;
-    new (): HTMLReflectToAttrElement;
-  };
-  interface HTMLElementTagNameMap {
-    'reflect-to-attr': HTMLReflectToAttrElement;
-  }
-  interface ElementTagNameMap {
-    'reflect-to-attr': HTMLReflectToAttrElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'reflect-to-attr': JSXElements.ReflectToAttrAttributes;
+    }
+
+    interface ShadowDomArray {
+      'values': number[];
+    }
+
+    interface ShadowDomBasicRoot {
+
+    }
+
+    interface ShadowDomBasic {
+
+    }
+
+    interface ShadowDomSlotBasic {
+
+    }
+
+    interface ShadowDomSlotNestedRoot {
+
+    }
+
+    interface ShadowDomSlotNested {
+      'i': number;
+    }
+
+    interface SlotArrayBasic {
+
+    }
+
+    interface SlotArrayComplexRoot {
+
+    }
+
+    interface SlotArrayComplex {
+
+    }
+
+    interface SlotArrayTop {
+
+    }
+
+    interface SlotBasicOrderRoot {
+
+    }
+
+    interface SlotBasicOrder {
+
+    }
+
+    interface SlotBasicRoot {
+
+    }
+
+    interface SlotBasic {
+
+    }
+
+    interface SlotDynamicWrapperRoot {
+
+    }
+
+    interface SlotDynamicWrapper {
+      'tag': string;
+    }
+
+    interface SlotFallbackRoot {
+
+    }
+
+    interface SlotFallback {
+      'inc': number;
+    }
+
+    interface SlotHtml {
+      'inc': number;
+    }
+
+    interface SlotLightDomRoot {
+
+    }
+
+    interface SlotLightDomContent {
+
+    }
+
+    interface SlotMapOrderRoot {
+
+    }
+
+    interface SlotMapOrder {
+
+    }
+
+    interface SlotReorderRoot {
+
+    }
+
+    interface SlotReorder {
+      'reordered': boolean;
+    }
+
+    interface SlotReplaceWrapperRoot {
+
+    }
+
+    interface SlotReplaceWrapper {
+      'href': string;
+    }
+
+    interface CssCmp {
+
+    }
+
+    interface SassCmp {
+
+    }
+
+    interface SvgAttr {
+
+    }
+
+    interface SvgClass {
+
+    }
+
+    interface Tag3dComponent {
+
+    }
+
+    interface Tag88 {
+
     }
   }
+
+
+    interface HTMLAttributeBasicRootElement extends StencilComponents.AttributeBasicRoot, HTMLStencilElement {}
+
+    var HTMLAttributeBasicRootElement: {
+      prototype: HTMLAttributeBasicRootElement;
+      new (): HTMLAttributeBasicRootElement;
+    };
+    
+
+    interface HTMLAttributeBasicElement extends StencilComponents.AttributeBasic, HTMLStencilElement {}
+
+    var HTMLAttributeBasicElement: {
+      prototype: HTMLAttributeBasicElement;
+      new (): HTMLAttributeBasicElement;
+    };
+    
+
+    interface HTMLAttributeBooleanRootElement extends StencilComponents.AttributeBooleanRoot, HTMLStencilElement {}
+
+    var HTMLAttributeBooleanRootElement: {
+      prototype: HTMLAttributeBooleanRootElement;
+      new (): HTMLAttributeBooleanRootElement;
+    };
+    
+
+    interface HTMLAttributeBooleanElement extends StencilComponents.AttributeBoolean, HTMLStencilElement {}
+
+    var HTMLAttributeBooleanElement: {
+      prototype: HTMLAttributeBooleanElement;
+      new (): HTMLAttributeBooleanElement;
+    };
+    
+
+    interface HTMLAttributeComplexElement extends StencilComponents.AttributeComplex, HTMLStencilElement {}
+
+    var HTMLAttributeComplexElement: {
+      prototype: HTMLAttributeComplexElement;
+      new (): HTMLAttributeComplexElement;
+    };
+    
+
+    interface HTMLAttributeHostElement extends StencilComponents.AttributeHost, HTMLStencilElement {}
+
+    var HTMLAttributeHostElement: {
+      prototype: HTMLAttributeHostElement;
+      new (): HTMLAttributeHostElement;
+    };
+    
+
+    interface HTMLConditionalBasicElement extends StencilComponents.ConditionalBasic, HTMLStencilElement {}
+
+    var HTMLConditionalBasicElement: {
+      prototype: HTMLConditionalBasicElement;
+      new (): HTMLConditionalBasicElement;
+    };
+    
+
+    interface HTMLConditionalRerenderRootElement extends StencilComponents.ConditionalRerenderRoot, HTMLStencilElement {}
+
+    var HTMLConditionalRerenderRootElement: {
+      prototype: HTMLConditionalRerenderRootElement;
+      new (): HTMLConditionalRerenderRootElement;
+    };
+    
+
+    interface HTMLConditionalRerenderElement extends StencilComponents.ConditionalRerender, HTMLStencilElement {}
+
+    var HTMLConditionalRerenderElement: {
+      prototype: HTMLConditionalRerenderElement;
+      new (): HTMLConditionalRerenderElement;
+    };
+    
+
+    interface HTMLCssVariablesRootElement extends StencilComponents.CssVariablesRoot, HTMLStencilElement {}
+
+    var HTMLCssVariablesRootElement: {
+      prototype: HTMLCssVariablesRootElement;
+      new (): HTMLCssVariablesRootElement;
+    };
+    
+
+    interface HTMLCssVariablesElement extends StencilComponents.CssVariables, HTMLStencilElement {}
+
+    var HTMLCssVariablesElement: {
+      prototype: HTMLCssVariablesElement;
+      new (): HTMLCssVariablesElement;
+    };
+    
+
+    interface HTMLDynamicImportElement extends StencilComponents.DynamicImport, HTMLStencilElement {}
+
+    var HTMLDynamicImportElement: {
+      prototype: HTMLDynamicImportElement;
+      new (): HTMLDynamicImportElement;
+    };
+    
+
+    interface HTMLEsmImportElement extends StencilComponents.EsmImport, HTMLStencilElement {}
+
+    var HTMLEsmImportElement: {
+      prototype: HTMLEsmImportElement;
+      new (): HTMLEsmImportElement;
+    };
+    
+
+    interface HTMLInitCssRootElement extends StencilComponents.InitCssRoot, HTMLStencilElement {}
+
+    var HTMLInitCssRootElement: {
+      prototype: HTMLInitCssRootElement;
+      new (): HTMLInitCssRootElement;
+    };
+    
+
+    interface HTMLKeyReorderRootElement extends StencilComponents.KeyReorderRoot, HTMLStencilElement {}
+
+    var HTMLKeyReorderRootElement: {
+      prototype: HTMLKeyReorderRootElement;
+      new (): HTMLKeyReorderRootElement;
+    };
+    
+
+    interface HTMLKeyReorderElement extends StencilComponents.KeyReorder, HTMLStencilElement {}
+
+    var HTMLKeyReorderElement: {
+      prototype: HTMLKeyReorderElement;
+      new (): HTMLKeyReorderElement;
+    };
+    
+
+    interface HTMLLifecycleBasicAElement extends StencilComponents.LifecycleBasicA, HTMLStencilElement {}
+
+    var HTMLLifecycleBasicAElement: {
+      prototype: HTMLLifecycleBasicAElement;
+      new (): HTMLLifecycleBasicAElement;
+    };
+    
+
+    interface HTMLLifecycleBasicBElement extends StencilComponents.LifecycleBasicB, HTMLStencilElement {}
+
+    var HTMLLifecycleBasicBElement: {
+      prototype: HTMLLifecycleBasicBElement;
+      new (): HTMLLifecycleBasicBElement;
+    };
+    
+
+    interface HTMLLifecycleBasicCElement extends StencilComponents.LifecycleBasicC, HTMLStencilElement {}
+
+    var HTMLLifecycleBasicCElement: {
+      prototype: HTMLLifecycleBasicCElement;
+      new (): HTMLLifecycleBasicCElement;
+    };
+    
+
+    interface HTMLLifecycleUnloadAElement extends StencilComponents.LifecycleUnloadA, HTMLStencilElement {}
+
+    var HTMLLifecycleUnloadAElement: {
+      prototype: HTMLLifecycleUnloadAElement;
+      new (): HTMLLifecycleUnloadAElement;
+    };
+    
+
+    interface HTMLLifecycleUnloadBElement extends StencilComponents.LifecycleUnloadB, HTMLStencilElement {}
+
+    var HTMLLifecycleUnloadBElement: {
+      prototype: HTMLLifecycleUnloadBElement;
+      new (): HTMLLifecycleUnloadBElement;
+    };
+    
+
+    interface HTMLLifecycleUnloadRootElement extends StencilComponents.LifecycleUnloadRoot, HTMLStencilElement {}
+
+    var HTMLLifecycleUnloadRootElement: {
+      prototype: HTMLLifecycleUnloadRootElement;
+      new (): HTMLLifecycleUnloadRootElement;
+    };
+    
+
+    interface HTMLReflectToAttrElement extends StencilComponents.ReflectToAttr, HTMLStencilElement {}
+
+    var HTMLReflectToAttrElement: {
+      prototype: HTMLReflectToAttrElement;
+      new (): HTMLReflectToAttrElement;
+    };
+    
+
+    interface HTMLShadowDomArrayRootElement extends StencilComponents.ShadowDomArrayRoot, HTMLStencilElement {}
+
+    var HTMLShadowDomArrayRootElement: {
+      prototype: HTMLShadowDomArrayRootElement;
+      new (): HTMLShadowDomArrayRootElement;
+    };
+    
+
+    interface HTMLShadowDomArrayElement extends StencilComponents.ShadowDomArray, HTMLStencilElement {}
+
+    var HTMLShadowDomArrayElement: {
+      prototype: HTMLShadowDomArrayElement;
+      new (): HTMLShadowDomArrayElement;
+    };
+    
+
+    interface HTMLShadowDomBasicRootElement extends StencilComponents.ShadowDomBasicRoot, HTMLStencilElement {}
+
+    var HTMLShadowDomBasicRootElement: {
+      prototype: HTMLShadowDomBasicRootElement;
+      new (): HTMLShadowDomBasicRootElement;
+    };
+    
+
+    interface HTMLShadowDomBasicElement extends StencilComponents.ShadowDomBasic, HTMLStencilElement {}
+
+    var HTMLShadowDomBasicElement: {
+      prototype: HTMLShadowDomBasicElement;
+      new (): HTMLShadowDomBasicElement;
+    };
+    
+
+    interface HTMLShadowDomSlotBasicElement extends StencilComponents.ShadowDomSlotBasic, HTMLStencilElement {}
+
+    var HTMLShadowDomSlotBasicElement: {
+      prototype: HTMLShadowDomSlotBasicElement;
+      new (): HTMLShadowDomSlotBasicElement;
+    };
+    
+
+    interface HTMLShadowDomSlotNestedRootElement extends StencilComponents.ShadowDomSlotNestedRoot, HTMLStencilElement {}
+
+    var HTMLShadowDomSlotNestedRootElement: {
+      prototype: HTMLShadowDomSlotNestedRootElement;
+      new (): HTMLShadowDomSlotNestedRootElement;
+    };
+    
+
+    interface HTMLShadowDomSlotNestedElement extends StencilComponents.ShadowDomSlotNested, HTMLStencilElement {}
+
+    var HTMLShadowDomSlotNestedElement: {
+      prototype: HTMLShadowDomSlotNestedElement;
+      new (): HTMLShadowDomSlotNestedElement;
+    };
+    
+
+    interface HTMLSlotArrayBasicElement extends StencilComponents.SlotArrayBasic, HTMLStencilElement {}
+
+    var HTMLSlotArrayBasicElement: {
+      prototype: HTMLSlotArrayBasicElement;
+      new (): HTMLSlotArrayBasicElement;
+    };
+    
+
+    interface HTMLSlotArrayComplexRootElement extends StencilComponents.SlotArrayComplexRoot, HTMLStencilElement {}
+
+    var HTMLSlotArrayComplexRootElement: {
+      prototype: HTMLSlotArrayComplexRootElement;
+      new (): HTMLSlotArrayComplexRootElement;
+    };
+    
+
+    interface HTMLSlotArrayComplexElement extends StencilComponents.SlotArrayComplex, HTMLStencilElement {}
+
+    var HTMLSlotArrayComplexElement: {
+      prototype: HTMLSlotArrayComplexElement;
+      new (): HTMLSlotArrayComplexElement;
+    };
+    
+
+    interface HTMLSlotArrayTopElement extends StencilComponents.SlotArrayTop, HTMLStencilElement {}
+
+    var HTMLSlotArrayTopElement: {
+      prototype: HTMLSlotArrayTopElement;
+      new (): HTMLSlotArrayTopElement;
+    };
+    
+
+    interface HTMLSlotBasicOrderRootElement extends StencilComponents.SlotBasicOrderRoot, HTMLStencilElement {}
+
+    var HTMLSlotBasicOrderRootElement: {
+      prototype: HTMLSlotBasicOrderRootElement;
+      new (): HTMLSlotBasicOrderRootElement;
+    };
+    
+
+    interface HTMLSlotBasicOrderElement extends StencilComponents.SlotBasicOrder, HTMLStencilElement {}
+
+    var HTMLSlotBasicOrderElement: {
+      prototype: HTMLSlotBasicOrderElement;
+      new (): HTMLSlotBasicOrderElement;
+    };
+    
+
+    interface HTMLSlotBasicRootElement extends StencilComponents.SlotBasicRoot, HTMLStencilElement {}
+
+    var HTMLSlotBasicRootElement: {
+      prototype: HTMLSlotBasicRootElement;
+      new (): HTMLSlotBasicRootElement;
+    };
+    
+
+    interface HTMLSlotBasicElement extends StencilComponents.SlotBasic, HTMLStencilElement {}
+
+    var HTMLSlotBasicElement: {
+      prototype: HTMLSlotBasicElement;
+      new (): HTMLSlotBasicElement;
+    };
+    
+
+    interface HTMLSlotDynamicWrapperRootElement extends StencilComponents.SlotDynamicWrapperRoot, HTMLStencilElement {}
+
+    var HTMLSlotDynamicWrapperRootElement: {
+      prototype: HTMLSlotDynamicWrapperRootElement;
+      new (): HTMLSlotDynamicWrapperRootElement;
+    };
+    
+
+    interface HTMLSlotDynamicWrapperElement extends StencilComponents.SlotDynamicWrapper, HTMLStencilElement {}
+
+    var HTMLSlotDynamicWrapperElement: {
+      prototype: HTMLSlotDynamicWrapperElement;
+      new (): HTMLSlotDynamicWrapperElement;
+    };
+    
+
+    interface HTMLSlotFallbackRootElement extends StencilComponents.SlotFallbackRoot, HTMLStencilElement {}
+
+    var HTMLSlotFallbackRootElement: {
+      prototype: HTMLSlotFallbackRootElement;
+      new (): HTMLSlotFallbackRootElement;
+    };
+    
+
+    interface HTMLSlotFallbackElement extends StencilComponents.SlotFallback, HTMLStencilElement {}
+
+    var HTMLSlotFallbackElement: {
+      prototype: HTMLSlotFallbackElement;
+      new (): HTMLSlotFallbackElement;
+    };
+    
+
+    interface HTMLSlotHtmlElement extends StencilComponents.SlotHtml, HTMLStencilElement {}
+
+    var HTMLSlotHtmlElement: {
+      prototype: HTMLSlotHtmlElement;
+      new (): HTMLSlotHtmlElement;
+    };
+    
+
+    interface HTMLSlotLightDomRootElement extends StencilComponents.SlotLightDomRoot, HTMLStencilElement {}
+
+    var HTMLSlotLightDomRootElement: {
+      prototype: HTMLSlotLightDomRootElement;
+      new (): HTMLSlotLightDomRootElement;
+    };
+    
+
+    interface HTMLSlotLightDomContentElement extends StencilComponents.SlotLightDomContent, HTMLStencilElement {}
+
+    var HTMLSlotLightDomContentElement: {
+      prototype: HTMLSlotLightDomContentElement;
+      new (): HTMLSlotLightDomContentElement;
+    };
+    
+
+    interface HTMLSlotMapOrderRootElement extends StencilComponents.SlotMapOrderRoot, HTMLStencilElement {}
+
+    var HTMLSlotMapOrderRootElement: {
+      prototype: HTMLSlotMapOrderRootElement;
+      new (): HTMLSlotMapOrderRootElement;
+    };
+    
+
+    interface HTMLSlotMapOrderElement extends StencilComponents.SlotMapOrder, HTMLStencilElement {}
+
+    var HTMLSlotMapOrderElement: {
+      prototype: HTMLSlotMapOrderElement;
+      new (): HTMLSlotMapOrderElement;
+    };
+    
+
+    interface HTMLSlotReorderRootElement extends StencilComponents.SlotReorderRoot, HTMLStencilElement {}
+
+    var HTMLSlotReorderRootElement: {
+      prototype: HTMLSlotReorderRootElement;
+      new (): HTMLSlotReorderRootElement;
+    };
+    
+
+    interface HTMLSlotReorderElement extends StencilComponents.SlotReorder, HTMLStencilElement {}
+
+    var HTMLSlotReorderElement: {
+      prototype: HTMLSlotReorderElement;
+      new (): HTMLSlotReorderElement;
+    };
+    
+
+    interface HTMLSlotReplaceWrapperRootElement extends StencilComponents.SlotReplaceWrapperRoot, HTMLStencilElement {}
+
+    var HTMLSlotReplaceWrapperRootElement: {
+      prototype: HTMLSlotReplaceWrapperRootElement;
+      new (): HTMLSlotReplaceWrapperRootElement;
+    };
+    
+
+    interface HTMLSlotReplaceWrapperElement extends StencilComponents.SlotReplaceWrapper, HTMLStencilElement {}
+
+    var HTMLSlotReplaceWrapperElement: {
+      prototype: HTMLSlotReplaceWrapperElement;
+      new (): HTMLSlotReplaceWrapperElement;
+    };
+    
+
+    interface HTMLCssCmpElement extends StencilComponents.CssCmp, HTMLStencilElement {}
+
+    var HTMLCssCmpElement: {
+      prototype: HTMLCssCmpElement;
+      new (): HTMLCssCmpElement;
+    };
+    
+
+    interface HTMLSassCmpElement extends StencilComponents.SassCmp, HTMLStencilElement {}
+
+    var HTMLSassCmpElement: {
+      prototype: HTMLSassCmpElement;
+      new (): HTMLSassCmpElement;
+    };
+    
+
+    interface HTMLSvgAttrElement extends StencilComponents.SvgAttr, HTMLStencilElement {}
+
+    var HTMLSvgAttrElement: {
+      prototype: HTMLSvgAttrElement;
+      new (): HTMLSvgAttrElement;
+    };
+    
+
+    interface HTMLSvgClassElement extends StencilComponents.SvgClass, HTMLStencilElement {}
+
+    var HTMLSvgClassElement: {
+      prototype: HTMLSvgClassElement;
+      new (): HTMLSvgClassElement;
+    };
+    
+
+    interface HTMLTag3dComponentElement extends StencilComponents.Tag3dComponent, HTMLStencilElement {}
+
+    var HTMLTag3dComponentElement: {
+      prototype: HTMLTag3dComponentElement;
+      new (): HTMLTag3dComponentElement;
+    };
+    
+
+    interface HTMLTag88Element extends StencilComponents.Tag88, HTMLStencilElement {}
+
+    var HTMLTag88Element: {
+      prototype: HTMLTag88Element;
+      new (): HTMLTag88Element;
+    };
+    
+
+  namespace JSX {
+    interface Element {}
+    export interface IntrinsicElements {
+    'attribute-basic-root': JSXElements.AttributeBasicRootAttributes;
+    'attribute-basic': JSXElements.AttributeBasicAttributes;
+    'attribute-boolean-root': JSXElements.AttributeBooleanRootAttributes;
+    'attribute-boolean': JSXElements.AttributeBooleanAttributes;
+    'attribute-complex': JSXElements.AttributeComplexAttributes;
+    'attribute-host': JSXElements.AttributeHostAttributes;
+    'conditional-basic': JSXElements.ConditionalBasicAttributes;
+    'conditional-rerender-root': JSXElements.ConditionalRerenderRootAttributes;
+    'conditional-rerender': JSXElements.ConditionalRerenderAttributes;
+    'css-variables-root': JSXElements.CssVariablesRootAttributes;
+    'css-variables': JSXElements.CssVariablesAttributes;
+    'dynamic-import': JSXElements.DynamicImportAttributes;
+    'esm-import': JSXElements.EsmImportAttributes;
+    'init-css-root': JSXElements.InitCssRootAttributes;
+    'key-reorder-root': JSXElements.KeyReorderRootAttributes;
+    'key-reorder': JSXElements.KeyReorderAttributes;
+    'lifecycle-basic-a': JSXElements.LifecycleBasicAAttributes;
+    'lifecycle-basic-b': JSXElements.LifecycleBasicBAttributes;
+    'lifecycle-basic-c': JSXElements.LifecycleBasicCAttributes;
+    'lifecycle-unload-a': JSXElements.LifecycleUnloadAAttributes;
+    'lifecycle-unload-b': JSXElements.LifecycleUnloadBAttributes;
+    'lifecycle-unload-root': JSXElements.LifecycleUnloadRootAttributes;
+    'reflect-to-attr': JSXElements.ReflectToAttrAttributes;
+    'shadow-dom-array-root': JSXElements.ShadowDomArrayRootAttributes;
+    'shadow-dom-array': JSXElements.ShadowDomArrayAttributes;
+    'shadow-dom-basic-root': JSXElements.ShadowDomBasicRootAttributes;
+    'shadow-dom-basic': JSXElements.ShadowDomBasicAttributes;
+    'shadow-dom-slot-basic': JSXElements.ShadowDomSlotBasicAttributes;
+    'shadow-dom-slot-nested-root': JSXElements.ShadowDomSlotNestedRootAttributes;
+    'shadow-dom-slot-nested': JSXElements.ShadowDomSlotNestedAttributes;
+    'slot-array-basic': JSXElements.SlotArrayBasicAttributes;
+    'slot-array-complex-root': JSXElements.SlotArrayComplexRootAttributes;
+    'slot-array-complex': JSXElements.SlotArrayComplexAttributes;
+    'slot-array-top': JSXElements.SlotArrayTopAttributes;
+    'slot-basic-order-root': JSXElements.SlotBasicOrderRootAttributes;
+    'slot-basic-order': JSXElements.SlotBasicOrderAttributes;
+    'slot-basic-root': JSXElements.SlotBasicRootAttributes;
+    'slot-basic': JSXElements.SlotBasicAttributes;
+    'slot-dynamic-wrapper-root': JSXElements.SlotDynamicWrapperRootAttributes;
+    'slot-dynamic-wrapper': JSXElements.SlotDynamicWrapperAttributes;
+    'slot-fallback-root': JSXElements.SlotFallbackRootAttributes;
+    'slot-fallback': JSXElements.SlotFallbackAttributes;
+    'slot-html': JSXElements.SlotHtmlAttributes;
+    'slot-light-dom-root': JSXElements.SlotLightDomRootAttributes;
+    'slot-light-dom-content': JSXElements.SlotLightDomContentAttributes;
+    'slot-map-order-root': JSXElements.SlotMapOrderRootAttributes;
+    'slot-map-order': JSXElements.SlotMapOrderAttributes;
+    'slot-reorder-root': JSXElements.SlotReorderRootAttributes;
+    'slot-reorder': JSXElements.SlotReorderAttributes;
+    'slot-replace-wrapper-root': JSXElements.SlotReplaceWrapperRootAttributes;
+    'slot-replace-wrapper': JSXElements.SlotReplaceWrapperAttributes;
+    'css-cmp': JSXElements.CssCmpAttributes;
+    'sass-cmp': JSXElements.SassCmpAttributes;
+    'svg-attr': JSXElements.SvgAttrAttributes;
+    'svg-class': JSXElements.SvgClassAttributes;
+    'tag-3d-component': JSXElements.Tag3dComponentAttributes;
+    'tag-88': JSXElements.Tag88Attributes;
+    }
+  }
+
   namespace JSXElements {
+
+    export interface AttributeBasicRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface AttributeBasicAttributes extends HTMLAttributes {
+      'customAttr'?: string;
+      'multiWord'?: string;
+      'single'?: string;
+    }
+
+    export interface AttributeBooleanRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface AttributeBooleanAttributes extends HTMLAttributes {
+      'boolState'?: boolean;
+      'noreflect'?: boolean;
+      'strState'?: string;
+    }
+
+    export interface AttributeComplexAttributes extends HTMLAttributes {
+      'bool0'?: boolean;
+      'bool1'?: boolean;
+      'bool2'?: boolean;
+      'nu0'?: number;
+      'nu1'?: number;
+      'str0'?: string;
+      'str1'?: string;
+    }
+
+    export interface AttributeHostAttributes extends HTMLAttributes {
+
+    }
+
+    export interface ConditionalBasicAttributes extends HTMLAttributes {
+
+    }
+
+    export interface ConditionalRerenderRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface ConditionalRerenderAttributes extends HTMLAttributes {
+
+    }
+
+    export interface CssVariablesRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface CssVariablesAttributes extends HTMLAttributes {
+
+    }
+
+    export interface DynamicImportAttributes extends HTMLAttributes {
+
+    }
+
+    export interface EsmImportAttributes extends HTMLAttributes {
+      'onSomeEvent'?: (event: CustomEvent) => void;
+      'propVal'?: number;
+    }
+
+    export interface InitCssRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface KeyReorderRootAttributes extends HTMLAttributes {
+
+    }
+
+    export interface KeyReorderAttributes extends HTMLAttributes {
+      'num'?: number;
+    }
+
+    export interface LifecycleBasicAAttributes extends HTMLAttributes {
+
+    }
+
+    export interface LifecycleBasicBAttributes extends HTMLAttributes {
+      'onLifecycleLoad'?: (event: CustomEvent) => void;
+      'onLifecycleUpdate'?: (event: CustomEvent) => void;
+      'value'?: string;
+    }
+
+    export interface LifecycleBasicCAttributes extends HTMLAttributes {
+      'onLifecycleLoad'?: (event: CustomEvent) => void;
+      'onLifecycleUpdate'?: (event: CustomEvent) => void;
+      'value'?: string;
+    }
+
+    export interface LifecycleUnloadAAttributes extends HTMLAttributes {
+
+    }
+
+    export interface LifecycleUnloadBAttributes extends HTMLAttributes {
+
+    }
+
+    export interface LifecycleUnloadRootAttributes extends HTMLAttributes {
+
+    }
+
     export interface ReflectToAttrAttributes extends HTMLAttributes {
       'bool'?: boolean;
       'dynamicNu'?: number;
@@ -822,1131 +906,264 @@ declare global {
       'str'?: string;
       'undef'?: string;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomArrayRoot {
-
-    }
-  }
-
-  interface HTMLShadowDomArrayRootElement extends StencilComponents.ShadowDomArrayRoot, HTMLStencilElement {}
-
-  var HTMLShadowDomArrayRootElement: {
-    prototype: HTMLShadowDomArrayRootElement;
-    new (): HTMLShadowDomArrayRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-array-root': JSXElements.ShadowDomArrayRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomArrayRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomArray {
-      'values': number[];
-    }
-  }
-
-  interface HTMLShadowDomArrayElement extends StencilComponents.ShadowDomArray, HTMLStencilElement {}
-
-  var HTMLShadowDomArrayElement: {
-    prototype: HTMLShadowDomArrayElement;
-    new (): HTMLShadowDomArrayElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-array': HTMLShadowDomArrayElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-array': HTMLShadowDomArrayElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-array': JSXElements.ShadowDomArrayAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomArrayAttributes extends HTMLAttributes {
       'values'?: number[];
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomBasicRoot {
-
-    }
-  }
-
-  interface HTMLShadowDomBasicRootElement extends StencilComponents.ShadowDomBasicRoot, HTMLStencilElement {}
-
-  var HTMLShadowDomBasicRootElement: {
-    prototype: HTMLShadowDomBasicRootElement;
-    new (): HTMLShadowDomBasicRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-basic-root': JSXElements.ShadowDomBasicRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomBasicRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomBasic {
-
-    }
-  }
-
-  interface HTMLShadowDomBasicElement extends StencilComponents.ShadowDomBasic, HTMLStencilElement {}
-
-  var HTMLShadowDomBasicElement: {
-    prototype: HTMLShadowDomBasicElement;
-    new (): HTMLShadowDomBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-basic': HTMLShadowDomBasicElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-basic': HTMLShadowDomBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-basic': JSXElements.ShadowDomBasicAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomBasicAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomSlotBasic {
-
-    }
-  }
-
-  interface HTMLShadowDomSlotBasicElement extends StencilComponents.ShadowDomSlotBasic, HTMLStencilElement {}
-
-  var HTMLShadowDomSlotBasicElement: {
-    prototype: HTMLShadowDomSlotBasicElement;
-    new (): HTMLShadowDomSlotBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-slot-basic': JSXElements.ShadowDomSlotBasicAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomSlotBasicAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomSlotNestedRoot {
-
-    }
-  }
-
-  interface HTMLShadowDomSlotNestedRootElement extends StencilComponents.ShadowDomSlotNestedRoot, HTMLStencilElement {}
-
-  var HTMLShadowDomSlotNestedRootElement: {
-    prototype: HTMLShadowDomSlotNestedRootElement;
-    new (): HTMLShadowDomSlotNestedRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-slot-nested-root': JSXElements.ShadowDomSlotNestedRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomSlotNestedRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface ShadowDomSlotNested {
-      'i': number;
-    }
-  }
-
-  interface HTMLShadowDomSlotNestedElement extends StencilComponents.ShadowDomSlotNested, HTMLStencilElement {}
-
-  var HTMLShadowDomSlotNestedElement: {
-    prototype: HTMLShadowDomSlotNestedElement;
-    new (): HTMLShadowDomSlotNestedElement;
-  };
-  interface HTMLElementTagNameMap {
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
-  }
-  interface ElementTagNameMap {
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'shadow-dom-slot-nested': JSXElements.ShadowDomSlotNestedAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface ShadowDomSlotNestedAttributes extends HTMLAttributes {
       'i'?: number;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotArrayBasic {
-
-    }
-  }
-
-  interface HTMLSlotArrayBasicElement extends StencilComponents.SlotArrayBasic, HTMLStencilElement {}
-
-  var HTMLSlotArrayBasicElement: {
-    prototype: HTMLSlotArrayBasicElement;
-    new (): HTMLSlotArrayBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-array-basic': HTMLSlotArrayBasicElement;
-  }
-  interface ElementTagNameMap {
-    'slot-array-basic': HTMLSlotArrayBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-array-basic': JSXElements.SlotArrayBasicAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotArrayBasicAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotArrayComplexRoot {
-
-    }
-  }
-
-  interface HTMLSlotArrayComplexRootElement extends StencilComponents.SlotArrayComplexRoot, HTMLStencilElement {}
-
-  var HTMLSlotArrayComplexRootElement: {
-    prototype: HTMLSlotArrayComplexRootElement;
-    new (): HTMLSlotArrayComplexRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-array-complex-root': JSXElements.SlotArrayComplexRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotArrayComplexRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotArrayComplex {
-
-    }
-  }
-
-  interface HTMLSlotArrayComplexElement extends StencilComponents.SlotArrayComplex, HTMLStencilElement {}
-
-  var HTMLSlotArrayComplexElement: {
-    prototype: HTMLSlotArrayComplexElement;
-    new (): HTMLSlotArrayComplexElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-array-complex': HTMLSlotArrayComplexElement;
-  }
-  interface ElementTagNameMap {
-    'slot-array-complex': HTMLSlotArrayComplexElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-array-complex': JSXElements.SlotArrayComplexAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotArrayComplexAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotArrayTop {
-
-    }
-  }
-
-  interface HTMLSlotArrayTopElement extends StencilComponents.SlotArrayTop, HTMLStencilElement {}
-
-  var HTMLSlotArrayTopElement: {
-    prototype: HTMLSlotArrayTopElement;
-    new (): HTMLSlotArrayTopElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-array-top': HTMLSlotArrayTopElement;
-  }
-  interface ElementTagNameMap {
-    'slot-array-top': HTMLSlotArrayTopElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-array-top': JSXElements.SlotArrayTopAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotArrayTopAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotBasicOrderRoot {
-
-    }
-  }
-
-  interface HTMLSlotBasicOrderRootElement extends StencilComponents.SlotBasicOrderRoot, HTMLStencilElement {}
-
-  var HTMLSlotBasicOrderRootElement: {
-    prototype: HTMLSlotBasicOrderRootElement;
-    new (): HTMLSlotBasicOrderRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-basic-order-root': JSXElements.SlotBasicOrderRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotBasicOrderRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotBasicOrder {
-
-    }
-  }
-
-  interface HTMLSlotBasicOrderElement extends StencilComponents.SlotBasicOrder, HTMLStencilElement {}
-
-  var HTMLSlotBasicOrderElement: {
-    prototype: HTMLSlotBasicOrderElement;
-    new (): HTMLSlotBasicOrderElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-basic-order': HTMLSlotBasicOrderElement;
-  }
-  interface ElementTagNameMap {
-    'slot-basic-order': HTMLSlotBasicOrderElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-basic-order': JSXElements.SlotBasicOrderAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotBasicOrderAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotBasicRoot {
-
-    }
-  }
-
-  interface HTMLSlotBasicRootElement extends StencilComponents.SlotBasicRoot, HTMLStencilElement {}
-
-  var HTMLSlotBasicRootElement: {
-    prototype: HTMLSlotBasicRootElement;
-    new (): HTMLSlotBasicRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-basic-root': HTMLSlotBasicRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-basic-root': HTMLSlotBasicRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-basic-root': JSXElements.SlotBasicRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotBasicRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotBasic {
-
-    }
-  }
-
-  interface HTMLSlotBasicElement extends StencilComponents.SlotBasic, HTMLStencilElement {}
-
-  var HTMLSlotBasicElement: {
-    prototype: HTMLSlotBasicElement;
-    new (): HTMLSlotBasicElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-basic': HTMLSlotBasicElement;
-  }
-  interface ElementTagNameMap {
-    'slot-basic': HTMLSlotBasicElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-basic': JSXElements.SlotBasicAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotBasicAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotDynamicWrapperRoot {
-
-    }
-  }
-
-  interface HTMLSlotDynamicWrapperRootElement extends StencilComponents.SlotDynamicWrapperRoot, HTMLStencilElement {}
-
-  var HTMLSlotDynamicWrapperRootElement: {
-    prototype: HTMLSlotDynamicWrapperRootElement;
-    new (): HTMLSlotDynamicWrapperRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-dynamic-wrapper-root': JSXElements.SlotDynamicWrapperRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotDynamicWrapperRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotDynamicWrapper {
-      'tag': string;
-    }
-  }
-
-  interface HTMLSlotDynamicWrapperElement extends StencilComponents.SlotDynamicWrapper, HTMLStencilElement {}
-
-  var HTMLSlotDynamicWrapperElement: {
-    prototype: HTMLSlotDynamicWrapperElement;
-    new (): HTMLSlotDynamicWrapperElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
-  }
-  interface ElementTagNameMap {
-    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-dynamic-wrapper': JSXElements.SlotDynamicWrapperAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotDynamicWrapperAttributes extends HTMLAttributes {
       'tag'?: string;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotFallbackRoot {
-
-    }
-  }
-
-  interface HTMLSlotFallbackRootElement extends StencilComponents.SlotFallbackRoot, HTMLStencilElement {}
-
-  var HTMLSlotFallbackRootElement: {
-    prototype: HTMLSlotFallbackRootElement;
-    new (): HTMLSlotFallbackRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-fallback-root': HTMLSlotFallbackRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-fallback-root': HTMLSlotFallbackRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-fallback-root': JSXElements.SlotFallbackRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotFallbackRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotFallback {
-      'inc': number;
-    }
-  }
-
-  interface HTMLSlotFallbackElement extends StencilComponents.SlotFallback, HTMLStencilElement {}
-
-  var HTMLSlotFallbackElement: {
-    prototype: HTMLSlotFallbackElement;
-    new (): HTMLSlotFallbackElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-fallback': HTMLSlotFallbackElement;
-  }
-  interface ElementTagNameMap {
-    'slot-fallback': HTMLSlotFallbackElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-fallback': JSXElements.SlotFallbackAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotFallbackAttributes extends HTMLAttributes {
       'inc'?: number;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotHtml {
-      'inc': number;
-    }
-  }
-
-  interface HTMLSlotHtmlElement extends StencilComponents.SlotHtml, HTMLStencilElement {}
-
-  var HTMLSlotHtmlElement: {
-    prototype: HTMLSlotHtmlElement;
-    new (): HTMLSlotHtmlElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-html': HTMLSlotHtmlElement;
-  }
-  interface ElementTagNameMap {
-    'slot-html': HTMLSlotHtmlElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-html': JSXElements.SlotHtmlAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotHtmlAttributes extends HTMLAttributes {
       'inc'?: number;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotLightDomRoot {
-
-    }
-  }
-
-  interface HTMLSlotLightDomRootElement extends StencilComponents.SlotLightDomRoot, HTMLStencilElement {}
-
-  var HTMLSlotLightDomRootElement: {
-    prototype: HTMLSlotLightDomRootElement;
-    new (): HTMLSlotLightDomRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-light-dom-root': HTMLSlotLightDomRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-light-dom-root': HTMLSlotLightDomRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-light-dom-root': JSXElements.SlotLightDomRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotLightDomRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotLightDomContent {
-
-    }
-  }
-
-  interface HTMLSlotLightDomContentElement extends StencilComponents.SlotLightDomContent, HTMLStencilElement {}
-
-  var HTMLSlotLightDomContentElement: {
-    prototype: HTMLSlotLightDomContentElement;
-    new (): HTMLSlotLightDomContentElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-light-dom-content': HTMLSlotLightDomContentElement;
-  }
-  interface ElementTagNameMap {
-    'slot-light-dom-content': HTMLSlotLightDomContentElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-light-dom-content': JSXElements.SlotLightDomContentAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotLightDomContentAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotMapOrderRoot {
-
-    }
-  }
-
-  interface HTMLSlotMapOrderRootElement extends StencilComponents.SlotMapOrderRoot, HTMLStencilElement {}
-
-  var HTMLSlotMapOrderRootElement: {
-    prototype: HTMLSlotMapOrderRootElement;
-    new (): HTMLSlotMapOrderRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-map-order-root': HTMLSlotMapOrderRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-map-order-root': HTMLSlotMapOrderRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-map-order-root': JSXElements.SlotMapOrderRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotMapOrderRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotMapOrder {
-
-    }
-  }
-
-  interface HTMLSlotMapOrderElement extends StencilComponents.SlotMapOrder, HTMLStencilElement {}
-
-  var HTMLSlotMapOrderElement: {
-    prototype: HTMLSlotMapOrderElement;
-    new (): HTMLSlotMapOrderElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-map-order': HTMLSlotMapOrderElement;
-  }
-  interface ElementTagNameMap {
-    'slot-map-order': HTMLSlotMapOrderElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-map-order': JSXElements.SlotMapOrderAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotMapOrderAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotReorderRoot {
-
-    }
-  }
-
-  interface HTMLSlotReorderRootElement extends StencilComponents.SlotReorderRoot, HTMLStencilElement {}
-
-  var HTMLSlotReorderRootElement: {
-    prototype: HTMLSlotReorderRootElement;
-    new (): HTMLSlotReorderRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-reorder-root': HTMLSlotReorderRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-reorder-root': HTMLSlotReorderRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-reorder-root': JSXElements.SlotReorderRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotReorderRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotReorder {
-      'reordered': boolean;
-    }
-  }
-
-  interface HTMLSlotReorderElement extends StencilComponents.SlotReorder, HTMLStencilElement {}
-
-  var HTMLSlotReorderElement: {
-    prototype: HTMLSlotReorderElement;
-    new (): HTMLSlotReorderElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-reorder': HTMLSlotReorderElement;
-  }
-  interface ElementTagNameMap {
-    'slot-reorder': HTMLSlotReorderElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-reorder': JSXElements.SlotReorderAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotReorderAttributes extends HTMLAttributes {
       'reordered'?: boolean;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotReplaceWrapperRoot {
-
-    }
-  }
-
-  interface HTMLSlotReplaceWrapperRootElement extends StencilComponents.SlotReplaceWrapperRoot, HTMLStencilElement {}
-
-  var HTMLSlotReplaceWrapperRootElement: {
-    prototype: HTMLSlotReplaceWrapperRootElement;
-    new (): HTMLSlotReplaceWrapperRootElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
-  }
-  interface ElementTagNameMap {
-    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-replace-wrapper-root': JSXElements.SlotReplaceWrapperRootAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotReplaceWrapperRootAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SlotReplaceWrapper {
-      'href': string;
-    }
-  }
-
-  interface HTMLSlotReplaceWrapperElement extends StencilComponents.SlotReplaceWrapper, HTMLStencilElement {}
-
-  var HTMLSlotReplaceWrapperElement: {
-    prototype: HTMLSlotReplaceWrapperElement;
-    new (): HTMLSlotReplaceWrapperElement;
-  };
-  interface HTMLElementTagNameMap {
-    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
-  }
-  interface ElementTagNameMap {
-    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'slot-replace-wrapper': JSXElements.SlotReplaceWrapperAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SlotReplaceWrapperAttributes extends HTMLAttributes {
       'href'?: string;
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface CssCmp {
-
-    }
-  }
-
-  interface HTMLCssCmpElement extends StencilComponents.CssCmp, HTMLStencilElement {}
-
-  var HTMLCssCmpElement: {
-    prototype: HTMLCssCmpElement;
-    new (): HTMLCssCmpElement;
-  };
-  interface HTMLElementTagNameMap {
-    'css-cmp': HTMLCssCmpElement;
-  }
-  interface ElementTagNameMap {
-    'css-cmp': HTMLCssCmpElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'css-cmp': JSXElements.CssCmpAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface CssCmpAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SassCmp {
-
-    }
-  }
-
-  interface HTMLSassCmpElement extends StencilComponents.SassCmp, HTMLStencilElement {}
-
-  var HTMLSassCmpElement: {
-    prototype: HTMLSassCmpElement;
-    new (): HTMLSassCmpElement;
-  };
-  interface HTMLElementTagNameMap {
-    'sass-cmp': HTMLSassCmpElement;
-  }
-  interface ElementTagNameMap {
-    'sass-cmp': HTMLSassCmpElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'sass-cmp': JSXElements.SassCmpAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SassCmpAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SvgAttr {
-
-    }
-  }
-
-  interface HTMLSvgAttrElement extends StencilComponents.SvgAttr, HTMLStencilElement {}
-
-  var HTMLSvgAttrElement: {
-    prototype: HTMLSvgAttrElement;
-    new (): HTMLSvgAttrElement;
-  };
-  interface HTMLElementTagNameMap {
-    'svg-attr': HTMLSvgAttrElement;
-  }
-  interface ElementTagNameMap {
-    'svg-attr': HTMLSvgAttrElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'svg-attr': JSXElements.SvgAttrAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SvgAttrAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface SvgClass {
-
-    }
-  }
-
-  interface HTMLSvgClassElement extends StencilComponents.SvgClass, HTMLStencilElement {}
-
-  var HTMLSvgClassElement: {
-    prototype: HTMLSvgClassElement;
-    new (): HTMLSvgClassElement;
-  };
-  interface HTMLElementTagNameMap {
-    'svg-class': HTMLSvgClassElement;
-  }
-  interface ElementTagNameMap {
-    'svg-class': HTMLSvgClassElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'svg-class': JSXElements.SvgClassAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface SvgClassAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface Tag3dComponent {
-
-    }
-  }
-
-  interface HTMLTag3dComponentElement extends StencilComponents.Tag3dComponent, HTMLStencilElement {}
-
-  var HTMLTag3dComponentElement: {
-    prototype: HTMLTag3dComponentElement;
-    new (): HTMLTag3dComponentElement;
-  };
-  interface HTMLElementTagNameMap {
-    'tag-3d-component': HTMLTag3dComponentElement;
-  }
-  interface ElementTagNameMap {
-    'tag-3d-component': HTMLTag3dComponentElement;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'tag-3d-component': JSXElements.Tag3dComponentAttributes;
-    }
-  }
-  namespace JSXElements {
     export interface Tag3dComponentAttributes extends HTMLAttributes {
 
     }
-  }
-}
 
-
-declare global {
-
-  namespace StencilComponents {
-    interface Tag88 {
-
-    }
-  }
-
-  interface HTMLTag88Element extends StencilComponents.Tag88, HTMLStencilElement {}
-
-  var HTMLTag88Element: {
-    prototype: HTMLTag88Element;
-    new (): HTMLTag88Element;
-  };
-  interface HTMLElementTagNameMap {
-    'tag-88': HTMLTag88Element;
-  }
-  interface ElementTagNameMap {
-    'tag-88': HTMLTag88Element;
-  }
-  namespace JSX {
-    interface IntrinsicElements {
-      'tag-88': JSXElements.Tag88Attributes;
-    }
-  }
-  namespace JSXElements {
     export interface Tag88Attributes extends HTMLAttributes {
 
     }
   }
-}
 
+  interface HTMLElementTagNameMap {
+    'attribute-basic-root': HTMLAttributeBasicRootElement
+    'attribute-basic': HTMLAttributeBasicElement
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement
+    'attribute-boolean': HTMLAttributeBooleanElement
+    'attribute-complex': HTMLAttributeComplexElement
+    'attribute-host': HTMLAttributeHostElement
+    'conditional-basic': HTMLConditionalBasicElement
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement
+    'conditional-rerender': HTMLConditionalRerenderElement
+    'css-variables-root': HTMLCssVariablesRootElement
+    'css-variables': HTMLCssVariablesElement
+    'dynamic-import': HTMLDynamicImportElement
+    'esm-import': HTMLEsmImportElement
+    'init-css-root': HTMLInitCssRootElement
+    'key-reorder-root': HTMLKeyReorderRootElement
+    'key-reorder': HTMLKeyReorderElement
+    'lifecycle-basic-a': HTMLLifecycleBasicAElement
+    'lifecycle-basic-b': HTMLLifecycleBasicBElement
+    'lifecycle-basic-c': HTMLLifecycleBasicCElement
+    'lifecycle-unload-a': HTMLLifecycleUnloadAElement
+    'lifecycle-unload-b': HTMLLifecycleUnloadBElement
+    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'reflect-to-attr': HTMLReflectToAttrElement
+    'shadow-dom-array-root': HTMLShadowDomArrayRootElement
+    'shadow-dom-array': HTMLShadowDomArrayElement
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
+    'shadow-dom-basic': HTMLShadowDomBasicElement
+    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement
+    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement
+    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement
+    'slot-array-basic': HTMLSlotArrayBasicElement
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement
+    'slot-array-complex': HTMLSlotArrayComplexElement
+    'slot-array-top': HTMLSlotArrayTopElement
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement
+    'slot-basic-order': HTMLSlotBasicOrderElement
+    'slot-basic-root': HTMLSlotBasicRootElement
+    'slot-basic': HTMLSlotBasicElement
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement
+    'slot-fallback-root': HTMLSlotFallbackRootElement
+    'slot-fallback': HTMLSlotFallbackElement
+    'slot-html': HTMLSlotHtmlElement
+    'slot-light-dom-root': HTMLSlotLightDomRootElement
+    'slot-light-dom-content': HTMLSlotLightDomContentElement
+    'slot-map-order-root': HTMLSlotMapOrderRootElement
+    'slot-map-order': HTMLSlotMapOrderElement
+    'slot-reorder-root': HTMLSlotReorderRootElement
+    'slot-reorder': HTMLSlotReorderElement
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement
+    'css-cmp': HTMLCssCmpElement
+    'sass-cmp': HTMLSassCmpElement
+    'svg-attr': HTMLSvgAttrElement
+    'svg-class': HTMLSvgClassElement
+    'tag-3d-component': HTMLTag3dComponentElement
+    'tag-88': HTMLTag88Element
+  }
+
+  interface ElementTagNameMap {
+    'attribute-basic-root': HTMLAttributeBasicRootElement;
+    'attribute-basic': HTMLAttributeBasicElement;
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
+    'attribute-boolean': HTMLAttributeBooleanElement;
+    'attribute-complex': HTMLAttributeComplexElement;
+    'attribute-host': HTMLAttributeHostElement;
+    'conditional-basic': HTMLConditionalBasicElement;
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
+    'conditional-rerender': HTMLConditionalRerenderElement;
+    'css-variables-root': HTMLCssVariablesRootElement;
+    'css-variables': HTMLCssVariablesElement;
+    'dynamic-import': HTMLDynamicImportElement;
+    'esm-import': HTMLEsmImportElement;
+    'init-css-root': HTMLInitCssRootElement;
+    'key-reorder-root': HTMLKeyReorderRootElement;
+    'key-reorder': HTMLKeyReorderElement;
+    'lifecycle-basic-a': HTMLLifecycleBasicAElement;
+    'lifecycle-basic-b': HTMLLifecycleBasicBElement;
+    'lifecycle-basic-c': HTMLLifecycleBasicCElement;
+    'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
+    'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
+    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'reflect-to-attr': HTMLReflectToAttrElement;
+    'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
+    'shadow-dom-array': HTMLShadowDomArrayElement;
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
+    'shadow-dom-basic': HTMLShadowDomBasicElement;
+    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
+    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
+    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
+    'slot-array-basic': HTMLSlotArrayBasicElement;
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
+    'slot-array-complex': HTMLSlotArrayComplexElement;
+    'slot-array-top': HTMLSlotArrayTopElement;
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
+    'slot-basic-order': HTMLSlotBasicOrderElement;
+    'slot-basic-root': HTMLSlotBasicRootElement;
+    'slot-basic': HTMLSlotBasicElement;
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
+    'slot-fallback-root': HTMLSlotFallbackRootElement;
+    'slot-fallback': HTMLSlotFallbackElement;
+    'slot-html': HTMLSlotHtmlElement;
+    'slot-light-dom-root': HTMLSlotLightDomRootElement;
+    'slot-light-dom-content': HTMLSlotLightDomContentElement;
+    'slot-map-order-root': HTMLSlotMapOrderRootElement;
+    'slot-map-order': HTMLSlotMapOrderElement;
+    'slot-reorder-root': HTMLSlotReorderRootElement;
+    'slot-reorder': HTMLSlotReorderElement;
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
+    'css-cmp': HTMLCssCmpElement;
+    'sass-cmp': HTMLSassCmpElement;
+    'svg-attr': HTMLSvgAttrElement;
+    'svg-class': HTMLSvgClassElement;
+    'tag-3d-component': HTMLTag3dComponentElement;
+    'tag-88': HTMLTag88Element;
+  }
+}
 declare global { namespace JSX { interface StencilJSX {} } }
 
 export declare function defineCustomElements(window: any): void;

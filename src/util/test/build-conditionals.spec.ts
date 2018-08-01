@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
-import { mockConfig } from '../../../testing/mocks';
+import { mockConfig } from '../../testing/mocks';
 
 
 describe('build conditionals', () => {
