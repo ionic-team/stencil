@@ -1,6 +1,44 @@
 <a name="0.11.0"></a>
 # 🍇 [0.11.0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0) (2018-07-31)
 
+**Update stencil.config.js:**
+
+```diff
+- const sass = require('sass');
+- const postcss = require('@stencil/postcss');
++ const { sass } = require('@stencil/sass');
++ const { postcss } = require('@stencil/postcss');
+```
+
+**Or migrate to strong typed configuration:**
+
+- **Step 1:** rename
+`stencil.config.js` => `stencil.config.ts`
+
+- **Step 2:** use ES modules instead of commonjs
+
+```ts
+import { Config } from '@stencil/core';
+import { sass } from '@stencil/sass';
+import { postcss } from '@stencil/postcss';
+import * as autoprefixer from 'autoprefixer';
+
+export const config: Config = {
+  plugins: [
+    postcss({
+      sass(),
+      plugins: [autoprefixer()]
+    })
+  ]
+};
+```
+
+> Using **stencil.config.ts** provides many DX improvements such as: autocompletion and documentation built into the IDE and detection of errors at compiler time!
+
+**Example:** https://github.com/ionic-team/ionic-pwa-toolkit/blob/master/stencil.config.ts
+
+
+
 ### Features
 
 * **config:** typed stencil.config.ts and config error reporting
@@ -12,6 +50,7 @@
 * **prerender:** css scope ids as classnames instead of attributes
 * **prerender:** use ssrc and ssrv attributes instead of data-ssrc and data-ssrv attributes
 * **set-accesor:** boolean values ([aac503b](https://github.com/ionic-team/stencil/commit/aac503b))
+
 
 
 ### Bug Fixes
