@@ -82,7 +82,7 @@ export function appendDefineCustomElementsType(content: string) {
   const types = `export declare function defineCustomElements(window: any): void;`;
 
   if (!content.includes(types)) {
-    content += '\n' + types;
+    content += types;
   }
 
   return content;
