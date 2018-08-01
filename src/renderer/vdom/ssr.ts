@@ -98,4 +98,29 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
       parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
     }
   }
+
+  if (nodeType === NODE_TYPE.CommentNode) {
+    childVNodeSplt = domApi.$getTextContent(node).split('.');
+    if (childVNodeSplt[0] === 'l' && childVNodeSplt[1] === ssrVNodeId) {
+      // ok great, this is a slot for this vnode
+      childVNode = { vtag: 'slot' } as d.VNode;
+      domApi.$insertBefore(parentVNode.elm, childVNode.elm = domApi.$createElement(childVNode.vtag), node);
+      domApi.$remove(node);
+
+      if (childVNodeSplt[3]) {
+        // this slot has a "name" attribute
+        childVNode.vattrs = childVNode.vattrs || {};
+        domApi.$setAttribute(childVNode.elm, 'name', childVNode.vattrs.name = (childVNode.vname = childVNodeSplt[3]));
+      }
+
+      // this is a new child vnode
+      // so ensure its parent vnode has the vchildren array
+      if (!parentVNode.vchildren) {
+        parentVNode.vchildren = [];
+      }
+
+      // add our child vnode to a specific index of the vnode's children
+      parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+    }
+  }
 }

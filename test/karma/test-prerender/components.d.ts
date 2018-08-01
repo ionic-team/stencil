@@ -256,4 +256,37 @@ declare global {
   }
 }
 
+
+declare global {
+
+  namespace StencilComponents {
+    interface CmpSdA {
+
+    }
+  }
+
+  interface HTMLCmpSdAElement extends StencilComponents.CmpSdA, HTMLStencilElement {}
+
+  var HTMLCmpSdAElement: {
+    prototype: HTMLCmpSdAElement;
+    new (): HTMLCmpSdAElement;
+  };
+  interface HTMLElementTagNameMap {
+    'cmp-sd-a': HTMLCmpSdAElement;
+  }
+  interface ElementTagNameMap {
+    'cmp-sd-a': HTMLCmpSdAElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'cmp-sd-a': JSXElements.CmpSdAAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface CmpSdAAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
 declare global { namespace JSX { interface StencilJSX {} } }

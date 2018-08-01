@@ -52,8 +52,15 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       newVNode.elm = domApi.$createTextNode(newVNode.vtext) as any;
 
     } else if (Build.slotPolyfill && newVNode.isSlotReference) {
-      // create a slot reference html text node
-      newVNode.elm = domApi.$createTextNode('') as any;
+
+      if (Build.ssrServerSide && isShadowDomComponent) {
+        // create a slot reference html text node for server side
+        newVNode.elm = domApi.$createComment('l.' + ssrId + '.' + childIndex + '.' + (newVNode.vname || '')) as any;
+
+      } else {
+        // create a slot reference html text node for client side
+        newVNode.elm = domApi.$createTextNode('') as any;
+      }
 
     } else {
       // create element
@@ -559,7 +566,8 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       checkSlotFallbackVisibility: boolean,
       checkSlotRelocate: boolean,
       hostTagName: string,
-      contentRef: d.RenderNode;
+      contentRef: d.RenderNode,
+      isShadowDomComponent: boolean;
 
 
   return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, encapsulation: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
@@ -569,13 +577,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     hostTagName = domApi.$tagName(hostElm);
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;
+    isShadowDomComponent = (encapsulation === 'shadow');
 
     if (Build.ssrServerSide) {
-      if (encapsulation !== 'shadow') {
-        ssrId = ssrPatchId;
-      } else {
-        ssrId = null;
-      }
+      ssrId = ssrPatchId;
     }
 
     if (Build.slotPolyfill) {

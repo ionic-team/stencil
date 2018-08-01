@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { connectedCallback } from '../core/connected';
-import { ENCAPSULATION } from '../util/constants';
 import { initHostElement } from '../core/init-host-element';
 import { initHostSnapshot } from '../core/host-snapshot';
 
@@ -46,11 +45,9 @@ function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlob
     plt.requestBundle(cmpMeta, elm);
   }
 
-  if (cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom) {
-    initHostElement(plt, cmpMeta, elm, config.hydratedCssClass);
+  initHostElement(plt, cmpMeta, elm, config.hydratedCssClass);
 
-    connectedCallback(plt, cmpMeta, elm);
-  }
+  connectedCallback(plt, cmpMeta, elm);
 
   connectComponentOnReady(App, elm);
 

@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
+import { mockConfig } from '../../../testing/mocks';
 
 
 describe('build conditionals', () => {
@@ -16,7 +17,7 @@ describe('build conditionals', () => {
       membersMeta: {}
     };
     coreBuild = {} as any;
-    config = {};
+    config = mockConfig();
     buildCtx = {} as any;
     compilerCtx = {} as any;
   });
@@ -71,6 +72,21 @@ describe('build conditionals', () => {
 
 
   describe('setBuildConditionals', () => {
+
+    it('set hydrateClientFromSsr true', async () => {
+      const compilerCtx: d.CompilerCtx = {};
+      config.outputTargets = [
+        { type: 'www', hydrateComponents: true }
+      ];
+      const bc = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, []);
+      expect(bc.hydrateClientFromSsr).toBe(true);
+    });
+
+    it('set hydrateClientFromSsr false', async () => {
+      const compilerCtx: d.CompilerCtx = {};
+      const bc = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, []);
+      expect(bc.hydrateClientFromSsr).toBe(false);
+    });
 
     it('set Build.hasSlot true', async () => {
       buildCtx.hasSlot = true;

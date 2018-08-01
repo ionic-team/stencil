@@ -26,6 +26,15 @@ export class AppRoot {
           <div id="client-componentDidLoad"/>
         </div>
         <div>
+          <cmp-sd-a>
+            <div slot="slot-right">cmp-sd-a right content</div>
+            cmp-sd-a default content
+            <div slot="slot-left">
+              <div>cmp-sd-a left content</div>
+            </div>
+          </cmp-sd-a>
+        </div>
+        <div>
           <cmp-scoped-a></cmp-scoped-a>
         </div>
         <div>
