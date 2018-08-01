@@ -9,7 +9,7 @@
 import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID, SSR_SHADOW_DOM } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -23,7 +23,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) {
     newVNode = newParentVNode.vchildren[childIndex];
 
-    if (Build.slotPolyfill && !useNativeShadowDom) {
+    if (Build.slotPolyfill && Build.hasSlot && !useNativeShadowDom) {
       // remember for later we need to check to relocate nodes
       checkSlotRelocate = true;
 
@@ -53,8 +53,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else if (Build.slotPolyfill && newVNode.isSlotReference) {
 
-      if (Build.ssrServerSide && isShadowDomComponent) {
-        // create a slot reference html text node for server side
+      if (Build.ssrServerSide && Build.hasSlot && Build.shadowDom && isShadowDomComponent) {
+        // create a slot reference html comment node for server side
+        // when the client side hydrates it'll turn this html comment
+        // into an actual <slot> element
         newVNode.elm = domApi.$createComment('l.' + ssrId + '.' + childIndex + '.' + (newVNode.vname || '')) as any;
 
       } else {
@@ -581,6 +583,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     if (Build.ssrServerSide) {
       ssrId = ssrPatchId;
+
+      if (isShadowDomComponent) {
+        domApi.$setAttribute(hostElm, SSR_SHADOW_DOM, '');
+      }
     }
 
     if (Build.slotPolyfill) {

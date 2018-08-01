@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { compareHtml, mockConfig, mockDomApi, mockHtml, mockPlatform  } from '../../../testing/mocks';
 import { createVNodesFromSsr } from '../ssr';
-import { ENCAPSULATION, SSR_CHILD_ID, SSR_VNODE_ID } from '../../../util/constants';
+import { ENCAPSULATION, SSR_CHILD_ID, SSR_SHADOW_DOM, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
 import { hydrateHtml } from '../../../server/hydrate-html';
 
@@ -56,7 +56,7 @@ describe('ssr shadow dom', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <cmp-a class="sc-cmp-a-h ${config.hydratedCssClass}" ssrv="0">
+          <cmp-a class="sc-cmp-a-h ${config.hydratedCssClass}" ssrsd="" ssrv="0">
             <div class="sc-cmp-a sc-cmp-a-s" ssrc="0.0">
               <section class="sc-cmp-a" ssrc="0.0">
                 <!--s.0.0-->Shadow Content<!--/-->
@@ -78,6 +78,7 @@ describe('ssr shadow dom', () => {
 
     expect(cmpAVnode.vtag).toBe('cmp-a');
     expect(cmpAVnode.elm.getAttribute(SSR_VNODE_ID)).toBe('0');
+    expect(cmpAVnode.elm.getAttribute(SSR_SHADOW_DOM)).toBe('');
     expect(cmpAVnode.elm.classList.contains('sc-cmp-a-h')).toBe(true);
 
     expect(cmpAVnode.vchildren).toHaveLength(1);

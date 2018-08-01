@@ -71,6 +71,7 @@ export const enum NODE_TYPE {
  */
 export const SSR_VNODE_ID = 'ssrv';
 export const SSR_CHILD_ID = 'ssrc';
+export const SSR_SHADOW_DOM = 'ssrsd';
 
 
 /**
