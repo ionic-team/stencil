@@ -8,7 +8,6 @@ export default function localResolution(config: Config, compilerCtx: CompilerCtx
 
     async resolveId(importee: string, importer: string) {
       importee = normalizePath(importee);
-      importer = normalizePath(importer);
 
       if (importee.indexOf('./') === -1) {
         return null;
@@ -17,6 +16,7 @@ export default function localResolution(config: Config, compilerCtx: CompilerCtx
       if (!importer) {
         return null;
       }
+      importer = normalizePath(importer);
 
       if (importee.endsWith('.js')) {
         return null;

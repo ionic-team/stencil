@@ -1,11 +1,10 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { initHostSnapshot } from './host-snapshot';
 import { initElementListeners } from './listeners';
 
 
 export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-  if (Build.listener) {
+  if (__BUILD_CONDITIONALS__.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
     // have fired even before the instance is ready

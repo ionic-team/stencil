@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { definePropertyGetterSetter, definePropertyValue, setValue } from './proxy-members';
 import { MEMBER_TYPE } from '../util/constants';
 import { noop } from '../util/helpers';
@@ -11,7 +10,7 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersMeta: d.Mem
   // the setters allows us to know when data has changed so we can re-render
 
 
-  if (!Build.clientSide) {
+  if (!__BUILD_CONDITIONALS__.clientSide) {
     // in just a server-side build
     // let's set the properties to the values immediately
     let values = plt.valuesMap.get(hostPrototype);

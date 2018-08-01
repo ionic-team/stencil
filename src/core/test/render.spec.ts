@@ -508,7 +508,7 @@ describe('instance render', () => {
     const cmpMeta: d.ComponentMeta = {
       componentConstructor: cmpConstructor
     };
-    render(plt, cmpMeta, hostElm, instance, false);
+    render(plt, cmpMeta, hostElm, instance);
     return instance;
   }
 

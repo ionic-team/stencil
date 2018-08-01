@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import * as ts from 'typescript';
 
@@ -24,11 +23,11 @@ export async function transpileCoreBuild(config: d.Config, compilerCtx: d.Compil
   const diagnostics: d.Diagnostic[] = [];
 
   const transpileOpts: ts.TranspileOptions = {
-    compilerOptions: getCompilerOptions(coreBuild),
-    transformers: {
-      before: [
-        buildConditionalsTransform(coreBuild)
-      ]
+    compilerOptions: {
+      allowJs: true,
+      declaration: false,
+      target: ts.ScriptTarget.ES5,
+      module: ts.ModuleKind.ESNext
     }
   };
 
@@ -49,23 +48,4 @@ export async function transpileCoreBuild(config: d.Config, compilerCtx: d.Compil
   }
 
   return results;
-}
-
-
-function getCompilerOptions(coreBuild: d.BuildConditionals) {
-  const opts: ts.CompilerOptions = {
-    allowJs: true,
-    declaration: false
-  };
-
-  if (coreBuild.es5) {
-    opts.target = ts.ScriptTarget.ES5;
-
-  } else {
-    opts.target = ts.ScriptTarget.ES2017;
-  }
-
-  opts.module = ts.ModuleKind.ESNext;
-
-  return opts;
 }
