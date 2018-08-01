@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { dashToPascalCase } from '../util/helpers';
 import { getElementScopeId } from '../util/scope';
 import { h } from '../renderer/vdom/h';
@@ -22,7 +21,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     let reflectHostAttr: d.VNodeData;
     let rootElm: HTMLElement;
 
-    if (Build.reflectToAttr) {
+    if (__BUILD_CONDITIONALS__.reflectToAttr) {
       reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpMeta.componentConstructor.properties, instance);
     }
 
@@ -31,7 +30,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // this browser DOES support native shadow dom
       // and this is the first render
       // let's create that shadow root
-      if (Build.shadowDom) {
+      if (__BUILD_CONDITIONALS__.shadowDom) {
         rootElm = hostElm.shadowRoot as any;
       }
 
@@ -41,7 +40,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       rootElm = hostElm;
     }
 
-    if (Build.styles && !hostElm['s-rn']) {
+    if (__BUILD_CONDITIONALS__.styles && !hostElm['s-rn']) {
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
@@ -67,12 +66,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       const vnodeChildren = instance.render && instance.render();
 
       let vnodeHostData: d.VNodeData;
-      if (Build.hostData) {
+      if (__BUILD_CONDITIONALS__.hostData) {
         // user component provided a "hostData()" method
         // the returned data/attributes are used on the host element
         vnodeHostData = instance.hostData && instance.hostData();
 
-        if (Build.isDev) {
+        if (__BUILD_CONDITIONALS__.isDev) {
           if (vnodeHostData && cmpMeta.membersMeta) {
             const foundHostKeys = Object.keys(vnodeHostData).reduce((err, k) => {
               if (cmpMeta.membersMeta[k]) {
@@ -96,7 +95,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         }
       }
 
-      if (Build.reflectToAttr && reflectHostAttr) {
+      if (__BUILD_CONDITIONALS__.reflectToAttr && reflectHostAttr) {
         vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
       }
 
@@ -104,7 +103,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // now any changes will again queue
       plt.activeRender = false;
 
-      if (Build.hostTheme && hostMeta) {
+      if (__BUILD_CONDITIONALS__.hostTheme && hostMeta) {
         // component meta data has a "theme"
         // use this to automatically generate a good css class
         // from the mode and color to add to the host element
@@ -120,7 +119,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
-      if (Build.reflectToAttr) {
+      if (__BUILD_CONDITIONALS__.reflectToAttr) {
         // only care if we're reflecting values to the host element
         hostVNode.ishost = true;
       }
@@ -138,7 +137,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     }
 
     // update styles!
-    if (Build.cssVarShim && plt.customStyle) {
+    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
       plt.customStyle.updateHost(hostElm);
     }
 

@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { createPlatformMain } from './platform-main';
 import { createPlatformMainLegacy } from './platform-main-legacy';
 import { CustomStyle, supportsCssVars } from './polyfills/css-shim/custom-style';
@@ -11,14 +10,14 @@ declare const resourcesUrl: string;
 declare const hydratedCssClass: string;
 
 
-if (Build.polyfills) {
+if (__BUILD_CONDITIONALS__.polyfills) {
   // es5 build which does not use es module imports or dynamic imports
   // and requires the es5 way of extending HTMLElement
 
   let customStyle: CustomStyle;
-  if (Build.cssVarShim) {
+  if (__BUILD_CONDITIONALS__.cssVarShim) {
     let needShim = !supportsCssVars(window);
-    if (Build.isDev) {
+    if (__BUILD_CONDITIONALS__.isDev) {
       if (window.location.search.indexOf('cssvars=false') > 0) {
         // by adding ?shadow=false it'll force the slot polyfill
         // only add this check when in dev mode

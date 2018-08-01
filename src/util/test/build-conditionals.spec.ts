@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import * as d from '../../declarations';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
 
 
@@ -170,50 +170,93 @@ describe('build conditionals', () => {
         theme: {}
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.hostTheme).toBeTruthy();
-      expect(Object.keys(coreBuild)).toHaveLength(2);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: true
+      });
     });
 
     it('styles', () => {
       cmpMeta.stylesMeta = {};
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.styles).toBeTruthy();
-      expect(Object.keys(coreBuild)).toHaveLength(2);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: true,
+        hostTheme: false
+      });
     });
 
     it('shadowDom', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.shadowDom).toBeTruthy();
-      expect(coreBuild.slotPolyfill).toBeFalsy();
+      expect(coreBuild).toEqual({
+        shadowDom: true,
+        slotPolyfill: false,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('slotPolyfill cuz ScopedCss', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
-      expect(coreBuild.shadowDom).toBeFalsy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('slotPolyfill cuz NoEncapsulation', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
-      expect(coreBuild.shadowDom).toBeFalsy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('listener', () => {
       cmpMeta.listenersMeta = [{}];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.listener).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: true,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('event', () => {
       cmpMeta.eventsMeta = [{ eventName: 'name' }];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.event).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: true,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('element', () => {
@@ -222,6 +265,15 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.element).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        element: true
+      });
     });
 
     it('method', () => {
@@ -229,7 +281,15 @@ describe('build conditionals', () => {
         memberType: MEMBER_TYPE.Method
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.method).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        method: true
+      });
     });
 
     it('propContext', () => {
@@ -237,7 +297,15 @@ describe('build conditionals', () => {
         memberType: MEMBER_TYPE.PropContext
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.propContext).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        propContext: true
+      });
     });
 
     it('propConnect', () => {
@@ -245,7 +313,15 @@ describe('build conditionals', () => {
         memberType: MEMBER_TYPE.PropConnect
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.propConnect).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        propConnect: true
+      });
     });
 
     it('observeAttr w/ "any" prop type', () => {
@@ -254,7 +330,15 @@ describe('build conditionals', () => {
         propType: PROP_TYPE.Any
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.observeAttr).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        observeAttr: true
+      });
     });
 
     it('observeAttr w/ boolean prop type', () => {
@@ -263,7 +347,15 @@ describe('build conditionals', () => {
         propType: PROP_TYPE.Boolean
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.observeAttr).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        observeAttr: true
+      });
     });
 
     it('observeAttr w/ number prop type', () => {
@@ -272,7 +364,15 @@ describe('build conditionals', () => {
         propType: PROP_TYPE.Number
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.observeAttr).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        observeAttr: true
+      });
     });
 
     it('observeAttr w/ string prop type', () => {
@@ -281,7 +381,15 @@ describe('build conditionals', () => {
         propType: PROP_TYPE.String
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.observeAttr).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false,
+        observeAttr: true
+      });
     });
 
     it('do not set observeAttr w/out valid prop type', () => {
@@ -289,15 +397,26 @@ describe('build conditionals', () => {
         memberType: MEMBER_TYPE.Prop,
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.observeAttr).toBeFalsy();
-      expect(Object.keys(coreBuild)).toHaveLength(1);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
     it('should do nothing with no member meta', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(Object.keys(coreBuild)).toHaveLength(1);
-      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild).toEqual({
+        shadowDom: false,
+        slotPolyfill: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
     });
 
   });

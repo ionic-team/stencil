@@ -1,13 +1,14 @@
 
 
 export interface BuildConditionals {
-  coreId?: 'core' | 'core.pf' | 'esm.es5';
-  polyfills?: boolean;
-  es5?: boolean;
-  cssVarShim?: boolean;
-  clientSide?: boolean;
-  browserModuleLoader?: boolean;
-  externalModuleLoader?: boolean;
+  [key: string]: any;
+  coreId: 'core' | 'core.pf' | 'esm.es5';
+  polyfills: boolean;
+  es5: boolean;
+  cssVarShim: boolean;
+  clientSide: boolean;
+  browserModuleLoader: boolean;
+  externalModuleLoader: boolean;
 
   // dev
   isDev: boolean;
@@ -53,6 +54,10 @@ export interface BuildConditionals {
   // elements
   hasSlot: boolean;
   hasSvg: boolean;
+}
+
+declare global {
+  var __BUILD_CONDITIONALS__: BuildConditionals;
 }
 
 export interface UserBuildConditionals {

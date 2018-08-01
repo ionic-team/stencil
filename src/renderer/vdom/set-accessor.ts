@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { Build } from '../../util/build-conditionals';
 import { elementHasProperty } from '../../core/proxy-members';
 import { PROP_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
@@ -82,7 +81,7 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
 
   } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
     (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
-    || (!Build.clientSide && elementHasProperty(plt, elm, memberName))) {
+    || (!__BUILD_CONDITIONALS__.clientSide && elementHasProperty(plt, elm, memberName))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
@@ -95,7 +94,7 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
       // set it directly as property on the element
       setProperty(elm, memberName, newValue);
 
-      if (Build.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
+      if (__BUILD_CONDITIONALS__.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
         // we also want to set this data to the attribute
         updateAttribute(
           elm,

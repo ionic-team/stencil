@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initComponentInstance } from './init-component-instance';
 import { render } from './render';
@@ -66,7 +65,7 @@ export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: b
       // https://www.youtube.com/watch?v=olLxrojmvMg
       instance = initComponentInstance(plt, elm, plt.hostSnapshotMap.get(elm));
 
-      if (Build.cmpWillLoad) {
+      if (__BUILD_CONDITIONALS__.cmpWillLoad) {
         // fire off the user's componentWillLoad method (if one was provided)
         // componentWillLoad only runs ONCE, after instance's element has been
         // assigned as the host element, but BEFORE render() has been called
@@ -79,7 +78,7 @@ export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: b
         }
       }
 
-    } else if (Build.cmpWillUpdate) {
+    } else if (__BUILD_CONDITIONALS__.cmpWillUpdate) {
       // already created an instance and this is an update
       // fire off the user's componentWillUpdate method (if one was provided)
       // componentWillUpdate runs BEFORE render() has been called
@@ -121,7 +120,7 @@ export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d
       // componentDidLoad just fired off
 
     } else {
-      if (Build.cmpDidUpdate) {
+      if (__BUILD_CONDITIONALS__.cmpDidUpdate) {
         // fire off the user's componentDidUpdate method (if one was provided)
         // componentDidUpdate runs AFTER render() has been called
         // but only AFTER an UPDATE and not after the intial render
@@ -130,7 +129,7 @@ export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d
       callNodeRefs(plt.vnodeMap.get(elm));
     }
 
-    if (Build.hotModuleReplacement) {
+    if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
 

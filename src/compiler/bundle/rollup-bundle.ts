@@ -1,14 +1,14 @@
 import * as d from '../../declarations';
 import abortPlugin from './rollup-plugins/abort-plugin';
-import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import bundleJson from './rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
-import { BundleSet, RollupDirOptions, rollup } from 'rollup';
+import { RollupBuild, RollupDirOptions, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
+import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
 
 
 export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
@@ -16,11 +16,20 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     buildCtx.debug(`createBundle aborted, not active build`);
   }
 
+  const buildConditionals = {
+    isDev: !!config.devMode
+  } as d.BuildConditionals;
+
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`Build.${key}`] = buildConditionals[key];
+    return all;
+  }, <{ [key: string]: any}>{});
+
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
   const builtins = require('rollup-plugin-node-builtins');
   const globals = require('rollup-plugin-node-globals');
-  let rollupBundle: BundleSet;
+  let rollupBundle: RollupBuild;
 
   const commonjsConfig = {
     include: 'node_modules/**',
@@ -37,19 +46,20 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
   const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
 
   const rollupConfig: RollupDirOptions = {
-    input: entryModules.map(b => b.entryKey),
+    input: entryModules.map(b => b.filePath),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
-    experimentalDynamicImport: true,
     plugins: [
       abortPlugin(buildCtx),
+      rollupPluginReplace({
+        values: replaceObj
+      }),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       globals(),
       builtins(),
-      bundleEntryFile(config, buildCtx, entryModules),
-      inMemoryFsRead(config, compilerCtx, buildCtx),
+      inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),

@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { attributeChangedCallback } from './attribute-changed';
-import { Build } from '../util/build-conditionals';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { hmrStart } from './hmr-component';
@@ -24,7 +23,7 @@ export function initHostElement(
     connectedCallback(plt, cmpMeta, (this as d.HostElement));
   };
 
-  if (Build.observeAttr) {
+  if (__BUILD_CONDITIONALS__.observeAttr) {
     HostElementConstructor.attributeChangedCallback = function(attribName: string, oldVal: string, newVal: string) {
       // the browser has just informed us that an attribute
       // on the host element has changed
@@ -41,7 +40,7 @@ export function initHostElement(
     initComponentLoaded(plt, (this as d.HostElement), hydratedCssClass);
   };
 
-  if (Build.hotModuleReplacement) {
+  if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
     HostElementConstructor['s-hmr'] = function(hmrVersionId) {
       hmrStart(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
     };

@@ -3,7 +3,6 @@ import * as d from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 
-
 export class TestingConfig implements d.Config {
   _isTesting = true;
   logger = new TestingLogger();

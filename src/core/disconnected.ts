@@ -1,4 +1,3 @@
-import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
@@ -29,7 +28,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     plt.domApi.$removeEventListener(elm);
     plt.hasListenersMap.delete(elm);
 
-    if (Build.cmpDidUnload) {
+    if (__BUILD_CONDITIONALS__.cmpDidUnload) {
       // call instance componentDidUnload
       // if we've created an instance for this
       const instance = plt.instanceMap.get(elm);
@@ -40,7 +39,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     }
 
     // clear CSS var-shim tracking
-    if (Build.cssVarShim && plt.customStyle) {
+    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
       plt.customStyle.removeHost(elm);
     }
 
