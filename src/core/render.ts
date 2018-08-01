@@ -30,7 +30,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // this browser DOES support native shadow dom
       // and this is the first render
       // let's create that shadow root
-      if (__BUILD_CONDITIONALS__.shadowDom) {
+      if (__BUILD_CONDITIONALS__.hasShadowDom) {
         rootElm = hostElm.shadowRoot as any;
       }
 

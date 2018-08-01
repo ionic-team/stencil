@@ -8,7 +8,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     coreId: 'core',
     polyfills: false,
     cssVarShim: true,
-    shadowDom: true,
+    hasShadowDom: true,
     slotPolyfill: true,
     ssrServerSide: true,
     devInspector: true,
@@ -59,7 +59,7 @@ export async function setBuildConditionals(
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild = {
+  const coreBuild: d.BuildConditionals = {
     coreId: coreId,
     clientSide: true,
     isDev: !!config.devMode,
@@ -79,7 +79,7 @@ export async function setBuildConditionals(
     es5: false,
     cssVarShim: false,
     ssrServerSide: false,
-    shadowDom: false,
+    hasShadowDom: false,
     slotPolyfill: false,
     event: false,
     listener: false,
@@ -199,7 +199,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
     return;
   }
 
-  coreBuild.shadowDom = coreBuild.shadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
+  coreBuild.hasShadowDom = coreBuild.hasShadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
   coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);

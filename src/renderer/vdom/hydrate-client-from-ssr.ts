@@ -3,7 +3,7 @@ import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 
 
 export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
-  const allSsrElms: d.HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
+  const allSsrElms = rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`) as NodeListOf<d.HostElement>;
   const ilen = allSsrElms.length;
   let elm: d.HostElement,
       ssrVNodeId: string,
@@ -25,6 +25,10 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
         addChildSsrVNodes(domApi, elm.childNodes[j] as d.RenderNode, ssrVNode, ssrVNodeId, true);
       }
+    }
+
+    if (__BUILD_CONDITIONALS__.hasShadowDom) {
+      convertToShadowDom(domApi, rootElm as HTMLElement);
     }
   }
 }
@@ -57,7 +61,7 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
         }
 
         // add our child vnode to a specific index of the vnode's children
-        parentVNode.vchildren[<any>childVNodeSplt[1]] = childVNode;
+        parentVNode.vchildren[childVNodeSplt[1]] = childVNode;
 
         // this is now the new parent vnode for all the next child checks
         parentVNode = childVNode;
@@ -70,8 +74,9 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
     }
 
     // keep drilling down through the elements
-    for (let i = 0; i < node.childNodes.length; i++) {
-      addChildSsrVNodes(domApi, <any>node.childNodes[i], parentVNode, ssrVNodeId, checkNestedElements);
+    const childNodes = domApi.$childNodes(node) as NodeListOf<d.RenderNode>;
+    for (let i = 0; i < childNodes.length; i++) {
+      addChildSsrVNodes(domApi, childNodes[i], parentVNode, ssrVNodeId, checkNestedElements);
     }
 
   } else if (nodeType === NODE_TYPE.TextNode &&
@@ -95,7 +100,7 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
       }
 
       // add our child vnode to a specific index of the vnode's children
-      parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+      parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
     }
   }
 
@@ -121,8 +126,26 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
         }
 
         // add our child vnode to a specific index of the vnode's children
-        parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+        parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
       }
+    }
+  }
+}
+
+
+export function convertToShadowDom(domApi: d.DomApi, node: d.HostElement) {
+  const nodeType = domApi.$nodeType(node);
+
+  const vnodeId = domApi.$getAttribute(node, SSR_VNODE_ID);
+  if (vnodeId) {
+
+  }
+
+  if (nodeType === NODE_TYPE.ElementNode) {
+    // keep drilling down through the elements
+    const childNodes = domApi.$childNodes(node) as NodeListOf<d.HostElement>;
+    for (let i = 0; i < childNodes.length; i++) {
+      convertToShadowDom(domApi, childNodes[i]);
     }
   }
 }

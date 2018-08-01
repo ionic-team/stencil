@@ -25,7 +25,7 @@ export interface BuildConditionals {
   styles: boolean;
 
   // dom
-  shadowDom: boolean;
+  hasShadowDom: boolean;
   slotPolyfill: boolean;
 
   // vdom

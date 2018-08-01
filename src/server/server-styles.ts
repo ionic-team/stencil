@@ -20,6 +20,8 @@ export function serverInitStyle(domApi: d.DomApi, appliedStyleIds: Set<string>, 
 
   const styleElm = domApi.$createElement('style');
   styleElm.setAttribute('data-styles', '');
+  styleElm.setAttribute('data-ssr', cmpCtr.is);
+
   styleElm.innerHTML = cmpCtr.style;
 
   domApi.$appendChild(domApi.$doc.head, styleElm);

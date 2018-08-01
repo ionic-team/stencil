@@ -50,7 +50,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     }
   }
 
-  if (__BUILD_CONDITIONALS__.shadowDom) {
+  if (__BUILD_CONDITIONALS__.hasShadowDom) {
     if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom && !hostElm.shadowRoot) {
       // this component is using shadow dom
       // and this browser supports shadow dom

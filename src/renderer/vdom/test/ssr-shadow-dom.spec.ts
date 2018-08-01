@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { compareHtml, mockConfig, mockDomApi, mockHtml, mockPlatform  } from '../../../testing/mocks';
-import { createVNodesFromSsr } from '../ssr';
+import { createVNodesFromSsr } from '../hydrate-client-from-ssr';
 import { ENCAPSULATION, SSR_CHILD_ID, SSR_SHADOW_DOM, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
 import { hydrateHtml } from '../../../server/hydrate-html';
