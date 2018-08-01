@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID, SSR_SHADOW_DOM } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_SHADOW_DOM, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -22,11 +22,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) {
     newVNode = newParentVNode.vchildren[childIndex];
 
-<<<<<<< HEAD
-    if (Build.slotPolyfill && Build.hasSlot && !useNativeShadowDom) {
-=======
-    if (__BUILD_CONDITIONALS__.slotPolyfill && !useNativeShadowDom) {
->>>>>>> master
+    if (__BUILD_CONDITIONALS__.slotPolyfill && __BUILD_CONDITIONALS__.hasSlot && !useNativeShadowDom) {
       // remember for later we need to check to relocate nodes
       checkSlotRelocate = true;
 
@@ -54,10 +50,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       // create text node
       newVNode.elm = domApi.$createTextNode(newVNode.vtext) as any;
 
-<<<<<<< HEAD
-    } else if (Build.slotPolyfill && newVNode.isSlotReference) {
+    } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
 
-      if (Build.ssrServerSide && Build.hasSlot && Build.shadowDom && isShadowDomComponent) {
+      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot && __BUILD_CONDITIONALS__.shadowDom && isShadowDomComponent) {
         // create a slot reference html comment node for server side
         // when the client side hydrates it'll turn this html comment
         // into an actual <slot> element
@@ -67,11 +62,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         // create a slot reference html text node for client side
         newVNode.elm = domApi.$createTextNode('') as any;
       }
-=======
-    } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
-      // create a slot reference html text node
-      newVNode.elm = domApi.$createTextNode('') as any;
->>>>>>> master
 
     } else {
       // create element

@@ -1,13 +1,12 @@
 import * as d from '../../declarations';
+import { dashToPascalCase } from '../../util/helpers';
+import { generatePreamble, normalizePath } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import { getHyperScriptFnEsmFileName } from '../app/app-file-naming';
 import { RollupBuild } from 'rollup';
-import { dashToPascalCase } from '../../util/helpers';
-import { EntryModule } from '../../declarations';
-import { generatePreamble, normalizePath } from '../util';
 
 
-export async function writeEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: EntryModule[]) {
+export async function writeEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[]) {
   const path = config.sys.path;
 
   await Promise.all(

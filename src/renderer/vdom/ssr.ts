@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { Build } from '../../util/build-conditionals';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 
 
@@ -100,7 +99,7 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
     }
   }
 
-  if (Build.hasSlot) {
+  if (__BUILD_CONDITIONALS__.hasSlot) {
     if (nodeType === NODE_TYPE.CommentNode) {
       childVNodeSplt = domApi.$getTextContent(node).split('.');
       if (childVNodeSplt[0] === 'l' && childVNodeSplt[1] === ssrVNodeId) {
