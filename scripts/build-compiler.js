@@ -3,6 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const cp = require('child_process');
 const transpile = require('./transpile');
+const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
@@ -20,9 +21,20 @@ const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
 if (success) {
 
+  const buildConditionals = getDefaultBuildConditionals();
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    return all;
+  }, {});
+
   function bundleCompiler() {
     rollup.rollup({
       input: ENTRY_FILE,
+      plugins: [
+        rollupPluginReplace({
+          values: replaceObj
+        })
+      ],
       external: [
         'fs',
         'path',

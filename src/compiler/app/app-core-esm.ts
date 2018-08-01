@@ -3,7 +3,7 @@ import { buildCoreContent } from './build-core-content';
 import { generatePreamble } from '../util';
 import { getCoreEsmBuildPath, getGlobalEsmFileName } from './app-file-naming';
 import { generateAppGlobalScript } from './app-global-scripts';
-import { setBuildConditionals } from './build-conditionals';
+import { setBuildConditionals } from '../../util/build-conditionals';
 
 
 export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {

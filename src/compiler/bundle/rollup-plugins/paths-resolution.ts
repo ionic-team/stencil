@@ -13,12 +13,11 @@ export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerC
     name: 'pathsResolverPlugin',
 
     resolveId(importee: string, importer: string) {
-      importee = normalizePath(importee);
-      importer = normalizePath(importer);
-
       if (!importer) {
         return null;
       }
+      importee = normalizePath(importee);
+      importer = normalizePath(importer);
 
       const paths = tsCompilerOptions.paths || {};
 

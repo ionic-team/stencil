@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
-import { Build } from '../util/build-conditionals';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
@@ -31,11 +30,11 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   Context.document = doc;
   Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
-  if (Build.listener) {
+  if (__BUILD_CONDITIONALS__.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
-  if (Build.event) {
+  if (__BUILD_CONDITIONALS__.event) {
     Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
@@ -96,7 +95,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 
-  if (Build.browserModuleLoader) {
+  if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // if the HTML was generated from SSR
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);
@@ -116,7 +115,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         hydratedCssClass,
       );
 
-      if (Build.observeAttr) {
+      if (__BUILD_CONDITIONALS__.observeAttr) {
         // add which attributes should be observed
         const observedAttributes: string[] = HostElementConstructor.observedAttributes = [];
 
@@ -144,7 +143,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       queueUpdate(plt, elm);
 
 
-    } else if (Build.externalModuleLoader) {
+    } else if (__BUILD_CONDITIONALS__.externalModuleLoader) {
       // using a 3rd party bundler to import modules
       // at this point the cmpMeta will already have a
       // static function as a the bundleIds that returns the module
@@ -182,7 +181,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       });
 
 
-    } else if (Build.browserModuleLoader) {
+    } else if (__BUILD_CONDITIONALS__.browserModuleLoader) {
       // self loading module using built-in browser's import()
       // this is when not using a 3rd party bundler
       // and components are able to lazy load themselves
@@ -194,7 +193,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       const useScopedCss = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
       let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
 
-      if (Build.hotModuleReplacement && hmrVersionId) {
+      if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
         url += '?s-hmr=' + hmrVersionId;
       }
 
@@ -230,17 +229,17 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     }
   }
 
-  if (Build.styles) {
+  if (__BUILD_CONDITIONALS__.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
       attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 
-  if (Build.devInspector) {
+  if (__BUILD_CONDITIONALS__.devInspector) {
     generateDevInspector(App, namespace, win, plt);
   }
 
-  if (Build.browserModuleLoader) {
+  if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
     (App.components || [])

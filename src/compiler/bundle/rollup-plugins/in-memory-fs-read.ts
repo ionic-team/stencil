@@ -1,8 +1,9 @@
 import * as d from '../../../declarations';
+import { ENTRY_KEY_PREFIX } from '../../entries/entry-modules';
 import { normalizePath } from '../../util';
 
 
-export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules?: d.EntryModule[]) {
   const path = config.sys.path;
   const assetsCache: d.FilesMap = {};
   let tsFileNames: string[];
@@ -18,6 +19,17 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
       }
 
       const orgImportee = importee;
+
+      // Entry files live in inMemoryFs
+      if (path.basename(importee).startsWith(ENTRY_KEY_PREFIX) && entryModules) {
+        const bundle = entryModules.find(b => b.filePath === importee);
+        if (bundle) {
+          return bundle.filePath;
+        }
+
+        buildCtx.debug(`bundleEntryFilePlugin resolveId, unable to find entry key: ${importee}`);
+        buildCtx.debug(`entryModules entryKeys: ${entryModules.map(em => em.filePath).join(', ')}`);
+      }
 
       if (!path.isAbsolute(importee)) {
         importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);

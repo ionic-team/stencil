@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
-import { transpileCoreBuild } from '../transpile/core-build';
+import { transpileCoreBuild } from '../transpile/core-es5-build';
+import { replaceBuildString } from '../../util/text-manipulation';
 
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
@@ -8,22 +9,33 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
     return '';
   }
 
-  const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, coreContent);
+  // Replace all __BUILD_CONDITIONALS__ with the current coreBuild obj
+  const replaceObj = Object.keys(coreBuild).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = coreBuild[key];
+    return all;
+  }, <{ [key: string]: any}>{});
 
-  if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
-    buildCtx.diagnostics.push(...transpileResults.diagnostics);
-    return coreContent;
+  let replacedContent = replaceBuildString(coreContent, replaceObj);
+
+  // If this is an es5 build then transpile the code down to es5 using Typescript.
+  if (coreBuild.es5) {
+    const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, replacedContent);
+
+    if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
+      buildCtx.diagnostics.push(...transpileResults.diagnostics);
+      return replacedContent;
+    }
+
+    replacedContent = transpileResults.code;
   }
-
-  coreContent = transpileResults.code;
 
   const sourceTarget: d.SourceTarget = coreBuild.es5 ? 'es5' : 'es2017';
 
-  const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
+  const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, replacedContent);
 
   if (minifyResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...minifyResults.diagnostics);
-    return coreContent;
+    return replacedContent;
   }
 
   return minifyResults.output;

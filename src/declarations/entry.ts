@@ -3,6 +3,7 @@ import * as d from '.';
 
 export interface EntryModule {
   entryKey?: string;
+  filePath?: string;
   dependencies?: string[];
   moduleFiles: d.ModuleFile[];
   compiledModuleJsText?: string;

@@ -2,7 +2,8 @@ import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../d
 import { catchError } from '../util';
 import { createBundle } from './rollup-bundle';
 import { minifyJs } from '../minifier';
-import { writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
+import { writeEntryModules, writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
+import { ENTRY_KEY_PREFIX } from '../entries/entry-modules';
 
 
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
@@ -16,6 +17,8 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
     // no entry modules, so don't bother
     return results;
   }
+
+  await writeEntryModules(config, compilerCtx, entryModules);
 
   try {
     // run rollup, but don't generate yet
@@ -74,7 +77,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     }
 
     const promises = Object.keys(jsModuleList)
-      .filter(m => !m.startsWith('entry:'))
+      .filter(m => !m.startsWith(ENTRY_KEY_PREFIX))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
         if (!chunk || !chunk.code) {
