@@ -1,3 +1,5 @@
+// Adapted to TS from https://github.com/rollup/rollup-plugin-replace
+
 import MagicString, { SourceMap } from 'magic-string';
 
 function escape(str: string) {
