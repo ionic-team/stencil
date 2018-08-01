@@ -49,6 +49,7 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   const imports = `import { ${angularImports.sort().join(', ')} } from '@angular/core';`;
   const final: string[] = [
     '/* auto-generated angular directive proxies */',
+    '/* tslint:disable */',
     imports,
     auxFunctions.join('\n'),
     proxies,
@@ -158,7 +159,7 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
 export declare interface ${cmpMeta.componentClass} extends StencilComponents.${tagNameAsPascal} {}
-@Directive({${directiveOpts.join(', ')}})
+@Directive({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
