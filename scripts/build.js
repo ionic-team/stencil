@@ -1,19 +1,16 @@
 const fs = require('fs-extra');
 const path = require('path');
+const transpile = require('./transpile');
 const fork = require('child_process').fork;
-const execSync = require('child_process').execSync;
 
 const SCRIPTS_DIR = __dirname;
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
-
 const BUILD_ID = getBuildId();
 
 fs.removeSync(DIST_DIR);
-try {
-  execSync(`node ${path.join(SCRIPTS_DIR, 'build-build-conditionals.js')}`);
-} catch(e) {
-  console.log(e);
-}
+
+transpile(path.join('..', 'src', 'build-conditionals', 'tsconfig.json'));
+
 [
   'build-cli.js',
   'build-compiler.js',
