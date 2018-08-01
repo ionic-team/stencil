@@ -9,8 +9,11 @@ const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const BUILD_ID = getBuildId();
 
 fs.removeSync(DIST_DIR);
-
-execSync(`node ${path.join(SCRIPTS_DIR, 'build-build-conditionals.js')}`);
+try {
+  execSync(`node ${path.join(SCRIPTS_DIR, 'build-build-conditionals.js')}`);
+} catch(e) {
+  console.log(e);
+}
 [
   'build-cli.js',
   'build-compiler.js',
