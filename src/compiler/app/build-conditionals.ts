@@ -130,7 +130,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   if (!cmpMeta) return;
 
   if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
-    coreBuild.shadowDom = true;
+    coreBuild.hasShadowDom = true;
   } else {
     coreBuild.slotPolyfill = true;
   }

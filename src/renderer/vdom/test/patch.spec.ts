@@ -147,7 +147,7 @@ describe('renderer', () => {
       vnode0 = {};
       vnode0.elm = hostElm;
       hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null)), false, 'scoped').elm;
-      expect(hostElm.firstChild.classList.contains('sc-my-tag')).toBe(true);
+      expect(hostElm.firstChild.classList.contains('scs-my-tag')).toBe(true);
     });
 
   });

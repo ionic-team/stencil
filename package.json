@@ -128,7 +128,7 @@
     "transform": {
       "^.+\\.(ts|tsx)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
-    "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$",
+    "testRegex": "/Users/adam/git/stencil/src/renderer/vdom/test/hydrate-client-from-ssr.spec.ts",
     "testPathIgnorePatterns": [
       "/node_modules",
       "<rootDir>/test"

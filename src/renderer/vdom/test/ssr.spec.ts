@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { createRendererPatch } from '../patch';
-import { createVNodesFromSsr } from '../ssr';
+import { createVNodesFromSsr } from '../hydrate-client-from-ssr';
 import { SSR_CHILD_ID, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
 import { initHostSnapshot } from '../../../core/host-snapshot';

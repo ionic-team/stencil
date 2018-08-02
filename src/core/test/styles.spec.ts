@@ -170,7 +170,7 @@ describe('styles', () => {
 
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('sc-cmp-a');
+    expect(elm['s-sc']).toBe('scs-cmp-a');
   });
 
   it('should not set scope id if shadom and supports shadow dom', () => {
@@ -200,7 +200,7 @@ describe('styles', () => {
     elm.mode = undefined;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('sc-cmp-a');
+    expect(elm['s-sc']).toBe('scs-cmp-a');
   });
 
   it('should set scope id with mode set, but no style mode set', () => {
@@ -213,7 +213,7 @@ describe('styles', () => {
     elm.mode = 'md';
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('sc-cmp-a');
+    expect(elm['s-sc']).toBe('scs-cmp-a');
   });
 
   it('should set scope id with mode set and style mode set', () => {
@@ -233,7 +233,7 @@ describe('styles', () => {
     elm.mode = 'md';
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('sc-cmp-a-md');
+    expect(elm['s-sc']).toBe('scs-cmp-a-md');
   });
 
   it('should set scope id with no mode set and style mode set', () => {
@@ -253,7 +253,7 @@ describe('styles', () => {
     elm.mode = undefined;
     attachStyles(plt, domApi, cmpMeta, elm);
 
-    expect(elm['s-sc']).toBe('sc-cmp-a');
+    expect(elm['s-sc']).toBe('scs-cmp-a');
   });
 
   it('should append component styles template to head, with styleMode and scoped css', () => {

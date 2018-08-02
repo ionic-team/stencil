@@ -31,7 +31,7 @@ describe('hydrate', () => {
           }
           static get style() {
             return `
-              .sc-ion-test-h {
+              .scs-ion-test-h {
                 color: red;
               }
             `;
@@ -53,15 +53,15 @@ describe('hydrate', () => {
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
         <head>
-          <style data-styles="">
-            .sc-ion-test-h {
+          <style data-styles="" data-ssr="ion-test">
+            .scs-ion-test-h {
               color:red;
             }
           </style>
         </head>
         <body>
-          <ion-test class="sc-ion-test-h ${config.hydratedCssClass}" ssrv="0">
-            <div class="sc-ion-test" ssrc="0.0."></div>
+          <ion-test class="scs-ion-test-h ${config.hydratedCssClass}" ssrv="0">
+            <div class="scs-ion-test" ssrc="0.0."></div>
           </ion-test>
         </body>
       </html>

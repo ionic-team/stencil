@@ -21,7 +21,7 @@ describe('prerender index', () => {
 
   it('should pass properties down in prerendering', async () => {
     config = new TestingConfig();
-    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.hasShadowDom = false;
     __BUILD_CONDITIONALS__.slotPolyfill = true;
     __BUILD_CONDITIONALS__.ssrServerSide = true;
     config.buildAppCore = true;
@@ -72,7 +72,7 @@ describe('prerender index', () => {
 
   it('should prerender w/ defaults', async () => {
     config = new TestingConfig();
-    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.hasShadowDom = false;
     __BUILD_CONDITIONALS__.slotPolyfill = true;
     config.buildAppCore = true;
     config.flags.prerender = true;

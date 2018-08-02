@@ -187,7 +187,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -200,7 +200,7 @@ describe('build conditionals', () => {
       cmpMeta.stylesMeta = {};
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -213,7 +213,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: true,
+        hasShadowDom: true,
         slotPolyfill: false,
         event: false,
         listener: false,
@@ -226,7 +226,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -239,7 +239,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -253,7 +253,7 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.listener).toBeTruthy();
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: true,
@@ -266,7 +266,7 @@ describe('build conditionals', () => {
       cmpMeta.eventsMeta = [{ eventName: 'name' }];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: true,
         listener: false,
@@ -282,7 +282,7 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.element).toBeTruthy();
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -298,7 +298,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -314,7 +314,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -330,7 +330,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -347,7 +347,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -364,7 +364,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -381,7 +381,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -398,7 +398,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -414,7 +414,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,
@@ -426,7 +426,7 @@ describe('build conditionals', () => {
     it('should do nothing with no member meta', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
-        shadowDom: false,
+        hasShadowDom: false,
         slotPolyfill: true,
         event: false,
         listener: false,

@@ -52,7 +52,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
 
-      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot && __BUILD_CONDITIONALS__.shadowDom && isShadowDomComponent) {
+      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot && __BUILD_CONDITIONALS__.hasShadowDom && isShadowDomComponent) {
         // create a slot reference html comment node for server side
         // when the client side hydrates it'll turn this html comment
         // into an actual <slot> element

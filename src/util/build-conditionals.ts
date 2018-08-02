@@ -4,7 +4,7 @@ import { isTsFile } from '../compiler/util';
 
 
 export function getDefaultBuildConditionals(): d.BuildConditionals {
-  return {
+  const buildConditionals: d.BuildConditionals = {
     coreId: 'core',
     polyfills: false,
     cssVarShim: true,
@@ -41,6 +41,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     hydrateClientFromSsr: false,
     es5: false
   };
+  return buildConditionals;
 }
 
 export async function setBuildConditionals(

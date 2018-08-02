@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
-import { createVNodesFromSsr } from '../renderer/vdom/ssr';
+import { createVNodesFromSsr } from '../renderer/vdom/hydrate-client-from-ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
@@ -26,7 +26,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
-  if (__BUILD_CONDITIONALS__.isDev && __BUILD_CONDITIONALS__.shadowDom && domApi.$supportsShadowDom && customStyle) {
+  if (__BUILD_CONDITIONALS__.isDev && __BUILD_CONDITIONALS__.hasShadowDom && domApi.$supportsShadowDom && customStyle) {
     console.error('Unsupported browser. Native shadow-dom available but CSS Custom Properites are not.');
   }
 

@@ -21,7 +21,7 @@ describe('host-snapshot', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
-    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.hasShadowDom = false;
     __BUILD_CONDITIONALS__.slotPolyfill = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);

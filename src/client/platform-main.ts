@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
-import { createVNodesFromSsr } from '../renderer/vdom/ssr';
+import { createVNodesFromSsr } from '../renderer/vdom/hydrate-client-from-ssr';
 import { createQueueClient } from './queue-client';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';

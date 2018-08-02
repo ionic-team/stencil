@@ -184,71 +184,71 @@ describe('ShadowCss', function() {
   describe(('::slotted'), () => {
 
     it('should handle *', () => {
-      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-s > * {}');
+      const r = s('::slotted(*) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-s > * {}');
     });
 
     it('should handle * descendant', () => {
-      const r = s('::slotted(*) .my-class {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-s .my-class {}');
+      const r = s('::slotted(*) .my-class {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-s .my-class {}');
     });
 
     it('should handle :host complex selector', () => {
-      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-h > .scs-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle host-context complex selector', () => {
-      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-h.red > .scs-ion-tag-s > *:nth-of-type(2n - 1), .red .scs-ion-tag-h > .scs-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle left side selector', () => {
-      const r = s('div::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('div.sc-ion-tag-s > ul {}');
+      const r = s('div::slotted(ul) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('div.scs-ion-tag-s > ul {}');
     });
 
     it('should handle tag selector', () => {
-      const r = s('::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-s > ul {}');
+      const r = s('::slotted(ul) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-s > ul {}');
     });
 
     it('should handle class selector', () => {
-      const r = s('::slotted(.foo) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-s > .foo {}');
+      const r = s('::slotted(.foo) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-s > .foo {}');
     });
 
     it('should handle multiple selector', () => {
-      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
-      expect(r).toEqual('.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+      const r = s('::slotted(ul), ::slotted(li) {}', 'scs-ion-tag', 'scs-ion-tag-h', 'scs-ion-tag-s');
+      expect(r).toEqual('.scs-ion-tag-s > ul, .scs-ion-tag-s > li {}');
     });
 
   });
 
   describe('getScopeId', () => {
     it('should work without mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' })).toBe('sc-my-tag');
+      expect(getScopeId({ tagNameMeta: 'my-tag' })).toBe('scs-my-tag');
     });
 
     it('should work with default mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' }, DEFAULT_STYLE_MODE)).toBe('sc-my-tag');
+      expect(getScopeId({ tagNameMeta: 'my-tag' }, DEFAULT_STYLE_MODE)).toBe('scs-my-tag');
     });
 
     it('should work with md mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' }, 'md')).toBe('sc-my-tag-md');
+      expect(getScopeId({ tagNameMeta: 'my-tag' }, 'md')).toBe('scs-my-tag-md');
     });
   });
 
 
   describe('getElementScopeId, host', () => {
     it('should add -h suffix', () => {
-      expect(getElementScopeId('sc-my-tag', true)).toBe('sc-my-tag-h');
+      expect(getElementScopeId('scs-my-tag', true)).toBe('scs-my-tag-h');
     });
   });
 
   describe('getElementScopeId, slot', () => {
     it('should add -s suffix', () => {
-      expect(getElementScopeId('sc-my-tag')).toBe('sc-my-tag-s');
+      expect(getElementScopeId('scs-my-tag')).toBe('scs-my-tag-s');
     });
   });
 

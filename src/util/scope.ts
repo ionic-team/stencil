@@ -3,7 +3,7 @@ import { DEFAULT_STYLE_MODE } from './constants';
 
 
 export function getScopeId(cmpMeta: d.ComponentMeta, mode?: string) {
-  return ('sc-' + cmpMeta.tagNameMeta) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
+  return ('scs-' + cmpMeta.tagNameMeta) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
 }
 
 
