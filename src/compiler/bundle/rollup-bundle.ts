@@ -46,6 +46,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
   const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
 
   const rollupConfig: RollupDirOptions = {
+    ...config.rollupConfig.inputOptions,
     input: entryModules.map(b => b.filePath),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,

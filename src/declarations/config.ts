@@ -110,6 +110,7 @@ export interface StencilConfig {
   cacheDir?: string;
   commonjs?: BundlingConfig;
   nodeResolve?: NodeResolveConfig;
+  rollupConfig?: RollupConfig;
   devInspector?: boolean;
   devMode?: boolean;
   devServer?: d.DevServerConfig;
@@ -143,6 +144,19 @@ export interface Config extends StencilConfig {
   _isTesting?: boolean;
 }
 
+export interface RollupConfig {
+  inputOptions?: RollupInputOptions;
+  outputOptions?: RollupOutputOptions;
+}
+
+export interface RollupInputOptions {
+  context?: string;
+  moduleContext?: string | ((id: string) => string) | { [id: string]: string };
+}
+
+export interface RollupOutputOptions {
+  globals?: { [name: string]: string } | ((name: string) => string);
+}
 
 export interface BundlingConfig {
   namedExports?: {
