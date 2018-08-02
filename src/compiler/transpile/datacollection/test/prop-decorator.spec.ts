@@ -34,7 +34,7 @@ describe('props decorator', () => {
           name: 'objectAnyThing',
           type: '(_: any) => any',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Unknown,
         reflectToAttrib: false
       },
@@ -50,7 +50,7 @@ describe('props decorator', () => {
           name: 'size',
           type: 'string',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,
         reflectToAttrib: false
       },
@@ -65,7 +65,7 @@ describe('props decorator', () => {
           name: 'withOptions',
           type: 'number',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: true
       },
@@ -81,7 +81,7 @@ describe('props decorator', () => {
           name: 'width',
           type: 'number',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: false
       },
@@ -97,7 +97,7 @@ describe('props decorator', () => {
           name: 'setting',
           type: `"auto" | "manual"`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,
         reflectToAttrib: false
       },
@@ -113,7 +113,7 @@ describe('props decorator', () => {
           name: 'values',
           type: `number | {}`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: false
       },
@@ -129,7 +129,7 @@ describe('props decorator', () => {
           name: 'enabled',
           type: `string | boolean`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Any,
         reflectToAttrib: false
       },

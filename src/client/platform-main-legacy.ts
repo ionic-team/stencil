@@ -71,6 +71,9 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
     requestBundle: requestBundle,
+    isAppLoaded: false,
+    activeRender: false,
+    tmpDisconnected: false,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),

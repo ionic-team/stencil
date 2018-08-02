@@ -301,39 +301,37 @@ export interface ComponentAppliedStyles {
 export type OnReadyCallback = ((elm: d.HostElement) => void);
 
 
-export interface ComponentHostData {
+export type ComponentHostData = [
   /**
    * tag name (ion-badge)
    */
-  [0]: string;
+  string,
 
   /**
    * map of bundle ids
    */
-  [1]: {
-    [modeName: string]: any[];
-  };
+  BundleIds,
 
   /**
    * has styles
    */
-  [2]: boolean;
+  boolean,
 
   /**
    * members
    */
-  [3]: ComponentMemberData[];
+  ComponentMemberData[],
 
   /**
    * encapsulated
    */
-  [4]: number;
+  number,
 
   /**
    * listeners
    */
-  [5]: ComponentListenersData[];
-}
+  ComponentListenersData[]
+];
 
 
 export interface ComponentMemberData {

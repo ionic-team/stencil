@@ -63,6 +63,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
     requestBundle,
+    activeRender: false,
+    isAppLoaded: false,
+    tmpDisconnected: false,
+    attachStyles: (__BUILD_CONDITIONALS__.styles) ? attachStyles : undefined,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -103,33 +107,30 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
 
-    if (!win.customElements.get(cmpMeta.tagNameMeta)) {
+    const tagNameMeta = cmpMeta.tagNameMeta;
+
+    if (!win.customElements.get(tagNameMeta)) {
 
       // define the custom element
       // initialize the members on the host element prototype
       // keep a ref to the metadata with the tag as the key
       initHostElement(
         plt,
-        (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
+        (cmpRegistry[tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
         hydratedCssClass,
       );
 
       if (__BUILD_CONDITIONALS__.observeAttr) {
         // add which attributes should be observed
-        const observedAttributes: string[] = HostElementConstructor.observedAttributes = [];
-
         // at this point the membersMeta only includes attributes which should
         // be observed, it does not include all props yet, so it's safe to
         // loop through all of the props (attrs) and observed them
-        for (const propName in cmpMeta.membersMeta) {
-          if (cmpMeta.membersMeta[propName].attribName) {
-            observedAttributes.push(
-              // add this attribute to our array of attributes we need to observe
-              cmpMeta.membersMeta[propName].attribName
-            );
-          }
-        }
+        // set the array of all the attributes to keep an eye on
+        // https://www.youtube.com/watch?v=RBs21CFBALI
+        HostElementConstructor.observedAttributes = Object.values(cmpMeta.membersMeta)
+          .map(member => member.attribName)
+          .filter(attribName => !!attribName);
       }
 
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
@@ -137,7 +138,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
 
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+  async function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
       queueUpdate(plt, elm);
@@ -186,9 +187,9 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // this is when not using a 3rd party bundler
       // and components are able to lazy load themselves
       // through standardized browser APIs
-      const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
-                        cmpMeta.bundleIds :
-                        (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
+      const bundleId = (typeof cmpMeta.bundleIds === 'string')
+        ? cmpMeta.bundleIds
+        : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
       const useScopedCss = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
       let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
@@ -197,42 +198,30 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         url += '?s-hmr=' + hmrVersionId;
       }
 
-      // dynamic es module import() => woot!
-      __import(url).then(importedModule => {
-        // async loading of the module is done
-        try {
-          // get the component constructor from the module
-          // initialize this component constructor's styles
-          // it is possible for the same component to have difficult styles applied in the same app
-          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
-          initStyleTemplate(
-            domApi,
-            cmpMeta,
-            cmpMeta.encapsulationMeta,
-            cmpMeta.componentConstructor.style,
-            cmpMeta.componentConstructor.styleMode
-          );
+      try {
+        // dynamic es module import() => woot!
+        const importedModule = await __import(url);
 
-        } catch (e) {
-          // oh man, something's up
-          console.error(e);
-
-          // provide a bogus component constructor
-          // so the rest of the app acts as normal
-          cmpMeta.componentConstructor = class {} as any;
-        }
+        // get the component constructor from the module
+        // initialize this component constructor's styles
+        // it is possible for the same component to have difficult styles applied in the same app
+        cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+        initStyleTemplate(
+          domApi,
+          cmpMeta,
+          cmpMeta.encapsulationMeta,
+          cmpMeta.componentConstructor.style,
+          cmpMeta.componentConstructor.styleMode
+        );
 
         // bundle all loaded up, let's continue
         queueUpdate(plt, elm);
 
-      }).catch(err => console.error(err, url));
+      } catch (e) {
+        // oh man, something's up
+        console.error(e);
+      }
     }
-  }
-
-  if (__BUILD_CONDITIONALS__.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
-      attachStyles(plt, domApi, cmpMeta, elm);
-    };
   }
 
   if (__BUILD_CONDITIONALS__.devInspector) {
@@ -243,10 +232,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
     (App.components || [])
-      .map(data => {
-        const cmpMeta = parseComponentLoader(data);
-        return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
-      })
+      .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
   }
 

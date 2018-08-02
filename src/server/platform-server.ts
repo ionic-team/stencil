@@ -84,6 +84,8 @@ export function createPlatformServer(
     getContextItem,
     isDefinedComponent,
     onError,
+    activeRender: false,
+    isAppLoaded: false,
     nextId: () => config.namespace + (ids++),
     propConnect,
     queue: (Context.queue = createQueueServer()),

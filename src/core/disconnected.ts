@@ -32,9 +32,9 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
       // call instance componentDidUnload
       // if we've created an instance for this
       const instance = plt.instanceMap.get(elm);
-      if (instance) {
+      if (instance && instance.componentDidUnload) {
         // call the user's componentDidUnload if there is one
-        instance.componentDidUnload && instance.componentDidUnload();
+        instance.componentDidUnload();
       }
     }
 

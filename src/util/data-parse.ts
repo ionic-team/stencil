@@ -3,47 +3,44 @@ import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
-export function parseComponentLoader(cmpData: d.ComponentHostData, i?: number, d?: d.ComponentMemberData) {
+export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.ComponentMeta {
   // tag name will always be lower case
-  const cmpMeta: d.ComponentMeta = {
-    tagNameMeta: cmpData[0],
-    membersMeta: {
-      // every component defaults to always have
-      // the mode and color properties
-      // but only color should observe any attribute changes
-      'color': { attribName: 'color' }
-    }
-  };
-
-  // map of the bundle ids
-  // can contain modes, and array of esm and es5 bundle ids
-  cmpMeta.bundleIds = cmpData[1] as any;
-
   // parse member meta
   // this data only includes props that are attributes that need to be observed
   // it does not include all of the props yet
-  const memberData = cmpData[3];
+  const [tagNameMeta, bundleIds, , memberData, encapsulationMeta, listenerMeta] = cmpRegistryData;
+
+  const membersMeta: any = {
+    // every component defaults to always have
+    // the mode and color properties
+    // but only color should observe any attribute changes
+    'color': { attribName: 'color' }
+  };
   if (memberData) {
-    for (i = 0; i < memberData.length; i++) {
-      d = memberData[i];
-      cmpMeta.membersMeta[d[0]] = {
+    for (let i = 0; i < memberData.length; i++) {
+      const d = memberData[i];
+      membersMeta[d[0]] = {
         memberType: d[1],
         reflectToAttrib: !!d[2],
-        attribName: typeof d[3] === 'string' ? d[3] as string : d[3] ? d[0] : 0 as any,
+        attribName: typeof d[3] === 'string' ? d[3] : d[3] ? d[0] : 0 as any,
         propType: d[4]
       };
     }
   }
+  return {
+    tagNameMeta,
 
-  // encapsulation
-  cmpMeta.encapsulationMeta = cmpData[4];
+    // map of the bundle ids
+    // can contain modes, and array of esm and es5 bundle ids
+    bundleIds,
+    membersMeta: { ...membersMeta },
 
-  if (cmpData[5]) {
+    // encapsulation
+    encapsulationMeta,
+
     // parse listener meta
-    cmpMeta.listenersMeta = cmpData[5].map(parseListenerData);
-  }
-
-  return cmpMeta;
+    listenersMeta: listenerMeta ? listenerMeta.map(parseListenerData) : undefined
+  };
 }
 
 function parseListenerData(listenerData: d.ComponentListenersData) {

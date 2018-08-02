@@ -16,6 +16,18 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     App.raf = win.requestAnimationFrame.bind(win);
   }
 
+  function queueTask(queue: d.RafCallback[]) {
+    return (cb: d.RafCallback) => {
+      // queue dom reads
+      queue.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        App.raf(flush);
+      }
+    };
+  }
+
   function consume(queue: d.RafCallback[]) {
     for (let i = 0; i < queue.length; i++) {
       try {
@@ -85,24 +97,8 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
       }
     },
 
-    read(cb: d.RafCallback) {
-      // queue dom reads
-      domReads.push(cb);
+    read: queueTask(domReads),
+    write: queueTask(domWrites),
 
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    },
-
-    write(cb: d.RafCallback) {
-      // queue dom writes
-      domWrites.push(cb);
-
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    }
   };
 }

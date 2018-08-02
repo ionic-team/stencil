@@ -8,8 +8,6 @@ export function proxyComponentInstance(
   elm: d.HostElement,
   instance: d.ComponentInstance,
   hostSnapshot: d.HostSnapshot,
-  properties?: d.ComponentConstructorProperties,
-  memberName?: string
 ) {
   // at this point we've got a specific node of a host element, and created a component class instance
   // and we've already created getters/setters on both the host element and component class prototypes
@@ -27,15 +25,12 @@ export function proxyComponentInstance(
 
   // get the properties from the constructor
   // and add default "mode" and "color" properties
-  properties = Object.assign({
-    color: { type: String }
-  }, cmpConstructor.properties);
-
-  // always set mode
-  properties.mode = { type: String };
-
-  // define each of the members and initialize what their role is
-  for (memberName in properties) {
-    defineMember(plt, properties[memberName], elm, instance, memberName, hostSnapshot);
-  }
+  Object.entries({
+    color: { type: String },
+    ...cmpConstructor.properties,
+    mode: { type: String },
+  }).forEach(([memberName, property]) => {
+    // define each of the members and initialize what their role is
+    defineMember(plt, property, elm, instance, memberName, hostSnapshot);
+  });
 }
