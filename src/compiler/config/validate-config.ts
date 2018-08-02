@@ -8,6 +8,7 @@ import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateWorkers } from './validate-workers';
+import { validateRollupConfig } from './validate-rollup-config';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
@@ -131,6 +132,8 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   if (setEnvVariables !== false) {
     setProcessEnvironment(config);
   }
+
+  validateRollupConfig(config);
 
   return config;
 }

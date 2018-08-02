@@ -28,6 +28,7 @@ export async function writeEntryModules(config: d.Config, compilerCtx: d.Compile
 
 export async function writeEsModules(config: d.Config, rollupBundle: RollupBuild) {
   const { output } = await rollupBundle.generate({
+    ...config.rollupConfig.outputOptions,
     format: 'es',
     banner: generatePreamble(config),
     intro: `const { h } = window.${config.namespace};`,
@@ -51,6 +52,7 @@ export async function writeLegacyModules(config: d.Config, rollupBundle: RollupB
   });
 
   const { output } = await rollupBundle.generate({
+    ...config.rollupConfig.outputOptions,
     format: 'amd',
     amd: {
       id: getBundleIdPlaceholder(),
@@ -68,6 +70,7 @@ export async function writeLegacyModules(config: d.Config, rollupBundle: RollupB
 export async function writeEsmEs5Modules(config: d.Config, rollupBundle: RollupBuild) {
   if (config.outputTargets.some(o => o.type === 'dist')) {
     const { output } = await rollupBundle.generate({
+      ...config.rollupConfig.outputOptions,
       format: 'es',
       banner: generatePreamble(config),
       intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
