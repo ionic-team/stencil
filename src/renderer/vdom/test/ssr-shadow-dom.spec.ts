@@ -125,56 +125,54 @@ describe('ssr shadow dom', () => {
 
     expect(ssrResults.diagnostics).toHaveLength(0);
 
-    // expect(compareHtml(ssrResults.html)).toEqual(compareHtml(`
-    //   <html dir="ltr" data-ssr="">
-    //     <head></head>
-    //     <body>
-    //       <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrsd="" ssrh="0">
-    //         <header class="scs-cmp-a" ssrc="0.0">
-    //           <!--s.0.0-->
-    //             cmp-a shadow-dom
-    //           <!--/-->
-    //         </header>
-    //         <!--l.0.1.-->
-    //         <!--ssrld.0.1-->
-    //           cmp-a light-dom top
-    //         <!--/ssrld.0.1-->
-    //         <cmp-b ssrld="0.4" class="scs-cmp-b-h hydrated" ssrsd="" ssrh="1">
-    //           <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
-    //             <!--l.1.0.-->
-    //             <article ssrld="1.2">
-    //               cmp-b light-dom
-    //             </article>
-    //             <section class="scs-cmp-b" ssrc="1.1">
-    //               <!--s.1.0-->
-    //                 cmp-bshadow-dom
-    //               <!--/-->
-    //             </section>
-    //             <!--l.1.2.named-slot-->
-    //             <nav slot="named-slot" ssrld="1.4">
-    //               cmp-b light-dom
-    //             </nav>
-    //             <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrc="1.3" ssrsd="" ssrh="2">
-    //               <!--s.1.0-->
-    //                 <!--ssrld.2.2-->
-    //                   cmp-c light-dom
-    //                 <!--/ssrld.2.2-->
-    //               <!--/-->
-    //               <footer class="scs-cmp-c" ssrc="2.0">
-    //                 <!--s.2.0-->
-    //                   cmp-c shadow-dom
-    //                 <!--/-->
-    //               </footer>
-    //             </cmp-c>
-    //           </div>
-    //         </cmp-b>
-    //         <span ssrld="0.6">
-    //           cmp-a light-dom bottom
-    //         </span>
-    //       </cmp-a>
-    //     </body>
-    //   </html>
-    // `));
+    expect(compareHtml(ssrResults.html)).toEqual(compareHtml(`
+      <html dir="ltr" data-ssr="">
+        <head></head>
+        <body>
+          <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="0">
+            <header class="scs-cmp-a" ssrc="0.0">
+              <!--s.0.0-->
+                cmp-a shadow-dom
+              <!--/-->
+            </header>
+            <!--s.0.1-->
+            <!--l.0.1-->
+              cmp-a light-dom top
+            <cmp-b ssrl="0.3" class="scs-cmp-b-h hydrated" ssrh="1">
+              <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
+                <!--s.1.0-->
+                <article ssrl="1.2">
+                  cmp-b light-dom
+                </article>
+                <section class="scs-cmp-b" ssrc="1.1">
+                  <!--s.1.0-->
+                    cmp-bshadow-dom
+                  <!--/-->
+                </section>
+                <!--s.1.2.named-slot-->
+                <nav slot="named-slot" ssrl="1.4">
+                  cmp-b light-dom
+                </nav>
+                <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrc="1.3" ssrh="2">
+                  <!--s.1.0-->
+                    <!--l.2.2-->
+                      cmp-c light-dom
+                  <!--/-->
+                  <footer class="scs-cmp-c" ssrc="2.0">
+                    <!--s.2.0-->
+                      cmp-c shadow-dom
+                    <!--/-->
+                  </footer>
+                </cmp-c>
+              </div>
+            </cmp-b>
+            <span ssrl="0.5">
+              cmp-a light-dom bottom
+            </span>
+          </cmp-a>
+        </body>
+      </html>
+    `));
 
     const hydratedRoot = mockHtml('<div>' + ssrResults.html + '</div>');
 
@@ -186,11 +184,11 @@ describe('ssr shadow dom', () => {
     // expect(cmpASsrVnode.elm).toBe(cmpAElm);
     // isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
-    const cmpBElm = hydratedRoot.querySelector('cmp-b') as d.HostElement;
-    const cmpBSsrVnode = plt.vnodeMap.get(cmpBElm);
-    expect(cmpBSsrVnode.vtag).toBe('cmp-b');
-    expect(cmpBSsrVnode.elm).toBe(cmpBElm);
-    isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
+    // const cmpBElm = hydratedRoot.querySelector('cmp-b') as d.HostElement;
+    // const cmpBSsrVnode = plt.vnodeMap.get(cmpBElm);
+    // expect(cmpBSsrVnode.vtag).toBe('cmp-b');
+    // expect(cmpBSsrVnode.elm).toBe(cmpBElm);
+    // isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
 
     // const cmpCElm = hydratedRoot.querySelector('cmp-c') as d.HostElement;
     // const cmpCSsrVnode = plt.vnodeMap.get(cmpCElm);

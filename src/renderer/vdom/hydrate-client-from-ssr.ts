@@ -191,7 +191,7 @@ export function upgradeShadowDomComponents(domApi: d.DomApi, node: d.HostElement
 
     const ssrHostId = domApi.$getAttribute(node, SSR_HOST_ID);
     console.log('\n\n\n\n\n', ssrHostId, '\n\n\n\n\n')
-    if (ssrHostId && ssrHostId.includes('.s')) {
+    if (ssrHostId && ssrHostId.includes(SSR_SHADOW_DOM_HOST_ID)) {
       // attach a shadow root to the host element
       const shadowRoot = domApi.$attachShadow(node, { mode: 'open' });
 

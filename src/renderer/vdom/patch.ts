@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -56,7 +56,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         // create a slot reference html comment node for server side
         // when the client side hydrates it'll turn this html comment
         // into an actual <slot> element
-        newVNode.elm = domApi.$createComment('l.' + ssrId + '.' + childIndex + '.' + (newVNode.vname || '')) as any;
+        newVNode.elm = domApi.$createComment(`${SSR_SLOT_NODE_COMMENT}.${ssrId}.${childIndex}${newVNode.vname ? '.' + newVNode.vname : ''}`) as any;
 
       } else {
         // create a slot reference html text node for client side
