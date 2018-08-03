@@ -11,10 +11,11 @@ export {
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
-  QueueApi
+  QueueApi,
+  JSX
 } from './declarations/index';
 
-
+export { h } from './renderer/vdom';
 /**
  * Build
  */
