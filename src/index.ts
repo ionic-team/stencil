@@ -12,7 +12,8 @@ export {
   EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSX
+  JSX,
+  JSXElements
 } from './declarations/index';
 
 export { h } from './renderer/vdom';

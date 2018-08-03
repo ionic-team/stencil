@@ -1,128 +1,135 @@
 export type CssClassMap = { [className: string]: boolean };
 
-export declare namespace JSX {
-  interface Element { }
-  interface IntrinsicElements {
+declare global {
+  interface HTMLStencilElement extends HTMLElement {
+    componentOnReady(): Promise<this>;
+    forceUpdate(): void;
+  }
+}
+
+export namespace JSX {
+  export interface Element {}
+  export interface IntrinsicElements {
     // Stencil elements
     slot: JSXElements.SlotAttributes;
 
     // HTML
-    a: JSXElements.AnchorHTMLAttributes;
+    a: JSXElements.AnchorHTMLAttributes<HTMLAnchorElement>;
     abbr: JSXElements.HTMLAttributes;
     address: JSXElements.HTMLAttributes;
-    area: JSXElements.AreaHTMLAttributes;
+    area: JSXElements.AreaHTMLAttributes<HTMLAreaElement>;
     article: JSXElements.HTMLAttributes;
     aside: JSXElements.HTMLAttributes;
-    audio: JSXElements.AudioHTMLAttributes;
+    audio: JSXElements.AudioHTMLAttributes<HTMLAudioElement>;
     b: JSXElements.HTMLAttributes;
-    base: JSXElements.BaseHTMLAttributes;
+    base: JSXElements.BaseHTMLAttributes<HTMLBaseElement>;
     bdi: JSXElements.HTMLAttributes;
     bdo: JSXElements.HTMLAttributes;
     big: JSXElements.HTMLAttributes;
-    blockquote: JSXElements.BlockquoteHTMLAttributes;
-    body: JSXElements.HTMLAttributes;
-    br: JSXElements.HTMLAttributes;
-    button: JSXElements.ButtonHTMLAttributes;
-    canvas: JSXElements.CanvasHTMLAttributes;
-    caption: JSXElements.HTMLAttributes;
+    blockquote: JSXElements.BlockquoteHTMLAttributes<HTMLQuoteElement>;
+    body: JSXElements.HTMLAttributes<HTMLBodyElement>;
+    br: JSXElements.HTMLAttributes<HTMLBRElement>;
+    button: JSXElements.ButtonHTMLAttributes<HTMLButtonElement>;
+    canvas: JSXElements.CanvasHTMLAttributes<HTMLCanvasElement>;
+    caption: JSXElements.HTMLAttributes<HTMLTableCaptionElement>;
     cite: JSXElements.HTMLAttributes;
     code: JSXElements.HTMLAttributes;
-    col: JSXElements.ColHTMLAttributes;
-    colgroup: JSXElements.ColgroupHTMLAttributes;
-    data: JSXElements.HTMLAttributes;
-    datalist: JSXElements.HTMLAttributes;
+    col: JSXElements.ColHTMLAttributes<HTMLTableColElement>;
+    colgroup: JSXElements.ColgroupHTMLAttributes<HTMLTableColElement>;
+    data: JSXElements.HTMLAttributes<HTMLDataElement>;
+    datalist: JSXElements.HTMLAttributes<HTMLDataListElement>;
     dd: JSXElements.HTMLAttributes;
-    del: JSXElements.DelHTMLAttributes;
-    details: JSXElements.DetailsHTMLAttributes;
+    del: JSXElements.DelHTMLAttributes<HTMLModElement>;
+    details: JSXElements.DetailsHTMLAttributes<HTMLElement>;
     dfn: JSXElements.HTMLAttributes;
-    dialog: JSXElements.DialogHTMLAttributes;
-    div: JSXElements.HTMLAttributes;
-    dl: JSXElements.HTMLAttributes;
+    dialog: JSXElements.DialogHTMLAttributes<HTMLDialogElement>;
+    div: JSXElements.HTMLAttributes<HTMLDivElement>;
+    dl: JSXElements.HTMLAttributes<HTMLDListElement>;
     dt: JSXElements.HTMLAttributes;
     em: JSXElements.HTMLAttributes;
-    embed: JSXElements.EmbedHTMLAttributes;
-    fieldset: JSXElements.FieldsetHTMLAttributes;
+    embed: JSXElements.EmbedHTMLAttributes<HTMLEmbedElement>;
+    fieldset: JSXElements.FieldsetHTMLAttributes<HTMLFieldSetElement>;
     figcaption: JSXElements.HTMLAttributes;
     figure: JSXElements.HTMLAttributes;
     footer: JSXElements.HTMLAttributes;
-    form: JSXElements.FormHTMLAttributes;
-    h1: JSXElements.HTMLAttributes;
-    h2: JSXElements.HTMLAttributes;
-    h3: JSXElements.HTMLAttributes;
-    h4: JSXElements.HTMLAttributes;
-    h5: JSXElements.HTMLAttributes;
-    h6: JSXElements.HTMLAttributes;
-    head: JSXElements.HTMLAttributes;
+    form: JSXElements.FormHTMLAttributes<HTMLFormElement>;
+    h1: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h2: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h3: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h4: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h5: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h6: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    head: JSXElements.HTMLAttributes<HTMLHeadElement>;
     header: JSXElements.HTMLAttributes;
     hgroup: JSXElements.HTMLAttributes;
-    hr: JSXElements.HTMLAttributes;
-    html: JSXElements.HTMLAttributes;
+    hr: JSXElements.HTMLAttributes<HTMLHRElement>;
+    html: JSXElements.HTMLAttributes<HTMLHtmlElement>;
     i: JSXElements.HTMLAttributes;
-    iframe: JSXElements.IframeHTMLAttributes;
-    img: JSXElements.ImgHTMLAttributes;
-    input: JSXElements.InputHTMLAttributes;
-    ins: JSXElements.InsHTMLAttributes;
+    iframe: JSXElements.IframeHTMLAttributes<HTMLIFrameElement>;
+    img: JSXElements.ImgHTMLAttributes<HTMLImageElement>;
+    input: JSXElements.InputHTMLAttributes<HTMLInputElement>;
+    ins: JSXElements.InsHTMLAttributes<HTMLModElement>;
     kbd: JSXElements.HTMLAttributes;
-    keygen: JSXElements.KeygenHTMLAttributes;
-    label: JSXElements.LabelHTMLAttributes;
-    legend: JSXElements.HTMLAttributes;
-    li: JSXElements.LiHTMLAttributes;
-    link: JSXElements.LinkHTMLAttributes;
+    keygen: JSXElements.KeygenHTMLAttributes<HTMLElement>;
+    label: JSXElements.LabelHTMLAttributes<HTMLLabelElement>;
+    legend: JSXElements.HTMLAttributes<HTMLLegendElement>;
+    li: JSXElements.LiHTMLAttributes<HTMLLIElement>;
+    link: JSXElements.LinkHTMLAttributes<HTMLLinkElement>;
     main: JSXElements.HTMLAttributes;
-    map: JSXElements.MapHTMLAttributes;
+    map: JSXElements.MapHTMLAttributes<HTMLMapElement>;
     mark: JSXElements.HTMLAttributes;
-    menu: JSXElements.MenuHTMLAttributes;
+    menu: JSXElements.MenuHTMLAttributes<HTMLMenuElement>;
     menuitem: JSXElements.HTMLAttributes;
-    meta: JSXElements.MetaHTMLAttributes;
-    meter: JSXElements.MeterHTMLAttributes;
+    meta: JSXElements.MetaHTMLAttributes<HTMLMetaElement>;
+    meter: JSXElements.MeterHTMLAttributes<HTMLMeterElement>;
     nav: JSXElements.HTMLAttributes;
     noscript: JSXElements.HTMLAttributes;
-    object: JSXElements.ObjectHTMLAttributes;
-    ol: JSXElements.OlHTMLAttributes;
-    optgroup: JSXElements.OptgroupHTMLAttributes;
-    option: JSXElements.OptionHTMLAttributes;
-    output: JSXElements.OutputHTMLAttributes;
-    p: JSXElements.HTMLAttributes;
-    param: JSXElements.ParamHTMLAttributes;
-    picture: JSXElements.HTMLAttributes;
-    pre: JSXElements.HTMLAttributes;
-    progress: JSXElements.ProgressHTMLAttributes;
-    q: JSXElements.QuoteHTMLAttributes;
+    object: JSXElements.ObjectHTMLAttributes<HTMLObjectElement>;
+    ol: JSXElements.OlHTMLAttributes<HTMLOListElement>;
+    optgroup: JSXElements.OptgroupHTMLAttributes<HTMLOptGroupElement>;
+    option: JSXElements.OptionHTMLAttributes<HTMLOptionElement>;
+    output: JSXElements.OutputHTMLAttributes<HTMLOutputElement>;
+    p: JSXElements.HTMLAttributes<HTMLParagraphElement>;
+    param: JSXElements.ParamHTMLAttributes<HTMLParamElement>;
+    picture: JSXElements.HTMLAttributes<HTMLPictureElement>;
+    pre: JSXElements.HTMLAttributes<HTMLPreElement>;
+    progress: JSXElements.ProgressHTMLAttributes<HTMLProgressElement>;
+    q: JSXElements.QuoteHTMLAttributes<HTMLQuoteElement>;
     rp: JSXElements.HTMLAttributes;
     rt: JSXElements.HTMLAttributes;
     ruby: JSXElements.HTMLAttributes;
     s: JSXElements.HTMLAttributes;
     samp: JSXElements.HTMLAttributes;
-    script: JSXElements.ScriptHTMLAttributes;
+    script: JSXElements.ScriptHTMLAttributes<HTMLScriptElement>;
     section: JSXElements.HTMLAttributes;
-    select: JSXElements.SelectHTMLAttributes;
+    select: JSXElements.SelectHTMLAttributes<HTMLSelectElement>;
     small: JSXElements.HTMLAttributes;
-    source: JSXElements.SourceHTMLAttributes;
-    span: JSXElements.HTMLAttributes;
+    source: JSXElements.SourceHTMLAttributes<HTMLSourceElement>;
+    span: JSXElements.HTMLAttributes<HTMLSpanElement>;
     strong: JSXElements.HTMLAttributes;
-    style: JSXElements.StyleHTMLAttributes;
+    style: JSXElements.StyleHTMLAttributes<HTMLStyleElement>;
     sub: JSXElements.HTMLAttributes;
     summary: JSXElements.HTMLAttributes;
     sup: JSXElements.HTMLAttributes;
-    table: JSXElements.TableHTMLAttributes;
-    tbody: JSXElements.HTMLAttributes;
-    td: JSXElements.TdHTMLAttributes;
-    textarea: JSXElements.TextareaHTMLAttributes;
-    tfoot: JSXElements.HTMLAttributes;
-    th: JSXElements.ThHTMLAttributes;
-    thead: JSXElements.HTMLAttributes;
-    time: JSXElements.TimeHTMLAttributes;
-    title: JSXElements.HTMLAttributes;
-    tr: JSXElements.HTMLAttributes;
-    track: JSXElements.TrackHTMLAttributes;
+    table: JSXElements.TableHTMLAttributes<HTMLTableElement>;
+    tbody: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    td: JSXElements.TdHTMLAttributes<HTMLTableDataCellElement>;
+    textarea: JSXElements.TextareaHTMLAttributes<HTMLTextAreaElement>;
+    tfoot: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    th: JSXElements.ThHTMLAttributes<HTMLTableHeaderCellElement>;
+    thead: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    time: JSXElements.TimeHTMLAttributes<HTMLTimeElement>;
+    title: JSXElements.HTMLAttributes<HTMLTitleElement>;
+    tr: JSXElements.HTMLAttributes<HTMLTableRowElement>;
+    track: JSXElements.TrackHTMLAttributes<HTMLTrackElement>;
     u: JSXElements.HTMLAttributes;
-    ul: JSXElements.HTMLAttributes;
+    ul: JSXElements.HTMLAttributes<HTMLUListElement>;
     'var': JSXElements.HTMLAttributes;
-    video: JSXElements.VideoHTMLAttributes;
+    video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
     wbr: JSXElements.HTMLAttributes;
 
     // catch all
-    [tagName: string]: any;
+    [tagName: string]: JSXElements.HTMLAttributes;
   }
 }
 
@@ -134,7 +141,7 @@ export namespace JSXElements {
     slot?: string;
   }
 
-  export interface AnchorHTMLAttributes extends HTMLAttributes {
+  export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
     download?: any;
     href?: string;
     hrefLang?: string;
@@ -144,7 +151,9 @@ export namespace JSXElements {
     target?: string;
   }
 
-  export interface AreaHTMLAttributes extends HTMLAttributes {
+  export interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
+
+  export interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
     coords?: string;
     download?: any;
@@ -157,31 +166,16 @@ export namespace JSXElements {
     target?: string;
   }
 
-  export interface AudioHTMLAttributes extends MediaHTMLAttributes {}
-
-  export interface AreaHTMLAttributes extends HTMLAttributes {
-    alt?: string;
-    coords?: string;
-    download?: any;
-    href?: string;
-    hrefLang?: string;
-    hreflang?: string;
-    media?: string;
-    rel?: string;
-    shape?: string;
-    target?: string;
-  }
-
-  export interface BaseHTMLAttributes extends HTMLAttributes {
+  export interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
     href?: string;
     target?: string;
   }
 
-  export interface BlockquoteHTMLAttributes extends HTMLAttributes {
+  export interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
     cite?: string;
   }
 
-  export interface ButtonHTMLAttributes extends HTMLAttributes {
+  export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
     autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
@@ -200,48 +194,48 @@ export namespace JSXElements {
     value?: string | string[] | number;
   }
 
-  export interface CanvasHTMLAttributes extends HTMLAttributes {
+  export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
     height?: number | string;
     width?: number | string;
   }
 
-  export interface ColHTMLAttributes extends HTMLAttributes {
+  export interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
     span?: number;
   }
 
-  export interface ColgroupHTMLAttributes extends HTMLAttributes {
+  export interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
     span?: number;
   }
 
-  export interface DetailsHTMLAttributes extends HTMLAttributes {
+  export interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
     open?: boolean;
   }
 
-  export interface DelHTMLAttributes extends HTMLAttributes {
+  export interface DelHTMLAttributes<T> extends HTMLAttributes<T> {
     cite?: string;
     dateTime?: string;
     datetime?: string;
   }
 
-  export interface DialogHTMLAttributes extends HTMLAttributes {
+  export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
     open?: boolean;
     returnValue?: string;
   }
 
-  export interface EmbedHTMLAttributes extends HTMLAttributes {
+  export interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
     height?: number | string;
     src?: string;
     type?: string;
     width?: number | string;
   }
 
-  export interface FieldsetHTMLAttributes extends HTMLAttributes {
+  export interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
     disabled?: boolean;
     form?: string;
     name?: string;
   }
 
-  export interface FormHTMLAttributes extends HTMLAttributes {
+  export interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
     acceptCharset?: string;
     acceptcharset?: string;
     action?: string;
@@ -256,11 +250,11 @@ export namespace JSXElements {
     target?: string;
   }
 
-  export interface HtmlHTMLAttributes extends HTMLAttributes {
+  export interface HtmlHTMLAttributes<T> extends HTMLAttributes<T> {
     manifest?: string;
   }
 
-  export interface IframeHTMLAttributes extends HTMLAttributes {
+  export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
     allowFullScreen?: boolean;
     allowfullScreen?: string | boolean;
     allowTransparency?: boolean;
@@ -282,7 +276,7 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface ImgHTMLAttributes extends HTMLAttributes {
+  export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
     decoding?: 'async' | 'auto' | 'sync';
     height?: number | string;
@@ -295,13 +289,13 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface InsHTMLAttributes extends HTMLAttributes {
+  export interface InsHTMLAttributes<T> extends HTMLAttributes<T> {
     cite?: string;
     dateTime?: string;
     datetime?: string;
   }
 
-  export interface InputHTMLAttributes extends HTMLAttributes {
+  export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
     accept?: string;
     alt?: string;
     autoComplete?: string;
@@ -347,7 +341,7 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface KeygenHTMLAttributes extends HTMLAttributes {
+  export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
     autoFocus?: boolean;
     autofocus?: boolean | string;
     challenge?: string;
@@ -360,17 +354,17 @@ export namespace JSXElements {
     name?: string;
   }
 
-  export interface LabelHTMLAttributes extends HTMLAttributes {
+  export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
     htmlfor?: string;
   }
 
-  export interface LiHTMLAttributes extends HTMLAttributes {
+  export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
     value?: string | string[] | number;
   }
 
-  export interface LinkHTMLAttributes extends HTMLAttributes {
+  export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
     href?: string;
     hrefLang?: string;
     hreflang?: string;
@@ -381,15 +375,15 @@ export namespace JSXElements {
     type?: string;
   }
 
-  export interface MapHTMLAttributes extends HTMLAttributes {
+  export interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
     name?: string;
   }
 
-  export interface MenuHTMLAttributes extends HTMLAttributes {
+  export interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
     type?: string;
   }
 
-  export interface MediaHTMLAttributes extends HTMLAttributes {
+  export interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
     autoPlay?: boolean;
     autoplay?: boolean | string;
     controls?: boolean;
@@ -403,7 +397,7 @@ export namespace JSXElements {
     src?: string;
   }
 
-  export interface MetaHTMLAttributes extends HTMLAttributes {
+  export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
     charSet?: string;
     charset?: string;
     content?: string;
@@ -412,7 +406,7 @@ export namespace JSXElements {
     name?: string;
   }
 
-  export interface MeterHTMLAttributes extends HTMLAttributes {
+  export interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     high?: number;
     low?: number;
@@ -422,11 +416,11 @@ export namespace JSXElements {
     value?: string | string[] | number;
   }
 
-  export interface QuoteHTMLAttributes extends HTMLAttributes {
+  export interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
     cite?: string;
   }
 
-  export interface ObjectHTMLAttributes extends HTMLAttributes {
+  export interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
     classID?: string;
     classid?: string;
     data?: string;
@@ -440,41 +434,41 @@ export namespace JSXElements {
     wmode?: string;
   }
 
-  export interface OlHTMLAttributes extends HTMLAttributes {
+  export interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
     reversed?: boolean;
     start?: number;
   }
 
-  export interface OptgroupHTMLAttributes extends HTMLAttributes {
+  export interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
     disabled?: boolean;
     label?: string;
   }
 
-  export interface OptionHTMLAttributes extends HTMLAttributes {
+  export interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
     disabled?: boolean;
     label?: string;
     selected?: boolean;
     value?: string | string[] | number;
   }
 
-  export interface OutputHTMLAttributes extends HTMLAttributes {
+  export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
     htmlfor?: string;
     name?: string;
   }
 
-  export interface ParamHTMLAttributes extends HTMLAttributes {
+  export interface ParamHTMLAttributes<T> extends HTMLAttributes<T> {
     name?: string;
     value?: string | string[] | number;
   }
 
-  export interface ProgressHTMLAttributes extends HTMLAttributes {
+  export interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
     max?: number | string;
     value?: string | string[] | number;
   }
 
-  export interface ScriptHTMLAttributes extends HTMLAttributes {
+  export interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
     async?: boolean;
     charSet?: string;
     charset?: string;
@@ -487,7 +481,7 @@ export namespace JSXElements {
     type?: string;
   }
 
-  export interface SelectHTMLAttributes extends HTMLAttributes {
+  export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
     autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
@@ -497,7 +491,7 @@ export namespace JSXElements {
     size?: number;
   }
 
-  export interface SourceHTMLAttributes extends HTMLAttributes {
+  export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
     media?: string;
     sizes?: string;
     src?: string;
@@ -505,14 +499,14 @@ export namespace JSXElements {
     type?: string;
   }
 
-  export interface StyleHTMLAttributes extends HTMLAttributes {
+  export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
     media?: string;
     nonce?: string;
     scoped?: boolean;
     type?: string;
   }
 
-  export interface TableHTMLAttributes extends HTMLAttributes {
+  export interface TableHTMLAttributes<T> extends HTMLAttributes<T> {
     cellPadding?: number | string;
     cellpadding?: number | string;
     cellSpacing?: number | string;
@@ -520,7 +514,7 @@ export namespace JSXElements {
     summary?: string;
   }
 
-  export interface TextareaHTMLAttributes extends HTMLAttributes {
+  export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
     autoFocus?: boolean;
     autofocus?: boolean | string;
     cols?: number;
@@ -540,13 +534,13 @@ export namespace JSXElements {
     wrap?: string;
   }
 
-  export interface TdHTMLAttributes extends HTMLAttributes {
+  export interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
     colSpan?: number;
     headers?: string;
     rowSpan?: number;
   }
 
-  export interface ThHTMLAttributes extends HTMLAttributes {
+  export interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
     colSpan?: number;
     headers?: string;
     rowSpan?: number;
@@ -554,11 +548,11 @@ export namespace JSXElements {
     scope?: string;
   }
 
-  export interface TimeHTMLAttributes extends HTMLAttributes {
+  export interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
     dateTime?: string;
   }
 
-  export interface TrackHTMLAttributes extends HTMLAttributes {
+  export interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
     default?: boolean;
     kind?: string;
     label?: string;
@@ -567,7 +561,7 @@ export namespace JSXElements {
     srclang?: string;
   }
 
-  export interface VideoHTMLAttributes extends MediaHTMLAttributes {
+  export interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
     height?: number | string;
     playsInline?: boolean;
     playsinline?: boolean | string;
@@ -575,10 +569,10 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface HTMLAttributes extends DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes {
     // vdom specific
     innerHTML?: string;
-    ref?: (elm?: HTMLElement) => void;
+    ref?: (elm?: T) => void;
     key?: string | number;
 
     // Standard HTML Attributes
