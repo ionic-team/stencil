@@ -6,10 +6,32 @@ describe('queue-client', () => {
 
   let App: d.AppGlobal;
   let win: Window;
+  let nuRAFs: number;
 
   beforeEach(() => {
+    nuRAFs = 0;
     App = mockApp();
     win = mockWindow();
+  });
+
+  it('should run nested tasks in next tick', done => {
+    const q = createQueueClient(App, win);
+
+    const results: number[] = [];
+
+    q.read(() => {
+      results.push(1);
+      q.write(() => results.push(5));
+      q.read(() => results.push(3));
+      q.read(() => results.push(4));
+      q.write(() => {
+        results.push(6);
+        expect(results).toEqual([1, 2, 3, 4, 5, 6]);
+        expect(nuRAFs).toBe(2);
+        done();
+      });
+    });
+    q.write(() => results.push(2));
   });
 
   it('should run all dom writes', done => {
@@ -77,7 +99,10 @@ describe('queue-client', () => {
   function mockApp() {
     return {
       raf: (cb) => {
-        process.nextTick(cb);
+        process.nextTick(() => {
+          nuRAFs++;
+          cb(0);
+        });
       }
     } as d.AppGlobal;
   }

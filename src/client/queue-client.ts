@@ -16,7 +16,18 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     App.raf = win.requestAnimationFrame.bind(win);
   }
 
-  function consume(queue: d.RafCallback[]) {
+  function queueTask(queue: d.RafCallback[]) {
+    return (cb: d.RafCallback) => {
+      // queue dom reads
+      queue.push(cb);
+       if (!rafPending) {
+        rafPending = true;
+        App.raf(flush);
+      }
+    };
+  }
+
+  function consumeAll(queue: d.RafCallback[]) {
     for (let i = 0; i < queue.length; i++) {
       try {
         queue[i](now());
@@ -24,12 +35,11 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
         console.error(e);
       }
     }
-    queue.length = 0;
   }
 
-  function consumeTimeout(queue: d.RafCallback[], timeout: number) {
+  function consumeUntilTimeout(queue: d.RafCallback[], timeout: number) {
     let i = 0;
-    let ts: number;
+    let ts = 0;
     while (i < queue.length && (ts = now()) < timeout) {
       try {
         queue[i++](ts);
@@ -50,19 +60,24 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
 
+    // Copy tasks to digest
+    const reads = domReads.slice();
+    const writes = domWrites.slice();
+    domWrites.length = 0;
+    domReads.length = 0;
+
     // DOM READS!!!
-    consume(domReads);
+    // All reads must be done before starting with writes
+    consumeAll(reads);
 
     const start = now() + (7 * Math.ceil(congestion * (1.0 / 22.0)));
 
     // DOM WRITES!!!
-    consumeTimeout(domWrites, start);
-    consumeTimeout(domWritesLow, start);
+    consumeUntilTimeout(writes, start);
+    consumeUntilTimeout(domWritesLow, start);
 
-    if (domWrites.length > 0) {
-      domWritesLow.push(...domWrites);
-      domWrites.length = 0;
-    }
+    // Write tasks that could not be finish on time are moved to the low priority queue
+    domWritesLow.push(...writes);
 
     if (rafPending = ((domReads.length + domWrites.length + domWritesLow.length) > 0)) {
       // still more to do yet, but we've run out of time
@@ -81,28 +96,11 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
       highPriority.push(cb);
 
       if (highPriority.length === 1) {
-        resolved.then(() => consume(highPriority));
+        resolved.then(() => consumeAll(highPriority));
       }
     },
 
-    read(cb: d.RafCallback) {
-      // queue dom reads
-      domReads.push(cb);
-
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    },
-
-    write(cb: d.RafCallback) {
-      // queue dom writes
-      domWrites.push(cb);
-
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    }
+    read: queueTask(domReads),
+    write: queueTask(domWrites)
   };
 }
