@@ -51,6 +51,26 @@ describe('validateConfig', () => {
     expect(outputTarget.prerenderLocations).toEqual([{ path: '/docs/' }]);
   });
 
+  it('allow for preRender urls', () => {
+    const www: d.OutputTargetWww = {
+      type: 'www',
+      prerenderLocations: [
+        {
+          path: '/'
+        }, {
+          path: '/repos'
+        }
+      ]
+    };
+    config.outputTargets = [www];
+    validateConfig(config);
+    const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
+    expect(outputTarget.baseUrl).toBe('/');
+    expect(outputTarget.prerenderLocations).toEqual([
+      { path: '/' }, { path: '/repos' }
+    ]);
+  });
+
   it('default ssr when flag true, prod mode', () => {
     config.flags = { ssr: true };
     validateConfig(config);
