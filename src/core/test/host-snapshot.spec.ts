@@ -63,7 +63,7 @@ describe('host-snapshot', () => {
   });
 
   it('do not set content reference node when ssr', () => {
-    hostElm.setAttribute('ssrv', '88');
+    hostElm.setAttribute('ssrh', '88');
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr']).toBeUndefined();
   });

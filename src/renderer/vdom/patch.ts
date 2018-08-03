@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_SHADOW_DOM, SSR_VNODE_ID } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -581,10 +581,12 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     isShadowDomComponent = (encapsulation === 'shadow');
 
     if (__BUILD_CONDITIONALS__.ssrServerSide) {
+      // only set the ssr id when we're doing ssr, duh
       ssrId = ssrPatchId;
 
       if (isShadowDomComponent) {
-        domApi.$setAttribute(hostElm, SSR_SHADOW_DOM, '');
+        // this is a shadow dom component we're server side rendering
+        addShadowDomSsrData(domApi, hostElm, ssrId);
       }
     }
 
@@ -602,7 +604,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
       // SSR ONLY: we've been given an SSR id, so the host element
       // should be given the ssr id attribute
-      domApi.$setAttribute(oldVNode.elm, SSR_VNODE_ID, ssrId);
+      domApi.$setAttribute(oldVNode.elm, SSR_HOST_ID, ssrId);
     }
 
     if (__BUILD_CONDITIONALS__.slotPolyfill) {
@@ -697,6 +699,35 @@ export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
     vNode.vchildren && vNode.vchildren.forEach(vChild => {
       callNodeRefs(vChild, isDestroy);
     });
+  }
+}
+
+
+export function addShadowDomSsrData(domApi: d.DomApi, hostElm: d.HostElement, ssrId: number) {
+  // this is a shadow dom component we're server side rendering
+  // add the ssrsd attribute so later on the client side
+  // code knows what to do with it
+  domApi.$setAttribute(hostElm, SSR_HOST_ID, `${ssrId}.${SSR_SHADOW_DOM_HOST_ID}`);
+
+  // before we got ahead and hydrate anything
+  // since we're in the middle of server side rendering
+  // let's also add attributes to the direct child nodes
+  // of this shadow dom component. This way the client side
+  // knows what nodes should stay in the light dom
+  const childNodes = domApi.$childNodes(hostElm);
+  for (let i = 0; i < childNodes.length; i++) {
+    const childNode = childNodes[i];
+
+    if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode) {
+      // this is an element that's an immediate child of the host element
+      domApi.$setAttribute(childNode, SSR_LIGHT_DOM_ATTR, `${ssrId}.${i}`);
+
+    } else if (domApi.$nodeType(childNode) === NODE_TYPE.TextNode && domApi.$getTextContent(childNode).trim() !== '') {
+      // this is a text node that's an immediate child of the host element
+      const startComment = domApi.$createComment(`${SSR_LIGHT_DOM_NODE_COMMENT}.${ssrId}.${i}`);
+      domApi.$insertBefore(hostElm, startComment, childNode);
+      i++;
+    }
   }
 }
 

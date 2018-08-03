@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_SHADOW_DOM, SSR_VNODE_ID } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 
 
 export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
-  const allSsrElms = rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`) as NodeListOf<d.HostElement>;
+  const allSsrElms = rootElm.querySelectorAll(`[${SSR_HOST_ID}]`) as NodeListOf<d.HostElement>;
   const ilen = allSsrElms.length;
   const removeNodes: Node[] = [];
   let elm: d.HostElement,
@@ -18,8 +18,8 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
 
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
-      ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
-      domApi.$removeAttribute(elm, SSR_VNODE_ID);
+      ssrVNodeId = domApi.$getAttribute(elm, SSR_HOST_ID);
+      domApi.$removeAttribute(elm, SSR_HOST_ID);
       ssrVNode = {};
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
       plt.vnodeMap.set(elm, ssrVNode);
@@ -42,11 +42,9 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
 
 function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean, removeNodes: Node[]) {
   const nodeType = domApi.$nodeType(node);
-  let previousComment: Comment;
   let childVNodeId: string,
       childVNodeSplt: any[],
-      childVNode: d.VNode,
-      endingComment: Comment;
+      childVNode: d.VNode;
 
   if (checkNestedElements && nodeType === NODE_TYPE.ElementNode) {
     childVNodeId = domApi.$getAttribute(node, SSR_CHILD_ID);
@@ -91,67 +89,65 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.
       addChildSsrVNodes(domApi, childNodes[i], parentVNode, ssrVNodeId, checkNestedElements, removeNodes);
     }
 
-  } else if (nodeType === NODE_TYPE.TextNode &&
-            (previousComment = <Comment>node.previousSibling) &&
-            domApi.$nodeType(previousComment) === NODE_TYPE.CommentNode) {
-
+  } else if (domApi.$nodeType(node) === NODE_TYPE.CommentNode) {
+    // this is a comment node, so it could have ssr data in it
     // split the start comment's data with a period
-    childVNodeSplt = domApi.$getTextContent(previousComment).split('.');
+    childVNodeSplt = domApi.$getTextContent(node).split('.');
 
-    // ensure this is an ssr text node start comment
-    // which should start with an "s" and delimited by periods
-    if (childVNodeSplt[0] === 's' && childVNodeSplt[1] === ssrVNodeId) {
-      // cool, this is a text node and it's got a start comment
-      childVNode = {
-        vtext: domApi.$getTextContent(node)
-      };
-      childVNode.elm = node;
+    if (childVNodeSplt[1] === ssrVNodeId) {
+      let nextTextNode = node;
+      while ((nextTextNode = domApi.$nextSibling(nextTextNode) as d.RenderNode)) {
+        if (domApi.$nodeType(nextTextNode) === NODE_TYPE.TextNode) {
 
-      // this is a new child vnode
-      // so ensure its parent vnode has the vchildren array
-      if (!parentVNode.vchildren) {
-        parentVNode.vchildren = [];
-      }
+          if (childVNodeSplt[0] === SSR_TEXT_NODE_COMMENT) {
+            // this is an ssr text node start comment
+            // which should start with an "s" and delimited by periods
+            childVNode = {
+              vtext: domApi.$getTextContent(nextTextNode),
+              elm: nextTextNode
+            };
 
-      // add our child vnode to a specific index of the vnode's children
-      parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
+            // this is a new child vnode
+            // so ensure its parent vnode has the vchildren array
+            if (!parentVNode.vchildren) {
+              parentVNode.vchildren = [];
+            }
 
-      removeNodes.push(previousComment);
+            // add our child vnode to a specific index of the vnode's children
+            parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
 
-      endingComment = domApi.$nextSibling(node) as Comment;
-      if (endingComment && domApi.$nodeType(endingComment) === NODE_TYPE.CommentNode && domApi.$getTextContent(endingComment) === '/') {
-        removeNodes.push(endingComment);
-      }
-    }
-  }
+          } else if (childVNodeSplt[0] === SSR_LIGHT_DOM_NODE_COMMENT) {
 
-  if (__BUILD_CONDITIONALS__.hasSlot) {
-    if (nodeType === NODE_TYPE.CommentNode) {
-      childVNodeSplt = domApi.$getTextContent(node).split('.');
-      if (childVNodeSplt[0] === 'l' && childVNodeSplt[1] === ssrVNodeId) {
-        // ok great, this is a slot for this vnode
-        childVNode = {
-          vtag: 'slot',
-          vattrs: null,
-          vchildren: null
-        };
-        domApi.$insertBefore(parentVNode.elm, childVNode.elm = domApi.$createElement(childVNode.vtag), node);
-        domApi.$remove(node);
 
-        if (childVNodeSplt[3]) {
-          // this slot has a "name" attribute
-          childVNode.vattrs = childVNode.vattrs || {};
-          domApi.$setAttribute(childVNode.elm, 'name', childVNode.vattrs.name = (childVNode.vname = childVNodeSplt[3]));
+          } else if (__BUILD_CONDITIONALS__.hasSlot && childVNodeSplt[0] === SSR_SLOT_NODE_COMMENT) {
+            // this comment node represents where a real <slot> node should go
+            // replace with an actual <slot>
+            childVNode = {
+              vtag: 'slot',
+              vattrs: null,
+              vchildren: null
+            };
+            domApi.$insertBefore(parentVNode.elm, childVNode.elm = domApi.$createElement(childVNode.vtag), node);
+            domApi.$remove(node);
+
+            if (childVNodeSplt[3]) {
+              // this slot has a "name" attribute
+              childVNode.vattrs = childVNode.vattrs || {};
+              domApi.$setAttribute(childVNode.elm, 'name', childVNode.vattrs.name = (childVNode.vname = childVNodeSplt[3]));
+            }
+
+            // this is a new child vnode
+            // so ensure its parent vnode has the vchildren array
+            if (!parentVNode.vchildren) {
+              parentVNode.vchildren = [];
+            }
+
+            // add our child vnode to a specific index of the vnode's children
+            parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
+          }
+
+          break;
         }
-
-        // this is a new child vnode
-        // so ensure its parent vnode has the vchildren array
-        if (!parentVNode.vchildren) {
-          parentVNode.vchildren = [];
-        }
-
-        // add our child vnode to a specific index of the vnode's children
-        parentVNode.vchildren[childVNodeSplt[2]] = childVNode;
       }
     }
   }
@@ -193,7 +189,9 @@ export function upgradeShadowDomComponents(domApi: d.DomApi, node: d.HostElement
       upgradeShadowDomComponents(domApi, childNode);
     }
 
-    if (domApi.$hasAttribute(node, SSR_SHADOW_DOM)) {
+    const ssrHostId = domApi.$getAttribute(node, SSR_HOST_ID);
+    console.log('\n\n\n\n\n', ssrHostId, '\n\n\n\n\n')
+    if (ssrHostId && ssrHostId.includes('.s')) {
       // attach a shadow root to the host element
       const shadowRoot = domApi.$attachShadow(node, { mode: 'open' });
 
@@ -211,9 +209,6 @@ export function upgradeShadowDomComponents(domApi: d.DomApi, node: d.HostElement
         // add the shadow root
         domApi.$insertBefore(shadowRoot, childNode, shadowRoot.firstChild);
       }
-
-      // this is the host element of a shadow dom component
-      domApi.$removeAttribute(node, SSR_SHADOW_DOM);
     }
   }
 }

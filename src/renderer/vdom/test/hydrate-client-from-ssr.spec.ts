@@ -32,7 +32,8 @@ describe('upgradeShadowDomComponents', () => {
   it('should move light dom nodes back to root and create slots', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-      <cmp-a class="scs-cmp-a-h" ssrsd="" ssrv="0">
+    TODO!!!
+      <cmp-a class="scs-cmp-a-h" ssrh="0.s">
         <div class="scs-cmp-a scs-cmp-a-s" ssrc="0.0">
           <section class="scs-cmp-a" ssrc="0.0">
             <!--s.0.0-->Shadow Content<!--/-->
@@ -48,10 +49,11 @@ describe('upgradeShadowDomComponents', () => {
     const html = rootElm.outerHTML;
 
     expect(compareHtml(html)).toBe(compareHtml(`
+    TODO!!!
       <html>
         <head></head>
         <body>
-          <cmp-a>
+          <cmp-a ssrh="0.s">
             <shadow-root>
               88
               <span>
@@ -65,10 +67,10 @@ describe('upgradeShadowDomComponents', () => {
     `));
   });
 
-  fit('move all node types in host content into the shadow root', () => {
+  it('move all node types in host content into the shadow root', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-      <cmp-a ssrsd>
+      <cmp-a ssrh="88.s">
         88
         <span>
           <b>mph</b>
@@ -85,7 +87,7 @@ describe('upgradeShadowDomComponents', () => {
       <html>
         <head></head>
         <body>
-          <cmp-a>
+          <cmp-a ssrh="88.s">
             <shadow-root>
               88
               <span>
@@ -102,7 +104,7 @@ describe('upgradeShadowDomComponents', () => {
   it('add shadow root, and remove ssrsd attribute', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-      <cmp-a ssrsd></cmp-a>
+      <cmp-a ssrh="88.s"></cmp-a>
     `;
 
     upgradeShadowDomComponents(domApi, rootElm);
@@ -113,7 +115,7 @@ describe('upgradeShadowDomComponents', () => {
       <html>
         <head></head>
         <body>
-          <cmp-a>
+          <cmp-a ssrh="88.s">
             <shadow-root></shadow-root>
           </cmp-a>
         </body>

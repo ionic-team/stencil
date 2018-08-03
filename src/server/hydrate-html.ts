@@ -3,7 +3,7 @@ import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, norm
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { SSR_VNODE_ID } from '../util/constants';
+import { SSR_HOST_ID } from '../util/constants';
 
 
 export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentRegistry, opts: d.HydrateOptions) {
@@ -119,7 +119,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
         // this may have been patched more than once
         // so reuse the ssr id if it already has one
         if (oldVNode && oldVNode.elm) {
-          existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_VNODE_ID);
+          existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_HOST_ID);
         }
 
         if (existingSsrId) {

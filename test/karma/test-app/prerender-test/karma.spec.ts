@@ -33,9 +33,9 @@ describe('prerender', () => {
     expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
   });
 
-  it('set ssrv', () => {
+  it('set ssrh', () => {
     const appRoot = app.querySelector('app-root');
-    expect(appRoot.getAttribute('ssrv')).toBe('0');
+    expect(appRoot.getAttribute('ssrh')).toBe('0');
     expect(appRoot.getAttribute('class')).toBe('hydrated');
 
     const main = app.querySelector('app-root main');

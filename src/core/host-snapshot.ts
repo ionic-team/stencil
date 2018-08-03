@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
+import { ENCAPSULATION, SSR_HOST_ID } from '../util/constants';
 
 
 export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
@@ -19,7 +19,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
-    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_VNODE_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom)) {
+    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_HOST_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom)) {
       // only required when we're NOT using native shadow dom (slot)
       // or this browser doesn't support native shadow dom
       // and this host element was NOT created with SSR
