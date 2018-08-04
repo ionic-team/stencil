@@ -40,7 +40,7 @@ export function testMatchClasslist(el: HTMLElement, classes: string[]) {
 export function testMatchAttributes(el: HTMLElement, attributes: { [attr: string]: string }) {
   const keys = Object.keys(attributes);
   if (el.attributes.length !== keys.length) {
-    throw new Error(`expected ${keys.length} classes, found ${el.attributes.length}`);
+    throw new Error(`expected ${keys.length} attributes, found ${el.attributes.length}`);
   }
   testAttributes(el, attributes);
 }

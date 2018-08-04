@@ -2,13 +2,13 @@ import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
-import { createVNodesFromSsr } from '../renderer/vdom/hydrate-client-from-ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
+import { hydrateClientFromSsr } from '../renderer/vdom/hydrate-client-from-ssr';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { initHostElement } from '../core/init-host-element';
 import { initStyleTemplate } from '../core/styles';
@@ -106,7 +106,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   if (__BUILD_CONDITIONALS__.hydrateClientFromSsr) {
     // if the HTML was generated from SSR
     // then let's walk the tree and generate vnodes out of the data
-    createVNodesFromSsr(plt, domApi, rootElm);
+    hydrateClientFromSsr(plt, domApi, rootElm);
   }
 
 

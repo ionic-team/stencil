@@ -9,6 +9,11 @@ export interface BuildConditionals {
   clientSide: boolean;
   browserModuleLoader: boolean;
   externalModuleLoader: boolean;
+
+  /**
+   * If this build should be able to hydrate the client
+   * from the server side rendered html data.
+   */
   hydrateClientFromSsr?: boolean;
 
   // dev
@@ -18,13 +23,19 @@ export interface BuildConditionals {
   hotModuleReplacement: boolean;
   verboseError: boolean;
 
-  // ssr
+  /**
+   * If this is a server side build
+   */
   ssrServerSide: boolean;
 
-  // encapsulation
+  /**
+   * If there is at least one component that has styles.
+   */
   styles: boolean;
 
-  // dom
+  /**
+   * If there is at least one component that uses shadow dom.
+   */
   hasShadowDom: boolean;
   slotPolyfill: boolean;
 
@@ -52,12 +63,26 @@ export interface BuildConditionals {
   // attr
   observeAttr: boolean;
 
-  // elements
+  /**
+   * If there is at least one component that has a <slot>
+   */
   hasSlot: boolean;
+
+  /**
+   * If there is at least one component that has a <svg>
+   */
   hasSvg: boolean;
 }
 
 declare global {
+  /**
+   * Build Conditionals allow each user's build to only
+   * include features which the app is actually using. Everyone's
+   * build will be slightly different. At build time, the
+   * compiler will set each of the boolean values with the
+   * __BUILD_CONDITIONALS__ object depending on what the
+   * static analysis found.
+   */
   var __BUILD_CONDITIONALS__: BuildConditionals;
 }
 

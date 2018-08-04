@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -105,7 +105,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
           if (childNode) {
             if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
               // SSR ONLY: add the text node's start comment
-              domApi.$appendChild(elm, domApi.$createComment('s.' + ssrId + '.' + i));
+              domApi.$appendChild(elm, domApi.$createComment(SSR_TEXT_NODE_COMMENT + '.' + ssrId + '.' + i));
             }
 
             // append our new node
@@ -580,13 +580,16 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     useNativeShadowDom = useNativeShadowDomVal;
     isShadowDomComponent = (encapsulation === 'shadow');
 
-    if (__BUILD_CONDITIONALS__.ssrServerSide) {
-      // only set the ssr id when we're doing ssr, duh
+    if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrPatchId)) {
+      // SSR ONLY: we've been given an SSR id, so the host element
+      // should be given the ssr id attribute
       ssrId = ssrPatchId;
 
       if (isShadowDomComponent) {
         // this is a shadow dom component we're server side rendering
         addShadowDomSsrData(domApi, hostElm, ssrId);
+      } else {
+        domApi.$setAttribute(oldVNode.elm, SSR_HOST_ID, ssrId);
       }
     }
 
@@ -600,12 +603,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     // synchronous patch
     patchVNode(oldVNode, newVNode);
-
-    if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
-      // SSR ONLY: we've been given an SSR id, so the host element
-      // should be given the ssr id attribute
-      domApi.$setAttribute(oldVNode.elm, SSR_HOST_ID, ssrId);
-    }
 
     if (__BUILD_CONDITIONALS__.slotPolyfill) {
       if (checkSlotRelocate) {
@@ -707,7 +704,7 @@ export function addShadowDomSsrData(domApi: d.DomApi, hostElm: d.HostElement, ss
   // this is a shadow dom component we're server side rendering
   // add the ssrsd attribute so later on the client side
   // code knows what to do with it
-  domApi.$setAttribute(hostElm, SSR_HOST_ID, `${ssrId}.${SSR_SHADOW_DOM_HOST_ID}`);
+  domApi.$setAttribute(hostElm, SSR_HOST_ID, `${SSR_SHADOW_DOM_HOST_ID}${ssrId}`);
 
   // before we got ahead and hydrate anything
   // since we're in the middle of server side rendering

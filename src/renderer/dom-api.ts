@@ -214,7 +214,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
 
   if (__BUILD_CONDITIONALS__.hasShadowDom) {
-    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+    domApi.$attachShadow = (elm) => elm.attachShadow({ mode: 'open' });
 
     domApi.$supportsShadowDom = !!domApi.$doc.documentElement.attachShadow;
 

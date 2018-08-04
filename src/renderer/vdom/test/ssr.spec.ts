@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { addShadowDomSsrData, createRendererPatch } from '../patch';
 import { compareHtml, mockDomApi, mockElement, mockPlatform, removeWhitespaceFromNodes } from '../../../testing/mocks';
-import { createVNodesFromSsr } from '../hydrate-client-from-ssr';
 import { h } from '../h';
+import { hydrateClientFromSsr } from '../hydrate-client-from-ssr';
 import { initHostSnapshot } from '../../../core/host-snapshot';
 import { SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_SHADOW_DOM_HOST_ID } from '../../../util/constants';
 
@@ -23,7 +23,7 @@ describe('ssr', () => {
     it('should add shadow dom host attribute', () => {
       const elm = mockElement('cmp-a');
       addShadowDomSsrData(domApi, elm, 88);
-      expect(elm.getAttribute(SSR_HOST_ID)).toBe('88.s');
+      expect(elm.getAttribute(SSR_HOST_ID)).toBe('s88');
     });
 
     it('should add light dom attributes to elements', () => {
@@ -92,7 +92,7 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(plt, domApi, rootElm);
+      hydrateClientFromSsr(plt, domApi, rootElm);
 
       const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
       expect(cmpA.vchildren).toHaveLength(1);
@@ -125,7 +125,7 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(plt, domApi, rootElm);
+      hydrateClientFromSsr(plt, domApi, rootElm);
 
       const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
       expect(cmpA.vchildren).toHaveLength(1);
@@ -173,7 +173,7 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(plt, domApi, rootElm);
+      hydrateClientFromSsr(plt, domApi, rootElm);
 
       const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
       expect(cmpA.vchildren).toHaveLength(2);
@@ -237,9 +237,9 @@ describe('ssr', () => {
       expect(hostElm.getAttribute(SSR_HOST_ID)).toBe('1');
       expect(hostElm.querySelector('div').getAttribute(SSR_CHILD_ID)).toBe('1.0');
       expect(hostElm.querySelector('button').getAttribute(SSR_CHILD_ID)).toBe('1.0');
-      expect(hostElm.querySelector('button').innerHTML).toBe('<!--s.1.0-->Text 1<!--/--> ');
+      expect(hostElm.querySelector('button').innerHTML).toBe('<!--t.1.0-->Text 1<!--/--> ');
       expect(hostElm.querySelector('span').getAttribute(SSR_CHILD_ID)).toBe('1.1');
-      expect(hostElm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/--> ');
+      expect(hostElm.querySelector('span').innerHTML).toBe('<!--t.1.0-->Text 2<!--/--> ');
     });
 
   });

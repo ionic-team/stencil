@@ -185,7 +185,7 @@ describe('hydrate', () => {
         <body>
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
             <elm-a ssrc="0.0">
-              <!--s.0.0-->inner text<!--/-->
+              <!--t.0.0-->inner text<!--/-->
               content text
             </elm-a>
           </ion-test>

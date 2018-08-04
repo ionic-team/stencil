@@ -1,13 +1,15 @@
 import * as d from '../../../declarations';
-import { compareHtml, mockDomApi } from '../../../testing/mocks';
-import { upgradeShadowDomComponents } from '../hydrate-client-from-ssr';
+import { compareHtml, mockDomApi, mockPlatform } from '../../../testing/mocks';
+import { hydrateClientFromSsr } from '../hydrate-client-from-ssr';
 
 
-describe('upgradeShadowDomComponents', () => {
+describe('upgradeToShadowDom', () => {
 
   let domApi: d.DomApi;
+  let plt: d.PlatformApi;
 
   beforeEach(() => {
+    plt = mockPlatform();
     domApi = mockDomApi();
     domApi.$supportsShadowDom = true;
     domApi.$attachShadow = (elm) => {
@@ -32,35 +34,42 @@ describe('upgradeShadowDomComponents', () => {
   it('should move light dom nodes back to root and create slots', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-    TODO!!!
-      <cmp-a class="scs-cmp-a-h" ssrh="0.s">
-        <div class="scs-cmp-a scs-cmp-a-s" ssrc="0.0">
-          <section class="scs-cmp-a" ssrc="0.0">
-            <!--s.0.0-->Shadow Content<!--/-->
-          </section>
-          <!--l.0.1.-->
-          <!--l.0.2.named-slot-->
-        </div>
-      </cmp-a>
+      <html dir="ltr" data-ssr="">
+        <head></head>
+        <body>
+          <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="s0">
+            <header class="scs-cmp-a" ssrc="0.0">
+              <!--t.0.0-->
+                cmp-a shadow-dom
+              <!--/-->
+            </header>
+            <!--s.0.1-->
+            <!--l.0.1-->cmp-a light-dom top
+            <span ssrl="0.5">
+              cmp-a light-dom bottom
+            </span>
+          </cmp-a>
+        </body>
+      </html>
     `;
 
-    upgradeShadowDomComponents(domApi, rootElm);
+    hydrateClientFromSsr(plt, domApi, rootElm);
 
-    const html = rootElm.outerHTML;
-
-    expect(compareHtml(html)).toBe(compareHtml(`
-    TODO!!!
+    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
       <html>
         <head></head>
         <body>
-          <cmp-a ssrh="0.s">
+          <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
             <shadow-root>
-              88
-              <span>
-                <b>mph</b>
-              </span>
-              <!--1955-->
+              <header class="scs-cmp-a">
+                cmp-a shadow-dom
+              </header>
+              <slot></slot>
             </shadow-root>
+            cmp-a light-dom top
+            <span>
+              cmp-a light-dom bottom
+            </span>
           </cmp-a>
         </body>
       </html>
@@ -70,7 +79,7 @@ describe('upgradeShadowDomComponents', () => {
   it('move all node types in host content into the shadow root', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-      <cmp-a ssrh="88.s">
+      <cmp-a ssrh="s0">
         88
         <span>
           <b>mph</b>
@@ -79,15 +88,13 @@ describe('upgradeShadowDomComponents', () => {
       </cmp-a>
     `;
 
-    upgradeShadowDomComponents(domApi, rootElm);
+    hydrateClientFromSsr(plt, domApi, rootElm);
 
-    const html = rootElm.outerHTML;
-
-    expect(compareHtml(html)).toBe(compareHtml(`
+    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
       <html>
         <head></head>
         <body>
-          <cmp-a ssrh="88.s">
+          <cmp-a>
             <shadow-root>
               88
               <span>
@@ -101,41 +108,21 @@ describe('upgradeShadowDomComponents', () => {
     `));
   });
 
-  it('add shadow root, and remove ssrsd attribute', () => {
+  it('add shadow root', () => {
     const rootElm = domApi.$createElement('html');
     rootElm.innerHTML = `
-      <cmp-a ssrh="88.s"></cmp-a>
+      <cmp-a ssrh="s0"></cmp-a>
     `;
 
-    upgradeShadowDomComponents(domApi, rootElm);
+    hydrateClientFromSsr(plt, domApi, rootElm);
 
-    const html = rootElm.outerHTML;
-
-    expect(compareHtml(html)).toBe(compareHtml(`
+    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
       <html>
         <head></head>
         <body>
-          <cmp-a ssrh="88.s">
+          <cmp-a>
             <shadow-root></shadow-root>
           </cmp-a>
-        </body>
-      </html>
-    `));
-  });
-
-  it('do nothing for no SD components', () => {
-    const rootElm = domApi.$createElement('html');
-    rootElm.innerHTML = `<p>no shadow here</p>`;
-
-    upgradeShadowDomComponents(domApi, rootElm);
-
-    const html = rootElm.outerHTML;
-
-    expect(compareHtml(html)).toBe(compareHtml(`
-      <html>
-        <head></head>
-        <body>
-          <p>no shadow here</p>
         </body>
       </html>
     `));

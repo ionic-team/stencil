@@ -168,9 +168,17 @@ export interface RenderNode extends d.HostElement {
    * Scope Id
    */
   ['s-si']?: string;
+}
 
-  /**
-   * Scope Id
-   */
-  ['s-si']?: string;
+
+
+export interface ShadowDomComponent {
+  hostElm: d.HostElement;
+  lightDomNodes: LightDomNode[];
+}
+
+
+export interface LightDomNode {
+  contentIndex: number;
+  elm: d.RenderNode;
 }

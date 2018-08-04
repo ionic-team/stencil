@@ -8,7 +8,7 @@ export interface DomApi {
   $createElementNS(namespace: string, tagName: any): any;
   $createTextNode(text: string): Text;
   $createComment(data: string): Comment;
-  $insertBefore(parentNode: Node, childNode: Node, referenceNode: Node): void;
+  $insertBefore(parentNode: Node, childNode: Node, referenceNode?: Node): void;
   $remove(node: Node): Node;
   $appendChild(parentNode: Node, childNode: Node): void;
   $addClass(elm: any, cssClass: string): void;
@@ -32,5 +32,5 @@ export interface DomApi {
   $dispatchEvent?(elm: Element | Document | Window, eventName: string, data: any): void;
   $supportsShadowDom?: boolean;
   $supportsEventOptions?: boolean;
-  $attachShadow?(elm: any, shadowRootInitDict: ShadowRootInit): any;
+  $attachShadow?(elm: any): any;
 }
