@@ -6,7 +6,7 @@
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
     "build.app": "node ../../bin/stencil build --debug --es5",
-    "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender && node test-prerender/no-script-build.js",
+    "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender --dev && node test-prerender/no-script-build.js",
     "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",
