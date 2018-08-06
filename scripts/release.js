@@ -173,7 +173,12 @@ function runTasks(opts) {
     tasks.push(
       {
         title: 'Publish @stencil/core',
-        task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: rootDir })
+        task: () => execa(
+          'npm',
+          ['publish'].concat(opts.tag ? ['--tag', opts.tag] : [])
+          .concat(opts.otp ? ['--otp', opts.otp] : []),
+          { cwd: rootDir }
+        )
       },
       {
         title: 'Tagging the latest commit',
@@ -322,6 +327,12 @@ function publishUI() {
         }
         return true;
       }
+    },
+    {
+      type: 'input',
+      name: 'otp',
+      message: 'NPM Auth code',
+      when: () => process.argv.slice(2).indexOf('--otp') > -1,
     },
     {
       type: 'confirm',
