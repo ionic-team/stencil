@@ -194,7 +194,11 @@ function runTasks(opts) {
       tasks.push(
         {
           title: 'Also set "next" tag on @stencil/core',
-          task: () => execa('npm', ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'], { cwd: rootDir })
+          task: () => execa(
+            'npm', 
+            ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next']
+            .concat(opts.otp ? ['--otp', opts.otp] : []),
+            { cwd: rootDir })
         }
       );
     }
