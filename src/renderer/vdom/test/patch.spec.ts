@@ -132,9 +132,13 @@ describe('renderer', () => {
           )
         )
       ).elm;
-      expect(hostElm.childNodes[0].tagName).toBe('SPAN');
-      expect(hostElm.childNodes[0].className).toBe('functional-cmp');
-      expect(hostElm.childNodes[0].textContent).toBe('Test Child');
+
+      const span = hostElm.childNodes[0] as d.RenderNode;
+
+      expect(span.tagName).toBe('SPAN');
+      expect(span['s-hn']).toBe('my-tag');
+      expect(span.className).toBe('functional-cmp');
+      expect(span.textContent).toBe('Test Child');
     });
 
   });

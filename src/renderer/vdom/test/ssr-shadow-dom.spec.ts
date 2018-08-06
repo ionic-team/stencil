@@ -129,7 +129,8 @@ describe('ssr shadow dom', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="s0">
+          <cmp-a ssrh="s0" class="scs-cmp-a-h scs-cmp-a-s hydrated">
+            <!--c.0-->
             <header class="scs-cmp-a" ssrc="0.0">
               <!--t.0.0-->
                 cmp-a shadow-dom
@@ -138,7 +139,8 @@ describe('ssr shadow dom', () => {
             <!--s.0.1-->
             <!--l.0.1-->
               cmp-a light-dom top
-            <cmp-b ssrl="0.3" class="scs-cmp-b-h hydrated" ssrh="s1">
+            <cmp-b ssrh="s1" ssrl="0.3" class="scs-cmp-b-h hydrated">
+              <!--c.1-->
               <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
                 <!--s.1.0-->
                 <article ssrl="1.2">
@@ -154,6 +156,7 @@ describe('ssr shadow dom', () => {
                   cmp-b light-dom
                 </nav>
                 <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrc="1.3" ssrh="s2">
+                  <!--c.2-->
                   <!--t.1.0-->
                     <!--l.2.2-->
                       cmp-c light-dom
@@ -184,17 +187,38 @@ describe('ssr shadow dom', () => {
     expect(cmpASsrVnode.elm).toBe(cmpAElm);
     isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
+    const cmpAContentRef = cmpAElm['s-cr'];
+    expect(cmpAContentRef).toBeDefined();
+    expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAContentRef['s-cn']).toBe(true);
+    expect(cmpAContentRef.parentNode).toBe(cmpAElm);
+    expect(domApi.$childNodes(cmpAElm)[0]).toBe(cmpAContentRef);
+
     const cmpBElm = hydratedRoot.querySelector('cmp-b') as d.HostElement;
     const cmpBSsrVnode = plt.vnodeMap.get(cmpBElm);
     expect(cmpBSsrVnode.vtag).toBe('cmp-b');
     expect(cmpBSsrVnode.elm).toBe(cmpBElm);
     isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
 
+    const cmpBContentRef = cmpBElm['s-cr'];
+    expect(cmpBContentRef).toBeDefined();
+    expect(cmpBContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBContentRef['s-cn']).toBe(true);
+    expect(cmpBContentRef.parentNode).toBe(cmpBElm);
+    expect(domApi.$childNodes(cmpBElm)[0]).toBe(cmpBContentRef);
+
     const cmpCElm = hydratedRoot.querySelector('cmp-c') as d.HostElement;
     const cmpCSsrVnode = plt.vnodeMap.get(cmpCElm);
     expect(cmpCSsrVnode.vtag).toBe('cmp-c');
     expect(cmpCSsrVnode.elm).toBe(cmpCElm);
     isSameVChildren(cmpCRender, cmpCSsrVnode.vchildren);
+
+    const cmpCContentRef = cmpCElm['s-cr'];
+    expect(cmpCContentRef).toBeDefined();
+    expect(cmpCContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpCContentRef['s-cn']).toBe(true);
+    expect(cmpCContentRef.parentNode).toBe(cmpCElm);
+    expect(domApi.$childNodes(cmpCElm)[0]).toBe(cmpCContentRef);
 
 
     // expect(compareHtml(hydratedRoot.innerHTML)).toBe(compareHtml(`

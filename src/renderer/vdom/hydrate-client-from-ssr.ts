@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 
 
 // Welcome SSR Friends!!!
@@ -36,12 +36,13 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
       for (let i = childNodes.length - 1; i >= 0; i--) {
         // relocate all of the host content nodes into the shadow root
         const node = childNodes[i];
+        if (!node['s-cn']) {
+          // remove from the host content
+          node.remove();
 
-        // remove from the host content
-        node.remove();
-
-        // add the shadow root
-        domApi.$insertBefore(shadowRoot, node, shadowRoot.firstChild);
+          // add the shadow root
+          domApi.$insertBefore(shadowRoot, node, shadowRoot.firstChild);
+        }
       }
 
       shadowDomComponent.lightDomNodes.sort((a, b) => {
@@ -104,14 +105,14 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
         }
 
         // keep drilling down through child nodes and build up the vnode
-        addChildSsrVNodes(domApi, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, shadowDomComponent, removeNodes);
+        addChildSsrVNodes(domApi, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, shadowDomComponent, removeNodes);
       }
     }
   }
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, shadowDomComponent: d.ShadowDomComponent, removeNodes: d.RenderNode[]) {
+function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, shadowDomComponent: d.ShadowDomComponent, removeNodes: d.RenderNode[]) {
   let attrId: string;
   let dataIdSplt: any[];
   let childVNode: d.VNode;
@@ -181,7 +182,7 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, nodeType: numbe
     // keep drilling down through the elements
     childNodes = domApi.$childNodes(node) as NodeListOf<d.RenderNode>;
     for (let i = 0; i < childNodes.length; i++) {
-      addChildSsrVNodes(domApi, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, shadowDomComponent, removeNodes);
+      addChildSsrVNodes(domApi, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, shadowDomComponent, removeNodes);
     }
 
   } else if (nodeType === NODE_TYPE.CommentNode) {
@@ -193,7 +194,13 @@ function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, nodeType: numbe
       // cool, so this is a comment node representing some ssr data
       // about a child node of this host element
 
-      if (__BUILD_CONDITIONALS__.hasSlot && dataIdSplt[0] === SSR_SLOT_NODE_COMMENT) {
+      if (__BUILD_CONDITIONALS__.hasSlot && dataIdSplt[0] === SSR_CONTENT_REF_NODE_COMMENT) {
+        // this is a content reference html comment
+        (hostElm['s-cr'] = domApi.$createTextNode('') as any)['s-cn'] = true;
+        domApi.$insertBefore(hostElm, hostElm['s-cr'], node);
+        node.remove();
+
+      } else if (__BUILD_CONDITIONALS__.hasSlot && dataIdSplt[0] === SSR_SLOT_NODE_COMMENT) {
         // this comment node represents where a real <slot> node should go
         // replace the comment node with an actual <slot>
         childVNode = {

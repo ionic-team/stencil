@@ -3,7 +3,6 @@ import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, norm
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { SSR_HOST_ID } from '../util/constants';
 
 
 export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentRegistry, opts: d.HydrateOptions) {
@@ -107,31 +106,11 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
       return;
     }
 
-    // patch the render function that we can add SSR ids
-    // and to connect any elements it may have just appened to the DOM
-    let ssrIds = 0;
     const pltRender = plt.render;
     plt.render = function render(hostElm: d.HostElement, oldVNode: d.VNode, newVNode, useNativeShadowDom, encapsulation) {
-      let ssrId: number;
-      let existingSsrId: string;
-
-      if (hydrateTarget.ssrIds !== false) {
-        // this may have been patched more than once
-        // so reuse the ssr id if it already has one
-        if (oldVNode && oldVNode.elm) {
-          existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_HOST_ID);
-        }
-
-        if (existingSsrId) {
-          ssrId = parseInt(existingSsrId, 10);
-        } else {
-          ssrId = ssrIds++;
-        }
-      }
-
       useNativeShadowDom = false;
 
-      newVNode = pltRender(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation, ssrId);
+      newVNode = pltRender(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation, hostElm['s-ssr-id']);
 
       connectChildElements(config, plt, App, hydrateResults, newVNode.elm as Element);
 

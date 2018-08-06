@@ -38,6 +38,11 @@ export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppG
 
 
 function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta) {
+  if (typeof elm['s-ssr-id'] !== 'number') {
+    // during ssr, let's add a unique ssr id to each host element
+    elm['s-ssr-id'] = plt.nextSsrId();
+  }
+
   const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
   plt.hostSnapshotMap.set(elm, hostSnapshot);
 

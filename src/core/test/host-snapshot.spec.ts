@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { initHostSnapshot } from '../host-snapshot';
 import { mockDomApi } from '../../testing/mocks';
-import { ENCAPSULATION } from '../../util/constants';
+import { ENCAPSULATION, NODE_TYPE } from '../../util/constants';
 import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 describe('host-snapshot', () => {
@@ -54,24 +54,35 @@ describe('host-snapshot', () => {
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
 
-  it('do not set content reference node is shadow and supports shadow', () => {
+  it('set content reference node when ssr shadow dom component', () => {
     domApi.$attachShadow = () => {/**/};
     domApi.$supportsShadowDom = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
+    hostElm['s-ssr-id'] = 88;
+    __BUILD_CONDITIONALS__.ssrServerSide = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-cr']).toBeUndefined();
+    expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(hostElm['s-cr'].textContent).toBe(`c.88`);
+    expect(hostElm['s-cr']['s-cn']).toBe(true);
   });
 
-  it('do not set content reference node when ssr', () => {
-    hostElm.setAttribute('ssrh', '88');
+  it('set content reference node when ssr scoped css component', () => {
+    domApi.$attachShadow = () => {/**/};
+    domApi.$supportsShadowDom = true;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
+    hostElm['s-ssr-id'] = 88;
+    __BUILD_CONDITIONALS__.ssrServerSide = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(hostElm['s-cr']).toBeUndefined();
+    expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(hostElm['s-cr'].textContent).toBe(`c.88`);
+    expect(hostElm['s-cr']['s-cn']).toBe(true);
   });
 
   it('sets content reference text node and is content reference text node boolean', () => {
+    __BUILD_CONDITIONALS__.ssrServerSide = false;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr']).toBeDefined();
-    expect(hostElm['s-cr'].nodeType).toBe(3);
+    expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.TextNode);
     expect(hostElm['s-cr'].textContent).toBe('');
     expect(hostElm['s-cr']['s-cn']).toBe(true);
 

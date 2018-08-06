@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, SSR_HOST_ID } from '../util/constants';
+import { ENCAPSULATION, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID } from '../util/constants';
 
 
 export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
@@ -19,15 +19,24 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
-    if (!hostElm['s-cr'] && !domApi.$getAttribute(hostElm, SSR_HOST_ID) && (!domApi.$supportsShadowDom || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom)) {
+    if (__BUILD_CONDITIONALS__.ssrServerSide && !hostElm['s-cr'] && cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+      // we're doing server side rendering
+      // and this component is either a shadow dom or scoped css component
+      // so let's add this content reference as a comment
+      if (!domApi.$hasAttribute(hostElm, SSR_HOST_ID)) {
+        domApi.$setAttribute(hostElm, SSR_HOST_ID, hostElm['s-ssr-id']);
+        hostElm['s-cr'] = domApi.$createComment(`${SSR_CONTENT_REF_NODE_COMMENT}.${hostElm['s-ssr-id']}`) as any;
+        hostElm['s-cr']['s-cn'] = true;
+        domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
+      }
+
+    } else if (!hostElm['s-cr'] && (!domApi.$supportsShadowDom || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom)) {
       // only required when we're NOT using native shadow dom (slot)
       // or this browser doesn't support native shadow dom
-      // and this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
       // create a node to represent where the original
       // content was first placed, which is useful later on
-      hostElm['s-cr'] = domApi.$createTextNode('') as any;
-      hostElm['s-cr']['s-cn'] = true;
+      (hostElm['s-cr'] = domApi.$createTextNode('') as any)['s-cn'] = true;
       domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
     }
 

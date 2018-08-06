@@ -333,11 +333,16 @@ export interface HostElement extends HTMLElement {
   ['s-id']?: string;
 
   /**
+   * SSR Id:
+   * Numeric id assigned to the element during ssr.
+   */
+  ['s-ssr-id']?: number;
+
+  /**
    * Content Reference:
    * Reference to the HTML Comment that's placed inside of the
-   * host element's original content. This comment is used to
+   * host element's original content. This node is used to
    * always represent where host element's light dom is.
-   * (deprecated $defaultHolder)
    */
   ['s-cr']?: d.RenderNode;
 

@@ -52,7 +52,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
 
-      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot && __BUILD_CONDITIONALS__.hasShadowDom && isShadowDomComponent) {
+      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot) {
         // create a slot reference html comment node for server side
         // when the client side hydrates it'll turn this html comment
         // into an actual <slot> element
@@ -194,8 +194,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     containerElm?: d.RenderNode,
     childNode?: Node
   ) {
-    // $defaultHolder deprecated 2018-04-02
-    const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
+    const contentRef = parentElm['s-cr'];
     containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
     if ((containerElm as any).shadowRoot && domApi.$tagName(containerElm) === hostTagName) {
       containerElm = (containerElm as any).shadowRoot;
@@ -378,7 +377,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     return domApi.$parentNode(node['s-ol'] ? node['s-ol'] : node);
   }
 
-  function patchVNode(oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Comment) {
+  function patchVNode(oldVNode: d.VNode, newVNode: d.VNode) {
     const elm = newVNode.elm = oldVNode.elm;
     const oldChildren = oldVNode.vchildren;
     const newChildren = newVNode.vchildren;
@@ -421,9 +420,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (__BUILD_CONDITIONALS__.slotPolyfill && (defaultHolder = (elm['s-cr'] || (elm as any)['$defaultHolder']/* $defaultHolder deprecated 2018-04-02 */))) {
+    } else if (__BUILD_CONDITIONALS__.slotPolyfill && elm['s-cr']) {
       // this element has slotted content
-      domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
+      domApi.$setTextContent(domApi.$parentNode(elm['s-cr']), newVNode.vtext);
 
     } else if (oldVNode.vtext !== newVNode.vtext) {
       // update the text content for the text only vnode

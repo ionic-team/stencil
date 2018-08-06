@@ -144,11 +144,6 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     // it's official, this element has rendered
     hostElm['s-rn'] = true;
 
-    if ((hostElm as any)['$onRender']) {
-      // $onRender deprecated 2018-04-02
-      hostElm['s-rc'] = (hostElm as any)['$onRender'];
-    }
-
     if (hostElm['s-rc']) {
       // ok, so turns out there are some child host elements
       // waiting on this parent element to load

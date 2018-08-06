@@ -55,12 +55,13 @@ describe('hydrate', () => {
         <head>
           <style data-styles="" data-ssr="ion-test">
             .scs-ion-test-h {
-              color:red;
+              color: red;
             }
           </style>
         </head>
         <body>
-          <ion-test class="scs-ion-test-h ${config.hydratedCssClass}" ssrh="0">
+          <ion-test ssrh="0" class="scs-ion-test-h hydrated">
+            <!--c.0-->
             <div class="scs-ion-test" ssrc="0.0."></div>
           </ion-test>
         </body>
@@ -122,9 +123,9 @@ describe('hydrate', () => {
         <body>
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
             <elm-a ssrc="0.0.">
-              <div slot="slot-a">inner slot-a text</div>
-              <div>default slot text</div>
-              <div slot="slot-b">inner slot-b text</div>
+              <!--s.0.0.slot-a--><div slot="slot-a">inner slot-a text</div>
+              <!--s.0.1--><div>default slot text</div>
+              <!--s.0.2.slot-b--><div slot="slot-b">inner slot-b text</div>
             </elm-a>
           </ion-test>
         </body>
@@ -186,7 +187,7 @@ describe('hydrate', () => {
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
             <elm-a ssrc="0.0">
               <!--t.0.0-->inner text<!--/-->
-              content text
+              <!--s.0.1-->content text
             </elm-a>
           </ion-test>
         </body>

@@ -74,6 +74,9 @@ export function createPlatformServer(
   // internal id increment for unique ids
   let ids = 0;
 
+  // internal id increment for unique ssr ids
+  let ssrIds = 0;
+
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
     attachStyles: noop,
@@ -85,6 +88,7 @@ export function createPlatformServer(
     isDefinedComponent,
     onError,
     nextId: () => config.namespace + (ids++),
+    nextSsrId: () => (ssrIds++),
     propConnect,
     queue: (Context.queue = createQueueServer()),
     requestBundle: requestBundle,

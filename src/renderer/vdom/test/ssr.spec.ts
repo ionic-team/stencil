@@ -219,8 +219,13 @@ describe('ssr', () => {
       hostElm = removeWhitespaceFromNodes(ssrhNode.elm);
 
       expect(hostElm.getAttribute(SSR_HOST_ID)).toBe('1');
-      expect(hostElm.firstElementChild.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
-      expect(hostElm.firstElementChild.innerHTML).toBe('<child-a></child-a>');
+
+      const div = hostElm.firstElementChild as d.RenderNode;
+      expect(div.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
+      expect(div.outerHTML).toBe('<div ssrc="1.0."><!--s.1.0--><child-a></child-a></div>');
+
+      const slotRef = div.firstChild as d.RenderNode;
+      expect(slotRef.textContent).toBe('s.1.0');
     });
 
     it('should add same ssr to all elements', () => {
