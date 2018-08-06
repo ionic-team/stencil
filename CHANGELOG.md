@@ -1,3 +1,23 @@
+<a name="0.11.1"></a>
+## 🐝 [0.11.1](https://github.com/ionic-team/stencil/compare/v0.11.0...v0.11.1) (2018-08-06)
+
+
+### Bug Fixes
+
+* **angular:** disable tslint for generated code ([4ea8b9c](https://github.com/ionic-team/stencil/commit/4ea8b9c))
+
+
+### Features
+
+* **config:** expose limited rollup options for input and output. ([9f969a6](https://github.com/ionic-team/stencil/commit/9f969a6))
+
+
+### Performance Improvements
+
+* **components:** reduce size of components.d.ts distribution  ([e149120](https://github.com/ionic-team/stencil/commit/e149120))
+
+
+
 <a name="0.11.0"></a>
 # 🍇 [0.11.0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0) (2018-07-31)
 
