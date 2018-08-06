@@ -122,6 +122,7 @@ describe('hydrate', () => {
         <head></head>
         <body>
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
+            <!--c.0-->
             <elm-a ssrc="0.0.">
               <!--s.0.0.slot-a--><div slot="slot-a">inner slot-a text</div>
               <!--s.0.1--><div>default slot text</div>
@@ -185,6 +186,7 @@ describe('hydrate', () => {
         <head></head>
         <body>
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
+            <!--c.0-->
             <elm-a ssrc="0.0">
               <!--t.0.0-->inner text<!--/-->
               <!--s.0.1-->content text
@@ -238,7 +240,8 @@ describe('hydrate', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test ssrh="0" class="${config.hydratedCssClass}">
+          <ion-test ssrh="0" class="hydrated">
+            <!--c.0-->
             <div ssrc="0.0."></div>
           </ion-test>
         </body>

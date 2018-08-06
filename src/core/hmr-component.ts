@@ -34,7 +34,7 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
   };
 
   // create the new host snapshot from the element
-  plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
+  plt.hostSnapshotMap.set(elm, initHostSnapshot(plt, plt.domApi, cmpMeta, elm));
 
   // request the bundle again
   plt.requestBundle(cmpMeta, elm, hmrVersionId);

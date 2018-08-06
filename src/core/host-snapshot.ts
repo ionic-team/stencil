@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { ENCAPSULATION, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID } from '../util/constants';
 
 
-export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
+export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
   // the host element has connected to the dom
   // and we've waited a tick to make sure all frameworks
   // have finished adding attributes and child nodes to the host
@@ -19,11 +19,13 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
-    if (__BUILD_CONDITIONALS__.ssrServerSide && !hostElm['s-cr'] && cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+    if (__BUILD_CONDITIONALS__.ssrServerSide && !hostElm['s-cr']) {
       // we're doing server side rendering
       // and this component is either a shadow dom or scoped css component
       // so let's add this content reference as a comment
       if (!domApi.$hasAttribute(hostElm, SSR_HOST_ID)) {
+        // during ssr, let's add a unique ssr id to each host element
+        hostElm['s-ssr-id'] = plt.nextSsrId();
         domApi.$setAttribute(hostElm, SSR_HOST_ID, hostElm['s-ssr-id']);
         hostElm['s-cr'] = domApi.$createComment(`${SSR_CONTENT_REF_NODE_COMMENT}.${hostElm['s-ssr-id']}`) as any;
         hostElm['s-cr']['s-cn'] = true;

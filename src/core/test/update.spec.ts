@@ -81,6 +81,7 @@ describe('instance update', () => {
   });
 
   it('should render text', async () => {
+    __BUILD_CONDITIONALS__.ssrServerSide = false;
 
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
@@ -102,6 +103,8 @@ describe('instance update', () => {
   });
 
   it('should render text where null values exist in an array', async () => {
+    __BUILD_CONDITIONALS__.ssrServerSide = false;
+
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -117,15 +120,26 @@ describe('instance update', () => {
 
     const node = await mockConnect(plt, '<ion-test></ion-test>');
 
-    const elm = await waitForLoad(plt, node, 'ion-test');
-    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.TextNode);
-    expect(elm.childNodes[1].nodeType).toBe(3); // Node.TEXT_NODE
-    expect(elm.childNodes[1].textContent).toBe('');
-    expect(elm.childNodes[2].nodeType).toBe(1); // Node.ELEMENT_NODE
-    expect(elm.childNodes[2].nodeName).toBe('GRASSHOPPER');
-    expect(elm.childNodes[2].textContent).toBe('hi');
-    expect(elm.childNodes[3].nodeType).toBe(3); // Node.TEXT_NODE
-    expect(elm.childNodes[3].textContent).toBe('');
+    const elm = await waitForLoad(plt, node, 'ion-test') as d.HostElement;
+
+    const contentRef = elm.childNodes[0] as d.RenderNode;
+    expect(contentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(contentRef.textContent).toBe('');
+    expect(contentRef['s-cn']).toBe(true);
+    expect(elm['s-cr']).toBe(contentRef);
+
+    const emptyTextNode1 = elm.childNodes[1] as d.RenderNode;
+    expect(emptyTextNode1.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(emptyTextNode1.textContent).toBe('');
+
+    const grassHopper = elm.childNodes[2] as d.RenderNode;
+    expect(grassHopper.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(grassHopper.nodeName).toBe('GRASSHOPPER');
+    expect(grassHopper.textContent).toBe('hi');
+
+    const emptyTextNode2 = elm.childNodes[3] as d.RenderNode;
+    expect(emptyTextNode2.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(emptyTextNode2.textContent).toBe('');
   });
 
   it('should not run renderer when no render() fn', async () => {

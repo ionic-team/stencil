@@ -12,7 +12,7 @@ export function patchDomApi(config: d.Config, plt: d.PlatformApi, domApi: d.DomA
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && !cmpMeta.componentConstructor) {
       initHostElement(plt, cmpMeta, elm, config.namespace);
-      const hostSnapshot = initHostSnapshot(domApi, cmpMeta, elm);
+      const hostSnapshot = initHostSnapshot(plt, domApi, cmpMeta, elm);
       plt.hostSnapshotMap.set(elm, hostSnapshot);
       plt.requestBundle(cmpMeta, elm);
     }

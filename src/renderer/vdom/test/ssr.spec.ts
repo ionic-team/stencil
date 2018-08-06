@@ -9,11 +9,12 @@ import { SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_SHADOW_DOM_HOST_ID }
 
 describe('ssr', () => {
 
-  const plt = mockPlatform();
+  let plt: d.PlatformApi;
   let domApi: d.DomApi;
   let patch: d.RendererApi;
 
   beforeEach(() => {
+    plt = mockPlatform();
     domApi = mockDomApi();
     patch = createRendererPatch(<any>plt, domApi);
   });
@@ -210,7 +211,7 @@ describe('ssr', () => {
         )
       );
 
-      initHostSnapshot(domApi, {}, hostElm as d.HostElement);
+      initHostSnapshot(plt, domApi, {}, hostElm as d.HostElement);
 
       const defaultContentNode = domApi.$createElement('child-a');
       hostElm.appendChild(defaultContentNode);

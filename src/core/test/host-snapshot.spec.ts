@@ -1,16 +1,18 @@
 import * as d from '../../declarations';
 import { initHostSnapshot } from '../host-snapshot';
-import { mockDomApi } from '../../testing/mocks';
+import { mockDomApi, mockPlatform } from '../../testing/mocks';
 import { ENCAPSULATION, NODE_TYPE } from '../../util/constants';
 import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 describe('host-snapshot', () => {
 
+  let plt: d.PlatformApi;
   let domApi: d.DomApi;
   let cmpMeta: d.ComponentMeta;
   let hostElm: d.HostElement;
 
   beforeEach(() => {
+    plt = mockPlatform();
     domApi = mockDomApi();
     cmpMeta = { tagNameMeta: 'ion-tag' };
     hostElm = domApi.$createElement('cmp-a') as any;
@@ -23,7 +25,7 @@ describe('host-snapshot', () => {
     cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
     __BUILD_CONDITIONALS__.hasShadowDom = false;
     __BUILD_CONDITIONALS__.slotPolyfill = true;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
   });
 
@@ -33,7 +35,7 @@ describe('host-snapshot', () => {
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     __BUILD_CONDITIONALS__.isDev = false;
     domApi.$supportsShadowDom = false;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
   });
 
@@ -42,7 +44,7 @@ describe('host-snapshot', () => {
     domApi.$attachShadow = () => wasAttached = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     domApi.$supportsShadowDom = true;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(true);
   });
 
@@ -50,7 +52,7 @@ describe('host-snapshot', () => {
     domApi.$supportsShadowDom = false;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     __BUILD_CONDITIONALS__.isDev = false;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
 
@@ -58,11 +60,10 @@ describe('host-snapshot', () => {
     domApi.$attachShadow = () => {/**/};
     domApi.$supportsShadowDom = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
-    hostElm['s-ssr-id'] = 88;
     __BUILD_CONDITIONALS__.ssrServerSide = true;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
-    expect(hostElm['s-cr'].textContent).toBe(`c.88`);
+    expect(hostElm['s-cr'].textContent).toBe(`c.0`);
     expect(hostElm['s-cr']['s-cn']).toBe(true);
   });
 
@@ -70,17 +71,16 @@ describe('host-snapshot', () => {
     domApi.$attachShadow = () => {/**/};
     domApi.$supportsShadowDom = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
-    hostElm['s-ssr-id'] = 88;
     __BUILD_CONDITIONALS__.ssrServerSide = true;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
-    expect(hostElm['s-cr'].textContent).toBe(`c.88`);
+    expect(hostElm['s-cr'].textContent).toBe(`c.0`);
     expect(hostElm['s-cr']['s-cn']).toBe(true);
   });
 
   it('sets content reference text node and is content reference text node boolean', () => {
     __BUILD_CONDITIONALS__.ssrServerSide = false;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
+    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr']).toBeDefined();
     expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.TextNode);
     expect(hostElm['s-cr'].textContent).toBe('');
@@ -102,7 +102,7 @@ describe('host-snapshot', () => {
     hostElm.setAttribute('first', 'Marty');
     hostElm.setAttribute('last-name', 'McFly');
 
-    const s = initHostSnapshot(domApi, cmpMeta, hostElm);
+    const s = initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(s.$attributes['dont-care']).toBeUndefined();
     expect(s.$attributes['first']).toBe('Marty');
     expect(s.$attributes['last-name']).toBe('McFly');
@@ -110,7 +110,7 @@ describe('host-snapshot', () => {
 
   it('set id, no members', () => {
     hostElm['s-id'] = 'App88';
-    const s = initHostSnapshot(domApi, cmpMeta, hostElm);
+    const s = initHostSnapshot(plt, domApi, cmpMeta, hostElm);
     expect(s.$id).toBe('App88');
     expect(s.$attributes).toEqual({});
   });
