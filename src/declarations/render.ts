@@ -150,6 +150,11 @@ export interface RenderNode extends d.HostElement {
   ['s-hn']?: string;
 
   /**
+   * The string id of the original location
+   */
+  ['s-light-dom-id']?: string;
+
+  /**
    * Original Location Reference:
    * A reference pointing to the comment
    * which represents the original location

@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_ORIGINAL_LOCATION_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -34,7 +34,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
         if (!newVNode.vchildren) {
           // slot element does not have fallback content
-          // create an html comment we'll use to always reference
+          // create an node we'll use to always reference
           // where actual slot content should sit next to
           newVNode.isSlotReference = true;
 
@@ -607,8 +607,26 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
           if (!relocateNode.nodeToRelocate['s-ol']) {
             // add a reference node marking this node's original location
             // keep a reference to this node for later lookups
-            orgLocationNode = domApi.$createTextNode('') as any;
-            orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
+            if (__BUILD_CONDITIONALS__.ssrServerSide) {
+              const relocateId = `${SSR_ORIGINAL_LOCATION_NODE_COMMENT}.${i}`;
+              orgLocationNode = domApi.$createComment(relocateId) as any;
+
+              const nodeType = domApi.$nodeType(relocateNode.nodeToRelocate);
+              if (nodeType === NODE_TYPE.ElementNode) {
+                domApi.$setAttribute(relocateNode.nodeToRelocate, `ssro`, i);
+
+              } else if (nodeType === NODE_TYPE.TextNode) {
+                domApi.$insertBefore(
+                  domApi.$parentNode(relocateNode.nodeToRelocate),
+                  domApi.$createComment('to.' +relocateId),
+                  relocateNode.nodeToRelocate
+                );
+              }
+
+            } else {
+              orgLocationNode = domApi.$createTextNode('') as any;
+              orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
+            }
 
             domApi.$insertBefore(
               domApi.$parentNode(relocateNode.nodeToRelocate),
@@ -702,27 +720,6 @@ export function addSsrSlotted(domApi: d.DomApi, hostElm: d.HostElement, useNativ
     SSR_HOST_ID,
     `${__BUILD_CONDITIONALS__.hasShadowDom && useNativeShadowDom ? SSR_SHADOW_DOM_HOST_ID : ''}${ssrId}`
   );
-
-  // before we got ahead and hydrate anything
-  // since we're in the middle of server side rendering
-  // let's also add attributes to the direct child nodes
-  // of this shadow dom component. This way the client side
-  // knows what nodes should stay in the light dom
-  const childNodes = domApi.$childNodes(hostElm);
-  for (let i = 0; i < childNodes.length; i++) {
-    const childNode = childNodes[i];
-
-    if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode) {
-      // this is an element that's an immediate child of the host element
-      domApi.$setAttribute(childNode, SSR_LIGHT_DOM_ATTR, `${ssrId}.${i}`);
-
-    } else if (domApi.$nodeType(childNode) === NODE_TYPE.TextNode && domApi.$getTextContent(childNode).trim() !== '') {
-      // this is a text node that's an immediate child of the host element
-      const startComment = domApi.$createComment(`${SSR_LIGHT_DOM_NODE_COMMENT}.${ssrId}.${i}`);
-      domApi.$insertBefore(hostElm, startComment, childNode);
-      i++;
-    }
-  }
 }
 
 

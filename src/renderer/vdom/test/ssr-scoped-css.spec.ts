@@ -114,16 +114,27 @@ describe('ssr scoped css', () => {
         <body>
           <cmp-a ssrh="0" class="scs-cmp-a-h scs-cmp-a-s hydrated">
             <!--c.0-->
+            <!--o.0.5-->
+            <!--o.0.4-->
+            <!--o.0.3-->
+            <!--o.0.2-->
+            <!--o.0.1-->
+            <!--o.0.0-->
             <header class="scs-cmp-a" ssrc="0.0">
               <!--t.0.0-->
                 cmp-a scope-encapsulated
               <!--/-->
             </header>
             <!--s.0.1-->
-            <!--l.0.1-->
+            <!--l.0.0-->
               cmp-a light-dom top
-            <cmp-b ssrh="1" ssrl="0.3" class="scs-cmp-b-h hydrated">
+            <cmp-b ssrl="0.3" ssrh="1" class="scs-cmp-b-h hydrated">
               <!--c.1-->
+              <!--o.1.3-->
+              <!--o.1.2-->
+              <!--o.1.1-->
+              <!--o.1.4-->
+              <!--o.1.0-->
               <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
                 <!--s.1.0-->
                 <article ssrl="1.2">
@@ -164,85 +175,95 @@ describe('ssr scoped css', () => {
 
     hydrateClientFromSsr(plt, domApi, hydratedRoot);
 
-    const cmpAElm = hydratedRoot.querySelector('cmp-a') as d.HostElement;
-    const cmpASsrVnode = plt.vnodeMap.get(cmpAElm);
+    const cmpAHost = hydratedRoot.querySelector('cmp-a') as d.HostElement;
+    const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
     expect(cmpASsrVnode.vtag).toBe('cmp-a');
-    expect(cmpASsrVnode.elm).toBe(cmpAElm);
+    expect(cmpASsrVnode.elm).toBe(cmpAHost);
     isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
-    const cmpAContentRef = cmpAElm['s-cr'];
+    const cmpAContentRef = cmpAHost['s-cr'];
     expect(cmpAContentRef).toBeDefined();
     expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpAContentRef['s-cn']).toBe(true);
-    expect(cmpAContentRef.parentNode).toBe(cmpAElm);
-    expect(domApi.$childNodes(cmpAElm)[0]).toBe(cmpAContentRef);
+    expect(cmpAContentRef.parentNode).toBe(cmpAHost);
+    expect(domApi.$childNodes(cmpAHost)[0]).toBe(cmpAContentRef);
 
-    const cmpBElm = hydratedRoot.querySelector('cmp-b') as d.HostElement;
-    const cmpBSsrVnode = plt.vnodeMap.get(cmpBElm);
+    const cmpAHeader = cmpAHost.querySelector('header') as d.RenderNode;
+    expect(cmpAHeader['s-hn']).toBe('cmp-a');
+    expect(cmpAHeader['s-ol']).toBe('cmp-a');
+
+    const cmpAHeaderTextComment = cmpAHeader.firstChild as d.RenderNode;
+    expect(cmpAHeaderTextComment['s-hn']).toBe('cmp-a');
+
+    const cmpBHost = hydratedRoot.querySelector('cmp-b') as d.HostElement;
+    const cmpBSsrVnode = plt.vnodeMap.get(cmpBHost);
     expect(cmpBSsrVnode.vtag).toBe('cmp-b');
-    expect(cmpBSsrVnode.elm).toBe(cmpBElm);
+    expect(cmpBSsrVnode.elm).toBe(cmpBHost);
     isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
 
-    const cmpBContentRef = cmpBElm['s-cr'];
+    const cmpBContentRef = cmpBHost['s-cr'];
     expect(cmpBContentRef).toBeDefined();
     expect(cmpBContentRef.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpBContentRef['s-cn']).toBe(true);
-    expect(cmpBContentRef.parentNode).toBe(cmpBElm);
-    expect(domApi.$childNodes(cmpBElm)[0]).toBe(cmpBContentRef);
+    expect(cmpBContentRef.parentNode).toBe(cmpBHost);
+    expect(domApi.$childNodes(cmpBHost)[0]).toBe(cmpBContentRef);
 
-    const cmpCElm = hydratedRoot.querySelector('cmp-c') as d.HostElement;
-    const cmpCSsrVnode = plt.vnodeMap.get(cmpCElm);
+    const cmpBDiv = cmpBHost.querySelector('div') as d.RenderNode;
+    expect(cmpBDiv['s-hn']).toBe('cmp-b');
+
+    const cmpBSection = cmpBHost.querySelector('section') as d.RenderNode;
+    expect(cmpBSection['s-hn']).toBe('cmp-b');
+
+    const cmpCHost = hydratedRoot.querySelector('cmp-c') as d.HostElement;
+    const cmpCSsrVnode = plt.vnodeMap.get(cmpCHost);
     expect(cmpCSsrVnode.vtag).toBe('cmp-c');
-    expect(cmpCSsrVnode.elm).toBe(cmpCElm);
+    expect(cmpCSsrVnode.elm).toBe(cmpCHost);
     isSameVChildren(cmpCRender, cmpCSsrVnode.vchildren);
 
-    const cmpCContentRef = cmpCElm['s-cr'];
+    const cmpCContentRef = cmpCHost['s-cr'];
     expect(cmpCContentRef).toBeDefined();
     expect(cmpCContentRef.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpCContentRef['s-cn']).toBe(true);
-    expect(cmpCContentRef.parentNode).toBe(cmpCElm);
-    expect(domApi.$childNodes(cmpCElm)[0]).toBe(cmpCContentRef);
+    expect(cmpCContentRef.parentNode).toBe(cmpCHost);
+    expect(domApi.$childNodes(cmpCHost)[0]).toBe(cmpCContentRef);
 
-
-    // expect(compareHtml(hydratedRoot.innerHTML)).toBe(compareHtml(`
-    //   <cmp-a class="hydrated">
-    //     <shadow-root>
-    //       <header>
-    //         cmp-a shadow-dom
-    //       </header>
-    //       <slot></slot>
-    //       cmp-a light-dom top
-    //       <cmp-b class="hydrated">
-    //         <shadow-root>
-    //           <div>
-    //             <slot></slot>
-    //             <article>
-    //               cmp-b light-dom
-    //             </article>
-    //             <section>
-    //               cmp-b shadow-dom
-    //             </section>
-    //             <slot name="named-slot"></slot>
-    //             <nav slot="named-slot">
-    //               cmp-b light-dom
-    //             </nav>
-    //             <cmp-c class="hydrated">
-    //               <shadow-root>
-    //                 cmp-c light-dom
-    //                 <footer>
-    //                   cmp-c shadow-dom
-    //                 </footer>
-    //               </shadow-root>
-    //             </cmp-c>
-    //           </div>
-    //         </shadow-root>
-    //       </cmp-b>
-    //       <span>
-    //         cmp-a light-dom bottom
-    //       </span>
-    //     </shadow-root>
-    //   </cmp-a>
-    // `));
+    expect(compareHtml(hydratedRoot.innerHTML)).toBe(compareHtml(`
+      <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
+        <header class="scs-cmp-a">
+          cmp-a scope-encapsulated
+        </header>
+        <!--s.0.1-->
+        <!--l.0.1-->
+          cmp-a light-dom top
+        <cmp-b ssrl="0.3" class="scs-cmp-b-h hydrated">
+          <div class="scs-cmp-b scs-cmp-b-s">
+            <!--s.1.0-->
+            <article ssrl="1.2">
+              cmp-b light-dom
+            </article>
+            <section class="scs-cmp-b">
+              cmp-b scope-encapsulated
+            </section>
+            <!--s.1.2.named-slot-->
+            <nav slot="named-slot" ssrl="1.4">
+              cmp-b light-dom
+            </nav>
+            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated">
+              <!--l.2.2-->
+                cmp-c light-dom
+              <footer class="scs-cmp-c">
+                <!--t.2.0-->
+                  cmp-c scope-encapsulated
+                <!--/-->
+              </footer>
+            </cmp-c>
+          </div>
+        </cmp-b>
+        <span ssrl="0.5">
+          cmp-a light-dom bottom
+        </span>
+      </cmp-a>
+    `));
   });
 
 });

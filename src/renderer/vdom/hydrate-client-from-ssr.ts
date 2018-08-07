@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, n, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 
 
 // Welcome SSR Friends!!!
-
 
 export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
   // mark the root element has fully loaded since it was prerendered
@@ -105,14 +104,14 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
         }
 
         // keep drilling down through child nodes and build up the vnode
-        addChildSsrVNodes(domApi, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
+        addChildSsrVNodes(domApi, ssrVNode.vtag as string, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
       }
     }
   }
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, slottedCmp: d.SlottedComponent, removeNodes: d.RenderNode[]) {
+function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, slottedCmp: d.SlottedComponent, removeNodes: d.RenderNode[]) {
   let attrId: string;
   let dataIdSplt: any[];
   let childVNode: d.VNode;
@@ -138,6 +137,8 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
           vattrs: null,
           vchildren: null
         };
+
+        node['s-hn'] = hostTagName;
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
@@ -182,7 +183,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
     // keep drilling down through the elements
     childNodes = domApi.$childNodes(node) as NodeListOf<d.RenderNode>;
     for (let i = 0; i < childNodes.length; i++) {
-      addChildSsrVNodes(domApi, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
+      addChildSsrVNodes(domApi, hostTagName, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
     }
 
   } else if (nodeType === NODE_TYPE.CommentNode) {
@@ -250,6 +251,8 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
                 elm: nextNode
               };
 
+              nextNode['s-hn'] = hostTagName;
+
               // this is a new child vnode
               // so ensure its parent vnode has the vchildren array
               if (!parentVNode.vchildren) {
@@ -266,6 +269,11 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
               if (nextNode && domApi.$nodeType(nextNode) === NODE_TYPE.CommentNode && domApi.$getTextContent(nextNode) === '/') {
                 removeNodes.push(nextNode);
               }
+
+            } if (dataIdSplt[0] === n) {
+              console.log('\n\n\n\n\n\n', dataIdSplt, '\n\n\n\n\n\n')
+
+
 
             } else if (__BUILD_CONDITIONALS__.hasShadowDom && dataIdSplt[0] === SSR_LIGHT_DOM_NODE_COMMENT) {
               // this is an ssr text node start comment for light dom content

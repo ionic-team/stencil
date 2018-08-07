@@ -67,7 +67,7 @@ export const enum NODE_TYPE {
 
 
 /**
- * SSR Attribute Names
+ * SSR Identifiers
  */
 export const SSR_HOST_ID = 'ssrh';
 export const SSR_SHADOW_DOM_HOST_ID = 's';
@@ -77,6 +77,7 @@ export const SSR_CONTENT_REF_NODE_COMMENT = 'c';
 export const SSR_TEXT_NODE_COMMENT = 't';
 export const SSR_SLOT_NODE_COMMENT = 's';
 export const SSR_LIGHT_DOM_NODE_COMMENT = 'l';
+export const SSR_ORIGINAL_LOCATION_NODE_COMMENT = 'o';
 
 /**
  * Default style mode id

@@ -154,6 +154,17 @@ describe('renderer', () => {
       expect(hostElm.firstChild.classList.contains('scs-my-tag')).toBe(true);
     });
 
+    it('adds s-hn to children', () => {
+      hostElm = mockElement('my-tag');
+      vnode0 = {};
+      vnode0.elm = hostElm;
+      hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null, 'text')), false, 'scoped').elm;
+
+      const div = hostElm.querySelector('div') as d.RenderNode;
+      expect(div['s-hn']).toBe('my-tag');
+      expect(div.firstChild['s-hn']).toBe('my-tag');
+    });
+
   });
 
   describe('created element', () => {

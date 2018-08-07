@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID } from '../util/constants';
+import { ENCAPSULATION, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, NODE_TYPE, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT } from '../util/constants';
 
 
 export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
@@ -19,15 +19,40 @@ export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: 
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
+
     if (__BUILD_CONDITIONALS__.ssrServerSide && !hostElm['s-cr']) {
       // we're doing server side rendering
       // and this component is either a shadow dom or scoped css component
       // so let's add this content reference as a comment
       if (!domApi.$hasAttribute(hostElm, SSR_HOST_ID)) {
         // during ssr, let's add a unique ssr id to each host element
-        hostElm['s-ssr-id'] = plt.nextSsrId();
-        domApi.$setAttribute(hostElm, SSR_HOST_ID, hostElm['s-ssr-id']);
-        hostElm['s-cr'] = domApi.$createComment(`${SSR_CONTENT_REF_NODE_COMMENT}.${hostElm['s-ssr-id']}`) as any;
+        const ssrId = plt.nextSsrId();
+
+        // get an array of all the child nodes of this host element
+        // const childNodes = Array.prototype.slice.call(domApi.$childNodes(hostElm)) as d.RenderNode[];
+
+        // childNodes.forEach((childNode, i) => {
+        //   // before we got ahead and hydrate anything
+        //   // since we're in the middle of server side rendering
+        //   // let's also add attributes to the direct child nodes
+        //   // of this shadow dom component. This way the client side
+        //   // knows what nodes should stay in the light dom
+        //   childNode['s-light-dom-id'] = `${ssrId}.${i}`;
+
+        //   if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode) {
+        //     // this is an element that's an immediate child of the host element
+        //     domApi.$setAttribute(childNode, SSR_LIGHT_DOM_ATTR, childNode['s-light-dom-id']);
+
+        //   } else if (domApi.$nodeType(childNode) === NODE_TYPE.TextNode && domApi.$getTextContent(childNode).trim() !== '') {
+        //     // this is a text node that's an immediate child of the host element
+        //     const startComment = domApi.$createComment(`${SSR_LIGHT_DOM_NODE_COMMENT}.${childNode['s-light-dom-id']}`);
+        //     domApi.$insertBefore(hostElm, startComment, childNode);
+        //   }
+        // });
+
+        hostElm['s-ssr-id'] = ssrId;
+        domApi.$setAttribute(hostElm, SSR_HOST_ID, ssrId);
+        hostElm['s-cr'] = domApi.$createComment(`${SSR_CONTENT_REF_NODE_COMMENT}.${ssrId}`) as any;
         hostElm['s-cr']['s-cn'] = true;
         domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
       }
