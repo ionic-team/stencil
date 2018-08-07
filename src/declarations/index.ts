@@ -20,7 +20,7 @@ export * from './events';
 export * from './file-system';
 export * from './fs-watch';
 export * from './in-memory-fs';
-export * from './jsx';
+export { JSX, JSXElements, CssClassMap } from './jsx';
 export * from './logger';
 export * from './minify-js';
 export * from './output-targets';
