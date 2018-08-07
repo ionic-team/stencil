@@ -25,6 +25,8 @@ export const RESERVED_PROPERTIES: string[] = [
   'Promise',
   'publicPath',
   'queue',
+  'ael',
+  'rel',
   'raf',
   'read',
   'ref',
