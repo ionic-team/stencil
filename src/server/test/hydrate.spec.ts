@@ -124,9 +124,9 @@ describe('hydrate', () => {
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
             <!--c.0-->
             <elm-a ssrc="0.0.">
-              <!--s.0.0.slot-a--><div slot="slot-a">inner slot-a text</div>
-              <!--s.0.1--><div>default slot text</div>
-              <!--s.0.2.slot-b--><div slot="slot-b">inner slot-b text</div>
+              <!--s.0.0.slot-a--><div slot="slot-a" ssrl="0.6">inner slot-a text</div>
+              <!--s.0.1--><div ssrl="0.2">default slot text</div>
+              <!--s.0.2.slot-b--><div slot="slot-b" ssrl="0.4">inner slot-b text</div>
             </elm-a>
           </ion-test>
         </body>
@@ -162,7 +162,7 @@ describe('hydrate', () => {
           }
           render() {
             return h('elm-a', null,
-              'inner text',
+              'component content',
               h('slot', null)
             );
           }
@@ -172,7 +172,7 @@ describe('hydrate', () => {
     const opts: d.HydrateOptions = {
       html: `
         <ion-test>
-          content text
+          light-dom content
         </ion-test>
       `
     };
@@ -188,8 +188,8 @@ describe('hydrate', () => {
           <ion-test ssrh="0" class="${config.hydratedCssClass}">
             <!--c.0-->
             <elm-a ssrc="0.0">
-              <!--t.0.0-->inner text<!--/-->
-              <!--s.0.1-->content text
+              <!--t.0.0-->component content<!--/-->
+              <!--s.0.1--><!--l.0.1-->light-dom content
             </elm-a>
           </ion-test>
         </body>

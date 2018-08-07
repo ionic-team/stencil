@@ -10,17 +10,17 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
   plt.hasLoadedMap.set(rootElm as d.HostElement, true);
 
   const removeNodes: d.RenderNode[] = [];
-  const shadowDomComponents: d.ShadowDomComponent[] = [];
+  const slottedCmps: d.SlottedComponent[] = [];
 
   // start drilling down through the dom looking
   // for elements that are actually hydrated components
-  hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, shadowDomComponents, removeNodes);
+  hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, slottedCmps, removeNodes);
 
   // remove all the nodes we identified we no longer need in the dom
   removeNodes.forEach(removeNode => removeNode.remove());
 
-  if (__BUILD_CONDITIONALS__.hasShadowDom) {
-    shadowDomComponents.forEach(shadowDomComponent => {
+  slottedCmps.forEach(slottedCmp => {
+    if (__BUILD_CONDITIONALS__.hasShadowDom && slottedCmp.useShadowDom) {
       // cool so we finished up building a vnode out of the ssr data found in the html
       // and turns out that this host element is a component that should use shadow dom
       // we've also collected up all of the nodes that should be relocated to the light dom
@@ -28,11 +28,11 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
       // If you're reading this, you rock, and we appreciate you. You stay classy San Dieago.
 
       // attach a shadow root to the host element
-      const shadowRoot = domApi.$attachShadow(shadowDomComponent.hostElm);
+      const shadowRoot = domApi.$attachShadow(slottedCmp.hostElm);
 
       // move all of the current content child nodes into the shadow root
       // get all the child nodes of this host element
-      const childNodes = domApi.$childNodes(shadowDomComponent.hostElm) as NodeListOf<d.RenderNode>;
+      const childNodes = domApi.$childNodes(slottedCmp.hostElm) as NodeListOf<d.RenderNode>;
       for (let i = childNodes.length - 1; i >= 0; i--) {
         // relocate all of the host content nodes into the shadow root
         const node = childNodes[i];
@@ -45,21 +45,21 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
         }
       }
 
-      shadowDomComponent.lightDomNodes.sort((a, b) => {
+      slottedCmp.lightDomNodes.sort((a, b) => {
         if (a.contentIndex < b.contentIndex) return 1;
         return -1;
       });
 
-      shadowDomComponent.lightDomNodes.forEach(lightDomNode => {
+      slottedCmp.lightDomNodes.forEach(lightDomNode => {
         lightDomNode.elm.remove();
-        domApi.$insertBefore(shadowDomComponent.hostElm, lightDomNode.elm);
+        domApi.$insertBefore(slottedCmp.hostElm, lightDomNode.elm);
       });
-    });
-  }
+    }
+  });
 }
 
 
-function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, shadowDomComponents: d.ShadowDomComponent[], removeNodes: d.RenderNode[], childNodes?: NodeListOf<d.RenderNode>, node?: d.RenderNode, i?: number, ssrHostId?: string, ssrVNode?: d.VNode) {
+function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, slottedCmps: d.SlottedComponent[], removeNodes: d.RenderNode[], childNodes?: NodeListOf<d.RenderNode>, node?: d.RenderNode, i?: number, ssrHostId?: string, ssrVNode?: d.VNode) {
   // get all the child nodes for this element
   // this includes elements, text nodes and comment nodes
   childNodes = domApi.$childNodes(parentNode) as NodeListOf<d.RenderNode>;
@@ -71,7 +71,7 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
     if (domApi.$nodeType(node) === NODE_TYPE.ElementNode) {
       // this is an element node :)
       // keep drilling down first so we hydrate from bottom up
-      hydrateElementFromSsr(plt, domApi, node, shadowDomComponents, removeNodes);
+      hydrateElementFromSsr(plt, domApi, node, slottedCmps, removeNodes);
 
       // see if this element has a host id attribute
       ssrHostId = domApi.$getAttribute(node, SSR_HOST_ID);
@@ -91,28 +91,28 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
         // store this vnode data with the actual element as the key
         plt.vnodeMap.set(node, ssrVNode);
 
-        let shadowDomComponent: d.ShadowDomComponent;
-        if (__BUILD_CONDITIONALS__.hasShadowDom && domApi.$supportsShadowDom && ssrHostId.includes(SSR_SHADOW_DOM_HOST_ID)) {
+        const slottedCmp: d.SlottedComponent = {
+          hostElm: node,
+          lightDomNodes: [] as any,
+          useShadowDom: (__BUILD_CONDITIONALS__.hasShadowDom && domApi.$supportsShadowDom && ssrHostId.includes(SSR_SHADOW_DOM_HOST_ID))
+        };
+        slottedCmps.push(slottedCmp);
+
+        if (slottedCmp.useShadowDom) {
           // we know this is host node cuz of the id had some prefix
           // well let's trim it off to get the real host id
           ssrHostId = ssrHostId.substring(1);
-
-          shadowDomComponent = {
-            hostElm: node,
-            lightDomNodes: [] as any
-          };
-          shadowDomComponents.push(shadowDomComponent);
         }
 
         // keep drilling down through child nodes and build up the vnode
-        addChildSsrVNodes(domApi, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, shadowDomComponent, removeNodes);
+        addChildSsrVNodes(domApi, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
       }
     }
   }
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, shadowDomComponent: d.ShadowDomComponent, removeNodes: d.RenderNode[]) {
+function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, slottedCmp: d.SlottedComponent, removeNodes: d.RenderNode[]) {
   let attrId: string;
   let dataIdSplt: any[];
   let childVNode: d.VNode;
@@ -169,7 +169,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
       if (dataIdSplt[0] === ssrHostId) {
         // cool, so looks like this element is a light dom that should
         // be relocated to be a direct child of the host component
-        shadowDomComponent.lightDomNodes.push({
+        slottedCmp.lightDomNodes.push({
           contentIndex: parseInt(dataIdSplt[2], 10),
           elm: node
         });
@@ -182,7 +182,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
     // keep drilling down through the elements
     childNodes = domApi.$childNodes(node) as NodeListOf<d.RenderNode>;
     for (let i = 0; i < childNodes.length; i++) {
-      addChildSsrVNodes(domApi, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, shadowDomComponent, removeNodes);
+      addChildSsrVNodes(domApi, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
     }
 
   } else if (nodeType === NODE_TYPE.CommentNode) {
@@ -271,7 +271,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostElm: d.HostElement, node: d.Ren
               // this is an ssr text node start comment for light dom content
               // let's remember the content index number for this node
               // so we can later sort them to the correct order in the light dom
-              shadowDomComponent.lightDomNodes.push({
+              slottedCmp.lightDomNodes.push({
                 contentIndex: parseInt(dataIdSplt[2], 10),
                 elm: nextNode
               });

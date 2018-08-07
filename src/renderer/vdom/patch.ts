@@ -583,13 +583,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       // SSR ONLY: we've been given an SSR id, so the host element
       // should be given the ssr id attribute
       ssrId = ssrPatchId;
-
-      if (isShadowDomComponent) {
-        // this is a shadow dom component we're server side rendering
-        addShadowDomSsrData(domApi, hostElm, ssrId);
-      } else {
-        domApi.$setAttribute(oldVNode.elm, SSR_HOST_ID, ssrId);
-      }
+      addSsrSlotted(domApi, hostElm, isShadowDomComponent, ssrId);
     }
 
     if (__BUILD_CONDITIONALS__.slotPolyfill) {
@@ -699,11 +693,15 @@ export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
 }
 
 
-export function addShadowDomSsrData(domApi: d.DomApi, hostElm: d.HostElement, ssrId: number) {
+export function addSsrSlotted(domApi: d.DomApi, hostElm: d.HostElement, useNativeShadowDom: boolean, ssrId: number) {
   // this is a shadow dom component we're server side rendering
   // add the ssrsd attribute so later on the client side
   // code knows what to do with it
-  domApi.$setAttribute(hostElm, SSR_HOST_ID, `${SSR_SHADOW_DOM_HOST_ID}${ssrId}`);
+  domApi.$setAttribute(
+    hostElm,
+    SSR_HOST_ID,
+    `${__BUILD_CONDITIONALS__.hasShadowDom && useNativeShadowDom ? SSR_SHADOW_DOM_HOST_ID : ''}${ssrId}`
+  );
 
   // before we got ahead and hydrate anything
   // since we're in the middle of server side rendering

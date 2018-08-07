@@ -172,9 +172,10 @@ export interface RenderNode extends d.HostElement {
 
 
 
-export interface ShadowDomComponent {
+export interface SlottedComponent {
   hostElm: d.HostElement;
   lightDomNodes: LightDomNode[];
+  useShadowDom: boolean;
 }
 
 

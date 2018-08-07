@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
-import { addShadowDomSsrData, createRendererPatch } from '../patch';
+import { addSsrSlotted, createRendererPatch } from '../patch';
 import { compareHtml, mockDomApi, mockElement, mockPlatform, removeWhitespaceFromNodes } from '../../../testing/mocks';
 import { h } from '../h';
 import { hydrateClientFromSsr } from '../hydrate-client-from-ssr';
 import { initHostSnapshot } from '../../../core/host-snapshot';
-import { SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_SHADOW_DOM_HOST_ID } from '../../../util/constants';
+import { SSR_CHILD_ID, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR } from '../../../util/constants';
 
 
 describe('ssr', () => {
@@ -19,12 +19,18 @@ describe('ssr', () => {
     patch = createRendererPatch(<any>plt, domApi);
   });
 
-  describe('addShadowDomSsrData', () => {
+  describe('addSsrSlotted', () => {
 
     it('should add shadow dom host attribute', () => {
       const elm = mockElement('cmp-a');
-      addShadowDomSsrData(domApi, elm, 88);
+      addSsrSlotted(domApi, elm, true, 88);
       expect(elm.getAttribute(SSR_HOST_ID)).toBe('s88');
+    });
+
+    it('should add scoped host attribute', () => {
+      const elm = mockElement('cmp-a');
+      addSsrSlotted(domApi, elm, false, 88);
+      expect(elm.getAttribute(SSR_HOST_ID)).toBe('88');
     });
 
     it('should add light dom attributes to elements', () => {
@@ -34,7 +40,7 @@ describe('ssr', () => {
         <article></article>
         <footer></footer>
       `;
-      addShadowDomSsrData(domApi, elm, 88);
+      addSsrSlotted(domApi, elm, true, 88);
 
       const header = elm.querySelector('header');
       expect(header.hasAttribute(SSR_LIGHT_DOM_ATTR)).toBe(true);
@@ -51,7 +57,7 @@ describe('ssr', () => {
       elm.innerHTML = `
         light-dom text node
       `;
-      addShadowDomSsrData(domApi, elm, 88);
+      addSsrSlotted(domApi, elm, true, 88);
 
       expect(compareHtml(elm.innerHTML)).toBe(compareHtml(`
         <!--l.88.0-->
@@ -65,7 +71,7 @@ describe('ssr', () => {
         light-dom text node
         <a></a>
       `;
-      addShadowDomSsrData(domApi, elm, 88);
+      addSsrSlotted(domApi, elm, true, 88);
 
       expect(compareHtml(elm.innerHTML)).toBe(compareHtml(`
         <!--l.88.0-->
@@ -223,7 +229,7 @@ describe('ssr', () => {
 
       const div = hostElm.firstElementChild as d.RenderNode;
       expect(div.getAttribute(SSR_CHILD_ID)).toBe('1.0.');
-      expect(div.outerHTML).toBe('<div ssrc="1.0."><!--s.1.0--><child-a></child-a></div>');
+      expect(div.outerHTML).toBe('<div ssrc="1.0."><!--s.1.0--><child-a ssrl="1.1"></child-a></div>');
 
       const slotRef = div.firstChild as d.RenderNode;
       expect(slotRef.textContent).toBe('s.1.0');
