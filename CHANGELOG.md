@@ -1,3 +1,13 @@
+<a name="0.11.2"></a>
+## 🎯 [0.11.2](https://github.com/ionic-team/stencil/compare/v0.11.1...v0.11.2) (2018-08-07)
+
+
+### Bug Fixes
+
+* **testing:** ensure that testing files are getting Build conditionals propertly removed. ([f039aab](https://github.com/ionic-team/stencil/commit/f039aab))
+
+
+
 <a name="0.11.1"></a>
 ## 🐝 [0.11.1](https://github.com/ionic-team/stencil/compare/v0.11.0...v0.11.1) (2018-08-06)
 
