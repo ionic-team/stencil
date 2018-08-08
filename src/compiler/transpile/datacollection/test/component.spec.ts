@@ -94,9 +94,7 @@ describe('component', () => {
             },
           },
         ],
-        'hostMeta': {
-          'theme': 'action-sheet',
-        },
+
         'jsdoc': {
           'documentation': 'This is an actionSheet class',
           'name': 'ActionSheet',

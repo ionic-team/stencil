@@ -29,7 +29,6 @@ export interface BuildConditionals {
 
   // vdom
   hostData: boolean;
-  hostTheme: boolean;
   reflectToAttr: boolean;
 
   // decorators

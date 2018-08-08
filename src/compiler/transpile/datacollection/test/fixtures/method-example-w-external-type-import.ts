@@ -9,9 +9,6 @@ import * as t from '../../../../../declarations/app-global';
   styleUrls: {
     ios: 'action-sheet.ios.scss',
     md: 'action-sheet.md.scss'
-  },
-  host: {
-    theme: 'action-sheet'
   }
 })
 export class ActionSheet {

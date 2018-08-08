@@ -28,7 +28,6 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
     tagNameMeta: componentOptions.tag,
     stylesMeta: getStylesMeta(componentOptions),
     assetsDirsMeta: [],
-    hostMeta: getHostMeta(diagnostics, componentOptions.host),
     dependencies: [],
     jsdoc: serializeSymbol(checker, symbol)
   };
@@ -55,38 +54,4 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
   }
 
   return cmpMeta;
-}
-
-
-function getHostMeta(diagnostics: d.Diagnostic[], hostData: d.HostMeta) {
-  hostData = hostData || {};
-
-  Object.keys(hostData).forEach(key => {
-    const type = typeof hostData[key];
-
-    if (type !== 'string' && type !== 'number' && type !== 'boolean') {
-      // invalid data
-      delete hostData[key];
-
-      let itsType = 'object';
-      if (type === 'function') {
-        itsType = 'function';
-
-      } else if (Array.isArray(hostData[key])) {
-        itsType = 'Array';
-      }
-
-      const diagnostic = buildWarn(diagnostics);
-      diagnostic.messageText = [
-        `The @Component decorator's host property "${key}" has a type of "${itsType}". `,
-        `However, a @Component decorator's "host" can only take static data, `,
-        `such as a string, number or boolean. `,
-        `Please use the "hostData()" method instead `,
-        `if attributes or properties need to be dynamically added to `,
-        `the host element.`
-      ].join('');
-    }
-  });
-
-  return hostData;
 }

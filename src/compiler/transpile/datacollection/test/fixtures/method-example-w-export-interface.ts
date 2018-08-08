@@ -11,9 +11,6 @@ export interface ActionSheetOptions {
   styleUrls: {
     ios: 'action-sheet.ios.scss',
     md: 'action-sheet.md.scss'
-  },
-  host: {
-    theme: 'action-sheet'
   }
 })
 export class ActionSheet {

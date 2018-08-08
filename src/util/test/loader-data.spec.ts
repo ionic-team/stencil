@@ -185,15 +185,6 @@ describe('data serialize/parse', () => {
       expect(cmpMeta.membersMeta.str.attribName).toEqual('str');
     });
 
-    it('should always set color even with no props', () => {
-      cmpMeta.membersMeta = null;
-
-      const format = formatBrowserLoaderComponent(cmpMeta);
-      cmpMeta = parseComponentLoader(format);
-
-      expect(cmpMeta.membersMeta.color).toBeDefined();
-    });
-
     it('should set has styles', () => {
       cmpMeta.stylesMeta = {
         ios: {}

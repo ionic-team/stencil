@@ -312,7 +312,7 @@ describe('instance render', () => {
     expect(vnode.vchildren[2].vtext).toBe('');
   });
 
-  it('should not create a vnode when there is no render() or hostData() or hostMeta', () => {
+  it('should not create a vnode when there is no render() or hostData()', () => {
     class MyComponent { }
 
     doRender(MyComponent);
@@ -404,57 +404,6 @@ describe('instance render', () => {
       });
     });
 
-    it('should apply theme', () => {
-      class MyComponent {
-        static get host() {
-          return {
-            theme: 'my-component'
-          };
-        }
-      }
-
-      doRender(MyComponent);
-
-      expect(hostElm).toMatchClasses(['my-component']);
-    });
-
-    it('should apply theme with mode', () => {
-      class MyComponent {
-        mode = 'ios';
-        static get host() {
-          return {
-            theme: 'my-component'
-          };
-        }
-      }
-
-      spyOn(plt, 'attachStyles');
-      doRender(MyComponent);
-
-      expect(hostElm).toMatchClasses(['my-component', 'my-component-ios']);
-      expect(plt.attachStyles).toHaveBeenCalled();
-    });
-
-    it('should apply theme with mode and color', () => {
-      class MyComponent {
-        mode = 'md';
-        color = 'main';
-        static get host() {
-          return {
-            theme: 'my-component'
-          };
-        }
-      }
-
-      doRender(MyComponent);
-
-      expect(hostElm).toMatchClasses([
-        'my-component',
-        'my-component-md',
-        'my-component-main',
-        'my-component-md-main'
-      ]);
-    });
 
     it('should apply hostData() + theme (mode+color)', () => {
       class MyComponent {
@@ -474,12 +423,6 @@ describe('instance render', () => {
             }
           };
         }
-
-        static get host() {
-          return {
-            theme: 'my-component'
-          };
-        }
       }
 
       doRender(MyComponent);
@@ -487,14 +430,10 @@ describe('instance render', () => {
       expect(hostElm).toMatchClasses([
         'a',
         'hola',
-        'my-component',
-        'my-component-md',
-        'my-component-main',
-        'my-component-md-main'
       ]);
 
       expect(hostElm).toMatchAttributes({
-        'class': 'a hola my-component my-component-md my-component-main my-component-md-main',
+        'class': 'a hola',
         'number': '12',
         'appear': 'true',
       });

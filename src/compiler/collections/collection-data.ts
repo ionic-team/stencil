@@ -194,7 +194,6 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
   serializeConnectMember(cmpData, cmpMeta);
   serializeHostElementMember(cmpData, cmpMeta);
   serializeEvents(cmpData, cmpMeta);
-  serializeHost(cmpData, cmpMeta);
   serializeEncapsulation(cmpData, cmpMeta);
 
   return cmpData;
@@ -227,7 +226,6 @@ export function parseComponentDataToModuleFile(config: d.Config, collection: d.C
   parseConnectMember(cmpData, cmpMeta);
   parseHostElementMember(cmpData, cmpMeta);
   parseEvents(cmpData, cmpMeta);
-  parseHost(cmpData, cmpMeta);
   parseEncapsulation(cmpData, cmpMeta);
 
   // DEPRECATED: 2017-12-27
@@ -811,23 +809,6 @@ function parseEvents(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
     eventComposed: (eventData.composed !== false)
   }));
 }
-
-
-function serializeHost(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
-  if (!cmpMeta.hostMeta || Array.isArray(cmpMeta.hostMeta) || !Object.keys(cmpMeta.hostMeta).length) {
-    return;
-  }
-  cmpData.host = cmpMeta.hostMeta;
-}
-
-
-function parseHost(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
-  if (!cmpData.host) {
-    return;
-  }
-  cmpMeta.hostMeta = cmpData.host;
-}
-
 
 function serializeEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {

@@ -10,8 +10,6 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     // if this component has a render function, let's fire
     // it off and generate the child vnodes for this host element
     // note that we do not create the host element cuz it already exists
-    const hostMeta = cmpMeta.componentConstructor.host;
-
     const encapsulation = cmpMeta.componentConstructor.encapsulation;
 
     // test if this component should be shadow dom
@@ -57,7 +55,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       }
     }
 
-    if (instance.render || instance.hostData || hostMeta || reflectHostAttr) {
+    if (instance.render || instance.hostData || reflectHostAttr) {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
@@ -103,12 +101,6 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // now any changes will again queue
       plt.activeRender = false;
 
-      if (__BUILD_CONDITIONALS__.hostTheme && hostMeta) {
-        // component meta data has a "theme"
-        // use this to automatically generate a good css class
-        // from the mode and color to add to the host element
-        vnodeHostData = applyComponentHostData(vnodeHostData, hostMeta, instance);
-      }
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
 
@@ -162,59 +154,6 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     plt.onError(e, RUNTIME_ERROR.RenderError, hostElm, true);
   }
 }
-
-
-export function applyComponentHostData(vnodeHostData: d.VNodeData, hostMeta: d.ComponentConstructorHost, instance: any) {
-  vnodeHostData = vnodeHostData || {};
-
-  // component meta data has a "theme"
-  // use this to automatically generate a good css class
-  // from the mode and color to add to the host element
-  Object.keys(hostMeta).forEach(key => {
-
-    if (key === 'theme') {
-      // host: { theme: 'button' }
-      // adds css classes w/ mode and color combinations
-      // class="button button-md button-primary button-md-primary"
-      convertCssNamesToObj(
-        vnodeHostData['class'] = vnodeHostData['class'] || {},
-        hostMeta[key],
-        instance.mode,
-        instance.color
-      );
-
-    } else if (key === 'class') {
-      // host: { class: 'multiple css-classes' }
-      // class="multiple css-classes"
-      convertCssNamesToObj(
-        vnodeHostData[key] = vnodeHostData[key] || {},
-        hostMeta[key]
-      );
-
-    } else {
-      // rando attribute/properties
-      vnodeHostData[key] = hostMeta[key];
-    }
-  });
-
-  return vnodeHostData;
-}
-
-
-export function convertCssNamesToObj(cssClassObj: { [className: string]: boolean}, className: string, mode?: string, color?: string) {
-  className.split(' ').forEach(cssClass => {
-    cssClassObj[cssClass] = true;
-
-    if (mode) {
-      cssClassObj[`${cssClass}-${mode}`] = true;
-
-      if (color) {
-        cssClassObj[`${cssClass}-${mode}-${color}`] = cssClassObj[`${cssClass}-${color}`] = true;
-      }
-    }
-  });
-}
-
 
 export function reflectInstanceValuesToHostAttributes(properties: d.ComponentConstructorProperties, instance: d.ComponentInstance, reflectHostAttr?: d.VNodeData) {
   if (properties) {

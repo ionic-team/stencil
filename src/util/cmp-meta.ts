@@ -13,14 +13,6 @@ export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta:
 
   cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
-  if (!cmpMeta.membersMeta.color) {
-    cmpMeta.membersMeta.color = {
-      propType: PROP_TYPE.String,
-      attribName: 'color',
-      memberType: MEMBER_TYPE.Prop
-    };
-  }
-
   if (cmp.properties) {
     Object.keys(cmp.properties).forEach(memberName => {
       const property = cmp.properties[memberName];

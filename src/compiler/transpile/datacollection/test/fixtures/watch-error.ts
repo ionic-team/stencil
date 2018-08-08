@@ -8,9 +8,6 @@ import { Component, Method, Watch } from '../../../../../index';
   styleUrls: {
     ios: 'action-sheet.ios.scss',
     md: 'action-sheet.md.scss'
-  },
-  host: {
-    theme: 'action-sheet'
   }
 })
 class ActionSheet {

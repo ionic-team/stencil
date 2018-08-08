@@ -60,10 +60,6 @@ export function addStaticMeta(cmpMeta: d.ComponentMeta) {
     staticMembers.encapsulation = convertValueToLiteral(encapsulation);
   }
 
-  if (cmpMeta.hostMeta && Object.keys(cmpMeta.hostMeta).length > 0) {
-    staticMembers.host = convertValueToLiteral(cmpMeta.hostMeta);
-  }
-
   const propertiesMeta = formatComponentConstructorProperties(cmpMeta.membersMeta);
   if (propertiesMeta && Object.keys(propertiesMeta).length > 0) {
     staticMembers.properties = convertValueToLiteral(propertiesMeta);

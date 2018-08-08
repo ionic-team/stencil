@@ -75,14 +75,6 @@ describe('collection components', () => {
     expect(b.cmpMeta.membersMeta.myElement.memberType).toBe(MEMBER_TYPE.Element);
   });
 
-  it('hostMeta', () => {
-    a.hostMeta = { theme: { 'some-class': true } };
-    const cmpData = serializeComponent(config, collectionDir, moduleFile);
-    expect(cmpData.host.theme['some-class']).toBe(true);
-    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
-    expect(b.cmpMeta.hostMeta.theme['some-class']).toBe(true);
-  });
-
   it('methodsMeta', () => {
     a.membersMeta = {
       'methodA': { memberType: MEMBER_TYPE.Method },

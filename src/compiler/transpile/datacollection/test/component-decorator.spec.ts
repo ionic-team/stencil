@@ -16,7 +16,6 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
-        hostMeta: {},
         stylesMeta: {},
         encapsulationMeta: ENCAPSULATION.NoEncapsulation,
         jsdoc: {
@@ -38,7 +37,6 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
-        hostMeta: {},
         stylesMeta: {},
         encapsulationMeta: ENCAPSULATION.ShadowDom,
         jsdoc: {
@@ -60,7 +58,6 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
-        hostMeta: {},
         stylesMeta: {},
         assetsDirsMeta: [],
         encapsulationMeta: ENCAPSULATION.ScopedCss,
@@ -87,9 +84,6 @@ describe('component decorator', () => {
           documentation: 'This is an actionSheet class',
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
-        },
-        hostMeta: {
-          theme: 'action-sheet'
         },
         stylesMeta: {
           ios: {

@@ -16,7 +16,6 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     verboseError: true,
     styles: true,
     hostData: true,
-    hostTheme: true,
     reflectToAttr: true,
     hasSlot: true,
     hasSvg: true,
@@ -82,7 +81,6 @@ export async function setBuildConditionals(
     event: false,
     listener: false,
     styles: false,
-    hostTheme: false,
     observeAttr: false,
     propConnect: false,
     propContext: false,
@@ -195,7 +193,6 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
   coreBuild.styles = coreBuild.styles || !!cmpMeta.stylesMeta;
-  coreBuild.hostTheme = coreBuild.hostTheme || !!(cmpMeta.hostMeta && cmpMeta.hostMeta.theme);
 
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);

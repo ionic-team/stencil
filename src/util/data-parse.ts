@@ -7,12 +7,7 @@ export function parseComponentLoader(cmpData: d.ComponentHostData, i?: number, d
   // tag name will always be lower case
   const cmpMeta: d.ComponentMeta = {
     tagNameMeta: cmpData[0],
-    membersMeta: {
-      // every component defaults to always have
-      // the mode and color properties
-      // but only color should observe any attribute changes
-      'color': { attribName: 'color' }
-    }
+    membersMeta: {}
   };
 
   // map of the bundle ids

@@ -50,7 +50,6 @@ export interface ComponentConstructor {
 
 
 export interface ComponentConstructorHost {
-  theme?: string;
   [attrName: string]: string | undefined;
 }
 
@@ -63,7 +62,6 @@ export interface ComponentMeta {
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
-  hostMeta?: HostMeta;
   encapsulationMeta?: number;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;

@@ -41,12 +41,10 @@ describe('fillCmpMetaFromConstructor', () => {
     expect(cmpMeta.membersMeta.propC.memberType).toBe(MEMBER_TYPE.State);
   });
 
-  it('membersMeta w/ color', () => {
+  it('membersMeta should be empty', () => {
     const cmpMeta = fillCmpMetaFromConstructor(cmp, {});
     expect(cmpMeta.membersMeta).toBeDefined();
-    expect(cmpMeta.membersMeta.color.propType).toBe(PROP_TYPE.String);
-    expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_TYPE.Prop);
-    expect(cmpMeta.membersMeta.color.attribName).toBe('color');
+    expect(Object.keys(cmpMeta.membersMeta)).toEqual([]);
   });
 
   it('listenersMeta', () => {

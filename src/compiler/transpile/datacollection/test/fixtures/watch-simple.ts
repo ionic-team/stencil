@@ -8,9 +8,6 @@ import { Component, Method, PropWillChange, PropDidChange, Watch, Prop } from '.
   styleUrls: {
     ios: 'action-sheet.ios.scss',
     md: 'action-sheet.md.scss'
-  },
-  host: {
-    theme: 'action-sheet'
   }
 })
 class ActionSheet {

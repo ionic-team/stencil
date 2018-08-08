@@ -12,9 +12,6 @@ import iOSLeaveAnimation from './animations/ios.leave';
   styleUrls: {
     ios: 'action-sheet.ios.scss',
     md: 'action-sheet.md.scss'
-  },
-  host: {
-    theme: 'action-sheet'
   }
 })
 class ActionSheet {
