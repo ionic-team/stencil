@@ -1,3 +1,13 @@
+<a name="0.11.3"></a>
+## 🔥 [0.11.3](https://github.com/ionic-team/stencil/compare/v0.11.2...v0.11.3) (2018-08-08)
+
+
+### Bug Fixes
+
+* **events:** prevent ael and rel property renaming ([509fca2](https://github.com/ionic-team/stencil/commit/509fca2))
+
+
+
 <a name="0.11.2"></a>
 ## 🎯 [0.11.2](https://github.com/ionic-team/stencil/compare/v0.11.1...v0.11.2) (2018-08-07)
 
