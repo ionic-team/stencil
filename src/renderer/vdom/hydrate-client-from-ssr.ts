@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, n, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_CONTENT_REF_NODE_COMMENT, SSR_HOST_ID, SSR_LIGHT_DOM_ATTR, SSR_LIGHT_DOM_NODE_COMMENT, SSR_ORIGINAL_LOCATION_NODE_ATTR, SSR_ORIGINAL_LOCATION_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
 
 
 // Welcome SSR Friends!!!
@@ -58,14 +58,10 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
 }
 
 
-function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, slottedCmps: d.SlottedComponent[], removeNodes: d.RenderNode[], childNodes?: NodeListOf<d.RenderNode>, node?: d.RenderNode, i?: number, ssrHostId?: string, ssrVNode?: d.VNode) {
+function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, slottedCmps: d.SlottedComponent[], removeNodes: d.RenderNode[], ssrHostId?: string, ssrVNode?: d.VNode) {
   // get all the child nodes for this element
   // this includes elements, text nodes and comment nodes
-  childNodes = domApi.$childNodes(parentNode) as NodeListOf<d.RenderNode>;
-
-  // loop through all our new friends
-  for (i = 0; i < childNodes.length; i++) {
-    node = childNodes[i];
+  Array.prototype.slice.call(domApi.$childNodes(parentNode)).forEach((node: d.RenderNode) => {
 
     if (domApi.$nodeType(node) === NODE_TYPE.ElementNode) {
       // this is an element node :)
@@ -107,7 +103,8 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
         addChildSsrVNodes(domApi, ssrVNode.vtag as string, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
       }
     }
-  }
+
+  });
 }
 
 
@@ -115,7 +112,6 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
   let attrId: string;
   let dataIdSplt: any[];
   let childVNode: d.VNode;
-  let childNodes: NodeListOf<d.RenderNode>;
   let nextNode: d.RenderNode;
 
   if (checkNestedElements && nodeType === NODE_TYPE.ElementNode) {
@@ -162,29 +158,32 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
       }
     }
 
-    if (__BUILD_CONDITIONALS__.hasShadowDom && (attrId = domApi.$getAttribute(node, SSR_LIGHT_DOM_ATTR))) {
+    if ((attrId = domApi.$getAttribute(node, SSR_ORIGINAL_LOCATION_NODE_ATTR)) && (dataIdSplt = attrId.split('.')) && (dataIdSplt[0] === ssrHostId)) {
+      console.log('\n\n\n\n\n\n SSR_ORIGINAL_LOCATION_NODE_ATTR', dataIdSplt, '\n\n\n\n\n\n')
+
+      // remove the ssr original location attribute
+      domApi.$removeAttribute(node, SSR_ORIGINAL_LOCATION_NODE_ATTR);
+    }
+
+    if ((attrId = domApi.$getAttribute(node, SSR_LIGHT_DOM_ATTR)) && (dataIdSplt = attrId.split('.')) && (dataIdSplt[0] === ssrHostId)) {
       // since this is a shadow dom component let's also check to
       // to see if this element is a light dom node that should
       // be relocated to be a direct child of the host component
-      dataIdSplt = attrId.split('.');
-      if (dataIdSplt[0] === ssrHostId) {
-        // cool, so looks like this element is a light dom that should
-        // be relocated to be a direct child of the host component
-        slottedCmp.lightDomNodes.push({
-          contentIndex: parseInt(dataIdSplt[2], 10),
-          elm: node
-        });
+      // cool, so looks like this element is a light dom that should
+      // be relocated to be a direct child of the host component
+      slottedCmp.lightDomNodes.push({
+        contentIndex: parseInt(dataIdSplt[2], 10),
+        elm: node
+      });
 
-        // remove the ssr light dom attribute
-        domApi.$removeAttribute(node, SSR_LIGHT_DOM_ATTR);
-      }
+      // remove the ssr light dom attribute
+      domApi.$removeAttribute(node, SSR_LIGHT_DOM_ATTR);
     }
 
     // keep drilling down through the elements
-    childNodes = domApi.$childNodes(node) as NodeListOf<d.RenderNode>;
-    for (let i = 0; i < childNodes.length; i++) {
-      addChildSsrVNodes(domApi, hostTagName, hostElm, childNodes[i], domApi.$nodeType(childNodes[i]), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
-    }
+    (Array.prototype.slice.call(domApi.$childNodes(node)) as d.RenderNode[]).forEach(childNode => {
+      addChildSsrVNodes(domApi, hostTagName, hostElm, childNode, domApi.$nodeType(childNode), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
+    });
 
   } else if (nodeType === NODE_TYPE.CommentNode) {
     // this is a comment node, so it could have ssr data in it
@@ -207,22 +206,28 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
         childVNode = {
           vtag: 'slot',
           vattrs: null,
-          vchildren: null,
-          elm: domApi.$createElement('slot')
+          vchildren: null
         };
-
-        // add the new <slot> element
-        domApi.$insertBefore(parentVNode.elm, childVNode.elm, node);
-
-        // remove the old html comment node
-        domApi.$remove(node);
 
         if (dataIdSplt[3]) {
           // this slot has a "name" attribute
           // add the "name" to the vnode data
           childVNode.vattrs = childVNode.vattrs || {};
-          domApi.$setAttribute(childVNode.elm, 'name', childVNode.vattrs.name = (childVNode.vname = dataIdSplt[3]));
+          childVNode.vattrs.name = (childVNode.vname = dataIdSplt[3]);
         }
+
+        if (__BUILD_CONDITIONALS__.hasShadowDom && domApi.$supportsShadowDom) {
+          // add the new <slot> element
+          childVNode.elm = domApi.$createElement('slot');
+          domApi.$insertBefore(parentVNode.elm, childVNode.elm, node);
+
+          if (dataIdSplt[3]) {
+            domApi.$setAttribute(childVNode.elm, 'name', dataIdSplt[3]);
+          }
+        }
+
+        // remove the old html comment node
+        domApi.$remove(node);
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
@@ -270,12 +275,13 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
                 removeNodes.push(nextNode);
               }
 
-            } if (dataIdSplt[0] === n) {
-              console.log('\n\n\n\n\n\n', dataIdSplt, '\n\n\n\n\n\n')
+            } if (dataIdSplt[0] === SSR_ORIGINAL_LOCATION_NODE_COMMENT) {
+              console.log('\n\n\n\n\n\n comment', dataIdSplt, '\n\n\n\n\n\n')
 
+              // remove this node later on
+              removeNodes.push(node);
 
-
-            } else if (__BUILD_CONDITIONALS__.hasShadowDom && dataIdSplt[0] === SSR_LIGHT_DOM_NODE_COMMENT) {
+            } else if (dataIdSplt[0] === SSR_LIGHT_DOM_NODE_COMMENT) {
               // this is an ssr text node start comment for light dom content
               // let's remember the content index number for this node
               // so we can later sort them to the correct order in the light dom

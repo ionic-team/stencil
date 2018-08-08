@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { isDef } from '../../util/helpers';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_HOST_ID, SSR_ORIGINAL_LOCATION_NODE_COMMENT, SSR_SHADOW_DOM_HOST_ID, SSR_SLOT_NODE_COMMENT, SSR_TEXT_NODE_COMMENT } from '../../util/constants';
+import { NODE_TYPE } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -52,15 +52,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else if (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotReference) {
 
-      if (__BUILD_CONDITIONALS__.ssrServerSide && __BUILD_CONDITIONALS__.hasSlot) {
-        // create a slot reference html comment node for server side
-        // when the client side hydrates it'll turn this html comment
-        // into an actual <slot> element
-        newVNode.elm = domApi.$createComment(`${SSR_SLOT_NODE_COMMENT}.${ssrId}.${childIndex}${newVNode.vname ? '.' + newVNode.vname : ''}`) as any;
+      // create a slot reference html text node for client side
+      newVNode.elm = domApi.$createTextNode('') as any;
 
-      } else {
-        // create a slot reference html text node for client side
-        newVNode.elm = domApi.$createTextNode('') as any;
+      if (__BUILD_CONDITIONALS__.ssrServerSide) {
+        newVNode.elm.ssrIsSlotRef = true;
+        newVNode.elm.ssrSlotChildOfHostId = ssrHostId;
+        newVNode.elm.ssrSlotChildIndex = childIndex;
       }
 
     } else {
@@ -84,16 +82,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         domApi.$addClass(elm, (elm['s-si'] = scopeId));
       }
 
-      if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
+      if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId)) {
         // SSR ONLY: this is an SSR render and this
         // logic does not run on the client
-
-        // give this element the SSR child id that can be read by the client
-        domApi.$setAttribute(
-          elm,
-          SSR_CHILD_ID,
-          ssrId + '.' + childIndex + (hasChildNodes(newVNode.vchildren) ? '' : '.')
-        );
+        elm.ssrIsComponentChild = true;
+        elm.ssrComponentChildOfHostId = ssrHostId;
+        elm.ssrComponentChildIndex = childIndex;
+        elm.ssrIsLastComponentChild = hasChildNodes(newVNode.vchildren);
       }
 
       if (newVNode.vchildren) {
@@ -103,18 +98,14 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
           // return node could have been null
           if (childNode) {
-            if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-              // SSR ONLY: add the text node's start comment
-              domApi.$appendChild(elm, domApi.$createComment(SSR_TEXT_NODE_COMMENT + '.' + ssrId + '.' + i));
-            }
-
             // append our new node
             domApi.$appendChild(elm, childNode);
 
-            if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-              // SSR ONLY: add the text node's end comment
-              domApi.$appendChild(elm, domApi.$createComment('/'));
-              domApi.$appendChild(elm, domApi.$createTextNode(' '));
+            if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId) && childNode.nodeType === NODE_TYPE.TextNode) {
+              // SSR ONLY
+              childNode.ssrIsComponentChild = true;
+              childNode.ssrComponentChildOfHostId = ssrHostId;
+              childNode.ssrComponentChildIndex = childIndex;
             }
           }
         }
@@ -561,29 +552,26 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
   // internal variables to be reused per patch() call
   let useNativeShadowDom: boolean,
-      ssrId: number,
+      ssrHostId: number,
       scopeId: string,
       checkSlotFallbackVisibility: boolean,
       checkSlotRelocate: boolean,
       hostTagName: string,
-      contentRef: d.RenderNode,
-      isShadowDomComponent: boolean;
+      contentRef: d.RenderNode;
 
 
-  return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, encapsulation: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
+  return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, ssrId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
     hostTagName = domApi.$tagName(hostElm);
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;
-    isShadowDomComponent = (encapsulation === 'shadow');
 
-    if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrPatchId)) {
+    if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {
       // SSR ONLY: we've been given an SSR id, so the host element
       // should be given the ssr id attribute
-      ssrId = ssrPatchId;
-      addSsrSlotted(domApi, hostElm, isShadowDomComponent, ssrId);
+      ssrHostId = ssrId;
     }
 
     if (__BUILD_CONDITIONALS__.slotPolyfill) {
@@ -607,26 +595,8 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
           if (!relocateNode.nodeToRelocate['s-ol']) {
             // add a reference node marking this node's original location
             // keep a reference to this node for later lookups
-            if (__BUILD_CONDITIONALS__.ssrServerSide) {
-              const relocateId = `${SSR_ORIGINAL_LOCATION_NODE_COMMENT}.${i}`;
-              orgLocationNode = domApi.$createComment(relocateId) as any;
-
-              const nodeType = domApi.$nodeType(relocateNode.nodeToRelocate);
-              if (nodeType === NODE_TYPE.ElementNode) {
-                domApi.$setAttribute(relocateNode.nodeToRelocate, `ssro`, i);
-
-              } else if (nodeType === NODE_TYPE.TextNode) {
-                domApi.$insertBefore(
-                  domApi.$parentNode(relocateNode.nodeToRelocate),
-                  domApi.$createComment('to.' +relocateId),
-                  relocateNode.nodeToRelocate
-                );
-              }
-
-            } else {
-              orgLocationNode = domApi.$createTextNode('') as any;
-              orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
-            }
+            orgLocationNode = domApi.$createTextNode('') as any;
+            orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 
             domApi.$insertBefore(
               domApi.$parentNode(relocateNode.nodeToRelocate),
@@ -708,18 +678,6 @@ export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
       callNodeRefs(vChild, isDestroy);
     });
   }
-}
-
-
-export function addSsrSlotted(domApi: d.DomApi, hostElm: d.HostElement, useNativeShadowDom: boolean, ssrId: number) {
-  // this is a shadow dom component we're server side rendering
-  // add the ssrsd attribute so later on the client side
-  // code knows what to do with it
-  domApi.$setAttribute(
-    hostElm,
-    SSR_HOST_ID,
-    `${__BUILD_CONDITIONALS__.hasShadowDom && useNativeShadowDom ? SSR_SHADOW_DOM_HOST_ID : ''}${ssrId}`
-  );
 }
 
 

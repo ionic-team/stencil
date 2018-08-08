@@ -90,7 +90,6 @@ export interface RendererApi {
     oldVNode: d.VNode | Element,
     newVNode: d.VNode,
     useNativeShadowDom?: boolean,
-    encapsulation?: d.Encapsulation,
     ssrId?: number
   ): d.VNode;
 }
@@ -150,11 +149,6 @@ export interface RenderNode extends d.HostElement {
   ['s-hn']?: string;
 
   /**
-   * The string id of the original location
-   */
-  ['s-light-dom-id']?: string;
-
-  /**
    * Original Location Reference:
    * A reference pointing to the comment
    * which represents the original location
@@ -173,6 +167,22 @@ export interface RenderNode extends d.HostElement {
    * Scope Id
    */
   ['s-si']?: string;
+
+  // SSR Light Dom
+  ssrIsLightDom?: boolean;
+  ssrLightDomIndex?: number;
+  ssrLightDomChildOfHostId?: number;
+
+  // SSR Component Child Node
+  ssrIsComponentChild?: boolean;
+  ssrComponentChildOfHostId?: number;
+  ssrComponentChildIndex?: number;
+  ssrIsLastComponentChild?: boolean;
+
+  // SSR Slot Reference
+  ssrIsSlotRef?: boolean;
+  ssrSlotChildOfHostId?: number;
+  ssrSlotChildIndex?: number;
 }
 
 

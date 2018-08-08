@@ -5,7 +5,7 @@ export function testProperties(instance: any, properties: { [prop: string]: any 
   const keys = Object.keys(properties);
   for (const prop of keys) {
     if (!instance[prop] === properties[prop]) {
-      throw new Error(`expected property "${prop}",  but it was not found`);
+      throw new Error(`expected property "${prop}", but it was not found`);
     }
   }
 }

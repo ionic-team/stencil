@@ -12,11 +12,9 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     // note that we do not create the host element cuz it already exists
     const hostMeta = cmpMeta.componentConstructor.host;
 
-    const encapsulation = cmpMeta.componentConstructor.encapsulation;
-
     // test if this component should be shadow dom
     // and if so does the browser supports it
-    const useNativeShadowDom = (encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
+    const useNativeShadowDom = (cmpMeta.componentConstructor.encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
 
     let reflectHostAttr: d.VNodeData;
     let rootElm: HTMLElement;
@@ -131,8 +129,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         hostElm,
         oldVNode,
         hostVNode,
-        useNativeShadowDom,
-        encapsulation
+        useNativeShadowDom
       ));
     }
 

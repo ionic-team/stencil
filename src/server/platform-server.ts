@@ -1,8 +1,8 @@
 import * as d from '../declarations';
+import * as c from '../util/constants';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { enableEventListener } from '../core/listeners';
 import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
@@ -13,6 +13,7 @@ import { patchDomApi } from './dom-api-server';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 import { serverAttachStyles, serverInitStyle } from './server-styles';
+import { ssrComment } from './ssr-comment';
 import { toDashCase } from '../util/helpers';
 
 
@@ -133,6 +134,9 @@ export function createPlatformServer(
   function appLoaded(failureDiagnostic?: d.Diagnostic) {
     if (plt.hasLoadedMap.has(rootElm) || failureDiagnostic) {
       // the root node has loaded
+
+      ssrComment(domApi, rootElm);
+
       plt.onAppLoad && plt.onAppLoad(rootElm, failureDiagnostic);
     }
   }
@@ -171,7 +175,7 @@ export function createPlatformServer(
     try {
       callback(bundleExports, ...deps.map(d => getLoadedBundle(d)));
     } catch (e) {
-      onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
+      onError(e, c.RUNTIME_ERROR.LoadBundleError, null, true);
     }
 
     // If name is undefined then this callback was fired by component callback
@@ -287,7 +291,7 @@ export function createPlatformServer(
     config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
   }
 
-  function onError(err: Error, type: RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {
+  function onError(err: Error, type: c.RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {
     const diagnostic: d.Diagnostic = {
       type: 'runtime',
       header: 'Runtime error detected',
@@ -301,25 +305,25 @@ export function createPlatformServer(
     }
 
     switch (type) {
-      case RUNTIME_ERROR.LoadBundleError:
+      case c.RUNTIME_ERROR.LoadBundleError:
         diagnostic.header += ' while loading bundle';
         break;
-      case RUNTIME_ERROR.QueueEventsError:
+      case c.RUNTIME_ERROR.QueueEventsError:
         diagnostic.header += ' while running initial events';
         break;
-      case RUNTIME_ERROR.WillLoadError:
+      case c.RUNTIME_ERROR.WillLoadError:
         diagnostic.header += ' during componentWillLoad()';
         break;
-      case RUNTIME_ERROR.DidLoadError:
+      case c.RUNTIME_ERROR.DidLoadError:
         diagnostic.header += ' during componentDidLoad()';
         break;
-      case RUNTIME_ERROR.InitInstanceError:
+      case c.RUNTIME_ERROR.InitInstanceError:
         diagnostic.header += ' while initializing instance';
         break;
-      case RUNTIME_ERROR.RenderError:
+      case c.RUNTIME_ERROR.RenderError:
         diagnostic.header += ' while rendering';
         break;
-      case RUNTIME_ERROR.DidUpdateError:
+      case c.RUNTIME_ERROR.DidUpdateError:
         diagnostic.header += ' while updating';
         break;
     }
@@ -350,9 +354,9 @@ export function createPlatformServer(
 export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: string) {
   let bundleId: string = (typeof cmpMeta.bundleIds === 'string') ?
     cmpMeta.bundleIds :
-    ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE]);
+    ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[c.DEFAULT_STYLE_MODE]);
 
-  if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
+  if (cmpMeta.encapsulationMeta === c.ENCAPSULATION.ScopedCss || cmpMeta.encapsulationMeta === c.ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';
   }
 

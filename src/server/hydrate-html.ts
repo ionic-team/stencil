@@ -107,10 +107,10 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
     }
 
     const pltRender = plt.render;
-    plt.render = function render(hostElm: d.HostElement, oldVNode: d.VNode, newVNode, useNativeShadowDom, encapsulation) {
+    plt.render = function render(hostElm: d.HostElement, oldVNode: d.VNode, newVNode, useNativeShadowDom) {
       useNativeShadowDom = false;
 
-      newVNode = pltRender(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation, hostElm['s-ssr-id']);
+      newVNode = pltRender(hostElm, oldVNode, newVNode, useNativeShadowDom, hostElm.ssrHostId);
 
       connectChildElements(config, plt, App, hydrateResults, newVNode.elm as Element);
 
