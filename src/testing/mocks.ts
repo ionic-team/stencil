@@ -13,6 +13,7 @@ import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { validateConfig } from '../compiler/config/validate-config';
 import { BuildContext } from '../compiler/build/build-ctx';
+import './expect';
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
   const hydrateResults: d.HydrateResults = {

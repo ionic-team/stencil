@@ -6,18 +6,7 @@ export { spyOnEvent } from './public-utils';
 import * as expect from './expect';
 export { expect };
 
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toHaveClasses(classlist: string[]): void;
-      toMatchClasses(classlist: string[]): void;
-      toHaveAttributes(attributes: { [attr: string]: string }): void;
-      toMatchAttributes(attributes: { [attr: string]: string }): void;
-      toHaveProperties(properties: { [prop: string]: any }): void;
-    }
-  }
-}
-
+import './expect';
 
 /**
  * DEPRECATED 2018-04-08

@@ -74,6 +74,7 @@
     "execa": "^0.8.0",
     "fs-extra": "^5.0.0",
     "glob": "7.1.2",
+    "html-beautify": "^1.0.4",
     "inquirer": "^3.3.0",
     "is-glob": "4.0.0",
     "jest": "^23.1.0",
