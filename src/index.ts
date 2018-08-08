@@ -6,12 +6,15 @@ export {
   ComponentDidUpdate,
   ComponentWillLoad,
   ComponentWillUpdate,
+  ComponentInstance as IComponent,
   StencilConfig as Config,
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSXElements
+  JSXElements,
+  DefaultIntrinsicElements,
+  Hyperscript
 } from './declarations/index';
 
 /**
