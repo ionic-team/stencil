@@ -17,8 +17,12 @@ export function ssrComment(domApi: d.DomApi, node: d.RenderNode) {
     ssrCommentLightDom(domApi, node, nodeType);
   }
 
-  if (node.ssrIsComponentChild) {
-    ssrCommentComponentChild(domApi, node, nodeType);
+  if (node.ssrIsCmpElm) {
+    ssrCommentCmpElmChild(domApi, node);
+  }
+
+  if (node.ssrIsCmpText) {
+    ssrCommentCmpTextChild(domApi, node);
   }
 
   if (node.ssrIsSlotRef) {
@@ -42,7 +46,12 @@ function ssrCommentHostElement(domApi: d.DomApi, hostElm: d.RenderNode) {
 
 
 function ssrCommentHostAttr(domApi: d.DomApi, hostElm: d.RenderNode) {
-  const attrId = hostElm.ssrHostId;
+  let attrId = hostElm.ssrHostId + '';
+
+  if (hostElm.ssrHostEncapsulation === c.ENCAPSULATION.ShadowDom) {
+    attrId = c.SSR_SHADOW_DOM_HOST_ID + attrId;
+  }
+
   domApi.$setAttribute(hostElm, c.SSR_HOST_ID, attrId);
 }
 
@@ -70,22 +79,22 @@ function ssrCommentOriginalLocationRef(domApi: d.DomApi, elm: d.RenderNode) {
 }
 
 
-function ssrCommentComponentChild(domApi: d.DomApi, node: d.RenderNode, nodeType: number) {
-  if (nodeType === c.NODE_TYPE.ElementNode) {
-    const attrId = `${node.ssrComponentChildOfHostId}.${node.ssrComponentChildIndex}`;
-    domApi.$setAttribute(node, c.SSR_CHILD_ID, attrId);
+function ssrCommentCmpElmChild(domApi: d.DomApi, node: d.RenderNode) {
+  const attrId = `${node.ssrCmpElmChildOfHostId}.${node.ssrCmpElmChildIndex}`;
+  domApi.$setAttribute(node, c.SSR_CHILD_ID, attrId);
+}
 
-  } else if (nodeType === c.NODE_TYPE.TextNode && domApi.$getTextContent(node).trim() !== '') {
-    const startCommentId = `${c.SSR_TEXT_NODE_COMMENT}.${node.ssrComponentChildOfHostId}.${node.ssrComponentChildIndex}`;
-    const parentNode = domApi.$parentNode(node);
 
-    const startComment = domApi.$createComment(startCommentId) as any;
-    domApi.$insertBefore(parentNode, startComment, node);
+function ssrCommentCmpTextChild(domApi: d.DomApi, node: d.RenderNode) {
+  const startCommentId = `${c.SSR_TEXT_NODE_COMMENT}.${node.ssrCmpTextChildOfHostId}.${node.ssrCmpTextChildIndex}`;
+  const parentNode = domApi.$parentNode(node);
 
-    const endCommentId = `/${c.SSR_TEXT_NODE_COMMENT}`;
-    const endComment = domApi.$createComment(endCommentId) as any;
-    domApi.$insertBefore(parentNode, endComment, node.nextSibling);
-  }
+  const startComment = domApi.$createComment(startCommentId) as any;
+  domApi.$insertBefore(parentNode, startComment, node);
+
+  const endCommentId = `/${c.SSR_TEXT_NODE_COMMENT}`;
+  const endComment = domApi.$createComment(endCommentId) as any;
+  domApi.$insertBefore(parentNode, endComment, node.nextSibling);
 }
 
 

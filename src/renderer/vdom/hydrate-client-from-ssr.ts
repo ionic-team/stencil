@@ -13,48 +13,48 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
 
   // start drilling down through the dom looking
   // for elements that are actually hydrated components
-  hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, slottedCmps, removeNodes);
+  // hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, slottedCmps, removeNodes);
 
   // remove all the nodes we identified we no longer need in the dom
-  removeNodes.forEach(removeNode => removeNode.remove());
+  // removeNodes.forEach(removeNode => removeNode.remove());
 
-  slottedCmps.forEach(slottedCmp => {
-    if (__BUILD_CONDITIONALS__.hasShadowDom && slottedCmp.useShadowDom) {
-      // cool so we finished up building a vnode out of the ssr data found in the html
-      // and turns out that this host element is a component that should use shadow dom
-      // we've also collected up all of the nodes that should be relocated to the light dom
-      // now it is time for some pixie dust to magically turn this element to use shadow dom ;)
-      // If you're reading this, you rock, and we appreciate you. You stay classy San Dieago.
+  // slottedCmps.forEach(slottedCmp => {
+  //   if (__BUILD_CONDITIONALS__.hasShadowDom && slottedCmp.useShadowDom) {
+  //     // cool so we finished up building a vnode out of the ssr data found in the html
+  //     // and turns out that this host element is a component that should use shadow dom
+  //     // we've also collected up all of the nodes that should be relocated to the light dom
+  //     // now it is time for some pixie dust to magically turn this element to use shadow dom ;)
+  //     // If you're reading this, you rock, and we appreciate you. You stay classy San Dieago.
 
-      // attach a shadow root to the host element
-      const shadowRoot = domApi.$attachShadow(slottedCmp.hostElm);
+  //     // attach a shadow root to the host element
+  //     const shadowRoot = domApi.$attachShadow(slottedCmp.hostElm);
 
-      // move all of the current content child nodes into the shadow root
-      // get all the child nodes of this host element
-      const childNodes = domApi.$childNodes(slottedCmp.hostElm) as NodeListOf<d.RenderNode>;
-      for (let i = childNodes.length - 1; i >= 0; i--) {
-        // relocate all of the host content nodes into the shadow root
-        const node = childNodes[i];
-        if (!node['s-cn']) {
-          // remove from the host content
-          node.remove();
+  //     // move all of the current content child nodes into the shadow root
+  //     // get all the child nodes of this host element
+  //     const childNodes = domApi.$childNodes(slottedCmp.hostElm) as NodeListOf<d.RenderNode>;
+  //     for (let i = childNodes.length - 1; i >= 0; i--) {
+  //       // relocate all of the host content nodes into the shadow root
+  //       const node = childNodes[i];
+  //       if (!node['s-cn']) {
+  //         // remove from the host content
+  //         node.remove();
 
-          // add the shadow root
-          domApi.$insertBefore(shadowRoot, node, shadowRoot.firstChild);
-        }
-      }
+  //         // add the shadow root
+  //         domApi.$insertBefore(shadowRoot, node, shadowRoot.firstChild);
+  //       }
+  //     }
 
-      slottedCmp.lightDomNodes.sort((a, b) => {
-        if (a.contentIndex < b.contentIndex) return 1;
-        return -1;
-      });
+  //     slottedCmp.lightDomNodes.sort((a, b) => {
+  //       if (a.contentIndex < b.contentIndex) return 1;
+  //       return -1;
+  //     });
 
-      slottedCmp.lightDomNodes.forEach(lightDomNode => {
-        lightDomNode.elm.remove();
-        domApi.$insertBefore(slottedCmp.hostElm, lightDomNode.elm);
-      });
-    }
-  });
+  //     slottedCmp.lightDomNodes.forEach(lightDomNode => {
+  //       lightDomNode.elm.remove();
+  //       domApi.$insertBefore(slottedCmp.hostElm, lightDomNode.elm);
+  //     });
+  //   }
+  // });
 }
 
 

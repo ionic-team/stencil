@@ -135,7 +135,7 @@ describe('ssr scoped css', () => {
                   cmp-b light-dom top
                 </article>
                 <section class="scs-cmp-b" ssrc="1.1">
-                  <!--t.1.1-->
+                  <!--t.1.0-->
                     cmp-b scope-encapsulated
                   <!--/t-->
                 </section>
@@ -165,9 +165,9 @@ describe('ssr scoped css', () => {
       </html>
     `);
 
-    // const hydratedRoot = mockHtml('<div>' + ssrResults.html + '</div>');
+    const hydratedRoot = mockHtml('<div>' + ssrResults.html + '</div>');
 
-    // hydrateClientFromSsr(plt, domApi, hydratedRoot);
+    hydrateClientFromSsr(plt, domApi, hydratedRoot);
 
     // const cmpAHost = hydratedRoot.querySelector('cmp-a') as d.HostElement;
     // const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
@@ -220,37 +220,58 @@ describe('ssr scoped css', () => {
     // expect(cmpCContentRef.parentNode).toBe(cmpCHost);
     // expect(domApi.$childNodes(cmpCHost)[0]).toBe(cmpCContentRef);
 
-  //   expect(compareHtml(hydratedRoot.innerHTML)).toBe(compareHtml(`
-  //     <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
-  //       <header class="scs-cmp-a">
-  //         cmp-a scope-encapsulated
-  //       </header>
-  //       cmp-a light-dom top
-  //       <cmp-b class="scs-cmp-b-h hydrated">
-  //         <div class="scs-cmp-b scs-cmp-b-s">
-  //           <article>
-  //             cmp-b light-dom
-  //           </article>
-  //           <section class="scs-cmp-b">
-  //             cmp-b scope-encapsulated
-  //           </section>
-  //           <nav slot="named-slot">
-  //             cmp-b light-dom
-  //           </nav>
-  //           <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated">
-  //             cmp-c light-dom
-  //             <footer class="scs-cmp-c">
-  //               cmp-c scope-encapsulated
-  //             </footer>
-  //           </cmp-c>
-  //         </div>
-  //       </cmp-b>
-  //       <span>
-  //         cmp-a light-dom bottom
-  //       </span>
-  //     </cmp-a>
-  //   `));
-  // });
+    expect(hydratedRoot.innerHTML).toEqualHtml(`
+      <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="0">
+        <!--c.0-->
+        <!--o.0.0-->
+        <!--o.0.1-->
+        <!--o.0.3-->
+        <header class="scs-cmp-a" ssrc="0.0">
+          <!--t.0.0-->
+            cmp-a scope-encapsulated
+          <!--/t-->
+        </header>
+        <!--s.0.1-->
+        <!--l.0.0-->
+        cmp-a light-dom top
+        <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
+          <!--c.1-->
+          <!--o.1.1-->
+          <!--o.1.3-->
+          <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
+            <!--s.1.0-->
+            <article ssrl="1.1">
+              cmp-b light-dom top
+            </article>
+            <section class="scs-cmp-b" ssrc="1.1">
+              <!--t.1.1-->
+                cmp-b scope-encapsulated
+              <!--/t-->
+            </section>
+            <!--s.1.2.named-slot-->
+            <nav slot="named-slot" ssrl="1.3">
+              cmp-b light-dom bottom
+            </nav>
+            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
+              <!--c.2-->
+              <!--l.2.0-->
+              <!--t.1.3-->
+                cmp-c light-dom
+              <!--/t-->
+              <footer class="scs-cmp-c" ssrc="2.0">
+                <!--t.2.0-->
+                  cmp-c scope-encapsulated
+                <!--/t-->
+              </footer>
+            </cmp-c>
+          </div>
+        </cmp-b>
+        <span ssrl="0.3">
+          cmp-a light-dom bottom
+        </span>
+      </cmp-a>
+    `));
+  });
 
 });
 

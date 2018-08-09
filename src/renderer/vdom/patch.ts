@@ -85,10 +85,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId)) {
         // SSR ONLY: this is an SSR render and this
         // logic does not run on the client
-        elm.ssrIsComponentChild = true;
-        elm.ssrComponentChildOfHostId = ssrHostId;
-        elm.ssrComponentChildIndex = childIndex;
-        elm.ssrIsLastComponentChild = hasChildNodes(newVNode.vchildren);
+        elm.ssrIsCmpElm = true;
+        elm.ssrCmpElmChildOfHostId = ssrHostId;
+        elm.ssrCmpElmChildIndex = childIndex;
+        elm.ssrIsLastCmpElmChild = hasChildNodes(newVNode.vchildren);
       }
 
       if (newVNode.vchildren) {
@@ -102,10 +102,12 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
             domApi.$appendChild(elm, childNode);
 
             if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId) && childNode.nodeType === NODE_TYPE.TextNode) {
-              // SSR ONLY
-              childNode.ssrIsComponentChild = true;
-              childNode.ssrComponentChildOfHostId = ssrHostId;
-              childNode.ssrComponentChildIndex = childIndex;
+              if (domApi.$getTextContent(childNode).trim() !== '') {
+                // SSR ONLY
+                childNode.ssrIsCmpText = true;
+                childNode.ssrCmpTextChildOfHostId = ssrHostId;
+                childNode.ssrCmpTextChildIndex = i;
+              }
             }
           }
         }
@@ -556,14 +558,16 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       scopeId: string,
       checkSlotFallbackVisibility: boolean,
       checkSlotRelocate: boolean,
+      hostElm: d.HostElement,
       hostTagName: string,
       contentRef: d.RenderNode;
 
 
-  return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, ssrId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
+  return function patch(hostElement: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, ssrId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
+    hostElm = hostElement;
     hostTagName = domApi.$tagName(hostElm);
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;

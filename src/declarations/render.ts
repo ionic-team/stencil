@@ -170,14 +170,19 @@ export interface RenderNode extends d.HostElement {
 
   // SSR Light Dom
   ssrIsLightDom?: boolean;
-  ssrLightDomIndex?: number;
   ssrLightDomChildOfHostId?: number;
+  ssrLightDomIndex?: number;
 
-  // SSR Component Child Node
-  ssrIsComponentChild?: boolean;
-  ssrComponentChildOfHostId?: number;
-  ssrComponentChildIndex?: number;
-  ssrIsLastComponentChild?: boolean;
+  // SSR Component Element Child Node
+  ssrIsCmpElm?: boolean;
+  ssrCmpElmChildOfHostId?: number;
+  ssrCmpElmChildIndex?: number;
+  ssrIsLastCmpElmChild?: boolean;
+
+  // SSR Component Text Child Node
+  ssrIsCmpText?: boolean;
+  ssrCmpTextChildOfHostId?: number;
+  ssrCmpTextChildIndex?: number;
 
   // SSR Slot Reference
   ssrIsSlotRef?: boolean;
