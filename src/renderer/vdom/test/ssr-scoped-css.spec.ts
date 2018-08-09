@@ -146,7 +146,7 @@ describe('ssr scoped css', () => {
                 <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
                   <!--c.2-->
                   <!--l.2.0-->
-                  <!--t.1.3-->
+                  <!--t.1.0-->
                     cmp-c light-dom
                   <!--/t-->
                   <footer class="scs-cmp-c" ssrc="2.0">
@@ -244,7 +244,7 @@ describe('ssr scoped css', () => {
               cmp-b light-dom top
             </article>
             <section class="scs-cmp-b" ssrc="1.1">
-              <!--t.1.1-->
+              <!--t.1.0-->
                 cmp-b scope-encapsulated
               <!--/t-->
             </section>
@@ -255,7 +255,7 @@ describe('ssr scoped css', () => {
             <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
               <!--c.2-->
               <!--l.2.0-->
-              <!--t.1.3-->
+              <!--t.1.0-->
                 cmp-c light-dom
               <!--/t-->
               <footer class="scs-cmp-c" ssrc="2.0">
@@ -270,7 +270,8 @@ describe('ssr scoped css', () => {
           cmp-a light-dom bottom
         </span>
       </cmp-a>
-    `));
+    `);
+
   });
 
 });
