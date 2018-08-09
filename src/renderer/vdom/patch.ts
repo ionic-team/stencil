@@ -89,6 +89,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         elm.ssrCmpElmChildOfHostId = ssrHostId;
         elm.ssrCmpElmChildIndex = childIndex;
         elm.ssrIsLastCmpElmChild = hasChildNodes(newVNode.vchildren);
+        elm.ssrHasLastCmpChildText = (!!newVNode.vchildren && newVNode.vchildren.length === 1 && typeof newVNode.vchildren[0].vtext === 'string');
       }
 
       if (newVNode.vchildren) {
@@ -127,7 +128,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         newVNode.elm['s-sr'] = true;
 
         // remember the content reference comment
-        newVNode.elm['s-cr'] = contentRef;
+        newVNode.elm['s-cr'] = hostElm['s-cr'];
 
         // remember the slot name, or empty string for default slot
         newVNode.elm['s-sn'] = newVNode.vname || '';
@@ -559,8 +560,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       checkSlotFallbackVisibility: boolean,
       checkSlotRelocate: boolean,
       hostElm: d.HostElement,
-      hostTagName: string,
-      contentRef: d.RenderNode;
+      hostTagName: string;
 
 
   return function patch(hostElement: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, ssrId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
@@ -569,7 +569,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // the same patch() call will reference the same data
     hostElm = hostElement;
     hostTagName = domApi.$tagName(hostElm);
-    contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;
 
     if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId)) {

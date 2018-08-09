@@ -178,6 +178,7 @@ export interface RenderNode extends d.HostElement {
   ssrCmpElmChildOfHostId?: number;
   ssrCmpElmChildIndex?: number;
   ssrIsLastCmpElmChild?: boolean;
+  ssrHasLastCmpChildText?: boolean;
 
   // SSR Component Text Child Node
   ssrIsCmpText?: boolean;

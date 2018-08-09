@@ -117,10 +117,8 @@ describe('ssr scoped css', () => {
             <!--o.0.0-->
             <!--o.0.1-->
             <!--o.0.3-->
-            <header class="scs-cmp-a" ssrc="0.0">
-              <!--t.0.0-->
-                cmp-a scope-encapsulated
-              <!--/t-->
+            <header class="scs-cmp-a" ssrc="0.0.t">
+              cmp-a scope-encapsulated
             </header>
             <!--s.0.1-->
             <!--t...0.0-->
@@ -130,29 +128,25 @@ describe('ssr scoped css', () => {
               <!--c.1-->
               <!--o.1.1-->
               <!--o.1.3-->
-              <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
+              <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0.">
                 <!--s.1.0-->
                 <article ssrl="1.1">
                   cmp-b light-dom top
                 </article>
-                <section class="scs-cmp-b" ssrc="1.1">
-                  <!--t.1.0-->
-                    cmp-b scope-encapsulated
-                  <!--/t-->
+                <section class="scs-cmp-b" ssrc="1.1.t">
+                  cmp-b scope-encapsulated
                 </section>
                 <!--s.1.2.named-slot-->
                 <nav slot="named-slot" ssrl="1.3">
                   cmp-b light-dom bottom
                 </nav>
-                <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
+                <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
                   <!--c.2-->
                   <!--t.1.0.2.0-->
                     cmp-c light-dom
                   <!--/t-->
-                  <footer class="scs-cmp-c" ssrc="2.0">
-                    <!--t.2.0-->
-                      cmp-c scope-encapsulated
-                    <!--/t-->
+                  <footer class="scs-cmp-c" ssrc="2.0.t">
+                    cmp-c scope-encapsulated
                   </footer>
                 </cmp-c>
               </div>
@@ -169,10 +163,11 @@ describe('ssr scoped css', () => {
 
     hydrateClientFromSsr(plt, domApi, hydratedRoot);
 
-    // const cmpAHost = hydratedRoot.querySelector('cmp-a') as d.HostElement;
-    // const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
-    // expect(cmpASsrVnode.vtag).toBe('cmp-a');
-    // expect(cmpASsrVnode.elm).toBe(cmpAHost);
+    const cmpAHost = hydratedRoot.querySelector('cmp-a') as d.HostElement;
+    const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
+    expect(cmpASsrVnode.vtag).toBe('cmp-a');
+    expect(cmpASsrVnode.elm).toBe(cmpAHost);
+    // expect(cmpAHost['s-cr'])
     // isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
     // const cmpAContentRef = cmpAHost['s-cr'];
@@ -221,15 +216,13 @@ describe('ssr scoped css', () => {
     // expect(domApi.$childNodes(cmpCHost)[0]).toBe(cmpCContentRef);
 
     expect(hydratedRoot.innerHTML).toEqualHtml(`
-      <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="0">
+      <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
         <!--c.0-->
         <!--o.0.0-->
         <!--o.0.1-->
         <!--o.0.3-->
-        <header class="scs-cmp-a" ssrc="0.0">
-          <!--t.0.0-->
-            cmp-a scope-encapsulated
-          <!--/t-->
+        <header class="scs-cmp-a" ssrc="0.0.t">
+          cmp-a scope-encapsulated
         </header>
         <!--s.0.1-->
         <!--t...0.0-->
@@ -239,29 +232,25 @@ describe('ssr scoped css', () => {
           <!--c.1-->
           <!--o.1.1-->
           <!--o.1.3-->
-          <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
+          <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0.">
             <!--s.1.0-->
             <article ssrl="1.1">
               cmp-b light-dom top
             </article>
-            <section class="scs-cmp-b" ssrc="1.1">
-              <!--t.1.0-->
-                cmp-b scope-encapsulated
-              <!--/t-->
+            <section class="scs-cmp-b" ssrc="1.1.t">
+              cmp-b scope-encapsulated
             </section>
             <!--s.1.2.named-slot-->
             <nav slot="named-slot" ssrl="1.3">
               cmp-b light-dom bottom
             </nav>
-            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
+            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
               <!--c.2-->
               <!--t.1.0.2.0-->
                 cmp-c light-dom
               <!--/t-->
-              <footer class="scs-cmp-c" ssrc="2.0">
-                <!--t.2.0-->
-                  cmp-c scope-encapsulated
-                <!--/t-->
+              <footer class="scs-cmp-c" ssrc="2.0.t">
+                cmp-c scope-encapsulated
               </footer>
             </cmp-c>
           </div>

@@ -13,7 +13,7 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
 
   // start drilling down through the dom looking
   // for elements that are actually hydrated components
-  // hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, slottedCmps, removeNodes);
+  hydrateElementFromSsr(plt, domApi, rootElm as d.RenderNode, slottedCmps, removeNodes);
 
   // remove all the nodes we identified we no longer need in the dom
   // removeNodes.forEach(removeNode => removeNode.remove());
@@ -58,15 +58,18 @@ export function hydrateClientFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootE
 }
 
 
-function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, slottedCmps: d.SlottedComponent[], removeNodes: d.RenderNode[], ssrHostId?: string, ssrVNode?: d.VNode) {
+function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode: d.RenderNode, slottedCmps: d.SlottedComponent[], removeNodes: d.RenderNode[], childNodes?: NodeListOf<d.RenderNode>, node?: d.RenderNode, ssrHostId?: string, ssrVNode?: d.VNode) {
   // get all the child nodes for this element
   // this includes elements, text nodes and comment nodes
-  Array.prototype.slice.call(domApi.$childNodes(parentNode)).forEach((node: d.RenderNode) => {
+  childNodes = domApi.$childNodes(parentNode) as NodeListOf<d.RenderNode>;
+
+  for (let i = childNodes.length - 1; i >= 0; i--) {
+    node = childNodes[i];
 
     if (domApi.$nodeType(node) === NODE_TYPE.ElementNode) {
       // this is an element node :)
       // keep drilling down first so we hydrate from bottom up
-      hydrateElementFromSsr(plt, domApi, node, slottedCmps, removeNodes);
+      // hydrateElementFromSsr(plt, domApi, node, slottedCmps, removeNodes);
 
       // see if this element has a host id attribute
       ssrHostId = domApi.$getAttribute(node, SSR_HOST_ID);
@@ -99,16 +102,16 @@ function hydrateElementFromSsr(plt: d.PlatformApi, domApi: d.DomApi, parentNode:
           ssrHostId = ssrHostId.substring(1);
         }
 
-        // keep drilling down through child nodes and build up the vnode
-        addChildSsrVNodes(domApi, ssrVNode.vtag as string, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
+        // keep drilling down through child nodes
+        addChildNodes(domApi, ssrVNode.vtag as string, node, node, NODE_TYPE.ElementNode, ssrVNode, ssrHostId, true, slottedCmp, removeNodes);
       }
     }
+  }
 
-  });
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, slottedCmp: d.SlottedComponent, removeNodes: d.RenderNode[]) {
+function addChildNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.HostElement, node: d.RenderNode, nodeType: number, parentVNode: d.VNode, ssrHostId: string, checkNestedElements: boolean, slottedCmp: d.SlottedComponent, removeNodes: d.RenderNode[]) {
   let attrId: string;
   let dataIdSplt: any[];
   let childVNode: d.VNode;
@@ -154,13 +157,11 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
         checkNestedElements = (dataIdSplt[2] !== '');
 
         // remove the ssr child attribute
-        domApi.$removeAttribute(node, SSR_CHILD_ID);
+        // domApi.$removeAttribute(node, SSR_CHILD_ID);
       }
     }
 
     if ((attrId = domApi.$getAttribute(node, SSR_ORIGINAL_LOCATION_NODE_ATTR)) && (dataIdSplt = attrId.split('.')) && (dataIdSplt[0] === ssrHostId)) {
-      console.log('\n\n\n\n\n\n SSR_ORIGINAL_LOCATION_NODE_ATTR', dataIdSplt, '\n\n\n\n\n\n')
-
       // remove the ssr original location attribute
       domApi.$removeAttribute(node, SSR_ORIGINAL_LOCATION_NODE_ATTR);
     }
@@ -177,12 +178,12 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
       });
 
       // remove the ssr light dom attribute
-      domApi.$removeAttribute(node, SSR_LIGHT_DOM_ATTR);
+      // domApi.$removeAttribute(node, SSR_LIGHT_DOM_ATTR);
     }
 
     // keep drilling down through the elements
     (Array.prototype.slice.call(domApi.$childNodes(node)) as d.RenderNode[]).forEach(childNode => {
-      addChildSsrVNodes(domApi, hostTagName, hostElm, childNode, domApi.$nodeType(childNode), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
+      addChildNodes(domApi, hostTagName, hostElm, childNode, domApi.$nodeType(childNode), parentVNode, ssrHostId, checkNestedElements, slottedCmp, removeNodes);
     });
 
   } else if (nodeType === NODE_TYPE.CommentNode) {
@@ -198,7 +199,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
         // this is a content reference html comment
         (hostElm['s-cr'] = domApi.$createTextNode('') as any)['s-cn'] = true;
         domApi.$insertBefore(hostElm, hostElm['s-cr'], node);
-        node.remove();
+        // node.remove();
 
       } else if (__BUILD_CONDITIONALS__.hasSlot && dataIdSplt[0] === SSR_SLOT_NODE_COMMENT) {
         // this comment node represents where a real <slot> node should go
@@ -227,7 +228,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
         }
 
         // remove the old html comment node
-        domApi.$remove(node);
+        // domApi.$remove(node);
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
@@ -268,18 +269,16 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
               parentVNode.vchildren[dataIdSplt[2]] = childVNode;
 
               // remove this node later on
-              removeNodes.push(node);
+              // removeNodes.push(node);
 
               nextNode = domApi.$nextSibling(nextNode) as d.RenderNode;
               if (nextNode && domApi.$nodeType(nextNode) === NODE_TYPE.CommentNode && domApi.$getTextContent(nextNode) === '/') {
-                removeNodes.push(nextNode);
+                // removeNodes.push(nextNode);
               }
 
             } if (dataIdSplt[0] === SSR_ORIGINAL_LOCATION_NODE_COMMENT) {
-              console.log('\n\n\n\n\n\n comment', dataIdSplt, '\n\n\n\n\n\n')
-
               // remove this node later on
-              removeNodes.push(node);
+              // removeNodes.push(node);
 
             } else if (dataIdSplt[0] === SSR_LIGHT_DOM_NODE_COMMENT) {
               // this is an ssr text node start comment for light dom content
@@ -291,7 +290,7 @@ function addChildSsrVNodes(domApi: d.DomApi, hostTagName: string, hostElm: d.Hos
               });
 
               // remove this node later on
-              removeNodes.push(node);
+              // removeNodes.push(node);
             }
 
             break;

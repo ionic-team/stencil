@@ -79,12 +79,30 @@ function ssrCommentOriginalLocationRef(domApi: d.DomApi, elm: d.RenderNode) {
 
 
 function ssrCommentCmpElmChild(domApi: d.DomApi, node: d.RenderNode) {
-  const attrId = `${node.ssrCmpElmChildOfHostId}.${node.ssrCmpElmChildIndex}`;
+  let attrId = `${node.ssrCmpElmChildOfHostId}.${node.ssrCmpElmChildIndex}`;
+
+  if (node.ssrIsLastCmpElmChild) {
+    attrId += `.`;
+
+    if (node.ssrHasLastCmpChildText) {
+      node.ssrHasLastCmpChildText = false;
+      const childNodes = domApi.$childNodes(node);
+      if (childNodes.length === 1) {
+        if (domApi.$nodeType(childNodes[0]) === c.NODE_TYPE.TextNode) {
+          attrId += `t`;
+          node.ssrHasLastCmpChildText = true;
+        }
+      }
+    }
+  }
+
   domApi.$setAttribute(node, c.SSR_CHILD_ID, attrId);
 }
 
 
 function ssrCommentTextChild(domApi: d.DomApi, node: d.RenderNode) {
+  const parentNode = domApi.$parentNode(node) as d.RenderNode;
+
   const ssrCmpTextChildOfHostId = typeof node.ssrCmpTextChildOfHostId === 'number' ? node.ssrCmpTextChildOfHostId : '';
   const ssrCmpTextChildIndex = typeof node.ssrCmpTextChildIndex === 'number' ? node.ssrCmpTextChildIndex : '';
 
@@ -95,9 +113,10 @@ function ssrCommentTextChild(domApi: d.DomApi, node: d.RenderNode) {
       return;
     }
     startCommentId += `.${node.ssrLightDomChildOfHostId}.${node.ssrLightDomIndex}`;
-  }
 
-  const parentNode = domApi.$parentNode(node);
+  } else if (parentNode.ssrHasLastCmpChildText) {
+    return;
+  }
 
   const startComment = domApi.$createComment(startCommentId) as any;
   domApi.$insertBefore(parentNode, startComment, node);
