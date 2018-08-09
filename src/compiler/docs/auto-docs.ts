@@ -16,7 +16,6 @@ export function addAutoGenerate(cmpMeta: d.ComponentMeta, content: string[]) {
   const markdownContent = generateMemberMarkdown(cmpMeta);
   content.push(...markdownContent);
 
-  content.push(``);
   content.push(`----------------------------------------------`);
   content.push(``);
   content.push(NOTE);

@@ -37,6 +37,7 @@ export class MarkdownMethods {
 
     content.push(...table.toMarkdown());
     content.push(``);
+    content.push(``);
 
     return content;
   }
