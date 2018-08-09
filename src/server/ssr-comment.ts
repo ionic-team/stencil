@@ -9,6 +9,10 @@ export function ssrComment(domApi: d.DomApi, node: d.RenderNode) {
     ssrCommentHostElement(domApi, node);
   }
 
+  if (node.ssrIsOriginalLocRef) {
+    ssrCommentOriginalLocationRef(domApi, node);
+  }
+
   if (node.ssrIsLightDom) {
     ssrCommentLightDom(domApi, node, nodeType);
   }
@@ -40,6 +44,29 @@ function ssrCommentHostElement(domApi: d.DomApi, hostElm: d.RenderNode) {
 function ssrCommentHostAttr(domApi: d.DomApi, hostElm: d.RenderNode) {
   const attrId = hostElm.ssrHostId;
   domApi.$setAttribute(hostElm, c.SSR_HOST_ID, attrId);
+}
+
+
+function ssrCommentHostContentRef(domApi: d.DomApi, hostElm: d.RenderNode) {
+  const commentId = `${c.SSR_CONTENT_REF_NODE_COMMENT}.${hostElm.ssrHostId}`;
+
+  const contentRefComment = domApi.$createComment(commentId) as any;
+  domApi.$insertBefore(hostElm, contentRefComment, hostElm['s-cr']);
+
+  domApi.$remove(hostElm['s-cr']);
+
+  hostElm['s-cr'] = contentRefComment;
+  hostElm['s-cr']['s-cn'] = true;
+}
+
+
+function ssrCommentOriginalLocationRef(domApi: d.DomApi, elm: d.RenderNode) {
+  const commentId = `${c.SSR_ORIGINAL_LOCATION_NODE_COMMENT}.${elm.ssrOrgignalLocLightDomId}`;
+
+  const orgLocRefComment = domApi.$createComment(commentId) as any;
+  domApi.$insertBefore(domApi.$parentNode(elm), orgLocRefComment, elm);
+
+  domApi.$remove(elm);
 }
 
 
@@ -88,17 +115,4 @@ function ssrCommentSlotRef(domApi: d.DomApi, elm: d.RenderNode) {
   domApi.$insertBefore(domApi.$parentNode(elm), slotRefComment, elm);
 
   domApi.$remove(elm);
-}
-
-
-function ssrCommentHostContentRef(domApi: d.DomApi, hostElm: d.RenderNode) {
-  const commentId = `${c.SSR_CONTENT_REF_NODE_COMMENT}.${hostElm.ssrHostId}`;
-
-  const contentRefComment = domApi.$createComment(commentId) as any;
-  domApi.$insertBefore(hostElm, contentRefComment, hostElm['s-cr']);
-
-  domApi.$remove(hostElm['s-cr']);
-
-  hostElm['s-cr'] = contentRefComment;
-  hostElm['s-cr']['s-cn'] = true;
 }

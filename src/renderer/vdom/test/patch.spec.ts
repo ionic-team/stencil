@@ -150,7 +150,7 @@ describe('renderer', () => {
       hostElm['s-sc'] = getScopeId({ tagNameMeta: 'my-tag' });
       vnode0 = {};
       vnode0.elm = hostElm;
-      hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null)), false, 'scoped').elm;
+      hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null)), false).elm;
       expect(hostElm.firstChild.classList.contains('scs-my-tag')).toBe(true);
     });
 
@@ -158,7 +158,7 @@ describe('renderer', () => {
       hostElm = mockElement('my-tag');
       vnode0 = {};
       vnode0.elm = hostElm;
-      hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null, 'text')), false, 'scoped').elm;
+      hostElm = patch(hostElm, vnode0, h('my-tag', null, h('div', null, 'text')), false).elm;
 
       const div = hostElm.querySelector('div') as d.RenderNode;
       expect(div['s-hn']).toBe('my-tag');

@@ -183,6 +183,10 @@ export interface RenderNode extends d.HostElement {
   ssrIsSlotRef?: boolean;
   ssrSlotChildOfHostId?: number;
   ssrSlotChildIndex?: number;
+
+  // SSR Original Location
+  ssrIsOriginalLocRef?: boolean;
+  ssrOrgignalLocLightDomId?: string;
 }
 
 

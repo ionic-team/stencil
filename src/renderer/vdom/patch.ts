@@ -603,6 +603,14 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
               (relocateNode.nodeToRelocate['s-ol'] = orgLocationNode),
               relocateNode.nodeToRelocate
             );
+
+            if (__BUILD_CONDITIONALS__.ssrServerSide && relocateNode.nodeToRelocate.ssrIsLightDom) {
+              if (domApi.$nodeType(relocateNode.nodeToRelocate) === NODE_TYPE.TextNode && domApi.$getTextContent(relocateNode.nodeToRelocate).trim() === '') {
+                continue;
+              }
+              orgLocationNode.ssrIsOriginalLocRef = true;
+              orgLocationNode.ssrOrgignalLocLightDomId = `${relocateNode.nodeToRelocate.ssrLightDomChildOfHostId}.${relocateNode.nodeToRelocate.ssrLightDomIndex}`;
+            }
           }
         }
 
@@ -686,7 +694,7 @@ function hasChildNodes(children: d.VNode[]) {
   // if there aren't, this info is useful so the client runtime
   // doesn't have to climb down and check so many elements
   if (children) {
-    for (var i = 0; i < children.length; i++) {
+    for (let i = 0; i < children.length; i++) {
       if (children[i].vtag !== 'slot' || hasChildNodes(children[i].vchildren)) {
         return true;
       }

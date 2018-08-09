@@ -114,6 +114,9 @@ describe('ssr scoped css', () => {
         <body>
           <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="0">
             <!--c.0-->
+            <!--o.0.0-->
+            <!--o.0.1-->
+            <!--o.0.3-->
             <header class="scs-cmp-a" ssrc="0.0">
               <!--t.0.0-->
                 cmp-a scope-encapsulated
@@ -124,6 +127,8 @@ describe('ssr scoped css', () => {
             cmp-a light-dom top
             <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
               <!--c.1-->
+              <!--o.1.1-->
+              <!--o.1.3-->
               <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
                 <!--s.1.0-->
                 <article ssrl="1.1">
