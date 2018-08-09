@@ -13,16 +13,15 @@ export function ssrComment(domApi: d.DomApi, node: d.RenderNode) {
     ssrCommentOriginalLocationRef(domApi, node);
   }
 
-  if (node.ssrIsLightDom) {
-    ssrCommentLightDom(domApi, node, nodeType);
+  if ((nodeType === c.NODE_TYPE.TextNode && node.ssrIsLightDom) || node.ssrIsCmpText) {
+    ssrCommentTextChild(domApi, node);
+
+  } else if (node.ssrIsLightDom) {
+    ssrCommentLightDomElm(domApi, node);
   }
 
   if (node.ssrIsCmpElm) {
     ssrCommentCmpElmChild(domApi, node);
-  }
-
-  if (node.ssrIsCmpText) {
-    ssrCommentCmpTextChild(domApi, node);
   }
 
   if (node.ssrIsSlotRef) {
@@ -85,8 +84,19 @@ function ssrCommentCmpElmChild(domApi: d.DomApi, node: d.RenderNode) {
 }
 
 
-function ssrCommentCmpTextChild(domApi: d.DomApi, node: d.RenderNode) {
-  const startCommentId = `${c.SSR_TEXT_NODE_COMMENT}.${node.ssrCmpTextChildOfHostId}.${node.ssrCmpTextChildIndex}`;
+function ssrCommentTextChild(domApi: d.DomApi, node: d.RenderNode) {
+  const ssrCmpTextChildOfHostId = typeof node.ssrCmpTextChildOfHostId === 'number' ? node.ssrCmpTextChildOfHostId : '';
+  const ssrCmpTextChildIndex = typeof node.ssrCmpTextChildIndex === 'number' ? node.ssrCmpTextChildIndex : '';
+
+  let startCommentId = `${c.SSR_TEXT_NODE_COMMENT}.${ssrCmpTextChildOfHostId}.${ssrCmpTextChildIndex}`;
+
+  if (node.ssrIsLightDom) {
+    if (domApi.$getTextContent(node).trim() === '') {
+      return;
+    }
+    startCommentId += `.${node.ssrLightDomChildOfHostId}.${node.ssrLightDomIndex}`;
+  }
+
   const parentNode = domApi.$parentNode(node);
 
   const startComment = domApi.$createComment(startCommentId) as any;
@@ -98,18 +108,9 @@ function ssrCommentCmpTextChild(domApi: d.DomApi, node: d.RenderNode) {
 }
 
 
-function ssrCommentLightDom(domApi: d.DomApi, node: d.RenderNode, nodeType: number) {
-  if (nodeType === c.NODE_TYPE.ElementNode) {
-    const attrId = `${node.ssrLightDomChildOfHostId}.${node.ssrLightDomIndex}`;
-    domApi.$setAttribute(node, c.SSR_LIGHT_DOM_ATTR, attrId);
-
-  } else if (nodeType === c.NODE_TYPE.TextNode && domApi.$getTextContent(node).trim() !== '') {
-    const commentId = `${c.SSR_LIGHT_DOM_NODE_COMMENT}.${node.ssrLightDomChildOfHostId}.${node.ssrLightDomIndex}`;
-    const parentNode = domApi.$parentNode(node);
-
-    const startComment = domApi.$createComment(commentId) as any;
-    domApi.$insertBefore(parentNode, startComment, node);
-  }
+function ssrCommentLightDomElm(domApi: d.DomApi, node: d.RenderNode) {
+  const attrId = `${node.ssrLightDomChildOfHostId}.${node.ssrLightDomIndex}`;
+  domApi.$setAttribute(node, c.SSR_LIGHT_DOM_ATTR, attrId);
 }
 
 

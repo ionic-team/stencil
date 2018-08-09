@@ -123,8 +123,9 @@ describe('ssr scoped css', () => {
               <!--/t-->
             </header>
             <!--s.0.1-->
-            <!--l.0.0-->
-            cmp-a light-dom top
+            <!--t...0.0-->
+              cmp-a light-dom top
+            <!--/t-->
             <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
               <!--c.1-->
               <!--o.1.1-->
@@ -145,8 +146,7 @@ describe('ssr scoped css', () => {
                 </nav>
                 <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
                   <!--c.2-->
-                  <!--l.2.0-->
-                  <!--t.1.0-->
+                  <!--t.1.0.2.0-->
                     cmp-c light-dom
                   <!--/t-->
                   <footer class="scs-cmp-c" ssrc="2.0">
@@ -232,8 +232,9 @@ describe('ssr scoped css', () => {
           <!--/t-->
         </header>
         <!--s.0.1-->
-        <!--l.0.0-->
-        cmp-a light-dom top
+        <!--t...0.0-->
+          cmp-a light-dom top
+        <!--/t-->
         <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
           <!--c.1-->
           <!--o.1.1-->
@@ -254,8 +255,7 @@ describe('ssr scoped css', () => {
             </nav>
             <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
               <!--c.2-->
-              <!--l.2.0-->
-              <!--t.1.0-->
+              <!--t.1.0.2.0-->
                 cmp-c light-dom
               <!--/t-->
               <footer class="scs-cmp-c" ssrc="2.0">
@@ -271,7 +271,6 @@ describe('ssr scoped css', () => {
         </span>
       </cmp-a>
     `);
-
   });
 
 });
