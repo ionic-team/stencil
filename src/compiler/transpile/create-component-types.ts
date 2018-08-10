@@ -51,7 +51,7 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
     if (cti.includeIntrinsicElements) {
       const intrinsicImportAlias = 'DependentIntrinsicElements' + (intrinsicImports.length + 1);
       intrinsicImports.push(intrinsicImportAlias);
-      return `import { LocalIntrinsicElements as ${intrinsicImportAlias} } '${cti.pkgName}';`;
+      return `import { LocalIntrinsicElements as ${intrinsicImportAlias} } from '${cti.pkgName}';`;
     }
     return `import '${cti.pkgName}'`;
   })

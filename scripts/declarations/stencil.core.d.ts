@@ -38,17 +38,3 @@ export interface QueueApi {
 export interface RafCallback {
   (timeStamp: number): void;
 }
-
-declare global {
-  namespace JSX {
-    interface Element {}
-    export interface IntrinsicElements {}
-  }
-  namespace JSXElements {}
-
-  interface HTMLStencilElement extends HTMLElement {
-    componentOnReady(): Promise<this>;
-  }
-
-  interface HTMLAttributes {}
-}

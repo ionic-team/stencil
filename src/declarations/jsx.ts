@@ -1,5 +1,7 @@
-
-export type CssClassMap = { [className: string]: boolean };
+/**
+ * This file gets copied to all distributions of stencil component collections.
+ * - no imports
+ */
 
 declare global {
   interface HTMLStencilElement extends HTMLElement {
@@ -575,7 +577,7 @@ export namespace JSXElements {
 
     // Standard HTML Attributes
     accessKey?: string;
-    class?: string | CssClassMap;
+    class?: string |  { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
     contextMenu?: string;
@@ -639,7 +641,7 @@ export namespace JSXElements {
   export interface SVGAttributes extends DOMAttributes {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
-    class?: string | CssClassMap;
+    class?: string | { [className: string]: boolean };
     color?: string;
     height?: number | string;
     id?: string;
