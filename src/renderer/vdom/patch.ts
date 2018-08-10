@@ -56,9 +56,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       newVNode.elm = domApi.$createTextNode('') as any;
 
       if (__BUILD_CONDITIONALS__.ssrServerSide) {
+        // SSR ONLY: this node represents a <slot> element
         newVNode.elm.ssrIsSlotRef = true;
-        newVNode.elm.ssrSlotChildOfHostId = ssrHostId;
-        newVNode.elm.ssrSlotChildIndex = childIndex;
+        newVNode.elm.ssrSlotHostId = ssrHostId;
+        newVNode.elm.ssrSlotIndex = childIndex;
       }
 
     } else {
@@ -83,12 +84,11 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       }
 
       if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId)) {
-        // SSR ONLY: this is an SSR render and this
-        // logic does not run on the client
-        elm.ssrIsCmpElm = true;
-        elm.ssrCmpElmChildOfHostId = ssrHostId;
-        elm.ssrCmpElmChildIndex = childIndex;
-        elm.ssrIsLastCmpElmChild = hasChildNodes(newVNode.vchildren);
+        // SSR ONLY: this is an element that is a child of this host element
+        elm.ssrIsCmpChildElm = true;
+        elm.ssrCmpChildElmHostId = ssrHostId;
+        elm.ssrCmpChildElmIndex = childIndex;
+        elm.ssrIsLastCmpChildElm = hasChildNodes(newVNode.vchildren);
         elm.ssrHasLastCmpChildText = (!!newVNode.vchildren && newVNode.vchildren.length === 1 && typeof newVNode.vchildren[0].vtext === 'string');
       }
 
@@ -104,10 +104,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
             if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrHostId) && childNode.nodeType === NODE_TYPE.TextNode) {
               if (domApi.$getTextContent(childNode).trim() !== '') {
-                // SSR ONLY
-                childNode.ssrIsCmpText = true;
-                childNode.ssrCmpTextChildOfHostId = ssrHostId;
-                childNode.ssrCmpTextChildIndex = i;
+                // SSR ONLY: this is a text node that is a child of this host element
+                childNode.ssrIsCmpChildText = true;
+                childNode.ssrCmpChildTextHostId = ssrHostId;
+                childNode.ssrCmpChildTextIndex = i;
               }
             }
           }
@@ -607,12 +607,15 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
               relocateNode.nodeToRelocate
             );
 
-            if (__BUILD_CONDITIONALS__.ssrServerSide && relocateNode.nodeToRelocate.ssrIsLightDom) {
-              if (domApi.$nodeType(relocateNode.nodeToRelocate) === NODE_TYPE.TextNode && domApi.$getTextContent(relocateNode.nodeToRelocate).trim() === '') {
-                continue;
+            if (__BUILD_CONDITIONALS__.ssrServerSide) {
+              if (relocateNode.nodeToRelocate.ssrIsLightDomText && domApi.$getTextContent(relocateNode.nodeToRelocate).trim() !== '') {
+                orgLocationNode.ssrIsOriginalLocRef = true;
+                orgLocationNode.ssrOrgignalLocLightDomId = `${relocateNode.nodeToRelocate.ssrLightDomTextHostId}.${relocateNode.nodeToRelocate.ssrLightDomTextIndex}`;
               }
-              orgLocationNode.ssrIsOriginalLocRef = true;
-              orgLocationNode.ssrOrgignalLocLightDomId = `${relocateNode.nodeToRelocate.ssrLightDomChildOfHostId}.${relocateNode.nodeToRelocate.ssrLightDomIndex}`;
+              if (relocateNode.nodeToRelocate.ssrIsLightDomElm) {
+                orgLocationNode.ssrIsOriginalLocRef = true;
+                orgLocationNode.ssrOrgignalLocLightDomId = `${relocateNode.nodeToRelocate.ssrLightDomElmHostId}.${relocateNode.nodeToRelocate.ssrLightDomElmIndex}`;
+              }
             }
           }
         }

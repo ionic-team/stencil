@@ -121,9 +121,8 @@ describe('ssr scoped css', () => {
               cmp-a scope-encapsulated
             </header>
             <!--s.0.1-->
-            <!--t...0.0-->
-              cmp-a light-dom top
-            <!--/t-->
+            <!--l.0.0-->
+            cmp-a light-dom top
             <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
               <!--c.1-->
               <!--o.1.1-->
@@ -142,7 +141,8 @@ describe('ssr scoped css', () => {
                 </nav>
                 <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
                   <!--c.2-->
-                  <!--t.1.0.2.0-->
+                  <!--l.2.0-->
+                  <!--t.1.0-->
                     cmp-c light-dom
                   <!--/t-->
                   <footer class="scs-cmp-c" ssrc="2.0.t">
@@ -167,7 +167,15 @@ describe('ssr scoped css', () => {
     const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
     expect(cmpASsrVnode.vtag).toBe('cmp-a');
     expect(cmpASsrVnode.elm).toBe(cmpAHost);
-    // expect(cmpAHost['s-cr'])
+
+    const cmpAContentRef = cmpAHost.childNodes[0];
+    expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAContentRef.textContent).toBe('');
+    expect(cmpAHost['s-cr']).toBe(cmpAContentRef);
+    expect(cmpAHost['s-cr']['s-cn']).toBe(true);
+
+    const cmpAOrgLoc0 = cmpAHost.childNodes[1];
+    // expect(cmpAOrgLoc0['s-nr']).toBe(true);
     // isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
     // const cmpAContentRef = cmpAHost['s-cr'];
@@ -217,17 +225,12 @@ describe('ssr scoped css', () => {
 
     expect(hydratedRoot.innerHTML).toEqualHtml(`
       <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
-        <!--c.0-->
-        <!--o.0.0-->
-        <!--o.0.1-->
-        <!--o.0.3-->
         <header class="scs-cmp-a" ssrc="0.0.t">
           cmp-a scope-encapsulated
         </header>
         <!--s.0.1-->
-        <!--t...0.0-->
-          cmp-a light-dom top
-        <!--/t-->
+        <!--l.0.0-->
+        cmp-a light-dom top
         <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
           <!--c.1-->
           <!--o.1.1-->
@@ -246,7 +249,8 @@ describe('ssr scoped css', () => {
             </nav>
             <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
               <!--c.2-->
-              <!--t.1.0.2.0-->
+              <!--l.2.0-->
+              <!--t.1.0-->
                 cmp-c light-dom
               <!--/t-->
               <footer class="scs-cmp-c" ssrc="2.0.t">

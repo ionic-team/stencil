@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION } from '../util/constants';
+import { ENCAPSULATION, NODE_TYPE } from '../util/constants';
 
 
 export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
@@ -38,9 +38,18 @@ export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: 
         // and mark them as light dom nodes BEFORE we move stuff around
         const childNodes = Array.prototype.slice.call(domApi.$childNodes(hostElm)) as d.RenderNode[];
         childNodes.forEach((childNode, i) => {
-          childNode.ssrIsLightDom = true;
-          childNode.ssrLightDomChildOfHostId = hostElm.ssrHostId;
-          childNode.ssrLightDomIndex = i;
+          const nodeType = domApi.$nodeType(childNode);
+
+          if (nodeType === NODE_TYPE.ElementNode) {
+            childNode.ssrIsLightDomElm = true;
+            childNode.ssrLightDomElmHostId = hostElm.ssrHostId;
+            childNode.ssrLightDomElmIndex = i;
+
+          } else if (nodeType === NODE_TYPE.TextNode) {
+            childNode.ssrIsLightDomText = true;
+            childNode.ssrLightDomTextHostId = hostElm.ssrHostId;
+            childNode.ssrLightDomTextIndex = i;
+          }
         });
       }
 

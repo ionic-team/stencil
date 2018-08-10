@@ -168,33 +168,37 @@ export interface RenderNode extends d.HostElement {
    */
   ['s-si']?: string;
 
-  // SSR Light Dom
-  ssrIsLightDom?: boolean;
-  ssrLightDomChildOfHostId?: number;
-  ssrLightDomIndex?: number;
+  // SSR Light Dom Text Node
+  ssrIsLightDomText?: boolean;
+  ssrLightDomTextHostId?: number;
+  ssrLightDomTextIndex?: number;
+
+  // SSR Light Dom Element Node
+  ssrIsLightDomElm?: boolean;
+  ssrLightDomElmHostId?: number;
+  ssrLightDomElmIndex?: number;
 
   // SSR Component Element Child Node
-  ssrIsCmpElm?: boolean;
-  ssrCmpElmChildOfHostId?: number;
-  ssrCmpElmChildIndex?: number;
-  ssrIsLastCmpElmChild?: boolean;
+  ssrIsCmpChildElm?: boolean;
+  ssrCmpChildElmHostId?: number;
+  ssrCmpChildElmIndex?: number;
+  ssrIsLastCmpChildElm?: boolean;
   ssrHasLastCmpChildText?: boolean;
 
   // SSR Component Text Child Node
-  ssrIsCmpText?: boolean;
-  ssrCmpTextChildOfHostId?: number;
-  ssrCmpTextChildIndex?: number;
+  ssrIsCmpChildText?: boolean;
+  ssrCmpChildTextHostId?: number;
+  ssrCmpChildTextIndex?: number;
 
   // SSR Slot Reference
   ssrIsSlotRef?: boolean;
-  ssrSlotChildOfHostId?: number;
-  ssrSlotChildIndex?: number;
+  ssrSlotHostId?: number;
+  ssrSlotIndex?: number;
 
   // SSR Original Location
   ssrIsOriginalLocRef?: boolean;
   ssrOrgignalLocLightDomId?: string;
 }
-
 
 
 export interface SlottedComponent {
