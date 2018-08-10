@@ -1,3 +1,43 @@
+<a name="0.11.3"></a>
+## 🔥 [0.11.3](https://github.com/ionic-team/stencil/compare/v0.11.2...v0.11.3) (2018-08-08)
+
+
+### Bug Fixes
+
+* **events:** prevent ael and rel property renaming ([509fca2](https://github.com/ionic-team/stencil/commit/509fca2))
+
+
+
+<a name="0.11.2"></a>
+## 🎯 [0.11.2](https://github.com/ionic-team/stencil/compare/v0.11.1...v0.11.2) (2018-08-07)
+
+
+### Bug Fixes
+
+* **testing:** ensure that testing files are getting Build conditionals propertly removed. ([f039aab](https://github.com/ionic-team/stencil/commit/f039aab))
+
+
+
+<a name="0.11.1"></a>
+## 🐝 [0.11.1](https://github.com/ionic-team/stencil/compare/v0.11.0...v0.11.1) (2018-08-06)
+
+
+### Bug Fixes
+
+* **angular:** disable tslint for generated code ([4ea8b9c](https://github.com/ionic-team/stencil/commit/4ea8b9c))
+
+
+### Features
+
+* **config:** expose limited rollup options for input and output. ([9f969a6](https://github.com/ionic-team/stencil/commit/9f969a6))
+
+
+### Performance Improvements
+
+* **components:** reduce size of components.d.ts distribution  ([e149120](https://github.com/ionic-team/stencil/commit/e149120))
+
+
+
 <a name="0.11.0"></a>
 # 🍇 [0.11.0](https://github.com/ionic-team/stencil/compare/v0.10.10...v0.11.0) (2018-07-31)
 

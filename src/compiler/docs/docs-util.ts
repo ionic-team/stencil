@@ -152,7 +152,7 @@ interface RowData {
 
 
 export function getMemberDocumentation(jsDoc: d.JsDoc) {
-  if (jsDoc && jsDoc.documentation) {
+  if (jsDoc && typeof jsDoc.documentation === 'string') {
     return jsDoc.documentation.trim();
   }
   return '';

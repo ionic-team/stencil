@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
-import { MarkdownAttrs } from './markdown-attrs';
 import { MarkdownCssCustomProperties } from './markdown-css-props';
 import { MarkdownEvents } from './markdown-events';
 import { MarkdownMethods } from './markdown-methods';
@@ -16,7 +15,6 @@ export function addAutoGenerate(cmpMeta: d.ComponentMeta, content: string[]) {
   const markdownContent = generateMemberMarkdown(cmpMeta);
   content.push(...markdownContent);
 
-  content.push(``);
   content.push(`----------------------------------------------`);
   content.push(``);
   content.push(NOTE);
@@ -25,7 +23,6 @@ export function addAutoGenerate(cmpMeta: d.ComponentMeta, content: string[]) {
 
 
 function generateMemberMarkdown(cmpMeta: d.ComponentMeta) {
-  const attrs = new MarkdownAttrs();
   const events = new MarkdownEvents();
   const methods = new MarkdownMethods();
   const props = new MarkdownProps();
@@ -36,10 +33,6 @@ function generateMemberMarkdown(cmpMeta: d.ComponentMeta) {
 
     if (memberMeta.memberType === MEMBER_TYPE.Prop || memberMeta.memberType === MEMBER_TYPE.PropMutable) {
       props.addRow(memberName, memberMeta);
-
-      if (memberMeta.attribName) {
-        attrs.addRow(memberMeta);
-      }
 
     } else if (memberMeta.memberType === MEMBER_TYPE.Method) {
       methods.addRow(memberName, memberMeta);
@@ -58,7 +51,6 @@ function generateMemberMarkdown(cmpMeta: d.ComponentMeta) {
 
   return [
     ...props.toMarkdown(),
-    ...attrs.toMarkdown(),
     ...events.toMarkdown(),
     ...methods.toMarkdown(),
     ...cssCustomProps.toMarkdown()

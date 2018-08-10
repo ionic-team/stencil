@@ -47,7 +47,7 @@ export type ChildType = VNode | number | string;
 
 
 export interface ComponentProps {
-  children?: d.VNode[];
+  children: d.VNode[];
   key?: string | number | any;
 }
 
@@ -57,7 +57,7 @@ export interface FunctionalUtilities {
 }
 
 export interface FunctionalComponent<PropsType = {}> {
-  (props?: PropsType & ComponentProps, utils?: FunctionalUtilities): VNode | VNode[];
+  (props: PropsType & ComponentProps, utils: FunctionalUtilities): VNode | VNode[];
 }
 
 

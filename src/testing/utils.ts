@@ -5,7 +5,7 @@ export function testProperties(instance: any, properties: { [prop: string]: any 
   const keys = Object.keys(properties);
   for (const prop of keys) {
     if (!instance[prop] === properties[prop]) {
-      throw new Error(`expected property "${prop}",  but it was not found`);
+      throw new Error(`expected property "${prop}", but it was not found`);
     }
   }
 }
@@ -40,7 +40,7 @@ export function testMatchClasslist(el: HTMLElement, classes: string[]) {
 export function testMatchAttributes(el: HTMLElement, attributes: { [attr: string]: string }) {
   const keys = Object.keys(attributes);
   if (el.attributes.length !== keys.length) {
-    throw new Error(`expected ${keys.length} classes, found ${el.attributes.length}`);
+    throw new Error(`expected ${keys.length} attributes, found ${el.attributes.length}`);
   }
   testAttributes(el, attributes);
 }
