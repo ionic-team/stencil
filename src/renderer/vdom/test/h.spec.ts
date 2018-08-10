@@ -333,10 +333,72 @@ describe('h()', () => {
 
   });
 
+  describe('functional components', () => {
+
+    it('should receive props, array, and utils as props', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, { 'id': 'blank' }, h('span', {}));
+      expect(args.length).toBe(3);
+      expect(args[0]).toEqual({ id: 'blank' });
+      expect(args[1].length).toEqual(1);
+      expect(args[2]).toHaveProperties(['map', 'foreach']);
+    });
+
+    it('should receive an empty object when component receives no props', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, {});
+      expect(args[0]).toEqual({});
+      expect(args[1]).toEqual([]);
+    });
+
+    it('should receive an empty array when component receives no children', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, {});
+      expect(args[1]).toEqual([]);
+    });
+
+
+    it('should handle functional cmp which returns null', async () => {
+      const MyFunction: d.FunctionalComponent = () => { return null; };
+      const vnode = h(MyFunction, {});
+
+      expect(vnode).toEqual(null);
+    });
+
+    it('should render functional cmp content', async () => {
+      const MyFunction: d.FunctionalComponent = () => {
+        return h('div', { id: 'fn-cmp' }, 'fn-cmp');
+      };
+      const vnode = h(MyFunction, {});
+      expect(vnode).toEqual({
+        'elm': undefined,
+        'ishost': false,
+        'vattrs': {'id': 'fn-cmp'},
+        'vchildren': [{'vtext': 'fn-cmp'}],
+        'vkey': undefined,
+        'vname': undefined,
+        'vtag': 'div',
+        'vtext': undefined
+      });
+    });
+  });
+
   describe('VDom Util methods', () => {
     it('utils.forEach should loop over items and get the ChildNode data', () => {
       const output = [];
-      const FunctionalCmp: FunctionalComponent = ({ children, ...nodeData }, util) => {
+      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
         util.forEach(children, element => {
           output.push(element);
           util.forEach(element.vchildren, el => {
@@ -380,7 +442,7 @@ describe('h()', () => {
     });
 
     it('replaceAttributes should return the attributes for the node', () => {
-      const FunctionalCmp: FunctionalComponent = ({ children, ...nodeData }, util) => {
+      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
         return util.map(children, child => {
           return {
             ...child,
