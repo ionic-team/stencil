@@ -127,7 +127,7 @@ describe('ssr scoped css', () => {
               <!--c.1-->
               <!--o.1.1-->
               <!--o.1.3-->
-              <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0.">
+              <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0">
                 <!--s.1.0-->
                 <article ssrl="1.1">
                   cmp-b light-dom top
@@ -139,7 +139,7 @@ describe('ssr scoped css', () => {
                 <nav slot="named-slot" ssrl="1.3">
                   cmp-b light-dom bottom
                 </nav>
-                <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
+                <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3">
                   <!--c.2-->
                   <!--l.2.0-->
                   <!--t.1.0-->
@@ -168,30 +168,40 @@ describe('ssr scoped css', () => {
     expect(cmpASsrVnode.vtag).toBe('cmp-a');
     expect(cmpASsrVnode.elm).toBe(cmpAHost);
 
-    const cmpAContentRef = cmpAHost.childNodes[0];
+    const cmpAContentRef = cmpAHost.firstChild as d.RenderNode;
     expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpAContentRef.textContent).toBe('');
+    expect(cmpAHost['s-hn']).toBeUndefined();
     expect(cmpAHost['s-cr']).toBe(cmpAContentRef);
     expect(cmpAHost['s-cr']['s-cn']).toBe(true);
+    expect(cmpAHost['s-cr']['s-hn']).toBeUndefined();
 
-    const cmpAOrgLoc0 = cmpAHost.childNodes[1];
+    const cmpAOrgLoc0 = cmpAContentRef.nextSibling as d.RenderNode;
+    const cmpAOrgLoc1 = cmpAOrgLoc0.nextSibling as d.RenderNode;
+    const cmpAOrgLoc2 = cmpAOrgLoc1.nextSibling as d.RenderNode;
     // expect(cmpAOrgLoc0['s-nr']).toBe(true);
     // isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
-    // const cmpAContentRef = cmpAHost['s-cr'];
-    // expect(cmpAContentRef).toBeDefined();
-    // expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
-    // expect(cmpAContentRef['s-cn']).toBe(true);
-    // expect(cmpAContentRef.parentNode).toBe(cmpAHost);
-    // expect(domApi.$childNodes(cmpAHost)[0]).toBe(cmpAContentRef);
+    const cmpAHeader = cmpAOrgLoc2.nextSibling as d.RenderNode;
+    expect(cmpAHeader.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpAHeader.nodeName).toBe('HEADER');
+    expect(cmpAHeader['s-hn']).toBe('cmp-a');
 
-    // const cmpAHeader = cmpAHost.querySelector('header') as d.RenderNode;
-    // expect(cmpAHeader['s-hn']).toBe('cmp-a');
+    const cmpASlot = cmpAHeader.nextSibling as d.RenderNode;
+    expect(cmpASlot.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpASlot['s-hn']).toBe('cmp-a');
+    expect(cmpASlot['s-sr']).toBe(true);
+    expect(cmpASlot['s-cr']).toBe(cmpAContentRef);
+    expect(cmpASlot['s-sn']).toBe('');
 
-    // const cmpAHeaderTextComment = cmpAHeader.firstChild as d.RenderNode;
-    // expect(cmpAHeaderTextComment['s-hn']).toBe('cmp-a');
+    const cmpALightDomTop = cmpASlot.nextSibling as d.RenderNode;
+    expect(cmpALightDomTop.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpALightDomTop.textContent.trim()).toBe('cmp-a light-dom top');
+    expect(cmpALightDomTop['s-hn']).toBeUndefined();
 
-    // const cmpBHost = hydratedRoot.querySelector('cmp-b') as d.HostElement;
+    const cmpBHost = cmpALightDomTop.nextSibling as d.RenderNode;
+    expect(cmpBHost.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpBHost.nodeName).toBe('CMP-B');
     // const cmpBSsrVnode = plt.vnodeMap.get(cmpBHost);
     // expect(cmpBSsrVnode.vtag).toBe('cmp-b');
     // expect(cmpBSsrVnode.elm).toBe(cmpBHost);
@@ -223,43 +233,41 @@ describe('ssr scoped css', () => {
     // expect(cmpCContentRef.parentNode).toBe(cmpCHost);
     // expect(domApi.$childNodes(cmpCHost)[0]).toBe(cmpCContentRef);
 
+    const cmpASpan = cmpBHost.nextSibling.nextSibling as d.RenderNode;
+    expect(cmpASpan.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpASpan.nodeName).toBe('SPAN');
+    expect(cmpASpan.textContent.trim()).toBe('cmp-a light-dom bottom');
+    // expect(cmpASpan['s-hn']).toBe('cmp-a');
+    // expect(cmpASpan['s-sr']).toBe(true);
+    // expect(cmpASpan['s-cr']).toBe(cmpAContentRef);
+    // expect(cmpASpan['s-sn']).toBe('');
+
     expect(hydratedRoot.innerHTML).toEqualHtml(`
       <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
-        <header class="scs-cmp-a" ssrc="0.0.t">
+        <header class="scs-cmp-a">
           cmp-a scope-encapsulated
         </header>
-        <!--s.0.1-->
-        <!--l.0.0-->
         cmp-a light-dom top
-        <cmp-b class="scs-cmp-b-h hydrated" ssrh="1" ssrl="0.1">
-          <!--c.1-->
-          <!--o.1.1-->
-          <!--o.1.3-->
-          <div class="scs-cmp-b scs-cmp-b-s" ssrc="1.0.">
-            <!--s.1.0-->
-            <article ssrl="1.1">
+        <cmp-b class="scs-cmp-b-h hydrated">
+          <div class="scs-cmp-b scs-cmp-b-s">
+            <article>
               cmp-b light-dom top
             </article>
-            <section class="scs-cmp-b" ssrc="1.1.t">
+            <section class="scs-cmp-b">
               cmp-b scope-encapsulated
             </section>
-            <!--s.1.2.named-slot-->
-            <nav slot="named-slot" ssrl="1.3">
+            <nav slot="named-slot">
               cmp-b light-dom bottom
             </nav>
-            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated" ssrh="2" ssrc="1.3.">
-              <!--c.2-->
-              <!--l.2.0-->
-              <!--t.1.0-->
-                cmp-c light-dom
-              <!--/t-->
-              <footer class="scs-cmp-c" ssrc="2.0.t">
+            <cmp-c class="scs-cmp-b scs-cmp-c-h hydrated">
+              cmp-c light-dom
+              <footer class="scs-cmp-c">
                 cmp-c scope-encapsulated
               </footer>
             </cmp-c>
           </div>
         </cmp-b>
-        <span ssrl="0.3">
+        <span>
           cmp-a light-dom bottom
         </span>
       </cmp-a>

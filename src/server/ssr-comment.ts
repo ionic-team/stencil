@@ -106,17 +106,13 @@ function ssrCommentLightDomText(domApi: d.DomApi, node: d.RenderNode) {
 function ssrCommentCmpChildElm(domApi: d.DomApi, node: d.RenderNode) {
   let attrId = `${node.ssrCmpChildElmHostId}.${node.ssrCmpChildElmIndex}`;
 
-  if (node.ssrIsLastCmpChildElm) {
-    attrId += `.`;
-
-    if (node.ssrHasLastCmpChildText) {
-      node.ssrHasLastCmpChildText = false;
-      const childNodes = domApi.$childNodes(node);
-      if (childNodes.length === 1) {
-        if (domApi.$nodeType(childNodes[0]) === c.NODE_TYPE.TextNode) {
-          attrId += `t`;
-          node.ssrHasLastCmpChildText = true;
-        }
+  if (node.ssrCmpChildContainsTextOnly) {
+    node.ssrCmpChildContainsTextOnly = false;
+    const childNodes = domApi.$childNodes(node);
+    if (childNodes.length === 1) {
+      if (domApi.$nodeType(childNodes[0]) === c.NODE_TYPE.TextNode) {
+        attrId += `.t`;
+        node.ssrCmpChildContainsTextOnly = true;
       }
     }
   }
@@ -128,7 +124,7 @@ function ssrCommentCmpChildElm(domApi: d.DomApi, node: d.RenderNode) {
 function ssrCommentCmpChildText(domApi: d.DomApi, node: d.RenderNode) {
   const parentNode = domApi.$parentNode(node) as d.RenderNode;
 
-  if (parentNode.ssrHasLastCmpChildText) {
+  if (parentNode.ssrCmpChildContainsTextOnly) {
     return;
   }
 

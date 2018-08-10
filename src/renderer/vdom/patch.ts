@@ -88,8 +88,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         elm.ssrIsCmpChildElm = true;
         elm.ssrCmpChildElmHostId = ssrHostId;
         elm.ssrCmpChildElmIndex = childIndex;
-        elm.ssrIsLastCmpChildElm = hasChildNodes(newVNode.vchildren);
-        elm.ssrHasLastCmpChildText = (!!newVNode.vchildren && newVNode.vchildren.length === 1 && typeof newVNode.vchildren[0].vtext === 'string');
+        elm.ssrCmpChildContainsTextOnly = (!!newVNode.vchildren && newVNode.vchildren.length === 1 && typeof newVNode.vchildren[0].vtext === 'string');
       }
 
       if (newVNode.vchildren) {
@@ -124,7 +123,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       newVNode.elm['s-hn'] = hostTagName;
 
       if (newVNode.isSlotFallback || newVNode.isSlotReference) {
-        // remember the content reference comment
+        // remember the this is a slot node reference
         newVNode.elm['s-sr'] = true;
 
         // remember the content reference comment
@@ -692,21 +691,6 @@ export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
       callNodeRefs(vChild, isDestroy);
     });
   }
-}
-
-
-function hasChildNodes(children: d.VNode[]) {
-  // SSR ONLY: check if there are any more nested child elements
-  // if there aren't, this info is useful so the client runtime
-  // doesn't have to climb down and check so many elements
-  if (children) {
-    for (let i = 0; i < children.length; i++) {
-      if (children[i].vtag !== 'slot' || hasChildNodes(children[i].vchildren)) {
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 
