@@ -91,7 +91,7 @@ export function h(nodeName: any, vnodeData: any) {
 
   if (typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children, utils);
+    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children || [], utils);
   }
 
   return {
