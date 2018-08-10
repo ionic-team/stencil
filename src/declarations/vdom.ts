@@ -58,13 +58,13 @@ export type ChildType = VNode | number | string;
 
 
 export interface ComponentProps {
-  children: d.VNode[];
+  children?: d.VNode[];
   key?: string | number | any;
 }
 
 export interface FunctionalUtilities {
-  forEach: (children: d.VNode[], cb: (vnode: d.VNode) => void) => void;
-  map: (children: d.VNode[], cb: (vnode: ChildNode) => ChildNode) => d.VNode[];
+  forEach: (children: d.VNode[], cb: (vnode: d.VNode, index: number, array: d.VNode[]) => void) => void;
+  map: (children: d.VNode[], cb: (vnode: ChildNode, index: number, array: d.VNode[]) => ChildNode) => d.VNode[];
 }
 
 export interface FunctionalComponent<PropsType = {}> {

@@ -132,13 +132,21 @@ function VNodeToChild(vnode: d.VNode): d.ChildNode {
 }
 
 const utils: FunctionalUtilities = {
-  'forEach': (children: d.VNode[], cb: (vnode: d.VNode) => void) => {
-    children.forEach((item) => cb(VNodeToChild(item)));
+  'forEach': (children, cb) => {
+    children.forEach((item, index, array) =>
+      cb(
+        VNodeToChild(item),
+        index,
+        array
+      )
+    );
   },
-  'map': (children: d.VNode[], cb: (vnode: d.ChildNode) => d.ChildNode): d.VNode[] => {
-    return children.map((item) => childToVNode(
+  'map': (children, cb): d.VNode[] => {
+    return children.map((item, index, array) => childToVNode(
         cb(
-          VNodeToChild(item)
+          VNodeToChild(item),
+          index,
+          array
         )
       )
     );
