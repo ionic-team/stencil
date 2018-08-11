@@ -175,7 +175,7 @@ export interface NodeResolveConfig {
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
   customResolveOptions?: {
-    [key: string]: string
+    [key: string]: string | string[]
   };
 }
 
