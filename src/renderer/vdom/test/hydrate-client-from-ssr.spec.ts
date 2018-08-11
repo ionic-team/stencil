@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-import { compareHtml, mockDomApi, mockPlatform } from '../../../testing/mocks';
 import { hydrateClientFromSsr } from '../hydrate-client-from-ssr';
+import { mockDomApi, mockPlatform } from '../../../testing/mocks';
 
 
-describe('upgradeToShadowDom', () => {
+describe('hydrateClientFromSsr', () => {
 
   let domApi: d.DomApi;
   let plt: d.PlatformApi;
@@ -88,7 +88,7 @@ describe('upgradeToShadowDom', () => {
 
     hydrateClientFromSsr(plt, domApi, rootElm);
 
-    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
+    expect(rootElm.outerHTML).toEqualHtml(`
       <html>
         <head></head>
         <body>
@@ -103,7 +103,7 @@ describe('upgradeToShadowDom', () => {
           </cmp-a>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('add shadow root', () => {
@@ -114,7 +114,7 @@ describe('upgradeToShadowDom', () => {
 
     hydrateClientFromSsr(plt, domApi, rootElm);
 
-    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
+    expect(rootElm.outerHTML).toEqualHtml(`
       <html>
         <head></head>
         <body>
@@ -123,7 +123,7 @@ describe('upgradeToShadowDom', () => {
           </cmp-a>
         </body>
       </html>
-    `));
+    `);
   });
 
 });

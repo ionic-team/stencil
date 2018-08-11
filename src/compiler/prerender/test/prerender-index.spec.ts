@@ -64,9 +64,9 @@ describe('prerender index', () => {
 
     const index = await c.fs.readFile(path.join(root, 'www', 'index.html'));
 
-    expect(index).toContain('<p ssrc=\"1.0\"><!--t.1.0-->property from parent<!--/--> </p>');
-    expect(index).toContain('<p ssrc=\"1.1\"><!--t.1.0-->attr from parent<!--/--> </p>');
-    expect(index).toContain('<p ssrc=\"1.2\"><!--t.1.0-->custom attr from parent<!--/--> </p>');
+    expect(index).toContain('<p ssrc="1.0.t">property from parent</p>');
+    expect(index).toContain('<p ssrc="1.1.t">attr from parent</p>');
+    expect(index).toContain('<p ssrc="1.2.t">custom attr from parent</p>');
     expect(index).not.toContain('unset');
   });
 
