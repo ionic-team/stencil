@@ -167,25 +167,38 @@ describe('ssr scoped css', () => {
     const cmpASsrVnode = plt.vnodeMap.get(cmpAHost);
     expect(cmpASsrVnode.vtag).toBe('cmp-a');
     expect(cmpASsrVnode.elm).toBe(cmpAHost);
+    isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
 
     const cmpAContentRef = cmpAHost.firstChild as d.RenderNode;
     expect(cmpAContentRef.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpAContentRef.textContent).toBe('');
+    expect(cmpAHost['s-si']).toBeUndefined();
     expect(cmpAHost['s-hn']).toBeUndefined();
     expect(cmpAHost['s-cr']).toBe(cmpAContentRef);
     expect(cmpAHost['s-cr']['s-cn']).toBe(true);
     expect(cmpAHost['s-cr']['s-hn']).toBeUndefined();
 
     const cmpAOrgLoc0 = cmpAContentRef.nextSibling as d.RenderNode;
+    expect(cmpAOrgLoc0.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAOrgLoc0.textContent.trim()).toBe('');
+
     const cmpAOrgLoc1 = cmpAOrgLoc0.nextSibling as d.RenderNode;
+    expect(cmpAOrgLoc1.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAOrgLoc1.textContent.trim()).toBe('');
+
     const cmpAOrgLoc2 = cmpAOrgLoc1.nextSibling as d.RenderNode;
-    // expect(cmpAOrgLoc0['s-nr']).toBe(true);
-    // isSameVChildren(cmpARender, cmpASsrVnode.vchildren);
+    expect(cmpAOrgLoc2.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAOrgLoc2.textContent.trim()).toBe('');
 
     const cmpAHeader = cmpAOrgLoc2.nextSibling as d.RenderNode;
     expect(cmpAHeader.nodeType).toBe(NODE_TYPE.ElementNode);
     expect(cmpAHeader.nodeName).toBe('HEADER');
     expect(cmpAHeader['s-hn']).toBe('cmp-a');
+
+    const cmpAHeaderText = cmpAHeader.firstChild as d.RenderNode;
+    expect(cmpAHeaderText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpAHeaderText.textContent.trim()).toBe('cmp-a scope-encapsulated');
+    expect(cmpAHeaderText['s-hn']).toBe('cmp-a');
 
     const cmpASlot = cmpAHeader.nextSibling as d.RenderNode;
     expect(cmpASlot.nodeType).toBe(NODE_TYPE.TextNode);
@@ -198,49 +211,129 @@ describe('ssr scoped css', () => {
     expect(cmpALightDomTop.nodeType).toBe(NODE_TYPE.TextNode);
     expect(cmpALightDomTop.textContent.trim()).toBe('cmp-a light-dom top');
     expect(cmpALightDomTop['s-hn']).toBeUndefined();
+    expect(cmpALightDomTop['s-ol']).toBe(cmpAOrgLoc0);
+    expect(cmpAOrgLoc0['s-nr']).toBe(cmpALightDomTop);
 
     const cmpBHost = cmpALightDomTop.nextSibling as d.RenderNode;
     expect(cmpBHost.nodeType).toBe(NODE_TYPE.ElementNode);
     expect(cmpBHost.nodeName).toBe('CMP-B');
-    // const cmpBSsrVnode = plt.vnodeMap.get(cmpBHost);
-    // expect(cmpBSsrVnode.vtag).toBe('cmp-b');
-    // expect(cmpBSsrVnode.elm).toBe(cmpBHost);
-    // isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
+    expect(cmpBHost['s-hn']).toBeUndefined();
+    const cmpBSsrVnode = plt.vnodeMap.get(cmpBHost);
+    expect(cmpBSsrVnode.vtag).toBe('cmp-b');
+    expect(cmpBSsrVnode.elm).toBe(cmpBHost);
+    isSameVChildren(cmpBRender, cmpBSsrVnode.vchildren);
+    expect(cmpBHost['s-ol']).toBe(cmpAOrgLoc1);
+    expect(cmpAOrgLoc1['s-nr']).toBe(cmpBHost);
 
-    // const cmpBContentRef = cmpBHost['s-cr'];
-    // expect(cmpBContentRef).toBeDefined();
-    // expect(cmpBContentRef.nodeType).toBe(NODE_TYPE.TextNode);
-    // expect(cmpBContentRef['s-cn']).toBe(true);
-    // expect(cmpBContentRef.parentNode).toBe(cmpBHost);
-    // expect(domApi.$childNodes(cmpBHost)[0]).toBe(cmpBContentRef);
+    const cmpBContentRef = cmpBHost['s-cr'];
+    expect(cmpBContentRef).toBeDefined();
+    expect(cmpBContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBContentRef['s-cn']).toBe(true);
+    expect(cmpBHost['s-cr']).toBe(cmpBContentRef);
+    expect(cmpBHost['s-cr']['s-hn']).toBeUndefined();
 
-    // const cmpBDiv = cmpBHost.querySelector('div') as d.RenderNode;
-    // expect(cmpBDiv['s-hn']).toBe('cmp-b');
+    const cmpBOrgLoc0 = cmpBContentRef.nextSibling as d.RenderNode;
+    expect(cmpBOrgLoc0.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBOrgLoc0.textContent.trim()).toBe('');
 
-    // const cmpBSection = cmpBHost.querySelector('section') as d.RenderNode;
-    // expect(cmpBSection['s-hn']).toBe('cmp-b');
+    const cmpBOrgLoc1 = cmpBOrgLoc0.nextSibling as d.RenderNode;
+    expect(cmpBOrgLoc1.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBOrgLoc1.textContent.trim()).toBe('');
 
-    // const cmpCHost = hydratedRoot.querySelector('cmp-c') as d.HostElement;
-    // const cmpCSsrVnode = plt.vnodeMap.get(cmpCHost);
-    // expect(cmpCSsrVnode.vtag).toBe('cmp-c');
-    // expect(cmpCSsrVnode.elm).toBe(cmpCHost);
-    // isSameVChildren(cmpCRender, cmpCSsrVnode.vchildren);
+    const cmpBDiv = cmpBOrgLoc1.nextSibling as d.RenderNode;
+    expect(cmpBDiv.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpBDiv.nodeName).toBe('DIV');
+    expect(cmpBDiv['s-hn']).toBe('cmp-b');
 
-    // const cmpCContentRef = cmpCHost['s-cr'];
-    // expect(cmpCContentRef).toBeDefined();
-    // expect(cmpCContentRef.nodeType).toBe(NODE_TYPE.TextNode);
-    // expect(cmpCContentRef['s-cn']).toBe(true);
-    // expect(cmpCContentRef.parentNode).toBe(cmpCHost);
-    // expect(domApi.$childNodes(cmpCHost)[0]).toBe(cmpCContentRef);
+    const cmpBDivSlot = cmpBDiv.firstChild as d.RenderNode;
+    expect(cmpBDivSlot.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBDivSlot.textContent.trim()).toBe('');
+    expect(cmpBDivSlot['s-hn']).toBe('cmp-b');
+    expect(cmpBDivSlot['s-sr']).toBe(true);
+    expect(cmpBDivSlot['s-cr']).toBe(cmpBContentRef);
+    expect(cmpBDivSlot['s-sn']).toBe('');
+
+    const cmpBArticle = cmpBDivSlot.nextSibling.nextSibling as d.RenderNode;
+    expect(cmpBArticle.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpBArticle.nodeName).toBe('ARTICLE');
+    expect(cmpBArticle['s-hn']).toBeUndefined();
+    expect(cmpBArticle['s-ol']).toBe(cmpBOrgLoc0);
+    expect(cmpBOrgLoc0['s-nr']).toBe(cmpBArticle);
+
+    const cmpBArticleText = cmpBArticle.firstChild as d.RenderNode;
+    expect(cmpBArticleText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBArticleText.textContent.trim()).toBe('cmp-b light-dom top');
+    expect(cmpBArticleText['s-hn']).toBeUndefined();
+
+    const cmpBSection = cmpBArticle.nextSibling.nextSibling as d.RenderNode;
+    expect(cmpBSection.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpBSection.nodeName).toBe('SECTION');
+    expect(cmpBSection['s-hn']).toBe('cmp-b');
+
+    const cmpBSectionText = cmpBSection.firstChild as d.RenderNode;
+    expect(cmpBSectionText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBSectionText.textContent.trim()).toBe('cmp-b scope-encapsulated');
+    expect(cmpBSectionText['s-hn']).toBe('cmp-b');
+
+    const cmpBDivNamedSlot = cmpBSection.nextSibling as d.RenderNode;
+    expect(cmpBDivNamedSlot.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBDivNamedSlot.textContent.trim()).toBe('');
+    expect(cmpBDivNamedSlot['s-hn']).toBe('cmp-b');
+    expect(cmpBDivNamedSlot['s-sr']).toBe(true);
+    expect(cmpBDivNamedSlot['s-cr']).toBe(cmpBContentRef);
+    expect(cmpBDivNamedSlot['s-sn']).toBe('named-slot');
+
+    const cmpBNav = cmpBDivNamedSlot.nextSibling as d.RenderNode;
+    expect(cmpBNav.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpBNav.nodeName).toBe('NAV');
+    expect(cmpBNav['s-hn']).toBeUndefined();
+    expect(cmpBNav['s-ol']).toBe(cmpBOrgLoc1);
+    expect(cmpBOrgLoc1['s-nr']).toBe(cmpBNav);
+
+    const cmpBNavText = cmpBNav.firstChild as d.RenderNode;
+    expect(cmpBNavText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpBNavText.textContent.trim()).toBe('cmp-b light-dom bottom');
+    expect(cmpBNavText['s-hn']).toBeUndefined();
+
+    const cmpCHost = cmpBNav.nextSibling as d.RenderNode;
+    expect(cmpCHost.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpCHost.nodeName).toBe('CMP-C');
+    expect(cmpCHost['s-hn']).toBe('cmp-b');
+    const cmpCSsrVnode = plt.vnodeMap.get(cmpCHost);
+    expect(cmpCSsrVnode.vtag).toBe('cmp-c');
+    expect(cmpCSsrVnode.elm).toBe(cmpCHost);
+    isSameVChildren(cmpCRender, cmpCSsrVnode.vchildren);
+
+    const cmpCContentRef = cmpCHost['s-cr'];
+    expect(cmpCContentRef).toBeDefined();
+    expect(cmpCContentRef.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpCContentRef['s-cn']).toBe(true);
+    expect(cmpCHost['s-cr']).toBe(cmpCContentRef);
+    expect(cmpCHost['s-cr']['s-hn']).toBeUndefined();
+
+    const cmpCLightDomText = cmpCContentRef.nextSibling as d.RenderNode;
+    expect(cmpCLightDomText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpCLightDomText.textContent.trim()).toBe('cmp-c light-dom');
+    expect(cmpCLightDomText['s-ol']).toBeUndefined();
+
+    const cmpCFooter = cmpCLightDomText.nextSibling as d.RenderNode;
+    expect(cmpCFooter.nodeType).toBe(NODE_TYPE.ElementNode);
+    expect(cmpCFooter.nodeName).toBe('FOOTER');
+    expect(cmpCFooter['s-hn']).toBe('cmp-c');
+
+    const cmpCFooterText = cmpCFooter.firstChild as d.RenderNode;
+    expect(cmpCFooterText.nodeType).toBe(NODE_TYPE.TextNode);
+    expect(cmpCFooterText.textContent.trim()).toBe('cmp-c scope-encapsulated');
+    expect(cmpCFooterText['s-hn']).toBe('cmp-c');
 
     const cmpASpan = cmpBHost.nextSibling.nextSibling as d.RenderNode;
     expect(cmpASpan.nodeType).toBe(NODE_TYPE.ElementNode);
     expect(cmpASpan.nodeName).toBe('SPAN');
     expect(cmpASpan.textContent.trim()).toBe('cmp-a light-dom bottom');
-    // expect(cmpASpan['s-hn']).toBe('cmp-a');
-    // expect(cmpASpan['s-sr']).toBe(true);
-    // expect(cmpASpan['s-cr']).toBe(cmpAContentRef);
-    // expect(cmpASpan['s-sn']).toBe('');
+    expect(cmpASpan['s-hn']).toBeUndefined();
+    expect(cmpASpan['s-cr']).toBeUndefined();
+    expect(cmpASpan['s-ol']).toBe(cmpAOrgLoc2);
+    expect(cmpAOrgLoc2['s-nr']).toBe(cmpASpan);
 
     expect(hydratedRoot.innerHTML).toEqualHtml(`
       <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated">
@@ -300,12 +393,13 @@ function isSameVNode(a: d.VNode, b: d.VNode) {
   expect(a.vattrs).toEqual(b.vattrs);
   expect(a.vname).toBe(b.vname);
   expect(a.vkey).toBe(b.vkey);
+
   isSameVChildren(a.vchildren, b.vchildren);
 
   if (typeof a.vtext === 'string') {
     expect(b.elm.nodeType).toBe(NODE_TYPE.TextNode);
     expect(b.elm.textContent).toBe(a.vtext);
-  } else {
+  } else if (a.vtag !== 'slot') {
     expect(b.elm.nodeType).toBe(NODE_TYPE.ElementNode);
   }
 }

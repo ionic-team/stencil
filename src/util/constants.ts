@@ -73,7 +73,6 @@ export const SSR_HOST_ID = 'ssrh';
 export const SSR_SHADOW_DOM_HOST_ID = 's';
 export const SSR_CHILD_ID = 'ssrc';
 export const SSR_LIGHT_DOM_ATTR = 'ssrl';
-export const SSR_ORIGINAL_LOCATION_NODE_ATTR = 'ssro';
 export const SSR_CONTENT_REF_NODE_COMMENT = 'c';
 export const SSR_TEXT_NODE_COMMENT = 't';
 export const SSR_TEXT_NODE_COMMENT_END = '/t';
