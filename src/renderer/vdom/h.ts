@@ -13,8 +13,8 @@ import { FunctionalUtilities } from '../../declarations';
 const stack: any[] = [];
 
 
-export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
-export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
+export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
+export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export function h(nodeName: any, vnodeData: any) {
   let children: any[] = null;
   let lastSimple = false;
@@ -91,10 +91,7 @@ export function h(nodeName: any, vnodeData: any) {
 
   if (typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)({
-      ...vnodeData,
-      children: children
-    }, utils);
+    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children || [], utils);
   }
 
   return {
@@ -132,13 +129,21 @@ function VNodeToChild(vnode: d.VNode): d.ChildNode {
 }
 
 const utils: FunctionalUtilities = {
-  'forEach': (children: d.VNode[], cb: (vnode: d.VNode) => void) => {
-    children.forEach((item) => cb(VNodeToChild(item)));
+  'forEach': (children, cb) => {
+    children.forEach((item, index, array) =>
+      cb(
+        VNodeToChild(item),
+        index,
+        array
+      )
+    );
   },
-  'map': (children: d.VNode[], cb: (vnode: d.ChildNode) => d.ChildNode): d.VNode[] => {
-    return children.map((item) => childToVNode(
+  'map': (children, cb): d.VNode[] => {
+    return children.map((item, index, array) => childToVNode(
         cb(
-          VNodeToChild(item)
+          VNodeToChild(item),
+          index,
+          array
         )
       )
     );

@@ -26,7 +26,7 @@ describe('renderer', () => {
 
     it('should re-render functional component w/ children', () => {
       const DoesNotRenderChildren = () => h('div', null, 'mph');
-      const RendersChildren = props => h('div', null, props.children, '-12');
+      const RendersChildren = (props, children) => h('div', null, children, '-12');
 
       hostElm = mockElement('my-tag');
 
@@ -97,7 +97,7 @@ describe('renderer', () => {
     });
 
     it('should render as a sibling component', () => {
-      function functionalComp({children, ...props}: any) {
+      function functionalComp(props: any, children) {
         return h('span', props, children);
       }
 
@@ -118,7 +118,7 @@ describe('renderer', () => {
     });
 
     it('should render children', () => {
-      function functionalComp({children, ...props}: any) {
+      function functionalComp(props: any, children) {
         return h('span', props, children);
       }
 
