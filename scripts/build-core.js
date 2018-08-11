@@ -12,8 +12,11 @@ const DST_DIR = path.join(ROOT_DIR, 'dist');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
 const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-core');
 const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
-const DECLARATIONS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'declarations');
-const DECLARATIONS_DIST_DIR = path.join(DST_DIR, 'client', 'declarations');
+const DECLARATIONS_SRC_FILES = [
+  path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
+  path.join(SRC_DIR, 'declarations', 'jsx.ts')
+];
+const DECLARATIONS_DIST_FILE = path.join(DST_DIR, 'client', 'declarations', 'stencil.core.d.ts');
 
 const inputCoreFile = path.join(TRANSPILED_DIR, 'client', 'core-browser.js');
 const outputCoreFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
@@ -40,7 +43,7 @@ if (success) {
   buildLoader(inputLoaderFile, outputLoaderFile);
   buildCoreEsm(inputCoreEsmFile, outputCoreEsmFile);
   copyMain();
-  copyClientFiles();
+  createCoreDts();
   copyUtilDir();
   buildPolyfills(outputPolyfillsDir);
 
@@ -88,8 +91,13 @@ if (success) {
   }
 
 
-  function copyClientFiles() {
-    fs.copySync(DECLARATIONS_SRC_DIR, DECLARATIONS_DIST_DIR);
+  function createCoreDts() {
+    const coreFileContents = DECLARATIONS_SRC_FILES
+      .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
+      .join('\n');
+
+    fs.mkdirSync(path.dirname(DECLARATIONS_DIST_FILE));
+    fs.writeFileSync(DECLARATIONS_DIST_FILE, coreFileContents);
   }
 
 

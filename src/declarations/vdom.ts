@@ -36,7 +36,7 @@ export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
   vtext?: string;
-  vchildren?: d.VNode[];
+  vchildren?: VNode[];
   vattrs?: any;
   vname?: string;
 }
@@ -46,12 +46,12 @@ export type PropsType = VNodeProdData | number | string | null;
 export type ChildType = VNode | number | string;
 
 export interface FunctionalUtilities {
-  forEach: (children: d.VNode[], cb: (vnode: d.VNode, index: number, array: d.VNode[]) => void) => void;
-  map: (children: d.VNode[], cb: (vnode: ChildNode, index: number, array: d.VNode[]) => ChildNode) => d.VNode[];
+  forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: VNode[]) => void) => void;
+  map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: VNode[]) => ChildNode) => VNode[];
 }
 
 export interface FunctionalComponent<T = {}> {
-  (props: T, children: d.VNode[], utils: FunctionalUtilities): VNode | VNode[];
+  (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
 

@@ -19,7 +19,7 @@ export interface PlatformApi {
   isAppLoaded?: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
-  queue: QueueApi;
+  queue: d.QueueApi;
   render?: d.RendererApi;
   tmpDisconnected?: boolean;
   nextId?: () => string;
@@ -38,20 +38,6 @@ export interface PlatformApi {
   queuedEvents?: WeakMap<d.HostElement, any[]>;
   vnodeMap?: WeakMap<d.HostElement, d.VNode>;
   valuesMap?: WeakMap<d.HostElement, any>;
-}
-
-
-export interface QueueApi {
-  tick: (cb: RafCallback) => void;
-  read: (cb: RafCallback) => void;
-  write: (cb: RafCallback) => void;
-  clear?: () => void;
-  flush?: (cb?: () => void) => void;
-}
-
-
-export interface RafCallback {
-  (timeStamp: number): void;
 }
 
 
