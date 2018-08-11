@@ -38,10 +38,8 @@ describe('upgradeToShadowDom', () => {
         <head></head>
         <body>
           <cmp-a class="scs-cmp-a-h scs-cmp-a-s hydrated" ssrh="s0">
-            <header class="scs-cmp-a" ssrc="0.0">
-              <!--t.0.0-->
-                cmp-a shadow-dom
-              <!--/-->
+            <header class="scs-cmp-a" ssrc="0.0.t">
+              cmp-a shadow-dom
             </header>
             <!--s.0.1-->
             <!--l.0.1-->cmp-a light-dom top
@@ -55,7 +53,7 @@ describe('upgradeToShadowDom', () => {
 
     hydrateClientFromSsr(plt, domApi, rootElm);
 
-    expect(compareHtml(rootElm.outerHTML)).toBe(compareHtml(`
+    expect(rootElm.outerHTML).toEqualHtml(`
       <html>
         <head></head>
         <body>
@@ -73,7 +71,7 @@ describe('upgradeToShadowDom', () => {
           </cmp-a>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('move all node types in host content into the shadow root', () => {
