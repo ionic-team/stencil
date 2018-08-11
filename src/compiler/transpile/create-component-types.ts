@@ -143,9 +143,7 @@ import { DefaultIntrinsicElements } from '@stencil/core';
 
 declare global {
   export namespace JSX {
-    export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {
-      [key: string]: HTMLAttributes;
-    }
+    export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {}
   }
 }
 `;
