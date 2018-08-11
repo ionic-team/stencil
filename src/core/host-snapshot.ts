@@ -57,7 +57,7 @@ export function initHostSnapshot(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: 
       domApi.$insertBefore(hostElm, hostElm['s-cr'], domApi.$childNodes(hostElm)[0]);
     }
 
-    if (!domApi.$supportsShadowDom && cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom as number) {
+    if (!domApi.$supportsShadowDom && cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
       // this component should use shadow dom
       // but this browser doesn't support it
       // so let's polyfill a few things for the user

@@ -56,28 +56,6 @@ describe('host-snapshot', () => {
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
 
-  it('set content reference node when ssr shadow dom component', () => {
-    domApi.$attachShadow = () => {/**/};
-    domApi.$supportsShadowDom = true;
-    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
-    __BUILD_CONDITIONALS__.ssrServerSide = true;
-    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
-    expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
-    expect(hostElm['s-cr'].textContent).toBe(`c.0`);
-    expect(hostElm['s-cr']['s-cn']).toBe(true);
-  });
-
-  it('set content reference node when ssr scoped css component', () => {
-    domApi.$attachShadow = () => {/**/};
-    domApi.$supportsShadowDom = true;
-    cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
-    __BUILD_CONDITIONALS__.ssrServerSide = true;
-    initHostSnapshot(plt, domApi, cmpMeta, hostElm);
-    expect(hostElm['s-cr'].nodeType).toBe(NODE_TYPE.CommentNode);
-    expect(hostElm['s-cr'].textContent).toBe(`c.0`);
-    expect(hostElm['s-cr']['s-cn']).toBe(true);
-  });
-
   it('sets content reference text node and is content reference text node boolean', () => {
     __BUILD_CONDITIONALS__.ssrServerSide = false;
     initHostSnapshot(plt, domApi, cmpMeta, hostElm);
