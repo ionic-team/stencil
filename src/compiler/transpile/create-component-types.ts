@@ -139,10 +139,9 @@ function generateLocalTypesFile(intrinsicImports: string[]) {
   ];
 
   return `
-import { DefaultIntrinsicElements, Hyperscript } from '@stencil/core';
+import { DefaultIntrinsicElements } from '@stencil/core';
 
 declare global {
-  export var h: Hyperscript;
   export namespace JSX {
     export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {
       [key: string]: HTMLAttributes;

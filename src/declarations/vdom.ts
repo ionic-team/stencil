@@ -11,6 +11,10 @@ export interface Hyperscript {
   (sel: any, data: VNodeData, children: VNode): VNode;
 }
 
+declare global {
+  export var h: Hyperscript;
+}
+
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
   vtag?: string | number | Function;
