@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { compareHtml, mockConfig } from '../../testing/mocks';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import * as c from '../../util/constants';
+import { mockConfig } from '../../testing/mocks';
 import { h } from '../../renderer/vdom/h';
 import { hydrateHtml } from '../hydrate-html';
 
 
-describe('hydrate', () => {
+describe('server hydrate', () => {
 
   let config: d.Config;
   let outputTarget: d.OutputTargetHydrate;
@@ -21,7 +21,7 @@ describe('hydrate', () => {
       'ion-test': {
         bundleIds: 'ion-test',
         tagNameMeta: 'ion-test',
-        encapsulationMeta: ENCAPSULATION.ScopedCss,
+        encapsulationMeta: c.ENCAPSULATION.ScopedCss,
         componentConstructor: class {
           static get encapsulation() {
             return 'scoped';
@@ -50,7 +50,7 @@ describe('hydrate', () => {
 
     expect(hydrateResults.diagnostics).toEqual([]);
 
-    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+    expect(hydrateResults.html).toEqualHtml(`
       <html dir="ltr" data-ssr="">
         <head>
           <style data-styles="" data-ssr="ion-test">
@@ -60,13 +60,13 @@ describe('hydrate', () => {
           </style>
         </head>
         <body>
-          <ion-test ssrh="0" class="scs-ion-test-h hydrated">
+          <ion-test class="scs-ion-test-h hydrated" ssrh="0">
             <!--c.0-->
-            <div class="scs-ion-test" ssrc="0.0."></div>
+            <div class="scs-ion-test" ssrc="0.0"></div>
           </ion-test>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('should load content in nested named slots', async () => {
@@ -77,8 +77,8 @@ describe('hydrate', () => {
         tagNameMeta: 'ion-test',
         membersMeta: {
           size: {
-            memberType: MEMBER_TYPE.Prop,
-            propType: PROP_TYPE.String,
+            memberType: c.MEMBER_TYPE.Prop,
+            propType: c.PROP_TYPE.String,
             attribName: 'size'
           }
         },
@@ -117,21 +117,33 @@ describe('hydrate', () => {
     const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
     expect(hydrateResults.diagnostics).toEqual([]);
 
-    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+    expect(hydrateResults.html).toEqualHtml(`
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test ssrh="0" class="${config.hydratedCssClass}">
+          <ion-test class="hydrated" ssrh="0">
             <!--c.0-->
-            <elm-a ssrc="0.0.">
-              <!--s.0.0.slot-a--><div slot="slot-a" ssrl="0.6">inner slot-a text</div>
-              <!--s.0.1--><div ssrl="0.2">default slot text</div>
-              <!--s.0.2.slot-b--><div slot="slot-b" ssrl="0.4">inner slot-b text</div>
+            <!--o.0.1-->
+            <!--o.0.3-->
+            <!--o.0.5-->
+            <elm-a ssrc="0.0">
+              <!--s.0.0.slot-a-->
+              <div slot="slot-a" ssrl="0.5">
+                inner slot-a text
+              </div>
+              <!--s.0.1-->
+              <div ssrl="0.1">
+                default slot text
+              </div>
+              <!--s.0.2.slot-b-->
+              <div slot="slot-b" ssrl="0.3">
+                inner slot-b text
+              </div>
             </elm-a>
           </ion-test>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('should load content in nested default slot', async () => {
@@ -143,8 +155,8 @@ describe('hydrate', () => {
         tagNameMeta: 'ion-test',
         membersMeta: {
           size: {
-            memberType: MEMBER_TYPE.Prop,
-            propType: PROP_TYPE.String,
+            memberType: c.MEMBER_TYPE.Prop,
+            propType: c.PROP_TYPE.String,
             attribName: 'size'
           }
         },
@@ -181,20 +193,25 @@ describe('hydrate', () => {
 
     expect(hydrateResults.diagnostics).toEqual([]);
 
-    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+    expect(hydrateResults.html).toEqualHtml(`
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test ssrh="0" class="${config.hydratedCssClass}">
+          <ion-test class="hydrated" ssrh="0">
             <!--c.0-->
+            <!--o.0.0-->
             <elm-a ssrc="0.0">
-              <!--t.0.0-->component content<!--/-->
-              <!--s.0.1--><!--l.0.1-->light-dom content
+              <!--t.0.0-->
+                component content
+              <!--/t-->
+              <!--s.0.1-->
+              <!--l.0.0-->
+              light-dom content
             </elm-a>
           </ion-test>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('should load one component and assign ssr ids', async () => {
@@ -205,8 +222,8 @@ describe('hydrate', () => {
         tagNameMeta: 'ion-test',
         membersMeta: {
           size: {
-            memberType: MEMBER_TYPE.Prop,
-            propType: PROP_TYPE.String,
+            memberType: c.MEMBER_TYPE.Prop,
+            propType: c.PROP_TYPE.String,
             attribName: 'size'
           }
         },
@@ -236,17 +253,17 @@ describe('hydrate', () => {
 
     expect(hydrateResults.diagnostics).toEqual([]);
 
-    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+    expect(hydrateResults.html).toEqualHtml(`
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test ssrh="0" class="hydrated">
+          <ion-test class="hydrated" ssrh="0">
             <!--c.0-->
-            <div ssrc="0.0."></div>
+            <div ssrc="0.0"></div>
           </ion-test>
         </body>
       </html>
-    `));
+    `);
   });
 
   it('should do nothing when no components registered', async () => {
