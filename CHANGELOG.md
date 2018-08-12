@@ -1,3 +1,28 @@
+<a name="0.11.4"></a>
+## ⛰ [0.11.4](https://github.com/ionic-team/stencil/compare/v0.11.3...v0.11.4) (2018-08-12)
+
+### Functionl Component Interface change
+
+This release includes a change to the interface of functional components. This change should make working with components simpler and more predictable.
+
+Previously children were included with props as the first parameter in the components signature.  The change has moved children out into the second parameter.  You can now assume that children is always passed and its value will always be an array.  If there are no children the array lenght will be zero.
+
+```diff
+- const Component: FunctionalComponent<PropInterface> = ({ children, ...props}, utils) => {
++ const Component: FunctionalComponent<PropInterface> = (props, children, utils) => {
+```
+
+### Bug Fixes
+
+* **types:** Update available config options for nodeResolveConfig to allow for string arrays. ([72dca29](https://github.com/ionic-team/stencil/commit/72dca29))
+
+
+### Features
+
+* **functional components:** add index and array to functional utility methods map and foreach. ([a3abc85](https://github.com/ionic-team/stencil/commit/a3abc85))
+
+
+
 <a name="0.11.3"></a>
 ## 🔥 [0.11.3](https://github.com/ionic-team/stencil/compare/v0.11.2...v0.11.3) (2018-08-08)
 
