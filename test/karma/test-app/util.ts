@@ -22,6 +22,7 @@ export function setupDomTests(document: Document) {
     testBed.appendChild(app)
 
     if (url) {
+      console.log('url',url)
       app.setAttribute('data-url', url);
       await renderTest(url, app);
     }
@@ -52,10 +53,11 @@ export function setupDomTests(document: Document) {
           const frag = document.createDocumentFragment();
           const elm = document.createElement('div');
           elm.innerHTML = this.responseText;
+          console.log('1', url)
           frag.appendChild(elm);
 
           app.innerHTML = elm.innerHTML;
-
+          console.log('2', url)
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
             const script = document.createElement('script') as HTMLScriptElement;
@@ -68,17 +70,21 @@ export function setupDomTests(document: Document) {
           }
 
           elm.innerHTML = '';
+          console.log('3', url)
 
           const promises: Promise<any>[] = [];
           loadPromises(promises, app);
+          console.log('4', url)
 
           Promise.all(promises).then(() => {
+            console.log('resolve all',app)
             resolve(app);
 
           }).catch(err => {
             console.error('Promise.all error', err);
             reject(err);
           });
+          console.log('5', url)
         }
 
         var oReq = new XMLHttpRequest();
@@ -98,11 +104,15 @@ export function setupDomTests(document: Document) {
   }
 
   function loadPromises(promises: Promise<any>[], component: any) {
+    console.log('loadPromises 1')
     if (component.componentOnReady) {
+      console.log('loadPromises 2')
       promises.push(component.componentOnReady());
     }
 
+    console.log('loadPromises 3', component.childNodes.length)
     for (let i = 0; i < component.childNodes.length; i++) {
+      console.log('loadPromises 4')
       loadPromises(promises, component.childNodes[i]);
     }
   }

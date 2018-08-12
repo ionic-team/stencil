@@ -1,39 +1,20 @@
 import { setupDomTests } from '../util';
 
-describe('prerender', () => {
+
+describe('prerender no-script', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
   beforeAll(async () => {
-    app = await setupDom('/prerender/index.html');
+    try {
+      app = await setupDom('/prerender/index-no-script.html');
+    } catch (e) {
+      console.error(e)
+    }
   });
   afterAll(tearDownDom);
 
-  it('server componentWillLoad Order', () => {
-    const elm = app.querySelector('#server-componentWillLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpA server componentWillLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpD - a1-child server componentWillLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpD - a2-child server componentWillLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD - a3-child server componentWillLoad');
-    expect(elm.children[4].textContent.trim()).toBe('CmpD - a4-child server componentWillLoad');
-    expect(elm.children[5].textContent.trim()).toBe('CmpB server componentWillLoad');
-    expect(elm.children[6].textContent.trim()).toBe('CmpC server componentWillLoad');
-    expect(elm.children[7].textContent.trim()).toBe('CmpD - c-child server componentWillLoad');
-  });
-
-  it('server componentDidLoad Order', () => {
-    const elm = app.querySelector('#server-componentDidLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpD - a1-child server componentDidLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpD - a2-child server componentDidLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpD - a3-child server componentDidLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD - a4-child server componentDidLoad');
-    expect(elm.children[4].textContent.trim()).toBe('CmpD - c-child server componentDidLoad');
-    expect(elm.children[5].textContent.trim()).toBe('CmpC server componentDidLoad');
-    expect(elm.children[6].textContent.trim()).toBe('CmpB server componentDidLoad');
-    expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
-  });
-
-  it('correct scoped styles applied after scripts kick in', () => {
+  it('correct scoped styles applied before scripts kick in', () => {
     testScopedStyles(app);
   });
 
