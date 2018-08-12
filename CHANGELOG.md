@@ -1,7 +1,7 @@
 <a name="0.11.4"></a>
 ## ⛰ [0.11.4](https://github.com/ionic-team/stencil/compare/v0.11.3...v0.11.4) (2018-08-12)
 
-### Functionl Component Interface change
+### Functional Component Interface change
 
 This release includes a change to the interface of functional components. This change should make working with components simpler and more predictable.
 
