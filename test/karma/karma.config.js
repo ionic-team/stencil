@@ -89,7 +89,6 @@ module.exports = function(config) {
     customLaunchers: browserStack ? browserStackLaunchers : {},
 
     files: [
-      // 'test-app/shadow-dom-basic/karma.spec.ts',
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
       'www/build/testapp.js',

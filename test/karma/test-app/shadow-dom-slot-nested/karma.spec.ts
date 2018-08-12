@@ -56,33 +56,30 @@ describe('shadow-dom-slot-nested', () => {
 
     } else {
       expect(elm.shadowRoot).toBe(elm);
-      expect(elm.classList.contains('sc-shadow-dom-slot-nested-root-h')).toBe(true);
+      expect(elm.className).toBe('scs-shadow-dom-slot-nested-root-h hydrated');
 
       const section = elm.querySelector('section');
-      expect(section.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
+      expect(section.className).toBe('scs-shadow-dom-slot-nested-root');
       expect(section.textContent.trim()).toBe('shadow-dom-slot-nested');
       expect(window.getComputedStyle(section).color).toBe('rgb(0, 128, 0)');
 
       const article = elm.querySelector('article');
-      expect(article.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
+      expect(article.className).toBe('scs-shadow-dom-slot-nested-root');
       expect(window.getComputedStyle(article).color).toBe('rgb(0, 128, 0)');
 
       expect(article.children.length).toBe(3);
 
       const testSlotPolyfillNested = function(i: number) {
         const nestedElm = article.children[i];
-        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
-        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-h')).toBe(true);
+        expect(nestedElm.className).toBe('scs-shadow-dom-slot-nested-root scs-shadow-dom-slot-nested-h hydrated');
 
         const header = nestedElm.querySelector('header');
-        expect(header.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
-        expect(header.classList.contains('sc-shadow-dom-slot-nested-s')).toBe(false);
+        expect(header.className).toBe('scs-shadow-dom-slot-nested');
         expect(header.textContent.trim()).toBe('shadow dom: ' + i);
         expect(window.getComputedStyle(header).color).toBe('rgb(255, 0, 0)');
 
         const footer = nestedElm.querySelector('footer');
-        expect(footer.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
-        expect(footer.classList.contains('sc-shadow-dom-slot-nested-s')).toBe(true);
+        expect(footer.className).toBe('scs-shadow-dom-slot-nested scs-shadow-dom-slot-nested-s');
         expect(footer.textContent.trim()).toBe('light dom: ' + i);
         expect(window.getComputedStyle(footer).color).toBe('rgb(0, 128, 0)');
       };

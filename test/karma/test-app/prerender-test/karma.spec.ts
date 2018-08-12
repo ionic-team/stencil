@@ -33,21 +33,23 @@ describe('prerender', () => {
     expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
   });
 
-  it('set ssrh', () => {
-    const appRoot = app.querySelector('app-root');
-    expect(appRoot.getAttribute('ssrh')).toBe('0');
-    expect(appRoot.getAttribute('class')).toBe('hydrated');
-
-    const main = app.querySelector('app-root main');
-    expect(main.getAttribute('ssrc')).toBe('0.0');
-  });
-
   it('correct scoped styles applied after scripts kick in', () => {
     testScopedStyles(app);
   });
 
-  it('correct scoped styles applied before scripts kick in', async () => {
+});
+
+
+describe('prerender no-script', () => {
+  const { setupDom, tearDownDom } = setupDomTests(document);
+  let app: HTMLElement;
+
+  beforeAll(async () => {
     app = await setupDom('/prerender/index-no-script.html');
+  });
+  afterAll(tearDownDom);
+
+  it('correct scoped styles applied before scripts kick in', () => {
     testScopedStyles(app);
   });
 
