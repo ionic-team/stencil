@@ -1,4 +1,3 @@
-import { Collection, Config } from '../../../declarations';
 import { CompilerUpgrade, calculateRequiredUpgrades } from '../collection-compatibility';
 import { mockConfig } from '../../../testing/mocks';
 
@@ -17,9 +16,10 @@ describe('collection-compatibility', () => {
       expect(upgrades.indexOf(CompilerUpgrade.JSX_Upgrade_From_0_0_5) > -1).toBe(true);
     });
 
-    it('should have no upgrades', () => {
+    // Any releases after 11.5 should use local JSX definitions.
+    it('should have one upgrade', () => {
       const upgrades = calculateRequiredUpgrades(config, '99.99.99');
-      expect(upgrades.length).toBe(0);
+      expect(upgrades.length).toBe(1);
     });
 
   });
