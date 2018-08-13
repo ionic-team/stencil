@@ -4,10 +4,10 @@ import { PROP_TYPE } from '../../util/constants';
 
 
 export class MarkdownProps {
-  private rows: Row[] = [];
+  private rows: PropRow[] = [];
 
   addRow(propName: string, memberMeta: d.MemberMeta) {
-    this.rows.push(new Row(propName, memberMeta));
+    this.rows.push(new PropRow(propName, memberMeta));
   }
 
   toMarkdown() {
@@ -53,7 +53,7 @@ export class MarkdownProps {
 }
 
 
-class Row {
+export class PropRow {
 
   constructor(public memberName: string, private memberMeta: d.MemberMeta) {}
 
@@ -77,34 +77,36 @@ class Row {
   }
 
   get type() {
-    let type = '';
+
+    if (this.memberMeta.attribType && this.memberMeta.attribType.text) {
+      if (!this.memberMeta.attribType.text.includes('(')) {
+        const typeSplit = this.memberMeta.attribType.text.split('|').map(t => {
+          return '`' + t.replace(/\'/g, '"').trim() + '`';
+        });
+
+        return typeSplit.join(', ');
+      }
+
+      return '`' + this.memberMeta.attribType.text + '`';
+    }
+
     const propType = this.memberMeta.propType;
 
     switch (propType) {
       case PROP_TYPE.Any:
-        type = 'any';
-        break;
+        return '`any`';
 
       case PROP_TYPE.Boolean:
-        type = 'boolean';
-        break;
+        return '`boolean`';
 
       case PROP_TYPE.Number:
-        type = 'number';
-        break;
+        return '`number`';
 
       case PROP_TYPE.String:
-        type = 'string';
-        break;
+        return '`string`';
     }
 
-    type = this.memberMeta.attribType.text;
-
-    if (type) {
-      return '`' + type + '`';
-    }
-
-    return type;
+    return '';
   }
 
 }
