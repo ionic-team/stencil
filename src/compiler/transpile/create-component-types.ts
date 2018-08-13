@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
-import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
+import { COMPONENTS_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
@@ -27,11 +27,15 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
     componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
   }
 
-  // immediately write the components.d.ts file to disk and put it into fs memory
-  const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
-  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
-  buildCtx.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsSrcFilePath)}`);
+  // immediately write the components.d.ts file to disk and put it into fs memory
+  let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
+  if (destination !== 'src') {
+    componentsDtsFilePath = config.sys.path.resolve(destination, COMPONENTS_DTS);
+  }
+
+  await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  buildCtx.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
 }
 
 
