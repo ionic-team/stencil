@@ -143,7 +143,9 @@ import { DefaultIntrinsicElements } from '@stencil/core';
 
 declare global {
   export namespace JSX {
-    export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {}
+    export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {
+      [tagName: string]: any;
+    }
   }
 }
 `;
@@ -309,7 +311,7 @@ interface ${tagNameAsPascal} {${
   stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
 }}`,
     JSXElements: `
-interface ${jsxInterfaceName}<T> extends JSXElements.HTMLAttributes<T> {${
+interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentAttributesOptional !== '' ? `\n${stencilComponentAttributesOptional}\n` : ''
 }}`,
     global: `
@@ -320,7 +322,7 @@ var ${interfaceName}: {
 };`,
     HTMLElementTagNameMap: `'${tagName}': ${interfaceName}`,
     ElementTagNameMap: `'${tagName}': ${interfaceName};`,
-    IntrinsicElements: `'${tagName}': StencilComponents.${jsxInterfaceName}<${interfaceName}>;`
+    IntrinsicElements: `'${tagName}': StencilComponents.${jsxInterfaceName};`
   };
 }
 

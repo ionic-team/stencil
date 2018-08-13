@@ -128,9 +128,6 @@ export interface DefaultIntrinsicElements {
   'var': JSXElements.HTMLAttributes;
   video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
   wbr: JSXElements.HTMLAttributes;
-
-  // catch all
-  [tagName: string]: JSXElements.HTMLAttributes;
 }
 
 
