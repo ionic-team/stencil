@@ -20,7 +20,11 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es5",
-    "outDir": "www"
+    "outDir": "www",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core": ["../../"]
+    }
   },
   "include": [
     "test-app/**/*.spec.ts",
