@@ -147,6 +147,7 @@ import { DefaultIntrinsicElements } from '@stencil/core';
 
 declare global {
   export namespace JSX {
+    export interface Element {}
     export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {
       [tagName: string]: any;
     }
@@ -423,7 +424,7 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
 async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
   const collections = compilerCtx.collections.map(collection => {
     const upgrades = validateCollectionCompatibility(config, collection);
-    const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.includes(CompilerUpgrade.Add_Local_Intrinsic_Elements);
+    const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.indexOf(CompilerUpgrade.Add_Local_Intrinsic_Elements) !== -1;
     return getCollectionTypesImport(config, compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
   });
 
