@@ -1,42 +1,5 @@
 import * as d from '.';
 
-
-export interface ComponentWillLoad {
-  /**
-   * componentWillLoad
-   */
-  componentWillLoad: () => Promise<void> | void;
-}
-
-export interface ComponentDidLoad {
-  /**
-   * componentDidLoad
-   */
-  componentDidLoad: () => void;
-}
-
-export interface ComponentWillUpdate {
-  /**
-   * componentWillUpdate
-   */
-  componentWillUpdate: () => Promise<void> | void;
-}
-
-export interface ComponentDidUpdate {
-  /**
-   * componentDidUpdate
-   */
-  componentDidUpdate: () => void;
-}
-
-export interface ComponentDidUnload {
-  /**
-   * componentDidUnload
-   */
-  componentDidUnload: () => void;
-}
-
-
 export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
@@ -214,69 +177,6 @@ export interface StyleDoc {
 export type ComponentDependencies = string[];
 
 
-export interface ComponentInstance {
-  /**
-   * The component is about to load and it has not
-   * rendered yet.
-   *
-   * This is the best place to make any data updates
-   * before the first render.
-   *
-   * componentWillLoad will only be called once.
-   */
-  componentWillLoad?: () => Promise<void> | void;
-
-  /**
-   * The component has loaded and has already rendered.
-   *
-   * Updating data in this method will cause the
-   * component to re-render.
-   *
-   * componentDidLoad will only be called once.
-   */
-  componentDidLoad?: () => void;
-
-  /**
-   * The component is about to update and re-render.
-   *
-   * Called multiple times throughout the life of
-   * the component as it updates.
-   *
-   * componentWillUpdate is not called on the first render.
-   */
-  componentWillUpdate?: () => Promise<void> | void;
-
-  /**
-   * The component has just re-rendered.
-   *
-   * Called multiple times throughout the life of
-   * the component as it updates.
-   *
-   * componentWillUpdate is not called on the
-   * first render.
-   */
-  componentDidUpdate?: () => void;
-
-  /**
-   * The component did unload and the element
-   * will be destroyed.
-   */
-  componentDidUnload?: () => void;
-
-  render?: () => any;
-  /**
-   * Used to dynamically set host element attributes.
-   * Should be placed directly above render()
-   */
-  hostData?: () => d.VNodeData;
-
-  mode?: string;
-  color?: string;
-
-  [memberName: string]: any;
-}
-
-
 export abstract class ComponentModule {
   abstract componentWillLoad?: () => Promise<void> | void;
   abstract componentDidLoad?: () => void;
@@ -305,7 +205,7 @@ export interface ComponentInternalValues {
 
 
 export interface ComponentModule {
-  new(): ComponentInstance;
+  new(): d.ComponentInstance;
 }
 
 

@@ -55,7 +55,7 @@ export interface QueuedComponentOnReady {
 export interface CoreContext {
   attr?: number;
   emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => void;
-  enableListener?: EventListenerEnable;
+  enableListener?: d.EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
   isClient?: boolean;
   isPrerender?: boolean;
@@ -72,11 +72,6 @@ export interface CoreContext {
 
 export interface DomControllerCallback {
   (cb: d.RafCallback): number;
-}
-
-
-export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
 }
 
 

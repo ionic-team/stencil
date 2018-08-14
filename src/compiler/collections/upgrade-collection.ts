@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { CompilerUpgrade, validateCollectinCompatibility } from './collection-compatibility';
+import { CompilerUpgrade, validateCollectionCompatibility } from './collection-compatibility';
 import { componentDependencies } from '../transpile/transformers/component-dependencies';
 import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
 import { transformSourceString } from '../transpile/transformers/util';
@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 
 export async function upgradeCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {
   try {
-    const upgradeTransforms = validateCollectinCompatibility(config, collection);
+    const upgradeTransforms = validateCollectionCompatibility(config, collection);
 
     if (upgradeTransforms.length === 0) {
       return;
