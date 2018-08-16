@@ -27,7 +27,7 @@
     }
   },
   "include": [
-    "test-app/components.d.ts",
+    "test-app/generated.d.ts",
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/util.ts",
