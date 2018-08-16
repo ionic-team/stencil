@@ -1,10 +1,11 @@
-<a name="0.12.0-0"></a>
-# 🌎 [0.12.0-0](https://github.com/ionic-team/stencil/compare/v0.11.4...v0.12.0-0) (2018-08-14)
+<a name="0.12.0-1"></a>
+# 🏕 [0.12.0-1](https://github.com/ionic-team/stencil/compare/v0.12.0-0...v0.12.0-1) (2018-08-16)
 
 
 ### Bug Fixes
 
 * **changelog:** correct typo in changelog. ([7ffd452](https://github.com/ionic-team/stencil/commit/7ffd452))
+* **types:** set HTMLAttributes as a global within components.d.ts ([4889891](https://github.com/ionic-team/stencil/commit/4889891))
 * **types:** move global type definitions of JSX into a projects component.d.ts file ([#1018](https://github.com/ionic-team/stencil/issues/1018)) ([7e4e501](https://github.com/ionic-team/stencil/commit/7e4e501))
 
 

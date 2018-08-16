@@ -58,5 +58,6 @@ declare global {
       [tagName: string]: any;
     }
   }
+  export interface HTMLAttributes extends JSXElements.HTMLAttributes {}
 }
 
