@@ -105,7 +105,7 @@ describe('build', () => {
     expect(r.filesWritten).toHaveLength(7);
 
     expectFiles(c.fs, [
-      path.join(root, 'src', 'components.d.ts'),
+      path.join(root, 'src', 'generated.d.ts'),
       path.join(root, 'www', 'build', 'app.js'),
       path.join(root, 'www', 'build', 'app', 'app.core.js'),
       path.join(root, 'www', 'build', 'app', 'app.global.js'),

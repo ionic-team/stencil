@@ -35,7 +35,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   }
 
   // DEPRECATED: 2018/08/16
-  const fileExists = await compilerCtx.fs.access(pathJoin(config, config.srcDir, 'components.d.ts'));
+  const fileExists = await compilerCtx.fs.access(pathJoin(config, config.srcDir, 'generated.d.ts'));
   if (fileExists) {
     config.logger.warn('As of Stencil 0.12.0 components.d.ts was renamed to generated.d.ts. Please delete the component.d.ts and update any references to it.');
   }

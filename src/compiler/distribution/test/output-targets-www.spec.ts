@@ -41,7 +41,7 @@ describe('outputTargets', () => {
 
       path.join(root, 'User', 'testing', 'www', 'index.html'),
 
-      path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
+      path.join(root, 'User', 'testing', 'src', 'generated.d.ts'),
     ]);
 
     doNotExpectFiles(c.fs, [
@@ -61,7 +61,7 @@ describe('outputTargets', () => {
 
       path.join(root, 'User', 'testing', 'dist', 'types'),
       path.join(root, 'User', 'testing', 'dist', 'types', 'components'),
-      path.join(root, 'User', 'testing', 'dist', 'types', 'components.d.ts'),
+      path.join(root, 'User', 'testing', 'dist', 'types', 'generated.d.ts'),
       path.join(root, 'User', 'testing', 'dist', 'types', 'components', 'cmp-a.d.ts'),
       path.join(root, 'User', 'testing', 'dist', 'types', 'stencil.core.d.ts'),
     ]);

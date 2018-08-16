@@ -33,7 +33,7 @@ describe('dist loader/core resourcesUrl', () => {
         "module": "dist/esm/index.js",
         "main": "dist/index.js",
         "collection\": "dist/collection/collection-manifest.json",
-        "types": "dist/types/components.d.ts"
+        "types": "dist/types/generated.d.ts"
       }`);
 
     const r = await c.build();
@@ -81,7 +81,7 @@ describe('dist loader/core resourcesUrl', () => {
         "module": "dist/some-build/esm/index.js",
         "main": "dist/some-build/index.js",
         "collection\": "dist/collection/collection-manifest.json",
-        "types": "dist/types/components.d.ts"
+        "types": "dist/types/generated.d.ts"
       }`);
 
     const r = await c.build();
