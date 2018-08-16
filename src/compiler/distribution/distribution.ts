@@ -86,13 +86,13 @@ async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
 
 
 export function getComponentsDtsSrcFilePath(config: d.Config) {
-  return pathJoin(config, config.srcDir, COMPONENTS_DTS);
+  return pathJoin(config, config.srcDir, GENERATED_DTS);
 }
 
 
 export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
-  return pathJoin(config, outputTarget.typesDir, COMPONENTS_DTS);
+  return pathJoin(config, outputTarget.typesDir, GENERATED_DTS);
 }
 
 
-export const COMPONENTS_DTS = 'components.d.ts';
+export const GENERATED_DTS = 'generated.d.ts';

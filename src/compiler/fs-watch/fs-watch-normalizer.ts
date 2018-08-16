@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { COMPONENTS_DTS } from '../distribution/distribution';
+import { GENERATED_DTS } from '../distribution/distribution';
 import { normalizePath } from '../util';
 
 
@@ -122,5 +122,5 @@ export class FsWatchNormalizer {
 
 
 function shouldIgnore(filePath: string) {
-  return filePath.endsWith(COMPONENTS_DTS);
+  return filePath.endsWith(GENERATED_DTS);
 }

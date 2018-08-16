@@ -23,7 +23,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   const rootTsFiles = compilerCtx.rootTsFiles.slice();
 
-  // ensure components.d.ts IS in the type validation transpile
+  // ensure generated.d.ts IS in the type validation transpile
   if (!rootTsFiles.includes(componentsDtsSrcFilePath)) {
     rootTsFiles.push(componentsDtsSrcFilePath);
   }

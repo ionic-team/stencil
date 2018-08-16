@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
-import { COMPONENTS_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
-import { normalizePath } from '../util';
+import { normalizePath, pathJoin } from '../util';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination = 'src') {
@@ -27,11 +27,17 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
     componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
   }
 
-
-  // immediately write the components.d.ts file to disk and put it into fs memory
+  // immediately write the generated.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
+
   if (destination !== 'src') {
-    componentsDtsFilePath = config.sys.path.resolve(destination, COMPONENTS_DTS);
+    componentsDtsFilePath = config.sys.path.resolve(destination, GENERATED_DTS);
+  }
+
+  // DEPRECATED: 2018/08/16
+  const fileExists = await compilerCtx.fs.access(pathJoin(config, config.srcDir, 'components.d.ts'));
+  if (fileExists) {
+    config.logger.warn('As of Stencil 0.12.0 components.d.ts was renamed to generated.d.ts. Please delete the component.d.ts and update any references to it.');
   }
 
   await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });

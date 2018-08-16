@@ -52,7 +52,7 @@ export function calculateRequiredUpgrades(config: Config, collectionVersion: str
   if (config.sys.semver.gte(collectionVersion, '0.11.5')) {
     // 2018-08-08
     // add dependencies to component metadata
-    // this is used in create of components.d.ts for local vs
+    // this is used in create of generated.d.ts for local vs
     // dist.
     upgrades.push(CompilerUpgrade.Add_Local_Intrinsic_Elements);
   }
