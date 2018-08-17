@@ -158,8 +158,8 @@ const CACHE_DIR_README = `# Stencil Cache Directory
 
 This directory contains files which the compiler has
 cached for faster builds. To disable caching, please set
-"enableCache: false" within the stencil.config.js file.
+"enableCache: false" within the stencil config.
 
 To change the cache directory, please update the
-"cacheDir" property within the stencil.config.js file.
+"cacheDir" property within the stencil config.
 `;
