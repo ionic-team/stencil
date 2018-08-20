@@ -79,8 +79,11 @@ export function proxyInputs(instance: any, el: ElementRef, props: string[]) {
 
 function outputsAuxFunction() {
   return `
-export function proxyOutputs(instance: any, events: string[]) {
-  events.forEach(eventName => instance[eventName] = new EventEmitter());
+export function proxyOutputs(instance: any, el: ElementRef, events: string[]) {
+  events.forEach(eventName => {
+    instance[eventName] = new EventEmitter();
+    el.nativeElement.addEventListener(eventName, (ev: any) => instance[eventName].emit(ev));
+  });
 }`;
 }
 
@@ -168,10 +171,8 @@ export class ${cmpMeta.componentClass} {`];
   });
 
   // Generate component constructor
-  if (hasMethods || hasInputs) {
+  if (hasMethods || hasInputs || hasOutputs) {
     lines.push(`  constructor(r: ElementRef) {`);
-  } else if (hasOutputs) {
-    lines.push(`  constructor() {`);
   }
 
   if (hasMethods) {
@@ -183,7 +184,7 @@ export class ${cmpMeta.componentClass} {`];
   }
 
   if (hasOutputs) {
-    lines.push(`    proxyOutputs(this, ['${outputs.join(`', '`)}']);`);
+    lines.push(`    proxyOutputs(this, r, ['${outputs.join(`', '`)}']);`);
   }
 
   if (hasContructor) {
