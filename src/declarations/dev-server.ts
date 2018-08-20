@@ -17,12 +17,18 @@ export interface DevServerConfig {
   port?: number;
   protocol?: 'http' | 'https';
   root?: string;
+  ssl?: DevServerSSLConfig;
 }
 
 
 export interface DevServerStartResponse {
   browserUrl?: string;
   initialLoadUrl?: string;
+}
+
+export interface DevServerSSLConfig {
+  certPath?: string;
+  keyPath?: string;
 }
 
 

@@ -18,7 +18,7 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
 
   if (devServerConfig.protocol === 'https') {
     // https server
-    server = https.createServer(await getSSL(), reqHandler) as any;
+    server = https.createServer(await getSSL(devServerConfig.ssl), reqHandler) as any;
 
   } else {
     // http server
