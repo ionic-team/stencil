@@ -349,17 +349,21 @@ async function scanDirForTsFiles(config: d.Config, compilerCtx: d.CompilerCtx, b
     return item.isFile && isFileIncludePath(config, item.absPath);
   });
 
-  scanDirTimeSpan.finish(`scan for ts files finished`);
-
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
 
   // return just the abs path
   // make sure it doesn't include generated.d.ts
-  return tsFileItems
+  const tsFilePaths = tsFileItems
     .map(tsFileItem => tsFileItem.absPath)
-    .filter(tsFilePath => {
-      return tsFilePath !== componentsDtsSrcFilePath;
-    });
+    .filter(tsFileAbsPath => tsFileAbsPath !== componentsDtsSrcFilePath);
+
+  scanDirTimeSpan.finish(`scan for ts files finished: ${tsFilePaths.length}`);
+
+  if (tsFilePaths.length === 0) {
+    config.logger.warn(`No components found within: ${config.srcDir}`);
+  }
+
+  return tsFilePaths;
 }
 
 
