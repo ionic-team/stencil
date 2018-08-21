@@ -42,7 +42,6 @@ if (success) {
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
-        'rollup-plugin-node-globals',
         'rollup-pluginutils',
         'typescript',
         'util'
