@@ -1,9 +1,12 @@
-<a name="0.12.0-1"></a>
-# 🏕 [0.12.0-1](https://github.com/ionic-team/stencil/compare/v0.12.0-0...v0.12.0-1) (2018-08-16)
+<a name="0.12.0-2"></a>
+# 📺 [0.12.0-2](https://github.com/ionic-team/stencil/compare/v0.12.0-1...v0.12.0-2) (2018-08-21)
 
 
 ### Bug Fixes
 
+* **build:** do not exclude **/test/** directory from build ([12f650d](https://github.com/ionic-team/stencil/commit/12f650d))
+* **exports:** remap esm exports from collection directory to a local es5 directory. ([dbd8cac](https://github.com/ionic-team/stencil/commit/dbd8cac))
+* **types:** rename components.d.ts to generated.d.ts to avoid a typescript bug. fixes [#1021](https://github.com/ionic-team/stencil/issues/1021) ([5893740](https://github.com/ionic-team/stencil/commit/5893740))
 * **changelog:** correct typo in changelog. ([7ffd452](https://github.com/ionic-team/stencil/commit/7ffd452))
 * **types:** set HTMLAttributes as a global within components.d.ts ([4889891](https://github.com/ionic-team/stencil/commit/4889891))
 * **types:** move global type definitions of JSX into a projects component.d.ts file ([#1018](https://github.com/ionic-team/stencil/issues/1018)) ([7e4e501](https://github.com/ionic-team/stencil/commit/7e4e501))
