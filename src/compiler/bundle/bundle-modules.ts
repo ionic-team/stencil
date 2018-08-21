@@ -1,5 +1,5 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../declarations';
-import { catchError } from '../util';
+import { catchError, pathJoin } from '../util';
 import { createBundle } from './rollup-bundle';
 import { minifyJs } from '../minifier';
 import { writeEntryModules, writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
@@ -19,6 +19,19 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
   }
 
   await writeEntryModules(config, compilerCtx, entryModules);
+
+  // Check for index.js file. This file is used for stencil project exports
+  // usually this contains utility exports.
+  // If it exists then add it as an entry point.
+  const exportedFile = pathJoin(config, config.srcDir, 'index.js');
+  const fileExists = await compilerCtx.fs.access(exportedFile);
+  if (fileExists) {
+    buildCtx.entryModules.push({
+      entryKey: 'exportedFile',
+      filePath: exportedFile,
+      moduleFiles: []
+    });
+  }
 
   try {
     // run rollup, but don't generate yet

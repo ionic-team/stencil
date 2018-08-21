@@ -13,8 +13,11 @@ export async function generateEsmIndex(config: d.Config, compilerCtx: d.Compiler
   const defineLibraryEsm = getDefineCustomElementsPath(config, outputTarget, 'es5');
   await addExport(config, compilerCtx, outputTarget, esm, defineLibraryEsm);
 
-  const collectionIndexPath = pathJoin(config, outputTarget.collectionDir, 'index.js');
-  await addExport(config, compilerCtx, outputTarget, esm, collectionIndexPath);
+  const exportsIndexPath =  pathJoin(config, getDistEsmBuildDir(config, outputTarget), `es5`, `index.js`);
+  const fileExists = await compilerCtx.fs.access(exportsIndexPath);
+  if (fileExists) {
+    await addExport(config, compilerCtx, outputTarget, esm, exportsIndexPath);
+  }
 
   const distIndexEsmPath = getDistEsmIndexPath(config, outputTarget);
   await Promise.all([
