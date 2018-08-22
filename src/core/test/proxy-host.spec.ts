@@ -1,6 +1,6 @@
 import { ComponentMeta, PlatformApi } from '../../declarations';
 import { MEMBER_TYPE } from '../../util/constants';
-import { mockElement, mockPlatform } from '../../testing/mocks';
+import { mockDocument, mockPlatform } from '../../testing/mocks';
 import { proxyHostElementPrototype } from '../proxy-host-element';
 
 
@@ -12,7 +12,8 @@ describe('proxyHostElementPrototype', () => {
 
   beforeEach(() => {
     cmpMeta = {};
-    elm = mockElement('my-cmp');
+    const doc = mockDocument();
+    elm = doc.createElement('my-cmp');
   });
 
 

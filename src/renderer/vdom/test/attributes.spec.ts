@@ -1,15 +1,17 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
-import { mockElement, mockRenderer } from '../../../testing/mocks';
+import { mockDocument, mockRenderer } from '../../../testing/mocks';
 
 
 describe('attributes', function() {
   const patch = mockRenderer();
   let hostElm: any;
+  let doc: Document;
   let vnode0: d.VNode;
 
-  beforeEach(function() {
-    hostElm = mockElement('div');
+  beforeEach(() => {
+    doc = mockDocument();
+    hostElm = doc.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -51,7 +53,7 @@ describe('attributes', function() {
   });
 
   it('should not touch class nor id fields', function() {
-    hostElm = mockElement('div');
+    hostElm = doc.createElement('div');
     hostElm.id = 'myId';
     hostElm.className = 'myClass';
     vnode0.elm = hostElm;
@@ -96,7 +98,7 @@ describe('attributes', function() {
         })
       );
 
-      vnode0.elm = mockElement('svg') as any;
+      vnode0.elm = doc.createElementNS('http://www.w3.org/2000/svg', 'svg') as any;
       const result: any = patch(hostElm, vnode0, a).elm;
       expect(result.childNodes.length).toEqual(1);
       expect(result.childNodes[0].getAttribute('href')).toEqual(testUrl);

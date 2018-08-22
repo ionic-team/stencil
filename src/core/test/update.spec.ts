@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { h } from '../../renderer/vdom/h';
-import { MockedPlatform, mockConnect, mockDefine, mockElement, mockPlatform, waitForLoad } from '../../testing/mocks';
+import { MockedPlatform, mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
 import { queueUpdate, renderUpdate } from '../update';
 import { getDefaultBuildConditionals } from '../../util/build-conditionals';
@@ -25,7 +25,7 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as d.HostElement;
+      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
       const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
       const instance = new MyComponent();
@@ -40,7 +40,7 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as d.HostElement;
+      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
       const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
 

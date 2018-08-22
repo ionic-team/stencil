@@ -1,7 +1,5 @@
-import { ComponentConstructorEvent } from '../../declarations';
-import { HostElement } from '../../index';
 import { initEventEmitters } from '../init-event-emitters';
-import { mockComponentInstance, mockElement, mockPlatform } from '../../testing/mocks';
+import { mockDocument, mockPlatform } from '../../testing/mocks';
 
 
 describe('initEventEmitters', () => {
@@ -9,7 +7,7 @@ describe('initEventEmitters', () => {
   it('should init event emitter', () => {
     const plt = mockPlatform();
     const instance = {};
-    const elm = mockElement() as any;
+    const elm = plt.domApi.$createElement('div');
 
     plt.instanceMap.set(elm, instance);
     plt.hostElementMap.set(instance, elm);

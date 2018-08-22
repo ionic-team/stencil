@@ -17,30 +17,29 @@ export class UsedSelectors {
 
       // tags
       const tagName = elm.tagName.toLowerCase();
-      if (this.tags.indexOf(tagName) === -1) {
+      if (!this.tags.includes(tagName)) {
         this.tags.push(tagName);
       }
 
       // classes
       const classList = elm.classList;
       for (i = 0; i < classList.length; i++) {
-        const className = classList[i];
+        const className = classList.item(i);
 
-        if (this.classNames.indexOf(className) === -1) {
+        if (!this.classNames.includes(className)) {
           this.classNames.push(className);
         }
-
       }
 
       // attributes
       const attributes = elm.attributes;
       for (i = 0; i < attributes.length; i++) {
-        const attr = attributes[i];
+        const attr = attributes.item(i);
 
         const attrName = attr.name.toLowerCase();
         if (!attrName || attrName === 'class' || attrName === 'id' || attrName === 'style') continue;
 
-        if (this.attrs.indexOf(attrName) === -1) {
+        if (!this.attrs.includes(attrName)) {
           this.attrs.push(attrName);
         }
       }
@@ -49,7 +48,7 @@ export class UsedSelectors {
       var idValue = elm.getAttribute('id');
       if (idValue) {
         idValue = idValue.trim();
-        if (idValue && this.ids.indexOf(idValue) === -1) {
+        if (idValue && !this.ids.includes(idValue)) {
           this.ids.push(idValue);
         }
       }

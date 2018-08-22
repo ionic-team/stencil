@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { attachStyles, initStyleTemplate } from '../styles';
-import { mockDomApi, mockElement, mockPlatform } from '../../testing/mocks';
 import { ENCAPSULATION } from '../../util/constants';
+import { mockPlatform } from '../../testing/mocks';
 
 
 describe('styles', () => {
@@ -13,8 +13,8 @@ describe('styles', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
-    domApi = mockDomApi();
-    elm = mockElement() as any;
+    domApi = plt.domApi;
+    elm = domApi.$createElement('div') as any;
     cmpMeta = {
       tagNameMeta: 'cmp-a'
     };

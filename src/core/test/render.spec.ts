@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
-import { mockElement, mockPlatform } from '../../testing/mocks';
 import { h } from '../../renderer/vdom/h';
-import { render } from '../render';
+import { mockPlatform } from '../../testing/mocks';
 import { PROP_TYPE } from '../../util/constants';
+import { render } from '../render';
+import '../../testing/expect';
 
 
 describe('instance render', () => {
@@ -12,7 +13,7 @@ describe('instance render', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
-    hostElm = mockElement('ion-tag') as d.HostElement;
+    hostElm = plt.domApi.$createElement('ion-tag') as d.HostElement;
   });
 
 

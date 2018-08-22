@@ -1,17 +1,19 @@
 import * as d from '../../../declarations';
-import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { mockPlatform } from '../../../testing/mocks';
 import { PROP_TYPE } from '../../../util/constants';
 import { setAccessor } from '../set-accessor';
-
+import '../../../testing/expect';
 
 describe('setAccessor for custom elements', () => {
 
   var elm: any;
   let plt: d.PlatformApi;
+  let domApi: d.DomApi;
 
   beforeEach(() => {
     plt = mockPlatform();
-    elm = mockElement('my-tag');
+    domApi = plt.domApi;
+    elm = domApi.$createElement('my-tag');
   });
 
 
@@ -198,7 +200,7 @@ describe('setAccessor for custom elements', () => {
         return childCmpMeta;
       }
     };
-    elm = mockElement('cmp-a');
+    elm = domApi.$createElement('cmp-a');
 
     const oldValue: any = 'someval';
     const newValue: any = null;
@@ -321,12 +323,13 @@ describe('setAccessor for custom elements', () => {
 
 describe('setAccessor for inputs', () => {
   const plt: any = mockPlatform();
+  const domApi = plt.domApi;
 
   describe('simple attributes', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -368,7 +371,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         const expected = newValue === true ? '' : newValue.toString();
@@ -406,7 +409,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm).toMatchAttributes({ });
@@ -451,7 +454,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
@@ -492,7 +495,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -518,7 +521,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: '' });
@@ -544,7 +547,7 @@ describe('setAccessor for inputs', () => {
   describe('min/max attributes', () => {
     describe('should not add attribute when prop is undefined or null', () => {
       function testMinMaxAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -562,7 +565,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testMinMaxAttribute(propName: string, newValue: any, oldValue: any) {
-        const inputElm = mockElement('input');
+        const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
@@ -582,39 +585,40 @@ describe('setAccessor for inputs', () => {
 
 describe('setAccessor for standard html elements', () => {
   const plt: any = mockPlatform();
+  const domApi = plt.domApi;
 
   describe('simple global attributes', () => {
 
     it('should not add attribute when prop is undefined or null', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'title', undefined, undefined, false, false);
 
       expect(inputElm.hasAttribute('title')).toBe(false);
     });
 
     it('should add attribute when prop is string', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'title', undefined, 'lime', false, false);
 
       expect(inputElm.hasAttribute('title')).toBe(true);
     });
 
     it('should add attribute when prop is boolean', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, true, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
     it('should add attribute when prop is number', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 1, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
     it('should remove attribute when prop is undefined', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'title', undefined, 'lime', false, false);
       setAccessor(plt, inputElm, 'title', 'lime', undefined, false, false);
 
@@ -622,7 +626,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should remove attribute when prop is null', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'title', undefined, 'lime', false, false);
       setAccessor(plt, inputElm, 'title', 'lime', null, false, false);
 
@@ -633,42 +637,42 @@ describe('setAccessor for standard html elements', () => {
   describe('simple nonstandard attributes', () => {
 
     it('should not add attribute when prop is undefined or null', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, undefined, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(false);
     });
 
     it('should add attribute when prop is string', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 'lime', false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
     it('should add attribute when prop is boolean', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, true, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
     it('should add attribute when prop is number', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 1, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(true);
     });
 
     it('should aria role attribute', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'role', undefined, 'main', false, false);
 
       expect(inputElm.hasAttribute('role')).toBe(true);
     });
 
     it('should remove attribute when prop is undefined', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 1, false, false);
       setAccessor(plt, inputElm, 'color', 1, undefined, false, false);
 
@@ -676,14 +680,14 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should remove attribute when prop is null', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'color', undefined, 1, false, false);
       setAccessor(plt, inputElm, 'color', 1, null, false, false);
 
       expect(inputElm.hasAttribute('color')).toBe(false);
     });
     it('should remove aria role attribute', () => {
-      const inputElm = mockElement('section');
+      const inputElm = domApi.$createElement('section');
       setAccessor(plt, inputElm, 'role', undefined, 'main', false, false);
       setAccessor(plt, inputElm, 'role', 'main', undefined, false, false);
 
@@ -693,7 +697,7 @@ describe('setAccessor for standard html elements', () => {
 
   describe('class attribute', () => {
     it('should add classes', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       setAccessor(plt, elm, 'class', undefined, 'class1 class2   class3', false, false);
       expect(elm).toMatchClasses(['class1', 'class2', 'class3']);
 
@@ -707,7 +711,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should not add any classes', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       setAccessor(plt, elm, 'class', '', '', false, false);
       expect(elm).toMatchClasses([]);
 
@@ -722,7 +726,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should remove classes', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.classList.add('icon', 'ion-color');
 
       setAccessor(plt, elm, 'class', 'icon', 'icon2', false, false);
@@ -730,7 +734,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should not have duplicated classes', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.classList.add('md');
 
       setAccessor(plt, elm, 'class', undefined, 'md ios', false, false);
@@ -738,7 +742,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should also add one class', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.classList.add('md');
 
       setAccessor(plt, elm, 'class', 'md', 'md ios', false, false);
@@ -746,7 +750,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should remove one class', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.classList.add('md');
 
       setAccessor(plt, elm, 'class', 'md', '', false, false);
@@ -758,7 +762,7 @@ describe('setAccessor for standard html elements', () => {
   describe('style attribute', () => {
 
     it('should add styles', () => {
-      let elm = mockElement('section');
+      let elm = domApi.$createElement('section');
       const newStyles = {
         'box-shadow': '1px',
         'color': 'blue',
@@ -767,14 +771,14 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(plt, elm, 'style', undefined, newStyles, false, false);
       expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue; padding-left: 88px;');
 
-      elm = mockElement('my-tag');
+      elm = domApi.$createElement('my-tag');
       setAccessor(plt, elm, 'style', {}, {
         'font-size': '12px',
         marginRight: '55px'
       }, false, false);
       expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
-      elm = mockElement('my-tag');
+      elm = domApi.$createElement('my-tag');
       setAccessor(plt, elm, 'style', {
         'font-size': '12px',
         'color': 'blue'
@@ -786,7 +790,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should not add styles', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       setAccessor(plt, elm, 'style', undefined, undefined, false, false);
       expect(elm.style.cssText).toEqual('');
 
@@ -801,7 +805,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should change styles only when it has a new value', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
 
@@ -813,7 +817,7 @@ describe('setAccessor for standard html elements', () => {
     });
 
     it('should remove styles', () => {
-      const elm = mockElement('section');
+      const elm = domApi.$createElement('section');
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
       elm.style.setProperty('margin', '20px');
