@@ -9,7 +9,7 @@ import { JSXElements } from '@stencil/core';
 
 
 
-declare namespace StencilComponents {
+export namespace StencilComponents {
 
   interface AttributeBasicRoot {}
   interface AttributeBasicRootAttributes extends JSXElements.HTMLAttributes {}
