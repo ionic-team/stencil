@@ -77,7 +77,7 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   });
 
   const componentsFileString = `
-declare namespace StencilComponents {
+export namespace StencilComponents {
 ${modules.map(m => {
     return `${m.StencilComponents}${m.JSXElements}`;
   })
