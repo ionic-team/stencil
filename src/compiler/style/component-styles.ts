@@ -265,11 +265,14 @@ function getStyleId(cmpMeta: d.ComponentMeta, modeName: string, isScopedStyles: 
 
 
 export function escapeCssForJs(style: string) {
-  return style
-    .replace(/\\[\D0-7]/g, (v) => '\\' + v)
-    .replace(/\r\n|\r|\n/g, `\\n`)
-    .replace(/\"/g, `\\"`)
-    .replace(/\@/g, `\\@`);
+  if (typeof style === 'string') {
+    return style
+      .replace(/\\[\D0-7]/g, (v) => '\\' + v)
+      .replace(/\r\n|\r|\n/g, `\\n`)
+      .replace(/\"/g, `\\"`)
+      .replace(/\@/g, `\\@`);
+  }
+  return style;
 }
 
 
