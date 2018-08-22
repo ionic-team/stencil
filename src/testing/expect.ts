@@ -1,4 +1,6 @@
 import { testAttributes, testClasslist, testMatchAttributes, testMatchClasslist, testProperties } from './utils';
+import { parse } from './mock-doc/parse-html';
+import { serialize } from './mock-doc/serialize-node';
 
 
 declare global {
@@ -16,37 +18,19 @@ declare global {
 
 
 export function toEqualHtml(a: string, b: string) {
-  const htmlBeautify = require('html-beautify');
+  const parseA = parse(a);
+  const parseB = parse(b);
 
-  while (a.includes('  ')) {
-    a = a.replace(/  /g, ' ');
-  }
+  const serializeA = serialize(parseA, {
+    format: 'html'
+  });
 
-  while (b.includes('  ')) {
-    b = b.replace(/  /g, ' ');
-  }
+  const serializeB = serialize(parseB, {
+    format: 'html'
+  });
 
-  while (/>\s/.test(a)) {
-    a = a.replace(/\>\s/g, '>');
-  }
-
-  while (/>\s/.test(b)) {
-    b = b.replace(/>\s/g, '>');
-  }
-
-  while (/\s</.test(a)) {
-    a = a.replace(/\s</g, '<');
-  }
-
-  while (/\s</.test(b)) {
-    b = b.replace(/\s</g, '<');
-  }
-
-  a = htmlBeautify(a);
-  b = htmlBeautify(b);
-
-  if (a !== b) {
-    expect(a).toBe(b);
+  if (serializeA !== serializeB) {
+    expect(serializeA).toBe(serializeB);
     return {
       message: () => 'HTML does not match',
       pass: false,

@@ -1,20 +1,20 @@
 import { AppGlobal, DomApi } from '../../declarations';
 import { createDomApi } from '../dom-api';
-import { mockElement, mockWindow } from '../../testing/mocks';
+import { mockWindow } from '../../testing/mocks';
 
 
 describe('dom api', () => {
 
   let domApi: DomApi;
   let win: Window;
-  let doc: any;
+  let doc: Document;
   let elm: Element;
   let App: AppGlobal;
 
   beforeEach(() => {
     win = mockWindow();
     doc = win.document;
-    elm = mockElement('div');
+    elm = doc.createElement('div');
     App = {};
     domApi = createDomApi(App, win, doc);
   });
@@ -23,24 +23,24 @@ describe('dom api', () => {
   describe('$parentElement', () => {
 
     it('element w/ parentNode thats is a shadow root should return host', () => {
-      const parentElement = mockElement('parent');
+      const parentElement = doc.createElement('parent');
       const frag = doc.createDocumentFragment();
       frag.appendChild(elm);
-      frag.host = parentElement;
+      (frag as any).host = parentElement;
       const r = domApi.$parentElement(elm);
       expect(r).toBe(parentElement);
     });
 
     it('element w/ parentNode thats not a shadow root should return parentNode', () => {
-      const parentElement = mockElement('parent');
+      const parentElement = doc.createElement('parent');
       parentElement.appendChild(elm);
       const r = domApi.$parentElement(elm);
       expect(r).toBe(parentElement);
     });
 
-    it('no parent should return undefined', () => {
+    it('no parent should return null', () => {
       const r = domApi.$parentElement(elm);
-      expect(r).toBeUndefined();
+      expect(r).toBeNull();
     });
 
   });
@@ -63,7 +63,7 @@ describe('dom api', () => {
     });
 
     it('parent', () => {
-      const parentElement = mockElement('div');
+      const parentElement = doc.createElement('div');
       parentElement.appendChild(elm);
       const r = domApi.$elementRef(elm, 'parent');
       expect(r).toBe(parentElement);

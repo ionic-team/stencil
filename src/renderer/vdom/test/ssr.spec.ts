@@ -182,9 +182,9 @@ describe('ssr', () => {
       expect(hostElm.getAttribute(SSR_VNODE_ID)).toBe('1');
       expect(hostElm.querySelector('div').getAttribute(SSR_CHILD_ID)).toBe('1.0');
       expect(hostElm.querySelector('button').getAttribute(SSR_CHILD_ID)).toBe('1.0');
-      expect(hostElm.querySelector('button').innerHTML).toBe('<!--s.1.0-->Text 1<!--/--> ');
+      expect(hostElm.querySelector('button').innerHTML).toBe('<!--s.1.0-->Text 1<!--/-->');
       expect(hostElm.querySelector('span').getAttribute(SSR_CHILD_ID)).toBe('1.1');
-      expect(hostElm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/--> ');
+      expect(hostElm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/-->');
     });
 
   });

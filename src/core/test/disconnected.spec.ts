@@ -1,5 +1,5 @@
 import { isDisconnected } from '../disconnected';
-import { mockDomApi, mockElement } from '../../testing/mocks';
+import { mockDocument, mockDomApi } from '../../testing/mocks';
 
 
 describe('disconnected', () => {
@@ -9,14 +9,16 @@ describe('disconnected', () => {
     const domApi = mockDomApi();
 
     it('should not be disconnected when elm has a parentNode', () => {
-      const parentNode = mockElement();
-      const elm = mockElement();
+      const doc = mockDocument();
+      const parentNode = doc.createElement('div');
+      const elm = doc.createElement('div');
       parentNode.appendChild(elm);
       expect(isDisconnected(domApi, elm)).toBe(true);
     });
 
     it('should be disconnected when elm has no parentNode', () => {
-      const elm = mockElement();
+      const doc = mockDocument();
+      const elm = doc.createElement('div');
       expect(isDisconnected(domApi, elm)).toBe(true);
     });
 
