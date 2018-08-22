@@ -47,7 +47,7 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   }
 
   const imports = `import { ${angularImports.sort().join(', ')} } from '@angular/core';`;
-  const sourceImports = outputTarget.componentCorePackage ? `import { StencilComponents } from '${ outputTarget.componentCorePackage };` : '';
+  const sourceImports = outputTarget.componentCorePackage ? `import { StencilComponents } from '${ outputTarget.componentCorePackage }';` : '';
 
   const final: string[] = [
     '/* auto-generated angular directive proxies */',
