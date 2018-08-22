@@ -109,7 +109,7 @@ function runTasks(opts) {
     {
       title: 'Check remote history',
       task: () => execa.stdout('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(result => {
-        if (result !== '0') {
+        if (result !== '0' && process.argv.slice(2).indexOf('--any-branch') === -1) {
           throw new Error('Remote history differs. Please pull changes.');
         }
       })
