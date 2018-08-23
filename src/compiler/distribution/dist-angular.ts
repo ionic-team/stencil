@@ -47,7 +47,11 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   }
 
   const imports = `import { ${angularImports.sort().join(', ')} } from '@angular/core';`;
-  const sourceImports = outputTarget.componentCorePackage ? `import { StencilComponents } from '${ outputTarget.componentCorePackage }';` : '';
+  let sourceImports =  '';
+  if (outputTarget.componentCorePackage) {
+    sourceImports = `import { LocalElementInterfaces } from '${ outputTarget.componentCorePackage }';\n` +
+      `type StencilComponents<T extends keyof LocalElementInterfaces> = LocalElementInterfaces[T];`;
+  }
 
   const final: string[] = [
     '/* auto-generated angular directive proxies */',
@@ -161,7 +165,7 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
-export declare interface ${cmpMeta.componentClass} extends StencilComponents.${tagNameAsPascal} {}
+export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
 @Directive({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 

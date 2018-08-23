@@ -57,11 +57,14 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
 
   const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
   const intrinsicImports: string[] = [];
+  const localElementInterfaces: string[] = [];
   const collectionTypesImportsString = collectionTypesImports.map((cti) => {
     if (cti.includeIntrinsicElements) {
       const intrinsicImportAlias = 'DependentIntrinsicElements' + (intrinsicImports.length + 1);
+      const localElementInterfaceAlias = 'LocalElementInterfaces' + (intrinsicImports.length + 1);
       intrinsicImports.push(intrinsicImportAlias);
-      return `import { LocalIntrinsicElements as ${intrinsicImportAlias} } from '${cti.pkgName}';`;
+      localElementInterfaces.push(localElementInterfaceAlias);
+      return `import { LocalIntrinsicElements as ${intrinsicImportAlias}, LocalElementInterfaces as ${localElementInterfaceAlias} } from '${cti.pkgName}';\n`;
     }
     return `import '${cti.pkgName}'`;
   })
@@ -77,11 +80,13 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   });
 
   const componentsFileString = `
-export namespace StencilComponents {
 ${modules.map(m => {
-    return `${m.StencilComponents}${m.JSXElements}`;
-  })
-  .join('\n')}
+  return `${m.StencilComponents}${m.JSXElements}`;
+})
+.join('\n')}
+
+export interface LocalElementInterfaces ${localElementInterfaces.length === 0 ? ' ' : `extends ${localElementInterfaces.join(', ')} `}{
+${modules.map(m => `'${m.tagNameAsPascal}': ${m.tagNameAsPascal};`).join('\n')}
 }
 
 export interface LocalIntrinsicElements {
@@ -318,6 +323,7 @@ export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: strin
   }, true);
 
   return {
+    tagNameAsPascal: tagNameAsPascal,
     StencilComponents: `
 interface ${tagNameAsPascal} {${
   stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
@@ -327,14 +333,14 @@ interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentAttributesOptional !== '' ? `\n${stencilComponentAttributesOptional}\n` : ''
 }}`,
     global: `
-interface ${interfaceName} extends StencilComponents.${tagNameAsPascal}, HTMLStencilElement {}
+interface ${interfaceName} extends ${tagNameAsPascal}, HTMLStencilElement {}
 var ${interfaceName}: {
   prototype: ${interfaceName};
   new (): ${interfaceName};
 };`,
     HTMLElementTagNameMap: `'${tagName}': ${interfaceName}`,
     ElementTagNameMap: `'${tagName}': ${interfaceName};`,
-    IntrinsicElements: `'${tagName}': StencilComponents.${jsxInterfaceName};`
+    IntrinsicElements: `'${tagName}': ${jsxInterfaceName};`
   };
 }
 
