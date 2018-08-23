@@ -9,29 +9,32 @@ import { JSXElements } from '@stencil/core';
 
 
 
-export namespace StencilComponents {
 
-  interface AppRoot {}
-  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
+interface AppRoot {}
+interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CurrentDate {}
-  interface CurrentDateAttributes extends JSXElements.HTMLAttributes {}
+interface CurrentDate {}
+interface CurrentDateAttributes extends JSXElements.HTMLAttributes {}
+
+export interface LocalElementInterfaces  {
+  'AppRoot': AppRoot;
+  'CurrentDate': CurrentDate;
 }
 
 export interface LocalIntrinsicElements {
-  'app-root': StencilComponents.AppRootAttributes;
-  'current-date': StencilComponents.CurrentDateAttributes;
+  'app-root': AppRootAttributes;
+  'current-date': CurrentDateAttributes;
 }
 
 declare global {
 
-  interface HTMLAppRootElement extends StencilComponents.AppRoot, HTMLStencilElement {}
+  interface HTMLAppRootElement extends AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLCurrentDateElement extends StencilComponents.CurrentDate, HTMLStencilElement {}
+  interface HTMLCurrentDateElement extends CurrentDate, HTMLStencilElement {}
   var HTMLCurrentDateElement: {
     prototype: HTMLCurrentDateElement;
     new (): HTMLCurrentDateElement;

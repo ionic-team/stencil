@@ -1,9 +1,10 @@
-<a name="0.12.0-4"></a>
-# 🐮 [0.12.0-4](https://github.com/ionic-team/stencil/compare/v0.12.0-3...v0.12.0-4) (2018-08-22)
+<a name="0.12.0-5"></a>
+# ⛺️ [0.12.0-5](https://github.com/ionic-team/stencil/compare/v0.12.0-4...v0.12.0-5) (2018-08-23)
 
 
 ### Bug Fixes
 
+* **angular:** export local element interfaces to be used in angular type definitions. ([fc081a3](https://github.com/ionic-team/stencil/commit/fc081a3))
 * **types:** export StencilComponents from core builds and all import to angular builds. ([#1033](https://github.com/ionic-team/stencil/issues/1033)) ([a8ba582](https://github.com/ionic-team/stencil/commit/a8ba582))
 * **build:** move rollup node globals plugin local to resolve its issue with dynamic imports. ([ce72eb6](https://github.com/ionic-team/stencil/commit/ce72eb6))
 * **build:** do not exclude **/test/** directory from build ([12f650d](https://github.com/ionic-team/stencil/commit/12f650d))
