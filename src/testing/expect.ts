@@ -1,5 +1,5 @@
 import { testAttributes, testClasslist, testMatchAttributes, testMatchClasslist, testProperties } from './utils';
-import { parse } from './mock-doc/parse-html';
+import { parseFragment } from './parse-html';
 import { serialize } from './mock-doc/serialize-node';
 
 
@@ -18,8 +18,8 @@ declare global {
 
 
 export function toEqualHtml(a: string, b: string) {
-  const parseA = parse(a);
-  const parseB = parse(b);
+  const parseA = parseFragment(a);
+  const parseB = parseFragment(b);
 
   const serializeA = serialize(parseA, {
     format: 'html'

@@ -1,5 +1,5 @@
-import { MockElement } from './node';
 import { MockDocument } from './document';
+import { MockElement } from './node';
 
 
 export class MockEvent {
@@ -74,9 +74,7 @@ export function removeEventListener(elm: any, type: string, handler: any) {
     const elmListener = target._listeners.find(e => e.type === type && e.handler === handler);
     if (elmListener) {
       const index = target._listeners.indexOf(elmListener);
-      if (index > -1) {
-        target._listeners.splice(index, 1);
-      }
+      target._listeners.splice(index, 1);
     }
   }
 }

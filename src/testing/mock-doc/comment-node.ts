@@ -1,11 +1,12 @@
 import { MockNode } from './node';
+import { NODE_TYPES } from './constants';
 
 
 export class MockComment extends MockNode {
 
   constructor(ownerDocument: any, data: string) {
     super(ownerDocument);
-    this.nodeType = MockNode.COMMENT_NODE;
+    this.nodeType = NODE_TYPES.COMMENT_NODE;
     this.nodeName = '#comment';
     this.nodeValue = data;
   }

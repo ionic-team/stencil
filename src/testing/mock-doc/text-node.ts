@@ -1,11 +1,12 @@
 import { MockNode } from './node';
+import { NODE_TYPES } from './constants';
 
 
 export class MockTextNode extends MockNode {
 
   constructor(ownerDocument: any, text: string) {
     super(ownerDocument);
-    this.nodeType = MockNode.TEXT_NODE;
+    this.nodeType = NODE_TYPES.TEXT_NODE;
     this.nodeName = '#text';
     this.nodeValue = text;
   }
@@ -36,7 +37,7 @@ export class MockTextNode extends MockNode {
       const text: string[] = [];
       for (let i = 0; i < this.parentNode.childNodes.length; i++) {
         const childNode = this.parentNode.childNodes[i];
-        if (childNode.nodeType === MockNode.TEXT_NODE) {
+        if (childNode.nodeType === NODE_TYPES.TEXT_NODE) {
           text.push(childNode.nodeValue);
         }
       }

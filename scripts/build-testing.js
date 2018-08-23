@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs')
 const transpile = require('./transpile');
 const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
@@ -22,6 +23,8 @@ if (success) {
     return all;
   }, {});
 
+  fixCssWhatImport();
+
   function bundleTestingUtils() {
     rollup.rollup({
       input: ENTRY_FILE,
@@ -39,6 +42,7 @@ if (success) {
         rollupResolve({
           jsnext: true
         }),
+        rollupCommonjs(),
         rollupPluginReplace({
           values: replaceObj
         })
@@ -82,4 +86,19 @@ if (success) {
     console.log(`✅ testing: ${DEST_FILE}`);
   });
 
+}
+
+
+function fixCssWhatImport() {
+  // for unit tests to work, typescript expects the syntax "import * as cssWhat from 'css-what';"
+  // but for bundling, rollup expects "import cssWhat from 'css-what';"
+  // basically this issue: https://github.com/Microsoft/TypeScript/issues/5565
+  // except that doesn't seem to work when transpiling isolated modules, idk
+  // this is an uber hack just to get both scenarios to work
+  const transpiledFile = path.join(TRANSPILED_DIR, 'testing', 'mock-doc', 'selector.js');
+
+  let transpiledContent = fs.readFileSync(transpiledFile, 'utf8');
+  transpiledContent = transpiledContent.replace('import * as cssWhat ', 'import cssWhat ');
+
+  fs.writeFileSync(transpiledFile, transpiledContent);
 }

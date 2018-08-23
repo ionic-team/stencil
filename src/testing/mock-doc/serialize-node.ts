@@ -1,6 +1,7 @@
 import { MockAttributeMap } from './attribute';
 import { MockComment } from './comment-node';
 import { MockElement, MockNode } from './node';
+import { NODE_TYPES } from './constants';
 
 
 export function serialize(elm: MockElement, opts: SerializeElementOptions = {}) {
@@ -46,15 +47,15 @@ export function serialize(elm: MockElement, opts: SerializeElementOptions = {}) 
 
 function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
   switch (node.nodeType) {
-    case MockNode.ELEMENT_NODE:
+    case NODE_TYPES.ELEMENT_NODE:
       serializeElmentToHtml(node as MockElement, opts, output);
       break;
 
-    case MockNode.TEXT_NODE:
+    case NODE_TYPES.TEXT_NODE:
       serializeTextNodeToHtml(node, opts, output);
       break;
 
-    case MockNode.COMMENT_NODE:
+    case NODE_TYPES.COMMENT_NODE:
       serializeCommentNodeToHtml(node as MockComment, opts, output);
       break;
   }
@@ -179,7 +180,7 @@ function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, 
     }
   }
 
-  const parentTagName = (node.parentNode && node.parentNode.nodeType === MockNode.ELEMENT_NODE ? node.parentNode.nodeName : null);
+  const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
 
   if (NON_ESCAPABLE_CONTENT[parentTagName]) {
     output.text.push(node.nodeValue);

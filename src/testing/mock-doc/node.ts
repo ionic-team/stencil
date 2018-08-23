@@ -2,6 +2,7 @@ import { createCSSStyleDeclaration } from './css-style-declaration';
 import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
+import { NODE_TYPES } from './constants';
 import { parseFragment } from './parse-html';
 import { selectAll, selectOne } from './selector';
 import { SerializeElementOptions, serialize } from './serialize-node';
@@ -35,7 +36,7 @@ export class MockNode {
   }
 
   insertBefore(newNode: MockNode, referenceNode: MockNode) {
-    if (newNode.nodeType === MockNode.DOCUMENT_FRAGMENT_NODE) {
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
       for (let i = 0; i < newNode.childNodes.length; i++) {
         insertBefore(this, newNode.childNodes[i], referenceNode);
       }
@@ -121,7 +122,7 @@ export class MockElement extends MockNode {
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument);
-    this.nodeType = MockNode.ELEMENT_NODE;
+    this.nodeType = NODE_TYPES.ELEMENT_NODE;
     if (nodeName) {
       this.nodeName = nodeName.toUpperCase();
     }
@@ -143,7 +144,7 @@ export class MockElement extends MockNode {
   }
 
   get children() {
-    return this.childNodes.filter(n => n.nodeType === MockNode.ELEMENT_NODE) as MockElement[];
+    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
   }
 
   get className() { return this.getAttribute('class') || ''; }
@@ -224,10 +225,12 @@ export class MockElement extends MockNode {
   }
 
   set innerHTML(html: string) {
-    this.childNodes.length = 0;
+    for (let i = this.childNodes.length - 1; i >= 0; i--) {
+      this.removeChild(this.childNodes[i]);
+    }
 
     if (html) {
-      const frag = parseFragment(html);
+      const frag = parseFragment(this.ownerDocument, html);
       for (let i = 0; i < frag.childNodes.length; i++) {
         this.appendChild(frag.childNodes[i]);
       }
@@ -245,12 +248,11 @@ export class MockElement extends MockNode {
   }
 
   hasAttribute(name: string) {
-    return this.hasAttributeNS(null, name);
+    return this.getAttribute(name) !== null;
   }
 
   hasAttributeNS(namespaceURI: string, name: string) {
-    name = name.toLowerCase();
-    return this.attributes.items.some(a => a.name === name && a.namespaceURI === namespaceURI);
+    return this.getAttributeNS(namespaceURI, name) !== null;
   }
 
   get hidden() { return this.hasAttribute('hidden'); }
@@ -276,7 +278,7 @@ export class MockElement extends MockNode {
 
   get nextElementSibling() {
     const parentElement = this.parentElement;
-    if (parentElement && (parentElement.nodeType === MockNode.ELEMENT_NODE || parentElement.nodeType === MockNode.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === MockNode.DOCUMENT_NODE)) {
+    if (parentElement && (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)) {
       const children = parentElement.children;
       const index = children.indexOf(this) + 1;
       return parentElement.children[index] || null;
@@ -294,7 +296,7 @@ export class MockElement extends MockNode {
 
   get previousElementSibling() {
     const parentElement = this.parentElement;
-    if (parentElement && (parentElement.nodeType === MockNode.ELEMENT_NODE || parentElement.nodeType === MockNode.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === MockNode.DOCUMENT_NODE)) {
+    if (parentElement && (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)) {
       const children = parentElement.children;
       const index = children.indexOf(this) - 1;
       return parentElement.children[index] || null;
@@ -493,9 +495,9 @@ const NOT_IMPL = `is not implemented for MockElement. For unit tests, instead tr
 function getTextContent(childNodes: MockNode[], text: string[]) {
   for (let i = 0; i < childNodes.length; i++) {
     const childNode = childNodes[i];
-    if (childNode.nodeType === MockNode.TEXT_NODE) {
+    if (childNode.nodeType === NODE_TYPES.TEXT_NODE) {
       text.push(childNode.nodeValue);
-    } else if (childNode.nodeType === MockNode.ELEMENT_NODE) {
+    } else if (childNode.nodeType === NODE_TYPES.ELEMENT_NODE) {
       getTextContent(childNode.childNodes, text);
     }
   }
@@ -507,7 +509,7 @@ function setTextContent(elm: MockElement, text: string) {
     elm.removeChild(elm.childNodes[i]);
   }
   const textNode = new MockNode(elm.ownerDocument);
-  textNode.nodeType = MockNode.TEXT_NODE;
+  textNode.nodeType = NODE_TYPES.TEXT_NODE;
   textNode.nodeValue = text;
   elm.appendChild(textNode);
 }

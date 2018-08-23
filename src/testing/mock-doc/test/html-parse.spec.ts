@@ -1,12 +1,11 @@
-import { mockDocument } from '../../mocks';
+import { MockDocument } from '../document';
 import { parse, parseFragment } from '../parse-html';
-import '../../expect';
 
 
 describe('parseHtml', () => {
-  let doc: Document;
+  let doc: MockDocument;
   beforeEach(() => {
-    doc = mockDocument();
+    doc = new MockDocument();
   });
 
   it('get text only outerHTML', () => {
@@ -42,7 +41,7 @@ describe('parseHtml', () => {
     const html = `
       a<!--comment-->b
     `;
-    const elm = parseFragment(html);
+    const elm = parseFragment(doc, html);
     expect(elm.childNodes).toHaveLength(3);
     expect(elm.firstChild.nodeValue).toBe('a');
     expect(elm.firstChild.nextSibling.nodeName).toBe('#comment');
@@ -57,7 +56,7 @@ describe('parseHtml', () => {
     const html = `
       <div><span></span></div>
     `;
-    const elm = parseFragment(html);
+    const elm = parseFragment(doc, html);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('DIV');
     expect(elm.firstElementChild.firstElementChild.tagName).toBe('SPAN');
@@ -70,7 +69,7 @@ describe('parseHtml', () => {
       <div></div>
       <span></span>
     `;
-    const elm = parseFragment(html);
+    const elm = parseFragment(doc, html);
     expect(elm.children).toHaveLength(2);
     expect(elm.children[0].tagName).toBe('DIV');
     expect(elm.children[0].nextElementSibling.tagName).toBe('SPAN');
@@ -82,7 +81,7 @@ describe('parseHtml', () => {
     const html = `
       <article>text</article>
     `;
-    const elm = parseFragment(html);
+    const elm = parseFragment(doc, html);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('ARTICLE');
     expect(elm.firstElementChild.firstChild.nodeName).toBe('#text');
@@ -93,7 +92,7 @@ describe('parseHtml', () => {
     const html = `
       <article>a < b</article>
     `;
-    const elm = parseFragment(html);
+    const elm = parseFragment(doc, html);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('ARTICLE');
     expect(elm.firstElementChild.firstChild.nodeName).toBe('#text');
@@ -104,7 +103,7 @@ describe('parseHtml', () => {
     const html = `
       <div class="doc">hello</div>
     `;
-    const elm = parse(html);
+    const elm = parse(doc, html);
     expect(elm.children).toHaveLength(1);
     expect(elm.children[0].tagName).toBe('HTML');
     expect(elm.children[0].firstChild.nodeName).toBe('HEAD');

@@ -1,8 +1,10 @@
 import { createElement } from './element';
 import { MockComment } from './comment-node';
 import { MockDocumentFragment } from './document-fragment';
-import { MockElement, MockNode } from './node';
+import { MockDocumentTypeNode } from './document-type-node';
+import { MockElement } from './node';
 import { MockTextNode } from './text-node';
+import { NODE_TYPES } from './constants';
 import { parse } from './parse-html';
 
 
@@ -11,16 +13,17 @@ export class MockDocument extends MockElement {
   defaultView: any;
   documentElement: MockElement;
   head: MockElement;
+  _parser: any;
 
   constructor(html?: string) {
     super(null, null);
     this.nodeName = '#document';
 
-    const docTypeNode = new MockDocumentTypeNode(this);
+    const docTypeNode = this.createDocumentTypeNode();
     this.appendChild(docTypeNode);
 
     if (typeof html === 'string') {
-      const parsedDoc = parse(html);
+      const parsedDoc = parse(this, html);
 
       this.documentElement = parsedDoc.children.find(elm => elm.nodeName === 'HTML');
       this.appendChild(this.documentElement);
@@ -41,8 +44,8 @@ export class MockDocument extends MockElement {
     }
   }
 
-  createComment(text: string) {
-    return new MockComment(this, text);
+  createComment(data: string) {
+    return new MockComment(this, data);
   }
 
   createElement(tagName: string) {
@@ -59,12 +62,12 @@ export class MockDocument extends MockElement {
     return new MockTextNode(this, text);
   }
 
-  createDocument() {
-    return new MockDocument();
-  }
-
   createDocumentFragment() {
     return new MockDocumentFragment(this);
+  }
+
+  createDocumentTypeNode() {
+    return new MockDocumentTypeNode(this);
   }
 
   getElementById(id: string) {
@@ -145,22 +148,11 @@ function getElementsByTagName(elm: MockElement, tagName: string, foundElms: Mock
 }
 
 
-export class MockDocumentTypeNode extends MockElement {
-
-  constructor(ownerDocument: any) {
-    super(ownerDocument, '!DOCTYPE');
-    this.nodeType = MockNode.DOCUMENT_TYPE_NODE;
-    this.setAttribute('html', '');
-  }
-
-}
-
-
 function setOwnerDocument(elm: MockElement, ownerDocument: any) {
   for (let i = 0; i < elm.childNodes.length; i++) {
     elm.childNodes[i].ownerDocument = ownerDocument;
 
-    if (elm.childNodes[i].nodeType === MockNode.ELEMENT_NODE) {
+    if (elm.childNodes[i].nodeType === NODE_TYPES.ELEMENT_NODE) {
       setOwnerDocument(elm.childNodes[i] as any, ownerDocument);
     }
   }

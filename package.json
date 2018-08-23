@@ -38,11 +38,12 @@
     "start": "npm install && npm run build",
     "test": "npm run test.jest",
     "test.dist": "node scripts/test-dist.js",
-    "test.testing": "node scripts/test-testing.js",
     "test.jest": "jest",
     "test.karma": "cd test/karma && npm run karma.prod",
+    "test.prod": "npm run test.dist && npm run test.jest && npm run test.karma && npm run test.server && npm run test.sys.node && npm run test.testing",
     "test.server": "cd test/server && npm run test.prod",
     "test.sys.node": "cd test/sys/node && npm run test.prod",
+    "test.testing": "node scripts/test-testing.js",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },
