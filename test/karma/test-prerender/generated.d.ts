@@ -9,83 +9,91 @@ import { JSXElements } from '@stencil/core';
 
 
 
-declare namespace StencilComponents {
 
-  interface AppRoot {}
-  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
+interface AppRoot {}
+interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpA {}
-  interface CmpAAttributes extends JSXElements.HTMLAttributes {}
+interface CmpA {}
+interface CmpAAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpB {}
-  interface CmpBAttributes extends JSXElements.HTMLAttributes {}
+interface CmpB {}
+interface CmpBAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpC {}
-  interface CmpCAttributes extends JSXElements.HTMLAttributes {}
+interface CmpC {}
+interface CmpCAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpD {
-    'uniqueId': string;
-  }
-  interface CmpDAttributes extends JSXElements.HTMLAttributes {
-    'uniqueId'?: string;
-  }
+interface CmpD {
+  'uniqueId': string;
+}
+interface CmpDAttributes extends JSXElements.HTMLAttributes {
+  'uniqueId'?: string;
+}
 
-  interface CmpScopedA {}
-  interface CmpScopedAAttributes extends JSXElements.HTMLAttributes {}
+interface CmpScopedA {}
+interface CmpScopedAAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpScopedB {}
-  interface CmpScopedBAttributes extends JSXElements.HTMLAttributes {}
+interface CmpScopedB {}
+interface CmpScopedBAttributes extends JSXElements.HTMLAttributes {}
+
+export interface LocalElementInterfaces  {
+  'AppRoot': AppRoot;
+  'CmpA': CmpA;
+  'CmpB': CmpB;
+  'CmpC': CmpC;
+  'CmpD': CmpD;
+  'CmpScopedA': CmpScopedA;
+  'CmpScopedB': CmpScopedB;
 }
 
 export interface LocalIntrinsicElements {
-  'app-root': StencilComponents.AppRootAttributes;
-  'cmp-a': StencilComponents.CmpAAttributes;
-  'cmp-b': StencilComponents.CmpBAttributes;
-  'cmp-c': StencilComponents.CmpCAttributes;
-  'cmp-d': StencilComponents.CmpDAttributes;
-  'cmp-scoped-a': StencilComponents.CmpScopedAAttributes;
-  'cmp-scoped-b': StencilComponents.CmpScopedBAttributes;
+  'app-root': AppRootAttributes;
+  'cmp-a': CmpAAttributes;
+  'cmp-b': CmpBAttributes;
+  'cmp-c': CmpCAttributes;
+  'cmp-d': CmpDAttributes;
+  'cmp-scoped-a': CmpScopedAAttributes;
+  'cmp-scoped-b': CmpScopedBAttributes;
 }
 
 declare global {
 
-  interface HTMLAppRootElement extends StencilComponents.AppRoot, HTMLStencilElement {}
+  interface HTMLAppRootElement extends AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLCmpAElement extends StencilComponents.CmpA, HTMLStencilElement {}
+  interface HTMLCmpAElement extends CmpA, HTMLStencilElement {}
   var HTMLCmpAElement: {
     prototype: HTMLCmpAElement;
     new (): HTMLCmpAElement;
   };
 
-  interface HTMLCmpBElement extends StencilComponents.CmpB, HTMLStencilElement {}
+  interface HTMLCmpBElement extends CmpB, HTMLStencilElement {}
   var HTMLCmpBElement: {
     prototype: HTMLCmpBElement;
     new (): HTMLCmpBElement;
   };
 
-  interface HTMLCmpCElement extends StencilComponents.CmpC, HTMLStencilElement {}
+  interface HTMLCmpCElement extends CmpC, HTMLStencilElement {}
   var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;
     new (): HTMLCmpCElement;
   };
 
-  interface HTMLCmpDElement extends StencilComponents.CmpD, HTMLStencilElement {}
+  interface HTMLCmpDElement extends CmpD, HTMLStencilElement {}
   var HTMLCmpDElement: {
     prototype: HTMLCmpDElement;
     new (): HTMLCmpDElement;
   };
 
-  interface HTMLCmpScopedAElement extends StencilComponents.CmpScopedA, HTMLStencilElement {}
+  interface HTMLCmpScopedAElement extends CmpScopedA, HTMLStencilElement {}
   var HTMLCmpScopedAElement: {
     prototype: HTMLCmpScopedAElement;
     new (): HTMLCmpScopedAElement;
   };
 
-  interface HTMLCmpScopedBElement extends StencilComponents.CmpScopedB, HTMLStencilElement {}
+  interface HTMLCmpScopedBElement extends CmpScopedB, HTMLStencilElement {}
   var HTMLCmpScopedBElement: {
     prototype: HTMLCmpScopedBElement;
     new (): HTMLCmpScopedBElement;

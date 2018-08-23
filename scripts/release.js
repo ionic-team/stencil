@@ -93,7 +93,7 @@ function runTasks(opts) {
     {
       title: 'Check current branch',
       task: () => execa.stdout('git', ['symbolic-ref', '--short', 'HEAD']).then(branch => {
-        if (branch !== 'master') {
+        if (branch !== 'master' && process.argv.slice(2).indexOf('--any-branch') === -1) {
           throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
         }
       })
@@ -109,7 +109,7 @@ function runTasks(opts) {
     {
       title: 'Check remote history',
       task: () => execa.stdout('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(result => {
-        if (result !== '0') {
+        if (result !== '0' && process.argv.slice(2).indexOf('--any-branch') === -1) {
           throw new Error('Remote history differs. Please pull changes.');
         }
       })
@@ -195,7 +195,7 @@ function runTasks(opts) {
         {
           title: 'Also set "next" tag on @stencil/core',
           task: () => execa(
-            'npm', 
+            'npm',
             ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next']
             .concat(opts.otp ? ['--otp', opts.otp] : []),
             { cwd: rootDir })

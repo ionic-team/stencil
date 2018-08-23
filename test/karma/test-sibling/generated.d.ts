@@ -9,19 +9,21 @@ import { JSXElements } from '@stencil/core';
 
 
 
-declare namespace StencilComponents {
 
-  interface SiblingRoot {}
-  interface SiblingRootAttributes extends JSXElements.HTMLAttributes {}
+interface SiblingRoot {}
+interface SiblingRootAttributes extends JSXElements.HTMLAttributes {}
+
+export interface LocalElementInterfaces  {
+  'SiblingRoot': SiblingRoot;
 }
 
 export interface LocalIntrinsicElements {
-  'sibling-root': StencilComponents.SiblingRootAttributes;
+  'sibling-root': SiblingRootAttributes;
 }
 
 declare global {
 
-  interface HTMLSiblingRootElement extends StencilComponents.SiblingRoot, HTMLStencilElement {}
+  interface HTMLSiblingRootElement extends SiblingRoot, HTMLStencilElement {}
   var HTMLSiblingRootElement: {
     prototype: HTMLSiblingRootElement;
     new (): HTMLSiblingRootElement;
