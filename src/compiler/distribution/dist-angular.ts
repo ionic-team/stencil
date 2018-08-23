@@ -39,7 +39,9 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   ];
 
   if (hasDirectives) {
-    angularImports.push('Directive');
+    angularImports.push('Component');
+    angularImports.push('ViewEncapsulation');
+    angularImports.push('ChangeDetectionStrategy');
   }
 
   if (hasOutputs) {
@@ -154,7 +156,10 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
 
   // Generate Angular @Directive
   const directiveOpts = [
-    `selector: \'${cmpMeta.tagNameMeta}\'`
+    `selector: \'${cmpMeta.tagNameMeta}\'`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
+    `encapsulation: ViewEncapsulation.None`,
+    `template: '<ng-content></ng-content>'`
   ];
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
@@ -166,7 +171,7 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
 export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
-@Directive({ ${directiveOpts.join(', ')} })
+@Component({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
