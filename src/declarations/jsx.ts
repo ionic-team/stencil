@@ -8,6 +8,7 @@ declare global {
     componentOnReady(): Promise<this>;
     forceUpdate(): void;
   }
+  interface StencilAttributeEscapeHatch {}
 }
 
 export interface DefaultIntrinsicElements {
@@ -566,7 +567,7 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends StencilAttributeEscapeHatch, DOMAttributes {
     // vdom specific
     innerHTML?: string;
     ref?: (elm?: T) => void;
@@ -635,7 +636,7 @@ export namespace JSXElements {
     unselectable?: boolean;
   }
 
-  export interface SVGAttributes extends DOMAttributes {
+  export interface SVGAttributes extends StencilAttributeEscapeHatch, DOMAttributes {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
