@@ -29,7 +29,7 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
     }
 
     config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
-      const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget as any, 'es5');
+      const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget as any, sourceTarget);
       promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
     });
 
