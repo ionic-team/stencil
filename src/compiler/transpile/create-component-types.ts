@@ -3,7 +3,7 @@ import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath } from '../util';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination = 'src') {
@@ -21,7 +21,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   // get all the output targets that require types
   const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
 
-  if (typesOutputTargets.length > 0) {
+  if (typesOutputTargets.length > 0 && destination !== 'src') {
     // we're building a dist output target(s)
     // so let's also add the types for the defineCustomElements
     componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
@@ -32,12 +32,6 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
 
   if (destination !== 'src') {
     componentsDtsFilePath = config.sys.path.resolve(destination, GENERATED_DTS);
-  }
-
-  // DEPRECATED: 2018/08/16
-  const fileExists = await compilerCtx.fs.access(pathJoin(config, config.srcDir, 'components.d.ts'));
-  if (fileExists) {
-    config.logger.warn('As of Stencil 0.12.0 components.d.ts was renamed to generated.d.ts. Please delete the components.d.ts and update any references to it.');
   }
 
   await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
@@ -56,16 +50,7 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   const defineGlobalIntrinsicElements = destination === 'src';
 
   const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
-  const intrinsicImports: string[] = [];
-  const localElementInterfaces: string[] = [];
   const collectionTypesImportsString = collectionTypesImports.map((cti) => {
-    if (cti.includeIntrinsicElements) {
-      const intrinsicImportAlias = 'DependentIntrinsicElements' + (intrinsicImports.length + 1);
-      const localElementInterfaceAlias = 'LocalElementInterfaces' + (intrinsicImports.length + 1);
-      intrinsicImports.push(intrinsicImportAlias);
-      localElementInterfaces.push(localElementInterfaceAlias);
-      return `import { LocalIntrinsicElements as ${intrinsicImportAlias}, LocalElementInterfaces as ${localElementInterfaceAlias} } from '${cti.pkgName}';\n`;
-    }
     return `import '${cti.pkgName}'`;
   })
   .join('\n');
@@ -80,20 +65,22 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   });
 
   const componentsFileString = `
+export namespace Components {
 ${modules.map(m => {
   return `${m.StencilComponents}${m.JSXElements}`;
 })
 .join('\n')}
-
-export interface LocalElementInterfaces ${localElementInterfaces.length === 0 ? ' ' : `extends ${localElementInterfaces.join(', ')} `}{
-${modules.map(m => `'${m.tagNameAsPascal}': ${m.tagNameAsPascal};`).join('\n')}
-}
-
-export interface LocalIntrinsicElements {
-${modules.map(m => m.IntrinsicElements).join('\n')}
 }
 
 declare global {
+interface StencilElementInterfaces {
+${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
+}
+
+interface StencilIntrinsicElements {
+${modules.map(m => m.IntrinsicElements).join('\n')}
+}
+
 ${modules.map(m => m.global).join('\n')}
 
 interface HTMLElementTagNameMap {
@@ -102,7 +89,6 @@ ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
 
 interface ElementTagNameMap {
 ${modules.map(m => m.ElementTagNameMap).join('\n')}
-}
 }
 `;
 
@@ -136,35 +122,27 @@ ${typeData.sort(sortImportNames).map(td => {
  */
 /* tslint:disable */
 
-import { JSXElements } from '@stencil/core';
+import '@stencil/core';
 
 ${collectionTypesImportsString}
 ${typeImportString}
 ${componentsFileString}
-${defineGlobalIntrinsicElements ? generateLocalTypesFile(intrinsicImports) : ''}
+${defineGlobalIntrinsicElements ? generateLocalTypesFile() : ''}
+}
 `;
   return indentTypes(code);
 }
 
-function generateLocalTypesFile(intrinsicImports: string[]) {
-  const intrinsicElementInterfaces = [
-    'LocalIntrinsicElements',
-    'DefaultIntrinsicElements',
-    ...intrinsicImports
-  ];
+function generateLocalTypesFile() {
 
   return `
-import { DefaultIntrinsicElements } from '@stencil/core';
-
-declare global {
   export namespace JSX {
     export interface Element {}
-    export interface IntrinsicElements extends ${intrinsicElementInterfaces.join(', ')} {
+    export interface IntrinsicElements extends StencilIntrinsicElements {
       [tagName: string]: any;
     }
   }
-  export interface HTMLAttributes extends JSXElements.HTMLAttributes {}
-}
+  export interface HTMLAttributes extends StencilHTMLAttributes {}
 `;
 }
 
@@ -329,18 +307,18 @@ interface ${tagNameAsPascal} {${
   stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
 }}`,
     JSXElements: `
-interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
+interface ${jsxInterfaceName} extends StencilHTMLAttributes {${
   stencilComponentAttributesOptional !== '' ? `\n${stencilComponentAttributesOptional}\n` : ''
 }}`,
     global: `
-interface ${interfaceName} extends ${tagNameAsPascal}, HTMLStencilElement {}
+interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${interfaceName}: {
   prototype: ${interfaceName};
   new (): ${interfaceName};
 };`,
     HTMLElementTagNameMap: `'${tagName}': ${interfaceName}`,
     ElementTagNameMap: `'${tagName}': ${interfaceName};`,
-    IntrinsicElements: `'${tagName}': ${jsxInterfaceName};`
+    IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
   };
 }
 

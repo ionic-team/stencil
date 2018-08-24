@@ -8,131 +8,132 @@ declare global {
     componentOnReady(): Promise<this>;
     forceUpdate(): void;
   }
-  interface StencilAttributeEscapeHatch {}
+  interface StencilHTMLAttributes extends JSXElements.HTMLAttributes {}
+  interface StencilIntrinsicElements extends JSXElements.DefaultIntrinsicElements {}
+  interface StencilElementInterfaces {}
+  interface StencilGlobalHTMLAttributes {}
 }
-
-export interface DefaultIntrinsicElements {
-  // Stencil elements
-  slot: JSXElements.SlotAttributes;
-
-  // HTML
-  a: JSXElements.AnchorHTMLAttributes<HTMLAnchorElement>;
-  abbr: JSXElements.HTMLAttributes;
-  address: JSXElements.HTMLAttributes;
-  area: JSXElements.AreaHTMLAttributes<HTMLAreaElement>;
-  article: JSXElements.HTMLAttributes;
-  aside: JSXElements.HTMLAttributes;
-  audio: JSXElements.AudioHTMLAttributes<HTMLAudioElement>;
-  b: JSXElements.HTMLAttributes;
-  base: JSXElements.BaseHTMLAttributes<HTMLBaseElement>;
-  bdi: JSXElements.HTMLAttributes;
-  bdo: JSXElements.HTMLAttributes;
-  big: JSXElements.HTMLAttributes;
-  blockquote: JSXElements.BlockquoteHTMLAttributes<HTMLQuoteElement>;
-  body: JSXElements.HTMLAttributes<HTMLBodyElement>;
-  br: JSXElements.HTMLAttributes<HTMLBRElement>;
-  button: JSXElements.ButtonHTMLAttributes<HTMLButtonElement>;
-  canvas: JSXElements.CanvasHTMLAttributes<HTMLCanvasElement>;
-  caption: JSXElements.HTMLAttributes<HTMLTableCaptionElement>;
-  cite: JSXElements.HTMLAttributes;
-  code: JSXElements.HTMLAttributes;
-  col: JSXElements.ColHTMLAttributes<HTMLTableColElement>;
-  colgroup: JSXElements.ColgroupHTMLAttributes<HTMLTableColElement>;
-  data: JSXElements.HTMLAttributes<HTMLDataElement>;
-  datalist: JSXElements.HTMLAttributes<HTMLDataListElement>;
-  dd: JSXElements.HTMLAttributes;
-  del: JSXElements.DelHTMLAttributes<HTMLModElement>;
-  details: JSXElements.DetailsHTMLAttributes<HTMLElement>;
-  dfn: JSXElements.HTMLAttributes;
-  dialog: JSXElements.DialogHTMLAttributes<HTMLDialogElement>;
-  div: JSXElements.HTMLAttributes<HTMLDivElement>;
-  dl: JSXElements.HTMLAttributes<HTMLDListElement>;
-  dt: JSXElements.HTMLAttributes;
-  em: JSXElements.HTMLAttributes;
-  embed: JSXElements.EmbedHTMLAttributes<HTMLEmbedElement>;
-  fieldset: JSXElements.FieldsetHTMLAttributes<HTMLFieldSetElement>;
-  figcaption: JSXElements.HTMLAttributes;
-  figure: JSXElements.HTMLAttributes;
-  footer: JSXElements.HTMLAttributes;
-  form: JSXElements.FormHTMLAttributes<HTMLFormElement>;
-  h1: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  h2: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  h3: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  h4: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  h5: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  h6: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-  head: JSXElements.HTMLAttributes<HTMLHeadElement>;
-  header: JSXElements.HTMLAttributes;
-  hgroup: JSXElements.HTMLAttributes;
-  hr: JSXElements.HTMLAttributes<HTMLHRElement>;
-  html: JSXElements.HTMLAttributes<HTMLHtmlElement>;
-  i: JSXElements.HTMLAttributes;
-  iframe: JSXElements.IframeHTMLAttributes<HTMLIFrameElement>;
-  img: JSXElements.ImgHTMLAttributes<HTMLImageElement>;
-  input: JSXElements.InputHTMLAttributes<HTMLInputElement>;
-  ins: JSXElements.InsHTMLAttributes<HTMLModElement>;
-  kbd: JSXElements.HTMLAttributes;
-  keygen: JSXElements.KeygenHTMLAttributes<HTMLElement>;
-  label: JSXElements.LabelHTMLAttributes<HTMLLabelElement>;
-  legend: JSXElements.HTMLAttributes<HTMLLegendElement>;
-  li: JSXElements.LiHTMLAttributes<HTMLLIElement>;
-  link: JSXElements.LinkHTMLAttributes<HTMLLinkElement>;
-  main: JSXElements.HTMLAttributes;
-  map: JSXElements.MapHTMLAttributes<HTMLMapElement>;
-  mark: JSXElements.HTMLAttributes;
-  menu: JSXElements.MenuHTMLAttributes<HTMLMenuElement>;
-  menuitem: JSXElements.HTMLAttributes;
-  meta: JSXElements.MetaHTMLAttributes<HTMLMetaElement>;
-  meter: JSXElements.MeterHTMLAttributes<HTMLMeterElement>;
-  nav: JSXElements.HTMLAttributes;
-  noscript: JSXElements.HTMLAttributes;
-  object: JSXElements.ObjectHTMLAttributes<HTMLObjectElement>;
-  ol: JSXElements.OlHTMLAttributes<HTMLOListElement>;
-  optgroup: JSXElements.OptgroupHTMLAttributes<HTMLOptGroupElement>;
-  option: JSXElements.OptionHTMLAttributes<HTMLOptionElement>;
-  output: JSXElements.OutputHTMLAttributes<HTMLOutputElement>;
-  p: JSXElements.HTMLAttributes<HTMLParagraphElement>;
-  param: JSXElements.ParamHTMLAttributes<HTMLParamElement>;
-  picture: JSXElements.HTMLAttributes<HTMLPictureElement>;
-  pre: JSXElements.HTMLAttributes<HTMLPreElement>;
-  progress: JSXElements.ProgressHTMLAttributes<HTMLProgressElement>;
-  q: JSXElements.QuoteHTMLAttributes<HTMLQuoteElement>;
-  rp: JSXElements.HTMLAttributes;
-  rt: JSXElements.HTMLAttributes;
-  ruby: JSXElements.HTMLAttributes;
-  s: JSXElements.HTMLAttributes;
-  samp: JSXElements.HTMLAttributes;
-  script: JSXElements.ScriptHTMLAttributes<HTMLScriptElement>;
-  section: JSXElements.HTMLAttributes;
-  select: JSXElements.SelectHTMLAttributes<HTMLSelectElement>;
-  small: JSXElements.HTMLAttributes;
-  source: JSXElements.SourceHTMLAttributes<HTMLSourceElement>;
-  span: JSXElements.HTMLAttributes<HTMLSpanElement>;
-  strong: JSXElements.HTMLAttributes;
-  style: JSXElements.StyleHTMLAttributes<HTMLStyleElement>;
-  sub: JSXElements.HTMLAttributes;
-  summary: JSXElements.HTMLAttributes;
-  sup: JSXElements.HTMLAttributes;
-  table: JSXElements.TableHTMLAttributes<HTMLTableElement>;
-  tbody: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-  td: JSXElements.TdHTMLAttributes<HTMLTableDataCellElement>;
-  textarea: JSXElements.TextareaHTMLAttributes<HTMLTextAreaElement>;
-  tfoot: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-  th: JSXElements.ThHTMLAttributes<HTMLTableHeaderCellElement>;
-  thead: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-  time: JSXElements.TimeHTMLAttributes<HTMLTimeElement>;
-  title: JSXElements.HTMLAttributes<HTMLTitleElement>;
-  tr: JSXElements.HTMLAttributes<HTMLTableRowElement>;
-  track: JSXElements.TrackHTMLAttributes<HTMLTrackElement>;
-  u: JSXElements.HTMLAttributes;
-  ul: JSXElements.HTMLAttributes<HTMLUListElement>;
-  'var': JSXElements.HTMLAttributes;
-  video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
-  wbr: JSXElements.HTMLAttributes;
-}
-
 
 export namespace JSXElements {
+  export interface DefaultIntrinsicElements {
+    // Stencil elements
+    slot: JSXElements.SlotAttributes;
+
+    // HTML
+    a: JSXElements.AnchorHTMLAttributes<HTMLAnchorElement>;
+    abbr: JSXElements.HTMLAttributes;
+    address: JSXElements.HTMLAttributes;
+    area: JSXElements.AreaHTMLAttributes<HTMLAreaElement>;
+    article: JSXElements.HTMLAttributes;
+    aside: JSXElements.HTMLAttributes;
+    audio: JSXElements.AudioHTMLAttributes<HTMLAudioElement>;
+    b: JSXElements.HTMLAttributes;
+    base: JSXElements.BaseHTMLAttributes<HTMLBaseElement>;
+    bdi: JSXElements.HTMLAttributes;
+    bdo: JSXElements.HTMLAttributes;
+    big: JSXElements.HTMLAttributes;
+    blockquote: JSXElements.BlockquoteHTMLAttributes<HTMLQuoteElement>;
+    body: JSXElements.HTMLAttributes<HTMLBodyElement>;
+    br: JSXElements.HTMLAttributes<HTMLBRElement>;
+    button: JSXElements.ButtonHTMLAttributes<HTMLButtonElement>;
+    canvas: JSXElements.CanvasHTMLAttributes<HTMLCanvasElement>;
+    caption: JSXElements.HTMLAttributes<HTMLTableCaptionElement>;
+    cite: JSXElements.HTMLAttributes;
+    code: JSXElements.HTMLAttributes;
+    col: JSXElements.ColHTMLAttributes<HTMLTableColElement>;
+    colgroup: JSXElements.ColgroupHTMLAttributes<HTMLTableColElement>;
+    data: JSXElements.HTMLAttributes<HTMLDataElement>;
+    datalist: JSXElements.HTMLAttributes<HTMLDataListElement>;
+    dd: JSXElements.HTMLAttributes;
+    del: JSXElements.DelHTMLAttributes<HTMLModElement>;
+    details: JSXElements.DetailsHTMLAttributes<HTMLElement>;
+    dfn: JSXElements.HTMLAttributes;
+    dialog: JSXElements.DialogHTMLAttributes<HTMLDialogElement>;
+    div: JSXElements.HTMLAttributes<HTMLDivElement>;
+    dl: JSXElements.HTMLAttributes<HTMLDListElement>;
+    dt: JSXElements.HTMLAttributes;
+    em: JSXElements.HTMLAttributes;
+    embed: JSXElements.EmbedHTMLAttributes<HTMLEmbedElement>;
+    fieldset: JSXElements.FieldsetHTMLAttributes<HTMLFieldSetElement>;
+    figcaption: JSXElements.HTMLAttributes;
+    figure: JSXElements.HTMLAttributes;
+    footer: JSXElements.HTMLAttributes;
+    form: JSXElements.FormHTMLAttributes<HTMLFormElement>;
+    h1: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h2: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h3: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h4: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h5: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    h6: JSXElements.HTMLAttributes<HTMLHeadingElement>;
+    head: JSXElements.HTMLAttributes<HTMLHeadElement>;
+    header: JSXElements.HTMLAttributes;
+    hgroup: JSXElements.HTMLAttributes;
+    hr: JSXElements.HTMLAttributes<HTMLHRElement>;
+    html: JSXElements.HTMLAttributes<HTMLHtmlElement>;
+    i: JSXElements.HTMLAttributes;
+    iframe: JSXElements.IframeHTMLAttributes<HTMLIFrameElement>;
+    img: JSXElements.ImgHTMLAttributes<HTMLImageElement>;
+    input: JSXElements.InputHTMLAttributes<HTMLInputElement>;
+    ins: JSXElements.InsHTMLAttributes<HTMLModElement>;
+    kbd: JSXElements.HTMLAttributes;
+    keygen: JSXElements.KeygenHTMLAttributes<HTMLElement>;
+    label: JSXElements.LabelHTMLAttributes<HTMLLabelElement>;
+    legend: JSXElements.HTMLAttributes<HTMLLegendElement>;
+    li: JSXElements.LiHTMLAttributes<HTMLLIElement>;
+    link: JSXElements.LinkHTMLAttributes<HTMLLinkElement>;
+    main: JSXElements.HTMLAttributes;
+    map: JSXElements.MapHTMLAttributes<HTMLMapElement>;
+    mark: JSXElements.HTMLAttributes;
+    menu: JSXElements.MenuHTMLAttributes<HTMLMenuElement>;
+    menuitem: JSXElements.HTMLAttributes;
+    meta: JSXElements.MetaHTMLAttributes<HTMLMetaElement>;
+    meter: JSXElements.MeterHTMLAttributes<HTMLMeterElement>;
+    nav: JSXElements.HTMLAttributes;
+    noscript: JSXElements.HTMLAttributes;
+    object: JSXElements.ObjectHTMLAttributes<HTMLObjectElement>;
+    ol: JSXElements.OlHTMLAttributes<HTMLOListElement>;
+    optgroup: JSXElements.OptgroupHTMLAttributes<HTMLOptGroupElement>;
+    option: JSXElements.OptionHTMLAttributes<HTMLOptionElement>;
+    output: JSXElements.OutputHTMLAttributes<HTMLOutputElement>;
+    p: JSXElements.HTMLAttributes<HTMLParagraphElement>;
+    param: JSXElements.ParamHTMLAttributes<HTMLParamElement>;
+    picture: JSXElements.HTMLAttributes<HTMLPictureElement>;
+    pre: JSXElements.HTMLAttributes<HTMLPreElement>;
+    progress: JSXElements.ProgressHTMLAttributes<HTMLProgressElement>;
+    q: JSXElements.QuoteHTMLAttributes<HTMLQuoteElement>;
+    rp: JSXElements.HTMLAttributes;
+    rt: JSXElements.HTMLAttributes;
+    ruby: JSXElements.HTMLAttributes;
+    s: JSXElements.HTMLAttributes;
+    samp: JSXElements.HTMLAttributes;
+    script: JSXElements.ScriptHTMLAttributes<HTMLScriptElement>;
+    section: JSXElements.HTMLAttributes;
+    select: JSXElements.SelectHTMLAttributes<HTMLSelectElement>;
+    small: JSXElements.HTMLAttributes;
+    source: JSXElements.SourceHTMLAttributes<HTMLSourceElement>;
+    span: JSXElements.HTMLAttributes<HTMLSpanElement>;
+    strong: JSXElements.HTMLAttributes;
+    style: JSXElements.StyleHTMLAttributes<HTMLStyleElement>;
+    sub: JSXElements.HTMLAttributes;
+    summary: JSXElements.HTMLAttributes;
+    sup: JSXElements.HTMLAttributes;
+    table: JSXElements.TableHTMLAttributes<HTMLTableElement>;
+    tbody: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    td: JSXElements.TdHTMLAttributes<HTMLTableDataCellElement>;
+    textarea: JSXElements.TextareaHTMLAttributes<HTMLTextAreaElement>;
+    tfoot: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    th: JSXElements.ThHTMLAttributes<HTMLTableHeaderCellElement>;
+    thead: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
+    time: JSXElements.TimeHTMLAttributes<HTMLTimeElement>;
+    title: JSXElements.HTMLAttributes<HTMLTitleElement>;
+    tr: JSXElements.HTMLAttributes<HTMLTableRowElement>;
+    track: JSXElements.TrackHTMLAttributes<HTMLTrackElement>;
+    u: JSXElements.HTMLAttributes;
+    ul: JSXElements.HTMLAttributes<HTMLUListElement>;
+    'var': JSXElements.HTMLAttributes;
+    video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
+    wbr: JSXElements.HTMLAttributes;
+  }
 
   export interface SlotAttributes {
     name?: string;
@@ -567,7 +568,7 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface HTMLAttributes<T = HTMLElement> extends StencilAttributeEscapeHatch, DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends StencilGlobalHTMLAttributes, DOMAttributes {
     // vdom specific
     innerHTML?: string;
     ref?: (elm?: T) => void;
@@ -636,7 +637,7 @@ export namespace JSXElements {
     unselectable?: boolean;
   }
 
-  export interface SVGAttributes extends StencilAttributeEscapeHatch, DOMAttributes {
+  export interface SVGAttributes extends StencilGlobalHTMLAttributes, DOMAttributes {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };

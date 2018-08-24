@@ -43,11 +43,11 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!
-    // create the generated.d.ts file and write to disk
+    // create the components.d.ts file and write to disk
     await generateComponentTypes(config, compilerCtx, buildCtx);
 
     if (!config._isTesting) {
-      // now that we've updated teh generated.d.ts file
+      // now that we've updated teh components.d.ts file
       // lets do a full typescript build (but in another thread)
       validateTypesMain(config, compilerCtx, buildCtx);
     }

@@ -27,7 +27,7 @@ describe('outputTargets', () => {
         "module": "dist/esm/index.js",
         "main": "dist/index.js",
         "collection": "dist/collection/collection-manifest.json",
-        "types": "dist/types/generated.d.ts"
+        "types": "dist/types/components.d.ts"
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `
@@ -79,12 +79,12 @@ describe('outputTargets', () => {
 
       // these are written by the worker thread now which is hard to test
       // path.join(root, 'User', 'testing', 'dist', 'types', 'components'),
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'generated.d.ts'),
+      // path.join(root, 'User', 'testing', 'dist', 'types', 'components.d.ts'),
       // path.join(root, 'User', 'testing', 'dist', 'types', 'components', 'cmp-a.d.ts'),
       // path.join(root, 'User', 'testing', 'dist', 'types', 'global.d.ts'),
       // path.join(root, 'User', 'testing', 'dist', 'types', 'stencil.core.d.ts'),
 
-      path.join(root, 'User', 'testing', 'src', 'generated.d.ts'),
+      path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
 
     doNotExpectFiles(c.fs, [

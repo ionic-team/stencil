@@ -224,7 +224,7 @@ describe('util', () => {
     });
 
     it('should return false for d.ts file', () => {
-      expect(util.isWebDevFile('generated.d.ts')).toEqual(false);
+      expect(util.isWebDevFile('components.d.ts')).toEqual(false);
     });
 
     it('should return false for other types of files', () => {

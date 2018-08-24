@@ -45,7 +45,7 @@ describe('outputTargets', () => {
         "module": "custom-dist/dist-build/esm/index.js",
         "main": "custom-dist/dist-build/index.js",
         "collection": "custom-dist/dist-collection/collection-manifest.json",
-        "types": "custom-dist/custom-types/generated.d.ts"
+        "types": "custom-dist/custom-types/components.d.ts"
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
@@ -74,7 +74,7 @@ describe('outputTargets', () => {
       // these are written by the worker thread now which is hard to test
       // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types'),
       // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types', 'components'),
-      // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types', 'generated.d.ts'),
+      // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types', 'components.d.ts'),
       // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types', 'components', 'cmp-a.d.ts'),
       // path.join(root, 'User', 'testing', 'custom-dist', 'custom-types', 'stencil.core.d.ts'),
 

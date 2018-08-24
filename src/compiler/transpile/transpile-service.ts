@@ -31,8 +31,8 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
   } else {
     changedTsFiles = buildCtx.filesChanged.filter(filePath => {
       // do transpiling if one of the changed files is a ts file
-      // and the changed file is not the generated.d.ts file
-      // when the generated.d.ts file is written to disk it shouldn't cause a new build
+      // and the changed file is not the components.d.ts file
+      // when the components.d.ts file is written to disk it shouldn't cause a new build
       return isFileIncludePath(config, filePath);
     });
   }
@@ -142,7 +142,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     transpileCtx.compilerCtx = compilerCtx;
     transpileCtx.buildCtx = buildCtx;
 
-    // ensure generated.d.ts isn't in the transpile (for now)
+    // ensure components.d.ts isn't in the transpile (for now)
     const cmpDts = getComponentsDtsSrcFilePath(config);
     tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
@@ -352,7 +352,7 @@ async function scanDirForTsFiles(config: d.Config, compilerCtx: d.CompilerCtx, b
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
 
   // return just the abs path
-  // make sure it doesn't include generated.d.ts
+  // make sure it doesn't include components.d.ts
   const tsFilePaths = tsFileItems
     .map(tsFileItem => tsFileItem.absPath)
     .filter(tsFileAbsPath => tsFileAbsPath !== componentsDtsSrcFilePath);

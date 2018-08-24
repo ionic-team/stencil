@@ -13,7 +13,6 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXElements,
-  DefaultIntrinsicElements,
   Hyperscript
 } from './declarations/index';
 

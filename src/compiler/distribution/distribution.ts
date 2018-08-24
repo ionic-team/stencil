@@ -95,4 +95,4 @@ export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.
 }
 
 
-export const GENERATED_DTS = 'generated.d.ts';
+export const GENERATED_DTS = 'components.d.ts';

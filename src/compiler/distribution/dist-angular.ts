@@ -54,8 +54,7 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
 `;
 
   const sourceImports = !outputTarget.componentCorePackage ? ''
-    : `import { LocalElementInterfaces } from '${ outputTarget.componentCorePackage }';\n` +
-      `type StencilComponents<T extends keyof LocalElementInterfaces> = LocalElementInterfaces[T];`;
+    : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
 
   const promisifyUtils = !hasDirectives ? '' : `
 type PromisifyType<T> = T extends Promise<any> ? T : Promise<T>;
