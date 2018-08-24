@@ -13,45 +13,91 @@ import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from '../../style/normalize-styles';
 import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
+import { buildError } from '../../util';
+import { isDecoratorNamed } from './utils';
 
 
 export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
-    function visit(node: ts.Node, tsSourceFile: ts.SourceFile, moduleFile: d.ModuleFile): ts.VisitResult<ts.Node> {
+    function visit(node: ts.Node, tsSourceFile: ts.SourceFile, moduleFile: d.ModuleFile) {
 
-      if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-        getCollections(config, compilerCtx, buildCtx.collections, moduleFile, node as ts.ImportDeclaration);
-      }
-
-      if (ts.isClassDeclaration(node)) {
-        const cmpMeta = visitClass(buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
-        if (cmpMeta) {
-          moduleFile.cmpMeta = cmpMeta;
-
-          cmpMeta.stylesMeta = normalizeStyles(config, moduleFile.sourceFilePath, cmpMeta.stylesMeta);
-          cmpMeta.assetsDirsMeta = normalizeAssetsDir(config, moduleFile.sourceFilePath, cmpMeta.assetsDirsMeta);
+      try {
+        if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+          getCollections(config, compilerCtx, buildCtx.collections, moduleFile, node as ts.ImportDeclaration);
         }
-      }
 
-      return ts.visitEachChild(node, (node) => {
-        return visit(node, tsSourceFile, moduleFile);
-      }, transformContext);
+        if (ts.isClassDeclaration(node)) {
+          const cmpMeta = visitClass(buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
+          if (cmpMeta) {
+            if (moduleFile.cmpMeta) {
+              throw new Error(`More than one @Component() class in a single file is not valid`);
+            }
+            moduleFile.cmpMeta = cmpMeta;
+
+            cmpMeta.stylesMeta = normalizeStyles(config, moduleFile.sourceFilePath, cmpMeta.stylesMeta);
+            cmpMeta.assetsDirsMeta = normalizeAssetsDir(config, moduleFile.sourceFilePath, cmpMeta.assetsDirsMeta);
+          }
+        }
+        return node;
+
+      } catch ({message}) {
+        const error = buildError(buildCtx.diagnostics);
+        error.messageText = message;
+        error.relFilePath = tsSourceFile.fileName;
+      }
+      return undefined;
     }
 
     return (tsSourceFile) => {
       const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
       moduleFile.externalImports.length = 0;
       moduleFile.localImports.length = 0;
+      moduleFile.cmpMeta = undefined;
 
-      return visit(tsSourceFile, tsSourceFile, moduleFile) as ts.SourceFile;
+      const results = ts.visitEachChild(tsSourceFile, (node) => {
+        return visit(node, tsSourceFile, moduleFile);
+      }, transformContext);
+
+      if (moduleFile.cmpMeta) {
+        const fileSymbol = typeChecker.getSymbolAtLocation(tsSourceFile);
+        const fileExports = (fileSymbol && typeChecker.getExportsOfModule(fileSymbol)) || [];
+
+        if (fileExports.length > 1) {
+          const error = buildError(buildCtx.diagnostics);
+          error.messageText = `@Component() must be the only export of the module`;
+          error.relFilePath = tsSourceFile.fileName;
+
+        } else if (
+          fileExports.length === 0 ||
+          !isComponentClass(fileExports[0])
+        ) {
+          const error = buildError(buildCtx.diagnostics);
+          error.messageText = `Missing export in @Component() class`;
+          error.relFilePath = tsSourceFile.fileName;
+        }
+      }
+      return results;
     };
   };
 }
 
+function isComponentClass(symbol: ts.Symbol) {
+  const decorators = symbol.valueDeclaration && symbol.valueDeclaration.decorators;
+  if (!decorators) {
+    return false;
+  }
+  return isDecoratorNamed('Component')(decorators[0]);
+}
 
-export function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.ComponentMeta | undefined {
+
+export function visitClass(
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  classNode: ts.ClassDeclaration,
+  sourceFile: ts.SourceFile,
+): d.ComponentMeta | undefined {
   const cmpMeta = getComponentDecoratorMeta(diagnostics, typeChecker, classNode);
 
   if (!cmpMeta) {
