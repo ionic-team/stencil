@@ -7,6 +7,7 @@ import { inlineLoaderScript } from './inline-loader-script';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
+import { validateIndexHtml } from './validate-html';
 
 
 export async function optimizeHtml(
@@ -18,6 +19,8 @@ export async function optimizeHtml(
   diagnostics: d.Diagnostic[]
 ) {
   const promises: Promise<any>[] = [];
+
+  validateIndexHtml(doc, diagnostics);
 
   if (hydrateTarget.hydrateComponents) {
     doc.documentElement.setAttribute(
