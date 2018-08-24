@@ -1,9 +1,19 @@
-<a name="0.12.0-7"></a>
-# 🎪 [0.12.0-7](https://github.com/ionic-team/stencil/compare/v0.12.0-6...v0.12.0-7) (2018-08-23)
+<a name="0.12.0-8"></a>
+# 🌶 [0.12.0-8](https://github.com/ionic-team/stencil/compare/v0.12.0-7...v0.12.0-8) (2018-08-24)
+
+
+### Features
+
+* **compiler:** adds more compiler checks ([6fa63fd](https://github.com/ionic-team/stencil/commit/6fa63fd))
+* **URL:** add URL polyfill for ie11 ([8d07ee9](https://github.com/ionic-team/stencil/commit/8d07ee9))
 
 
 ### Bug Fixes
 
+* **angular:** event emitters work programatically ([dabcf5e](https://github.com/ionic-team/stencil/commit/dabcf5e))
+* **angular:** promisify methods ([0ad19de](https://github.com/ionic-team/stencil/commit/0ad19de))
+* **angular:** using Component instead of Directive ([d3b3c80](https://github.com/ionic-team/stencil/commit/d3b3c80))
+* **config:** add esModuleInterop ([2865fae](https://github.com/ionic-team/stencil/commit/2865fae))
 * **escapeCssForJs:** test for string input ([297fa2e](https://github.com/ionic-team/stencil/commit/297fa2e))
 * **method:** remove focus() and blur() from blacklist ([fbcc368](https://github.com/ionic-team/stencil/commit/fbcc368))
 * **angular:** export local element interfaces to be used in angular type definitions. ([fc081a3](https://github.com/ionic-team/stencil/commit/fc081a3))
