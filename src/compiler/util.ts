@@ -6,7 +6,7 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
   if (config.devMode && !config.flags.serviceWorker) {
     return false;
   }
-  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker);
+  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
   return wwwServiceOutputs.some(outputTarget => {
     return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });

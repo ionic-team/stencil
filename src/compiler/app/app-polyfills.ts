@@ -41,4 +41,5 @@ const POLYFILLS = [
   'string.js',
   'promise.js',
   'fetch.js',
+  'url.js',
 ];
