@@ -27,7 +27,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
     componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
   }
 
-  // immediately write the generated.d.ts file to disk and put it into fs memory
+  // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
   if (destination !== 'src') {

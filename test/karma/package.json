@@ -2,7 +2,7 @@
   "private": true,
   "module": "test-dist/esm/index.js",
   "main": "test-dist/index.js",
-  "types": "test-dist/types/generated.d.ts",
+  "types": "test-dist/types/components.d.ts",
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
     "build.app": "node ../../bin/stencil build --debug --es5",
