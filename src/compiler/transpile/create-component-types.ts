@@ -122,7 +122,7 @@ ${typeData.sort(sortImportNames).map(td => {
  */
 /* tslint:disable */
 
-import '@stencil/core';
+${defineGlobalIntrinsicElements ? `import '@stencil/core';` : `import './stencil.core';`}
 
 ${collectionTypesImportsString}
 ${typeImportString}

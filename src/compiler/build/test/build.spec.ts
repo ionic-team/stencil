@@ -114,6 +114,9 @@ describe('build', () => {
       path.join(root, 'www', 'index.html')
     ]);
 
+    const componentsContents = await c.fs.readFile(path.join(root, 'src', 'components.d.ts'));
+    expect(componentsContents).toContain(`import '@stencil/core';`);
+
     // double check we're not saving dist files in the wrong locations
     doNotExpectFiles(c.fs, [
       path.join(root, 'build'),
