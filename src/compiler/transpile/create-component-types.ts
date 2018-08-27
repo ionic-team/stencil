@@ -53,7 +53,7 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
 
   const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
   const collectionTypesImportsString = collectionTypesImports.map((cti) => {
-    return `import '${cti.pkgName}'`;
+    return `import '${cti.pkgName}';`;
   })
   .join('\n');
 
