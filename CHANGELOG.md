@@ -1,3 +1,13 @@
+<a name="0.12.1"></a>
+## 🤘 [0.12.1](https://github.com/ionic-team/stencil/compare/v0.12.0...v0.12.1) (2018-08-27)
+
+
+### Bug Fixes
+
+* ensure all '@stencil/core' types are changed to './stencil.core' in components.d.ts file. ([638ad47](https://github.com/ionic-team/stencil/commit/638ad47))
+
+
+
 <a name="0.12.0"></a>
 # 🚑 [0.12.0](https://github.com/ionic-team/stencil/compare/v0.12.0-8...v0.12.0) (2018-08-27)
 
