@@ -14,7 +14,7 @@ export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerC
     let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.esm.js' });
 
     // browser esm core build
-    const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+    const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
 
     const hasAppGlobalImport = !!(globalJsContentsEsm && globalJsContentsEsm.length);
 
