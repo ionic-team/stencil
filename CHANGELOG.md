@@ -1,3 +1,18 @@
+<a name="0.12.2-0"></a>
+## 🏁 [0.12.2-0](https://github.com/ionic-team/stencil/compare/v0.12.1...v0.12.2-0) (2018-08-28)
+
+
+### Bug Fixes
+
+* correct rollup globals plugin to include the correct local path to the globals files. ([cf81429](https://github.com/ionic-team/stencil/commit/cf81429))
+
+
+### Features
+
+* add types to decorators to ensure that they are assigned correctly. ([99d058e](https://github.com/ionic-team/stencil/commit/99d058e))
+
+
+
 <a name="0.12.1"></a>
 ## 🤘 [0.12.1](https://github.com/ionic-team/stencil/compare/v0.12.0...v0.12.1) (2018-08-27)
 
