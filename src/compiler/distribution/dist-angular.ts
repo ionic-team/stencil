@@ -56,26 +56,11 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
   const sourceImports = !outputTarget.componentCorePackage ? ''
     : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
 
-  const promisifyUtils = !hasDirectives ? '' : `
-type PromisifyType<T> = T extends Promise<any> ? T : Promise<T>;
-type PromisifyProp<T> =
-  T extends () => infer R ? () => PromisifyType<R> :
-  T extends (a: infer A) => infer R ? (a: A) => PromisifyType<R> :
-  T extends (a: infer A, b: infer B) => infer R ? (a: A, b: B) => PromisifyType<R> :
-  T extends (a: infer A, b: infer B, c: infer B) => infer R ? (a: A, b: B) => PromisifyType<R> :
-  T extends (...a: any[]) => infer R ? (...a: any[]) => PromisifyType<R> :
-  T;
-
-type Promisify<T> = {
-  [P in keyof T]: PromisifyProp<T[P]>;
-}`;
-
   const final: string[] = [
     '/* auto-generated angular directive proxies */',
     '/* tslint:disable */',
     imports,
     sourceImports,
-    promisifyUtils,
     auxFunctions.join('\n'),
     proxies,
   ];
@@ -185,7 +170,7 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
-export declare interface ${cmpMeta.componentClass} extends Promisify<StencilComponents<'${tagNameAsPascal}'>> {}
+export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
 @Component({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
