@@ -181,6 +181,8 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     return;
   }
 
+  const hasWarning = ctx.buildCtx.hasWarning;
+
   // look up the old cache key using the ts file path
   const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
 
@@ -190,7 +192,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // create a cache key out of the content and compiler options
   const cacheKey = `transpileService_${config.sys.generateContentHash(content + tsFilePath + ctx.configKey, 32)}` ;
 
-  if (oldCacheKey === cacheKey && checkCacheKey) {
+  if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!
     return;
   }
@@ -200,7 +202,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
   let ensureExternalImports: string[] = null;
 
-  if (useFsCache) {
+  if (useFsCache && !hasWarning) {
     // let's check to see if we've already cached this in our filesystem
     // but only bother for the very first build
     const cachedStr = await ctx.compilerCtx.cache.get(cacheKey);
@@ -275,7 +277,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
         });
       }
 
-      if (config.enableCache) {
+      if (config.enableCache && !hasWarning) {
         // cache this module file and js text for later
         const cacheModuleFile: CachedModuleFile = {
           moduleFile: moduleFile,

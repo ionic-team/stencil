@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { buildFinish } from './build-finish';
-import { hasError } from '../util';
+import { hasError, hasWarning } from '../util';
 
 
 export class BuildContext implements d.BuildCtx {
@@ -128,6 +128,13 @@ export class BuildContext implements d.BuildCtx {
       return true;
     }
 
+    return false;
+  }
+
+  get hasWarning() {
+    if (hasWarning(this.diagnostics)) {
+      return true;
+    }
     return false;
   }
 

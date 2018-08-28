@@ -29,7 +29,7 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
         }
 
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = visitClass(buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
+          const cmpMeta = visitClass(config, buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
           if (cmpMeta) {
             if (moduleFile.cmpMeta) {
               throw new Error(`More than one @Component() class in a single file is not valid`);
@@ -93,6 +93,7 @@ function isComponentClass(symbol: ts.Symbol) {
 
 
 export function visitClass(
+  config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   classNode: ts.ClassDeclaration,
@@ -111,7 +112,7 @@ export function visitClass(
   cmpMeta.membersMeta = {
     // membersMeta is shared with @Prop, @State, @Method, @Element
     ...getElementDecoratorMeta(typeChecker, classNode),
-    ...getMethodDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile, componentClass),
+    ...getMethodDecoratorMeta(config, diagnostics, typeChecker, classNode, sourceFile, componentClass),
     ...getStateDecoratorMeta(classNode),
     ...getPropDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile, componentClass)
   };

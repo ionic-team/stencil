@@ -3,18 +3,16 @@ import * as d from '../../declarations';
 
 export function cleanDiagnostics(diagnostics: d.Diagnostic[]) {
   const cleaned: d.Diagnostic[] = [];
-
   const maxErrors = Math.min(diagnostics.length, MAX_ERRORS);
-  const dups: {[key: string]: boolean} = {};
-
+  const dups = new Set<string>();
   for (var i = 0; i < maxErrors; i++) {
     const d = diagnostics[i];
 
     const key = d.absFilePath + d.code + d.messageText + d.type;
-    if (dups[key]) {
+    if (dups.has(key)) {
       continue;
     }
-    dups[key] = true;
+    dups.add(key);
 
     if (d.messageText) {
       if (typeof (<any>d.messageText).message === 'string') {
