@@ -27,7 +27,10 @@ if (transpileSuccess) {
   copyXdgOpen();
 
   // open-in-editor's visualstudio.vbs file
-  copyOpenInEditor()
+  copyOpenInEditor();
+
+  // copy the rollup node globals files that are used
+  copyRollupNodeGlobals();
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
@@ -161,6 +164,19 @@ function copyXdgOpen() {
   }
   const xdgOpenDestPath = path.join(__dirname, '..', 'dist', 'sys', 'node', 'xdg-open');
   fs.copySync(xdgOpenSrcPath[0], xdgOpenDestPath);
+}
+
+function copyRollupNodeGlobals() {
+  const sourceDir = path.join(__dirname, '..', 'src', 'compiler', 'bundle', 'rollup-plugins', 'node-globals-files');
+  const destDir = path.join(__dirname, '..', 'dist', 'sys', 'node');
+
+  const rollupGlobalsSrc = path.join(sourceDir, 'rollup-node-globals-global.js');
+  const rollupGlobalsDest = path.join(destDir, 'rollup-node-globals-global.js');
+  fs.copySync(rollupGlobalsSrc, rollupGlobalsDest);
+
+  const rollupGlobalsBrowserSrc = path.join(sourceDir, 'rollup-node-globals-browser.js');
+  const rollupGlobalsBrowserDest = path.join(destDir, 'rollup-node-globals-browser.js');
+  fs.copySync(rollupGlobalsBrowserSrc, rollupGlobalsBrowserDest );
 }
 
 
