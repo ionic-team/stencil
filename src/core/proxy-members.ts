@@ -123,7 +123,9 @@ export function defineMember(
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
-    definePropertyValue(elm, memberName, instance[memberName].bind(instance));
+    definePropertyValue(elm, memberName, function() {
+      return Promise.resolve(instance[memberName](...arguments));
+    });
 
   } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
     // @Prop({ context: 'config' })
