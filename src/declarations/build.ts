@@ -50,6 +50,7 @@ export interface BuildCtx {
   scriptsAdded: string[];
   scriptsDeleted: string[];
   hasError: boolean;
+  hasWarning: boolean;
   rollupResults?: RollupResults;
   startTime: number;
   styleBuildCount: number;

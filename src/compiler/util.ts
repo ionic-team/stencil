@@ -197,6 +197,12 @@ export function hasError(diagnostics: d.Diagnostic[]): boolean {
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 
+export function hasWarning(diagnostics: d.Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
+  return diagnostics.some(d => d.level === 'warn');
+}
 
 export function pathJoin(config: d.Config, ...paths: string[]) {
   return normalizePath(config.sys.path.join.apply(config.sys.path, paths));
