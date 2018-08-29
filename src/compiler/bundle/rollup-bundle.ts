@@ -10,6 +10,7 @@ import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
 import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
 import globals from './rollup-plugins/node-globals';
+import statsPlugin from './rollup-plugins/rollup-stats-plugin';
 
 
 export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
@@ -65,6 +66,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
       ...config.plugins,
+      statsPlugin(buildCtx),
       abortPlugin(buildCtx)
     ],
     onwarn: createOnWarnFn(config, buildCtx.diagnostics)

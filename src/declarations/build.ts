@@ -1,5 +1,11 @@
 import * as d from '.';
 
+export interface RollupResultModule {
+  id: string;
+}
+export interface RollupResults {
+  modules: RollupResultModule[];
+}
 
 export interface BuildCtx {
   abort(): Promise<BuildResults>;
@@ -44,6 +50,7 @@ export interface BuildCtx {
   scriptsAdded: string[];
   scriptsDeleted: string[];
   hasError: boolean;
+  rollupResults?: RollupResults;
   startTime: number;
   styleBuildCount: number;
   stylesUpdated: BuildStyleUpdate[];
@@ -145,6 +152,7 @@ export interface BuildStats {
   };
   components: BuildComponent[];
   entries: BuildEntry[];
+  rollupResults: RollupResults;
   sourceGraph: BuildSourceGraph;
   collections: {
     name: string;

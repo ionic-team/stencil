@@ -29,7 +29,6 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
     transpileBuildCount: buildCtx.transpileBuildCount,
 
     components: [],
-
     entries: generateBuildResultsEntries(config, buildCtx)
   };
 
