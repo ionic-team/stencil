@@ -1,3 +1,13 @@
+<a name="0.12.3"></a>
+## 🎩 [0.12.3](https://github.com/ionic-team/stencil/compare/v0.12.2...v0.12.3) (2018-08-29)
+
+
+### Bug Fixes
+
+* **angular:** promisy types is not longer needed ([d6ba49b](https://github.com/ionic-team/stencil/commit/d6ba49b))
+
+
+
 <a name="0.12.2"></a>
 ## 🚖 [0.12.2](https://github.com/ionic-team/stencil/compare/v0.12.2-0...v0.12.2) (2018-08-28)
 
