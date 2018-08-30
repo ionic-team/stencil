@@ -14,7 +14,8 @@ const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-core');
 const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 const DECLARATIONS_SRC_FILES = [
   path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
-  path.join(SRC_DIR, 'declarations', 'jsx.ts')
+  path.join(SRC_DIR, 'declarations', 'jsx.ts'),
+  path.join(SRC_DIR, 'declarations', 'functional-components.ts')
 ];
 const DECLARATIONS_DIST_FILE = path.join(DST_DIR, 'client', 'declarations', 'stencil.core.d.ts');
 
