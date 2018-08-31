@@ -17,7 +17,6 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
       if (propDecorator == null) {
         return allMembers;
       }
-
       const propOptions = getPropOptions(propDecorator, diagnostics);
       const memberName = (prop.name as ts.Identifier).text;
       const symbol = checker.getSymbolAtLocation(prop.name);
@@ -109,11 +108,12 @@ function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, p
 
     attribType = {
       text: attribTypeText,
+      optional: prop.questionToken !== undefined
     };
-
   } else {
     attribType = {
       text: prop.type.getText(),
+      optional: prop.questionToken !== undefined,
       typeReferences: getAttributeTypeInfo(prop.type, sourceFile)
     };
   }

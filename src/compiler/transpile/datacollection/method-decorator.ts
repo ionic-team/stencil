@@ -40,6 +40,7 @@ export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.
         memberType: MEMBER_TYPE.Method,
         attribType: {
           text: typeString,
+          optional: false,
           typeReferences: {
             ...methodReturnTypes,
             ...getAttributeTypeInfo(member, sourceFile)

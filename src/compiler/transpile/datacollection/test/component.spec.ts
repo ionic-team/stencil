@@ -121,6 +121,7 @@ describe('component', () => {
             'attribName': 'action-sheet-id',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -140,6 +141,7 @@ describe('component', () => {
             'attribName': 'buttons',
             'attribType': {
               'text': 'ActionSheetButton[]',
+              'optional': false,
               'typeReferences': {
                 'ActionSheetButton': {
                   'referenceLocation': 'local',
@@ -163,6 +165,7 @@ describe('component', () => {
             'attribName': 'css-class',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -181,6 +184,7 @@ describe('component', () => {
             'attribName': 'enable-backdrop-dismiss',
             'attribType': {
               'text': 'boolean',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -196,6 +200,7 @@ describe('component', () => {
             'attribName': 'enter-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
                   'importReferenceLocation': '../../index',
@@ -216,6 +221,7 @@ describe('component', () => {
             'attribName': 'exit-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
                   'importReferenceLocation': '../../index',
@@ -236,6 +242,7 @@ describe('component', () => {
             'attribName': 'sub-title',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -251,6 +258,7 @@ describe('component', () => {
             'attribName': 'title',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
