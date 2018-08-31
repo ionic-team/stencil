@@ -18,6 +18,7 @@ describe('props decorator', () => {
         attribName: 'object-any-thing',
         attribType: {
           text: '(_) => Promise<OtherThing>',
+          optional: false,
           typeReferences: {
             OtherThing: {
               importReferenceLocation: '../../../../../index',
@@ -41,6 +42,7 @@ describe('props decorator', () => {
         attribName: 'size',
         attribType: {
           text: 'string',
+          optional: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -56,6 +58,7 @@ describe('props decorator', () => {
         attribName: 'my-custom-attr-name',
         attribType: {
           text: 'number',
+          optional: false,
         },
         jsdoc: {
           documentation: '',
@@ -70,6 +73,7 @@ describe('props decorator', () => {
         attribName: 'width',
         attribType: {
           text: 'number',
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -85,6 +89,7 @@ describe('props decorator', () => {
         attribName: 'setting',
         attribType: {
           text: `'auto' | 'manual'`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -100,6 +105,7 @@ describe('props decorator', () => {
         attribName: 'values',
         attribType: {
           text: `number | number[]`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -115,6 +121,7 @@ describe('props decorator', () => {
         attribName: 'enabled',
         attribType: {
           text: `boolean | string`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {

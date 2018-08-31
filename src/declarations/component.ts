@@ -80,6 +80,7 @@ export interface AttributeTypeReferences {
 
 export interface AttributeTypeInfo {
   text: string;
+  optional: boolean;
   typeReferences?: AttributeTypeReferences;
 }
 

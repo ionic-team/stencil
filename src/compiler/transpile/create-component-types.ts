@@ -327,6 +327,7 @@ var ${interfaceName}: {
 interface TypeInfo {
   [key: string]: {
     type: string;
+    optional: boolean;
     jsdoc?: string;
   };
 }
@@ -339,12 +340,13 @@ function attributesToMultiLineString(attributes: TypeInfo, optional = true, padd
   return Object.keys(attributes)
     .sort()
     .reduce((fullList, key) => {
-      if (attributes[key].jsdoc) {
+      const type = attributes[key];
+      if (type.jsdoc) {
         fullList.push(`/**`);
-        fullList.push(` * ${attributes[key].jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+        fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
         fullList.push(` */`);
       }
-      fullList.push(`'${key}'${optional ? '?' : '' }: ${attributes[key].type};`);
+      fullList.push(`'${key}'${ optional || type.optional ? '?' : '' }: ${type.type};`);
       return fullList;
     }, <string[]>[])
     .map(item => `${paddingString}${item}`)
@@ -360,6 +362,7 @@ function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
         type: member.attribType.text,
+        optional: member.attribType.optional
       };
 
       if (member.jsdoc) {
@@ -381,6 +384,7 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
         type: member.attribType.text,
+        optional: false
       };
 
       if (member.jsdoc) {
@@ -401,6 +405,7 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
       const eventType = (eventMetaObj.eventType) ? `CustomEvent<${eventMetaObj.eventType.text}>` : `CustomEvent`;
       obj[memberName] = {
         type: `(event: ${eventType}) => void`, // TODO this is not good enough
+        optional: false
       };
 
       if (eventMetaObj.jsdoc) {

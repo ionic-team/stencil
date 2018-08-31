@@ -21,7 +21,8 @@ export function getEventDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.T
         const genericType = gatherEventEmitterGeneric(member.type);
         if (genericType) {
           metadata.eventType = {
-            text: genericType.getText()
+            text: genericType.getText(),
+            optional: false
           };
           if (ts.isTypeReferenceNode(genericType)) {
             metadata.eventType.typeReferences = getAttributeTypeInfo(member, sourceFile);

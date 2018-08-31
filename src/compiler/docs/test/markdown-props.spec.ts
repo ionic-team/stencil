@@ -7,7 +7,8 @@ describe('markdown props', () => {
   it('advanced union types', () => {
     const row = new PropRow('name', {
       attribType: {
-        text: `(AlertButton | string)[]`
+        text: `(AlertButton | string)[]`,
+        optional: false
       }
     });
 
@@ -17,7 +18,8 @@ describe('markdown props', () => {
   it('union types', () => {
     const row = new PropRow('name', {
       attribType: {
-        text: `string | string[]`
+        text: `string | string[]`,
+        optional: false
       }
     });
 
@@ -27,7 +29,8 @@ describe('markdown props', () => {
   it('string union types', () => {
     const row = new PropRow('name', {
       attribType: {
-        text: `'submit' | 'reset' | 'button'`
+        text: `'submit' | 'reset' | 'button'`,
+        optional: false
       }
     });
 
