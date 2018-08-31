@@ -64,6 +64,17 @@ export namespace Components {
   interface AttributeHost {}
   interface AttributeHostAttributes extends StencilHTMLAttributes {}
 
+  interface AttributeHtmlRoot {
+    'anyAttr': any | null;
+    'nuAttr': number | null;
+    'strAttr': string;
+  }
+  interface AttributeHtmlRootAttributes extends StencilHTMLAttributes {
+    'anyAttr'?: any | null;
+    'nuAttr'?: number | null;
+    'strAttr'?: string;
+  }
+
   interface ConditionalBasic {}
   interface ConditionalBasicAttributes extends StencilHTMLAttributes {}
 
@@ -296,6 +307,7 @@ declare global {
     'AttributeBoolean': Components.AttributeBoolean;
     'AttributeComplex': Components.AttributeComplex;
     'AttributeHost': Components.AttributeHost;
+    'AttributeHtmlRoot': Components.AttributeHtmlRoot;
     'ConditionalBasic': Components.ConditionalBasic;
     'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
     'ConditionalRerender': Components.ConditionalRerender;
@@ -356,6 +368,7 @@ declare global {
     'attribute-boolean': Components.AttributeBooleanAttributes;
     'attribute-complex': Components.AttributeComplexAttributes;
     'attribute-host': Components.AttributeHostAttributes;
+    'attribute-html-root': Components.AttributeHtmlRootAttributes;
     'conditional-basic': Components.ConditionalBasicAttributes;
     'conditional-rerender-root': Components.ConditionalRerenderRootAttributes;
     'conditional-rerender': Components.ConditionalRerenderAttributes;
@@ -444,6 +457,12 @@ declare global {
   var HTMLAttributeHostElement: {
     prototype: HTMLAttributeHostElement;
     new (): HTMLAttributeHostElement;
+  };
+
+  interface HTMLAttributeHtmlRootElement extends Components.AttributeHtmlRoot, HTMLStencilElement {}
+  var HTMLAttributeHtmlRootElement: {
+    prototype: HTMLAttributeHtmlRootElement;
+    new (): HTMLAttributeHtmlRootElement;
   };
 
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
@@ -759,6 +778,7 @@ declare global {
     'attribute-boolean': HTMLAttributeBooleanElement
     'attribute-complex': HTMLAttributeComplexElement
     'attribute-host': HTMLAttributeHostElement
+    'attribute-html-root': HTMLAttributeHtmlRootElement
     'conditional-basic': HTMLConditionalBasicElement
     'conditional-rerender-root': HTMLConditionalRerenderRootElement
     'conditional-rerender': HTMLConditionalRerenderElement
@@ -819,6 +839,7 @@ declare global {
     'attribute-boolean': HTMLAttributeBooleanElement;
     'attribute-complex': HTMLAttributeComplexElement;
     'attribute-host': HTMLAttributeHostElement;
+    'attribute-html-root': HTMLAttributeHtmlRootElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
     'conditional-rerender': HTMLConditionalRerenderElement;

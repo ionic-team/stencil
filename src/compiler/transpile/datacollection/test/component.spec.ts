@@ -198,15 +198,14 @@ describe('component', () => {
               'text': 'AnimationBuilder',
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'enterAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -218,15 +217,14 @@ describe('component', () => {
               'text': 'AnimationBuilder',
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'exitAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,

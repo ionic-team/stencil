@@ -41,7 +41,7 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
         memberData.attribName = getAttributeName(propOptions, memberName);
         memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
         memberData.reflectToAttrib = getReflectToAttr(propOptions);
-        memberData.propType = propTypeFromTSType(type, memberData.attribType.text);
+        memberData.propType = propTypeFromTSType(type);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
@@ -144,10 +144,15 @@ function inferPropType(expression: ts.Expression | undefined) {
   return undefined;
 }
 
-function propTypeFromTSType(type: ts.Type, text: string) {
+function propTypeFromTSType(type: ts.Type) {
   const isStr = checkType(type, isString);
   const isNu = checkType(type, isNumber);
   const isBool = checkType(type, isBoolean);
+  const isAnyType = checkType(type, isAny);
+
+  if (isAnyType) {
+    return PROP_TYPE.Any;
+  }
 
   // if type is more than a primitive type at the same time, we mark it as any
   if (Number(isStr) + Number(isNu) + Number(isBool) > 1) {
@@ -163,9 +168,6 @@ function propTypeFromTSType(type: ts.Type, text: string) {
   }
   if (isBool) {
     return PROP_TYPE.Boolean;
-  }
-  if (text === 'any') {
-    return PROP_TYPE.Any;
   }
   return PROP_TYPE.Unknown;
 }
@@ -197,6 +199,13 @@ function isNumber(t: ts.Type) {
 function isString(t: ts.Type) {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLike | ts.TypeFlags.StringLiteral));
+  }
+  return false;
+}
+
+function isAny(t: ts.Type) {
+  if (t) {
+    return !!(t.flags & ts.TypeFlags.Any);
   }
   return false;
 }
