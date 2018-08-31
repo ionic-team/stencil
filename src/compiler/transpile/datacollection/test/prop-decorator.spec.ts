@@ -160,12 +160,12 @@ describe('props decorator', () => {
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 12; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
 
     // unknown
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       expect(response[`unknown${i}`].propType).toEqual(PROP_TYPE.Unknown);
     }
   });

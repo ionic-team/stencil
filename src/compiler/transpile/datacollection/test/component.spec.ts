@@ -203,15 +203,14 @@ describe('component', () => {
               'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'enterAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -224,15 +223,14 @@ describe('component', () => {
               'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'exitAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,

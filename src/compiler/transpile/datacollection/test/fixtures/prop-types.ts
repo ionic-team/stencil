@@ -1,4 +1,4 @@
-import { Component, Method } from '../../../../../index';
+import { Component, Method, Prop } from '../../../../../index';
 
 /// STRINGS
 const enum Text2 {
@@ -24,6 +24,8 @@ function returnNu(): number {
 interface Something {
   prop: string;
 }
+
+type AnyAlias = any;
 
 @Component({
   tag: 'my-component',
@@ -76,9 +78,9 @@ class MyComponent {
   // TODO: revisit any vs unknown
   // Expect "any"
   @Prop() any0: any;
-  @Prop() any1 = [];
-  @Prop() any2 = {};
-  @Prop() any3 = new WeakMap();
+  @Prop() any1: AnyAlias;
+  @Prop() any2?: UnknownInterface;
+  @Prop() any3?: any | null;
   @Prop() any4?: any;
   @Prop() any5!: any;
   @Prop() any6: string | number;
@@ -86,10 +88,13 @@ class MyComponent {
   @Prop() any8: number | boolean;
   @Prop() any9: string | number | boolean;
   @Prop() any10?: string | number | boolean | string[];
+  @Prop() any11 = new WeakMap();
 
 
   // Expect "unknown"
   @Prop() unknown0: Something;
   @Prop() unknown1?: Something;
   @Prop() unknown2!: Something;
+  @Prop() unknown3 = [];
+  @Prop() unknown4 = {};
 }
