@@ -75,19 +75,39 @@ function generateJsDocMembers(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompo
         name: memberName
       };
 
-      if (memberMeta.propType === PROP_TYPE.Boolean) {
-        propData.type = 'boolean';
-
-      } else if (memberMeta.propType === PROP_TYPE.Number) {
-        propData.type = 'number';
-
-      } else if (memberMeta.propType === PROP_TYPE.String) {
-        propData.type = 'string';
-
-      } else if (memberMeta.propType === PROP_TYPE.Any) {
-        propData.type = 'any';
+      if (memberMeta.attribType && memberMeta.attribType.text) {
+        if (!memberMeta.attribType.text.includes('(')) {
+          const typeSplit = memberMeta.attribType.text.split('|').map(t => {
+            return t.replace(/\'/g, '"').trim();
+          });
+  
+          propData.type =  typeSplit.join(', ');
+        }
+  
+        propData.type =  memberMeta.attribType.text;
       } else {
-        propData.type = memberMeta.attribType.text;
+        const propType = memberMeta.propType;
+  
+        switch (propType) {
+          case PROP_TYPE.Any:
+            propData.type =  'any';
+            break;
+          case PROP_TYPE.Boolean:
+            propData.type =  'boolean';
+            break;
+          case PROP_TYPE.Number:
+            propData.type =  'number';
+            break;
+          case PROP_TYPE.String:
+            propData.type =  'string';
+            break;
+          default:
+            propData.type =  '';
+        }
+      }
+      
+      if (memberMeta.attribType.optional) {
+        propData.optional = true
       }
 
       if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
