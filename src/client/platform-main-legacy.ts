@@ -6,7 +6,6 @@ import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -286,27 +285,26 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
-          requestBundleQueue.push(() => requestComponentBundle(cmpMeta, bundleId, hmrVersionId));
+          requestBundleQueue.push(() => requestComponentBundle(bundleId, hmrVersionId));
 
         } else {
           // css already all loaded
-          requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
+          requestComponentBundle(bundleId, hmrVersionId);
         }
 
       } else {
         // not using css shim, so no need to wait on css shim to finish
         // figure out which bundle to request and kick it off
-        requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
+        requestComponentBundle(bundleId, hmrVersionId);
       }
     }
   }
 
 
-  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, hmrVersionId: string) {
+  function requestComponentBundle(bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    const useScoped = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
-    let url = resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js';
+    let url = resourcesUrl + bundleId + (domApi.$supportsShadowDom ? '' : '.sc') + '.es5.js';
 
     if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
       url += '?s-hmr=' + hmrVersionId;

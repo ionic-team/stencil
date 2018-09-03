@@ -3,7 +3,6 @@ import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
-import { requiresScopedStyles } from '../style/component-styles';
 import { validateComponentTag } from '../config/validate-component';
 
 
@@ -50,10 +49,10 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export function getEntryEncapsulations(entryModule: d.EntryModule) {
+export function getEntryEncapsulations(moduleFiles: d.ModuleFile[]) {
   const encapsulations: ENCAPSULATION[] = [];
 
-  entryModule.moduleFiles.forEach(m => {
+  moduleFiles.forEach(m => {
     const encapsulation = m.cmpMeta.encapsulationMeta || ENCAPSULATION.NoEncapsulation;
     if (!encapsulations.includes(encapsulation)) {
       encapsulations.push(encapsulation);
@@ -102,57 +101,12 @@ export function getComponentStyleModes(cmpMeta: d.ComponentMeta) {
 }
 
 
-export function entryRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
-  return encapsulations.some(e => requiresScopedStyles(e));
-}
-
-
 export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.EntryPoint[]) {
-  const outtedNoEncapsulation: d.ModuleFile[] = [];
-  const outtedScopedCss: d.ModuleFile[] = [];
-  const outtedShadowDom: d.ModuleFile[] = [];
 
-  const cleanedEntryModules: d.ModuleFile[][] = [
-    outtedNoEncapsulation,
-    outtedScopedCss,
-    outtedShadowDom
-  ];
-
-  entryPoints.forEach(entryPoint => {
-    const entryModules = allModules.filter(m => {
+  const cleanedEntryModules = entryPoints.map(entryPoint => {
+    return allModules.filter(m => {
       return entryPoint.some(ep => m.cmpMeta && ep.tag === m.cmpMeta.tagNameMeta);
     });
-
-    const noEncapsulation = entryModules.filter(m => {
-      return m.cmpMeta.encapsulationMeta !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
-    });
-    const scopedCss = entryModules.filter(m => {
-      return m.cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss;
-    });
-    const shadowDom = entryModules.filter(m => {
-      return m.cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
-    });
-
-    if ((noEncapsulation.length > 0 && scopedCss.length === 0 && shadowDom.length === 0) ||
-       (noEncapsulation.length === 0 && scopedCss.length > 0 && shadowDom.length === 0) ||
-       (noEncapsulation.length === 0 && scopedCss.length === 0 && shadowDom.length > 0)) {
-      cleanedEntryModules.push(entryModules);
-
-    } else if (noEncapsulation.length >= scopedCss.length && noEncapsulation.length >= shadowDom.length) {
-      cleanedEntryModules.push(noEncapsulation);
-      outtedScopedCss.push(...scopedCss);
-      outtedShadowDom.push(...shadowDom);
-
-    } else if (scopedCss.length >= noEncapsulation.length && scopedCss.length >= shadowDom.length) {
-      cleanedEntryModules.push(scopedCss);
-      outtedNoEncapsulation.push(...noEncapsulation);
-      outtedShadowDom.push(...shadowDom);
-
-    } else if (shadowDom.length >= noEncapsulation.length && shadowDom.length >= scopedCss.length) {
-      cleanedEntryModules.push(shadowDom);
-      outtedNoEncapsulation.push(...noEncapsulation);
-      outtedScopedCss.push(...scopedCss);
-    }
   });
 
   return cleanedEntryModules
@@ -169,12 +123,8 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
 
 export function createEntryModule(config: d.Config) {
   return (moduleFiles: d.ModuleFile[]) => {
-    const entryModule: d.EntryModule = {
-      moduleFiles: moduleFiles
-    };
-
     // generate a unique entry key based on the components within this entry module
-    entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
+    const entryKey = ENTRY_KEY_PREFIX + moduleFiles
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
         return 1;
@@ -189,18 +139,13 @@ export function createEntryModule(config: d.Config) {
     })
     .map(m => m.cmpMeta.tagNameMeta).join('.');
 
-    // generate a unique entry key based on the components within this entry module
-    entryModule.filePath = config.sys.path.join(config.srcDir, entryModule.entryKey + '.js');
-
-    // get the modes used in this bundle
-    entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
-
-    // get the encapsulations used in this bundle
-    const encapsulations = getEntryEncapsulations(entryModule);
-
-    // figure out if we'll need a scoped css build
-    entryModule.requiresScopedStyles = entryRequiresScopedStyles(encapsulations);
-
+    const entryModule: d.EntryModule = {
+      moduleFiles,
+      entryKey,
+      filePath: config.sys.path.join(config.srcDir, `${entryKey}.js`),
+      modeNames: getEntryModes(moduleFiles),
+      requiresScopedStyles: true
+    };
     return entryModule;
   };
 }

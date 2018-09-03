@@ -199,10 +199,16 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   if (requiresScopedStyles(cmpMeta.encapsulationMeta)) {
     // only create scoped styles if we need to
-    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
-    if (config.devMode) {
-      styleMeta.compiledStyleTextScoped = '\n' + styleMeta.compiledStyleTextScoped + '\n';
+    const compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleTextScoped = compiledStyleTextScoped;
+    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+      styleMeta.compiledStyleText = compiledStyleTextScoped;
     }
+  }
+
+  // by default the compiledTextScoped === compiledStyleText
+  if (!styleMeta.compiledStyleTextScoped) {
+    styleMeta.compiledStyleTextScoped = styleMeta.compiledStyleText;
   }
 
   let addStylesUpdate = false;
@@ -228,10 +234,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
-
-  if (styleMeta.compiledStyleTextScoped) {
-    styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
-  }
+  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
 
   const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
 

@@ -6,7 +6,6 @@ import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -150,7 +149,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // static function as a the bundleIds that returns the module
       const moduleOpts: d.GetModuleOptions = {
         mode: elm.mode,
-        scoped: cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)
+        scoped: !domApi.$supportsShadowDom
       };
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
@@ -191,7 +190,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         ? cmpMeta.bundleIds
         : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      const useScopedCss = cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
+      const useScopedCss = !domApi.$supportsShadowDom;
       let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
 
       if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
