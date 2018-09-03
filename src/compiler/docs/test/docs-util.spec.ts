@@ -1,5 +1,5 @@
-import { MarkdownTable } from '../docs-util';
-
+import { MarkdownTable, getPropType } from '../docs-util';
+import { PROP_TYPE } from '../../../util/constants';
 
 describe('markdown-table', () => {
 
@@ -49,3 +49,68 @@ describe('markdown-table', () => {
   });
 
 });
+
+describe('getPropType', () => {
+  it('advanced union types', () => {
+    const memberMeta = {
+      attribType: {
+        text: `(AlertButton | string)[]`,
+        optional: false
+      }
+    }
+    expect(getPropType(memberMeta)).toBe('(AlertButton | string)[]');
+  });
+
+  it('union types', () => {
+    const memberMeta = {
+      attribType: {
+        text: `string | string[]`,
+        optional: false
+      }
+    }
+    expect(getPropType(memberMeta)).toBe('string, string[]');
+  });
+
+  it('string union types', () => {
+    const memberMeta = {
+      attribType: {
+        text: `'submit' | 'reset' | 'button'`,
+        optional: false
+      }
+    }
+
+    expect(getPropType(memberMeta)).toBe('"submit", "reset", "button"');
+  });
+
+  it('any type', () => {
+    const memberMeta = {
+      propType: PROP_TYPE.Any
+    }
+
+    expect(getPropType(memberMeta)).toBe('any');
+  });
+
+  it('string type', () => {
+    const memberMeta = {
+      propType: PROP_TYPE.String
+    }
+
+    expect(getPropType(memberMeta)).toBe('string');
+  });
+
+  it('number type', () => {
+    const memberMeta = {
+      propType: PROP_TYPE.Number
+    }
+
+    expect(getPropType(memberMeta)).toBe('number');
+  });
+
+  it('boolean type', () => {
+    const memberMeta = {
+      propType: PROP_TYPE.Boolean
+    }
+
+    expect(getPropType(memberMeta)).toBe('boolean');
+  });
+})
