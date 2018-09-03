@@ -51,6 +51,8 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     input: entryModules.map(b => b.filePath),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
+    optimizeChunks: true,
+    chunkGroupingSize: 6000,
     plugins: [
       abortPlugin(buildCtx),
       rollupPluginReplace({
