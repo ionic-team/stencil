@@ -213,7 +213,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
   // generate the bundle build for mode, no scoped styles, and esm
   await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false);
 
-  if (entryModule.requiresScopedStyles) {
+  if (entryModule.requiresScopedStyles && config.buildScoped) {
     // create js text for: mode, scoped styles, esm
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esm, modeName, true);
 
@@ -228,7 +228,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
     // generate the bundle build for: mode, no scoped styles and es5
     await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
 
-    if (entryModule.requiresScopedStyles) {
+    if (entryModule.requiresScopedStyles && config.buildScoped) {
       // create js text for: mode, scoped styles, es5
       jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.es5, modeName, true, 'es5');
 
@@ -242,7 +242,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, false, 'es5');
     await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
 
-    if (entryModule.requiresScopedStyles) {
+    if (entryModule.requiresScopedStyles && config.buildScoped) {
       jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, true, 'es5');
       await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true, 'es5');
     }

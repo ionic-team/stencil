@@ -15,6 +15,7 @@ export class TestingConfig implements d.Config {
   devMode = true;
   enableCache = false;
   buildAppCore = false;
+  buildScoped = true;
   flags: d.ConfigFlags = {};
   bundles: d.ConfigBundle[];
   outputTargets: d.OutputTarget[];
