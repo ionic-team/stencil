@@ -102,7 +102,7 @@ describe('build', () => {
     expect(r.entries[0].components[0].tag).toContain('cmp-a');
     expect(r.transpileBuildCount).toBe(2);
     expect(r.bundleBuildCount).toBe(1);
-    expect(r.filesWritten).toHaveLength(7);
+    expect(r.filesWritten).toHaveLength(8);
 
     expectFiles(c.fs, [
       path.join(root, 'src', 'components.d.ts'),
