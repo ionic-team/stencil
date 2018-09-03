@@ -79,6 +79,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
   setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);

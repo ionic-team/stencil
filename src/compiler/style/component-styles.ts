@@ -197,7 +197,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
   }
 
-  if (requiresScopedStyles(cmpMeta.encapsulationMeta)) {
+  if (requiresScopedStyles(cmpMeta.encapsulationMeta, config)) {
     // only create scoped styles if we need to
     const compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
     styleMeta.compiledStyleTextScoped = compiledStyleTextScoped;
@@ -279,8 +279,11 @@ export function escapeCssForJs(style: string) {
 }
 
 
-export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
-  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
+export function requiresScopedStyles(encapsulation: ENCAPSULATION, config: d.Config) {
+  return (
+    (encapsulation === ENCAPSULATION.ShadowDom && config.buildScoped) ||
+    (encapsulation === ENCAPSULATION.ScopedCss)
+  );
 }
 
 
