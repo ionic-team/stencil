@@ -122,31 +122,26 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
 
 
 export function createEntryModule(config: d.Config) {
-  return (moduleFiles: d.ModuleFile[]) => {
+  return (moduleFiles: d.ModuleFile[]): d.EntryModule => {
     // generate a unique entry key based on the components within this entry module
     const entryKey = ENTRY_KEY_PREFIX + moduleFiles
-    .sort((a, b) => {
-      if (a.isCollectionDependency && !b.isCollectionDependency) {
-        return 1;
-      }
-      if (!a.isCollectionDependency && b.isCollectionDependency) {
-        return -1;
-      }
+      .sort(sortModuleFiles)
+      .map(m => m.cmpMeta.tagNameMeta)
+      .join('.');
 
-      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
-      return 0;
-    })
-    .map(m => m.cmpMeta.tagNameMeta).join('.');
-
-    const entryModule: d.EntryModule = {
+    return {
       moduleFiles,
       entryKey,
+
+      // generate a unique entry key based on the components within this entry module
       filePath: config.sys.path.join(config.srcDir, `${entryKey}.js`),
+
+      // get the modes used in this bundle
       modeNames: getEntryModes(moduleFiles),
+
+      // figure out if we'll need a scoped css build
       requiresScopedStyles: true
     };
-    return entryModule;
   };
 }
 
@@ -233,4 +228,17 @@ export function validateComponentEntries(config: d.Config, compilerCtx: d.Compil
   });
 
   return allModules;
+}
+
+function sortModuleFiles(a: d.ModuleFile, b: d.ModuleFile) {
+  if (a.isCollectionDependency && !b.isCollectionDependency) {
+    return 1;
+  }
+  if (!a.isCollectionDependency && b.isCollectionDependency) {
+    return -1;
+  }
+
+  if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+  if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+  return 0;
 }
