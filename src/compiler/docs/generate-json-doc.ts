@@ -98,7 +98,7 @@ function generateJsDocMembers(
           name: memberName
         };
 
-        propData = getPropType(memberMeta);
+        propData.type = getPropType(memberMeta);
 
         if (memberMeta.attribType.optional) {
           propData.optional = true;
