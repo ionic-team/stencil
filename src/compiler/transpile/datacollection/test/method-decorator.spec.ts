@@ -1,6 +1,7 @@
 import { gatherMetadata } from './test-utils';
 import { getMethodDecoratorMeta } from '../method-decorator';
 import * as path from 'path';
+import { MEMBER_TYPE } from '../../../../util/constants';
 import { Config } from '../../../../declarations';
 import { mockConfig } from '../../../../testing/mocks';
 
@@ -22,7 +23,7 @@ describe('method decorator', () => {
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: any) => any',
           optional: false,
@@ -56,7 +57,7 @@ describe('method decorator', () => {
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: ActionSheetOptions) => any',
           optional: false,
@@ -87,7 +88,7 @@ describe('method decorator', () => {
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: t.CoreContext) => any',
           optional: false,

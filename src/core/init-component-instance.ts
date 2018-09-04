@@ -92,7 +92,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    delete elm['s-ld'];
+    elm['s-ld'] = undefined;
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
@@ -139,13 +139,14 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
   // Note: in IE11 <svg> does not have the "children" property
   for (let i = 0; i < elm.childNodes.length; i++) {
-    if (elm.childNodes[i].nodeType === NODE_TYPE.ElementNode) {
-      if (plt.getComponentMeta(elm.childNodes[i] as any) && !plt.hasConnectedMap.has(elm.childNodes[i] as d.HostElement)) {
+    const child = elm.childNodes[i] as d.HostElement;
+    if (child.nodeType === NODE_TYPE.ElementNode) {
+      if (plt.getComponentMeta(child) && !plt.hasConnectedMap.has(child)) {
         // this is a defined componnent
         // but it hasn't connected yet
         return false;
       }
-      if (!allChildrenHaveConnected(plt, elm.childNodes[i] as d.HostElement)) {
+      if (!allChildrenHaveConnected(plt, child)) {
         // one of the defined child components hasn't connected yet
         return false;
       }

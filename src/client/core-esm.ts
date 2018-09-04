@@ -13,11 +13,11 @@ export { h } from '../renderer/vdom/h';
 
 
 export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | d.ComponentHostData[], opts: CustomElementsDefineOptions = {}) {
-  cmpData = Array.isArray(cmpData) ? cmpData : [cmpData];
+  const cmpDataArray = (Array.isArray(cmpData) ? cmpData : [cmpData]) as  d.ComponentHostData[];
   const doc = win.document;
   const hydratedCssClass = opts.hydratedCssClass || '__APP__HYDRATED__CSS__PLACEHOLDER__';
 
-  const styleCmps = cmpData.filter(c => c[2]).map(c => c[0]);
+  const styleCmps = cmpDataArray.filter(([hasStyles]) => hasStyles).map(c => c[0]);
   if (styleCmps.length) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies

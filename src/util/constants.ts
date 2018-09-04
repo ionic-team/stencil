@@ -3,13 +3,13 @@
  * Member Types
  */
 export const enum MEMBER_TYPE {
-  Prop = 1,
-  PropMutable = 2,
-  PropContext = 3,
-  PropConnect = 4,
-  State = 5,
-  Method = 6,
-  Element = 7,
+  Prop = 1 << 0,
+  PropMutable = 1 << 1,
+  PropContext = 1 << 2,
+  PropConnect = 1 << 3,
+  State = 1 << 4,
+  Method = 1 << 5,
+  Element = 1 << 6,
 }
 
 
@@ -18,10 +18,10 @@ export const enum MEMBER_TYPE {
  */
 export const enum PROP_TYPE {
   Unknown = 0,
-  Any = 1,
-  String = 2,
-  Boolean = 3,
-  Number = 4,
+  Any = 1 << 0,
+  String = 1 << 1,
+  Boolean = 1 << 2,
+  Number = 1 << 3,
 }
 
 
