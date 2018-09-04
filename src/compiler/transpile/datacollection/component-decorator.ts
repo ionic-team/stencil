@@ -29,7 +29,14 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
 
   // check if class has more than one decorator
   if (node.decorators.length > 1) {
-    throw new Error(`@Component({ tag: "${componentOptions.tag}"}) can not be decorated with more decorators at the same time`);
+    throw new Error(`@Component({ tag: "${componentOptions.tag}" }) can not be decorated with more decorators at the same time`);
+  }
+
+  if (componentOptions.host) {
+    const warn = buildWarn(diagnostics);
+    warn.header = 'Host prop deprecated';
+    warn.messageText = `The “host” property used in @Component({ tag: "${componentOptions.tag}" }) has been deprecated.
+It will be removed in future versions. Please use the "hostData()" method instead. `;
   }
 
   const symbol = checker.getSymbolAtLocation(node.name);
