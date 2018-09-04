@@ -147,9 +147,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // using a 3rd party bundler to import modules
       // at this point the cmpMeta will already have a
       // static function as a the bundleIds that returns the module
+      const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
       const moduleOpts: d.GetModuleOptions = {
         mode: elm.mode,
-        scoped: !domApi.$supportsShadowDom
+        scoped: useScopedCss
       };
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
@@ -190,8 +191,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         ? cmpMeta.bundleIds
         : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      const useScopedCss = !domApi.$supportsShadowDom;
-      let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
+      const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
+      let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.js';
 
       if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
         url += '?s-hmr=' + hmrVersionId;

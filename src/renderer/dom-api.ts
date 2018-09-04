@@ -14,10 +14,22 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
   const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
 
+  if (__BUILD_CONDITIONALS__.es5) {
+    if (typeof win.CustomEvent !== 'function') {
+      // CustomEvent polyfill
+      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+        evt = doc.createEvent('CustomEvent');
+        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+        return evt;
+      };
+      win.CustomEvent.prototype = win.Event.prototype;
+    }
+  }
+
   const domApi: DomApi = {
 
     $doc: doc,
-
+    $supportsShadowDom: !!doc.documentElement.attachShadow,
     $supportsEventOptions: false,
 
     $nodeType: (node: any) =>
@@ -208,37 +220,28 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
           });
         }
       }
-    }
+    },
+    $dispatchEvent: (elm, eventName, data) =>
+      elm && elm.dispatchEvent(new win.CustomEvent(eventName, data)),
 
+    $parentElement: (elm, parentNode?): any =>
+      // if the parent node is a document fragment (shadow root)
+      // then use the "host" property on it
+      // otherwise use the parent node
+      ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode
   };
 
+  if (__BUILD_CONDITIONALS__.isDev) {
+    if ((win as Window).location.search.indexOf('shadow=false') > 0) {
+      // by adding ?shadow=false it'll force the slot polyfill
+      // only add this check when in dev mode
+      domApi.$supportsShadowDom = false;
+    }
+  }
 
   if (__BUILD_CONDITIONALS__.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
-
-    domApi.$supportsShadowDom = !!domApi.$doc.documentElement.attachShadow;
-
-    if (__BUILD_CONDITIONALS__.isDev) {
-      if ((win as Window).location.search.indexOf('shadow=false') > 0) {
-        // by adding ?shadow=false it'll force the slot polyfill
-        // only add this check when in dev mode
-        domApi.$supportsShadowDom = false;
-      }
-    }
   }
-
-  if (__BUILD_CONDITIONALS__.es5) {
-    if (typeof win.CustomEvent !== 'function') {
-      // CustomEvent polyfill
-      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-        evt = doc.createEvent('CustomEvent');
-        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
-        return evt;
-      };
-      win.CustomEvent.prototype = win.Event.prototype;
-    }
-  }
-  domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
 
   if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {
     // test if this browser supports event options or not
@@ -250,12 +253,6 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       );
     } catch (e) {}
   }
-
-  domApi.$parentElement = (elm: Node, parentNode?: any): any =>
-    // if the parent node is a document fragment (shadow root)
-    // then use the "host" property on it
-    // otherwise use the parent node
-    ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode;
 
   return domApi;
 }

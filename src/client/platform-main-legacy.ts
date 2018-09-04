@@ -304,7 +304,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   function requestComponentBundle(bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    let url = resourcesUrl + bundleId + (domApi.$supportsShadowDom ? '' : '.sc') + '.es5.js';
+    const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
+    let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.es5.js';
 
     if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
       url += '?s-hmr=' + hmrVersionId;

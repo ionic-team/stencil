@@ -98,7 +98,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
-    if (domApi.$supportsShadowDom) {
+    if (__BUILD_CONDITIONALS__.shadowDom && domApi.$supportsShadowDom) {
       if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles

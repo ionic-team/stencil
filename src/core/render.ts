@@ -19,25 +19,20 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     const useNativeShadowDom = (encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
 
     let reflectHostAttr: d.VNodeData;
-    let rootElm: HTMLElement;
+    let rootElm: HTMLElement = hostElm;
 
     if (__BUILD_CONDITIONALS__.reflectToAttr) {
       reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpMeta.componentConstructor.properties, instance);
     }
 
-    if (useNativeShadowDom) {
-      // this component SHOULD use native slot/shadow dom
-      // this browser DOES support native shadow dom
-      // and this is the first render
-      // let's create that shadow root
-      if (__BUILD_CONDITIONALS__.shadowDom) {
-        rootElm = hostElm.shadowRoot as any;
-      }
-
-    } else {
-      // not using, or can't use shadow dom
-      // set the root element, which will be the shadow root when enabled
-      rootElm = hostElm;
+    // this component SHOULD use native slot/shadow dom
+    // this browser DOES support native shadow dom
+    // and this is the first render
+    // let's create that shadow root
+    // test if this component should be shadow dom
+    // and if so does the browser supports it
+    if (__BUILD_CONDITIONALS__.shadowDom && useNativeShadowDom) {
+      rootElm = hostElm.shadowRoot as any;
     }
 
     if (__BUILD_CONDITIONALS__.styles && !hostElm['s-rn']) {
