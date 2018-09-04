@@ -52,7 +52,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
     optimizeChunks: true,
-    chunkGroupingSize: 6000,
+    chunkGroupingSize: 5500,
     plugins: [
       abortPlugin(buildCtx),
       rollupPluginReplace({

@@ -32,6 +32,7 @@ export async function writeEsModules(config: d.Config, rollupBundle: RollupBuild
     format: 'es',
     banner: generatePreamble(config),
     intro: `const { h } = window.${config.namespace};`,
+    compact: !config.devMode
   });
   return <any>output as d.JSModuleList;
 }
@@ -61,6 +62,7 @@ export async function writeLegacyModules(config: d.Config, rollupBundle: RollupB
     banner: generatePreamble(config),
     intro: `const h = window.${config.namespace}.h;`,
     strict: false,
+    compact: !config.devMode
   });
 
   return <any>output as d.JSModuleList;
@@ -75,6 +77,7 @@ export async function writeEsmEs5Modules(config: d.Config, rollupBundle: RollupB
       banner: generatePreamble(config),
       intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
       strict: false,
+      compact: !config.devMode
     });
 
     return <any>output as d.JSModuleList;
