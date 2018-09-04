@@ -2,7 +2,6 @@ import { parse } from './css-parser';
 import { CSSScope } from './interfaces';
 import { getSelectors, getSelectorsForScopes, resolveValues } from './selectors';
 import { compileTemplate, executeTemplate } from './template';
-import { getElementScopeId } from '../../../util/scope';
 
 
 export function parseCSS(original: string): CSSScope {
@@ -69,9 +68,7 @@ export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
 }
 
 export function replaceScope(original: string, oldScopeId: string, newScopeId: string) {
-  original = replaceAll(original, `\\[${getElementScopeId(oldScopeId, true)}\\]`, `[${getElementScopeId(newScopeId, true)}]`);
-  original = replaceAll(original, `\\[${oldScopeId}\\]`, `[${newScopeId}]`);
-  original = replaceAll(original, `\\[${getElementScopeId(oldScopeId)}\\]`, `[${getElementScopeId(newScopeId)}]`);
+  original = replaceAll(original, `\\.${oldScopeId}`, `.${newScopeId}`);
   return original;
 }
 
