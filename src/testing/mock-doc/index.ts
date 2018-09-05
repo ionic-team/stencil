@@ -5,9 +5,11 @@ import { MockWindow } from './window';
 export { applyWindowToGlobal } from './global';
 
 export function mockDocument(html?: string) {
-  return new MockDocument(html);
+  const mockDoc: any = new MockDocument(html);
+  return mockDoc as Document;
 }
 
 export function mockWindow() {
-  return new MockWindow();
+  const mockWin: any = new MockWindow();
+  return mockWin as Window;
 }
