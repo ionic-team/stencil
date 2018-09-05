@@ -122,9 +122,6 @@ export interface ComponentInstance {
     [attrName: string]: any;
   };
 
-  mode?: string;
-  color?: string;
-
   [memberName: string]: any;
 }
 
