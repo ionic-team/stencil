@@ -108,6 +108,7 @@ function bundleNodeSysMain() {
     external: [
       'child_process',
       'crypto',
+      'events',
       'fs',
       'path',
       'os',
