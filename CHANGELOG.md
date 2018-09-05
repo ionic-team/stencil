@@ -1,18 +1,51 @@
-<a name="0.13.0-0"></a>
-# 💚 [0.13.0-0](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-0) (2018-09-04)
+<a name="0.13.0-1"></a>
+# 🔔 [0.13.0-1](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-1) (2018-09-05)
+
+Testing within Stencil is now broken up into two distinct types: Unit Tests with [Jest](https://jestjs.io/), and End-To-End tests with [Puppeteer](https://pptr.dev/). Previous versions already used Jest, but Stencil provided a `TestWindow` and mocked the browser environment using JSDom.
+
+With the latest changes, the browser environment for e2e testing is done using Puppeteer, which provides many advantages Stencil can start to incorporate into its builds later on. This means the previous testing methods using `TestWindow` has been removed in place of Puppeteer's API.
+
+Stencil also provides many utility functions to help test Jest and Puppeteer. For example, a component's shadow dom can now be queried and tested with the Stencil utility functions built on top of Puppeteer. Tests can not only be provided mock HTML content, but they can also go to URLs of your app which Puppeteer is able to open up and test on Stencil's dev server.
 
 
-### Bug Fixes
+### Example E2E Test
 
-* **compiler:** emit optional token when appropriated ([#1050](https://github.com/ionic-team/stencil/issues/1050)) ([870a0fc](https://github.com/ionic-team/stencil/commit/870a0fc))
-* **compiler:** mark any types correctly ([8c6bcd9](https://github.com/ionic-team/stencil/commit/8c6bcd9))
-* **css-shim:** using class scoped CSS ([2b969cc](https://github.com/ionic-team/stencil/commit/2b969cc))
-* **dev:** add dynamic and shadow-dom checks ([fd2016e](https://github.com/ionic-team/stencil/commit/fd2016e))
+```javascript
+it('should create standalone, unchecked by default', async () => {
+  const page = await newE2EPage();
+
+  await page.setContent(`
+    <ion-toggle class="some-class"></ion-toggle>
+  `);
+
+  const ionChange = await page.spyOnEvent('ionChange');
+
+  const toggle = await page.find('ion-toggle');
+
+  expect(toggle).toHaveClasses(['some-class', 'hydrated']);
+
+  expect(toggle).not.toHaveClass('toggle-checked');
+
+  toggle.setProperty('checked', true);
+
+  await page.waitForChanges();
+
+  // toggle should have checked css
+  expect(toggle).toHaveClass('toggle-checked');
+
+  // make sure we received the correct event detail
+  expect(ionChange).toHaveReceivedEventDetail({
+    checked: true,
+    value: 'on'
+  });
+});
+```
 
 
 ### Features
 
 * **compiler:** methods should return a promise ([98510d5](https://github.com/ionic-team/stencil/commit/98510d5))
+* **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
 
 
 ### Performance Improvements
@@ -21,6 +54,19 @@
 * **bundling:** improve cross encapsulation bundling ([3e181c1](https://github.com/ionic-team/stencil/commit/3e181c1))
 * **core:** reduce size and improve runtime perf ([#787](https://github.com/ionic-team/stencil/issues/787)) ([8e94403](https://github.com/ionic-team/stencil/commit/8e94403))
 * **dev:** shadow-dom polyfill is not needed in dev mode ([b3bfd9a](https://github.com/ionic-team/stencil/commit/b3bfd9a))
+* tune optimizeChunks integration ([518b425](https://github.com/ionic-team/stencil/commit/518b425))
+
+
+### Bug Fixes
+
+* **compiler:** emit optional token when appropriated ([#1050](https://github.com/ionic-team/stencil/issues/1050)) ([870a0fc](https://github.com/ionic-team/stencil/commit/870a0fc))
+* **compiler:** mark any types correctly ([8c6bcd9](https://github.com/ionic-team/stencil/commit/8c6bcd9))
+* **css-shim:** using class scoped CSS ([2b969cc](https://github.com/ionic-team/stencil/commit/2b969cc))
+* **dev:** add dynamic and shadow-dom checks ([fd2016e](https://github.com/ionic-team/stencil/commit/fd2016e))
+* **compiler:** no emit promise warning while testing ([fceb3a1](https://github.com/ionic-team/stencil/commit/fceb3a1))
+* **core:** the request of a dependency is an expression ([b3d2e75](https://github.com/ionic-team/stencil/commit/b3d2e75))
+* **host:** adds Component host deprecation warning ([9cd8e2e](https://github.com/ionic-team/stencil/commit/9cd8e2e))
+* **platform:** scoped css check ([da796c4](https://github.com/ionic-team/stencil/commit/da796c4))
 
 
 
