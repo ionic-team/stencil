@@ -124,7 +124,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
 
-        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
+        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', 'components', fileName);
         return compilerCtx.fs.writeFile(distBuildPath, jsText);
       });
 
@@ -334,7 +334,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
-    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', fileName);
+    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', 'components', fileName);
 
     // write to the build
     await compilerCtx.fs.writeFile(esmBuildPath, jsText);

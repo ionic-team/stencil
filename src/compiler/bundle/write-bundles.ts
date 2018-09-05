@@ -75,7 +75,7 @@ export async function writeEsmEs5Modules(config: d.Config, rollupBundle: RollupB
       ...config.rollupConfig.outputOptions,
       format: 'es',
       banner: generatePreamble(config),
-      intro: `import { h } from './${getHyperScriptFnEsmFileName(config)}';`,
+      intro: `import { h } from '../${getHyperScriptFnEsmFileName(config)}';`,
       strict: false,
       compact: !config.devMode
     });

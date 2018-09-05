@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmBuildDir, getDistEsmIndexPath } from '../app/app-file-naming';
-import { formatEsmLoaderComponent } from '../../util/data-serialize';
+import { formatBrowserLoaderComponent } from '../../util/data-serialize';
 import { normalizePath, pathJoin } from '../util';
 
 
@@ -71,8 +71,8 @@ async function generateDefineCustomElements(config: d.Config, compilerCtx: d.Com
 
   c.push(``);
 
-  c.push(`export function defineCustomElements(window, opts) {`);
-  c.push(`  defineCustomElement(window, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);`);
+  c.push(`export function defineCustomElements(win, opts) {`);
+  c.push(`  defineCustomElement(win, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);`);
   c.push(`}`);
 
   const defineFilePath = getDefineCustomElementsPath(config, outputTarget, 'es5');
@@ -82,7 +82,7 @@ async function generateDefineCustomElements(config: d.Config, compilerCtx: d.Com
 
 
 export function appendDefineCustomElementsType(content: string) {
-  const types = `export declare function defineCustomElements(window: any): void;`;
+  const types = `export declare function defineCustomElements(win: any): void;`;
 
   if (!content.includes(types)) {
     content += types;
@@ -95,7 +95,7 @@ export function appendDefineCustomElementsType(content: string) {
 async function generateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist) {
   const c = await Promise.all(Object.keys(cmpRegistry).sort().map(async tagName => {
     const cmpMeta = cmpRegistry[tagName];
-    const data = await formatEsmLoaderComponent(config, cmpMeta);
+    const data = JSON.stringify(formatBrowserLoaderComponent(cmpMeta));
     return `export var ${cmpMeta.componentClass} = ${data};`;
   }));
 
