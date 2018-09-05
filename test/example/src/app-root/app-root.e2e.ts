@@ -13,7 +13,7 @@ describe('goto root url', () => {
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText('Hello, my name is Stencil JS');
 
-    await page.screenshot('navigate to homepage');
+    // await page.screenshot('navigate to homepage');
   });
 
   it('should navigate to the index.html page with custom url searchParams', async () => {
@@ -25,7 +25,7 @@ describe('goto root url', () => {
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText('Hello, my name is Doc Brown');
 
-    await page.screenshot('navigate to homepage with querystrings');
+    // await page.screenshot('navigate to homepage with querystrings');
   });
 
 });
