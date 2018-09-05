@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { completeE2EScreenshots, startE2ESnapshot } from '../screenshot/data-generator';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '../compiler/util';
 import { runJest, setupJestConfig } from './jest/jest-runner';
@@ -98,19 +97,10 @@ export class Testing implements d.Testing {
 
     this.jestConfigPath = await setupJestConfig(config);
 
-    let screenshotData: d.E2ESnapshot;
-    if (doScreenshots) {
-      screenshotData = await startE2ESnapshot(config);
-    }
-
     try {
       await runJest(config, this.jestConfigPath, doScreenshots);
     } catch (e) {
       config.logger.error(e);
-    }
-
-    if (doScreenshots) {
-      await completeE2EScreenshots(config, env, screenshotData);
     }
 
     config.logger.info('');
