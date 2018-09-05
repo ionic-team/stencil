@@ -3,7 +3,6 @@ import * as pd from './puppeteer-declarations';
 import { closePage } from './puppeteer-browser';
 import { findE2EElement } from './puppeteer-element';
 import { initE2EPageEvents } from './puppeteer-events';
-import { initE2EPageScreenshot } from './puppeteer-screenshot';
 import * as puppeteer from 'puppeteer';
 
 
@@ -26,8 +25,6 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
   await page.setCacheEnabled(false);
 
   await initE2EPageEvents(page);
-
-  initE2EPageScreenshot(page);
 
   page.find = findE2EElement.bind(null, page);
 

@@ -10,7 +10,7 @@ export interface NewE2EPageOptions {
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 type PuppeteerPage = Omit<puppeteer.Page,
-'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'url' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers'
+'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'url' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
 >;
 
 export interface E2EPage extends PuppeteerPage {
@@ -23,8 +23,6 @@ export interface E2EPage extends PuppeteerPage {
   find(selector: string): Promise<E2EElement>;
 
   goTo(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
-
-  screenshot(uniqueDescription: string, opts?: d.E2EScreenshotOptions): Promise<void>;
 
   setContent(html: string): Promise<void>;
 
