@@ -67,13 +67,6 @@ function testPackage(testPkg) {
   },
   {
     packageJson: '../testing/package.json',
-    files: [
-      'index.js',
-      'jest.environment.js',
-      'jest.preprocessor.js',
-      'jest.preset.js',
-      'jest.setuptest.js'
-    ],
     exports: [
       'applyWindowToGlobal',
       'createJestPuppeteerEnvironment',
