@@ -156,6 +156,6 @@ const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const MIN_HASHED_FILENAME_LENTH = 4;
 const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
-const DEFAULT_EXCLUDES = ['**/*.spec.*'];
+const DEFAULT_EXCLUDES = ['**/*.+(spec|e2e).*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
 const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';
