@@ -11,7 +11,9 @@ Stencil also provides many utility functions to help test Jest and Puppeteer. Fo
 ### Example E2E Test
 
 ```javascript
-it('should create standalone, unchecked by default', async () => {
+import { newE2EPage } from '@stencil/core/testing';
+
+it('should create toggle, unchecked by default', async () => {
   const page = await newE2EPage();
 
   await page.setContent(`
@@ -30,10 +32,8 @@ it('should create standalone, unchecked by default', async () => {
 
   await page.waitForChanges();
 
-  // toggle should have checked css
   expect(toggle).toHaveClass('toggle-checked');
 
-  // make sure we received the correct event detail
   expect(ionChange).toHaveReceivedEventDetail({
     checked: true,
     value: 'on'
