@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { mockStencilSystem } from '../../../testing/mocks';
-import { normalizePath } from '../../../compiler/util';
 import { validateServiceWorker } from '../validate-service-worker';
+
 
 describe('validateServiceWorker', () => {
 
@@ -160,6 +160,7 @@ describe('validateServiceWorker', () => {
 
   it('should create sw config when in devMode if flag serviceWorker', () => {
     outputTarget = {
+      type: 'www',
       dir: '/www',
       serviceWorker: true as any
     };
