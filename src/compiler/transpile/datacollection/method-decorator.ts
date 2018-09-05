@@ -28,7 +28,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
         ts.SignatureKind.Call
       );
 
-      if (!isPromise(checker, returnType)) {
+      if (!config._isTesting && !isPromise(checker, returnType)) {
         const filePath = sourceFile.fileName;
         const warn = buildWarn(diagnostics);
         warn.header = '@Method requires async';

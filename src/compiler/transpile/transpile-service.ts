@@ -182,7 +182,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     return;
   }
 
-  const hasWarning = ctx.buildCtx.hasWarning;
+  const hasWarning = ctx.buildCtx.hasWarning && !config._isTesting;
 
   // look up the old cache key using the ts file path
   const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
