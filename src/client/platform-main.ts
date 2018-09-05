@@ -137,7 +137,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
 
-  async function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
       queueUpdate(plt, elm);
@@ -198,29 +198,33 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         url += '?s-hmr=' + hmrVersionId;
       }
 
-      try {
-        // dynamic es module import() => woot!
-        const importedModule = await __import(url);
+      // dynamic es module import() => woot!
+      __import(url).then(importedModule => {
+        // async loading of the module is done
+        try {
+          // get the component constructor from the module
+          // initialize this component constructor's styles
+          // it is possible for the same component to have difficult styles applied in the same app
+          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+          initStyleTemplate(
+            domApi,
+            cmpMeta,
+            cmpMeta.encapsulationMeta,
+            cmpMeta.componentConstructor.style,
+            cmpMeta.componentConstructor.styleMode
+          );
 
-        // get the component constructor from the module
-        // initialize this component constructor's styles
-        // it is possible for the same component to have difficult styles applied in the same app
-        cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
-        initStyleTemplate(
-          domApi,
-          cmpMeta,
-          cmpMeta.encapsulationMeta,
-          cmpMeta.componentConstructor.style,
-          cmpMeta.componentConstructor.styleMode
-        );
+          // bundle all loaded up, let's continue
+          queueUpdate(plt, elm);
 
-        // bundle all loaded up, let's continue
-        queueUpdate(plt, elm);
-
-      } catch (e) {
-        // oh man, something's up
-        console.error(e);
-      }
+        } catch (e) {
+          // oh man, something's up
+          console.error(e);
+          // provide a bogus component constructor
+          // so the rest of the app acts as normal
+          cmpMeta.componentConstructor = class {} as any;
+        }
+      }, err => console.error(err, url));
     }
   }
 
