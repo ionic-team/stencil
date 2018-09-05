@@ -35,12 +35,14 @@ export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx
     // let's use this updated html for the index content now
     Object.assign(results, hydratedResults);
 
+    timeSpan.finish(`${msg}, finished: ${prerenderLocation.path}`);
+
   } catch (e) {
     // ahh man! what happened!
+    timeSpan.finish(`${msg}, failed: ${prerenderLocation.path}`);
+
     catchError(buildCtx.diagnostics, e);
   }
-
-  timeSpan.finish(`${msg}, finished: ${prerenderLocation.path}`);
 
   return results;
 }
