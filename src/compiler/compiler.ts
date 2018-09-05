@@ -45,10 +45,6 @@ export class Compiler implements d.Compiler {
       this.on('fsChange', fsWatchResults => {
         this.rebuild(fsWatchResults);
       });
-
-      if (config.flags.serve) {
-        this.startDevServer();
-      }
     }
   }
 
@@ -74,14 +70,14 @@ export class Compiler implements d.Compiler {
     }
 
     // start up the dev server
-    const devServerConfig = await startDevServerMain(this.config, this.ctx);
+    const devServer = await startDevServerMain(this.config, this.ctx);
 
     // get the browser url to be logged out at the end of the build
-    this.config.devServer.browserUrl = devServerConfig.browserUrl;
+    this.config.devServer.browserUrl = devServer.browserUrl;
 
-    return {
-      browserUrl: this.config.devServer.browserUrl
-    };
+    this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
+
+    return devServer;
   }
 
   on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;

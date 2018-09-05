@@ -127,7 +127,9 @@ export interface StencilConfig {
   preamble?: string;
   srcIndexHtml?: string;
   sys?: d.StencilSystem;
+  testing?: d.TestingConfig;
   tsconfig?: string;
+  validateTypes?: boolean;
   watch?: boolean;
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
@@ -182,16 +184,22 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'serve';
+  task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
+  args?: string[];
   address?: string;
   cache?: boolean;
+  channel?: string;
   checkVersion?: boolean;
+  ci?: boolean;
+  compare?: boolean;
   config?: string;
   debug?: boolean;
   dev?: boolean;
   docs?: boolean;
   docsJson?: string;
+  e2e?: boolean;
   es5?: boolean;
+  headless?: boolean;
   help?: boolean;
   log?: boolean;
   logLevel?: string;
@@ -201,8 +209,10 @@ export interface ConfigFlags {
   prerender?: boolean;
   prod?: boolean;
   root?: string;
+  screenshot?: boolean;
   serve?: boolean;
   serviceWorker?: boolean;
+  spec?: boolean;
   ssr?: boolean;
   stats?: boolean;
   version?: boolean;

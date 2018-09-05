@@ -347,7 +347,7 @@ describe('instance render', () => {
       }
 
       doRender(MyComponent);
-      expect(hostElm).toMatchClasses(['a', 'clAss', 'My-class_']);
+      expect(hostElm).toHaveClasses(['a', 'clAss', 'My-class_']);
     });
 
     it('should set attributes', () => {
@@ -368,8 +368,8 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses(['a', 'b', 'c', 'my-class']);
-      expect(hostElm).toMatchAttributes({
+      expect(hostElm).toHaveClasses(['a', 'b', 'c', 'my-class']);
+      expect(hostElm).toEqualAttributes({
         side: '  left   top ',
         empty: '',
         class: 'a b c my-class',
@@ -397,8 +397,8 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses(['a', 'hola']);
-      expect(hostElm).toMatchAttributes({
+      expect(hostElm).toHaveClasses(['a', 'hola']);
+      expect(hostElm).toEqualAttributes({
         class: 'a hola',
         number: '12',
         appear: 'true'
@@ -416,7 +416,7 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses(['my-component']);
+      expect(hostElm).toHaveClasses(['my-component']);
     });
 
     it('should apply theme with mode', () => {
@@ -432,7 +432,7 @@ describe('instance render', () => {
       spyOn(plt, 'attachStyles');
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses(['my-component', 'my-component-ios']);
+      expect(hostElm).toHaveClasses(['my-component', 'my-component-ios']);
       expect(plt.attachStyles).toHaveBeenCalled();
     });
 
@@ -449,7 +449,7 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses([
+      expect(hostElm).toHaveClasses([
         'my-component',
         'my-component-md',
         'my-component-main',
@@ -485,7 +485,7 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      expect(hostElm).toMatchClasses([
+      expect(hostElm).toHaveClasses([
         'a',
         'hola',
         'my-component',
@@ -494,7 +494,7 @@ describe('instance render', () => {
         'my-component-md-main'
       ]);
 
-      expect(hostElm).toMatchAttributes({
+      expect(hostElm).toEqualAttributes({
         'class': 'a hola my-component my-component-md my-component-main my-component-md-main',
         'number': '12',
         'appear': 'true',

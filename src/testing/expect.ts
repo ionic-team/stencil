@@ -1,29 +1,28 @@
-import { testAttributes, testClasslist, testMatchAttributes, testMatchClasslist, testProperties } from './utils';
+import * as d from '../declarations';
 import { parseFragment } from './parse-html';
 import { serialize } from './mock-doc/serialize-node';
+import deepEqual from 'fast-deep-equal';
 
 
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toEqualHtml(html: string): void;
-      toHaveClasses(classlist: string[]): void;
-      toMatchClasses(classlist: string[]): void;
-      toHaveAttributes(attributes: { [attr: string]: string }): void;
-      toMatchAttributes(attributes: { [attr: string]: string }): void;
-      toHaveProperties(properties: { [prop: string]: any }): void;
-    }
+export function toEqualHtml(input: string | HTMLElement, shouldEqual: string) {
+  if (input == null) {
+    throw new Error(`expect toEqualHtml value is null`);
   }
-}
 
+  let serializeA: string;
 
-export function toEqualHtml(a: string, b: string) {
-  const parseA = parseFragment(a);
-  const parseB = parseFragment(b);
+  if ((input as HTMLElement).nodeName) {
+    serializeA = (input as HTMLElement).innerHTML;
 
-  const serializeA = serialize(parseA, {
-    format: 'html'
-  });
+  } else {
+    const parseA = parseFragment(input as string);
+
+    serializeA = serialize(parseA, {
+      format: 'html'
+    });
+  }
+
+  const parseB = parseFragment(shouldEqual);
 
   const serializeB = serialize(parseB, {
     format: 'html'
@@ -38,83 +37,217 @@ export function toEqualHtml(a: string, b: string) {
   }
 
   return {
-    message: () => '',
+    message: () => 'expect HTML to match',
     pass: true,
   };
 }
 
-export function toHaveClasses(element: HTMLElement, classlist: string[]) {
-  try {
-    testClasslist(element, classlist);
-    return {
-      message: () => 'expected to not match classes',
-      pass: true,
-    };
-  } catch (msg) {
-    return {
-      message: () => msg,
-      pass: false,
-    };
+export function toEqualText(elm: HTMLElement, expectTextContent: string) {
+  if (!elm) {
+    throw new Error(`expect toEqualText value is null`);
   }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toEqualText value is not an element`);
+  }
+
+  const elmTextContent = (elm.textContent || '').trim();
+  expectTextContent = (expectTextContent || '').trim();
+
+  const pass = (elmTextContent === expectTextContent);
+
+  return {
+    message: () => `expected textContent "${expectTextContent}" to ${pass ? 'not ' : ''}equal "${elmTextContent}"`,
+    pass: pass,
+  };
 }
 
-export function toMatchClasses(element: HTMLElement, classlist: string[]) {
-  try {
-    testMatchClasslist(element, classlist);
-    return {
-      message: () => 'expected to not match classes',
-      pass: true,
-    };
-  } catch (msg) {
-    return {
-      message: () => msg,
-      pass: false,
-    };
+export function toHaveAttribute(elm: HTMLElement, expectAttrName: string) {
+  if (!elm) {
+    throw new Error(`expect toHaveAttribute value is null`);
   }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toHaveAttribute value is not an element`);
+  }
+
+  const pass = elm.hasAttribute(expectAttrName);
+
+  return {
+    message: () => `expected to ${pass ? 'not ' : ''}have the attribute "${expectAttrName}"`,
+    pass: pass,
+  };
 }
 
-export function toHaveAttributes(element: HTMLElement, attributes: { [attr: string]: string }) {
-  try {
-    testAttributes(element, attributes);
-    return {
-      message: () => 'expected to not match attributes',
-      pass: true,
-    };
-  } catch (msg) {
-    return {
-      message: () => msg,
-      pass: false,
-    };
+export function toEqualAttribute(elm: HTMLElement, expectAttrName: string, expectAttrValue: string) {
+  if (!elm) {
+    throw new Error(`expect toMatchAttribute value is null`);
   }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toMatchAttribute value is not an element`);
+  }
+
+  const receivedAttrValue = elm.getAttribute(expectAttrName);
+
+  const pass = (expectAttrValue === receivedAttrValue);
+
+  return {
+    message: () => `expected attribute ${expectAttrName} "${expectAttrValue}" to ${pass ? 'not ' : ''}equal "${receivedAttrValue}"`,
+    pass: pass,
+  };
 }
 
-export function toMatchAttributes(element: HTMLElement, attributes: { [attr: string]: string }) {
-  try {
-    testMatchAttributes(element, attributes);
-    return {
-      message: () => 'expected to not match attributes',
-      pass: true,
-    };
-  } catch (msg) {
-    return {
-      message: () => msg,
-      pass: false,
-    };
+export function toEqualAttributes(elm: HTMLElement, expectAttrs: {[attrName: string]: any}) {
+  if (!elm) {
+    throw new Error(`expect toEqualAttributes value is null`);
   }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toEqualAttributes value is not an element`);
+  }
+
+  const attrNames = Object.keys(expectAttrs);
+
+  const pass = attrNames.every(attrName => {
+    let expectAttrValue = expectAttrs[attrName];
+    if (expectAttrValue != null) {
+      expectAttrValue = String(expectAttrValue);
+    }
+    return elm.getAttribute(attrName) === expectAttrValue;
+  });
+
+  return {
+    message: () => `expected attributes to ${pass ? 'not ' : ''}equal ${attrNames.map(a => `[${a}="${expectAttrs[a]}"]`).join(', ')}`,
+    pass: pass,
+  };
 }
 
-
-export function toHaveProperties(instance: any, properties: { [prop: string]: any }) {
-  try {
-    testProperties(instance, properties);
-    return {
-      message: () => 'expected to not match properties',
-      pass: true,
-    };
-  } catch (msg) {
-    return {
-      message: () => msg,
-      pass: false,
-    };
+export function toHaveReceivedEvent(eventSpy: d.EventSpy) {
+  if (!eventSpy) {
+    throw new Error(`toHaveReceivedEvent event spy is null`);
   }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveReceivedEvent did not receive an event spy`);
+  }
+
+  const pass = (eventSpy.events.length > 0);
+
+  return {
+    message: () => `expected to have ${pass ? 'not ' : ''}called "${eventSpy.eventName}" event`,
+    pass: pass,
+  };
+}
+
+export function toHaveReceivedEventTimes(eventSpy: d.EventSpy, count: number) {
+  if (!eventSpy) {
+    throw new Error(`toHaveReceivedEventTimes event spy is null`);
+  }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveReceivedEventTimes did not receive an event spy`);
+  }
+
+  const pass = (eventSpy.length === count);
+
+  return {
+    message: () => `expected event "${eventSpy.eventName}" to have been called ${count} times, but was called ${eventSpy.events.length} time${eventSpy.events.length > 1 ? 's' : ''}`,
+    pass: pass,
+  };
+}
+
+export function toHaveReceivedEventDetail(eventSpy: d.EventSpy, eventDetail: any) {
+  if (!eventSpy) {
+    throw new Error(`toHaveReceivedEventDetail event spy is null`);
+  }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveReceivedEventDetail did not receive an event spy`);
+  }
+
+  if (!eventSpy.lastEvent) {
+    throw new Error(`event "${eventSpy.eventName}" was not received`);
+  }
+
+  const pass = deepEqual(eventSpy.lastEvent.detail, eventDetail);
+
+  expect(eventSpy.lastEvent.detail).toEqual(eventDetail);
+
+  return {
+    message: () => `expected event "${eventSpy.eventName}" detail to ${pass ? 'not ' : ''}equal`,
+    pass: pass,
+  };
+}
+
+export function toHaveClass(elm: HTMLElement, expectClassName: string) {
+  if (!elm) {
+    throw new Error(`expect toHaveClass value is null`);
+  }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toHaveClass value is not an element`);
+  }
+
+  const pass = elm.classList.contains(expectClassName);
+
+  return {
+    message: () => `expected to ${pass ? 'not ' : ''}have css class "${expectClassName}"`,
+    pass: pass,
+  };
+}
+
+export function toHaveClasses(elm: HTMLElement, expectClassNames: string[]) {
+  if (!elm) {
+    throw new Error(`expect toHaveClasses value is null`);
+  }
+
+  if (typeof (elm as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (elm.nodeType !== 1) {
+    throw new Error(`expect toHaveClasses value is not an element`);
+  }
+
+  const pass = expectClassNames.every(expectClassName => {
+    return elm.classList.contains(expectClassName);
+  });
+
+  return {
+    message: () => `expected to ${pass ? 'not ' : ''}have css classes "${expectClassNames.join(' ')}", but className is "${elm.className}"`,
+    pass: pass,
+  };
 }

@@ -3,6 +3,7 @@ import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
 import { taskHelp } from './task-help';
 import { taskServe } from './task-serve';
+import { taskTest } from './task-test';
 import { taskCheckVersion, taskVersion } from './task-version';
 
 
@@ -28,6 +29,10 @@ export async function runTask(process: NodeJS.Process, config: d.Config, flags: 
 
       case 'serve':
         await taskServe(process, config, flags);
+        break;
+
+      case 'test':
+        await taskTest(config);
         break;
 
       default:

@@ -5,6 +5,12 @@ import { getUserCompilerOptions } from './compiler-options';
 
 
 export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.validateTypes === false) {
+    // probably unit testing that doesn't
+    // want to take time to validate the types
+    return;
+  }
+
   if (!buildCtx.isActiveBuild) {
     buildCtx.debug(`validateTypesMain aborted, not active build`);
     return;

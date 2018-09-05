@@ -160,18 +160,7 @@ export class MockElement extends MockNode {
 
   cloneNode(deep?: boolean) {
     const cloned = new MockElement(null, this.nodeName);
-
-    const srcAttrs = this.attributes;
-    if (srcAttrs.length > 0) {
-      cloned.attributes = new MockAttributeMap();
-      cloned.attributes.items = srcAttrs.items.map(srcAttr => {
-        const dstAttr = new MockAttr();
-        dstAttr.name = srcAttr.name;
-        dstAttr.value = srcAttr.value;
-        dstAttr.namespaceURI = srcAttr.namespaceURI;
-        return dstAttr;
-      });
-    }
+    cloned.attributes = this.attributes.cloneAttributes();
 
     if (deep) {
       for (let i = 0; i < this.childNodes.length; i++) {

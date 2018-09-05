@@ -38,7 +38,8 @@ export function responseHeaders(headers: d.DevResponseHeaders): any {
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
   'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
   'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server'
+  'X-Powered-By': 'Stencil Dev Server',
+  'Access-Control-Allow-Origin': '*'
 };
 
 

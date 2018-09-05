@@ -31,7 +31,8 @@ export function transpile(input: string, opts: TranspileOptions = {}, path?: str
     rootDir: '/',
     srcDir: '/',
     devMode: true,
-    _isTesting: true
+    _isTesting: true,
+    validateTypes: false
   });
 
   const transpileResults = transpileModuleForTesting(config, compilerOpts, path, input);

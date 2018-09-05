@@ -28,10 +28,6 @@ export function mockDocument(html?: string) {
   return (doc as any) as Document;
 }
 
-export interface MockHTMLElementTagNameMap extends HTMLElementTagNameMap {
-  [tagName: string]: HTMLElement;
-}
-
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
   const hydrateResults: d.HydrateResults = {

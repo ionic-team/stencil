@@ -96,7 +96,16 @@ export class MockWindow {
     this._navigator = value;
   }
 
-  performance = new MockPerformance();
+  private _performance: any = null;
+  get performance() {
+    if (!this._performance) {
+      this._performance = new MockPerformance();
+    }
+    return this._performance;
+  }
+  set performance(value) {
+    this._performance = value;
+  }
 
   private _parent: any = null;
   get parent() {

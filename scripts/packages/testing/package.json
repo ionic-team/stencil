@@ -2,5 +2,11 @@
   "name": "@stencil/core/testing",
   "private": true,
   "main": "./index.js",
-  "types": "../dist/testing/index.d.ts"
+  "types": "../dist/testing/index.d.ts",
+  "files": [
+    "jest.environment.js",
+    "jest.preprocessor.js",
+    "jest.preset.js",
+    "jest.setuptest.js"
+  ]
 }

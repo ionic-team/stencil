@@ -163,7 +163,7 @@ describe('renderer', () => {
     it('receives css classes', () => {
       const vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       hostElm = patch(hostElm, vnode0, vnode1).elm;
-      expect(hostElm.firstChild).toMatchClasses(['i', 'am', 'a', 'class']);
+      expect(hostElm.firstChild).toHaveClasses(['i', 'am', 'a', 'class']);
     });
 
     it('should not remove duplicate css classes', () => {
@@ -185,7 +185,7 @@ describe('renderer', () => {
       const vnode1 = h('i', { class: {i: true, am: true } });
       hostElm = patch(hostElm, vnode0, vnode1).elm;
 
-      expect(hostElm).toMatchClasses(['i', 'am', 'horse']);
+      expect(hostElm).toHaveClasses(['i', 'am', 'horse']);
     });
 
     it('changes elements classes from previous vnode', () => {
@@ -194,7 +194,7 @@ describe('renderer', () => {
       patch(hostElm, vnode0, vnode1);
       hostElm = patch(hostElm, vnode1, vnode2).elm;
 
-      expect(hostElm).toMatchClasses(['i', 'am']);
+      expect(hostElm).toHaveClasses(['i', 'am']);
     });
 
     it('preserves memoized classes', () => {
@@ -202,10 +202,10 @@ describe('renderer', () => {
       const vnode1 = h('i', { class: cachedClass });
       const vnode2 = h('i', { class: cachedClass });
       hostElm = patch(hostElm, vnode0, vnode1).elm;
-      expect(hostElm).toMatchClasses(['i', 'am']);
+      expect(hostElm).toHaveClasses(['i', 'am']);
 
       hostElm = patch(hostElm, vnode1, vnode2).elm;
-      expect(hostElm).toMatchClasses(['i', 'am']);
+      expect(hostElm).toHaveClasses(['i', 'am']);
     });
 
     it('removes missing classes', () => {
@@ -213,7 +213,7 @@ describe('renderer', () => {
       const vnode2 = h('i', { class: {i: true, am: true } });
       patch(hostElm, vnode0, vnode1);
       hostElm = patch(hostElm, vnode1, vnode2).elm;
-      expect(hostElm).toMatchClasses(['i', 'am']);
+      expect(hostElm).toHaveClasses(['i', 'am']);
     });
 
     it('removes classes when class set to empty string', () => {
@@ -221,7 +221,7 @@ describe('renderer', () => {
       const vnode2 = h('i', { class: '' });
       patch(hostElm, vnode0, vnode1);
       hostElm = patch(hostElm, vnode1, vnode2).elm;
-      expect(hostElm).toMatchClasses([]);
+      expect(hostElm).toHaveClasses([]);
     });
 
 

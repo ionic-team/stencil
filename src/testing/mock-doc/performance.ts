@@ -3,7 +3,6 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/Performance
  */
 export class MockPerformance {
-  private startMs = Date.now();
 
   clearMarks() {
     //
@@ -38,7 +37,7 @@ export class MockPerformance {
   }
 
   now() {
-    return Date.now() - this.startMs;
+    return Date.now();
   }
 
   setResourceTimingBufferSize() {

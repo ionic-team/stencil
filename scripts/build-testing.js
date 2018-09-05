@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
-const rollupCommonjs = require('rollup-plugin-commonjs')
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
 const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
@@ -29,14 +29,17 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'fs',
+        'jest-environment-node',
+        'os',
+        'path',
+        'puppeteer',
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
         'rollup-pluginutils',
-        'typescript',
-        'fs',
-        'path'
+        'typescript'
       ],
       plugins: [
         rollupResolve({
@@ -77,11 +80,9 @@ if (success) {
     });
   }
 
-
   bundleTestingUtils();
 
-
-  process.on('exit', (code) => {
+  process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
     console.log(`✅ testing: ${DEST_FILE}`);
   });

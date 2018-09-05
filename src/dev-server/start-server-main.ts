@@ -8,7 +8,7 @@ import { sendMsg } from './util';
  * it is not apart of the dev-server/index.js bundle
  */
 
-export function startDevServerMain(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function startDevServerMain(config: d.Config, compilerCtx: d.CompilerCtx) {
   const fork = require('child_process').fork;
 
   // using the path stuff below because after the the bundles are created
@@ -27,11 +27,20 @@ export function startDevServerMain(config: d.Config, compilerCtx: d.CompilerCtx)
   // for the http and web socket server
   const serverProcess = fork(program, parameters, options);
 
-  config.sys.addDestroy(() => {
-    serverProcess.kill('SIGINT');
-  });
+  const devServerConfig = await startServer(config, compilerCtx, serverProcess);
 
-  return startServer(config, compilerCtx, serverProcess);
+  const devServer: d.DevServer = {
+    browserUrl: devServerConfig.browserUrl,
+    close: () => {
+      try {
+        serverProcess.kill('SIGINT');
+        config.logger.debug(`dev server closed`);
+      } catch (e) {}
+      return Promise.resolve();
+    }
+  };
+
+  return devServer;
 }
 
 

@@ -7,8 +7,9 @@ import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
-import { validateWorkers } from './validate-workers';
 import { validateRollupConfig } from './validate-rollup-config';
+import { validateTesting } from './validate-testing';
+import { validateWorkers } from './validate-workers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
@@ -81,6 +82,10 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
+  if (typeof config.validateTypes !== 'boolean') {
+    config.validateTypes = true;
+  }
+
   setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
 
@@ -135,6 +140,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   }
 
   validateRollupConfig(config);
+  validateTesting(config);
 
   return config;
 }

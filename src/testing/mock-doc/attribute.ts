@@ -7,6 +7,18 @@ export class MockAttributeMap {
     return this.items.length;
   }
 
+  cloneAttributes() {
+    const attributes = new MockAttributeMap();
+    attributes.items = this.items.map(srcAttr => {
+      const dstAttr = new MockAttr();
+      dstAttr.name = srcAttr.name;
+      dstAttr.value = srcAttr.value;
+      dstAttr.namespaceURI = srcAttr.namespaceURI;
+      return dstAttr;
+    });
+    return attributes;
+  }
+
   getNamedItem(name: string) {
     name = name.toLowerCase();
     return this.items.find(attr => attr.name === name && (attr.namespaceURI == null || attr.namespaceURI === 'http://www.w3.org/1999/xlink')) || null;

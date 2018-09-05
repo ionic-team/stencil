@@ -345,7 +345,8 @@ describe('h()', () => {
       expect(args.length).toBe(3);
       expect(args[0]).toEqual({ id: 'blank' });
       expect(args[1].length).toEqual(1);
-      expect(args[2]).toHaveProperties(['map', 'foreach']);
+      expect(typeof args[2].map).toBe('function');
+      expect(typeof args[2].forEach).toBe('function');
     });
 
     it('should receive an empty object when component receives no props', async () => {

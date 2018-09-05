@@ -6,7 +6,7 @@ export interface Compiler {
   config: d.Config;
   docs(): Promise<void>;
   isValid: boolean;
-  startDevServer(): Promise<{ browserUrl: string }>;
+  startDevServer(): Promise<d.DevServer>;
 }
 
 
