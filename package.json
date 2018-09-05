@@ -85,7 +85,6 @@
     "inquirer": "^3.3.0",
     "is-glob": "4.0.0",
     "jest": "^23.5.0",
-    "jest-environment-node-debug": "^2.0.0",
     "listr": "^0.13.0",
     "mime-db": "1.32.0",
     "minimatch": "3.0.4",
