@@ -1,7 +1,9 @@
-import { Component, Prop } from '../../../dist/index';
+import { Component, Prop } from '../../../../dist/index';
 
 @Component({
-  tag: 'prop-cmp'
+  tag: 'prop-cmp',
+  styleUrl: 'prop-cmp.css',
+  shadow: true
 })
 export class PropCmp {
   @Prop() first: string;

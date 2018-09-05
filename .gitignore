@@ -24,4 +24,4 @@ node_modules/
 /sys
 /testing
 
-test/e2e/app/components.d.ts
+test/example/www/*

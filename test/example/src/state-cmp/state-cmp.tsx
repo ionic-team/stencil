@@ -1,4 +1,4 @@
-import { Component, State } from '../../../dist/index';
+import { Component, State } from '../../../../dist/index';
 
 @Component({
   tag: 'state-cmp'
@@ -38,7 +38,7 @@ export class StateCmp {
   }
 }
 
-export interface DaySelection {
+interface DaySelection {
   label: string;
   selected: boolean
 }

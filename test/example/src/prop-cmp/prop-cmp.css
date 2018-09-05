@@ -1,0 +1,14 @@
+
+:host {
+  display: block;
+  border: 2px solid black;
+  border-radius: 10px;
+  margin: 80px auto;
+  padding: 40px 20px;
+  max-width: 320px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  background: #047aff;
+  color: white;
+}

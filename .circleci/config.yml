@@ -22,7 +22,7 @@ aliases:
 defaults: &defaults
   working_directory: ~/stencil
   docker:
-    - image: circleci/node:8.5
+    - image: circleci/node:latest-browsers
 
 jobs:
   build:
@@ -45,6 +45,13 @@ jobs:
       - attach_workspace:
           at: ~/stencil
       - run: npm run test.dist && npm run test.testing
+
+  test_example:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: npm run test.example -- --ci --debug --maxWorkers=4
 
   test_jest:
     <<: *defaults
@@ -87,6 +94,9 @@ workflows:
     jobs:
       - build
       - test_dist:
+          requires:
+            - build
+      - test_example:
           requires:
             - build
       - test_jest:

@@ -1,4 +1,4 @@
-import { Component, Listen, Prop } from '../../../dist/index';
+import { Component, Listen, Prop } from '../../../../dist/index';
 
 @Component({
   tag: 'listen-cmp'
