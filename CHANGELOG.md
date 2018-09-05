@@ -1,11 +1,27 @@
 <a name="0.13.0-1"></a>
 # 🔔 [0.13.0-1](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-1) (2018-09-05)
 
-Testing within Stencil is now broken up into two distinct types: Unit Tests with [Jest](https://jestjs.io/), and End-To-End tests with [Puppeteer](https://pptr.dev/). Previous versions already used Jest, but Stencil provided a `TestWindow` and mocked the browser environment using JSDom.
+Testing within Stencil is now broken up into two distinct types: Unit tests with [Jest](https://jestjs.io/), and End-to-end tests with [Puppeteer](https://pptr.dev/). Previous versions already used Jest, but Stencil provided a `TestWindow` and mocked the browser environment using JSDom.
 
 With the latest changes, the browser environment for e2e testing is done using Puppeteer, which provides many advantages Stencil can start to incorporate into its builds later on. This means the previous testing methods using `TestWindow` has been removed in place of Puppeteer's API.
 
 Stencil also provides many utility functions to help test Jest and Puppeteer. For example, a component's shadow dom can now be queried and tested with the Stencil utility functions built on top of Puppeteer. Tests can not only be provided mock HTML content, but they can also go to URLs of your app which Puppeteer is able to open up and test on Stencil's dev server.
+
+
+### Stencil Test Command
+
+End-to-end tests require a fresh build, dev-server, and puppeteer browser instance created before the tests can actually run. With the added build complexities, the `stencil test` command is able to organize the build requirements beforehand.
+
+Previously, the `jest` command was directly within an `npm` script, and Jest's config was within the app's `package.json` file. While this is certainly still doable, the `stencil test` command handles the build requirements, keeps configurations centralized in `stencil.config.ts`, and lazily installs Jest and Puppeteer when they're needed for the first time.
+
+With this release, the `jest` config within the app's `package.json` file can be safely removed, and the `npm` `test` script can be set to `stencil test --spec` instead of `jest`. It's also recommended to add an `npm` script `test.e2e` pointing to `stencil test --e2e`. Note that both unit tests and end-to-end tests could be ran with the same command, such as `stencil test --spec --e2e`. Below would be a common setup:
+
+```
+"scripts": {
+  "test": "stencil test --spec",
+  "test.e2e": "stencil test --e2e"
+}
+```
 
 
 ### Example E2E Test
@@ -17,14 +33,14 @@ it('should create toggle, unchecked by default', async () => {
   const page = await newE2EPage();
 
   await page.setContent(`
-    <ion-toggle class="some-class"></ion-toggle>
+    <ion-toggle class="pretty-toggle"></ion-toggle>
   `);
 
   const ionChange = await page.spyOnEvent('ionChange');
 
   const toggle = await page.find('ion-toggle');
 
-  expect(toggle).toHaveClasses(['some-class', 'hydrated']);
+  expect(toggle).toHaveClasses(['pretty-toggle', 'hydrated']);
 
   expect(toggle).not.toHaveClass('toggle-checked');
 
