@@ -89,6 +89,7 @@
     "listr": "^0.13.0",
     "mime-db": "1.32.0",
     "minimatch": "3.0.4",
+    "node-fetch": "1.7.3",
     "open-in-editor": "2.2.0",
     "opn": "5.2.0",
     "parse5": "5.1.0",
