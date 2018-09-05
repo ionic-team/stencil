@@ -75,7 +75,7 @@ async function generateJsDocsUsages(
   return rtn;
 }
 
-function generateJsDocMembers(
+export function generateJsDocMembers(
   cmpMeta: d.ComponentMeta,
   jsonCmp: d.JsonDocsComponent
 ) {
