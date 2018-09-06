@@ -61,7 +61,6 @@
     "typescript": "~2.9.1"
   },
   "devDependencies": {
-    "@types/acorn": "^4.0.3",
     "@types/autoprefixer": "^6.7.3",
     "@types/chokidar": "^1.7.4",
     "@types/fs-extra": "^5.0.0",
