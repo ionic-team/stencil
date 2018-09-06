@@ -119,13 +119,132 @@ export interface TestingConfig {
    */
   emulate?: EmulateConfig[];
 
+
+  /**
+   * This option tells Jest that all imported modules in your tests should be mocked automatically.
+   * All modules used in your tests will have a replacement implementation, keeping the API surface. Default: false
+   */
+  automock?: boolean;
+
+  /**
+   * By default, Jest runs all tests and produces all errors into the console upon completion.
+   * The bail config option can be used here to have Jest stop running tests after the first failure. Default: false
+   */
+  bail?: boolean;
+
+  /**
+   * The directory where Jest should store its cached dependency information. Jest attempts to scan your dependency tree once (up-front)
+   * and cache it in order to ease some of the filesystem raking that needs to happen while running tests. This config option lets you
+   * customize where Jest stores that cache data on disk. Default: "/tmp/<path>"
+   */
+  cacheDirectory?: string;
+
+  /**
+   * Automatically clear mock calls and instances between every test. Equivalent to calling jest.clearAllMocks()
+   * between each test. This does not remove any mock implementation that may have been provided. Default: false
+   */
+  clearMocks?: boolean;
+
+  /**
+   * Indicates whether the coverage information should be collected while executing the test. Because this retrofits all
+   * executed files with coverage collection statements, it may significantly slow down your tests. Default: false
+   */
+  collectCoverage?: boolean;
+
+  /**
+   * An array of glob patterns indicating a set of files for which coverage information should be collected.
+   * If a file matches the specified glob pattern, coverage information will be collected for it even if no tests exist
+   * for this file and it's never required in the test suite. Default: undefined
+   */
+  collectCoverageFrom?: any[];
+
+  /**
+   * The directory where Jest should output its coverage files. Default: undefined
+   */
+  coverageDirectory?: string;
+
+  /**
+   * An array of regexp pattern strings that are matched against all file paths before executing the test. If the file path matches
+   * any of the patterns, coverage information will be skipped. These pattern strings match against the full path.
+   * Use the <rootDir> string token to include the path to your project's root directory to prevent it from accidentally
+   * ignoring all of your files in different environments that may have different root directories.
+   * Example: ["<rootDir>/build/", "<rootDir>/node_modules/"]. Default: ["/node_modules/"]
+   */
+  coveragePathIgnorePatterns?: any[];
+
+  /**
+   * A list of reporter names that Jest uses when writing coverage reports. Any istanbul reporter can be used.
+   * Default: ["json", "lcov", "text"]
+   */
+  coverageReporters?: any[];
+
+  /**
+   * This will be used to configure minimum threshold enforcement for coverage results. Thresholds can be specified as global,
+   * as a glob, and as a directory or file path. If thresholds aren't met, jest will fail. Thresholds specified as a positive
+   * number are taken to be the minimum percentage required. Thresholds specified as a negative number represent the maximum
+   * number of uncovered entities allowed. Default: undefined
+   */
+  coverageThreshold?: any;
+
+  errorOnDeprecated?: boolean;
+  forceCoverageMatch?: any[];
+  globals?: any;
+  globalSetup?: string;
+  globalTeardown?: string;
+
+  /**
+   * An array of directory names to be searched recursively up from the requiring module's location. Setting this option will
+   * override the default, if you wish to still search node_modules for packages include it along with any other
+   * options: ["node_modules", "bower_components"]. Default: ["node_modules"]
+   */
+  moduleDirectories?: string[];
+
+  /**
+   * An array of file extensions your modules use. If you require modules without specifying a file extension,
+   * these are the extensions Jest will look for. Default: ['ts', 'tsx', 'js', 'json']
+   */
   moduleFileExtensions?: string[];
+
+  moduleNameMapper?: any;
+  modulePaths?: any[];
+  modulePathIgnorePatterns?: any[];
+  notify?: boolean;
+  notifyMode?: string;
+  preset?: string;
+  prettierPath?: string;
+  projects?: any;
+  reporters?: any;
+  resetMocks?: boolean;
+  resetModules?: boolean;
+  resolver?: string;
+  restoreMocks?: string;
+  rootDir?: string;
+  roots?: any[];
+  runner?: string;
+
+  /**
+   * The paths to modules that run some code to configure or set up the testing environment before each test.
+   * Since every test runs in its own environment, these scripts will be executed in the testing environment
+   * immediately before executing the test code itself. Default: []
+   */
+  setupFiles?: string[];
+
   setupTestFrameworkScriptFile?: string;
+  snapshotSerializers?: any[];
   testEnvironment?: string;
+  testEnvironmentOptions?: any;
   testMatch?: string[];
   testPathIgnorePatterns?: string[];
   testRegex?: string;
+  testResultsProcessor?: string;
+  testRunner?: string;
+  testURL?: string;
+  timers?: string;
   transform?: {[key: string]: string };
+  transformIgnorePatterns?: any[];
+  unmockedModulePathPatterns?: any[];
+  verbose?: boolean;
+  watchPathIgnorePatterns?: any[];
 }
 
 
