@@ -101,6 +101,7 @@
     "ws": "5.2.1"
   },
   "lazyDependencies": {
+    "@types/jest": "~23.3.1",
     "jest": "~23.5.0",
     "jest-environment-node": "~23.4.0",
     "puppeteer": "~1.7.0",

@@ -13,6 +13,10 @@ export class NodeResolveModule {
       return cachedPath;
     }
 
+    if (moduleId.startsWith('@types/')) {
+      return this.resolveTypesModule(fromDir, moduleId, cacheKey);
+    }
+
     const Module = require('module');
 
     fromDir = path.resolve(fromDir);
@@ -31,9 +35,7 @@ export class NodeResolveModule {
       dir = path.dirname(dir);
       packageJsonFilePath = path.join(dir, 'package.json');
 
-      try {
-        fs.accessSync(packageJsonFilePath);
-      } catch (e) {
+      if (!hasAccess(packageJsonFilePath)) {
         continue;
       }
 
@@ -45,4 +47,37 @@ export class NodeResolveModule {
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
   }
 
+  resolveTypesModule(fromDir: string, moduleId: string, cacheKey: string) {
+    const moduleSplt = moduleId.split('/');
+
+    const root = path.parse(fromDir).root;
+
+    let dir = path.join(fromDir, 'noop.js');
+    let typesPackageJsonFilePath: string;
+
+    while (dir !== root) {
+      dir = path.dirname(dir);
+      typesPackageJsonFilePath = path.join(dir, 'node_modules', moduleSplt[0], moduleSplt[1], 'package.json');
+
+      if (!hasAccess(typesPackageJsonFilePath)) {
+        continue;
+      }
+
+      this.resolveModuleCache.set(cacheKey, typesPackageJsonFilePath);
+
+      return typesPackageJsonFilePath;
+    }
+
+    throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
+  }
+
+}
+
+function hasAccess(filePath: string) {
+  let access = false;
+  try {
+    fs.accessSync(filePath);
+    access = true;
+  } catch (e) {}
+  return access;
 }

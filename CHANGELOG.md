@@ -18,6 +18,7 @@ With this release, the `jest` config within the app's `package.json` file can be
 ```javascript
 "scripts": {
   "test": "stencil test --spec",
+  "test.watch": "stencil test --spec --watch",
   "test.e2e": "stencil test --e2e"
 }
 ```

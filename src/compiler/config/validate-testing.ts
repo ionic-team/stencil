@@ -28,13 +28,22 @@ export function validateTesting(config: d.Config) {
 
   const path = config.sys.path;
 
+  if (typeof testing.rootDir === 'string') {
+    if (!path.isAbsolute(testing.rootDir)) {
+      testing.rootDir = path.join(config.rootDir, testing.rootDir);
+    }
+
+  } else {
+    testing.rootDir = config.rootDir;
+  }
+
   if (!Array.isArray(testing.moduleFileExtensions)) {
     testing.moduleFileExtensions = DEFAULT_MODULE_FILE_EXTENSIONS;
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return config.sys.path.join(config.rootDir, ignorePattern);
+      return config.sys.path.join(testing.rootDir, ignorePattern);
     });
 
     config.outputTargets.forEach((outputTarget: d.OutputTargetWww) => {

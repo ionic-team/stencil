@@ -277,8 +277,4 @@ export class NodeSystem implements d.StencilSystem {
     };
   }
 
-  get workbox() {
-    return require('workbox-build');
-  }
-
 }

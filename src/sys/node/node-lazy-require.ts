@@ -56,7 +56,7 @@ export class NodeLazyRequire implements d.LazyRequire {
       return Promise.resolve();
     }
 
-    logger.info(logger.magenta(`Please wait while missing dependencies are installed. This may take a few moments and will only be required for the first time run.`));
+    logger.info(logger.magenta(`Please wait while missing dependencies are installed. This may take a few moments and will only be required for the first run.`));
 
     const moduleIds = depsToInstall.map(dep => dep.moduleId);
     const timeSpan = logger.createTimeSpan(`installing dependenc${moduleIds.length > 1 ? 'ies' : 'y'}: ${moduleIds.join(', ')}`);

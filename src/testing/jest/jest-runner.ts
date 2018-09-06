@@ -48,7 +48,7 @@ export async function runJestDevice(config: d.Config, jestConfigPath: string, sc
     }
 
     const p = cp.fork(jestBinModule, args, {
-      cwd: config.rootDir,
+      cwd: config.testing.rootDir,
       env: jestProcessEnv
     });
 
