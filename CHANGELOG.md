@@ -1,5 +1,5 @@
-<a name="0.13.0-3"></a>
-# 🌪 [0.13.0-3](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-3) (2018-09-05)
+<a name="0.13.0-4"></a>
+# 🌈 [0.13.0-4](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-4) (2018-09-06)
 
 Testing within Stencil is now broken up into two distinct types: Unit tests with [Jest](https://jestjs.io/), and End-to-end tests with [Puppeteer](https://pptr.dev/). Previous versions already used Jest, but Stencil provided a `TestWindow` and mocked the browser environment using JSDom.
 
