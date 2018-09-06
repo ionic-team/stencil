@@ -63,7 +63,6 @@ export interface StencilSystem {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
-  workbox?: Workbox;
 }
 
 
