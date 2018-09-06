@@ -15,11 +15,23 @@ Previously, the `jest` command was directly within an `npm` script, and Jest's c
 
 With this release, the `jest` config within the app's `package.json` file can be safely removed, and the `npm` `test` script can be set to `stencil test --spec` instead of `jest`. It's also recommended to add an `npm` script `test.e2e` pointing to `stencil test --e2e`. Note that both unit tests and end-to-end tests could be ran with the same command, such as `stencil test --spec --e2e`. Below would be a common setup:
 
-```
+```javascript
 "scripts": {
   "test": "stencil test --spec",
   "test.e2e": "stencil test --e2e"
 }
+```
+
+Providing a Jest config is no longer required and Stencil will apply defaults from data it has already gathered. For example, Stencil already knows what directories to look through, and what files are spec and e2e files. Jest can still be configured using the same config names, but now using the stencil config `testing` property. It's also recommended to use the typed version of stencil.config *.ts* so you'll be able to see the typed configs and descriptions.
+
+```javascript
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  testing: {
+    testPathIgnorePatterns: [...]
+  }
+};
 ```
 
 
