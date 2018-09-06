@@ -1,5 +1,5 @@
-<a name="0.13.0-4"></a>
-# 🌈 [0.13.0-4](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-4) (2018-09-06)
+<a name="0.13.0-5"></a>
+# 🐦 [0.13.0-5](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-5) (2018-09-06)
 
 ### Stencil Testing Features
 
