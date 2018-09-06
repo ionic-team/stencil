@@ -75,6 +75,8 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
       opts.output.beautify = true;
       opts.output.indent_level = 2;
       opts.output.comments = 'all';
+    } else {
+      opts.output.comments = '/webpack/';
     }
   }
 
