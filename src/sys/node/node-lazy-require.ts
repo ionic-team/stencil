@@ -136,9 +136,17 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
     const opts: cp.SpawnOptions = {
       shell: true,
       cwd: fromDir,
+      env: Object.assign({}, process.env)
     };
+    opts.env.NODE_ENV = 'development';
 
-    logger.debug(`${cmd} ${args.join(' ')}, cwd: ${fromDir}`);
+    if (logger.level === 'debug') {
+      args.push('--verbose');
+      opts.stdio = 'inherit';
+    }
+
+    logger.debug(`${cmd} ${args.join(' ')}`);
+    logger.debug(`${cmd}, cwd: ${fromDir}`);
 
     const childProcess = cp.spawn(cmd, args, opts);
 
@@ -150,8 +158,12 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       });
     }
 
-    childProcess.once('exit', code => {
-      if (code === 0) {
+    childProcess.once('exit', exitCode => {
+      if (logger.level === 'debug') {
+        logger.debug(`${cmd}, exit ${exitCode}`);
+      }
+
+      if (exitCode === 0) {
         resolve();
       } else {
         reject(`failed to install: ${moduleIds.join(', ')}${error ? ', ' + error : ''}`);
