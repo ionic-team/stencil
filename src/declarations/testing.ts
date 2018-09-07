@@ -12,6 +12,7 @@ declare global {
 
       toHaveClass(expectClassName: string): void;
       toHaveClasses(expectClassNames: string[]): void;
+      toMatchClasses(expectClassNames: string[]): void;
 
       toHaveReceivedEvent(): void;
       toHaveReceivedEventTimes(count: number): void;

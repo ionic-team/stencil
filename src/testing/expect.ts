@@ -251,3 +251,15 @@ export function toHaveClasses(elm: HTMLElement, expectClassNames: string[]) {
     pass: pass,
   };
 }
+
+export function toMatchClasses(elm: HTMLElement, expectClassNames: string[]) {
+  let { pass } = toHaveClasses(elm, expectClassNames);
+  if (pass) {
+    pass = expectClassNames.length === elm.classList.length;
+  }
+
+  return {
+    message: () => `expected to ${pass ? 'not ' : ''}match css classes "${expectClassNames.join(' ')}", but className is "${elm.className}"`,
+    pass: pass,
+  };
+}
