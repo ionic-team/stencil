@@ -31,6 +31,10 @@ export async function startPuppeteerBrowser(config: d.Config) {
     slowMo: config.testing.browserSlowMo
   };
 
+  if (config.testing.browserExecutablePath) {
+    launchOpts.executablePath = config.testing.browserExecutablePath;
+  }
+
   const browser = await puppeteer.launch(launchOpts);
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
