@@ -104,6 +104,11 @@ export interface TestingConfig {
   browserArgs?: string[];
 
   /**
+   * Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
+   */
+  browserExecutablePath?: string;
+
+  /**
    * Whether to run browser e2e tests in headless mode. Defaults to true.
    */
   browserHeadless?: boolean;
