@@ -6,6 +6,8 @@
     "declaration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmitHelpers": true,
+    "importHelpers": true,
     "lib": [
       "dom",
       "es2017"
