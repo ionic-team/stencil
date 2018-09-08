@@ -26,8 +26,8 @@ export function init(
     x = doc.createElement('style');
     x.innerHTML = y.join() + '{visibility:hidden}.' + hydratedCssClass + '{visibility:inherit}';
     x.setAttribute('data-styles', '');
-    const linkElms = doc.head.querySelectorAll('link[rel="stylesheet"][href]');
-    doc.head.insertBefore(x, linkElms[0]);
+    y = doc.head.querySelector('meta[charset]');
+    doc.head.insertBefore(x, y ? y.nextSibling : doc.head.firstChild);
   }
 
   createComponentOnReadyPrototype(win, namespace, HTMLElementPrototype);
