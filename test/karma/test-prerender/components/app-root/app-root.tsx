@@ -1,4 +1,4 @@
-import { Component } from '../../../../../dist/index';
+import { Component } from '../../../../../dist';
 
 
 @Component({
@@ -24,6 +24,12 @@ export class AppRoot {
         <div class="client">
           <div id="client-componentWillLoad"/>
           <div id="client-componentDidLoad"/>
+        </div>
+        <div>
+          <cmp-scoped-a></cmp-scoped-a>
+        </div>
+        <div>
+          <cmp-scoped-b></cmp-scoped-b>
         </div>
       </main>
     );

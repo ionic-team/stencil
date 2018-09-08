@@ -2,6 +2,16 @@ import * as d from '../declarations';
 import { BANNER } from '../util/constants';
 
 
+export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) {
+  if (config.devMode && !config.flags.serviceWorker) {
+    return false;
+  }
+  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
+  return wwwServiceOutputs.some(outputTarget => {
+    return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
+  });
+}
+
 /**
  * Test if a file is a typescript source file, such as .ts or .tsx.
  * However, d.ts files and spec.ts files return false.
@@ -187,6 +197,12 @@ export function hasError(diagnostics: d.Diagnostic[]): boolean {
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 
+export function hasWarning(diagnostics: d.Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
+  return diagnostics.some(d => d.level === 'warn');
+}
 
 export function pathJoin(config: d.Config, ...paths: string[]) {
   return normalizePath(config.sys.path.join.apply(config.sys.path, paths));

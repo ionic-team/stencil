@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
 import { createWebSocket } from './server-web-socket';
+import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './util';
 import { getEditors } from './open-in-editor';
-import { UNREGISTER_SW_URL, getBrowserUrl, sendError, sendMsg } from './util';
 
 
 export async function startDevServerWorker(process: NodeJS.Process, devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
@@ -24,8 +24,8 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
     // process that the server has successfully started up
     sendMsg(process, {
       serverStated: {
-        browserUrl: getBrowserUrl(devServerConfig),
-        initialLoadUrl: getBrowserUrl(devServerConfig, UNREGISTER_SW_URL)
+        browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, '/'),
+        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, DEV_SERVER_INIT_URL)
       }
     });
 

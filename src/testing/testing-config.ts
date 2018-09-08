@@ -3,7 +3,6 @@ import * as d from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 
-
 export class TestingConfig implements d.Config {
   _isTesting = true;
   logger = new TestingLogger();
@@ -16,6 +15,7 @@ export class TestingConfig implements d.Config {
   devMode = true;
   enableCache = false;
   buildAppCore = false;
+  buildScoped = true;
   flags: d.ConfigFlags = {};
   bundles: d.ConfigBundle[];
   outputTargets: d.OutputTarget[];
@@ -24,4 +24,5 @@ export class TestingConfig implements d.Config {
   maxConcurrentWorkers = 1;
   minifyCss: boolean;
   minifyJs: boolean;
+  validateTypes = false;
 }

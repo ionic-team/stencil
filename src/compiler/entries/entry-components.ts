@@ -41,7 +41,7 @@ export function processAppComponentEntryTags(buildCtx: d.BuildCtx, hasUserConfig
     });
   }
 
-  return processAppGraph(allModules, appEntryTags);
+  return processAppGraph(buildCtx, allModules, appEntryTags);
 }
 
 

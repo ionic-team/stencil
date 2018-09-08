@@ -2,6 +2,7 @@
 [![Build Status][circle-badge]][circle-badge-url]
 [![Appveyor Build status][appveyor-badge]][appveyor-badge-url]
 [![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
+[![license][npm-license]][npm-license-url]
 
 
 # Stencil: A Compiler for Web Components and PWAs
@@ -150,10 +151,12 @@ Web Components, specifically Custom Elements, are natively supported in Chrome a
 For the small minority of browsers that do not support modern browser features and APIs, Stencil will automatically polyfill them on-demand. What this means is that for browsers that already support the feature natively, they will not have to download and parse any unnecessary JavaScript. The great news is that in today's web landscape, most modern APIs are already shipping for what Stencil requires. Polyfills which are loaded on-demand include:
 
  - [Custom Element](https://github.com/WebReflection/document-register-element)
+ - [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
  - [CSS Variables](https://github.com/webcomponents/shadycss)
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) *(transpiled to promises)*
  - [fetch()](https://github.com/github/fetch)
+ - [URL](https://github.com/lifaon74/url-polyfill)
  - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
  - [Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
  - [Array.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
@@ -184,6 +187,8 @@ For the small minority of browsers that do not support modern browser features a
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
 [npm-badge-url]: https://www.npmjs.com/package/@stencil/core
+[npm-license]: https://img.shields.io/npm/l/@stencil/core.svg
+[npm-license-url]: https://github.com/ionic-team/stencil/blob/master/LICENSE
 [circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
 [circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
 [browserstack-badge]: https://www.browserstack.com/automate/badge.svg?badge_key=WVNVbkRJdDBJQnBEMzZuWUdlMEZuTjlPUm9sOHZsSVNkUlJTRkJVQkx0ST0tLTFhbk5jRUNEVWxJL1J0SVR0WUFndnc9PQ==--90c84981a2ed2ede760ca48fbfc3fdd5b71d3e5e

@@ -33,10 +33,12 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
   const results: d.TranspileResults = {
     sourceFilePath: sourceFilePath,
     code: null,
+    map: null,
     diagnostics: [],
     cmpMeta: null
   };
 
+  options.sourceMap = true;
   options.isolatedModules = true;
   // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
   options.suppressOutputPathCheck = true;

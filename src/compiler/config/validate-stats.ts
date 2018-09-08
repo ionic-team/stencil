@@ -13,7 +13,7 @@ export function validateStats(config: d.Config) {
     }
   }
 
-  const outputTargets = config.outputTargets.filter(o => o.type === 'stats');
+  const outputTargets = config.outputTargets.filter(o => o.type === 'stats') as d.OutputTargetStats[];
 
   outputTargets.forEach(outputTarget => {
     validateStatsOutputTarget(config, outputTarget);

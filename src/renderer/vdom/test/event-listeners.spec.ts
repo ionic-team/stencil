@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
-import { mockElement, mockRenderer } from '../../../testing/mocks';
+import { mockDocument, mockRenderer } from '../../../testing/mocks';
 
 
 describe('event listeners', () => {
@@ -9,7 +9,8 @@ describe('event listeners', () => {
   let vnode0: d.VNode;
 
   beforeEach(() => {
-    hostElm = mockElement('div');
+    const doc = mockDocument();
+    hostElm = doc.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -19,7 +20,7 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    const vnode = h('div', { onclick: clicked },
+    const vnode = h('div', { onClick: clicked },
       h('a', null, 'Click my parent')
     );
 
@@ -32,11 +33,11 @@ describe('event listeners', () => {
   it('does not attach new listener', () => {
     const result: any[] = [];
 
-    const vnode1 = h('div', { onclick: () => { result.push(1); } },
+    const vnode1 = h('div', { onClick: () => { result.push(1); } },
       h('a', null, 'Click my parent'),
     );
 
-    const vnode2 = h('div', { onclick: () => { result.push(2); } },
+    const vnode2 = h('div', { onClick: () => { result.push(2); } },
       h('a', null, 'Click my parent'),
     );
 
@@ -55,7 +56,7 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    const vnode1 = h('div', { onclick: clicked },
+    const vnode1 = h('div', { onClick: clicked },
       h('a', null, 'Click my parent'),
     );
 
@@ -83,8 +84,8 @@ describe('event listeners', () => {
       result.push(ev);
     }
 
-    const vnode1 = h('div', { onclick: click },
-      h('a', { onclick: click }, 'Click my parent'),
+    const vnode1 = h('div', { onClick: click },
+      h('a', { onClick: click }, 'Click my parent'),
     );
 
     hostElm = patch(hostElm, vnode0, vnode1).elm;

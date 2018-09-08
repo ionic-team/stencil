@@ -2,6 +2,7 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constant
 import { gatherMetadata } from './test-utils';
 import { visitClass } from '../gather-metadata';
 import * as path from 'path';
+import { mockConfig } from '../../../../testing/mocks';
 
 
 describe('component', () => {
@@ -12,12 +13,12 @@ describe('component', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-        response = visitClass(diagnostics, checker, classNode, sourceFile);
+        response = visitClass(mockConfig(), diagnostics, checker, classNode, sourceFile);
       });
 
       expect(response).toEqual({
         'componentClass': 'ActionSheet',
-        'encapsulation': ENCAPSULATION.NoEncapsulation,
+        'encapsulationMeta': ENCAPSULATION.NoEncapsulation,
         'assetsDirsMeta': [],
         'dependencies': [],
         'eventsMeta': [
@@ -121,6 +122,7 @@ describe('component', () => {
             'attribName': 'action-sheet-id',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -140,6 +142,7 @@ describe('component', () => {
             'attribName': 'buttons',
             'attribType': {
               'text': 'ActionSheetButton[]',
+              'optional': false,
               'typeReferences': {
                 'ActionSheetButton': {
                   'referenceLocation': 'local',
@@ -163,6 +166,7 @@ describe('component', () => {
             'attribName': 'css-class',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -181,6 +185,7 @@ describe('component', () => {
             'attribName': 'enable-backdrop-dismiss',
             'attribType': {
               'text': 'boolean',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -196,17 +201,17 @@ describe('component', () => {
             'attribName': 'enter-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'enterAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -216,17 +221,17 @@ describe('component', () => {
             'attribName': 'exit-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'exitAnimation',
-              'type': 'any',
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -236,6 +241,7 @@ describe('component', () => {
             'attribName': 'sub-title',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -251,6 +257,7 @@ describe('component', () => {
             'attribName': 'title',
             'attribType': {
               'text': 'string',
+              'optional': false,
               'typeReferences': {}
             },
             'jsdoc': {

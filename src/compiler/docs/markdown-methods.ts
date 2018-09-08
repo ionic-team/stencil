@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
-import { getMemberDocumentation } from './docs-util';
+import { MarkdownTable, getMemberDocumentation } from './docs-util';
 
 
 export class MarkdownMethods {
   private rows: Row[] = [];
 
-  addRow(memberName: string, memberMeta: d.MemberMeta) {
-    this.rows.push(new Row(memberName, memberMeta));
+  addRow(methodName: string, memberMeta: d.MemberMeta) {
+    this.rows.push(new Row(methodName, memberMeta));
   }
 
   toMarkdown() {
@@ -19,14 +19,25 @@ export class MarkdownMethods {
     content.push(``);
 
     this.rows = this.rows.sort((a, b) => {
-      if (a.memberName < b.memberName) return -1;
-      if (a.memberName > b.memberName) return 1;
+      if (a.methodName < b.methodName) return -1;
+      if (a.methodName > b.methodName) return 1;
       return 0;
     });
 
+    const table = new MarkdownTable();
+
+    table.addHeader(['Method', 'Description']);
+
     this.rows.forEach(row => {
-      content.push(...row.toMarkdown());
+      table.addRow([
+        '`' + row.methodName + '`',
+        row.description
+      ]);
     });
+
+    content.push(...table.toMarkdown());
+    content.push(``);
+    content.push(``);
 
     return content;
   }
@@ -35,22 +46,10 @@ export class MarkdownMethods {
 
 class Row {
 
-  constructor(public memberName: string, private memberMeta: d.MemberMeta) {}
+  constructor(public methodName: string, private memberMeta: d.MemberMeta) {}
 
-  toMarkdown() {
-    const content: string[] = [];
-
-    content.push(`#### ${this.memberName}()`);
-    content.push(``);
-
-    const doc = getMemberDocumentation(this.memberMeta.jsdoc);
-    if (doc) {
-      content.push(doc);
-      content.push(``);
-    }
-
-    content.push(``);
-
-    return content;
+  get description() {
+    return getMemberDocumentation(this.memberMeta.jsdoc);
   }
+
 }

@@ -35,7 +35,10 @@ export interface AppRegistry {
 
 
 export interface AppRegistryComponents {
-  [tagName: string]: string | d.BundleIds;
+  [tagName: string]: {
+    bundleIds: d.BundleIds,
+    encapsulation?: 'shadow' | 'scoped';
+  };
 }
 
 

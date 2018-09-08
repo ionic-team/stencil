@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { MEMBER_TYPE } from '../../util/constants';
-import { mockElement, mockPlatform } from '../../testing/mocks';
+import { mockDocument, mockPlatform } from '../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
 
 
@@ -15,7 +14,8 @@ describe('proxyComponentInstance', () => {
   beforeEach(() => {
     plt = mockPlatform();
     cmpConstructor = {};
-    elm = mockElement('my-cmp') as any;
+    const doc = mockDocument();
+    elm = doc.createElement('my-cmp');
     instance = {};
     hostSnapshot = {};
   });

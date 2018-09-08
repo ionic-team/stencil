@@ -26,6 +26,7 @@ if (success) {
         'buffer',
         'child_process',
         'crypto',
+        'events',
         'fs',
         'http',
         'https',

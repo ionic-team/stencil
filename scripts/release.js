@@ -2,7 +2,7 @@
  * Deploy script adopted from https://github.com/sindresorhus/np
  * MIT License (c) Sindre Sorhus (sindresorhus.com)
  */
-const chalk = require('chalk');
+const tc = require('turbocolor');
 const execa = require('execa');
 const inquirer = require('inquirer');
 const Listr = require('listr');
@@ -12,7 +12,6 @@ const semver = require('semver');
 
 
 const rootDir = path.join(__dirname, '../');
-const scriptsDir = path.join(rootDir, 'scripts');
 const packageJsonPath = path.join(rootDir, 'package.json');
 
 
@@ -94,7 +93,7 @@ function runTasks(opts) {
     {
       title: 'Check current branch',
       task: () => execa.stdout('git', ['symbolic-ref', '--short', 'HEAD']).then(branch => {
-        if (branch !== 'master') {
+        if (branch !== 'master' && process.argv.slice(2).indexOf('--any-branch') === -1) {
           throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
         }
       })
@@ -110,7 +109,7 @@ function runTasks(opts) {
     {
       title: 'Check remote history',
       task: () => execa.stdout('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(result => {
-        if (result !== '0') {
+        if (result !== '0' && process.argv.slice(2).indexOf('--any-branch') === -1) {
           throw new Error('Remote history differs. Please pull changes.');
         }
       })
@@ -130,6 +129,10 @@ function runTasks(opts) {
       {
         title: 'Build @stencil/core',
         task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
+      },
+      {
+        title: 'Optimize for release',
+        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
       },
       {
         title: 'Run dist tests',
@@ -170,7 +173,12 @@ function runTasks(opts) {
     tasks.push(
       {
         title: 'Publish @stencil/core',
-        task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: rootDir })
+        task: () => execa(
+          'npm',
+          ['publish'].concat(opts.tag ? ['--tag', opts.tag] : [])
+          .concat(opts.otp ? ['--otp', opts.otp] : []),
+          { cwd: rootDir }
+        )
       },
       {
         title: 'Tagging the latest commit',
@@ -186,7 +194,11 @@ function runTasks(opts) {
       tasks.push(
         {
           title: 'Also set "next" tag on @stencil/core',
-          task: () => execa('npm', ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'], { cwd: rootDir })
+          task: () => execa(
+            'npm',
+            ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next']
+            .concat(opts.otp ? ['--otp', opts.otp] : []),
+            { cwd: rootDir })
         }
       );
     }
@@ -203,7 +215,7 @@ function runTasks(opts) {
       }
     })
     .catch(err => {
-      console.log('\n', chalk.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -213,7 +225,7 @@ function prepareUI() {
   const pkg = readPkg();
   const oldVersion = pkg.version;
 
-  console.log(`\nPrepare to publish a new version of ${chalk.bold.magenta(pkg.name)} ${chalk.dim(`(${oldVersion})`)}\n`);
+  console.log(`\nPrepare to publish a new version of ${tc.bold.magenta(pkg.name)} ${tc.dim(`(${oldVersion})`)}\n`);
 
   const prompts = [
     {
@@ -255,7 +267,7 @@ function prepareUI() {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
-        return `Will bump from ${chalk.cyan(oldVersion)} to ${chalk.cyan(answers.version)}. Continue?`;
+        return `Will bump from ${tc.cyan(oldVersion)} to ${tc.cyan(answers.version)}. Continue?`;
       }
     }
   ];
@@ -270,7 +282,7 @@ function prepareUI() {
       }
     })
     .catch(err => {
-      console.log('\n', chalk.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -279,7 +291,7 @@ function publishUI() {
   const pkg = readPkg();
   const version = pkg.version;
 
-  console.log(`\nPublish a new version of ${chalk.bold.magenta(pkg.name)} ${chalk.dim(`(${version})`)}\n`);
+  console.log(`\nPublish a new version of ${tc.bold.magenta(pkg.name)} ${tc.dim(`(${version})`)}\n`);
 
   const prompts = [
     {
@@ -321,13 +333,19 @@ function publishUI() {
       }
     },
     {
+      type: 'input',
+      name: 'otp',
+      message: 'NPM Auth code',
+      when: () => process.argv.slice(2).indexOf('--otp') > -1,
+    },
+    {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
         const tag = answers.tag;
         const tagPart = tag ? ` and tag this release in npm as ${tag}` : '';
 
-        return `Will publish ${chalk.cyan(version + tagPart)}. Continue?`;
+        return `Will publish ${tc.cyan(version + tagPart)}. Continue?`;
       }
     }
   ];
@@ -343,7 +361,7 @@ function publishUI() {
       }
     })
     .catch(err => {
-      console.log('\n', chalk.red(err), '\n');
+      console.log('\n', tc.red(err), '\n');
       process.exit(0);
     });
 }
@@ -396,17 +414,17 @@ function prettyVersionDiff(oldVersion, inc) {
 
   for (let i = 0; i < newVersion.length; i++) {
     if ((newVersion[i] !== oldVersion[i] && !firstVersionChange)) {
-      output.push(`${chalk.dim.cyan(newVersion[i])}`);
+      output.push(`${tc.dim.cyan(newVersion[i])}`);
       firstVersionChange = true;
     } else if (newVersion[i].indexOf('-') >= 1) {
       let preVersion = [];
       preVersion = newVersion[i].split('-');
-      output.push(`${chalk.dim.cyan(`${preVersion[0]}-${preVersion[1]}`)}`);
+      output.push(`${tc.dim.cyan(`${preVersion[0]}-${preVersion[1]}`)}`);
     } else {
-      output.push(chalk.reset.dim(newVersion[i]));
+      output.push(tc.reset.dim(newVersion[i]));
     }
   }
-  return output.join(chalk.reset.dim('.'));
+  return output.join(tc.reset.dim('.'));
 }
 
 const prepare = process.argv.slice(2).indexOf('--prepare') > -1;

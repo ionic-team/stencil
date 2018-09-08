@@ -45,6 +45,7 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         },
         components: buildResults.components,
         entries: buildResults.entries,
+        rollupResults: buildCtx.rollupResults,
         sourceGraph: {},
         collections: buildCtx.collections.map(c => {
           return {

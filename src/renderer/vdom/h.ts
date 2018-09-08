@@ -8,12 +8,13 @@
  */
 
 import * as d from '../../declarations';
+import { FunctionalUtilities } from '../../declarations';
 
 const stack: any[] = [];
 
 
-export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
-export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
+export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
+export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export function h(nodeName: any, vnodeData: any) {
   let children: any[] = null;
   let lastSimple = false;
@@ -90,10 +91,7 @@ export function h(nodeName: any, vnodeData: any) {
 
   if (typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)({
-      ...vnodeData,
-      children: children
-    }, utils);
+    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children || [], utils);
   }
 
   return {
@@ -108,10 +106,46 @@ export function h(nodeName: any, vnodeData: any) {
   } as d.VNode;
 }
 
-const utils = {
-  'getTag': (vnode: d.VNode) => vnode.vtag,
-  'getChildren': (vnode: d.VNode) => vnode.vchildren,
-  'getText': (vnode: d.VNode) => vnode.vtext,
-  'getAttributes': (vnode: d.VNode) => vnode.vattrs,
-  'replaceAttributes': (vnode: d.VNode, attributes: any) => vnode.vattrs = attributes
+function childToVNode(child: d.ChildNode) {
+  return {
+    vtag: child['vtag'],
+    vchildren: child['vchildren'],
+    vtext: child['vtext'],
+    vattrs: child['vattrs'],
+    vkey: child['vkey'],
+    vname: child['vname']
+  };
+}
+
+function VNodeToChild(vnode: d.VNode): d.ChildNode {
+  return {
+    'vtag': vnode.vtag,
+    'vchildren': vnode.vchildren,
+    'vtext': vnode.vtext,
+    'vattrs': vnode.vattrs,
+    'vkey': vnode.vkey,
+    'vname': vnode.vname
+  };
+}
+
+const utils: FunctionalUtilities = {
+  'forEach': (children, cb) => {
+    children.forEach((item, index, array) =>
+      cb(
+        VNodeToChild(item),
+        index,
+        array
+      )
+    );
+  },
+  'map': (children, cb): d.VNode[] => {
+    return children.map((item, index, array) => childToVNode(
+        cb(
+          VNodeToChild(item),
+          index,
+          array
+        )
+      )
+    );
+  }
 };

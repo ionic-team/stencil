@@ -4,8 +4,9 @@ import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename 
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
-import { PLUGIN_HELPERS } from '../style/generate-component-styles';
+import { PLUGIN_HELPERS } from '../style/component-styles';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
+import { OutputTargetDist } from '../../declarations';
 
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], jsModules: d.JSModuleMap) {
@@ -105,7 +106,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
     return;
   }
 
-  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
   if (!distOutputs.length) {
     return;
   }
@@ -123,7 +124,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
 
-        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', fileName);
+        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', 'components', fileName);
         return compilerCtx.fs.writeFile(distBuildPath, jsText);
       });
 
@@ -136,7 +137,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
 
 async function writeBundleJSFile(config: d.Config, compilerCtx: d.CompilerCtx, fileName: string, jsText: string) {
-  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild);
+  const outputTargets = config.outputTargets.filter(outputTarget => outputTarget.appBuild) as d.OutputTargetBuild[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved in www
@@ -212,7 +213,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
   // generate the bundle build for mode, no scoped styles, and esm
   await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false);
 
-  if (entryModule.requiresScopedStyles) {
+  if (entryModule.requiresScopedStyles && config.buildScoped) {
     // create js text for: mode, scoped styles, esm
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esm, modeName, true);
 
@@ -227,7 +228,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
     // generate the bundle build for: mode, no scoped styles and es5
     await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
 
-    if (entryModule.requiresScopedStyles) {
+    if (entryModule.requiresScopedStyles && config.buildScoped) {
       // create js text for: mode, scoped styles, es5
       jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.es5, modeName, true, 'es5');
 
@@ -241,7 +242,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, false, 'es5');
     await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, 'es5');
 
-    if (entryModule.requiresScopedStyles) {
+    if (entryModule.requiresScopedStyles && config.buildScoped) {
       jsText = await createBundleJsText(config, compilerCtx, buildCtx, entryModule, jsCode.esmEs5, modeName, true, 'es5');
       await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, true, 'es5');
     }
@@ -296,7 +297,7 @@ async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.Compi
 
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.appBuild;
-  });
+  }) as d.OutputTargetBuild[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
@@ -329,11 +330,11 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
   entryModule.entryBundles = entryModule.entryBundles || [];
   entryModule.entryBundles.push(entryBundle);
 
-  const outputTargets = config.outputTargets.filter(o => o.type === 'dist');
+  const outputTargets = config.outputTargets.filter(o => o.type === 'dist') as OutputTargetDist[];
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
-    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', fileName);
+    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', 'components', fileName);
 
     // write to the build
     await compilerCtx.fs.writeFile(esmBuildPath, jsText);

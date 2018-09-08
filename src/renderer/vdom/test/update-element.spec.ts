@@ -1,4 +1,4 @@
-import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { mockPlatform } from '../../../testing/mocks';
 import { NODE_TYPE } from '../../../util/constants';
 import { updateElement } from '../update-dom-node';
 import { VNode } from '../../../declarations';
@@ -8,9 +8,10 @@ import * as setAccessor from '../set-accessor';
 describe('updateElement', () => {
 
   const plt: any = mockPlatform();
+  const domApi = plt.domApi;
 
   it('should add/remove classes', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     elm.className = 'mr plutonium';
     const oldVNode: VNode = {
       vattrs: { class: 'mr plutonium' }
@@ -24,7 +25,7 @@ describe('updateElement', () => {
   });
 
   it('should remove classes when oldVNode.vattrs but no newVNode.attrs', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
     const oldVNode: VNode = {
       vattrs: { class: 'mr fusion' }
@@ -37,7 +38,7 @@ describe('updateElement', () => {
   });
 
   it('should do nothing when class is unchanged', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
     const oldVNode: VNode = {
       vattrs: { class: 'mr fusion' }
@@ -51,7 +52,7 @@ describe('updateElement', () => {
   });
 
   it('should add new classes when no oldVNode.vattrs', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     const oldVNode: VNode = {};
     const newVnode: VNode = {
       elm: elm,
@@ -62,7 +63,7 @@ describe('updateElement', () => {
   });
 
   it('should add new class when no oldVNode', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     const oldVNode: VNode = null;
     const newVnode: VNode = {
       elm: elm,
@@ -74,7 +75,7 @@ describe('updateElement', () => {
 
   it('should do nothing when no newVnode attrs', () => {
     expect(() => {
-      const elm = mockElement('my-tag') as HTMLElement;
+      const elm = domApi.$createElement('my-tag') as HTMLElement;
       const oldVNode: VNode = null;
       const newVnode: VNode = {
         elm: elm
@@ -85,7 +86,7 @@ describe('updateElement', () => {
 
   it('should use host element on shadow root element when using shadow dom', () => {
     const elm: any = {
-      host: mockElement('div') as HTMLElement,
+      host: domApi.$createElement('div') as HTMLElement,
       nodeType: NODE_TYPE.DocumentFragment
     };
     const oldVNode: VNode = null;
@@ -102,7 +103,7 @@ describe('updateElement', () => {
   });
 
   it('should use host element when using an element with a "host" property', () => {
-    const elm: any = mockElement('a') as HTMLElement;
+    const elm: any = domApi.$createElement('a') as HTMLElement;
     elm.host = 'localhost:8888';
     const oldVNode: VNode = null;
     const newVnode: VNode = {
@@ -118,7 +119,7 @@ describe('updateElement', () => {
   });
 
   it('should use host element when not shadow dom', () => {
-    const elm = mockElement('my-tag') as HTMLElement;
+    const elm = domApi.$createElement('my-tag') as HTMLElement;
     const oldVNode: VNode = null;
     const newVnode: VNode = {
       elm: elm,
@@ -134,7 +135,7 @@ describe('updateElement', () => {
 
   it('max test', () => {
     const spy = jest.spyOn(setAccessor, 'setAccessor');
-    const elm = mockElement('section') as HTMLElement;
+    const elm = domApi.$createElement('section') as HTMLElement;
     const initialVNode: VNode = null;
     const firstVNode: VNode = {
       elm: elm,

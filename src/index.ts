@@ -1,19 +1,20 @@
 
 import * as d from './declarations/index';
-
 export {
   ComponentDidLoad,
   ComponentDidUnload,
   ComponentDidUpdate,
   ComponentWillLoad,
   ComponentWillUpdate,
-  Config,
+  ComponentInstance as ComponentInterface,
+  StencilConfig as Config,
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
-  QueueApi
+  QueueApi,
+  JSXElements,
+  Hyperscript
 } from './declarations/index';
-
 
 /**
  * Build

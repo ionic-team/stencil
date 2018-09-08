@@ -1,7 +1,7 @@
 import { Collection, Config } from '../../declarations';
 
 
-export function validateCollectinCompatibility(config: Config, collection: Collection): number[] {
+export function validateCollectionCompatibility(config: Config, collection: Collection): number[] {
   if (!collection.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
@@ -49,6 +49,14 @@ export function calculateRequiredUpgrades(config: Config, collectionVersion: str
     upgrades.push(CompilerUpgrade.Add_Component_Dependencies);
   }
 
+  if (config.sys.semver.gte(collectionVersion, '0.11.5')) {
+    // 2018-08-08
+    // add dependencies to component metadata
+    // this is used in create of components.d.ts for local vs
+    // dist.
+    upgrades.push(CompilerUpgrade.Add_Local_Intrinsic_Elements);
+  }
+
   return upgrades;
 }
 
@@ -57,5 +65,6 @@ export const enum CompilerUpgrade {
   JSX_Upgrade_From_0_0_5,
   Metadata_Upgrade_From_0_1_0,
   Remove_Stencil_Imports,
-  Add_Component_Dependencies
+  Add_Component_Dependencies,
+  Add_Local_Intrinsic_Elements
 }

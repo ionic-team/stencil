@@ -1,24 +1,24 @@
 import * as d from '../declarations';
 
 
-export function createQueueServer() {
-  const highPriority: Function[] = [];
+export function createQueueServer(): d.QueueApi {
+  const highPriority: d.RafCallback[] = [];
   const domReads: d.RafCallback[] = [];
   const domWrites: d.RafCallback[] = [];
 
   let queued = false;
 
-  function flush(cb?: Function) {
+  function flush(cb?: () => void) {
     while (highPriority.length > 0) {
-      highPriority.shift()();
+      highPriority.shift()(0);
     }
 
     while (domReads.length > 0) {
-      domReads.shift()();
+      domReads.shift()(0);
     }
 
     while (domWrites.length > 0) {
-      domWrites.shift()();
+      domWrites.shift()(0);
     }
 
     queued = (highPriority.length > 0) || (domReads.length > 0) || (domWrites.length > 0);
@@ -37,7 +37,7 @@ export function createQueueServer() {
 
   return {
 
-    tick: (cb: Function) => {
+    tick: (cb: d.RafCallback) => {
       // queue high priority work to happen in next tick
       // uses Promise.resolve() for next tick
       highPriority.push(cb);
@@ -72,5 +72,5 @@ export function createQueueServer() {
 
     clear: clear
 
-  } as d.QueueApi;
+  };
 }

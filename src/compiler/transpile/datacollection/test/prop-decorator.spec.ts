@@ -18,6 +18,7 @@ describe('props decorator', () => {
         attribName: 'object-any-thing',
         attribType: {
           text: '(_) => Promise<OtherThing>',
+          optional: false,
           typeReferences: {
             OtherThing: {
               importReferenceLocation: '../../../../../index',
@@ -33,7 +34,7 @@ describe('props decorator', () => {
           name: 'objectAnyThing',
           type: '(_: any) => any',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Unknown,
         reflectToAttrib: false
       },
@@ -41,6 +42,7 @@ describe('props decorator', () => {
         attribName: 'size',
         attribType: {
           text: 'string',
+          optional: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -48,7 +50,7 @@ describe('props decorator', () => {
           name: 'size',
           type: 'string',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,
         reflectToAttrib: false
       },
@@ -56,13 +58,14 @@ describe('props decorator', () => {
         attribName: 'my-custom-attr-name',
         attribType: {
           text: 'number',
+          optional: false,
         },
         jsdoc: {
           documentation: '',
           name: 'withOptions',
           type: 'number',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: true
       },
@@ -70,6 +73,7 @@ describe('props decorator', () => {
         attribName: 'width',
         attribType: {
           text: 'number',
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -77,7 +81,7 @@ describe('props decorator', () => {
           name: 'width',
           type: 'number',
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: false
       },
@@ -85,6 +89,7 @@ describe('props decorator', () => {
         attribName: 'setting',
         attribType: {
           text: `'auto' | 'manual'`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -92,7 +97,7 @@ describe('props decorator', () => {
           name: 'setting',
           type: `"auto" | "manual"`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,
         reflectToAttrib: false
       },
@@ -100,6 +105,7 @@ describe('props decorator', () => {
         attribName: 'values',
         attribType: {
           text: `number | number[]`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -107,7 +113,7 @@ describe('props decorator', () => {
           name: 'values',
           type: `number | {}`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
         reflectToAttrib: false
       },
@@ -115,6 +121,7 @@ describe('props decorator', () => {
         attribName: 'enabled',
         attribType: {
           text: `boolean | string`,
+          optional: true,
           typeReferences: {}
         },
         jsdoc: {
@@ -122,7 +129,7 @@ describe('props decorator', () => {
           name: 'enabled',
           type: `string | boolean`,
         },
-        memberType: 1,
+        memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Any,
         reflectToAttrib: false
       },
@@ -153,12 +160,12 @@ describe('props decorator', () => {
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 12; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
 
     // unknown
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       expect(response[`unknown${i}`].propType).toEqual(PROP_TYPE.Unknown);
     }
   });

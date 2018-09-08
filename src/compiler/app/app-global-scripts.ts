@@ -11,7 +11,7 @@ import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
   const globalJsContents = await generateAppGlobalContents(config, compilerCtx, buildCtx, sourceTarget);
 
-  if (globalJsContents.length) {
+  if (globalJsContents.length > 0) {
     appRegistry.global = getGlobalFileName(config);
 
     const globalJsContent = generateGlobalJs(config, globalJsContents);
@@ -23,15 +23,15 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 
     if (sourceTarget !== 'es5') {
       config.outputTargets.filter(o => o.appBuild).forEach(outputTarget => {
-        const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget);
+        const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget as any);
         promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent));
       });
+    } else {
+      config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
+        const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget as any, 'es5');
+        promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
+      });
     }
-
-    config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
-      const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget, 'es5');
-      promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
-    });
 
     await Promise.all(promises);
   }

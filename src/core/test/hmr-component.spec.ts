@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { hmrFinish, hmrStart } from '../hmr-component';
-import { mockElement, mockPlatform } from '../../testing/mocks';
+import { mockDocument, mockPlatform } from '../../testing/mocks';
 import { noop } from '../../util/helpers';
 
 
@@ -13,7 +13,8 @@ describe('hmr-component', () => {
     plt = mockPlatform();
     plt.requestBundle = noop;
     cmpMeta = {};
-    elm = mockElement();
+    const doc = mockDocument();
+    elm = doc.createElement('div');
     plt.getComponentMeta = () => cmpMeta;
   });
 

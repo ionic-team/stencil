@@ -1,6 +1,6 @@
 import { ComponentMeta, PlatformApi } from '../../declarations';
 import { MEMBER_TYPE } from '../../util/constants';
-import { mockElement, mockPlatform } from '../../testing/mocks';
+import { mockDocument, mockPlatform } from '../../testing/mocks';
 import { proxyHostElementPrototype } from '../proxy-host-element';
 
 
@@ -12,7 +12,8 @@ describe('proxyHostElementPrototype', () => {
 
   beforeEach(() => {
     cmpMeta = {};
-    elm = mockElement('my-cmp');
+    const doc = mockDocument();
+    elm = doc.createElement('my-cmp');
   });
 
 
@@ -20,7 +21,7 @@ describe('proxyHostElementPrototype', () => {
     cmpMeta.membersMeta = {
       'myProp': { memberType: MEMBER_TYPE.Prop }
     };
-    proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+    proxyHostElementPrototype(plt, Object.entries(cmpMeta.membersMeta), elm);
     expect(elm.myProp).toBeUndefined();
   });
 
@@ -29,7 +30,7 @@ describe('proxyHostElementPrototype', () => {
       'myProp': { memberType: MEMBER_TYPE.Prop },
       'myPropMutable': { memberType: MEMBER_TYPE.PropMutable }
     };
-    proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+    proxyHostElementPrototype(plt, Object.entries(cmpMeta.membersMeta), elm);
 
     const myProp = Object.getOwnPropertyDescriptor(elm, 'myProp');
     expect(myProp.get).toBeDefined();
@@ -44,7 +45,7 @@ describe('proxyHostElementPrototype', () => {
     cmpMeta.membersMeta = {
       'myMethod': { memberType: MEMBER_TYPE.Method }
     };
-    proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+    proxyHostElementPrototype(plt, Object.entries(cmpMeta.membersMeta), elm);
     const prop = Object.getOwnPropertyDescriptor(elm, 'myMethod');
     expect(prop.value).toBeDefined();
     expect(typeof prop.value).toBe('function');
@@ -57,17 +58,11 @@ describe('proxyHostElementPrototype', () => {
       'myPropConnect': { memberType: MEMBER_TYPE.PropConnect },
       'myPropContext': { memberType: MEMBER_TYPE.PropContext }
     };
-    proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+    proxyHostElementPrototype(plt, Object.entries(cmpMeta.membersMeta), elm);
     expect(Object.getOwnPropertyDescriptor(elm, 'myState')).toBeUndefined();
     expect(Object.getOwnPropertyDescriptor(elm, 'myElement')).toBeUndefined();
     expect(Object.getOwnPropertyDescriptor(elm, 'myPropConnect')).toBeUndefined();
     expect(Object.getOwnPropertyDescriptor(elm, 'myPropContext')).toBeUndefined();
-  });
-
-  it('do nothing for no members', () => {
-    expect(() => {
-      proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
-    }).not.toThrow();
   });
 
 });

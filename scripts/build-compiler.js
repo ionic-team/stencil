@@ -1,8 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const cp = require('child_process');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
+const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
@@ -20,17 +22,32 @@ const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
 if (success) {
 
+  const buildConditionals = getDefaultBuildConditionals();
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    return all;
+  }, {});
+
   function bundleCompiler() {
     rollup.rollup({
       input: ENTRY_FILE,
+      plugins: [
+        rollupResolve({
+          jsnext: true
+        }),
+        rollupCommonjs(),
+        rollupPluginReplace({
+          values: replaceObj
+        })
+      ],
       external: [
+        'crypto',
         'fs',
         'path',
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
-        'rollup-plugin-node-globals',
         'rollup-pluginutils',
         'typescript',
         'util'
@@ -105,23 +122,26 @@ function updateBuildIds(buildId, input) {
 
   let output = input;
 
+  // increment this number to bust the cache entirely
+  const CACHE_BUSTER = 1;
+
   output = output.replace(/__BUILDID__/g, buildId);
 
-  let tsPkg = require('../node_modules/typescript/package.json');
-  let transpileId = tsPkg.name + tsPkg.version;
+  let transpilePkg = require('../node_modules/typescript/package.json');
+  let transpileId = transpilePkg.name + transpilePkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:TRANSPILE__/g, transpileId);
 
-  let cleanCssPkg = require('../node_modules/clean-css/package.json');
-  let minifyStyleId = cleanCssPkg.name + cleanCssPkg.version;
+  let minifyStylePkg = require('../node_modules/clean-css/package.json');
+  let minifyStyleId = minifyStylePkg.name + minifyStylePkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYSTYLE__/g, minifyStyleId);
 
-  let uglifyPkg = require('../node_modules/uglify-es/package.json');
-  let minifyJsId = uglifyPkg.name + uglifyPkg.version;
+  let minifyJsPkg = require('../node_modules/terser/package.json');
+  let minifyJsId = minifyJsPkg.name + minifyJsPkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
 
   let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
   let postcssPkg = require('../node_modules/postcss/package.json');
-  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version;
+  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:AUTOPREFIXCSS__/g, autoPrefixerId);
 
   return output;

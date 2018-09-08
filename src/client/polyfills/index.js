@@ -32,6 +32,19 @@ export function applyPolyfills(window, cb) {
     promises.push(import('./polyfills/fetch.js'));
   }
 
+  function checkIfURLIsSupported() {
+    try {
+      var u = new URL('b', 'http://a');
+      u.pathname = 'c%20d';
+      return (u.href === 'http://a/c%20d') && u.searchParams;
+    } catch(e) {
+      return false;
+    }
+  }
+  if (!checkIfURLIsSupported) {
+    promises.push(import('./polyfills/url.js'));
+  }
+
   Promise.all(promises).then(function(results) {
     results.forEach(function(polyfillModule) {
       polyfillModule.applyPolyfill(window, window.document);

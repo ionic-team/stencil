@@ -10,11 +10,13 @@ export async function generateJsDocComponent(config: d.Config, compilerCtx: d.Co
     usage: await generateJsDocsUsages(config, compilerCtx, dirPath),
     props: [],
     methods: [],
-    events: []
+    events: [],
+    styles: []
   };
 
   generateJsDocMembers(cmpMeta, jsonCmp);
   generateJsDocEvents(cmpMeta, jsonCmp);
+  generateJsDocCssProps(cmpMeta, jsonCmp);
 
   jsonDocs.components.push(jsonCmp);
 }
@@ -128,5 +130,28 @@ function generateJsDocEvents(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompon
     };
 
     jsonCmp.events.push(eventData);
+  });
+}
+
+
+function generateJsDocCssProps(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsComponent) {
+  if (!cmpMeta.styleDocs) {
+    return;
+  }
+
+  cmpMeta.styleDocs.sort((a, b) => {
+    if (a.annotation < b.annotation) return -1;
+    if (a.annotation > b.annotation) return 1;
+    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+    return 0;
+
+  }).forEach(styleDoc => {
+    const cssPropData: d.JsonDocsStyle = {
+      annotation: styleDoc.annotation || '',
+      name: styleDoc.name,
+      docs: styleDoc.docs || ''
+    };
+    jsonCmp.styles.push(cssPropData);
   });
 }

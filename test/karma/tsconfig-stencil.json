@@ -20,9 +20,14 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es2017",
-    "outDir": "www"
+    "outDir": "www",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core": ["../../"]
+    }
   },
   "include": [
+    "test-app/components.d.ts",
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/util.ts",

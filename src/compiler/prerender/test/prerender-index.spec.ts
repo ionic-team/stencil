@@ -3,11 +3,17 @@ import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
+import { getDefaultBuildConditionals } from '../../../util/build-conditionals';
 
 
 jest.setTimeout(20000);
 
 describe('prerender index', () => {
+
+  beforeEach(() => {
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
+  });
+
 
   let c: TestingCompiler;
   let config: d.Config;
@@ -15,6 +21,9 @@ describe('prerender index', () => {
 
   it('should pass properties down in prerendering', async () => {
     config = new TestingConfig();
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
+    __BUILD_CONDITIONALS__.ssrServerSide = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
 
@@ -55,14 +64,16 @@ describe('prerender index', () => {
 
     const index = await c.fs.readFile(path.join(root, 'www', 'index.html'));
 
-    expect(index).toContain('<p data-ssrc=\"1.0\"><!--s.1.0-->property from parent<!--/--> </p>');
-    expect(index).toContain('<p data-ssrc=\"1.1\"><!--s.1.0-->attr from parent<!--/--> </p>');
-    expect(index).toContain('<p data-ssrc=\"1.2\"><!--s.1.0-->custom attr from parent<!--/--> </p>');
+    expect(index).toContain('<p ssrc=\"1.0\"><!--s.1.0-->property from parent<!--/--> </p>');
+    expect(index).toContain('<p ssrc=\"1.1\"><!--s.1.0-->attr from parent<!--/--> </p>');
+    expect(index).toContain('<p ssrc=\"1.2\"><!--s.1.0-->custom attr from parent<!--/--> </p>');
     expect(index).not.toContain('unset');
   });
 
   it('should prerender w/ defaults', async () => {
     config = new TestingConfig();
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
     config.outputTargets = [

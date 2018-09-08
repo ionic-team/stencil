@@ -15,7 +15,7 @@ export async function generateProxies(config: d.Config, compilerCtx: d.CompilerC
 }
 
 export async function generateDistributions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<any> {
-  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
 
   if (distOutputs.length === 0) {
     // not doing any dist builds
@@ -86,13 +86,13 @@ async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
 
 
 export function getComponentsDtsSrcFilePath(config: d.Config) {
-  return pathJoin(config, config.srcDir, COMPONENTS_DTS);
+  return pathJoin(config, config.srcDir, GENERATED_DTS);
 }
 
 
 export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
-  return pathJoin(config, outputTarget.typesDir, COMPONENTS_DTS);
+  return pathJoin(config, outputTarget.typesDir, GENERATED_DTS);
 }
 
 
-export const COMPONENTS_DTS = 'components.d.ts';
+export const GENERATED_DTS = 'components.d.ts';

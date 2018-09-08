@@ -3,9 +3,10 @@ import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, seriali
 import { MEMBER_TYPE } from '../../../util/constants';
 import { validatePublicName } from './reserved-public-members';
 import * as ts from 'typescript';
+import { buildWarn, normalizePath } from '../../util';
 
 
-export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string): d.MembersMeta {
+export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string): d.MembersMeta {
   return classNode.members
     .filter(isMethodWithDecorators)
     .reduce((membersMeta, member: ts.MethodDeclaration) => {
@@ -27,6 +28,15 @@ export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.
         ts.SignatureKind.Call
       );
 
+      if (!config._isTesting && !isPromise(checker, returnType)) {
+        const filePath = sourceFile.fileName;
+        const warn = buildWarn(diagnostics);
+        warn.header = '@Method requires async';
+        warn.messageText = `External @Method() ${methodName}() should return a Promise or void.\n\n Consider prefixing the method with async, such as @Method async ${methodName}(). \n Next minor release will error.`;
+        warn.absFilePath = normalizePath(filePath);
+        warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+      }
+
       let methodReturnTypes: d.AttributeTypeReferences = {};
       const returnTypeNode = checker.typeToTypeNode(returnType);
 
@@ -40,6 +50,7 @@ export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.
         memberType: MEMBER_TYPE.Method,
         attribType: {
           text: typeString,
+          optional: false,
           typeReferences: {
             ...methodReturnTypes,
             ...getAttributeTypeInfo(member, sourceFile)
@@ -51,4 +62,12 @@ export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.
 
       return membersMeta;
     }, {} as d.MembersMeta);
+}
+
+function isPromise(checker: ts.TypeChecker, type: ts.Type) {
+  if (type.isUnionOrIntersection()) {
+    return false;
+  }
+  const typeText = checker.typeToString(type);
+  return typeText === 'void' || typeText.startsWith('Promise<');
 }

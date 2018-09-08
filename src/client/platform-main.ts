@@ -1,13 +1,11 @@
 import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
-import { Build } from '../util/build-conditionals';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -31,11 +29,11 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   Context.document = doc;
   Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
-  if (Build.listener) {
+  if (__BUILD_CONDITIONALS__.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
-  if (Build.event) {
+  if (__BUILD_CONDITIONALS__.event) {
     Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
@@ -64,6 +62,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
     requestBundle,
+    activeRender: false,
+    isAppLoaded: false,
+    tmpDisconnected: false,
+    attachStyles: (__BUILD_CONDITIONALS__.styles) ? attachStyles : undefined,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -96,7 +98,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 
-  if (Build.browserModuleLoader) {
+  if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // if the HTML was generated from SSR
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);
@@ -104,33 +106,30 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
 
-    if (!win.customElements.get(cmpMeta.tagNameMeta)) {
+    const tagNameMeta = cmpMeta.tagNameMeta;
+
+    if (!win.customElements.get(tagNameMeta)) {
 
       // define the custom element
       // initialize the members on the host element prototype
       // keep a ref to the metadata with the tag as the key
       initHostElement(
         plt,
-        (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
+        (cmpRegistry[tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
         hydratedCssClass,
       );
 
-      if (Build.observeAttr) {
+      if (__BUILD_CONDITIONALS__.observeAttr) {
         // add which attributes should be observed
-        const observedAttributes: string[] = HostElementConstructor.observedAttributes = [];
-
         // at this point the membersMeta only includes attributes which should
         // be observed, it does not include all props yet, so it's safe to
         // loop through all of the props (attrs) and observed them
-        for (const propName in cmpMeta.membersMeta) {
-          if (cmpMeta.membersMeta[propName].attribName) {
-            observedAttributes.push(
-              // add this attribute to our array of attributes we need to observe
-              cmpMeta.membersMeta[propName].attribName
-            );
-          }
-        }
+        // set the array of all the attributes to keep an eye on
+        // https://www.youtube.com/watch?v=RBs21CFBALI
+        HostElementConstructor.observedAttributes = Object.values(cmpMeta.membersMeta)
+          .map(member => member.attribName)
+          .filter(attribName => !!attribName);
       }
 
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
@@ -144,13 +143,14 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       queueUpdate(plt, elm);
 
 
-    } else if (Build.externalModuleLoader) {
+    } else if (__BUILD_CONDITIONALS__.externalModuleLoader) {
       // using a 3rd party bundler to import modules
       // at this point the cmpMeta will already have a
       // static function as a the bundleIds that returns the module
+      const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
       const moduleOpts: d.GetModuleOptions = {
         mode: elm.mode,
-        scoped: cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)
+        scoped: useScopedCss
       };
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
@@ -163,7 +163,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           initStyleTemplate(
             domApi,
             cmpMeta,
-            cmpMeta.encapsulation,
+            cmpMeta.encapsulationMeta,
             cmpConstructor.style,
             cmpConstructor.styleMode
           );
@@ -182,19 +182,19 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       });
 
 
-    } else if (Build.browserModuleLoader) {
+    } else if (__BUILD_CONDITIONALS__.browserModuleLoader) {
       // self loading module using built-in browser's import()
       // this is when not using a 3rd party bundler
       // and components are able to lazy load themselves
       // through standardized browser APIs
-      const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
-                        cmpMeta.bundleIds :
-                        (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
+      const bundleId = (typeof cmpMeta.bundleIds === 'string')
+        ? cmpMeta.bundleIds
+        : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      const useScopedCss = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
-      let url = resourcesUrl + bundleId + ((useScopedCss ? '.sc' : '') + '.js');
+      const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
+      let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.js';
 
-      if (Build.hotModuleReplacement && hmrVersionId) {
+      if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
         url += '?s-hmr=' + hmrVersionId;
       }
 
@@ -209,45 +209,34 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           initStyleTemplate(
             domApi,
             cmpMeta,
-            cmpMeta.encapsulation,
+            cmpMeta.encapsulationMeta,
             cmpMeta.componentConstructor.style,
             cmpMeta.componentConstructor.styleMode
           );
 
+          // bundle all loaded up, let's continue
+          queueUpdate(plt, elm);
+
         } catch (e) {
           // oh man, something's up
           console.error(e);
-
           // provide a bogus component constructor
           // so the rest of the app acts as normal
           cmpMeta.componentConstructor = class {} as any;
         }
-
-        // bundle all loaded up, let's continue
-        queueUpdate(plt, elm);
-
-      }).catch(err => console.error(err, url));
+      }, err => console.error(err, url));
     }
   }
 
-  if (Build.styles) {
-    plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
-      attachStyles(plt, domApi, cmpMeta, elm);
-    };
-  }
-
-  if (Build.devInspector) {
+  if (__BUILD_CONDITIONALS__.devInspector) {
     generateDevInspector(App, namespace, win, plt);
   }
 
-  if (Build.browserModuleLoader) {
+  if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
     (App.components || [])
-      .map(data => {
-        const cmpMeta = parseComponentLoader(data);
-        return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
-      })
+      .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
   }
 

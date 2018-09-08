@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from './constants';
 
 
 export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta: d.ComponentMeta) {

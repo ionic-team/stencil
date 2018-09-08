@@ -1,13 +1,13 @@
 import * as d from '../../declarations';
-import { getMemberDocumentation } from './docs-util';
+import { MarkdownTable, getMemberDocumentation } from './docs-util';
 import { PROP_TYPE } from '../../util/constants';
 
 
 export class MarkdownProps {
-  private rows: Row[] = [];
+  private rows: PropRow[] = [];
 
-  addRow(memberName: string, memberMeta: d.MemberMeta) {
-    this.rows.push(new Row(memberName, memberMeta));
+  addRow(propName: string, memberMeta: d.MemberMeta) {
+    this.rows.push(new PropRow(propName, memberMeta));
   }
 
   toMarkdown() {
@@ -20,57 +20,93 @@ export class MarkdownProps {
     content.push(``);
 
     this.rows = this.rows.sort((a, b) => {
-      if (a.memberName < b.memberName) return -1;
-      if (a.memberName > b.memberName) return 1;
+      if (a.propName < b.propName) return -1;
+      if (a.propName > b.propName) return 1;
       return 0;
     });
 
+    const table = new MarkdownTable();
+
+    table.addHeader([
+      'Property',
+      'Attribute',
+      'Description',
+      'Type'
+    ]);
+
     this.rows.forEach(row => {
-      content.push(...row.toMarkdown());
+      table.addRow([
+        row.propName,
+        row.attrName,
+        row.description,
+        row.type
+      ]);
     });
+
+    content.push(...table.toMarkdown());
+    content.push(``);
+    content.push(``);
+
 
     return content;
   }
 }
 
 
-class Row {
+export class PropRow {
 
   constructor(public memberName: string, private memberMeta: d.MemberMeta) {}
 
-  toMarkdown() {
-    const content: string[] = [];
+  get propName() {
+    return '`' + this.memberName + '`';
+  }
 
-    content.push(`#### ${this.memberName}`);
-    content.push(``);
-    content.push(getPropType(this.memberMeta));
-    content.push(``);
+  get attrName() {
+    if (this.memberMeta.attribName) {
+      const propType = this.memberMeta.propType;
 
-    const doc = getMemberDocumentation(this.memberMeta.jsdoc);
-    if (doc) {
-      content.push(doc);
-      content.push(``);
+      if (propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Number || propType === PROP_TYPE.String) {
+        return '`' + this.memberMeta.attribName + '`';
+      }
+    }
+    return '--';
+  }
+
+  get description() {
+    return getMemberDocumentation(this.memberMeta.jsdoc);
+  }
+
+  get type() {
+
+    if (this.memberMeta.attribType && this.memberMeta.attribType.text) {
+      if (!this.memberMeta.attribType.text.includes('(')) {
+        const typeSplit = this.memberMeta.attribType.text.split('|').map(t => {
+          return '`' + t.replace(/\'/g, '"').trim() + '`';
+        });
+
+        return typeSplit.join(', ');
+      }
+
+      return '`' + this.memberMeta.attribType.text + '`';
     }
 
-    content.push(``);
+    const propType = this.memberMeta.propType;
 
-    return content;
+    switch (propType) {
+      case PROP_TYPE.Any:
+        return '`any`';
+
+      case PROP_TYPE.Boolean:
+        return '`boolean`';
+
+      case PROP_TYPE.Number:
+        return '`number`';
+
+      case PROP_TYPE.String:
+        return '`string`';
+    }
+
+    return '';
   }
+
 }
-
-
-function getPropType(prop: d.MemberMeta) {
-  const propType = prop.propType;
-  switch (propType) {
-    case PROP_TYPE.Any:
-      return 'any';
-    case PROP_TYPE.Boolean:
-      return 'boolean';
-    case PROP_TYPE.Number:
-      return 'number';
-    case PROP_TYPE.String:
-      return 'string';
-  }
-  return prop.attribType.text;
-}
-

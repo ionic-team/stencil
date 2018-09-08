@@ -1,4 +1,4 @@
-import { Component, Element } from '../../../../dist/index';
+import { Component, Element } from '../../../../dist';
 
 @Component({
   tag: 'attribute-basic-root'
@@ -6,6 +6,11 @@ import { Component, Element } from '../../../../dist/index';
 export class AttributeBasicRoot {
 
   @Element() el: HTMLElement;
+  url: URL;
+
+  componentWillLoad() {
+    this.url = new URL(window.location.href);
+  }
 
   testClick() {
     const cmp = this.el.querySelector('attribute-basic');
@@ -20,6 +25,7 @@ export class AttributeBasicRoot {
       <div>
         <button onClick={this.testClick.bind(this)}>Test</button>
         <attribute-basic></attribute-basic>
+        <div>hostname: {this.url.hostname}, pathname: {this.url.pathname}</div>
       </div>
     );
   }

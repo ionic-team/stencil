@@ -103,7 +103,7 @@ describe('validation', () => {
 
     it('should default exclude glob', () => {
       validateConfig(config);
-      expect(config.excludeSrc).toEqual(['**/test/**', '**/*.spec.*']);
+      expect(config.excludeSrc).toEqual(['**/*.+(spec|e2e).*']);
     });
 
   });

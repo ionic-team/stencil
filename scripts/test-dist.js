@@ -21,6 +21,9 @@ function testPackage(testPkg) {
   var pkgImport = require(pkgPath);
 
   if (testPkg.files) {
+    if (!Array.isArray(pkgJson.files)) {
+      throw new Error(testPkg.packageJson + ' missing "files" property');
+    }
     testPkg.files.forEach(testPkgFile => {
       if (!pkgJson.files.includes(testPkgFile)) {
         throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
@@ -65,8 +68,16 @@ function testPackage(testPkg) {
   {
     packageJson: '../testing/package.json',
     exports: [
+      'applyWindowToGlobal',
+      'createJestPuppeteerEnvironment',
       'h',
-      'TestWindow'
+      'jestPreprocessor',
+      'jestSetupTestFramework',
+      'mockDocument',
+      'mockWindow',
+      'newE2EPage',
+      'Testing',
+      'transpile'
     ]
   },
   {

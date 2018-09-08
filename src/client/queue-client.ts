@@ -5,7 +5,7 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
   const now: d.Now = () => win.performance.now();
 
   const resolved = Promise.resolve();
-  const highPriority: Function[] = [];
+  const highPriority: d.RafCallback[] = [];
   const domReads: d.RafCallback[] = [];
   const domWrites: d.RafCallback[] = [];
   const domWritesLow: d.RafCallback[] = [];
@@ -16,10 +16,22 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     App.raf = win.requestAnimationFrame.bind(win);
   }
 
-  function consume(queue: Function[]) {
+  function queueTask(queue: d.RafCallback[]) {
+    return (cb: d.RafCallback) => {
+      // queue dom reads
+      queue.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        App.raf(flush);
+      }
+    };
+  }
+
+  function consume(queue: d.RafCallback[]) {
     for (let i = 0; i < queue.length; i++) {
       try {
-        queue[i]();
+        queue[i](now());
       } catch (e) {
         console.error(e);
       }
@@ -27,11 +39,12 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     queue.length = 0;
   }
 
-  function consumeTimeout<T extends Function>(queue: T[], timeout: number) {
+  function consumeTimeout(queue: d.RafCallback[], timeout: number) {
     let i = 0;
-    while (i < queue.length && now() < timeout) {
+    let ts: number;
+    while (i < queue.length && (ts = now()) < timeout) {
       try {
-        queue[i++]();
+        queue[i++](ts);
       } catch (e) {
         console.error(e);
       }
@@ -74,7 +87,7 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
 
   return {
 
-    tick(cb: Function) {
+    tick(cb: d.RafCallback) {
       // queue high priority work to happen in next tick
       // uses Promise.resolve() for next tick
       highPriority.push(cb);
@@ -84,24 +97,8 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
       }
     },
 
-    read(cb: d.RafCallback) {
-      // queue dom reads
-      domReads.push(cb);
+    read: queueTask(domReads),
+    write: queueTask(domWrites),
 
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    },
-
-    write(cb: d.RafCallback) {
-      // queue dom writes
-      domWrites.push(cb);
-
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    }
   };
 }

@@ -1,18 +1,21 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
-import { mockDomApi, mockElement, mockRenderer, mockSVGElement } from '../../../testing/mocks';
+import { mockDocument, mockDomApi, mockRenderer } from '../../../testing/mocks';
 import { toVNode } from '../to-vnode';
 
 
 describe('renderer', () => {
   const patch = mockRenderer();
   const domApi = mockDomApi();
-
+  let doc: Document;
   let hostElm: any;
   let vnode0: d.VNode;
 
+  const SVGNamespace = 'http://www.w3.org/2000/svg';
+
   beforeEach(() => {
-    hostElm = mockElement('div');
+    doc = mockDocument();
+    hostElm = doc.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -25,10 +28,7 @@ describe('renderer', () => {
     });
 
     it('should automatically get svg namespace', () => {
-      const SVGNamespace = 'http://www.w3.org/2000/svg';
-      const XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
-
-      const svgElm = mockSVGElement();
+      const svgElm = doc.createElementNS(SVGNamespace, 'svg');
       const vnode1 = toVNode(domApi, svgElm);
       hostElm = patch(hostElm, vnode1, h('svg', null,
         h('foreignObject', null,
@@ -37,7 +37,7 @@ describe('renderer', () => {
       )).elm;
 
       expect(hostElm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
+      expect(hostElm.firstChild.firstChild.namespaceURI).not.toEqual(SVGNamespace);
     });
 
     it('should not affect subsequence element', () => {
@@ -49,11 +49,13 @@ describe('renderer', () => {
         h('div', null)
       ] as any)).elm;
 
-      expect(hostElm.constructor.name).toEqual('HTMLDivElement');
-      expect(hostElm.firstChild.constructor.name).toEqual('SVGSVGElement');
-      expect(hostElm.firstChild.firstChild.constructor.name).toEqual('SVGElement');
-      expect(hostElm.firstChild.lastChild.constructor.name).toEqual('SVGElement');
-      expect(hostElm.lastChild.constructor.name).toEqual('HTMLDivElement');
+      expect(hostElm.tagName).toEqual('DIV');
+      expect(hostElm.namespaceURI).not.toEqual(SVGNamespace);
+      expect(hostElm.firstChild.tagName).toEqual('SVG');
+      expect(hostElm.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.firstChild.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.firstChild.lastChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.lastChild.namespaceURI).not.toEqual(SVGNamespace);
     });
   });
 
@@ -73,7 +75,7 @@ describe('renderer', () => {
           h('div', null)
         ] as any
       ));
-      expect(oneMoreChildAdded.vchildren[1].elm.constructor.name).toEqual('HTMLDivElement');
+      expect(oneMoreChildAdded.vchildren[1].elm.tagName).toEqual('DIV');
     });
   });
 

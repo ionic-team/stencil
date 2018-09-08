@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
-import { transpileCoreBuild } from '../transpile/core-build';
+import { transpileCoreBuild } from '../transpile/core-es5-build';
+import { replaceBuildString } from '../../util/text-manipulation';
 
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
@@ -8,22 +9,33 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
     return '';
   }
 
-  const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, coreContent);
+  // Replace all __BUILD_CONDITIONALS__ with the current coreBuild obj
+  const replaceObj = Object.keys(coreBuild).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = coreBuild[key];
+    return all;
+  }, <{ [key: string]: any}>{});
 
-  if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
-    buildCtx.diagnostics.push(...transpileResults.diagnostics);
-    return coreContent;
+  let replacedContent = replaceBuildString(coreContent, replaceObj);
+
+  // If this is an es5 build then transpile the code down to es5 using Typescript.
+  if (coreBuild.es5) {
+    const transpileResults = await transpileCoreBuild(config, compilerCtx, coreBuild, replacedContent);
+
+    if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
+      buildCtx.diagnostics.push(...transpileResults.diagnostics);
+      return replacedContent;
+    }
+
+    replacedContent = transpileResults.code;
   }
-
-  coreContent = transpileResults.code;
 
   const sourceTarget: d.SourceTarget = coreBuild.es5 ? 'es5' : 'es2017';
 
-  const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
+  const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, replacedContent);
 
   if (minifyResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...minifyResults.diagnostics);
-    return coreContent;
+    return replacedContent;
   }
 
   return minifyResults.output;
@@ -61,10 +73,8 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
       opts.compress.drop_console = false;
       opts.compress.drop_debugger = false;
       opts.output.beautify = true;
-      opts.output.bracketize = true;
       opts.output.indent_level = 2;
       opts.output.comments = 'all';
-      opts.output.preserve_line = true;
     }
   }
 
@@ -89,7 +99,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
 }
 
 
-// Documentation of uglify options: https://github.com/mishoo/UglifyJS2
+// https://www.npmjs.com/package/terser
 const DEV_MINIFY_OPTS: any = {
   compress: {
     arrows: false,
@@ -137,7 +147,6 @@ const DEV_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: true,
-    bracketize: true,
     comments: 'all',
     ie8: false,
     indent_level: 2,
@@ -146,7 +155,6 @@ const DEV_MINIFY_OPTS: any = {
     keep_quoted_props: true,
     max_line_len: false,
     preamble: null,
-    preserve_line: true,
     quote_keys: false,
     quote_style: 1,
     semicolons: true,
@@ -212,7 +220,6 @@ const PROD_MINIFY_OPTS: any = {
   output: {
     ascii_only: false,
     beautify: false,
-    bracketize: false,
     comments: false,
     ie8: false,
     indent_level: 0,
@@ -221,7 +228,6 @@ const PROD_MINIFY_OPTS: any = {
     keep_quoted_props: false,
     max_line_len: false,
     preamble: null,
-    preserve_line: false,
     quote_keys: false,
     quote_style: 0,
     semicolons: true,

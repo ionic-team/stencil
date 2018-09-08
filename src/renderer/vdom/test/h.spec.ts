@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
+import { FunctionalComponent } from '../../../declarations';
 
 
 describe('h()', () => {
@@ -332,60 +333,157 @@ describe('h()', () => {
 
   });
 
+  describe('functional components', () => {
+
+    it('should receive props, array, and utils as props', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, { 'id': 'blank' }, h('span', {}));
+      expect(args.length).toBe(3);
+      expect(args[0]).toEqual({ id: 'blank' });
+      expect(args[1].length).toEqual(1);
+      expect(typeof args[2].map).toBe('function');
+      expect(typeof args[2].forEach).toBe('function');
+    });
+
+    it('should receive an empty object when component receives no props', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, {});
+      expect(args[0]).toEqual({});
+      expect(args[1]).toEqual([]);
+    });
+
+    it('should receive an empty array when component receives no children', async () => {
+      let args: any;
+      const MyFunction: d.FunctionalComponent = (...argArray) => {
+        args = argArray;
+        return null;
+      };
+      h(MyFunction, {});
+      expect(args[1]).toEqual([]);
+    });
+
+
+    it('should handle functional cmp which returns null', async () => {
+      const MyFunction: d.FunctionalComponent = () => { return null; };
+      const vnode = h(MyFunction, {});
+
+      expect(vnode).toEqual(null);
+    });
+
+    it('should render functional cmp content', async () => {
+      const MyFunction: d.FunctionalComponent = () => {
+        return h('div', { id: 'fn-cmp' }, 'fn-cmp');
+      };
+      const vnode = h(MyFunction, {});
+      expect(vnode).toEqual({
+        'elm': undefined,
+        'ishost': false,
+        'vattrs': {'id': 'fn-cmp'},
+        'vchildren': [{'vtext': 'fn-cmp'}],
+        'vkey': undefined,
+        'vname': undefined,
+        'vtag': 'div',
+        'vtext': undefined
+      });
+    });
+  });
+
   describe('VDom Util methods', () => {
-    it('getTag should return the VNode tagName', () => {
-      let tagName = null;
-      const FunctionalCmp = ({ children, ...nodeData }, util) => {
-        tagName = util.getTag(children[0]);
-        return h('article', null);
-      };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
-      expect(tagName).toEqual('div');
-    });
-
-    it('getChildren should return the child VNodes', () => {
-      let kids = null;
-      const FunctionalCmp = ({ children, ...nodeData }, util) => {
-        kids = util.getChildren(children[0]);
-        return h('article', null);
-      };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
-      expect(kids).toEqual([{'elm': undefined, 'ishost': false, 'vattrs': null, 'vchildren': null, 'vkey': undefined, 'vname': undefined, 'vtag': 'span', 'vtext': undefined}]);
-    });
-
-    it('getText should return the text in the node', () => {
-      let childText = null;
-      const FunctionalCmp = ({ children, ...nodeData }, util) => {
-        const kids = util.getChildren(children[0]);
-        childText = util.getText(kids[0]);
-        return h('article', null);
-      };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'));
-      expect(childText).toEqual('innerText');
-    });
-
-    it('getAttributes should return the attributes for the node', () => {
-      let attrs = null;
-      const FunctionalCmp = ({ children, ...nodeData }, util) => {
-        attrs = util.getAttributes(children[0]);
-        return h('article', null);
-      };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'));
-      expect(attrs).toEqual({ id: 'blue'});
-    });
-
-    it('replaceAttributes should return the attributes for the node', () => {
-      const FunctionalCmp = ({ children, ...nodeData }, util) => {
-        const attrs = util.getAttributes(children[0]);
-        util.replaceAttributes(children[0], {
-          ...attrs,
-          id: 'red'
+    it('utils.forEach should loop over items and get the ChildNode data', () => {
+      const output = [];
+      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
+        util.forEach(children, element => {
+          output.push(element);
+          util.forEach(element.vchildren, el => {
+            output.push(el);
+          });
         });
         return h('article', null);
       };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'));
-      expect(vnode).toEqual({'elm': undefined, 'ishost': false, 'vattrs': null, 'vchildren': null, 'vkey': undefined, 'vname': undefined, 'vtag': 'article', 'vtext': undefined});
+      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
+      expect(output).toEqual([
+        {
+          vattrs: {
+            id: 'blue',
+          },
+          vchildren: [
+            {
+              elm: undefined,
+              ishost: false,
+              vattrs: null,
+              vchildren: null,
+              vkey: undefined,
+              vname: undefined,
+              vtag: 'span',
+              vtext: undefined,
+            },
+          ],
+          vkey: undefined,
+          vname: undefined,
+          vtag: 'div',
+          vtext: undefined,
+        },
+        {
+          vattrs: null,
+          vchildren: null,
+          vkey: undefined,
+          vname: undefined,
+          vtag: 'span',
+          vtext: undefined,
+        },
+      ]);
     });
+
+    it('replaceAttributes should return the attributes for the node', () => {
+      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
+        return util.map(children, child => {
+          return {
+            ...child,
+            vattrs: {
+              ...(child.vattrs as any),
+              class: 'my-class'
+            }
+          };
+        });
+      };
+      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'), h('span', null));
+      expect(vnode).toEqual([
+        {
+          vattrs: {
+            class: 'my-class',
+            id: 'blue'
+          },
+          vchildren: [
+            {
+              vtext: 'innerText'
+            }
+          ],
+          vkey: undefined,
+          vname: undefined,
+          vtag: 'div',
+          vtext: undefined
+        },
+        {
+          vattrs: {
+            class: 'my-class'
+          },
+          vchildren: null,
+          vkey: undefined,
+          vname: undefined,
+          vtag: 'span',
+          vtext: undefined
+        }
+      ]);
+    });
+  });
 });
 
 

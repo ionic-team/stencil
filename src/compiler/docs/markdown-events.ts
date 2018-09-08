@@ -1,5 +1,5 @@
 import { EventMeta } from '../../declarations';
-import { getMemberDocumentation } from './docs-util';
+import { MarkdownTable, getMemberDocumentation } from './docs-util';
 
 
 export class MarkdownEvents {
@@ -24,9 +24,20 @@ export class MarkdownEvents {
       return 0;
     });
 
+    const table = new MarkdownTable();
+
+    table.addHeader(['Event', 'Description']);
+
     this.rows.forEach(row => {
-      content.push(...row.toMarkdown());
+      table.addRow([
+        '`' + row.eventName + '`',
+        row.description
+      ]);
     });
+
+    content.push(...table.toMarkdown());
+    content.push(``);
+    content.push(``);
 
     return content;
   }
@@ -37,20 +48,12 @@ class Row {
 
   constructor(public eventMeta: EventMeta) {}
 
-  toMarkdown() {
-    const content: string[] = [];
-
-    content.push(`#### ${this.eventMeta.eventName}`);
-    content.push(``);
-
-    const doc = getMemberDocumentation(this.eventMeta.jsdoc);
-    if (doc) {
-      content.push(doc);
-      content.push(``);
-    }
-
-    content.push(``);
-
-    return content;
+  get eventName() {
+    return this.eventMeta.eventName;
   }
+
+  get description() {
+    return getMemberDocumentation(this.eventMeta.jsdoc);
+  }
+
 }

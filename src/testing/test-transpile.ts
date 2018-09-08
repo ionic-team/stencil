@@ -10,7 +10,7 @@ const sys = mockStencilSystem();
 
 
 export function transpile(input: string, opts: TranspileOptions = {}, path?: string) {
-  const results: TranspileResults = { diagnostics: null, code: null };
+  const results: TranspileResults = { diagnostics: null, code: null, map: null };
 
   if (!opts.module) {
     opts.module = 'CommonJS';
@@ -31,12 +31,14 @@ export function transpile(input: string, opts: TranspileOptions = {}, path?: str
     rootDir: '/',
     srcDir: '/',
     devMode: true,
-    _isTesting: true
+    _isTesting: true,
+    validateTypes: false
   });
 
   const transpileResults = transpileModuleForTesting(config, compilerOpts, path, input);
 
   results.code = transpileResults.code;
+  results.map = transpileResults.map;
   results.diagnostics = transpileResults.diagnostics;
 
   logger.printLogs();
@@ -46,8 +48,8 @@ export function transpile(input: string, opts: TranspileOptions = {}, path?: str
 
 
 export interface TranspileOptions {
-  module?: 'None' | 'CommonJS' | 'AMD' | 'System' | 'UMD' | 'ES6' | 'ES2015' | 'ESNext' | string;
-  target?: 'ES5' | 'ES6' | 'ES2015' | 'ES2016' | 'ES2017' | 'ESNext' | string;
+  module?: string;
+  target?: string;
   [key: string]: any;
 }
 
@@ -55,4 +57,5 @@ export interface TranspileOptions {
 export interface TranspileResults {
   diagnostics: d.Diagnostic[];
   code?: string;
+  map?: any;
 }

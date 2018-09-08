@@ -1,5 +1,5 @@
 
-import { Component, State } from '../../../../dist/index';
+import { Component, State } from '../../../../dist';
 
 @Component({
   tag: 'attribute-host',

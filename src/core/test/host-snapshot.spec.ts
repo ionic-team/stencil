@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { initHostSnapshot } from '../host-snapshot';
 import { mockDomApi } from '../../testing/mocks';
 import { ENCAPSULATION } from '../../util/constants';
-
+import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 describe('host-snapshot', () => {
 
@@ -14,13 +14,15 @@ describe('host-snapshot', () => {
     domApi = mockDomApi();
     cmpMeta = { tagNameMeta: 'ion-tag' };
     hostElm = domApi.$createElement('cmp-a') as any;
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
-
 
   it('do not attach shadow root when not shadow', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
-    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
+    __BUILD_CONDITIONALS__.shadowDom = false;
+    __BUILD_CONDITIONALS__.slotPolyfill = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
   });
@@ -28,7 +30,8 @@ describe('host-snapshot', () => {
   it('do not attach shadow root when shadow but no support', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
+    __BUILD_CONDITIONALS__.isDev = false;
     domApi.$supportsShadowDom = false;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
@@ -37,7 +40,7 @@ describe('host-snapshot', () => {
   it('attach shadow root when shadow w/ support', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     domApi.$supportsShadowDom = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(true);
@@ -45,7 +48,8 @@ describe('host-snapshot', () => {
 
   it('manually set shadowRoot to host element if no shadow dom $supportsShadowDom', () => {
     domApi.$supportsShadowDom = false;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
+    __BUILD_CONDITIONALS__.isDev = false;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
@@ -53,13 +57,13 @@ describe('host-snapshot', () => {
   it('do not set content reference node is shadow and supports shadow', () => {
     domApi.$attachShadow = () => {/**/};
     domApi.$supportsShadowDom = true;
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr']).toBeUndefined();
   });
 
   it('do not set content reference node when ssr', () => {
-    hostElm.setAttribute('data-ssrv', '88');
+    hostElm.setAttribute('ssrv', '88');
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm['s-cr']).toBeUndefined();
   });

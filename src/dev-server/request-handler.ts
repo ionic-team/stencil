@@ -3,7 +3,7 @@ import { isDevClient } from './util';
 import { normalizePath } from '../compiler/util';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';
-import { serve404 } from './serve-404';
+import { serve404, serve404Content } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveDirectoryIndex } from './serve-directory-index';
 import * as http from 'http';
@@ -17,9 +17,13 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
     try {
       const req = normalizeHttpRequest(devServerConfig, incomingReq);
 
-      if (req.pathname === '') {
+      if (req.url === '') {
         res.writeHead(302, { 'location': '/' });
         return res.end();
+      }
+
+      if (!req.url.startsWith(devServerConfig.baseUrl)) {
+        return serve404Content(res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
       }
 
       if (isDevClient(req.pathname)) {
@@ -65,13 +69,17 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
   const req: d.HttpRequest = {
     method: (incomingReq.method || 'GET').toUpperCase() as any,
     acceptHeader: (incomingReq.headers && typeof incomingReq.headers.accept === 'string' && incomingReq.headers.accept) || '',
-    url: (incomingReq.url || '').trim() || ''
+    url: (incomingReq.url || '').trim() || '',
+    host: (incomingReq.headers && typeof incomingReq.headers.host === 'string' && incomingReq.headers.host) || null
   };
 
   const parsedUrl = url.parse(req.url);
   const parts = (parsedUrl.pathname || '').replace(/\\/g, '/').split('/');
 
   req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
+  if (req.pathname.length > 0) {
+    req.pathname = '/' + req.pathname.substring(devServerConfig.baseUrl.length);
+  }
 
   req.filePath = normalizePath(path.normalize(
     path.join(devServerConfig.root,

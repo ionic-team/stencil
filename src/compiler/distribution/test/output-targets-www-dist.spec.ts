@@ -24,7 +24,7 @@ describe('outputTargets', () => {
         dir: 'custom-www',
         buildDir: 'www-build',
         indexHtml: 'custom-index.htm'
-      } as d.OutputTargetDist,
+      } as any as d.OutputTargetDist,
       {
         type: 'dist',
         dir: 'custom-dist',

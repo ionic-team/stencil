@@ -1,9 +1,9 @@
-import { CompilerCtx, Config, OutputTarget } from '../../declarations';
+import { CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
 import { getAppBuildDir } from './app-file-naming';
 import { pathJoin } from '../util';
 
 
-export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetBuild) {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017
@@ -67,7 +67,9 @@ function getDisabledMessageScript() {
   <h2>Current Browser's Support:</h2>
   <ul>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">ES Module Imports</a>: <span id="es-modules-test"></span></li>
+    <li><a href="http://2ality.com/2017/01/import-operator.html">ES Dynamic Imports</a>: <span id="es-dynamic-modules-test"></span></li>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements">Custom Elements</a>: <span id="custom-elements-test"></span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a>: <span id="shadow-dom-test"></span></li>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a>: <span id="fetch-test"></span></li>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables">CSS Variables</a>: <span id="css-variables-test"></span></li>
   </ul>
@@ -79,10 +81,19 @@ function getDisabledMessageScript() {
   `;
 
   const script = `
+    function supportsDynamicImports() {
+      try {
+        new Function('import("")');
+        return true;
+      } catch (e) {}
+      return false;
+    }
     document.body.innerHTML = '${html.replace(/\r\n|\r|\n/g, '').replace(/\'/g, `\\'`).trim()}';
 
     document.getElementById('current-browser-output').textContent = window.navigator.userAgent;
     document.getElementById('es-modules-test').textContent = !!('noModule' in document.createElement('script'));
+    document.getElementById('es-dynamic-modules-test').textContent = supportsDynamicImports();
+    document.getElementById('shadow-dom-test').textContent = !!(document.head.attachShadow);
     document.getElementById('custom-elements-test').textContent = !!(window.customElements);
     document.getElementById('css-variables-test').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
     document.getElementById('fetch-test').textContent = !!(window.fetch);

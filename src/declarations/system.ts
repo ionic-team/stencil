@@ -9,6 +9,7 @@ export interface StencilSystem {
     version: string;
     typescriptVersion?: string;
     runtime?: string;
+    packageDir?: string;
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   createDom?(): CreateDom;
@@ -23,9 +24,9 @@ export interface StencilSystem {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
-  gzipSize?(text: string): Promise<number>;
   initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
   isGlob?(str: string): boolean;
+  lazyRequire?: d.LazyRequire;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
     output: string;
@@ -38,8 +39,9 @@ export interface StencilSystem {
     diagnostics?: d.Diagnostic[];
   }>;
   minimatch?(path: string, pattern: string, opts?: any): boolean;
-  open?: (p: string) => Promise<void>;
+  open?: (url: string) => Promise<void>;
   path?: Path;
+  requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
     rollup: {
@@ -47,13 +49,9 @@ export interface StencilSystem {
     };
     plugins: RollupPlugins;
   };
-  scopeCss?: (cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) => Promise<string>;
-  semver?: {
-    gt: (a: string, b: string, loose?: boolean) => boolean;
-    gte: (a: string, b: string, loose?: boolean) => boolean;
-    lt: (a: string, b: string, loose?: boolean) => boolean;
-    lte: (a: string, b: string, loose?: boolean) => boolean;
-  };
+  scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
+  semver?: Semver;
+  storage?: Storage;
   transpileToEs5?(cwd: string, input: string): Promise<d.TranspileResults>;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -65,7 +63,22 @@ export interface StencilSystem {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
-  workbox?: Workbox;
+}
+
+
+export interface LazyRequire {
+  ensure(logger: d.Logger, fromDir: string, moduleIds: string[]): Promise<void>;
+  require(moduleId: string): any;
+  getModulePath(moduleId: string): string;
+}
+
+
+export interface Semver {
+  gt: (a: string, b: string, loose?: boolean) => boolean;
+  gte: (a: string, b: string, loose?: boolean) => boolean;
+  lt: (a: string, b: string, loose?: boolean) => boolean;
+  lte: (a: string, b: string, loose?: boolean) => boolean;
+  satisfies: (version: string, range: string) => boolean;
 }
 
 
@@ -76,6 +89,13 @@ export interface SystemDetails {
   runtime: string;
   runtimeVersion: string;
   release: string;
+  tmpDir: string;
+}
+
+
+export interface Storage {
+  get(key: string): Promise<any>;
+  set(key: string, value: any): Promise<void>;
 }
 
 
@@ -143,6 +163,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  bin?: {[key: string]: string};
   browser?: string;
   module?: string;
   'jsnext:main'?: string;
@@ -150,6 +171,22 @@ export interface PackageJsonData {
   collection?: string;
   types?: string;
   files?: string[];
+  ['dist-tags']: {
+    latest: string;
+  };
+  dependencies?: {
+    [moduleId: string]: string;
+  };
+  devDependencies?: {
+    [moduleId: string]: string;
+  };
+  lazyDependencies?: {
+    [moduleId: string]: string;
+  };
+  repository?: {
+    type?: string;
+    url?: string;
+  };
 }
 
 

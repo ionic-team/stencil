@@ -1,18 +1,71 @@
 import { compareHtml, mockConfig } from '../../testing/mocks';
 import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { h } from '../../renderer/vdom/h';
 import { hydrateHtml } from '../hydrate-html';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
 describe('hydrate', () => {
 
   let config: Config;
-  let outputTarget: OutputTarget;
+  let outputTarget: OutputTargetHydrate;
 
   beforeEach(() => {
     config = mockConfig();
-    outputTarget = config.outputTargets[0];
+    outputTarget = config.outputTargets[0] as OutputTargetHydrate;
+  });
+
+  it('should add scope attributes', async () => {
+    const ctx: CompilerCtx = {};
+    const registry: ComponentRegistry = {
+      'ion-test': {
+        bundleIds: 'ion-test',
+        tagNameMeta: 'ion-test',
+        encapsulationMeta: ENCAPSULATION.ScopedCss,
+        componentConstructor: class {
+          static get encapsulation() {
+            return 'scoped';
+          }
+          static get is() {
+            return 'ion-test';
+          }
+          static get style() {
+            return `
+              .sc-ion-test-h {
+                color: red;
+              }
+            `;
+          }
+          render() {
+            return h('div', null);
+          }
+        } as any
+      }
+    };
+    const opts: HydrateOptions = {
+      html: `<ion-test></ion-test>`
+    };
+
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
+
+    expect(hydrateResults.diagnostics).toEqual([]);
+
+    expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
+      <html dir="ltr" data-ssr="">
+        <head>
+          <style data-styles="">
+            .sc-ion-test-h {
+              color:red;
+            }
+          </style>
+        </head>
+        <body>
+          <ion-test class="sc-ion-test-h ${config.hydratedCssClass}" ssrv="0">
+            <div class="sc-ion-test" ssrc="0.0."></div>
+          </ion-test>
+        </body>
+      </html>
+    `));
   });
 
   it('should load content in nested named slots', async () => {
@@ -67,8 +120,8 @@ describe('hydrate', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
-            <elm-a data-ssrc="0.0.">
+          <ion-test ssrv="0" class="${config.hydratedCssClass}">
+            <elm-a ssrc="0.0.">
               <div slot="slot-a">inner slot-a text</div>
               <div>default slot text</div>
               <div slot="slot-b">inner slot-b text</div>
@@ -130,8 +183,8 @@ describe('hydrate', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
-            <elm-a data-ssrc="0.0">
+          <ion-test ssrv="0" class="${config.hydratedCssClass}">
+            <elm-a ssrc="0.0">
               <!--s.0.0-->inner text<!--/-->
               content text
             </elm-a>
@@ -184,8 +237,8 @@ describe('hydrate', () => {
       <html dir="ltr" data-ssr="">
         <head></head>
         <body>
-          <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
-            <div data-ssrc="0.0."></div>
+          <ion-test ssrv="0" class="${config.hydratedCssClass}">
+            <div ssrc="0.0."></div>
           </ion-test>
         </body>
       </html>
@@ -205,5 +258,3 @@ describe('hydrate', () => {
   });
 
 });
-
-

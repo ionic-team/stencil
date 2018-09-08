@@ -47,6 +47,70 @@ describe('loader', () => {
       expect(win[namespace].components).toBe(components);
     });
 
+    it('add <style> as first element if no <meta charset>', () => {
+      const linkElm = doc.createElement('link');
+      linkElm.rel = 'stylesheet';
+      linkElm.href = '/styles.css';
+      doc.head.appendChild(linkElm);
+
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      components = [
+        ['cmp-tag', {}, true] as any
+      ];
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
+
+      expect(doc.head.children[0].tagName).toBe('STYLE');
+      expect(doc.head.children[1].tagName).toBe('LINK');
+      expect(doc.head.children[2].tagName).toBe('SCRIPT');
+    });
+
+    it('add <style> after <meta charset> when meta first element', () => {
+      const metaCharset = doc.createElement('meta');
+      metaCharset.charset = 'utf-8';
+      doc.head.appendChild(metaCharset);
+
+      const linkElm = doc.createElement('link');
+      linkElm.rel = 'stylesheet';
+      linkElm.href = '/styles.css';
+      doc.head.appendChild(linkElm);
+
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      components = [
+        ['cmp-tag', {}, true] as any
+      ];
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
+
+      expect(doc.head.children[0].tagName).toBe('META');
+      expect(doc.head.children[1].tagName).toBe('STYLE');
+      expect(doc.head.children[2].tagName).toBe('LINK');
+      expect(doc.head.children[3].tagName).toBe('SCRIPT');
+    });
+
+    it('add <style> after <meta charset> when meta last element', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      const metaCharset = doc.createElement('meta');
+      metaCharset.charset = 'utf-8';
+      doc.head.appendChild(metaCharset);
+
+      components = [
+        ['cmp-tag', {}, true] as any
+      ];
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
+
+      expect(doc.head.children[0].tagName).toBe('SCRIPT');
+      expect(doc.head.children[1].tagName).toBe('META');
+      expect(doc.head.children[2].tagName).toBe('STYLE');
+    });
+
     it('add <style> when components w/ styles', () => {
       const loaderScript = doc.createElement('script');
       loaderScript.src = '/build/app.js';

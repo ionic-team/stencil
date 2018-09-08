@@ -1,8 +1,9 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleMap } from '../../declarations';
-import { catchError } from '../util';
+import { catchError, pathJoin } from '../util';
 import { createBundle } from './rollup-bundle';
 import { minifyJs } from '../minifier';
-import { writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
+import { writeEntryModules, writeEsModules, writeEsmEs5Modules, writeLegacyModules } from './write-bundles';
+import { ENTRY_KEY_PREFIX } from '../entries/entry-modules';
 
 
 export async function generateBundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]): Promise<JSModuleMap> {
@@ -15,6 +16,21 @@ export async function generateBundleModules(config: Config, compilerCtx: Compile
   if (entryModules.length === 0) {
     // no entry modules, so don't bother
     return results;
+  }
+
+  await writeEntryModules(config, compilerCtx, entryModules);
+
+  // Check for index.js file. This file is used for stencil project exports
+  // usually this contains utility exports.
+  // If it exists then add it as an entry point.
+  const exportedFile = pathJoin(config, config.srcDir, 'index.js');
+  const fileExists = await compilerCtx.fs.access(exportedFile);
+  if (fileExists) {
+    buildCtx.entryModules.push({
+      entryKey: 'exportedFile',
+      filePath: exportedFile,
+      moduleFiles: []
+    });
   }
 
   try {
@@ -74,7 +90,7 @@ async function minifyChunks(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     }
 
     const promises = Object.keys(jsModuleList)
-      .filter(m => !m.startsWith('entry:'))
+      .filter(m => !m.startsWith(ENTRY_KEY_PREFIX))
       .map(chunkKey => jsModuleList[chunkKey])
       .map(async chunk => {
         if (!chunk || !chunk.code) {

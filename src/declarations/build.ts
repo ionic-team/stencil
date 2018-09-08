@@ -1,5 +1,11 @@
 import * as d from '.';
 
+export interface RollupResultModule {
+  id: string;
+}
+export interface RollupResults {
+  modules: RollupResultModule[];
+}
 
 export interface BuildCtx {
   abort(): Promise<BuildResults>;
@@ -31,6 +37,8 @@ export interface BuildCtx {
   hasCopyChanges: boolean;
   hasFinished: boolean;
   hasIndexHtmlChanges: boolean;
+  hasPrintedResults: boolean;
+  hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
   hasSlot: boolean;
   hasStyleChanges: boolean;
@@ -42,6 +50,8 @@ export interface BuildCtx {
   scriptsAdded: string[];
   scriptsDeleted: string[];
   hasError: boolean;
+  hasWarning: boolean;
+  rollupResults?: RollupResults;
   startTime: number;
   styleBuildCount: number;
   stylesUpdated: BuildStyleUpdate[];
@@ -103,6 +113,7 @@ export interface HotModuleReplacement {
   inlineStylesUpdated?: HmrStyleUpdate[];
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
+  serviceWorkerUpdated?: boolean;
   versionId?: string;
 }
 
@@ -142,6 +153,7 @@ export interface BuildStats {
   };
   components: BuildComponent[];
   entries: BuildEntry[];
+  rollupResults: RollupResults;
   sourceGraph: BuildSourceGraph;
   collections: {
     name: string;
@@ -192,7 +204,19 @@ export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAd
 
 
 export interface JSModuleList {
-  [key: string]: { code: string };
+  [key: string]: {
+    code: string,
+    imports?: string[],
+    exports?: string[],
+    modules?: {
+      [modulePath: string]: {
+        renderedExports: string[],
+        removedExports: string[],
+        renderedLength: number,
+        originalLength: number
+      }
+    }
+  };
 }
 
 export interface JSModuleMap {

@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { isDef } from '../util/helpers';
 import { parsePropertyValue } from '../util/data-parse';
 import { queueUpdate } from './update';
@@ -31,7 +30,7 @@ export function defineMember(
       if (property.state || property.mutable) {
         setValue(plt, elm, memberName, newValue);
 
-      } else if (Build.verboseError) {
+      } else if (__BUILD_CONDITIONALS__.verboseError) {
         console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
       }
     }
@@ -50,7 +49,7 @@ export function defineMember(
         }
       }
 
-      if (Build.clientSide) {
+      if (__BUILD_CONDITIONALS__.clientSide) {
         // client-side
         // within the browser, the element's prototype
         // already has its getter/setter set, but on the
@@ -114,36 +113,36 @@ export function defineMember(
       setComponentProp
     );
 
-  } else if (Build.element && property.elementRef) {
+  } else if (__BUILD_CONDITIONALS__.element && property.elementRef) {
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
     definePropertyValue(instance, memberName, elm);
 
-  } else if (Build.method && property.method) {
+  } else if (__BUILD_CONDITIONALS__.method && property.method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
     definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
-  } else if (Build.propContext && property.context) {
+  } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
     // @Prop({ context: 'config' })
     const contextObj = plt.getContextItem(property.context);
     if (contextObj !== undefined) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
-  } else if (Build.propConnect && property.connect) {
+  } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
     definePropertyValue(instance, memberName, plt.propConnect(property.connect));
   }
 }
 
 
-export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, values?: any, instance?: d.ComponentInstance, watchMethods?: string[]) {
+export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, instance?: d.ComponentInstance) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  values = plt.valuesMap.get(elm);
+  let values = plt.valuesMap.get(elm);
   if (!values) {
     plt.valuesMap.set(elm, values = {});
   }
@@ -162,16 +161,17 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
 
     if (instance) {
       // get an array of method names of watch functions to call
-      watchMethods = values[WATCH_CB_PREFIX + memberName];
-
-      if (Build.watchCallback && watchMethods) {
-        // this instance is watching for when this property changed
-        for (let i = 0; i < watchMethods.length; i++) {
-          try {
-            // fire off each of the watch methods that are watching this property
-            instance[watchMethods[i]].call(instance, newVal, oldVal, memberName);
-          } catch (e) {
-            console.error(e);
+      if (__BUILD_CONDITIONALS__.watchCallback) {
+        const watchMethods = values[WATCH_CB_PREFIX + memberName];
+        if (watchMethods) {
+          // this instance is watching for when this property changed
+          for (let i = 0; i < watchMethods.length; i++) {
+            try {
+              // fire off each of the watch methods that are watching this property
+              instance[watchMethods[i]].call(instance, newVal, oldVal, memberName);
+            } catch (e) {
+              console.error(e);
+            }
           }
         }
       }

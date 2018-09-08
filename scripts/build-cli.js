@@ -19,6 +19,7 @@ if (success) {
         'child_process',
         'crypto',
         'fs',
+        'https',
         'os',
         'path'
       ],

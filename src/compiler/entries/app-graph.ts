@@ -1,10 +1,11 @@
-import { EntryComponent, EntryPoint, ModuleFile } from '../../declarations';
+import * as d from '../../declarations';
+import { buildError } from '../util';
 
 
-export function processAppGraph(allModules: ModuleFile[], entryTags: string[]) {
-  const graph = getGraph(allModules, entryTags);
+export function processAppGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryTags: string[]) {
+  const graph = getGraph(buildCtx, allModules, entryTags);
 
-  const entryPoints: EntryPoint[] = [];
+  const entryPoints: d.EntryPoint[] = [];
 
   for (const graphEntry of graph) {
     if (entryPoints.some(en => en.some(ec => ec.tag === graphEntry.tag))) {
@@ -14,7 +15,7 @@ export function processAppGraph(allModules: ModuleFile[], entryTags: string[]) {
 
     const depsOf = graph.filter(d => d.dependencies.includes(graphEntry.tag));
     if (depsOf.length > 1) {
-      const commonEntryCmps: EntryComponent[] = [];
+      const commonEntryCmps: d.EntryComponent[] = [];
 
       depsOf.forEach(depOf => {
         depOf.dependencies.forEach(depTag => {
@@ -127,7 +128,7 @@ export function processAppGraph(allModules: ModuleFile[], entryTags: string[]) {
 }
 
 
-function getGraph(allModules: ModuleFile[], entryTags: string[]) {
+function getGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryTags: string[]) {
   const graph: { tag: string; dependencies: string[]; }[] = [];
 
   function addDeps(tag: string) {
@@ -137,7 +138,9 @@ function getGraph(allModules: ModuleFile[], entryTags: string[]) {
 
     const m = allModules.find(m => m.cmpMeta && m.cmpMeta.tagNameMeta === tag);
     if (!m) {
-      throw new Error(`processAppGraph, unable to find tag: ${tag}`);
+      const diagnostic = buildError(buildCtx.diagnostics);
+      diagnostic.messageText = `unable to find tag "${tag}" while generating component graph`;
+      return;
     }
     m.cmpMeta.dependencies = (m.cmpMeta.dependencies || []);
 

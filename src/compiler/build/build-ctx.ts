@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { buildFinish } from './build-finish';
-import { hasError } from '../util';
+import { hasError, hasWarning } from '../util';
 
 
 export class BuildContext implements d.BuildCtx {
@@ -29,6 +29,8 @@ export class BuildContext implements d.BuildCtx {
   hasCopyChanges = false;
   hasFinished = false;
   hasIndexHtmlChanges = false;
+  hasPrintedResults = false;
+  hasServiceWorkerChanges = false;
   hasScriptChanges = true;
   hasSlot: boolean = null;
   hasStyleChanges = true;
@@ -76,7 +78,9 @@ export class BuildContext implements d.BuildCtx {
   createTimeSpan(msg: string, debug?: boolean) {
     if ((this.isActiveBuild && !this.hasFinished) || debug) {
       if (debug) {
-        msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
+        if (this.config.watch) {
+          msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
+        }
       }
       const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
 
@@ -90,7 +94,9 @@ export class BuildContext implements d.BuildCtx {
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
           if ((this.isActiveBuild && !this.hasFinished) || debug) {
             if (debug) {
-              finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
+              if (this.config.watch) {
+                finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
+              }
             }
 
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
@@ -111,7 +117,11 @@ export class BuildContext implements d.BuildCtx {
   }
 
   debug(msg: string) {
-    this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
+    if (this.config.watch) {
+      this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
+    } else {
+      this.config.logger.debug(msg);
+    }
   }
 
   get isActiveBuild() {
@@ -126,6 +136,13 @@ export class BuildContext implements d.BuildCtx {
       return true;
     }
 
+    return false;
+  }
+
+  get hasWarning() {
+    if (hasWarning(this.diagnostics)) {
+      return true;
+    }
     return false;
   }
 

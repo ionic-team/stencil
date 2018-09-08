@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { attributeChangedCallback } from './attribute-changed';
-import { Build } from '../util/build-conditionals';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { hmrStart } from './hmr-component';
@@ -21,38 +20,48 @@ export function initHostElement(
 
   HostElementConstructor.connectedCallback = function() {
     // coolsville, our host element has just hit the DOM
-    connectedCallback(plt, cmpMeta, (this as d.HostElement));
+    connectedCallback(plt, cmpMeta, this);
   };
-
-  if (Build.observeAttr) {
-    HostElementConstructor.attributeChangedCallback = function(attribName: string, oldVal: string, newVal: string) {
-      // the browser has just informed us that an attribute
-      // on the host element has changed
-      attributeChangedCallback(cmpMeta.membersMeta, (this as d.HostElement), attribName, oldVal, newVal);
-    };
-  }
 
   HostElementConstructor.disconnectedCallback = function() {
     // the element has left the builing
-    disconnectedCallback(plt, (this as d.HostElement));
+    disconnectedCallback(plt, this);
   };
 
   HostElementConstructor['s-init'] = function() {
-    initComponentLoaded(plt, (this as d.HostElement), hydratedCssClass);
+    initComponentLoaded(plt, this, hydratedCssClass);
   };
 
-  if (Build.hotModuleReplacement) {
+  HostElementConstructor.forceUpdate = function() {
+    queueUpdate(plt, this);
+  };
+
+  if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
     HostElementConstructor['s-hmr'] = function(hmrVersionId) {
       hmrStart(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
     };
   }
 
-  HostElementConstructor.forceUpdate = function() {
-    queueUpdate(plt, (this as d.HostElement));
-  };
+  if (cmpMeta.membersMeta) {
+    const entries = Object.entries(cmpMeta.membersMeta);
+    if (__BUILD_CONDITIONALS__.observeAttr) {
+      let attrToProp: any = {};
+      entries.forEach(([propName, {attribName}]) => {
+        if (attribName) {
+          attrToProp[attribName] = propName;
+        }
+      });
+      attrToProp = {...attrToProp};
+      HostElementConstructor.attributeChangedCallback = function(attribName: string, _oldVal: string, newVal: string) {
+        // the browser has just informed us that an attribute
+        // on the host element has changed
+        attributeChangedCallback(attrToProp, this, attribName, newVal);
+      };
+    }
 
-  // add getters/setters to the host element members
-  // these would come from the @Prop and @Method decorators that
-  // should create the public API to this component
-  proxyHostElementPrototype(plt, cmpMeta.membersMeta, HostElementConstructor);
+    // add getters/setters to the host element members
+    // these would come from the @Prop and @Method decorators that
+    // should create the public API to this component
+    proxyHostElementPrototype(plt, entries, HostElementConstructor);
+  }
 }

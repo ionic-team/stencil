@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initEventEmitters } from './init-event-emitters';
 import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
@@ -27,13 +26,13 @@ export function initComponentInstance(
     // and let the getters/setters do their jobs
     proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot);
 
-    if (Build.event) {
+    if (__BUILD_CONDITIONALS__.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
       initEventEmitters(plt, componentConstructor.events, instance);
     }
 
-    if (Build.listener) {
+    if (__BUILD_CONDITIONALS__.listener) {
       try {
         // replay any event listeners on the instance that
         // were queued up between the time the element was
@@ -74,7 +73,7 @@ export function initComponentInstance(
 
 export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[]): any {
 
-  if (Build.polyfills && !allChildrenHaveConnected(plt, elm)) {
+  if (__BUILD_CONDITIONALS__.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
     // since the polyfill uses MutationObserver which causes the
     // connectedCallbacks to fire async, which isn't ideal for the code below
@@ -93,7 +92,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    delete elm['s-ld'];
+    elm['s-ld'] = undefined;
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
@@ -111,7 +110,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
         plt.onReadyCallbacksMap.delete(elm);
       }
 
-      if (Build.cmpDidLoad) {
+      if (__BUILD_CONDITIONALS__.cmpDidLoad) {
         // fire off the user's componentDidLoad method (if one was provided)
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called
@@ -124,7 +123,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     }
 
     // add the css class that this element has officially hydrated
-    elm.classList.add(hydratedCssClass);
+    plt.domApi.$addClass(elm, hydratedCssClass);
 
     // ( •_•)
     // ( •_•)>⌐■-■
@@ -140,13 +139,14 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
   // Note: in IE11 <svg> does not have the "children" property
   for (let i = 0; i < elm.childNodes.length; i++) {
-    if (elm.childNodes[i].nodeType === NODE_TYPE.ElementNode) {
-      if (plt.getComponentMeta(elm.childNodes[i] as any) && !plt.hasConnectedMap.has(elm.childNodes[i] as d.HostElement)) {
+    const child = elm.childNodes[i] as d.HostElement;
+    if (child.nodeType === NODE_TYPE.ElementNode) {
+      if (plt.getComponentMeta(child) && !plt.hasConnectedMap.has(child)) {
         // this is a defined componnent
         // but it hasn't connected yet
         return false;
       }
-      if (!allChildrenHaveConnected(plt, elm.childNodes[i] as d.HostElement)) {
+      if (!allChildrenHaveConnected(plt, child)) {
         // one of the defined child components hasn't connected yet
         return false;
       }

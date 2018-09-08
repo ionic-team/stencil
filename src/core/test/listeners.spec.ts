@@ -76,7 +76,7 @@ describe('instance listeners', () => {
 
       expect(plt.queuedEvents.get(elm)).toHaveLength(2);
 
-      const instance = initComponentInstance(plt, elm);
+      const instance = initComponentInstance(plt, elm, {});
 
       const data = instance.getData();
       expect(data).toEqual({ detail: { some: 'data' } });
@@ -150,19 +150,20 @@ describe('instance listeners', () => {
     function testEnableDisableEvent(eventName: string) {
       const instance = newTestComponent();
       const elm = plt.hostElementMap.get(instance);
+      const cmpMeta = plt.getComponentMeta(elm);
       spyOn(elm, 'addEventListener').and.callThrough();
       spyOn(elm, 'removeEventListener').and.callThrough();
 
       // Remove listener (it was never added, should do nothing)
       enableEventListener(plt, instance, eventName, false);
-      mockDispatchEvent(domApi, elm, eventName);
+      mockDispatchEvent(elm, eventName);
       expect(instance.test).not.toBeCalled();
       expect(elm.addEventListener).toHaveBeenCalledTimes(0);
       expect(elm.removeEventListener).toHaveBeenCalledTimes(0);
 
       // Add listener
       enableEventListener(plt, instance, eventName, true);
-      mockDispatchEvent(domApi, elm, eventName, 'hello');
+      mockDispatchEvent(elm, eventName, 'hello');
       expect(instance.test).toBeCalled();
       expect(elm.addEventListener).toHaveBeenCalledTimes(1);
       expect(elm.removeEventListener).toHaveBeenCalledTimes(0);
@@ -174,7 +175,7 @@ describe('instance listeners', () => {
 
       // Remove listener
       enableEventListener(plt, instance, eventName, false);
-      mockDispatchEvent(domApi, elm, eventName);
+      mockDispatchEvent(elm, eventName);
       expect(instance.test).toHaveBeenCalledTimes(1);
       expect(elm.addEventListener).toHaveBeenCalledTimes(2);
       expect(elm.removeEventListener).toHaveBeenCalledTimes(2);
@@ -233,28 +234,28 @@ describe('instance listeners', () => {
     function testAttachTo(attachTo: any, instance: any, el: any) {
       domApi.$supportsEventOptions = true;
 
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).not.toHaveBeenCalled();
 
       enableEventListener(plt, instance, 'd_passive', false, attachTo);
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).not.toHaveBeenCalled();
 
       enableEventListener(plt, instance, 'd_passive', true, attachTo);
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).toHaveBeenCalledTimes(2);
 
       enableEventListener(plt, instance, 'd_passive', false);
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).toHaveBeenCalledTimes(2);
 
       enableEventListener(plt, instance, 'd_passive', true, attachTo);
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).toHaveBeenCalledTimes(3);
 
       enableEventListener(plt, instance, 'd_passive', false, attachTo);
-      mockDispatchEvent(domApi, el, 'd_passive', 'hello');
+      mockDispatchEvent(el, 'd_passive', 'hello');
       expect(instance.test).toHaveBeenCalledTimes(3);
     }
 
@@ -308,7 +309,7 @@ describe('instance listeners', () => {
           eventDisabled: false
         }]
       });
-      instance.test = function (ev: any) {
+      instance.test = (ev: any) => {
         expect(ev.detail).toEqual('hello');
       };
       spyOn(instance, 'test').and.callThrough();
@@ -347,7 +348,7 @@ describe('instance listeners', () => {
       let calledCallback = false;
       let internalCallback: Function;
 
-      target.addEventListener = function (name: any, callback: any, options: any) {
+      target.addEventListener = (_name: any, callback: any) => {
         internalCallback = callback;
       };
 

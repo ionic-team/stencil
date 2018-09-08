@@ -7,7 +7,7 @@ import { generateEsmCore } from './app-core-esm';
 import { generateEsmHosts } from '../distribution/dist-esm';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateLoader } from './app-loader';
-import { setBuildConditionals } from './build-conditionals';
+import { setBuildConditionals } from '../../util/build-conditionals';
 
 
 export async function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
@@ -17,7 +17,7 @@ export async function generateAppFiles(config: d.Config, compilerCtx: d.Compiler
 
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.appBuild;
-  });
+  }) as d.OutputTargetBuild[];
 
   if (outputTargets.length === 0) {
     return;
@@ -33,7 +33,7 @@ export async function generateAppFiles(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
+export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   if (!config.buildAppCore) {
     return;
   }
@@ -74,7 +74,7 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 }
 
 
-async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
   // browser esm core build
   const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
 
@@ -86,7 +86,7 @@ async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
   if (config.buildEs5) {
     // browser core es5 build
     const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { isCopyTaskFile } from '../copy/config-copy-tasks';
-import { normalizePath, pathJoin } from '../util';
+import { hasServiceWorkerChanges, normalizePath, pathJoin } from '../util';
 
 
 export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {
@@ -45,6 +45,8 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 
   // figure out if any changed files were index.html files
   buildCtx.hasIndexHtmlChanges = hasIndexHtmlChanges(config, buildCtx);
+
+  buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
   // we've got watch results, which means this is a rebuild!!
   buildCtx.isRebuild = true;

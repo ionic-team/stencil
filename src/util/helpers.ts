@@ -12,3 +12,16 @@ export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.su
 export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const noop = (): any => { /* noop*/ };
+
+export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
+  return keys.reduce((final, key) => {
+    if (obj[key]) {
+      final[key] = obj[key];
+    }
+    return final;
+  }, {} as {[key: string]: any});
+};
+
+export const isObject = (val: Object) => {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+};

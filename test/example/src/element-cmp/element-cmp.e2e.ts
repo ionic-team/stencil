@@ -1,0 +1,34 @@
+import { newE2EPage } from '../../../../dist/testing';
+
+
+describe('@Element', () => {
+
+  it('should read the host elements attribute', async () => {
+    // create a new puppeteer page
+    const page = await newE2EPage({ html: `
+      <element-cmp host-element-attr="Marty McFly"></element-cmp>
+    `});
+
+    // with page.find() select the "element-cmp" element (uses querySelector)
+    const elm = await page.find('element-cmp');
+    expect(elm).toEqualText('Hello, my name is Marty McFly');
+  });
+
+  it('should correctly expect attrs and classes', async () => {
+    const page = await newE2EPage({ html: `
+      <element-cmp data-attr1="a" data-attr2="b" class="class1 class2"></element-cmp>
+    `});
+
+    const elm = await page.find('element-cmp');
+
+    expect(elm).toHaveAttribute('data-attr1');
+    expect(elm).not.toHaveAttribute('data-attr3');
+
+    expect(elm).toEqualAttribute('data-attr2', 'b');
+    expect(elm).not.toEqualAttribute('data-attr2', 'c');
+
+    expect(elm).toHaveClass('class1');
+    expect(elm).not.toHaveClass('class3');
+  });
+
+});

@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const transpile = require('./transpile');
-
+const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-server');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
@@ -15,17 +15,26 @@ const success = transpile(path.join('..', 'src', 'server', 'tsconfig.json'));
 
 if (success) {
 
+  const buildConditionals = getDefaultBuildConditionals();
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    return all;
+  }, {});
+
   function bundleCompiler() {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'fs',
         'path',
-        'chalk',
+        'turbocolor',
         'child_process'
       ],
       plugins: [
-        rollupResolve()
+        rollupResolve(),
+        rollupPluginReplace({
+          values: replaceObj
+        })
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
@@ -47,12 +56,12 @@ if (success) {
         file: DEST_FILE
 
       }).catch(err => {
-        console.log(`build server error: ${err}`);
+        console.log(`❌ build server error: ${err}`);
         process.exit(1);
       });
 
     }).catch(err => {
-      console.log(`build server error: ${err}`);
+      console.log(`❌ build server error: ${err}`);
       process.exit(1);
     });
   }

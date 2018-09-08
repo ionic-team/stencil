@@ -138,10 +138,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.children).toHaveLength(0);
 
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
 
     expect(parentElm.firstElementChild.nodeName).toBe('LION');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -162,10 +162,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.children).toHaveLength(0);
 
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
 
     expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
     expect(parentElm.firstElementChild.children).toHaveLength(1);
@@ -189,10 +189,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
 
     expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -241,7 +241,7 @@ describe('Component slot', () => {
 
     let instance = plt.instanceMap.get(parentElm);
     instance.innerH = h('h6', null, 'parent text update');
-    render(plt, parentCmpMeta, parentElm, instance, false);
+    render(plt, parentCmpMeta, parentElm, instance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('SECTION');
@@ -250,7 +250,7 @@ describe('Component slot', () => {
 
     instance = plt.instanceMap.get(childElm);
     instance.tag = 'article';
-    render(plt, childCmpMeta, childElm, instance, false);
+    render(plt, childCmpMeta, childElm, instance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ARTICLE');
@@ -279,10 +279,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-    render(plt, {}, childElm, {}, false);
-    render(plt, {}, parentElm, {}, false);
-    render(plt, {}, childElm, {}, false);
-    render(plt, {}, parentElm, {}, false);
+    render(plt, {}, childElm, {});
+    render(plt, {}, parentElm, {});
+    render(plt, {}, childElm, {});
+    render(plt, {}, parentElm, {});
 
     expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -344,13 +344,13 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.textContent).toBe('');
 
     const instance = plt.instanceMap.get(childElm);
-    render(plt, parentCmpMeta, childElm, instance, false);
+    render(plt, parentCmpMeta, childElm, instance);
     expect(parentElm.firstElementChild.textContent).toBe('content 1content 2');
 
-    render(plt, childCmpMeta, childElm, instance, false);
+    render(plt, childCmpMeta, childElm, instance);
     expect(parentElm.firstElementChild.textContent).toBe('');
 
-    render(plt, childCmpMeta, childElm, instance, false);
+    render(plt, childCmpMeta, childElm, instance);
     expect(parentElm.firstElementChild.textContent).toBe('content 4');
   });
 
@@ -395,7 +395,7 @@ describe('Component slot', () => {
 
     const parentInstance = plt.instanceMap.get(parentElm);
     parentInstance.msg = 'change 1';
-    render(plt, parentCmpMeta, parentElm, parentInstance, false);
+    render(plt, parentCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -404,7 +404,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
     parentInstance.msg = 'change 2';
-    render(plt, childCmpMeta, parentElm, parentInstance, false);
+    render(plt, childCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -451,7 +451,7 @@ describe('Component slot', () => {
 
     const parentInstance = plt.instanceMap.get(parentElm);
     parentInstance.msg = 'change 1';
-    render(plt, parentCmpMeta, parentElm, parentInstance, false);
+    render(plt, parentCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -459,7 +459,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
     parentInstance.msg = 'change 2';
-    render(plt, childCmpMeta, parentElm, parentInstance, false);
+    render(plt, childCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -508,7 +508,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.children[1].textContent).toBe('2');
 
     const parentInstance = plt.instanceMap.get(parentElm);
-    render(plt, parentCmpMeta, parentElm, parentInstance, false);
+    render(plt, parentCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -517,7 +517,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.children[1].nodeName).toBe('EAGLE');
     expect(parentElm.firstElementChild.firstElementChild.children[1].textContent).toBe('4');
 
-    render(plt, childCmpMeta, parentElm, parentInstance, false);
+    render(plt, childCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -577,7 +577,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('2');
 
     const parentInstance = plt.instanceMap.get(parentElm);
-    render(plt, parentCmpMeta, parentElm, parentInstance, false);
+    render(plt, parentCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -590,7 +590,7 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.children[1].children[1].children[0].nodeName).toBe('FOX');
     expect(parentElm.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('5');
 
-    render(plt, childCmpMeta, parentElm, parentInstance, false);
+    render(plt, childCmpMeta, parentElm, parentInstance);
 
     expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -656,7 +656,7 @@ describe('Component slot', () => {
     expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('1');
 
     let instance = plt.instanceMap.get(elm);
-    render(plt, test1CmpMeta, elm, instance, false);
+    render(plt, test1CmpMeta, elm, instance);
 
     expect(elm.firstElementChild.nodeName).toBe('TEST-1');
     expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -666,7 +666,7 @@ describe('Component slot', () => {
     expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('2');
 
     instance = plt.instanceMap.get(elm);
-    render(plt, test2CmpMeta, elm, instance, false);
+    render(plt, test2CmpMeta, elm, instance);
 
     expect(elm.firstElementChild.nodeName).toBe('TEST-1');
     expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -731,7 +731,7 @@ describe('Component slot', () => {
     expect(elm.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
 
     let instance = plt.instanceMap.get(elm);
-    render(plt, test1CmpMeta, elm, instance, false);
+    render(plt, test1CmpMeta, elm, instance);
 
     expect(elm.firstElementChild.nodeName).toBe('TEST-1');
     expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -745,7 +745,7 @@ describe('Component slot', () => {
     expect(elm.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
 
     instance = plt.instanceMap.get(elm);
-    render(plt, test2CmpMeta, elm, instance, false);
+    render(plt, test2CmpMeta, elm, instance);
 
     expect(elm.firstElementChild.nodeName).toBe('TEST-1');
     expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');

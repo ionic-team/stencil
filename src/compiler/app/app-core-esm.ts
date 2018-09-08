@@ -3,38 +3,36 @@ import { buildCoreContent } from './build-core-content';
 import { generatePreamble } from '../util';
 import { getCoreEsmBuildPath, getGlobalEsmFileName } from './app-file-naming';
 import { generateAppGlobalScript } from './app-global-scripts';
-import { setBuildConditionals } from './build-conditionals';
+import { setBuildConditionals } from '../../util/build-conditionals';
 
 
-export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
-  if (outputTarget.type !== 'dist') {
-    return;
+export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+  if (outputTarget.type === 'dist') {
+    // mega-minify the core w/ property renaming, but not the user's globals
+    // hardcode which features should and should not go in the core builds
+    // process the transpiled code by removing unused code and minify when configured to do so
+    let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.esm.js' });
+
+    // browser esm core build
+    const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
+
+    const hasAppGlobalImport = !!(globalJsContentsEsm && globalJsContentsEsm.length);
+
+    if (hasAppGlobalImport) {
+      jsContent = `import appGlobal from './${getGlobalEsmFileName(config)}';\n${jsContent}`;
+    } else {
+      jsContent = `var appGlobal = function(){};\n${jsContent}`;
+    }
+
+    // figure out which sections should be included in the core build
+    const buildConditionals = await setBuildConditionals(config, compilerCtx, 'esm.es5', buildCtx, entryModules);
+
+    await generateEsmCoreEs5(config, compilerCtx, buildCtx, outputTarget, buildConditionals, jsContent);
   }
-
-  // mega-minify the core w/ property renaming, but not the user's globals
-  // hardcode which features should and should not go in the core builds
-  // process the transpiled code by removing unused code and minify when configured to do so
-  let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.esm.js' });
-
-  // browser esm core build
-  const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
-
-  const hasAppGlobalImport = !!(globalJsContentsEsm && globalJsContentsEsm.length);
-
-  if (hasAppGlobalImport) {
-    jsContent = `import appGlobal from './${getGlobalEsmFileName(config)}';\n${jsContent}`;
-  } else {
-    jsContent = `var appGlobal = function(){};\n${jsContent}`;
-  }
-
-  // figure out which sections should be included in the core build
-  const buildConditionals = await setBuildConditionals(config, compilerCtx, 'esm.es5', buildCtx, entryModules);
-
-  await generateEsmCoreEs5(config, compilerCtx, buildCtx, outputTarget, buildConditionals, jsContent);
 }
 
 
-async function generateEsmCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, buildConditionals: d.BuildConditionals, jsContent: string) {
+async function generateEsmCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist, buildConditionals: d.BuildConditionals, jsContent: string) {
   const coreEsm = getCoreEsmBuildPath(config, outputTarget, 'es5');
   const relPath = config.sys.path.relative(config.rootDir, coreEsm);
 

@@ -1,5 +1,5 @@
 import { Config } from '../../../declarations';
-import { mockHtml } from '../../../testing/mocks';
+import { mockDocument } from '../../../testing/mocks';
 import { removeUnusedStyles } from '../remove-unused-styles';
 import { UsedSelectors } from '../../html/used-selectors';
 
@@ -9,12 +9,12 @@ describe('removeUnusedStyles', () => {
   const config: Config = {};
 
   it('should remove unused nested selectors', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div dir="ltr">
         <h1>Used</h1>
         <h2>Used</h2>
       </div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       [dir="ltr"] h1+h2 { font: used; }
@@ -26,11 +26,11 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused nested selectors', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div>
         <button id="usedId" class="my-used" mph="88">Unused</button>
       </div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       div label { font: used; }
@@ -47,11 +47,11 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should keep used nested selectors', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div>
         <label id="usedId" class="my-used" mph="88">Used</label>
       </div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       div { font: used; }
@@ -71,12 +71,12 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused id selector', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div>
         <label id="usedId">Used</label>
         <div id="another-UsedId">Used</div>
       </div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       label { font: used; }
@@ -94,9 +94,9 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused attr selector', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <label mph="88">Used</label>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       label { font: used; }
@@ -110,9 +110,9 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused tag selector', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <label class="div">Used</label>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       div { font: unused }
@@ -124,9 +124,9 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused classname in multi-selector', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div class="used-class"></div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       .unused-class, .unused-class2 { font: unused }
@@ -139,9 +139,9 @@ describe('removeUnusedStyles', () => {
   });
 
   it('should remove unused classname', () => {
-    const usedSelectors = new UsedSelectors(mockHtml(`
+    const usedSelectors = new UsedSelectors(mockDocument(`
       <div class="used-class"></div>
-    `));
+    `) as any);
 
     const css = removeUnusedStyles(config, usedSelectors, `
       .used-class { font: used }

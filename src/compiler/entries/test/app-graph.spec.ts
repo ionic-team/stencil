@@ -1,11 +1,14 @@
-import { ModuleFile } from '../../../declarations';
+import * as d from '../../../declarations';
 import { processAppGraph } from '../app-graph';
+import { mockBuildCtx } from '../../../testing/mocks';
 
 
 describe('processAppGraph', () => {
 
+  const buildCtx = mockBuildCtx();
+
   it('ion app', () => {
-    const allModules: ModuleFile[] = [
+    const allModules: d.ModuleFile[] = [
       { cmpMeta: { tagNameMeta: 'stencil-route', dependencies: [] } },
       { cmpMeta: { tagNameMeta: 'stencil-route-link', dependencies: ['stencil-route-link'] } },
       { cmpMeta: { tagNameMeta: 'stencil-router', dependencies: [] } },
@@ -32,7 +35,7 @@ describe('processAppGraph', () => {
       { cmpMeta: { tagNameMeta: 'stencil-beer', dependencies: ['ion-app', 'stencil-router', 'stencil-route'] } },
     ];
     const entryTags = [ 'profile-header', 'profile-page', 'stencil-beer' ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(5);
     expect(g[0]).toEqual([
       { tag: 'ion-action-sheet', dependencyOf: ['ion-action-sheet-controller'] },
@@ -70,15 +73,15 @@ describe('processAppGraph', () => {
   });
 
   it('circular', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'x', dependencies: ['y', 'x'] } },
-      { cmpMeta: { tagNameMeta: 'y', dependencies: ['z', 'z'] } },
-      { cmpMeta: { tagNameMeta: 'z', dependencies: ['x'] } },
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'x', dependencies: ['y', 'x'] }, sourceFilePath: 'x' },
+      { cmpMeta: { tagNameMeta: 'y', dependencies: ['z', 'z'] }, sourceFilePath: 'y' },
+      { cmpMeta: { tagNameMeta: 'z', dependencies: ['x'] }, sourceFilePath: 'z' },
     ];
     const entryTags = [
       'z', 'x', 'y'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(1);
     expect(g[0]).toEqual([
       { tag: 'x', dependencyOf: ['z'] },
@@ -88,17 +91,17 @@ describe('processAppGraph', () => {
   });
 
   it('random orders 2', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'y', dependencies: ['x', 'w', 'v'] } },
-      { cmpMeta: { tagNameMeta: 'v' } },
-      { cmpMeta: { tagNameMeta: 'x', dependencies: ['w', 'v'] } },
-      { cmpMeta: { tagNameMeta: 'z', dependencies: ['v', 'x', 'w'] } },
-      { cmpMeta: { tagNameMeta: 'w' } },
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'y', dependencies: ['x', 'w', 'v'] }, sourceFilePath: 'y' },
+      { cmpMeta: { tagNameMeta: 'v' }, sourceFilePath: 'v' },
+      { cmpMeta: { tagNameMeta: 'x', dependencies: ['w', 'v'] }, sourceFilePath: 'x' },
+      { cmpMeta: { tagNameMeta: 'z', dependencies: ['v', 'x', 'w'] }, sourceFilePath: 'z' },
+      { cmpMeta: { tagNameMeta: 'w' }, sourceFilePath: 'w' },
     ];
     const entryTags = [
       'y', 'z'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([
       { tag: 'v', dependencyOf: ['x', 'y', 'z'] },
@@ -110,18 +113,18 @@ describe('processAppGraph', () => {
   });
 
   it('random orders 1', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'w' } },
-      { cmpMeta: { tagNameMeta: 'y', dependencies: ['w', 'x', 'v'] } },
-      { cmpMeta: { tagNameMeta: 'x', dependencies: ['w', 'v'] } },
-      { cmpMeta: { tagNameMeta: 'v' } },
-      { cmpMeta: { tagNameMeta: 'z', dependencies: ['x', 'v', 'w'] } },
-      { cmpMeta: { tagNameMeta: 'a' } },
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'w' }, sourceFilePath: 'w' },
+      { cmpMeta: { tagNameMeta: 'y', dependencies: ['w', 'x', 'v'] }, sourceFilePath: 'y' },
+      { cmpMeta: { tagNameMeta: 'x', dependencies: ['w', 'v'] }, sourceFilePath: 'x' },
+      { cmpMeta: { tagNameMeta: 'v' }, sourceFilePath: 'v' },
+      { cmpMeta: { tagNameMeta: 'z', dependencies: ['x', 'v', 'w'] }, sourceFilePath: 'z' },
+      { cmpMeta: { tagNameMeta: 'a' }, sourceFilePath: 'a' },
     ];
     const entryTags = [
       'z', 'y', 'z', 'y',
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([
       { tag: 'v', dependencyOf: ['x', 'y', 'z'] },
@@ -133,17 +136,17 @@ describe('processAppGraph', () => {
   });
 
   it('common c,d,e', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd', 'e'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd', 'e'] } },
-      { cmpMeta: { tagNameMeta: 'c', dependencies: ['d', 'e'] } },
-      { cmpMeta: { tagNameMeta: 'd' } },
-      { cmpMeta: { tagNameMeta: 'e' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd', 'e'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd', 'e'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c', dependencies: ['d', 'e'] }, sourceFilePath: 'c' },
+      { cmpMeta: { tagNameMeta: 'd' }, sourceFilePath: 'd' },
+      { cmpMeta: { tagNameMeta: 'e' }, sourceFilePath: 'e' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([{ tag: 'b', dependencyOf: [] }]);
@@ -155,17 +158,17 @@ describe('processAppGraph', () => {
   });
 
   it('common c,d and b,e', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd', 'e'] } },
-      { cmpMeta: { tagNameMeta: 'c' } },
-      { cmpMeta: { tagNameMeta: 'd' } },
-      { cmpMeta: { tagNameMeta: 'e' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd', 'e'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' },
+      { cmpMeta: { tagNameMeta: 'd' }, sourceFilePath: 'd' },
+      { cmpMeta: { tagNameMeta: 'e' }, sourceFilePath: 'e' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([
@@ -179,16 +182,16 @@ describe('processAppGraph', () => {
   });
 
   it('common c,d w/ no entry c,d', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd'] } },
-      { cmpMeta: { tagNameMeta: 'c' } },
-      { cmpMeta: { tagNameMeta: 'd' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' },
+      { cmpMeta: { tagNameMeta: 'd' }, sourceFilePath: 'd' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([{ tag: 'b', dependencyOf: [] }]);
@@ -199,16 +202,16 @@ describe('processAppGraph', () => {
   });
 
   it('common c,d', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd'] } },
-      { cmpMeta: { tagNameMeta: 'c' } },
-      { cmpMeta: { tagNameMeta: 'd' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c', 'd'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c', 'd'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' },
+      { cmpMeta: { tagNameMeta: 'd' }, sourceFilePath: 'd' }
     ];
     const entryTags = [
       'a', 'b', 'c', 'd'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([{ tag: 'b', dependencyOf: [] }]);
@@ -219,15 +222,15 @@ describe('processAppGraph', () => {
   });
 
   it('common c, include module not an entry tags', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c'] } },
-      { cmpMeta: { tagNameMeta: 'c' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['c'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([{ tag: 'b', dependencyOf: [] }]);
@@ -235,15 +238,15 @@ describe('processAppGraph', () => {
   });
 
   it('group three together', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] } },
-      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c'] } },
-      { cmpMeta: { tagNameMeta: 'c' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b', dependencies: ['c'] }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' }
     ];
     const entryTags = [
       'a', 'b', 'c'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(1);
     expect(g[0]).toEqual([
       { tag: 'a', dependencyOf: [] },
@@ -253,17 +256,17 @@ describe('processAppGraph', () => {
   });
 
   it('exclude modules not used in entry modules', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] } },
-      { cmpMeta: { tagNameMeta: 'b' } },
-      { cmpMeta: { tagNameMeta: 'c', dependencies: ['d', 'e'] } },
-      { cmpMeta: { tagNameMeta: 'd', dependencies: ['e', 'a'] } },
-      { cmpMeta: { tagNameMeta: 'e', dependencies: ['b'] } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b' }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c', dependencies: ['d', 'e'] }, sourceFilePath: 'c' },
+      { cmpMeta: { tagNameMeta: 'd', dependencies: ['e', 'a'] }, sourceFilePath: 'd' },
+      { cmpMeta: { tagNameMeta: 'e', dependencies: ['b'] }, sourceFilePath: 'e' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(1);
     expect(g[0]).toEqual([
       { tag: 'a', dependencyOf: [] },
@@ -272,14 +275,14 @@ describe('processAppGraph', () => {
   });
 
   it('group two together', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] } },
-      { cmpMeta: { tagNameMeta: 'b' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a', dependencies: ['b'] }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b' }, sourceFilePath: 'b' }
     ];
     const entryTags = [
       'a', 'b'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(1);
     expect(g[0]).toEqual([
       { tag: 'a', dependencyOf: [] },
@@ -288,15 +291,15 @@ describe('processAppGraph', () => {
   });
 
   it('simple, no deps', () => {
-    const allModules: ModuleFile[] = [
-      { cmpMeta: { tagNameMeta: 'a' } },
-      { cmpMeta: { tagNameMeta: 'b' } },
-      { cmpMeta: { tagNameMeta: 'c' } }
+    const allModules: d.ModuleFile[] = [
+      { cmpMeta: { tagNameMeta: 'a' }, sourceFilePath: 'a' },
+      { cmpMeta: { tagNameMeta: 'b' }, sourceFilePath: 'b' },
+      { cmpMeta: { tagNameMeta: 'c' }, sourceFilePath: 'c' }
     ];
     const entryTags = [
       'a', 'b', 'c'
     ];
-    const g = processAppGraph(allModules, entryTags);
+    const g = processAppGraph(buildCtx, allModules, entryTags);
     expect(g).toHaveLength(3);
     expect(g[0]).toEqual([{ tag: 'a', dependencyOf: [] }]);
     expect(g[1]).toEqual([{ tag: 'b', dependencyOf: [] }]);

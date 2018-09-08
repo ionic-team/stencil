@@ -43,7 +43,7 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     if (buildCtx.isActiveBuild) {
       // successful write
       // kick off writing the cached file stuff
-      // no need to wait on it finishing
+      await compilerCtx.cache.commit();
       buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
       buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 

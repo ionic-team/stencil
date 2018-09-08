@@ -1,15 +1,17 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
-import { mockElement, mockRenderer } from '../../../testing/mocks';
+import { mockDocument, mockRenderer } from '../../../testing/mocks';
 
 
 describe('attributes', function() {
   const patch = mockRenderer();
   let hostElm: any;
+  let doc: Document;
   let vnode0: d.VNode;
 
-  beforeEach(function() {
-    hostElm = mockElement('div');
+  beforeEach(() => {
+    doc = mockDocument();
+    hostElm = doc.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -19,7 +21,7 @@ describe('attributes', function() {
     hostElm = patch(hostElm, vnode0, vnode1).elm;
     expect(hostElm.getAttribute('href')).toEqual('/foo');
     expect(hostElm.getAttribute('minlength')).toEqual('1');
-    expect(hostElm.getAttribute('value')).toEqual('true');
+    expect(hostElm.getAttribute('value')).toEqual('');
   });
 
   it('can be memoized', async function() {
@@ -29,11 +31,11 @@ describe('attributes', function() {
     hostElm = patch(hostElm, vnode0, vnode1).elm;
     expect(hostElm.getAttribute('href')).toEqual('/foo');
     expect(hostElm.getAttribute('minlength')).toEqual('1');
-    expect(hostElm.getAttribute('value')).toEqual('true');
+    expect(hostElm.getAttribute('value')).toEqual('');
     hostElm = patch(hostElm, vnode1, vnode2).elm;
     expect(hostElm.getAttribute('href')).toEqual('/foo');
     expect(hostElm.getAttribute('minlength')).toEqual('1');
-    expect(hostElm.getAttribute('value')).toEqual('true');
+    expect(hostElm.getAttribute('value')).toEqual('');
   });
 
   it('are not omitted when falsy values are provided', function() {
@@ -41,7 +43,7 @@ describe('attributes', function() {
     hostElm = patch(hostElm, vnode0, vnode1).elm;
     expect(hostElm.getAttribute('href')).toEqual(null);
     expect(hostElm.getAttribute('minlength')).toEqual('0');
-    expect(hostElm.getAttribute('value')).toEqual('false');
+    expect(hostElm.getAttribute('value')).toEqual(null);
   });
 
   it('are set correctly when namespaced', function() {
@@ -51,7 +53,7 @@ describe('attributes', function() {
   });
 
   it('should not touch class nor id fields', function() {
-    hostElm = mockElement('div');
+    hostElm = doc.createElement('div');
     hostElm.id = 'myId';
     hostElm.className = 'myClass';
     vnode0.elm = hostElm;
@@ -71,16 +73,16 @@ describe('attributes', function() {
       expect(hostElm.hasAttribute('required')).toEqual(true);
       expect(hostElm.getAttribute('required')).toEqual('');
       expect(hostElm.hasAttribute('readonly')).toEqual(true);
-      expect(hostElm.getAttribute('readonly')).toEqual('');
+      expect(hostElm.getAttribute('readonly')).toEqual('1');
       expect(hostElm.hasAttribute('noresize')).toEqual(true);
-      expect(hostElm.getAttribute('noresize')).toEqual('');
+      expect(hostElm.getAttribute('noresize')).toEqual('truthy');
     });
 
     it('is omitted if the value is falsy', function() {
       const vnode1 = h('div', { required: false, readonly: 'false', noresize: null });
       hostElm = patch(hostElm, vnode0, vnode1).elm;
       expect(hostElm.getAttribute('required')).toEqual(null);
-      expect(hostElm.getAttribute('readonly')).toEqual(null);
+      expect(hostElm.getAttribute('readonly')).toEqual('false');
       expect(hostElm.getAttribute('noresize')).toEqual(null);
     });
   });
@@ -96,7 +98,7 @@ describe('attributes', function() {
         })
       );
 
-      vnode0.elm = mockElement('svg') as any;
+      vnode0.elm = doc.createElementNS('http://www.w3.org/2000/svg', 'svg') as any;
       const result: any = patch(hostElm, vnode0, a).elm;
       expect(result.childNodes.length).toEqual(1);
       expect(result.childNodes[0].getAttribute('href')).toEqual(testUrl);

@@ -1,11 +1,12 @@
 import * as d from '.';
 
 
+declare type CustomMethodDecorator<T> = (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+
+
 export interface ComponentDecorator {
-  (opts?: ComponentOptions): any;
+  (opts?: ComponentOptions): ClassDecorator;
 }
-
-
 export interface ComponentOptions {
   tag: string;
   styleUrl?: string;
@@ -20,10 +21,8 @@ export interface ComponentOptions {
 
 
 export interface PropDecorator {
-  (opts?: PropOptions): any;
+  (opts?: PropOptions): PropertyDecorator;
 }
-
-
 export interface PropOptions {
   attr?: string;
   context?: string;
@@ -34,23 +33,19 @@ export interface PropOptions {
 
 
 export interface MethodDecorator {
-  (opts?: MethodOptions): any;
+  (opts?: MethodOptions): CustomMethodDecorator<any>;
 }
-
-
 export interface MethodOptions {}
 
 
 export interface ElementDecorator {
-  (): any;
+  (): PropertyDecorator;
 }
 
 
 export interface EventDecorator {
-  (opts?: EventOptions): any;
+  (opts?: EventOptions): PropertyDecorator;
 }
-
-
 export interface EventOptions {
   eventName?: string;
   bubbles?: boolean;
@@ -60,10 +55,8 @@ export interface EventOptions {
 
 
 export interface ListenDecorator {
-  (eventName: string, opts?: ListenOptions): any;
+  (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
-
-
 export interface ListenOptions {
   eventName?: string;
   capture?: boolean;
@@ -71,11 +64,12 @@ export interface ListenOptions {
   enabled?: boolean;
 }
 
+
 export interface StateDecorator {
-  (): any;
+  (): PropertyDecorator;
 }
 
 
 export interface WatchDecorator {
-  (propName: string): any;
+  (propName: string): CustomMethodDecorator<any>;
 }

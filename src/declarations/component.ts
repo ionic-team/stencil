@@ -1,42 +1,5 @@
 import * as d from '.';
 
-
-export interface ComponentWillLoad {
-  /**
-   * componentWillLoad
-   */
-  componentWillLoad: () => Promise<void> | void;
-}
-
-export interface ComponentDidLoad {
-  /**
-   * componentDidLoad
-   */
-  componentDidLoad: () => void;
-}
-
-export interface ComponentWillUpdate {
-  /**
-   * componentWillUpdate
-   */
-  componentWillUpdate: () => Promise<void> | void;
-}
-
-export interface ComponentDidUpdate {
-  /**
-   * componentDidUpdate
-   */
-  componentDidUpdate: () => void;
-}
-
-export interface ComponentDidUnload {
-  /**
-   * componentDidUnload
-   */
-  componentDidUnload: () => void;
-}
-
-
 export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
@@ -64,12 +27,13 @@ export interface ComponentMeta {
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   hostMeta?: HostMeta;
-  encapsulation?: number;
+  encapsulationMeta?: number;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;
   dependencies?: ComponentDependencies;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
+  styleDocs?: StyleDoc[];
   hmrLoad?: () => void;
 }
 
@@ -100,7 +64,7 @@ export interface MemberMeta {
   attribType?: AttributeTypeInfo;
   reflectToAttrib?: boolean;
   ctrlId?: string;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
   watchCallbacks?: string[];
 }
 
@@ -116,6 +80,7 @@ export interface AttributeTypeReferences {
 
 export interface AttributeTypeInfo {
   text: string;
+  optional: boolean;
   typeReferences?: AttributeTypeReferences;
 }
 
@@ -182,7 +147,7 @@ export interface EventMeta {
   eventCancelable?: boolean;
   eventComposed?: boolean;
   eventType?: AttributeTypeInfo;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
 }
 
 
@@ -192,81 +157,25 @@ export interface ListenMeta {
   eventCapture?: boolean;
   eventPassive?: boolean;
   eventDisabled?: boolean;
-  jsdoc?: JSDoc;
+  jsdoc?: JsDoc;
 }
 
 
-export interface JSDoc {
+export interface JsDoc {
   name: string;
   documentation: string;
   type: string;
 }
 
 
-export type ComponentDependencies = string[];
-
-
-export interface ComponentInstance {
-  /**
-   * The component is about to load and it has not
-   * rendered yet.
-   *
-   * This is the best place to make any data updates
-   * before the first render.
-   *
-   * componentWillLoad will only be called once.
-   */
-  componentWillLoad?: () => Promise<void> | void;
-
-  /**
-   * The component has loaded and has already rendered.
-   *
-   * Updating data in this method will cause the
-   * component to re-render.
-   *
-   * componentDidLoad will only be called once.
-   */
-  componentDidLoad?: () => void;
-
-  /**
-   * The component is about to update and re-render.
-   *
-   * Called multiple times throughout the life of
-   * the component as it updates.
-   *
-   * componentWillUpdate is not called on the first render.
-   */
-  componentWillUpdate?: () => Promise<void> | void;
-
-  /**
-   * The component has just re-rendered.
-   *
-   * Called multiple times throughout the life of
-   * the component as it updates.
-   *
-   * componentWillUpdate is not called on the
-   * first render.
-   */
-  componentDidUpdate?: () => void;
-
-  /**
-   * The component did unload and the element
-   * will be destroyed.
-   */
-  componentDidUnload?: () => void;
-
-  render?: () => any;
-  /**
-   * Used to dynamically set host element attributes.
-   * Should be placed directly above render()
-   */
-  hostData?: () => d.VNodeData;
-
-  mode?: string;
-  color?: string;
-
-  [memberName: string]: any;
+export interface StyleDoc {
+  name: string;
+  docs: string;
+  annotation: 'prop';
 }
+
+
+export type ComponentDependencies = string[];
 
 
 export abstract class ComponentModule {
@@ -297,7 +206,7 @@ export interface ComponentInternalValues {
 
 
 export interface ComponentModule {
-  new(): ComponentInstance;
+  new(): d.ComponentInstance;
 }
 
 
@@ -392,39 +301,37 @@ export interface ComponentAppliedStyles {
 export type OnReadyCallback = ((elm: d.HostElement) => void);
 
 
-export interface ComponentHostData {
+export type ComponentHostData = [
   /**
    * tag name (ion-badge)
    */
-  [0]: string;
+  string,
 
   /**
    * map of bundle ids
    */
-  [1]: {
-    [modeName: string]: any[];
-  };
+  BundleIds,
 
   /**
    * has styles
    */
-  [2]: boolean;
+  boolean,
 
   /**
    * members
    */
-  [3]: ComponentMemberData[];
+  ComponentMemberData[],
 
   /**
    * encapsulated
    */
-  [4]: number;
+  number,
 
   /**
    * listeners
    */
-  [5]: ComponentListenersData[];
-}
+  ComponentListenersData[]
+];
 
 
 export interface ComponentMemberData {

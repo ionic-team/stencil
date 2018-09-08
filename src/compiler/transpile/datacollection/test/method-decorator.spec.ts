@@ -1,7 +1,16 @@
 import { gatherMetadata } from './test-utils';
 import { getMethodDecoratorMeta } from '../method-decorator';
 import * as path from 'path';
+import { MEMBER_TYPE } from '../../../../util/constants';
+import { Config } from '../../../../declarations';
+import { mockConfig } from '../../../../testing/mocks';
 
+
+let config: Config;
+
+beforeEach(() => {
+  config = mockConfig();
+});
 
 describe('method decorator', () => {
 
@@ -9,14 +18,15 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: any) => any',
+          optional: false,
           typeReferences: {
             ActionSheet: {
               referenceLocation: 'global',
@@ -42,14 +52,15 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example-w-export-interface');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: ActionSheetOptions) => any',
+          optional: false,
           typeReferences: {
             ActionSheetOptions: {
               referenceLocation: 'local',
@@ -72,14 +83,15 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example-w-external-type-import');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
           text: '(opts?: t.CoreContext) => any',
+          optional: false,
           typeReferences: {
             Promise: {
               referenceLocation: 'global',

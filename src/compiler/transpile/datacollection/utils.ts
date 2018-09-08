@@ -45,7 +45,7 @@ export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol) {
     name: symbol.getName(),
     documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
     type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
-  } as d.JSDoc;
+  } as d.JsDoc;
 }
 
 export function isMethod(member: ts.ClassElement, methodName: string) {

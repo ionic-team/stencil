@@ -1,0 +1,9 @@
+@import "global-css-entry.css";
+
+$h1-font-size: 96px;
+
+h1 {
+  font-size: $h1-font-size;
+  color: maroon;
+  display: flex;
+}

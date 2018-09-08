@@ -1,6 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
-import { dashToPascalCase } from './helpers';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 
 
 export function formatBrowserLoaderComponentRegistry(cmpRegistry: d.ComponentRegistry) {
@@ -19,31 +18,11 @@ export function formatBrowserLoaderComponent(cmpMeta: d.ComponentMeta): d.Compon
     /* 1 */ formatBrowserLoaderBundleIds(cmpMeta.bundleIds as d.BundleIds),
     /* 2 */ formatHasStyles(cmpMeta.stylesMeta),
     /* 3 */ formatMembers(cmpMeta.membersMeta),
-    /* 4 */ formatEncapsulation(cmpMeta.encapsulation),
+    /* 4 */ formatEncapsulation(cmpMeta.encapsulationMeta),
     /* 5 */ formatListeners(cmpMeta.listenersMeta)
   ];
 
   return <any>trimFalsyData(d);
-}
-
-
-export async function formatEsmLoaderComponent(config: d.Config, cmpMeta: d.ComponentMeta) {
-  const d: any[] = [
-    /* 0 */ cmpMeta.tagNameMeta,
-    /* 1 */ '__GET_MODULE_FN__',
-    /* 2 */ formatHasStyles(cmpMeta.stylesMeta),
-    /* 3 */ formatMembers(cmpMeta.membersMeta),
-    /* 4 */ formatEncapsulation(cmpMeta.encapsulation),
-    /* 5 */ formatListeners(cmpMeta.listenersMeta)
-  ];
-
-  trimFalsyData(d);
-
-  const str = JSON.stringify(d);
-
-  const importFn = await formatEsmLoaderImportFns(config, cmpMeta);
-
-  return str.replace(`"__GET_MODULE_FN__"`, importFn);
 }
 
 
@@ -72,71 +51,6 @@ export function formatBrowserLoaderBundleIds(bundleIds: string | d.BundleIds): a
   });
 
   return bundleIdObj;
-}
-
-
-export async function formatEsmLoaderImportFns(config: d.Config, cmpMeta: d.ComponentMeta): Promise<string> {
-  const modes = Object.keys(cmpMeta.bundleIds).sort((a, b) => {
-    if (a === '$' || a === 'md') return 1;
-    if (a < b) return -1;
-    if (a > b) return 1;
-    return 0;
-  });
-
-  const moduleImports = modes.map(styleMode => {
-    return getModuleImport(cmpMeta, styleMode);
-  }).join('');
-
-  let importFn = `(function(){${moduleImports}})()`;
-
-  const minifyResults = await config.sys.minifyJs(importFn);
-
-  importFn = minifyResults.output;
-  if (importFn.endsWith(';')) {
-    importFn = importFn.substring(0, importFn.length - 1);
-  }
-
-  return `function(${importFn.includes('o.') ? 'o' : ''}){return(${importFn}).then(function(m){return m.${dashToPascalCase(cmpMeta.tagNameMeta)}})}`;
-}
-
-
-function getModuleFileName(cmpMeta: d.ComponentMeta, styleMode: string) {
-  return (typeof cmpMeta.bundleIds !== 'string') ? (cmpMeta.bundleIds as d.BundleIds)[styleMode] : cmpMeta.bundleIds;
-}
-
-
-function getModuleImport(cmpMeta: d.ComponentMeta, styleMode: string) {
-  const bundleFileName = getModuleFileName(cmpMeta, styleMode);
-  const isScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
-
-  if (styleMode === '$' || styleMode === 'md') {
-
-    if (isScoped) {
-      return `
-        if (o.scoped) {
-          return import('./${bundleFileName}.sc.js');
-        }
-        return import('./${bundleFileName}.js');
-      `;
-    }
-
-    return `return import('./${bundleFileName}.js');`;
-  }
-
-  if (isScoped) {
-    return `
-      if (o.mode == '${styleMode}') {
-        if (o.scoped) {
-          return import('./${bundleFileName}.sc.js');
-        }
-        return import('./${bundleFileName}.js');
-      }`;
-  }
-
-  return `
-    if (o.mode == '${styleMode}') {
-      return import('./${bundleFileName}.js');
-    }`;
 }
 
 

@@ -1,11 +1,14 @@
 import { toLowerCase } from '../../util/helpers';
 
 
-export function updateAttribute(elm: HTMLElement, memberName: string, newValue: any, isBoolean?: boolean, forceRemove?: boolean) {
+export function updateAttribute(
+  elm: HTMLElement,
+  memberName: string,
+  newValue: any,
+  isBooleanAttr = typeof newValue === 'boolean',
+) {
   const isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
-  const isBooleanAttr = BOOLEAN_ATTRS[memberName] || isBoolean;
-
-  if ((isBooleanAttr && (!newValue || newValue === 'false')) || forceRemove) {
+  if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
     if (isXlinkNs) {
       elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
 
@@ -16,6 +19,8 @@ export function updateAttribute(elm: HTMLElement, memberName: string, newValue: 
   } else if (typeof newValue !== 'function') {
     if (isBooleanAttr) {
       newValue = '';
+    } else {
+      newValue = newValue.toString();
     }
     if (isXlinkNs) {
       elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
@@ -25,26 +30,5 @@ export function updateAttribute(elm: HTMLElement, memberName: string, newValue: 
     }
   }
 }
-
-
-const BOOLEAN_ATTRS: any = {
-  'allowfullscreen': 1,
-  'async': 1,
-  'autofocus': 1,
-  'autoplay': 1,
-  'checked': 1,
-  'controls': 1,
-  'disabled': 1,
-  'enabled': 1,
-  'formnovalidate': 1,
-  'hidden': 1,
-  'multiple': 1,
-  'noresize': 1,
-  'readonly': 1,
-  'required': 1,
-  'selected': 1,
-  'spellcheck': 1,
-};
-
 
 const XLINK_NS = 'http://www.w3.org/1999/xlink';

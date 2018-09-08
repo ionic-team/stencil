@@ -6,11 +6,6 @@ export interface AddEventListener {
 }
 
 
-export interface EventEmitter<T= any> {
-  emit: (data?: T) => void;
-}
-
-
 export interface EventListenerCallback {
   (ev?: any): void;
 }

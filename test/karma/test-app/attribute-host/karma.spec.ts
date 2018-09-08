@@ -15,7 +15,7 @@ describe('attribute-host', function() {
     const button = app.querySelector('button');
 
     expect(elm.getAttribute('content')).toBe('attributes removed');
-    expect(elm.getAttribute('padding')).toBe('false');
+    expect(elm.getAttribute('padding')).toBe(null);
     expect(elm.getAttribute('bold')).toBe('false');
     expect(elm.getAttribute('margin')).toBe(null);
     expect(elm.getAttribute('color')).toBe(null);
@@ -44,7 +44,7 @@ describe('attribute-host', function() {
     }
 
     expect(elm.getAttribute('content')).toBe('attributes added');
-    expect(elm.getAttribute('padding')).toBe('true');
+    expect(elm.getAttribute('padding')).toBe('');
     expect(elm.getAttribute('bold')).toBe('true');
     expect(elm.getAttribute('margin')).toBe('');
     expect(elm.getAttribute('color')).toBe('lime');
@@ -62,7 +62,7 @@ describe('attribute-host', function() {
     }
 
     expect(elm.getAttribute('content')).toBe('attributes removed');
-    expect(elm.getAttribute('padding')).toBe('false');
+    expect(elm.getAttribute('padding')).toBe(null);
     expect(elm.getAttribute('bold')).toBe('false');
     expect(elm.getAttribute('margin')).toBe(null);
     expect(elm.getAttribute('color')).toBe(null);
@@ -80,7 +80,7 @@ describe('attribute-host', function() {
     }
 
     expect(elm.getAttribute('content')).toBe('attributes added');
-    expect(elm.getAttribute('padding')).toBe('true');
+    expect(elm.getAttribute('padding')).toBe('');
     expect(elm.getAttribute('bold')).toBe('true');
     expect(elm.getAttribute('margin')).toBe('');
     expect(elm.getAttribute('color')).toBe('lime');

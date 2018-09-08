@@ -10,7 +10,7 @@ export async function generateLoader(
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTarget,
+  outputTarget: d.OutputTargetBuild,
   appRegistry: d.AppRegistry,
   cmpRegistry: d.ComponentRegistry
 ) {
@@ -62,7 +62,7 @@ const CLIENT_LOADER_SOURCE = `loader.js`;
 
 export function injectAppIntoLoader(
   config: d.Config,
-  outputTarget: d.OutputTargetWww,
+  outputTarget: d.OutputTargetBuild,
   appCoreFileName: string,
   appCorePolyfilledFileName: string,
   hydratedCssClass: string,

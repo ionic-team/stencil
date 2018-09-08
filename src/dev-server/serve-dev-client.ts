@@ -45,6 +45,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
   let content = await fs.readFile(filePath);
 
   const devClientConfig: d.DevClientConfig = {
+    baseUrl: devServerConfig.baseUrl,
     editors: devServerConfig.editors,
     hmr: devServerConfig.hotReplacement
   };
@@ -59,7 +60,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
 }
 
 
-export function getDevServerClientScript(devServerConfig: d.DevServerConfig) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig);
+export function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
   return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
 }

@@ -1,9 +1,8 @@
 import * as d from '../declarations';
-import { Build } from '../util/build-conditionals';
-import { h } from '../renderer/vdom/h';
-import { ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { dashToPascalCase } from '../util/helpers';
-import { getHostScopeAttribute, getScopeId, getSlotScopeAttribute } from '../util/scope';
+import { getElementScopeId } from '../util/scope';
+import { h } from '../renderer/vdom/h';
+import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
@@ -20,28 +19,23 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     const useNativeShadowDom = (encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
 
     let reflectHostAttr: d.VNodeData;
-    let rootElm: HTMLElement;
+    let rootElm: HTMLElement = hostElm;
 
-    if (Build.reflectToAttr) {
+    if (__BUILD_CONDITIONALS__.reflectToAttr) {
       reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpMeta.componentConstructor.properties, instance);
     }
 
-    if (useNativeShadowDom) {
-      // this component SHOULD use native slot/shadow dom
-      // this browser DOES support native shadow dom
-      // and this is the first render
-      // let's create that shadow root
-      if (Build.shadowDom) {
-        rootElm = hostElm.shadowRoot as any;
-      }
-
-    } else {
-      // not using, or can't use shadow dom
-      // set the root element, which will be the shadow root when enabled
-      rootElm = hostElm;
+    // this component SHOULD use native slot/shadow dom
+    // this browser DOES support native shadow dom
+    // and this is the first render
+    // let's create that shadow root
+    // test if this component should be shadow dom
+    // and if so does the browser supports it
+    if (__BUILD_CONDITIONALS__.shadowDom && useNativeShadowDom) {
+      rootElm = hostElm.shadowRoot as any;
     }
 
-    if (Build.styles && !hostElm['s-rn']) {
+    if (__BUILD_CONDITIONALS__.styles && !hostElm['s-rn']) {
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
@@ -50,9 +44,10 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // if no render function
       const scopeId = hostElm['s-sc'];
       if (scopeId) {
-        plt.domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
+        plt.domApi.$addClass(hostElm, getElementScopeId(scopeId, true));
+
         if (!instance.render) {
-          plt.domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
+          plt.domApi.$addClass(hostElm, getElementScopeId(scopeId));
         }
       }
     }
@@ -66,12 +61,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       const vnodeChildren = instance.render && instance.render();
 
       let vnodeHostData: d.VNodeData;
-      if (Build.hostData) {
+      if (__BUILD_CONDITIONALS__.hostData) {
         // user component provided a "hostData()" method
         // the returned data/attributes are used on the host element
         vnodeHostData = instance.hostData && instance.hostData();
 
-        if (Build.isDev) {
+        if (__BUILD_CONDITIONALS__.isDev) {
           if (vnodeHostData && cmpMeta.membersMeta) {
             const foundHostKeys = Object.keys(vnodeHostData).reduce((err, k) => {
               if (cmpMeta.membersMeta[k]) {
@@ -95,7 +90,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         }
       }
 
-      if (Build.reflectToAttr && reflectHostAttr) {
+      if (__BUILD_CONDITIONALS__.reflectToAttr && reflectHostAttr) {
         vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
       }
 
@@ -103,7 +98,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // now any changes will again queue
       plt.activeRender = false;
 
-      if (Build.hostTheme && hostMeta) {
+      if (__BUILD_CONDITIONALS__.hostTheme && hostMeta) {
         // component meta data has a "theme"
         // use this to automatically generate a good css class
         // from the mode and color to add to the host element
@@ -119,7 +114,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
-      if (Build.reflectToAttr) {
+      if (__BUILD_CONDITIONALS__.reflectToAttr) {
         // only care if we're reflecting values to the host element
         hostVNode.ishost = true;
       }
@@ -137,7 +132,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     }
 
     // update styles!
-    if (Build.cssVarShim && plt.customStyle) {
+    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
       plt.customStyle.updateHost(hostElm);
     }
 
@@ -229,21 +224,4 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
   }
 
   return reflectHostAttr;
-}
-
-export function applyHostScope(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) {
-    // either this host element should use scoped css
-    // or it wants to use shadow dom but the browser doesn't support it
-    // create a scope id which is useful for scoped css
-    // and add the scope attribute to the host
-    const scopeId = getScopeId(cmpMeta, cmpMeta.componentConstructor.styleMode);
-    hostElm['s-sc'] = scopeId;
-    domApi.$setAttribute(hostElm, getHostScopeAttribute(scopeId), '');
-
-    // if no render function
-    if (!instance.render) {
-      domApi.$setAttribute(hostElm, getSlotScopeAttribute(scopeId), '');
-    }
-  }
 }

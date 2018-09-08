@@ -3,7 +3,6 @@ import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
-import { requiresScopedStyles } from '../style/generate-component-styles';
 import { validateComponentTag } from '../config/validate-component';
 
 
@@ -34,7 +33,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     const cleanedEntryModules = regroupEntryModules(allModules, buildCtx.entryPoints);
 
     buildCtx.entryModules = cleanedEntryModules
-      .map(createEntryModule)
+      .map(createEntryModule(config))
       .filter((entryModule, index, array) => {
         const firstIndex = array.findIndex(e => e.entryKey === entryModule.entryKey);
         return firstIndex === index;
@@ -50,11 +49,11 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export function getEntryEncapsulations(entryModule: d.EntryModule) {
+export function getEntryEncapsulations(moduleFiles: d.ModuleFile[]) {
   const encapsulations: ENCAPSULATION[] = [];
 
-  entryModule.moduleFiles.forEach(m => {
-    const encapsulation = m.cmpMeta.encapsulation || ENCAPSULATION.NoEncapsulation;
+  moduleFiles.forEach(m => {
+    const encapsulation = m.cmpMeta.encapsulationMeta || ENCAPSULATION.NoEncapsulation;
     if (!encapsulations.includes(encapsulation)) {
       encapsulations.push(encapsulation);
     }
@@ -102,57 +101,12 @@ export function getComponentStyleModes(cmpMeta: d.ComponentMeta) {
 }
 
 
-export function entryRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
-  return encapsulations.some(e => requiresScopedStyles(e));
-}
-
-
 export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.EntryPoint[]) {
-  const outtedNoEncapsulation: d.ModuleFile[] = [];
-  const outtedScopedCss: d.ModuleFile[] = [];
-  const outtedShadowDom: d.ModuleFile[] = [];
 
-  const cleanedEntryModules: d.ModuleFile[][] = [
-    outtedNoEncapsulation,
-    outtedScopedCss,
-    outtedShadowDom
-  ];
-
-  entryPoints.forEach(entryPoint => {
-    const entryModules = allModules.filter(m => {
+  const cleanedEntryModules = entryPoints.map(entryPoint => {
+    return allModules.filter(m => {
       return entryPoint.some(ep => m.cmpMeta && ep.tag === m.cmpMeta.tagNameMeta);
     });
-
-    const noEncapsulation = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom;
-    });
-    const scopedCss = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss;
-    });
-    const shadowDom = entryModules.filter(m => {
-      return m.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom;
-    });
-
-    if ((noEncapsulation.length > 0 && scopedCss.length === 0 && shadowDom.length === 0) ||
-       (noEncapsulation.length === 0 && scopedCss.length > 0 && shadowDom.length === 0) ||
-       (noEncapsulation.length === 0 && scopedCss.length === 0 && shadowDom.length > 0)) {
-      cleanedEntryModules.push(entryModules);
-
-    } else if (noEncapsulation.length >= scopedCss.length && noEncapsulation.length >= shadowDom.length) {
-      cleanedEntryModules.push(noEncapsulation);
-      outtedScopedCss.push(...scopedCss);
-      outtedShadowDom.push(...shadowDom);
-
-    } else if (scopedCss.length >= noEncapsulation.length && scopedCss.length >= shadowDom.length) {
-      cleanedEntryModules.push(scopedCss);
-      outtedNoEncapsulation.push(...noEncapsulation);
-      outtedShadowDom.push(...shadowDom);
-
-    } else if (shadowDom.length >= noEncapsulation.length && shadowDom.length >= scopedCss.length) {
-      cleanedEntryModules.push(shadowDom);
-      outtedNoEncapsulation.push(...noEncapsulation);
-      outtedScopedCss.push(...scopedCss);
-    }
   });
 
   return cleanedEntryModules
@@ -167,41 +121,32 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
 }
 
 
-export function createEntryModule(moduleFiles: d.ModuleFile[]) {
-  const entryModule: d.EntryModule = {
-    moduleFiles: moduleFiles
+export function createEntryModule(config: d.Config) {
+  return (moduleFiles: d.ModuleFile[]): d.EntryModule => {
+    // generate a unique entry key based on the components within this entry module
+    const entryKey = ENTRY_KEY_PREFIX + moduleFiles
+      .sort(sortModuleFiles)
+      .map(m => m.cmpMeta.tagNameMeta)
+      .join('.');
+
+    return {
+      moduleFiles,
+      entryKey,
+
+      // generate a unique entry key based on the components within this entry module
+      filePath: config.sys.path.join(config.srcDir, `${entryKey}.js`),
+
+      // get the modes used in this bundle
+      modeNames: getEntryModes(moduleFiles),
+
+      // figure out if we'll need a scoped css build
+      requiresScopedStyles: true
+    };
   };
-
-  // generate a unique entry key based on the components within this entry module
-  entryModule.entryKey = ENTRY_KEY_PREFIX + entryModule.moduleFiles
-    .sort((a, b) => {
-      if (a.isCollectionDependency && !b.isCollectionDependency) {
-        return 1;
-      }
-      if (!a.isCollectionDependency && b.isCollectionDependency) {
-        return -1;
-      }
-
-      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
-      return 0;
-    })
-    .map(m => m.cmpMeta.tagNameMeta).join('.');
-
-  // get the modes used in this bundle
-  entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
-
-  // get the encapsulations used in this bundle
-  const encapsulations = getEntryEncapsulations(entryModule);
-
-  // figure out if we'll need a scoped css build
-  entryModule.requiresScopedStyles = entryRequiresScopedStyles(encapsulations);
-
-  return entryModule;
 }
 
 
-export const ENTRY_KEY_PREFIX = 'entry:';
+export const ENTRY_KEY_PREFIX = 'entry.';
 
 
 export function getAppEntryTags(allModules: d.ModuleFile[]) {
@@ -283,4 +228,17 @@ export function validateComponentEntries(config: d.Config, compilerCtx: d.Compil
   });
 
   return allModules;
+}
+
+function sortModuleFiles(a: d.ModuleFile, b: d.ModuleFile) {
+  if (a.isCollectionDependency && !b.isCollectionDependency) {
+    return 1;
+  }
+  if (!a.isCollectionDependency && b.isCollectionDependency) {
+    return -1;
+  }
+
+  if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+  if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+  return 0;
 }

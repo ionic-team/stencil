@@ -1,8 +1,10 @@
 import { Component, CssClassMap, Element, Event, EventEmitter, Listen, Prop } from '@stencil/core';
-import { Animation, AnimationBuilder, AnimationController, Config } from '../../index';
+import { Animation, AnimationController, Config } from '../../index';
 
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
+
+interface AnimationBuilder {}
 
 /**
  * This is an actionSheet class

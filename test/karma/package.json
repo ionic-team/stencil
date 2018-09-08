@@ -6,7 +6,7 @@
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
     "build.app": "node ../../bin/stencil build --debug --es5",
-    "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender",
+    "build.prerender": "node ../../bin/stencil build --config stencil.config-prerender.js --prerender && node test-prerender/no-script-build.js",
     "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --es5",
     "karma": "npm run karma.webpack && karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",
@@ -17,6 +17,7 @@
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "devDependencies": {
+    "@stencil/sass": "0.0.5",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.0",
     "karma-browserstack-launcher": "^1.3.0",

@@ -20,8 +20,9 @@ node_modules/
 # submodule packages
 /compiler
 /polyfills
+/screenshot
 /server
 /sys
 /testing
 
-test/e2e/app/components.d.ts
+test/example/www/*

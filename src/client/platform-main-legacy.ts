@@ -1,13 +1,11 @@
 import * as d from '../declarations';
 import { attachStyles } from '../core/styles';
-import { Build } from '../util/build-conditionals';
 import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './polyfills/css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -27,7 +25,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
-  if (Build.isDev && Build.shadowDom && domApi.$supportsShadowDom && customStyle) {
+  if (__BUILD_CONDITIONALS__.isDev && __BUILD_CONDITIONALS__.shadowDom && domApi.$supportsShadowDom && customStyle) {
     console.error('Unsupported browser. Native shadow-dom available but CSS Custom Properites are not.');
   }
 
@@ -38,11 +36,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   Context.document = doc;
   Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
-  if (Build.listener) {
+  if (__BUILD_CONDITIONALS__.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
-  if (Build.event) {
+  if (__BUILD_CONDITIONALS__.event) {
     Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
@@ -72,6 +70,9 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
     requestBundle: requestBundle,
+    isAppLoaded: false,
+    activeRender: false,
+    tmpDisconnected: false,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -123,7 +124,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         hydratedCssClass
       );
 
-      if (Build.observeAttr) {
+      if (__BUILD_CONDITIONALS__.observeAttr) {
         // add which attributes should be observed
         const observedAttributes: string[] = [];
 
@@ -150,7 +151,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   function getLoadedBundle(bundleId: string, hmrVersionId?: string) {
-    if (Build.hotModuleReplacement && hmrVersionId) {
+    if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
       loadedBundles.delete(bundleId.replace(/^\.\//, ''));
     }
 
@@ -205,7 +206,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulation, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
             }
             break;
           }
@@ -250,7 +251,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
 
   let requestBundleQueue: Function[] = [];
-  if (Build.cssVarShim && customStyle) {
+  if (__BUILD_CONDITIONALS__.cssVarShim && customStyle) {
     customStyle.init().then(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
@@ -280,33 +281,33 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
-      if (Build.cssVarShim && customStyle) {
+      if (__BUILD_CONDITIONALS__.cssVarShim && customStyle) {
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
-          requestBundleQueue.push(() => requestComponentBundle(cmpMeta, bundleId, hmrVersionId));
+          requestBundleQueue.push(() => requestComponentBundle(bundleId, hmrVersionId));
 
         } else {
           // css already all loaded
-          requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
+          requestComponentBundle(bundleId, hmrVersionId);
         }
 
       } else {
         // not using css shim, so no need to wait on css shim to finish
         // figure out which bundle to request and kick it off
-        requestComponentBundle(cmpMeta, bundleId, hmrVersionId);
+        requestComponentBundle(bundleId, hmrVersionId);
       }
     }
   }
 
 
-  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, hmrVersionId: string) {
+  function requestComponentBundle(bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    const useScoped = cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom);
-    let url = resourcesUrl + bundleId + (useScoped ? '.sc' : '') + '.es5.js';
+    const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
+    let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.es5.js';
 
-    if (Build.hotModuleReplacement && hmrVersionId) {
+    if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
       url += '?s-hmr=' + hmrVersionId;
     }
 
@@ -351,13 +352,13 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
-  if (Build.styles) {
+  if (__BUILD_CONDITIONALS__.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
       attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 
-  if (Build.devInspector) {
+  if (__BUILD_CONDITIONALS__.devInspector) {
     generateDevInspector(App, namespace, win, plt);
   }
 

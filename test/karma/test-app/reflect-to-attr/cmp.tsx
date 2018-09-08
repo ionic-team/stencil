@@ -1,4 +1,4 @@
-import { Component, Prop, Element } from '../../../../dist/index';
+import { Component, Prop, Element } from '../../../../dist';
 
 @Component({
   tag: 'reflect-to-attr'

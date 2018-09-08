@@ -1,8 +1,15 @@
 import * as d from '.';
 
 
+export interface DevServer {
+  browserUrl: string;
+  close(): Promise<void>;
+}
+
+
 export interface DevServerConfig {
   address?: string;
+  baseUrl?: string;
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
@@ -33,6 +40,7 @@ export interface DevClientWindow extends Window {
 
 
 export interface DevClientConfig {
+  baseUrl: string;
   editors: d.DevServerEditor[];
   hmr: boolean;
 }
@@ -52,6 +60,7 @@ export interface HttpRequest {
   filePath?: string;
   stats?: d.FsStats;
   headers?: {[name: string]: string};
+  host?: string;
 }
 
 
@@ -75,6 +84,7 @@ export interface DevResponseHeaders {
   'Content-Type'?: string;
   'Content-Length'?: number;
   'X-Powered-By'?: string;
+  'Access-Control-Allow-Origin'?: string;
 }
 
 

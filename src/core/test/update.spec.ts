@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { Build } from '../../util/build-conditionals';
 import { h } from '../../renderer/vdom/h';
-import { MockedPlatform, mockConnect, mockDefine, mockElement, mockPlatform, waitForLoad } from '../../testing/mocks';
+import { MockedPlatform, mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
 import { queueUpdate, renderUpdate } from '../update';
+import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 
 describe('instance update', () => {
@@ -12,6 +12,7 @@ describe('instance update', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
+    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
 
 
@@ -24,7 +25,7 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as d.HostElement;
+      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
       const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
       const instance = new MyComponent();
@@ -39,7 +40,7 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as d.HostElement;
+      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
       const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
 
@@ -64,7 +65,7 @@ describe('instance update', () => {
     });
 
     const node = await mockConnect(plt, '<ion-test></ion-test>');
-    Build.hostData = false;
+    __BUILD_CONDITIONALS__.hostData = false;
     const elm = await waitForLoad(plt, node, 'ion-test');
     const vnode = plt.vnodeMap.get(elm);
     expect(vnode.elm.textContent).toBe('88');
@@ -77,8 +78,6 @@ describe('instance update', () => {
     await plt.$flushQueue();
 
     expect(vnode.elm.textContent).toBe('99');
-
-    Build.hostData = true;
   });
 
   it('should render text', async () => {

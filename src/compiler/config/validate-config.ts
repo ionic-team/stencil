@@ -7,6 +7,8 @@ import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
+import { validateRollupConfig } from './validate-rollup-config';
+import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
@@ -78,6 +80,11 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
+
+  if (typeof config.validateTypes !== 'boolean') {
+    config.validateTypes = true;
+  }
 
   setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
@@ -132,6 +139,9 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     setProcessEnvironment(config);
   }
 
+  validateRollupConfig(config);
+  validateTesting(config);
+
   return config;
 }
 
@@ -146,6 +156,6 @@ const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const MIN_HASHED_FILENAME_LENTH = 4;
 const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
-const DEFAULT_EXCLUDES = ['**/test/**', '**/*.spec.*'];
+const DEFAULT_EXCLUDES = ['**/*.+(spec|e2e).*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
 const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';

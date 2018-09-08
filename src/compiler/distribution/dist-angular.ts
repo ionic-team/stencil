@@ -39,17 +39,28 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   ];
 
   if (hasDirectives) {
-    angularImports.push('Directive');
+    angularImports.push('Component');
+    angularImports.push('ViewEncapsulation');
+    angularImports.push('ChangeDetectionStrategy');
   }
 
   if (hasOutputs) {
     angularImports.push('EventEmitter');
   }
 
-  const imports = `import { ${angularImports.sort().join(', ')} } from '@angular/core';`;
+  const imports = `
+${hasOutputs ? `import { fromEvent } from 'rxjs';` : '' }
+import { ${angularImports.sort().join(', ')} } from '@angular/core';
+`;
+
+  const sourceImports = !outputTarget.componentCorePackage ? ''
+    : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
+
   const final: string[] = [
     '/* auto-generated angular directive proxies */',
+    '/* tslint:disable */',
     imports,
+    sourceImports,
     auxFunctions.join('\n'),
     proxies,
   ];
@@ -66,10 +77,10 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
 
 function inputsAuxFunction() {
   return `
-export function proxyInputs(instance: any, el: ElementRef, props: string[]) {
+export function proxyInputs(instance: any, el: any, props: string[]) {
   props.forEach(propName => {
     Object.defineProperty(instance, propName, {
-      get: () => el.nativeElement[propName], set: (val: any) => el.nativeElement[propName] = val
+      get: () => el[propName], set: (val: any) => el[propName] = val
     });
   });
 }`;
@@ -78,16 +89,15 @@ export function proxyInputs(instance: any, el: ElementRef, props: string[]) {
 
 function outputsAuxFunction() {
   return `
-export function proxyOutputs(instance: any, events: string[]) {
-  events.forEach(eventName => instance[eventName] = new EventEmitter());
+export function proxyOutputs(instance: any, el: any, events: string[]) {
+  events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
 }`;
 }
 
 
 function methodsAuxFunction() {
   return `
-export function proxyMethods(instance: any, ref: ElementRef, methods: string[]) {
-  const el = ref.nativeElement;
+export function proxyMethods(instance: any, el: any, methods: string[]) {
   methods.forEach(methodName => {
     Object.defineProperty(instance, methodName, {
       get: function() {
@@ -146,43 +156,46 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
 
   // Generate Angular @Directive
   const directiveOpts = [
-    `selector: \'${cmpMeta.tagNameMeta}\'`
+    `selector: \'${cmpMeta.tagNameMeta}\'`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
+    `encapsulation: ViewEncapsulation.None`,
+    `template: '<ng-content></ng-content>'`
   ];
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
-  if (outputs.length > 0) {
-    directiveOpts.push(`outputs: ['${outputs.join(`', '`)}']`);
-  }
+  // if (outputs.length > 0) {
+  //   directiveOpts.push(`outputs: ['${outputs.join(`', '`)}']`);
+  // }
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
-export declare interface ${cmpMeta.componentClass} extends StencilComponents.${tagNameAsPascal} {}
-@Directive({${directiveOpts.join(', ')}})
+export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
+@Component({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
   outputs.forEach(output => {
-    lines.push(`  ${output}: EventEmitter<any>;`);
+    lines.push(`  ${output}: EventEmitter<CustomEvent>;`);
   });
 
   // Generate component constructor
-  if (hasMethods || hasInputs) {
-    lines.push(`  constructor(r: ElementRef) {`);
-  } else if (hasOutputs) {
-    lines.push(`  constructor() {`);
+  if (hasContructor) {
+    lines.push(`
+  constructor(r: ElementRef) {
+    const el = r.nativeElement;`);
   }
 
   if (hasMethods) {
-    lines.push(`    proxyMethods(this, r, ['${methods.join(`', '`)}']);`);
+    lines.push(`    proxyMethods(this, el, ['${methods.join(`', '`)}']);`);
   }
 
   if (hasInputs) {
-    lines.push(`    proxyInputs(this, r, ['${inputs.join(`', '`)}']);`);
+    lines.push(`    proxyInputs(this, el, ['${inputs.join(`', '`)}']);`);
   }
 
   if (hasOutputs) {
-    lines.push(`    proxyOutputs(this, ['${outputs.join(`', '`)}']);`);
+    lines.push(`    proxyOutputs(this, el, ['${outputs.join(`', '`)}']);`);
   }
 
   if (hasContructor) {

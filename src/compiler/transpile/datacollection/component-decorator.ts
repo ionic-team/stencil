@@ -22,6 +22,23 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
   }
 
+  if (node.heritageClauses && node.heritageClauses.some(c => c.token === ts.SyntaxKind.ExtendsKeyword)) {
+    throw new Error(`Classes decorated with @Component can not extend from a base class.
+  Inherency is temporarily disabled for stencil components.`);
+  }
+
+  // check if class has more than one decorator
+  if (node.decorators.length > 1) {
+    throw new Error(`@Component({ tag: "${componentOptions.tag}" }) can not be decorated with more decorators at the same time`);
+  }
+
+  if (componentOptions.host) {
+    const warn = buildWarn(diagnostics);
+    warn.header = 'Host prop deprecated';
+    warn.messageText = `The “host” property used in @Component({ tag: "${componentOptions.tag}" }) has been deprecated.
+It will be removed in future versions. Please use the "hostData()" method instead. `;
+  }
+
   const symbol = checker.getSymbolAtLocation(node.name);
 
   const cmpMeta: d.ComponentMeta = {
@@ -34,7 +51,7 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
   };
 
   // normalizeEncapsulation
-  cmpMeta.encapsulation =
+  cmpMeta.encapsulationMeta =
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;

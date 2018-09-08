@@ -1,4 +1,4 @@
-import { Component, Prop, Method } from '../../../../dist/index';
+import { Component, Prop, Method } from '../../../../dist';
 
 @Component({
   tag: 'attribute-complex'

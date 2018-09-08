@@ -30,10 +30,8 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
     opts.output.beautify = true;
-    opts.output.bracketize = true;
     opts.output.indent_level = 2;
     opts.output.comments = 'all';
-    opts.output.preserve_line = true;
   } else {
     opts.compress.pure_funcs = ['assert', 'console.debug'];
   }

@@ -2,7 +2,9 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
+const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-testing');
@@ -15,23 +17,38 @@ const success = transpile(path.join('..', 'src', 'testing', 'tsconfig.json'));
 
 if (success) {
 
+  const buildConditionals = getDefaultBuildConditionals();
+  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
+    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    return all;
+  }, {});
+
+  fixCssWhatImport();
+
   function bundleTestingUtils() {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'child_process',
+        'fs',
+        'jest-environment-node',
+        'os',
+        'path',
+        'puppeteer',
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
-        'rollup-plugin-node-globals',
         'rollup-pluginutils',
-        'typescript',
-        'fs',
-        'path'
+        'typescript'
       ],
       plugins: [
         rollupResolve({
           jsnext: true
+        }),
+        rollupCommonjs(),
+        rollupPluginReplace({
+          values: replaceObj
         })
       ],
       onwarn: (message) => {
@@ -64,13 +81,26 @@ if (success) {
     });
   }
 
-
   bundleTestingUtils();
 
-
-  process.on('exit', (code) => {
+  process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
     console.log(`✅ testing: ${DEST_FILE}`);
   });
 
+}
+
+
+function fixCssWhatImport() {
+  // for unit tests to work, typescript expects the syntax "import * as cssWhat from 'css-what';"
+  // but for bundling, rollup expects "import cssWhat from 'css-what';"
+  // basically this issue: https://github.com/Microsoft/TypeScript/issues/5565
+  // except that doesn't seem to work when transpiling isolated modules, idk
+  // this is an uber hack just to get both scenarios to work
+  const transpiledFile = path.join(TRANSPILED_DIR, 'testing', 'mock-doc', 'selector.js');
+
+  let transpiledContent = fs.readFileSync(transpiledFile, 'utf8');
+  transpiledContent = transpiledContent.replace('import * as cssWhat ', 'import cssWhat ');
+
+  fs.writeFileSync(transpiledFile, transpiledContent);
 }

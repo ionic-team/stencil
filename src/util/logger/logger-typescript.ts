@@ -26,7 +26,7 @@ function loadDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
     language: 'typescript',
     header: 'TypeScript',
     code: tsDiagnostic.code.toString(),
-    messageText: ts.flattenDiagnosticMessageText(tsDiagnostic.messageText, '\n'),
+    messageText: formatMessageText(tsDiagnostic),
     relFilePath: null,
     absFilePath: null,
     lines: []
@@ -40,9 +40,13 @@ function loadDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
     d.absFilePath = normalizePath(tsDiagnostic.file.fileName);
     if (config) {
       d.relFilePath = normalizePath(config.sys.path.relative(config.cwd, d.absFilePath));
+
+      if (!d.relFilePath.includes('/')) {
+        d.relFilePath = './' + d.relFilePath;
+      }
     }
 
-    const sourceText = tsDiagnostic.file.getText();
+    const sourceText = tsDiagnostic.file.text;
     const srcLines = splitLineBreaks(sourceText);
 
     const posData = tsDiagnostic.file.getLineAndCharacterOfPosition(tsDiagnostic.start);
@@ -93,3 +97,35 @@ function loadDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
   return d;
 }
 
+
+function formatMessageText(tsDiagnostic: ts.Diagnostic) {
+  let diagnosticChain = tsDiagnostic.messageText;
+
+  if (typeof diagnosticChain === 'string') {
+    return diagnosticChain;
+  }
+
+  const ignoreCodes: number[] = [];
+  const isStencilConfig = tsDiagnostic.file.fileName.includes('stencil.config');
+  if (isStencilConfig) {
+    ignoreCodes.push(2322);
+  }
+
+  let result = '';
+
+  while (diagnosticChain) {
+    if (!ignoreCodes.includes(diagnosticChain.code)) {
+      result += diagnosticChain.messageText + ' ';
+    }
+
+    diagnosticChain = diagnosticChain.next;
+  }
+
+  if (isStencilConfig) {
+    result = result.replace(`type 'StencilConfig'`, `Stencil Config`);
+    result = result.replace(`Object literal may only specify known properties, but `, ``);
+    result = result.replace(`Object literal may only specify known properties, and `, ``);
+  }
+
+  return result.trim();
+}
