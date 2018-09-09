@@ -2,6 +2,8 @@ import * as d from '../declarations';
 import { parseFragment } from './parse-html';
 import { serialize } from './mock-doc/serialize-node';
 import deepEqual from 'fast-deep-equal';
+import { MockDocumentFragment } from './mock-doc/document-fragment';
+import { NODE_TYPES } from './mock-doc/constants';
 
 
 export function toEqualHtml(input: string | HTMLElement, shouldEqual: string) {
@@ -9,18 +11,21 @@ export function toEqualHtml(input: string | HTMLElement, shouldEqual: string) {
     throw new Error(`expect toEqualHtml value is null`);
   }
 
-  let serializeA: string;
+  let parseA: MockDocumentFragment;
 
-  if ((input as HTMLElement).nodeName) {
-    serializeA = (input as HTMLElement).innerHTML;
+  if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
+    parseA = parseFragment((input as HTMLElement).outerHTML);
+
+  } else if (typeof input === 'string') {
+    parseA = parseFragment(input);
 
   } else {
-    const parseA = parseFragment(input as string);
-
-    serializeA = serialize(parseA, {
-      format: 'html'
-    });
+    throw new Error(`expect toEqualHtml value should be a string or an element`);
   }
+
+  const serializeA = serialize(parseA, {
+    format: 'html'
+  });
 
   const parseB = parseFragment(shouldEqual);
 
