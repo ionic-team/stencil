@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import { closePage } from './puppeteer-browser';
-import { findE2EElement } from './puppeteer-element';
+import { find } from './puppeteer-find';
 import { initE2EPageEvents } from './puppeteer-events';
 import * as puppeteer from 'puppeteer';
 
@@ -26,7 +26,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
   await initE2EPageEvents(page);
 
-  page.find = findE2EElement.bind(null, page);
+  page.find = find.bind(page, page);
 
   page.waitForChanges = waitForChanges.bind(null, page);
 

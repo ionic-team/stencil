@@ -18,7 +18,6 @@ export interface E2EPage extends PuppeteerPage {
    * Testing query for one element. Uses queryselector() to
    * find the first element that matches the selector
    * within the e2e page's light dom.
-   * @param selector Light Dom querySelector
    */
   find(selector: string): Promise<E2EElement>;
 
@@ -43,34 +42,190 @@ export interface E2EPageInternal extends E2EPage {
 
 
 export interface E2EElement {
+  /**
+   * Used to call a method on a component. For example, if a component
+   * has the method `cmp.myMethod(arg1, arg2)`, calling this method
+   * from a e2e test could be `cmp.callMethod('myMethod', arg1, arg2)`.
+   */
   callMethod(methodName: string, ...methodArgs: any[]): Promise<any>;
 
+  /**
+   * Gets and sets the value of the class attribute of the e2e element.
+   * Note that `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
   className: string;
 
+  /**
+   * Using classList is a convenient alternative to accessing an element's list of classes as a space-delimited string via element.className.
+   */
+  classList: {
+    /**
+     * Add specified class values. If these classes already exist in
+     * attribute of the element, then they are ignored.
+     */
+    add: (...tokens: string[]) => void;
+
+    /**
+     * Remove specified class values. Note: Removing a class that does
+     * not exist does NOT throw an error.
+     */
+    remove: (...tokens: string[]) => void;
+
+    /**
+     * If class exists then remove it, if not, then add it.
+     */
+    toggle: (token: string) => void;
+
+    /**
+     * Checks if specified class value exists in class attribute of the element.
+     */
+    contains: (className: string) => void;
+  };
+
+  /**
+   * Calling click() on an element crolls it into view if needed, and
+   * then uses page.mouse to click in the center of the element. Bear
+   * in mind that if click() triggers a navigation event and there's a
+   * separate page.waitForNavigation() promise to be resolved, you
+   * may end up with a race condition that yields unexpected results.
+   * Please see the puppeteer docs for more information.
+   */
   click(options?: puppeteer.ClickOptions): void;
 
+  /**
+   * Returns the value of a specified attribute on the element. If the
+   * given attribute does not exist, the value returned will be null.
+   */
+  getAttribute(name: string): string;
+
+  /**
+   * Used to get a property set on a component. For example, if a
+   * component has the property `elm.myProp`, then calling
+   * `elm.getProperty('myProp')` would return the `myProp` property value.
+   */
   getProperty(propertyName: string): Promise<any>;
 
+  /**
+   * Sets focus on the element.
+   */
   focus(): Promise<void>;
 
+  /**
+   * Sets hover on the element.
+   */
   hover(): Promise<void>;
 
+  /**
+   * Gets and sets id property of the element.
+   * Note that `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
+  id: string;
+
+  /**
+   * Gets and sets innerHTML property of the element.
+   * Note that `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
   innerHTML: string;
 
+  /**
+   * Gets and sets innerText property of the element.
+   * Note that `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
+  innerText: string;
+
+  /**
+   * Resolves to true if the element is visible in the current viewport.
+   */
   isIntersectingViewport(): Promise<boolean>;
 
+  /**
+   * Node name of the node, which in an element's case is the tag name.
+   * Note, this will always be upper-cased.
+   */
+  nodeName: string;
+
+  /**
+   * The node type of the node. An element's node type is always `1`.
+   */
+  nodeType: number;
+
+  /**
+   * Gets the element's outerHTML. This is a read-only property and will
+   * throw an error if set.
+   */
   outerHTML: string;
 
+  /**
+   * Focuses the element, and then uses keyboard.down and keyboard.up.
+   * If key is a single character and no modifier keys besides Shift are
+   * being held down, a keypress/input event will also be generated. The
+   * text option can be specified to force an input event to be generated.
+   * Note: Modifier keys DO effect elementHandle.press. Holding down Shift
+   * will type the text in upper case.
+   */
   press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
 
+  /**
+   * Sets the value of an attribute on the specified element. If the
+   * attribute already exists, the value is updated; otherwise a new
+   * attribute is added with the specified name and value. The value
+   * will always be converted to a string. Note that
+   * `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
+  setAttribute(name: string, value: any): void;
+
+  /**
+   * Used to set a property set on a component. For example, if a
+   * component has the property `elm.myProp`, then calling
+   * `elm.setProperty('myProp', 88)` would set the value `88` to
+   * the `myProp` property on the component.
+   */
   setProperty(propertyName: string, value: any): void;
 
+  /**
+   * Used to test if an event was, or was not dispatched. This method
+   * returns a promise, that resolves with an EventSpy. The EventSpy
+   * can be used along with `expect(spy).toHaveReceivedEvent()`,
+   * `expect(spy).toHaveReceivedEventTimes(x)` and
+   * `expect(spy).toHaveReceivedEventDetail({...})`.
+   */
   spyOnEvent(eventName: string): Promise<d.EventSpy>;
 
+  /**
+   * Tag name of the element. Note, this will always be upper-cased.
+   */
+  tagName: string;
+
+  /**
+   * This method scrolls the element it into view if needed,
+   * and then uses page.touchscreen to tap in the center of the element.
+   */
   tap(): Promise<void>;
 
+  /**
+   * The textContent property represents the text content of a node
+   * and its descendants. Note that `await page.waitForChanges()` must
+   * be called before reading the value if content has changed.
+   */
+  textContent: string;
+
+  /**
+   * This is a convenience method to easily create a CustomEvent,
+   * and dispatch it from the element, to include any custom event
+   * detail data.
+   */
   triggerEvent(eventName: string, eventInitDict?: d.EventInitDict): void;
 
+  /**
+   * Sends a keydown, keypress/input, and keyup event for each character in the text.
+   * To press a special key, like Control or ArrowDown, use keyboard.press.
+   * @param text A text to type into a focused element.
+   */
   type(text: string, options?: { delay: number }): Promise<void>;
 }
 

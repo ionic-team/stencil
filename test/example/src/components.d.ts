@@ -14,6 +14,9 @@ export namespace Components {
   interface AppRoot {}
   interface AppRootAttributes extends StencilHTMLAttributes {}
 
+  interface DomApi {}
+  interface DomApiAttributes extends StencilHTMLAttributes {}
+
   interface ElementCmp {}
   interface ElementCmpAttributes extends StencilHTMLAttributes {}
 
@@ -60,6 +63,7 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'AppRoot': Components.AppRoot;
+    'DomApi': Components.DomApi;
     'ElementCmp': Components.ElementCmp;
     'EventCmp': Components.EventCmp;
     'ListenCmp': Components.ListenCmp;
@@ -70,6 +74,7 @@ declare global {
 
   interface StencilIntrinsicElements {
     'app-root': Components.AppRootAttributes;
+    'dom-api': Components.DomApiAttributes;
     'element-cmp': Components.ElementCmpAttributes;
     'event-cmp': Components.EventCmpAttributes;
     'listen-cmp': Components.ListenCmpAttributes;
@@ -83,6 +88,12 @@ declare global {
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
+  };
+
+  interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {}
+  var HTMLDomApiElement: {
+    prototype: HTMLDomApiElement;
+    new (): HTMLDomApiElement;
   };
 
   interface HTMLElementCmpElement extends Components.ElementCmp, HTMLStencilElement {}
@@ -123,6 +134,7 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement
+    'dom-api': HTMLDomApiElement
     'element-cmp': HTMLElementCmpElement
     'event-cmp': HTMLEventCmpElement
     'listen-cmp': HTMLListenCmpElement
@@ -133,6 +145,7 @@ declare global {
 
   interface ElementTagNameMap {
     'app-root': HTMLAppRootElement;
+    'dom-api': HTMLDomApiElement;
     'element-cmp': HTMLElementCmpElement;
     'event-cmp': HTMLEventCmpElement;
     'listen-cmp': HTMLListenCmpElement;

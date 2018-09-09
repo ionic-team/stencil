@@ -47,6 +47,10 @@ export class MockAttributeMap {
   }
 
   setNamedItemNS(attr: MockAttr) {
+    if (attr && attr.value != null) {
+      attr.value = String(attr.value);
+    }
+
     const existingAttr = this.items.find(a => a.name.toLowerCase() === attr.name.toLowerCase() && a.namespaceURI === attr.namespaceURI);
     if (existingAttr) {
       existingAttr.value = attr.value;

@@ -7,7 +7,7 @@ declare global {
       toEqualText(expectTextContent: string): void;
 
       toHaveAttribute(expectAttrName: string): void;
-      toEqualAttribute(expectAttrName: string, expectAttrValue: string): void;
+      toEqualAttribute(expectAttrName: string, expectAttrValue: any): void;
       toEqualAttributes(expectAttrs: {[attrName: string]: any}): void;
 
       toHaveClass(expectClassName: string): void;

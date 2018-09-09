@@ -170,7 +170,8 @@ function serializeAttributes(opts: SerializeElementOptions, attrMap: MockAttribu
     }
 
     if (attr.name === 'class' && opts.pretty) {
-      attr.value = attr.value.split(' ').sort().join(' ');
+      const tokens = attr.value.split(' ').filter(t => t !== '').sort();
+      attr.value = tokens.join(' ');
     }
 
     output.text.push('="', escapeString(attr.value, true), '"');
@@ -178,9 +179,7 @@ function serializeAttributes(opts: SerializeElementOptions, attrMap: MockAttribu
 }
 
 function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
-  const trimmedValue = node.nodeValue.trim();
-
-  if (trimmedValue === '') {
+  if (node.nodeValue.trim() === '') {
     return;
   }
 
@@ -197,11 +196,15 @@ function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, 
   const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
 
   if (NON_ESCAPABLE_CONTENT[parentTagName]) {
-    output.text.push(opts.pretty ? trimmedValue : node.nodeValue);
+    output.text.push(node.nodeValue);
 
   } else {
-    output.text.push(escapeString(opts.pretty ? trimmedValue : node.nodeValue, false));
+    output.text.push(escapeString(opts.pretty ? prettyText(node as any) : node.nodeValue, false));
   }
+}
+
+function prettyText(textNode: Text) {
+  return textNode.nodeValue.replace(/\s\s+/g, ' ').trim();
 }
 
 function serializeCommentNodeToHtml(commentNode: MockComment, opts: SerializeElementOptions, output: SerializeOutput) {

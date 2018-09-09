@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
+import * as puppeteer from 'puppeteer';
 
 
 export async function initE2EPageEvents(page: pd.E2EPageInternal) {
@@ -24,7 +25,9 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
     selector = 'window';
   }
 
-  await addE2EListener(page, selector, eventName, (ev: any) => {
+  const handle = await page.evaluateHandle(selector);
+
+  await addE2EListener(page, handle, eventName, (ev: any) => {
     eventSpy.events.push(ev);
   });
 
@@ -51,7 +54,7 @@ export class EventSpy implements d.EventSpy {
 }
 
 
-export async function addE2EListener(page: pd.E2EPageInternal, selector: string, eventName: string, resolve: (ev: any) => void, cancelRejectId?: any) {
+export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, resolve: (ev: any) => void, cancelRejectId?: any) {
   // NODE CONTEXT
   const id = page._eventIds++;
 
@@ -62,30 +65,17 @@ export async function addE2EListener(page: pd.E2EPageInternal, selector: string,
     cancelRejectId: cancelRejectId
   });
 
-  if (selector === 'window' || selector === 'document') {
-    // add window or document event listener
-    await page.evaluate((id, selector, eventName) => {
-      // BROWSER CONTEXT
-      (selector === 'document' ? document : window).addEventListener(eventName, (ev: any) => {
-        (window as pd.BrowserWindow).stencilOnEvent({
-          id: id,
-          event: (window as pd.BrowserWindow).stencilSerializeEvent(ev)
-        });
-      });
-    }, id, selector, eventName);
+  const executionContext = elmHandle.executionContext();
 
-  } else {
-    // add element event listener
-    await page.$eval(selector, (elm: any, id, eventName) => {
-      // BROWSER CONTEXT
-      elm.addEventListener(eventName, (ev: any) => {
-        (window as pd.BrowserWindow).stencilOnEvent({
-          id: id,
-          event: (window as pd.BrowserWindow).stencilSerializeEvent(ev)
-        });
+  // add element event listener
+  await executionContext.evaluate((elm: any, id: number, eventName: string) => {
+    elm.addEventListener(eventName, (ev: any) => {
+      (window as pd.BrowserWindow).stencilOnEvent({
+        id: id,
+        event: (window as pd.BrowserWindow).stencilSerializeEvent(ev)
       });
-    }, id, eventName);
-  }
+    });
+  }, elmHandle, id, eventName);
 }
 
 
