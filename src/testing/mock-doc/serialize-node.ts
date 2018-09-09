@@ -82,7 +82,7 @@ function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, 
     output.text.push('<');
     output.text.push(tagName);
 
-    serializeAttributes(elm.attributes, output);
+    serializeAttributes(opts, elm.attributes, output);
 
     const cssText = elm.style.cssText;
     if (cssText) {
@@ -131,7 +131,15 @@ function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, 
 }
 
 
-function serializeAttributes(attrMap: MockAttributeMap, output: SerializeOutput) {
+function serializeAttributes(opts: SerializeElementOptions, attrMap: MockAttributeMap, output: SerializeOutput) {
+  if (opts.pretty) {
+    attrMap.items.sort((a, b) => {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
+  }
+
   for (let i = 0, attrsLength = attrMap.items.length; i < attrsLength; i++) {
     const attr = attrMap.items[i];
 
@@ -161,12 +169,18 @@ function serializeAttributes(attrMap: MockAttributeMap, output: SerializeOutput)
       output.text.push(attr.namespaceURI, ':', attr.name);
     }
 
+    if (attr.name === 'class' && opts.pretty) {
+      attr.value = attr.value.split(' ').sort().join(' ');
+    }
+
     output.text.push('="', escapeString(attr.value, true), '"');
   }
 }
 
 function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
-  if (node.nodeValue.trim() === '') {
+  const trimmedValue = node.nodeValue.trim();
+
+  if (trimmedValue === '') {
     return;
   }
 
@@ -183,10 +197,10 @@ function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, 
   const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
 
   if (NON_ESCAPABLE_CONTENT[parentTagName]) {
-    output.text.push(node.nodeValue);
+    output.text.push(opts.pretty ? trimmedValue : node.nodeValue);
 
   } else {
-    output.text.push(escapeString(node.nodeValue, false));
+    output.text.push(escapeString(opts.pretty ? trimmedValue : node.nodeValue, false));
   }
 }
 
@@ -266,4 +280,5 @@ export interface SerializeElementOptions {
   format?: 'html';
   indentSpaces?: number;
   newLines?: boolean;
+  pretty?: boolean;
 }

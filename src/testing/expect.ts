@@ -24,13 +24,15 @@ export function toEqualHtml(input: string | HTMLElement, shouldEqual: string) {
   }
 
   const serializeA = serialize(parseA, {
-    format: 'html'
+    format: 'html',
+    pretty: true
   });
 
   const parseB = parseFragment(shouldEqual);
 
   const serializeB = serialize(parseB, {
-    format: 'html'
+    format: 'html',
+    pretty: true
   });
 
   if (serializeA !== serializeB) {
