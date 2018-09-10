@@ -19,7 +19,7 @@ export async function getAppBrowserCorePolyfills(config: d.Config) {
 
 
 export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget);
+  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget, 'es5');
 
   await POLYFILLS.map(async polyfillFile => {
     const staticName = config.sys.path.join('polyfills', 'esm', polyfillFile);

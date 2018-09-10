@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { appendDefineCustomElementsType } from '../distribution/dist-esm';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
@@ -18,15 +17,6 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
 
   // Generate d.ts files for component types
   let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata, destination);
-
-  // get all the output targets that require types
-  const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
-
-  if (typesOutputTargets.length > 0 && destination !== 'src') {
-    // we're building a dist output target(s)
-    // so let's also add the types for the defineCustomElements
-    componentTypesFileContent = appendDefineCustomElementsType(componentTypesFileContent);
-  }
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
