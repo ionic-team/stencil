@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function genereateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!config.devServer || !config.devServer.hotReplacement || !buildCtx.isRebuild) {
     return null;
   }
