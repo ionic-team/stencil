@@ -30,9 +30,9 @@ describe('dist loader/core resourcesUrl', () => {
     await setupFs(c,
       '<script src="http://cdn.stenciljs.com/dist/myapp.js"></script>',
       `{
-        "module": "dist/esm/index.js",
+        "module": "dist/esm/es5/index.js",
         "main": "dist/index.js",
-        "collection\": "dist/collection/collection-manifest.json",
+        "collection": "dist/collection/collection-manifest.json",
         "types": "dist/types/components.d.ts"
       }`);
 
@@ -78,7 +78,7 @@ describe('dist loader/core resourcesUrl', () => {
     await setupFs(c,
       '<script src="http://cdn.stenciljs.com/dist/some-build/myapp.js"></script>',
       `{
-        "module": "dist/some-build/esm/index.js",
+        "module": "dist/some-build/esm/es5/index.js",
         "main": "dist/some-build/index.js",
         "collection\": "dist/collection/collection-manifest.json",
         "types": "dist/types/components.d.ts"

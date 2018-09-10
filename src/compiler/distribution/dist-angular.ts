@@ -164,9 +164,6 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
-  // if (outputs.length > 0) {
-  //   directiveOpts.push(`outputs: ['${outputs.join(`', '`)}']`);
-  // }
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`

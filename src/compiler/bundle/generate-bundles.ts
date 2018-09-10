@@ -124,7 +124,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
 
-        const distBuildPath = pathJoin(config, getDistEsmComponentsDir(config, distOutput), fileName);
+        const distBuildPath = pathJoin(config, getDistEsmComponentsDir(config, distOutput, 'es5'), fileName);
         return compilerCtx.fs.writeFile(distBuildPath, jsText);
       });
 
@@ -310,7 +310,7 @@ async function generateBundleBrowserBuild(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, jsText: string, bundleId: string, modeName: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
+async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, jsText: string, bundleId: string, modeName: string, isScopedStyles: boolean, sourceTarget: d.SourceTarget) {
   // create the file name
   const fileName = getEsmFilename(bundleId, isScopedStyles);
 
@@ -334,7 +334,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
-    const esmBuildPath = pathJoin(config, getDistEsmComponentsDir(config, outputTarget), fileName);
+    const esmBuildPath = pathJoin(config, getDistEsmComponentsDir(config, outputTarget, sourceTarget), fileName);
 
     // write to the build
     await compilerCtx.fs.writeFile(esmBuildPath, jsText);

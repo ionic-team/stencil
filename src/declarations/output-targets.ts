@@ -52,6 +52,7 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   collectionDir?: string;
   typesDir?: string;
+  esmLoaderPath?: string;
 }
 
 
