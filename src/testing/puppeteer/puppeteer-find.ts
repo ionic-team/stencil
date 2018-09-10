@@ -5,13 +5,31 @@ import { E2EElement } from './puppeteer-element';
 export async function find(page: pd.E2EPageInternal, selector: string) {
   const { lightSelector, shadowSelector } = getSelector(selector);
 
-  const elmHandle = await page.$(lightSelector);
+  let elmHandle = await page.$(lightSelector);
 
   if (!elmHandle) {
     return null;
   }
 
-  const elm = new E2EElement(page, elmHandle, shadowSelector);
+  if (shadowSelector) {
+    const shadowHandle = await page.evaluateHandle((elm: HTMLElement, shadowSelector: string) => {
+
+      if (!elm.shadowRoot) {
+        throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
+      }
+
+      return elm.shadowRoot.querySelector(shadowSelector);
+
+    }, elmHandle, shadowSelector);
+
+    if (!shadowHandle) {
+      return null;
+    }
+
+    elmHandle = shadowHandle.asElement();
+  }
+
+  const elm = new E2EElement(page, elmHandle);
 
   page._elements.push(elm);
 
@@ -24,10 +42,14 @@ export async function find(page: pd.E2EPageInternal, selector: string) {
 export async function findAll(page: pd.E2EPageInternal, selector: string) {
   const { lightSelector, shadowSelector } = getSelector(selector);
 
+  if (shadowSelector) {
+    //
+  }
+
   const elmHandles = await page.$$(lightSelector);
 
   const elms = elmHandles.map(async elmHandle => {
-    const elm = new E2EElement(page, elmHandle, shadowSelector);
+    const elm = new E2EElement(page, elmHandle);
 
     page._elements.push(elm);
 

@@ -9,7 +9,7 @@ import { parseFragment } from '../parse-html';
 export class E2EElement extends MockElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
 
-  constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle, public _shadowSelector: string) {
+  constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
   }
 
@@ -203,25 +203,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
 
     const executionContext = this._elmHandle.executionContext();
 
-    const rtn = await executionContext.evaluate((elm: HTMLElement, shadowSelector: string, queuedActions: ElementAction[]) => {
-      // BROWSER CONTEXT
-      let foundElm: HTMLElement;
-
-      if (shadowSelector) {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root not found for: ${elm.tagName.toLowerCase()}`);
-        }
-
-        foundElm = elm.shadowRoot.querySelector(shadowSelector);
-
-        if (!foundElm) {
-          throw new Error(`selector "${this._shadowSelector}" not found in shadow root of ${elm.tagName.toLowerCase()}`);
-        }
-
-      } else {
-        foundElm = elm;
-      }
-
+    const rtn = await executionContext.evaluate((elm: HTMLElement, queuedActions: ElementAction[]) => {
       // BROWSER CONTEXT
       // cannot use async/await in here cuz typescript transpiles it in the node context
       return (elm as any).componentOnReady().then(() => {
@@ -232,19 +214,19 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
             rtn = (elm as any)[queuedAction.methodName].apply(elm, queuedAction.methodArgs);
 
           } else if (queuedAction.setPropertyName) {
-            (foundElm as any)[queuedAction.setPropertyName] = queuedAction.setPropertyValue;
+            (elm as any)[queuedAction.setPropertyName] = queuedAction.setPropertyValue;
 
           } else if (queuedAction.setAttributeName) {
-            foundElm.setAttribute(queuedAction.setAttributeName, queuedAction.setAttributeValue);
+            elm.setAttribute(queuedAction.setAttributeName, queuedAction.setAttributeValue);
 
           } else if (queuedAction.classAdd) {
-            foundElm.classList.add(queuedAction.classAdd);
+            elm.classList.add(queuedAction.classAdd);
 
           } else if (queuedAction.classRemove) {
-            foundElm.classList.remove(queuedAction.classRemove);
+            elm.classList.remove(queuedAction.classRemove);
 
           } else if (queuedAction.classToggle) {
-            foundElm.classList.toggle(queuedAction.classToggle);
+            elm.classList.toggle(queuedAction.classToggle);
 
           } else if (queuedAction.eventName) {
             const eventInitDict = queuedAction.eventInitDict || {};
@@ -262,7 +244,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
             }
 
             const ev = new CustomEvent(queuedAction.eventName, eventInitDict);
-            foundElm.dispatchEvent(ev);
+            elm.dispatchEvent(ev);
           }
         });
 
@@ -275,7 +257,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
         return rtn;
       });
 
-    }, this._elmHandle, this._shadowSelector, this._queuedActions);
+    }, this._elmHandle, this._queuedActions);
 
     this._queuedActions.length = 0;
 
@@ -285,28 +267,11 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   async e2eSync() {
     const executionContext = this._elmHandle.executionContext();
 
-    const outerHTML = await executionContext.evaluate((elm: HTMLElement, shadowSelector) => {
+    const outerHTML = await executionContext.evaluate((elm: HTMLElement) => {
 
-      let foundElm: HTMLElement;
+      return elm.outerHTML;
 
-      if (shadowSelector) {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root not found for: ${elm.tagName.toLowerCase()}`);
-        }
-
-        foundElm = elm.shadowRoot.querySelector(shadowSelector);
-
-        if (!foundElm) {
-          throw new Error(`selector "${this._shadowSelector}" not found in shadow root of ${elm.tagName.toLowerCase()}`);
-        }
-
-      } else {
-        foundElm = elm;
-      }
-
-      return foundElm.outerHTML;
-
-    }, this._elmHandle, this._shadowSelector);
+    }, this._elmHandle);
 
     const frag = parseFragment(outerHTML);
 
@@ -319,8 +284,8 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       this.removeChild(this.childNodes[i]);
     }
 
-    for (let i = 0; i < rootElm.childNodes.length; i++) {
-      this.appendChild(rootElm.childNodes[i]);
+    while (rootElm.childNodes.length > 0) {
+      this.appendChild(rootElm.childNodes[0]);
     }
   }
 
