@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-cli');
@@ -22,6 +24,10 @@ if (success) {
         'https',
         'os',
         'path'
+      ],
+      plugins: [
+        rollupResolve(),
+        rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;

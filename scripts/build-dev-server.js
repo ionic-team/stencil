@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const glob = require('glob');
 const transpile = require('./transpile');
 
@@ -36,6 +38,10 @@ if (success) {
         'querystring',
         'url',
         'zlib'
+      ],
+      plugins: [
+        rollupResolve(),
+        rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;

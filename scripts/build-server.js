@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
 const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
@@ -32,6 +33,7 @@ if (success) {
       ],
       plugins: [
         rollupResolve(),
+        rollupCommonjs(),
         rollupPluginReplace({
           values: replaceObj
         })
