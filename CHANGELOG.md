@@ -1,5 +1,5 @@
-<a name="0.13.0-6"></a>
-# 🚠 [0.13.0-6](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-6) (2018-09-10)
+<a name="0.13.0-7"></a>
+# 🍻 [0.13.0-7](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-7) (2018-09-10)
 
 ### Stencil Testing Features
 
@@ -118,6 +118,7 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **platform:** scoped css check ([da796c4](https://github.com/ionic-team/stencil/commit/da796c4))
 * **styles:** ensure styles added after meta[charset] ([2979f6e](https://github.com/ionic-team/stencil/commit/2979f6e))
 * **styles:** insert styles after meta charset ([df40ca8](https://github.com/ionic-team/stencil/commit/df40ca8))
+* **tslib:** rollup tslib in dist ([1b66f3b](https://github.com/ionic-team/stencil/commit/1b66f3b))
 
 
 
