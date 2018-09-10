@@ -30,7 +30,7 @@ export async function generateReadmes(config: d.Config, compilerCtx: d.CompilerC
     } else {
       cmpDirectories.push(dirPath);
 
-      promises.push(genereateReadme(config, compilerCtx, outputTargets, jsonDocs, moduleFile, dirPath));
+      promises.push(generateReadme(config, compilerCtx, outputTargets, jsonDocs, moduleFile, dirPath));
     }
   });
 
@@ -51,7 +51,7 @@ export async function generateReadmes(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-async function genereateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocs[], jsonDocs: d.JsonDocs, moduleFile: d.ModuleFile, dirPath: string) {
+async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocs[], jsonDocs: d.JsonDocs, moduleFile: d.ModuleFile, dirPath: string) {
   const readMePath = config.sys.path.join(dirPath, 'readme.md');
 
   let existingContent: string = null;

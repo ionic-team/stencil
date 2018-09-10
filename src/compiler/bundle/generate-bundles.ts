@@ -24,9 +24,9 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
   await generateBundleModes(config, compilerCtx, buildCtx, entryModules, jsModules, bundleKeys);
 
   await Promise.all([
-    genereateBrowserEsm(config, compilerCtx, buildCtx, jsModules, bundleKeys),
-    genereateBrowserEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys),
-    genereateEsmEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys)
+    generateBrowserEsm(config, compilerCtx, buildCtx, jsModules, bundleKeys),
+    generateBrowserEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys),
+    generateEsmEs5(config, compilerCtx, buildCtx, jsModules, bundleKeys)
   ]);
 
   // create the registry of all the components
@@ -38,12 +38,12 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+async function generateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
   if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEsm started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`generateBrowserEsm started`, true);
   const esmModules = jsModules.esm;
 
   const entryKeys = Object.keys(esmModules);
@@ -61,17 +61,17 @@ async function genereateBrowserEsm(config: d.Config, compilerCtx: d.CompilerCtx,
 
   await Promise.all(esmPromises);
 
-  timeSpan.finish(`genereateBrowserEsm finished`);
+  timeSpan.finish(`generateBrowserEsm finished`);
 }
 
 
-async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+async function generateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
   if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
   if (config.buildEs5) {
-    const timeSpan = buildCtx.createTimeSpan(`genereateBrowserEs5 started`, true);
+    const timeSpan = buildCtx.createTimeSpan(`generateBrowserEs5 started`, true);
 
     const es5Modules = jsModules.es5;
 
@@ -96,12 +96,12 @@ async function genereateBrowserEs5(config: d.Config, compilerCtx: d.CompilerCtx,
         await writeBundleJSFile(config, compilerCtx, fileName, jsText);
       });
     await Promise.all(es5Promises);
-    timeSpan.finish(`genereateBrowserEs5 finished`);
+    timeSpan.finish(`generateBrowserEs5 finished`);
   }
 }
 
 
-async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
+async function generateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, jsModules: d.JSModuleMap, bundleKeys: { [key: string]: string }) {
   if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
@@ -111,7 +111,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
     return;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`genereateEsmEs5 started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`generateEsmEs5 started`, true);
 
   await Promise.all(distOutputs.map(async distOutput => {
 
@@ -132,7 +132,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   }));
 
-  timeSpan.finish(`genereateEsmEs5 finished`);
+  timeSpan.finish(`generateEsmEs5 finished`);
 }
 
 
