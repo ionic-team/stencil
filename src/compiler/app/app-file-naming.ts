@@ -59,6 +59,9 @@ export function getDistEsmBuildDir(config: d.Config, outputTarget: d.OutputTarge
   return pathJoin(config, outputTarget.buildDir, 'esm');
 }
 
+export function getDistEsmComponentsDir(config: d.Config, outputTarget: d.OutputTargetDist) {
+  return pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', 'build');
+}
 
 export function getDistEsmIndexPath(config: d.Config, outputTarget: d.OutputTargetDist) {
   return pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'index.js');

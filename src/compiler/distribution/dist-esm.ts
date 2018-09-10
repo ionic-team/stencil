@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmBuildDir, getDistEsmIndexPath } from '../app/app-file-naming';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmBuildDir, getDistEsmComponentsDir, getDistEsmIndexPath } from '../app/app-file-naming';
 import { formatBrowserLoaderComponent } from '../../util/data-serialize';
 import { normalizePath, pathJoin } from '../util';
 
@@ -13,7 +13,7 @@ export async function generateEsmIndex(config: d.Config, compilerCtx: d.Compiler
   const defineLibraryEsm = getDefineCustomElementsPath(config, outputTarget, 'es5');
   await addExport(config, compilerCtx, outputTarget, esm, defineLibraryEsm);
 
-  const exportsIndexPath =  pathJoin(config, getDistEsmBuildDir(config, outputTarget), `es5`, `index.js`);
+  const exportsIndexPath = pathJoin(config, getDistEsmComponentsDir(config, outputTarget), `index.js`);
   const fileExists = await compilerCtx.fs.access(exportsIndexPath);
   if (fileExists) {
     await addExport(config, compilerCtx, outputTarget, esm, exportsIndexPath);
@@ -62,22 +62,21 @@ async function generateDefineCustomElements(config: d.Config, compilerCtx: d.Com
     return cmpMeta.componentClass;
   }).sort();
 
-  const c: string[] = [
-    `// ${config.namespace}: Custom Elements Define Library, ES Module/ES5 Target`
-  ];
+  const c = `
+// ${config.namespace}: Custom Elements Define Library, ES Module/ES5 Target
 
-  c.push(`import { defineCustomElement } from './${getCoreEsmFileName(config)}';`);
-  c.push(`import {\n  ${componentClassList.join(',\n  ')}\n} from './${getComponentsEsmFileName(config)}';`);
+import { defineCustomElement } from './${getCoreEsmFileName(config)}';
+import {\n  ${componentClassList.join(',\n  ')}\n} from './${getComponentsEsmFileName(config)}';
 
-  c.push(``);
-
-  c.push(`export function defineCustomElements(win, opts) {`);
-  c.push(`  defineCustomElement(win, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);`);
-  c.push(`}`);
+export function defineCustomElements(win, opts) {
+  defineCustomElement(win, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);
+}
+export { defineCustomElement };
+`;
 
   const defineFilePath = getDefineCustomElementsPath(config, outputTarget, 'es5');
 
-  await compilerCtx.fs.writeFile(defineFilePath, c.join('\n'));
+  await compilerCtx.fs.writeFile(defineFilePath, c);
 }
 
 

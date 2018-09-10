@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { getAppBuildDir, getBrowserFilename, getDistEsmBuildDir, getEsmFilename } from '../app/app-file-naming';
+import { getAppBuildDir, getBrowserFilename, getEsmFilename, getDistEsmComponentsDir } from '../app/app-file-naming';
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { hasError, pathJoin } from '../util';
 import { minifyJs } from '../minifier';
@@ -124,7 +124,7 @@ async function genereateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(config, compilerCtx, buildCtx, jsText);
 
-        const distBuildPath = pathJoin(config, getDistEsmBuildDir(config, distOutput), 'es5', 'components', fileName);
+        const distBuildPath = pathJoin(config, getDistEsmComponentsDir(config, distOutput), fileName);
         return compilerCtx.fs.writeFile(distBuildPath, jsText);
       });
 
@@ -334,7 +334,7 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 
   await Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
-    const esmBuildPath = pathJoin(config, getDistEsmBuildDir(config, outputTarget), 'es5', 'components', fileName);
+    const esmBuildPath = pathJoin(config, getDistEsmComponentsDir(config, outputTarget), fileName);
 
     // write to the build
     await compilerCtx.fs.writeFile(esmBuildPath, jsText);
@@ -431,7 +431,7 @@ export function setBundleModeIds(moduleFiles: d.ModuleFile[], modeName: string, 
 export function getBundleId(config: d.Config, entryModule: d.EntryModule, modeName: string, jsText: string) {
   if (config.hashFileNames) {
     // create style id from hashing the content
-    return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
+    return getBundleIdHashed(config, jsText);
   }
 
   return getBundleIdDev(entryModule, modeName);

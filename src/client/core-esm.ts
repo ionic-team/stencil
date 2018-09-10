@@ -101,7 +101,11 @@ function buildComponentLoader(c: d.ComponentHostData) {
 }
 
 function loadBundle(bundleId: string, useScopedCss: boolean, className: string) {
-  return import(`./components/${bundleId}${(useScopedCss ? '.sc' : '')}.js`).then(m => m[className]);
+  return import(
+    /*! webpackExclude: /^(chunk/index)/ */
+    /*! webpackMode: "lazy" */
+    `./build/${bundleId}${(useScopedCss ? '.sc' : '')}.js`
+  ).then(m => m[className]);
 }
 
 function isNative(fn: Function) {
