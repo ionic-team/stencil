@@ -7,12 +7,35 @@
 import '@stencil/core';
 
 
+import {
+  CarData,
+} from './car-list/car-data';
+import {
+  EventEmitter,
+} from './../../../dist/index';
 
 
 export namespace Components {
 
   interface AppRoot {}
   interface AppRootAttributes extends StencilHTMLAttributes {}
+
+  interface CarDetail {
+    'car': CarData;
+  }
+  interface CarDetailAttributes extends StencilHTMLAttributes {
+    'car'?: CarData;
+  }
+
+  interface CarList {
+    'cars': CarData[];
+    'selected': CarData;
+  }
+  interface CarListAttributes extends StencilHTMLAttributes {
+    'cars'?: CarData[];
+    'onCarSelected'?: (event: CustomEvent<CarData>) => void;
+    'selected'?: CarData;
+  }
 
   interface DomApi {}
   interface DomApiAttributes extends StencilHTMLAttributes {}
@@ -63,6 +86,8 @@ export namespace Components {
 declare global {
   interface StencilElementInterfaces {
     'AppRoot': Components.AppRoot;
+    'CarDetail': Components.CarDetail;
+    'CarList': Components.CarList;
     'DomApi': Components.DomApi;
     'ElementCmp': Components.ElementCmp;
     'EventCmp': Components.EventCmp;
@@ -74,6 +99,8 @@ declare global {
 
   interface StencilIntrinsicElements {
     'app-root': Components.AppRootAttributes;
+    'car-detail': Components.CarDetailAttributes;
+    'car-list': Components.CarListAttributes;
     'dom-api': Components.DomApiAttributes;
     'element-cmp': Components.ElementCmpAttributes;
     'event-cmp': Components.EventCmpAttributes;
@@ -88,6 +115,18 @@ declare global {
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
+  };
+
+  interface HTMLCarDetailElement extends Components.CarDetail, HTMLStencilElement {}
+  var HTMLCarDetailElement: {
+    prototype: HTMLCarDetailElement;
+    new (): HTMLCarDetailElement;
+  };
+
+  interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {}
+  var HTMLCarListElement: {
+    prototype: HTMLCarListElement;
+    new (): HTMLCarListElement;
   };
 
   interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {}
@@ -134,6 +173,8 @@ declare global {
 
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement
+    'car-detail': HTMLCarDetailElement
+    'car-list': HTMLCarListElement
     'dom-api': HTMLDomApiElement
     'element-cmp': HTMLElementCmpElement
     'event-cmp': HTMLEventCmpElement
@@ -145,6 +186,8 @@ declare global {
 
   interface ElementTagNameMap {
     'app-root': HTMLAppRootElement;
+    'car-detail': HTMLCarDetailElement;
+    'car-list': HTMLCarListElement;
     'dom-api': HTMLDomApiElement;
     'element-cmp': HTMLElementCmpElement;
     'event-cmp': HTMLEventCmpElement;
