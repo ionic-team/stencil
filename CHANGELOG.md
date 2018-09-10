@@ -1,5 +1,5 @@
-<a name="0.13.0-5"></a>
-# 🐦 [0.13.0-5](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-5) (2018-09-06)
+<a name="0.13.0-6"></a>
+# 🚠 [0.13.0-6](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-6) (2018-09-10)
 
 ### Stencil Testing Features
 
@@ -87,7 +87,11 @@ Also note, developers should try to rely on publicly exposed methods as little a
 ### Features
 
 * **compiler:** methods should return a promise ([98510d5](https://github.com/ionic-team/stencil/commit/98510d5))
+* **e2e:** add dom api for e2e testing ([3a2a884](https://github.com/ionic-team/stencil/commit/3a2a884))
+* **puppeteer:** allow specification of Chrome executable ([6b80237](https://github.com/ionic-team/stencil/commit/6b80237))
+* **serialize:** serialize pretty print html option ([c6e34b5](https://github.com/ionic-team/stencil/commit/c6e34b5))
 * **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
+* **testing:** add toMatchClasses() ([bf4ff31](https://github.com/ionic-team/stencil/commit/bf4ff31))
 
 
 ### Performance Improvements
@@ -97,11 +101,13 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **core:** reduce size and improve runtime perf ([#787](https://github.com/ionic-team/stencil/issues/787)) ([8e94403](https://github.com/ionic-team/stencil/commit/8e94403))
 * **dev:** shadow-dom polyfill is not needed in dev mode ([b3bfd9a](https://github.com/ionic-team/stencil/commit/b3bfd9a))
 * tune optimizeChunks integration ([518b425](https://github.com/ionic-team/stencil/commit/518b425))
+* remove duplicated TS helpers ([1320afc](https://github.com/ionic-team/stencil/commit/1320afc))
 
 
 ### Bug Fixes
 
 * **compiler:** emit optional token when appropriated ([#1050](https://github.com/ionic-team/stencil/issues/1050)) ([870a0fc](https://github.com/ionic-team/stencil/commit/870a0fc))
+* **compiler:** esm index.js ([49e8a74](https://github.com/ionic-team/stencil/commit/49e8a74))
 * **compiler:** mark any types correctly ([8c6bcd9](https://github.com/ionic-team/stencil/commit/8c6bcd9))
 * **compiler:** no emit promise warning while testing ([fceb3a1](https://github.com/ionic-team/stencil/commit/fceb3a1))
 * **core:** the request of a dependency is an expression ([b3d2e75](https://github.com/ionic-team/stencil/commit/b3d2e75))
@@ -110,6 +116,8 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **esm:** treeshakable esm output ([62164b0](https://github.com/ionic-team/stencil/commit/62164b0))
 * **host:** adds Component host deprecation warning ([9cd8e2e](https://github.com/ionic-team/stencil/commit/9cd8e2e))
 * **platform:** scoped css check ([da796c4](https://github.com/ionic-team/stencil/commit/da796c4))
+* **styles:** ensure styles added after meta[charset] ([2979f6e](https://github.com/ionic-team/stencil/commit/2979f6e))
+* **styles:** insert styles after meta charset ([df40ca8](https://github.com/ionic-team/stencil/commit/df40ca8))
 
 
 
