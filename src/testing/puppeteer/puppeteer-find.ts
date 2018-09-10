@@ -1,11 +1,12 @@
 import * as pd from './puppeteer-declarations';
 import { E2EElement } from './puppeteer-element';
+import * as puppeteer from 'puppeteer';
 
 
-export async function find(page: pd.E2EPageInternal, selector: string) {
+export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: string) {
   const { lightSelector, shadowSelector } = getSelector(selector);
 
-  let elmHandle = await page.$(lightSelector);
+  let elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
     return null;

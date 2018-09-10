@@ -26,7 +26,16 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
   await initE2EPageEvents(page);
 
-  page.find = find.bind(page, page);
+  let docPromise: Promise<puppeteer.JSHandle> = null;
+
+  page.find = async (selector: string) => {
+    if (!docPromise) {
+      docPromise = page.evaluateHandle('document');
+    }
+    const documentJsHandle = await docPromise;
+    const docHandle = documentJsHandle.asElement();
+    return find(page, docHandle, selector);
+  };
 
   page.waitForChanges = waitForChanges.bind(null, page);
 

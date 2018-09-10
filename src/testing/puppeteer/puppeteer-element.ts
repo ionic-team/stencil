@@ -2,8 +2,10 @@ import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
+import { find } from './puppeteer-find';
 import { MockElement } from '../mock-doc/node';
 import { parseFragment } from '../parse-html';
+import { MockDocumentFragment } from '../mock-doc/document-fragment';
 
 
 export class E2EElement extends MockElement implements pd.E2EElementInternal {
@@ -11,6 +13,10 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
+  }
+
+  find(selector: string) {
+    return find(this._page, this._elmHandle, selector);
   }
 
   callMethod(methodName: string, ...methodArgs: any[]) {
@@ -184,6 +190,16 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     throw new Error(`outerHTML is read only`);
   }
 
+  private _shadowRoot: MockDocumentFragment = null;
+  get shadowRoot() {
+    this._validate();
+    return this._shadowRoot;
+  }
+
+  set shadowRoot(_value: any) {
+    throw new Error(`shadowRoot is read only`);
+  }
+
   get textContent() {
     this._validate();
     return super.textContent;
@@ -267,11 +283,20 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   async e2eSync() {
     const executionContext = this._elmHandle.executionContext();
 
-    const outerHTML = await executionContext.evaluate((elm: HTMLElement) => {
-
-      return elm.outerHTML;
-
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: HTMLElement) => {
+      return {
+        outerHTML: elm.outerHTML,
+        shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null
+      };
     }, this._elmHandle);
+
+    if (shadowRootHTML) {
+      this._shadowRoot = parseFragment(shadowRootHTML);
+      (this._shadowRoot as any).host = this;
+
+    } else {
+      this._shadowRoot = null;
+    }
 
     const frag = parseFragment(outerHTML);
 

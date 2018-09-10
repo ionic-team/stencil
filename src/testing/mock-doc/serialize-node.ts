@@ -92,7 +92,9 @@ function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, 
     output.text.push('>');
   }
 
-  if (!EMPTY_ELEMENTS[tagName]) {
+  const ignoreTagContent = (opts.excludeTagContent && opts.excludeTagContent.includes(tagName));
+
+  if (!EMPTY_ELEMENTS[tagName] && !ignoreTagContent) {
 
     let childNodes: MockNode[];
 
@@ -280,6 +282,7 @@ interface SerializeOutput {
 export interface SerializeElementOptions {
   excludeRoot?: boolean;
   excludeTags?: string[];
+  excludeTagContent?: string[];
   format?: 'html';
   indentSpaces?: number;
   newLines?: boolean;

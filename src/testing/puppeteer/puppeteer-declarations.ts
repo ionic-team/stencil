@@ -13,20 +13,54 @@ type PuppeteerPage = Omit<puppeteer.Page,
 'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'url' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
 >;
 
+
+/**
+ * The E2EPage is a wrapper utility to Puppeteer in order to
+ * to create easier to write and read end-to-end tests.
+ */
 export interface E2EPage extends PuppeteerPage {
+
   /**
-   * Testing query for one element. Uses queryselector() to
-   * find the first element that matches the selector
-   * within the e2e page's light dom.
+   * Find an element using a selector, which is the same as
+   * `document.querySelector(selector)`. Use `>>>` within the
+   * selector to find elements within the host element's shadow root.
+   * For example, to select the first `div` inside of the component
+   * `my-cmp`, the call would be `page.find('my-cmp >>> div')`.
    */
   find(selector: string): Promise<E2EElement>;
 
+  /**
+   * During an end-to-end test, a dev-server is started so `page.goto(url)` can be used
+   * on the app being tested. Urls are always relative since the dev server provides
+   * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
+   * when creating a new page, such as `const page = await newE2EPage({ url })`.
+   */
   goTo(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
 
+  /**
+   * Instead of testing a url directly, html content can be mocked using
+   * `page.setContent(html)`. A shortcut to `page.setContent(html)` is to set
+   * the `html` option when creating a new page, such as
+   * `const page = await newE2EPage({ html })`.
+   */
   setContent(html: string): Promise<void>;
 
+  /**
+   * Used to test if an event was, or was not dispatched. This method
+   * returns a promise, that resolves with an EventSpy. The EventSpy
+   * can be used along with `expect(spy).toHaveReceivedEvent()`,
+   * `expect(spy).toHaveReceivedEventTimes(x)` and
+   * `expect(spy).toHaveReceivedEventDetail({...})`.
+   */
   spyOnEvent(eventName: string, selector?: 'window' | 'document'): Promise<d.EventSpy>;
 
+  /**
+   * Both Stencil and Puppeteer have an asynchronous architecture, which is a good thing
+   * for performance. Since all calls are async, it's required that
+   * `await page.waitForChanges()` is called when changes are made to components.
+   * An error will be thrown if changes were made to a component but `waitForChanges()`
+   * was not called.
+   */
   waitForChanges(): Promise<void>;
 }
 
@@ -94,6 +128,20 @@ export interface E2EElement {
   click(options?: puppeteer.ClickOptions): void;
 
   /**
+   * Find a child element using a selector, which is the same as
+   * `element.querySelector(selector)`. Use `>>>` within the
+   * selector to find elements within a host element's shadow root.
+   * For example, to select the first `div` inside of the component
+   * `my-cmp`, the call would be `element.find('my-cmp >>> div')`.
+   */
+  find(selector: string): Promise<E2EElement>;
+
+  /**
+   * Sets focus on the element.
+   */
+  focus(): Promise<void>;
+
+  /**
    * Returns the value of a specified attribute on the element. If the
    * given attribute does not exist, the value returned will be null.
    */
@@ -105,11 +153,6 @@ export interface E2EElement {
    * `elm.getProperty('myProp')` would return the `myProp` property value.
    */
   getProperty(propertyName: string): Promise<any>;
-
-  /**
-   * Sets focus on the element.
-   */
-  focus(): Promise<void>;
 
   /**
    * Sets hover on the element.
@@ -186,6 +229,13 @@ export interface E2EElement {
    * the `myProp` property on the component.
    */
   setProperty(propertyName: string, value: any): void;
+
+  /**
+   * The ShadowRoot interface of the Shadow DOM API is the root node of a
+   * DOM subtree that is rendered separately from a document's main DOM tree.
+   * This value will be `null` if the element does not have a shadowRoot.
+   */
+  shadowRoot: ShadowRoot;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
