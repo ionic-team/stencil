@@ -250,6 +250,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId]);
   }
 
+  get color() {
+    return this.sysUtil.turbocolor;
+  }
+
   get semver() {
     return this.sysUtil.semver;
   }
