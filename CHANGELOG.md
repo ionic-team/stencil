@@ -1,5 +1,5 @@
-<a name="0.13.0-7"></a>
-# 🍻 [0.13.0-7](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-7) (2018-09-10)
+<a name="0.13.0-8"></a>
+# 🚗 [0.13.0-8](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-8) (2018-09-11)
 
 ### Stencil Testing Features
 
@@ -100,6 +100,7 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **bundling:** improve cross encapsulation bundling ([3e181c1](https://github.com/ionic-team/stencil/commit/3e181c1))
 * **core:** reduce size and improve runtime perf ([#787](https://github.com/ionic-team/stencil/issues/787)) ([8e94403](https://github.com/ionic-team/stencil/commit/8e94403))
 * **dev:** shadow-dom polyfill is not needed in dev mode ([b3bfd9a](https://github.com/ionic-team/stencil/commit/b3bfd9a))
+* **esm:** using webpack comments to reduce number of chunks ([91c9a09](https://github.com/ionic-team/stencil/commit/91c9a09))
 * tune optimizeChunks integration ([518b425](https://github.com/ionic-team/stencil/commit/518b425))
 * remove duplicated TS helpers ([1320afc](https://github.com/ionic-team/stencil/commit/1320afc))
 
