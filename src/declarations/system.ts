@@ -13,6 +13,7 @@ export interface StencilSystem {
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   createDom?(): CreateDom;
+  color?: any;
   createFsWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   destroy?(): void;
   addDestroy?(fn: Function): void;
@@ -79,7 +80,8 @@ export interface Semver {
   lt: (a: string, b: string, loose?: boolean) => boolean;
   lte: (a: string, b: string, loose?: boolean) => boolean;
   satisfies: (version: string, range: string) => boolean;
-}
+  prerelease: (version: string) => string[] | null;
+ }
 
 
 export interface SystemDetails {
