@@ -1,10 +1,8 @@
-import { AppGlobal, DomApi } from '../../declarations';
-import { createDomApi } from '../dom-api';
-import { mockWindow } from '../../testing/mocks';
+import { AppGlobal, DomApi } from "../../declarations";
+import { mockWindow } from "../../testing/mocks";
+import { createDomApi } from "../dom-api";
 
-
-describe('dom api', () => {
-
+describe("dom api", () => {
   let domApi: DomApi;
   let win: Window;
   let doc: Document;
@@ -14,16 +12,14 @@ describe('dom api', () => {
   beforeEach(() => {
     win = mockWindow();
     doc = win.document;
-    elm = doc.createElement('div');
+    elm = doc.createElement("div");
     App = {};
     domApi = createDomApi(App, win, doc);
   });
 
-
-  describe('$parentElement', () => {
-
-    it('element w/ parentNode thats is a shadow root should return host', () => {
-      const parentElement = doc.createElement('parent');
+  describe("$parentElement", () => {
+    it("element w/ parentNode thats is a shadow root should return host", () => {
+      const parentElement = doc.createElement("parent");
       const frag = doc.createDocumentFragment();
       frag.appendChild(elm);
       (frag as any).host = parentElement;
@@ -31,54 +27,58 @@ describe('dom api', () => {
       expect(r).toBe(parentElement);
     });
 
-    it('element w/ parentNode thats not a shadow root should return parentNode', () => {
-      const parentElement = doc.createElement('parent');
+    it("element w/ parentNode thats not a shadow root should return parentNode", () => {
+      const parentElement = doc.createElement("parent");
       parentElement.appendChild(elm);
       const r = domApi.$parentElement(elm);
       expect(r).toBe(parentElement);
     });
 
-    it('no parent should return null', () => {
+    it("no parent should return null", () => {
       const r = domApi.$parentElement(elm);
       expect(r).toBeNull();
     });
-
   });
 
-  describe('$elementRef', () => {
-
-    it('window', () => {
-      const r = domApi.$elementRef(elm, 'window');
+  describe("$elementRef", () => {
+    it("window", () => {
+      const r = domApi.$elementRef(elm, "window");
       expect(r).toBe(win);
     });
 
-    it('document', () => {
-      const r = domApi.$elementRef(elm, 'document');
+    it("document", () => {
+      const r = domApi.$elementRef(elm, "document");
       expect(r).toBe(doc);
     });
 
-    it('body', () => {
-      const r = domApi.$elementRef(elm, 'body');
+    it("body", () => {
+      const r = domApi.$elementRef(elm, "body");
       expect(r).toBe(doc.body);
     });
 
-    it('parent', () => {
-      const parentElement = doc.createElement('div');
+    it("parent", () => {
+      const parentElement = doc.createElement("div");
       parentElement.appendChild(elm);
-      const r = domApi.$elementRef(elm, 'parent');
+      const r = domApi.$elementRef(elm, "parent");
       expect(r).toBe(parentElement);
     });
 
-    it('child', () => {
-      const r = domApi.$elementRef(elm, 'child');
+    it("child", () => {
+      const r = domApi.$elementRef(elm, "child");
       expect(r).toBe(elm.firstElementChild);
     });
 
-    it('self', () => {
-      const r = domApi.$elementRef(elm, '');
+    it("self", () => {
+      const r = domApi.$elementRef(elm, "");
       expect(r).toBe(elm);
     });
-
   });
 
+  describe("$addClass", () => {
+    it("should apply a class to svg elements", () => {
+      const elm = doc.createElement("svg");
+      domApi.$addClass(elm, "something");
+      expect(elm).toHaveClass("something");
+    });
+  });
 });

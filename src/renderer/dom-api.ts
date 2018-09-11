@@ -59,7 +59,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
           elm.classList.add(cssClass);
         } else if (elm.nodeName === "SVG") {
           // https://caniuse.com/#search=classList
-          // IE11 really does not treat <svg> properly :-/
+          // IE11 lacks classList on <svg>
           let appliedClasses = elm.getAttribute("class") || "";
           appliedClasses = !appliedClasses.split(" ").includes(cssClass)
             ? `${elm.className} ${cssClass}`
