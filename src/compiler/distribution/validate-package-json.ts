@@ -37,6 +37,13 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
+  // Check for not recommended values
+  if (pkgData.module.endsWith('collection/index.js')) {
+    const err = buildWarn(diagnostics);
+    err.messageText = `package.json "module" property is set to "${pkgData.module}" but it's not recommended since it might point to non-ES5 code. It's recommended to set the "module" property to: ${moduleRel}`;
+    return;
+  }
+
   const pkgFile = pathJoin(config, config.rootDir, pkgData.module);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
@@ -44,6 +51,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
     err.messageText = `package.json "module" property is set to "${pkgData.module}" but cannot be found. It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
+
 }
 
 
