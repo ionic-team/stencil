@@ -95,6 +95,9 @@ export namespace Components {
   }
   interface DynamicImportAttributes extends StencilHTMLAttributes {}
 
+  interface Es5AddclassSvg {}
+  interface Es5AddclassSvgAttributes extends StencilHTMLAttributes {}
+
   interface EsmImport {
     'propVal': number;
     'someMethod': () => void;
@@ -314,6 +317,7 @@ declare global {
     'CssVariablesRoot': Components.CssVariablesRoot;
     'CssVariables': Components.CssVariables;
     'DynamicImport': Components.DynamicImport;
+    'Es5AddclassSvg': Components.Es5AddclassSvg;
     'EsmImport': Components.EsmImport;
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorderRoot': Components.KeyReorderRoot;
@@ -375,6 +379,7 @@ declare global {
     'css-variables-root': Components.CssVariablesRootAttributes;
     'css-variables': Components.CssVariablesAttributes;
     'dynamic-import': Components.DynamicImportAttributes;
+    'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
     'esm-import': Components.EsmImportAttributes;
     'init-css-root': Components.InitCssRootAttributes;
     'key-reorder-root': Components.KeyReorderRootAttributes;
@@ -499,6 +504,12 @@ declare global {
   var HTMLDynamicImportElement: {
     prototype: HTMLDynamicImportElement;
     new (): HTMLDynamicImportElement;
+  };
+
+  interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLStencilElement {}
+  var HTMLEs5AddclassSvgElement: {
+    prototype: HTMLEs5AddclassSvgElement;
+    new (): HTMLEs5AddclassSvgElement;
   };
 
   interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {}
@@ -785,6 +796,7 @@ declare global {
     'css-variables-root': HTMLCssVariablesRootElement
     'css-variables': HTMLCssVariablesElement
     'dynamic-import': HTMLDynamicImportElement
+    'es5-addclass-svg': HTMLEs5AddclassSvgElement
     'esm-import': HTMLEsmImportElement
     'init-css-root': HTMLInitCssRootElement
     'key-reorder-root': HTMLKeyReorderRootElement
@@ -846,6 +858,7 @@ declare global {
     'css-variables-root': HTMLCssVariablesRootElement;
     'css-variables': HTMLCssVariablesElement;
     'dynamic-import': HTMLDynamicImportElement;
+    'es5-addclass-svg': HTMLEs5AddclassSvgElement;
     'esm-import': HTMLEsmImportElement;
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
