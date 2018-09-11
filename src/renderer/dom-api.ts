@@ -1,25 +1,24 @@
-import { AppGlobal, DomApi, EventEmitterData } from "../declarations";
-import { KEY_CODE_MAP, NODE_TYPE } from "../util/constants";
-import { toLowerCase } from "../util/helpers";
+import { AppGlobal, DomApi, EventEmitterData } from '../declarations';
+import { KEY_CODE_MAP, NODE_TYPE } from '../util/constants';
+import { toLowerCase } from '../util/helpers';
+
 
 export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   // using the $ prefix so that closure is
   // cool with property renaming each of these
 
   if (!App.ael) {
-    App.ael = (elm, eventName, cb, opts) =>
-      elm.addEventListener(eventName, cb, opts);
-    App.rel = (elm, eventName, cb, opts) =>
-      elm.removeEventListener(eventName, cb, opts);
+    App.ael = (elm, eventName, cb, opts) => elm.addEventListener(eventName, cb, opts);
+    App.rel = (elm, eventName, cb, opts) => elm.removeEventListener(eventName, cb, opts);
   }
 
   const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
 
   if (__BUILD_CONDITIONALS__.es5) {
-    if (typeof win.CustomEvent !== "function") {
+    if (typeof win.CustomEvent !== 'function') {
       // CustomEvent polyfill
       win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-        evt = doc.createEvent("CustomEvent");
+        evt = doc.createEvent('CustomEvent');
         evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
         return evt;
       };
@@ -28,13 +27,16 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   }
 
   const domApi: DomApi = {
+
     $doc: doc,
     $supportsShadowDom: !!doc.documentElement.attachShadow,
     $supportsEventOptions: false,
 
-    $nodeType: (node: any) => node.nodeType,
+    $nodeType: (node: any) =>
+      node.nodeType,
 
-    $createElement: (tagName: any) => doc.createElement(tagName),
+    $createElement: (tagName: any) =>
+      doc.createElement(tagName),
 
     $createElementNS: (namespace: string, tagName: string) =>
       doc.createElementNS(namespace, tagName),
@@ -57,82 +59,79 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       if (__BUILD_CONDITIONALS__.hasSvg && __BUILD_CONDITIONALS__.es5) {
         if (!!elm.classList) {
           elm.classList.add(cssClass);
-        } else if (elm.nodeName === "SVG") {
+        } else if (elm.nodeName === 'SVG') {
           // https://caniuse.com/#search=classList
-          // IE11 lacks classList on <svg>
-          let appliedClasses = elm.getAttribute("class") || "";
-          appliedClasses = !appliedClasses.split(" ").includes(cssClass)
+          // IE11 really does not do <svg> properly :-/
+          let appliedClasses = elm.getAttribute('class') || '';
+          appliedClasses = !appliedClasses.split(' ').includes(cssClass)
             ? `${elm.className} ${cssClass}`
             : appliedClasses;
-          elm.setAttribute("class", appliedClasses);
+          elm.setAttribute('class', appliedClasses);
         }
       } else {
         elm.classList.add(cssClass);
       }
     },
 
-    $childNodes: (node: Node) => node.childNodes,
+    $childNodes: (node: Node) =>
+      node.childNodes,
 
-    $parentNode: (node: Node) => node.parentNode,
+    $parentNode: (node: Node) =>
+      node.parentNode,
 
-    $nextSibling: (node: Node) => node.nextSibling,
+    $nextSibling: (node: Node) =>
+      node.nextSibling,
 
-    $previousSibling: (node: Node) => node.previousSibling,
+    $previousSibling: (node: Node) =>
+      node.previousSibling,
 
-    $tagName: (elm: Element) => toLowerCase(elm.nodeName),
+    $tagName: (elm: Element) =>
+      toLowerCase(elm.nodeName),
 
-    $getTextContent: (node: any) => node.textContent,
+    $getTextContent: (node: any) =>
+      node.textContent,
 
-    $setTextContent: (node: Node, text: string) => (node.textContent = text),
+    $setTextContent: (node: Node, text: string) =>
+      node.textContent = text,
 
-    $getAttribute: (elm: Element, key: string) => elm.getAttribute(key),
+    $getAttribute: (elm: Element, key: string) =>
+      elm.getAttribute(key),
 
     $setAttribute: (elm: Element, key: string, val: string) =>
       elm.setAttribute(key, val),
 
-    $setAttributeNS: (
-      elm,
-      namespaceURI: string,
-      qualifiedName: string,
-      val: string
-    ) => elm.setAttributeNS(namespaceURI, qualifiedName, val),
+    $setAttributeNS: (elm, namespaceURI: string, qualifiedName: string, val: string) =>
+      elm.setAttributeNS(namespaceURI, qualifiedName, val),
 
-    $removeAttribute: (elm, key) => elm.removeAttribute(key),
+    $removeAttribute: (elm, key) =>
+      elm.removeAttribute(key),
 
-    $hasAttribute: (elm: Element, key) => elm.hasAttribute(key),
+    $hasAttribute: (elm: Element, key) =>
+      elm.hasAttribute(key),
 
     $getMode: (elm: Element) =>
-      elm.getAttribute("mode") || (App.Context || {}).mode,
+      elm.getAttribute('mode') || (App.Context || {}).mode,
 
     $elementRef: (elm: any, referenceName: string) => {
-      if (referenceName === "child") {
+      if (referenceName === 'child') {
         return elm.firstElementChild;
       }
-      if (referenceName === "parent") {
+      if (referenceName === 'parent') {
         return domApi.$parentElement(elm);
       }
-      if (referenceName === "body") {
+      if (referenceName === 'body') {
         return doc.body;
       }
-      if (referenceName === "document") {
+      if (referenceName === 'document') {
         return doc;
       }
-      if (referenceName === "window") {
+      if (referenceName === 'window') {
         return win;
       }
       return elm;
     },
 
-    $addEventListener: (
-      assignerElm,
-      eventName,
-      listenerCallback,
-      useCapture,
-      usePassive,
-      attachTo,
-      eventListenerOpts?: any,
-      splt?: string[]
-    ) => {
+    $addEventListener: (assignerElm, eventName, listenerCallback, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[]) => {
       // remember the original name before we possibly change it
       const assignersEventName = eventName;
       let attachToElm = assignerElm;
@@ -141,27 +140,26 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       // this element from the unregister listeners weakmap
       let assignersUnregListeners = unregisterListenerFns.get(assignerElm);
 
-      if (
-        assignersUnregListeners &&
-        assignersUnregListeners[assignersEventName]
-      ) {
+      if (assignersUnregListeners && assignersUnregListeners[assignersEventName]) {
         // removed any existing listeners for this event for the assigner element
         // this element already has this listener, so let's unregister it now
         assignersUnregListeners[assignersEventName]();
       }
 
-      if (typeof attachTo === "string") {
+      if (typeof attachTo === 'string') {
         // attachTo is a string, and is probably something like
         // "parent", "window", or "document"
         // and the eventName would be like "mouseover" or "mousemove"
         attachToElm = domApi.$elementRef(assignerElm, attachTo);
-      } else if (typeof attachTo === "object") {
+
+      } else if (typeof attachTo === 'object') {
         // we were passed in an actual element to attach to
         attachToElm = attachTo;
+
       } else {
         // depending on the event name, we could actually be attaching
         // this element to something like the document or window
-        splt = eventName.split(":");
+        splt = eventName.split(':');
 
         if (splt.length > 1) {
           // document:mousemove
@@ -181,7 +179,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       let eventListener = listenerCallback;
 
       // test to see if we're looking for an exact keycode
-      splt = eventName.split(".");
+      splt = eventName.split('.');
 
       if (splt.length > 1) {
         // looks like this listener is also looking for a keycode
@@ -199,26 +197,23 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
       // create the actual event listener options to use
       // this browser may not support event options
-      eventListenerOpts = domApi.$supportsEventOptions
-        ? {
-            capture: !!useCapture,
-            passive: !!usePassive
-          }
-        : !!useCapture;
+      eventListenerOpts = domApi.$supportsEventOptions ? {
+        capture: !!useCapture,
+        passive: !!usePassive
+      } : !!useCapture;
 
       // ok, good to go, let's add the actual listener to the dom element
       App.ael(attachToElm, eventName, eventListener, eventListenerOpts);
 
       if (!assignersUnregListeners) {
         // we don't already have a collection, let's create it
-        unregisterListenerFns.set(assignerElm, (assignersUnregListeners = {}));
+        unregisterListenerFns.set(assignerElm, assignersUnregListeners = {});
       }
 
       // add the unregister listener to this element's collection
       assignersUnregListeners[assignersEventName] = () => {
         // looks like it's time to say goodbye
-        attachToElm &&
-          App.rel(attachToElm, eventName, eventListener, eventListenerOpts);
+        attachToElm && App.rel(attachToElm, eventName, eventListener, eventListenerOpts);
         assignersUnregListeners[assignersEventName] = null;
       };
     },
@@ -231,13 +226,12 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         // this element has unregister listeners
         if (eventName) {
           // passed in one specific event name to remove
-          assignersUnregListeners[eventName] &&
-            assignersUnregListeners[eventName]();
+          assignersUnregListeners[eventName] && assignersUnregListeners[eventName]();
+
         } else {
           // remove all event listeners
           Object.keys(assignersUnregListeners).forEach(assignersEventName => {
-            assignersUnregListeners[assignersEventName] &&
-              assignersUnregListeners[assignersEventName]();
+            assignersUnregListeners[assignersEventName] && assignersUnregListeners[assignersEventName]();
           });
         }
       }
@@ -249,14 +243,11 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       // if the parent node is a document fragment (shadow root)
       // then use the "host" property on it
       // otherwise use the parent node
-      (parentNode = domApi.$parentNode(elm)) &&
-      domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment
-        ? parentNode.host
-        : parentNode
+      ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode
   };
 
   if (__BUILD_CONDITIONALS__.isDev) {
-    if ((win as Window).location.search.indexOf("shadow=false") > 0) {
+    if ((win as Window).location.search.indexOf('shadow=false') > 0) {
       // by adding ?shadow=false it'll force the slot polyfill
       // only add this check when in dev mode
       domApi.$supportsShadowDom = false;
@@ -264,18 +255,15 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   }
 
   if (__BUILD_CONDITIONALS__.shadowDom) {
-    domApi.$attachShadow = (elm, shadowRootInit) =>
-      elm.attachShadow(shadowRootInit);
+    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
   }
 
   if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {
     // test if this browser supports event options or not
     try {
-      (win as Window).addEventListener(
-        "e",
-        null,
-        Object.defineProperty({}, "passive", {
-          get: () => (domApi.$supportsEventOptions = true)
+      (win as Window).addEventListener('e', null,
+        Object.defineProperty({}, 'passive', {
+          get: () => domApi.$supportsEventOptions = true
         })
       );
     } catch (e) {}

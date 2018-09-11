@@ -1,7 +1,7 @@
-import { Component } from "../../../../dist";
+import { Component } from '../../../../dist';
 
 @Component({
-  tag: "es5-addclass-svg",
+  tag: 'es5-addclass-svg',
   shadow: true
 })
 export class SvgAddClass {
