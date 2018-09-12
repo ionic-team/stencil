@@ -1,5 +1,5 @@
-<a name="0.13.0-8"></a>
-# 🚗 [0.13.0-8](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-8) (2018-09-11)
+<a name="0.13.0-9"></a>
+# 🎢 [0.13.0-9](https://github.com/ionic-team/stencil/compare/v0.13.0-8...v0.13.0-9) (2018-09-12)
 
 ### Stencil Testing Features
 
@@ -84,6 +84,20 @@ Stencil's architecture is async at all levels which allows for many performance 
 Also note, developers should try to rely on publicly exposed methods as little as possible, and instead default to using properties and events as much as possible. As an app scales, we've found it's easier to manage and pass data through `@Prop` rather than public methods.
 
 
+### defineCustomElements()
+
+Stencil collections injects `defineCustomElements()` into the generated collection in order to easily consume the generated web components in external projects, such as Angular or Vue.
+We have been working to make it more performant and smaller while still providing transparent lazy loading out of the box.
+
+This releases introduces a subtle change in how this function is exported, previously it was exported in the main entry-point, but now it lives in their own entry-point, called `loader` by default.
+This change will lead to much better tree-shaking and performance.
+
+```diff
+- import { defineCustomElements }  from 'my-collection';
++ import { defineCustomElements }  from 'my-collection/dist/loader';
+```
+
+
 ### Features
 
 * **compiler:** methods should return a promise ([98510d5](https://github.com/ionic-team/stencil/commit/98510d5))
@@ -92,6 +106,7 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **serialize:** serialize pretty print html option ([c6e34b5](https://github.com/ionic-team/stencil/commit/c6e34b5))
 * **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
 * **testing:** add toMatchClasses() ([bf4ff31](https://github.com/ionic-team/stencil/commit/bf4ff31))
+* **cli:** add prerelease warning ([5052fe2](https://github.com/ionic-team/stencil/commit/5052fe2))
 
 
 ### Performance Improvements
@@ -120,6 +135,13 @@ Also note, developers should try to rely on publicly exposed methods as little a
 * **styles:** ensure styles added after meta[charset] ([2979f6e](https://github.com/ionic-team/stencil/commit/2979f6e))
 * **styles:** insert styles after meta charset ([df40ca8](https://github.com/ionic-team/stencil/commit/df40ca8))
 * **tslib:** rollup tslib in dist ([1b66f3b](https://github.com/ionic-team/stencil/commit/1b66f3b))
+* **dev-server:** ensure dev-server web socket is open ([5d292c0](https://github.com/ionic-team/stencil/commit/5d292c0)), closes [#1013](https://github.com/ionic-team/stencil/issues/1013)
+* **dev-server:** fix ie11 dev-server errors ([a43915f](https://github.com/ionic-team/stencil/commit/a43915f))
+* **dom-api:** classList.add polyfill for IE11 svgs ([e451d88](https://github.com/ionic-team/stencil/commit/e451d88))
+* **hydrated:** apply hydrated visibility to all components ([3c9c2d4](https://github.com/ionic-team/stencil/commit/3c9c2d4))
+* **lifecycle:** run componentDidUpdate after all child cmps load ([12fcf75](https://github.com/ionic-team/stencil/commit/12fcf75))
+* **validate:** not recommended pkg.module value ([c6c4281](https://github.com/ionic-team/stencil/commit/c6c4281))
+
 
 
 
