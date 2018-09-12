@@ -97,7 +97,7 @@ if (success) {
       .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
       .join('\n');
 
-    fs.mkdirSync(path.dirname(DECLARATIONS_DIST_FILE));
+    fs.ensureDirSync(path.dirname(DECLARATIONS_DIST_FILE));
     fs.writeFileSync(DECLARATIONS_DIST_FILE, coreFileContents);
   }
 
