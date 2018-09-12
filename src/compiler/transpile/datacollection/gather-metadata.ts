@@ -13,7 +13,7 @@ import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from '../../style/normalize-styles';
 import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
-import { buildError } from '../../util';
+import { buildError, buildWarn } from '../../util';
 import { isDecoratorNamed } from './utils';
 
 
@@ -65,11 +65,16 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
         const fileExports = (fileSymbol && typeChecker.getExportsOfModule(fileSymbol)) || [];
 
         if (fileExports.length > 1) {
-          const error = buildError(buildCtx.diagnostics);
-          error.messageText = `@Component() must be the only export of the module`;
-          error.relFilePath = tsSourceFile.fileName;
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.messageText = `@Component() should be the only export of the module.
+Other export statements might cause malfunction of the underling bundler, leading to broken lazy loading of components.
+Create a new auxiliar .ts file in order to export shared functionality.
+`;
+          warn.relFilePath = tsSourceFile.fileName;
 
-        } else if (
+        }
+
+        if (
           fileExports.length === 0 ||
           !isComponentClass(fileExports[0])
         ) {
