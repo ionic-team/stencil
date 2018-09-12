@@ -89,7 +89,7 @@ Also note, developers should try to rely on publicly exposed methods as little a
 Stencil collections injects `defineCustomElements()` into the generated collection in order to easily consume the generated web components in external projects, such as Angular or Vue.
 We have been working to make it more performant and smaller while still providing transparent lazy loading out of the box.
 
-This releases introduces a subtle change in how this function is exported, previously it was exported in the main entry-point, but now it lives in their own entry-point, called `loader` by default.
+This releases introduces a subtle change in how this function is exported. Previously it was exported in the main entry-point, but now it lives in its own entry-point. This entry point is called loader by default but that can be modified via the `stencil.config.ts` file.
 This change will lead to much better tree-shaking and performance.
 
 ```diff
