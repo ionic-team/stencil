@@ -20,11 +20,12 @@ describe('es5 $addClass svg', () => {
 
   function testNativeShadow(result: HTMLElement) {
     const svg = result.shadowRoot.querySelector('svg');
-    expect(svg.classList.length).toBe(0);
+    expect(svg).toHaveClass('existing-css-class');
+    expect(svg).not.toHaveClass('sc-es5-addclass-svg');
   }
 
   function testPolyfilledShadow(result: HTMLElement) {
     const svg = result.querySelector('svg');
-    expect(svg.getAttribute('class')).toBe('sc-es5-addclass-svg-h');
+    expect(svg.getAttribute('class')).toBe('existing-css-class sc-es5-addclass-svg');
   }
 });
