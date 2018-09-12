@@ -1,4 +1,3 @@
-import { selectOne } from '../selector';
 import { MockDocument } from '../document';
 
 describe('selector', () => {

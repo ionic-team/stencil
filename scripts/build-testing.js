@@ -23,8 +23,6 @@ if (success) {
     return all;
   }, {});
 
-  fixCssWhatImport();
-
   function bundleTestingUtils() {
     rollup.rollup({
       input: ENTRY_FILE,
@@ -40,20 +38,29 @@ if (success) {
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
         'rollup-pluginutils',
-        'typescript'
+        'typescript',
+        '../mock-doc'
       ],
       plugins: [
-        rollupResolve({
-          jsnext: true
-        }),
+        (() => {
+          return {
+            resolveId(id) {
+              if (id === '@stencil/core/mock-doc') {
+                return '../mock-doc';
+              }
+            }
+          }
+        })(),
+        rollupResolve(),
         rollupCommonjs(),
         rollupPluginReplace({
           values: replaceObj
         })
       ],
       onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error( message );
+        if (message.code === 'UNUSED_EXTERNAL_IMPORT') return;
+        if (message.code === 'CIRCULAR_DEPENDENCY') return;
+        console.error(message);
       }
 
     }).then(bundle => {
@@ -90,17 +97,3 @@ if (success) {
 
 }
 
-
-function fixCssWhatImport() {
-  // for unit tests to work, typescript expects the syntax "import * as cssWhat from 'css-what';"
-  // but for bundling, rollup expects "import cssWhat from 'css-what';"
-  // basically this issue: https://github.com/Microsoft/TypeScript/issues/5565
-  // except that doesn't seem to work when transpiling isolated modules, idk
-  // this is an uber hack just to get both scenarios to work
-  const transpiledFile = path.join(TRANSPILED_DIR, 'testing', 'mock-doc', 'selector.js');
-
-  let transpiledContent = fs.readFileSync(transpiledFile, 'utf8');
-  transpiledContent = transpiledContent.replace('import * as cssWhat ', 'import cssWhat ');
-
-  fs.writeFileSync(transpiledFile, transpiledContent);
-}

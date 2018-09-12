@@ -5,7 +5,7 @@ import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement } from './node';
 import { MockTextNode } from './text-node';
 import { NODE_TYPES } from './constants';
-import { parse } from './parse-html';
+import { parseDocumentUtil } from './parse-util';
 
 
 export class MockDocument extends MockElement {
@@ -23,7 +23,7 @@ export class MockDocument extends MockElement {
     this.appendChild(docTypeNode);
 
     if (typeof html === 'string') {
-      const parsedDoc = parse(this, html);
+      const parsedDoc: MockDocument = parseDocumentUtil(this, html);
 
       this.documentElement = parsedDoc.children.find(elm => elm.nodeName === 'HTML');
       this.appendChild(this.documentElement);

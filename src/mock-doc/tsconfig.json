@@ -6,31 +6,27 @@
     "declaration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
-    "jsxFactory": "h",
+    "noEmitHelpers": true,
+    "importHelpers": true,
     "lib": [
       "dom",
       "es2017"
     ],
-    "module": "esnext",
+    "module": "es2015",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../dist/transpiled-core",
+    "outDir": "../../dist/transpiled-mock-doc",
     "pretty": true,
-    "target": "es2017",
-    "baseUrl": ".",
-    "paths": {
-      "@stencil/core/mock-doc": [
-        "../dist/mock-doc"
-      ]
-    }
+    "rootDir": "../",
+    "target": "es2015"
   },
   "include": [
-    "index.ts",
-    "../types/*.d.ts",
-    "client/**/*.ts"
+    "../../types/*.d.ts"
+  ],
+  "files": [
+    "./index.ts"
   ]
 }

@@ -22,6 +22,7 @@ const DIST = path.join(__dirname, '..', 'dist');
   path.join(DIST, 'sys', 'node', 'sys-util.js'),
   path.join(DIST, 'sys', 'node', 'sys-worker.js'),
   path.join(DIST, 'sys', 'node', 'websocket.js'),
+  path.join(DIST, 'mock-doc', 'index.js'),
 
 ].forEach(minify);
 

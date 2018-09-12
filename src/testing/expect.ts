@@ -1,8 +1,6 @@
 import * as d from '../declarations';
-import { parseFragment } from './parse-html';
-import { serialize } from './mock-doc/serialize-node';
+import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import deepEqual from 'fast-deep-equal';
-import { NODE_TYPES } from './mock-doc/constants';
 
 
 export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {
@@ -13,15 +11,13 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
   let serializeA: string;
 
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
-    serializeA = serialize((input as any), {
-      format: 'html',
+    serializeA = serializeNodeToHtml((input as any), {
       pretty: true,
       excludeRoot: false
     });
 
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
-    serializeA = serialize((input as any), {
-      format: 'html',
+    serializeA = serializeNodeToHtml((input as any), {
       pretty: true,
       excludeRoot: true,
       excludeTags: ['style'],
@@ -29,9 +25,8 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
     });
 
   } else if (typeof input === 'string') {
-    const parseA = parseFragment(input);
-    serializeA = serialize(parseA, {
-      format: 'html',
+    const parseA = parseHtmlToFragment(input);
+    serializeA = serializeNodeToHtml(parseA, {
       pretty: true,
       excludeRoot: true
     });
@@ -40,10 +35,9 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
     throw new Error(`expect toEqualHtml value should be an element, shadow root or string`);
   }
 
-  const parseB = parseFragment(shouldEqual);
+  const parseB = parseHtmlToFragment(shouldEqual);
 
-  const serializeB = serialize(parseB, {
-    format: 'html',
+  const serializeB = serializeNodeToHtml(parseB, {
     pretty: true
   });
 

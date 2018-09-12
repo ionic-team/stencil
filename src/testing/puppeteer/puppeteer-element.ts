@@ -3,9 +3,7 @@ import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
 import { find } from './puppeteer-find';
-import { MockElement } from '../mock-doc/node';
-import { parseFragment } from '../parse-html';
-import { MockDocumentFragment } from '../mock-doc/document-fragment';
+import { MockElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
 
 
 export class E2EElement extends MockElement implements pd.E2EElementInternal {
@@ -133,6 +131,18 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return api;
   }
 
+  get className() {
+    this._validate();
+    return super.className;
+  }
+
+  set className(value: string) {
+    this._queuedActions.push({
+      setPropertyName: 'className',
+      setPropertyValue: value
+    });
+  }
+
   get id() {
     this._validate();
     return super.id;
@@ -186,18 +196,30 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return super.outerHTML;
   }
 
-  set outerHTML(_value: string) {
-    throw new Error(`outerHTML is read only`);
+  set outerHTML(_: any) {
+    throw new Error(`outerHTML is read-only`);
   }
 
-  private _shadowRoot: MockDocumentFragment = null;
+  private _shadowRoot: DocumentFragment = null;
   get shadowRoot() {
     this._validate();
     return this._shadowRoot;
   }
 
-  set shadowRoot(_value: any) {
-    throw new Error(`shadowRoot is read only`);
+  set shadowRoot(_: any) {
+    throw new Error(`shadowRoot is read-only`);
+  }
+
+  get tabIndex() {
+    this._validate();
+    return super.tabIndex;
+  }
+
+  set tabIndex(value: number) {
+    this._queuedActions.push({
+      setPropertyName: 'tabIndex',
+      setPropertyValue: value
+    });
   }
 
   get textContent() {
@@ -208,6 +230,18 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   set textContent(value: string) {
     this._queuedActions.push({
       setPropertyName: 'textContent',
+      setPropertyValue: value
+    });
+  }
+
+  get title() {
+    this._validate();
+    return super.title;
+  }
+
+  set title(value: string) {
+    this._queuedActions.push({
+      setPropertyName: 'title',
       setPropertyValue: value
     });
   }
@@ -291,14 +325,14 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     }, this._elmHandle);
 
     if (shadowRootHTML) {
-      this._shadowRoot = parseFragment(shadowRootHTML);
+      this._shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
       (this._shadowRoot as any).host = this;
 
     } else {
       this._shadowRoot = null;
     }
 
-    const frag = parseFragment(outerHTML);
+    const frag = parseHtmlToFragment(outerHTML);
 
     const rootElm = frag.firstElementChild;
 

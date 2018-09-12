@@ -4,7 +4,7 @@ import { MockElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
-export function serialize(elm: MockElement, opts: SerializeElementOptions = {}) {
+export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOptions = {}) {
   const output: SerializeOutput = {
     indent: 0,
     text: []
@@ -283,7 +283,6 @@ export interface SerializeElementOptions {
   excludeRoot?: boolean;
   excludeTags?: string[];
   excludeTagContent?: string[];
-  format?: 'html';
   indentSpaces?: number;
   newLines?: boolean;
   pretty?: boolean;

@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import * as customExpect from '../expect';
-import { applyWindowToGlobal } from '../mock-doc';
 import { getDefaultBuildConditionals } from '../../build-conditionals';
 import { h } from '../../renderer/vdom/h';
+import { applyWindowToGlobal } from '@stencil/core/mock-doc';
 
 
 declare const global: d.JestEnvironmentGlobal;

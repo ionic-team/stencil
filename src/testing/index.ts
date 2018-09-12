@@ -1,19 +1,17 @@
 
-export { applyWindowToGlobal } from './mock-doc';
 export { createJestPuppeteerEnvironment } from './jest/jest-environment';
 export { E2EElement, E2EPage } from './puppeteer/puppeteer-declarations';
 export { h } from '../renderer/vdom/h';
 export { jestPreprocessor } from './jest/jest-preprocessor';
 export { jestSetupTestFramework } from './jest/jest-setup-test';
-export { mockDocument, mockWindow } from './mock-doc';
 export { newE2EPage } from './puppeteer/puppeteer-page';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
+import { MockWindow } from '@stencil/core/mock-doc';
 
 
 
 let hasLogged = false;
-import { MockWindow } from './mock-doc/window';
 // DEPRECATED 2018-08-31
 
 /**

@@ -8,14 +8,12 @@ import { createRendererPatch } from '../renderer/vdom/patch';
 import { initComponentInstance } from '../core/init-component-instance';
 import { initHostElement } from '../core/init-host-element';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
-import { MockCustomEvent } from './mock-doc/event';
-import { MockDocument } from './mock-doc/document';
-import { MockWindow } from './mock-doc/window';
 import { TestingConfig } from './testing-config';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
+import { MockCustomEvent, MockDocument, MockWindow } from '@stencil/core/mock-doc';
 
 
 export function mockWindow() {

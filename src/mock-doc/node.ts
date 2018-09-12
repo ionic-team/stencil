@@ -3,9 +3,9 @@ import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
 import { NODE_TYPES } from './constants';
-import { parseFragment } from './parse-html';
+import { parseFragmentUtil } from './parse-util';
 import { selectAll, selectOne } from './selector';
-import { SerializeElementOptions, serialize } from './serialize-node';
+import { SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 
 
 export class MockNode {
@@ -206,7 +206,7 @@ export class MockElement extends MockNode {
     if (this.childNodes.length === 0) {
       return '';
     }
-    return serialize(this, {
+    return serializeNodeToHtml(this, {
       excludeRoot: true,
       newLines: false,
       indentSpaces: 0
@@ -219,7 +219,7 @@ export class MockElement extends MockNode {
     }
 
     if (html) {
-      const frag = parseFragment(this.ownerDocument, html);
+      const frag = parseFragmentUtil(this.ownerDocument, html);
       for (let i = 0; i < frag.childNodes.length; i++) {
         this.appendChild(frag.childNodes[i]);
       }
@@ -276,7 +276,7 @@ export class MockElement extends MockNode {
   }
 
   get outerHTML() {
-    return serialize(this, {
+    return serializeNodeToHtml(this, {
       excludeRoot: false,
       newLines: false,
       indentSpaces: 0
@@ -346,9 +346,6 @@ export class MockElement extends MockNode {
     this._style = style;
   }
 
-  get title() { return this.getAttribute('title') || ''; }
-  set title(value: string) { this.setAttribute('title', value); }
-
   get tabIndex() { return parseInt(this.getAttribute('tabindex') || '-1', 10); }
   set tabIndex(value: number) { this.setAttribute('tabindex', value); }
 
@@ -369,6 +366,9 @@ export class MockElement extends MockNode {
   set textContent(value: string) {
     setTextContent(this, value);
   }
+
+  get title() { return this.getAttribute('title') || ''; }
+  set title(value: string) { this.setAttribute('title', value); }
 
   onabort() {/**/}
   onauxclick() {/**/}
@@ -455,7 +455,7 @@ export class MockElement extends MockNode {
   onwheel() {/**/}
 
   toString(opts?: SerializeElementOptions) {
-    return serialize(this, opts);
+    return serializeNodeToHtml(this, opts);
   }
 
 }

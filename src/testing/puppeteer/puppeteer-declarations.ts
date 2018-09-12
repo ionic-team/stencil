@@ -91,7 +91,8 @@ export interface E2EElement {
   className: string;
 
   /**
-   * Using classList is a convenient alternative to accessing an element's list of classes as a space-delimited string via element.className.
+   * Using classList is a convenient alternative to accessing an element's list
+   * of classes as a space-delimited string via `element.className`.
    */
   classList: {
     /**
@@ -118,11 +119,8 @@ export interface E2EElement {
   };
 
   /**
-   * Calling click() on an element crolls it into view if needed, and
-   * then uses page.mouse to click in the center of the element. Bear
-   * in mind that if click() triggers a navigation event and there's a
-   * separate page.waitForNavigation() promise to be resolved, you
-   * may end up with a race condition that yields unexpected results.
+   * Calling `click()` on an element scrolls it into view if needed, and
+   * then uses `page.mouse` to click in the center of the element.
    * Please see the puppeteer docs for more information.
    */
   click(options?: puppeteer.ClickOptions): void;
@@ -160,21 +158,21 @@ export interface E2EElement {
   hover(): Promise<void>;
 
   /**
-   * Gets and sets id property of the element.
+   * Gets and sets `id` property of the element.
    * Note that `await page.waitForChanges()` must be called before reading
    * the value if content has changed.
    */
   id: string;
 
   /**
-   * Gets and sets innerHTML property of the element.
+   * Gets and sets `innerHTML` property of the element.
    * Note that `await page.waitForChanges()` must be called before reading
    * the value if content has changed.
    */
   innerHTML: string;
 
   /**
-   * Gets and sets innerText property of the element.
+   * Gets and sets `innerText` property of the element.
    * Note that `await page.waitForChanges()` must be called before reading
    * the value if content has changed.
    */
@@ -192,22 +190,24 @@ export interface E2EElement {
   nodeName: string;
 
   /**
-   * The node type of the node. An element's node type is always `1`.
+   * The type of a node represented by a number.
+   * Element = 1, TextNode = 3, Comment = 8,
+   * Document Fragment (also what a shadow root is) = 11.
    */
   nodeType: number;
 
   /**
-   * Gets the element's outerHTML. This is a read-only property and will
+   * Gets the element's `outerHTML. This is a read-only property and will
    * throw an error if set.
    */
   outerHTML: string;
 
   /**
-   * Focuses the element, and then uses keyboard.down and keyboard.up.
+   * Focuses the element, and then uses `keyboard.down` and `keyboard.up`.
    * If key is a single character and no modifier keys besides Shift are
    * being held down, a keypress/input event will also be generated. The
    * text option can be specified to force an input event to be generated.
-   * Note: Modifier keys DO effect elementHandle.press. Holding down Shift
+   * Note: Modifier keys DO effect `elementHandle.press`. Holding down Shift
    * will type the text in upper case.
    */
   press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
@@ -233,7 +233,7 @@ export interface E2EElement {
   /**
    * The ShadowRoot interface of the Shadow DOM API is the root node of a
    * DOM subtree that is rendered separately from a document's main DOM tree.
-   * This value will be `null` if the element does not have a shadowRoot.
+   * This value will be `null` if the element does not have a `shadowRoot`.
    */
   shadowRoot: ShadowRoot;
 
@@ -247,34 +247,45 @@ export interface E2EElement {
   spyOnEvent(eventName: string): Promise<d.EventSpy>;
 
   /**
+   * Represents the tab order of the current element. Setting the
+   * `tabIndex` property will also set the `tabindex` attribute.
+   */
+  tabIndex: number;
+
+  /**
    * Tag name of the element. Note, this will always be upper-cased.
    */
   tagName: string;
 
   /**
    * This method scrolls the element it into view if needed,
-   * and then uses page.touchscreen to tap in the center of the element.
+   * and then uses `page.touchscreen` to tap in the center of the element.
    */
   tap(): Promise<void>;
 
   /**
-   * The textContent property represents the text content of a node
+   * The `textContent` property represents the text content of a node
    * and its descendants. Note that `await page.waitForChanges()` must
    * be called before reading the value if content has changed.
    */
   textContent: string;
 
   /**
-   * This is a convenience method to easily create a CustomEvent,
+   * Represents the `title` of the element, the text usually displayed in a
+   * 'tool tip' popup when the mouse is over the displayed node.
+   */
+  title: string;
+
+  /**
+   * This is a convenience method to easily create a `CustomEvent`,
    * and dispatch it from the element, to include any custom event
-   * detail data.
+   * `detail` data as the second argument.
    */
   triggerEvent(eventName: string, eventInitDict?: d.EventInitDict): void;
 
   /**
    * Sends a keydown, keypress/input, and keyup event for each character in the text.
-   * To press a special key, like Control or ArrowDown, use keyboard.press.
-   * @param text A text to type into a focused element.
+   * To press a special key, like Control or ArrowDown, use `keyboard.press`.
    */
   type(text: string, options?: { delay: number }): Promise<void>;
 }

@@ -11,6 +11,7 @@
     "bin/",
     "compiler/",
     "dist/",
+    "mock-doc/",
     "polyfills/",
     "screenshot/",
     "server/",
@@ -27,6 +28,7 @@
     "build.server": "node scripts/build-server.js",
     "build.dev.server": "node scripts/build-dev-server.js",
     "build.dev.server.client": "node scripts/build-dev-server-client.js",
+    "build.mock-doc": "node scripts/build-mock-doc.js",
     "build.prod": "node scripts/build-prod.js",
     "build.screenshot": "node scripts/build-screenshot.js",
     "build.submodules": "node scripts/build-submodules.js",
@@ -130,6 +132,22 @@
   ],
   "jest": {
     "preset": "./testing/jest.preset.js",
+    "modulePathIgnorePatterns": [
+      "/bin",
+      "/scripts",
+      "/www"
+    ],
+    "moduleNameMapper": {
+      "@stencil/core/mock-doc": "<rootDir>/mock-doc/"
+    },
+    "testPathIgnorePatterns": [
+      "/.stencil",
+      "/bin",
+      "/dist",
+      "/node_modules",
+      "/scripts",
+      "/www"
+    ],
     "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
   }
 }

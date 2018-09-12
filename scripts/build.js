@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const transpile = require('./transpile');
-const fork = require('child_process').fork;
+const { execSync, fork } = require('child_process');
 
 const SCRIPTS_DIR = __dirname;
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
@@ -10,6 +10,10 @@ const BUILD_ID = getBuildId();
 fs.removeSync(DIST_DIR);
 
 transpile(path.join('..', 'src', 'build-conditionals', 'tsconfig.json'));
+
+execSync('node build-mock-doc.js', {
+  cwd: path.join(SCRIPTS_DIR)
+});
 
 [
   'build-cli.js',

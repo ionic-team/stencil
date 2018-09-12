@@ -1,17 +1,16 @@
 import { MockComment } from './comment-node';
 import { MockDocument } from './document';
-import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockNode } from './node';
 import { MockTextNode } from './text-node';
 import { NODE_TYPES } from './constants';
 import * as parse5 from 'parse5';
 
 
-export function parse(ownerDocument: MockDocument, html: string) {
+export function parseDocumentUtil(ownerDocument: any, html: string) {
   const doc = parse5.parse(
     html.trim(),
     getParser(ownerDocument)
-  ) as MockDocument;
+  ) as any;
 
   doc.documentElement = doc.firstElementChild;
   doc.head = doc.documentElement.firstElementChild;
@@ -21,17 +20,17 @@ export function parse(ownerDocument: MockDocument, html: string) {
 }
 
 
-export function parseFragment(ownerDocument: MockDocument, html: string) {
+export function parseFragmentUtil(ownerDocument: any, html: string) {
   const frag = parse5.parseFragment(
     html.trim(),
     getParser(ownerDocument)
-  ) as MockDocumentFragment;
+  ) as any;
 
   return frag;
 }
 
 
-function getParser(ownerDocument: MockDocument) {
+function getParser(ownerDocument: any) {
   if (ownerDocument._parser) {
     return ownerDocument._parser;
   }

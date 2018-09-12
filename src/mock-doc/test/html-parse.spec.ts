@@ -1,5 +1,5 @@
 import { MockDocument } from '../document';
-import { parse, parseFragment } from '../parse-html';
+import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 
 
 describe('parseHtml', () => {
@@ -41,7 +41,7 @@ describe('parseHtml', () => {
     const html = `
       a<!--comment-->b
     `;
-    const elm = parseFragment(doc, html);
+    const elm = parseHtmlToFragment(html, doc);
     expect(elm.childNodes).toHaveLength(3);
     expect(elm.firstChild.nodeValue).toBe('a');
     expect(elm.firstChild.nextSibling.nodeName).toBe('#comment');
@@ -56,7 +56,7 @@ describe('parseHtml', () => {
     const html = `
       <div><span></span></div>
     `;
-    const elm = parseFragment(doc, html);
+    const elm = parseHtmlToFragment(html, doc);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('DIV');
     expect(elm.firstElementChild.firstElementChild.tagName).toBe('SPAN');
@@ -69,7 +69,7 @@ describe('parseHtml', () => {
       <div></div>
       <span></span>
     `;
-    const elm = parseFragment(doc, html);
+    const elm = parseHtmlToFragment(html, doc);
     expect(elm.children).toHaveLength(2);
     expect(elm.children[0].tagName).toBe('DIV');
     expect(elm.children[0].nextElementSibling.tagName).toBe('SPAN');
@@ -81,7 +81,7 @@ describe('parseHtml', () => {
     const html = `
       <article>text</article>
     `;
-    const elm = parseFragment(doc, html);
+    const elm = parseHtmlToFragment(html, doc);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('ARTICLE');
     expect(elm.firstElementChild.firstChild.nodeName).toBe('#text');
@@ -92,7 +92,7 @@ describe('parseHtml', () => {
     const html = `
       <article>a < b</article>
     `;
-    const elm = parseFragment(doc, html);
+    const elm = parseHtmlToFragment(html, doc);
     expect(elm.children).toHaveLength(1);
     expect(elm.firstElementChild.tagName).toBe('ARTICLE');
     expect(elm.firstElementChild.firstChild.nodeName).toBe('#text');
@@ -103,7 +103,7 @@ describe('parseHtml', () => {
     const html = `
       <div class="doc">hello</div>
     `;
-    const elm = parse(doc, html);
+    const elm = parseHtmlToDocument(html, doc);
     expect(elm.children).toHaveLength(1);
     expect(elm.children[0].tagName).toBe('HTML');
     expect(elm.children[0].firstChild.nodeName).toBe('HEAD');
