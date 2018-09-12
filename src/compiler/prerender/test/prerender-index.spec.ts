@@ -103,8 +103,8 @@ describe('prerender index', () => {
       path.join(root, 'assets', 'web-components', 'app', 'app.core.js'),
       path.join(root, 'assets', 'web-components', 'app', 'app.core.pf.js'),
       path.join(root, 'assets', 'web-components', 'app', 'app.registry.json'),
-      path.join(root, 'assets', 'web-components', 'app', 'cmp-a.es5.js'),
-      path.join(root, 'assets', 'web-components', 'app', 'cmp-a.js')
+      path.join(root, 'assets', 'web-components', 'app', 'cmp-a.es5.entry.js'),
+      path.join(root, 'assets', 'web-components', 'app', 'cmp-a.entry.js')
     ]);
 
     doNotExpectFiles(c.fs, [

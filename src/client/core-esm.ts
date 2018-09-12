@@ -102,9 +102,9 @@ function buildComponentLoader(c: d.ComponentHostData) {
 
 function loadBundle(bundleId: string, useScopedCss: boolean, className: string) {
   return import(
-    /* webpackExclude: /^(chunk/index)/ */
+    /* webpackInclude: /\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    `./build/${bundleId}${(useScopedCss ? '.sc' : '')}.js`
+    `./build/${bundleId}${(useScopedCss ? '.sc' : '')}.entry.js`
   ).then(m => m[className]);
 }
 

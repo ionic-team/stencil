@@ -219,10 +219,21 @@ export interface JSModuleList {
   };
 }
 
-export interface JSModuleMap {
+export interface JSModuleFormats {
   esm?: JSModuleList;
-  es5?: JSModuleList;
-  esmEs5?: JSModuleList;
+  amd?: JSModuleList;
+}
+
+export interface DerivedChunk {
+  entryKey: string;
+  filename: string;
+  code: string;
+}
+
+export interface DerivedModule {
+  list: DerivedChunk[];
+  sourceTarget: d.SourceTarget;
+  isBrowser: boolean;
 }
 
 

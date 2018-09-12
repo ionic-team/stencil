@@ -53,13 +53,13 @@ describe('build', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.entry.js'));
     expect(cmpA).toContain('Built with http://stenciljs.com');
     expect(cmpA).toContain('App.loadBundle("cmp-a"');
     expect(cmpA).toContain('someFn(!0)');
     expect(cmpA).not.toContain('/** minify me plz **/');
 
-    const cmpB = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-b.es5.js'));
+    const cmpB = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-b.es5.entry.js'));
     expect(cmpB).toContain('Built with http://stenciljs.com');
     expect(cmpB).toContain('App.loadBundle("cmp-b"');
     expect(cmpB).toContain('someFn(!0)');
@@ -84,7 +84,7 @@ describe('build', () => {
     expect(r.hasSlot).toBe(false);
     expect(r.hasSvg).toBe(false);
 
-    const output = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const output = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(output).toContain('/*! Built with http://stenciljs.com */\nconst{h:t}=window.App;class s{static get is(){return"cmp-a"}}export{s as CmpA};');
   });
 
@@ -110,7 +110,7 @@ describe('build', () => {
       path.join(root, 'www', 'build', 'app', 'app.core.js'),
       path.join(root, 'www', 'build', 'app', 'app.global.js'),
       path.join(root, 'www', 'build', 'app', 'app.registry.json'),
-      path.join(root, 'www', 'build', 'app', 'cmp-a.js'),
+      path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'),
       path.join(root, 'www', 'index.html')
     ]);
 

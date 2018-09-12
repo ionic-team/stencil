@@ -148,12 +148,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
   }
 
   if (config.minifyJs) {
-    const minifyResults = await minifyJs(config, compilerCtx, jsContent, sourceTarget, false);
-    if (minifyResults.diagnostics && minifyResults.diagnostics.length) {
-      buildCtx.diagnostics.push(...minifyResults.diagnostics);
-    } else {
-      jsContent = minifyResults.output;
-    }
+    jsContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, jsContent, sourceTarget, false);
   }
 
   return `\n(function(resourcesUrl){${jsContent}\n})(resourcesUrl);\n`;

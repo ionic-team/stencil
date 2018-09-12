@@ -53,7 +53,7 @@ export interface StencilSystem {
   scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
   semver?: Semver;
   storage?: Storage;
-  transpileToEs5?(cwd: string, input: string): Promise<d.TranspileResults>;
+  transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
     format(url: Url): string;

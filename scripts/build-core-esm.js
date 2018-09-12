@@ -1,8 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const ts = require('typescript');
-
 
 function buildCoreEsm(inputFile, outputFile) {
   return rollup.rollup({

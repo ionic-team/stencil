@@ -87,10 +87,6 @@ export function getPolyfillsEsmBuildPath(config: d.Config, outputTarget: d.Outpu
   return pathJoin(config, getDistEsmDir(config, outputTarget, sourceTarget), `polyfills`);
 }
 
-export function getHyperScriptFnEsmFileName(config: d.Config) {
-  return `${config.fsNamespace}.core.js`;
-}
-
 export function getCoreEsmFileName(config: d.Config) {
   return `${config.fsNamespace}.core.js`;
 }
@@ -117,10 +113,10 @@ export function getGlobalStyleFilename(config: d.Config) {
 
 
 export function getBrowserFilename(bundleId: string, isScopedStyles: boolean, sourceTarget?: d.SourceTarget) {
-  return `${bundleId}${isScopedStyles ? '.sc' : ''}${sourceTarget === 'es5' ? '.es5' : ''}.js`;
+  return `${bundleId}${isScopedStyles ? '.sc' : ''}${sourceTarget === 'es5' ? '.es5' : ''}.entry.js`;
 }
 
 
 export function getEsmFilename(bundleId: string, isScopedStyles: boolean) {
-  return `${bundleId}${isScopedStyles ? '.sc' : ''}.js`;
+  return `${bundleId}${isScopedStyles ? '.sc' : ''}.entry.js`;
 }

@@ -356,7 +356,7 @@ export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: s
   }
 
   // server-side always uses es5 and jsonp callback modules
-  bundleId += '.es5.js';
+  bundleId += '.es5.entry.js';
 
   return bundleId;
 }
