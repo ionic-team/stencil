@@ -96,7 +96,8 @@ export function createPlatformServer(
     componentAppliedStyles: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
-    hasLoadedMap: new WeakMap(),
+    isCmpLoaded: new WeakMap(),
+    isCmpReady: new WeakMap(),
     hostElementMap: new WeakMap(),
     hostSnapshotMap: new WeakMap(),
     instanceMap: new WeakMap(),
@@ -124,12 +125,12 @@ export function createPlatformServer(
   rootElm['s-rn'] = true;
 
   rootElm['s-init'] = function appLoadedCallback() {
-    plt.hasLoadedMap.set(rootElm, true);
+    plt.isCmpReady.set(rootElm, true);
     appLoaded();
   };
 
   function appLoaded(failureDiagnostic?: d.Diagnostic) {
-    if (plt.hasLoadedMap.has(rootElm) || failureDiagnostic) {
+    if (plt.isCmpReady.has(rootElm) || failureDiagnostic) {
       // the root node has loaded
       plt.onAppLoad && plt.onAppLoad(rootElm, failureDiagnostic);
     }

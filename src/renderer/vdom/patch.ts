@@ -19,6 +19,17 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
+  // internal variables to be reused per patch() call
+  let useNativeShadowDom: boolean,
+  ssrId: number,
+  scopeId: string,
+  checkSlotFallbackVisibility: boolean,
+  checkSlotRelocate: boolean,
+  contentRef: d.RenderNode,
+  hostTagName: string,
+  hostElm: d.HostElement;
+
+
   function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) {
     newVNode = newParentVNode.vchildren[childIndex];
 
@@ -61,6 +72,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
                         domApi.$createElement(
                           (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag)
                         );
+
+      if (plt.isDefinedComponent(elm)) {
+        plt.isCmpReady.delete(hostElm);
+      }
 
       if (__BUILD_CONDITIONALS__.hasSvg) {
         isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
@@ -185,8 +200,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     containerElm?: d.RenderNode,
     childNode?: Node
   ) {
-    // $defaultHolder deprecated 2018-04-02
-    const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
+    const contentRef = parentElm['s-cr'];
     containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
     if ((containerElm as any).shadowRoot && domApi.$tagName(containerElm) === hostTagName) {
       containerElm = (containerElm as any).shadowRoot;
@@ -412,7 +426,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (__BUILD_CONDITIONALS__.slotPolyfill && (defaultHolder = (elm['s-cr'] || (elm as any)['$defaultHolder']/* $defaultHolder deprecated 2018-04-02 */))) {
+    } else if (__BUILD_CONDITIONALS__.slotPolyfill && (defaultHolder = (elm['s-cr'] as any))) {
       // this element has slotted content
       domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
 
@@ -551,20 +565,12 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
   }
 
-  // internal variables to be reused per patch() call
-  let useNativeShadowDom: boolean,
-      ssrId: number,
-      scopeId: string,
-      checkSlotFallbackVisibility: boolean,
-      checkSlotRelocate: boolean,
-      hostTagName: string,
-      contentRef: d.RenderNode;
 
-
-  return function patch(hostElm: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, encapsulation: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
+  return function patch(hostElement: d.HostElement, oldVNode: d.VNode, newVNode: d.VNode, useNativeShadowDomVal: boolean, encapsulation: d.Encapsulation, ssrPatchId?: number, i?: number, relocateNode?: RelocateNode, orgLocationNode?: d.RenderNode, refNode?: d.RenderNode, parentNodeRef?: Node, insertBeforeNode?: Node) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
+    hostElm = hostElement;
     hostTagName = domApi.$tagName(hostElm);
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = useNativeShadowDomVal;

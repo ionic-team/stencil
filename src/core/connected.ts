@@ -61,7 +61,7 @@ export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostEleme
     if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element
       // if the ancestor already loaded then do nothing, it's too late
-      if (!plt.hasLoadedMap.has(elm)) {
+      if (!plt.isCmpReady.has(elm)) {
 
         // keep a reference to this element's ancestor host element
         // elm._ancestorHostElement = ancestorHostElement;
@@ -69,10 +69,6 @@ export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostEleme
 
         // ensure there is an array to contain a reference to each of the child elements
         // and set this element as one of the ancestor's child elements it should wait on
-        if ((ancestorHostElement as any)['$activeLoading']) {
-          // $activeLoading deprecated 2018-04-02
-          ancestorHostElement['s-ld'] = (ancestorHostElement as any)['$activeLoading'];
-        }
         (ancestorHostElement['s-ld'] = ancestorHostElement['s-ld'] || []).push(elm);
       }
       break;

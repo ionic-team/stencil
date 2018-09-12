@@ -1,7 +1,7 @@
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
-import { propagateComponentLoaded } from './init-component-instance';
+import { propagateComponentReady } from './init-component-instance';
 
 
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -17,7 +17,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
 
     // double check that we've informed the ancestor host elements
     // that they're good to go and loaded (cuz this one is on its way out)
-    propagateComponentLoaded(plt, elm);
+    propagateComponentReady(plt, elm);
 
     // since we're disconnecting, call all of the JSX ref's with null
     callNodeRefs(plt.vnodeMap.get(elm), true);

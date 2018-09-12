@@ -28,7 +28,8 @@ export interface PlatformApi {
   componentAppliedStyles: WeakMap<Node, d.ComponentAppliedStyles>;
   hasConnectedMap: WeakMap<d.HostElement, boolean>;
   hasListenersMap: WeakMap<d.HostElement, boolean>;
-  hasLoadedMap: WeakMap<d.HostElement, boolean>;
+  isCmpLoaded: WeakMap<d.HostElement, boolean>;
+  isCmpReady: WeakMap<d.HostElement, boolean>;
   hostSnapshotMap: WeakMap<d.HostElement, d.HostSnapshot>;
   hostElementMap: WeakMap<d.ComponentInstance, d.HostElement>;
   instanceMap: WeakMap<d.HostElement, d.ComponentInstance>;

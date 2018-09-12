@@ -238,28 +238,24 @@ export interface HostElement extends HTMLElement {
    * Reference to the HTML Comment that's placed inside of the
    * host element's original content. This comment is used to
    * always represent where host element's light dom is.
-   * (deprecated $defaultHolder)
    */
   ['s-cr']?: d.RenderNode;
 
   /**
    * Is Active Loading:
    * Array of child host elements that are actively loading.
-   * (deprecated $activeLoading)
    */
   ['s-ld']?: HostElement[];
 
   /**
    * Has Rendered:
    * Set to true if this component has rendered
-   * (deprecated $rendered)
    */
   ['s-rn']?: boolean;
 
   /**
    * On Render Callbacks:
    * Array of callbacks to fire off after it has rendered.
-   * (deprecated $onRender)
    */
   ['s-rc']?: (() => void)[];
 
@@ -274,7 +270,6 @@ export interface HostElement extends HTMLElement {
    * Component Initial Load:
    * The component has fully loaded, instance creatd,
    * and has rendered. Method is on the host element prototype.
-   * (deprecated $initLoad)
    */
   ['s-init']?: () => void;
 

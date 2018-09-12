@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { h } from '../../renderer/vdom/h';
 import { MockedPlatform, mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
-import { queueUpdate, renderUpdate } from '../update';
+import { queueUpdate } from '../update';
 import { getDefaultBuildConditionals } from '../../util/build-conditionals';
 
 
@@ -15,41 +15,6 @@ describe('instance update', () => {
     __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
   });
 
-
-  describe('renderUpdate', () => {
-
-    it('should fire off componentDidUpdate if its on the instance and isInitialLoad is false', () => {
-      class MyComponent {
-        ranLifeCycle = false;
-        componentDidUpdate() {
-          this.ranLifeCycle = true;
-        }
-      }
-      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
-      const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
-      plt.defineComponent(cmpMeta);
-      const instance = new MyComponent();
-      renderUpdate(plt, elm, instance, false);
-      expect(instance.ranLifeCycle).toBe(true);
-    });
-
-    it('should not fire off componentDidUpdate if its on the instance and isInitialLoad is true', () => {
-      class MyComponent {
-        ranLifeCycle = false;
-        componentDidUpdate() {
-          this.ranLifeCycle = true;
-        }
-      }
-      const elm = plt.domApi.$createElement('ion-tag') as d.HostElement;
-      const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
-      plt.defineComponent(cmpMeta);
-
-      const instance = new MyComponent();
-      renderUpdate(plt, elm, instance, true);
-      expect(instance.ranLifeCycle).toBe(false);
-    });
-
-  });
 
   it('should render state', async () => {
     mockDefine(plt, {

@@ -71,7 +71,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     componentAppliedStyles: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
-    hasLoadedMap: new WeakMap(),
+    isCmpLoaded: new WeakMap(),
+    isCmpReady: new WeakMap(),
     hostElementMap: new WeakMap(),
     hostSnapshotMap: new WeakMap(),
     instanceMap: new WeakMap(),
@@ -94,7 +95,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 

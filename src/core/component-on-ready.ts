@@ -14,13 +14,13 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
 
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta) {
-      if (plt.hasLoadedMap.has(elm)) {
+      if (plt.isCmpReady.has(elm)) {
         // element has already loaded, pass the resolve the element component
         // so we know that the resolve knows it this element is an app component
         resolve(elm);
 
       } else {
-        // element hasn't loaded yet
+        // element hasn't loaded yet or it has an update in progress
         // add this resolve specifically to this elements on ready queue
         const onReadyCallbacks = plt.onReadyCallbacksMap.get(elm) || [];
         onReadyCallbacks.push(resolve);

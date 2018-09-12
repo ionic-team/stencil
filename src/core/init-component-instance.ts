@@ -71,7 +71,7 @@ export function initComponentInstance(
 }
 
 
-export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[]): any {
+export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any {
 
   if (__BUILD_CONDITIONALS__.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
@@ -84,20 +84,28 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
   if (
-    !plt.hasLoadedMap.has(elm) &&
     (instance = plt.instanceMap.get(elm)) &&
     !plt.isDisconnectedMap.has(elm) &&
     (!elm['s-ld'] || !elm['s-ld'].length)
   ) {
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
-    // ensure we remove any child references cuz it doesn't matter at this point
-    elm['s-ld'] = undefined;
 
-    // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
-    // elm._hasLoaded = true;
-    plt.hasLoadedMap.set(elm, true);
+    plt.isCmpReady.set(elm, true);
+
+    if (!(hasCmpLoaded = plt.isCmpLoaded.has(elm))) {
+      // remember that this component has loaded
+      // isCmpLoaded map is useful to know if we should fire
+      // the lifecycle componentDidLoad() or componentDidUpdate()
+      plt.isCmpLoaded.set(elm, true);
+
+      // ensure we remove any child references cuz it doesn't matter at this point
+      elm['s-ld'] = undefined;
+
+      // add the css class that this element has officially hydrated
+      plt.domApi.$addClass(elm, hydratedCssClass);
+    }
 
     try {
       // fire off the ref if it exists
@@ -110,20 +118,25 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
         plt.onReadyCallbacksMap.delete(elm);
       }
 
-      if (__BUILD_CONDITIONALS__.cmpDidLoad) {
+      if (__BUILD_CONDITIONALS__.cmpDidLoad && !hasCmpLoaded && instance.componentDidLoad) {
+        // we've never loaded this component
         // fire off the user's componentDidLoad method (if one was provided)
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called
-        // we'll also fire this method off on the element, just to
-        instance.componentDidLoad && instance.componentDidLoad();
+        // and all the child componenets have finished loading
+        instance.componentDidLoad();
+
+      } else if (__BUILD_CONDITIONALS__.cmpDidUpdate && hasCmpLoaded && instance.componentDidUpdate) {
+        // we've already loaded this component
+        // fire off the user's componentDidUpdate method (if one was provided)
+        // componentDidUpdate runs AFTER render() has been called
+        // and all child components have finished updating
+        instance.componentDidUpdate();
       }
 
     } catch (e) {
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);
     }
-
-    // add the css class that this element has officially hydrated
-    plt.domApi.$addClass(elm, hydratedCssClass);
 
     // ( •_•)
     // ( •_•)>⌐■-■
@@ -131,7 +144,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    propagateComponentLoaded(plt, elm);
+    propagateComponentReady(plt, elm);
   }
 }
 
@@ -157,16 +170,14 @@ function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
 }
 
 
-export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[]) {
+export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
-  const ancestorHostElement = plt.ancestorHostElementMap.get(elm);
-
-  if (ancestorHostElement) {
+  if ((ancestorHostElement = plt.ancestorHostElementMap.get(elm))) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = ancestorHostElement['s-ld'] || (ancestorHostElement as any)['$activeLoading'];
+    ancestorsActivelyLoadingChildren = ancestorHostElement['s-ld'];
 
     if (ancestorsActivelyLoadingChildren) {
       index = ancestorsActivelyLoadingChildren.indexOf(elm);
@@ -182,9 +193,6 @@ export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement,
       // (which actually ends up as this method again but for the ancestor)
       if (!ancestorsActivelyLoadingChildren.length) {
         ancestorHostElement['s-init'] && ancestorHostElement['s-init']();
-
-        // $initLoad deprecated 2018-04-02
-        (ancestorHostElement as any)['$initLoad'] && (ancestorHostElement as any)['$initLoad']();
       }
     }
 

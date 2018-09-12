@@ -13,7 +13,7 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
       jlen: number;
 
   if (ilen > 0) {
-    plt.hasLoadedMap.set(rootElm as d.HostElement, true);
+    plt.isCmpReady.set(rootElm as d.HostElement, true);
 
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
