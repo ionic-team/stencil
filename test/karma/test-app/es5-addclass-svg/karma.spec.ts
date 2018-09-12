@@ -25,6 +25,6 @@ describe('es5 $addClass svg', () => {
 
   function testPolyfilledShadow(result: HTMLElement) {
     const svg = result.querySelector('svg');
-    expect(svg.getAttribute('class')).toBe('sc-es5-addclass-svg');
+    expect(svg.getAttribute('class')).toBe('sc-es5-addclass-svg-h');
   }
 });
