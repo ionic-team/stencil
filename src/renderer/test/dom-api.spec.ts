@@ -1,6 +1,6 @@
 import { AppGlobal, DomApi } from '../../declarations';
-import { createDomApi } from '../dom-api';
 import { mockWindow } from '../../testing/mocks';
+import { createDomApi } from '../dom-api';
 
 
 describe('dom api', () => {
@@ -77,6 +77,16 @@ describe('dom api', () => {
     it('self', () => {
       const r = domApi.$elementRef(elm, '');
       expect(r).toBe(elm);
+    });
+
+  });
+
+  describe('$addClass', () => {
+
+    it('should apply a class to svg elements', () => {
+      const elm = doc.createElement('svg');
+      domApi.$addClass(elm, 'something');
+      expect(elm).toHaveClass('something');
     });
 
   });

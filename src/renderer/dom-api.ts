@@ -55,8 +55,23 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $appendChild: (parentNode: Node, childNode: Node) =>
       parentNode.appendChild(childNode),
 
-    $addClass: (elm: Element, cssClass: string) =>
-      elm.classList.add(cssClass),
+    $addClass: (elm: Element, cssClass: string) => {
+      if (__BUILD_CONDITIONALS__.hasSvg && __BUILD_CONDITIONALS__.es5) {
+        if (!!elm.classList) {
+          elm.classList.add(cssClass);
+        } else if (elm.nodeName === 'SVG') {
+          // https://caniuse.com/#search=classList
+          // IE11 really does not do <svg> properly :-/
+          let appliedClasses = elm.getAttribute('class') || '';
+          appliedClasses = !appliedClasses.split(' ').includes(cssClass)
+            ? `${elm.className} ${cssClass}`
+            : appliedClasses;
+          elm.setAttribute('class', appliedClasses);
+        }
+      } else {
+        elm.classList.add(cssClass);
+      }
+    },
 
     $childNodes: (node: Node) =>
       node.childNodes,
