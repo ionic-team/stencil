@@ -42,10 +42,10 @@ if (success) {
           '/* Dev Server Client */'
         ].join('\n'),
 
-        intro: '(function(win, doc, config) {\n' +
+        intro: '(function(iframeWindow, appWindow, appDoc, config) {\n' +
               '"use strict";',
 
-        outro: '})(window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
+        outro: '})(window, window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
 
         footer: '</script>'
 

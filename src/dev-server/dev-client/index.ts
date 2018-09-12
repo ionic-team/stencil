@@ -1,8 +1,12 @@
 import * as d from '../../declarations';
+import { applyPolyfills } from './polyfills';
 import { initClient } from './init-client';
 
-declare const win: d.DevClientWindow;
-declare const doc: Document;
+declare const iframeWindow: Window;
+declare const appWindow: d.DevClientWindow;
+declare const appDoc: Document;
 declare const config: d.DevClientConfig;
 
-initClient(win, doc, config);
+applyPolyfills(iframeWindow);
+
+initClient(appWindow, appDoc, config);
