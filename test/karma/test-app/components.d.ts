@@ -138,6 +138,23 @@ export namespace Components {
     'value'?: string;
   }
 
+  interface LifecycleOnReadyA {}
+  interface LifecycleOnReadyAAttributes extends StencilHTMLAttributes {}
+
+  interface LifecycleOnReadyB {
+    'value': number;
+  }
+  interface LifecycleOnReadyBAttributes extends StencilHTMLAttributes {
+    'value'?: number;
+  }
+
+  interface LifecycleOnReadyC {
+    'value': number;
+  }
+  interface LifecycleOnReadyCAttributes extends StencilHTMLAttributes {
+    'value'?: number;
+  }
+
   interface LifecycleUnloadA {}
   interface LifecycleUnloadAAttributes extends StencilHTMLAttributes {}
 
@@ -321,6 +338,9 @@ declare global {
     'LifecycleBasicA': Components.LifecycleBasicA;
     'LifecycleBasicB': Components.LifecycleBasicB;
     'LifecycleBasicC': Components.LifecycleBasicC;
+    'LifecycleOnReadyA': Components.LifecycleOnReadyA;
+    'LifecycleOnReadyB': Components.LifecycleOnReadyB;
+    'LifecycleOnReadyC': Components.LifecycleOnReadyC;
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
@@ -382,6 +402,9 @@ declare global {
     'lifecycle-basic-a': Components.LifecycleBasicAAttributes;
     'lifecycle-basic-b': Components.LifecycleBasicBAttributes;
     'lifecycle-basic-c': Components.LifecycleBasicCAttributes;
+    'lifecycle-on-ready-a': Components.LifecycleOnReadyAAttributes;
+    'lifecycle-on-ready-b': Components.LifecycleOnReadyBAttributes;
+    'lifecycle-on-ready-c': Components.LifecycleOnReadyCAttributes;
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
@@ -541,6 +564,24 @@ declare global {
   var HTMLLifecycleBasicCElement: {
     prototype: HTMLLifecycleBasicCElement;
     new (): HTMLLifecycleBasicCElement;
+  };
+
+  interface HTMLLifecycleOnReadyAElement extends Components.LifecycleOnReadyA, HTMLStencilElement {}
+  var HTMLLifecycleOnReadyAElement: {
+    prototype: HTMLLifecycleOnReadyAElement;
+    new (): HTMLLifecycleOnReadyAElement;
+  };
+
+  interface HTMLLifecycleOnReadyBElement extends Components.LifecycleOnReadyB, HTMLStencilElement {}
+  var HTMLLifecycleOnReadyBElement: {
+    prototype: HTMLLifecycleOnReadyBElement;
+    new (): HTMLLifecycleOnReadyBElement;
+  };
+
+  interface HTMLLifecycleOnReadyCElement extends Components.LifecycleOnReadyC, HTMLStencilElement {}
+  var HTMLLifecycleOnReadyCElement: {
+    prototype: HTMLLifecycleOnReadyCElement;
+    new (): HTMLLifecycleOnReadyCElement;
   };
 
   interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {}
@@ -792,6 +833,9 @@ declare global {
     'lifecycle-basic-a': HTMLLifecycleBasicAElement
     'lifecycle-basic-b': HTMLLifecycleBasicBElement
     'lifecycle-basic-c': HTMLLifecycleBasicCElement
+    'lifecycle-on-ready-a': HTMLLifecycleOnReadyAElement
+    'lifecycle-on-ready-b': HTMLLifecycleOnReadyBElement
+    'lifecycle-on-ready-c': HTMLLifecycleOnReadyCElement
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
@@ -853,6 +897,9 @@ declare global {
     'lifecycle-basic-a': HTMLLifecycleBasicAElement;
     'lifecycle-basic-b': HTMLLifecycleBasicBElement;
     'lifecycle-basic-c': HTMLLifecycleBasicCElement;
+    'lifecycle-on-ready-a': HTMLLifecycleOnReadyAElement;
+    'lifecycle-on-ready-b': HTMLLifecycleOnReadyBElement;
+    'lifecycle-on-ready-c': HTMLLifecycleOnReadyCElement;
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
