@@ -10,8 +10,6 @@ describe('dom api e2e tests', () => {
 
     const elm = await page.find('.class-a');
 
-    await page.waitForChanges();
-
     expect(elm).toHaveClass('class-a');
     expect(elm).not.toHaveClass('class-b');
     expect(elm.className).toBe('class-a hydrated');

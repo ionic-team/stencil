@@ -40,6 +40,9 @@ export namespace Components {
   interface DomApi {}
   interface DomApiAttributes extends StencilHTMLAttributes {}
 
+  interface DomInteraction {}
+  interface DomInteractionAttributes extends StencilHTMLAttributes {}
+
   interface ElementCmp {}
   interface ElementCmpAttributes extends StencilHTMLAttributes {}
 
@@ -89,6 +92,7 @@ declare global {
     'CarDetail': Components.CarDetail;
     'CarList': Components.CarList;
     'DomApi': Components.DomApi;
+    'DomInteraction': Components.DomInteraction;
     'ElementCmp': Components.ElementCmp;
     'EventCmp': Components.EventCmp;
     'ListenCmp': Components.ListenCmp;
@@ -102,6 +106,7 @@ declare global {
     'car-detail': Components.CarDetailAttributes;
     'car-list': Components.CarListAttributes;
     'dom-api': Components.DomApiAttributes;
+    'dom-interaction': Components.DomInteractionAttributes;
     'element-cmp': Components.ElementCmpAttributes;
     'event-cmp': Components.EventCmpAttributes;
     'listen-cmp': Components.ListenCmpAttributes;
@@ -133,6 +138,12 @@ declare global {
   var HTMLDomApiElement: {
     prototype: HTMLDomApiElement;
     new (): HTMLDomApiElement;
+  };
+
+  interface HTMLDomInteractionElement extends Components.DomInteraction, HTMLStencilElement {}
+  var HTMLDomInteractionElement: {
+    prototype: HTMLDomInteractionElement;
+    new (): HTMLDomInteractionElement;
   };
 
   interface HTMLElementCmpElement extends Components.ElementCmp, HTMLStencilElement {}
@@ -176,6 +187,7 @@ declare global {
     'car-detail': HTMLCarDetailElement
     'car-list': HTMLCarListElement
     'dom-api': HTMLDomApiElement
+    'dom-interaction': HTMLDomInteractionElement
     'element-cmp': HTMLElementCmpElement
     'event-cmp': HTMLEventCmpElement
     'listen-cmp': HTMLListenCmpElement
@@ -189,6 +201,7 @@ declare global {
     'car-detail': HTMLCarDetailElement;
     'car-list': HTMLCarListElement;
     'dom-api': HTMLDomApiElement;
+    'dom-interaction': HTMLDomInteractionElement;
     'element-cmp': HTMLElementCmpElement;
     'event-cmp': HTMLEventCmpElement;
     'listen-cmp': HTMLListenCmpElement;

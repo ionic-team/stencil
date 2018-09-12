@@ -43,12 +43,24 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return eventSpy;
   }
 
-  async click(options?: puppeteer.ClickOptions) {
-    return this._elmHandle.click(options);
+  async click() {
+    const executionContext = this._elmHandle.executionContext();
+
+    await executionContext.evaluate((elm: HTMLElement) => {
+      return elm.click();
+    }, this._elmHandle);
+
+    await this._page.waitForChanges();
   }
 
   async focus() {
-    return this._elmHandle.focus();
+    const executionContext = this._elmHandle.executionContext();
+
+    await executionContext.evaluate((elm: HTMLElement) => {
+      return elm.focus();
+    }, this._elmHandle);
+
+    await this._page.waitForChanges();
   }
 
   async hover() {
