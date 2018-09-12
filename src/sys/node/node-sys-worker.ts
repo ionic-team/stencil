@@ -113,8 +113,8 @@ export class NodeSystemWorker {
     return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
   }
 
-  transpileToEs5(cwd: string, input: string) {
-    return transpileToEs5Worker(cwd, input);
+  transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
+    return transpileToEs5Worker(cwd, input, inlineHelpers);
   }
 
   validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {

@@ -37,13 +37,7 @@ export async function generateLoader(
 
   if (config.minifyJs) {
     // minify the loader which should always be es5
-    const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true, buildCtx.timestamp);
-
-    if (minifyJsResults.diagnostics.length > 0) {
-      buildCtx.diagnostics.push(...minifyJsResults.diagnostics);
-    } else {
-      loaderContent = minifyJsResults.output;
-    }
+    loaderContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, loaderContent, 'es5', true, buildCtx.timestamp);
 
   } else {
     // dev

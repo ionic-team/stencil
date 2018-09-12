@@ -24,14 +24,11 @@ module.exports = function buildPolyfills(outputPolyfillsDir) {
 
     const polyfillContent = fs.readFileSync(srcFilePath, 'utf8');
 
-    const esmWrapped = [
-      'export function applyPolyfill(window, document) {',
-      polyfillContent,
-      '}'
-    ].join('\n');
+    const esmWrapped = (fileName === 'tslib.js')
+      ? polyfillContent
+      : `export function applyPolyfill(window, document) {${polyfillContent}}`;
 
     fs.writeFileSync(esmFilePath, esmWrapped);
-
     fs.writeFileSync(es5FilePath, polyfillContent);
   });
 };

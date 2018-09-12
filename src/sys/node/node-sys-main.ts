@@ -258,8 +258,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysUtil.semver;
   }
 
-  async transpileToEs5(cwd: string, input: string) {
-    return this.sysWorker.run('transpileToEs5', [cwd, input]);
+  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
+    return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 
   get url() {

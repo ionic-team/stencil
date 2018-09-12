@@ -380,6 +380,9 @@ export function getStyleIdPlaceholder(tagName: string) {
   return `/**style-id-placeholder:${tagName}:**/`;
 }
 
+export function getIntroPlaceholder() {
+  return `/**:intro-placeholder:**/`;
+}
 
 export function getBundleIdPlaceholder() {
   return `/**:bundle-id:**/`;

@@ -38,7 +38,7 @@ export interface CompilerCtx {
   lastBuildHadError?: boolean;
   lastBuildResults?: d.BuildResults;
   lastBuildStyles?: Map<string, string>;
-  lastJsModules?: d.JSModuleMap;
+  lastRawModules?: d.DerivedModule[];
   localPrerenderServer?: any;
   moduleFiles?: d.ModuleFiles;
   resolvedCollections?: string[];

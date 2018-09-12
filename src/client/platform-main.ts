@@ -193,7 +193,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
       const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
-      let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.js';
+      let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.entry.js';
 
       if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
         url += '?s-hmr=' + hmrVersionId;

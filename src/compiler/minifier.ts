@@ -5,22 +5,27 @@ import { generatePreamble } from './util';
 /**
  * Interal minifier, not exposed publicly.
  */
-export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string) {
+export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string): Promise<string> {
   const opts: any = { output: {}, compress: {}, mangle: true };
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
+    opts.toplevel = true;
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
+    opts.compress.pure_getters = true;
     opts.output.beautify = false;
 
   } else {
     opts.ecma = 6;
+    opts.toplevel = true;
+    opts.module = true;
     opts.output.ecma = 6;
     opts.compress.ecma = 6;
     opts.toplevel = true;
     opts.compress.arrows = true;
+    opts.compress.pure_getters = true;
     opts.output.beautify = false;
   }
 
@@ -48,10 +53,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     cacheKey = compilerCtx.cache.createKey('minifyJs', '__BUILDID:MINIFYJS__', opts, jsText);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
-      return {
-        output: cachedContent,
-        diagnostics: []
-      };
+      return cachedContent;
     }
   }
 
@@ -63,5 +65,10 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     }
   }
 
-  return r;
+  if (r.diagnostics.length > 0) {
+    diagnostics.push(...r.diagnostics);
+    return jsText;
+  } else {
+    return r.output;
+  }
 }

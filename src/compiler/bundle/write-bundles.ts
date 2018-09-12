@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { getBundleIdPlaceholder } from '../../util/data-serialize';
-import { getHyperScriptFnEsmFileName } from '../app/app-file-naming';
+import { getBundleIdPlaceholder, getIntroPlaceholder } from '../../util/data-serialize';
 import { RollupBuild } from 'rollup';
 import { dashToPascalCase } from '../../util/helpers';
 import { EntryModule } from '../../declarations';
@@ -26,22 +25,23 @@ export async function writeEntryModules(config: d.Config, compilerCtx: d.Compile
   );
 }
 
-export async function writeEsModules(config: d.Config, rollupBundle: RollupBuild) {
+export async function writeEsmModules(config: d.Config, rollupBundle: RollupBuild) {
   const { output } = await rollupBundle.generate({
     ...config.rollupConfig.outputOptions,
     format: 'es',
     banner: generatePreamble(config),
-    intro: `const { h } = window.${config.namespace};`,
+    intro: getIntroPlaceholder(),
+    strict: false,
     compact: !config.devMode
   });
   return <any>output as d.JSModuleList;
 }
 
 
-export async function writeLegacyModules(config: d.Config, rollupBundle: RollupBuild, entryModules: d.EntryModule[]) {
+export async function writeAmdModules(config: d.Config, rollupBundle: RollupBuild, entryModules: d.EntryModule[]) {
   if (!config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
-    return null;
+    return undefined;
   }
 
   rollupBundle.cache.modules.forEach(module => {
@@ -60,28 +60,12 @@ export async function writeLegacyModules(config: d.Config, rollupBundle: RollupB
       define: `${config.namespace}.loadBundle`
     },
     banner: generatePreamble(config),
-    intro: `const h = window.${config.namespace}.h;`,
+    intro: getIntroPlaceholder(),
     strict: false,
     compact: !config.devMode
   });
 
+
   return <any>output as d.JSModuleList;
 }
 
-
-export async function writeEsmEs5Modules(config: d.Config, rollupBundle: RollupBuild) {
-  if (config.outputTargets.some(o => o.type === 'dist')) {
-    const { output } = await rollupBundle.generate({
-      ...config.rollupConfig.outputOptions,
-      format: 'es',
-      banner: generatePreamble(config),
-      intro: `import { h } from '../${getHyperScriptFnEsmFileName(config)}';`,
-      strict: false,
-      compact: !config.devMode
-    });
-
-    return <any>output as d.JSModuleList;
-  }
-
-  return null;
-}

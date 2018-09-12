@@ -57,14 +57,7 @@ export async function minifyInlineScript(config: d.Config, compilerCtx: d.Compil
     return;
   }
 
-  const minifyResults = await minifyJs(config, compilerCtx, script.innerHTML, 'es5', false);
-  minifyResults.diagnostics.forEach(diagnostic => {
-    diagnostics.push(diagnostic);
-  });
-
-  if (typeof minifyResults.output === 'string') {
-    script.innerHTML = minifyResults.output;
-  }
+  script.innerHTML = await minifyJs(config, compilerCtx, diagnostics, script.innerHTML, 'es5', false);
 }
 
 

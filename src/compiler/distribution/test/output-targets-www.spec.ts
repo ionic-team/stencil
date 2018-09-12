@@ -34,7 +34,7 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'www', 'build'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.js'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'cmp-a.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'cmp-a.entry.js'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app', 'es5-build-disabled.js'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.registry.json'),
@@ -55,7 +55,7 @@ describe('outputTargets', () => {
 
       path.join(root, 'User', 'testing', 'dist', 'testapp', '/'),
       path.join(root, 'User', 'testing', 'dist', 'testapp.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.js'),
+      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.entry.js'),
       path.join(root, 'User', 'testing', 'dist', 'testapp', 'es5-build-disabled.js'),
       path.join(root, 'User', 'testing', 'dist', 'testapp', 'testapp.core.js'),
 

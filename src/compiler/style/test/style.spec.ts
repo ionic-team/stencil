@@ -24,7 +24,7 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain('\\\\F113');
   });
 
@@ -38,7 +38,7 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain('\\\\2014 \\\\00A0');
   });
 
@@ -53,7 +53,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain('color: red');
 
     const rebuildListener = c.once('buildFinish');
@@ -69,7 +69,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: green`);
   });
 
@@ -96,11 +96,11 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'u.js'));
+    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'u.entry.js'));
     expect(iosContent).toContain(`body{font-family:Helvetica}`);
     expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.js'));
+    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.entry.js'));
     expect(mdContent).toContain(`body{font-family:Roboto}`);
     expect(mdContent).toContain(`static get styleMode(){return"md"}`);
   });
@@ -122,7 +122,7 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'hashed.js'));
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'hashed.entry.js'));
     expect(content).toContain(`body{color:red}`);
   });
 
@@ -139,7 +139,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`body{color:red}`);
 
     const rebuildListener = c.once('buildFinish');
@@ -155,7 +155,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color:green`);
   });
 
@@ -176,7 +176,7 @@ describe('component-styles', () => {
     expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
-    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: red`);
     expect(content).toContain(`color: green`);
     expect(content).toContain(`color: blue`);
@@ -194,7 +194,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: red`);
     expect(content).toContain(`color: green`);
     expect(content).not.toContain(`color: blue`);
@@ -216,7 +216,7 @@ describe('component-styles', () => {
     expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
-    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: red`);
 
     const rebuildListener = c.once('buildFinish');
@@ -232,7 +232,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(0);
 
-    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: red`);
     expect(content).toContain(`console.log('88')`);
   });
@@ -253,7 +253,7 @@ describe('component-styles', () => {
     expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
-    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    let content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: red`);
 
     const rebuildListener = c.once('buildFinish');
@@ -269,7 +269,7 @@ describe('component-styles', () => {
     expect(r.diagnostics).toEqual([]);
     expect(r.styleBuildCount).toBe(1);
 
-    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain(`color: blue`);
     expect(content).toContain(`console.log('88')`);
   });
