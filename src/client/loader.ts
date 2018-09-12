@@ -19,7 +19,7 @@ export function init(
   App = win[namespace] = win[namespace] || {};
   App.components = components;
 
-  y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
+  y = components.map(function(c) { return c[0]; });
   if (y.length) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
