@@ -1,6 +1,8 @@
-const sass = require('@stencil/sass');
+import { Config } from '../../dist'
+import { sass } from '@stencil/sass';
 
-exports.config = {
+
+export const config: Config = {
   namespace: 'TestApp',
   srcDir: 'test-app',
   tsconfig: 'tsconfig-stencil.json',

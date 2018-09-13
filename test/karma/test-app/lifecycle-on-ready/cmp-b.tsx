@@ -16,7 +16,7 @@ export class LifecycleOnReadyB {
     document.getElementById('output').appendChild(li);
 
     return new Promise(resolve => {
-      setTimeout(resolve);
+      setTimeout(resolve, 20);
     });
   }
 

@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('conditional-basic', function() {
@@ -23,7 +23,7 @@ describe('conditional-basic', function() {
     expect(results.textContent).toEqual('');
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     expect(results.textContent).toEqual('Content');
   });

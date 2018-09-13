@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('slot-dynamic-wrapper', () => {
@@ -19,7 +19,7 @@ describe('slot-dynamic-wrapper', () => {
 
     let button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     result = app.querySelector('.results1 section h1');
     expect(result).toBe(null);
@@ -28,7 +28,7 @@ describe('slot-dynamic-wrapper', () => {
     expect(result.textContent.trim()).toBe('parent text');
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     result = app.querySelector('.results1 section h1');
     expect(result.textContent.trim()).toBe('parent text');

@@ -1,5 +1,7 @@
 import { Component, State } from '../../../../dist';
 
+declare const window: any;
+
 @Component({
   tag: 'lifecycle-on-ready-a'
 })
@@ -14,6 +16,12 @@ export class LifecycleOnReadyA {
     const li = document.createElement('li');
     li.innerHTML = `<span style="color:gray">async add child components to lifecycle-on-ready-a</span> ${this.values[this.values.length - 1]}`;
     document.getElementById('output').appendChild(li);
+
+    window.TestApp.onReady().then(() => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="font-weight:bold">TestApp.onReady() resolved</span> ${this.values[this.values.length - 1]}`;
+      document.getElementById('output').appendChild(li);
+    });
   }
 
   componentWillLoad() {
@@ -22,7 +30,7 @@ export class LifecycleOnReadyA {
     document.getElementById('output').appendChild(li);
 
     return new Promise(resolve => {
-      setTimeout(resolve);
+      setTimeout(resolve, 10);
     });
   }
 

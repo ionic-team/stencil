@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('attribute-basic', function() {
@@ -18,7 +18,7 @@ describe('attribute-basic', function() {
     const button = app.querySelector('button');
     button.click();
 
-    await flush(app);
+    await waitForChanges();
 
     expect(app.querySelector('.single').textContent).toBe('single-update');
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');

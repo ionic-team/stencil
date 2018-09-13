@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('slot-fallback', () => {
@@ -33,7 +33,7 @@ describe('slot-fallback', () => {
 
     // update fallback content
     buttonChangeFallbackContent.click();
-    await flush(app);
+    await waitForChanges();
 
     result = app.querySelector('.results1 slot-fb[name="start"]:not([hidden])');
     expect(result.textContent).toBe('slot start fallback 1');
@@ -46,7 +46,7 @@ describe('slot-fallback', () => {
 
     // set light dom instead and hide fallback content
     buttonChangeLightDom.click();
-    await flush(app);
+    await waitForChanges();
 
     // fallback content hidden but still the same
     result = app.querySelector('.results1 slot-fb[name="start"][hidden]');
@@ -70,7 +70,7 @@ describe('slot-fallback', () => {
 
     buttonChangeFallbackContent.click();
     buttonChangeSlotContent.click();
-    await flush(app);
+    await waitForChanges();
 
     // fallback content hidden and updated content
     result = app.querySelector('.results1 slot-fb[name="start"][hidden]');
@@ -94,7 +94,7 @@ describe('slot-fallback', () => {
 
     // change back to fallback content
     buttonChangeLightDom.click();
-    await flush(app);
+    await waitForChanges();
 
     // fallback content should not be hidden
     result = app.querySelector('.results1 slot-fb[name="start"]:not([hidden])');
@@ -119,7 +119,7 @@ describe('slot-fallback', () => {
     // update content
     buttonChangeFallbackContent.click();
     buttonChangeSlotContent.click();
-    await flush(app);
+    await waitForChanges();
 
     // fallback content should not be hidden
     result = app.querySelector('.results1 slot-fb[name="start"]:not([hidden])');
@@ -143,7 +143,7 @@ describe('slot-fallback', () => {
 
     // change back to showing slot content
     buttonChangeLightDom.click();
-    await flush(app);
+    await waitForChanges();
 
     // fallback content hidden and updated content
     result = app.querySelector('.results1 slot-fb[name="start"][hidden]');

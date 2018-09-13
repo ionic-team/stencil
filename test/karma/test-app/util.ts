@@ -113,28 +113,12 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function flush(app: HTMLElement) {
-  return new Promise(resolve => {
+export function waitForChanges() {
+  const win = window as any;
 
-    function done() {
-      observer && observer.disconnect();
-      clearTimeout(tmr);
-      resolve();
-    }
-
-    let tmr = setTimeout(done, 750);
-
-    var observer = new MutationObserver(() => {
-      setTimeout(() => {
-        (window as any).TestApp.Context.queue.write(done);
-      }, 100);
-    });
-
-    observer.observe(app, {
-      childList: true,
-      attributes: true,
-      characterData: true,
-      subtree: true
-    });
+  const promises = win['s-apps'].map((appNamespace: string) => {
+    return win[appNamespace].onReady();
   });
+
+  return Promise.all(promises);
 }

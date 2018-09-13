@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('attribute-complex', function() {
@@ -23,7 +23,7 @@ describe('attribute-complex', function() {
     el.setAttribute('str-0', 'false');
     el.setAttribute('str-1', '123');
 
-    await flush(app);
+    await waitForChanges();
 
     const instance = el.getInstance();
     expect(instance.nu0).toBe(3);
@@ -48,7 +48,7 @@ describe('attribute-complex', function() {
     el.bool1 = 'false';
     el.bool2 = false;
 
-    await flush(app);
+    await waitForChanges();
 
     expect(instance.nu0).toBe(1234);
     expect(instance.nu1).toBe(-111.1);

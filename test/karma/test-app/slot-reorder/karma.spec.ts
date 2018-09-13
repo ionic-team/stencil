@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('slot-reorder', () => {
@@ -124,17 +124,17 @@ describe('slot-reorder', () => {
     ordered();
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     reordered();
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     ordered();
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     reordered();
   });
