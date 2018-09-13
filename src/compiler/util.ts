@@ -2,14 +2,10 @@ import * as d from '../declarations';
 import { BANNER } from '../util/constants';
 
 
-export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  if (config.devMode && !config.flags.serviceWorker) {
-    return false;
-  }
-  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
-  return wwwServiceOutputs.some(outputTarget => {
-    return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
-  });
+export function hasServiceWorkerChanges(config: d.Config) {
+  // treat as if service worker always has changes if devMode and serviceworker flag is true
+  // this allows precache revision values to be regenerated
+  return !(config.devMode && !config.flags.serviceWorker);
 }
 
 /**
