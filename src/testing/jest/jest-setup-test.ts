@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import * as customExpect from '../expect';
+import { expectExtend } from '../matchers';
 import { getDefaultBuildConditionals } from '../../build-conditionals';
 import { h } from '../../renderer/vdom/h';
 import { applyWindowToGlobal } from '@stencil/core/mock-doc';
@@ -15,5 +15,5 @@ export function jestSetupTestFramework() {
 
   applyWindowToGlobal(global);
 
-  expect.extend(customExpect);
+  expect.extend(expectExtend);
 }
