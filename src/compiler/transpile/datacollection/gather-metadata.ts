@@ -68,7 +68,7 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
           const warn = buildWarn(buildCtx.diagnostics);
           warn.messageText = `@Component() should be the only export of the module.
 Numerous export statements within a component module may cause undesirable bundling output, leading to unoptimized lazy loading.
-Create a new auxiliar \`.ts\` file in order to export shared functionality.`;
+Create a new auxiliary \`.ts\` file in order to export shared functionality.`;
           warn.relFilePath = tsSourceFile.fileName;
 
         }
