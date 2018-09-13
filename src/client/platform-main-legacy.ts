@@ -49,8 +49,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  // DEPRECATED $definedCmps 2018-05-22
-  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win as any)['$definedCmps'] = (win['s-defined'] || (win as any)['$definedCmps'] || {});
+  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || {});
 
   // internal id increment for unique ids
   let ids = 0;
