@@ -170,7 +170,11 @@ function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
 }
 
 
-export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement) {
+export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) {
+
+  // we're no longer processing this component
+  plt.processingCmp.delete(elm);
+
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
   if ((ancestorHostElement = plt.ancestorHostElementMap.get(elm))) {
@@ -197,5 +201,13 @@ export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, 
     }
 
     plt.ancestorHostElementMap.delete(elm);
+  }
+
+  if (plt.onAppReadyCallbacks.length && !plt.processingCmp.size) {
+    // we've got some promises waiting on the entire app to be done processing
+    // so it should have an empty queue and no longer rendering
+    while ((cb = plt.onAppReadyCallbacks.shift())) {
+      cb();
+    }
   }
 }

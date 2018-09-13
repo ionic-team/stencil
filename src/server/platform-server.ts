@@ -106,8 +106,16 @@ export function createPlatformServer(
     onReadyCallbacksMap: new WeakMap(),
     queuedEvents: new WeakMap(),
     vnodeMap: new WeakMap(),
-    valuesMap: new WeakMap()
+    valuesMap: new WeakMap(),
+
+    processingCmp: new Set(),
+    onAppReadyCallbacks: []
   };
+
+  // create a method that returns a promise
+  // which gets resolved when the app's queue is empty
+  // and app is idle, works for both initial load and updates
+  App.onReady = () => new Promise(resolve => plt.queue.write(() => plt.processingCmp.size ? plt.onAppReadyCallbacks.push(resolve) : resolve()));
 
   // patch dom api like createElement()
   patchDomApi(config, plt, domApi);

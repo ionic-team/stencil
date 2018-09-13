@@ -5,6 +5,9 @@ import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
+  // we're actively processing this component
+  plt.processingCmp.add(elm);
+
   // only run patch if it isn't queued already
   if (!plt.isQueuedForUpdate.has(elm)) {
     plt.isQueuedForUpdate.set(elm, true);

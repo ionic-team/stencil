@@ -39,6 +39,8 @@ export interface PlatformApi {
   queuedEvents: WeakMap<d.HostElement, any[]>;
   vnodeMap: WeakMap<d.HostElement, d.VNode>;
   valuesMap: WeakMap<d.HostElement, any>;
+  processingCmp: Set<d.HostElement>;
+  onAppReadyCallbacks: Function[];
 }
 
 

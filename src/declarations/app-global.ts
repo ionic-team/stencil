@@ -34,6 +34,7 @@ export interface AppGlobal {
   loaded?: boolean;
   h?: Function;
   initialized?: boolean;
+  onReady?: () => Promise<void>;
   raf?: DomControllerCallback;
   rel?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
 }

@@ -22,6 +22,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'loaded',
   'mode',
   'namespace',
+  'onReady',
   'Promise',
   'publicPath',
   'queue',
