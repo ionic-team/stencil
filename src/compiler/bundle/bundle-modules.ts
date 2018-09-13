@@ -8,7 +8,7 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
 
   if (entryModules.length === 0) {
     // no entry modules, so don't bother
-    return {};
+    return undefined;
   }
 
   await writeEntryModules(config, compilerCtx, entryModules);
@@ -32,7 +32,7 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
     const rollupBundle = await createBundle(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) {
       // rollup errored, so let's not continue
-      return {};
+      return undefined;
     }
 
     const [esm, amd] = await Promise.all([
@@ -45,7 +45,7 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
 
     if (buildCtx.hasError || !buildCtx.isActiveBuild) {
       // someone could have errored
-      return {};
+      return undefined;
     }
 
     return {
@@ -57,5 +57,5 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
     catchError(buildCtx.diagnostics, err);
   }
 
-  return {};
+  return undefined;
 }
