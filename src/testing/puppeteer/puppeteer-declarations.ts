@@ -68,9 +68,9 @@ export interface E2EPage extends PuppeteerPage {
 export interface E2EPageInternal extends E2EPage {
   isClosed(): boolean;
   _elements: E2EElementInternal[];
-  _goto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
   _events: WaitForEvent[];
   _eventIds: number;
+  _goto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
   _screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
 }
 

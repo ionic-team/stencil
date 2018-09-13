@@ -9,6 +9,10 @@ import { CarData } from '../car-list/car-data';
 export class CarDetail {
   @Prop() car: CarData;
 
+  componentWillLoad() {
+    return new Promise(resolve => setTimeout(resolve, 20));
+  }
+
   render() {
     if (!this.car) {
       return null;

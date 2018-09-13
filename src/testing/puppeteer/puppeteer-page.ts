@@ -221,7 +221,12 @@ async function waitForChanges(page: pd.E2EPageInternal) {
   }));
 
   await page.evaluate(() => {
-    return new Promise(resolve => window.requestAnimationFrame(resolve));
+
+    const promises = (window as d.WindowData)['s-apps'].map((appNamespace: string) => {
+      return (window as any)[appNamespace].onReady();
+    });
+
+    return Promise.all(promises);
   });
 
   await Promise.all(page._elements.map(async elm => {

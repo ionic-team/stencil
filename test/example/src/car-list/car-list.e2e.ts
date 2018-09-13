@@ -31,7 +31,10 @@ describe('car-list', () => {
     ];
 
     elm.setProperty('cars', cars);
+
     await page.waitForChanges();
+
+    expect(elm).toEqualHtml(`<car-list class="hydrated"></car-list>`);
 
     expect(elm.innerHTML).toEqualHtml(``);
 

@@ -12,6 +12,10 @@ export class CarList {
   @Prop({ mutable: true }) selected: CarData;
   @Event() carSelected: EventEmitter<CarData>;
 
+  componentWillLoad() {
+    return new Promise(resolve => setTimeout(resolve, 20));
+  }
+
   selectCar(car: CarData) {
     this.selected = car;
     this.carSelected.emit(car);
