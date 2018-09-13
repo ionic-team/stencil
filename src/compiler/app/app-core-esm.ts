@@ -7,7 +7,7 @@ import { setBuildConditionals } from '../../util/build-conditionals';
 
 
 export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
-  if (outputTarget.type === 'dist') {
+  if (outputTarget.type === 'dist' && config.buildEsm) {
     // mega-minify the core w/ property renaming, but not the user's globals
     // hardcode which features should and should not go in the core builds
     // process the transpiled code by removing unused code and minify when configured to do so

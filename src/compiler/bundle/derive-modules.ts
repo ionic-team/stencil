@@ -51,8 +51,8 @@ async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     return undefined;
   }
 
-  // skip non browser builds during dev mode
-  if (!isBrowser && config.devMode) {
+  // skip non-browser builds if ESM is disabled
+  if (!isBrowser && !config.buildEsm) {
     return undefined;
   }
 

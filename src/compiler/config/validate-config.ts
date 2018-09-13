@@ -80,6 +80,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildEsm', null, config.buildEs5);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
   if (typeof config.validateTypes !== 'boolean') {

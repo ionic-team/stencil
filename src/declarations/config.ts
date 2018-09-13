@@ -106,6 +106,7 @@ export interface StencilConfig {
   assetVersioning?: ConfigAssetVersioning;
   autoprefixCss?: boolean | any;
   buildEs5?: boolean;
+  buildEsm?: boolean;
   buildScoped?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
