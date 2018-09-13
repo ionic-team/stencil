@@ -5,35 +5,88 @@ describe('dom interaction e2e tests', () => {
 
   it('should click button in shadow root', async () => {
     const page = await newE2EPage({ html: `
-      <dom-interaction></dom-api>
+      <dom-interaction></dom-interaction>
     `});
 
-    const wasClicked = await page.find('dom-interaction >>> .was-clicked');
+    const button = await page.find('dom-interaction >>> .click');
 
-    expect(wasClicked).toEqualText(`false`);
-
-    const button = await page.find('dom-interaction >>> button');
+    expect(button).toEqualText(`Click`);
 
     await button.click();
 
-    expect(wasClicked).toEqualText(`true`);
+    expect(button).toEqualText(`Was Clicked`);
   });
 
 
   it('should focus button in shadow root', async () => {
     const page = await newE2EPage({ html: `
-      <dom-interaction></dom-api>
+      <dom-interaction></dom-interaction>
     `});
 
-    const wasFocused = await page.find('dom-interaction >>> .was-focused');
+    const button = await page.find('dom-interaction >>> .focus');
 
-    expect(wasFocused).toEqualText(`false`);
+    expect(button).toEqualText(`Focus`);
 
-    const button = await page.find('dom-interaction >>> button');
+    await button.tap();
 
-    await button.focus();
+    expect(button).toEqualText(`Has Focus`);;
+  });
 
-    expect(wasFocused).toEqualText(`true`);
+
+  it('should tap button in shadow root', async () => {
+    const page = await newE2EPage({ html: `
+      <dom-interaction></dom-interaction>
+    `});
+
+    const button = await page.find('dom-interaction >>> .tap');
+
+    expect(button).toEqualText(`Tap`);
+
+    await button.tap();
+
+    expect(button).toEqualText(`Was Tapped`);
+  });
+
+
+  it('should use press() to enter text in an input in the shadow root', async () => {
+    const page = await newE2EPage({ html: `
+      <dom-interaction></dom-interaction>
+    `});
+
+    const input = await page.find('dom-interaction >>> .input');
+
+    let value = await input.getProperty('value');
+    expect(value).toBe('');
+
+    await input.press('8');
+    await input.press('8');
+    await input.press(' ');
+
+    await page.keyboard.down('Shift');
+    await input.press('KeyM');
+    await input.press('KeyP');
+    await input.press('KeyH');
+    await page.keyboard.up('Shift');
+
+    value = await input.getProperty('value');
+    expect(value).toBe('88 MPH');
+  });
+
+
+  it('should use type() to enter text in an input in the shadow root', async () => {
+    const page = await newE2EPage({ html: `
+      <dom-interaction></dom-interaction>
+    `});
+
+    const input = await page.find('dom-interaction >>> .input');
+
+    let value = await input.getProperty('value');
+    expect(value).toBe('');
+
+    await input.type('88 MPH');
+
+    value = await input.getProperty('value');
+    expect(value).toBe('88 MPH');
   });
 
 });

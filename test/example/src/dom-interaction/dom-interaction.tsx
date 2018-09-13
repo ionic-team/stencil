@@ -6,26 +6,24 @@ import { Component, State } from '../../../../dist/index';
 })
 export class DomInteractionCmp {
 
-  @State() wasClicked = 'false';
-  @State() wasFocused = 'false';
-
-  onClick() {
-    this.wasClicked = 'true';
-  }
-
-  onFocus() {
-    this.wasFocused = 'true';
-  }
+  @State() clickMsg = 'Click';
+  @State() focusMsg = 'Focus';
+  @State() tapMsg = 'Tap';
 
   render() {
     return (
       <div>
-        <button onClick={this.onClick.bind(this)} onFocus={this.onFocus.bind(this)}>Button</button>
         <section>
-          <label>Clicked:</label> <span class="was-clicked">{this.wasClicked}</span>
+          <button onClick={() => this.clickMsg = 'Was Clicked'} class="click">{this.clickMsg}</button>
         </section>
         <section>
-          <label>Focused:</label> <span class="was-focused">{this.wasFocused}</span>
+          <button onFocus={() => this.focusMsg = 'Has Focus'} class="focus">{this.focusMsg}</button>
+        </section>
+        <section>
+          <button onClick={() => this.tapMsg = 'Was Tapped'} class="tap">{this.tapMsg}</button>
+        </section>
+        <section>
+          <input class="input"/>
         </section>
       </div>
     );

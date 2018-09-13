@@ -43,44 +43,38 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return eventSpy;
   }
 
-  async click() {
-    const executionContext = this._elmHandle.executionContext();
-
-    await executionContext.evaluate((elm: HTMLElement) => {
-      return elm.click();
-    }, this._elmHandle);
-
+  async click(options?: puppeteer.ClickOptions) {
+    await this._elmHandle.click(options);
     await this._page.waitForChanges();
   }
 
   async focus() {
-    const executionContext = this._elmHandle.executionContext();
-
-    await executionContext.evaluate((elm: HTMLElement) => {
-      return elm.focus();
-    }, this._elmHandle);
-
+    await this._elmHandle.focus();
     await this._page.waitForChanges();
   }
 
   async hover() {
-    return this._elmHandle.hover();
+    await this._elmHandle.hover();
+    await this._page.waitForChanges();
   }
 
-  async isIntersectingViewport() {
+  isIntersectingViewport() {
     return this._elmHandle.isIntersectingViewport();
   }
 
   async press(key: string, options?: { text?: string, delay?: number }) {
-    return this._elmHandle.press(key, options);
+    await this._elmHandle.press(key, options);
+    await this._page.waitForChanges();
   }
 
   async tap() {
-    return this._elmHandle.tap();
+    await this._elmHandle.tap();
+    await this._page.waitForChanges();
   }
 
   async type(text: string, options?: { delay: number }) {
-    return this._elmHandle.type(text, options);
+    await this._elmHandle.type(text, options);
+    await this._page.waitForChanges();
   }
 
   async getProperty(propertyName: string) {

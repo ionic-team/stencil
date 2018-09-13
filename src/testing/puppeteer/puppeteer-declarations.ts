@@ -209,6 +209,7 @@ export interface E2EElement {
    * text option can be specified to force an input event to be generated.
    * Note: Modifier keys DO effect `elementHandle.press`. Holding down Shift
    * will type the text in upper case.
+   * Key names: https://github.com/GoogleChrome/puppeteer/blob/master/lib/USKeyboardLayout.js
    */
   press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
 
