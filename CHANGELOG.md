@@ -1,5 +1,5 @@
-<a name="0.13.0-10"></a>
-# [Prerelease] 🎨 [0.13.0-10](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-10) (2018-09-14)
+<a name="0.13.0-11"></a>
+# [Prerelease] 👀 [0.13.0-11](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-11) (2018-09-14)
 
 ### Stencil Testing Features
 
@@ -109,6 +109,7 @@ This change will lead to much better tree-shaking and performance.
 * **serialize:** serialize pretty print html option ([c6e34b5](https://github.com/ionic-team/stencil/commit/c6e34b5))
 * **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
 * **testing:** add toMatchClasses() ([bf4ff31](https://github.com/ionic-team/stencil/commit/bf4ff31))
+* **bundle:** export esm-es2017 ([efd985d](https://github.com/ionic-team/stencil/commit/efd985d))
 
 
 ### Performance Improvements
