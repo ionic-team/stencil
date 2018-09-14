@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
 
@@ -86,6 +87,15 @@ export function newBrowserPage(browser: puppeteer.Browser) {
 
 
 export async function closePage(page: any) {
+  if (Array.isArray((page as pd.E2EPageInternal)._elements)) {
+    const disposes = (page as pd.E2EPageInternal)._elements.map(async elmHande => {
+      if (typeof elmHande.e2eDispose === 'function') {
+        await elmHande.e2eDispose();
+      }
+    });
+    await Promise.all(disposes);
+  }
+
   try {
     if (!(page as puppeteer.Page).isClosed()) {
       await (page as puppeteer.Page).close();
