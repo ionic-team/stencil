@@ -177,6 +177,15 @@ export interface E2EElement {
   getProperty(propertyName: string): Promise<any>;
 
   /**
+   * Returns an object that reports the values of all CSS properties of this
+   * element after applying active stylesheets and resolving any basic computation
+   * those values may contain. Individual CSS property values are accessed by
+   * simply indexing with CSS property names. The method is shortcut and an async
+   * version of using `window.getComputedStyle(element)` directly.
+   */
+  getComputedStyle(pseudoElt?: string | null): Promise<CSSStyleDeclaration>;
+
+  /**
    * Sets hover on the element.
    */
   hover(): Promise<void>;

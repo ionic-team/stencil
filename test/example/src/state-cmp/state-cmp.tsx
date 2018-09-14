@@ -2,7 +2,7 @@ import { Component, State } from '../../../../dist/index';
 
 @Component({
   tag: 'state-cmp',
-  styles: `.selected { font-weight: bold }`,
+  styles: `.selected { font-weight: bold; color: blue; }`,
   shadow: true
 })
 export class StateCmp {

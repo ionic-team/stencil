@@ -23,7 +23,7 @@ describe('@State', () => {
     expect(buttons[6]).not.toEqualText('Sunday');
   });
 
-  it('should select a day', async () => {
+  it('should select a day and check computed styles', async () => {
     const page = await newE2EPage({ html: `
       <state-cmp></state-cmp>
     `});
@@ -33,7 +33,17 @@ describe('@State', () => {
 
     expect(buttons[6]).toHaveClass('selected');
 
+    const selectedStyle = await buttons[6].getComputedStyle();
+    expect(selectedStyle.fontWeight).toBe('700');
+    expect(selectedStyle.getPropertyValue('font-weight')).toBe('700');
+    expect(selectedStyle.color).toBe('rgb(0, 0, 255)');
+    expect(selectedStyle.getPropertyValue('color')).toBe('rgb(0, 0, 255)');
+
     expect(buttons[1]).not.toHaveClass('selected');
+
+    const unselectedStyle = await buttons[1].getComputedStyle();
+    expect(unselectedStyle.fontWeight).not.toBe('700');
+    expect(unselectedStyle.color).toBe('rgb(0, 0, 0)');
   });
 
 });

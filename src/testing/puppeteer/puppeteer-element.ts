@@ -257,6 +257,43 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     });
   }
 
+  async getComputedStyle(pseudoElt?: string | null) {
+    const style = await this._page.evaluate((elm: HTMLElement, pseudoElt: string) => {
+      const rtn: any = {};
+
+      const computedStyle = window.getComputedStyle(elm, pseudoElt);
+
+      const keys = Object.keys(computedStyle);
+
+      keys.forEach(key => {
+        if (isNaN(key as any)) {
+          const value = computedStyle[key as any];
+          if (value != null) {
+            rtn[key] = value;
+          }
+
+        } else {
+          const dashProp = computedStyle[key as any];
+          if (dashProp.includes('-')) {
+            const value = computedStyle.getPropertyValue(dashProp);
+            if (value != null) {
+              rtn[dashProp] = value;
+            }
+          }
+        }
+      });
+
+      return rtn;
+
+    }, this._elmHandle, pseudoElt);
+
+    style.getPropertyValue = (propName: string) => {
+      return style[propName];
+    };
+
+    return style;
+  }
+
   async e2eRunActions() {
     if (this._queuedActions.length === 0) {
       return;
