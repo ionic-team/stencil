@@ -5,7 +5,6 @@ import { SVG_NS } from '../../../util/constants';
 import { toVNode } from '../to-vnode';
 import { getScopeId } from '../../../util/scope';
 import { shuffleArray } from '../../../testing/utils';
-import '../../../testing/expect';
 
 
 describe('renderer', () => {

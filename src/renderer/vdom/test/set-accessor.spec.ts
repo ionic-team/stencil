@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { mockPlatform } from '../../../testing/mocks';
 import { PROP_TYPE } from '../../../util/constants';
 import { setAccessor } from '../set-accessor';
-import '../../../testing/expect';
 
 describe('setAccessor for custom elements', () => {
 

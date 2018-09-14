@@ -3,7 +3,6 @@ import { h } from '../../renderer/vdom/h';
 import { mockPlatform } from '../../testing/mocks';
 import { PROP_TYPE } from '../../util/constants';
 import { render } from '../render';
-import '../../testing/expect';
 
 
 describe('instance render', () => {
