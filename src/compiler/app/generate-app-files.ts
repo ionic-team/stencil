@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
-import { generateAppGlobalScript } from './app-global-scripts';
+import { generateBrowserAppGlobalScript } from './app-global-scripts';
 import { generateCoreBrowser } from './app-core-browser';
-import { generateEsmCore } from './app-core-esm';
+import { generateEsmCores } from './app-core-esm';
 import { generateEsmHosts } from '../distribution/dist-esm';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateLoader } from './app-loader';
@@ -54,7 +54,7 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
       generateBrowserCoreEs5(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry),
 
       // core esm
-      generateEsmCore(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry)
+      generateEsmCores(config, compilerCtx, buildCtx, outputTarget, entryModules)
     ]);
 
     await Promise.all([
@@ -76,7 +76,7 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 
 async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
   // browser esm core build
-  const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+  const globalJsContentsEsm = await generateBrowserAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es2017');
 
   // figure out which sections should be included in the core build
   const buildConditionals = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, entryModules);
@@ -89,7 +89,7 @@ async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerC
 async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
   if (config.buildEs5) {
     // browser core es5 build
-    const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
+    const globalJsContentsEs5 = await generateBrowserAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
 
     const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, 'core.pf', buildCtx, entryModules);
 

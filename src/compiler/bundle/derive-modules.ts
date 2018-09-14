@@ -12,10 +12,10 @@ export async function deriveModules(config: d.Config, compilerCtx: d.CompilerCtx
     return undefined;
   }
   const modules = await Promise.all([
-    deriveModule(config, compilerCtx, buildCtx, 'es2017', true, moduleFormats.esm),
-    // deriveModule(config, compilerCtx, buildCtx, 'es2017', false, moduleFormats.esm),
-    deriveModule(config, compilerCtx, buildCtx, 'es5', false, moduleFormats.esm),
-    deriveModule(config, compilerCtx, buildCtx, 'es5', true, moduleFormats.amd),
+    deriveModule(config, compilerCtx, buildCtx, 'es2017', true, moduleFormats.esm),   // browser ES2017
+    deriveModule(config, compilerCtx, buildCtx, 'es2017', false, moduleFormats.esm),  // esm ES2017
+    deriveModule(config, compilerCtx, buildCtx, 'es5', false, moduleFormats.esm),     // esm ES5
+    deriveModule(config, compilerCtx, buildCtx, 'es5', true, moduleFormats.amd),      // browser ES5
   ]);
 
   const rawModules = modules.filter(m => !!m);
@@ -77,8 +77,8 @@ async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     }
   }
 
-  // // minify
-  if (config.minifyJs) {
+  // only minify browser build when minifyJs is enabled
+  if (isBrowser && config.minifyJs) {
     chunk.code = await minifyJs(config, compilerCtx, buildCtx.diagnostics, chunk.code, sourceTarget, true);
   }
 }

@@ -34,6 +34,7 @@ export interface CompilerCtx {
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
+  lastBuildConditionalsEsmEs2017?: d.BuildConditionals;
   lastComponentStyleInput?: Map<string, string>;
   lastBuildHadError?: boolean;
   lastBuildResults?: d.BuildResults;

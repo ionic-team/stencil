@@ -7,7 +7,7 @@ import { normalizePath, pathJoin } from '../util';
 
 export async function generateEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
 
-  const targets = ['es5'] as d.SourceTarget[];
+  const targets = ['es5', 'es2017'] as d.SourceTarget[];
   await Promise.all([
     generateEsmIndexShortcut(config, compilerCtx, outputTarget),
     ...targets.map(sourceTarget => generateEsmIndex(config, compilerCtx, outputTarget, sourceTarget))
@@ -60,14 +60,21 @@ export async function generateEsmHosts(config: d.Config, compilerCtx: d.Compiler
   }
 
   await Promise.all([
-    generateEsmEs5(config, compilerCtx, cmpRegistry, outputTarget),
-    generateDefineCustomElements(config, compilerCtx, cmpRegistry, outputTarget),
+    generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es5'),
+    generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es2017'),
+
     generateEsmLoader(config, compilerCtx, outputTarget)
   ]);
 }
 
+export async function generateEsmHost(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
+  await Promise.all([
+    generateEsm(config, compilerCtx, cmpRegistry, outputTarget, sourceTarget),
+    generateDefineCustomElements(config, compilerCtx, cmpRegistry, outputTarget, sourceTarget),
+  ]);
+}
 
-async function generateDefineCustomElements(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist) {
+async function generateDefineCustomElements(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   const componentClassList = Object.keys(cmpRegistry).map(tagName => {
     const cmpMeta: d.ComponentMeta = cmpRegistry[tagName];
     return cmpMeta.componentClass;
@@ -75,46 +82,49 @@ async function generateDefineCustomElements(config: d.Config, compilerCtx: d.Com
 
   const componentsFileName = getComponentsEsmFileName(config);
   const c = `
-// ${config.namespace}: Custom Elements Define Library, ES Module/ES5 Target
+// ${config.namespace}: Custom Elements Define Library, ES Module/${sourceTarget} Target
 
 import { defineCustomElement } from './${getCoreEsmFileName(config)}';
 import {\n  ${componentClassList.join(',\n  ')}\n} from './${componentsFileName}';
 
 export function defineCustomElements(win, opts) {
-  defineCustomElement(win, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);
+  return defineCustomElement(win, [\n    ${componentClassList.join(',\n    ')}\n  ], opts);
 }
 `;
 
-  const defineFilePath = getDefineCustomElementsPath(config, outputTarget, 'es5');
+  const defineFilePath = getDefineCustomElementsPath(config, outputTarget, sourceTarget);
 
   await compilerCtx.fs.writeFile(defineFilePath, c);
 }
 
-async function generateEsmEs5(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist) {
+async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
+  const VAR = sourceTarget === 'es5' ? 'var' : 'const';
   const c = await Promise.all(Object.keys(cmpRegistry).sort().map(async tagName => {
     const cmpMeta = cmpRegistry[tagName];
     const data = JSON.stringify(formatBrowserLoaderComponent(cmpMeta));
-    return `export var ${cmpMeta.componentClass} = ${data};`;
+    return `export ${VAR} ${cmpMeta.componentClass} = ${data};`;
   }));
 
-  c.unshift(`// ${config.namespace}: Host Data, ES Module/ES5 Target`);
+  c.unshift(`// ${config.namespace}: Host Data, ES Module/${sourceTarget} Target`);
 
-  const componentsEsmFilePath = getComponentsEsmBuildPath(config, outputTarget, 'es5');
+  const componentsEsmFilePath = getComponentsEsmBuildPath(config, outputTarget, sourceTarget);
 
-  await compilerCtx.fs.writeFile(componentsEsmFilePath, c.join('\n\n'));
+  await compilerCtx.fs.writeFile(componentsEsmFilePath, c.join('\n'));
 }
 
 async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const loaderPath = getLoaderEsmPath(config, outputTarget);
-  const defineFilePath = getDefineCustomElementsPath(config, outputTarget, 'es5');
+  const es5EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es5');
+  const es2017EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es2017');
 
   const packageJsonContent = JSON.stringify({
     'name': 'loader',
     'typings': './index.d.ts',
-    'module': config.sys.path.relative(loaderPath, defineFilePath)
+    'module': config.sys.path.relative(loaderPath, es5EntryPoint),
+    'es2017': config.sys.path.relative(loaderPath, es2017EntryPoint),
   });
 
-  const indexDtsContent = `export declare function defineCustomElements(win: any): void;`;
+  const indexDtsContent = `export declare function defineCustomElements(win: any): Promise<void>;`;
 
   await compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent);
   await compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.d.ts'), indexDtsContent);

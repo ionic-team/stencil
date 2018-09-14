@@ -35,54 +35,58 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
     createComponentOnReadyPrototype(win, namespace, (win as any).HTMLElement.prototype);
   }
 
-  applyPolyfills(win, () => {
+  return new Promise(resolve => {
 
-    if (!pltMap[namespace]) {
-      const Context: d.CoreContext = {};
-      const resourcesUrl = opts.resourcesUrl || './';
+    applyPolyfills(win, () => {
 
-      appGlobal(namespace, Context, win, doc, resourcesUrl, hydratedCssClass);
+      if (!pltMap[namespace]) {
+        const Context: d.CoreContext = {};
+        const resourcesUrl = opts.resourcesUrl || './';
 
-      // create a platform for this namespace
-      pltMap[namespace] = createPlatformMain(
-        namespace,
-        Context,
-        win,
-        doc,
-        resourcesUrl,
-        hydratedCssClass
-      );
-    }
+        appGlobal(namespace, Context, win, doc, resourcesUrl, hydratedCssClass);
 
-    // polyfills have been applied if need be
-    (cmpData as d.ComponentHostData[]).forEach(c => {
-      let HostElementConstructor: any;
-
-      if (isNative(win.customElements.define)) {
-        // native custom elements supported
-        const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
-        HostElementConstructor = createHostConstructor(win);
-
-      } else {
-        // using polyfilled custom elements
-        HostElementConstructor = function(self: any) {
-          return (win as any).HTMLElement.call(this, self);
-        };
-
-        HostElementConstructor.prototype = Object.create(
-          (win as any).HTMLElement.prototype,
-          { constructor: { value: HostElementConstructor, configurable: true } }
+        // create a platform for this namespace
+        pltMap[namespace] = createPlatformMain(
+          namespace,
+          Context,
+          win,
+          doc,
+          resourcesUrl,
+          hydratedCssClass
         );
       }
 
-      // convert the static constructor data to cmp metadata
-      // define the component as a custom element
-      pltMap[namespace].defineComponent(
-        buildComponentLoader(c),
-        HostElementConstructor
-      );
-    });
+      // polyfills have been applied if need be
+      (cmpData as d.ComponentHostData[]).forEach(c => {
+        let HostElementConstructor: any;
 
+        if (isNative(win.customElements.define)) {
+          // native custom elements supported
+          const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
+          HostElementConstructor = createHostConstructor(win);
+
+        } else {
+          // using polyfilled custom elements
+          HostElementConstructor = function(self: any) {
+            return (win as any).HTMLElement.call(this, self);
+          };
+
+          HostElementConstructor.prototype = Object.create(
+            (win as any).HTMLElement.prototype,
+            { constructor: { value: HostElementConstructor, configurable: true } }
+          );
+        }
+
+        // convert the static constructor data to cmp metadata
+        // define the component as a custom element
+        pltMap[namespace].defineComponent(
+          buildComponentLoader(c),
+          HostElementConstructor
+        );
+      });
+
+      resolve();
+    });
   });
 }
 

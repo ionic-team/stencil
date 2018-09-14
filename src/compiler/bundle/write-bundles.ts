@@ -32,7 +32,6 @@ export async function writeEsmModules(config: d.Config, rollupBundle: RollupBuil
     banner: generatePreamble(config),
     intro: getIntroPlaceholder(),
     strict: false,
-    compact: !config.devMode
   });
   return <any>output as d.JSModuleList;
 }
@@ -62,7 +61,6 @@ export async function writeAmdModules(config: d.Config, rollupBundle: RollupBuil
     banner: generatePreamble(config),
     intro: getIntroPlaceholder(),
     strict: false,
-    compact: !config.devMode
   });
 
 

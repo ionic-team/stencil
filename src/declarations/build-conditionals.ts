@@ -1,8 +1,10 @@
 
 
+export type BuildCoreIds = 'core' | 'core.pf' | 'esm.es5' | 'esm.es2017';
+
 export interface BuildConditionals {
   [key: string]: any;
-  coreId: 'core' | 'core.pf' | 'esm.es5';
+  coreId: BuildCoreIds;
   polyfills: boolean;
   es5: boolean;
   cssVarShim: boolean;
