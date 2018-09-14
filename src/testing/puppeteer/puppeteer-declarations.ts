@@ -21,13 +21,24 @@ type PuppeteerPage = Omit<puppeteer.Page,
 export interface E2EPage extends PuppeteerPage {
 
   /**
-   * Find an element using a selector, which is the same as
+   * Find an element that matches the selector, which is the same as
    * `document.querySelector(selector)`. Use `>>>` within the
-   * selector to find elements within the host element's shadow root.
+   * selector to find an element within the host element's shadow root.
    * For example, to select the first `div` inside of the component
    * `my-cmp`, the call would be `page.find('my-cmp >>> div')`.
+   * Returns `null` if an element was not found.
    */
   find(selector: string): Promise<E2EElement>;
+
+  /**
+   * Find all elements that match the selector, which is the same as
+   * `document.querySelectorAll(selector)`. Use `>>>` within the
+   * selector to find elements within the host element's shadow root.
+   * For example, to select all of the `li` elements inside of the component
+   * `my-cmp`, the call would be `page.findAll('my-cmp >>> li')`.
+   * Returns an empty array if no elements were found.
+   */
+  findAll(selector: string): Promise<E2EElement[]>;
 
   /**
    * During an end-to-end test, a dev-server is started so `page.goto(url)` can be used
@@ -126,13 +137,26 @@ export interface E2EElement {
   click(options?: puppeteer.ClickOptions): void;
 
   /**
-   * Find a child element using a selector, which is the same as
+   * Find a child element that matches the selector, which is the same as
    * `element.querySelector(selector)`. Use `>>>` within the
-   * selector to find elements within a host element's shadow root.
+   * selector to find an element within a host element's shadow root.
    * For example, to select the first `div` inside of the component
-   * `my-cmp`, the call would be `element.find('my-cmp >>> div')`.
+   * `my-cmp`, which is a child of this element, the call would be
+   * `element.find('my-cmp >>> div')`. Returns `null` if no
+   * elements were found.
    */
   find(selector: string): Promise<E2EElement>;
+
+  /**
+   * Find all child elements that match the selector, which is the same as
+   * `element.querySelectorAll(selector)`. Use `>>>` within the
+   * selector to find elements within a host element's shadow root.
+   * For example, to select all `li` elements inside of the component
+   * `my-cmp`, which is a child of this element, the call would be
+   * `element.findAll('my-cmp >>> li')`. Returns an empty array if
+   * no elements were found.
+   */
+  findAll(selector: string): Promise<E2EElement[]>;
 
   /**
    * Sets focus on the element.

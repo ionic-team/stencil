@@ -23,6 +23,8 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
 
     }, elmHandle, shadowSelector);
 
+    await elmHandle.dispose();
+
     if (!shadowHandle) {
       return null;
     }
@@ -31,35 +33,60 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   }
 
   const elm = new E2EElement(page, elmHandle);
-
-  page._elements.push(elm);
-
   await elm.e2eSync();
-
   return elm;
 }
 
 
-export async function findAll(page: pd.E2EPageInternal, selector: string) {
+export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: string) {
+  const foundElms: E2EElement[] = [];
+
   const { lightSelector, shadowSelector } = getSelector(selector);
 
-  if (shadowSelector) {
-    //
+  const lightElmHandles = await rootHandle.$$(lightSelector);
+  if (lightElmHandles.length === 0) {
+    return foundElms;
   }
 
-  const elmHandles = await page.$$(lightSelector);
+  if (shadowSelector) {
+    // light dom selected, then shadow dom selected inside of light dom elements
+    for (let i = 0; i < lightElmHandles.length; i++) {
+      const executionContext = lightElmHandles[i].executionContext();
 
-  const elms = elmHandles.map(async elmHandle => {
-    const elm = new E2EElement(page, elmHandle);
+      const shadowJsHandle = await executionContext.evaluateHandle((elm, shadowSelector) => {
+        if (!elm.shadowRoot) {
+          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
+        }
 
-    page._elements.push(elm);
+        return elm.shadowRoot.querySelectorAll(shadowSelector);
 
-    await elm.e2eSync();
+      }, lightElmHandles[i], shadowSelector);
 
-    return elm;
-  });
+      await lightElmHandles[i].dispose();
 
-  return Promise.all(elms);
+      const shadowJsProperties = await shadowJsHandle.getProperties();
+      await shadowJsHandle.dispose();
+
+      for (const shadowJsProperty of shadowJsProperties.values()) {
+        const shadowElmHandle = shadowJsProperty.asElement();
+        if (shadowElmHandle) {
+          const elm = new E2EElement(page, shadowElmHandle);
+          await elm.e2eSync();
+          foundElms.push(elm);
+        }
+      }
+    }
+
+  } else {
+    // light dom only
+    for (let i = 0; i < lightElmHandles.length; i++) {
+      const elm = new E2EElement(page, lightElmHandles[i]);
+      await elm.e2eSync();
+      foundElms.push(elm);
+    }
+  }
+
+  return foundElms;
 }
 
 

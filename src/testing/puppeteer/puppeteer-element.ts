@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
-import { find } from './puppeteer-find';
+import { find, findAll } from './puppeteer-find';
 import { MockElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
 
 
@@ -11,10 +11,15 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
+    _page._elements.push(this);
   }
 
   find(selector: string) {
     return find(this._page, this._elmHandle, selector);
+  }
+
+  findAll(selector: string) {
+    return findAll(this._page, this._elmHandle, selector);
   }
 
   callMethod(methodName: string, ...methodArgs: any[]) {

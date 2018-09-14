@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import { closePage } from './puppeteer-browser';
-import { find } from './puppeteer-find';
+import { find, findAll } from './puppeteer-find';
 import { initE2EPageEvents } from './puppeteer-events';
 import * as puppeteer from 'puppeteer';
 
@@ -35,6 +35,15 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
     const documentJsHandle = await docPromise;
     const docHandle = documentJsHandle.asElement();
     return find(page, docHandle, selector);
+  };
+
+  page.findAll = async (selector: string) => {
+    if (!docPromise) {
+      docPromise = page.evaluateHandle('document');
+    }
+    const documentJsHandle = await docPromise;
+    const docHandle = documentJsHandle.asElement();
+    return findAll(page, docHandle, selector);
   };
 
   page.waitForChanges = waitForChanges.bind(null, page);

@@ -1,44 +1,43 @@
 import { Component, State } from '../../../../dist/index';
 
 @Component({
-  tag: 'state-cmp'
+  tag: 'state-cmp',
+  styles: `.selected { font-weight: bold }`,
+  shadow: true
 })
 export class StateCmp {
 
-  @State() days: DaySelection[] = [
-    { label: 'Su', selected: true },
-    { label: 'M', selected: true },
-    { label: 'Tu', selected: true },
-    { label: 'W', selected: true },
-    { label: 'Th', selected: true },
-    { label: 'F', selected: true },
-    { label: 'Sa', selected: true }
+  @State() selected: string;
+
+  days: string[] = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
   ];
 
-  private handleDayClicked(day: DaySelection) {
-    day.selected = !day.selected;
-    this.days = [... this.days];
-  }
-
-  private selectedClass(day: DaySelection) {
-    return day.selected === true ? 'selected' : '';
+  dayClicked(day: string) {
+    this.selected = day;
   }
 
   render() {
     return (
-      <div class="form-group" id="days-form-group">
-        <label>What days would you like notifications?</label>
-        <div class="schedule-days-container">
-          { this.days.map(day =>
-            <div class={'day-button btn ' + this.selectedClass(day)} onClick={() => this.handleDayClicked(day)}>{day.label}</div>
+      <section>
+        <label>What is your favorite day?</label>
+        <div>
+          {this.days.map(day =>
+            <button
+              class={day === this.selected ? 'selected' : ''}
+              onClick={() => this.dayClicked(day)}
+              key={day}>
+                {day}
+            </button>
           )}
         </div>
-      </div>
+      </section>
     );
   }
-}
-
-interface DaySelection {
-  label: string;
-  selected: boolean
 }
