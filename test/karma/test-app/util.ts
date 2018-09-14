@@ -116,9 +116,15 @@ export function setupDomTests(document: Document) {
 export function waitForChanges() {
   const win = window as any;
 
-  const promises = win['s-apps'].map((appNamespace: string) => {
-    return win[appNamespace].onReady();
-  });
+  return new Promise(resolve => {
+    window.requestAnimationFrame(() => {
+      const promises = win['s-apps'].map((appNamespace: string) => {
+        return win[appNamespace].onReady();
+      });
 
-  return Promise.all(promises);
+      Promise.all(promises).then(() => {
+        window.requestAnimationFrame(resolve);
+      });
+    });
+  });
 }
