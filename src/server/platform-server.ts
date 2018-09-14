@@ -166,6 +166,13 @@ export function createPlatformServer(
     return loadedBundles[bundleId.replace(/^\.\//, '')];
   }
 
+  function isLoadedBundle(id: string) {
+    if (id === 'exports' || id === 'require') {
+      return true;
+    }
+    return !!getLoadedBundle(id);
+  }
+
   /**
    * Execute a bundle queue item
    * @param name
@@ -176,7 +183,11 @@ export function createPlatformServer(
     const bundleExports: d.CjsExports = {};
 
     try {
-      callback(bundleExports, ...deps.map(d => getLoadedBundle(d)));
+      callback.apply(null, deps.map(d => {
+        if (d === 'exports') return bundleExports;
+        if (d === 'require') return userRequire;
+        return getLoadedBundle(d);
+      }));
     } catch (e) {
       onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
     }
@@ -225,20 +236,25 @@ export function createPlatformServer(
   /**
    * This function is called anytime a JS file is loaded
    */
-  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
+  function loadBundle(bundleId: string, [...dependentsList]: string[], importer: Function) {
 
-    const missingDependents = dependentsList.filter(d => !getLoadedBundle(d));
+    const missingDependents = dependentsList.filter(d => !isLoadedBundle(d));
     missingDependents.forEach(d => {
       const fileName = d.replace('.js', '.es5.js');
       loadFile(fileName);
     });
 
     execBundleCallback(bundleId, dependentsList, importer);
-  };
+  }
+  App.loadBundle = loadBundle;
 
 
   function isDefinedComponent(elm: Element) {
     return !!(cmpRegistry[elm.tagName.toLowerCase()]);
+  }
+
+  function userRequire(ids: string[], resolve: Function) {
+    loadBundle(undefined, ids, resolve);
   }
 
 
@@ -268,7 +284,7 @@ export function createPlatformServer(
         cmpMeta.bundleIds :
         (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
 
-      if (getLoadedBundle(bundleId)) {
+      if (isLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
         queueUpdate(plt, elm);
 
@@ -281,6 +297,7 @@ export function createPlatformServer(
 
   function loadFile(fileName: string) {
     const jsFilePath = config.sys.path.join(appBuildDir, fileName);
+
     const jsCode = compilerCtx.fs.readFileSync(jsFilePath);
     config.sys.vm.runInContext(jsCode, win);
   }
