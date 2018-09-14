@@ -32,7 +32,7 @@ export class Testing implements d.Testing {
 
   async runTests() {
     if (!this.isValid || !this.compiler) {
-      return;
+      return false;
     }
 
     const env: d.E2EProcessEnv = process.env;
@@ -41,7 +41,7 @@ export class Testing implements d.Testing {
     const { isValid, outputTarget } = getOutputTarget(config);
     if (!isValid) {
       this.isValid = false;
-      return;
+      return false;
     }
 
     const msg: string[] = [];
@@ -83,7 +83,7 @@ export class Testing implements d.Testing {
 
       if (!results || (!config.watch && hasError(results && results.diagnostics))) {
         await this.destroy();
-        process.exit(1);
+        return false;
       }
 
       if (this.devServer) {
@@ -101,9 +101,11 @@ export class Testing implements d.Testing {
       await runJest(config, this.jestConfigPath, doScreenshots);
     } catch (e) {
       config.logger.error(e);
+      return false;
     }
 
     config.logger.info('');
+    return true;
   }
 
   async destroy() {

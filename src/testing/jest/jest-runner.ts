@@ -14,7 +14,6 @@ export async function runJest(config: d.Config, jestConfigPath: string, doScreen
         const emulate = emulateDevices[i];
         await runJestDevice(config, jestConfigPath, emulate);
       }
-
       return;
     }
   }
@@ -52,19 +51,20 @@ export async function runJestDevice(config: d.Config, jestConfigPath: string, sc
       env: jestProcessEnv
     });
 
-    p.on(`unhandledRejection`, (r: any) => {
+    p.on(`unhandledRejection`, (r) => {
       reject(r);
     });
 
-    p.once('exit', () => {
-      resolve();
+    p.once('exit', (d) => {
+      if (d === 0) {
+        resolve();
+      } else {
+        reject('tests failed');
+      }
     });
 
     p.once('error', err => {
-      if (err && err.message) {
-        config.logger.error(err.message);
-      }
-      resolve();
+      reject(err.message);
     });
 
   });

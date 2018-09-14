@@ -146,7 +146,7 @@ export interface E2EProcessEnv {
 
 export interface Testing {
   isValid: boolean;
-  runTests(): Promise<void>;
+  runTests(): Promise<boolean>;
   destroy(): Promise<void>;
 }
 

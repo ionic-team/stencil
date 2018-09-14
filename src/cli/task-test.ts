@@ -15,7 +15,12 @@ export async function taskTest(config: d.Config) {
     process.exit(1);
   }
 
-  await testing.runTests();
-
+  const passed = await testing.runTests();
   await testing.destroy();
+
+  if (passed) {
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
 }
