@@ -57,6 +57,13 @@ export namespace Components {
     'onMyWindowEvent'?: (event: CustomEvent<number>) => void;
   }
 
+  interface FocusCmp {
+    'focusOnOpen': boolean;
+  }
+  interface FocusCmpAttributes extends StencilHTMLAttributes {
+    'focusOnOpen'?: boolean;
+  }
+
   interface ListenCmp {
     'opened': boolean;
   }
@@ -95,6 +102,7 @@ declare global {
     'DomInteraction': Components.DomInteraction;
     'ElementCmp': Components.ElementCmp;
     'EventCmp': Components.EventCmp;
+    'FocusCmp': Components.FocusCmp;
     'ListenCmp': Components.ListenCmp;
     'MethodCmp': Components.MethodCmp;
     'PropCmp': Components.PropCmp;
@@ -109,6 +117,7 @@ declare global {
     'dom-interaction': Components.DomInteractionAttributes;
     'element-cmp': Components.ElementCmpAttributes;
     'event-cmp': Components.EventCmpAttributes;
+    'focus-cmp': Components.FocusCmpAttributes;
     'listen-cmp': Components.ListenCmpAttributes;
     'method-cmp': Components.MethodCmpAttributes;
     'prop-cmp': Components.PropCmpAttributes;
@@ -158,6 +167,12 @@ declare global {
     new (): HTMLEventCmpElement;
   };
 
+  interface HTMLFocusCmpElement extends Components.FocusCmp, HTMLStencilElement {}
+  var HTMLFocusCmpElement: {
+    prototype: HTMLFocusCmpElement;
+    new (): HTMLFocusCmpElement;
+  };
+
   interface HTMLListenCmpElement extends Components.ListenCmp, HTMLStencilElement {}
   var HTMLListenCmpElement: {
     prototype: HTMLListenCmpElement;
@@ -190,6 +205,7 @@ declare global {
     'dom-interaction': HTMLDomInteractionElement
     'element-cmp': HTMLElementCmpElement
     'event-cmp': HTMLEventCmpElement
+    'focus-cmp': HTMLFocusCmpElement
     'listen-cmp': HTMLListenCmpElement
     'method-cmp': HTMLMethodCmpElement
     'prop-cmp': HTMLPropCmpElement
@@ -204,6 +220,7 @@ declare global {
     'dom-interaction': HTMLDomInteractionElement;
     'element-cmp': HTMLElementCmpElement;
     'event-cmp': HTMLEventCmpElement;
+    'focus-cmp': HTMLFocusCmpElement;
     'listen-cmp': HTMLListenCmpElement;
     'method-cmp': HTMLMethodCmpElement;
     'prop-cmp': HTMLPropCmpElement;
