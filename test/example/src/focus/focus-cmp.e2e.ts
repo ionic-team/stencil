@@ -8,9 +8,9 @@ describe('@Element', () => {
       <focus-cmp focus-on-open="true"></focus-cmp>
     `
     });
-    const elm = await page.find('focus-cmp');
+    const elm = await page.find('focus-cmp button');
     const activeElement = await page.evaluateHandle(
-      () => document.activeElement
+      async () => document.activeElement
     );
     expect(elm).toEqual(activeElement);
   });
