@@ -28,7 +28,7 @@ export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
 }
 
 
-export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement, userPromise?: Promise<void> | void) {
+export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) {
   // no longer queued for update
   plt.isQueuedForUpdate.delete(elm);
 
@@ -59,20 +59,22 @@ export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: b
       // https://www.youtube.com/watch?v=olLxrojmvMg
       instance = initComponentInstance(plt, elm, plt.hostSnapshotMap.get(elm));
 
-      if (__BUILD_CONDITIONALS__.cmpWillLoad) {
+      if (__BUILD_CONDITIONALS__.cmpWillLoad && instance) {
+        // this is the initial load and the instance was just created
         // fire off the user's componentWillLoad method (if one was provided)
         // componentWillLoad only runs ONCE, after instance's element has been
         // assigned as the host element, but BEFORE render() has been called
         try {
           if (instance.componentWillLoad) {
-            userPromise = instance.componentWillLoad();
+            await instance.componentWillLoad();
           }
         } catch (e) {
           plt.onError(e, RUNTIME_ERROR.WillLoadError, elm);
         }
       }
 
-    } else if (__BUILD_CONDITIONALS__.cmpWillUpdate) {
+    } else if (__BUILD_CONDITIONALS__.cmpWillUpdate && instance) {
+      // component already initialized, this is an update
       // already created an instance and this is an update
       // fire off the user's componentWillUpdate method (if one was provided)
       // componentWillUpdate runs BEFORE render() has been called
@@ -80,47 +82,21 @@ export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: b
       // get the returned promise (if one was provided)
       try {
         if (instance.componentWillUpdate) {
-          userPromise = instance.componentWillUpdate();
+          await instance.componentWillUpdate();
         }
       } catch (e) {
         plt.onError(e, RUNTIME_ERROR.WillUpdateError, elm);
       }
     }
 
-    if (userPromise && userPromise.then) {
-      // looks like the user return a promise!
-      // let's not actually kick off the render
-      // until the user has resolved their promise
-      userPromise
-        .then(() => renderUpdate(plt, elm, instance))
-        .catch(err => {
-          console.error(err);
-          renderUpdate(plt, elm, instance);
-        });
+    // if this component has a render function, let's fire
+    // it off and generate a vnode for this
+    render(plt, plt.getComponentMeta(elm), elm, instance);
 
-    } else {
-      // user never returned a promise so there's
-      // no need to wait on anything, let's do the render now my friend
-      renderUpdate(plt, elm, instance);
-    }
-  }
-}
-
-
-export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d.ComponentInstance) {
-  // if this component has a render function, let's fire
-  // it off and generate a vnode for this
-  render(plt, plt.getComponentMeta(elm), elm, instance);
-
-  try {
     elm['s-init']();
 
     if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
-
-  } catch (e) {
-    // derp
-    plt.onError(e, RUNTIME_ERROR.DidUpdateError, elm, true);
   }
 }
