@@ -1,5 +1,5 @@
-<a name="0.13.0-11"></a>
-# [Prerelease] 👀 [0.13.0-11](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-11) (2018-09-14)
+<a name="0.13.0-12"></a>
+# ⛲️ [0.13.0-12](https://github.com/ionic-team/stencil/compare/v0.13.0-11...v0.13.0-12) (2018-09-17)
 
 ### Stencil Testing Features
 
@@ -149,6 +149,8 @@ This change will lead to much better tree-shaking and performance.
 * **lifecycle:** run componentDidUpdate after all child cmps load ([12fcf75](https://github.com/ionic-team/stencil/commit/12fcf75))
 * **testing:** handle errors ([2dc2bce](https://github.com/ionic-team/stencil/commit/2dc2bce))
 * **validate:** not recommended pkg.module value ([c6c4281](https://github.com/ionic-team/stencil/commit/c6c4281))
+* **lifecycle:** ensure es5 builds wait on returned lifecycle async/await ([c3a7655](https://github.com/ionic-team/stencil/commit/c3a7655))
+* **prerender:** ensure that platform-server prerender follows amd format for require/exports. ([f5e5e0c](https://github.com/ionic-team/stencil/commit/f5e5e0c))
 
 
 
