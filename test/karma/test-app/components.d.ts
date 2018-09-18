@@ -120,6 +120,27 @@ export namespace Components {
     'num'?: number;
   }
 
+  interface LifecycleAsyncA {}
+  interface LifecycleAsyncAAttributes extends StencilHTMLAttributes {}
+
+  interface LifecycleAsyncB {
+    'value': string;
+  }
+  interface LifecycleAsyncBAttributes extends StencilHTMLAttributes {
+    'onLifecycleLoad'?: (event: CustomEvent) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent) => void;
+    'value'?: string;
+  }
+
+  interface LifecycleAsyncC {
+    'value': string;
+  }
+  interface LifecycleAsyncCAttributes extends StencilHTMLAttributes {
+    'onLifecycleLoad'?: (event: CustomEvent) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent) => void;
+    'value'?: string;
+  }
+
   interface LifecycleBasicA {}
   interface LifecycleBasicAAttributes extends StencilHTMLAttributes {}
 
@@ -339,6 +360,9 @@ declare global {
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorderRoot': Components.KeyReorderRoot;
     'KeyReorder': Components.KeyReorder;
+    'LifecycleAsyncA': Components.LifecycleAsyncA;
+    'LifecycleAsyncB': Components.LifecycleAsyncB;
+    'LifecycleAsyncC': Components.LifecycleAsyncC;
     'LifecycleBasicA': Components.LifecycleBasicA;
     'LifecycleBasicB': Components.LifecycleBasicB;
     'LifecycleBasicC': Components.LifecycleBasicC;
@@ -404,6 +428,9 @@ declare global {
     'init-css-root': Components.InitCssRootAttributes;
     'key-reorder-root': Components.KeyReorderRootAttributes;
     'key-reorder': Components.KeyReorderAttributes;
+    'lifecycle-async-a': Components.LifecycleAsyncAAttributes;
+    'lifecycle-async-b': Components.LifecycleAsyncBAttributes;
+    'lifecycle-async-c': Components.LifecycleAsyncCAttributes;
     'lifecycle-basic-a': Components.LifecycleBasicAAttributes;
     'lifecycle-basic-b': Components.LifecycleBasicBAttributes;
     'lifecycle-basic-c': Components.LifecycleBasicCAttributes;
@@ -557,6 +584,24 @@ declare global {
   var HTMLKeyReorderElement: {
     prototype: HTMLKeyReorderElement;
     new (): HTMLKeyReorderElement;
+  };
+
+  interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
+  var HTMLLifecycleAsyncAElement: {
+    prototype: HTMLLifecycleAsyncAElement;
+    new (): HTMLLifecycleAsyncAElement;
+  };
+
+  interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {}
+  var HTMLLifecycleAsyncBElement: {
+    prototype: HTMLLifecycleAsyncBElement;
+    new (): HTMLLifecycleAsyncBElement;
+  };
+
+  interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {}
+  var HTMLLifecycleAsyncCElement: {
+    prototype: HTMLLifecycleAsyncCElement;
+    new (): HTMLLifecycleAsyncCElement;
   };
 
   interface HTMLLifecycleBasicAElement extends Components.LifecycleBasicA, HTMLStencilElement {}
@@ -842,6 +887,9 @@ declare global {
     'init-css-root': HTMLInitCssRootElement
     'key-reorder-root': HTMLKeyReorderRootElement
     'key-reorder': HTMLKeyReorderElement
+    'lifecycle-async-a': HTMLLifecycleAsyncAElement
+    'lifecycle-async-b': HTMLLifecycleAsyncBElement
+    'lifecycle-async-c': HTMLLifecycleAsyncCElement
     'lifecycle-basic-a': HTMLLifecycleBasicAElement
     'lifecycle-basic-b': HTMLLifecycleBasicBElement
     'lifecycle-basic-c': HTMLLifecycleBasicCElement
@@ -907,6 +955,9 @@ declare global {
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'key-reorder': HTMLKeyReorderElement;
+    'lifecycle-async-a': HTMLLifecycleAsyncAElement;
+    'lifecycle-async-b': HTMLLifecycleAsyncBElement;
+    'lifecycle-async-c': HTMLLifecycleAsyncCElement;
     'lifecycle-basic-a': HTMLLifecycleBasicAElement;
     'lifecycle-basic-b': HTMLLifecycleBasicBElement;
     'lifecycle-basic-c': HTMLLifecycleBasicCElement;
