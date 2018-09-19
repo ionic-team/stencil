@@ -45,6 +45,10 @@ export async function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfi
     screenshotEmulate.height = userEmulateConfig.height;
   }
 
+  if (typeof userEmulateConfig.deviceScaleFactor === 'number') {
+    screenshotEmulate.deviceScaleFactor = userEmulateConfig.deviceScaleFactor;
+  }
+
   if (typeof userEmulateConfig.hasTouch === 'boolean') {
     screenshotEmulate.hasTouch = userEmulateConfig.hasTouch;
   }
