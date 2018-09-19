@@ -63,6 +63,51 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     await this._page.waitForChanges();
   }
 
+  async isVisible() {
+    this._validate();
+
+    const executionContext = this._elmHandle.executionContext();
+
+    const isVisible = await executionContext.evaluate((elm: d.HostElement) => {
+
+      return new Promise<boolean>(resolve => {
+
+        window.requestAnimationFrame(() => {
+          const style = window.getComputedStyle(elm);
+          const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+          resolve(isVisible);
+        });
+
+      });
+
+    }, this._elmHandle);
+
+    return isVisible as boolean;
+  }
+
+  waitForVisible() {
+    return new Promise<void>((resolve, reject) => {
+      let resolveTmr: any;
+
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(`waitUntilVisible timed out`);
+      }, 15000);
+
+      const checkVisible = async () => {
+        const isVisible = await this.isVisible();
+        if (isVisible) {
+          clearTimeout(rejectTmr);
+          resolve();
+        } else {
+          resolveTmr = setTimeout(checkVisible, 10);
+        }
+      };
+
+      checkVisible();
+    });
+  }
+
   isIntersectingViewport() {
     return this._elmHandle.isIntersectingViewport();
   }
