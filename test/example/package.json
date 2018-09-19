@@ -6,5 +6,10 @@
     "test": "node ../../bin/stencil test --e2e --spec",
     "test.e2e": "node ../../bin/stencil test --e2e",
     "test.spec": "node ../../bin/stencil test --spec"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "1.6.4",
+    "jest": "23.5.0",
+    "puppeteer": "1.7.0"
   }
 }
