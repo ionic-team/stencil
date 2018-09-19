@@ -5,7 +5,13 @@ export async function taskTest(config: d.Config) {
   await config.sys.lazyRequire.ensure(
     config.logger,
     config.rootDir,
-    ['@types/jest', 'jest', 'jest-environment-node', 'puppeteer']
+    [
+      '@types/jest',
+      '@types/puppeteer',
+      'jest',
+      'jest-environment-node',
+      'puppeteer'
+    ]
   );
 
   const { Testing } = require('../testing/index.js');
