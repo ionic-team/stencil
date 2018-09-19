@@ -3,9 +3,29 @@ import { E2EElement } from './puppeteer-element';
 import * as puppeteer from 'puppeteer';
 
 
-export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: string) {
-  const { lightSelector, shadowSelector } = getSelector(selector);
+export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
+  const { lightSelector, shadowSelector, text, contains } = getSelector(selector);
 
+  let elmHandle: puppeteer.ElementHandle;
+
+  if (typeof lightSelector === 'string') {
+    elmHandle = await findWithCssSelector(page, rootHandle, lightSelector, shadowSelector);
+
+  } else {
+    elmHandle = await findWithText(page, rootHandle, text, contains);
+  }
+
+  if (!elmHandle) {
+    return null;
+  }
+
+  const elm = new E2EElement(page, elmHandle);
+  await elm.e2eSync();
+  return elm;
+}
+
+
+async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, lightSelector: string, shadowSelector: string) {
   let elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
@@ -32,9 +52,50 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
     elmHandle = shadowHandle.asElement();
   }
 
-  const elm = new E2EElement(page, elmHandle);
-  await elm.e2eSync();
-  return elm;
+  return elmHandle;
+}
+
+
+async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, text: string, contains: string) {
+  const jsHandle = await page.evaluateHandle((rootElm: HTMLElement, text: string, contains: string) => {
+    let foundElm: any = null;
+
+    function checkContent(elm: HTMLElement) {
+      if (!elm || foundElm) {
+        return;
+      }
+
+      if (elm.nodeType === 3) {
+        if (typeof text === 'string' && elm.textContent.trim() === text) {
+          foundElm = elm.parentElement;
+          return;
+        }
+        if (typeof contains === 'string' && elm.textContent.includes(contains)) {
+          foundElm = elm.parentElement;
+          return;
+        }
+      }
+
+      checkContent(elm.shadowRoot as any);
+
+      if (elm.childNodes) {
+        for (let i = 0; i < elm.childNodes.length; i++) {
+          checkContent(elm.childNodes[i] as any);
+        }
+      }
+    }
+
+    checkContent(rootElm);
+
+    return foundElm;
+
+  }, rootHandle, text, contains);
+
+  if (jsHandle) {
+    return jsHandle.asElement();
+  }
+
+  return null;
 }
 
 
@@ -90,11 +151,29 @@ export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.El
 }
 
 
-function getSelector(selector: string) {
-  const splt = selector.split('>>>');
+function getSelector(selector: pd.FindSelector) {
+  const rtn = {
+    lightSelector: null as string,
+    shadowSelector: null as string,
+    text: null as string,
+    contains: null as string
+  };
 
-  const lightSelector = splt[0].trim();
-  const shadowSelector = (splt.length > 1 ? splt[1].trim() : null);
+  if (typeof selector === 'string') {
+    const splt = selector.split('>>>');
 
-  return { lightSelector, shadowSelector };
+    rtn.lightSelector = splt[0].trim();
+    rtn.shadowSelector = (splt.length > 1 ? splt[1].trim() : null);
+
+  } else if (typeof selector.text === 'string') {
+    rtn.text = selector.text.trim();
+
+  } else if (typeof selector.contains === 'string') {
+    rtn.contains = selector.contains.trim();
+
+  } else {
+    throw new Error(`invalid find selector: ${selector}`);
+  }
+
+  return rtn;
 }

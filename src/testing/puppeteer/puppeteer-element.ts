@@ -66,28 +66,33 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   async isVisible() {
     this._validate();
 
-    const executionContext = this._elmHandle.executionContext();
+    let isVisible = false;
 
-    const isVisible = await executionContext.evaluate((elm: d.HostElement) => {
+    try {
+      const executionContext = this._elmHandle.executionContext();
 
-      return new Promise<boolean>(resolve => {
+      isVisible = await executionContext.evaluate((elm: d.HostElement) => {
 
-        window.requestAnimationFrame(() => {
-          if (elm.isConnected) {
-            const style = window.getComputedStyle(elm);
-            const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-            resolve(isVisible);
+        return new Promise<boolean>(resolve => {
 
-          } else {
-            resolve(false);
-          }
+          window.requestAnimationFrame(() => {
+            if (elm.isConnected) {
+              const style = window.getComputedStyle(elm);
+              const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+              resolve(isVisible);
+
+            } else {
+              resolve(false);
+            }
+          });
+
         });
 
-      });
+      }, this._elmHandle);
 
-    }, this._elmHandle);
+    } catch (e) {}
 
-    return isVisible as boolean;
+    return isVisible;
   }
 
   waitForVisible() {
