@@ -1,5 +1,4 @@
 import { Component, Listen, State } from '../../../../dist';
-import { timeout } from './util';
 
 @Component({
   tag: 'lifecycle-async-a'
@@ -42,7 +41,6 @@ export class LifecycleAsyncA {
       this.updates = [...this.updates, 'componentDidUpdate-a'];
       this.componentDidUpdated = true;
     }
-    await timeout(100);
   }
 
   testClick() {

@@ -12,10 +12,8 @@ export class LifecycleAsyncC {
   @Event() lifecycleLoad: EventEmitter;
   @Event() lifecycleUpdate: EventEmitter;
 
-
   async componentWillLoad() {
     this.lifecycleLoad.emit('componentWillLoad-c');
-    await timeout(1000);
   }
 
   async componentDidLoad() {
