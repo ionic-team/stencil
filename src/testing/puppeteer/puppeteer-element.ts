@@ -73,9 +73,14 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       return new Promise<boolean>(resolve => {
 
         window.requestAnimationFrame(() => {
-          const style = window.getComputedStyle(elm);
-          const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-          resolve(isVisible);
+          if (elm.isConnected) {
+            const style = window.getComputedStyle(elm);
+            const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+            resolve(isVisible);
+
+          } else {
+            resolve(false);
+          }
         });
 
       });
@@ -91,7 +96,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
 
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
-        reject(`waitUntilVisible timed out`);
+        reject(`waitForVisible timed out`);
       }, 15000);
 
       const checkVisible = async () => {
@@ -101,6 +106,29 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
           resolve();
         } else {
           resolveTmr = setTimeout(checkVisible, 10);
+        }
+      };
+
+      checkVisible();
+    });
+  }
+
+  waitForNotVisible() {
+    return new Promise<void>((resolve, reject) => {
+      let resolveTmr: any;
+
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(`waitForNotVisible timed out`);
+      }, 15000);
+
+      const checkVisible = async () => {
+        const isVisible = await this.isVisible();
+        if (isVisible) {
+          resolveTmr = setTimeout(checkVisible, 10);
+        } else {
+          clearTimeout(rejectTmr);
+          resolve();
         }
       };
 

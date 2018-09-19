@@ -331,9 +331,17 @@ export interface E2EElement {
 
   /**
    * Waits until the element's style is `display !== 'none'`,
-   * `visibility !== 'hidden'` and `opacity !== '0'`.
+   * `visibility !== 'hidden'`, `opacity !== '0'` and the element
+   * is connected to the document.
    */
   waitForVisible(): Promise<void>;
+
+  /**
+   * Waits until the element's style is `display === 'none'`, or
+   * `visibility === 'hidden'`, or `opacity === '0'`, or the element
+   * is no longer connected to the document.
+   */
+  waitForNotVisible(): Promise<void>;
 }
 
 
