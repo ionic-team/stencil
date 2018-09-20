@@ -1,5 +1,5 @@
-<a name="0.13.0-12"></a>
-# ⛲️ [0.13.0-12](https://github.com/ionic-team/stencil/compare/v0.13.0-11...v0.13.0-12) (2018-09-17)
+<a name="0.13.0-13"></a>
+# [Prerelease] 🌝 [0.13.0-13](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-13) (2018-09-20)
 
 ### Stencil Testing Features
 
@@ -100,16 +100,20 @@ This change will lead to much better tree-shaking and performance.
 
 ### Features
 
+* **bundle:** export esm-es2017 ([efd985d](https://github.com/ionic-team/stencil/commit/efd985d))
 * **cli:** add prerelease warning ([5052fe2](https://github.com/ionic-team/stencil/commit/5052fe2))
 * **compiler:** methods should return a promise ([98510d5](https://github.com/ionic-team/stencil/commit/98510d5))
+* **e2e:** add isVisible() and waitForVisible() to e2e testing ([acb8cd6](https://github.com/ionic-team/stencil/commit/acb8cd6))
+* **e2e:** add waitForNotVisible() to e2e testing ([8b10b56](https://github.com/ionic-team/stencil/commit/8b10b56))
+* **e2e:** find element by text content ([309c250](https://github.com/ionic-team/stencil/commit/309c250))
 * **e2e:** add dom api for e2e testing ([3a2a884](https://github.com/ionic-team/stencil/commit/3a2a884))
 * **e2e:** test computed styles of an e2e element ([c1a613c](https://github.com/ionic-team/stencil/commit/c1a613c))
 * **onReady:** onReady() resolves after app load/update finished ([bba5fbc](https://github.com/ionic-team/stencil/commit/bba5fbc))
 * **puppeteer:** allow specification of Chrome executable ([6b80237](https://github.com/ionic-team/stencil/commit/6b80237))
+* **screenshot:** compare screenshots against master during e2e tests ([892b8b1](https://github.com/ionic-team/stencil/commit/892b8b1))
 * **serialize:** serialize pretty print html option ([c6e34b5](https://github.com/ionic-team/stencil/commit/c6e34b5))
 * **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
 * **testing:** add toMatchClasses() ([bf4ff31](https://github.com/ionic-team/stencil/commit/bf4ff31))
-* **bundle:** export esm-es2017 ([efd985d](https://github.com/ionic-team/stencil/commit/efd985d))
 
 
 ### Performance Improvements
