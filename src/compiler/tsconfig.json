@@ -21,6 +21,12 @@
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
     "rootDir": "../",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/mock-doc": [
+        "../../dist/mock-doc"
+      ]
+    },
     "target": "es2015"
   },
   "include": [

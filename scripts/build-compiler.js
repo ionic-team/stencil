@@ -31,18 +31,10 @@ if (success) {
   function bundleCompiler() {
     rollup.rollup({
       input: ENTRY_FILE,
-      plugins: [
-        rollupResolve({
-          jsnext: true
-        }),
-        rollupCommonjs(),
-        rollupPluginReplace({
-          values: replaceObj
-        })
-      ],
       external: [
         'crypto',
         'fs',
+        '../mock-doc',
         'path',
         'rollup',
         'rollup-plugin-commonjs',
@@ -51,6 +43,22 @@ if (success) {
         'rollup-pluginutils',
         'typescript',
         'util'
+      ],
+      plugins: [
+        (() => {
+          return {
+            resolveId(id) {
+              if (id === '@stencil/core/mock-doc') {
+                return '../mock-doc';
+              }
+            }
+          }
+        })(),
+        rollupResolve(),
+        rollupCommonjs(),
+        rollupPluginReplace({
+          values: replaceObj
+        })
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;

@@ -96,7 +96,7 @@
     "parse5": "5.1.0",
     "pixelmatch": "4.0.2",
     "postcss": "6.0.21",
-    "puppeteer": "^1.7.0",
+    "puppeteer": "~1.7.0",
     "semver": "5.5.0",
     "terser": "3.8.1",
     "tslib": "^1.9.3",
@@ -149,8 +149,13 @@
       "/.stencil",
       "/bin",
       "/dist",
+      "/mock-doc",
       "/node_modules",
+      "/screenshot",
       "/scripts",
+      "/server",
+      "/sys",
+      "/testing",
       "/www"
     ],
     "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
