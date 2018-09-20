@@ -37,6 +37,21 @@ export function validateTesting(config: d.Config) {
     testing.rootDir = config.rootDir;
   }
 
+  if (config.flags && typeof config.flags.screenshotConnector === 'string') {
+    testing.screenshotConnector = config.flags.screenshotConnector;
+  }
+
+  if (typeof testing.screenshotConnector === 'string') {
+    if (!path.isAbsolute(testing.screenshotConnector)) {
+      testing.screenshotConnector = path.join(config.rootDir, testing.screenshotConnector);
+    }
+
+  } else {
+    testing.screenshotConnector = config.sys.path.join(
+      config.sys.compiler.packageDir, 'screenshot', 'screenshot-connector.js'
+    );
+  }
+
   if (!Array.isArray(testing.moduleFileExtensions)) {
     testing.moduleFileExtensions = DEFAULT_MODULE_FILE_EXTENSIONS;
   }
@@ -77,6 +92,30 @@ export function validateTesting(config: d.Config) {
     );
   }
 
+  if (typeof testing.allowableMismatchedPixels === 'number') {
+    if (testing.allowableMismatchedPixels < 0) {
+      throw new Error(`allowableMismatchedPixels must be a value that is 0 or greater`);
+    }
+
+  } else {
+    testing.allowableMismatchedPixels = DEFAULT_ALLOWABLE_MISMATCHED_PIXELS;
+  }
+
+  if (typeof testing.allowableMismatchedRatio === 'number') {
+    if (testing.allowableMismatchedRatio < 0 || testing.allowableMismatchedRatio > 1) {
+      throw new Error(`allowableMismatchedRatio must be a value ranging from 0 to 1`);
+    }
+  }
+
+  if (typeof testing.pixelmatchThreshold === 'number') {
+    if (testing.pixelmatchThreshold < 0 || testing.pixelmatchThreshold > 1) {
+      throw new Error(`pixelmatchThreshold must be a value ranging from 0 to 1`);
+    }
+
+  } else {
+    testing.pixelmatchThreshold = DEFAULT_PIXEL_MATCH_THRESHOLD;
+  }
+
   if (Array.isArray(testing.testMatch)) {
     delete testing.testRegex;
 
@@ -93,7 +132,7 @@ export function validateTesting(config: d.Config) {
     }
 
     testing.testMatch = [
-      `**/+(*.)+(${types.join('|')}).+(ts|tsx|js)?(x)`
+      `**/*(*.)+(${types.join('|')}).+(ts)?(x)`
     ];
   }
 
@@ -127,3 +166,7 @@ const DEFAULT_IGNORE_PATTERNS = [
   '.stencil',
   'node_modules',
 ];
+
+
+const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
+const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;

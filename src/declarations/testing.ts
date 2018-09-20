@@ -71,8 +71,43 @@ declare global {
        * received the correct custom event `detail` data.
        */
       toHaveReceivedEventDetail(eventDetail: any): void;
+
+      /**
+       * Used to evaluate the results of `compareScreenshot()`, such as
+       * `expect(compare).toMatchScreenshot()`. The `allowableMismatchedRatio`
+       * value from the testing config is used by default if
+       * `MatchScreenshotOptions` were not provided.
+       */
+      toMatchScreenshot(opts?: MatchScreenshotOptions): void;
     }
   }
+}
+
+
+export interface MatchScreenshotOptions {
+  /**
+   * The `allowableMismatchedPixels` value is the total number of pixels
+   * that can be mismatched until the test fails. For example, if the value
+   * is `100`, and if there were `101` pixels that were mismatched then the
+   * test would fail. If the `allowableMismatchedRatio` is provided it will
+   * take precedence, otherwise `allowableMismatchedPixels` will be used.
+   */
+  allowableMismatchedPixels?: number;
+
+  /**
+   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
+   * determine an acceptable ratio of pixels that can be mismatched before
+   * the image is considered to have changes. Realistically, two screenshots
+   * representing the same content may have a small number of pixels that
+   * are not identical due to anti-aliasing, which is perfectly normal. The
+   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
+   * divided by the total number of pixels in the screenshot. For example,
+   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
+   * the image is considered to have changes. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedRatio?: number;
 }
 
 
@@ -119,6 +154,13 @@ export interface JestEnvironmentGlobal {
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
   resourcesUrl: string;
+  currentSpec?: {
+    id: string;
+    description: string;
+    fullName: string;
+    testPath: string;
+  };
+  screenshotDescriptions: Set<string>;
 }
 
 
@@ -133,10 +175,9 @@ export interface E2EProcessEnv {
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_LOADER_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
-  __STENCIL_SCREENSHOTS__?: 'true';
-  __STENCIL_SCREENSHOT_IMAGES_DIR__?: string;
-  __STENCIL_SCREENSHOT_DATA_DIR__?: string;
 
+  __STENCIL_SCREENSHOT__?: 'true';
+  __STENCIL_SCREENSHOT_BUILD__?: string;
   __STENCIL_E2E_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
@@ -152,6 +193,39 @@ export interface Testing {
 
 
 export interface TestingConfig {
+  /**
+   * The `allowableMismatchedPixels` value is used to determine an acceptable
+   * number of pixels that can be mismatched before the image is considered
+   * to have changes. Realistically, two screenshots representing the same
+   * content may have a small number of pixels that are not identical due to
+   * anti-aliasing, which is perfectly normal. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedPixels?: number;
+
+  /**
+   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
+   * determine an acceptable ratio of pixels that can be mismatched before
+   * the image is considered to have changes. Realistically, two screenshots
+   * representing the same content may have a small number of pixels that
+   * are not identical due to anti-aliasing, which is perfectly normal. The
+   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
+   * divided by the total number of pixels in the screenshot. For example,
+   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
+   * the image is considered to have changes. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedRatio?: number;
+
+  /**
+   * Matching threshold while comparing two screenshots. Value ranges from `0` to `1`.
+   * Smaller values make the comparison more sensitive. The `pixelmatchThreshold`
+   * value helps to ignore anti-aliasing. Default: `0.1`
+   */
+  pixelmatchThreshold?: number;
+
   /**
    * Additional arguments to pass to the browser instance.
    */
@@ -179,6 +253,10 @@ export interface TestingConfig {
    */
   emulate?: EmulateConfig[];
 
+  /**
+   * Path to the Screenshot Connector module.
+   */
+  screenshotConnector?: string;
 
   /**
    * This option tells Jest that all imported modules in your tests should be mocked automatically.
@@ -345,39 +423,13 @@ export interface EmulateConfig {
    */
   isLandscape?: boolean;
 
+  /**
+   * User-Agent to be used. Defaults to the user-agent of the installed Puppeteer version.
+   */
   userAgent?: string;
 
   /**
    * Changes the CSS media type of the page. The only allowed values are 'screen', 'print' and null. Passing null disables media emulation.
    */
   mediaType?: 'screen' | 'print';
-}
-
-
-export interface E2EScreenshotOptions {
-  /**
-   * When true, takes a screenshot of the full scrollable page.
-   * @default false
-   */
-  fullPage?: boolean;
-
-  /**
-   * Hides default white background and allows capturing screenshots with transparency.
-   * @default false
-   */
-  omitBackground?: boolean;
-
-  /**
-   * An object which specifies clipping region of the page.
-   */
-  clip?: {
-    /** The x-coordinate of top-left corner. */
-    x: number;
-    /** The y-coordinate of top-left corner. */
-    y: number;
-    /** The width. */
-    width: number;
-    /** The height. */
-    height: number;
-  };
 }

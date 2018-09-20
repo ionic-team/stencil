@@ -74,6 +74,17 @@ function testPackage(testPkg) {
     ]
   },
   {
+    packageJson: '../screenshot/package.json',
+    files: [
+      'compare/',
+      'index.js',
+      'screenshot-connector.js'
+    ],
+    exports: [
+      'ScreenshotConnector'
+    ]
+  },
+  {
     packageJson: '../server/package.json',
     exports: [
       'h',
@@ -109,6 +120,7 @@ function testPackage(testPkg) {
       "dist/",
       "compiler/",
       "mock-doc/",
+      "screenshot/",
       "server/",
       "sys/",
       "testing/"
@@ -116,5 +128,7 @@ function testPackage(testPkg) {
     exports: []
   }
 ].forEach(testPackage);
+
+
 
 console.log(`✅ test.dist`);

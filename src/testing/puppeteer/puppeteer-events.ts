@@ -3,7 +3,7 @@ import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
 
-export async function initE2EPageEvents(page: pd.E2EPageInternal) {
+export async function initPageEvents(page: pd.E2EPageInternal) {
   page._events = [];
   page._eventIds = 0;
 

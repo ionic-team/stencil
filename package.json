@@ -70,6 +70,8 @@
     "@types/mime-types": "^2.1.0",
     "@types/node": "9.4.5",
     "@types/parse5": "5.0.0",
+    "@types/pixelmatch": "4.0.0",
+    "@types/pngjs": "^3.3.2",
     "@types/puppeteer": "^1.6.0",
     "@types/ws": "^5.1.2",
     "autoprefixer": "^8.2.0",
@@ -92,6 +94,7 @@
     "open-in-editor": "2.2.0",
     "opn": "5.2.0",
     "parse5": "5.1.0",
+    "pixelmatch": "4.0.2",
     "postcss": "6.0.21",
     "puppeteer": "^1.7.0",
     "semver": "5.5.0",
@@ -105,8 +108,10 @@
   },
   "lazyDependencies": {
     "@types/jest": "~23.3.1",
+    "@types/puppeteer": "^1.6.0",
     "jest": "~23.5.0",
     "jest-environment-node": "~23.4.0",
+    "pixelmatch": "4.0.2",
     "puppeteer": "~1.7.0",
     "workbox-build": "~3.4.1"
   },

@@ -3,6 +3,7 @@ import { toHaveReceivedEvent, toHaveReceivedEventDetail, toHaveReceivedEventTime
 import { toEqualHtml } from './html';
 import { toEqualText } from './text';
 import { toHaveClass, toHaveClasses, toMatchClasses } from './class-list';
+import { toMatchScreenshot } from './screenshot';
 
 
 export const expectExtend = {
@@ -16,6 +17,6 @@ export const expectExtend = {
   toMatchClasses,
   toHaveReceivedEvent,
   toHaveReceivedEventDetail,
-  toHaveReceivedEventTimes
+  toHaveReceivedEventTimes,
+  toMatchScreenshot
 };
-

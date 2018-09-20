@@ -28,10 +28,13 @@ if (success) {
       input: ENTRY_FILE,
       external: [
         'child_process',
+        'crypto',
         'fs',
         'jest-environment-node',
         'os',
         'path',
+        'pixelmatch',
+        'pngjs',
         'puppeteer',
         'rollup',
         'rollup-plugin-commonjs',

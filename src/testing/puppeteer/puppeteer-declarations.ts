@@ -21,6 +21,40 @@ type PuppeteerPage = Omit<puppeteer.Page,
 export interface E2EPage extends PuppeteerPage {
 
   /**
+   * `Experimental`
+   * Takes a screenshot of the page, then compares the current screenshot
+   * against the master screenshot. The returned screenshot compare
+   * results can then be used to test pixel mismatches, such as
+   * `expect(results).toMatchScreenshot()`.
+   */
+  compareScreenshot(): Promise<d.ScreenshotCompare>;
+
+  /**
+   * `Experimental`
+   * Takes a screenshot of the page, then compares the current screenshot
+   * against the master screenshot. The provided `description` will be
+   * added onto its current description, which comes from the test description.
+   */
+  compareScreenshot(description: string): Promise<d.ScreenshotCompare>;
+
+  /**
+   * `Experimental`
+   * Takes a screenshot of the page, then compares the current screenshot
+   * against the master screenshot. The `opts` argument can be used to
+   * customize screenshot options.
+   */
+  compareScreenshot(opts: d.ScreenshotOptions): Promise<d.ScreenshotCompare>;
+
+  /**
+   * `Experimental`
+   * Takes a screenshot of the page, then compares the current screenshot
+   * against the master screenshot. The `description` argument will be
+   * added onto its current description, which comes from the test description.
+   * The `opts` argument can be used to customize screenshot options.
+   */
+  compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotCompare>;
+
+  /**
    * Find an element that matches the selector, which is the same as
    * `document.querySelector(selector)`. Use `>>>` within the
    * selector to find an element within the host element's shadow root.
@@ -38,7 +72,7 @@ export interface E2EPage extends PuppeteerPage {
    * `my-cmp`, the call would be `page.findAll('my-cmp >>> li')`.
    * Returns an empty array if no elements were found.
    */
-  findAll(selector: FindSelector): Promise<E2EElement[]>;
+  findAll(selector: string): Promise<E2EElement[]>;
 
   /**
    * During an end-to-end test, a dev-server is started so `page.goto(url)` can be used
@@ -82,7 +116,7 @@ export interface E2EPageInternal extends E2EPage {
   _events: WaitForEvent[];
   _eventIds: number;
   _goto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
-  _screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
+  screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
 }
 
 
@@ -156,7 +190,7 @@ export interface E2EElement {
    * `element.findAll('my-cmp >>> li')`. Returns an empty array if
    * no elements were found.
    */
-  findAll(selector: FindSelector): Promise<E2EElement[]>;
+  findAll(selector: string): Promise<E2EElement[]>;
 
   /**
    * Sets focus on the element.

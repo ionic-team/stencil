@@ -1,0 +1,11 @@
+{
+  "name": "@stencil/core/screenshot",
+  "private": true,
+  "main": "./index.js",
+  "types": "../dist/screenshot/index.d.ts",
+  "files": [
+    "compare/",
+    "index.js",
+    "screenshot-connector.js"
+  ]
+}

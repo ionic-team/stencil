@@ -10,6 +10,7 @@ export async function taskTest(config: d.Config) {
       '@types/puppeteer',
       'jest',
       'jest-environment-node',
+      'pixelmatch',
       'puppeteer'
     ]
   );

@@ -2,7 +2,8 @@ import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import { closePage } from './puppeteer-browser';
 import { find, findAll } from './puppeteer-find';
-import { initE2EPageEvents } from './puppeteer-events';
+import { initPageEvents } from './puppeteer-events';
+import { initPageScreenshot } from './puppeteer-screenshot';
 import * as puppeteer from 'puppeteer';
 
 
@@ -24,7 +25,9 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
   await page.setCacheEnabled(false);
 
-  await initE2EPageEvents(page);
+  await initPageEvents(page);
+
+  initPageScreenshot(page);
 
   let docPromise: Promise<puppeteer.JSHandle> = null;
 

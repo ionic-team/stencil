@@ -9,6 +9,7 @@ const ROOT_DIR = path.join(__dirname, '..');
 const SUBMODULES = [
   'compiler',
   'mock-doc',
+  'screenshot',
   'server',
   'sys/node',
   'testing'

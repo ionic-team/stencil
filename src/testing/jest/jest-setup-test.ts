@@ -16,4 +16,17 @@ export function jestSetupTestFramework() {
   applyWindowToGlobal(global);
 
   expect.extend(expectExtend);
+
+  const jasmineEnv = (jasmine as any).getEnv();
+  if (jasmineEnv) {
+    jasmineEnv.addReporter({
+      specStarted: (spec: any) => {
+        global.currentSpec = spec;
+      }
+    });
+  }
+
+  global.screenshotDescriptions = new Set();
+
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
 }

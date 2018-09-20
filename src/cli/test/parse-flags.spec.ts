@@ -319,6 +319,24 @@ describe('parseFlags', () => {
     expect(flags.screenshot).toBe(true);
   });
 
+  it('should parse --screenshot-connector scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector';
+    process.argv[3] = 'scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should parse --screenshot-connector=scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector=scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should not parse --screenshot-connector', () => {
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(null);
+  });
+
   it('should parse --serve', () => {
     process.argv[2] = '--serve';
     const flags = parseFlags(process);
@@ -343,22 +361,15 @@ describe('parseFlags', () => {
     expect(flags.stats).toBe(true);
   });
 
-  it('should parse --channel=production', () => {
-    process.argv[2] = '--channel=production';
+  it('should parse --update-screenshot', () => {
+    process.argv[2] = '--update-screenshot';
     const flags = parseFlags(process);
-    expect(flags.channel).toBe('production');
+    expect(flags.updateScreenshot).toBe(true);
   });
 
-  it('should parse --channel production', () => {
-    process.argv[2] = '--channel';
-    process.argv[3] = 'production';
+  it('should not parse --update-screenshot', () => {
     const flags = parseFlags(process);
-    expect(flags.channel).toBe('production');
-  });
-
-  it('should not parse --channel', () => {
-    const flags = parseFlags(process);
-    expect(flags.channel).toBe(null);
+    expect(flags.updateScreenshot).toBe(null);
   });
 
   it('should parse --version', () => {
