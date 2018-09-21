@@ -1,11 +1,59 @@
 import { MockDocument } from '../document';
 import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
+import { NODE_TYPES } from '../constants';
 
 
 describe('parseHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
+  });
+
+  it('getElementsByTagName', () => {
+    doc = new MockDocument(`
+      <article>article</article>
+      <section>section</section>
+      <section>section</section>
+    `);
+
+    expect(doc.nodeType).toBe(NODE_TYPES.DOCUMENT_NODE);
+    expect(doc.childElementCount).toBe(1);
+    expect(doc.firstElementChild.tagName).toBe('HTML');
+    expect(doc.lastChild.nodeName).toBe('HTML');
+    expect(doc.children[0].nodeName).toBe('HTML');
+    expect(doc.children[0].nodeType).toBe(NODE_TYPES.ELEMENT_NODE);
+
+    const htmlElms = doc.getElementsByTagName('html');
+    expect(htmlElms).toHaveLength(1);
+    expect(htmlElms[0].tagName).toBe('HTML');
+
+    const bodyElms = doc.getElementsByTagName('body');
+    expect(bodyElms).toHaveLength(1);
+    expect(bodyElms[0].tagName).toBe('BODY');
+
+    const articleElms = doc.getElementsByTagName('article');
+    expect(articleElms).toHaveLength(1);
+    expect(articleElms[0].tagName).toBe('ARTICLE');
+
+    const sectionElms = doc.getElementsByTagName('section');
+    expect(sectionElms).toHaveLength(2);
+    expect(sectionElms[0].tagName).toBe('SECTION');
+    expect(sectionElms[1].tagName).toBe('SECTION');
+  });
+
+  it('getElementsByTagName', () => {
+    doc = new MockDocument(`
+      <form name="form-name">
+        <input name="a">
+        <input name="a">
+      </form>
+    `);
+
+    const formElms = doc.getElementsByName('form-name');
+    expect(formElms).toHaveLength(1);
+
+    const inputElms = doc.getElementsByName('a');
+    expect(inputElms).toHaveLength(2);
   });
 
   it('get text only outerHTML', () => {

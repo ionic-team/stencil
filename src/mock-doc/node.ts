@@ -147,6 +147,10 @@ export class MockElement extends MockNode {
     return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
   }
 
+  get childElementCount() {
+    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
+  }
+
   get className() { return this.getAttribute('class') || ''; }
   set className(value: string) { this.setAttribute('class', value); }
 

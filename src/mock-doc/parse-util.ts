@@ -39,8 +39,6 @@ function getParser(ownerDocument: any) {
 
     createDocument() {
       const doc = ownerDocument.createElement('#document');
-      doc.nodeName = '#document';
-      doc.parentNode = null;
       (doc as any)['x-mode'] = 'no-quirks';
       return doc;
     },

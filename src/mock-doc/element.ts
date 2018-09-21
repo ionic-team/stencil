@@ -12,6 +12,9 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'button':
       return new MockButtonElement(ownerDocument);
 
+    case 'form':
+      return new MockFormElement(ownerDocument);
+
     case 'img':
       return new MockImgElement(ownerDocument);
 
@@ -105,6 +108,15 @@ patchPropAttributes(MockInputElement.prototype, {
   type: String,
   value: String,
   width: Number
+});
+
+class MockFormElement extends MockElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'form');
+  }
+}
+patchPropAttributes(MockFormElement.prototype, {
+  name: String
 });
 
 

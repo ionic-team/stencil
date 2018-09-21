@@ -13,18 +13,10 @@ import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
-import { MockCustomEvent, MockDocument, MockWindow } from '@stencil/core/mock-doc';
+import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
 
 
-export function mockWindow() {
-  const win = new MockWindow();
-  return (win as any) as Window;
-}
-
-export function mockDocument(html?: string) {
-  const doc = new MockDocument(html);
-  return (doc as any) as Document;
-}
+export { mockDocument, mockWindow };
 
 
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {

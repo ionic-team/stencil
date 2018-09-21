@@ -18,6 +18,7 @@ export class MockDocument extends MockElement {
   constructor(html?: string) {
     super(null, null);
     this.nodeName = '#document';
+    this.nodeType = NODE_TYPES.DOCUMENT_NODE;
 
     const docTypeNode = this.createDocumentTypeNode();
     this.appendChild(docTypeNode);
@@ -32,7 +33,7 @@ export class MockDocument extends MockElement {
       this.body = this.documentElement.children.find(elm => elm.nodeName === 'BODY');
       setOwnerDocument(this.documentElement, this);
 
-    } else {
+    } else if (html !== false) {
       this.documentElement = new MockElement(this, 'html');
       this.appendChild(this.documentElement);
 
@@ -49,6 +50,12 @@ export class MockDocument extends MockElement {
   }
 
   createElement(tagName: string) {
+    if (tagName === '#document') {
+      const doc = new MockDocument(false as any);
+      doc.nodeName = tagName;
+      doc.parentNode = null;
+      return doc;
+    }
     return createElement(this, tagName);
   }
 
@@ -83,7 +90,13 @@ export class MockDocument extends MockElement {
 
   getElementsByTagName(tagName: string) {
     const foundElms: MockElement[] = [];
-    getElementsByTagName(this, tagName, foundElms);
+    getElementsByTagName(this, tagName.toLowerCase(), foundElms);
+    return foundElms;
+  }
+
+  getElementsByName(name: string) {
+    const foundElms: MockElement[] = [];
+    getElementsByName(this, name.toLowerCase(), foundElms);
     return foundElms;
   }
 
@@ -140,10 +153,22 @@ function getElementsByTagName(elm: MockElement, tagName: string, foundElms: Mock
   const children = elm.children;
   for (let i = 0; i < children.length; i++) {
     const childElm = children[i];
-    if (childElm.nodeName.toLowerCase() === tagName.toLowerCase()) {
+    if (childElm.nodeName.toLowerCase() === tagName) {
       foundElms.push(childElm);
     }
     getElementsByTagName(childElm, tagName, foundElms);
+  }
+}
+
+
+function getElementsByName(elm: MockElement, name: string, foundElms: MockElement[]) {
+  const children = elm.children;
+  for (let i = 0; i < children.length; i++) {
+    const childElm = children[i];
+    if ((childElm as any).name && (childElm as any).name.toLowerCase() === name) {
+      foundElms.push(childElm);
+    }
+    getElementsByName(childElm, name, foundElms);
   }
 }
 
