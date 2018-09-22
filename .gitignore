@@ -21,9 +21,12 @@ node_modules/
 /compiler
 /mock-doc
 /polyfills
-/screenshot
 /server
 /sys
 /testing
+
+/screenshot/index.js
+/screenshot/package.json
+/screenshot/screenshot-connector.js
 
 test/example/www/*

@@ -1,0 +1,2 @@
+/*! Built with http://stenciljs.com */
+const{h:e}=window.App;class o{render(){return[e("ion-header",null,e("ion-toolbar",{color:"primary"},e("ion-title",null,"Screenshot Comparison"))),e("ion-content",null,"a, b")]}static get is(){return"screenshot-lookup"}static get style(){return".is-master{background:#efffe6}table.screenshot-lookup{margin:8px;width:100%;font-size:12px}.screenshot-lookup td{padding:4px 8px}.screenshot-lookup .desc,.screenshot-lookup .timestamp{white-space:nowrap}"}}export{o as ScreenshotLookup};
