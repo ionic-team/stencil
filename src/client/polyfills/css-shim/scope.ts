@@ -16,18 +16,6 @@ export function parseCSS(original: string): CSSScope {
   };
 }
 
-export function getScopesForElement(hostTemplateMap: WeakMap<HTMLElement, CSSScope>, node: HTMLElement) {
-  const scopes: CSSScope[] = [];
-  while (node) {
-    const scope = hostTemplateMap.get(node);
-    if (scope) {
-      scopes.push(scope);
-    }
-    node = node.parentElement;
-  }
-  return scopes;
-}
-
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
   const css = parseCSS(styleEl.innerHTML);
   css.styleEl = styleEl;
