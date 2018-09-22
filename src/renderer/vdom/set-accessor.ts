@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { elementHasProperty } from '../../core/proxy-members';
+import { elementHasProperty } from '../../core/element-has-property';
 import { PROP_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
 import { updateAttribute } from './update-attribute';
