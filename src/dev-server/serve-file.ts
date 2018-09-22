@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import * as util from './util';
-import { getDevServerClientScript } from './serve-dev-client';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
 import * as path from 'path';
@@ -101,3 +100,9 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 }
 
 const urlVersionIds = new Map<string, string>();
+
+
+function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
+  return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
+}
