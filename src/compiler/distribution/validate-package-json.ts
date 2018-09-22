@@ -1,8 +1,7 @@
 import * as d from '../../declarations';
 import { buildWarn, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
-import { getComponentsDtsTypesFilePath } from './distribution';
-import { getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
+import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
 
 
 export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {

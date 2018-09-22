@@ -120,3 +120,16 @@ export function getBrowserFilename(bundleId: string, isScopedStyles: boolean, so
 export function getEsmFilename(bundleId: string, isScopedStyles: boolean) {
   return `${bundleId}${isScopedStyles ? '.sc' : ''}.entry.js`;
 }
+
+
+export function getComponentsDtsSrcFilePath(config: d.Config) {
+  return pathJoin(config, config.srcDir, GENERATED_DTS);
+}
+
+
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
+  return pathJoin(config, outputTarget.typesDir, GENERATED_DTS);
+}
+
+
+export const GENERATED_DTS = 'components.d.ts';

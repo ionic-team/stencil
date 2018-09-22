@@ -4,7 +4,7 @@ import { generateCommonJsIndex } from './dist-cjs';
 import { generateEsmIndexes } from './dist-esm';
 import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
-import { hasError, pathJoin } from '../util';
+import { hasError } from '../util';
 import * as v from './validate-package-json';
 
 
@@ -83,16 +83,3 @@ async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
 
   return pkgData;
 }
-
-
-export function getComponentsDtsSrcFilePath(config: d.Config) {
-  return pathJoin(config, config.srcDir, GENERATED_DTS);
-}
-
-
-export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
-  return pathJoin(config, outputTarget.typesDir, GENERATED_DTS);
-}
-
-
-export const GENERATED_DTS = 'components.d.ts';

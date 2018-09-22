@@ -3,7 +3,7 @@ import { addCollection } from './datacollection/discover-collections';
 import addComponentMetadata from './transformers/add-component-metadata';
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/gather-metadata';
-import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
+import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getModuleFile } from '../build/compiler-ctx';
 import { getModuleImports } from './transformers/module-imports';
 import { getUserCompilerOptions } from './compiler-options';

@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../distribution/distribution';
+import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { MEMBER_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
-import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
+
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination = 'src') {
   // only gather components that are still root ts files we've found and have component metadata
