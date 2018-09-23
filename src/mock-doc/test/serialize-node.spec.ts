@@ -8,6 +8,15 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('svg', () => {
+    doc.body.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+    `;
+
+    const html = serializeNodeToHtml(doc.body);
+    expect(html).toBe(`<svg xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink></svg>`);
+  });
+
   it('remove empty attrs', () => {
     const elm = doc.createElement('button');
 

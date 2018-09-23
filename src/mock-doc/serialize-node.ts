@@ -93,9 +93,9 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
         } else if (attr.namespaceURI === 'http://www.w3.org/2000/xmlns/') {
           if (attr.name !== 'xmlns') {
             output.text.push('xmlns:' + attr.name);
+          } else {
+            output.text.push(attr.name);
           }
-
-          output.text.push(attr.name);
 
         } else if (attr.namespaceURI === 'http://www.w3.org/1999/xlink') {
           output.text.push('xlink:' + attr.name);
