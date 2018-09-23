@@ -53,12 +53,13 @@ describe('serializeNodeToHtml', () => {
 
   it('empty document', () => {
     const html = serializeNodeToHtml(doc);
-    expect(html).toBe(`<html><head></head><body></body></html>`);
+    expect(html).toBe(`<!doctype html><html><head></head><body></body></html>`);
   });
 
   it('empty document, pretty', () => {
     const html = serializeNodeToHtml(doc, { pretty: true });
-    expect(html).toBe(`<html>
+    expect(html).toBe(`<!doctype html>
+<html>
   <head></head>
   <body></body>
 </html>`);

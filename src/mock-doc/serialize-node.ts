@@ -205,7 +205,10 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
       }
     }
 
-    output.text.push('<!--', node.nodeValue, '-->');
+    output.text.push('<!--' + node.nodeValue + '-->');
+
+  } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
+    output.text.push('<!doctype html>');
   }
 }
 
