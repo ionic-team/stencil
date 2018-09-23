@@ -20,6 +20,14 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
     opts.removeAttributeQuotes = false;
   }
 
+  if (typeof opts.removeEmptyAttributes !== 'boolean') {
+    opts.removeEmptyAttributes = true;
+  }
+
+  if (typeof opts.collapseBooleanAttributes !== 'boolean') {
+    opts.collapseBooleanAttributes = false;
+  }
+
   if (opts.outerHTML) {
     serializeToHtml(elm, opts, output);
   } else {
@@ -69,49 +77,52 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
 
       for (let i = 0, attrsLength = (node as MockElement).attributes.items.length; i < attrsLength; i++) {
         const attr = (node as MockElement).attributes.items[i];
+        const attrName = attr.name;
 
-        if (attr.name === 'style') {
+        if (attrName === 'style') {
           continue;
         }
 
-        if (attr.value === '' && REMOVE_EMPTY_ATTR.has(attr.name)) {
+        let attrValue = attr.value;
+        if (opts.removeEmptyAttributes && attrValue === '' && REMOVE_EMPTY_ATTR.has(attrName)) {
           continue;
         }
 
-        output.text.push(' ');
+        const attrNamespaceURI = attr.namespaceURI;
+        if (!attrNamespaceURI) {
+          output.text.push(' ' + attrName);
 
-        if (!attr.namespaceURI) {
-          output.text.push(attr.name);
+        } else if (attrNamespaceURI === 'http://www.w3.org/XML/1998/namespace') {
+          output.text.push(' xml:' + attrName);
 
-        } else if (attr.namespaceURI === 'http://www.w3.org/XML/1998/namespace') {
-          output.text.push('xml:' + attr.name);
-
-        } else if (attr.namespaceURI === 'http://www.w3.org/2000/xmlns/') {
-          if (attr.name !== 'xmlns') {
-            output.text.push('xmlns:' + attr.name);
+        } else if (attrNamespaceURI === 'http://www.w3.org/2000/xmlns/') {
+          if (attrName !== 'xmlns') {
+            output.text.push(' xmlns:' + attrName);
           } else {
-            output.text.push(attr.name);
+            output.text.push(' ' + attrName);
           }
 
-        } else if (attr.namespaceURI === 'http://www.w3.org/1999/xlink') {
-          output.text.push('xlink:' + attr.name);
+        } else if (attrNamespaceURI === 'http://www.w3.org/1999/xlink') {
+          output.text.push(' xlink:' + attrName);
 
         } else {
-          output.text.push(attr.namespaceURI + ':' + attr.name);
+          output.text.push(' ' + attrNamespaceURI + ':' + attrName);
         }
 
-        if (attr.name === 'class' && opts.pretty) {
-          const tokens = attr.value.split(' ').filter(t => t !== '').sort();
-          attr.value = tokens.join(' ').trim();
+        if (attrName === 'class' && opts.pretty) {
+          const tokens = attrValue.split(' ').filter(t => t !== '').sort();
+          attrValue = attr.value = tokens.join(' ').trim();
 
-        } else if (attr.name.startsWith('data-') && attr.value === '') {
-          continue;
+        } else if (attrValue === '') {
+          if ((opts.collapseBooleanAttributes && BOOLEAN_ATTR.has(attrName)) || (opts.removeEmptyAttributes && attrName.startsWith('data-'))) {
+            continue;
+          }
         }
 
-        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attr.value)) {
-          output.text.push('=' + escapeString(attr.value, true));
+        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
+          output.text.push('=' + escapeString(attrValue, true));
         } else {
-          output.text.push('="' + escapeString(attr.value, true) + '"');
+          output.text.push('="' + escapeString(attrValue, true) + '"');
         }
       }
 
@@ -226,46 +237,14 @@ function escapeString(str: string, attrMode: boolean) {
   return str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
 }
 
-const NON_ESCAPABLE_CONTENT = new Set([
-  'style',
-  'script',
-  'xmp',
-  'iframe',
-  'noembed',
-  'noframes',
-  'plaintext',
-  'noscript'
-]);
+const NON_ESCAPABLE_CONTENT = new Set(['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext', 'noscript']);
 
-const EMPTY_ELEMENTS = new Set([
-  'area',
-  'base',
-  'basefont',
-  'bgsound',
-  'br',
-  'col',
-  'embed',
-  'frame',
-  'hr',
-  'img',
-  'input',
-  'keygen',
-  'link',
-  'meta',
-  'param',
-  'source',
-  'trace',
-  'wbr'
-]);
+const EMPTY_ELEMENTS = new Set(['area', 'base', 'basefont', 'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'trace', 'wbr']);
 
-const REMOVE_EMPTY_ATTR = new Set([
-  'class',
-  'dir',
-  'id',
-  'lang',
-  'name',
-  'title'
-]);
+const REMOVE_EMPTY_ATTR = new Set(['class', 'dir', 'id', 'lang', 'name', 'title']);
+
+const BOOLEAN_ATTR = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'compact', 'controls', 'declare', 'default', 'defaultchecked', 'defaultmuted', 'defaultselected', 'defer', 'disabled', 'enabled', 'formnovalidate', 'hidden', 'indeterminate', 'inert', 'ismap', 'itemscope', 'loop', 'multiple', 'muted', 'nohref', 'noresize', 'noshade', 'novalidate', 'nowrap', 'open', 'pauseonexit', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected', 'sortable', 'truespeed', 'typemustmatch', 'visible']);
+
 
 interface SerializeOutput {
   indent: number;
@@ -273,11 +252,13 @@ interface SerializeOutput {
 }
 
 export interface SerializeElementOptions {
-  outerHTML?: boolean;
-  excludeTags?: string[];
+  collapseBooleanAttributes?: boolean;
   excludeTagContent?: string[];
+  excludeTags?: string[];
   indentSpaces?: number;
   newLines?: boolean;
+  outerHTML?: boolean;
   pretty?: boolean;
   removeAttributeQuotes?: boolean;
+  removeEmptyAttributes?: boolean;
 }
