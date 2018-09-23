@@ -9,6 +9,20 @@ describe('parseHtml', () => {
     doc = new MockDocument();
   });
 
+  it('template', () => {
+    doc = new MockDocument(`
+      <template>text</template>
+    `);
+
+    expect(doc.head.innerHTML).toBe(`<template>text</template>`);
+
+    const tmplElm: HTMLTemplateElement = doc.head.firstElementChild as any;
+
+    expect(tmplElm.outerHTML).toBe(`<template>text</template>`);
+    expect(tmplElm.content.firstChild.textContent).toBe(`text`);
+    expect(tmplElm.childNodes).toHaveLength(0);
+  });
+
   it('getElementsByTagName', () => {
     doc = new MockDocument(`
       <article>article</article>

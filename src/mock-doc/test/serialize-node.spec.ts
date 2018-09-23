@@ -8,6 +8,14 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('template', () => {
+    const input = `<template>text</template>`;
+    doc.body.innerHTML = input;
+
+    const output = serializeNodeToHtml(doc.body);
+    expect(input).toBe(output);
+  });
+
   it('svg', () => {
     const input = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>`;
     doc.body.innerHTML = input;

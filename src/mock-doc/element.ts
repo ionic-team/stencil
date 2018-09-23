@@ -157,7 +157,7 @@ patchPropAttributes(MockScriptElement.prototype, {
 });
 
 
-class MockTemplateElement extends MockElement {
+export class MockTemplateElement extends MockElement {
   content: MockDocumentFragment;
 
   constructor(ownerDocument: any) {

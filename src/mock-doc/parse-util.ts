@@ -1,6 +1,7 @@
 import { MockComment } from './comment-node';
 import { MockDocument } from './document';
 import { MockElement, MockNode } from './node';
+import { MockTemplateElement } from './element';
 import { MockTextNode } from './text-node';
 import { NODE_TYPES } from './constants';
 import * as parse5 from 'parse5';
@@ -25,7 +26,6 @@ export function parseFragmentUtil(ownerDocument: any, html: string) {
     html.trim(),
     getParser(ownerDocument)
   ) as any;
-
   return frag;
 }
 
@@ -76,12 +76,12 @@ function getParser(ownerDocument: any) {
       parentNode.insertBefore(newNode, referenceNode);
     },
 
-    setTemplateContent(templateElement: MockElement, contentElement: MockElement) {
-      templateElement.appendChild(contentElement);
+    setTemplateContent(templateElement: MockTemplateElement, contentElement: MockElement) {
+      templateElement.content = contentElement;
     },
 
-    getTemplateContent(templateElement: MockElement) {
-      return templateElement.children[0];
+    getTemplateContent(templateElement: MockTemplateElement) {
+      return templateElement.content;
     },
 
     setDocumentType(doc: MockDocument, name: string, publicId: string, systemId: string) {
