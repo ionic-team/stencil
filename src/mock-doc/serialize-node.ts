@@ -1,5 +1,3 @@
-import { MockAttributeMap } from './attribute';
-import { MockComment } from './comment-node';
 import { MockElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
@@ -16,6 +14,14 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
 
   if (opts.pretty && typeof opts.newLines !== 'boolean') {
     opts.newLines = true;
+  }
+
+  if (typeof opts.removeAttributeQuotes !== 'boolean') {
+    if (opts.pretty) {
+      opts.removeAttributeQuotes = false;
+    } else {
+      opts.removeAttributeQuotes = true;
+    }
   }
 
   if (opts.outerHTML) {
@@ -38,29 +44,157 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
 
 
 function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
-  switch (node.nodeType) {
-    case NODE_TYPES.ELEMENT_NODE:
-      serializeElmentToHtml(node as MockElement, opts, output);
-      break;
+  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
+    const tagName = node.nodeName.toLowerCase();
 
-    case NODE_TYPES.TEXT_NODE:
-      serializeTextNodeToHtml(node, opts, output);
-      break;
+    const ignoreTag = (opts.excludeTags && opts.excludeTags.includes(tagName));
 
-    case NODE_TYPES.COMMENT_NODE:
-      serializeCommentNodeToHtml(node as MockComment, opts, output);
-      break;
-  }
-}
+    if (!ignoreTag) {
 
+      if (opts.newLines) {
+        output.text.push('\n');
+      }
 
-function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, output: SerializeOutput) {
-  const tagName = elm.tagName.toLowerCase();
+      if (opts.indentSpaces > 0) {
+        for (let i = 0; i < output.indent; i++) {
+          output.text.push(' ');
+        }
+      }
 
-  const ignoreTag = (opts.excludeTags && opts.excludeTags.includes(tagName));
+      output.text.push('<' + tagName);
 
-  if (!ignoreTag) {
+      if (opts.pretty) {
+        (node as MockElement).attributes.items.sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        });
+      }
 
+      for (let i = 0, attrsLength = (node as MockElement).attributes.items.length; i < attrsLength; i++) {
+        const attr = (node as MockElement).attributes.items[i];
+
+        if (attr.name === 'style') {
+          continue;
+        }
+
+        if (attr.value === '' && REMOVE_EMPTY_ATTR.has(attr.name)) {
+          continue;
+        }
+
+        output.text.push(' ');
+
+        if (!attr.namespaceURI) {
+          output.text.push(attr.name);
+
+        } else if (attr.namespaceURI === 'http://www.w3.org/XML/1998/namespace') {
+          output.text.push('xml:' + attr.name);
+
+        } else if (attr.namespaceURI === 'http://www.w3.org/2000/xmlns/') {
+          if (attr.name !== 'xmlns') {
+            output.text.push('xmlns:' + attr.name);
+          }
+
+          output.text.push(attr.name);
+
+        } else if (attr.namespaceURI === 'http://www.w3.org/1999/xlink') {
+          output.text.push('xlink:' + attr.name);
+
+        } else {
+          output.text.push(attr.namespaceURI + ':' + attr.name);
+        }
+
+        if (attr.name === 'class' && opts.pretty) {
+          const tokens = attr.value.split(' ').filter(t => t !== '').sort();
+          attr.value = tokens.join(' ').trim();
+
+        } else if (attr.name.startsWith('data-') && attr.value === '') {
+          continue;
+        }
+
+        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attr.value)) {
+          output.text.push('=' + escapeString(attr.value, true));
+        } else {
+          output.text.push('="' + escapeString(attr.value, true) + '"');
+        }
+      }
+
+      const cssText = (node as MockElement).style.cssText;
+      if (cssText) {
+        output.text.push(' style="' + cssText + '">');
+      } else {
+        output.text.push('>');
+      }
+    }
+
+    if (!EMPTY_ELEMENTS.has(tagName)) {
+
+      const ignoreTagContent = (opts.excludeTagContent && opts.excludeTagContent.includes(tagName));
+
+      if (!ignoreTagContent) {
+        let childNodes: MockNode[];
+
+        if (tagName === 'template') {
+          childNodes = ((node as any) as HTMLTemplateElement).content.childNodes as any;
+        } else {
+          childNodes = node.childNodes;
+        }
+
+        if (childNodes.length > 0) {
+          if (opts.indentSpaces > 0 && !ignoreTag) {
+            output.indent = output.indent + opts.indentSpaces;
+          }
+
+          for (let i = 0; i < childNodes.length; i++) {
+            serializeToHtml(childNodes[i], opts, output);
+          }
+
+          if (opts.newLines && !ignoreTag) {
+            output.text.push('\n');
+          }
+
+          if (opts.indentSpaces > 0 && !ignoreTag) {
+            output.indent = output.indent - opts.indentSpaces;
+
+            for (let i = 0; i < output.indent; i++) {
+              output.text.push(' ');
+            }
+          }
+        }
+
+        if (!ignoreTag) {
+          output.text.push('</' + tagName + '>');
+        }
+      }
+    }
+
+  } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
+    if (node.nodeValue.trim() !== '') {
+      if (opts.newLines) {
+        output.text.push('\n');
+      }
+
+      if (opts.indentSpaces > 0) {
+        for (let i = 0; i < output.indent; i++) {
+          output.text.push(' ');
+        }
+      }
+
+      const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName.toLowerCase() : null);
+
+      if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
+        output.text.push(node.nodeValue);
+
+      } else {
+        if (opts.pretty) {
+          output.text.push(escapeString(node.nodeValue.replace(/\s\s+/g, ' ').trim(), false));
+        } else {
+          output.text.push(escapeString(node.nodeValue, false));
+        }
+      }
+    }
+
+  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE) {
     if (opts.newLines) {
       output.text.push('\n');
     }
@@ -71,168 +205,26 @@ function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, 
       }
     }
 
-    output.text.push('<');
-    output.text.push(tagName);
-
-    serializeAttributes(opts, elm.attributes, output);
-
-    const cssText = elm.style.cssText;
-    if (cssText) {
-      output.text.push(' style="', cssText, '"');
-    }
-
-    output.text.push('>');
-  }
-
-  if (!EMPTY_ELEMENTS.has(tagName)) {
-
-    const ignoreTagContent = (opts.excludeTagContent && opts.excludeTagContent.includes(tagName));
-
-    if (!ignoreTagContent) {
-      let childNodes: MockNode[];
-
-      if (tagName === 'template') {
-        childNodes = ((elm as any) as HTMLTemplateElement).content.childNodes as any;
-      } else {
-        childNodes = elm.childNodes;
-      }
-
-      if (childNodes.length > 0) {
-        if (opts.indentSpaces > 0 && !ignoreTag) {
-          output.indent = output.indent + opts.indentSpaces;
-        }
-
-        for (let i = 0; i < childNodes.length; i++) {
-          serializeToHtml(childNodes[i], opts, output);
-        }
-
-        if (opts.newLines && !ignoreTag) {
-          output.text.push('\n');
-        }
-
-        if (opts.indentSpaces > 0 && !ignoreTag) {
-          output.indent = output.indent - opts.indentSpaces;
-
-          for (let i = 0; i < output.indent; i++) {
-            output.text.push(' ');
-          }
-        }
-      }
-
-      if (!ignoreTag) {
-        output.text.push('</', tagName, '>');
-      }
-    }
+    output.text.push('<!--', node.nodeValue, '-->');
   }
 }
 
-
-function serializeAttributes(opts: SerializeElementOptions, attrMap: MockAttributeMap, output: SerializeOutput) {
-  if (opts.pretty) {
-    attrMap.items.sort((a, b) => {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
-  }
-
-  for (let i = 0, attrsLength = attrMap.items.length; i < attrsLength; i++) {
-    const attr = attrMap.items[i];
-
-    if (attr.name === 'style') {
-      continue;
-    }
-
-    output.text.push(' ');
-
-    if (!attr.namespaceURI) {
-      output.text.push(attr.name);
-
-    } else if (attr.namespaceURI === 'http://www.w3.org/XML/1998/namespace') {
-      output.text.push('xml:', attr.name);
-
-    } else if (attr.namespaceURI === 'http://www.w3.org/2000/xmlns/') {
-      if (attr.name !== 'xmlns') {
-        output.text.push('xmlns:', attr.name);
-      }
-
-      output.text.push(attr.name);
-
-    } else if (attr.namespaceURI === 'http://www.w3.org/1999/xlink') {
-      output.text.push('xlink:', attr.name);
-
-    } else {
-      output.text.push(attr.namespaceURI, ':', attr.name);
-    }
-
-    if (attr.name === 'class' && opts.pretty) {
-      const tokens = attr.value.split(' ').filter(t => t !== '').sort();
-      attr.value = tokens.join(' ');
-    }
-
-    output.text.push('="', escapeString(attr.value, true), '"');
-  }
-}
-
-function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
-  if (node.nodeValue.trim() === '') {
-    return;
-  }
-
-  if (opts.newLines) {
-    output.text.push('\n');
-  }
-
-  if (opts.indentSpaces > 0) {
-    for (let i = 0; i < output.indent; i++) {
-      output.text.push(' ');
-    }
-  }
-
-  const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName.toLowerCase() : null);
-
-  if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
-    output.text.push(node.nodeValue);
-
-  } else {
-    output.text.push(escapeString(opts.pretty ? prettyText(node as any) : node.nodeValue, false));
-  }
-}
-
-function prettyText(textNode: Text) {
-  return textNode.nodeValue.replace(/\s\s+/g, ' ').trim();
-}
-
-function serializeCommentNodeToHtml(commentNode: MockComment, opts: SerializeElementOptions, output: SerializeOutput) {
-  if (opts.newLines) {
-    output.text.push('\n');
-  }
-
-  if (opts.indentSpaces > 0) {
-    for (let i = 0; i < output.indent; i++) {
-      output.text.push(' ');
-    }
-  }
-
-  output.text.push('<!--', commentNode.nodeValue, '-->');
-}
 
 const AMP_REGEX = /&/g;
 const NBSP_REGEX = /\u00a0/g;
 const DOUBLE_QUOTE_REGEX = /"/g;
 const LT_REGEX = /</g;
 const GT_REGEX = />/g;
+const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>]+$/;
 
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
 
   if (attrMode) {
-      str = str.replace(DOUBLE_QUOTE_REGEX, '&quot;');
-  } else {
-      str = str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
+    return str.replace(DOUBLE_QUOTE_REGEX, '&quot;');
   }
 
-  return str;
+  return str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
 }
 
 const NON_ESCAPABLE_CONTENT = new Set([
@@ -267,6 +259,15 @@ const EMPTY_ELEMENTS = new Set([
   'wbr'
 ]);
 
+const REMOVE_EMPTY_ATTR = new Set([
+  'class',
+  'dir',
+  'id',
+  'lang',
+  'name',
+  'title'
+]);
+
 interface SerializeOutput {
   indent: number;
   text: string[];
@@ -279,4 +280,5 @@ export interface SerializeElementOptions {
   indentSpaces?: number;
   newLines?: boolean;
   pretty?: boolean;
+  removeAttributeQuotes?: boolean;
 }
