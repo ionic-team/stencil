@@ -10,28 +10,20 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
     text: []
   };
 
-  if (typeof opts.indentSpaces !== 'number') {
+  if (opts.pretty && typeof opts.indentSpaces !== 'number') {
     opts.indentSpaces = 2;
   }
 
-  if (typeof opts.newLines !== 'boolean') {
+  if (opts.pretty && typeof opts.newLines !== 'boolean') {
     opts.newLines = true;
   }
 
-  if (typeof opts.newLines !== 'boolean') {
-    opts.newLines = true;
-  }
-
-  if (typeof opts.excludeRoot !== 'boolean') {
-    opts.excludeRoot = true;
-  }
-
-  if (opts.excludeRoot) {
+  if (opts.outerHTML) {
+    serializeToHtml(elm, opts, output);
+  } else {
     for (let i = 0; i < elm.childNodes.length; i++) {
       serializeToHtml(elm.childNodes[i], opts, output);
     }
-  } else {
-    serializeToHtml(elm, opts, output);
   }
 
   if (output.text[0] === '\n') {
@@ -92,42 +84,44 @@ function serializeElmentToHtml(elm: MockElement, opts: SerializeElementOptions, 
     output.text.push('>');
   }
 
-  const ignoreTagContent = (opts.excludeTagContent && opts.excludeTagContent.includes(tagName));
+  if (!EMPTY_ELEMENTS.has(tagName)) {
 
-  if (!EMPTY_ELEMENTS[tagName] && !ignoreTagContent) {
+    const ignoreTagContent = (opts.excludeTagContent && opts.excludeTagContent.includes(tagName));
 
-    let childNodes: MockNode[];
+    if (!ignoreTagContent) {
+      let childNodes: MockNode[];
 
-    if (tagName === 'template') {
-      childNodes = ((elm as any) as HTMLTemplateElement).content.childNodes as any;
-    } else {
-      childNodes = elm.childNodes;
-    }
-
-    if (childNodes.length > 0) {
-      if (opts.indentSpaces > 0 && !ignoreTag) {
-        output.indent = output.indent + opts.indentSpaces;
+      if (tagName === 'template') {
+        childNodes = ((elm as any) as HTMLTemplateElement).content.childNodes as any;
+      } else {
+        childNodes = elm.childNodes;
       }
 
-      for (let i = 0; i < childNodes.length; i++) {
-        serializeToHtml(childNodes[i], opts, output);
-      }
+      if (childNodes.length > 0) {
+        if (opts.indentSpaces > 0 && !ignoreTag) {
+          output.indent = output.indent + opts.indentSpaces;
+        }
 
-      if (opts.newLines && !ignoreTag) {
-        output.text.push('\n');
-      }
+        for (let i = 0; i < childNodes.length; i++) {
+          serializeToHtml(childNodes[i], opts, output);
+        }
 
-      if (opts.indentSpaces > 0 && !ignoreTag) {
-        output.indent = output.indent - opts.indentSpaces;
+        if (opts.newLines && !ignoreTag) {
+          output.text.push('\n');
+        }
 
-        for (let i = 0; i < output.indent; i++) {
-          output.text.push(' ');
+        if (opts.indentSpaces > 0 && !ignoreTag) {
+          output.indent = output.indent - opts.indentSpaces;
+
+          for (let i = 0; i < output.indent; i++) {
+            output.text.push(' ');
+          }
         }
       }
-    }
 
-    if (!ignoreTag) {
-      output.text.push('</', tagName, '>');
+      if (!ignoreTag) {
+        output.text.push('</', tagName, '>');
+      }
     }
   }
 }
@@ -195,9 +189,9 @@ function serializeTextNodeToHtml(node: MockNode, opts: SerializeElementOptions, 
     }
   }
 
-  const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
+  const parentTagName = (node.parentNode && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName.toLowerCase() : null);
 
-  if (NON_ESCAPABLE_CONTENT[parentTagName]) {
+  if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
     output.text.push(node.nodeValue);
 
   } else {
@@ -241,38 +235,37 @@ function escapeString(str: string, attrMode: boolean) {
   return str;
 }
 
+const NON_ESCAPABLE_CONTENT = new Set([
+  'style',
+  'script',
+  'xmp',
+  'iframe',
+  'noembed',
+  'noframes',
+  'plaintext',
+  'noscript'
+]);
 
-const NON_ESCAPABLE_CONTENT: {[tagName: string]: boolean} = {
-  'style': true,
-  'script': true,
-  'xmp': true,
-  'iframe': true,
-  'noembed': true,
-  'noframes': true,
-  'plaintext': true,
-  'noscript': true
-};
-
-const EMPTY_ELEMENTS: {[tagName: string]: boolean} = {
-  'area': true,
-  'base': true,
-  'basefont': true,
-  'bgsound': true,
-  'br': true,
-  'col': true,
-  'embed': true,
-  'frame': true,
-  'hr': true,
-  'img': true,
-  'input': true,
-  'keygen': true,
-  'link': true,
-  'meta': true,
-  'param': true,
-  'source': true,
-  'trace': true,
-  'wbr': true
-};
+const EMPTY_ELEMENTS = new Set([
+  'area',
+  'base',
+  'basefont',
+  'bgsound',
+  'br',
+  'col',
+  'embed',
+  'frame',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'trace',
+  'wbr'
+]);
 
 interface SerializeOutput {
   indent: number;
@@ -280,7 +273,7 @@ interface SerializeOutput {
 }
 
 export interface SerializeElementOptions {
-  excludeRoot?: boolean;
+  outerHTML?: boolean;
   excludeTags?: string[];
   excludeTagContent?: string[];
   indentSpaces?: number;

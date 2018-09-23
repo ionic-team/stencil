@@ -211,7 +211,6 @@ export class MockElement extends MockNode {
       return '';
     }
     return serializeNodeToHtml(this, {
-      excludeRoot: true,
       newLines: false,
       indentSpaces: 0
     });
@@ -281,7 +280,7 @@ export class MockElement extends MockNode {
 
   get outerHTML() {
     return serializeNodeToHtml(this, {
-      excludeRoot: false,
+      outerHTML: true,
       newLines: false,
       indentSpaces: 0
     });
