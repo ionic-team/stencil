@@ -17,11 +17,7 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
   }
 
   if (typeof opts.removeAttributeQuotes !== 'boolean') {
-    if (opts.pretty) {
-      opts.removeAttributeQuotes = false;
-    } else {
-      opts.removeAttributeQuotes = true;
-    }
+    opts.removeAttributeQuotes = false;
   }
 
   if (opts.outerHTML) {
