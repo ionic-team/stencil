@@ -173,6 +173,10 @@ export async function setupJestConfig(config: d.Config) {
     jestConfig.rootDir = config.rootDir;
   }
 
+  try {
+    await config.sys.fs.mkdir(config.cacheDir);
+  } catch (e) {}
+
   await config.sys.fs.writeFile(
     jestConfigPath,
     JSON.stringify(jestConfig, null, 2)
