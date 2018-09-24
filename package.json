@@ -146,17 +146,18 @@
       "@stencil/core/mock-doc": "<rootDir>/mock-doc/"
     },
     "testPathIgnorePatterns": [
-      "/.stencil",
-      "/bin",
-      "/dist",
-      "/mock-doc",
-      "/node_modules",
-      "/screenshot",
-      "/scripts",
-      "/server",
-      "/sys",
-      "/testing",
-      "/www"
+      "<rootDir>/.stencil/",
+      "<rootDir>/bin/",
+      "<rootDir>/dist/",
+      "<rootDir>/mock-doc/",
+      "<rootDir>/node_modules/",
+      "<rootDir>/screenshot/",
+      "<rootDir>/scripts/",
+      "<rootDir>/server/",
+      "<rootDir>/sys/",
+      "<rootDir>/test/",
+      "<rootDir>/testing/",
+      "<rootDir>/www/"
     ],
     "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
   }

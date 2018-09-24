@@ -17,6 +17,7 @@ describe('outputTargets', () => {
     config.buildAppCore = true;
     config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'TestApp';
+    config.buildEs5 = true;
     config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
     config.outputTargets = [{ type: 'dist' }];
 
@@ -47,6 +48,7 @@ describe('outputTargets', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
+    console.log(c.fs.keys);
     expectFiles(c.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
 
@@ -68,12 +70,16 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.core.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.define.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.global.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.ios.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.ios.sc.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.md.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.md.sc.entry.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'index.js'),
-
       path.join(root, 'User', 'testing', 'dist', 'testapp.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.ios.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.md.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'es5-build-disabled.js'),
+      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.ios.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.ios.sc.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.md.entry.js'),
+      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.md.sc.entry.js'),
       path.join(root, 'User', 'testing', 'dist', 'testapp', 'testapp.core.js'),
       path.join(root, 'User', 'testing', 'dist', 'testapp', 'testapp.global.js'),
 
