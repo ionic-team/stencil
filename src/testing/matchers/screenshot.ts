@@ -22,7 +22,7 @@ export function toMatchScreenshot(compare: d.ScreenshotCompare, opts: d.MatchScr
     }
     return {
       message: () => `${device}: screenshot has a mismatch ratio of "${compare.mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${opts.allowableMismatchedRatio}"`,
-      pass: (compare.mismatchedRatio < opts.allowableMismatchedRatio),
+      pass: (compare.mismatchedRatio <= opts.allowableMismatchedRatio),
     };
   }
 
@@ -32,21 +32,21 @@ export function toMatchScreenshot(compare: d.ScreenshotCompare, opts: d.MatchScr
     }
     return {
       message: () => `${device}: screenshot has "${compare.mismatchedPixels}" mismatched pixels for "${compare.desc}", but expected less than "${opts.allowableMismatchedPixels}" mismatched pixels`,
-      pass: (compare.mismatchedPixels < opts.allowableMismatchedPixels),
+      pass: (compare.mismatchedPixels <= opts.allowableMismatchedPixels),
     };
   }
 
   if (typeof compare.allowableMismatchedRatio === 'number') {
     return {
       message: () => `${device}: screenshot has a mismatch ratio of "${compare.mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${compare.allowableMismatchedRatio}"`,
-      pass: (compare.mismatchedRatio < compare.allowableMismatchedRatio),
+      pass: (compare.mismatchedRatio <= compare.allowableMismatchedRatio),
     };
   }
 
   if (typeof compare.allowableMismatchedPixels === 'number') {
     return {
       message: () => `${device}: screenshot has "${compare.mismatchedPixels}" mismatched pixels for "${compare.desc}", but expected less than "${compare.allowableMismatchedPixels}" mismatched pixels`,
-      pass: (compare.mismatchedPixels < compare.allowableMismatchedPixels),
+      pass: (compare.mismatchedPixels <= compare.allowableMismatchedPixels),
     };
   }
 

@@ -60,6 +60,8 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
       const compare: d.ScreenshotCompare = {
         mismatchedRatio: 0,
         mismatchedPixels: 0,
+        allowableMismatchedPixels: 1,
+        allowableMismatchedRatio: 1.0,
         desc: ''
       };
       return compare;

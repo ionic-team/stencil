@@ -93,8 +93,8 @@ export interface ScreenshotCompare {
   isLandscape?: boolean;
   isMobile?: boolean;
   mediaType?: string;
-  allowableMismatchedPixels?: number;
-  allowableMismatchedRatio?: number;
+  allowableMismatchedPixels: number;
+  allowableMismatchedRatio: number;
   testPath?: string;
 }
 
