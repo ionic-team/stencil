@@ -5,7 +5,7 @@ import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from 
 import { NODE_TYPES } from './constants';
 import { parseFragmentUtil } from './parse-util';
 import { selectAll, selectOne } from './selector';
-import { SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
+import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 
 
 export class MockNode {
@@ -217,14 +217,19 @@ export class MockElement extends MockNode {
   }
 
   set innerHTML(html: string) {
-    for (let i = this.childNodes.length - 1; i >= 0; i--) {
-      this.removeChild(this.childNodes[i]);
-    }
+    if (NON_ESCAPABLE_CONTENT.has(this.nodeName.toLowerCase())) {
+      setTextContent(this, html);
 
-    if (html) {
-      const frag = parseFragmentUtil(this.ownerDocument, html);
-      for (let i = 0; i < frag.childNodes.length; i++) {
-        this.appendChild(frag.childNodes[i]);
+    } else {
+      for (let i = this.childNodes.length - 1; i >= 0; i--) {
+        this.removeChild(this.childNodes[i]);
+      }
+
+      if (html) {
+        const frag = parseFragmentUtil(this.ownerDocument, html);
+        for (let i = 0; i < frag.childNodes.length; i++) {
+          this.appendChild(frag.childNodes[i]);
+        }
       }
     }
   }

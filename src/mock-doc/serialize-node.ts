@@ -237,7 +237,7 @@ function escapeString(str: string, attrMode: boolean) {
   return str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
 }
 
-const NON_ESCAPABLE_CONTENT = new Set(['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext', 'noscript']);
+export const NON_ESCAPABLE_CONTENT = new Set(['style', 'script', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext', 'noscript']);
 
 const EMPTY_ELEMENTS = new Set(['area', 'base', 'basefont', 'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'trace', 'wbr']);
 

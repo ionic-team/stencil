@@ -122,4 +122,11 @@ describe('serializeNodeToHtml', () => {
 </html>`);
   });
 
+  it('script innerHTML', () => {
+    const input = `x<y && a>b`;
+    const scriptElm = doc.createElement('script');
+    scriptElm.innerHTML = input;
+    expect(scriptElm.innerHTML).toBe(input);
+  });
+
 });
