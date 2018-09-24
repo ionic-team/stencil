@@ -176,7 +176,7 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
     }
 
   } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
-    if (node.nodeValue.trim() !== '') {
+    if (typeof node.nodeValue === 'string' && node.nodeValue.trim() !== '') {
       if (opts.newLines) {
         output.text.push('\n');
       }
