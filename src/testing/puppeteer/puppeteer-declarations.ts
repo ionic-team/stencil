@@ -168,7 +168,7 @@ export interface E2EElement {
    * then uses `page.mouse` to click in the center of the element.
    * Please see the puppeteer docs for more information.
    */
-  click(options?: puppeteer.ClickOptions): void;
+  click(options?: puppeteer.ClickOptions): Promise<void>;
 
   /**
    * Find a child element that matches the selector, which is the same as
