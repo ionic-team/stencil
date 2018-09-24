@@ -54,6 +54,13 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     compilerOptions.declaration = false;
   }
 
+
+  if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module) {
+    config.logger.warn('To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will handle bundling both modern and legacy builds');
+  }
+  if (compilerOptions.target !==  DEFAULT_COMPILER_OPTIONS.target) {
+    config.logger.warn('To improve bundling, it is always recommended to set the tsconfig.json “target” setting to es2017. Note that the compiler will handle transpilation for ES5-only browsers');
+  }
   validateCompilerOptions(compilerOptions);
 
   compilerCtx.compilerOptions = compilerOptions;
@@ -74,12 +81,9 @@ function validateCompilerOptions(compilerOptions: ts.CompilerOptions) {
   compilerOptions.experimentalDecorators = DEFAULT_COMPILER_OPTIONS.experimentalDecorators;
   compilerOptions.noEmitOnError = DEFAULT_COMPILER_OPTIONS.noEmit;
   compilerOptions.suppressOutputPathCheck = DEFAULT_COMPILER_OPTIONS.suppressOutputPathCheck;
-  compilerOptions.module = DEFAULT_COMPILER_OPTIONS.module;
   compilerOptions.moduleResolution = DEFAULT_COMPILER_OPTIONS.moduleResolution;
-
-  if (compilerOptions.target === ts.ScriptTarget.ES3 || compilerOptions.target === ts.ScriptTarget.ES5) {
-    compilerOptions.target = DEFAULT_COMPILER_OPTIONS.target;
-  }
+  compilerOptions.module = DEFAULT_COMPILER_OPTIONS.module;
+  compilerOptions.target = DEFAULT_COMPILER_OPTIONS.target;
 }
 
 
@@ -116,7 +120,7 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   // transpile down to es2017
   target: ts.ScriptTarget.ES2017,
 
-  // create es2015 modules
+  // create esNext modules
   module: ts.ModuleKind.ESNext,
 
   // resolve using NodeJs style
