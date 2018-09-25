@@ -11,14 +11,18 @@ export class MarkdownMethods {
 
   toMarkdown() {
     const content: string[] = [];
-    if (!this.rows.length) {
+    if (this.rows.length === 0) {
       return content;
     }
 
     content.push(`## Methods`);
     content.push(``);
 
-    this.rows = this.rows.sort((a, b) => {
+    // Filter method that start with _
+    let rows = this.rows.filter(row => row.methodName[0] !== '_');
+
+    // Sort methods by name
+    rows = rows.sort((a, b) => {
       if (a.methodName < b.methodName) return -1;
       if (a.methodName > b.methodName) return 1;
       return 0;
@@ -28,7 +32,7 @@ export class MarkdownMethods {
 
     table.addHeader(['Method', 'Description']);
 
-    this.rows.forEach(row => {
+    rows.forEach(row => {
       table.addRow([
         '`' + row.methodName + '`',
         row.description
