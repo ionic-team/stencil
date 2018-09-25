@@ -1,5 +1,5 @@
-<a name="0.13.0-13"></a>
-# [Prerelease] 🌝 [0.13.0-13](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0-13) (2018-09-20)
+<a name="0.13.0-14"></a>
+# [Prerelease] 🔮 [0.13.0-14](https://github.com/ionic-team/stencil/compare/v0.12.4....v0.13.0-14) (2018-09-25)
 
 ### Stencil Testing Features
 
@@ -114,6 +114,7 @@ This change will lead to much better tree-shaking and performance.
 * **serialize:** serialize pretty print html option ([c6e34b5](https://github.com/ionic-team/stencil/commit/c6e34b5))
 * **testing:** e2e testing with puppeteer ([ad2c0d4](https://github.com/ionic-team/stencil/commit/ad2c0d4))
 * **testing:** add toMatchClasses() ([bf4ff31](https://github.com/ionic-team/stencil/commit/bf4ff31))
+* **docs:** skip private methods ([42bf7ce](https://github.com/ionic-team/stencil/commit/42bf7ce))
 
 
 ### Performance Improvements
@@ -155,7 +156,16 @@ This change will lead to much better tree-shaking and performance.
 * **validate:** not recommended pkg.module value ([c6c4281](https://github.com/ionic-team/stencil/commit/c6c4281))
 * **lifecycle:** ensure es5 builds wait on returned lifecycle async/await ([c3a7655](https://github.com/ionic-team/stencil/commit/c3a7655))
 * **prerender:** ensure that platform-server prerender follows amd format for require/exports. ([f5e5e0c](https://github.com/ionic-team/stencil/commit/f5e5e0c))
-
+* **config:** ensure correct target/module tsconfig ([7c20d52](https://github.com/ionic-team/stencil/commit/7c20d52))
+* **mock-doc:** check for text node nodeValue ([19f734e](https://github.com/ionic-team/stencil/commit/19f734e))
+* **mock-doc:** do not escape script content ([2498835](https://github.com/ionic-team/stencil/commit/2498835))
+* **mock-doc:** do not escape script innerHTML ([be1c43f](https://github.com/ionic-team/stencil/commit/be1c43f))
+* **mock-doc:** fix document methods ([f8a96ff](https://github.com/ionic-team/stencil/commit/f8a96ff))
+* **mock-doc:** fix serialize svg attrs ([107f6a9](https://github.com/ionic-team/stencil/commit/107f6a9))
+* **mock-doc:** fix template content ([8a61a15](https://github.com/ionic-team/stencil/commit/8a61a15))
+* **screenshot:** disable screenshot tests in e2e ([d530586](https://github.com/ionic-team/stencil/commit/d530586))
+* **testing:** click returns a promise ([36ec6dd](https://github.com/ionic-team/stencil/commit/36ec6dd))
+* **tslint:** tslint:disabled must be first line ([b21b432](https://github.com/ionic-team/stencil/commit/b21b432))
 
 
 
