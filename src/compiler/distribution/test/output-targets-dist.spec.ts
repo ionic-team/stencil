@@ -48,7 +48,6 @@ describe('outputTargets', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    console.log(c.fs.keys);
     expectFiles(c.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
 
