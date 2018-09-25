@@ -57,8 +57,8 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
     : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
 
   const final: string[] = [
-    '/* auto-generated angular directive proxies */',
     '/* tslint:disable */',
+    '/* auto-generated angular directive proxies */',
     imports,
     sourceImports,
     auxFunctions.join('\n'),
