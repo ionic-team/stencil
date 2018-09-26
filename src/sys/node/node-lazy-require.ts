@@ -136,13 +136,13 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
     const opts: cp.SpawnOptions = {
       shell: true,
       cwd: fromDir,
-      env: Object.assign({}, process.env)
+      env: Object.assign({}, process.env),
+      stdio: 'inherit'
     };
     opts.env.NODE_ENV = 'development';
 
     if (logger.level === 'debug') {
       args.push('--verbose');
-      opts.stdio = 'inherit';
     }
 
     logger.debug(`${cmd} ${args.join(' ')}`);
