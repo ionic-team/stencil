@@ -22,6 +22,8 @@ export async function taskTest(config: d.Config) {
       ensureModuleIds.push(
         'pixelmatch'
       );
+
+      config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
     }
   }
 
