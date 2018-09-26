@@ -26,8 +26,8 @@ export async function taskTest(config: d.Config) {
 
   // ensure we've got the required modules installed
   // jest and puppeteer are quite large, so this
-  // this is an experiment to lazy install
-  // these modules only when you need them
+  // is an experiment to lazy install these
+  // modules only when you need them
   await config.sys.lazyRequire.ensure(
     config.logger,
     config.rootDir,
