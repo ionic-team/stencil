@@ -1,5 +1,5 @@
-<a name="0.13.0-14"></a>
-# [Prerelease] 🔮 [0.13.0-14](https://github.com/ionic-team/stencil/compare/v0.12.4....v0.13.0-14) (2018-09-25)
+<a name="0.13.0"></a>
+# 🏁 [0.13.0](https://github.com/ionic-team/stencil/compare/v0.12.4...v0.13.0) (2018-09-26)
 
 ### Stencil Testing Features
 
@@ -130,6 +130,7 @@ This change will lead to much better tree-shaking and performance.
 
 ### Bug Fixes
 
+* **angular:** do not build dist ([5a3dfde](https://github.com/ionic-team/stencil/commit/5a3dfde))
 * **bundle:** return undefined when something fails ([52e650a](https://github.com/ionic-team/stencil/commit/52e650a))
 * **compiler:** emit optional token when appropriated ([#1050](https://github.com/ionic-team/stencil/issues/1050)) ([870a0fc](https://github.com/ionic-team/stencil/commit/870a0fc))
 * **compiler:** esm index.js ([49e8a74](https://github.com/ionic-team/stencil/commit/49e8a74))
