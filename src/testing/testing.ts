@@ -76,19 +76,28 @@ export class Testing implements d.Testing {
       // e2e tests only
       // do a build, start a dev server
       // and spin up a puppeteer browser
+
+      let buildTask: Promise<d.BuildResults> = null;
+
+      const doBuild = !(config.flags && config.flags.build === false);
+      if (doBuild) {
+        buildTask = compiler.build();
+      }
+
       const startupResults = await Promise.all([
-        compiler.build(),
         compiler.startDevServer(),
         startPuppeteerBrowser(config),
       ]);
 
-      const results = startupResults[0];
-      this.devServer = startupResults[1];
-      this.puppeteerBrowser = startupResults[2];
+      this.devServer = startupResults[0];
+      this.puppeteerBrowser = startupResults[1];
 
-      if (!results || (!config.watch && hasError(results && results.diagnostics))) {
-        await this.destroy();
-        return false;
+      if (doBuild) {
+        const results = await buildTask;
+        if (!results || (!config.watch && hasError(results && results.diagnostics))) {
+          await this.destroy();
+          return false;
+        }
       }
 
       if (this.devServer) {
