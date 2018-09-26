@@ -5,7 +5,7 @@ import * as path from 'path';
 
 export class NodeLogger implements d.Logger {
   private _level = 'info';
-  private tc: any;
+  private c: any;
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
 
@@ -14,7 +14,7 @@ export class NodeLogger implements d.Logger {
     const distDir = path.join(rootDir, 'dist');
     const sysUtil = require(path.join(distDir, 'sys', 'node', 'sys-util.js'));
 
-    this.tc = sysUtil.turbocolor;
+    this.c = sysUtil.color;
   }
 
   get level() {
@@ -26,7 +26,7 @@ export class NodeLogger implements d.Logger {
       l = l.toLowerCase().trim();
 
       if (LOG_LEVELS.indexOf(l) === -1) {
-        this.error(`Invalid log level '${this.tc.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.tc.bold(l)).join(', ')})`);
+        this.error(`Invalid log level '${this.c.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.c.bold(l)).join(', ')})`);
       } else {
         this._level = l;
       }
@@ -67,7 +67,7 @@ export class NodeLogger implements d.Logger {
   warnPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ WARN  ]';
-      lines[0] = this.bold(this.tc.yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.c.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -93,7 +93,7 @@ export class NodeLogger implements d.Logger {
   errorPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ ERROR ]';
-      lines[0] = this.bold(this.tc.red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.c.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -116,7 +116,7 @@ export class NodeLogger implements d.Logger {
         ('0' + d.getSeconds()).slice(-2) + '.' +
         Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
 
-      lines[0] = this.tc.cyan(prefix) + lines[0].substr(prefix.length);
+      lines[0] = this.c.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }
 
@@ -224,43 +224,43 @@ export class NodeLogger implements d.Logger {
   }
 
   color(msg: string, color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
-    return (this.tc as any)[color](msg);
+    return (this.c as any)[color](msg);
   }
 
   red(msg: string) {
-    return this.tc.red(msg);
+    return this.c.red(msg);
   }
 
   green(msg: string) {
-    return this.tc.green(msg);
+    return this.c.green(msg);
   }
 
   yellow(msg: string) {
-    return this.tc.yellow(msg);
+    return this.c.yellow(msg);
   }
 
   blue(msg: string) {
-    return this.tc.blue(msg);
+    return this.c.blue(msg);
   }
 
   magenta(msg: string) {
-    return this.tc.magenta(msg);
+    return this.c.magenta(msg);
   }
 
   cyan(msg: string) {
-    return this.tc.cyan(msg);
+    return this.c.cyan(msg);
   }
 
   gray(msg: string) {
-    return this.tc.gray(msg);
+    return this.c.gray(msg);
   }
 
   bold(msg: string) {
-    return this.tc.bold(msg);
+    return this.c.bold(msg);
   }
 
   dim(msg: string) {
-    return this.tc.dim(msg);
+    return this.c.dim(msg);
   }
 
   private shouldLog(level: string): boolean {
@@ -297,15 +297,15 @@ export class NodeLogger implements d.Logger {
         header += ': ';
       }
 
-      header += this.tc.cyan(d.relFilePath);
+      header += this.c.cyan(d.relFilePath);
 
       if (typeof d.lineNumber === 'number' && d.lineNumber > -1) {
-        header += this.tc.dim(`:`);
-        header += this.tc.yellow(`${d.lineNumber}`);
+        header += this.c.dim(`:`);
+        header += this.c.yellow(`${d.lineNumber}`);
 
         if (typeof d.columnNumber === 'number' && d.columnNumber > -1) {
-          header += this.tc.dim(`:`);
-          header += this.tc.yellow(`${d.columnNumber}`);
+          header += this.c.dim(`:`);
+          header += this.c.yellow(`${d.columnNumber}`);
         }
       }
     }
@@ -389,7 +389,7 @@ export class NodeLogger implements d.Logger {
     for (var i = 0; i < lineLength; i++) {
       var chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
-        chr = this.tc.bgRed(chr === '' ? ' ' : chr);
+        chr = this.c.bgRed(chr === '' ? ' ' : chr);
       }
       lineChars.push(chr);
     }
@@ -404,7 +404,7 @@ export class NodeLogger implements d.Logger {
 
     const words = text.split(' ').map(word => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
-        return this.tc.cyan(word);
+        return this.c.cyan(word);
       }
       return word;
     });
@@ -428,7 +428,7 @@ export class NodeLogger implements d.Logger {
         cssProp = false;
       }
       if (cssProp && safeChars.indexOf(c.toLowerCase()) > -1) {
-        chars.push(this.tc.cyan(c));
+        chars.push(this.c.cyan(c));
         continue;
       }
 

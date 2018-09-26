@@ -9,4 +9,4 @@ exports.opn = require('opn');
 
 exports.semver = require('semver');
 
-exports.turbocolor = require('turbocolor');
+exports.color = require('ansi-colors');

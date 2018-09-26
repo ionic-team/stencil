@@ -31,6 +31,7 @@ const DIST_LICENSES = path.join(DIST, 'sys', 'node', 'LICENSES');
 fs.emptyDirSync(DIST_LICENSES);
 
 [
+  'ansi-colors',
   'autoprefixer',
   'clean-css',
   'glob',
@@ -41,7 +42,6 @@ fs.emptyDirSync(DIST_LICENSES);
   'postcss',
   'semver',
   'terser',
-  'turbocolor',
   'ws',
 
 ].forEach(copyLicense);

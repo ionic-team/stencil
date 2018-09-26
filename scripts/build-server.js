@@ -26,9 +26,9 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'ansi-colors',
         'fs',
         'path',
-        'turbocolor',
         'child_process'
       ],
       plugins: [
