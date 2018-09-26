@@ -129,6 +129,7 @@ function configCase(prop: string) {
 
 const ARG_OPTS = {
   boolean: [
+    'build',
     'cache',
     'check-version',
     'ci',

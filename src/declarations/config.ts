@@ -188,6 +188,7 @@ export interface ConfigFlags {
   task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
   args?: string[];
   address?: string;
+  build?: boolean;
   cache?: boolean;
   checkVersion?: boolean;
   ci?: boolean;

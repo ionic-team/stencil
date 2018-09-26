@@ -93,6 +93,26 @@ describe('parseFlags', () => {
     expect(flags.task).toBe(null);
   });
 
+  it('should parse build flag to true', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(true);
+  });
+
+  it('should parse build flag to false', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--no-build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(false);
+  });
+
+  it('should not parse build flag, default null', () => {
+    process.argv[2] = 'test';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(null);
+  });
+
   it('should parse --cache', () => {
     process.argv[2] = '--cache';
     const flags = parseFlags(process);
