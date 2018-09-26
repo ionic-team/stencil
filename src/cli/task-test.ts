@@ -2,17 +2,37 @@ import * as d from '../declarations';
 
 
 export async function taskTest(config: d.Config) {
+  // always ensure we have jest modules installed
+  const ensureModuleIds = [
+    '@types/jest',
+    'jest',
+    'jest-environment-node',
+  ];
+
+  if (config.flags && config.flags.e2e) {
+    // if it's an e2e test, also make sure we're got
+    // puppeteer modules installed
+    ensureModuleIds.push(
+      '@types/puppeteer',
+      'puppeteer'
+    );
+
+    if (config.flags.screenshot) {
+      // ensure we've got pixelmatch for screenshots
+      ensureModuleIds.push(
+        'pixelmatch'
+      );
+    }
+  }
+
+  // ensure we've got the required modules installed
+  // jest and puppeteer are quite large, so this
+  // this is an experiment to lazy install
+  // these modules only when you need them
   await config.sys.lazyRequire.ensure(
     config.logger,
     config.rootDir,
-    [
-      '@types/jest',
-      '@types/puppeteer',
-      'jest',
-      'jest-environment-node',
-      'pixelmatch',
-      'puppeteer'
-    ]
+    ensureModuleIds
   );
 
   const { Testing } = require('../testing/index.js');
