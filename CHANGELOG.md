@@ -1,3 +1,13 @@
+<a name="0.13.2"></a>
+## ⚡️ [0.13.2](https://github.com/ionic-team/stencil/compare/v0.13.1...v0.13.2) (2018-09-27)
+
+
+### Bug Fixes
+
+* **pixelmatch:** require pixelmatch within fn ([36a4b37](https://github.com/ionic-team/stencil/commit/36a4b37))
+
+
+
 <a name="0.13.1"></a>
 ## 🐨 [0.13.1](https://github.com/ionic-team/stencil/compare/v0.13.0...v0.13.1) (2018-09-26)
 
