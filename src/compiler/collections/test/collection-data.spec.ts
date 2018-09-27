@@ -61,13 +61,40 @@ describe('manifest-data serialize/parse', () => {
       ]
     };
     const outManifest = serializeAppCollection(config, compilerCtx, manifestDir, entryModules, collection.global);
-
-    expect(outManifest.components).toHaveLength(1);
-    expect(outManifest.collections).toHaveLength(1);
-    expect(outManifest.collections[0].name).toBe('ionicons');
-    expect(outManifest.collections[0].tags).toHaveLength(1);
-    expect(outManifest.collections[0].tags[0]).toBe('ion-icon');
-    expect(outManifest.compiler.name).toEqual('test');
+    expect(outManifest).toEqual({
+      'components': [
+        {
+          'dependencies': [],
+          'componentPath': 'components/cmp-a.js'
+        }
+      ],
+      'collections': [
+        {
+          'name': 'ionicons',
+          'tags': [
+            'ion-icon'
+          ]
+        }
+      ],
+      'compiler': {
+        name: config.sys.compiler.name,
+        version: config.sys.compiler.version,
+        typescriptVersion: config.sys.compiler.typescriptVersion
+      },
+      'bundles': [
+        {
+          'components': [
+            'cmp-a',
+            'cmp-b'
+          ]
+        },
+        {
+          'components': [
+            'cmp-c'
+          ]
+        }
+      ]
+    });
   });
 
   it('serializeAppGlobal', () => {
