@@ -33,16 +33,17 @@ if (success) {
       input: ENTRY_FILE,
       external: [
         'crypto',
+        'events',
         'fs',
-        '../mock-doc',
+        'module',
         'path',
-        'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-plugin-node-builtins',
         'rollup-pluginutils',
         'typescript',
-        'util'
+        'util',
+        '../mock-doc'
       ],
       plugins: [
         (() => {
@@ -54,7 +55,9 @@ if (success) {
             }
           }
         })(),
-        rollupResolve(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs(),
         rollupPluginReplace({
           values: replaceObj
