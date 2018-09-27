@@ -120,14 +120,20 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
   const packageJsonContent = JSON.stringify({
     'name': 'loader',
     'typings': './index.d.ts',
-    'module': config.sys.path.relative(loaderPath, es5EntryPoint),
-    'es2017': config.sys.path.relative(loaderPath, es2017EntryPoint),
-  });
+    'module': './index.js',
+    'es2017': './index.es2017.js'
+  }, null, 2);
 
   const indexDtsContent = `export declare function defineCustomElements(win: any): Promise<void>;`;
+  const indexES5Content = `export * from '${config.sys.path.relative(loaderPath, es5EntryPoint)}';`;
+  const indexES2017Content = `export * from '${config.sys.path.relative(loaderPath, es2017EntryPoint)}';`;
 
-  await compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent);
-  await compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.d.ts'), indexDtsContent);
+  await Promise.all([
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent),
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.d.ts'), indexDtsContent),
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.js'), indexES5Content),
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.es2017.js'), indexES2017Content)
+  ]);
 }
 
 
