@@ -4,11 +4,11 @@ import { MockElement, MockNode } from './node';
 import { MockTemplateElement } from './element';
 import { MockTextNode } from './text-node';
 import { NODE_TYPES } from './constants';
-import * as parse5 from 'parse5';
+import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
 
 
 export function parseDocumentUtil(ownerDocument: any, html: string) {
-  const doc = parse5.parse(
+  const doc = parse(
     html.trim(),
     getParser(ownerDocument)
   ) as any;
@@ -22,7 +22,7 @@ export function parseDocumentUtil(ownerDocument: any, html: string) {
 
 
 export function parseFragmentUtil(ownerDocument: any, html: string) {
-  const frag = parse5.parseFragment(
+  const frag = parseFragment(
     html.trim(),
     getParser(ownerDocument)
   ) as any;
@@ -35,7 +35,7 @@ function getParser(ownerDocument: any) {
     return ownerDocument._parser;
   }
 
-  const treeAdapter: parse5.TreeAdapter = {
+  const treeAdapter: TreeAdapter = {
 
     createDocument() {
       const doc = ownerDocument.createElement('#document');
@@ -47,7 +47,7 @@ function getParser(ownerDocument: any) {
       return ownerDocument.createDocumentFragment();
     },
 
-    createElement(tagName: string, namespaceURI: string, attrs: parse5.Attribute[]) {
+    createElement(tagName: string, namespaceURI: string, attrs: Attribute[]) {
       const elm = ownerDocument.createElement(tagName);
       elm.namespaceURI = namespaceURI;
 
@@ -131,7 +131,7 @@ function getParser(ownerDocument: any) {
       }
     },
 
-    adoptAttributes(recipient: MockElement, attrs: parse5.Attribute[]) {
+    adoptAttributes(recipient: MockElement, attrs: Attribute[]) {
       for (let i = 0; i < attrs.length; i++) {
         const attr = attrs[i];
 
@@ -154,7 +154,7 @@ function getParser(ownerDocument: any) {
     },
 
     getAttrList(element: MockElement) {
-      const attrs: parse5.Attribute[] = element.attributes.items.map(attr => {
+      const attrs: Attribute[] = element.attributes.items.map(attr => {
         return {
           name: attr.name,
           value: attr.value,
@@ -210,7 +210,7 @@ function getParser(ownerDocument: any) {
     }
   };
 
-  const parseOptions: parse5.ParserOptions = {
+  const parseOptions: ParserOptions = {
     treeAdapter: treeAdapter
   };
 
