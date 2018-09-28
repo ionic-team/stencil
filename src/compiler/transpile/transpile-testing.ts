@@ -38,6 +38,9 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
     cmpMeta: null
   };
 
+  options.allowSyntheticDefaultImports = true;
+  options.esModuleInterop = true;
+
   options.sourceMap = true;
   options.isolatedModules = true;
   // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
