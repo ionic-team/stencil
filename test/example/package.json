@@ -10,7 +10,6 @@
   "devDependencies": {
     "@types/puppeteer": "1.6.4",
     "jest": "23.5.0",
-    "puppeteer": "1.7.0",
-    "rollup-plugin-node-builtins": "^2.1.2"
+    "puppeteer": "1.7.0"
   }
 }
