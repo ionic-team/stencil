@@ -105,7 +105,7 @@ export async function runJestDevice(config: d.Config, jestConfigPath: string, em
 
     const p = cp.fork(jestBinModule, args, {
       cwd: config.testing.rootDir,
-      env: jestProcessEnv
+      env: jestProcessEnv as any
     });
 
     p.on(`unhandledRejection`, (r) => {
