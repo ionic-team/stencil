@@ -121,14 +121,19 @@ function bundleNodeSysMain() {
       'util'
     ],
     plugins: [
+      (() => {
+        return {
+          resolveId(importee) {
+            if (importee === 'resolve') {
+              return path.join(__dirname, 'helpers', 'resolve-sync.js');
+            }
+          }
+        }
+      })(),
       rollupResolve({
         preferBuiltins: true,
       }),
-      rollupCommonjs({
-        namedExports: {
-          'resolve': ['core', 'isCore', 'sync' ]
-        }
-      }),
+      rollupCommonjs(),
       rollupJson()
     ],
     onwarn: (message) => {
