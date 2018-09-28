@@ -25,6 +25,16 @@ export class TestingFs implements d.FileSystem {
     });
   }
 
+  exists(filePath: string) {
+    return new Promise<boolean>(resolve => {
+      resolve(!!this.data[filePath]);
+    });
+  }
+
+  existsSync(filePath: string) {
+    return !!this.data[filePath];
+  }
+
   createReadStream(_filePath: string): any {
     return {};
   }

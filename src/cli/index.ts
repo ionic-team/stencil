@@ -20,6 +20,11 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   let config: d.Config;
   try {
     const configPath = getConfigFilePath(process, sys, flags.config);
+
+    // if --config is provided we need to check if it exists
+    if (flags.config && !sys.fs.existsSync(configPath)) {
+      throw new Error(`Stencil configuration file cannot be found at: "${flags.config}"`);
+    }
     config = sys.loadConfigFile(configPath, process);
 
   } catch (e) {
