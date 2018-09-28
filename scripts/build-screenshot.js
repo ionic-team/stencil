@@ -20,18 +20,23 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'assert',
+        'buffer',
         'crypto',
         'fs',
         'http',
         'net',
         'os',
         'path',
-        'pixelmatch',
-        'pngjs',
-        'url'
+        'stream',
+        'url',
+        'util',
+        'zlib'
       ],
       plugins: [
-        rollupResolve(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs(),
       ],
       onwarn: (message) => {

@@ -27,20 +27,23 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'assert',
+        'buffer',
         'child_process',
         'crypto',
         'fs',
         'jest-environment-node',
         'os',
         'path',
-        'pixelmatch',
-        'pngjs',
         'puppeteer',
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
         'rollup-pluginutils',
+        'stream',
         'typescript',
+        'util',
+        'zlib',
         '../mock-doc'
       ],
       plugins: [
@@ -53,7 +56,9 @@ if (success) {
             }
           }
         })(),
-        rollupResolve(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs(),
         rollupPluginReplace({
           values: replaceObj

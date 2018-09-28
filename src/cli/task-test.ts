@@ -14,8 +14,7 @@ export async function taskTest(config: d.Config) {
     // puppeteer modules installed
     ensureModuleIds.push(
       '@types/puppeteer',
-      'puppeteer',
-      'pixelmatch'
+      'puppeteer'
     );
 
     if (config.flags.screenshot) {

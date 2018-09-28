@@ -2,6 +2,8 @@ import { createHash } from 'crypto';
 import { createReadStream } from 'fs';
 import { readFile, writeFile } from './screenshot-fs';
 import { join } from 'path';
+import pixelmatch from 'pixelmatch';
+import { PNG } from 'pngjs';
 
 
 export async function getMismatchedPixels(cacheDir: string, imageDir: string, masterImageName: string, localImageName: string, width: number, height: number, pixelmatchThreshold: number) {
@@ -19,8 +21,6 @@ export async function getMismatchedPixels(cacheDir: string, imageDir: string, ma
     readImage(imageDir, masterImageName),
     readImage(imageDir, localImageName)
   ]);
-
-  const pixelmatch = require('pixelmatch');
 
   const mismatchedPixels = pixelmatch(images[0], images[1], null, width, height, {
     threshold: pixelmatchThreshold,
@@ -54,7 +54,6 @@ function getCacheKey(masterImageName: string, localImageName: string, width: num
 
 function readImage(imagesDir: string, image: string) {
   return new Promise<Buffer>(resolve => {
-    const { PNG } = require('pngjs');
     const filePath = join(imagesDir, image);
 
     const rs = createReadStream(filePath);
