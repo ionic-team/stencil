@@ -173,8 +173,16 @@ function inject (code: string, id: string, mod1: any, mod2: any, sourceMap: any,
   };
 }
 
-const PROCESS_PATH = require.resolve('process-es6');
-const BUFFER_PATH = require.resolve('buffer-es6');
+let PROCESS_PATH: string = null;
+try {
+  PROCESS_PATH = require.resolve('process-es6');
+} catch (e) {}
+
+let BUFFER_PATH: string = null;
+try {
+  BUFFER_PATH = require.resolve('buffer-es6');
+} catch (e) {}
+
 const GLOBAL_PATH = join(__dirname, '..', 'sys', 'node', 'rollup-node-globals-global.js');
 const BROWSER_PATH = join(__dirname, '..', 'sys', 'node', 'rollup-node-globals-browser.js');
 const DIRNAME = '\0node-globals:dirname';
@@ -233,6 +241,10 @@ const index = (function (options: Options = {}) {
       }
     },
     resolveId: function resolveId(importee: string, importer: string): string | void {
+      if ((importee === 'process' && PROCESS_PATH == null) || (importee === 'buffer' && BUFFER_PATH == null)) {
+        throw new Error(`For the node builtin import "${importee}" to be bundled from ${importer}, ensure the "rollup-plugin-node-builtins" plugin is installed and added to the stencil config plugins. Please see the bundling docs for more information.`);
+      }
+
       if (importee === DIRNAME) {
         const id = randomBytes(15).toString('hex');
         dirs.set(id, dirname('/' + relative(basedir, importer)));
