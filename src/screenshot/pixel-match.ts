@@ -1,12 +1,12 @@
-import crypto from 'crypto';
-import fs from 'fs';
+import { createHash } from 'crypto';
+import { createReadStream } from 'fs';
 import { readFile, writeFile } from './screenshot-fs';
-import path from 'path';
+import { join } from 'path';
 
 
 export async function getMismatchedPixels(cacheDir: string, imageDir: string, masterImageName: string, localImageName: string, width: number, height: number, pixelmatchThreshold: number) {
   const cacheKey = getCacheKey(masterImageName, localImageName, width, height, pixelmatchThreshold);
-  const diffJsonPath = path.join(cacheDir, `mismatch_${cacheKey}.json.log`);
+  const diffJsonPath = join(cacheDir, `mismatch_${cacheKey}.json.log`);
 
   try {
     const diffData = JSON.parse(await readFile(diffJsonPath)) as DiffData;
@@ -40,7 +40,7 @@ export async function getMismatchedPixels(cacheDir: string, imageDir: string, ma
 
 
 function getCacheKey(masterImageName: string, localImageName: string, width: number, height: number, pixelmatchThreshold: number) {
-  const hash = crypto.createHash('md5');
+  const hash = createHash('md5');
 
   hash.update(masterImageName);
   hash.update(localImageName);
@@ -55,9 +55,9 @@ function getCacheKey(masterImageName: string, localImageName: string, width: num
 function readImage(imagesDir: string, image: string) {
   return new Promise<Buffer>(resolve => {
     const { PNG } = require('pngjs');
-    const filePath = path.join(imagesDir, image);
+    const filePath = join(imagesDir, image);
 
-    const rs = fs.createReadStream(filePath);
+    const rs = createReadStream(filePath);
 
     rs.pipe(new PNG()).on('parsed', resolve);
   });

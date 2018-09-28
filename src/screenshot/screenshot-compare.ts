@@ -2,17 +2,17 @@ import * as d from '../declarations';
 import { getMismatchedPixels } from './pixel-match';
 import { normalizePath } from '../compiler/util';
 import { readScreenshotData, writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
-import crypto from 'crypto';
-import path from 'path';
+import { createHash } from 'crypto';
+import { join, relative } from 'path';
 
 
 export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, screenshotBuf: Buffer, desc: string, testPath: string, pixelmatchThreshold: number) {
-  const hash = crypto.createHash('md5').update(screenshotBuf).digest('hex');
+  const hash = createHash('md5').update(screenshotBuf).digest('hex');
   const localImageName = `${hash}.png`;
-  const imagePath = path.join(screenshotBuildData.imagesDirPath, localImageName);
+  const imagePath = join(screenshotBuildData.imagesDirPath, localImageName);
 
   if (testPath) {
-    testPath = normalizePath(path.relative(screenshotBuildData.rootDir, testPath));
+    testPath = normalizePath(relative(screenshotBuildData.rootDir, testPath));
   }
 
   // create the data we'll be saving as json
@@ -110,7 +110,7 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
     throw new Error(`invalid test description`);
   }
 
-  const hash = crypto.createHash('md5');
+  const hash = createHash('md5');
 
   hash.update(uniqueDescription);
   hash.update(emulateConfig.width.toString());
