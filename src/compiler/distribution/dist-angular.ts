@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { MEMBER_TYPE } from '../../util/constants';
-import { basename, dirname, relative } from 'path';
 import { dashToPascalCase } from '../../util/helpers';
+import { MEMBER_TYPE } from '../../util/constants';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
@@ -68,7 +67,7 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
   const finalText = final.join('\n') + '\n';
   await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
   if (outputTarget.directivesArrayFile) {
-    const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+    const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
     const a = angularArray(components, proxyPath);
     await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, a);
   }
@@ -228,10 +227,10 @@ function getMethods(cmpMeta: d.ComponentMeta) {
 }
 
 
-function relativeImport(pathFrom: string, pathTo: string) {
-  let relativePath = relative(dirname(pathFrom), dirname(pathTo));
+function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
+  let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
   relativePath = relativePath === '' ? '.' : relativePath;
-  return `${relativePath}/${basename(pathTo, '.ts')}`;
+  return `${relativePath}/${config.sys.path.basename(pathTo, '.ts')}`;
 }
 
 function angularArray(components: d.ComponentMeta[], proxyPath: string) {

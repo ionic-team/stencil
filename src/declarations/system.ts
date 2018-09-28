@@ -26,7 +26,6 @@ export interface StencilSystem {
     nodir?: boolean;
   }): Promise<string[]>;
   initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
-  isGlob?(str: string): boolean;
   lazyRequire?: d.LazyRequire;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyCss?(input: string, filePath?: string, opts?: any): Promise<{
@@ -39,19 +38,17 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
   }>;
-  minimatch?(path: string, pattern: string, opts?: any): boolean;
-  open?: (url: string) => Promise<void>;
+  open?: (url: string, opts?: any) => Promise<void>;
   path?: Path;
   requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string): string;
   rollup?: {
     rollup: {
-      (config: RollupInputConfig): Promise<RollupBundle>;
+      (config: any): Promise<any>;
     };
-    plugins: RollupPlugins;
+    plugins: {[pluginName: string]: any};
   };
   scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
-  semver?: Semver;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
   url?: {
@@ -72,16 +69,6 @@ export interface LazyRequire {
   require(moduleId: string): any;
   getModulePath(moduleId: string): string;
 }
-
-
-export interface Semver {
-  gt: (a: string, b: string, loose?: boolean) => boolean;
-  gte: (a: string, b: string, loose?: boolean) => boolean;
-  lt: (a: string, b: string, loose?: boolean) => boolean;
-  lte: (a: string, b: string, loose?: boolean) => boolean;
-  satisfies: (version: string, range: string) => boolean;
-  prerelease: (version: string) => string[] | null;
- }
 
 
 export interface SystemDetails {
@@ -118,46 +105,6 @@ export interface Path {
   relative(from: string, to: string): string;
   resolve(...pathSegments: any[]): string;
   sep: string;
-}
-
-
-
-export interface RollupInputConfig {
-  entry?: any;
-  input?: string;
-  cache?: any;
-  external?: Function;
-  plugins?: any[];
-  onwarn?: Function;
-}
-
-export interface RollupBundle {
-  generate: {(config: RollupGenerateConfig): Promise<RollupGenerateResults>};
-}
-
-
-export interface RollupGenerateConfig {
-  format: 'es' | 'cjs';
-  intro?: string;
-  outro?: string;
-  banner?: string;
-  footer?: string;
-  exports?: string;
-  external?: string[];
-  globals?: {[key: string]: any};
-  moduleName?: string;
-  strict?: boolean;
-}
-
-
-export interface RollupGenerateResults {
-  code: string;
-  map: any;
-}
-
-
-export interface RollupPlugins {
-  [pluginName: string]: any;
 }
 
 

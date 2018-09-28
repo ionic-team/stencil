@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
+const rollupJson = require('rollup-plugin-json');
 const glob = require('glob');
 const transpile = require('./transpile');
 
@@ -18,7 +19,6 @@ if (transpileSuccess) {
   // bundle external deps
   bundleExternal('node-fetch.js');
   bundleExternal('open-in-editor.js');
-  bundleExternal('sys-util.js');
   bundleExternal('sys-worker.js');
   bundleExternal('websocket.js');
 
@@ -108,18 +108,28 @@ function bundleNodeSysMain() {
   rollup.rollup({
     input: inputPath,
     external: [
+      'assert',
       'child_process',
       'crypto',
       'events',
       'fs',
+      'module',
       'path',
       'os',
       'typescript',
-      'url'
+      'url',
+      'util'
     ],
     plugins: [
-      rollupResolve(),
-      rollupCommonjs()
+      rollupResolve({
+        preferBuiltins: true,
+      }),
+      rollupCommonjs({
+        namedExports: {
+          'resolve': ['core', 'isCore', 'sync' ]
+        }
+      }),
+      rollupJson()
     ],
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
@@ -155,7 +165,7 @@ function bundleNodeSysMain() {
     });
 
   }).catch(err => {
-    console.error(`build sys.node error: ${err}`);
+    console.error(`build sys.node error: ${err.stack}`);
     process.exit(1);
   });
 }
@@ -185,7 +195,6 @@ function copyRollupNodeGlobals() {
   const rollupGlobalsBrowserDest = path.join(destDir, 'rollup-node-globals-browser.js');
   fs.copySync(rollupGlobalsBrowserSrc, rollupGlobalsBrowserDest );
 }
-
 
 function copyOpenInEditor() {
   const visualstudioVbsSrc = path.join(__dirname, '..', 'node_modules', 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');

@@ -8,6 +8,7 @@ import { getModuleFile } from '../build/compiler-ctx';
 import { getModuleImports } from './transformers/module-imports';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import minimatch from 'minimatch';
 import { normalizePath, pathJoin } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
@@ -410,14 +411,14 @@ const PRIME_TS_CACHE_TIMEOUT = 1000;
 
 export function isFileIncludePath(config: d.Config, readPath: string) {
   for (var i = 0; i < config.excludeSrc.length; i++) {
-    if (config.sys.minimatch(readPath, config.excludeSrc[i])) {
+    if (minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude
       return false;
     }
   }
 
   for (i = 0; i < config.includeSrc.length; i++) {
-    if (config.sys.minimatch(readPath, config.includeSrc[i])) {
+    if (minimatch(readPath, config.includeSrc[i])) {
       // this file is a file we want to include
       return true;
     }

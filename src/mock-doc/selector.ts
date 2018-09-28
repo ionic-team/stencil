@@ -1,5 +1,5 @@
 import { MockElement } from './node';
-import * as cssWhat from 'css-what';
+import cssWhat from 'css-what';
 
 
 export function selectOne(selector: string, elm: MockElement) {

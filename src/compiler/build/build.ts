@@ -38,7 +38,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // initialize all the collections we found when transpiling
     // async copy collection files and upgrade collections as needed
-    await initCollections(config, compilerCtx, buildCtx);
+    await initCollections(compilerCtx, buildCtx);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
     // we've got the compiler context filled with app modules and collection dependency modules

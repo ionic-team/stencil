@@ -33,16 +33,9 @@ if (success) {
       input: ENTRY_FILE,
       external: [
         'crypto',
-        'events',
         'fs',
-        'module',
         'path',
-        'rollup-plugin-commonjs',
-        'rollup-plugin-node-resolve',
-        'rollup-plugin-node-builtins',
-        'rollup-pluginutils',
         'typescript',
-        'util',
         '../mock-doc'
       ],
       plugins: [

@@ -1,5 +1,7 @@
 import * as d from '../../declarations';
 import { normalizePath } from '../util';
+import isGlob from 'is-glob';
+import minimatch from 'minimatch';
 
 
 export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -222,8 +224,8 @@ function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: s
     return filesChanged.map(fileChanged => {
       let shouldExclude = false;
 
-      if (config.sys.isGlob(excludeHmr)) {
-        shouldExclude = config.sys.minimatch(fileChanged, excludeHmr);
+      if (isGlob(excludeHmr)) {
+        shouldExclude = minimatch(fileChanged, excludeHmr);
       } else {
         shouldExclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
       }

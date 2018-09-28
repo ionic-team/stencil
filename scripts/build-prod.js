@@ -19,7 +19,6 @@ const DIST = path.join(__dirname, '..', 'dist');
 [
   path.join(DIST, 'sys', 'node', 'node-fetch.js'),
   path.join(DIST, 'sys', 'node', 'open-in-editor.js'),
-  path.join(DIST, 'sys', 'node', 'sys-util.js'),
   path.join(DIST, 'sys', 'node', 'sys-worker.js'),
   path.join(DIST, 'sys', 'node', 'websocket.js'),
   path.join(DIST, 'mock-doc', 'index.js'),
@@ -40,6 +39,9 @@ fs.emptyDirSync(DIST_LICENSES);
   'node-fetch',
   'opn',
   'postcss',
+  'rollup',
+  'rollup-plugin-commonjs',
+  'rollup-plugin-node-resolve',
   'semver',
   'terser',
   'ws',

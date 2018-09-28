@@ -26,7 +26,7 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
-        'ansi-colors',
+        'assert',
         'fs',
         'path',
         'child_process'

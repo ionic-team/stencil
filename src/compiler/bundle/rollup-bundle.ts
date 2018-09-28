@@ -5,9 +5,10 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
-import { RollupBuild, RollupDirOptions, rollup } from 'rollup';
+import { RollupBuild, RollupDirOptions } from 'rollup'; // types only
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
+import pluginHelper from './rollup-plugins/plugin-helper';
 import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
 import globals from './rollup-plugins/node-globals';
 import statsPlugin from './rollup-plugins/rollup-stats-plugin';
@@ -29,7 +30,6 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
 
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
-  const builtins = require('rollup-plugin-node-builtins');
   let rollupBundle: RollupBuild;
 
   const commonjsConfig = {
@@ -62,20 +62,20 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       globals(),
-      builtins(),
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),
       ...config.plugins,
       statsPlugin(buildCtx),
+      pluginHelper(config, compilerCtx, buildCtx),
       abortPlugin(buildCtx)
     ],
     onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
   try {
-    rollupBundle = await rollup(rollupConfig);
+    rollupBundle = await config.sys.rollup.rollup(rollupConfig);
 
   } catch (err) {
     // looks like there was an error bundling!

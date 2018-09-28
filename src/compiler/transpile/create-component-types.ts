@@ -415,7 +415,7 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
 
 async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
   const collections = compilerCtx.collections.map(collection => {
-    const upgrades = validateCollectionCompatibility(config, collection);
+    const upgrades = validateCollectionCompatibility(collection);
     const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.indexOf(CompilerUpgrade.Add_Local_Intrinsic_Elements) !== -1;
     return getCollectionTypesImport(config, compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
   });

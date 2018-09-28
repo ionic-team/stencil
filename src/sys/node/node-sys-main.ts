@@ -1,17 +1,22 @@
 import * as d from '../../declarations';
+import color from 'ansi-colors';
 import { createContext, runInContext } from './node-context';
 import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
+import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
+import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
+import opn from 'opn';
 import { WorkerManager } from './worker/index';
 
-import * as crypto from 'crypto';
-import * as os from 'os';
+
+import { createHash } from 'crypto';
+import { cpus, platform, release, tmpdir } from 'os';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -20,7 +25,6 @@ export class NodeSystem implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
   private distDir: string;
   private packageDir: string;
-  private sysUtil: any;
   private sysWorker: WorkerManager;
   private typescriptPackageJson: d.PackageJsonData;
   private destroys: Function[] = [];
@@ -39,8 +43,6 @@ export class NodeSystem implements d.StencilSystem {
 
     this.packageDir = path.join(__dirname, '..', '..', '..');
     this.distDir = path.join(this.packageDir, 'dist');
-
-    this.sysUtil = require(path.join(this.distDir, 'sys', 'node', 'sys-util.js'));
 
     try {
       this.packageJsonData = require(path.join(this.packageDir, 'package.json'));
@@ -61,7 +63,7 @@ export class NodeSystem implements d.StencilSystem {
     }
     const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
 
-    const availableCpus = os.cpus().length;
+    const availableCpus = cpus().length;
     if (typeof maxConcurrentWorkers === 'number') {
       maxConcurrentWorkers = Math.max(1, Math.min(availableCpus, maxConcurrentWorkers));
     } else {
@@ -141,9 +143,9 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   generateContentHash(content: any, length: number) {
-    let hash = crypto.createHash('md5')
-                     .update(content)
-                     .digest('base64');
+    let hash = createHash('md5')
+               .update(content)
+               .digest('base64');
 
     if (typeof length === 'number') {
       hash = hash.replace(/\W/g, '')
@@ -161,7 +163,7 @@ export class NodeSystem implements d.StencilSystem {
 
   glob(pattern: string, opts: any) {
     return new Promise<string[]>((resolve, reject) => {
-      this.sysUtil.glob(pattern, opts, (err: any, files: string[]) => {
+      glob(pattern, opts, (err: any, files: string[]) => {
         if (err) {
           reject(err);
         } else {
@@ -169,10 +171,6 @@ export class NodeSystem implements d.StencilSystem {
         }
       });
     });
-  }
-
-  isGlob(str: string) {
-    return this.sysUtil.isGlob(str);
   }
 
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
@@ -187,7 +185,7 @@ export class NodeSystem implements d.StencilSystem {
 
   get lazyRequire() {
     if (!this.nodeLazyRequire) {
-      this.nodeLazyRequire = new NodeLazyRequire(this.nodeResolveModule, this.sysUtil.semver, this.packageJsonData);
+      this.nodeLazyRequire = new NodeLazyRequire(this.nodeResolveModule, this.packageJsonData);
     }
     return this.nodeLazyRequire;
   }
@@ -200,12 +198,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('minifyJs', [input, opts]);
   }
 
-  minimatch(filePath: string, pattern: string, opts: any) {
-    return this.sysUtil.minimatch(filePath, pattern, opts);
-  }
-
-  open(p: string) {
-    return this.sysUtil.opn(p);
+  open(target: string, opts: any) {
+    return opn(target, opts) as Promise<any>;
   }
 
   get details() {
@@ -216,14 +210,14 @@ export class NodeSystem implements d.StencilSystem {
       release: '',
       runtime: 'node',
       runtimeVersion: '',
-      tmpDir: os.tmpdir()
+      tmpDir: tmpdir()
     };
     try {
-      const cpus = os.cpus();
-      details.cpuModel = cpus[0].model;
+      const sysCpus = cpus();
+      details.cpuModel = sysCpus[0].model;
       details.cpus = cpus.length;
-      details.platform = os.platform();
-      details.release = os.release();
+      details.platform = platform();
+      details.release = release();
       details.runtimeVersion = process.version;
     } catch (e) {}
     return details;
@@ -238,12 +232,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   get rollup() {
-    const rollup = require('rollup');
-    rollup.plugins = {
-      commonjs: require('rollup-plugin-commonjs'),
-      nodeResolve: require('rollup-plugin-node-resolve')
-    };
-    return rollup;
+    return NodeRollup;
   }
 
   scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
@@ -251,11 +240,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   get color() {
-    return this.sysUtil.color;
-  }
-
-  get semver() {
-    return this.sysUtil.semver;
+    return color;
   }
 
   async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {

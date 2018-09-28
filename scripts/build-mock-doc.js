@@ -15,8 +15,6 @@ const success = transpile(path.join('..', 'src', 'mock-doc', 'tsconfig.json'));
 
 if (success) {
 
-  fixCssWhatImport();
-
   function bundle() {
     rollup.rollup({
       input: ENTRY_FILE,
@@ -65,19 +63,4 @@ if (success) {
     console.log(`✅ mock-doc: ${DEST_FILE}`);
   });
 
-}
-
-
-function fixCssWhatImport() {
-  // for unit tests to work, typescript expects the syntax "import * as cssWhat from 'css-what';"
-  // but for bundling, rollup expects "import cssWhat from 'css-what';"
-  // basically this issue: https://github.com/Microsoft/TypeScript/issues/5565
-  // except that doesn't seem to work when transpiling isolated modules, idk
-  // this is an uber hack just to get both scenarios to work
-  const transpiledFile = path.join(TRANSPILED_DIR, 'mock-doc', 'selector.js');
-
-  let transpiledContent = fs.readFileSync(transpiledFile, 'utf8');
-  transpiledContent = transpiledContent.replace('import * as cssWhat ', 'import cssWhat ');
-
-  fs.writeFileSync(transpiledFile, transpiledContent);
 }

@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { printUpdateMessage, requestLatestCompilerVersion } from '../sys/node/check-version';
+import { lt } from 'semver';
 
 
 export function taskVersion(config: d.Config) {
@@ -12,7 +13,7 @@ export async function taskCheckVersion(config: d.Config) {
     const currentVersion = config.sys.compiler.version;
     const latestVersion = await requestLatestCompilerVersion();
 
-    if (config.sys.semver.lt(currentVersion, latestVersion)) {
+    if (lt(currentVersion, latestVersion)) {
       printUpdateMessage(config.logger, currentVersion, latestVersion);
 
     } else {

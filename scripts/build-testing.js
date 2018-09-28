@@ -39,7 +39,6 @@ if (success) {
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
-        'rollup-plugin-node-builtins',
         'rollup-pluginutils',
         'typescript',
         '../mock-doc'
