@@ -54,13 +54,18 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     compilerOptions.declaration = false;
   }
 
-
   if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module) {
-    config.logger.warn('To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will handle bundling both modern and legacy builds');
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
   }
+
   if (compilerOptions.target !==  DEFAULT_COMPILER_OPTIONS.target) {
-    config.logger.warn('To improve bundling, it is always recommended to set the tsconfig.json “target” setting to es2017. Note that the compiler will handle transpilation for ES5-only browsers');
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`);
   }
+
+  if (typeof compilerOptions.esModuleInterop !== 'boolean') {
+    config.logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
+  }
+
   validateCompilerOptions(compilerOptions);
 
   compilerCtx.compilerOptions = compilerOptions;
@@ -99,7 +104,6 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   // to verify that there are no conflicts between input and output paths.
   suppressOutputPathCheck: true,
 
-  // // Clear out other settings that would not be used in transpiling this module
   lib: [
     'lib.dom.d.ts',
     'lib.es5.d.ts',
@@ -108,11 +112,9 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
     'lib.es2017.d.ts'
   ],
 
-  // We are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
-  // noResolve: true,
-
   allowSyntheticDefaultImports: true,
+
+  esModuleInterop: true,
 
   // must always allow decorators
   experimentalDecorators: true,
