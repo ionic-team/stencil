@@ -22,6 +22,7 @@ export class NodeLazyRequire implements d.LazyRequire {
     }
 
     const depsToInstall: DepToInstall[] = [];
+    let isUpdate = false;
 
     const promises = ensureModuleIds.map(async ensureModuleId => {
       const existingModuleData = this.moduleData.get(ensureModuleId);
@@ -35,6 +36,8 @@ export class NodeLazyRequire implements d.LazyRequire {
         const resolvedPkgJsonPath = this.nodeResolveModule.resolveModule(fromDir, ensureModuleId);
 
         const installedPkgJson = await readPackageJson(resolvedPkgJsonPath);
+
+        isUpdate = true;
 
         if (satisfies(installedPkgJson.version, requiredVersionRange)) {
           this.moduleData.set(ensureModuleId, {
@@ -57,7 +60,9 @@ export class NodeLazyRequire implements d.LazyRequire {
       return Promise.resolve();
     }
 
-    logger.info(logger.magenta(`Please wait while missing dependencies are installed. This may take a few moments and will only be required for the first run.`));
+    const msg = `Please wait while required dependencies are ${isUpdate ? `updated` : `installed`}. This may take a few moments and will only be required for the initial run.`;
+
+    logger.info(logger.magenta(msg));
 
     const moduleIds = depsToInstall.map(dep => dep.moduleId);
     const timeSpan = logger.createTimeSpan(`installing dependenc${moduleIds.length > 1 ? 'ies' : 'y'}: ${moduleIds.join(', ')}`);
