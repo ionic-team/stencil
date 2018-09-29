@@ -181,7 +181,6 @@ export interface E2EProcessEnv {
   __STENCIL_E2E_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
-  __STENCIL_JEST_ENVIRONMENT_NODE_MODULE__?: string;
 }
 
 

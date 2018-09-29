@@ -5,8 +5,7 @@ export async function taskTest(config: d.Config) {
   // always ensure we have jest modules installed
   const ensureModuleIds = [
     '@types/jest',
-    'jest',
-    'jest-environment-node',
+    'jest'
   ];
 
   if (config.flags && config.flags.e2e) {

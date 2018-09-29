@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/puppeteer": "1.6.4",
-    "jest": "23.5.0",
+    "jest": "23.6.0",
     "puppeteer": "1.7.0"
   }
 }

@@ -68,10 +68,6 @@ export class Testing implements d.Testing {
       }
     }
 
-    const jestEnvNodeModule = config.sys.lazyRequire.getModulePath('jest-environment-node');
-    env.__STENCIL_JEST_ENVIRONMENT_NODE_MODULE__ = jestEnvNodeModule;
-    config.logger.debug(`jest-environment-node: ${jestEnvNodeModule}`);
-
     if (config.flags.e2e) {
       // e2e tests only
       // do a build, start a dev server
