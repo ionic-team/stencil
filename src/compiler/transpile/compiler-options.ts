@@ -66,6 +66,10 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     config.logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
   }
 
+  if (typeof compilerOptions.allowSyntheticDefaultImports !== 'boolean') {
+    config.logger.warn(`To standardize default imports, it is recommend to set the tsconfig.json "allowSyntheticDefaultImports" setting to "true".`);
+  }
+
   validateCompilerOptions(compilerOptions);
 
   compilerCtx.compilerOptions = compilerOptions;
