@@ -8,13 +8,30 @@ import { normalizePath } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import * as ts from 'typescript';
+import { validateConfig } from '../config/validate-config';
+import ts from 'typescript';
 
 
 /**
- * This is only used during TESTING
+ * Mainly used as the typescript preprocessor for unit tests
  */
-export function transpileModuleForTesting(config: d.Config, options: ts.CompilerOptions, sourceFilePath: string, input: string) {
+export function transpileModule(config: d.Config, input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
+  config = validateConfig(config);
+
+  if (typeof sourceFilePath === 'string') {
+    sourceFilePath = normalizePath(sourceFilePath);
+  } else {
+    sourceFilePath = (opts.jsx ? `module.tsx` : `module.ts`);
+  }
+
+  const results: d.TranspileResults = {
+    sourceFilePath: sourceFilePath,
+    code: null,
+    map: null,
+    diagnostics: [],
+    cmpMeta: null
+  };
+
   const compilerCtx: d.CompilerCtx = {
     collections: [],
     moduleFiles: {},
@@ -28,51 +45,17 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
   };
   const buildCtx = new BuildContext(config, compilerCtx);
 
-  sourceFilePath = normalizePath(sourceFilePath);
+  if (sourceFilePath.endsWith('.tsx')) {
+    // ensure we're setup for JSX in typescript
+    opts.jsx = ts.JsxEmit.React;
+    opts.jsxFactory = 'h';
+  }
 
-  const results: d.TranspileResults = {
-    sourceFilePath: sourceFilePath,
-    code: null,
-    map: null,
-    diagnostics: [],
-    cmpMeta: null
-  };
-
-  options.allowSyntheticDefaultImports = true;
-  options.esModuleInterop = true;
-
-  options.sourceMap = true;
-  options.isolatedModules = true;
-  // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
-  options.suppressOutputPathCheck = true;
-  // Filename can be non-ts file.
-  options.allowNonTsExtensions = true;
-  // We are not returning a sourceFile for lib file when asked by the program,
-  // so pass --noLib to avoid reporting a file not found error.
-  options.noLib = true;
-  // Clear out other settings that would not be used in transpiling this module
-  options.lib = undefined;
-  options.types = undefined;
-  options.noEmit = undefined;
-  options.noEmitOnError = undefined;
-  options.paths = undefined;
-  options.rootDirs = undefined;
-  options.declaration = undefined;
-  options.declarationDir = undefined;
-  options.out = undefined;
-  options.outFile = undefined;
-  // We are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
-  options.noResolve = true;
-
-  // if jsx is specified then treat file as .tsx
-  const inputFileName = sourceFilePath || (options.jsx ? `module.tsx` : `module.ts`);
-
-  const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
+  const sourceFile = ts.createSourceFile(sourceFilePath, input, opts.target);
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost = {
-    getSourceFile: (fileName: string) => fileName === normalizePath(inputFileName) ? sourceFile : undefined,
+    getSourceFile: (fileName: string) => normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined,
     writeFile: function (name: string, text: string) {
       if (name.endsWith('.map')) {
         results.map = text;
@@ -85,13 +68,13 @@ export function transpileModuleForTesting(config: d.Config, options: ts.Compiler
     getCanonicalFileName: (fileName: string) => fileName,
     getCurrentDirectory: () => '',
     getNewLine: () => ts.sys.newLine,
-    fileExists: (fileName: string) => fileName === inputFileName,
+    fileExists: (fileName: string) => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [] as string[]
   };
 
-  const program = ts.createProgram([inputFileName], options, compilerHost);
+  const program = ts.createProgram([sourceFilePath], opts, compilerHost);
   const typeChecker = program.getTypeChecker();
 
   // Emit
