@@ -17,11 +17,12 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
     if (tsconfigResults.error) {
-      buildCtx.diagnostics.push(loadTypeScriptDiagnostic(config, tsconfigResults.error));
+      if (!config._isTesting) {
+        buildCtx.diagnostics.push(loadTypeScriptDiagnostic(config, tsconfigResults.error));
+      }
 
     } else {
-      const parseResult = ts.parseJsonConfigFileContent(tsconfigResults.config, ts.sys, config.rootDir, undefined, tsconfigFilePath);
-
+      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.options, '.');
       if (parseResult.errors && parseResult.errors.length > 0) {
         loadTypeScriptDiagnostics(config, buildCtx.diagnostics, parseResult.errors);
 
