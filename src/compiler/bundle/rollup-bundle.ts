@@ -44,7 +44,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     ...config.nodeResolve
   };
 
-  const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
+  const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
 
   const rollupConfig: RollupDirOptions = {
     ...config.rollupConfig.inputOptions,

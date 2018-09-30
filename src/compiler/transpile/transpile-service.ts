@@ -74,7 +74,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     hasQueuedTsServicePrime: false
   };
 
-  const userCompilerOptions = await getUserCompilerOptions(config, transpileCtx.compilerCtx);
+  const userCompilerOptions = await getUserCompilerOptions(config, transpileCtx.compilerCtx, transpileCtx.buildCtx);
   const compilerOptions = Object.assign({}, userCompilerOptions) as ts.CompilerOptions;
 
   compilerOptions.isolatedModules = false;

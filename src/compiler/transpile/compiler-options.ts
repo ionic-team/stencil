@@ -1,31 +1,36 @@
 import * as d from '../../declarations';
+import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { normalizePath } from '../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
-export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (compilerCtx.compilerOptions) {
     return compilerCtx.compilerOptions;
   }
 
-  let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
+  let compilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
-    const normalizedConfigPath = normalizePath(config.tsconfig);
+    const tsconfigFilePath = normalizePath(config.tsconfig);
 
-    const sourceText = await compilerCtx.fs.readFile(normalizedConfigPath);
+    const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
-    try {
-      const sourceJson = JSON.parse(sourceText);
-      const parsedCompilerOptions: ts.CompilerOptions = ts.convertCompilerOptionsFromJson(sourceJson.compilerOptions, '.').options;
+    if (tsconfigResults.error) {
+      buildCtx.diagnostics.push(loadTypeScriptDiagnostic(config, tsconfigResults.error));
 
-      compilerOptions = {
-        ...compilerOptions,
-        ...parsedCompilerOptions
-      };
+    } else {
+      const parseResult = ts.parseJsonConfigFileContent(tsconfigResults.config, ts.sys, config.rootDir, undefined, tsconfigFilePath);
 
-    } catch (e) {
-      config.logger.warn('tsconfig.json is malformed, using default settings');
+      if (parseResult.errors && parseResult.errors.length > 0) {
+        loadTypeScriptDiagnostics(config, buildCtx.diagnostics, parseResult.errors);
+
+      } else {
+        compilerOptions = {
+          ...compilerOptions,
+          ...parseResult.options
+        };
+      }
     }
 
   } catch (e) {
@@ -62,11 +67,11 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`);
   }
 
-  if (typeof compilerOptions.esModuleInterop !== 'boolean') {
+  if (compilerOptions.esModuleInterop !== true) {
     config.logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
   }
 
-  if (typeof compilerOptions.allowSyntheticDefaultImports !== 'boolean') {
+  if (compilerOptions.allowSyntheticDefaultImports !== true) {
     config.logger.warn(`To standardize default imports, it is recommend to set the tsconfig.json "allowSyntheticDefaultImports" setting to "true".`);
   }
 
