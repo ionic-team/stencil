@@ -6,7 +6,7 @@ import { removeStencilImports } from '../transpile/transformers/remove-stencil-i
 import { transformSourceString } from '../transpile/transformers/util';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From_0_1_0/metadata-upgrade';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function upgradeCollection(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {

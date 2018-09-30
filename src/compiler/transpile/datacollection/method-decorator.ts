@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { validatePublicName } from './reserved-public-members';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { buildWarn, normalizePath } from '../../util';
 
 

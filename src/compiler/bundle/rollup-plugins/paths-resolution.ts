@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '../../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, tsCompilerOptions: ts.CompilerOptions) {

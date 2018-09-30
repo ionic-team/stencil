@@ -12,7 +12,7 @@ import { getWatchDecoratorMeta } from './watch-decorator';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from '../../style/normalize-styles';
 import { validateComponentClass } from './validate-component';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { buildError, buildWarn } from '../../util';
 import { isDecoratorNamed } from './utils';
 

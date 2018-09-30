@@ -4,7 +4,7 @@ import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { toDashCase } from '../../../util/helpers';
 import { validatePublicName } from './reserved-public-members';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string) {

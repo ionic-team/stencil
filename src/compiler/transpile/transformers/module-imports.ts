@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { getModuleFile } from '../../build/compiler-ctx';
 import { normalizePath } from '../../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {

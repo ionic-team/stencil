@@ -1,7 +1,7 @@
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { wroteFile } from '../../../testing/utils';
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 describe('bundle', () => {

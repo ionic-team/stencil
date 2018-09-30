@@ -13,7 +13,7 @@ import { normalizePath, pathJoin } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

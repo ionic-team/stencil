@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileToEs5Worker(cwd: string, input: string, inlineHelpers: boolean) {

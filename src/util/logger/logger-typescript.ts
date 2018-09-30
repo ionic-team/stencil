@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { MAX_ERRORS, splitLineBreaks } from './logger-util';
 import { normalizePath } from '../../compiler/util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 /**

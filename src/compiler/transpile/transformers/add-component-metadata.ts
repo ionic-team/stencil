@@ -3,7 +3,7 @@ import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE } from '../../../util/constants';
 import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import { formatConstructorEncapsulation, getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.TransformerFactory<ts.SourceFile> {

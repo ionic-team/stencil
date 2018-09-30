@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration) {
