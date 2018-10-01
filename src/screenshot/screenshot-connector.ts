@@ -2,29 +2,28 @@ import * as d from '../declarations';
 import * as fs from './screenshot-fs';
 import * as path from 'path';
 import { URL } from 'url';
-import { normalizePath } from '../compiler/util';
+// import { normalizePath } from '../compiler/util';
 
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
+  rootDir: string;
+  cacheDir: string;
   screenshotDirName = 'screenshot';
-  masterDirName = 'master';
-  localDirName = 'local';
-  compareAppFileName = 'compare.html';
   imagesDirName = 'images';
+  buildsDirName = 'builds';
+  currentBuildDirName = 'current';
+  compareAppFileName = 'compare.html';
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
-  rootDir: string;
-  cacheDir: string;
   compareAppDir: string;
   screenshotDir: string;
-  masterDir: string;
-  localDir: string;
   imagesDir: string;
+  buildsDir: string;
+  currentBuildDir: string;
   updateMaster: boolean;
   compareUrl: string;
-  masterBuild: d.ScreenshotBuild;
-  localBuild: d.ScreenshotBuild;
+  build: d.ScreenshotBuild;
   allowableMismatchedRatio: number;
   allowableMismatchedPixels: number;
   pixelmatchThreshold: number;
@@ -45,54 +44,49 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.logger.debug(`screenshot build: ${this.buildId}, ${this.buildMessage}, updateMaster: ${this.updateMaster}`);
     this.logger.debug(`screenshot, allowableMismatchedPixels: ${this.allowableMismatchedPixels}, allowableMismatchedRatio: ${this.allowableMismatchedRatio}, pixelmatchThreshold: ${this.pixelmatchThreshold}`);
 
-    if (typeof opts.screenshotDirName === 'string') {
-      this.screenshotDirName = opts.screenshotDirName;
-    }
-
-    if (typeof opts.masterDirName === 'string') {
-      this.masterDirName = opts.masterDirName;
-    }
-
-    if (typeof opts.localDirName === 'string') {
-      this.localDirName = opts.localDirName;
-    }
-
     if (typeof opts.compareAppFileName === 'string') {
       this.compareAppFileName = opts.compareAppFileName;
+    }
+
+    if (typeof opts.screenshotDirName === 'string') {
+      this.screenshotDirName = opts.screenshotDirName;
     }
 
     if (typeof opts.imagesDirName === 'string') {
       this.imagesDirName = opts.imagesDirName;
     }
 
+    if (typeof opts.buildsDirName === 'string') {
+      this.buildsDirName = opts.buildsDirName;
+    }
+
+    if (typeof opts.currentBuildDirName === 'string') {
+      this.currentBuildDirName = opts.currentBuildDirName;
+    }
+
     this.screenshotDir = path.join(this.rootDir, this.screenshotDirName);
     this.imagesDir = path.join(this.screenshotDir, this.imagesDirName);
-    this.masterDir = path.join(this.screenshotDir, this.masterDirName);
-    this.localDir = path.join(this.screenshotDir, this.localDirName);
+    this.buildsDir = path.join(this.screenshotDir, this.buildsDirName);
+    this.currentBuildDir = path.join(this.buildsDir, this.currentBuildDirName);
 
     this.logger.debug(`screenshotDirPath: ${this.screenshotDir}`);
     this.logger.debug(`imagesDirPath: ${this.imagesDir}`);
-    this.logger.debug(`masterDirPath: ${this.masterDir}`);
-    this.logger.debug(`localDirPath: ${this.localDir}`);
+    this.logger.debug(`buildsDirPath: ${this.buildsDir}`);
 
     await fs.mkDir(this.screenshotDir);
 
     await Promise.all([
       fs.mkDir(this.imagesDir),
-      fs.mkDir(this.masterDir),
-      fs.mkDir(this.localDir)
+      fs.mkDir(this.buildsDir),
     ]);
+
+    await fs.mkDir(this.currentBuildDir);
 
     const fsTasks: Promise<any>[] = [];
 
-    if (this.updateMaster) {
-      this.logger.debug(`empty master: ${this.masterDir}`);
-      fsTasks.push(fs.emptyDir(this.masterDir));
-    } else {
-      await this.pullMasterImages();
+    if (!this.updateMaster) {
+      await this.pullMasterBuild();
     }
-
-    fsTasks.push(fs.emptyDir(this.localDir));
 
     const gitIgnorePath = path.join(this.screenshotDir, '.gitignore');
     const gitIgnoreExists = await fs.fileExists(gitIgnorePath);
@@ -103,14 +97,13 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         content.push(this.imagesDirName);
       }
       if (opts.gitIgnoreLocal !== false) {
-        content.push(this.localDirName);
+        content.push(this.buildsDirName);
       }
       if (opts.gitIgnoreCompareApp !== false) {
         content.push(this.compareAppFileName);
       }
 
       if (content.length) {
-        content.unshift(`# only master screenshot data should be committed`);
         fsTasks.push(fs.writeFile(gitIgnorePath, content.join('\n')));
       }
     }
@@ -124,36 +117,32 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     await Promise.all(fsTasks);
   }
 
-  async pullMasterImages() {/**/}
+  async pullMasterBuild() {/**/}
 
   async completeBuild() {
-    const masterFilePaths = (await fs.readDir(this.masterDir)).map(f => path.join(this.masterDir, f)).filter(f => f.endsWith('.json'));
-    const masterScreenshots = await Promise.all(masterFilePaths.map(async f => JSON.parse(await fs.readFile(f)) as d.ScreenshotData));
-
-    sortScreenshots(masterScreenshots);
-
-    this.masterBuild = {
-      id: 'master',
-      message: 'Master',
-      screenshots: masterScreenshots
-    };
-
-    const localFilePaths = (await fs.readDir(this.localDir)).map(f => path.join(this.localDir, f)).filter(f => f.endsWith('.json'));
+    const localFilePaths = (await fs.readDir(this.currentBuildDir)).map(f => path.join(this.currentBuildDir, f)).filter(f => f.endsWith('.json'));
     const localScreenshots = await Promise.all(localFilePaths.map(async f => JSON.parse(await fs.readFile(f)) as d.ScreenshotData));
 
     sortScreenshots(localScreenshots);
 
-    this.localBuild = {
+    this.build = {
       id: this.buildId,
       message: this.buildMessage,
       screenshots: localScreenshots
     };
 
-    await fs.emptyDir(this.localDir);
+    await fs.emptyDir(this.currentBuildDir);
+    await fs.rmDir(this.currentBuildDir);
 
-    const localBuildPath = path.join(this.localDir, `${this.localBuild.id}.json`);
+    const buildPath = path.join(this.buildsDir, `${this.build.id}.json`);
+    const masterBuildPath = path.join(this.buildsDir, 'master.json');
+    const serializedBuild = JSON.stringify(this.build, null, 2);
 
-    await fs.writeFile(localBuildPath, JSON.stringify(this.localBuild, null, 2));
+    await fs.writeFile(buildPath, serializedBuild);
+
+    if (this.updateMaster || !(await fs.fileExists(masterBuildPath))) {
+      await fs.writeFile(masterBuildPath, serializedBuild);
+    }
 
     for (let i = 0; i < localScreenshots.length; i++) {
       const screenshot = localScreenshots[i];
@@ -173,14 +162,14 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   async publishBuild() {
-    const appUrl = normalizePath(path.relative(this.screenshotDir, this.compareAppDir));
-    const imagesUrl = normalizePath(path.relative(this.screenshotDir, this.imagesDir));
-    const jsonpUrl = normalizePath(path.relative(this.screenshotDir, this.cacheDir));
+    // const appUrl = normalizePath(path.relative(this.screenshotDir, this.compareAppDir));
+    // const imagesUrl = normalizePath(path.relative(this.screenshotDir, this.imagesDir));
+    // const jsonpUrl = normalizePath(path.relative(this.screenshotDir, this.cacheDir));
 
-    const html = createLocalCompare(appUrl, imagesUrl, jsonpUrl, this.masterBuild, this.localBuild);
+    // const html = createLocalCompare(appUrl, imagesUrl, jsonpUrl, this.masterBuild, this.localBuild);
 
-    const compareAppPath = path.join(this.screenshotDir, this.compareAppFileName);
-    await fs.writeFile(compareAppPath, html);
+    // const compareAppPath = path.join(this.screenshotDir, this.compareAppFileName);
+    // await fs.writeFile(compareAppPath, html);
   }
 
   getComparisonSummaryUrl() {
@@ -188,7 +177,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   getTotalScreenshotImages() {
-    return this.localBuild.screenshots.length;
+    return this.build.screenshots.length;
   }
 
   toJson() {
@@ -198,8 +187,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       cacheDir: this.cacheDir,
       screenshotDirPath: this.screenshotDir,
       imagesDirPath: this.imagesDir,
-      masterDirPath: this.masterDir,
-      localDirPath: this.localDir,
+      buildsDirPath: this.buildsDir,
+      currentBuildDirPath: this.currentBuildDir,
       updateMaster: this.updateMaster,
       compareUrlTemplate: this.compareUrl,
       allowableMismatchedPixels: this.allowableMismatchedPixels,
@@ -213,34 +202,34 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 }
 
 
-function createLocalCompare(appUrl: string, imagesUrl: string, jsonpUrl: string, masterBuild: d.ScreenshotBuild, localBuild: d.ScreenshotBuild) {
-  return `<!DOCTYPE html>
-<html dir="ltr" lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Stencil Screenshot Comparison</title>
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta http-equiv="x-ua-compatible" content="IE=Edge">
-  <link href="${appUrl}/build/app.css" rel="stylesheet">
-  <script src="${appUrl}/build/app.js"></script>
-  <link rel="icon" type="image/x-icon" href="${appUrl}/assets/favicon.ico">
-</head>
-<body>
-  <ion-app></ion-app>
-  <script>
-    (function() {
-      var compare = document.createElement('local-compare');
-      compare.imagesUrl = '${imagesUrl}/';
-      compare.jsonpUrl = '${jsonpUrl}/';
-      compare.buildA = ${JSON.stringify(masterBuild)};
-      compare.buildB = ${JSON.stringify(localBuild)};
-      compare.className = 'ion-page';
-      document.querySelector('ion-app').appendChild(compare);
-    })();
-  </script>
-</body>
-</html>`;
-}
+// function createLocalCompare(appUrl: string, imagesUrl: string, jsonpUrl: string, masterBuild: d.ScreenshotBuild, localBuild: d.ScreenshotBuild) {
+//   return `<!DOCTYPE html>
+// <html dir="ltr" lang="en">
+// <head>
+//   <meta charset="utf-8">
+//   <title>Stencil Screenshot Comparison</title>
+//   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+//   <meta http-equiv="x-ua-compatible" content="IE=Edge">
+//   <link href="${appUrl}/build/app.css" rel="stylesheet">
+//   <script src="${appUrl}/build/app.js"></script>
+//   <link rel="icon" type="image/x-icon" href="${appUrl}/assets/favicon.ico">
+// </head>
+// <body>
+//   <ion-app></ion-app>
+//   <script>
+//     (function() {
+//       var compare = document.createElement('local-compare');
+//       compare.imagesUrl = '${imagesUrl}/';
+//       compare.jsonpUrl = '${jsonpUrl}/';
+//       compare.buildA = ${JSON.stringify(masterBuild)};
+//       compare.buildB = ${JSON.stringify(localBuild)};
+//       compare.className = 'ion-page';
+//       document.querySelector('ion-app').appendChild(compare);
+//     })();
+//   </script>
+// </body>
+// </html>`;
+// }
 
 
 function sortScreenshots(screenshots: d.ScreenshotData[]) {

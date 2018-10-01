@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { getMismatchedPixels } from './pixel-match';
 import { normalizePath } from '../compiler/util';
-import { readScreenshotData, writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
+import { readScreenshotDataFromBuild, writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';
 
@@ -39,7 +39,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
   // write the local build data
   await Promise.all([
-    writeScreenshotData(screenshotBuildData.localDirPath, localData),
+    writeScreenshotData(screenshotBuildData.currentBuildDirPath, localData),
     writeScreenshotImage(imagePath, screenshotBuf)
   ]);
 
@@ -47,7 +47,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   const compare: d.ScreenshotCompare = {
     id: localData.id,
     desc: localData.desc,
-    expectedImage: null,
+    expectedImage: localData.image,
     receivedImage: localData.image,
     mismatchedPixels: 0,
     mismatchedRatio: 0,
@@ -70,14 +70,12 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   if (screenshotBuildData.updateMaster) {
     // this data is going to become the master data
     // so no need to compare with previous versions
-    await writeScreenshotData(screenshotBuildData.masterDirPath, localData);
     return compare;
   }
 
-  const masterData = await readScreenshotData(screenshotBuildData.masterDirPath, localData.id);
+  const masterData = await readScreenshotDataFromBuild(screenshotBuildData.buildsDirPath, 'master', localData.id);
   if (!masterData) {
     // there is no master data so nothing to compare it with
-    await writeScreenshotData(screenshotBuildData.masterDirPath, localData);
     return compare;
   }
 

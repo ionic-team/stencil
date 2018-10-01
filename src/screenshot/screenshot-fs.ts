@@ -30,6 +30,19 @@ export async function readScreenshotData(dataDir: string, screenshotId: string) 
 }
 
 
+export async function readScreenshotDataFromBuild(dataDir: string, buildId: string, screenshotId: string) {
+  let rtn: d.ScreenshotData = null;
+
+  try {
+    const dataFilePath = path.join(dataDir, `${buildId}.json`);
+    const dataContent = await readFile(dataFilePath);
+    rtn = JSON.parse(dataContent).screenshots.find((screenshot: any) => screenshot.id === screenshotId);
+  } catch (e) {}
+
+  return rtn;
+}
+
+
 function getDataFilePath(dataDir: string, screenshotId: string) {
   const fileName = `${screenshotId}.json`;
   return path.join(dataDir, fileName);
@@ -81,6 +94,14 @@ export function writeFile(filePath: string, data: any) {
 export function mkDir(filePath: string) {
   return new Promise<void>(resolve => {
     fs.mkdir(filePath, () => {
+      resolve();
+    });
+  });
+}
+
+export function rmDir(filePath: string) {
+  return new Promise<void>(resolve => {
+    fs.rmdir(filePath, () => {
       resolve();
     });
   });

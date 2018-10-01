@@ -17,10 +17,10 @@ export interface ScreenshotConnectorOptions {
   compareAppDir: string;
   logger: d.Logger;
   screenshotDirName?: string;
-  masterDirName?: string;
-  localDirName?: string;
-  compareAppFileName?: string;
   imagesDirName?: string;
+  buildsDirName?: string;
+  currentBuildDirName?: string;
+  compareAppFileName?: string;
   buildId: string;
   buildMessage: string;
   updateMaster?: boolean;
@@ -39,8 +39,8 @@ export interface ScreenshotBuildData {
   cacheDir: string;
   screenshotDirPath: string;
   imagesDirPath: string;
-  masterDirPath: string;
-  localDirPath: string;
+  buildsDirPath: string;
+  currentBuildDirPath: string;
   updateMaster: boolean;
   compareUrlTemplate: string;
   allowableMismatchedPixels: number;
