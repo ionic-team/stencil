@@ -6,6 +6,7 @@ import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 export async function generateJsDocComponent(config: d.Config, compilerCtx: d.CompilerCtx, jsonDocs: d.JsonDocs, cmpMeta: d.ComponentMeta, dirPath: string, readmeContent: string) {
   const jsonCmp: d.JsonDocsComponent = {
     tag: cmpMeta.tagNameMeta,
+    docs: getMemberDocumentation(cmpMeta.jsdoc),
     readme: readmeContent || '',
     usage: await generateJsDocsUsages(config, compilerCtx, dirPath),
     props: [],

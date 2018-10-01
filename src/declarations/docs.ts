@@ -8,6 +8,7 @@ export interface JsonDocs {
 export interface JsonDocsComponent {
   tag?: string;
   readme?: string;
+  docs?: string,
   usage?: JsonDocsUsage;
   props?: JsonDocsProp[];
   methods?: JsonDocsMethod[];
