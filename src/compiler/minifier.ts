@@ -10,7 +10,6 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
-    opts.toplevel = true;
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
