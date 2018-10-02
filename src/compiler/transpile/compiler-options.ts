@@ -22,7 +22,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
       }
 
     } else {
-      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.options, '.');
+      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, '.');
       if (parseResult.errors && parseResult.errors.length > 0) {
         loadTypeScriptDiagnostics(config, buildCtx.diagnostics, parseResult.errors);
 
