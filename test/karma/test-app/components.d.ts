@@ -210,6 +210,12 @@ export namespace Components {
     'undef'?: string;
   }
 
+  interface ScopedBasicRoot {}
+  interface ScopedBasicRootAttributes extends StencilHTMLAttributes {}
+
+  interface ScopedBasic {}
+  interface ScopedBasicAttributes extends StencilHTMLAttributes {}
+
   interface ShadowDomArrayRoot {}
   interface ShadowDomArrayRootAttributes extends StencilHTMLAttributes {}
 
@@ -374,6 +380,8 @@ declare global {
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
     'ReflectToAttr': Components.ReflectToAttr;
+    'ScopedBasicRoot': Components.ScopedBasicRoot;
+    'ScopedBasic': Components.ScopedBasic;
     'ShadowDomArrayRoot': Components.ShadowDomArrayRoot;
     'ShadowDomArray': Components.ShadowDomArray;
     'ShadowDomBasicRoot': Components.ShadowDomBasicRoot;
@@ -442,6 +450,8 @@ declare global {
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
+    'scoped-basic-root': Components.ScopedBasicRootAttributes;
+    'scoped-basic': Components.ScopedBasicAttributes;
     'shadow-dom-array-root': Components.ShadowDomArrayRootAttributes;
     'shadow-dom-array': Components.ShadowDomArrayAttributes;
     'shadow-dom-basic-root': Components.ShadowDomBasicRootAttributes;
@@ -663,6 +673,18 @@ declare global {
   var HTMLReflectToAttrElement: {
     prototype: HTMLReflectToAttrElement;
     new (): HTMLReflectToAttrElement;
+  };
+
+  interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {}
+  var HTMLScopedBasicRootElement: {
+    prototype: HTMLScopedBasicRootElement;
+    new (): HTMLScopedBasicRootElement;
+  };
+
+  interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {}
+  var HTMLScopedBasicElement: {
+    prototype: HTMLScopedBasicElement;
+    new (): HTMLScopedBasicElement;
   };
 
   interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {}
@@ -901,6 +923,8 @@ declare global {
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
     'reflect-to-attr': HTMLReflectToAttrElement
+    'scoped-basic-root': HTMLScopedBasicRootElement
+    'scoped-basic': HTMLScopedBasicElement
     'shadow-dom-array-root': HTMLShadowDomArrayRootElement
     'shadow-dom-array': HTMLShadowDomArrayElement
     'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
@@ -969,6 +993,8 @@ declare global {
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
+    'scoped-basic-root': HTMLScopedBasicRootElement;
+    'scoped-basic': HTMLScopedBasicElement;
     'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
     'shadow-dom-array': HTMLShadowDomArrayElement;
     'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;

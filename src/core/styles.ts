@@ -71,14 +71,16 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
   // or it wants to use shadow dom but the browser doesn't support it
   // create a scope id which is useful for scoped css
   // and add the scope attribute to the host
-  const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
 
   // create the style id w/ the host element's mode
   let styleId = cmpMeta.tagNameMeta + hostElm.mode;
   let styleTemplate = (cmpMeta as any)[styleId];
 
+  const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
   if (shouldScopeCss) {
-    hostElm['s-sc'] = getScopeId(cmpMeta, hostElm.mode);
+    hostElm['s-sc'] = styleTemplate
+      ? getScopeId(cmpMeta, hostElm.mode)
+      : getScopeId(cmpMeta);
   }
 
   if (!styleTemplate) {
@@ -86,10 +88,6 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     // create the style id using the default style mode and try again
     styleId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
     styleTemplate = (cmpMeta as any)[styleId];
-
-    if (shouldScopeCss) {
-      hostElm['s-sc'] = getScopeId(cmpMeta);
-    }
   }
 
   if (styleTemplate) {
@@ -143,7 +141,6 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
           // remember we don't need to do this again for this element
           appliedStyles[styleId] = true;
-
         }
 
         if (styleElm) {
