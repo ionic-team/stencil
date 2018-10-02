@@ -90,7 +90,11 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     ]
   });
 
-  const tsDiagnostics = program.getOptionsDiagnostics().concat(program.getSyntacticDiagnostics());
+  const tsDiagnostics = [...program.getSyntacticDiagnostics()];
+
+  if (config.validateTypes) {
+    tsDiagnostics.push(...program.getOptionsDiagnostics());
+  }
 
   loadTypeScriptDiagnostics(config, buildCtx.diagnostics, tsDiagnostics);
 
