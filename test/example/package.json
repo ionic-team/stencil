@@ -3,13 +3,13 @@
   "private": true,
   "scripts": {
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
-    "test": "node ../../bin/stencil test --e2e --spec",
-    "test.e2e": "node ../../bin/stencil test --e2e",
-    "test.spec": "node ../../bin/stencil test --spec"
+    "test": "node ../../bin/stencil test",
+    "jest": "jest"
   },
   "devDependencies": {
     "@types/puppeteer": "1.6.4",
     "jest": "23.6.0",
+    "jest-cli": "23.6.0",
     "puppeteer": "1.8.0"
   }
 }

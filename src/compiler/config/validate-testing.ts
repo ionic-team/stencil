@@ -123,16 +123,28 @@ export function validateTesting(config: d.Config) {
     delete testing.testMatch;
 
   } else {
-    const types: string[] = [];
-    if (config.flags.e2e) {
-      types.push('e2e');
-    }
-    if (config.flags.spec) {
-      types.push('spec');
-    }
-
     testing.testMatch = [
-      `**/*(*.)+(${types.join('|')}).+(ts)?(x)`
+      `**/*(*.)+(e2e|spec).+(ts)?(x)`
+    ];
+  }
+
+  if (typeof testing.runner !== 'string') {
+    testing.runner = path.join(
+      config.sys.compiler.packageDir, 'testing', 'jest.runner.js'
+    );
+  }
+
+  if (!Array.isArray(testing.emulate) || testing.emulate.length === 0) {
+    testing.emulate = [
+      {
+        width: 600,
+        height: 600,
+        deviceScaleFactor: 1,
+        isMobile: false,
+        hasTouch: false,
+        isLandscape: false,
+        userAgent: 'default'
+      }
     ];
   }
 

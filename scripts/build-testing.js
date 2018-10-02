@@ -35,6 +35,7 @@ if (success) {
         'constants',
         'crypto',
         'fs',
+        'jest-cli',
         'os',
         'path',
         'process',
@@ -47,6 +48,7 @@ if (success) {
         'typescript',
         'util',
         'vm',
+        'yargs',
         'zlib',
         '../mock-doc'
       ],

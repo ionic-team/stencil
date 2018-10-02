@@ -171,6 +171,7 @@ export interface E2EProcessEnv {
   STENCIL_SCREENSHOT_CONNECTOR?: string;
   STENCIL_SCREENSHOT_SERVER?: string;
 
+  __STENCIL_EMULATE_CONFIGS__?: string;
   __STENCIL_EMULATE__?: string;
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_LOADER_URL__?: string;
@@ -178,7 +179,9 @@ export interface E2EProcessEnv {
 
   __STENCIL_SCREENSHOT__?: 'true';
   __STENCIL_SCREENSHOT_BUILD__?: string;
+
   __STENCIL_E2E_TESTS__?: 'true';
+  __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
 }

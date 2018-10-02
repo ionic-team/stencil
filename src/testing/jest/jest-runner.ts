@@ -1,31 +1,59 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../../compiler/util';
+import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
-import * as cp from 'child_process';
 import * as path from 'path';
 
 
-export async function runJest(config: d.Config, env: d.E2EProcessEnv, jestConfigPath: string, doScreenshots: boolean) {
-  if (doScreenshots) {
-    const emulateDevices = config.testing.emulate;
-    if (Array.isArray(emulateDevices)) {
-      return await runJestScreenshot(config, env, jestConfigPath, emulateDevices);
-    }
-  }
+export async function runJest(config: d.Config, env: d.E2EProcessEnv, _doScreenshots: boolean) {
+  env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(config.testing.emulate);
 
-  let passed = true;
+  const { runCLI } = require('jest-cli');
 
-  try {
-    await runJestDevice(config, jestConfigPath, null);
-  } catch (e) {
-    passed = false;
-  }
+  const jestArgv = buildJestArgv(config);
+  const projects = getProjectListFromCLIArgs(config, jestArgv);
 
-  return passed;
+  const cliResults = await runCLI(jestArgv, projects);
+
+  return Promise.resolve(cliResults.results.success);
 }
 
 
-export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv, jestConfigPath: string, emulateDevices: d.EmulateConfig[]) {
+const TestRunner = require('jest-runner');
+export class StencilTestRunner extends TestRunner {
+
+  async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
+    const env = (process.env as d.E2EProcessEnv);
+
+    tests = tests.filter(t => {
+      if (t.path.includes('.e2e.') && env.__STENCIL_E2E_TESTS__ === 'true') {
+        return true;
+      }
+      if (t.path.includes('.spec.') && env.__STENCIL_SPEC_TESTS__ === 'true') {
+        return true;
+      }
+      return false;
+    });
+
+    const emulateConfigsStr = env.__STENCIL_EMULATE_CONFIGS__;
+
+    const emulateConfigs = JSON.parse(emulateConfigsStr) as d.EmulateConfig[];
+
+    for (let i = 0; i < emulateConfigs.length; i++) {
+      const emulateConfig = emulateConfigs[i];
+
+      tests = tests.map(test => {
+        env.__STENCIL_EMULATE__ = JSON.stringify(emulateConfig);
+        return test;
+      });
+
+      await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
+    }
+  }
+
+}
+
+
+export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv,  emulateDevices: d.EmulateConfig[]) {
   config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
 
   const ScreenshotConnector = require(config.testing.screenshotConnector) as any;
@@ -55,7 +83,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv, 
   for (let i = 0; i < emulateDevices.length; i++) {
     const emulate = emulateDevices[i];
     try {
-      await runJestDevice(config, jestConfigPath, emulate);
+      await runJestDevice(config, emulate);
     } catch (e) {
       passed = false;
     }
@@ -78,53 +106,19 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv, 
 }
 
 
-export async function runJestDevice(config: d.Config, jestConfigPath: string, emulateDevice: d.EmulateConfig) {
-  const jestPkgJsonPath = config.sys.resolveModule(config.rootDir, 'jest');
-  const jestPkgJson: d.PackageJsonData = require(jestPkgJsonPath);
-  const jestBinModule = path.join(normalizePath(path.dirname(jestPkgJsonPath)), jestPkgJson.bin.jest);
-
-  const args = [
-    '--config', jestConfigPath,
-    ...getJestArgs(config)
-  ];
-
-  if (config.watch) {
-    args.push('--watch');
+export async function runJestDevice(config: d.Config, emulateDevice: d.EmulateConfig) {
+  if (emulateDevice) {
+    config.logger.info(`screenshot emulate: ${emulateDevice.device || emulateDevice.userAgent}`);
+    setScreenshotEmulateData(emulateDevice, process.env);
   }
 
-  config.logger.debug(`jest module: ${jestBinModule}`);
-  config.logger.debug(`jest args: ${args.join(' ')}`);
+  const { runCLI } = require('jest-cli');
 
-  return new Promise((resolve, reject) => {
+  const jestArgv = buildJestArgv(config);
+  const projects = getProjectListFromCLIArgs(config, jestArgv);
 
-    const jestProcessEnv = Object.assign({}, process.env as d.E2EProcessEnv);
-    if (emulateDevice) {
-      config.logger.info(`screenshot emulate: ${emulateDevice.device || emulateDevice.userAgent}`);
-      setScreenshotEmulateData(emulateDevice, jestProcessEnv);
-    }
-
-    const p = cp.fork(jestBinModule, args, {
-      cwd: config.testing.rootDir,
-      env: jestProcessEnv as any
-    });
-
-    p.on(`unhandledRejection`, (r) => {
-      reject(r);
-    });
-
-    p.once('exit', (d) => {
-      if (d === 0) {
-        resolve();
-      } else {
-        reject('tests failed');
-      }
-    });
-
-    p.once('error', err => {
-      reject(err.message);
-    });
-
-  });
+  const results = await runCLI(jestArgv, projects);
+  console.log(results);
 }
 
 
@@ -154,160 +148,3 @@ function createBuildMessage() {
 
   return `Local: ${fmDt}`;
 }
-
-
-
-export async function setupJestConfig(config: d.Config) {
-  const jestConfigPath = path.join(config.cacheDir, STENCIL_JEST_CONFIG);
-
-  config.logger.debug(`jest config: ${jestConfigPath}`);
-
-  const jestConfig: any = {};
-  Object.keys(config.testing).forEach(testingConfig => {
-    if (JEST_CONFIG.includes(testingConfig)) {
-      jestConfig[testingConfig] = (config.testing as any)[testingConfig];
-    }
-  });
-
-  if (typeof jestConfig.rootDir !== 'string') {
-    jestConfig.rootDir = config.rootDir;
-  }
-
-  try {
-    await config.sys.fs.mkdir(config.cacheDir);
-  } catch (e) {}
-
-  await config.sys.fs.writeFile(
-    jestConfigPath,
-    JSON.stringify(jestConfig, null, 2)
-  );
-
-  return jestConfigPath;
-}
-
-const JEST_CONFIG = [
-  'automock',
-  'bail',
-  'browser',
-  'cacheDirectory',
-  'clearMocks',
-  'collectCoverage',
-  'collectCoverageFrom',
-  'coverageDirectory',
-  'coveragePathIgnorePatterns',
-  'coverageReporters',
-  'coverageThreshold',
-  'errorOnDeprecated',
-  'forceCoverageMatch',
-  'globals',
-  'globalSetup',
-  'globalTeardown',
-  'moduleDirectories',
-  'moduleFileExtensions',
-  'moduleNameMapper',
-  'modulePathIgnorePatterns',
-  'modulePaths',
-  'notify',
-  'notifyMode',
-  'preset',
-  'prettierPath',
-  'projects',
-  'reporters',
-  'resetMocks',
-  'resetModules',
-  'resolver',
-  'restoreMocks',
-  'rootDir',
-  'roots',
-  'runner',
-  'setupFiles',
-  'setupTestFrameworkScriptFile',
-  'snapshotSerializers',
-  'testEnvironment',
-  'testEnvironmentOptions',
-  'testMatch',
-  'testPathIgnorePatterns',
-  'testRegex',
-  'testResultsProcessor',
-  'testRunner',
-  'testURL',
-  'timers',
-  'transform',
-  'transformIgnorePatterns',
-  'unmockedModulePathPatterns',
-  'verbose',
-  'watchPathIgnorePatterns',
-];
-
-
-const STENCIL_JEST_CONFIG = 'stencil.jest.config.json';
-
-
-function getJestArgs(config: d.Config) {
-  const args: string[] = [];
-
-  if (config.flags && config.flags.args) {
-    config.flags.args.forEach(arg => {
-      if (JEST_ARGS.includes(arg)) {
-        args.push(arg);
-      } else if (JEST_ARGS.some(jestArg => arg.startsWith(jestArg))) {
-        args.push(arg);
-      }
-    });
-  }
-
-  if (config.logger.level === 'debug') {
-    if (!args.includes('--detectOpenHandles')) {
-      args.push('--detectOpenHandles');
-    }
-  }
-
-  return args;
-}
-
-const JEST_ARGS = [
-  '--bail',
-  '--cache',
-  '--changedFilesWithAncestor',
-  '--changedSince',
-  '--clearCache',
-  '--collectCoverageFrom=',
-  '--colors',
-  '--config=',
-  '--coverage',
-  '--debug',
-  '--detectOpenHandles',
-  '--env=',
-  '--errorOnDeprecated',
-  '--expand',
-  '--findRelatedTests',
-  '--forceExit',
-  '--help',
-  '--init',
-  '--json',
-  '--outputFile=',
-  '--lastCommit',
-  '--listTests',
-  '--logHeapUsage',
-  '--maxWorkers=',
-  '--noStackTrace',
-  '--notify',
-  '--onlyChanged',
-  '--passWithNoTests',
-  '--reporters',
-  '--runInBand',
-  '--setupTestFrameworkScriptFile=',
-  '--showConfig',
-  '--silent',
-  '--testNamePattern=',
-  '--testLocationInResults',
-  '--testPathPattern=',
-  '--testRunner=',
-  '--updateSnapshot',
-  '--useStderr',
-  '--verbose',
-  '--version',
-  '--watch',
-  '--watchAll',
-  '--watchman',
-];

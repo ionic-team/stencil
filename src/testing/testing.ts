@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '../compiler/util';
-import { runJest, setupJestConfig } from './jest/jest-runner';
+import { runJest } from './jest/jest-runner';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import * as puppeteer from 'puppeteer';
 
@@ -12,7 +12,6 @@ export class Testing implements d.Testing {
   config: d.Config;
   devServer: d.DevServer;
   puppeteerBrowser: puppeteer.Browser;
-  jestConfigPath: string;
 
   constructor(config: d.Config) {
     const { Compiler } = require('../compiler/index.js');
@@ -53,6 +52,7 @@ export class Testing implements d.Testing {
 
     if (config.flags.spec) {
       msg.push('spec');
+      env.__STENCIL_SPEC_TESTS__ = 'true';
     }
 
     config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
@@ -105,9 +105,7 @@ export class Testing implements d.Testing {
       }
     }
 
-    this.jestConfigPath = await setupJestConfig(config);
-
-    const passed = await runJest(config, env, this.jestConfigPath, doScreenshots);
+    const passed = await runJest(config, env, doScreenshots);
 
     config.logger.info('');
 
@@ -116,12 +114,6 @@ export class Testing implements d.Testing {
 
   async destroy() {
     if (this.config) {
-      if (this.jestConfigPath) {
-        try {
-          await this.config.sys.fs.unlink(this.jestConfigPath);
-        } catch (e) {}
-      }
-
       this.config.sys.destroy();
       this.config = null;
     }

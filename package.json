@@ -86,6 +86,7 @@
     "inquirer": "^3.3.0",
     "is-glob": "4.0.0",
     "jest": "^23.6.0",
+    "jest-cli": "^23.6.0",
     "jest-environment-node": "^23.4.0",
     "listr": "^0.13.0",
     "magic-string": "0.22.5",
@@ -116,6 +117,7 @@
     "@types/jest": "~23.3.1",
     "@types/puppeteer": "^1.6.4",
     "jest": "~23.6.0",
+    "jest-cli": "~23.6.0",
     "pixelmatch": "4.0.2",
     "puppeteer": "~1.8.0",
     "workbox-build": "~3.4.1"
