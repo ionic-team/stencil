@@ -7,44 +7,45 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
   // ¯\_(ツ)_/¯
   // keep the existing state
   // forget the constructor
+  const meta = plt.metaHostMap.get(elm);
   cmpMeta.componentConstructor = null;
 
   // no sir, this component has never loaded, not once, ever
-  plt.isCmpLoaded.delete(elm);
-  plt.isCmpReady.delete(elm);
+  meta.isCmpLoaded = false;
+  meta.isCmpReady = false;
 
   // forget the instance
-  const instance = plt.instanceMap.get(elm);
+  const instance = meta.instance;
   if (instance) {
-    plt.hostElementMap.delete(instance);
-    plt.instanceMap.delete(elm);
+    plt.metaInstanceMap.delete(instance);
+    meta.instance = undefined;
   }
 
   // detatch any event listeners that may have been added
   // because we're not passing an exact event name it'll
   // remove all of this element's event, which is good
   plt.domApi.$removeEventListener(elm);
-  plt.hasListenersMap.delete(elm);
+  meta.hasListeners = false;
   cmpMeta.listenersMeta = null;
 
   // create a callback for when this component finishes hmr
   elm['s-hmr-load'] = () => {
     // finished hmr for this element
     delete elm['s-hmr-load'];
-    hmrFinish(plt, cmpMeta, elm);
+    hmrFinish(plt, meta, cmpMeta, elm);
   };
 
   // create the new host snapshot from the element
-  plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
+  meta.hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
 
   // request the bundle again
-  plt.requestBundle(cmpMeta, elm, hmrVersionId);
+  plt.requestBundle(cmpMeta, meta, hmrVersionId);
 }
 
 
-export function hmrFinish(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-  if (!plt.hasListenersMap.has(elm)) {
-    plt.hasListenersMap.set(elm, true);
+export function hmrFinish(plt: d.PlatformApi, meta: d.InternalMeta, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+  if (!meta.hasListeners) {
+    meta.hasListeners = true;
 
     // initElementListeners works off of cmp metadata
     // but we just got new data from the constructor

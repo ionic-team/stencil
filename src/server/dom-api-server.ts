@@ -8,13 +8,13 @@ export function patchDomApi(config: d.Config, plt: d.PlatformApi, domApi: d.DomA
   const orgCreateElement = domApi.$createElement;
   domApi.$createElement = (tagName: string) => {
     const elm = orgCreateElement(tagName) as d.HostElement;
-
-    const cmpMeta = plt.getComponentMeta(elm);
+    const meta = plt.metaHostMap.get(elm as d.HostElement);
+    const cmpMeta = meta.cmpMeta;
     if (cmpMeta && !cmpMeta.componentConstructor) {
       initHostElement(plt, cmpMeta, elm, config.namespace);
       const hostSnapshot = initHostSnapshot(domApi, cmpMeta, elm);
-      plt.hostSnapshotMap.set(elm, hostSnapshot);
-      plt.requestBundle(cmpMeta, elm);
+      meta.hostSnapshot = hostSnapshot;
+      plt.requestBundle(cmpMeta, meta);
     }
 
     return elm;

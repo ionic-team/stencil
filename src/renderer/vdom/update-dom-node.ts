@@ -8,20 +8,22 @@ export function updateElement(plt: d.PlatformApi, oldVnode: d.VNode | null, newV
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
   const elm = (newVnode.elm.nodeType === NODE_TYPE.DocumentFragment && newVnode.elm.host) ? newVnode.elm.host : (newVnode.elm as any);
+  const meta = plt.metaHostMap.get(elm);
+  const cmpMeta = meta && meta.cmpMeta;
   const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
   const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
   // remove attributes no longer present on the vnode by setting them to undefined
   for (memberName in oldVnodeAttrs) {
     if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.ishost);
+      setAccessor(plt, cmpMeta, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.ishost);
     }
   }
 
   // add new & update changed attributes
   for (memberName in newVnodeAttrs) {
     if (!(memberName in oldVnodeAttrs) || newVnodeAttrs[memberName] !== (memberName === 'value' || memberName === 'checked' ? elm[memberName] : oldVnodeAttrs[memberName])) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.ishost);
+      setAccessor(plt, cmpMeta, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.ishost);
     }
   }
 }

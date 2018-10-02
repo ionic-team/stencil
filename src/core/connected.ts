@@ -4,29 +4,29 @@ import { initElementListeners } from './listeners';
 
 
 export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+  const meta = plt.metaHostMap.get(elm);
   if (__BUILD_CONDITIONALS__.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
     // have fired even before the instance is ready
-    if (!plt.hasListenersMap.has(elm)) {
+    if (!meta.hasListeners) {
       // it's possible we've already connected
       // then disconnected
       // and the same element is reconnected again
-      plt.hasListenersMap.set(elm, true);
+      meta.hasListeners = true;
       initElementListeners(plt, elm);
     }
   }
 
   // this element just connected, which may be re-connecting
   // ensure we remove it from our map of disconnected
-  plt.isDisconnectedMap.delete(elm);
+  meta.isDisconnected = false;
 
-  if (!plt.hasConnectedMap.has(elm)) {
-    plt.hasConnectedComponent = true;
-    plt.processingCmp.add(elm);
-
+  if (!meta.hasConnected) {
     // first time we've connected
-    plt.hasConnectedMap.set(elm, true);
+  plt.hasConnectedComponent = true;
+    meta.hasConnected = true;
+    plt.processingCmp.add(elm);
 
     if (!elm['s-id']) {
       // assign a unique id to this host element
@@ -36,7 +36,7 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
 
     // register this component as an actively
     // loading child to its parent component
-    registerWithParentComponent(plt, elm);
+    registerWithParentComponent(plt, meta, elm);
 
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can
@@ -46,14 +46,14 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
     plt.queue.tick(() => {
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
-      plt.requestBundle(cmpMeta, elm);
+      meta.hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
+      plt.requestBundle(cmpMeta, meta);
     });
   }
 }
 
 
-export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) {
+export function registerWithParentComponent(plt: d.PlatformApi, meta: d.InternalMeta, elm: d.HostElement, ancestorHostElement?: d.HostElement) {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   ancestorHostElement = elm;
@@ -63,11 +63,11 @@ export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostEleme
     if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element
       // if the ancestor already loaded then do nothing, it's too late
-      if (!plt.isCmpReady.has(elm)) {
+      if (!meta.isCmpReady) {
 
         // keep a reference to this element's ancestor host element
         // elm._ancestorHostElement = ancestorHostElement;
-        plt.ancestorHostElementMap.set(elm, ancestorHostElement);
+        meta.ancestorHostElement = ancestorHostElement;
 
         // ensure there is an array to contain a reference to each of the child elements
         // and set this element as one of the ancestor's child elements it should wait on

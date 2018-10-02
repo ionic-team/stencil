@@ -7,38 +7,35 @@ import { queueUpdate } from './update';
 
 export function defineMember(
   plt: d.PlatformApi,
+  meta: d.InternalMeta,
   property: d.ComponentConstructorProperty,
-  elm: d.HostElement,
   instance: d.ComponentInstance,
   memberName: string,
   hostSnapshot: d.HostSnapshot,
   hostAttributes?: d.HostSnapshotAttributes,
   hostAttrValue?: string
 ) {
-
-  function getComponentProp(this: d.ComponentInstance, values?: any) {
+  const {valuesMap, element} = meta;
+  function getComponentProp() {
     // component instance prop/state getter
     // get the property value directly from our internal values
-    values = plt.valuesMap.get(plt.hostElementMap.get(this));
-    return values && values[memberName];
+    return valuesMap[memberName];
   }
 
-  function setComponentProp(this: d.ComponentInstance, newValue: any, elm?: d.HostElement) {
+  function setComponentProp(newValue: any) {
     // component instance prop/state setter (cannot be arrow fn)
-    elm = plt.hostElementMap.get(this);
-
-    if (elm) {
+    if (element) {
       if (property.state || property.mutable) {
-        setValue(plt, elm, memberName, newValue);
+        setValue(plt, meta, element, memberName, newValue);
 
       } else if (__BUILD_CONDITIONALS__.verboseError) {
-        console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
+        console.warn(`@Prop() "${memberName}" on "${element.tagName}" cannot be modified.`);
       }
     }
   }
 
   if (property.type || property.state) {
-    const values = plt.valuesMap.get(elm);
+    const values = meta.valuesMap;
 
     if (!property.state) {
       if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
@@ -58,19 +55,19 @@ export function defineMember(
         // so instead the server's elm has the getter/setter
         // directly on the actual element instance, not its prototype
         // so on the browser we can use "hasOwnProperty"
-        if (elm.hasOwnProperty(memberName)) {
+        if (element.hasOwnProperty(memberName)) {
           // @Prop or @Prop({mutable:true})
           // property values on the host element should override
           // any default values on the component instance
           if (values[memberName] === undefined) {
-            values[memberName] = parsePropertyValue(property.type, (elm as any)[memberName]);
+            values[memberName] = parsePropertyValue(property.type, (element as any)[memberName]);
           }
 
           // for the client only, let's delete its "own" property
           // this way our already assigned getter/setter on the prototype kicks in
           // the very special case is to NOT do this for "mode"
           if (memberName !== 'mode') {
-            delete (elm as any)[memberName];
+            delete (element as any)[memberName];
           }
         }
 
@@ -81,12 +78,12 @@ export function defineMember(
         // on the server we cannot accurately use "hasOwnProperty"
         // instead we'll do a direct lookup to see if the
         // constructor has this property
-        if (elementHasProperty(plt, elm, memberName)) {
+        if (elementHasProperty(meta.cmpMeta, element, memberName)) {
           // @Prop or @Prop({mutable:true})
           // property values on the host element should override
           // any default values on the component instance
           if (values[memberName] === undefined) {
-            values[memberName] = (elm as any)[memberName];
+            values[memberName] = (element as any)[memberName];
           }
         }
       }
@@ -118,19 +115,19 @@ export function defineMember(
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
-    definePropertyValue(instance, memberName, elm);
+    definePropertyValue(instance, memberName, element);
 
   } else if (__BUILD_CONDITIONALS__.method && property.method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
-    definePropertyValue(elm, memberName, instance[memberName].bind(instance));
+    definePropertyValue(element, memberName, instance[memberName].bind(instance));
 
   } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
     // @Prop({ context: 'config' })
     const contextObj = plt.getContextItem(property.context);
     if (contextObj !== undefined) {
-      definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+      definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(element)) || contextObj);
     }
 
   } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
@@ -140,14 +137,10 @@ export function defineMember(
 }
 
 
-export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, instance?: d.ComponentInstance) {
+export function setValue(plt: d.PlatformApi, meta: d.InternalMeta, elm: d.HostElement, memberName: string, newVal: any) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  let values = plt.valuesMap.get(elm);
-  if (!values) {
-    plt.valuesMap.set(elm, values = {});
-  }
-
+  const values = meta.valuesMap;
   const oldVal = values[memberName];
 
   // check our new property value against our internal value
@@ -158,7 +151,7 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
     // https://youtu.be/dFtLONl4cNc?t=22
     values[memberName] = newVal;
 
-    instance = plt.instanceMap.get(elm);
+    const instance = meta.instance;
 
     if (instance) {
       // get an array of method names of watch functions to call
@@ -182,7 +175,7 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing
         // up millions cuz this function ensures it only runs once
-        queueUpdate(plt, elm);
+        queueUpdate(plt, meta);
       }
     }
   }

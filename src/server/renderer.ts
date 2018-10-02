@@ -10,10 +10,10 @@ import { validateConfig } from '../compiler/config/validate-config';
 export class Renderer {
   private ctx: d.CompilerCtx;
   private outputTarget: d.OutputTargetWww;
-  private cmpRegistry: d.ComponentRegistry;
+  private cmpRegistry: d.ComponentMap;
 
 
-  constructor(public config: d.Config, registry?: d.ComponentRegistry, ctx?: d.CompilerCtx, outputTarget?: d.OutputTargetWww) {
+  constructor(public config: d.Config, registry?: d.ComponentMap, ctx?: d.CompilerCtx, outputTarget?: d.OutputTargetWww) {
     this.config = validateConfig(config);
 
     // do not allow more than one worker when prerendering

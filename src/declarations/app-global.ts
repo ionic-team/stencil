@@ -15,7 +15,7 @@ export interface WindowData extends Window {
   /**
    * All defined custom elements
    */
-  ['s-defined']?: { [tag: string]: boolean };
+  ['s-defined']?: Set<string>;
 
   HTMLElement?: any;
 

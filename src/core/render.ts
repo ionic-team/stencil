@@ -5,13 +5,13 @@ import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
+export function render(plt: d.PlatformApi, meta: d.InternalMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
   try {
     // if this component has a render function, let's fire
     // it off and generate the child vnodes for this host element
     // note that we do not create the host element cuz it already exists
+    const cmpMeta = meta.cmpMeta;
     const hostMeta = cmpMeta.componentConstructor.host;
-
     const encapsulation = cmpMeta.componentConstructor.encapsulation;
 
     // test if this component should be shadow dom
@@ -107,7 +107,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
 
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
-      const oldVNode = plt.vnodeMap.get(hostElm) || ({} as d.VNode);
+      const oldVNode = meta.vnodeMap || {};
       oldVNode.elm = rootElm;
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
@@ -120,13 +120,13 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      plt.vnodeMap.set(hostElm, plt.render(
+      meta.vnodeMap = plt.render(
         hostElm,
         oldVNode,
         hostVNode,
         useNativeShadowDom,
         encapsulation
-      ));
+      );
     }
 
     // update styles!

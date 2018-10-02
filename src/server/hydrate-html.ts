@@ -6,7 +6,7 @@ import { optimizeHtml } from '../compiler/html/optimize-html';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentRegistry, opts: d.HydrateOptions) {
+export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentMap, opts: d.HydrateOptions) {
   return new Promise<d.HydrateResults>(resolve => {
 
     // validate the hydrate options and add any missing info

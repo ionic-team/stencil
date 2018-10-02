@@ -1,7 +1,7 @@
-import { ComponentInstance, HostElement, PlatformApi } from '../declarations';
+import * as d from '../declarations';
 
 
-export function initElementListeners(plt: PlatformApi, elm: HostElement) {
+export function initElementListeners(plt: d.PlatformApi, elm: d.HostElement) {
   // so the element was just connected, which means it's in the DOM
   // however, the component instance hasn't been created yet
   // but what if an event it should be listening to get emitted right now??
@@ -9,6 +9,7 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
   // to receive events between now and the instance being created let's
   // queue up all of the event data and fire it off on the instance when it's ready
   const cmpMeta = plt.getComponentMeta(elm);
+  const meta = plt.metaHostMap.get(elm);
 
   if (cmpMeta.listenersMeta) {
     // we've got listens
@@ -19,7 +20,7 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
         plt.domApi.$addEventListener(
           elm,
           listenMeta.eventName,
-          createListenerCallback(plt, elm, listenMeta.eventMethodName),
+          createListenerCallback(meta, listenMeta.eventMethodName),
           listenMeta.eventCapture,
           listenMeta.eventPassive
         );
@@ -29,33 +30,30 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function createListenerCallback(plt: PlatformApi, elm: HostElement, eventMethodName: string, val?: any) {
+export function createListenerCallback(meta: d.InternalMeta, eventMethodName: string) {
   // create the function that gets called when the element receives
   // an event which it should be listening for
+  const instance = meta.instance;
   return (ev?: any) => {
     // get the instance if it exists
-    val = plt.instanceMap.get(elm);
-    if (val) {
+    if (instance) {
       // instance is ready, let's call it's member method for this event
-      val[eventMethodName](ev);
+      instance[eventMethodName](ev);
 
     } else {
       // instance is not ready!!
       // let's queue up this event data and replay it later
       // when the instance is ready
-      val = (plt.queuedEvents.get(elm) || []);
-      val.push(eventMethodName, ev);
-      plt.queuedEvents.set(elm, val);
+      meta.queuedEvents.push(ev);
     }
   };
 }
 
 
-export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element, passive?: boolean) {
+export function enableEventListener(plt: d.PlatformApi, instance: d.ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element, passive?: boolean) {
   if (instance) {
     // cool, we've got an instance, it's get the element it's on
-    const elm = plt.hostElementMap.get(instance);
-    const cmpMeta = plt.getComponentMeta(elm);
+    const { element, cmpMeta} = plt.metaInstanceMap.get(this);
 
     if (cmpMeta && cmpMeta.listenersMeta) {
       // alrighty, so this cmp has listener meta
@@ -67,7 +65,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
         if (listenMeta) {
           // found the listen meta, so let's add the listener
           plt.domApi.$addEventListener(
-            elm,
+            element,
             eventName,
             (ev: any) => instance[listenMeta.eventMethodName](ev),
             listenMeta.eventCapture,
@@ -79,7 +77,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
       } else {
         // we're disabling the event listener
         // so let's just remove it entirely
-        plt.domApi.$removeEventListener(elm, eventName);
+        plt.domApi.$removeEventListener(element, eventName);
       }
     }
   }

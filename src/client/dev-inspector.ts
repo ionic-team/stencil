@@ -172,5 +172,5 @@ function getComponentMeta(plt: d.PlatformApi, tagName: string): Promise<d.DevIns
 }
 
 function getComponentInstance(plt: d.PlatformApi, elm: any) {
-  return Promise.resolve(plt.instanceMap.get(elm));
+  return Promise.resolve(plt.metaHostMap.get(elm).instance);
 }

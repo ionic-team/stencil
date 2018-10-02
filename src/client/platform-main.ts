@@ -14,11 +14,11 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
-
+import { newInternalMeta } from '../core/internal-meta';
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) {
-  const cmpRegistry: d.ComponentRegistry = { 'html': {} };
-  const controllerComponents: {[tag: string]: d.HostElement} = {};
+  const cmpRegistry: d.ComponentMap = new Map([['html', {}]]);
+  const controllerComponents = new Map<string, d.HostElement>();
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
@@ -42,7 +42,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || {});
+  const globalDefined = win['s-defined'] = (win['s-defined'] || new Set());
 
   // internal id increment for unique ids
   let ids = 0;
@@ -52,10 +52,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     domApi,
     defineComponent,
     emitEvent: Context.emit,
-    getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
+    getComponentMeta: elm => cmpRegistry.get(domApi.$tagName(elm)),
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
-    isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
+    isDefinedComponent: (elm: Element) => (globalDefined.has(domApi.$tagName(elm)) || !!plt.getComponentMeta(elm)),
     nextId: () => namespace + (ids++),
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
@@ -66,21 +66,9 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     tmpDisconnected: false,
     attachStyles: (__BUILD_CONDITIONALS__.styles) ? attachStyles : undefined,
 
-    ancestorHostElementMap: new WeakMap(),
+    metaHostMap: new WeakMap(),
+    metaInstanceMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    hasConnectedMap: new WeakMap(),
-    hasListenersMap: new WeakMap(),
-    isCmpLoaded: new WeakMap(),
-    isCmpReady: new WeakMap(),
-    hostElementMap: new WeakMap(),
-    hostSnapshotMap: new WeakMap(),
-    instanceMap: new WeakMap(),
-    isDisconnectedMap: new WeakMap(),
-    isQueuedForUpdate: new WeakMap(),
-    onReadyCallbacksMap: new WeakMap(),
-    queuedEvents: new WeakMap(),
-    vnodeMap: new WeakMap(),
-    valuesMap: new WeakMap(),
 
     processingCmp: new Set(),
     onAppReadyCallbacks: []
@@ -102,8 +90,9 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
-    domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
+    // TODO
+    // plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    domApi.$dispatchEvent(win, 'appload', { detail: { namespace } });
   };
 
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
@@ -117,13 +106,15 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     const tagNameMeta = cmpMeta.tagNameMeta;
 
     if (!win.customElements.get(tagNameMeta)) {
+      globalDefined.add(tagNameMeta);
+      cmpRegistry.set(tagNameMeta, cmpMeta);
 
       // define the custom element
       // initialize the members on the host element prototype
       // keep a ref to the metadata with the tag as the key
       initHostElement(
         plt,
-        (cmpRegistry[tagNameMeta] = cmpMeta),
+        cmpMeta,
         HostElementConstructor.prototype,
         hydratedCssClass,
       );
@@ -145,10 +136,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
 
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+  function requestBundle(cmpMeta: d.ComponentMeta, meta: d.InternalMeta, hmrVersionId: string) {
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
-      queueUpdate(plt, elm);
+      queueUpdate(plt, meta);
 
 
     } else if (__BUILD_CONDITIONALS__.externalModuleLoader) {
@@ -157,7 +148,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // static function as a the bundleIds that returns the module
       const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
       const moduleOpts: d.GetModuleOptions = {
-        mode: elm.mode,
+        mode: meta.element.mode,
         scoped: useScopedCss
       };
 
@@ -186,7 +177,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         }
 
         // bundle all loaded up, let's continue
-        queueUpdate(plt, elm);
+        queueUpdate(plt, meta);
       });
 
 
@@ -197,7 +188,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // through standardized browser APIs
       const bundleId = (typeof cmpMeta.bundleIds === 'string')
         ? cmpMeta.bundleIds
-        : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
+        : (cmpMeta.bundleIds as d.BundleIds)[meta.element.mode];
 
       const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
       let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.entry.js';
@@ -223,7 +214,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           );
 
           // bundle all loaded up, let's continue
-          queueUpdate(plt, elm);
+          queueUpdate(plt, meta);
 
         } catch (e) {
           // oh man, something's up
@@ -245,9 +236,14 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     // standard es2017 class extends HTMLElement
     components
       .map(parseComponentLoader)
-      .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
+      .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {
+        constructor() {
+          super();
+          plt.metaHostMap.set(this, newInternalMeta(this, cmpMeta));
+        }
+      }));
 
-    if (!plt.hasConnectedComponent) {
+   if (!plt.hasConnectedComponent) {
       // we just defined call the custom elements but no
       // connectedCallbacks happened, so no components in the dom :(
       rootElm['s-init']();

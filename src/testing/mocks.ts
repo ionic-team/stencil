@@ -14,6 +14,7 @@ import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
 import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
+import { newInternalMeta } from '../core/internal-meta';
 
 
 export { mockDocument, mockWindow };
@@ -48,7 +49,7 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
     win,
     win.document,
     App,
-    cmpRegistry,
+    new Map(Object.entries(cmpRegistry)),
     hydrateResults.diagnostics,
     false,
     null
@@ -189,7 +190,8 @@ export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpM
     $attributes: {}
   };
 
-  return initComponentInstance(plt, elm, hostSnapshot);
+  const meta = newInternalMeta(elm, cmpMeta);
+  return initComponentInstance(plt, meta, hostSnapshot);
 }
 
 
@@ -232,7 +234,8 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
   if (!node) return;
 
   if (node.tagName) {
-    if (!plt.hasConnectedMap.has(node)) {
+    const meta = plt.metaInstanceMap.get(node);
+    if (!meta || !meta.hasConnected) {
       const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
         initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated');

@@ -5,7 +5,7 @@ import { toLowerCase } from '../../util/helpers';
 import { updateAttribute } from './update-attribute';
 
 
-export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) {
+export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) {
   if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
@@ -81,12 +81,11 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
 
   } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
     (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
-    || (!__BUILD_CONDITIONALS__.clientSide && elementHasProperty(plt, elm, memberName))) {
+    || (!__BUILD_CONDITIONALS__.clientSide && elementHasProperty(cmpMeta, elm, memberName))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
-    const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
       // we know for a fact that this element is a known component
       // and this component has this member name as a property,

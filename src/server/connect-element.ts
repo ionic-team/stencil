@@ -16,7 +16,8 @@ export function connectChildElements(config: d.Config, plt: d.PlatformApi, App: 
 
 
 export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: Element) {
-  if (!plt.hasConnectedMap.has(elm as d.HostElement)) {
+  const meta = plt.metaHostMap.get(elm as d.HostElement);
+  if (!meta.hasConnected) {
     const tagName = elm.tagName.toLowerCase();
     const cmpMeta = plt.getComponentMeta(elm);
 
@@ -33,17 +34,19 @@ export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppG
       connectImgElement(hydrateResults, elm as HTMLImageElement);
     }
 
-    plt.hasConnectedMap.set(elm as d.HostElement, true);
+    meta.hasConnected = true;
   }
 }
 
 
 function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta) {
   const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
-  plt.hostSnapshotMap.set(elm, hostSnapshot);
+  const meta = plt.metaHostMap.get(elm as d.HostElement);
+
+  meta.hostSnapshot = hostSnapshot;
 
   if (!cmpMeta.componentConstructor) {
-    plt.requestBundle(cmpMeta, elm);
+    plt.requestBundle(cmpMeta, meta);
   }
 
   if (cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom) {

@@ -4,8 +4,8 @@ import { defineMember } from './proxy-members';
 
 export function proxyComponentInstance(
   plt: d.PlatformApi,
+  meta: d.InternalMeta,
   cmpConstructor: d.ComponentConstructor,
-  elm: d.HostElement,
   instance: d.ComponentInstance,
   hostSnapshot: d.HostSnapshot,
 ) {
@@ -15,13 +15,6 @@ export function proxyComponentInstance(
   // and let's have the getters/setters kick in and do their jobs
 
   // let's automatically add a reference to the host element on the instance
-  plt.hostElementMap.set(instance, elm);
-
-  // create the values object if it doesn't already exist
-  // this will hold all of the internal getter/setter values
-  if (!plt.valuesMap.has(elm)) {
-    plt.valuesMap.set(elm, {});
-  }
 
   // get the properties from the constructor
   // and add default "mode" and "color" properties
@@ -31,6 +24,6 @@ export function proxyComponentInstance(
     mode: { type: String },
   }).forEach(([memberName, property]) => {
     // define each of the members and initialize what their role is
-    defineMember(plt, property, elm, instance, memberName, hostSnapshot);
+    defineMember(plt, meta, property, instance, memberName, hostSnapshot);
   });
 }

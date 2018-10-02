@@ -1,6 +1,24 @@
 import * as d from '.';
 
 
+export interface InternalMeta {
+  ancestorHostElement: d.HostElement;
+  hasConnected: boolean;
+  hasListeners: boolean;
+  isCmpLoaded: boolean;
+  isCmpReady: boolean;
+  cmpMeta: d.ComponentMeta;
+  hostSnapshot: d.HostSnapshot;
+  instance: d.ComponentInstance;
+  element: d.HostElement;
+  isDisconnected: boolean;
+  isQueuedForUpdate: boolean;
+  onReadyCallbacks: d.OnReadyCallback[];
+  queuedEvents: any[];
+  vnodeMap: d.VNode;
+  valuesMap: any;
+}
+
 export interface PlatformApi {
   activeRender: boolean;
   attachStyles?: (plt: PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) => void;
@@ -14,7 +32,7 @@ export interface PlatformApi {
   isDefinedComponent: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  requestBundle: (cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId?: string) => void;
+  requestBundle: (cmpMeta: d.ComponentMeta, meta: d.InternalMeta, hmrVersionId?: string) => void;
   onAppLoad?: (rootElm: d.HostElement, failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
@@ -25,21 +43,10 @@ export interface PlatformApi {
   nextId?: () => string;
   hasConnectedComponent?: boolean;
 
-  ancestorHostElementMap: WeakMap<d.HostElement, d.HostElement>;
+  metaHostMap: WeakMap<d.HostElement, InternalMeta>;
+  metaInstanceMap: WeakMap<d.ComponentInstance, InternalMeta>;
+
   componentAppliedStyles: WeakMap<Node, d.ComponentAppliedStyles>;
-  hasConnectedMap: WeakMap<d.HostElement, boolean>;
-  hasListenersMap: WeakMap<d.HostElement, boolean>;
-  isCmpLoaded: WeakMap<d.HostElement, boolean>;
-  isCmpReady: WeakMap<d.HostElement, boolean>;
-  hostSnapshotMap: WeakMap<d.HostElement, d.HostSnapshot>;
-  hostElementMap: WeakMap<d.ComponentInstance, d.HostElement>;
-  instanceMap: WeakMap<d.HostElement, d.ComponentInstance>;
-  isDisconnectedMap: WeakMap<d.HostElement, boolean>;
-  isQueuedForUpdate: WeakMap<d.HostElement, boolean>;
-  onReadyCallbacksMap: WeakMap<d.HostElement, d.OnReadyCallback[]>;
-  queuedEvents: WeakMap<d.HostElement, any[]>;
-  vnodeMap: WeakMap<d.HostElement, d.VNode>;
-  valuesMap: WeakMap<d.HostElement, any>;
   processingCmp: Set<d.HostElement>;
   onAppReadyCallbacks: Function[];
 }

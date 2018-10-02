@@ -1,7 +1,7 @@
-import { DomApi, HostElement } from '../declarations';
+import * as d from '../declarations';
 
 
-export function proxyController(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string) {
+export function proxyController(domApi: d.DomApi, controllerComponents: Map<string, d.HostElement>, ctrlTag: string) {
   return {
     'create': proxyProp(domApi, controllerComponents, ctrlTag, 'create'),
     'componentOnReady': proxyProp(domApi, controllerComponents, ctrlTag, 'componentOnReady')
@@ -9,7 +9,7 @@ export function proxyController(domApi: DomApi, controllerComponents: { [tag: st
 }
 
 
-function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string, proxyMethodName: string) {
+function proxyProp(domApi: d.DomApi, controllerComponents: Map<string, d.HostElement>, ctrlTag: string, proxyMethodName: string) {
   return function () {
     const args = arguments;
     return loadComponent(domApi, controllerComponents, ctrlTag)
@@ -18,16 +18,17 @@ function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostEl
 }
 
 
-export function loadComponent(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string): Promise<any> {
-  let ctrlElm = controllerComponents[ctrlTag];
+export function loadComponent(domApi: d.DomApi, controllerComponents: Map<string, d.HostElement>, ctrlTag: string): Promise<any> {
+  let ctrlElm = controllerComponents.get(ctrlTag);
   const body = domApi.$doc.body;
   if (body) {
     if (!ctrlElm) {
-      ctrlElm = body.querySelector(ctrlTag) as HostElement;
-    }
-    if (!ctrlElm) {
-      ctrlElm = controllerComponents[ctrlTag] = domApi.$createElement(ctrlTag) as any;
-      domApi.$appendChild(body, ctrlElm);
+      ctrlElm = body.querySelector(ctrlTag);
+      if (!ctrlElm) {
+        ctrlElm = domApi.$createElement(ctrlTag);
+        controllerComponents.set(ctrlTag, ctrlElm);
+        domApi.$appendChild(body, ctrlElm);
+      }
     }
     return ctrlElm.componentOnReady();
   }

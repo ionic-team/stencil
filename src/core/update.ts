@@ -4,42 +4,43 @@ import { render } from './render';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
+export function queueUpdate(plt: d.PlatformApi, meta: d.InternalMeta) {
   // we're actively processing this component
-  plt.processingCmp.add(elm);
+  plt.processingCmp.add(meta.element);
 
   // only run patch if it isn't queued already
-  if (!plt.isQueuedForUpdate.has(elm)) {
-    plt.isQueuedForUpdate.set(elm, true);
+  if (!meta.isQueuedForUpdate) {
+    meta.isQueuedForUpdate = true;
     // run the patch in the next tick
     // vdom diff and patch the host element for differences
     if (plt.isAppLoaded) {
       // app has already loaded
       // let's queue this work in the dom write phase
-      plt.queue.write(() => update(plt, elm));
+      plt.queue.write(() => update(plt, meta));
 
     } else {
       // app hasn't finished loading yet
       // so let's use next tick to do everything
       // as fast as possible
-      plt.queue.tick(() => update(plt, elm));
+      plt.queue.tick(() => update(plt, meta));
     }
   }
 }
 
 
-export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) {
+export async function update(plt: d.PlatformApi, meta: d.InternalMeta) {
+  const element = meta.element;
+
   // no longer queued for update
-  plt.isQueuedForUpdate.delete(elm);
+  meta.isQueuedForUpdate = false;
 
   // everything is async, so somehow we could have already disconnected
   // this node, so be sure to do nothing if we've already disconnected
-  if (!plt.isDisconnectedMap.has(elm)) {
-    instance = plt.instanceMap.get(elm);
-    isInitialLoad = !instance;
+  if (!meta.isDisconnected) {
+    let instance = meta.instance;
 
-    if (isInitialLoad) {
-      ancestorHostElement = plt.ancestorHostElementMap.get(elm);
+    if (!instance) {
+      const ancestorHostElement = meta.ancestorHostElement;
 
       if (ancestorHostElement && !ancestorHostElement['s-rn']) {
         // this is the intial load
@@ -49,7 +50,7 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLo
         (ancestorHostElement['s-rc'] = ancestorHostElement['s-rc'] || []).push(() => {
           // this will get fired off when the ancestor host element
           // finally gets around to rendering its lazy self
-          update(plt, elm);
+          update(plt, meta);
         });
         return;
       }
@@ -57,7 +58,7 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLo
       // haven't created a component instance for this host element yet!
       // create the instance from the user's component class
       // https://www.youtube.com/watch?v=olLxrojmvMg
-      instance = initComponentInstance(plt, elm, plt.hostSnapshotMap.get(elm));
+      instance = initComponentInstance(plt, meta, meta.hostSnapshot);
 
       if (__BUILD_CONDITIONALS__.cmpWillLoad && instance) {
         // this is the initial load and the instance was just created
@@ -69,7 +70,7 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLo
             await instance.componentWillLoad();
           }
         } catch (e) {
-          plt.onError(e, RUNTIME_ERROR.WillLoadError, elm);
+          plt.onError(e, RUNTIME_ERROR.WillLoadError, element);
         }
       }
 
@@ -85,18 +86,18 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLo
           await instance.componentWillUpdate();
         }
       } catch (e) {
-        plt.onError(e, RUNTIME_ERROR.WillUpdateError, elm);
+        plt.onError(e, RUNTIME_ERROR.WillUpdateError, meta.element);
       }
     }
 
     // if this component has a render function, let's fire
     // it off and generate a vnode for this
-    render(plt, plt.getComponentMeta(elm), elm, instance);
+    render(plt, meta, element, instance);
 
-    elm['s-init']();
+    element['s-init']();
 
     if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
-      elm['s-hmr-load'] && elm['s-hmr-load']();
+      element['s-hmr-load'] && element['s-hmr-load']();
     }
   }
 }

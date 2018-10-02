@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
+import { getInternalMeta } from '../../core/internal-meta';
 
 
 export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
@@ -13,14 +14,14 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
       jlen: number;
 
   if (ilen > 0) {
-    plt.isCmpReady.set(rootElm as d.HostElement, true);
+    getInternalMeta(plt, elm).isCmpLoaded = true;
 
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
       ssrVNode = {};
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
-      plt.vnodeMap.set(elm, ssrVNode);
+      getInternalMeta(plt, elm).vnodeMap = ssrVNode;
 
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
         addChildSsrVNodes(domApi, elm.childNodes[j] as d.RenderNode, ssrVNode, ssrVNodeId, true);

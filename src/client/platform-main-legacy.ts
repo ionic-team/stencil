@@ -17,11 +17,11 @@ import { queueUpdate } from '../core/update';
 
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
-  const cmpRegistry: d.ComponentRegistry = { 'html': {} };
+  const cmpRegistry: d.ComponentMap = new Map([['html', {}]]);
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles = new Map<string, d.CjsExports>();
   const pendingBundleRequests = new Set<string>();
-  const controllerComponents: {[tag: string]: d.HostElement} = {};
+  const controllerComponents = new Map<string, d.HostElement>();
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
@@ -49,7 +49,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || {});
+  const globalDefined: Set<string> = win['s-defined'] = (win['s-defined'] || new Set());
 
   // internal id increment for unique ids
   let ids = 0;
@@ -60,10 +60,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     defineComponent,
     emitEvent: Context.emit,
     customStyle,
-    getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
+    getComponentMeta: elm => cmpRegistry.get(domApi.$tagName(elm)),
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
-    isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
+    isDefinedComponent: (elm: Element) => (globalDefined.has(domApi.$tagName(elm)) || !!plt.getComponentMeta(elm)),
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     nextId: () => namespace + (ids++),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
@@ -73,21 +73,9 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     activeRender: false,
     tmpDisconnected: false,
 
-    ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    hasConnectedMap: new WeakMap(),
-    hasListenersMap: new WeakMap(),
-    isCmpLoaded: new WeakMap(),
-    isCmpReady: new WeakMap(),
-    hostElementMap: new WeakMap(),
-    hostSnapshotMap: new WeakMap(),
-    instanceMap: new WeakMap(),
-    isDisconnectedMap: new WeakMap(),
-    isQueuedForUpdate: new WeakMap(),
-    onReadyCallbacksMap: new WeakMap(),
-    queuedEvents: new WeakMap(),
-    vnodeMap: new WeakMap(),
-    valuesMap: new WeakMap(),
+    metaHostMap: new WeakMap(),
+    metaInstanceMap: new WeakMap(),
 
     processingCmp: new Set(),
     onAppReadyCallbacks: []
@@ -109,7 +97,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    // plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 
@@ -119,15 +107,16 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
-
-    if (!win.customElements.get(cmpMeta.tagNameMeta)) {
+    const tagNameMeta = cmpMeta.tagNameMeta;
+    if (!win.customElements.get(tagNameMeta)) {
       // keep a map of all the defined components
-      globalDefined[cmpMeta.tagNameMeta] = true;
+      globalDefined.add(tagNameMeta);
+      cmpRegistry.set(tagNameMeta, cmpMeta);
 
       // initialize the members on the host element prototype
       // keep a ref to the metadata with the tag as the key
       initHostElement(plt,
-        (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
+        cmpMeta,
         HostElementConstructor.prototype,
         hydratedCssClass
       );
@@ -209,7 +198,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
           const normalizedRegistryTag = registryTags[i].replace(/-/g, '').toLowerCase();
 
           if (normalizedRegistryTag === normalizedTagName) {
-            const cmpMeta = cmpRegistry[registryTags[i]];
+            const cmpMeta = cmpRegistry.get(registryTags[i]);
             if (cmpMeta) {
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
@@ -272,20 +261,20 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   // This is executed by the component's connected callback.
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+  function requestBundle(cmpMeta: d.ComponentMeta, meta: d.InternalMeta, hmrVersionId: string) {
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
-      (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
+      (cmpMeta.bundleIds as d.BundleIds)[meta.element.mode];
 
     if (getLoadedBundle(bundleId, hmrVersionId)) {
       // sweet, we've already loaded this bundle
-      queueUpdate(plt, elm);
+      queueUpdate(plt, meta);
 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
       bundleQueue.push([undefined, [bundleId], () => {
-        queueUpdate(plt, elm);
+        queueUpdate(plt, meta);
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
@@ -372,10 +361,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // register all the components now that everything's ready
   components
-    .map(data => {
-      const cmpMeta = parseComponentLoader(data);
-      return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
-    })
+    .map(data => parseComponentLoader(data))
     .forEach(cmpMeta => {
       // es5 way of extending HTMLElement
       function HostElement(self: any) {

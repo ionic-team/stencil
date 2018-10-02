@@ -1,6 +1,8 @@
 import * as d from '.';
 
 export interface ComponentConstructor {
+  new (): any;
+
   is?: string;
   properties?: ComponentConstructorProperties;
   events?: ComponentConstructorEvent[];
@@ -225,6 +227,9 @@ export interface ComponentRegistry {
   // registry tag must always be lower-case
   [tagName: string]: ComponentMeta;
 }
+
+
+export type ComponentMap = Map<string, ComponentMeta>;
 
 
 export interface HostElement extends HTMLElement {

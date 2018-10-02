@@ -33,7 +33,7 @@ export function initHostElement(
   };
 
   HostElementConstructor.forceUpdate = function() {
-    queueUpdate(plt, this);
+    queueUpdate(plt, plt.metaHostMap.get(this));
   };
 
   if (__BUILD_CONDITIONALS__.hotModuleReplacement) {

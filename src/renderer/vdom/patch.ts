@@ -72,9 +72,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
                         domApi.$createElement(
                           (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag)
                         );
-
-      if (plt.isDefinedComponent(elm)) {
-        plt.isCmpReady.delete(hostElm);
+      const c = plt.metaHostMap.get(elm);
+      if (c) {
+        c.isCmpReady = false;
       }
 
       if (__BUILD_CONDITIONALS__.hasSvg) {

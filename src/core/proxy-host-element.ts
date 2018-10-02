@@ -13,16 +13,13 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
   if (!__BUILD_CONDITIONALS__.clientSide) {
     // in just a server-side build
     // let's set the properties to the values immediately
-    let values = plt.valuesMap.get(hostPrototype);
-    if (!values) {
-      plt.valuesMap.set(hostPrototype, values = {});
-    }
+    const meta = plt.metaHostMap.get(hostPrototype);
 
     membersEntries.forEach(([memberName, member]) => {
       const memberType = member.memberType;
 
       if (memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable)) {
-        values[memberName] = (hostPrototype as any)[memberName];
+        meta.valuesMap[memberName] = (hostPrototype as any)[memberName];
       }
     });
   }
@@ -38,11 +35,12 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
         function getHostElementProp(this: d.HostElement) {
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
-          return (plt.valuesMap.get(this) || {})[memberName];
+          return plt.metaHostMap.get(this).valuesMap[memberName];
         },
         function setHostElementProp(this: d.HostElement, newValue: any) {
           // host element setter (cannot be arrow fn)
-          setValue(plt, this, memberName, parsePropertyValue(member.propType, newValue));
+          const meta = plt.metaHostMap.get(this);
+          setValue(plt, meta, this, memberName, parsePropertyValue(member.propType, newValue));
         }
       );
 

@@ -22,22 +22,21 @@ export function createPlatformServer(
   win: any,
   doc: Document,
   App: d.AppGlobal,
-  cmpRegistry: d.ComponentRegistry,
+  cmpRegistry: d.ComponentMap,
   diagnostics: d.Diagnostic[],
   isPrerender: boolean,
   compilerCtx?: d.CompilerCtx
 ): d.PlatformApi {
-  const loadedBundles: {[bundleId: string]:  d.CjsExports} = {};
+  cmpRegistry.set('html', {});
+
+  const loadedBundles = new Map<string, d.CjsExports>();
   const appliedStyleIds = new Set<string>();
-  const controllerComponents: {[tag: string]: d.HostElement} = {};
+  const controllerComponents = new Map<string, d.HostElement>();
 
   const domApi = createDomApi(App, win, doc);
 
   // init build context
   compilerCtx = compilerCtx || {};
-
-  // the root <html> element is always the top level registered component
-  cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
 
   // initialize Core global object
   const Context: d.CoreContext = {};
@@ -92,21 +91,9 @@ export function createPlatformServer(
     requestBundle: requestBundle,
     tmpDisconnected: false,
 
-    ancestorHostElementMap: new WeakMap(),
+    metaHostMap: new WeakMap(),
+    metaInstanceMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    hasConnectedMap: new WeakMap(),
-    hasListenersMap: new WeakMap(),
-    isCmpLoaded: new WeakMap(),
-    isCmpReady: new WeakMap(),
-    hostElementMap: new WeakMap(),
-    hostSnapshotMap: new WeakMap(),
-    instanceMap: new WeakMap(),
-    isDisconnectedMap: new WeakMap(),
-    isQueuedForUpdate: new WeakMap(),
-    onReadyCallbacksMap: new WeakMap(),
-    queuedEvents: new WeakMap(),
-    vnodeMap: new WeakMap(),
-    valuesMap: new WeakMap(),
 
     processingCmp: new Set(),
     onAppReadyCallbacks: []
@@ -133,37 +120,37 @@ export function createPlatformServer(
   rootElm['s-rn'] = true;
 
   rootElm['s-init'] = function appLoadedCallback() {
-    plt.isCmpReady.set(rootElm, true);
+    // plt.isCmpReady.set(rootElm, true);
     appLoaded();
   };
 
-  function appLoaded(failureDiagnostic?: d.Diagnostic) {
-    if (plt.isCmpReady.has(rootElm) || failureDiagnostic) {
-      // the root node has loaded
-      plt.onAppLoad && plt.onAppLoad(rootElm, failureDiagnostic);
-    }
+  function appLoaded(_failureDiagnostic?: d.Diagnostic) {
+    // if (plt.isCmpReady.has(rootElm) || failureDiagnostic) {
+    //   // the root node has loaded
+    //   plt.onAppLoad && plt.onAppLoad(rootElm, failureDiagnostic);
+    // }
   }
 
   function getComponentMeta(elm: Element) {
     // registry tags are always lower-case
-    return cmpRegistry[elm.nodeName.toLowerCase()];
+    return cmpRegistry.get(elm.nodeName.toLowerCase());
   }
 
   function defineComponent(cmpMeta: d.ComponentMeta) {
     // default mode and color props
-    cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
+    cmpRegistry.set(cmpMeta.tagNameMeta, cmpMeta);
   }
 
 
   function setLoadedBundle(bundleId: string, value: d.CjsExports) {
-    loadedBundles[bundleId] = value;
+    loadedBundles.set(bundleId, value);
   }
 
   function getLoadedBundle(bundleId: string) {
     if (bundleId == null) {
       return null;
     }
-    return loadedBundles[bundleId.replace(/^\.\//, '')];
+    return loadedBundles.get(bundleId.replace(/^\.\//, ''));
   }
 
   function isLoadedBundle(id: string) {
@@ -211,7 +198,7 @@ export function createPlatformServer(
           const normalizedRegistryTag = registryTags[i].replace(/-/g, '').toLowerCase();
 
           if (normalizedRegistryTag === normalizedTagName) {
-            const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+            const cmpMeta = cmpRegistry.get(toDashCase(pascalCasedTagName));
             if (cmpMeta) {
               // connect the component's constructor to its metadata
               const componentConstructor = bundleExports[pascalCasedTagName];
@@ -250,7 +237,7 @@ export function createPlatformServer(
 
 
   function isDefinedComponent(elm: Element) {
-    return !!(cmpRegistry[elm.tagName.toLowerCase()]);
+    return !!(cmpRegistry.get(elm.tagName.toLowerCase()));
   }
 
   function userRequire(ids: string[], resolve: Function) {
@@ -264,7 +251,9 @@ export function createPlatformServer(
 
 
   // This is executed by the component's connected callback.
-  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+  function requestBundle(cmpMeta: d.ComponentMeta, meta: d.InternalMeta) {
+
+    const elm = meta.element;
 
     // set the "mode" property
     if (!elm.mode) {
@@ -275,9 +264,10 @@ export function createPlatformServer(
     }
 
     // It is possible the data was loaded from an outside source like tests
-    if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
-      serverInitStyle(domApi, appliedStyleIds, cmpRegistry[cmpMeta.tagNameMeta].componentConstructor);
-      queueUpdate(plt, elm);
+    const componentConstructor = cmpRegistry.get(cmpMeta.tagNameMeta).componentConstructor;
+    if (componentConstructor) {
+      serverInitStyle(domApi, appliedStyleIds, componentConstructor);
+      queueUpdate(plt, meta);
 
     } else {
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
@@ -286,7 +276,7 @@ export function createPlatformServer(
 
       if (isLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
-        queueUpdate(plt, elm);
+        queueUpdate(plt, meta);
 
       } else {
         const fileName = getComponentBundleFilename(cmpMeta, elm.mode);

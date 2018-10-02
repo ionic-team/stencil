@@ -251,8 +251,13 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       // if the parent node is a document fragment (shadow root)
       // then use the "host" property on it
       // otherwise use the parent node
-      ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode
+      ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode,
+
   };
+
+  if (__BUILD_CONDITIONALS__.shadowDom) {
+    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+  }
 
   if (__BUILD_CONDITIONALS__.isDev) {
     if ((win as Window).location.search.indexOf('shadow=false') > 0) {
@@ -260,10 +265,6 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       // only add this check when in dev mode
       domApi.$supportsShadowDom = false;
     }
-  }
-
-  if (__BUILD_CONDITIONALS__.shadowDom) {
-    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
   }
 
   if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {

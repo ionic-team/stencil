@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export function elementHasProperty(plt: d.PlatformApi, elm: d.HostElement, memberName: string) {
+export function elementHasProperty(cmpMeta: d.ComponentMeta, elm: d.HostElement, memberName: string) {
   // within the browser, the element's prototype
   // already has its getter/setter set, but on the
   // server the prototype is shared causing issues
@@ -14,7 +14,6 @@ export function elementHasProperty(plt: d.PlatformApi, elm: d.HostElement, membe
   let hasOwnProperty = elm.hasOwnProperty(memberName);
   if (!hasOwnProperty) {
     // element doesn't
-    const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta) {
       if (cmpMeta.componentConstructor && cmpMeta.componentConstructor.properties) {
         // if we have the constructor property data, let's check that

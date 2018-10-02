@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, win?: any, apps?: string[], queuedComponentOnReadys?: d.QueuedComponentOnReady[], i?: number) {
+export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, win?: any, apps?: string[], queuedComponentOnReadys?: d.QueuedComponentOnReady[]) {
 
   // add componentOnReady() to the App object
   // this also is used to know that the App's core is ready
@@ -12,9 +12,10 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
       return false;
     }
 
-    const cmpMeta = plt.getComponentMeta(elm);
+    const meta = plt.metaHostMap.get(elm);
+    const cmpMeta = meta.cmpMeta;
     if (cmpMeta) {
-      if (plt.isCmpReady.has(elm)) {
+      if (meta.isCmpReady) {
         // element has already loaded, pass the resolve the element component
         // so we know that the resolve knows it this element is an app component
         resolve(elm);
@@ -22,9 +23,7 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
       } else {
         // element hasn't loaded yet or it has an update in progress
         // add this resolve specifically to this elements on ready queue
-        const onReadyCallbacks = plt.onReadyCallbacksMap.get(elm) || [];
-        onReadyCallbacks.push(resolve);
-        plt.onReadyCallbacksMap.set(elm, onReadyCallbacks);
+        meta.onReadyCallbacks.push(resolve);
       }
     }
 
@@ -34,7 +33,7 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
 
   if (queuedComponentOnReadys) {
     // we've got some componentOnReadys in the queue before the app was ready
-    for (i = queuedComponentOnReadys.length - 1; i >= 0; i--) {
+    for (let i = queuedComponentOnReadys.length - 1; i >= 0; i--) {
       // go through each element and see if this app recongizes it
       if (App.componentOnReady(queuedComponentOnReadys[i][0], queuedComponentOnReadys[i][1])) {
         // turns out this element belongs to this app
@@ -44,7 +43,7 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
       }
     }
 
-    for (i = 0; i < apps.length; i++) {
+    for (let i = 0; i < apps.length; i++) {
       if (!win[apps[i]].componentOnReady) {
         // there is at least 1 apps that isn't ready yet
         // so let's stop here cuz there's still app cores loading
@@ -55,7 +54,7 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
     // if we got to this point then that means all of the apps are ready
     // and they would have removed any of their elements from queuedComponentOnReadys
     // so let's do the cleanup of the  remaining queuedComponentOnReadys
-    for (i = 0; i < queuedComponentOnReadys.length; i++) {
+    for (let i = 0; i < queuedComponentOnReadys.length; i++) {
       // resolve any queued componentsOnReadys that are left over
       // since these elements were not apart of any apps
       // call the resolve fn, but pass null so it's know this wasn't a known app component
