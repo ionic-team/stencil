@@ -187,6 +187,8 @@ export interface NodeResolveConfig {
 export interface ConfigFlags {
   task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
   args?: string[];
+  knownArgs?: string[];
+  unknownArgs?: string[];
   address?: string;
   build?: boolean;
   cache?: boolean;

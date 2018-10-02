@@ -5,7 +5,9 @@ import { dashToPascalCase } from '../util/helpers';
 export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
   const flags: any = {
     task: null,
-    args: []
+    args: [],
+    knownArgs: [],
+    unknownArgs: null
   };
 
   // cmd line has more priority over npm scripts cmd
@@ -13,10 +15,10 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
     flags.task = flags.args[0];
   }
-  parseArgs(flags, flags.args);
+  parseArgs(flags, flags.args, flags.knownArgs);
 
   const npmScriptCmdArgs = getNpmScriptArgs(process);
-  parseArgs(flags, npmScriptCmdArgs);
+  parseArgs(flags, npmScriptCmdArgs, flags.knownArgs);
 
   npmScriptCmdArgs.forEach(npmArg => {
     if (!flags.args.includes(npmArg)) {
@@ -24,11 +26,22 @@ export function parseFlags(process: NodeJS.Process): d.ConfigFlags {
     }
   });
 
+  if (flags.task != null) {
+    const i = flags.args.indexOf(flags.task);
+    if (i > -1) {
+      flags.args.splice(i, 1);
+    }
+  }
+
+  flags.unknownArgs = flags.args.filter((arg: string) => {
+    return !flags.knownArgs.includes(arg);
+  });
+
   return flags;
 }
 
 
-export function parseArgs(flags: any, args: string[]): d.ConfigFlags {
+export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.ConfigFlags {
   ARG_OPTS.boolean.forEach(booleanName => {
 
     const alias = (ARG_OPTS.alias as any)[booleanName];
@@ -41,12 +54,15 @@ export function parseArgs(flags: any, args: string[]): d.ConfigFlags {
     args.forEach(cmdArg => {
       if (cmdArg === `--${booleanName}`) {
         flags[flagKey] = true;
+        knownArgs.push(cmdArg);
 
       } else if (cmdArg === `--no-${booleanName}`) {
         flags[flagKey] = false;
+        knownArgs.push(cmdArg);
 
       } else if (alias && cmdArg === `-${alias}`) {
         flags[flagKey] = true;
+        knownArgs.push(cmdArg);
       }
     });
   });
@@ -67,18 +83,23 @@ export function parseArgs(flags: any, args: string[]): d.ConfigFlags {
         const values = cmdArg.split('=');
         values.shift();
         flags[flagKey] = values.join('=');
+        knownArgs.push(cmdArg);
 
       } else if (cmdArg === `--${stringName}`) {
         flags[flagKey] = args[i + 1];
+        knownArgs.push(cmdArg);
+        knownArgs.push(args[i + 1]);
 
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
           const values = cmdArg.split('=');
           values.shift();
           flags[flagKey] = values.join('=');
+          knownArgs.push(cmdArg);
 
         } else if (cmdArg === `-${alias}`) {
           flags[flagKey] = args[i + 1];
+          knownArgs.push(args[i + 1]);
         }
       }
     }
@@ -100,18 +121,22 @@ export function parseArgs(flags: any, args: string[]): d.ConfigFlags {
         const values = cmdArg.split('=');
         values.shift();
         flags[flagKey] = parseInt(values.join(''), 10);
+        knownArgs.push(cmdArg);
 
       } else if (cmdArg === `--${numberName}`) {
         flags[flagKey] = parseInt(args[i + 1], 10);
+        knownArgs.push(args[i + 1]);
 
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
           const values = cmdArg.split('=');
           values.shift();
           flags[flagKey] = parseInt(values.join(''), 10);
+          knownArgs.push(cmdArg);
 
         } else if (cmdArg === `-${alias}`) {
           flags[flagKey] = parseInt(args[i + 1], 10);
+          knownArgs.push(args[i + 1]);
         }
       }
     }
