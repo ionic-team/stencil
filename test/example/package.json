@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
-    "test": "node ../../bin/stencil test",
+    "test": "node ../../bin/stencil test --e2e --spec",
     "jest": "jest"
   },
   "devDependencies": {
