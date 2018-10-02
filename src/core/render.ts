@@ -41,12 +41,10 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // shadow root or if they should be global
       plt.attachStyles(plt, plt.domApi, cmpMeta, hostElm);
 
-      // if no render function
       const scopeId = hostElm['s-sc'];
       if (scopeId) {
         plt.domApi.$addClass(hostElm, getElementScopeId(scopeId, true));
-
-        if (!instance.render) {
+        if (encapsulation === 'scoped') {
           plt.domApi.$addClass(hostElm, getElementScopeId(scopeId));
         }
       }
