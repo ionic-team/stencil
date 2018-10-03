@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '../compiler/util';
 import { runJest } from './jest/jest-runner';
+import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import * as puppeteer from 'puppeteer';
 
@@ -105,7 +106,13 @@ export class Testing implements d.Testing {
       }
     }
 
-    const passed = await runJest(config, env, doScreenshots);
+    let passed = false;
+
+    if (doScreenshots) {
+      passed = await runJestScreenshot(config, env);
+    } else {
+      passed = await runJest(config, env);
+    }
 
     config.logger.info('');
 

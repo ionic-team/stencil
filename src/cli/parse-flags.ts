@@ -210,7 +210,9 @@ export function getNpmScriptArgs(process: NodeJS.Process) {
       const npmConfigArgs = process.env.npm_config_argv;
       if (npmConfigArgs) {
         args = (JSON.parse(npmConfigArgs).original as string[]);
-        args.shift();
+        if (args[0] === 'run') {
+          args = args.slice(2);
+        }
       }
     }
   } catch (e) {}

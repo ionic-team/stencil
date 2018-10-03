@@ -195,22 +195,11 @@ async function setPageEmulate(page: puppeteer.Page) {
     const screenshotEmulate = JSON.parse(emulateJsonContent) as d.EmulateConfig;
 
     const emulateOptions: puppeteer.EmulateOptions = {
-      viewport: {
-        width: screenshotEmulate.width,
-        height: screenshotEmulate.height,
-        deviceScaleFactor: screenshotEmulate.deviceScaleFactor,
-        isMobile: screenshotEmulate.isMobile,
-        hasTouch: screenshotEmulate.hasTouch,
-        isLandscape: screenshotEmulate.isLandscape
-      },
+      viewport: screenshotEmulate.viewport,
       userAgent: screenshotEmulate.userAgent
     };
 
     await (page as puppeteer.Page).emulate(emulateOptions);
-
-    if (screenshotEmulate.mediaType) {
-      await page.emulateMedia(screenshotEmulate.mediaType);
-    }
 
   } catch (e) {
     console.error('setPageEmulate', e);

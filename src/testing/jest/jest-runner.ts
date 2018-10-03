@@ -1,150 +1,89 @@
 import * as d from '../../declarations';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
-import * as path from 'path';
 
 
-export async function runJest(config: d.Config, env: d.E2EProcessEnv, _doScreenshots: boolean) {
+export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
+  // set all of the emulate data to the process.env to be read later on
   env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(config.testing.emulate);
 
-  const { runCLI } = require('jest-cli');
-
+  // build up our args from our already know list of args in the config
   const jestArgv = buildJestArgv(config);
+
+  // build up the project paths, which is basically the app's root dir
   const projects = getProjectListFromCLIArgs(config, jestArgv);
 
+  // run the jest-cli with our data rather than letting the
+  // jest-cli parse the args itself
+  const { runCLI } = require('jest-cli');
   const cliResults = await runCLI(jestArgv, projects);
 
-  return Promise.resolve(cliResults.results.success);
+  const success = !!cliResults.results.success;
+
+  return success;
 }
 
 
-const TestRunner = require('jest-runner');
-export class StencilTestRunner extends TestRunner {
+export function createTestRunner(): any {
 
-  async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
-    const env = (process.env as d.E2EProcessEnv);
+  const TestRunner = require('jest-runner');
 
-    tests = tests.filter(t => {
-      if (t.path.includes('.e2e.') && env.__STENCIL_E2E_TESTS__ === 'true') {
-        return true;
+  class StencilTestRunner extends TestRunner {
+
+    async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
+      const env = (process.env as d.E2EProcessEnv);
+
+        // filter out only the tests the flags said we should run
+      tests = tests.filter(t => includeTestFile(t.path, env));
+
+      if (env.__STENCIL_SCREENSHOT__ === 'true') {
+        // we're doing e2e screenshots, so let's loop through
+        // each of the emulate configs for each test
+
+        // get the emulate configs from the process env
+        // and parse the emulate config data
+        const emulateConfigs = JSON.parse(env.__STENCIL_EMULATE_CONFIGS__) as d.EmulateConfig[];
+
+        // loop through each emulate config to re-run the tests per config
+        for (let i = 0; i < emulateConfigs.length; i++) {
+          const emulateConfig = emulateConfigs[i];
+
+          // reset the environment for each emulate config
+          setScreenshotEmulateData(emulateConfig, env);
+
+          // run the test for each emulate config
+          await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
+        }
+
+      } else {
+        // not doing e2e screenshot tests
+        // so just run each test once
+        await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
       }
-      if (t.path.includes('.spec.') && env.__STENCIL_SPEC_TESTS__ === 'true') {
-        return true;
-      }
-      return false;
-    });
-
-    const emulateConfigsStr = env.__STENCIL_EMULATE_CONFIGS__;
-
-    const emulateConfigs = JSON.parse(emulateConfigsStr) as d.EmulateConfig[];
-
-    for (let i = 0; i < emulateConfigs.length; i++) {
-      const emulateConfig = emulateConfigs[i];
-
-      tests = tests.map(test => {
-        env.__STENCIL_EMULATE__ = JSON.stringify(emulateConfig);
-        return test;
-      });
-
-      await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
     }
+
   }
 
+  return StencilTestRunner;
 }
 
 
-export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv,  emulateDevices: d.EmulateConfig[]) {
-  config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
+export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
+  testPath = testPath.toLowerCase().replace(/\\/g, '/');
 
-  const ScreenshotConnector = require(config.testing.screenshotConnector) as any;
-  const connector: d.ScreenshotConnector = new ScreenshotConnector();
-
-  const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
-  await connector.initBuild({
-    buildId: createBuildId(),
-    buildMessage: createBuildMessage(),
-    rootDir: config.rootDir,
-    cacheDir: config.cacheDir,
-    compareAppDir: path.join(config.sys.compiler.packageDir, 'screenshot', 'compare'),
-    updateMaster: config.flags.updateScreenshot,
-    logger: config.logger,
-    allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
-    allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
-    pixelmatchThreshold: config.testing.pixelmatchThreshold
-  });
-  initTimespan.finish(`screenshot, initBuild finished`);
-
-  env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson();
-
-  const testsTimespan = config.logger.createTimeSpan(`screenshot, tests started`, true);
-
-  let passed = true;
-
-  for (let i = 0; i < emulateDevices.length; i++) {
-    const emulate = emulateDevices[i];
-    try {
-      await runJestDevice(config, emulate);
-    } catch (e) {
-      passed = false;
-    }
+  if (!(testPath.endsWith('.ts') || testPath.endsWith('.tsx'))) {
+    return false;
   }
 
-  testsTimespan.finish(`screenshot, tests finished`);
-
-  const completeTimespan = config.logger.createTimeSpan(`screenshot, completeTimespan started`, true);
-  await connector.completeBuild();
-  completeTimespan.finish(`screenshot, completeTimespan finished`);
-
-  const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
-  await connector.publishBuild();
-  publishTimespan.finish(`screenshot, publishBuild finished`);
-
-  config.logger.info(`screenshots images compared: ${connector.getTotalScreenshotImages()}`);
-  config.logger.info(config.logger.magenta(connector.getComparisonSummaryUrl()));
-
-  return passed;
-}
-
-
-export async function runJestDevice(config: d.Config, emulateDevice: d.EmulateConfig) {
-  if (emulateDevice) {
-    config.logger.info(`screenshot emulate: ${emulateDevice.device || emulateDevice.userAgent}`);
-    setScreenshotEmulateData(emulateDevice, process.env);
+  if ((testPath.includes('.e2e.') || testPath.includes('/e2e.')) && env.__STENCIL_E2E_TESTS__ === 'true') {
+    // keep this test if it's an e2e file and we should be testing e2e
+    return true;
   }
 
-  const { runCLI } = require('jest-cli');
+  if ((testPath.includes('.spec.') || testPath.includes('/spec.')) && env.__STENCIL_SPEC_TESTS__ === 'true') {
+    // keep this test if it's a spec file and we should be testing unit tests
+    return true;
+  }
 
-  const jestArgv = buildJestArgv(config);
-  const projects = getProjectListFromCLIArgs(config, jestArgv);
-
-  const results = await runCLI(jestArgv, projects);
-  console.log(results);
-}
-
-
-function createBuildId() {
-  const d = new Date();
-
-  let fmDt = (d.getFullYear() + '');
-  fmDt += ('0' + (d.getMonth() + 1)).slice(-2);
-  fmDt += ('0' + d.getDate()).slice(-2);
-  fmDt += ('0' + d.getHours()).slice(-2);
-  fmDt += ('0' + d.getMinutes()).slice(-2);
-  fmDt += ('0' + d.getSeconds()).slice(-2);
-
-  return fmDt;
-}
-
-
-function createBuildMessage() {
-  const d = new Date();
-
-  let fmDt = (d.getFullYear() + '') + '-';
-  fmDt += ('0' + (d.getMonth() + 1)).slice(-2) + '-';
-  fmDt += ('0' + d.getDate()).slice(-2) + ' ';
-  fmDt += ('0' + d.getHours()).slice(-2) + ':';
-  fmDt += ('0' + d.getMinutes()).slice(-2) + ':';
-  fmDt += ('0' + d.getSeconds()).slice(-2);
-
-  return `Local: ${fmDt}`;
+  return false;
 }

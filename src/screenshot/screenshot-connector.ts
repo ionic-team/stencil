@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import * as fs from './screenshot-fs';
 import * as path from 'path';
+import { normalizePath } from '../compiler/util';
 import { URL } from 'url';
-// import { normalizePath } from '../compiler/util';
 
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
@@ -13,6 +13,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   buildsDirName = 'builds';
   currentBuildDirName = 'current';
   compareAppFileName = 'compare.html';
+  masterFileName = 'master.json';
+  localFileName = 'local.json';
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
@@ -134,15 +136,35 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     await fs.emptyDir(this.currentBuildDir);
     await fs.rmDir(this.currentBuildDir);
 
-    const buildPath = path.join(this.buildsDir, `${this.build.id}.json`);
-    const masterBuildPath = path.join(this.buildsDir, 'master.json');
-    const serializedBuild = JSON.stringify(this.build, null, 2);
+    const localBuildPath = path.join(this.buildsDir, this.localFileName);
+    const masterBuildPath = path.join(this.buildsDir, this.masterFileName);
+    const serializedLocalBuild = JSON.stringify(this.build, null, 2);
 
-    await fs.writeFile(buildPath, serializedBuild);
+    await fs.writeFile(localBuildPath, serializedLocalBuild);
 
     if (this.updateMaster || !(await fs.fileExists(masterBuildPath))) {
-      await fs.writeFile(masterBuildPath, serializedBuild);
+      await fs.writeFile(masterBuildPath, serializedLocalBuild);
     }
+
+    const masterBuiltContent = await fs.readFile(masterBuildPath);
+    const masterBuild = JSON.parse(masterBuiltContent) as d.ScreenshotBuild;
+
+    masterBuild.id = 'master';
+    masterBuild.message = `Master`;
+
+    this.build.screenshots.forEach(localScreenshot => {
+      const masterHasScreenshot = masterBuild.screenshots.some(masterScreenshot => {
+        return localScreenshot.id === masterScreenshot.id;
+      });
+
+      if (!masterHasScreenshot) {
+        masterBuild.screenshots.push(Object.assign({}, localScreenshot));
+      }
+    });
+
+    sortScreenshots(masterBuild.screenshots);
+    const serializedMasterBuild = JSON.stringify(masterBuild, null, 2);
+    await fs.writeFile(masterBuildPath, serializedMasterBuild);
 
     for (let i = 0; i < localScreenshots.length; i++) {
       const screenshot = localScreenshots[i];
@@ -159,18 +181,11 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       const jsonpContent = `loadScreenshot("${imageName}","data:image/png;base64,${imageBuf.toString('base64')}",${screenshot.width},${screenshot.height},${screenshot.deviceScaleFactor},${screenshot.naturalWidth},${screenshot.naturalHeight});`;
       await fs.writeFile(jsonFilePath, jsonpContent);
     }
+
+    await createLocalCompareApp(this.screenshotDir, this.compareAppDir, this.compareAppFileName, this.imagesDir, this.cacheDir, masterBuild, this.build);
   }
 
-  async publishBuild() {
-    // const appUrl = normalizePath(path.relative(this.screenshotDir, this.compareAppDir));
-    // const imagesUrl = normalizePath(path.relative(this.screenshotDir, this.imagesDir));
-    // const jsonpUrl = normalizePath(path.relative(this.screenshotDir, this.cacheDir));
-
-    // const html = createLocalCompare(appUrl, imagesUrl, jsonpUrl, this.masterBuild, this.localBuild);
-
-    // const compareAppPath = path.join(this.screenshotDir, this.compareAppFileName);
-    // await fs.writeFile(compareAppPath, html);
-  }
+  async publishBuild() {/**/}
 
   getComparisonSummaryUrl() {
     return this.compareUrl;
@@ -202,36 +217,6 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 }
 
 
-// function createLocalCompare(appUrl: string, imagesUrl: string, jsonpUrl: string, masterBuild: d.ScreenshotBuild, localBuild: d.ScreenshotBuild) {
-//   return `<!DOCTYPE html>
-// <html dir="ltr" lang="en">
-// <head>
-//   <meta charset="utf-8">
-//   <title>Stencil Screenshot Comparison</title>
-//   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-//   <meta http-equiv="x-ua-compatible" content="IE=Edge">
-//   <link href="${appUrl}/build/app.css" rel="stylesheet">
-//   <script src="${appUrl}/build/app.js"></script>
-//   <link rel="icon" type="image/x-icon" href="${appUrl}/assets/favicon.ico">
-// </head>
-// <body>
-//   <ion-app></ion-app>
-//   <script>
-//     (function() {
-//       var compare = document.createElement('local-compare');
-//       compare.imagesUrl = '${imagesUrl}/';
-//       compare.jsonpUrl = '${jsonpUrl}/';
-//       compare.buildA = ${JSON.stringify(masterBuild)};
-//       compare.buildB = ${JSON.stringify(localBuild)};
-//       compare.className = 'ion-page';
-//       document.querySelector('ion-app').appendChild(compare);
-//     })();
-//   </script>
-// </body>
-// </html>`;
-// }
-
-
 function sortScreenshots(screenshots: d.ScreenshotData[]) {
   screenshots.sort((a, b) => {
     if (a.desc && b.desc) {
@@ -260,4 +245,46 @@ function sortScreenshots(screenshots: d.ScreenshotData[]) {
 
     return 0;
   });
+}
+
+
+export async function createLocalCompareApp(screenshotDir: string, compareAppDir: string, compareAppFileName: string, imagesDir: string, cacheDir: string, masterBuild: d.ScreenshotBuild, localBuild: d.ScreenshotBuild) {
+  const appUrl = normalizePath(path.relative(screenshotDir, compareAppDir));
+  const imagesUrl = normalizePath(path.relative(screenshotDir, imagesDir));
+  const jsonpUrl = normalizePath(path.relative(screenshotDir, cacheDir));
+
+  const html = createAppIndex(appUrl, imagesUrl, jsonpUrl, masterBuild, localBuild);
+
+  const compareAppPath = path.join(screenshotDir, compareAppFileName);
+  await fs.writeFile(compareAppPath, html);
+}
+
+
+function createAppIndex(appUrl: string, imagesUrl: string, jsonpUrl: string, masterBuild: d.ScreenshotBuild, localBuild: d.ScreenshotBuild) {
+  return `<!doctype html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stencil Screenshot Visual Diff</title>
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="x-ua-compatible" content="IE=Edge">
+  <link href="${appUrl}/build/app.css" rel="stylesheet">
+  <script src="${appUrl}/build/app.js"></script>
+  <link rel="icon" type="image/x-icon" href="${appUrl}/assets/favicon.ico">
+</head>
+<body>
+  <ion-app></ion-app>
+  <script>
+    (function() {
+      var compare = document.createElement('local-compare');
+      compare.imagesUrl = '${imagesUrl}/';
+      compare.jsonpUrl = '${jsonpUrl}/';
+      compare.buildA = ${JSON.stringify(masterBuild)};
+      compare.buildB = ${JSON.stringify(localBuild)};
+      compare.className = 'ion-page';
+      document.querySelector('ion-app').appendChild(compare);
+    })();
+  </script>
+</body>
+</html>`;
 }

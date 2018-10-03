@@ -70,7 +70,6 @@ export interface ScreenshotData {
   hasTouch?: boolean;
   isLandscape?: boolean;
   isMobile?: boolean;
-  mediaType?: string;
   testPath?: string;
 }
 
@@ -92,7 +91,6 @@ export interface ScreenshotCompare {
   hasTouch?: boolean;
   isLandscape?: boolean;
   isMobile?: boolean;
-  mediaType?: string;
   allowableMismatchedPixels: number;
   allowableMismatchedRatio: number;
   testPath?: string;

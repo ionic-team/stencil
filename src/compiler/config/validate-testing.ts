@@ -137,13 +137,15 @@ export function validateTesting(config: d.Config) {
   if (!Array.isArray(testing.emulate) || testing.emulate.length === 0) {
     testing.emulate = [
       {
-        width: 600,
-        height: 600,
-        deviceScaleFactor: 1,
-        isMobile: false,
-        hasTouch: false,
-        isLandscape: false,
-        userAgent: 'default'
+        userAgent: 'default',
+        viewport: {
+          width: 600,
+          height: 600,
+          deviceScaleFactor: 1,
+          isMobile: false,
+          hasTouch: false,
+          isLandscape: false,
+        }
       }
     ];
   }

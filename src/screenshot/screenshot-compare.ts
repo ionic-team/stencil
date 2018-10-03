@@ -26,15 +26,14 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     userAgent: emulateConfig.userAgent,
     desc: desc,
     testPath: testPath,
-    width: emulateConfig.width,
-    height: emulateConfig.height,
-    deviceScaleFactor: emulateConfig.deviceScaleFactor,
-    naturalWidth: Math.round(emulateConfig.width * emulateConfig.deviceScaleFactor),
-    naturalHeight: Math.round(emulateConfig.height * emulateConfig.deviceScaleFactor),
-    hasTouch: emulateConfig.hasTouch,
-    isLandscape: emulateConfig.isLandscape,
-    isMobile: emulateConfig.isMobile,
-    mediaType: emulateConfig.mediaType
+    width: emulateConfig.viewport.width,
+    height: emulateConfig.viewport.height,
+    deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
+    naturalWidth: Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor),
+    naturalHeight: Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor),
+    hasTouch: emulateConfig.viewport.hasTouch,
+    isLandscape: emulateConfig.viewport.isLandscape,
+    isMobile: emulateConfig.viewport.isMobile
   };
 
   // write the local build data
@@ -53,15 +52,14 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     mismatchedRatio: 0,
     device: emulateConfig.device,
     userAgent: emulateConfig.userAgent,
-    width: emulateConfig.width,
-    height: emulateConfig.height,
-    deviceScaleFactor: emulateConfig.deviceScaleFactor,
+    width: emulateConfig.viewport.width,
+    height: emulateConfig.viewport.height,
+    deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
     naturalWidth: localData.naturalWidth,
     naturalHeight: localData.naturalHeight,
-    hasTouch: emulateConfig.hasTouch,
-    isLandscape: emulateConfig.isLandscape,
-    isMobile: emulateConfig.isMobile,
-    mediaType: emulateConfig.mediaType,
+    hasTouch: emulateConfig.viewport.hasTouch,
+    isLandscape: emulateConfig.viewport.isLandscape,
+    isMobile: emulateConfig.viewport.isMobile,
     allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
     allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
     testPath: testPath
@@ -110,17 +108,13 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
 
   const hash = createHash('md5');
 
-  hash.update(uniqueDescription);
-  hash.update(emulateConfig.width.toString());
-  hash.update(emulateConfig.height.toString());
-  hash.update(emulateConfig.deviceScaleFactor.toString());
-  hash.update(emulateConfig.userAgent.toString());
-  hash.update(emulateConfig.hasTouch.toString());
-  hash.update(emulateConfig.isMobile.toString());
-
-  if (emulateConfig.mediaType != null) {
-    hash.update(emulateConfig.mediaType);
-  }
+  hash.update(uniqueDescription + ':');
+  hash.update(emulateConfig.userAgent + ':');
+  hash.update(emulateConfig.viewport.width + ':');
+  hash.update(emulateConfig.viewport.height + ':');
+  hash.update(emulateConfig.viewport.deviceScaleFactor + ':');
+  hash.update(emulateConfig.viewport.hasTouch + ':');
+  hash.update(emulateConfig.viewport.isMobile + ':');
 
   return hash.digest('hex').substr(0, 8).toLowerCase();
 }

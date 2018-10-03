@@ -6,6 +6,6 @@
   "files": [
     "compare/",
     "index.js",
-    "screenshot-connector.js"
+    "connector.js"
   ]
 }

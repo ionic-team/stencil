@@ -78,7 +78,7 @@ function testPackage(testPkg) {
     files: [
       'compare/',
       'index.js',
-      'screenshot-connector.js'
+      'connector.js'
     ],
     exports: [
       'ScreenshotConnector'

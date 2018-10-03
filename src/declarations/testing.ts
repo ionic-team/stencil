@@ -396,14 +396,25 @@ export interface EmulateConfig {
   device?: string;
 
   /**
+   * User-Agent to be used. Defaults to the user-agent of the installed Puppeteer version.
+   */
+  userAgent?: string;
+
+  viewport?: EmulateViewport;
+}
+
+
+export interface EmulateViewport {
+
+  /**
    * Page width in pixels.
    */
-  width?: number;
+  width: number;
 
   /**
    * page height in pixels.
    */
-  height?: number;
+  height: number;
 
   /**
    * Specify device scale factor (can be thought of as dpr). Defaults to 1.
@@ -425,13 +436,4 @@ export interface EmulateConfig {
    */
   isLandscape?: boolean;
 
-  /**
-   * User-Agent to be used. Defaults to the user-agent of the installed Puppeteer version.
-   */
-  userAgent?: string;
-
-  /**
-   * Changes the CSS media type of the page. The only allowed values are 'screen', 'print' and null. Passing null disables media emulation.
-   */
-  mediaType?: 'screen' | 'print';
 }
