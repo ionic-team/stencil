@@ -12,10 +12,10 @@ export async function deriveModules(config: d.Config, compilerCtx: d.CompilerCtx
     return undefined;
   }
   const modules = await Promise.all([
-    deriveModule(config, compilerCtx, buildCtx, 'es2017', true, moduleFormats.esm),   // browser ES2017
-    deriveModule(config, compilerCtx, buildCtx, 'es2017', false, moduleFormats.esm),  // esm ES2017
-    deriveModule(config, compilerCtx, buildCtx, 'es5', false, moduleFormats.esm),     // esm ES5
-    deriveModule(config, compilerCtx, buildCtx, 'es5', true, moduleFormats.amd),      // browser ES5
+    deriveModule(config, compilerCtx, buildCtx, 'es2017', true, true, moduleFormats.esm),   // browser ES2017
+    deriveModule(config, compilerCtx, buildCtx, 'es2017', false, false, moduleFormats.esm),  // esm ES2017
+    deriveModule(config, compilerCtx, buildCtx, 'es5', false, true, moduleFormats.esm),     // esm ES5
+    deriveModule(config, compilerCtx, buildCtx, 'es5', true, true, moduleFormats.amd),      // browser ES5
   ]);
 
   const rawModules = modules.filter(m => !!m);
@@ -25,22 +25,7 @@ export async function deriveModules(config: d.Config, compilerCtx: d.CompilerCtx
   return rawModules;
 }
 
-function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, isBrowser: boolean): d.DerivedModule {
-
-  const list = Object.keys(moduleList).map(chunkKey => ({
-    entryKey: chunkKey.replace('.js', ''),
-    filename: chunkKey,
-    code: moduleList[chunkKey].code
-  }));
-
-  return {
-    list,
-    sourceTarget,
-    isBrowser
-  };
-}
-
-async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, moduleList: d.JSModuleList) {
+async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, mightMinify: boolean,  moduleList: d.JSModuleList) {
   // skip if moduleList is not defined
   if (!moduleList) {
     return undefined;
@@ -59,13 +44,29 @@ async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   const module = createModule(moduleList, sourceTarget, isBrowser);
 
   await Promise.all(
-    module.list.map(async chunk =>
-      deriveChunk(config, compilerCtx, buildCtx, sourceTarget, isBrowser, chunk))
+    module.list.map(chunk =>
+      deriveChunk(config, compilerCtx, buildCtx, sourceTarget, isBrowser, mightMinify, chunk)
+    )
   );
   return module;
 }
 
-async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, chunk: d.DerivedChunk) {
+function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, isBrowser: boolean): d.DerivedModule {
+
+  const list = Object.keys(moduleList).map(chunkKey => ({
+    entryKey: chunkKey.replace('.js', ''),
+    filename: chunkKey,
+    code: moduleList[chunkKey].code
+  }));
+
+  return {
+    list,
+    sourceTarget,
+    isBrowser
+  };
+}
+
+async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, mightMinify: boolean, chunk: d.DerivedChunk) {
   // replace intro placeholder with an actual intro statement
   chunk.code = chunk.code.replace(getIntroPlaceholder(), generateIntro(config, isBrowser));
 
@@ -78,7 +79,7 @@ async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // only minify browser build when minifyJs is enabled
-  if (isBrowser && config.minifyJs) {
+  if (mightMinify && config.minifyJs) {
     chunk.code = await minifyJs(config, compilerCtx, buildCtx.diagnostics, chunk.code, sourceTarget, true);
   }
 }
