@@ -243,6 +243,24 @@ describe('parseFlags', () => {
     expect(flags.e2e).toBe(true);
   });
 
+  it('should parse --emulate=android', () => {
+    process.argv[2] = '--emulate=android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should parse --emulate android', () => {
+    process.argv[2] = '--emulate';
+    process.argv[3] = 'android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should not parse --emulate', () => {
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe(null);
+  });
+
   it('should parse --es5', () => {
     process.argv[2] = '--es5';
     const flags = parseFlags(process);

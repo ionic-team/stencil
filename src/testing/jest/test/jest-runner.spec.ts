@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { includeTestFile } from '../jest-runner';
+import { getEmulateConfigs, includeTestFile } from '../jest-runner';
 
 
 describe('jest-runner', () => {
@@ -70,6 +70,48 @@ describe('jest-runner', () => {
     };
 
     expect(includeTestFile(testPath, env)).toBe(false);
+  });
+
+  it('should use android userAgent from getEmulateConfigs',  () => {
+    const testing: d.TestingConfig = {
+      emulate: [
+        { device: 'anDroiD' },
+        { device: 'iphone' }
+      ]
+    };
+    const flags: d.ConfigFlags = {
+      emulate: 'Android'
+    };
+    const emulateConfigs = getEmulateConfigs(testing, flags);
+    expect(emulateConfigs).toHaveLength(1);
+    expect(emulateConfigs[0].device).toBe('anDroiD');
+  });
+
+  it('should use android user agent from getEmulateConfigs',  () => {
+    const testing: d.TestingConfig = {
+      emulate: [
+        { userAgent: 'Mozilla/Android' },
+        { userAgent: 'SomeUserAgent/iPhone X' }
+      ]
+    };
+    const flags: d.ConfigFlags = {
+      emulate: 'android'
+    };
+    const emulateConfigs = getEmulateConfigs(testing, flags);
+    expect(emulateConfigs).toHaveLength(1);
+    expect(emulateConfigs[0].userAgent).toBe('Mozilla/Android');
+  });
+
+  it('should use all configs from getEmulateConfigs by default',  () => {
+    const testing: d.TestingConfig = {
+      emulate: [
+        { device: 'android' },
+        { device: 'iphone' }
+      ]
+    };
+    const flags: d.ConfigFlags = {};
+    const emulateConfigs = getEmulateConfigs(testing, flags);
+    expect(emulateConfigs).toHaveLength(2);
   });
 
 });

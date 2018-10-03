@@ -188,6 +188,7 @@ const ARG_OPTS = {
     'address',
     'config',
     'docs-json',
+    'emulate',
     'log-level',
     'root',
     'screenshot-connector'

@@ -4,8 +4,9 @@ import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 
 
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
-  // set all of the emulate data to the process.env to be read later on
-  env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(config.testing.emulate);
+  // set all of the emulate configs to the process.env to be read later on
+  const emulateConfigs = getEmulateConfigs(config.testing, config.flags);
+  env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(emulateConfigs);
 
   // build up our args from our already know list of args in the config
   const jestArgv = buildJestArgv(config);
@@ -86,4 +87,27 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   }
 
   return false;
+}
+
+
+export function getEmulateConfigs(testing: d.TestingConfig, flags: d.ConfigFlags) {
+  let emulateConfigs = testing.emulate.slice();
+
+  if (typeof flags.emulate === 'string') {
+    const emulateFlag = flags.emulate.toLowerCase();
+
+    emulateConfigs = emulateConfigs.filter(emulateConfig => {
+      if (typeof emulateConfig.device === 'string' && emulateConfig.device.toLowerCase() === emulateFlag) {
+        return true;
+      }
+
+      if (typeof emulateConfig.userAgent === 'string' && emulateConfig.userAgent.toLowerCase().includes(emulateFlag)) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  return emulateConfigs;
 }
