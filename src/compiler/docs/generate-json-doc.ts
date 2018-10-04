@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getMemberDocumentation } from './docs-util';
+import { getMemberDocumentation, getMethodParameters, getMethodReturns } from './docs-util';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
@@ -104,7 +104,9 @@ function generateJsDocMembers(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompo
     } else if (memberMeta.memberType === MEMBER_TYPE.Method) {
       jsonCmp.methods.push({
         name: memberName,
-        docs: getMemberDocumentation(memberMeta.jsdoc)
+        docs: getMemberDocumentation(memberMeta.jsdoc),
+        returns: getMethodReturns(memberMeta.jsdoc),
+        parameters: getMethodParameters(memberMeta.jsdoc)
       });
     }
   });

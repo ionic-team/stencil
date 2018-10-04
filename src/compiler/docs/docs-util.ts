@@ -157,3 +157,31 @@ export function getMemberDocumentation(jsDoc: d.JsDoc) {
   }
   return '';
 }
+
+export function getMemberType(jsDoc: d.JsDoc) {
+  if (jsDoc && typeof jsDoc.type === "string") {
+    return jsDoc.type.trim();
+  }
+  return "";
+}
+
+export function getMethodParameters({ parameters }: d.JsDoc): d.JsonDocMethodParameter[] {
+  if (parameters) {
+    return parameters.map(({ name, type, documentation }) => ({
+      name,
+      type,
+      docs: documentation
+    }));
+  }
+  return [];
+}
+
+export function getMethodReturns({ returns }: d.JsDoc): d.JsonDocsMethodReturn {
+  if (returns) {
+    return {
+      type: returns.type,
+      docs: returns.documentation
+    };
+  }
+  return null;
+}
