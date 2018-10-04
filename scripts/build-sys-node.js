@@ -125,7 +125,7 @@ function bundleNodeSysMain() {
         return {
           resolveId(importee) {
             if (importee === 'resolve') {
-              return path.join(__dirname, 'helpers', 'resolve-sync.js');
+              return path.join(__dirname, 'helpers', 'resolve.js');
             }
           }
         }
