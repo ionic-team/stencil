@@ -13,8 +13,18 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXElements,
-  Hyperscript
+  Hyperscript,
 } from './declarations/index';
+
+export namespace h {
+  export namespace JSX {
+    export interface IntrinsicElements extends d.JSXElements.DefaultIntrinsicElements, StencilIntrinsicElements {
+    }
+    export interface HTMLAttributes extends d.JSXElements.HTMLAttributes {
+    }
+  }
+}
+export var h: d.Hyperscript;
 
 /**
  * Build

@@ -116,30 +116,16 @@ ${typeData.sort(sortImportNames).map(td => {
  */`;
 
   const code = `
-import '@stencil/core';
+import { JSXElements } from '@stencil/core';
 
 ${collectionTypesImportsString}
 ${typeImportString}
 ${componentsFileString}
-${defineGlobalIntrinsicElements ? generateLocalTypesFile() : ''}
 }
 `;
   return `${header}
 
 ${indentTypes(code)}`;
-}
-
-function generateLocalTypesFile() {
-
-  return `
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
-`;
 }
 
 function indentTypes(code: string) {
@@ -303,7 +289,7 @@ interface ${tagNameAsPascal} {${
   stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
 }}`,
     JSXElements: `
-interface ${jsxInterfaceName} extends StencilHTMLAttributes {${
+interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentAttributesOptional !== '' ? `\n${stencilComponentAttributesOptional}\n` : ''
 }}`,
     global: `
