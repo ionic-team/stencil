@@ -21,6 +21,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
 
       const flags = ts.TypeFormatFlags.WriteArrowStyleSignature;
       const returnType = checker.getReturnTypeOfSignature(methodSignature);
+      const jsDocReturnTag = ts.getJSDocReturnTag(member);
       const typeString = checker.signatureToString(
         methodSignature,
         classNode,
@@ -56,7 +57,16 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
             ...getAttributeTypeInfo(member, sourceFile)
           }
         },
-        jsdoc: serializeSymbol(checker, symbol)
+        jsdoc: {
+          ...serializeSymbol(checker, symbol),
+          returns: {
+            type: checker.typeToString(returnType),
+            documentation: jsDocReturnTag ? jsDocReturnTag.comment : ""
+          },
+          parameters: methodSignature.parameters.map(parmSymbol =>
+            serializeSymbol(checker, parmSymbol)
+          )
+        }
       };
 
 

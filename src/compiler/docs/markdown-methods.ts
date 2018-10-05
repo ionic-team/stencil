@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { MarkdownTable, getMemberDocumentation } from './docs-util';
+import { MarkdownTable, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 
 
 export class MarkdownMethods {
@@ -28,19 +28,37 @@ export class MarkdownMethods {
       return 0;
     });
 
-    const table = new MarkdownTable();
-
-    table.addHeader(['Method', 'Description']);
-
     rows.forEach(row => {
-      table.addRow([
-        '`' + row.methodName + '`',
-        row.description
-      ]);
+      content.push(`### ${row.signature}`);
+      content.push(``);
+      content.push(row.description);
+      content.push(``);
+
+      if (row.parameters.length > 0) {
+        const parmsTable = new MarkdownTable();
+
+        parmsTable.addHeader(['Name', 'Type', 'Description']);
+
+        row.parameters.forEach(({ name, type, docs }) => {
+          parmsTable.addRow(['`' + name + '`', '`' + type + '`', docs]);
+        });
+
+        content.push(`#### Parameters`);
+        content.push(``);
+        content.push(...parmsTable.toMarkdown());
+        content.push(``);
+      }
+
+      if (row.returns) {
+        content.push(`#### Returns`);
+        content.push(``);
+        content.push(`Type: \`${row.returns.type}\``);
+        content.push(``);
+        content.push(row.returns.docs);
+        content.push(``);
+      }
     });
 
-    content.push(...table.toMarkdown());
-    content.push(``);
     content.push(``);
 
     return content;
@@ -56,4 +74,16 @@ class Row {
     return getMemberDocumentation(this.memberMeta.jsdoc);
   }
 
+  get signature() {
+    const type = getMemberType(this.memberMeta.jsdoc);
+    return '`' + this.methodName + type + '`';
+  }
+
+  get parameters() {
+    return getMethodParameters(this.memberMeta.jsdoc);
+  }
+
+  get returns() {
+    return getMethodReturns(this.memberMeta.jsdoc);
+  }
 }

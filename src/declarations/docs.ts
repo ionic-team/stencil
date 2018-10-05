@@ -35,8 +35,20 @@ export interface JsonDocsProp {
 export interface JsonDocsMethod {
   name: string;
   docs?: string;
+  returns?: JsonDocsMethodReturn;
+  parameters?: JsonDocMethodParameter[];
 }
 
+export interface JsonDocsMethodReturn {
+  type?: string;
+  docs?: string;
+}
+
+export interface JsonDocMethodParameter {
+  name?: string;
+  type?: string;
+  docs?: string;
+}
 
 export interface JsonDocsEvent {
   event: string;

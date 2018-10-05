@@ -42,6 +42,17 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
+          parameters: [
+            {
+              documentation: "action sheet options", 
+              name: "opts", 
+              type: "any"
+            }
+          ], 
+          returns: {
+            documentation: "action sheet", 
+            type: "any"
+          },
           type: '(opts?: any) => any',
         }
       }
@@ -73,6 +84,17 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
+          parameters: [
+            {
+              documentation: "action sheet options", 
+              name: "opts", 
+              type: "ActionSheetOptions"
+            }
+          ], 
+          returns: {
+            documentation: "", 
+            type: "any"
+          },
           type: '(opts?: ActionSheetOptions) => any',
         }
       }
@@ -101,6 +123,17 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
+          parameters: [
+            {
+              documentation: "action sheet options",
+              name: "opts",
+              type: "CoreContext"
+            }
+          ], 
+          returns: {
+            documentation: "", 
+            type: "any"
+          },
           type: '(opts?: CoreContext) => any'
         }
       }
