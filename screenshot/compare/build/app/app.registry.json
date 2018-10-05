@@ -2,76 +2,40 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "global": "app.global.js",
-  "core": "app.jyhfn7vh.js",
-  "corePolyfilled": "app.5v1at3af.js",
+  "core": "app.bxrni39o.js",
+  "corePolyfilled": "app.qbtpnspq.js",
   "components": {
     "app-root": {
       "bundleIds": {
-        "$": "hi8fqvrp"
+        "$": "vm0g9ot6"
       }
     },
-    "ion-animation-controller": {
+    "compare-analysis": {
       "bundleIds": {
-        "$": "hi8fqvrp"
-      }
-    },
-    "ion-app": {
-      "bundleIds": {
-        "$": "hi8fqvrp"
-      }
-    },
-    "ion-content": {
-      "bundleIds": {
-        "ios": "n64ptboo",
-        "md": "5ijyu34l"
+        "$": "iciqzslq"
       },
       "encapsulation": "shadow"
     },
-    "ion-header": {
+    "compare-filter": {
       "bundleIds": {
-        "ios": "n64ptboo",
-        "md": "5ijyu34l"
-      }
-    },
-    "ion-nav": {
-      "bundleIds": {
-        "$": "hi8fqvrp"
+        "$": "dudl4p8t"
       },
       "encapsulation": "shadow"
     },
-    "ion-route": {
+    "compare-header": {
       "bundleIds": {
-        "$": "hi8fqvrp"
-      }
-    },
-    "ion-router": {
-      "bundleIds": {
-        "$": "hi8fqvrp"
-      }
-    },
-    "ion-title": {
-      "bundleIds": {
-        "ios": "n64ptboo",
-        "md": "5ijyu34l"
+        "$": "dudl4p8t"
       },
       "encapsulation": "shadow"
     },
-    "ion-toolbar": {
+    "compare-row": {
       "bundleIds": {
-        "ios": "n64ptboo",
-        "md": "5ijyu34l"
-      },
-      "encapsulation": "shadow"
+        "$": "iciqzslq"
+      }
     },
     "local-compare": {
       "bundleIds": {
-        "$": "fgysnpd7"
-      }
-    },
-    "local-pixelmatch": {
-      "bundleIds": {
-        "$": "fgysnpd7"
+        "$": "gygudxoc"
       }
     },
     "screenshot-lookup": {
