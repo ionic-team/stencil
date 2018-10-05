@@ -48,7 +48,7 @@ export function validateTesting(config: d.Config) {
 
   } else {
     testing.screenshotConnector = config.sys.path.join(
-      config.sys.compiler.packageDir, 'screenshot', 'screenshot-connector.js'
+      config.sys.compiler.packageDir, 'screenshot', 'connector.js'
     );
   }
 

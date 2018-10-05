@@ -10,7 +10,7 @@ export async function writeScreenshotImage(imagePath: string, screenshotBuf: Buf
   }
 }
 
-export async function writeScreenshotData(dataDir: string, screenshotData: d.ScreenshotData) {
+export async function writeScreenshotData(dataDir: string, screenshotData: d.Screenshot) {
   const filePath = getDataFilePath(dataDir, screenshotData.id);
   const content = JSON.stringify(screenshotData, null, 2);
   await writeFile(filePath, content);
@@ -18,25 +18,12 @@ export async function writeScreenshotData(dataDir: string, screenshotData: d.Scr
 
 
 export async function readScreenshotData(dataDir: string, screenshotId: string) {
-  let rtn: d.ScreenshotData = null;
+  let rtn: d.Screenshot = null;
 
   try {
     const dataFilePath = getDataFilePath(dataDir, screenshotId);
     const dataContent = await readFile(dataFilePath);
     rtn = JSON.parse(dataContent);
-  } catch (e) {}
-
-  return rtn;
-}
-
-
-export async function readScreenshotDataFromBuild(dataDir: string, buildId: string, screenshotId: string) {
-  let rtn: d.ScreenshotData = null;
-
-  try {
-    const dataFilePath = path.join(dataDir, `${buildId}.json`);
-    const dataContent = await readFile(dataFilePath);
-    rtn = JSON.parse(dataContent).screenshots.find((screenshot: any) => screenshot.id === screenshotId);
   } catch (e) {}
 
   return rtn;

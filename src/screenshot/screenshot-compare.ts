@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { getMismatchedPixels } from './pixel-match';
 import { normalizePath } from '../compiler/util';
-import { readScreenshotDataFromBuild, writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
+import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';
 
@@ -9,7 +9,7 @@ import { join, relative } from 'path';
 export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, screenshotBuf: Buffer, desc: string, testPath: string, pixelmatchThreshold: number) {
   const hash = createHash('md5').update(screenshotBuf).digest('hex');
   const localImageName = `${hash}.png`;
-  const imagePath = join(screenshotBuildData.imagesDirPath, localImageName);
+  const imagePath = join(screenshotBuildData.imagesDir, localImageName);
 
   if (testPath) {
     testPath = normalizePath(relative(screenshotBuildData.rootDir, testPath));
@@ -19,7 +19,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   // the "id" is what we use as a key to compare to sets of data
   // the "image" is a hash of the image file name
   // and what we can use to quickly see if they're identical or not
-  const localData: d.ScreenshotData = {
+  const screenshot: d.Screenshot = {
     id: getScreenshotId(emulateConfig, desc),
     image: localImageName,
     device: emulateConfig.device,
@@ -38,16 +38,16 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
   // write the local build data
   await Promise.all([
-    writeScreenshotData(screenshotBuildData.currentBuildDirPath, localData),
+    writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot),
     writeScreenshotImage(imagePath, screenshotBuf)
   ]);
 
   // this is the data that'll get used by the jest matcher
   const compare: d.ScreenshotCompare = {
-    id: localData.id,
-    desc: localData.desc,
-    expectedImage: localData.image,
-    receivedImage: localData.image,
+    id: screenshot.id,
+    desc: screenshot.desc,
+    expectedImage: screenshot.image,
+    receivedImage: screenshot.image,
     mismatchedPixels: 0,
     mismatchedRatio: 0,
     device: emulateConfig.device,
@@ -55,8 +55,8 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     width: emulateConfig.viewport.width,
     height: emulateConfig.viewport.height,
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-    naturalWidth: localData.naturalWidth,
-    naturalHeight: localData.naturalHeight,
+    naturalWidth: screenshot.naturalWidth,
+    naturalHeight: screenshot.naturalHeight,
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
     isMobile: emulateConfig.viewport.isMobile,
@@ -71,14 +71,15 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     return compare;
   }
 
-  const masterData = await readScreenshotDataFromBuild(screenshotBuildData.buildsDirPath, 'master', localData.id);
-  if (!masterData) {
-    // there is no master data so nothing to compare it with
+  const masterScreenshotImage = screenshotBuildData.masterScreenshots[screenshot.id];
+
+  if (!masterScreenshotImage) {
+    // didn't find a master screenshot to compare it to
     return compare;
   }
 
   // set that the master data image is the image we're expecting
-  compare.expectedImage = masterData.image;
+  compare.expectedImage = masterScreenshotImage;
 
   // compare only if the image hashes are different
   if (compare.expectedImage !== compare.receivedImage) {
@@ -86,7 +87,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     // figure out a mismatch value
     compare.mismatchedPixels = await getMismatchedPixels(
       screenshotBuildData.cacheDir,
-      screenshotBuildData.imagesDirPath,
+      screenshotBuildData.imagesDir,
       compare.expectedImage,
       compare.receivedImage,
       compare.naturalWidth,

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { runJest } from './jest-runner';
-import * as path from 'path';
 
 
 export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) {
@@ -15,7 +14,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     buildMessage: createBuildMessage(),
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
-    compareAppDir: path.join(config.sys.compiler.packageDir, 'screenshot', 'compare'),
+    packageDir: config.sys.compiler.packageDir,
     updateMaster: config.flags.updateScreenshot,
     logger: config.logger,
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
@@ -24,7 +23,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   });
   initTimespan.finish(`screenshot, initBuild finished`);
 
-  env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson();
+  env.__STENCIL_SCREENSHOT_BUILD__ = await connector.toJson();
 
   const testsTimespan = config.logger.createTimeSpan(`screenshot, tests started`, true);
 
@@ -32,16 +31,31 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   testsTimespan.finish(`screenshot, tests finished, passed: ${passed}`);
 
-  const completeTimespan = config.logger.createTimeSpan(`screenshot, completeTimespan started`, true);
-  await connector.completeBuild();
-  completeTimespan.finish(`screenshot, completeTimespan finished`);
+  try {
+    const completeTimespan = config.logger.createTimeSpan(`screenshot, completeTimespan started`, true);
+    const currentBuild = await connector.completeBuild();
+    completeTimespan.finish(`screenshot, completeTimespan finished`);
 
-  const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
-  await connector.publishBuild();
-  publishTimespan.finish(`screenshot, publishBuild finished`);
+    let publishResults: d.PublishBuildResults = null;
+    if (currentBuild) {
+      const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
+      publishResults = await connector.publishBuild(currentBuild);
+      publishTimespan.finish(`screenshot, publishBuild finished`);
+    }
 
-  config.logger.info(`screenshots images compared: ${connector.getTotalScreenshotImages()}`);
-  config.logger.info(config.logger.magenta(connector.getComparisonSummaryUrl()));
+    if (publishResults) {
+      if (typeof publishResults.screenshotsCompared === 'number') {
+        config.logger.info(`screenshots images compared: ${publishResults.screenshotsCompared}`);
+      }
+
+      if (typeof publishResults.compareUrl === 'string') {
+        config.logger.info(config.logger.magenta(publishResults.compareUrl));
+      }
+    }
+
+  } catch (e) {
+    config.logger.error(e, e.stack);
+  }
 
   return passed;
 }

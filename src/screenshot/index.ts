@@ -1,3 +1,3 @@
 
 export { ScreenshotConnector } from './screenshot-connector';
-export { ScreenshotBuild, ScreenshotData } from '../declarations';
+export { ScreenshotBuild, Screenshot } from '../declarations';

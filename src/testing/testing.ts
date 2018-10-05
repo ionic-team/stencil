@@ -108,13 +108,17 @@ export class Testing implements d.Testing {
 
     let passed = false;
 
-    if (doScreenshots) {
-      passed = await runJestScreenshot(config, env);
-    } else {
-      passed = await runJest(config, env);
-    }
+    try {
+      if (doScreenshots) {
+        passed = await runJestScreenshot(config, env);
+      } else {
+        passed = await runJest(config, env);
+      }
+      config.logger.info('');
 
-    config.logger.info('');
+    } catch (e) {
+      config.logger.error(e);
+    }
 
     return passed;
   }
