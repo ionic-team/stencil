@@ -45,15 +45,15 @@ function runFilters() {
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         row.hidden = false;
-        if (!filterData.mismatch && row.mismatchedPixels === 0) {
-            row.hidden = true;
-        }
-        if (!filterData.comparable && !row.isComparable) {
-            row.hidden = true;
-        }
-        if (filterData.device && filterData.device !== row.device) {
-            row.hidden = true;
-        }
+        // if (!filterData.mismatch && row.mismatchedPixels === 0) {
+        //   row.hidden = true;
+        // }
+        // if (!filterData.comparable && !row.isComparable) {
+        //   row.hidden = true;
+        // }
+        // if (filterData.device && filterData.device !== row.device) {
+        //   row.hidden = true;
+        // }
         if (!row.hidden) {
             row.runCompare();
         }
@@ -63,23 +63,4 @@ window.onhashchange = () => {
     runFilters();
 };
 
-function getMismatchedPixels(imageA, imageB) {
-    const cacheKey = getCacheKey(imageA, imageB);
-    const mismatchedPixels = localStorage.getItem(cacheKey);
-    if (typeof mismatchedPixels === 'string') {
-        const num = parseInt(mismatchedPixels, 10);
-        if (!isNaN(num)) {
-            return num;
-        }
-    }
-    return null;
-}
-function setMismatchedPixels(imageA, imageB, mismatchedPixels) {
-    const cacheKey = getCacheKey(imageA, imageB);
-    localStorage.setItem(cacheKey, String(mismatchedPixels));
-}
-function getCacheKey(imageA, imageB) {
-    return `screenshot_mismatch_${imageA}_${imageB}`;
-}
-
-export { updateHash as a, setMismatchedPixels as b, runFilters as c, getMismatchedPixels as d };
+export { updateHash as a, runFilters as b };

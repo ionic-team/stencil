@@ -1,5 +1,5 @@
 /*! Built with http://stenciljs.com */
-App.loadBundle('chunk-61fec0be.js', ['exports'], function (exports) {
+App.loadBundle('chunk-5dda42a3.js', ['exports'], function (exports) {
     var h = window.App.h;
     function getFilterData() {
         var filterData = {};
@@ -45,15 +45,15 @@ App.loadBundle('chunk-61fec0be.js', ['exports'], function (exports) {
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             row.hidden = false;
-            if (!filterData.mismatch && row.mismatchedPixels === 0) {
-                row.hidden = true;
-            }
-            if (!filterData.comparable && !row.isComparable) {
-                row.hidden = true;
-            }
-            if (filterData.device && filterData.device !== row.device) {
-                row.hidden = true;
-            }
+            // if (!filterData.mismatch && row.mismatchedPixels === 0) {
+            //   row.hidden = true;
+            // }
+            // if (!filterData.comparable && !row.isComparable) {
+            //   row.hidden = true;
+            // }
+            // if (filterData.device && filterData.device !== row.device) {
+            //   row.hidden = true;
+            // }
             if (!row.hidden) {
                 row.runCompare();
             }
@@ -62,26 +62,6 @@ App.loadBundle('chunk-61fec0be.js', ['exports'], function (exports) {
     window.onhashchange = function () {
         runFilters();
     };
-    function getMismatchedPixels(imageA, imageB) {
-        var cacheKey = getCacheKey(imageA, imageB);
-        var mismatchedPixels = localStorage.getItem(cacheKey);
-        if (typeof mismatchedPixels === 'string') {
-            var num = parseInt(mismatchedPixels, 10);
-            if (!isNaN(num)) {
-                return num;
-            }
-        }
-        return null;
-    }
-    function setMismatchedPixels(imageA, imageB, mismatchedPixels) {
-        var cacheKey = getCacheKey(imageA, imageB);
-        localStorage.setItem(cacheKey, String(mismatchedPixels));
-    }
-    function getCacheKey(imageA, imageB) {
-        return "screenshot_mismatch_" + imageA + "_" + imageB;
-    }
     exports.updateHash = updateHash;
-    exports.setMismatchedPixels = setMismatchedPixels;
     exports.runFilters = runFilters;
-    exports.getMismatchedPixels = getMismatchedPixels;
 });

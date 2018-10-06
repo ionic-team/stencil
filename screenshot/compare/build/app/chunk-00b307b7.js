@@ -45,15 +45,15 @@ function runFilters() {
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         row.hidden = false;
-        if (!filterData.mismatch && row.mismatchedPixels === 0) {
+        if (!filterData.mismatch && (row.diff && row.diff.mismatchedPixels === 0)) {
             row.hidden = true;
         }
-        if (!filterData.comparable && !row.isComparable) {
-            row.hidden = true;
-        }
-        if (filterData.device && filterData.device !== row.device) {
-            row.hidden = true;
-        }
+        // if (!filterData.comparable && !row.isComparable) {
+        //   row.hidden = true;
+        // }
+        // if (filterData.device && filterData.device !== row.device) {
+        //   row.hidden = true;
+        // }
         if (!row.hidden) {
             row.runCompare();
         }

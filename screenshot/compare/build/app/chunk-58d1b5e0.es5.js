@@ -1,5 +1,5 @@
 /*! Built with http://stenciljs.com */
-App.loadBundle('chunk-61fec0be.js', ['exports'], function (exports) {
+App.loadBundle('chunk-58d1b5e0.js', ['exports'], function (exports) {
     var h = window.App.h;
     function getFilterData() {
         var filterData = {};
@@ -45,15 +45,15 @@ App.loadBundle('chunk-61fec0be.js', ['exports'], function (exports) {
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             row.hidden = false;
-            if (!filterData.mismatch && row.mismatchedPixels === 0) {
-                row.hidden = true;
-            }
-            if (!filterData.comparable && !row.isComparable) {
-                row.hidden = true;
-            }
-            if (filterData.device && filterData.device !== row.device) {
-                row.hidden = true;
-            }
+            // if (!filterData.mismatch && row.mismatchedPixels === 0) {
+            //   row.hidden = true;
+            // }
+            // if (!filterData.comparable && !row.isComparable) {
+            //   row.hidden = true;
+            // }
+            // if (filterData.device && filterData.device !== row.device) {
+            //   row.hidden = true;
+            // }
             if (!row.hidden) {
                 row.runCompare();
             }
