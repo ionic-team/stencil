@@ -6,6 +6,7 @@
   "files": [
     "compare/",
     "index.js",
-    "connector.js"
+    "connector.js",
+    "local-connector.js"
   ]
 }

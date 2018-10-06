@@ -27,6 +27,7 @@ node_modules/
 
 /screenshot/index.js
 /screenshot/package.json
-/screenshot/screenshot-connector.js
+/screenshot/connector.js
+/screenshot/local-connector.js
 
 test/example/www/*

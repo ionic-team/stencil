@@ -2,8 +2,6 @@ import * as d from '../declarations';
 import * as fs from './screenshot-fs';
 import * as path from 'path';
 import * as os from 'os';
-import { normalizePath } from '../compiler/util';
-import { URL } from 'url';
 
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
@@ -17,6 +15,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
+  buildAuthor: string;
+  buildTimestamp: number;
   screenshotDir: string;
   imagesDir: string;
   buildsDir: string;
@@ -31,10 +31,33 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.logger = opts.logger;
 
     this.buildId = opts.buildId;
-    this.buildMessage = opts.buildMessage;
+    this.buildMessage = opts.buildMessage || '';
+    this.buildAuthor = opts.buildAuthor || '';
+    this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now(),
     this.cacheDir = opts.cacheDir;
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
+
+    if (!opts.logger) {
+      throw new Error(`logger option required`);
+    }
+
+    if (typeof opts.buildId !== 'string') {
+      throw new Error(`buildId option required`);
+    }
+
+    if (typeof opts.cacheDir !== 'string') {
+      throw new Error(`cacheDir option required`);
+    }
+
+    if (typeof opts.packageDir !== 'string') {
+      throw new Error(`packageDir option required`);
+    }
+
+    if (typeof opts.rootDir !== 'string') {
+      throw new Error(`rootDir option required`);
+    }
+
     this.updateMaster = !!opts.updateMaster;
     this.allowableMismatchedPixels = opts.allowableMismatchedPixels;
     this.allowableMismatchedRatio = opts.allowableMismatchedRatio;
@@ -73,10 +96,6 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       fs.mkDir(this.buildsDir),
       fs.mkDir(this.currentBuildDir)
     ]);
-
-    if (!this.updateMaster) {
-      await this.pullMasterBuild();
-    }
   }
 
   async pullMasterBuild() {/**/}
@@ -100,7 +119,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     const build: d.ScreenshotBuild = {
       id: this.buildId,
       message: this.buildMessage,
-      timestamp: Date.now(),
+      author: this.buildAuthor,
+      timestamp: this.buildTimestamp,
       screenshots: screenshots
     };
 
@@ -110,86 +130,32 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     return build;
   }
 
-  async publishBuild(build: d.ScreenshotBuild) {
-    let masterBuild = await this.getMasterBuild();
-
-    if (this.updateMaster || !masterBuild) {
-      masterBuild = {
-        id: 'master',
-        message: 'Master',
-        timestamp: Date.now(),
-        screenshots: []
-      };
-    }
-
-    build.screenshots.forEach(currentScreenshot => {
-      const masterHasScreenshot = masterBuild.screenshots.some(masterScreenshot => {
-        return currentScreenshot.id === masterScreenshot.id;
-      });
-
-      if (!masterHasScreenshot) {
-        masterBuild.screenshots.push(Object.assign({}, currentScreenshot));
-      }
-    });
-
-    this.sortScreenshots(masterBuild.screenshots);
-
-    await fs.writeFile(this.masterBuildFilePath, JSON.stringify(masterBuild, null, 2));
-
-    for (let i = 0; i < build.screenshots.length; i++) {
-      const screenshot = build.screenshots[i];
-      const imageName = screenshot.image;
-      const jsonpFileName = `screenshot_${imageName}.js`;
-      const jsonFilePath = path.join(this.cacheDir, jsonpFileName);
-      const jsonpExists = await fs.fileExists(jsonFilePath);
-      if (jsonpExists) {
-        continue;
-      }
-
-      const imageFilePath = path.join(this.imagesDir, imageName);
-      const imageBuf = await fs.readFileBuffer(imageFilePath);
-      const jsonpContent = `loadScreenshot("${imageName}","data:image/png;base64,${imageBuf.toString('base64')}",${screenshot.width},${screenshot.height},${screenshot.deviceScaleFactor},${screenshot.naturalWidth},${screenshot.naturalHeight});`;
-      await fs.writeFile(jsonFilePath, jsonpContent);
-    }
-
-    const compareAppSourceDir = path.join(this.packageDir, 'screenshot', 'compare');
-    const appSrcUrl = normalizePath(path.relative(this.screenshotDir, compareAppSourceDir));
-    const imagesUrl = normalizePath(path.relative(this.screenshotDir, this.imagesDir));
-    const jsonpUrl = normalizePath(path.relative(this.screenshotDir, this.cacheDir));
-
-    const compareAppHtml = createLocalCompareApp(appSrcUrl, imagesUrl, jsonpUrl, masterBuild, build);
-
-    const compareAppFileName = 'compare.html';
-    const compareAppFilePath = path.join(this.screenshotDir, compareAppFileName);
-    await fs.writeFile(compareAppFilePath, compareAppHtml);
-
-    const gitIgnorePath = path.join(this.screenshotDir, '.gitignore');
-    const gitIgnoreExists = await fs.fileExists(gitIgnorePath);
-    if (!gitIgnoreExists) {
-      const content: string[] = [
-        this.imagesDirName,
-        this.buildsDirName,
-        compareAppFileName
-      ];
-      await fs.writeFile(gitIgnorePath, content.join('\n'));
-    }
-
-    const url = new URL(`file://${compareAppFilePath}`);
-
-    const results: d.PublishBuildResults = {
-      compareUrl: url.href,
-      screenshotsCompared: build.screenshots.length,
-      masterBuild: masterBuild,
-      currentBuild: build
-    };
-
-    return results;
+  async publishBuild(_build: d.ScreenshotBuild) {
+    return null as d.PublishBuildResults;
   }
 
-  async toJson() {
+  async generateJsonpDataUris(build: d.ScreenshotBuild) {
+    if (build && Array.isArray(build.screenshots)) {
+      for (let i = 0; i < build.screenshots.length; i++) {
+        const screenshot = build.screenshots[i];
+
+        const jsonpFileName = `screenshot_${screenshot.image}.js`;
+        const jsonFilePath = path.join(this.cacheDir, jsonpFileName);
+        const jsonpExists = await fs.fileExists(jsonFilePath);
+
+        if (!jsonpExists) {
+          const imageFilePath = path.join(this.imagesDir, screenshot.image);
+          const imageBuf = await fs.readFileBuffer(imageFilePath);
+          const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString('base64')}");`;
+          await fs.writeFile(jsonFilePath, jsonpContent);
+        }
+      }
+    }
+  }
+
+  toJson(masterBuild: d.ScreenshotBuild) {
     const masterScreenshots: {[screenshotId: string]: string} = {};
-    const masterBuild = await this.getMasterBuild();
-    if (masterBuild) {
+    if (masterBuild && Array.isArray(masterBuild.screenshots)) {
       masterBuild.screenshots.forEach(masterScreenshot => {
         masterScreenshots[masterScreenshot.id] = masterScreenshot.image;
       });
@@ -214,7 +180,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   sortScreenshots(screenshots: d.Screenshot[]) {
-    screenshots.sort((a, b) => {
+    return screenshots.sort((a, b) => {
       if (a.desc && b.desc) {
         if (a.desc.toLowerCase() < b.desc.toLowerCase()) return -1;
         if (a.desc.toLowerCase() > b.desc.toLowerCase()) return 1;
@@ -241,38 +207,6 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
       return 0;
     });
-
-    return screenshots;
   }
 
-}
-
-
-
-function createLocalCompareApp(appSrcUrl: string, imagesUrl: string, jsonpUrl: string, masterBuild: d.ScreenshotBuild, currentBuild: d.ScreenshotBuild) {
-  return `<!doctype html>
-<html dir="ltr" lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Stencil Screenshot Visual Diff</title>
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta http-equiv="x-ua-compatible" content="IE=Edge">
-  <link href="${appSrcUrl}/build/app.css" rel="stylesheet">
-  <script src="${appSrcUrl}/build/app.js"></script>
-  <link rel="icon" type="image/x-icon" href="${appSrcUrl}/assets/favicon.ico">
-</head>
-<body>
-  <script>
-    (function() {
-      var compare = document.createElement('local-compare');
-      compare.appSrcUrl = '${appSrcUrl}';
-      compare.imagesUrl = '${imagesUrl}/';
-      compare.jsonpUrl = '${jsonpUrl}/';
-      compare.a = ${JSON.stringify(masterBuild)};
-      compare.b = ${JSON.stringify(currentBuild)};
-      document.body.appendChild(compare);
-    })();
-  </script>
-</body>
-</html>`;
 }

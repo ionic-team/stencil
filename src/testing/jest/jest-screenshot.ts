@@ -12,6 +12,8 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   await connector.initBuild({
     buildId: createBuildId(),
     buildMessage: createBuildMessage(),
+    buildAuthor: '',
+    buildTimestamp: Date.now(),
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
     packageDir: config.sys.compiler.packageDir,
@@ -21,9 +23,16 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
     pixelmatchThreshold: config.testing.pixelmatchThreshold
   });
+
+  if (!config.flags.updateScreenshot) {
+    await connector.pullMasterBuild();
+  }
+
   initTimespan.finish(`screenshot, initBuild finished`);
 
-  env.__STENCIL_SCREENSHOT_BUILD__ = await connector.toJson();
+  const masterBuild = await connector.getMasterBuild();
+
+  env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson(masterBuild);
 
   const testsTimespan = config.logger.createTimeSpan(`screenshot, tests started`, true);
 
@@ -85,5 +94,5 @@ function createBuildMessage() {
   fmDt += ('0' + d.getMinutes()).slice(-2) + ':';
   fmDt += ('0' + d.getSeconds()).slice(-2);
 
-  return `Local: ${fmDt}`;
+  return `Build: ${fmDt}`;
 }

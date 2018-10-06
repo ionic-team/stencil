@@ -81,7 +81,8 @@ function testPackage(testPkg) {
       'connector.js'
     ],
     exports: [
-      'ScreenshotConnector'
+      'ScreenshotConnector',
+      'ScreenshotLocalConnector'
     ]
   },
   {

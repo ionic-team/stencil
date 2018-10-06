@@ -7,12 +7,17 @@ export interface ScreenshotConnector {
   getMasterBuild(): Promise<d.ScreenshotBuild>;
   pullMasterBuild(): Promise<void>;
   publishBuild(build: d.ScreenshotBuild): Promise<d.PublishBuildResults>;
+  generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
-  toJson(): Promise<string>;
+  toJson(masterBuild: d.ScreenshotBuild): string;
 }
 
 
 export interface ScreenshotConnectorOptions {
+  buildId: string;
+  buildMessage: string;
+  buildAuthor: string;
+  buildTimestamp: number;
   logger: d.Logger;
   rootDir: string;
   cacheDir: string;
@@ -21,8 +26,6 @@ export interface ScreenshotConnectorOptions {
   imagesDirName?: string;
   buildsDirName?: string;
   currentBuildDir?: string;
-  buildId: string;
-  buildMessage: string;
   updateMaster?: boolean;
   allowableMismatchedPixels?: number;
   allowableMismatchedRatio?: number;
@@ -49,6 +52,7 @@ export interface ScreenshotBuildData {
 export interface ScreenshotBuild {
   id: string;
   message: string;
+  author: string;
   timestamp: number;
   screenshots: Screenshot[];
 }
