@@ -2,45 +2,51 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.core.js",
-  "corePolyfilled": "app.core.pf.js",
+  "core": "app.kltkklsa.js",
+  "corePolyfilled": "app.gcxmosrg.js",
   "components": {
     "app-root": {
       "bundleIds": {
-        "$": "app-root"
+        "$": "vm0g9ot6"
       }
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "compare-analysis"
+        "$": "9djfybn4"
       },
       "encapsulation": "shadow"
     },
     "compare-filter": {
       "bundleIds": {
-        "$": "compare-filter"
+        "$": "9djfybn4"
       },
       "encapsulation": "shadow"
     },
     "compare-header": {
       "bundleIds": {
-        "$": "compare-filter"
+        "$": "9djfybn4"
       },
       "encapsulation": "shadow"
     },
     "compare-row": {
       "bundleIds": {
-        "$": "compare-analysis"
+        "$": "9djfybn4"
       }
     },
-    "local-compare": {
+    "compare-thead": {
       "bundleIds": {
-        "$": "local-compare"
+        "$": "9djfybn4"
+      },
+      "encapsulation": "shadow"
+    },
+    "screenshot-compare": {
+      "bundleIds": {
+        "$": "9djfybn4"
       }
     },
     "screenshot-lookup": {
       "bundleIds": {
-        "$": "screenshot-lookup"
+        "$": "7atdmzgw"
       }
     }
   }

@@ -1,0 +1,2 @@
+/*! Built with http://stenciljs.com */
+App.loadBundle("vm0g9ot6",["exports"],function(e){var n=window.App.h,t=function(){function e(){}return e.prototype.render=function(){return n("stencil-router",null,n("stencil-route-switch",null,n("stencil-route",{url:"/",component:"screenshot-lookup",exact:!0}),n("stencil-route",{url:"/:a/:b/",component:"screenshot-compare"})))},Object.defineProperty(e,"is",{get:function(){return"app-root"},enumerable:!0,configurable:!0}),e}();e.AppRoot=t,Object.defineProperty(e,"__esModule",{value:!0})});

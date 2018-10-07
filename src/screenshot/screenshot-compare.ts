@@ -29,8 +29,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     width: emulateConfig.viewport.width,
     height: emulateConfig.viewport.height,
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-    naturalWidth: Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor),
-    naturalHeight: Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor),
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
     isMobile: emulateConfig.viewport.isMobile
@@ -55,8 +53,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     width: emulateConfig.viewport.width,
     height: emulateConfig.viewport.height,
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-    naturalWidth: screenshot.naturalWidth,
-    naturalHeight: screenshot.naturalHeight,
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
     isMobile: emulateConfig.viewport.isMobile,
@@ -81,6 +77,9 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   // set that the master data image is the image we're expecting
   compare.expectedImage = masterScreenshotImage;
 
+  const naturalWidth = Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor);
+  const naturalHeight = Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor);
+
   // compare only if the image hashes are different
   if (compare.expectedImage !== compare.receivedImage) {
     // compare the two images pixel by pixel to
@@ -90,13 +89,13 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       screenshotBuildData.imagesDir,
       compare.expectedImage,
       compare.receivedImage,
-      compare.naturalWidth,
-      compare.naturalHeight,
+      naturalWidth,
+      naturalHeight,
       pixelmatchThreshold
     );
   }
 
-  compare.mismatchedRatio = (compare.mismatchedPixels / (compare.naturalWidth * compare.naturalHeight));
+  compare.mismatchedRatio = (compare.mismatchedPixels / (naturalWidth * naturalHeight));
 
   return compare;
 }

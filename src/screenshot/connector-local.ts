@@ -89,7 +89,7 @@ function createLocalCompareApp(appSrcUrl: string, imagesUrl: string, jsonpUrl: s
 <body>
   <script>
     (function() {
-      var compare = document.createElement('local-compare');
+      var compare = document.createElement('screenshot-compare');
       compare.appSrcUrl = '${appSrcUrl}';
       compare.imagesUrl = '${imagesUrl}/';
       compare.jsonpUrl = '${jsonpUrl}/';

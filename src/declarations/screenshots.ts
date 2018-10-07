@@ -75,8 +75,6 @@ export interface Screenshot {
   width?: number;
   height?: number;
   deviceScaleFactor?: number;
-  naturalWidth?: number;
-  naturalHeight?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
   isMobile?: boolean;
@@ -96,8 +94,6 @@ export interface ScreenshotCompare {
   width?: number;
   height?: number;
   deviceScaleFactor?: number;
-  naturalWidth?: number;
-  naturalHeight?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
   isMobile?: boolean;

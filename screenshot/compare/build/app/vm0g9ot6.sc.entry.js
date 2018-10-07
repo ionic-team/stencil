@@ -1,0 +1,2 @@
+/*! Built with http://stenciljs.com */
+const{h:e}=window.App;class t{render(){return e("stencil-router",null,e("stencil-route-switch",null,e("stencil-route",{url:"/",component:"screenshot-lookup",exact:!0}),e("stencil-route",{url:"/:a/:b/",component:"screenshot-compare"})))}static get is(){return"app-root"}}export{t as AppRoot};
