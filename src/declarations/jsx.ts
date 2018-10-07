@@ -951,52 +951,6 @@ export namespace JSXElements {
     onKeyUp?: (event: KeyboardEvent) => void;
     onKeyUpCapture?: (event: KeyboardEvent) => void;
 
-    // Media Events
-    onAbort?: (event: Event) => void;
-    onAbortCapture?: (event: Event) => void;
-    onCanPlay?: (event: Event) => void;
-    onCanPlayCapture?: (event: Event) => void;
-    onCanPlayThrough?: (event: Event) => void;
-    onCanPlayThroughCapture?: (event: Event) => void;
-    onDurationChange?: (event: Event) => void;
-    onDurationChangeCapture?: (event: Event) => void;
-    onEmptied?: (event: Event) => void;
-    onEmptiedCapture?: (event: Event) => void;
-    onEncrypted?: (event: Event) => void;
-    onEncryptedCapture?: (event: Event) => void;
-    onEnded?: (event: Event) => void;
-    onEndedCapture?: (event: Event) => void;
-    onLoadedData?: (event: Event) => void;
-    onLoadedDataCapture?: (event: Event) => void;
-    onLoadedMetadata?: (event: Event) => void;
-    onLoadedMetadataCapture?: (event: Event) => void;
-    onLoadStart?: (event: Event) => void;
-    onLoadStartCapture?: (event: Event) => void;
-    onPause?: (event: Event) => void;
-    onPauseCapture?: (event: Event) => void;
-    onPlay?: (event: Event) => void;
-    onPlayCapture?: (event: Event) => void;
-    onPlaying?: (event: Event) => void;
-    onPlayingCapture?: (event: Event) => void;
-    onProgress?: (event: Event) => void;
-    onProgressCapture?: (event: Event) => void;
-    onRateChange?: (event: Event) => void;
-    onRateChangeCapture?: (event: Event) => void;
-    onSeeked?: (event: Event) => void;
-    onSeekedCapture?: (event: Event) => void;
-    onSeeking?: (event: Event) => void;
-    onSeekingCapture?: (event: Event) => void;
-    onStalled?: (event: Event) => void;
-    onStalledCapture?: (event: Event) => void;
-    onSuspend?: (event: Event) => void;
-    onSuspendCapture?: (event: Event) => void;
-    onTimeUpdate?: (event: Event) => void;
-    onTimeUpdateCapture?: (event: Event) => void;
-    onVolumeChange?: (event: Event) => void;
-    onVolumeChangeCapture?: (event: Event) => void;
-    onWaiting?: (event: Event) => void;
-    onWaitingCapture?: (event: Event) => void;
-
     // MouseEvents
     onAuxClick?: (event: MouseEvent) => void;
     onClick?: (event: MouseEvent) => void;
