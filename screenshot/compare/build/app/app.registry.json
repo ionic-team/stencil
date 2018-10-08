@@ -2,51 +2,62 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.kltkklsa.js",
-  "corePolyfilled": "app.gcxmosrg.js",
+  "core": "app.xvzcex9a.js",
+  "corePolyfilled": "app.4d72vslh.js",
   "components": {
     "app-root": {
       "bundleIds": {
-        "$": "vm0g9ot6"
+        "$": "iyoh2hha"
       }
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       },
       "encapsulation": "shadow"
     },
     "compare-filter": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       },
       "encapsulation": "shadow"
     },
     "compare-header": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       },
       "encapsulation": "shadow"
     },
     "compare-row": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       }
     },
     "compare-thead": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       },
       "encapsulation": "shadow"
     },
     "screenshot-compare": {
       "bundleIds": {
-        "$": "9djfybn4"
+        "$": "dv1ktwdm"
       }
     },
     "screenshot-lookup": {
       "bundleIds": {
-        "$": "7atdmzgw"
+        "$": "n3jqfyua"
+      },
+      "encapsulation": "shadow"
+    },
+    "stencil-route": {
+      "bundleIds": {
+        "$": "iyoh2hha"
+      }
+    },
+    "stencil-router": {
+      "bundleIds": {
+        "$": "iyoh2hha"
       }
     }
   }
