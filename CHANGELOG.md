@@ -1,3 +1,22 @@
+<a name="0.14.0-1"></a>
+# 🐺 [0.14.0-1](https://github.com/ionic-team/stencil/compare/v0.14.0-0...v0.14.0-1) (2018-10-08)
+
+
+### Bug Fixes
+
+* **polyfill:** add polyfill for Object.values() ([24f637e](https://github.com/ionic-team/stencil/commit/24f637e)), closes [#1098](https://github.com/ionic-team/stencil/issues/1098)
+* **render:** add slot css class in scoped mode ([a0c6f07](https://github.com/ionic-team/stencil/commit/a0c6f07))
+* **resolve:** fix bundled node resolved plugin ([dfc3c19](https://github.com/ionic-team/stencil/commit/dfc3c19))
+
+
+### Features
+
+* **docs:** add component jsdoc to json docs ([#1125](https://github.com/ionic-team/stencil/issues/1125)) ([e3ae28b](https://github.com/ionic-team/stencil/commit/e3ae28b))
+* **docs:** support [@param](https://github.com/param) and [@returns](https://github.com/returns) jsdoc tags ([#1131](https://github.com/ionic-team/stencil/issues/1131)) ([ec2e224](https://github.com/ionic-team/stencil/commit/ec2e224))
+* **test:** add emulate cli arg to test specific emulate config ([10ce9cd](https://github.com/ionic-team/stencil/commit/10ce9cd))
+
+
+
 <a name="0.14.0-0"></a>
 # 🎇 [0.14.0-0](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-0) (2018-10-02)
 
