@@ -246,8 +246,8 @@ function consoleMessage(c: puppeteer.ConsoleMessage) {
 }
 
 
-function pageError(msg: string) {
-  console.error('pageerror', msg);
+function pageError(e: any) {
+  console.error('pageerror', e);
 }
 
 
