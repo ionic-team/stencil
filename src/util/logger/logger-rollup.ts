@@ -10,7 +10,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
     type: 'bundling',
     language: 'javascript',
     code: rollupError.code,
-    header: formatErrorCode(rollupError.code),
+    header: `Rollup: ${formatErrorCode(rollupError.code)}`,
     messageText: rollupError.message,
     relFilePath: null,
     absFilePath: null,
@@ -129,7 +129,7 @@ const SUPPRESS_WARNING_CODES = [
 ];
 
 
-function formatErrorCode(errorCode: string) {
+function formatErrorCode(errorCode: any) {
   if (typeof errorCode === 'string') {
     return errorCode.split('_').map(c => {
       return toTitleCase(c.toLowerCase());
