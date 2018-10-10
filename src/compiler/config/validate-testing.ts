@@ -14,15 +14,15 @@ export function validateTesting(config: d.Config) {
     testing.browserHeadless = true;
   }
 
-  if (config.flags.ci) {
-    testing.browserArgs = testing.browserArgs || [];
-    if (!testing.browserArgs.includes('--no-sandbox')) {
-      testing.browserArgs.push('--no-sandbox');
-    }
-    if (!testing.browserArgs.includes('--disable-setuid-sandbox')) {
-      testing.browserArgs.push('--disable-setuid-sandbox');
-    }
+  testing.browserArgs = testing.browserArgs || [];
+  addOption(testing.browserArgs, '--disable-gpu');
+  addOption(testing.browserArgs, '--disable-canvas-aa');
+  addOption(testing.browserArgs, '--disable-composited-antialiasing');
+  addOption(testing.browserArgs, '--disable-composited-antialiasing');
 
+  if (config.flags.ci) {
+    addOption(testing.browserArgs, '--no-sandbox');
+    addOption(testing.browserArgs, '--disable-setuid-sandbox');
     testing.browserHeadless = true;
   }
 
@@ -180,6 +180,12 @@ const DEFAULT_IGNORE_PATTERNS = [
   '.stencil',
   'node_modules',
 ];
+
+function addOption(setArray: string[], option: string) {
+  if (!setArray.includes(option)) {
+    setArray.push(option);
+  }
+}
 
 
 const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
