@@ -13,7 +13,8 @@ export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerC
     name: 'pathsResolverPlugin',
 
     resolveId(importee: string, importer: string) {
-      if (!importer) {
+      if (!importer || /\0/.test(importee)) {
+        // ignore IDs with null character, these belong to other plugins
         return null;
       }
       importee = normalizePath(importee);
