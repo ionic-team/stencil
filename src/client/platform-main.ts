@@ -14,6 +14,7 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
+import { runtimeHelpers } from './runtime-helpers';
 
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
@@ -238,6 +239,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
   if (__BUILD_CONDITIONALS__.devInspector) {
     generateDevInspector(App, namespace, win, plt);
+  }
+
+  if (__BUILD_CONDITIONALS__.isDev) {
+    runtimeHelpers(win);
   }
 
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
