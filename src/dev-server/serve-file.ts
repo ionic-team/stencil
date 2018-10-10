@@ -104,5 +104,5 @@ const urlVersionIds = new Map<string, string>();
 
 function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
-  return `\n<iframe src="${devServerClientUrl}" style="width:0;height:0;border:0"></iframe>`;
+  return `\n<iframe src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
 }
