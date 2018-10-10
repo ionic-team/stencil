@@ -12,7 +12,7 @@ export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string)
         const results = plugin.resolveId(importee, null, pluginCtx);
 
         if (results != null) {
-          if (typeof results.then === 'function') {
+          if (typeof (results as any).then === 'function') {
             const promiseResults = await results;
             if (promiseResults != null) {
               return promiseResults as string;
@@ -42,7 +42,7 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
         const results = plugin.load(id, pluginCtx);
 
         if (results != null) {
-          if (typeof results.then === 'function') {
+          if (typeof (results as any).then === 'function') {
             const promiseResults = await results;
             if (promiseResults != null) {
               return promiseResults as string;
@@ -104,7 +104,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
 
         if (results != null) {
-          if (typeof results.then === 'function') {
+          if (typeof (results as any).then === 'function') {
             pluginTransformResults = await results;
 
           } else {
