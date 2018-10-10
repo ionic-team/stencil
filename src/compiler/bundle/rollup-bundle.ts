@@ -10,7 +10,6 @@ import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
 import pluginHelper from './rollup-plugins/plugin-helper';
 import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
-import globals from './rollup-plugins/node-globals';
 import statsPlugin from './rollup-plugins/rollup-stats-plugin';
 
 
@@ -61,7 +60,6 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
-      globals(),
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
