@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { generateBundleModules } from './bundle-modules';
 import { deriveModules } from './derive-modules';
+import { generateBundleModules } from './bundle-modules';
 
 
 export async function generateModuleMap(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
@@ -17,7 +17,7 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
     return compilerCtx.lastRawModules;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`module map started`);
+  const moduleMapTimespan = buildCtx.createTimeSpan(`module map started`);
   let moduleFormats: d.JSModuleFormats;
 
   try {
@@ -26,15 +26,15 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
-  timeSpan.finish(`module map finished`);
 
-  const timeSpan2 = buildCtx.createTimeSpan(`module derive started`);
+  const moduleDeriveTimespan = buildCtx.createTimeSpan(`module derive started`, true);
   const derivesModules = await deriveModules(config, compilerCtx, buildCtx, moduleFormats);
-  timeSpan2.finish(`module derive finished`);
+  moduleDeriveTimespan.finish(`module derive finished`);
 
   // remember for next time incase we change just a css file or something
   compilerCtx.lastRawModules = derivesModules;
 
+  moduleMapTimespan.finish(`module map finished`);
 
   return derivesModules;
 }

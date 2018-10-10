@@ -115,7 +115,9 @@ export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundle
       }
     }
 
-    buildWarn(diagnostics).messageText = label + (warning.message || warning);
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.header = `Bundling Warning`;
+    diagnostic.messageText = label + (warning.message || warning);
   };
 }
 
