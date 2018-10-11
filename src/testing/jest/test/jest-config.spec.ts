@@ -36,7 +36,6 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.runInBand).toBe(true);
-    expect(jestArgv.ci).not.toBe(true);
   });
 
   it('pass --ci arg to jest', () => {
