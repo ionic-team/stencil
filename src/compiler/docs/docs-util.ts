@@ -13,7 +13,7 @@ export class MarkdownTable {
 
     data.forEach(text => {
       const col: ColumnData = {
-        text: text.replace(/\r?\n/g, ' '),
+        text: escapeMarkdownTableColumn(text),
         width: text.length
       };
       colData.push(col);
@@ -29,6 +29,13 @@ export class MarkdownTable {
     return createTable(this.rows);
   }
 
+}
+
+
+function escapeMarkdownTableColumn(text: string) {
+  text = text.replace(/\r?\n/g, ' ');
+  text = text.replace(/\|/g, '\\|');
+  return text;
 }
 
 
