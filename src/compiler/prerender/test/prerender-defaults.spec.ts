@@ -5,7 +5,7 @@ import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe('prerender, defaults', () => {
   const root = path.resolve('/');
