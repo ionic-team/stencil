@@ -14,7 +14,7 @@ describe('node-globals', function() {
   it('expect faked node globals', async () => {
     const ids = [
       'tmpdir', 'fs', 'Buffer', 'process'
-    ]
+    ];
     ids.forEach(id => {
       const tmpdir = app.querySelector(`#${id}`);
       expect(tmpdir.textContent.trim()).not.toBe('');

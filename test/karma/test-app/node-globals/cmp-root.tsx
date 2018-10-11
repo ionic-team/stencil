@@ -4,9 +4,9 @@ import fs from 'fs';
 
 
 @Component({
-  tag: 'node-global'
+  tag: 'node-globals'
 })
-export class NodeGlobal {
+export class NodeGlobals {
 
   tmpdir = '';
   fileSystem = false;
