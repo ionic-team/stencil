@@ -4,22 +4,29 @@ import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 
 
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
-  // set all of the emulate configs to the process.env to be read later on
-  const emulateConfigs = getEmulateConfigs(config.testing, config.flags);
-  env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(emulateConfigs);
+  let success = false;
 
-  // build up our args from our already know list of args in the config
-  const jestArgv = buildJestArgv(config);
+  try {
+    // set all of the emulate configs to the process.env to be read later on
+    const emulateConfigs = getEmulateConfigs(config.testing, config.flags);
+    env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(emulateConfigs);
 
-  // build up the project paths, which is basically the app's root dir
-  const projects = getProjectListFromCLIArgs(config, jestArgv);
+    // build up our args from our already know list of args in the config
+    const jestArgv = buildJestArgv(config);
 
-  // run the jest-cli with our data rather than letting the
-  // jest-cli parse the args itself
-  const { runCLI } = require('jest-cli');
-  const cliResults = await runCLI(jestArgv, projects);
+    // build up the project paths, which is basically the app's root dir
+    const projects = getProjectListFromCLIArgs(config, jestArgv);
 
-  const success = !!cliResults.results.success;
+    // run the jest-cli with our data rather than letting the
+    // jest-cli parse the args itself
+    const { runCLI } = require('jest-cli');
+    const cliResults = await runCLI(jestArgv, projects);
+
+    success = !!cliResults.results.success;
+
+  } catch (e) {
+    config.logger.error(`runJest: ${e}`);
+  }
 
   return success;
 }

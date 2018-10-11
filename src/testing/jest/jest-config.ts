@@ -9,10 +9,14 @@ export function buildJestArgv(config: d.Config) {
     ...config.flags.knownArgs.slice()
   ];
 
+  if (config.flags.e2e && config.flags.ci) {
+    args.push('--runInBand');
+  }
+
   config.logger.debug(`jest args: ${args.join(' ')}`);
 
   const { options } = require('jest-cli/build/cli/args');
-  const jestArgv = yargs(args).options(options).argv;
+  const jestArgv = yargs(args).options(options).argv as d.JestArgv;
 
   jestArgv.config = buildJestConfig(config);
 
@@ -25,11 +29,11 @@ export function buildJestConfig(config: d.Config) {
 
   const validJestConfigKeys = Object.keys(jestDefaults);
 
-  const jestConfig: any = {};
+  const jestConfig: d.JestConfig = {};
 
   Object.keys(config.testing).forEach(key => {
     if (validJestConfigKeys.includes(key)) {
-      jestConfig[key] = (config.testing as any)[key];
+      (jestConfig as any)[key] = (config.testing as any)[key];
     }
   });
 
@@ -39,7 +43,7 @@ export function buildJestConfig(config: d.Config) {
 }
 
 
-export function getProjectListFromCLIArgs(config: d.Config, argv: any) {
+export function getProjectListFromCLIArgs(config: d.Config, argv: d.JestArgv) {
   const projects = argv.projects ? argv.projects : [];
 
   projects.push(config.rootDir);

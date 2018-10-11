@@ -194,72 +194,7 @@ export interface Testing {
 }
 
 
-export interface TestingConfig {
-  /**
-   * The `allowableMismatchedPixels` value is used to determine an acceptable
-   * number of pixels that can be mismatched before the image is considered
-   * to have changes. Realistically, two screenshots representing the same
-   * content may have a small number of pixels that are not identical due to
-   * anti-aliasing, which is perfectly normal. If the `allowableMismatchedRatio`
-   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
-   * will be used.
-   */
-  allowableMismatchedPixels?: number;
-
-  /**
-   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
-   * determine an acceptable ratio of pixels that can be mismatched before
-   * the image is considered to have changes. Realistically, two screenshots
-   * representing the same content may have a small number of pixels that
-   * are not identical due to anti-aliasing, which is perfectly normal. The
-   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
-   * divided by the total number of pixels in the screenshot. For example,
-   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
-   * the image is considered to have changes. If the `allowableMismatchedRatio`
-   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
-   * will be used.
-   */
-  allowableMismatchedRatio?: number;
-
-  /**
-   * Matching threshold while comparing two screenshots. Value ranges from `0` to `1`.
-   * Smaller values make the comparison more sensitive. The `pixelmatchThreshold`
-   * value helps to ignore anti-aliasing. Default: `0.1`
-   */
-  pixelmatchThreshold?: number;
-
-  /**
-   * Additional arguments to pass to the browser instance.
-   */
-  browserArgs?: string[];
-
-  /**
-   * Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
-   */
-  browserExecutablePath?: string;
-
-  /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
-   */
-  browserHeadless?: boolean;
-
-  /**
-   * Slows down e2e browser operations by the specified amount of milliseconds.
-   * Useful so that you can see what is going on.
-   */
-  browserSlowMo?: number;
-
-  /**
-   * Array of browser emulations to be using during e2e tests. A full e2e
-   * test is ran for each emulation.
-   */
-  emulate?: EmulateConfig[];
-
-  /**
-   * Path to the Screenshot Connector module.
-   */
-  screenshotConnector?: string;
-
+export interface JestConfig {
   /**
    * This option tells Jest that all imported modules in your tests should be mocked automatically.
    * All modules used in your tests will have a replacement implementation, keeping the API surface. Default: false
@@ -385,6 +320,81 @@ export interface TestingConfig {
   unmockedModulePathPatterns?: any[];
   verbose?: boolean;
   watchPathIgnorePatterns?: any[];
+}
+
+export interface JestArgv extends JestConfig {
+  _: string[];
+  ci: boolean;
+  config: string;
+  runInBand: boolean;
+}
+
+
+export interface TestingConfig extends JestConfig {
+  /**
+   * The `allowableMismatchedPixels` value is used to determine an acceptable
+   * number of pixels that can be mismatched before the image is considered
+   * to have changes. Realistically, two screenshots representing the same
+   * content may have a small number of pixels that are not identical due to
+   * anti-aliasing, which is perfectly normal. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedPixels?: number;
+
+  /**
+   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
+   * determine an acceptable ratio of pixels that can be mismatched before
+   * the image is considered to have changes. Realistically, two screenshots
+   * representing the same content may have a small number of pixels that
+   * are not identical due to anti-aliasing, which is perfectly normal. The
+   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
+   * divided by the total number of pixels in the screenshot. For example,
+   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
+   * the image is considered to have changes. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedRatio?: number;
+
+  /**
+   * Matching threshold while comparing two screenshots. Value ranges from `0` to `1`.
+   * Smaller values make the comparison more sensitive. The `pixelmatchThreshold`
+   * value helps to ignore anti-aliasing. Default: `0.1`
+   */
+  pixelmatchThreshold?: number;
+
+  /**
+   * Additional arguments to pass to the browser instance.
+   */
+  browserArgs?: string[];
+
+  /**
+   * Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
+   */
+  browserExecutablePath?: string;
+
+  /**
+   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   */
+  browserHeadless?: boolean;
+
+  /**
+   * Slows down e2e browser operations by the specified amount of milliseconds.
+   * Useful so that you can see what is going on.
+   */
+  browserSlowMo?: number;
+
+  /**
+   * Array of browser emulations to be using during e2e tests. A full e2e
+   * test is ran for each emulation.
+   */
+  emulate?: EmulateConfig[];
+
+  /**
+   * Path to the Screenshot Connector module.
+   */
+  screenshotConnector?: string;
 }
 
 
