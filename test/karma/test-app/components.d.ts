@@ -46,7 +46,7 @@ export namespace Components {
     'bool0': boolean;
     'bool1': boolean;
     'bool2': boolean;
-    'getInstance': () => this;
+    'getInstance': () => Promise<this>;
     'nu0': number;
     'nu1': number;
     'str0': string;
@@ -188,6 +188,9 @@ export namespace Components {
 
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends StencilHTMLAttributes {}
+
+  interface NodeGlobal {}
+  interface NodeGlobalAttributes extends StencilHTMLAttributes {}
 
   interface ReflectToAttr {
     'bool': boolean;
@@ -379,6 +382,7 @@ declare global {
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'NodeGlobal': Components.NodeGlobal;
     'ReflectToAttr': Components.ReflectToAttr;
     'ScopedBasicRoot': Components.ScopedBasicRoot;
     'ScopedBasic': Components.ScopedBasic;
@@ -449,6 +453,7 @@ declare global {
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'node-global': Components.NodeGlobalAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
     'scoped-basic-root': Components.ScopedBasicRootAttributes;
     'scoped-basic': Components.ScopedBasicAttributes;
@@ -667,6 +672,12 @@ declare global {
   var HTMLLifecycleUnloadRootElement: {
     prototype: HTMLLifecycleUnloadRootElement;
     new (): HTMLLifecycleUnloadRootElement;
+  };
+
+  interface HTMLNodeGlobalElement extends Components.NodeGlobal, HTMLStencilElement {}
+  var HTMLNodeGlobalElement: {
+    prototype: HTMLNodeGlobalElement;
+    new (): HTMLNodeGlobalElement;
   };
 
   interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {}
@@ -922,6 +933,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'node-global': HTMLNodeGlobalElement
     'reflect-to-attr': HTMLReflectToAttrElement
     'scoped-basic-root': HTMLScopedBasicRootElement
     'scoped-basic': HTMLScopedBasicElement
@@ -992,6 +1004,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'node-global': HTMLNodeGlobalElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
     'scoped-basic': HTMLScopedBasicElement;

@@ -1,5 +1,7 @@
 import { Config } from '../../dist'
 import { sass } from '@stencil/sass';
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
 
 
 export const config: Config = {
@@ -23,6 +25,8 @@ export const config: Config = {
   excludeSrc: [],
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
   plugins: [
+    builtins(),
+    globals(),
     sass()
   ]
 };

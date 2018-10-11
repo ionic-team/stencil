@@ -25,7 +25,7 @@ describe('attribute-complex', function() {
 
     await waitForChanges();
 
-    const instance = el.getInstance();
+    const instance = await el.getInstance();
     expect(instance.nu0).toBe(3);
     expect(instance.nu1).toBe(-2.3);
 
@@ -39,7 +39,7 @@ describe('attribute-complex', function() {
 
   it('should cast element props', async () => {
     const el = app.querySelector('attribute-complex') as any;
-    const instance = el.getInstance();
+    const instance = await el.getInstance();
 
     el.nu0 = '1234';
     el.nu1 = '-111.1';
