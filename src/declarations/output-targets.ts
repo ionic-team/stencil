@@ -175,6 +175,7 @@ export interface OutputTargetDocs extends OutputTargetBase {
 
   readmeDir?: string;
   jsonFile?: string;
+  strict?: boolean;
 }
 
 

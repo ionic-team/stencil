@@ -31,6 +31,10 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidLoad',
+              'tags': [{
+                'name': 'output',
+                'text': '{ActionSheetEvent} Emitted after the alert has loaded.'
+              }],
               'type': 'any',
             },
           },
@@ -43,6 +47,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidPresent',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -55,6 +60,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillPresent',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -67,6 +73,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillDismiss',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -79,6 +86,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidDismiss',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -91,6 +99,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidUnload',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -101,6 +110,7 @@ describe('component', () => {
         'jsdoc': {
           'documentation': 'This is an actionSheet class',
           'name': 'ActionSheet',
+          'tags': [],
           'type': 'typeof ActionSheet',
         },
         'listenersMeta': [
@@ -113,6 +123,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'onDismiss',
+              'tags': [],
               'type': '(ev: any) => void',
             },
           },
@@ -128,6 +139,10 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'actionSheetId',
+              'tags': [{
+                'name': 'internal',
+                'text': undefined,
+              }],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -152,6 +167,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'buttons',
+              'tags': [],
               'type': '{}',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -172,6 +188,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'cssClass',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -191,6 +208,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'enableBackdropDismiss',
+              'tags': [],
               'type': 'boolean',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -211,6 +229,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'enterAnimation',
+              'tags': [],
               'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -231,6 +250,10 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'exitAnimation',
+              'tags': [{
+                'name': 'return',
+                'text': 'this is a property'
+              }],
               'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -247,6 +270,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'subTitle',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -263,6 +287,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'title',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,

@@ -74,6 +74,7 @@ describe('markdown props', () => {
       propType: PROP_TYPE.String,
       jsdoc: {
         documentation: 'Description',
+        tags: [],
         name: '',
         type: ''
       }

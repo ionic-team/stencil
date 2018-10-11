@@ -1,5 +1,5 @@
 import { EventMeta } from '../../declarations';
-import { MarkdownTable, getMemberDocumentation } from './docs-util';
+import { MarkdownTable, getMemberDocumentation, isMemberInternal } from './docs-util';
 
 
 export class MarkdownEvents {
@@ -11,14 +11,15 @@ export class MarkdownEvents {
 
   toMarkdown() {
     const content: string[] = [];
-    if (!this.rows.length) {
+    let rows = this.rows.filter(filterRow);
+    if (rows.length === 0) {
       return content;
     }
 
     content.push(`## Events`);
     content.push(``);
 
-    this.rows = this.rows.sort((a, b) => {
+    rows = rows.sort((a, b) => {
       if (a.eventMeta.eventName < b.eventMeta.eventName) return -1;
       if (a.eventMeta.eventName > b.eventMeta.eventName) return 1;
       return 0;
@@ -28,7 +29,7 @@ export class MarkdownEvents {
 
     table.addHeader(['Event', 'Description']);
 
-    this.rows.forEach(row => {
+    rows.forEach(row => {
       table.addRow([
         '`' + row.eventName + '`',
         row.description
@@ -56,4 +57,8 @@ class Row {
     return getMemberDocumentation(this.eventMeta.jsdoc);
   }
 
+}
+
+function filterRow(row: Row) {
+  return row.eventName[0] !== '_' && !isMemberInternal(row.eventMeta.jsdoc);
 }

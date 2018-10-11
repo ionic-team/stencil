@@ -45,4 +45,6 @@ function validateDocsOutputTarget(config: d.Config, outputTarget: d.OutputTarget
   if (typeof outputTarget.jsonFile === 'string') {
     outputTarget.jsonFile = pathJoin(config, config.rootDir, outputTarget.jsonFile);
   }
+
+  outputTarget.strict = !!outputTarget.strict;
 }

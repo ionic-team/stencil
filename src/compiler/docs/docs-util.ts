@@ -158,11 +158,20 @@ export function getMemberDocumentation(jsDoc: d.JsDoc) {
   return '';
 }
 
+export function getPlatform(jsDoc: d.JsDoc) {
+  const tag = jsDoc.tags.find(t => t.name === 'platform');
+  return tag.text || 'all';
+}
+
+export function isMemberInternal(jsDoc: d.JsDoc) {
+  return jsDoc && jsDoc.tags && jsDoc.tags.find(p => p.name === 'internal');
+}
+
 export function getMemberType(jsDoc: d.JsDoc) {
-  if (jsDoc && typeof jsDoc.type === "string") {
+  if (jsDoc && typeof jsDoc.type === 'string') {
     return jsDoc.type.trim();
   }
-  return "";
+  return '';
 }
 
 export function getMethodParameters({ parameters }: d.JsDoc): d.JsonDocMethodParameter[] {

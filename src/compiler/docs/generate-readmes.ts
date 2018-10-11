@@ -2,6 +2,8 @@ import * as d from '../../declarations';
 import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { generateJsDocComponent } from './generate-json-doc';
+import { getMemberDocumentation, isMemberInternal } from './docs-util';
+import { MEMBER_TYPE } from '../../util/constants';
 
 
 export async function generateReadmes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDocs[]) {
@@ -37,6 +39,9 @@ export async function generateReadmes(config: d.Config, compilerCtx: d.CompilerC
   await Promise.all(promises);
 
   await Promise.all(outputTargets.map(async outputTarget => {
+    if (outputTarget.strict) {
+      checkDocs(config, compilerCtx.moduleFiles);
+    }
     if (outputTarget.jsonFile) {
       jsonDocs.components = jsonDocs.components.sort((a, b) => {
         if (a.tag < b.tag) return -1;
@@ -158,4 +163,38 @@ async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readme
   await compilerCtx.fs.writeFiles(writeFiles);
 
   return true;
+}
+
+function checkDocs(config: d.Config, modules: d.ModuleFiles) {
+  Object.keys(modules).map(key => modules[key]).forEach(file => {
+    const cmpMeta = file.cmpMeta;
+    const filepath = config.sys.path.relative(config.rootDir, file.sourceFilePath);
+    if (cmpMeta && !file.isCollectionDependency) {
+      Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+        const member = cmpMeta.membersMeta[memberName];
+
+        if (memberName[0] !== '_') {
+          if (member.memberType === MEMBER_TYPE.Method) {
+            if (needsWarn(member.jsdoc)) {
+              config.logger.warn(`Method "${memberName}" of "${cmpMeta.tagNameMeta}" is not documented. ${filepath}`);
+            }
+          } else if (member.memberType === MEMBER_TYPE.Prop || member.memberType === MEMBER_TYPE.PropMutable) {
+            if (needsWarn(member.jsdoc)) {
+              config.logger.warn(`Property "${memberName}" of "${cmpMeta.tagNameMeta}" is not documented. ${filepath}`);
+            }
+          }
+        }
+      });
+
+      cmpMeta.eventsMeta && cmpMeta.eventsMeta.forEach(ev => {
+        if (needsWarn(ev.jsdoc)) {
+          config.logger.warn(`Event "${ev.eventName}" of "${cmpMeta.tagNameMeta}" is not documented. ${file.sourceFilePath}`);
+        }
+      });
+    }
+  });
+}
+
+function needsWarn(jsdoc: d.JsDoc) {
+  return !getMemberDocumentation(jsdoc) && !isMemberInternal(jsdoc);;
 }

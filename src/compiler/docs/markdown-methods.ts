@@ -11,15 +11,13 @@ export class MarkdownMethods {
 
   toMarkdown() {
     const content: string[] = [];
-    if (this.rows.length === 0) {
+    let rows = this.rows.filter(filterRow);
+    if (rows.length === 0) {
       return content;
     }
 
     content.push(`## Methods`);
     content.push(``);
-
-    // Filter method that start with _
-    let rows = this.rows.filter(row => row.methodName[0] !== '_');
 
     // Sort methods by name
     rows = rows.sort((a, b) => {
@@ -86,4 +84,8 @@ class Row {
   get returns() {
     return getMethodReturns(this.memberMeta.jsdoc);
   }
+}
+
+function filterRow(row: Row) {
+  return row.methodName[0] !== '_' && row.description.indexOf('@internal') < 0;
 }

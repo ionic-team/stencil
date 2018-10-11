@@ -12,14 +12,15 @@ export class MarkdownProps {
 
   toMarkdown() {
     const content: string[] = [];
-    if (!this.rows.length) {
+    let rows = this.rows.filter(filterRow);
+    if (rows.length === 0) {
       return content;
     }
 
     content.push(`## Properties`);
     content.push(``);
 
-    this.rows = this.rows.sort((a, b) => {
+    rows = rows.sort((a, b) => {
       if (a.propName < b.propName) return -1;
       if (a.propName > b.propName) return 1;
       return 0;
@@ -34,7 +35,7 @@ export class MarkdownProps {
       'Type'
     ]);
 
-    this.rows.forEach(row => {
+    rows.forEach(row => {
       table.addRow([
         row.propName,
         row.attrName,
@@ -109,4 +110,8 @@ export class PropRow {
     return '';
   }
 
+}
+
+function filterRow(row: PropRow) {
+  return row.memberName[0] !== '_' && row.description.indexOf('@internal') < 0;
 }

@@ -40,12 +40,13 @@ export function isMethodWithDecorators(member: ts.ClassElement): boolean {
     && member.decorators.length > 0;
 }
 
-export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol) {
+export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): d.JsDoc {
   return {
     name: symbol.getName(),
+    tags: symbol.getJsDocTags(),
     documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
     type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
-  } as d.JsDoc;
+  };
 }
 
 export function isMethod(member: ts.ClassElement, methodName: string) {

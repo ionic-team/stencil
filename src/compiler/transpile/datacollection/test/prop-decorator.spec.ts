@@ -32,6 +32,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'objectAnyThing',
+          tags: [],
           type: '(_: any) => any',
         },
         memberType: MEMBER_TYPE.Prop,
@@ -48,6 +49,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'size',
+          tags: [],
           type: 'string',
         },
         memberType: MEMBER_TYPE.Prop,
@@ -63,6 +65,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'withOptions',
+          tags: [],
           type: 'number',
         },
         memberType: MEMBER_TYPE.Prop,
@@ -79,6 +82,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'width',
+          tags: [],
           type: 'number',
         },
         memberType: MEMBER_TYPE.Prop,
@@ -95,6 +99,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'setting',
+          tags: [],
           type: `"auto" | "manual"`,
         },
         memberType: MEMBER_TYPE.Prop,
@@ -111,6 +116,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'values',
+          tags: [],
           type: `number | {}`,
         },
         memberType: MEMBER_TYPE.Prop,
@@ -127,6 +133,7 @@ describe('props decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'enabled',
+          tags: [],
           type: `string | boolean`,
         },
         memberType: MEMBER_TYPE.Prop,
