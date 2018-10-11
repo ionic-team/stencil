@@ -213,26 +213,33 @@ async function waitForChanges(page: pd.E2EPageInternal) {
     if (page.isClosed()) {
       return;
     }
-  } catch (e) {
-    return;
-  }
 
-  await Promise.all(page._elements.map(async elm => {
-    await elm.e2eRunActions();
-  }));
+    await Promise.all(page._elements.map(async elm => {
+      await elm.e2eRunActions();
+    }));
 
-  await page.evaluate(() => {
+    if (page.isClosed()) {
+      return;
+    }
 
-    const promises = (window as d.WindowData)['s-apps'].map((appNamespace: string) => {
-      return (window as any)[appNamespace].onReady();
+    await page.evaluate(() => {
+
+      const promises = (window as d.WindowData)['s-apps'].map((appNamespace: string) => {
+        return (window as any)[appNamespace].onReady();
+      });
+
+      return Promise.all(promises);
     });
 
-    return Promise.all(promises);
-  });
+    if (page.isClosed()) {
+      return;
+    }
 
-  await Promise.all(page._elements.map(async elm => {
-    await elm.e2eSync();
-  }));
+    await Promise.all(page._elements.map(async elm => {
+      await elm.e2eSync();
+    }));
+
+  } catch (e) {}
 }
 
 
