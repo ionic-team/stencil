@@ -125,8 +125,8 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
   }, null, 2);
 
   const indexDtsContent = `export declare function defineCustomElements(win: any): Promise<void>;`;
-  const indexES5Content = `export * from '${config.sys.path.relative(loaderPath, es5EntryPoint)}';`;
-  const indexES2017Content = `export * from '${config.sys.path.relative(loaderPath, es2017EntryPoint)}';`;
+  const indexES5Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es5EntryPoint))}';`;
+  const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
 
   await Promise.all([
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent),
