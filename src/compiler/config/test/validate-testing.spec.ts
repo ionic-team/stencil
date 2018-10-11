@@ -42,16 +42,6 @@ describe('validateTesting', () => {
     expect(config.testing.browserHeadless).toBe(true);
   });
 
-  it('default to no-sandbox browser args with ci flag', () => {
-    config.flags.e2e = true;
-    config.flags.ci = true;
-    validateConfig(config);
-    expect(config.testing.browserArgs).toEqual([
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ]);
-  });
-
   it('force headless with ci flag', () => {
     config.flags.e2e = true;
     config.flags.headless = false;
@@ -60,10 +50,27 @@ describe('validateTesting', () => {
     expect(config.testing.browserHeadless).toBe(true);
   });
 
-  it('default to no browser args', () => {
+  it('default to no-sandbox browser args with ci flag', () => {
+    config.flags.e2e = true;
+    config.flags.ci = true;
+    validateConfig(config);
+    expect(config.testing.browserArgs).toEqual([
+      '--disable-gpu',
+      '--disable-canvas-aa',
+      '--disable-composited-antialiasing',
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]);
+  });
+
+  it('default browser args', () => {
     config.flags.e2e = true;
     validateConfig(config);
-    expect(config.testing.browserArgs).toEqual(undefined);
+    expect(config.testing.browserArgs).toEqual([
+      '--disable-gpu',
+      '--disable-canvas-aa',
+      '--disable-composited-antialiasing'
+    ]);
   });
 
 });
