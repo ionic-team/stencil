@@ -29,6 +29,7 @@ export interface JsonDocsProp {
   attr?: string;
   reflectToAttr?: boolean;
   docs?: string;
+  optional?: boolean;
 }
 
 

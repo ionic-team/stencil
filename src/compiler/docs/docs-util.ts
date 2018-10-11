@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-
+import { PROP_TYPE } from '../../util/constants';
 
 export class MarkdownTable {
   private rows: RowData[] = [];
@@ -28,9 +28,7 @@ export class MarkdownTable {
   toMarkdown() {
     return createTable(this.rows);
   }
-
 }
-
 
 function createTable(rows: RowData[]) {
   const content: string[] = [];
@@ -55,7 +53,6 @@ function createTable(rows: RowData[]) {
   return content;
 }
 
-
 function createBorder(th: RowData) {
   const border: RowData = {
     columns: [],
@@ -76,7 +73,6 @@ function createBorder(th: RowData) {
   return createRow(border);
 }
 
-
 function createRow(row: RowData) {
   const content: string[] = ['| '];
 
@@ -88,12 +84,10 @@ function createRow(row: RowData) {
   return content.join('').trim();
 }
 
-
 function normalize(rows: RowData[]) {
   normalizeColumCount(rows);
   normalizeColumnWidth(rows);
 }
-
 
 function normalizeColumCount(rows: RowData[]) {
   let columnCount = 0;
@@ -113,7 +107,6 @@ function normalizeColumCount(rows: RowData[]) {
     }
   });
 }
-
 
 function normalizeColumnWidth(rows: RowData[]) {
   const columnCount = rows[0].columns.length;
@@ -136,9 +129,7 @@ function normalizeColumnWidth(rows: RowData[]) {
       }
     });
   }
-
 }
-
 
 interface ColumnData {
   text: string;
@@ -150,7 +141,6 @@ interface RowData {
   isHeader?: boolean;
 }
 
-
 export function getMemberDocumentation(jsDoc: d.JsDoc) {
   if (jsDoc && typeof jsDoc.documentation === 'string') {
     return jsDoc.documentation.trim();
@@ -159,13 +149,15 @@ export function getMemberDocumentation(jsDoc: d.JsDoc) {
 }
 
 export function getMemberType(jsDoc: d.JsDoc) {
-  if (jsDoc && typeof jsDoc.type === "string") {
+  if (jsDoc && typeof jsDoc.type === 'string') {
     return jsDoc.type.trim();
   }
-  return "";
+  return '';
 }
 
-export function getMethodParameters({ parameters }: d.JsDoc): d.JsonDocMethodParameter[] {
+export function getMethodParameters({
+  parameters
+}: d.JsDoc): d.JsonDocMethodParameter[] {
   if (parameters) {
     return parameters.map(({ name, type, documentation }) => ({
       name,
@@ -184,4 +176,42 @@ export function getMethodReturns({ returns }: d.JsDoc): d.JsonDocsMethodReturn {
     };
   }
   return null;
+}
+
+export function getPropType(
+  memberMeta: d.MemberMeta,
+  format = (type: string) => type
+) {
+  if (memberMeta.attribType && memberMeta.attribType.text) {
+    if (!memberMeta.attribType.text.includes('(')) {
+      const typeSplit = memberMeta.attribType.text.split('|').map(t => {
+        return format(t.replace(/\'/g, '"').trim());
+      });
+
+      return typeSplit.join(', ');
+    }
+
+    return format(memberMeta.attribType.text);
+  }
+
+  let propType;
+  switch (memberMeta.propType) {
+    case PROP_TYPE.Any:
+      propType = 'any';
+      break;
+    case PROP_TYPE.Boolean:
+      propType = 'boolean';
+      break;
+    case PROP_TYPE.Number:
+      propType = 'number';
+      break;
+    case PROP_TYPE.String:
+      propType = 'string';
+      break;
+    default:
+      propType = '';
+      break;
+  }
+
+  return format(propType);
 }
