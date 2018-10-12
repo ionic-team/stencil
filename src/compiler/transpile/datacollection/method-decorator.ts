@@ -61,7 +61,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
           ...serializeSymbol(checker, symbol),
           returns: {
             type: checker.typeToString(returnType),
-            documentation: jsDocReturnTag ? jsDocReturnTag.comment : ""
+            documentation: jsDocReturnTag ? jsDocReturnTag.comment : ''
           },
           parameters: methodSignature.parameters.map(parmSymbol =>
             serializeSymbol(checker, parmSymbol)

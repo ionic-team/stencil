@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getMemberDocumentation, getMethodParameters, getMethodReturns } from './docs-util';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { MEMBER_TYPE } from '../../util/constants';
 
 
 export async function generateJsDocComponent(config: d.Config, compilerCtx: d.CompilerCtx, jsonDocs: d.JsonDocs, cmpMeta: d.ComponentMeta, dirPath: string, readmeContent: string) {
@@ -61,7 +61,6 @@ async function generateJsDocsUsages(config: d.Config, compilerCtx: d.CompilerCtx
 
 function generateJsDocMembers(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsComponent) {
   if (!cmpMeta.membersMeta) return;
-
   Object.keys(cmpMeta.membersMeta).sort((a, b) => {
     if (a.toLowerCase() < b.toLowerCase()) return -1;
     if (a.toLowerCase() > b.toLowerCase()) return 1;
@@ -72,23 +71,9 @@ function generateJsDocMembers(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompo
 
     if (memberMeta.memberType === MEMBER_TYPE.Prop || memberMeta.memberType === MEMBER_TYPE.PropMutable) {
       const propData: d.JsonDocsProp = {
-        name: memberName
+        name: memberName,
+        type: memberMeta.jsdoc.type
       };
-
-      if (memberMeta.propType === PROP_TYPE.Boolean) {
-        propData.type = 'boolean';
-
-      } else if (memberMeta.propType === PROP_TYPE.Number) {
-        propData.type = 'number';
-
-      } else if (memberMeta.propType === PROP_TYPE.String) {
-        propData.type = 'string';
-
-      } else if (memberMeta.propType === PROP_TYPE.Any) {
-        propData.type = 'any';
-      } else {
-        propData.type = memberMeta.attribType.text;
-      }
 
       if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
         propData.mutable = true;

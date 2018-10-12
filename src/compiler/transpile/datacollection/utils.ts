@@ -45,8 +45,31 @@ export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): d.J
     name: symbol.getName(),
     tags: symbol.getJsDocTags(),
     documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
-    type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
+    type: serializeDocsSymbol(checker, symbol)
   };
+}
+
+export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): string {
+  const type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+  const set = new Set<string>();
+  parseDocsType(checker, type, set);
+
+  const parts = Array.from(set.keys()).sort();
+  if (parts.length > 20) {
+    return checker.typeToString(type);
+  } else {
+    return parts.join(' | ');
+  }
+}
+
+export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) {
+  if (type.isUnion() && (type.flags & ts.TypeFlags.Boolean) === 0) {
+    type.types.forEach(t => {
+      parseDocsType(checker, t, parts);
+    });
+  } else {
+    parts.add(checker.typeToString(type));
+  }
 }
 
 export function isMethod(member: ts.ClassElement, methodName: string) {

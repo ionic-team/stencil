@@ -78,36 +78,7 @@ export class PropRow {
   }
 
   get type() {
-
-    if (this.memberMeta.attribType && this.memberMeta.attribType.text) {
-      if (!this.memberMeta.attribType.text.includes('(')) {
-        const typeSplit = this.memberMeta.attribType.text.split('|').map(t => {
-          return '`' + t.replace(/\'/g, '"').trim() + '`';
-        });
-
-        return typeSplit.join(', ');
-      }
-
-      return '`' + this.memberMeta.attribType.text + '`';
-    }
-
-    const propType = this.memberMeta.propType;
-
-    switch (propType) {
-      case PROP_TYPE.Any:
-        return '`any`';
-
-      case PROP_TYPE.Boolean:
-        return '`boolean`';
-
-      case PROP_TYPE.Number:
-        return '`number`';
-
-      case PROP_TYPE.String:
-        return '`string`';
-    }
-
-    return '';
+    return `\`${this.memberMeta.jsdoc.type}\``;
   }
 
 }
