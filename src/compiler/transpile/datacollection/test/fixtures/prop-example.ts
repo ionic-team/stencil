@@ -1,5 +1,7 @@
 import { Component, Method, OtherThing } from '../../../../../index';
 
+type Color = 'primary' | 'secondary';
+
 /**
  * This is an actionSheet class
  */
@@ -33,4 +35,6 @@ class ActionSheet {
   @Prop() values?: number | number[];
 
   @Prop() enabled?: boolean | string;
+
+  @Prop() color?: Color;
 }

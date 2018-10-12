@@ -134,12 +134,33 @@ describe('props decorator', () => {
           documentation: '',
           name: 'enabled',
           tags: [],
-          type: `string | boolean`,
+          type: `boolean | string`,
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Any,
         reflectToAttrib: false
       },
+      color: {
+        attribName: 'color',
+        attribType: {
+          text: `Color`,
+          optional: true,
+          typeReferences: {
+            Color: {
+              referenceLocation: 'global'
+            }
+          }
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'color',
+          tags: [],
+          type: `"primary" | "secondary"`,
+        },
+        memberType: MEMBER_TYPE.Prop,
+        propType: PROP_TYPE.String,
+        reflectToAttrib: false
+      }
     });
   });
 

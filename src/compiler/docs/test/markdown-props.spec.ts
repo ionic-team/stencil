@@ -1,5 +1,6 @@
 import { PropRow } from '../markdown-props';
 import { PROP_TYPE } from '../../../util/constants';
+import { JsDoc } from '../../../declarations';
 
 
 describe('markdown props', () => {
@@ -9,64 +10,13 @@ describe('markdown props', () => {
       attribType: {
         text: `(AlertButton | string)[]`,
         optional: false
-      }
+      },
+      jsdoc: {
+        type: '(AlertButton | string)[]'
+      } as JsDoc
     });
 
     expect(row.type).toBe('`(AlertButton | string)[]`');
-  });
-
-  it('union types', () => {
-    const row = new PropRow('name', {
-      attribType: {
-        text: `string | string[]`,
-        optional: false
-      }
-    });
-
-    expect(row.type).toBe('`string`, `string[]`');
-  });
-
-  it('string union types', () => {
-    const row = new PropRow('name', {
-      attribType: {
-        text: `'submit' | 'reset' | 'button'`,
-        optional: false
-      }
-    });
-
-    expect(row.type).toBe('`"submit"`, `"reset"`, `"button"`');
-  });
-
-  it('any type', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.Any
-    });
-
-    expect(row.type).toBe('`any`');
-  });
-
-  it('string type', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.String
-    });
-
-    expect(row.type).toBe('`string`');
-  });
-
-  it('number type', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.Number
-    });
-
-    expect(row.type).toBe('`number`');
-  });
-
-  it('boolean type', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.Boolean
-    });
-
-    expect(row.type).toBe('`boolean`');
   });
 
   it('description', () => {

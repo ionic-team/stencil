@@ -54,6 +54,13 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
+  // normalize booleans
+  const hasTrue = set.delete('true');
+  const hasFalse = set.delete('false');
+  if (hasTrue || hasFalse) {
+    set.add('boolean');
+  }
+
   const parts = Array.from(set.keys()).sort();
   if (parts.length > 20) {
     return checker.typeToString(type);
@@ -63,12 +70,13 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
 }
 
 export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) {
-  if (type.isUnion() && (type.flags & ts.TypeFlags.Boolean) === 0) {
-    type.types.forEach(t => {
+  const text = checker.typeToString(type);
+  if (type.isUnion()) {
+    (type as ts.UnionType).types.forEach(t => {
       parseDocsType(checker, t, parts);
     });
   } else {
-    parts.add(checker.typeToString(type));
+    parts.add(text);
   }
 }
 
