@@ -1,5 +1,5 @@
-<a name="0.14.0-2"></a>
-# 🚁 [Prerelease] [0.14.0-2](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-2) (2018-10-11)
+<a name="0.14.0-3"></a>
+# 🔬 [Prerelease] [0.14.0-3](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-3) (2018-10-12)
 
 ### Features
 
@@ -8,6 +8,7 @@
 * **docs:** support [@param](https://github.com/param) and [@returns](https://github.com/returns) jsdoc tags ([#1131](https://github.com/ionic-team/stencil/issues/1131)) ([ec2e224](https://github.com/ionic-team/stencil/commit/ec2e224))
 * **test:** add emulate cli arg to test specific emulate config ([10ce9cd](https://github.com/ionic-team/stencil/commit/10ce9cd))
 * **test:** integrate test runner w/ builds ([92a3a71](https://github.com/ionic-team/stencil/commit/92a3a71))
+* **docs:** prop types are resolved to primitive types ([4dc5c32](https://github.com/ionic-team/stencil/commit/4dc5c32))
 
 
 ### Bug Fixes
