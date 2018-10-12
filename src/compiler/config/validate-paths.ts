@@ -49,8 +49,10 @@ export function validatePaths(config: Config) {
   } else {
     config.tsconfig = ts.findConfigFile(config.rootDir, ts.sys.fileExists);
   }
-  config.tsconfig = normalizePath(config.tsconfig);
-  config.logger.debug(`tsconfig: ${config.tsconfig}`);
+
+  if (typeof config.tsconfig === 'string') {
+    config.tsconfig = normalizePath(config.tsconfig);
+  }
 
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.srcIndexHtml)) {
