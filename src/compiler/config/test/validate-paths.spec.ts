@@ -93,12 +93,6 @@ describe('validatePaths', () => {
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].collectionDir)).toBe(true);
   });
 
-  it('should set default tsconfig and convert to absolute path', () => {
-    validateConfig(config);
-    expect(path.basename(config.tsconfig)).toBe('tsconfig.json');
-    expect(path.isAbsolute(config.tsconfig)).toBe(true);
-  });
-
   it('should set default types dir and convert to absolute path', () => {
     config.outputTargets = [{
       type: 'dist'
