@@ -2,46 +2,46 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.xvzcex9a.js",
-  "corePolyfilled": "app.4d72vslh.js",
+  "core": "app.wvpgqenw.js",
+  "corePolyfilled": "app.zfouy8ne.js",
   "components": {
     "app-root": {
       "bundleIds": {
-        "$": "iyoh2hha"
+        "$": "pjucjxvs"
       }
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       },
       "encapsulation": "shadow"
     },
     "compare-filter": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       },
       "encapsulation": "shadow"
     },
     "compare-header": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       },
       "encapsulation": "shadow"
     },
     "compare-row": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       }
     },
     "compare-thead": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       },
       "encapsulation": "shadow"
     },
     "screenshot-compare": {
       "bundleIds": {
-        "$": "dv1ktwdm"
+        "$": "vqqrg3hr"
       }
     },
     "screenshot-lookup": {
@@ -52,12 +52,12 @@
     },
     "stencil-route": {
       "bundleIds": {
-        "$": "iyoh2hha"
+        "$": "pjucjxvs"
       }
     },
     "stencil-router": {
       "bundleIds": {
-        "$": "iyoh2hha"
+        "$": "pjucjxvs"
       }
     }
   }
