@@ -1,5 +1,5 @@
-<a name="0.14.0-3"></a>
-# 🔬 [Prerelease] [0.14.0-3](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-3) (2018-10-12)
+<a name="0.14.0-4"></a>
+# 🌇 [Prerelease] [0.14.0-4](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-4) (2018-10-13)
 
 ### Features
 
@@ -19,28 +19,30 @@
 * **bundle:** add dev-only runtime helpers for node globals ([e098e00](https://github.com/ionic-team/stencil/commit/e098e00))
 * **bundle:** do not bundle node globals/builtins ([1102b0b](https://github.com/ionic-team/stencil/commit/1102b0b))
 * **bundle:** test for \0 ids ([45bf040](https://github.com/ionic-team/stencil/commit/45bf040))
-* **dist:** normalizePath for windows ([#1142](https://github.com/ionic-team/stencil/issues/1142)) ([93214ee](https://github.com/ionic-team/stencil/commit/93214ee))
-* **docs:** escape markdown docs generation columns ([e06ebce](https://github.com/ionic-team/stencil/commit/e06ebce))
-* **e2e:** check if page closed ([4d25144](https://github.com/ionic-team/stencil/commit/4d25144))
-* **log:** print out build errors from initial build ([196f302](https://github.com/ionic-team/stencil/commit/196f302))
-* **rollup:** improve rollup error logging ([0b64d5f](https://github.com/ionic-team/stencil/commit/0b64d5f))
-* **screenshot:** disable GPU and antialiasing ([cab2b87](https://github.com/ionic-team/stencil/commit/cab2b87))
 * **cli:** print warning if --config path does not exist ([492402f](https://github.com/ionic-team/stencil/commit/492402f))
 * **compiler:** reflectToAttrib is serialized to manifest ([4980042](https://github.com/ionic-team/stencil/commit/4980042))
 * **config:** ensure allowSyntheticDefaultImports setting in tsconfig ([ba7c673](https://github.com/ionic-team/stencil/commit/ba7c673))
 * **config:** ensure esModuleInterop setting in tsconfig ([be1c18d](https://github.com/ionic-team/stencil/commit/be1c18d))
 * **config:** user's tsconfig is not parsed ([ca0b9fc](https://github.com/ionic-team/stencil/commit/ca0b9fc))
+* **dist:** normalizePath for windows ([#1142](https://github.com/ionic-team/stencil/issues/1142)) ([93214ee](https://github.com/ionic-team/stencil/commit/93214ee))
 * **docs:** support strict docs and [@internal](https://github.com/internal) tag ([1ba029a](https://github.com/ionic-team/stencil/commit/1ba029a))
+* **docs:** escape markdown docs generation columns ([e06ebce](https://github.com/ionic-team/stencil/commit/e06ebce))
+* **e2e:** check if page closed ([4d25144](https://github.com/ionic-team/stencil/commit/4d25144))
 * **loader:** avoid relative path in package.json ([a4892eb](https://github.com/ionic-team/stencil/commit/a4892eb))
+* **log:** print out build errors from initial build ([196f302](https://github.com/ionic-team/stencil/commit/196f302))
 * **methods:** add focus/blur back to blacklisted methods ([6ad1be1](https://github.com/ionic-team/stencil/commit/6ad1be1))
 * **minified:** topLevel is not safe in ES5 ([8f17c32](https://github.com/ionic-team/stencil/commit/8f17c32))
 * **package:** ensure compatible [@types](https://github.com/types)/node with typescript ([fb5f76f](https://github.com/ionic-team/stencil/commit/fb5f76f))
 * **polyfill:** add polyfill for Object.values() ([24f637e](https://github.com/ionic-team/stencil/commit/24f637e)), closes [#1098](https://github.com/ionic-team/stencil/issues/1098)
 * **render:** add slot css class in scoped mode ([a0c6f07](https://github.com/ionic-team/stencil/commit/a0c6f07))
 * **resolve:** fix bundled node resolved plugin ([dfc3c19](https://github.com/ionic-team/stencil/commit/dfc3c19))
+* **rollup:** improve rollup error logging ([0b64d5f](https://github.com/ionic-team/stencil/commit/0b64d5f))
+* **screenshot:** disable GPU and antialiasing ([cab2b87](https://github.com/ionic-team/stencil/commit/cab2b87))
+* **screenshot:** provide compare url and update base connector ([3bbd609](https://github.com/ionic-team/stencil/commit/3bbd609))
 * **test:** do not print tsconfig errors during testing ([83ecade](https://github.com/ionic-team/stencil/commit/83ecade))
 * **testing:** parse user tsconfig for unit tests ([7c8fc4f](https://github.com/ionic-team/stencil/commit/7c8fc4f))
 * **tsconfig:** parse tsconfig w/ comments ([e1b54ea](https://github.com/ionic-team/stencil/commit/e1b54ea))
+* **tsconfig:** fix ts.findConfigFile ([d473d7a](https://github.com/ionic-team/stencil/commit/d473d7a))
 
 
 
