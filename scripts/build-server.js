@@ -22,12 +22,16 @@ if (success) {
     return all;
   }, {});
 
-  function bundleCompiler() {
+  function bundleServer() {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'assert',
+        'buffer',
+        'crypto',
         'fs',
+        'module',
+        'os',
         'path',
         'child_process'
       ],
@@ -69,7 +73,7 @@ if (success) {
   }
 
 
-  bundleCompiler();
+  bundleServer();
 
 
   process.on('exit', (code) => {
