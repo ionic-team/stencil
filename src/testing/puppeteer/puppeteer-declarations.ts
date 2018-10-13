@@ -27,7 +27,7 @@ export interface E2EPage extends PuppeteerPage {
    * results can then be used to test pixel mismatches, such as
    * `expect(results).toMatchScreenshot()`.
    */
-  compareScreenshot(): Promise<d.ScreenshotCompare>;
+  compareScreenshot(): Promise<d.ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -35,7 +35,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The provided `description` will be
    * added onto its current description, which comes from the test description.
    */
-  compareScreenshot(description: string): Promise<d.ScreenshotCompare>;
+  compareScreenshot(description: string): Promise<d.ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -43,7 +43,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The `opts` argument can be used to
    * customize screenshot options.
    */
-  compareScreenshot(opts: d.ScreenshotOptions): Promise<d.ScreenshotCompare>;
+  compareScreenshot(opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -52,7 +52,7 @@ export interface E2EPage extends PuppeteerPage {
    * added onto its current description, which comes from the test description.
    * The `opts` argument can be used to customize screenshot options.
    */
-  compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotCompare>;
+  compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
 
   /**
    * Find an element that matches the selector, which is the same as

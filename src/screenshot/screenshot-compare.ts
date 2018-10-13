@@ -19,8 +19,10 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   // the "id" is what we use as a key to compare to sets of data
   // the "image" is a hash of the image file name
   // and what we can use to quickly see if they're identical or not
+  const screenshotId = getScreenshotId(emulateConfig, desc);
+
   const screenshot: d.Screenshot = {
-    id: getScreenshotId(emulateConfig, desc),
+    id: screenshotId,
     image: localImageName,
     device: emulateConfig.device,
     userAgent: emulateConfig.userAgent,
@@ -31,73 +33,81 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
-    isMobile: emulateConfig.viewport.isMobile
-  };
-
-  // write the local build data
-  await Promise.all([
-    writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot),
-    writeScreenshotImage(imagePath, screenshotBuf)
-  ]);
-
-  // this is the data that'll get used by the jest matcher
-  const compare: d.ScreenshotCompare = {
-    id: screenshot.id,
-    desc: screenshot.desc,
-    expectedImage: screenshot.image,
-    receivedImage: screenshot.image,
-    mismatchedPixels: 0,
-    mismatchedRatio: 0,
-    device: emulateConfig.device,
-    userAgent: emulateConfig.userAgent,
-    width: emulateConfig.viewport.width,
-    height: emulateConfig.viewport.height,
-    deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-    hasTouch: emulateConfig.viewport.hasTouch,
-    isLandscape: emulateConfig.viewport.isLandscape,
     isMobile: emulateConfig.viewport.isMobile,
-    allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
-    allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
-    testPath: testPath
+    diff: {
+      id: screenshotId,
+      desc: desc,
+      imageA: localImageName,
+      imageB: localImageName,
+      mismatchedPixels: 0,
+      device: emulateConfig.device,
+      userAgent: emulateConfig.userAgent,
+      width: emulateConfig.viewport.width,
+      height: emulateConfig.viewport.height,
+      deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
+      hasTouch: emulateConfig.viewport.hasTouch,
+      isLandscape: emulateConfig.viewport.isLandscape,
+      isMobile: emulateConfig.viewport.isMobile,
+      allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
+      allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
+      testPath: testPath
+    }
   };
 
   if (screenshotBuildData.updateMaster) {
     // this data is going to become the master data
     // so no need to compare with previous versions
-    return compare;
+
+    // write the build data
+    await Promise.all([
+      writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot),
+      writeScreenshotImage(imagePath, screenshotBuf)
+    ]);
+
+    return screenshot.diff;
   }
 
   const masterScreenshotImage = screenshotBuildData.masterScreenshots[screenshot.id];
 
   if (!masterScreenshotImage) {
     // didn't find a master screenshot to compare it to
-    return compare;
+
+    // write the build data
+    await Promise.all([
+      writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot),
+      writeScreenshotImage(imagePath, screenshotBuf)
+    ]);
+
+    return screenshot.diff;
   }
 
+  await writeScreenshotImage(imagePath, screenshotBuf);
+
   // set that the master data image is the image we're expecting
-  compare.expectedImage = masterScreenshotImage;
+  screenshot.diff.imageA = masterScreenshotImage;
 
   const naturalWidth = Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor);
   const naturalHeight = Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor);
 
   // compare only if the image hashes are different
-  if (compare.expectedImage !== compare.receivedImage) {
+  if (screenshot.diff.imageA !== screenshot.diff.imageB) {
     // compare the two images pixel by pixel to
     // figure out a mismatch value
-    compare.mismatchedPixels = await getMismatchedPixels(
+
+    screenshot.diff.mismatchedPixels = await getMismatchedPixels(
       screenshotBuildData.cacheDir,
       screenshotBuildData.imagesDir,
-      compare.expectedImage,
-      compare.receivedImage,
+      screenshot.diff.imageA,
+      screenshot.diff.imageB,
       naturalWidth,
       naturalHeight,
       pixelmatchThreshold
     );
   }
 
-  compare.mismatchedRatio = (compare.mismatchedPixels / (naturalWidth * naturalHeight));
+  await writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot);
 
-  return compare;
+  return screenshot.diff;
 }
 
 

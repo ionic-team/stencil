@@ -57,14 +57,13 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
   } else {
     // screen shot not enabled, so just skip over all the logic
     page.compareScreenshot = async () => {
-      const compare: d.ScreenshotCompare = {
-        mismatchedRatio: 0,
+      const diff: d.ScreenshotDiff = {
         mismatchedPixels: 0,
         allowableMismatchedPixels: 1,
         allowableMismatchedRatio: 1.0,
         desc: ''
       };
-      return compare;
+      return diff;
     };
   }
 }

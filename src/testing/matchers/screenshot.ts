@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 
 
-export function toMatchScreenshot(compare: d.ScreenshotCompare, opts: d.MatchScreenshotOptions = {}) {
+export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreenshotOptions = {}) {
   if (!compare) {
     throw new Error(`expect toMatchScreenshot value is null`);
   }
@@ -20,9 +20,11 @@ export function toMatchScreenshot(compare: d.ScreenshotCompare, opts: d.MatchScr
     if (opts.allowableMismatchedRatio < 0 || opts.allowableMismatchedRatio > 1) {
       throw new Error(`expect toMatchScreenshot() allowableMismatchedRatio must be a value ranging from 0 to 1`);
     }
+
+    const mismatchedRatio = (compare.mismatchedPixels / ((compare.width * compare.deviceScaleFactor) * (compare.height * compare.deviceScaleFactor)));
     return {
-      message: () => `${device}: screenshot has a mismatch ratio of "${compare.mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${opts.allowableMismatchedRatio}"`,
-      pass: (compare.mismatchedRatio <= opts.allowableMismatchedRatio),
+      message: () => `${device}: screenshot has a mismatch ratio of "${mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${opts.allowableMismatchedRatio}"`,
+      pass: (mismatchedRatio <= opts.allowableMismatchedRatio),
     };
   }
 
@@ -37,9 +39,10 @@ export function toMatchScreenshot(compare: d.ScreenshotCompare, opts: d.MatchScr
   }
 
   if (typeof compare.allowableMismatchedRatio === 'number') {
+    const mismatchedRatio = (compare.mismatchedPixels / ((compare.width * compare.deviceScaleFactor) * (compare.height * compare.deviceScaleFactor)));
     return {
-      message: () => `${device}: screenshot has a mismatch ratio of "${compare.mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${compare.allowableMismatchedRatio}"`,
-      pass: (compare.mismatchedRatio <= compare.allowableMismatchedRatio),
+      message: () => `${device}: screenshot has a mismatch ratio of "${mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${compare.allowableMismatchedRatio}"`,
+      pass: (mismatchedRatio <= compare.allowableMismatchedRatio),
     };
   }
 

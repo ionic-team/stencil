@@ -12,7 +12,6 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   await connector.initBuild({
     buildId: createBuildId(),
     buildMessage: createBuildMessage(),
-    buildAuthor: '',
     buildTimestamp: Date.now(),
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
@@ -42,23 +41,20 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   try {
     const completeTimespan = config.logger.createTimeSpan(`screenshot, completeTimespan started`, true);
-    const currentBuild = await connector.completeBuild();
+    let results = await connector.completeBuild(masterBuild);
     completeTimespan.finish(`screenshot, completeTimespan finished`);
 
-    let publishResults: d.PublishBuildResults = null;
-    if (currentBuild) {
+    if (results) {
       const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
-      publishResults = await connector.publishBuild(currentBuild);
+      results = await connector.publishBuild(results);
       publishTimespan.finish(`screenshot, publishBuild finished`);
     }
 
-    if (publishResults) {
-      if (typeof publishResults.screenshotsCompared === 'number') {
-        config.logger.info(`screenshots images compared: ${publishResults.screenshotsCompared}`);
-      }
+    if (results && results.compare) {
+      config.logger.info(`screenshots compared: ${results.compare.diffs.length}`);
 
-      if (typeof publishResults.compareUrl === 'string') {
-        config.logger.info(config.logger.magenta(publishResults.compareUrl));
+      if (typeof results.compare.url === 'string') {
+        config.logger.info(config.logger.magenta(results.compare.url));
       }
     }
 

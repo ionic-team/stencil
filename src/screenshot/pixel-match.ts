@@ -6,7 +6,8 @@ import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
 
-export async function getMismatchedPixels(cacheDir: string, imageDir: string, masterImageName: string, localImageName: string, width: number, height: number, pixelmatchThreshold: number) {
+export async function getMismatchedPixels(cacheDir: string, imagesDir: string, masterImageName: string, localImageName: string, width: number, height: number, pixelmatchThreshold: number) {
+
   const cacheKey = getCacheKey(masterImageName, localImageName, width, height, pixelmatchThreshold);
   const diffJsonPath = join(cacheDir, `mismatch_${cacheKey}.json.log`);
 
@@ -18,8 +19,8 @@ export async function getMismatchedPixels(cacheDir: string, imageDir: string, ma
   } catch (e) {}
 
   const images = await Promise.all([
-    readImage(imageDir, masterImageName),
-    readImage(imageDir, localImageName)
+    readImage(imagesDir, masterImageName),
+    readImage(imagesDir, localImageName)
   ]);
 
   const mismatchedPixels = pixelmatch(images[0], images[1], null, width, height, {

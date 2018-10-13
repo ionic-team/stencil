@@ -3,20 +3,48 @@ import * as d from '.';
 
 export interface ScreenshotConnector {
   initBuild(opts: d.ScreenshotConnectorOptions): Promise<void>;
-  completeBuild(): Promise<d.ScreenshotBuild>;
+  completeBuild(masterBuild: d.ScreenshotBuild): Promise<ScreenshotBuildResults>;
   getMasterBuild(): Promise<d.ScreenshotBuild>;
   pullMasterBuild(): Promise<void>;
-  publishBuild(build: d.ScreenshotBuild): Promise<d.PublishBuildResults>;
+  publishBuild(buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotBuildResults>;
   generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
   toJson(masterBuild: d.ScreenshotBuild): string;
 }
 
 
+export interface ScreenshotBuildResults {
+  masterBuild: d.ScreenshotBuild;
+  currentBuild: d.ScreenshotBuild;
+  compare: ScreenshotCompareResults;
+}
+
+
+export interface ScreenshotCompareResults {
+  id: string;
+  a: {
+    id: string;
+    message: string;
+    author: string;
+    url: string;
+  };
+  b: {
+    id: string;
+    message: string;
+    author: string;
+    url: string;
+  };
+  timestamp: number;
+  url: string;
+  diffs: d.ScreenshotDiff[];
+}
+
+
 export interface ScreenshotConnectorOptions {
   buildId: string;
   buildMessage: string;
-  buildAuthor: string;
+  buildAuthor?: string;
+  buildUrl?: string;
   buildTimestamp: number;
   logger: d.Logger;
   rootDir: string;
@@ -52,17 +80,10 @@ export interface ScreenshotBuildData {
 export interface ScreenshotBuild {
   id: string;
   message: string;
-  author: string;
+  author?: string;
+  url?: string;
   timestamp: number;
   screenshots: Screenshot[];
-}
-
-
-export interface PublishBuildResults {
-  compareUrl?: string;
-  screenshotsCompared?: number;
-  masterBuild?: d.ScreenshotBuild;
-  currentBuild?: d.ScreenshotBuild;
 }
 
 
@@ -79,16 +100,16 @@ export interface Screenshot {
   isLandscape?: boolean;
   isMobile?: boolean;
   testPath?: string;
+  diff?: ScreenshotDiff;
 }
 
 
-export interface ScreenshotCompare {
+export interface ScreenshotDiff {
   mismatchedPixels: number;
-  mismatchedRatio: number;
   id?: string;
   desc?: string;
-  expectedImage?: string;
-  receivedImage?: string;
+  imageA?: string;
+  imageB?: string;
   device?: string;
   userAgent?: string;
   width?: number;

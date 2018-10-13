@@ -1,7 +1,7 @@
 import * as d from '../declarations';
-import * as fs from './screenshot-fs';
-import * as path from 'path';
-import * as os from 'os';
+import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
 
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
@@ -16,6 +16,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   buildId: string;
   buildMessage: string;
   buildAuthor: string;
+  buildUrl: string;
   buildTimestamp: number;
   screenshotDir: string;
   imagesDir: string;
@@ -32,7 +33,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     this.buildId = opts.buildId;
     this.buildMessage = opts.buildMessage || '';
-    this.buildAuthor = opts.buildAuthor || '';
+    this.buildAuthor = opts.buildAuthor;
+    this.buildUrl = opts.buildUrl;
     this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now(),
     this.cacheDir = opts.cacheDir;
     this.packageDir = opts.packageDir;
@@ -78,23 +80,23 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       this.buildsDirName = opts.buildsDirName;
     }
 
-    this.screenshotDir = path.join(this.rootDir, this.screenshotDirName);
-    this.imagesDir = path.join(this.screenshotDir, this.imagesDirName);
-    this.buildsDir = path.join(this.screenshotDir, this.buildsDirName);
-    this.masterBuildFilePath = path.join(this.buildsDir, this.masterBuildFileName);
-    this.currentBuildDir = path.join(os.tmpdir(), 'screenshot-build-' + this.buildId);
+    this.screenshotDir = join(this.rootDir, this.screenshotDirName);
+    this.imagesDir = join(this.screenshotDir, this.imagesDirName);
+    this.buildsDir = join(this.screenshotDir, this.buildsDirName);
+    this.masterBuildFilePath = join(this.buildsDir, this.masterBuildFileName);
+    this.currentBuildDir = join(tmpdir(), 'screenshot-build-' + this.buildId);
 
     this.logger.debug(`screenshotDirPath: ${this.screenshotDir}`);
     this.logger.debug(`imagesDirPath: ${this.imagesDir}`);
     this.logger.debug(`buildsDirPath: ${this.buildsDir}`);
     this.logger.debug(`currentBuildDir: ${this.currentBuildDir}`);
 
-    await fs.mkDir(this.screenshotDir);
+    await mkDir(this.screenshotDir);
 
     await Promise.all([
-      fs.mkDir(this.imagesDir),
-      fs.mkDir(this.buildsDir),
-      fs.mkDir(this.currentBuildDir)
+      mkDir(this.imagesDir),
+      mkDir(this.buildsDir),
+      mkDir(this.currentBuildDir)
     ]);
   }
 
@@ -104,34 +106,63 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     let masterBuild: d.ScreenshotBuild = null;
 
     try {
-      masterBuild = JSON.parse(await fs.readFile(this.masterBuildFilePath));
+      masterBuild = JSON.parse(await readFile(this.masterBuildFilePath));
     } catch (e) {}
 
     return masterBuild;
   }
 
-  async completeBuild() {
-    const filePaths = (await fs.readDir(this.currentBuildDir)).map(f => path.join(this.currentBuildDir, f)).filter(f => f.endsWith('.json'));
-    const screenshots = await Promise.all(filePaths.map(async f => JSON.parse(await fs.readFile(f)) as d.Screenshot));
+  async completeBuild(masterBuild: d.ScreenshotBuild) {
+    const filePaths = (await readDir(this.currentBuildDir)).map(f => join(this.currentBuildDir, f)).filter(f => f.endsWith('.json'));
+    const screenshots = await Promise.all(filePaths.map(async f => JSON.parse(await readFile(f)) as d.Screenshot));
 
     this.sortScreenshots(screenshots);
 
-    const build: d.ScreenshotBuild = {
-      id: this.buildId,
-      message: this.buildMessage,
-      author: this.buildAuthor,
-      timestamp: this.buildTimestamp,
-      screenshots: screenshots
+    const results: d.ScreenshotBuildResults = {
+      masterBuild: masterBuild,
+      currentBuild: {
+        id: this.buildId,
+        message: this.buildMessage,
+        author: this.buildAuthor,
+        timestamp: this.buildTimestamp,
+        screenshots: screenshots
+      },
+      compare: {
+        id: `${masterBuild.id}-${this.buildId}`,
+        a: {
+          id: masterBuild.id,
+          message: masterBuild.message,
+          author: masterBuild.author,
+          url: masterBuild.url
+        },
+        b: {
+          id: this.buildId,
+          message: this.buildMessage,
+          author: this.buildAuthor,
+          url: this.buildUrl,
+        },
+        url: null,
+        timestamp: this.buildTimestamp,
+        diffs: []
+      }
     };
 
-    await fs.emptyDir(this.currentBuildDir);
-    await fs.rmDir(this.currentBuildDir);
+    results.currentBuild.screenshots.forEach(screenshot => {
+      screenshot.diff.device = (screenshot.diff.device || screenshot.diff.userAgent);
+      results.compare.diffs.push(screenshot.diff);
+      delete screenshot.diff;
+    });
 
-    return build;
+    this.sortCompares(results.compare.diffs);
+
+    await emptyDir(this.currentBuildDir);
+    await rmDir(this.currentBuildDir);
+
+    return results;
   }
 
-  async publishBuild(_build: d.ScreenshotBuild) {
-    return null as d.PublishBuildResults;
+  async publishBuild(results: d.ScreenshotBuildResults) {
+    return results;
   }
 
   async generateJsonpDataUris(build: d.ScreenshotBuild) {
@@ -140,14 +171,14 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         const screenshot = build.screenshots[i];
 
         const jsonpFileName = `screenshot_${screenshot.image}.js`;
-        const jsonFilePath = path.join(this.cacheDir, jsonpFileName);
-        const jsonpExists = await fs.fileExists(jsonFilePath);
+        const jsonFilePath = join(this.cacheDir, jsonpFileName);
+        const jsonpExists = await fileExists(jsonFilePath);
 
         if (!jsonpExists) {
-          const imageFilePath = path.join(this.imagesDir, screenshot.image);
-          const imageBuf = await fs.readFileBuffer(imageFilePath);
+          const imageFilePath = join(this.imagesDir, screenshot.image);
+          const imageBuf = await readFileBuffer(imageFilePath);
           const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString('base64')}");`;
-          await fs.writeFile(jsonFilePath, jsonpContent);
+          await writeFile(jsonFilePath, jsonpContent);
         }
       }
     }
@@ -181,6 +212,42 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
   sortScreenshots(screenshots: d.Screenshot[]) {
     return screenshots.sort((a, b) => {
+      if (a.desc && b.desc) {
+        if (a.desc.toLowerCase() < b.desc.toLowerCase()) return -1;
+        if (a.desc.toLowerCase() > b.desc.toLowerCase()) return 1;
+      }
+
+      if (a.device && b.device) {
+        if (a.device.toLowerCase() < b.device.toLowerCase()) return -1;
+        if (a.device.toLowerCase() > b.device.toLowerCase()) return 1;
+      }
+
+      if (a.userAgent && b.userAgent) {
+        if (a.userAgent.toLowerCase() < b.userAgent.toLowerCase()) return -1;
+        if (a.userAgent.toLowerCase() > b.userAgent.toLowerCase()) return 1;
+      }
+
+      if (a.width < b.width) return -1;
+      if (a.width > b.width) return 1;
+
+      if (a.height < b.height) return -1;
+      if (a.height > b.height) return 1;
+
+      if (a.id < b.id) return -1;
+      if (a.id > b.id) return 1;
+
+      return 0;
+    });
+  }
+
+  sortCompares(compares: d.ScreenshotDiff[]) {
+    return compares.sort((a, b) => {
+      if (a.allowableMismatchedPixels > b.allowableMismatchedPixels) return -1;
+      if (a.allowableMismatchedPixels < b.allowableMismatchedPixels) return 1;
+
+      if (a.allowableMismatchedRatio > b.allowableMismatchedRatio) return -1;
+      if (a.allowableMismatchedRatio < b.allowableMismatchedRatio) return 1;
+
       if (a.desc && b.desc) {
         if (a.desc.toLowerCase() < b.desc.toLowerCase()) return -1;
         if (a.desc.toLowerCase() > b.desc.toLowerCase()) return 1;
