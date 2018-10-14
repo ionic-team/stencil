@@ -19,6 +19,7 @@ if (success) {
     rollup.rollup({
       input: ENTRY_FILE,
       external: [
+        'url'
       ],
       plugins: [
         rollupResolve(),

@@ -1,3 +1,5 @@
+import { URL } from 'url';
+
 
 export class MockLocation {
   protocol = '';
