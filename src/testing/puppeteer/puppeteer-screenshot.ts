@@ -60,8 +60,11 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
       const diff: d.ScreenshotDiff = {
         mismatchedPixels: 0,
         allowableMismatchedPixels: 1,
-        allowableMismatchedRatio: 1.0,
-        desc: ''
+        allowableMismatchedRatio: 1,
+        desc: '',
+        width: 1,
+        height: 1,
+        deviceScaleFactor: 1
       };
       return diff;
     };
