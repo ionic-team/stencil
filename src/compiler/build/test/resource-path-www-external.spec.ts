@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { mockDom } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 import * as path from 'path';
@@ -25,7 +26,9 @@ describe('www loader/core resourcesUrl', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
+    const url = 'http://emmitts-garage.com/?core=esm';
+    const html = c.fs.readFileSync(wwwOutput.indexHtml);
+    const { win, doc } = mockDom(url, html);
 
     const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
@@ -34,8 +37,8 @@ describe('www loader/core resourcesUrl', () => {
     const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcesUrl).toBe('http://emmitts-garage.com/build/app/');
-    expect(coreScriptSrc).toBe('http://emmitts-garage.com/build/app/app.core.js');
+    expect(resourcesUrl.endsWith('build/app/')).toBe(true);
+    expect(coreScriptSrc.endsWith('build/app/app.core.js')).toBe(true);
 
     const coreContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'));
     execScript(win, doc, coreContent);
@@ -62,7 +65,9 @@ describe('www loader/core resourcesUrl', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
+    const url = 'http://emmitts-garage.com/?core=esm';
+    const html = c.fs.readFileSync(wwwOutput.indexHtml);
+    const { win, doc } = mockDom(url, html);
 
     const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
@@ -95,7 +100,9 @@ describe('www loader/core resourcesUrl', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
+    const url = 'http://emmitts-garage.com/?core=esm';
+    const html = c.fs.readFileSync(wwwOutput.indexHtml);
+    const { win, doc } = mockDom(url, html);
 
     const loaderContent = await c.fs.readFile(path.join(root, 'User', 'testing', 'www', 'build', 'app.js'));
     execScript(win, doc, loaderContent);
@@ -112,43 +119,6 @@ describe('www loader/core resourcesUrl', () => {
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
   });
-
-
-  function mockDom(htmlFilePath: string): { win: Window, doc: HTMLDocument } {
-    const jsdom = require('jsdom');
-
-    const html = c.fs.readFileSync(htmlFilePath);
-
-    const dom = new jsdom.JSDOM(html, {
-      url: 'http://emmitts-garage.com/?core=esm'
-    });
-
-    const win = dom.window;
-    const doc = win.document;
-
-    win.fetch = {};
-
-    win.CSS = {
-      supports: () => true
-    };
-
-    win.requestAnimationFrame = (cb: Function) => {
-      setTimeout(cb);
-    };
-
-    win.CustomEvent = class {};
-
-    win.customElements = {
-      define: (tag: string) => $definedTag[tag] = true,
-      get: (tag: string) => $definedTag[tag]
-    };
-
-    const $definedTag = {};
-
-    win.dispatchEvent = () => true;
-
-    return { win, doc };
-  }
 
 
   function execScript(win: any, doc: any, jsContent: string) {

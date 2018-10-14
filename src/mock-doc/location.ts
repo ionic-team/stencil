@@ -1,7 +1,5 @@
 
-
 export class MockLocation {
-  href = '';
   protocol = '';
   host = '';
   hostname = '';
@@ -12,6 +10,23 @@ export class MockLocation {
   username  = '';
   password = '';
   origin = '';
+
+  private _href = '';
+  get href() {
+    return this._href;
+  }
+  set href(value) {
+    const url = new URL(value);
+    this.protocol = url.protocol;
+    this.host = url.host;
+    this.port = url.port;
+    this.pathname = url.pathname;
+    this.search = url.search;
+    this.hash = url.hash;
+    this.username = url.username;
+    this.password = url.password;
+    this.origin = url.origin;
+  }
 
   assign(_url: string) {
     //

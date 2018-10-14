@@ -76,7 +76,15 @@ export class MockWindow {
     return this._location;
   }
   set location(value) {
-    this._location = value;
+    if (typeof value === 'string') {
+      if (!this._location) {
+        this._location = new MockLocation();
+      }
+      this._location.href = value;
+
+    } else {
+      this._location = value;
+    }
   }
 
   matchMedia() {

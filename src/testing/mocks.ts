@@ -19,6 +19,17 @@ import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-do
 export { mockDocument, mockWindow };
 
 
+export function mockDom(url: string, html: string): { win: Window, doc: HTMLDocument } {
+  const win = mockWindow() as any;
+  win.location.href = url;
+
+  const doc = mockDocument(html);
+  win.document = doc;
+
+  return { win, doc };
+}
+
+
 export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
   const hydrateResults: d.HydrateResults = {
     diagnostics: []
