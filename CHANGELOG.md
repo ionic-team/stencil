@@ -1,5 +1,5 @@
-<a name="0.14.0-4"></a>
-# 🌇 [Prerelease] [0.14.0-4](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-4) (2018-10-13)
+<a name="0.14.0-5"></a>
+# 🏄 [Prerelease] [0.14.0-5](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-5) (2018-10-14)
 
 ### Features
 
@@ -40,6 +40,7 @@
 * **screenshot:** disable GPU and antialiasing ([cab2b87](https://github.com/ionic-team/stencil/commit/cab2b87))
 * **screenshot:** provide compare url and update base connector ([3bbd609](https://github.com/ionic-team/stencil/commit/3bbd609))
 * **test:** do not print tsconfig errors during testing ([83ecade](https://github.com/ionic-team/stencil/commit/83ecade))
+* **test:** mock e2e test data when not doing screenshot tests ([339d842](https://github.com/ionic-team/stencil/commit/339d842))
 * **testing:** parse user tsconfig for unit tests ([7c8fc4f](https://github.com/ionic-team/stencil/commit/7c8fc4f))
 * **tsconfig:** parse tsconfig w/ comments ([e1b54ea](https://github.com/ionic-team/stencil/commit/e1b54ea))
 * **tsconfig:** fix ts.findConfigFile ([d473d7a](https://github.com/ionic-team/stencil/commit/d473d7a))
