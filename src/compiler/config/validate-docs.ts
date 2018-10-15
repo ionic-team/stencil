@@ -15,17 +15,6 @@ export function validateDocs(config: d.Config) {
       config.outputTargets.push(outputTarget);
     }
 
-    const docsOutputTargets = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
-    docsOutputTargets.forEach(outputTarget => {
-      if (typeof outputTarget.jsonFile !== 'string' && typeof config.flags.docsJson === 'string') {
-        outputTarget.jsonFile = config.flags.docsJson;
-      }
-
-      if (typeof outputTarget.readmeDir !== 'string' && config.flags.docs) {
-        outputTarget.readmeDir = config.srcDir;
-      }
-    });
-
     const docsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
     docsOutputs.forEach(outputTarget => {
       validateDocsOutputTarget(config, outputTarget);
@@ -41,6 +30,14 @@ export function validateDocs(config: d.Config) {
 
 
 function validateDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocs) {
+  if (typeof config.flags.docsJson === 'string' && typeof outputTarget.jsonFile !== 'string') {
+    outputTarget.jsonFile = config.flags.docsJson;
+  }
+
+  if (config.flags.docs && typeof outputTarget.readmeDir !== 'string') {
+    outputTarget.readmeDir = config.srcDir;
+  }
+
   if (typeof outputTarget.readmeDir === 'string' && !config.sys.path.isAbsolute(outputTarget.readmeDir)) {
     outputTarget.readmeDir = pathJoin(config, config.rootDir, outputTarget.readmeDir);
   }
