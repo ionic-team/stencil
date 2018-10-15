@@ -1,62 +1,105 @@
 
 
-export function createCSSStyleDeclaration() {
-  const style: {[prop: string]: string } = {};
+export class CSSStyleDeclaration {
+  private _styles = new Map<string, string>();
 
-  Object.defineProperties(style, {
+  setProperty(prop: string, value: string) {
+    prop = jsCaseToCssCase(prop);
 
-    setProperty: {
-      value: function (name: string, value: string) {
-        name = cssCaseToJsCase(name);
+    if (value == null || value === '') {
+      this._styles.delete(prop);
+    } else {
+      this._styles.set(prop, String(value));
+    }
+  }
 
-        if (value === '') {
-          delete this[name];
-        } else {
-          this[name] = value;
-        }
-      }
-    },
+  getPropertyValue(prop: string) {
+    prop = jsCaseToCssCase(prop);
+    return String(this._styles.get(prop) || '');
+  }
 
-    getPropertyValue: {
-      value: function (name: string) {
-        return this[name].toString();
-      }
-    },
+  removeProperty(prop: string) {
+    prop = jsCaseToCssCase(prop);
+    this._styles.delete(prop);
+  }
 
-    removeProperty: {
-      value: function (name: string) {
-        delete this[cssCaseToJsCase(name)];
-      }
-    },
+  get length() {
+    return this._styles.size;
+  }
 
-    cssText: {
-      get: function() {
-        const cssText: string[] = [];
+  get cssText() {
+    const cssText: string[] = [];
 
-        Object.keys(style).forEach(name => {
-          if (typeof (style as any)[name] !== 'function') {
-            if ((style as any)[name] === '') {
-              delete (style as any)[name];
-            } else {
-              cssText.push(jsCaseToCssCase(name), ': ', (style as any)[name], '; ');
-            }
-          }
-        });
+    this._styles.forEach((value, prop) => {
+      cssText.push(`${prop}: ${value};`);
+    });
 
-        return cssText.join('').trim();
-      },
-      set: function(value: string) {
-        value;
-      }
+    return cssText.join(' ').trim();
+  }
+
+  get cssTextMinified() {
+    const cssText: string[] = [];
+
+    this._styles.forEach((value, prop) => {
+      cssText.push(`${prop}:${value}`);
+    });
+
+    return cssText.join(';').trim();
+  }
+
+  set cssText(cssText: string) {
+    if (cssText == null || cssText === '') {
+      this._styles.clear();
+      return;
     }
 
-  });
-
-  return style;
+    cssText.split(';').forEach(rule => {
+      rule = rule.trim();
+      if (rule.length > 0) {
+        const splt = rule.split(':');
+        if (splt.length > 1) {
+          const prop = splt[0].trim();
+          const value = splt[1].trim();
+          if (prop !== '' && value !== '') {
+            this._styles.set(jsCaseToCssCase(prop), value);
+          }
+        }
+      }
+    });
+  }
 }
 
 
+export function createCSSStyleDeclaration() {
+  return new Proxy(
+    new CSSStyleDeclaration(),
+    cssProxyHandler
+  );
+}
+
+
+const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
+  get: function(cssStyle, prop: string) {
+    if (prop in cssStyle) {
+      return (cssStyle as any)[prop];
+    }
+    prop = cssCaseToJsCase(prop);
+    return cssStyle.getPropertyValue(prop);
+  },
+
+  set: function(cssStyle, prop: string, value) {
+    if (prop in cssStyle) {
+      (cssStyle as any)[prop] = value;
+    } else {
+      cssStyle.setProperty(prop, value);
+    }
+    return true;
+  }
+};
+
+
 function cssCaseToJsCase(str: string) {
+  // font-size to fontSize
   if (str.length > 1 && str.includes('-')) {
     str = str.toLowerCase().split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
     str = str.substr(0, 1).toLowerCase() + str.substr(1);
@@ -67,6 +110,7 @@ function cssCaseToJsCase(str: string) {
 
 
 function jsCaseToCssCase(str: string) {
+  // fontSize to font-size
   if (str.length > 1 && (!str.includes('-') && /[A-Z]/.test(str))) {
     str = str.replace(/([A-Z])/g, g => ' ' + g[0]).trim().replace(/ /g, '-').toLowerCase();
   }

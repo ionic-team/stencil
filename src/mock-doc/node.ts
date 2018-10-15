@@ -1,4 +1,4 @@
-import { createCSSStyleDeclaration } from './css-style-declaration';
+import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
@@ -192,6 +192,13 @@ export class MockElement extends MockNode {
   }
 
   getAttribute(name: string) {
+    name = name.toLowerCase();
+    if (name === 'style') {
+      if (this._style && this._style.length > 0) {
+        return this.style.cssText;
+      }
+      return null;
+    }
     return this.getAttributeNS(null, name);
   }
 
@@ -245,6 +252,10 @@ export class MockElement extends MockNode {
   }
 
   hasAttribute(name: string) {
+    name = name.toLowerCase();
+    if (name === 'style') {
+      return (!!this._style && this._style.length > 0);
+    }
     return this.getAttribute(name) !== null;
   }
 
@@ -310,7 +321,12 @@ export class MockElement extends MockNode {
   }
 
   removeAttribute(name: string) {
-    this.removeAttributeNS(null, name);
+    name = name.toLowerCase();
+    if (name === 'style') {
+      this._style = null;
+    } else {
+      this.removeAttributeNS(null, name);
+    }
   }
 
   removeAttributeNS(namespaceURI: string, name: string) {
@@ -325,7 +341,12 @@ export class MockElement extends MockNode {
   }
 
   setAttribute(name: string, value: any) {
-    this.setAttributeNS(null, name, value);
+    name = name.toLowerCase();
+    if (name === 'style') {
+      this.style = value;
+    } else {
+      this.setAttributeNS(null, name, value);
+    }
   }
 
   setAttributeNS(namespaceURI: string, name: string, value: any) {
@@ -343,7 +364,7 @@ export class MockElement extends MockNode {
     }
   }
 
-  private _style: any;
+  private _style: CSSStyleDeclaration = null;
   get style() {
     if (!this._style) {
       this._style = createCSSStyleDeclaration();
@@ -351,7 +372,15 @@ export class MockElement extends MockNode {
     return this._style;
   }
   set style(style: any) {
-    this._style = style;
+    if (typeof style === 'string') {
+      if (!this._style) {
+        this._style = createCSSStyleDeclaration();
+      }
+      this._style.cssText = style;
+
+    } else {
+      this._style = style;
+    }
   }
 
   get tabIndex() { return parseInt(this.getAttribute('tabindex') || '-1', 10); }

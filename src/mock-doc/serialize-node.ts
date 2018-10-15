@@ -8,12 +8,14 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
     text: []
   };
 
-  if (opts.pretty && typeof opts.indentSpaces !== 'number') {
-    opts.indentSpaces = 2;
-  }
+  if (opts.pretty) {
+    if (typeof opts.indentSpaces !== 'number') {
+      opts.indentSpaces = 2;
+    }
 
-  if (opts.pretty && typeof opts.newLines !== 'boolean') {
-    opts.newLines = true;
+    if (typeof opts.newLines !== 'boolean') {
+      opts.newLines = true;
+    }
   }
 
   if (typeof opts.removeAttributeQuotes !== 'boolean') {
@@ -28,8 +30,13 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
     opts.collapseBooleanAttributes = false;
   }
 
+  if (typeof opts.removeHtmlComments !== 'boolean') {
+    opts.removeHtmlComments = false;
+  }
+
   if (opts.outerHTML) {
     serializeToHtml(elm, opts, output);
+
   } else {
     for (let i = 0; i < elm.childNodes.length; i++) {
       serializeToHtml(elm.childNodes[i], opts, output);
@@ -39,6 +46,7 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
   if (output.text[0] === '\n') {
     output.text.shift();
   }
+
   if (output.text[output.text.length - 1] === '\n') {
     output.text.pop();
   }
@@ -126,9 +134,12 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
         }
       }
 
-      const cssText = (node as MockElement).style.cssText;
-      if (cssText) {
-        output.text.push(' style="' + cssText + '">');
+      if ((node as MockElement).hasAttribute('style')) {
+        output.text.push(` style="${
+          opts.minifyInlineStyles ? ((node as MockElement).style.cssTextMinified || (node as MockElement).style.cssText) :
+          ((node as MockElement).style.cssText)
+        }">`);
+
       } else {
         output.text.push('>');
       }
@@ -201,7 +212,7 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
       }
     }
 
-  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE) {
+  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE && !opts.removeHtmlComments) {
     if (opts.newLines) {
       output.text.push('\n');
     }
@@ -225,7 +236,7 @@ const NBSP_REGEX = /\u00a0/g;
 const DOUBLE_QUOTE_REGEX = /"/g;
 const LT_REGEX = /</g;
 const GT_REGEX = />/g;
-const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>]+$/;
+const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
@@ -256,9 +267,11 @@ export interface SerializeElementOptions {
   excludeTagContent?: string[];
   excludeTags?: string[];
   indentSpaces?: number;
+  minifyInlineStyles?: boolean;
   newLines?: boolean;
   outerHTML?: boolean;
   pretty?: boolean;
   removeAttributeQuotes?: boolean;
+  removeHtmlComments?: boolean;
   removeEmptyAttributes?: boolean;
 }
