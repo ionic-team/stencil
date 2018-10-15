@@ -12,16 +12,19 @@ export function validateDocs(config: d.Config) {
       const outputTarget: d.OutputTargetDocs = {
         type: 'docs'
       };
-
-      if (typeof config.flags.docsJson === 'string') {
-        outputTarget.jsonFile = config.flags.docsJson;
-
-      } else if (config.flags.docs) {
-        outputTarget.readmeDir = config.srcDir;
-      }
-
       config.outputTargets.push(outputTarget);
     }
+
+    const docsOutputTargets = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
+    docsOutputTargets.forEach(outputTarget => {
+      if (typeof outputTarget.jsonFile !== 'string' && typeof config.flags.docsJson === 'string') {
+        outputTarget.jsonFile = config.flags.docsJson;
+      }
+
+      if (typeof outputTarget.readmeDir !== 'string' && config.flags.docs) {
+        outputTarget.readmeDir = config.srcDir;
+      }
+    });
 
     const docsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
     docsOutputs.forEach(outputTarget => {

@@ -51,6 +51,18 @@ describe('validateDocs', () => {
     expect(o.readmeDir).toContain('my-dir');
   });
 
+  it('docs-json w/ existing docs config', () => {
+    config.flags.docsJson = 'some/path/docs.json';
+    config.outputTargets.push(
+      {
+        type: 'docs'
+      } as d.OutputTargetDocs
+    );
+    validateConfig(config);
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    expect(o.jsonFile).toContain('docs.json');
+  });
+
   it('docs-json flag', () => {
     config.flags.docsJson = 'some/path/docs.json';
     validateConfig(config);
