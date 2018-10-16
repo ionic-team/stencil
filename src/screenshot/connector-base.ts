@@ -123,6 +123,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         id: this.buildId,
         message: this.buildMessage,
         author: this.buildAuthor,
+        url: this.buildUrl,
         timestamp: this.buildTimestamp,
         screenshots: screenshots
       };
@@ -134,6 +135,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         id: this.buildId,
         message: this.buildMessage,
         author: this.buildAuthor,
+        url: this.buildUrl,
         timestamp: this.buildTimestamp,
         screenshots: screenshots
       },
