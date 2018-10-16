@@ -14,7 +14,6 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
-import { runtimeHelpers } from './runtime-helpers';
 
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
@@ -369,10 +368,6 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   if (__BUILD_CONDITIONALS__.devInspector) {
     generateDevInspector(namespace, win, plt, components);
-  }
-
-  if (__BUILD_CONDITIONALS__.isDev) {
-    runtimeHelpers(win);
   }
 
   // register all the components now that everything's ready
