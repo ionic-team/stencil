@@ -118,6 +118,16 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     this.sortScreenshots(screenshots);
 
+    if (!masterBuild) {
+      masterBuild = {
+        id: this.buildId,
+        message: this.buildMessage,
+        author: this.buildAuthor,
+        timestamp: this.buildTimestamp,
+        screenshots: screenshots
+      };
+    }
+
     const results: d.ScreenshotBuildResults = {
       masterBuild: masterBuild,
       currentBuild: {
