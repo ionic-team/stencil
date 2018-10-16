@@ -1,5 +1,5 @@
-<a name="0.14.0-6"></a>
-# 🐣 [Prerelease] [0.14.0-6](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-6) (2018-10-16)
+<a name="0.14.0-7"></a>
+# 😸 [Prerelease] [0.14.0-7](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-7) (2018-10-16)
 
 ### Features
 
@@ -41,6 +41,7 @@
 * **resolve:** fix bundled node resolved plugin ([dfc3c19](https://github.com/ionic-team/stencil/commit/dfc3c19))
 * **rollup:** improve rollup error logging ([0b64d5f](https://github.com/ionic-team/stencil/commit/0b64d5f))
 * **runtime:** remove node globals runtime helpers ([c4eddf0](https://github.com/ionic-team/stencil/commit/c4eddf0))
+* **screenshot:** ensure masterBuild data ([8ee4a56](https://github.com/ionic-team/stencil/commit/8ee4a56))
 * **screenshot:** disable GPU and antialiasing ([cab2b87](https://github.com/ionic-team/stencil/commit/cab2b87))
 * **screenshot:** provide compare url and update base connector ([3bbd609](https://github.com/ionic-team/stencil/commit/3bbd609))
 * **test:** do not print tsconfig errors during testing ([83ecade](https://github.com/ionic-team/stencil/commit/83ecade))
