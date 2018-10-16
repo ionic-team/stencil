@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
-import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
+import { formatBrowserLoaderComponentTagNames } from '../../util/data-serialize';
 import { generatePreamble } from '../util';
 import { getLoaderPath } from './app-file-naming';
 import { minifyJs } from '../minifier';
@@ -63,9 +63,7 @@ export function injectAppIntoLoader(
   cmpRegistry: d.ComponentRegistry,
   loaderContent: string
 ) {
-  const cmpLoaderRegistry = formatBrowserLoaderComponentRegistry(cmpRegistry);
-
-  const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
+  const cmpTags = formatBrowserLoaderComponentTagNames(cmpRegistry);
 
   const resourcesUrl = outputTarget.resourcesUrl ? `"${outputTarget.resourcesUrl}"` : 0;
 
@@ -76,7 +74,7 @@ export function injectAppIntoLoader(
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,
-    cmpLoaderRegistryStr,
+    `"${cmpTags.join(',')}"`,
     'HTMLElement.prototype'
   ].join(',');
 

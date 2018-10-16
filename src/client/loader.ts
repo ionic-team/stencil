@@ -10,21 +10,19 @@ export function init(
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
-  components: d.ComponentHostData[],
+  cmpTags: string,
   HTMLElementPrototype: any,
   App?: d.AppGlobal,
   x?: any, y?: any, scriptElm?: HTMLScriptElement
 ) {
   // create global namespace if it doesn't already exist
   App = win[namespace] = win[namespace] || {};
-  App.components = components;
 
-  y = components.map(function(c) { return c[0]; });
-  if (y.length) {
+  if (cmpTags) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
     x = doc.createElement('style');
-    x.innerHTML = y.join() + '{visibility:hidden}.' + hydratedCssClass + '{visibility:inherit}';
+    x.innerHTML = cmpTags + '{visibility:hidden}.' + hydratedCssClass + '{visibility:inherit}';
     x.setAttribute('data-styles', '');
     y = doc.head.querySelector('meta[charset]');
     doc.head.insertBefore(x, y ? y.nextSibling : doc.head.firstChild);

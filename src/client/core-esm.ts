@@ -18,7 +18,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
   const doc = win.document;
   const hydratedCssClass = opts.hydratedCssClass || '__APP__HYDRATED__CSS__PLACEHOLDER__';
 
-  const styleCmps = cmpDataArray.filter(([hasStyles]) => hasStyles).map(c => c[0]);
+  const styleCmps = cmpDataArray.map(c => c[0]);
   if (styleCmps.length > 0) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
@@ -52,7 +52,8 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
           win,
           doc,
           resourcesUrl,
-          hydratedCssClass
+          hydratedCssClass,
+          cmpDataArray
         );
       }
 

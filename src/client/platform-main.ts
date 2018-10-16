@@ -17,7 +17,7 @@ import { queueUpdate } from '../core/update';
 import { runtimeHelpers } from './runtime-helpers';
 
 
-export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
+export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -238,7 +238,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   }
 
   if (__BUILD_CONDITIONALS__.devInspector) {
-    generateDevInspector(App, namespace, win, plt);
+    generateDevInspector(namespace, win, plt, components);
   }
 
   if (__BUILD_CONDITIONALS__.isDev) {
@@ -248,7 +248,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
-    (App.components || [])
+    components
       .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
   }

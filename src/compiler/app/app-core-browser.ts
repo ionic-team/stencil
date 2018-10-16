@@ -1,18 +1,19 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
+import * as d from '../../declarations';
 import { buildCoreContent } from './build-core-content';
+import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
 import { generatePreamble, pathJoin } from '../util';
 import { getAppBrowserCorePolyfills } from './app-polyfills';
 import { getAppBuildDir, getCoreFilename } from './app-file-naming';
 
 
-export async function generateCoreBrowser(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTargetBuild, globalJsContent: string, buildConditionals: BuildConditionals) {
+export async function generateCoreBrowser(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, cmpRegistry: d.ComponentRegistry, staticName: string, globalJsContent: string, buildConditionals: d.BuildConditionals) {
   const relPath = config.sys.path.relative(config.rootDir, getAppBuildDir(config, outputTarget));
   const timespan = buildCtx.createTimeSpan(`generateCoreBrowser ${buildConditionals.coreId} started, ${relPath}`, true);
 
   // mega-minify the core w/ property renaming, but not the user's globals
   // hardcode which features should and should not go in the core builds
   // process the transpiled code by removing unused code and minify when configured to do so
-  let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.build.js' });
+  let jsContent = await config.sys.getClientCoreFile({ staticName: staticName });
 
   jsContent = await buildCoreContent(config, compilerCtx, buildCtx, buildConditionals, jsContent);
 
@@ -23,7 +24,7 @@ export async function generateCoreBrowser(config: Config, compilerCtx: CompilerC
   }
 
   // wrap the core js code together
-  jsContent = wrapCoreJs(config, jsContent);
+  jsContent = wrapCoreJs(config, jsContent, cmpRegistry);
 
   if (buildConditionals.polyfills) {
     // this build wants polyfills so let's
@@ -50,19 +51,22 @@ export async function generateCoreBrowser(config: Config, compilerCtx: CompilerC
 }
 
 
-export function wrapCoreJs(config: Config, jsContent: string) {
+export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.ComponentRegistry) {
   if (typeof jsContent !== 'string') {
     jsContent = '';
   }
 
+  const cmpLoaderRegistry = formatBrowserLoaderComponentRegistry(cmpRegistry);
+
+  const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
+
   const output = [
     generatePreamble(config) + '\n',
-    `(function(Context,namespace,hydratedCssClass,resourcesUrl,s){`,
+    `(function(window,document,Context,namespace,hydratedCssClass,components,resourcesUrl){`,
     `"use strict";\n`,
-    `s=document.querySelector("script[data-namespace='${config.fsNamespace}']");`,
-    `if(s){resourcesUrl=s.getAttribute('data-resources-url');}\n`,
+    `(function(s){s&&(resourcesUrl=s.getAttribute('data-resources-url'))})(document.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
     jsContent.trim(),
-    `\n})({},"${config.namespace}","${config.hydratedCssClass}");`
+    `\n})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",${cmpLoaderRegistryStr});`
   ].join('');
 
   return output;
