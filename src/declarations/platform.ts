@@ -23,6 +23,7 @@ export interface PlatformApi {
   render?: d.RendererApi;
   tmpDisconnected: boolean;
   nextId?: () => string;
+  hasConnectedComponent?: boolean;
 
   ancestorHostElementMap: WeakMap<d.HostElement, d.HostElement>;
   componentAppliedStyles: WeakMap<Node, d.ComponentAppliedStyles>;

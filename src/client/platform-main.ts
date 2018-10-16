@@ -246,6 +246,12 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     components
       .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
+
+    if (!plt.hasConnectedComponent) {
+      // we just defined call the custom elements but no
+      // connectedCallbacks happened, so no components in the dom :(
+      rootElm['s-init']();
+    }
   }
 
   // create the componentOnReady fn

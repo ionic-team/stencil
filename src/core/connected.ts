@@ -22,6 +22,7 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
   plt.isDisconnectedMap.delete(elm);
 
   if (!plt.hasConnectedMap.has(elm)) {
+    plt.hasConnectedComponent = true;
     plt.processingCmp.add(elm);
 
     // first time we've connected

@@ -391,6 +391,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   );
 
+  if (!plt.hasConnectedComponent) {
+    // we just defined call the custom elements but no
+    // connectedCallbacks happened, so no components in the dom :(
+    rootElm['s-init']();
+  }
+
   // create the componentOnReady fn
   initCoreComponentOnReady(plt, App, win, win['s-apps'], win['s-cr']);
 
