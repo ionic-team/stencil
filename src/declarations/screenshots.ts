@@ -27,12 +27,14 @@ export interface ScreenshotCompareResults {
     message: string;
     author: string;
     url: string;
+    previewUrl: string;
   };
   b: {
     id: string;
     message: string;
     author: string;
     url: string;
+    previewUrl: string;
   };
   timestamp: number;
   url: string;
@@ -45,6 +47,7 @@ export interface ScreenshotConnectorOptions {
   buildMessage: string;
   buildAuthor?: string;
   buildUrl?: string;
+  previewUrl?: string;
   buildTimestamp: number;
   logger: d.Logger;
   rootDir: string;
@@ -82,6 +85,7 @@ export interface ScreenshotBuild {
   message: string;
   author?: string;
   url?: string;
+  previewUrl?: string;
   timestamp: number;
   screenshots: Screenshot[];
 }

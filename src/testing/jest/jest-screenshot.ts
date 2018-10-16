@@ -50,11 +50,22 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
       publishTimespan.finish(`screenshot, publishBuild finished`);
     }
 
-    if (results && results.compare) {
-      config.logger.info(`screenshots compared: ${results.compare.diffs.length}`);
+    if (results) {
+      if (config.flags.updateScreenshot) {
+        // updating the master screenshot
+        if (results.currentBuild && typeof results.currentBuild.previewUrl === 'string') {
+          config.logger.info(config.logger.magenta(results.currentBuild.previewUrl));
+        }
 
-      if (typeof results.compare.url === 'string') {
-        config.logger.info(config.logger.magenta(results.compare.url));
+      } else {
+        // comparing the screenshot to master
+        if (results.compare) {
+          config.logger.info(`screenshots compared: ${results.compare.diffs.length}`);
+
+          if (typeof results.compare.url === 'string') {
+            config.logger.info(config.logger.magenta(results.compare.url));
+          }
+        }
       }
     }
 
