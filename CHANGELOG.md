@@ -1,5 +1,5 @@
-<a name="0.14.0-7"></a>
-# 😸 [Prerelease] [0.14.0-7](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0-7) (2018-10-16)
+<a name="0.14.0"></a>
+# 🐳 [0.14.0](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0) (2018-10-16)
 
 ### Features
 
