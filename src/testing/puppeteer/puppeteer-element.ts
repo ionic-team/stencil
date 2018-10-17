@@ -79,7 +79,16 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
             if (elm.isConnected) {
               const style = window.getComputedStyle(elm);
               const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-              resolve(isVisible);
+
+              if (isVisible) {
+                window.requestAnimationFrame(() => {
+                  elm.clientWidth;
+                  resolve(true);
+                });
+
+              } else {
+                resolve(false);
+              }
 
             } else {
               resolve(false);
