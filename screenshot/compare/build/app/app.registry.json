@@ -2,8 +2,8 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.wvpgqenw.js",
-  "corePolyfilled": "app.zfouy8ne.js",
+  "core": "app.qlfnov5b.js",
+  "corePolyfilled": "app.prrxgxei.js",
   "components": {
     "app-root": {
       "bundleIds": {
@@ -12,41 +12,41 @@
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       },
       "encapsulation": "shadow"
     },
     "compare-filter": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       },
       "encapsulation": "shadow"
     },
     "compare-header": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       },
       "encapsulation": "shadow"
     },
     "compare-row": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       }
     },
     "compare-thead": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       },
       "encapsulation": "shadow"
     },
     "screenshot-compare": {
       "bundleIds": {
-        "$": "vqqrg3hr"
+        "$": "dvypjpef"
       }
     },
     "screenshot-lookup": {
       "bundleIds": {
-        "$": "n3jqfyua"
+        "$": "l6dfzrmf"
       },
       "encapsulation": "shadow"
     },
