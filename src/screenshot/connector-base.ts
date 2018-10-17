@@ -31,6 +31,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   allowableMismatchedRatio: number;
   allowableMismatchedPixels: number;
   pixelmatchThreshold: number;
+  timeoutBeforeScreenshot: number;
 
   async initBuild(opts: d.ScreenshotConnectorOptions) {
     this.logger = opts.logger;
@@ -45,6 +46,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
+    this.timeoutBeforeScreenshot = typeof opts.timeoutBeforeScreenshot === 'number' ? opts.timeoutBeforeScreenshot : 10;
 
     if (!opts.logger) {
       throw new Error(`logger option required`);
@@ -293,7 +295,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       updateMaster: this.updateMaster,
       allowableMismatchedPixels: this.allowableMismatchedPixels,
       allowableMismatchedRatio: this.allowableMismatchedRatio,
-      pixelmatchThreshold: this.pixelmatchThreshold
+      pixelmatchThreshold: this.pixelmatchThreshold,
+      timeoutBeforeScreenshot: this.timeoutBeforeScreenshot
     };
 
     return JSON.stringify(screenshotBuild);

@@ -66,6 +66,7 @@ export interface ScreenshotConnectorOptions {
   allowableMismatchedPixels?: number;
   allowableMismatchedRatio?: number;
   pixelmatchThreshold?: number;
+  timeoutBeforeScreenshot?: number;
 }
 
 
@@ -82,6 +83,7 @@ export interface ScreenshotBuildData {
   pixelmatchThreshold: number;
   masterScreenshots: {[screenshotId: string]: string};
   cache: {[cacheKey: string]: number};
+  timeoutBeforeScreenshot: number;
 }
 
 
