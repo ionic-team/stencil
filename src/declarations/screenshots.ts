@@ -16,6 +16,7 @@ export interface ScreenshotConnector {
 
 
 export interface ScreenshotBuildResults {
+  appNamespace: string;
   masterBuild: d.ScreenshotBuild;
   currentBuild: d.ScreenshotBuild;
   compare: ScreenshotCompareResults;
@@ -40,6 +41,7 @@ export interface ScreenshotCompareResults {
   };
   timestamp: number;
   url: string;
+  appNamespace: string;
   diffs: d.ScreenshotDiff[];
 }
 
@@ -50,6 +52,7 @@ export interface ScreenshotConnectorOptions {
   buildAuthor?: string;
   buildUrl?: string;
   previewUrl?: string;
+  appNamespace: string;
   buildTimestamp: number;
   logger: d.Logger;
   rootDir: string;
@@ -88,6 +91,7 @@ export interface ScreenshotBuild {
   author?: string;
   url?: string;
   previewUrl?: string;
+  appNamespace: string;
   timestamp: number;
   screenshots: Screenshot[];
 }

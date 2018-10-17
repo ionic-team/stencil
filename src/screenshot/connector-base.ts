@@ -20,6 +20,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   buildUrl: string;
   previewUrl: string;
   buildTimestamp: number;
+  appNamespace: string;
   screenshotDir: string;
   imagesDir: string;
   buildsDir: string;
@@ -43,6 +44,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.cacheDir = opts.cacheDir;
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
+    this.appNamespace = opts.appNamespace;
 
     if (!opts.logger) {
       throw new Error(`logger option required`);
@@ -129,12 +131,15 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         message: this.buildMessage,
         author: this.buildAuthor,
         url: this.buildUrl,
+        previewUrl: this.previewUrl,
+        appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
         screenshots: screenshots
       };
     }
 
     const results: d.ScreenshotBuildResults = {
+      appNamespace: this.appNamespace,
       masterBuild: masterBuild,
       currentBuild: {
         id: this.buildId,
@@ -142,6 +147,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         author: this.buildAuthor,
         url: this.buildUrl,
         previewUrl: this.previewUrl,
+        appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
         screenshots: screenshots
       },
@@ -162,6 +168,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
           previewUrl: this.previewUrl,
         },
         url: null,
+        appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
         diffs: []
       }

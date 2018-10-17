@@ -13,6 +13,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     buildId: createBuildId(),
     buildMessage: createBuildMessage(),
     buildTimestamp: Date.now(),
+    appNamespace: config.namespace,
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
     packageDir: config.sys.compiler.packageDir,

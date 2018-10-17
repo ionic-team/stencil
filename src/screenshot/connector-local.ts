@@ -13,6 +13,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
       results.masterBuild = {
         id: 'master',
         message: 'Master',
+        appNamespace: this.appNamespace,
         timestamp: Date.now(),
         screenshots: []
       };
@@ -39,7 +40,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     const imagesUrl = normalizePath(relative(this.screenshotDir, this.imagesDir));
     const jsonpUrl = normalizePath(relative(this.screenshotDir, this.cacheDir));
 
-    const compareAppHtml = createLocalCompareApp(appSrcUrl, imagesUrl, jsonpUrl, results.compare);
+    const compareAppHtml = createLocalCompareApp(this.appNamespace, appSrcUrl, imagesUrl, jsonpUrl, results.compare);
 
     const compareAppFileName = 'compare.html';
     const compareAppFilePath = join(this.screenshotDir, compareAppFileName);
@@ -85,12 +86,12 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 }
 
 
-function createLocalCompareApp(appSrcUrl: string, imagesUrl: string, jsonpUrl: string, compare: d.ScreenshotCompareResults) {
+function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: string, jsonpUrl: string, compare: d.ScreenshotCompareResults) {
   return `<!doctype html>
 <html dir="ltr" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Stencil Screenshot Visual Diff</title>
+  <title>Local ${namespace || ''} - Stencil Screenshot Visual Diff</title>
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="x-ua-compatible" content="IE=Edge">
   <link href="${appSrcUrl}/build/app.css" rel="stylesheet">
