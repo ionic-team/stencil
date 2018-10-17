@@ -205,21 +205,15 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   async getScreenshotCache() {
-    let screenshotCache: d.ScreenshotCache = null;
-
-    try {
-      screenshotCache = JSON.parse(await readFile(this.screenshotCacheFilePath));
-    } catch (e) {}
-
-    return screenshotCache;
+    return null as d.ScreenshotCache;
   }
 
-  async setScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
-    cache = cache || {};
-    cache.timestamp = this.buildTimestamp;
-    cache.lastBuildId = this.buildId;
-    cache.size = 0;
-    cache.items = cache.items || [];
+  async updateScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
+    screenshotCache = screenshotCache || {};
+    screenshotCache.timestamp = this.buildTimestamp;
+    screenshotCache.lastBuildId = this.buildId;
+    screenshotCache.size = 0;
+    screenshotCache.items = screenshotCache.items || [];
 
     if (buildResults && buildResults.compare && Array.isArray(buildResults.compare.diffs)) {
       buildResults.compare.diffs.forEach(diff => {
@@ -232,14 +226,14 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
           return;
         }
 
-        const existingItem = cache.items.find(i => i.key === diff.cacheKey);
+        const existingItem = screenshotCache.items.find(i => i.key === diff.cacheKey);
         if (existingItem) {
           // already have this cached, but update its timestamp
           existingItem.ts = this.buildTimestamp;
 
         } else {
           // add this item to the cache
-          cache.items.push({
+          screenshotCache.items.push({
             key: diff.cacheKey,
             ts: this.buildTimestamp,
             mp: diff.mismatchedPixels
@@ -249,7 +243,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     }
 
     // sort so the newest items are on top
-    cache.items.sort((a, b) => {
+    screenshotCache.items.sort((a, b) => {
       if (a.ts > b.ts) return -1;
       if (a.ts < b.ts) return 1;
       if (a.mp > b.mp) return -1;
@@ -258,11 +252,11 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     });
 
     // keep only the most recent items
-    cache.items = cache.items.slice(0, 1000);
+    screenshotCache.items = screenshotCache.items.slice(0, 1000);
 
-    cache.size = cache.items.length;
+    screenshotCache.size = screenshotCache.items.length;
 
-    await writeFile(this.screenshotCacheFilePath, JSON.stringify(cache, null, 2));
+    return screenshotCache;
   }
 
   toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache) {

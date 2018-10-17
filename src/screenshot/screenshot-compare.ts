@@ -97,7 +97,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       // awesome, we've got cached data so we
       // can skip having to do the heavy pixelmatch comparison
       screenshot.diff.mismatchedPixels = cachedMismatchedPixels;
-      console.log('cachehit', screenshot.diff.cacheKey, screenshot.diff.mismatchedPixels)
 
     } else {
       // images are not identical

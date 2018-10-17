@@ -8,7 +8,7 @@ export interface ScreenshotConnector {
   pullMasterBuild(): Promise<void>;
   publishBuild(buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotBuildResults>;
   getScreenshotCache(): Promise<d.ScreenshotCache>;
-  setScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults): Promise<void>;
+  updateScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotCache>;
   generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
   toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache): string;

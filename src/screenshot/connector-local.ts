@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { fileExists, writeFile } from './screenshot-fs';
+import { fileExists, readFile, writeFile } from './screenshot-fs';
 import { join, relative } from 'path';
 import { normalizePath } from '../compiler/util';
 import { ScreenshotConnector } from './connector-base';
@@ -61,6 +61,25 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     results.compare.url = url.href;
 
     return results;
+  }
+
+
+  async getScreenshotCache() {
+    let screenshotCache: d.ScreenshotCache = null;
+
+    try {
+      screenshotCache = JSON.parse(await readFile(this.screenshotCacheFilePath));
+    } catch (e) {}
+
+    return screenshotCache;
+  }
+
+  async updateScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
+    cache = await super.updateScreenshotCache(cache, buildResults);
+
+    await writeFile(this.screenshotCacheFilePath, JSON.stringify(cache, null, 2));
+
+    return cache;
   }
 
 }
