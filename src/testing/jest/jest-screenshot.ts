@@ -29,8 +29,13 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   initTimespan.finish(`screenshot, initBuild finished`);
 
-  const masterBuild = await connector.getMasterBuild();
-  const screenshotCache = await connector.getScreenshotCache();
+  const dataPromises = await Promise.all([
+    await connector.getMasterBuild(),
+    await connector.getScreenshotCache()
+  ]);
+
+  const masterBuild = dataPromises[0];
+  const screenshotCache = dataPromises[1];
 
   env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson(masterBuild, screenshotCache);
 
@@ -60,7 +65,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
         // comparing the screenshot to master
         if (results.compare) {
           try {
-            await connector.setScreenshotCache(screenshotCache, results);
+            await connector.updateScreenshotCache(screenshotCache, results);
           } catch (e) {
             config.logger.error(e);
           }
