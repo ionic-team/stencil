@@ -1,3 +1,13 @@
+<a name="0.14.1-0"></a>
+## 🐁 [Prerelease] [0.14.1-0](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1-0) (2018-10-17)
+
+
+### Bug Fixes
+
+* **screenshot:** improve screenshot caching and memory usage ([d8f6112](https://github.com/ionic-team/stencil/commit/d8f6112))
+
+
+
 <a name="0.14.0"></a>
 # 🐳 [0.14.0](https://github.com/ionic-team/stencil/compare/v0.13.2...v0.14.0) (2018-10-16)
 
