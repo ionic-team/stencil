@@ -2,46 +2,46 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.qlfnov5b.js",
-  "corePolyfilled": "app.prrxgxei.js",
+  "core": "app.uonclduy.js",
+  "corePolyfilled": "app.mzhilcyv.js",
   "components": {
     "app-root": {
       "bundleIds": {
-        "$": "pjucjxvs"
+        "$": "tjnmfg6d"
       }
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "b7qfinrk"
       },
       "encapsulation": "shadow"
     },
     "compare-filter": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "uuxzmktj"
       },
       "encapsulation": "shadow"
     },
     "compare-header": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "uuxzmktj"
       },
       "encapsulation": "shadow"
     },
     "compare-row": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "b7qfinrk"
       }
     },
     "compare-thead": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "b7qfinrk"
       },
       "encapsulation": "shadow"
     },
     "screenshot-compare": {
       "bundleIds": {
-        "$": "dvypjpef"
+        "$": "b7qfinrk"
       }
     },
     "screenshot-lookup": {
@@ -50,14 +50,24 @@
       },
       "encapsulation": "shadow"
     },
+    "screenshot-preview": {
+      "bundleIds": {
+        "$": "toatahed"
+      }
+    },
     "stencil-route": {
       "bundleIds": {
-        "$": "pjucjxvs"
+        "$": "tjnmfg6d"
+      }
+    },
+    "stencil-route-switch": {
+      "bundleIds": {
+        "$": "tjnmfg6d"
       }
     },
     "stencil-router": {
       "bundleIds": {
-        "$": "pjucjxvs"
+        "$": "tjnmfg6d"
       }
     }
   }
