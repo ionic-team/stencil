@@ -12,6 +12,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   imagesDirName = 'images';
   buildsDirName = 'builds';
   masterBuildFileName = 'master.json';
+  screenshotCacheFileName = 'screenshot-cache.json';
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
@@ -23,6 +24,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   imagesDir: string;
   buildsDir: string;
   masterBuildFilePath: string;
+  screenshotCacheFilePath: string;
   currentBuildDir: string;
   updateMaster: boolean;
   allowableMismatchedRatio: number;
@@ -86,6 +88,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.imagesDir = join(this.screenshotDir, this.imagesDirName);
     this.buildsDir = join(this.screenshotDir, this.buildsDirName);
     this.masterBuildFilePath = join(this.buildsDir, this.masterBuildFileName);
+    this.screenshotCacheFilePath = join(this.cacheDir, this.screenshotCacheFileName);
     this.currentBuildDir = join(tmpdir(), 'screenshot-build-' + this.buildId);
 
     this.logger.debug(`screenshotDirPath: ${this.screenshotDir}`);
@@ -201,7 +204,68 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     }
   }
 
-  toJson(masterBuild: d.ScreenshotBuild) {
+  async getScreenshotCache() {
+    let screenshotCache: d.ScreenshotCache = null;
+
+    try {
+      screenshotCache = JSON.parse(await readFile(this.screenshotCacheFilePath));
+    } catch (e) {}
+
+    return screenshotCache;
+  }
+
+  async setScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
+    cache = cache || {};
+    cache.timestamp = this.buildTimestamp;
+    cache.lastBuildId = this.buildId;
+    cache.size = 0;
+    cache.items = cache.items || [];
+
+    if (buildResults && buildResults.compare && Array.isArray(buildResults.compare.diffs)) {
+      buildResults.compare.diffs.forEach(diff => {
+        if (typeof diff.cacheKey !== 'string') {
+          return;
+        }
+
+        if (diff.imageA === diff.imageB) {
+          // no need to cache identical matches
+          return;
+        }
+
+        const existingItem = cache.items.find(i => i.key === diff.cacheKey);
+        if (existingItem) {
+          // already have this cached, but update its timestamp
+          existingItem.ts = this.buildTimestamp;
+
+        } else {
+          // add this item to the cache
+          cache.items.push({
+            key: diff.cacheKey,
+            ts: this.buildTimestamp,
+            mp: diff.mismatchedPixels
+          });
+        }
+      });
+    }
+
+    // sort so the newest items are on top
+    cache.items.sort((a, b) => {
+      if (a.ts > b.ts) return -1;
+      if (a.ts < b.ts) return 1;
+      if (a.mp > b.mp) return -1;
+      if (a.mp < b.mp) return 1;
+      return 0;
+    });
+
+    // keep only the most recent items
+    cache.items = cache.items.slice(0, 1000);
+
+    cache.size = cache.items.length;
+
+    await writeFile(this.screenshotCacheFilePath, JSON.stringify(cache, null, 2));
+  }
+
+  toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache) {
     const masterScreenshots: {[screenshotId: string]: string} = {};
     if (masterBuild && Array.isArray(masterBuild.screenshots)) {
       masterBuild.screenshots.forEach(masterScreenshot => {
@@ -209,14 +273,21 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       });
     }
 
+    const mismatchCache: {[cacheKey: string]: number} = {};
+    if (screenshotCache && Array.isArray(screenshotCache.items)) {
+      screenshotCache.items.forEach(cacheItem => {
+        mismatchCache[cacheItem.key] = cacheItem.mp;
+      });
+    }
+
     const screenshotBuild: d.ScreenshotBuildData = {
       buildId: this.buildId,
       rootDir: this.rootDir,
-      cacheDir: this.cacheDir,
       screenshotDir: this.screenshotDir,
       imagesDir: this.imagesDir,
       buildsDir: this.buildsDir,
       masterScreenshots: masterScreenshots,
+      cache: mismatchCache,
       currentBuildDir: this.currentBuildDir,
       updateMaster: this.updateMaster,
       allowableMismatchedPixels: this.allowableMismatchedPixels,

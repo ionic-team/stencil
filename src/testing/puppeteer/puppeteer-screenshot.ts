@@ -85,11 +85,15 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2E
   const screenshotBuildData = JSON.parse(env.__STENCIL_SCREENSHOT_BUILD__) as d.ScreenshotBuildData;
 
   const screenshotOpts = createPuppeteerScreenshopOptions(opts);
-  const screenshotBuf = await page.screenshot(screenshotOpts);
+  let screenshotBuf = await page.screenshot(screenshotOpts);
 
   const pixelmatchThreshold = (typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold);
 
-  return compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, testPath, pixelmatchThreshold);
+  const results = await compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, testPath, pixelmatchThreshold);
+
+  screenshotBuf = null;
+
+  return results;
 }
 
 

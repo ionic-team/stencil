@@ -7,9 +7,11 @@ export interface ScreenshotConnector {
   getMasterBuild(): Promise<d.ScreenshotBuild>;
   pullMasterBuild(): Promise<void>;
   publishBuild(buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotBuildResults>;
+  getScreenshotCache(): Promise<d.ScreenshotCache>;
+  setScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults): Promise<void>;
   generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
-  toJson(masterBuild: d.ScreenshotBuild): string;
+  toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache): string;
 }
 
 
@@ -67,7 +69,6 @@ export interface ScreenshotConnectorOptions {
 export interface ScreenshotBuildData {
   buildId: string;
   rootDir: string;
-  cacheDir: string;
   screenshotDir: string;
   imagesDir: string;
   buildsDir: string;
@@ -77,6 +78,7 @@ export interface ScreenshotBuildData {
   allowableMismatchedRatio: number;
   pixelmatchThreshold: number;
   masterScreenshots: {[screenshotId: string]: string};
+  cache: {[cacheKey: string]: number};
 }
 
 
@@ -88,6 +90,29 @@ export interface ScreenshotBuild {
   previewUrl?: string;
   timestamp: number;
   screenshots: Screenshot[];
+}
+
+
+export interface ScreenshotCache {
+  timestamp?: number;
+  lastBuildId?: string;
+  size?: number;
+  items?: {
+    /**
+     * Cache key
+     */
+    key: string;
+
+    /**
+     * Timestamp used to remove the oldest data
+     */
+    ts: number;
+
+    /**
+     * Mismatched pixels
+     */
+    mp: number;
+  }[];
 }
 
 
@@ -125,6 +150,7 @@ export interface ScreenshotDiff {
   allowableMismatchedPixels: number;
   allowableMismatchedRatio: number;
   testPath?: string;
+  cacheKey?: string;
 }
 
 

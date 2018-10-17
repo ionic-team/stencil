@@ -30,8 +30,9 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   initTimespan.finish(`screenshot, initBuild finished`);
 
   const masterBuild = await connector.getMasterBuild();
+  const screenshotCache = await connector.getScreenshotCache();
 
-  env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson(masterBuild);
+  env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson(masterBuild, screenshotCache);
 
   const testsTimespan = config.logger.createTimeSpan(`screenshot, tests started`, true);
 
@@ -48,9 +49,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
       const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
       results = await connector.publishBuild(results);
       publishTimespan.finish(`screenshot, publishBuild finished`);
-    }
 
-    if (results) {
       if (config.flags.updateScreenshot) {
         // updating the master screenshot
         if (results.currentBuild && typeof results.currentBuild.previewUrl === 'string') {
@@ -60,6 +59,12 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
       } else {
         // comparing the screenshot to master
         if (results.compare) {
+          try {
+            await connector.setScreenshotCache(screenshotCache, results);
+          } catch (e) {
+            config.logger.error(e);
+          }
+
           config.logger.info(`screenshots compared: ${results.compare.diffs.length}`);
 
           if (typeof results.compare.url === 'string') {
