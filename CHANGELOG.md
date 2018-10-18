@@ -1,9 +1,14 @@
-<a name="0.14.1-1"></a>
-## 🌏 [Prerelease] [0.14.1-1](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1-1) (2018-10-17)
+<a name="0.14.1-2"></a>
+## 📷 [Prerelease] [0.14.1-2](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1-2) (2018-10-18)
+
+### Features
+
+* **waitForEvent:** add page.waitForEvent() to e2e testing ([77d7b7c](https://github.com/ionic-team/stencil/commit/77d7b7c))
 
 
 ### Bug Fixes
 
+* **pixelmatch:** fork pixelmatch to another process ([95ebbc1](https://github.com/ionic-team/stencil/commit/95ebbc1))
 * **screenshot:** improve screenshot caching and memory usage ([d8f6112](https://github.com/ionic-team/stencil/commit/d8f6112))
 
 
