@@ -13,7 +13,12 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
 
   let devServerStart: Promise<d.DevServer> = null;
   if (config.devServer && flags.serve) {
-    devServerStart = compiler.startDevServer();
+    try {
+      devServerStart = compiler.startDevServer();
+    } catch (e) {
+      config.logger.error(e);
+      process.exit(1);
+    }
   }
 
   const latestVersion = getLatestCompilerVersion(config.sys, config.logger);

@@ -33,19 +33,23 @@ export async function taskTest(config: d.Config) {
     ensureModuleIds
   );
 
-  const { Testing } = require('../testing/index.js');
+  try {
+    const { Testing } = require('../testing/index.js');
 
-  const testing: d.Testing = new Testing(config);
-  if (!testing.isValid) {
-    process.exit(1);
-  }
+    const testing: d.Testing = new Testing(config);
+    if (!testing.isValid) {
+      process.exit(1);
+    }
 
-  const passed = await testing.runTests();
-  await testing.destroy();
+    const passed = await testing.runTests();
+    await testing.destroy();
 
-  if (passed) {
-    process.exit(0);
-  } else {
+    if (!passed) {
+      process.exit(1);
+    }
+
+  } catch (e) {
+    config.logger.error(e);
     process.exit(1);
   }
 }
