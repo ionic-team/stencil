@@ -4,12 +4,12 @@ import * as puppeteer from 'puppeteer';
 
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
-  page._events = [];
-  page._eventIds = 0;
+  page._e2eEvents = [];
+  page._e2eEventIds = 0;
 
   await page.exposeFunction('stencilOnEvent', (browserEvent: pd.BrowserContextEvent) => {
     // NODE CONTEXT
-    nodeContextEvents(page._events, browserEvent);
+    nodeContextEvents(page._e2eEvents, browserEvent);
   });
 
   await page.evaluateOnNewDocument(browserContextEvents);
@@ -56,9 +56,9 @@ export class EventSpy implements d.EventSpy {
 
 export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, resolve: (ev: any) => void, cancelRejectId?: any) {
   // NODE CONTEXT
-  const id = page._eventIds++;
+  const id = page._e2eEventIds++;
 
-  page._events.push({
+  page._e2eEvents.push({
     id: id,
     eventName: eventName,
     resolve: resolve,

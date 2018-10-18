@@ -11,7 +11,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
-    _page._elements.push(this);
+    _page._e2eElements.push(this);
   }
 
   find(selector: string) {
@@ -495,9 +495,9 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       this._elmHandle = null;
     }
 
-    const index = this._page._elements.indexOf(this);
+    const index = this._page._e2eElements.indexOf(this);
     if (index > -1) {
-      this._page._elements.splice(index, 1);
+      this._page._e2eElements.splice(index, 1);
     }
 
     this._page = null;

@@ -17,9 +17,9 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
   const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
 
-  page._elements = [];
+  page._e2eElements = [];
 
-  page._goto = page.goto;
+  page._e2eGoto = page.goto;
 
   await setPageEmulate(page as any);
 
@@ -106,7 +106,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 
   let timedOut = false;
   try {
-    await page._goto(fullUrl, {
+    await page._e2eGoto(fullUrl, {
       waitUntil: 'load'
     });
 
@@ -162,7 +162,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     // resolves once the stencil app has finished loading
     const appLoaded = page.waitForFunction('window.stencilAppLoaded');
 
-    await page._goto(url.join(''), {
+    await page._e2eGoto(url.join(''), {
       waitUntil: 'load'
     });
 
@@ -214,7 +214,7 @@ async function waitForChanges(page: pd.E2EPageInternal) {
       return;
     }
 
-    await Promise.all(page._elements.map(async elm => {
+    await Promise.all(page._e2eElements.map(async elm => {
       await elm.e2eRunActions();
     }));
 
@@ -235,7 +235,7 @@ async function waitForChanges(page: pd.E2EPageInternal) {
       return;
     }
 
-    await Promise.all(page._elements.map(async elm => {
+    await Promise.all(page._e2eElements.map(async elm => {
       await elm.e2eSync();
     }));
 

@@ -72,6 +72,7 @@ export async function connectBrowser() {
 export async function disconnectBrowser(browser: puppeteer.Browser, pages: puppeteer.Page[]) {
   if (Array.isArray(pages)) {
     await Promise.all(pages.map(closePage));
+    pages.length = 0;
   }
   if (browser) {
     try {
@@ -87,14 +88,26 @@ export function newBrowserPage(browser: puppeteer.Browser) {
 
 
 export async function closePage(page: any) {
-  if (Array.isArray((page as pd.E2EPageInternal)._elements)) {
-    const disposes = (page as pd.E2EPageInternal)._elements.map(async elmHande => {
-      if (typeof elmHande.e2eDispose === 'function') {
-        await elmHande.e2eDispose();
-      }
-    });
-    await Promise.all(disposes);
-  }
+  try {
+    if (Array.isArray((page as pd.E2EPageInternal)._e2eElements)) {
+      const disposes = (page as pd.E2EPageInternal)._e2eElements.map(async elmHande => {
+        if (typeof elmHande.e2eDispose === 'function') {
+          await elmHande.e2eDispose();
+        }
+      });
+      await Promise.all(disposes);
+    }
+  } catch (e) {}
+
+  (page as pd.E2EPageInternal)._e2eElements = null;
+  (page as pd.E2EPageInternal)._e2eEvents = null;
+  (page as pd.E2EPageInternal)._e2eGoto = null;
+  (page as pd.E2EPageInternal).find = null;
+  (page as pd.E2EPageInternal).findAll = null;
+  (page as pd.E2EPageInternal).compareScreenshot = null;
+  (page as pd.E2EPageInternal).setContent = null;
+  (page as pd.E2EPageInternal).spyOnEvent = null;
+  (page as pd.E2EPageInternal).waitForChanges = null;
 
   try {
     if (!(page as puppeteer.Page).isClosed()) {
