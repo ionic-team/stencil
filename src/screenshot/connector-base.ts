@@ -47,7 +47,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
-    this.timeoutBeforeScreenshot = typeof opts.timeoutBeforeScreenshot === 'number' ? opts.timeoutBeforeScreenshot : 10;
+    this.timeoutBeforeScreenshot = typeof opts.timeoutBeforeScreenshot === 'number' ? opts.timeoutBeforeScreenshot : 4;
     this.pixelmatchModulePath = opts.pixelmatchModulePath;
 
     if (!opts.logger) {

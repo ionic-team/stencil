@@ -108,6 +108,7 @@ export async function closePage(page: any) {
   (page as pd.E2EPageInternal).setContent = null;
   (page as pd.E2EPageInternal).spyOnEvent = null;
   (page as pd.E2EPageInternal).waitForChanges = null;
+  (page as pd.E2EPageInternal).waitForEvent = null;
 
   try {
     if (!(page as puppeteer.Page).isClosed()) {

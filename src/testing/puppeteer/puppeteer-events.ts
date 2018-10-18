@@ -15,6 +15,8 @@ export async function initPageEvents(page: pd.E2EPageInternal) {
   await page.evaluateOnNewDocument(browserContextEvents);
 
   page.spyOnEvent = pageSpyOnEvent.bind(page, page);
+
+  page.waitForEvent = pageWaitForEvent.bind(page, page);
 }
 
 
@@ -32,6 +34,35 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
   });
 
   return eventSpy;
+}
+
+
+async function pageWaitForEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
+  if (selector !== 'document') {
+    selector = 'window';
+  }
+
+  const ev = await page.evaluate((selector: string, eventName: string) => {
+
+    return new Promise((resolve, reject) => {
+      const tmr = setTimeout(() => {
+        reject(`page.waitForEvent() timeout, eventName: ${eventName}, selector: ${selector}`);
+      }, 10000);
+
+      function listener(ev: any) {
+        clearTimeout(tmr);
+        (window as any)[selector].removeEventListener(eventName, listener);
+        resolve((window as pd.BrowserWindow).stencilSerializeEvent(ev));
+      }
+
+      (window as any)[selector].addEventListener(eventName, listener);
+    });
+
+  }, selector, eventName);
+
+  await page.waitForChanges();
+
+  return ev;
 }
 
 

@@ -239,6 +239,8 @@ async function waitForChanges(page: pd.E2EPageInternal) {
       await elm.e2eSync();
     }));
 
+    await page.waitFor(4);
+
   } catch (e) {}
 }
 
