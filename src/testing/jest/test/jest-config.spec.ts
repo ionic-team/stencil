@@ -7,7 +7,23 @@ import path from 'path';
 
 describe('jest-config', () => {
 
-  it('force --runInBand arg when e2e test and --ci', () => {
+  it('pass --maxWorkers=2 arg when e2e test and --ci', () => {
+    const process: any = {
+      argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--maxWorkers=2']
+    };
+    const config = new TestingConfig();
+    config.flags = parseFlags(process);
+    config.testing = {};
+
+    expect(config.flags.args).toEqual(['--ci', '--e2e', '--maxWorkers=2']);
+    expect(config.flags.unknownArgs).toEqual(['--maxWorkers=2']);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.ci).toBe(true);
+    expect(jestArgv.maxWorkers).toBe(2);
+  });
+
+  it('force --maxWorkers=4 arg when e2e test and --ci', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', '--ci', '--e2e']
     };
@@ -20,22 +36,22 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.runInBand).toBe(true);
+    expect(jestArgv.maxWorkers).toBe(4);
   });
 
-  it('pass --runInBand arg to jest', () => {
+  it('pass --maxWorkers=2 arg to jest', () => {
     const process: any = {
-      argv: ['node', 'stencil', 'test', '--runInBand']
+      argv: ['node', 'stencil', 'test', '--maxWorkers=2']
     };
     const config = new TestingConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
-    expect(config.flags.args).toEqual(['--runInBand']);
-    expect(config.flags.unknownArgs).toEqual(['--runInBand']);
+    expect(config.flags.args).toEqual(['--maxWorkers=2']);
+    expect(config.flags.unknownArgs).toEqual(['--maxWorkers=2']);
 
     const jestArgv = buildJestArgv(config);
-    expect(jestArgv.runInBand).toBe(true);
+    expect(jestArgv.maxWorkers).toBe(2);
   });
 
   it('pass --ci arg to jest', () => {
@@ -51,7 +67,7 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.runInBand).not.toBe(true);
+    expect(jestArgv.maxWorkers).toBeUndefined();
   });
 
   it('pass test spec arg to jest', () => {

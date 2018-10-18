@@ -326,7 +326,7 @@ export interface JestArgv extends JestConfig {
   _: string[];
   ci: boolean;
   config: string;
-  runInBand: boolean;
+  maxWorkers: number;
 }
 
 

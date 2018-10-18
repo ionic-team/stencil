@@ -1,15 +1,18 @@
 import * as d from '../declarations';
-import { getMismatchedPixels } from './pixel-match';
 import { normalizePath } from '../compiler/util';
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';
+import { fork } from 'child_process';
 
 
 export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, currentScreenshotBuf: Buffer, desc: string, testPath: string, pixelmatchThreshold: number) {
   const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
+
+  await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
+  currentScreenshotBuf = null;
 
   if (testPath) {
     testPath = normalizePath(relative(screenshotBuildData.rootDir, testPath));
@@ -57,12 +60,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   if (screenshotBuildData.updateMaster) {
     // this data is going to become the master data
     // so no need to compare with previous versions
-
-    await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
-    currentScreenshotBuf = null;
-
     await writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot);
-
     return screenshot.diff;
   }
 
@@ -70,13 +68,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
   if (!masterScreenshotImage) {
     // didn't find a master screenshot to compare it to
-
-    // write the build data
-    await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
-    currentScreenshotBuf = null;
-
     await writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot);
-
     return screenshot.diff;
   }
 
@@ -87,7 +79,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   // compare only if the image hashes are different
   if (screenshot.diff.imageA !== screenshot.diff.imageB) {
     // we know the images are not identical since they have different hashes
-
     // create a cache key from the two hashes
     screenshot.diff.cacheKey = getCacheKey(screenshot.diff.imageA, screenshot.diff.imageB, pixelmatchThreshold);
 
@@ -108,23 +99,53 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       const naturalWidth = Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor);
       const naturalHeight = Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor);
 
+      const pixelMatchInput: d.PixelMatchInput = {
+        imageAPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageA),
+        imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
+        width: naturalWidth,
+        height: naturalHeight,
+        pixelmatchThreshold: pixelmatchThreshold
+      };
+
       screenshot.diff.mismatchedPixels = await getMismatchedPixels(
-        screenshotBuildData.imagesDir,
-        screenshot.diff.imageA,
-        currentScreenshotBuf,
-        naturalWidth,
-        naturalHeight,
-        pixelmatchThreshold
+        screenshotBuildData.pixelmatchModulePath,
+        pixelMatchInput
       );
     }
   }
 
-  await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
-  currentScreenshotBuf = null;
-
   await writeScreenshotData(screenshotBuildData.currentBuildDir, screenshot);
 
   return screenshot.diff;
+}
+
+
+async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
+  return new Promise<number>((resolve, reject) => {
+    const filteredExecArgs = process.execArgv.filter(
+      v => !/^--(debug|inspect)/.test(v)
+    );
+
+    const options = {
+      execArgv: filteredExecArgs,
+      env: process.env,
+      cwd: process.cwd(),
+      stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any
+    };
+
+    const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
+
+    pixelMatchProcess.on('message', data => {
+      pixelMatchProcess.kill();
+      resolve(data);
+    });
+
+    pixelMatchProcess.on('error', err => {
+      reject(err);
+    });
+
+    pixelMatchProcess.send(pixelMatchInput);
+  });
 }
 
 

@@ -29,5 +29,6 @@ node_modules/
 /screenshot/package.json
 /screenshot/connector.js
 /screenshot/local-connector.js
+/screenshot/pixel-match.js
 
 test/example/www/*

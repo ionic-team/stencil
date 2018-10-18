@@ -9,8 +9,8 @@ export function buildJestArgv(config: d.Config) {
     ...config.flags.knownArgs.slice()
   ];
 
-  if (config.flags.e2e && config.flags.ci) {
-    args.push('--runInBand');
+  if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--maxWorkers'))) {
+    args.push('--maxWorkers=4');
   }
 
   config.logger.debug(`jest args: ${args.join(' ')}`);

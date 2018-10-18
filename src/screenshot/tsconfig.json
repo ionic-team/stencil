@@ -26,6 +26,7 @@
     "../../types/*.d.ts"
   ],
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "./pixel-match.ts"
   ]
 }

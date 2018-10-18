@@ -11,6 +11,8 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   // for CI, let's wait a little longer than locally before taking the screenshot
   const timeoutBeforeScreenshot = config.flags.ci ? 100 : 10;
 
+  const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
+
   const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
   await connector.initBuild({
     buildId: createBuildId(),
@@ -25,7 +27,8 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
     allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
     pixelmatchThreshold: config.testing.pixelmatchThreshold,
-    timeoutBeforeScreenshot: timeoutBeforeScreenshot
+    timeoutBeforeScreenshot: timeoutBeforeScreenshot,
+    pixelmatchModulePath: pixelmatchModulePath
   });
 
   if (!config.flags.updateScreenshot) {

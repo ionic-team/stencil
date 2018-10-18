@@ -1,27 +1,25 @@
+import * as d from '../declarations';
 import { createReadStream } from 'fs';
-import { join } from 'path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
 
-export async function getMismatchedPixels(imagesDir: string, masterImageName: string, currentImageBuf: Buffer, width: number, height: number, pixelmatchThreshold: number) {
-  const masterImageBuf = await readImage(imagesDir, masterImageName);
+function getMismatchedPixels(pixelMatchInput: d.PixelMatchInput) {
+  const imgA = createReadStream(pixelMatchInput.imageAPath).pipe(new PNG()).on('parsed', doneReading);
+  const imgB = createReadStream(pixelMatchInput.imageBPath).pipe(new PNG()).on('parsed', doneReading);
 
-  const mismatchedPixels = pixelmatch(masterImageBuf, currentImageBuf, null, width, height, {
-    threshold: pixelmatchThreshold,
-    includeAA: false
-  });
+  let filesRead = 0;
 
-  return mismatchedPixels;
+  function doneReading() {
+    if (++filesRead < 2) return;
+
+    const mismatchedPixels = pixelmatch(imgA.data, imgB.data, null, pixelMatchInput.width, pixelMatchInput.height, {
+      threshold: pixelMatchInput.pixelmatchThreshold,
+      includeAA: false
+    });
+
+    process.send(mismatchedPixels);
+  }
 }
 
-
-function readImage(imagesDir: string, image: string) {
-  return new Promise<Buffer>(resolve => {
-    const filePath = join(imagesDir, image);
-
-    const rs = createReadStream(filePath);
-
-    rs.pipe(new PNG()).on('parsed', resolve);
-  });
-}
+process.on('message', getMismatchedPixels);
