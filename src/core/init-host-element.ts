@@ -56,6 +56,7 @@ export function initHostElement(
         // the browser has just informed us that an attribute
         // on the host element has changed
         attributeChangedCallback(attrToProp, this, attribName, newVal);
+        //TODO: check for boolean attributes and normalize newVal
       };
     }
 
