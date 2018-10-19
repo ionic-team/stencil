@@ -239,8 +239,13 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         }
       }
     },
-    $dispatchEvent: (elm, eventName, data) =>
-      elm && elm.dispatchEvent(new win.CustomEvent(eventName, data)),
+    $dispatchEvent: (elm, eventName, data) =>{
+      // create and return the custom event, allows for cancel checks
+      const e = new win.CustomEvent(eventName, data);
+      elm && elm.dispatchEvent(e);
+
+      return e;
+    },
 
     $parentElement: (elm, parentNode?): any =>
       // if the parent node is a document fragment (shadow root)

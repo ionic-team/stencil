@@ -7,14 +7,13 @@ export function initEventEmitters(plt: PlatformApi, cmpEvents: ComponentConstruc
     cmpEvents.forEach(eventMeta => {
 
       instance[eventMeta.method] = {
-        emit: (data: any) => {
+        emit: (data: any) => 
           plt.emitEvent(elm, eventMeta.name, {
             bubbles: eventMeta.bubbles,
             composed: eventMeta.composed,
             cancelable: eventMeta.cancelable,
             detail: data
-          } as EventEmitterData);
-        }
+          } as EventEmitterData)        
       };
 
     });

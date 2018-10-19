@@ -41,4 +41,36 @@ describe('initEventEmitters', () => {
     }
   });
 
+  it('should event emitter should return custom event', () => {
+    const plt = mockPlatform();
+    const instance = {};
+    const elm = plt.domApi.$createElement('div');
+
+    plt.instanceMap.set(elm, instance);
+    plt.hostElementMap.set(instance, elm);
+
+    const events = [{
+      name: 'my-event',
+      method: 'myEvent',
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    },
+    {
+      name: 'ionEvent',
+      method: 'ionEvent',
+      bubbles: false,
+      cancelable: false,
+      composed: false
+    }];
+
+    initEventEmitters(plt, events, instance);
+
+    for (const event of events) {
+      const ce = instance[event.method].emit('detail');
+      expect(ce).not.toEqual(null);
+      expect(ce.type).toEqual(event.name);
+    }
+  });
+
 });

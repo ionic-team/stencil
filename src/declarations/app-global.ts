@@ -54,7 +54,7 @@ export interface QueuedComponentOnReady {
 
 export interface CoreContext {
   attr?: number;
-  emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => void;
+  emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => CustomEvent;
   enableListener?: d.EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
   isClient?: boolean;
