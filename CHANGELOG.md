@@ -1,8 +1,9 @@
-<a name="0.14.1-4"></a>
-## 🌭 [Prerelease] [0.14.1-4](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1-4) (2018-10-19)
+<a name="0.14.1"></a>
+## 🍐 [0.14.1](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1) (2018-10-19)
 
 ### Features
 
+* **event:** get event from EventEmitter.emit allow check on e.defaultPrevented ([#1162](https://github.com/ionic-team/stencil/issues/1162)) ([f04a8f1](https://github.com/ionic-team/stencil/commit/f04a8f1))
 * **waitForEvent:** add page.waitForEvent() to e2e testing ([77d7b7c](https://github.com/ionic-team/stencil/commit/77d7b7c))
 
 
