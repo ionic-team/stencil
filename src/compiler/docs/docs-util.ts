@@ -157,6 +157,13 @@ interface RowData {
   isHeader?: boolean;
 }
 
+export function getEventDetailType(eventType: d.AttributeTypeInfo) {
+  if (eventType && eventType.text && typeof eventType.text === 'string' && eventType.text !== 'void') {
+    return eventType.text.trim();
+  }
+  return '';
+}
+
 
 export function getMemberDocumentation(jsDoc: d.JsDoc) {
   if (jsDoc && typeof jsDoc.documentation === 'string') {

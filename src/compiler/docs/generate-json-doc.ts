@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getMemberDocumentation, getMethodParameters, getMethodReturns } from './docs-util';
+import { getMemberDocumentation, getMethodParameters, getMethodReturns, getEventDetailType} from './docs-util';
 import { MEMBER_TYPE } from '../../util/constants';
 
 
@@ -114,7 +114,8 @@ function generateJsDocEvents(cmpMeta: d.ComponentMeta, jsonCmp: d.JsonDocsCompon
       bubbles: !!eventMeta.eventBubbles,
       cancelable: !!eventMeta.eventCancelable,
       composed: !!eventMeta.eventComposed,
-      docs: getMemberDocumentation(eventMeta.jsdoc)
+      docs: getMemberDocumentation(eventMeta.jsdoc),
+      detail: getEventDetailType(eventMeta.eventType),
     };
 
     jsonCmp.events.push(eventData);

@@ -56,6 +56,7 @@ export interface JsonDocsEvent {
   cancelable?: boolean;
   composed?: boolean;
   docs?: string;
+  detail?: string;
 }
 
 
