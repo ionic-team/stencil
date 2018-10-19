@@ -108,10 +108,12 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return new Promise<void>((resolve, reject) => {
       let resolveTmr: any;
 
+      const timeout = 30000;
+
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
-        reject(`waitForVisible timed out`);
-      }, 30000);
+        reject(`waitForVisible timed out: ${timeout}ms`);
+      }, timeout);
 
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
@@ -131,10 +133,12 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return new Promise<void>((resolve, reject) => {
       let resolveTmr: any;
 
+      const timeout = 30000;
+
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
-        reject(`waitForNotVisible timed out`);
-      }, 30000);
+        reject(`waitForNotVisible timed out: ${timeout}ms`);
+      }, timeout);
 
       const checkVisible = async () => {
         const isVisible = await this.isVisible();

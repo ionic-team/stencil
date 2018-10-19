@@ -12,6 +12,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   const timeoutBeforeScreenshot = config.flags.ci ? 80 : 4;
 
   const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
+  config.logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
 
   const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
   await connector.initBuild({

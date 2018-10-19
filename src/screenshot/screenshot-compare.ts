@@ -122,29 +122,42 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
 async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
   return new Promise<number>((resolve, reject) => {
-    const filteredExecArgs = process.execArgv.filter(
-      v => !/^--(debug|inspect)/.test(v)
-    );
+    const timeout = 30000;
+    const tmr = setTimeout(() => {
+      reject(`getMismatchedPixels timeout: ${timeout}ms`);
+    }, timeout);
 
-    const options = {
-      execArgv: filteredExecArgs,
-      env: process.env,
-      cwd: process.cwd(),
-      stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any
-    };
+    try {
+      const filteredExecArgs = process.execArgv.filter(
+        v => !/^--(debug|inspect)/.test(v)
+      );
 
-    const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
+      const options = {
+        execArgv: filteredExecArgs,
+        env: process.env,
+        cwd: process.cwd(),
+        stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any
+      };
 
-    pixelMatchProcess.on('message', data => {
-      pixelMatchProcess.kill();
-      resolve(data);
-    });
+      const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
 
-    pixelMatchProcess.on('error', err => {
-      reject(err);
-    });
+      pixelMatchProcess.on('message', data => {
+        pixelMatchProcess.kill();
+        clearTimeout(tmr);
+        resolve(data);
+      });
 
-    pixelMatchProcess.send(pixelMatchInput);
+      pixelMatchProcess.on('error', err => {
+        clearTimeout(tmr);
+        reject(err);
+      });
+
+      pixelMatchProcess.send(pixelMatchInput);
+
+    } catch (e) {
+      clearTimeout(tmr);
+      reject(`getMismatchedPixels error: ${e}`);
+    }
   });
 }
 
