@@ -1,5 +1,5 @@
 import { EventMeta } from '../../declarations';
-import { MarkdownTable, getMemberDocumentation, isMemberInternal } from './docs-util';
+import { MarkdownTable, getMemberDocumentation, isMemberInternal, getEventDetailType } from './docs-util';
 
 
 export class MarkdownEvents {
@@ -27,11 +27,12 @@ export class MarkdownEvents {
 
     const table = new MarkdownTable();
 
-    table.addHeader(['Event', 'Description']);
+    table.addHeader(['Event', 'Detail', 'Description']);
 
     rows.forEach(row => {
       table.addRow([
         '`' + row.eventName + '`',
+        row.detail,
         row.description
       ]);
     });
@@ -51,6 +52,10 @@ class Row {
 
   get eventName() {
     return this.eventMeta.eventName;
+  }
+
+  get detail() {
+    return getEventDetailType(this.eventMeta.eventType);
   }
 
   get description() {
