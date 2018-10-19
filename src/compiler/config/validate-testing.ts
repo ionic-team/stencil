@@ -70,7 +70,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.setuptest.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
     );
 
   } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {

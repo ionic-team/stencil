@@ -28,5 +28,9 @@ export function jestSetupTestFramework() {
 
   global.screenshotDescriptions = new Set();
 
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+  const env: d.E2EProcessEnv = process.env;
+
+  if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
+  }
 }

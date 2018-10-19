@@ -111,7 +111,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
         reject(`waitForVisible timed out`);
-      }, 15000);
+      }, 30000);
 
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
@@ -134,7 +134,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
         reject(`waitForNotVisible timed out`);
-      }, 15000);
+      }, 30000);
 
       const checkVisible = async () => {
         const isVisible = await this.isVisible();

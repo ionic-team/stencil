@@ -184,6 +184,7 @@ export interface E2EProcessEnv {
   __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
+  __STENCIL_DEFAULT_TIMEOUT__?: string;
 }
 
 
