@@ -2,8 +2,8 @@
   "namespace": "App",
   "fsNamespace": "app",
   "loader": "../app.js",
-  "core": "app.uonclduy.js",
-  "corePolyfilled": "app.mzhilcyv.js",
+  "core": "app.qqwwbd7c.js",
+  "corePolyfilled": "app.ibumv4zp.js",
   "components": {
     "app-root": {
       "bundleIds": {
@@ -12,7 +12,7 @@
     },
     "compare-analysis": {
       "bundleIds": {
-        "$": "b7qfinrk"
+        "$": "n5umzvjk"
       },
       "encapsulation": "shadow"
     },
@@ -30,18 +30,18 @@
     },
     "compare-row": {
       "bundleIds": {
-        "$": "b7qfinrk"
+        "$": "n5umzvjk"
       }
     },
     "compare-thead": {
       "bundleIds": {
-        "$": "b7qfinrk"
+        "$": "n5umzvjk"
       },
       "encapsulation": "shadow"
     },
     "screenshot-compare": {
       "bundleIds": {
-        "$": "b7qfinrk"
+        "$": "n5umzvjk"
       }
     },
     "screenshot-lookup": {
