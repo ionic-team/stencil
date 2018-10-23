@@ -32,7 +32,7 @@ fs.emptyDirSync(DIST_LICENSES);
 [
   'ansi-colors',
   'autoprefixer',
-  'clean-css',
+  'cssnano',
   'css-what',
   'glob',
   'is-glob',

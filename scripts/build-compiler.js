@@ -120,9 +120,8 @@ if (success) {
 function updateBuildIds(buildId, input) {
   // __BUILDID__
   // __BUILDID:TRANSPILE__
-  // __BUILDID:MINIFYSTYLE__
+  // __BUILDID:OPTIMIZECSS__
   // __BUILDID:MINIFYJS__
-  // __BUILDID:AUTOPREFIXCSS__
 
   let output = input;
 
@@ -135,18 +134,15 @@ function updateBuildIds(buildId, input) {
   let transpileId = transpilePkg.name + transpilePkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:TRANSPILE__/g, transpileId);
 
-  let minifyStylePkg = require('../node_modules/clean-css/package.json');
-  let minifyStyleId = minifyStylePkg.name + minifyStylePkg.version + CACHE_BUSTER;
-  output = output.replace(/__BUILDID:MINIFYSTYLE__/g, minifyStyleId);
-
   let minifyJsPkg = require('../node_modules/terser/package.json');
   let minifyJsId = minifyJsPkg.name + minifyJsPkg.version + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
 
   let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
+  let cssnanoPkg = require('../node_modules/cssnano/package.json');
   let postcssPkg = require('../node_modules/postcss/package.json');
-  let autoPrefixerId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + CACHE_BUSTER;
-  output = output.replace(/__BUILDID:AUTOPREFIXCSS__/g, autoPrefixerId);
+  let id = autoprefixerPkg.name + autoprefixerPkg.version + '_' + cssnanoPkg.name + cssnanoPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+  output = output.replace(/__BUILDID:OPTIMIZECSS__/g, id);
 
   return output;
 }

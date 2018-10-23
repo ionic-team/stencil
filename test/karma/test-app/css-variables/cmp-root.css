@@ -1,10 +1,4 @@
-
-:root {
-  --font-size: 22px;
-  --background: yellow;
-  --color: maroon;
-  --footer-color: maroon;
-}
+@import "variables.css";
 
 .dark {
   --font-size: 18px;

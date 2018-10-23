@@ -190,8 +190,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.nodeLazyRequire;
   }
 
-  minifyCss(input: string, filePath?: string, opts: any = {}) {
-    return this.sysWorker.run('minifyCss', [input, filePath, opts]);
+  optimizeCss(inputOpts: d.OptimizeCssInput) {
+    return this.sysWorker.run('optimizeCss', [inputOpts]);
   }
 
   minifyJs(input: string, opts?: any) {

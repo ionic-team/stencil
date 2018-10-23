@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
-import { minifyStyle } from './minify-style';
+import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
@@ -186,16 +185,8 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     filePath = externalStyle.absolutePath;
   }
 
-  // auto add css prefixes
-  const autoprefixConfig = config.autoprefixCss;
-  if (autoprefixConfig !== false) {
-    styleMeta.compiledStyleText = await autoprefixCssMain(config, compilerCtx, styleMeta.compiledStyleText, autoprefixConfig);
-  }
-
-  if (config.minifyCss) {
-    // minify css
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
-  }
+  // auto add css prefixes and minifies when configured
+  styleMeta.compiledStyleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath, true);
 
   if (requiresScopedStyles(cmpMeta.encapsulationMeta, config)) {
     // only create scoped styles if we need to

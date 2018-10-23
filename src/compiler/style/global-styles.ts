@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, normalizePath, pathJoin } from '../util';
 import { getCssImports } from './css-imports';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
-import { minifyStyle } from './minify-style';
+import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
@@ -40,17 +39,7 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
 
-    styleText = transformResults.code;
-
-    // auto add css prefixes
-    const autoprefixConfig = config.autoprefixCss;
-    if (autoprefixConfig !== false) {
-      styleText = await autoprefixCssMain(config, compilerCtx, styleText, autoprefixConfig);
-    }
-
-    if (config.minifyCss) {
-      styleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleText, filePath);
-    }
+    styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, filePath, true);
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);

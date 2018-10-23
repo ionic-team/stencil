@@ -28,13 +28,4 @@ describe('init-css-shim', () => {
     expect(imagePath).toBe(`url(${domain}${imageUrl})`);
   });
 
-  it('should replace "relative" paths', async () => {
-    const relativePath = '/test-app';
-    const root = app.querySelector('init-css-root #relative');
-    let imagePath = window.getComputedStyle(root).getPropertyValue('background-image');
-    imagePath = imagePath.replace(/\"/g, '');
-    imagePath = imagePath.replace(/\'/g, '');
-    expect(imagePath).toBe(`url(${window.location.origin}${relativePath}${imageUrl})`);
-  });
-
 });

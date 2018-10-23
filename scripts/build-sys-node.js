@@ -73,6 +73,14 @@ function bundleExternal(entryFileName) {
       // bundle this import
       callback();
     },
+    resolve: {
+      alias: {
+        'postcss': path.resolve(__dirname, '..', 'node_modules', 'postcss'),
+        'source-map': path.resolve(__dirname, '..', 'node_modules', 'source-map'),
+        'chalk': path.resolve(__dirname, 'helpers', 'empty.js'),
+        'cssnano-preset-default': path.resolve(__dirname, 'helpers', 'cssnano-preset-default'),
+      }
+    },
     optimization: {
       minimize: false
     },
