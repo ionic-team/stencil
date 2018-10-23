@@ -233,9 +233,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     }
   }
 
-  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
-  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
-
   const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
 
   if (addStylesUpdate) {
@@ -257,6 +254,9 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       isScoped: true
     });
   }
+
+  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
+  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
 
   return styleMeta;
 }
