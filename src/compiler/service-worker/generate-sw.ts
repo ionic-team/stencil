@@ -17,14 +17,16 @@ export async function generateServiceWorkers(config: d.Config, compilerCtx: d.Co
   const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
 
   const promises = wwwServiceOutputs.map(async outputTarget => {
-    await generateServiceWorker(buildCtx, outputTarget, workbox);
+    await generateServiceWorker(config, buildCtx, outputTarget, workbox);
   });
 
   await Promise.all(promises);
 }
 
 
-async function generateServiceWorker(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) {
+async function generateServiceWorker(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) {
+  ignoreLegacyBundles(config, outputTarget.serviceWorker);
+
   if (hasSrcConfig(outputTarget)) {
     await Promise.all([
       copyLib(buildCtx, outputTarget, workbox),
@@ -75,6 +77,21 @@ async function injectManifest(buildCtx: d.BuildCtx, outputTarget: d.OutputTarget
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
+  }
+}
+
+
+function ignoreLegacyBundles(config: d.Config, serviceWorker: d.ServiceWorkerConfig) {
+  const ignorePattern = `**/${config.fsNamespace}/*.es5.entry.js`;
+
+  if (typeof serviceWorker.globIgnores === 'string') {
+    serviceWorker.globIgnores = [serviceWorker.globIgnores];
+  }
+
+  serviceWorker.globIgnores = serviceWorker.globIgnores || [];
+
+  if (!serviceWorker.globIgnores.includes(ignorePattern)) {
+    serviceWorker.globIgnores.push(ignorePattern);
   }
 }
 
