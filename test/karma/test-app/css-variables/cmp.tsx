@@ -24,7 +24,10 @@ export class CssVariables {
         <p><button onClick={() => this.theme = 'light'}>Light Theme</button></p>
         <p><button onClick={() => this.theme = 'dark'}>Dark Theme</button></p>
         <p><button onClick={() => this.theme = 'default'}>Default Theme</button></p>
-      </main>
+      </main>,
+      <footer>
+        !important footer
+      </footer>
     ];
   }
 
