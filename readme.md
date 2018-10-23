@@ -158,6 +158,7 @@ For the small minority of browsers that do not support modern browser features a
  - [fetch()](https://github.com/github/fetch)
  - [URL](https://github.com/lifaon74/url-polyfill)
  - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+ - [Array.findIndex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
  - [Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
  - [Array.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
  - [Element.closest](https://github.com/jonathantneal/closest)
