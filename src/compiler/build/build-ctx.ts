@@ -185,7 +185,7 @@ function getBuildTimestamp() {
 
   // YYYY-MM-DDThh:mm:ss
   let timestamp = d.getUTCFullYear() + '-';
-  timestamp += ('0' + d.getUTCMonth()).slice(-2) + '-';
+  timestamp += ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-';
   timestamp += ('0' + d.getUTCDate()).slice(-2) + 'T';
   timestamp += ('0' + d.getUTCHours()).slice(-2) + ':';
   timestamp += ('0' + d.getUTCMinutes()).slice(-2) + ':';
