@@ -91,6 +91,9 @@ export namespace Components {
   interface CssVariables {}
   interface CssVariablesAttributes extends StencilHTMLAttributes {}
 
+  interface DynamicCssVariable {}
+  interface DynamicCssVariableAttributes extends StencilHTMLAttributes {}
+
   interface DynamicImport {
     'update': () => Promise<void>;
   }
@@ -364,6 +367,7 @@ declare global {
     'ConditionalRerender': Components.ConditionalRerender;
     'CssVariablesRoot': Components.CssVariablesRoot;
     'CssVariables': Components.CssVariables;
+    'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
     'EsmImport': Components.EsmImport;
@@ -435,6 +439,7 @@ declare global {
     'conditional-rerender': Components.ConditionalRerenderAttributes;
     'css-variables-root': Components.CssVariablesRootAttributes;
     'css-variables': Components.CssVariablesAttributes;
+    'dynamic-css-variable': Components.DynamicCssVariableAttributes;
     'dynamic-import': Components.DynamicImportAttributes;
     'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
     'esm-import': Components.EsmImportAttributes;
@@ -564,6 +569,12 @@ declare global {
   var HTMLCssVariablesElement: {
     prototype: HTMLCssVariablesElement;
     new (): HTMLCssVariablesElement;
+  };
+
+  interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {}
+  var HTMLDynamicCssVariableElement: {
+    prototype: HTMLDynamicCssVariableElement;
+    new (): HTMLDynamicCssVariableElement;
   };
 
   interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLStencilElement {}
@@ -915,6 +926,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement
     'css-variables-root': HTMLCssVariablesRootElement
     'css-variables': HTMLCssVariablesElement
+    'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
     'esm-import': HTMLEsmImportElement
@@ -986,6 +998,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement;
     'css-variables-root': HTMLCssVariablesRootElement;
     'css-variables': HTMLCssVariablesElement;
+    'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
     'esm-import': HTMLEsmImportElement;

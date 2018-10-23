@@ -200,6 +200,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'removeAttributeNS',
   'removeChild',
   'removeEventListener',
+  'removeProperty',
   'requestAnimationFrame',
   'requestIdleCallback',
   'search',
