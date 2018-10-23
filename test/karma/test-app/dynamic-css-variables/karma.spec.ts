@@ -11,22 +11,27 @@ describe('dynamic-css-variables', function() {
   afterEach(tearDownDom);
 
   it('should dynamically change the inline css variable', async () => {
-    const header = app.querySelector('header');
-    const headerStyles1 = window.getComputedStyle(header);
-    expect(headerStyles1.color).toBe('rgb(0, 0, 255)');
+    const win = window as any;
 
-    const button = app.querySelector('button');
-    button.click();
-    await waitForChanges();
+    if (win.CSS && win.CSS.supports && win.CSS.supports('--fake-var', 0)) {
+      const header = app.querySelector('header');
+      const headerStyles1 = window.getComputedStyle(header);
+      expect(headerStyles1.color).toBe('rgb(0, 0, 255)');
 
-    const headerStyles2 = window.getComputedStyle(header);
-    expect(headerStyles2.color).toBe('rgb(255, 255, 255)');
+      const button = app.querySelector('button');
+      button.click();
+      await waitForChanges();
 
-    button.click();
-    await waitForChanges();
+      const headerStyles2 = window.getComputedStyle(header);
+      expect(headerStyles2.color).toBe('rgb(255, 255, 255)');
 
-    const headerStyles3 = window.getComputedStyle(header);
-    expect(headerStyles3.color).toBe('rgb(0, 0, 255)');
+      button.click();
+      await waitForChanges();
+
+      const headerStyles3 = window.getComputedStyle(header);
+      expect(headerStyles3.color).toBe('rgb(0, 0, 255)');
+    }
+
   });
 
 });
