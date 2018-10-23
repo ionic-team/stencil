@@ -91,6 +91,9 @@ export namespace Components {
   interface CssVariables {}
   interface CssVariablesAttributes extends StencilHTMLAttributes {}
 
+  interface CustomEvent {}
+  interface CustomEventAttributes extends StencilHTMLAttributes {}
+
   interface DynamicCssVariable {}
   interface DynamicCssVariableAttributes extends StencilHTMLAttributes {}
 
@@ -367,6 +370,7 @@ declare global {
     'ConditionalRerender': Components.ConditionalRerender;
     'CssVariablesRoot': Components.CssVariablesRoot;
     'CssVariables': Components.CssVariables;
+    'CustomEvent': Components.CustomEvent;
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
@@ -439,6 +443,7 @@ declare global {
     'conditional-rerender': Components.ConditionalRerenderAttributes;
     'css-variables-root': Components.CssVariablesRootAttributes;
     'css-variables': Components.CssVariablesAttributes;
+    'custom-event': Components.CustomEventAttributes;
     'dynamic-css-variable': Components.DynamicCssVariableAttributes;
     'dynamic-import': Components.DynamicImportAttributes;
     'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
@@ -569,6 +574,12 @@ declare global {
   var HTMLCssVariablesElement: {
     prototype: HTMLCssVariablesElement;
     new (): HTMLCssVariablesElement;
+  };
+
+  interface HTMLCustomEventElement extends Components.CustomEvent, HTMLStencilElement {}
+  var HTMLCustomEventElement: {
+    prototype: HTMLCustomEventElement;
+    new (): HTMLCustomEventElement;
   };
 
   interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {}
@@ -926,6 +937,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement
     'css-variables-root': HTMLCssVariablesRootElement
     'css-variables': HTMLCssVariablesElement
+    'custom-event': HTMLCustomEventElement
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
@@ -998,6 +1010,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement;
     'css-variables-root': HTMLCssVariablesRootElement;
     'css-variables': HTMLCssVariablesElement;
+    'custom-event': HTMLCustomEventElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;

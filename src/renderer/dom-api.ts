@@ -19,6 +19,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       // CustomEvent polyfill
       win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
         evt = doc.createEvent('CustomEvent');
+        data = data || {};
         evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
         return evt;
       };
