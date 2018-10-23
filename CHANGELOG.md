@@ -1,3 +1,17 @@
+<a name="0.14.2"></a>
+## 💍 [0.14.2](https://github.com/ionic-team/stencil/compare/v0.14.1...v0.14.2) (2018-10-23)
+
+
+### Bug Fixes
+
+* **clean-css:** update to clean-css 4.2.1 ([6a648d7](https://github.com/ionic-team/stencil/commit/6a648d7))
+* **css-vars:** fix removing inline css variables ([9fcd7ee](https://github.com/ionic-team/stencil/commit/9fcd7ee)), closes [#1159](https://github.com/ionic-team/stencil/issues/1159)
+* **hmr:** fix hmr styles updates with escaped characters ([db2456a](https://github.com/ionic-team/stencil/commit/db2456a)), closes [#1156](https://github.com/ionic-team/stencil/issues/1156)
+* **service-worker:** do not default to sw cache ico, png, and svg files ([822c7b3](https://github.com/ionic-team/stencil/commit/822c7b3)), closes [#1164](https://github.com/ionic-team/stencil/issues/1164)
+* **service-worker:** do not sw cache legacy bundles ([93e16b1](https://github.com/ionic-team/stencil/commit/93e16b1)), closes [#1006](https://github.com/ionic-team/stencil/issues/1006)
+
+
+
 <a name="0.14.1"></a>
 ## 🍐 [0.14.1](https://github.com/ionic-team/stencil/compare/v0.14.0...v0.14.1) (2018-10-19)
 
