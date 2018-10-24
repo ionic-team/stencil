@@ -57,6 +57,7 @@ if (typeof (window as any).CustomEvent !== 'function') {
   // CustomEvent polyfill
   (window as any).CustomEvent = (event: any, data: any) => {
     const evt = document.createEvent('CustomEvent');
+    data = data || {};
     evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
     return evt;
   };

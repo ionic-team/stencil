@@ -240,11 +240,10 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         }
       }
     },
-    $dispatchEvent: (elm, eventName, data) =>{
+    $dispatchEvent: (elm, eventName, data) => {
       // create and return the custom event, allows for cancel checks
       const e = new win.CustomEvent(eventName, data);
       elm && elm.dispatchEvent(e);
-
       return e;
     },
 
