@@ -1,8 +1,9 @@
-<a name="0.15.0-0"></a>
-# 😀 [0.15.0-0](https://github.com/ionic-team/stencil/compare/v0.14.2...v0.15.0-0) (2018-10-24)
+<a name="0.15.0-1"></a>
+# ✨ [Prerelease] [0.15.0-1](https://github.com/ionic-team/stencil/compare/v0.14.2...v0.15.0-1) (2018-10-24)
 
 ### Bug Fixes
 
+* **autoprefix:** handle true value as autoprefixCss config ([50b9b88](https://github.com/ionic-team/stencil/commit/50b9b88))
 * **build:** fix month in build timestamp ([#1177](https://github.com/ionic-team/stencil/issues/1177)) ([448a7d9](https://github.com/ionic-team/stencil/commit/448a7d9))
 * **css:** cssnano for minifying css, and optimize postcss and autoprefixer ([7e6a55c](https://github.com/ionic-team/stencil/commit/7e6a55c)), closes [#1152](https://github.com/ionic-team/stencil/issues/1152)
 * **event:** fix CustomEvent polyfill ([e22fd30](https://github.com/ionic-team/stencil/commit/e22fd30)), closes [#1173](https://github.com/ionic-team/stencil/issues/1173)
