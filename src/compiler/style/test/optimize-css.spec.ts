@@ -27,16 +27,6 @@ describe('optimizeCss',  () => {
     expect(diagnostics).toHaveLength(1);
   });
 
-  it('handles autoprefixerCss true config', async () => {
-    config.autoprefixCss = true;
-    config.minifyCss = true;
-    const styleText = `/* css */ body { color: #ff0000; }`;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`body{color:red}`);
-  });
-
   it('discard-comments', async () => {
     config.minifyCss = true;
     const styleText = `/* css */ body { color: #ff0000; }`;
@@ -332,7 +322,21 @@ describe('optimizeCss',  () => {
     expect(output).toBe(`h1,h2,h3{color:red}`);
   });
 
-  it('prevent autoprefix by default', async () => {
+  it('prevent autoprefix with null', async () => {
+    config.autoprefixCss = null;
+    config.minifyCss = true;
+    const styleText = `
+      h1 {
+        box-shadow: 1px;
+      }
+    `;
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+
+    expect(diagnostics).toHaveLength(0);
+    expect(output).toBe(`h1{box-shadow:1px}`);
+  });
+
+  it('prevent autoprefix with false', async () => {
     config.autoprefixCss = false;
     config.minifyCss = true;
     const styleText = `
@@ -347,6 +351,20 @@ describe('optimizeCss',  () => {
   });
 
   it('autoprefix by default', async () => {
+    config.minifyCss = true;
+    const styleText = `
+      h1 {
+        box-shadow: 1px;
+      }
+    `;
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+
+    expect(diagnostics).toHaveLength(0);
+    expect(output).toBe(`h1{-webkit-box-shadow:1px;box-shadow:1px}`);
+  });
+
+  it('runs autoprefixerCss true config', async () => {
+    config.autoprefixCss = true;
     config.minifyCss = true;
     const styleText = `
       h1 {
