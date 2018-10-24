@@ -27,6 +27,16 @@ describe('optimizeCss',  () => {
     expect(diagnostics).toHaveLength(1);
   });
 
+  it('handles autoprefixerCss true config', async () => {
+    config.autoprefixCss = true;
+    config.minifyCss = true;
+    const styleText = `/* css */ body { color: #ff0000; }`;
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+
+    expect(diagnostics).toHaveLength(0);
+    expect(output).toBe(`body{color:red}`);
+  });
+
   it('discard-comments', async () => {
     config.minifyCss = true;
     const styleText = `/* css */ body { color: #ff0000; }`;

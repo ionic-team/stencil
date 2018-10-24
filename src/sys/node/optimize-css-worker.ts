@@ -49,7 +49,7 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
 
 
 export function addAutoprefixer(inputOpts: d.OptimizeCssInput) {
-  const autoprefixerOpts = inputOpts.autoprefixer || DEFAULT_AUTOPREFIX_LEGACY;
+  const autoprefixerOpts: any = (inputOpts.autoprefixer && typeof inputOpts.autoprefixer === 'object') || DEFAULT_AUTOPREFIX_LEGACY;
 
   return autoprefixer(autoprefixerOpts);
 }

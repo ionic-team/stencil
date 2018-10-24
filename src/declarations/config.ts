@@ -5,6 +5,14 @@ import * as d from '.';
  */
 export interface StencilConfig {
   /**
+   * By default, Stencil will use the appropriate config to automatically prefix css. For example,
+   * developers can write modern and standard css properties, such as "transform", and Stencil
+   * will automatically add in the prefixed version, such as "-webkit-transform". To disable
+   * autoprefixing css, set this value to `false`.
+   */
+  autoprefixCss?: boolean | any;
+
+  /**
    * By default, Stencil will statically analyze the application and generate a component graph of
    * how all the components are interconnected.
    *
@@ -104,7 +112,6 @@ export interface StencilConfig {
   srcDir?: string;
 
   assetVersioning?: ConfigAssetVersioning;
-  autoprefixCss?: boolean | any;
   buildEs5?: boolean;
   buildEsm?: boolean;
   buildScoped?: boolean;
