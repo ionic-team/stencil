@@ -83,8 +83,9 @@ export interface DevResponseHeaders {
   'Expires'?: string;
   'Content-Type'?: string;
   'Content-Length'?: number;
-  'X-Powered-By'?: string;
   'Access-Control-Allow-Origin'?: string;
+  'X-Powered-By'?: string;
+  'X-Directory-Index'?: string;
 }
 
 
