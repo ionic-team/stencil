@@ -29,6 +29,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'ael',
   'rel',
   'raf',
+  'asyncQueue',
   'read',
   'ref',
   'resourcesUrl',
