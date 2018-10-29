@@ -13,6 +13,7 @@ export function initHostElement(
   cmpMeta: d.ComponentMeta,
   HostElementConstructor: d.HostElement,
   hydratedCssClass: string,
+  perf: Performance
 ) {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
@@ -20,20 +21,20 @@ export function initHostElement(
 
   HostElementConstructor.connectedCallback = function() {
     // coolsville, our host element has just hit the DOM
-    connectedCallback(plt, cmpMeta, this);
+    connectedCallback(plt, cmpMeta, this, perf);
   };
 
   HostElementConstructor.disconnectedCallback = function() {
     // the element has left the builing
-    disconnectedCallback(plt, this);
+    disconnectedCallback(plt, this, perf);
   };
 
   HostElementConstructor['s-init'] = function() {
-    initComponentLoaded(plt, this, hydratedCssClass);
+    initComponentLoaded(plt, this, hydratedCssClass, perf);
   };
 
   HostElementConstructor.forceUpdate = function() {
-    queueUpdate(plt, this);
+    queueUpdate(plt, this, perf);
   };
 
   if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
@@ -56,13 +57,12 @@ export function initHostElement(
         // the browser has just informed us that an attribute
         // on the host element has changed
         attributeChangedCallback(attrToProp, this, attribName, newVal);
-        //TODO: check for boolean attributes and normalize newVal
       };
     }
 
     // add getters/setters to the host element members
     // these would come from the @Prop and @Method decorators that
     // should create the public API to this component
-    proxyHostElementPrototype(plt, entries, HostElementConstructor);
+    proxyHostElementPrototype(plt, entries, HostElementConstructor, perf);
   }
 }

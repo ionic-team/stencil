@@ -14,9 +14,13 @@ import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
 import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
+import { noop } from '../util/helpers';
 
 
 export { mockDocument, mockWindow };
+
+
+const testingPerf = { mark: noop, measure: noop } as any;
 
 
 export function mockDom(url: string, html: string): { win: Window, doc: HTMLDocument } {
@@ -189,7 +193,7 @@ export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpM
     $attributes: {}
   };
 
-  return initComponentInstance(plt, elm, hostSnapshot);
+  return initComponentInstance(plt, elm, hostSnapshot, testingPerf);
 }
 
 
@@ -235,7 +239,7 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
     if (!plt.hasConnectedMap.has(node)) {
       const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated');
+        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated', testingPerf);
         (node as d.HostElement).connectedCallback();
       }
     }

@@ -30,8 +30,8 @@ export function createPlatformServer(
   const loadedBundles: {[bundleId: string]:  d.CjsExports} = {};
   const appliedStyleIds = new Set<string>();
   const controllerComponents: {[tag: string]: d.HostElement} = {};
-
   const domApi = createDomApi(App, win, doc);
+  const perf = { mark: noop, measure: noop } as any;
 
   // init build context
   compilerCtx = compilerCtx || {};
@@ -118,7 +118,7 @@ export function createPlatformServer(
   App.onReady = () => new Promise(resolve => plt.queue.write(() => plt.processingCmp.size ? plt.onAppReadyCallbacks.push(resolve) : resolve()));
 
   // patch dom api like createElement()
-  patchDomApi(config, plt, domApi);
+  patchDomApi(config, plt, domApi, perf);
 
   // create the renderer which will be used to patch the vdom
   plt.render = createRendererPatch(plt, domApi);
@@ -277,7 +277,7 @@ export function createPlatformServer(
     // It is possible the data was loaded from an outside source like tests
     if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
       serverInitStyle(domApi, appliedStyleIds, cmpRegistry[cmpMeta.tagNameMeta].componentConstructor);
-      queueUpdate(plt, elm);
+      queueUpdate(plt, elm, perf);
 
     } else {
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
@@ -286,7 +286,7 @@ export function createPlatformServer(
 
       if (isLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
-        queueUpdate(plt, elm);
+        queueUpdate(plt, elm, perf);
 
       } else {
         const fileName = getComponentBundleFilename(cmpMeta, elm.mode);

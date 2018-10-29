@@ -5,7 +5,7 @@ import { noop } from '../util/helpers';
 import { parsePropertyValue } from '../util/data-parse';
 
 
-export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [string, d.MemberMeta][], hostPrototype: d.HostElement) {
+export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [string, d.MemberMeta][], hostPrototype: d.HostElement, perf: Performance) {
   // create getters/setters on the host element prototype to represent the public API
   // the setters allows us to know when data has changed so we can re-render
 
@@ -42,7 +42,7 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
         },
         function setHostElementProp(this: d.HostElement, newValue: any) {
           // host element setter (cannot be arrow fn)
-          setValue(plt, this, memberName, parsePropertyValue(member.propType, newValue));
+          setValue(plt, this, memberName, parsePropertyValue(member.propType, newValue), perf);
         }
       );
 

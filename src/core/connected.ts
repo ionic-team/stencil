@@ -3,7 +3,7 @@ import { initHostSnapshot } from './host-snapshot';
 import { initElementListeners } from './listeners';
 
 
-export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, perf: Performance) {
   if (__BUILD_CONDITIONALS__.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
@@ -22,17 +22,21 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
   plt.isDisconnectedMap.delete(elm);
 
   if (!plt.hasConnectedMap.has(elm)) {
-    plt.hasConnectedComponent = true;
-    plt.processingCmp.add(elm);
-
-    // first time we've connected
-    plt.hasConnectedMap.set(elm, true);
-
     if (!elm['s-id']) {
       // assign a unique id to this host element
       // it's possible this was already given an element id
       elm['s-id'] = plt.nextId();
     }
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
+
+    plt.hasConnectedComponent = true;
+    plt.processingCmp.add(elm);
+
+    // first time we've connected
+    plt.hasConnectedMap.set(elm, true);
 
     // register this component as an actively
     // loading child to its parent component
@@ -47,6 +51,12 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
       plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
+
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        perf.measure(`connected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      }
+
       plt.requestBundle(cmpMeta, elm);
     });
   }

@@ -4,10 +4,13 @@ import { NODE_TYPE } from '../util/constants';
 import { propagateComponentReady } from './init-component-instance';
 
 
-export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
+export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: Performance) {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
 
     // ok, let's officially destroy this thing
     // set this to true so that any of our pending async stuff
@@ -51,6 +54,11 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
       plt.onReadyCallbacksMap,
       plt.hostSnapshotMap
     ].forEach(wm => wm.delete(elm));
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      perf.measure(`disconnected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
   }
 }
 

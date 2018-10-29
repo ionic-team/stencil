@@ -12,6 +12,7 @@ export function defineMember(
   instance: d.ComponentInstance,
   memberName: string,
   hostSnapshot: d.HostSnapshot,
+  perf: Performance,
   hostAttributes?: d.HostSnapshotAttributes,
   hostAttrValue?: string
 ) {
@@ -29,7 +30,7 @@ export function defineMember(
 
     if (elm) {
       if (property.state || property.mutable) {
-        setValue(plt, elm, memberName, newValue);
+        setValue(plt, elm, memberName, newValue, perf);
 
       } else if (__BUILD_CONDITIONALS__.verboseError) {
         console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
@@ -140,7 +141,7 @@ export function defineMember(
 }
 
 
-export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, instance?: d.ComponentInstance) {
+export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, perf: Performance, instance?: d.ComponentInstance) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
   let values = plt.valuesMap.get(elm);
@@ -182,7 +183,7 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing
         // up millions cuz this function ensures it only runs once
-        queueUpdate(plt, elm);
+        queueUpdate(plt, elm, perf);
       }
     }
   }

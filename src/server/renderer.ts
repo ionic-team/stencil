@@ -5,6 +5,7 @@ import { getGlobalJsBuildPath } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
+import { noop } from '../util/helpers';
 
 
 export class Renderer {
@@ -38,9 +39,11 @@ export class Renderer {
   async hydrate(hydrateOpts: d.HydrateOptions) {
     let hydrateResults: d.HydrateResults;
 
+    const perf = { mark: noop, measure: noop } as any;
+
     // kick off hydrated, which is an async opertion
     try {
-      hydrateResults = await hydrateHtml(this.config, this.ctx, this.outputTarget, this.cmpRegistry, hydrateOpts);
+      hydrateResults = await hydrateHtml(this.config, this.ctx, this.outputTarget, this.cmpRegistry, hydrateOpts, perf);
 
     } catch (e) {
       hydrateResults = {

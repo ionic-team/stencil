@@ -3,8 +3,13 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
 import { getScopeId } from '../util/scope';
 
 
-export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, encapsulation: ENCAPSULATION, style: string, styleMode: string) {
+export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, encapsulation: ENCAPSULATION, style: string, styleMode: string, perf: Performance) {
   if (style) {
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`init_style_template_start:${cmpMeta.tagNameMeta}`);
+    }
+
     // we got a style mode for this component, let's create an id for this style
     const styleModeId = cmpMeta.tagNameMeta + (styleMode || DEFAULT_STYLE_MODE);
 
@@ -60,6 +65,11 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
         // so it can be cloned later
         domApi.$appendChild(domApi.$doc.head, templateElm);
       }
+    }
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`init_style_template_end:${cmpMeta.tagNameMeta}`);
+      perf.measure(`init_style_template:${cmpMeta.tagNameMeta}`, `init_style_template_start:${cmpMeta.tagNameMeta}`, `init_style_template_end:${cmpMeta.tagNameMeta}`);
     }
   }
 }

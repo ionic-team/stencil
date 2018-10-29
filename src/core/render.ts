@@ -5,8 +5,12 @@ import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance) {
+export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance, perf: Performance) {
   try {
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`render_start:${hostElm.nodeName.toLowerCase()}`);
+    }
+
     // if this component has a render function, let's fire
     // it off and generate the child vnodes for this host element
     // note that we do not create the host element cuz it already exists
@@ -143,6 +147,11 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // let's fire off all update callbacks waiting
       hostElm['s-rc'].forEach(cb => cb());
       hostElm['s-rc'] = null;
+    }
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`render_end:${hostElm.nodeName.toLowerCase()}`);
+      perf.measure(`render:${hostElm.nodeName.toLowerCase()}`, `render_start:${hostElm.nodeName.toLowerCase()}`, `render_end:${hostElm.nodeName.toLowerCase()}`);
     }
 
   } catch (e) {

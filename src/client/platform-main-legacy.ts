@@ -17,6 +17,11 @@ import { queueUpdate } from '../core/update';
 
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
+  const perf = win.performance;
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`app_load_start`);
+  }
+
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles = new Map<string, d.CjsExports>();
@@ -111,6 +116,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   rootElm['s-init'] = () => {
     plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark('app_load_end');
+      perf.measure('app_load', 'app_load_start', 'app_load_end');
+    }
   };
 
   // if the HTML was generated from SSR
@@ -129,7 +139,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       initHostElement(plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass
+        hydratedCssClass,
+        perf
       );
 
       if (__BUILD_CONDITIONALS__.observeAttr) {
@@ -153,8 +164,17 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         HostElementConstructor.observedAttributes = observedAttributes;
       }
 
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`define_start:${cmpMeta.tagNameMeta}`);
+      }
+
       // define the custom element
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
+
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`define_end:${cmpMeta.tagNameMeta}`);
+        perf.measure(`define:${cmpMeta.tagNameMeta}`, `define_start:${cmpMeta.tagNameMeta}`, `define_end:${cmpMeta.tagNameMeta}`);
+      }
     }
   }
 
@@ -214,7 +234,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
+              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode, perf);
             }
             break;
           }
@@ -279,13 +299,13 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
     if (getLoadedBundle(bundleId, hmrVersionId)) {
       // sweet, we've already loaded this bundle
-      queueUpdate(plt, elm);
+      queueUpdate(plt, elm, perf);
 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
       bundleQueue.push([undefined, [bundleId], () => {
-        queueUpdate(plt, elm);
+        queueUpdate(plt, elm, perf);
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
@@ -371,6 +391,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   // register all the components now that everything's ready
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`define_custom_elements_start`);
+  }
+
   components
     .map(data => {
       const cmpMeta = parseComponentLoader(data);
@@ -390,6 +414,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       defineComponent(cmpMeta, HostElement);
     }
   );
+
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`define_custom_elements_end`);
+    perf.measure(`define_custom_elements`, `define_custom_elements_start`, `define_custom_elements_end`);
+  }
 
   if (!plt.hasConnectedComponent) {
     // we just defined call the custom elements but no

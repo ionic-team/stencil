@@ -8,7 +8,12 @@ export function proxyComponentInstance(
   elm: d.HostElement,
   instance: d.ComponentInstance,
   hostSnapshot: d.HostSnapshot,
+  perf: Performance
 ) {
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`proxy_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+  }
+
   // at this point we've got a specific node of a host element, and created a component class instance
   // and we've already created getters/setters on both the host element and component class prototypes
   // let's upgrade any data that might have been set on the host element already
@@ -31,6 +36,11 @@ export function proxyComponentInstance(
     mode: { type: String },
   }).forEach(([memberName, property]) => {
     // define each of the members and initialize what their role is
-    defineMember(plt, property, elm, instance, memberName, hostSnapshot);
+    defineMember(plt, property, elm, instance, memberName, hostSnapshot, perf);
   });
+
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`proxy_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    perf.measure(`proxy_instance:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `proxy_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `proxy_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+  }
 }

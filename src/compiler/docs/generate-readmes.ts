@@ -196,5 +196,5 @@ function checkDocs(config: d.Config, modules: d.ModuleFiles) {
 }
 
 function needsWarn(jsdoc: d.JsDoc) {
-  return !getMemberDocumentation(jsdoc) && !isMemberInternal(jsdoc);;
+  return !getMemberDocumentation(jsdoc) && !isMemberInternal(jsdoc);
 }

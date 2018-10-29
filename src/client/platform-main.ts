@@ -17,6 +17,11 @@ import { queueUpdate } from '../core/update';
 
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) {
+  const perf = win.performance;
+  if (__BUILD_CONDITIONALS__.perf) {
+    perf.mark(`app_load_start`);
+  }
+
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -104,6 +109,11 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   rootElm['s-init'] = () => {
     plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark('app_load_end');
+      perf.measure('app_load', 'app_load_start', 'app_load_end');
+    }
   };
 
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
@@ -126,6 +136,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         (cmpRegistry[tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
         hydratedCssClass,
+        perf
       );
 
       if (__BUILD_CONDITIONALS__.observeAttr) {
@@ -140,16 +151,33 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           .filter(attribName => !!attribName);
       }
 
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`define_start:${cmpMeta.tagNameMeta}`);
+      }
+
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
+
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`define_end:${cmpMeta.tagNameMeta}`);
+        perf.measure(`define:${cmpMeta.tagNameMeta}`, `define_start:${cmpMeta.tagNameMeta}`, `define_end:${cmpMeta.tagNameMeta}`);
+      }
     }
   }
 
 
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
+
     if (cmpMeta.componentConstructor) {
       // we're already all loaded up :)
-      queueUpdate(plt, elm);
+      queueUpdate(plt, elm, perf);
 
+      if (__BUILD_CONDITIONALS__.perf) {
+        perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      }
 
     } else if (__BUILD_CONDITIONALS__.externalModuleLoader) {
       // using a 3rd party bundler to import modules
@@ -163,17 +191,25 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
         // async loading of the module is done
+
+        if (__BUILD_CONDITIONALS__.perf) {
+          perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+          perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
+
         try {
           // get the component constructor from the module
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
           cmpMeta.componentConstructor = cmpConstructor;
+
           initStyleTemplate(
             domApi,
             cmpMeta,
             cmpMeta.encapsulationMeta,
             cmpConstructor.style,
-            cmpConstructor.styleMode
+            cmpConstructor.styleMode,
+            perf
           );
 
         } catch (e) {
@@ -186,7 +222,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
         }
 
         // bundle all loaded up, let's continue
-        queueUpdate(plt, elm);
+        queueUpdate(plt, elm, perf);
       });
 
 
@@ -209,21 +245,29 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {
         // async loading of the module is done
+
+        if (__BUILD_CONDITIONALS__.perf) {
+          perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+          perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
+
         try {
           // get the component constructor from the module
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
           cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+
           initStyleTemplate(
             domApi,
             cmpMeta,
             cmpMeta.encapsulationMeta,
             cmpMeta.componentConstructor.style,
-            cmpMeta.componentConstructor.styleMode
+            cmpMeta.componentConstructor.styleMode,
+            perf
           );
 
           // bundle all loaded up, let's continue
-          queueUpdate(plt, elm);
+          queueUpdate(plt, elm, perf);
 
         } catch (e) {
           // oh man, something's up
@@ -243,9 +287,18 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`define_custom_elements_start`);
+    }
+
     components
       .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
+
+    if (__BUILD_CONDITIONALS__.perf) {
+      perf.mark(`define_custom_elements_end`);
+      perf.measure(`define_custom_elements`, `define_custom_elements_start`, `define_custom_elements_end`);
+    }
 
     if (!plt.hasConnectedComponent) {
       // we just defined call the custom elements but no
