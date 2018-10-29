@@ -45,6 +45,7 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
       angularImports.push('Component');
       angularImports.push('ViewEncapsulation');
       angularImports.push('ChangeDetectionStrategy');
+      angularImports.push('ChangeDetectorRef');
     }
   }
 
@@ -184,9 +185,16 @@ export class ${cmpMeta.componentClass} {`];
 
   // Generate component constructor
   if (hasContructor) {
-    lines.push(`
+    if (useDirectives) {
+      lines.push(`
   constructor(r: ElementRef) {
     const el = r.nativeElement;`);
+    } else {
+      lines.push(`
+  constructor(c: ChangeDetectorRef, r: ElementRef) {
+    c.detach();
+    const el = r.nativeElement;`);
+    }
   }
 
   if (hasMethods) {
