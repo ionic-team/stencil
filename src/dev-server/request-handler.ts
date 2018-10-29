@@ -68,6 +68,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
 function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: http.IncomingMessage) {
   const req: d.HttpRequest = {
     method: (incomingReq.method || 'GET').toUpperCase() as any,
+    headers: incomingReq.headers as any,
     acceptHeader: (incomingReq.headers && typeof incomingReq.headers.accept === 'string' && incomingReq.headers.accept) || '',
     url: (incomingReq.url || '').trim() || '',
     host: (incomingReq.headers && typeof incomingReq.headers.host === 'string' && incomingReq.headers.host) || null

@@ -23,23 +23,25 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
         content = updateStyleUrls(req.url, content);
       }
 
-      const contentLength = Buffer.byteLength(content, 'utf8');
-
-      if (util.shouldCompress(devServerConfig, req, contentLength)) {
+      if (util.shouldCompress(devServerConfig, req)) {
         // let's gzip this well known web dev text file
         res.writeHead(200, util.responseHeaders({
-          'Content-Type': util.getContentType(devServerConfig, req.filePath)
+          'Content-Type': util.getContentType(devServerConfig, req.filePath),
+          'Content-Encoding': 'gzip',
+          'Vary': 'Accept-Encoding'
         }));
-        zlib.createGzip().pipe(res);
+
+        zlib.gzip(content, (_, data) => {
+          res.end(data);
+        });
 
       } else {
         // let's not gzip this file
         res.writeHead(200, util.responseHeaders({
           'Content-Type': util.getContentType(devServerConfig, req.filePath),
-          'Content-Length': contentLength
+          'Content-Length': Buffer.byteLength(content, 'utf8')
         }));
-        res.write(content);
-        res.end();
+        res.end(content);
       }
 
     } else {
