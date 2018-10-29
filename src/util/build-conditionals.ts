@@ -64,7 +64,7 @@ export async function setBuildConditionals(
     clientSide: true,
     isDev: !!config.devMode,
     isProd: !config.devMode,
-    profile: !!config.flags.profile,
+    profile: !!(config.flags && config.flags.profile),
 
     hasSlot: !!buildCtx.hasSlot,
     hasSvg: !!buildCtx.hasSvg,
