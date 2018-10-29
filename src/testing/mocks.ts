@@ -20,7 +20,7 @@ import { noop } from '../util/helpers';
 export { mockDocument, mockWindow };
 
 
-const testingPerf = { mark: noop, measure: noop } as any;
+export const testingPerf = { mark: noop, measure: noop } as any;
 
 
 export function mockDom(url: string, html: string): { win: Window, doc: HTMLDocument } {

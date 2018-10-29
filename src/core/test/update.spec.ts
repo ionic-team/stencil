@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { h } from '../../renderer/vdom/h';
-import { MockedPlatform, mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../testing/mocks';
+import { MockedPlatform, mockConnect, mockDefine, mockPlatform, testingPerf, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
 import { queueUpdate } from '../update';
 import { getDefaultBuildConditionals } from '../../util/build-conditionals';
@@ -38,7 +38,7 @@ describe('instance update', () => {
     const instance = plt.instanceMap.get(elm);
     instance.value = '99';
 
-    queueUpdate(plt, elm);
+    queueUpdate(plt, elm, testingPerf);
 
     await plt.$flushQueue();
 
