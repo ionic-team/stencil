@@ -8,7 +8,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -55,7 +55,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
       plt.hostSnapshotMap
     ].forEach(wm => wm.delete(elm));
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       perf.measure(`disconnected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }

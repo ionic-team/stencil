@@ -10,7 +10,7 @@ export function proxyComponentInstance(
   hostSnapshot: d.HostSnapshot,
   perf: Performance
 ) {
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`proxy_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
 
@@ -39,7 +39,7 @@ export function proxyComponentInstance(
     defineMember(plt, property, elm, instance, memberName, hostSnapshot, perf);
   });
 
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`proxy_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     perf.measure(`proxy_instance:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `proxy_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `proxy_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }

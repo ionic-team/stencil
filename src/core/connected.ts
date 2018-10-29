@@ -28,7 +28,7 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       elm['s-id'] = plt.nextId();
     }
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -52,7 +52,7 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       // if it's already loaded then the callback will be synchronous
       plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         perf.measure(`connected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       }

@@ -219,6 +219,7 @@ export interface ConfigFlags {
   port?: number;
   prerender?: boolean;
   prod?: boolean;
+  profile?: boolean;
   root?: string;
   screenshot?: boolean;
   screenshotConnector?: string;

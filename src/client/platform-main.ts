@@ -18,7 +18,7 @@ import { queueUpdate } from '../core/update';
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) {
   const perf = win.performance;
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`app_load_start`);
   }
 
@@ -110,7 +110,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark('app_load_end');
       perf.measure('app_load', 'app_load_start', 'app_load_end');
     }
@@ -151,13 +151,13 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           .filter(attribName => !!attribName);
       }
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`define_start:${cmpMeta.tagNameMeta}`);
       }
 
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`define_end:${cmpMeta.tagNameMeta}`);
         perf.measure(`define:${cmpMeta.tagNameMeta}`, `define_start:${cmpMeta.tagNameMeta}`, `define_end:${cmpMeta.tagNameMeta}`);
       }
@@ -166,7 +166,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
 
 
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) {
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -174,7 +174,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       // we're already all loaded up :)
       queueUpdate(plt, elm, perf);
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       }
@@ -192,7 +192,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       (cmpMeta.bundleIds as d.GetModuleFn)(moduleOpts).then(cmpConstructor => {
         // async loading of the module is done
 
-        if (__BUILD_CONDITIONALS__.perf) {
+        if (__BUILD_CONDITIONALS__.profile) {
           perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
@@ -246,7 +246,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       __import(url).then(importedModule => {
         // async loading of the module is done
 
-        if (__BUILD_CONDITIONALS__.perf) {
+        if (__BUILD_CONDITIONALS__.profile) {
           perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
@@ -287,7 +287,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   if (__BUILD_CONDITIONALS__.browserModuleLoader) {
     // register all the components now that everything's ready
     // standard es2017 class extends HTMLElement
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`define_custom_elements_start`);
     }
 
@@ -295,7 +295,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
       .map(parseComponentLoader)
       .forEach(cmpMeta => defineComponent(cmpMeta, class extends HTMLElement {}));
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`define_custom_elements_end`);
       perf.measure(`define_custom_elements`, `define_custom_elements_start`, `define_custom_elements_end`);
     }

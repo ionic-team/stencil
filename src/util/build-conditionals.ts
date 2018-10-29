@@ -23,7 +23,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     observeAttr: true,
     isDev: true,
     isProd: false,
-    perf: false,
+    profile: false,
     element: true,
     event: true,
     listener: true,
@@ -64,7 +64,7 @@ export async function setBuildConditionals(
     clientSide: true,
     isDev: !!config.devMode,
     isProd: !config.devMode,
-    perf: (!!config.devMode || config.logLevel === 'debug'),
+    profile: !!config.flags.profile,
 
     hasSlot: !!buildCtx.hasSlot,
     hasSvg: !!buildCtx.hasSvg,

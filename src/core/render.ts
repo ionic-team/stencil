@@ -7,7 +7,7 @@ import { RUNTIME_ERROR } from '../util/constants';
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance, perf: Performance) {
   try {
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`render_start:${hostElm.nodeName.toLowerCase()}`);
     }
 
@@ -149,7 +149,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       hostElm['s-rc'] = null;
     }
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`render_end:${hostElm.nodeName.toLowerCase()}`);
       perf.measure(`render:${hostElm.nodeName.toLowerCase()}`, `render_start:${hostElm.nodeName.toLowerCase()}`, `render_end:${hostElm.nodeName.toLowerCase()}`);
     }

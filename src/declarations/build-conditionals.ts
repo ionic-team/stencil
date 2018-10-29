@@ -18,7 +18,7 @@ export interface BuildConditionals {
   devInspector: boolean;
   hotModuleReplacement: boolean;
   verboseError: boolean;
-  perf: boolean;
+  profile: boolean;
 
   // ssr
   ssrServerSide: boolean;

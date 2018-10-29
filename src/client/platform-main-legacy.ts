@@ -18,7 +18,7 @@ import { queueUpdate } from '../core/update';
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
   const perf = win.performance;
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`app_load_start`);
   }
 
@@ -117,7 +117,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark('app_load_end');
       perf.measure('app_load', 'app_load_start', 'app_load_end');
     }
@@ -164,14 +164,14 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         HostElementConstructor.observedAttributes = observedAttributes;
       }
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`define_start:${cmpMeta.tagNameMeta}`);
       }
 
       // define the custom element
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
 
-      if (__BUILD_CONDITIONALS__.perf) {
+      if (__BUILD_CONDITIONALS__.profile) {
         perf.mark(`define_end:${cmpMeta.tagNameMeta}`);
         perf.measure(`define:${cmpMeta.tagNameMeta}`, `define_start:${cmpMeta.tagNameMeta}`, `define_end:${cmpMeta.tagNameMeta}`);
       }
@@ -391,7 +391,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   }
 
   // register all the components now that everything's ready
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`define_custom_elements_start`);
   }
 
@@ -415,7 +415,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   );
 
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`define_custom_elements_end`);
     perf.measure(`define_custom_elements`, `define_custom_elements_start`, `define_custom_elements_end`);
   }

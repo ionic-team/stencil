@@ -5,7 +5,7 @@ import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement, perf: Performance) {
-  if (__BUILD_CONDITIONALS__.perf) {
+  if (__BUILD_CONDITIONALS__.profile) {
     perf.mark(`queue:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
 
@@ -74,13 +74,13 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
         // assigned as the host element, but BEFORE render() has been called
         try {
           if (instance.componentWillLoad) {
-            if (__BUILD_CONDITIONALS__.perf) {
+            if (__BUILD_CONDITIONALS__.profile) {
               perf.mark(`componentWillLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
             }
 
             await instance.componentWillLoad();
 
-            if (__BUILD_CONDITIONALS__.perf) {
+            if (__BUILD_CONDITIONALS__.profile) {
               perf.mark(`componentWillLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
               perf.measure(`componentWillLoad:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentWillLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentWillLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
             }
@@ -99,13 +99,13 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
       // get the returned promise (if one was provided)
       try {
         if (instance.componentWillUpdate) {
-          if (__BUILD_CONDITIONALS__.perf) {
+          if (__BUILD_CONDITIONALS__.profile) {
             perf.mark(`componentWillUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           }
 
           await instance.componentWillUpdate();
 
-          if (__BUILD_CONDITIONALS__.perf) {
+          if (__BUILD_CONDITIONALS__.profile) {
             perf.mark(`componentWillUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           }
         }

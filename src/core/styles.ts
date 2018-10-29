@@ -6,7 +6,7 @@ import { getScopeId } from '../util/scope';
 export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, encapsulation: ENCAPSULATION, style: string, styleMode: string, perf: Performance) {
   if (style) {
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`init_style_template_start:${cmpMeta.tagNameMeta}`);
     }
 
@@ -67,7 +67,7 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
       }
     }
 
-    if (__BUILD_CONDITIONALS__.perf) {
+    if (__BUILD_CONDITIONALS__.profile) {
       perf.mark(`init_style_template_end:${cmpMeta.tagNameMeta}`);
       perf.measure(`init_style_template:${cmpMeta.tagNameMeta}`, `init_style_template_start:${cmpMeta.tagNameMeta}`, `init_style_template_end:${cmpMeta.tagNameMeta}`);
     }

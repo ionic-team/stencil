@@ -348,6 +348,12 @@ describe('parseFlags', () => {
     expect(flags.prod).toBe(true);
   });
 
+  it('should parse --profile', () => {
+    process.argv[2] = '--profile';
+    const flags = parseFlags(process);
+    expect(flags.profile).toBe(true);
+  });
+
   it('should parse --prerender', () => {
     process.argv[2] = '--prerender';
     const flags = parseFlags(process);
