@@ -41,7 +41,8 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
           'Content-Type': util.getContentType(devServerConfig, req.filePath),
           'Content-Length': Buffer.byteLength(content, 'utf8')
         }));
-        res.end(content);
+        res.write(content);
+        res.end();
       }
 
     } else {

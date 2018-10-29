@@ -1,5 +1,5 @@
+import * as d from '../../declarations';
 import { createRequestHandler } from '../request-handler';
-import { DevServerConfig } from '../../declarations';
 import { mockConfig } from '../../testing/mocks';
 import { normalizePath } from '../../compiler/util';
 import { TestingFs } from '../../testing/testing-fs';
@@ -11,9 +11,9 @@ import * as path from 'path';
 
 describe('request-handler', async () => {
 
-  let config: DevServerConfig;
+  let config: d.DevServerConfig;
   let fs: TestingFs;
-  let req: http.ServerRequest;
+  let req: http.IncomingMessage;
   let res: TestServerResponse;
   const root = path.resolve('/');
   const tmplDirPath = normalizePath(path.join(__dirname, '..', 'templates', 'directory-index.html'));
@@ -300,6 +300,7 @@ describe('request-handler', async () => {
 
     it('serve root index.html w/ querystring', async () => {
       await fs.writeFile(path.join(root, 'www', 'index.html'), `hello`);
+      config.gzip = false;
       const handler = createRequestHandler(config, fs);
 
       req.url = '/?qs=123';
