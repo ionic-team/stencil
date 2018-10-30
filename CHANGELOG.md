@@ -1,3 +1,14 @@
+<a name="0.15.2-0"></a>
+## 🦄 [Prerelease] [0.15.2-0](https://github.com/ionic-team/stencil/compare/v0.15.1...v0.15.2-0) (2018-10-30)
+
+
+### Bug Fixes
+
+* **e2e:** throw errors for 404 tests ([d83beb8](https://github.com/ionic-team/stencil/commit/d83beb8))
+* **queue:** allow option to disable async queue ([#1186](https://github.com/ionic-team/stencil/issues/1186)) ([373e58c](https://github.com/ionic-team/stencil/commit/373e58c))
+
+
+
 <a name="0.15.1"></a>
 ## 🤓 [0.15.1](https://github.com/ionic-team/stencil/compare/v0.15.0...v0.15.1) (2018-10-30)
 
