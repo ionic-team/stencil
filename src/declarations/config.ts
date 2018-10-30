@@ -298,7 +298,7 @@ export interface ConfigBundle {
 
 
 export interface ServiceWorkerConfig {
-  // https://workboxjs.org/reference-docs/latest/module-workbox-build.html#.Configuration
+  // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];

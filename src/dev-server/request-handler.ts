@@ -22,7 +22,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         return res.end();
       }
 
-      if (!req.url.startsWith(devServerConfig.baseUrl)) {
+      if (!req.pathname.startsWith(devServerConfig.baseUrl)) {
         return serve404Content(res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
       }
 
@@ -92,9 +92,18 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
 }
 
 
-function isValidHistoryApi(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
-  return !!devServerConfig.historyApiFallback &&
-         req.method === 'GET' &&
-         (!devServerConfig.historyApiFallback.disableDotRule && !req.pathname.includes('.')) &&
-         req.acceptHeader.includes('text/html');
+export function isValidHistoryApi(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+  if (!devServerConfig.historyApiFallback) {
+    return false;
+  }
+  if (req.method !== 'GET') {
+    return false;
+  }
+  if (!req.acceptHeader.includes('text/html') && req.acceptHeader !== '*/*') {
+    return false;
+  }
+  if (!devServerConfig.historyApiFallback.disableDotRule && req.pathname.includes('.')) {
+    return false;
+  }
+  return true;
 }

@@ -28,5 +28,11 @@ export const config: Config = {
     builtins(),
     globals(),
     sass()
-  ]
+  ],
+  devServer: {
+    historyApiFallback: {
+      disableDotRule: true,
+      index: 'index.html'
+    }
+  }
 };

@@ -74,11 +74,11 @@ describe('request-handler', async () => {
       req.headers = {
         accept: '*/*'
       };
-      req.url = '/about.us';
+      req.url = 'http://stenciljs.com/about.us';
       req.method = 'GET';
 
       await handler(req, res);
-      expect(res.$statusCode).toBe(404);
+      expect(res.$statusCode).toBe(200);
     });
 
     it('should not load historyApiFallback index.html when dot in the url', async () => {
@@ -91,7 +91,7 @@ describe('request-handler', async () => {
       req.headers = {
         accept: '*/*'
       };
-      req.url = '/about.us';
+      req.url = 'http://stenciljs.com/about.us';
       req.method = 'GET';
 
       await handler(req, res);
@@ -378,17 +378,6 @@ describe('request-handler', async () => {
   });
 
 });
-
-
-function readResponse(res: http.ServerRequest) {
-  let content = '';
-
-  res.on('data', chunk => {
-    content += chunk;
-  });
-
-  return content;
-}
 
 
 interface TestServerResponse extends http.ServerResponse {
