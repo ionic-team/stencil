@@ -56,10 +56,16 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
   page.on('requestfailed', requestFailed);
 
   if (typeof opts.html === 'string') {
-    await e2eSetContent(page, opts.html);
+    const errMsg = await e2eSetContent(page, opts.html);
+    if (errMsg) {
+      throw errMsg;
+    }
 
   } else if (typeof opts.url === 'string') {
-    await e2eGoTo(page, opts.url);
+    const errMsg = await e2eGoTo(page, opts.url);
+    if (errMsg) {
+      throw errMsg;
+    }
 
   } else {
     page.goto = e2eGoTo.bind(null, page);
@@ -73,83 +79,68 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
   try {
     if (page.isClosed()) {
-      console.error('e2eGoTo unavailable: page already closed');
-      return;
+      return 'e2eGoTo unavailable: page already closed';
     }
   } catch (e) {
-    return;
+    return null;
   }
 
   if (typeof url !== 'string') {
-    console.error('invalid gotoTest() url');
     await closePage(page);
-    return;
+    return 'invalid gotoTest() url';
   }
 
   if (!url.startsWith('/')) {
-    console.error('gotoTest() url must start with /');
     await closePage(page);
-    return;
+    return 'gotoTest() url must start with /';
   }
 
   const browserUrl = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
   if (typeof browserUrl !== 'string') {
-    console.error('invalid gotoTest() browser url');
     await closePage(page);
-    return;
+    return 'invalid gotoTest() browser url';
   }
-
-  // resolves once the stencil app has finished loading
-  const appLoaded = page.waitForFunction('window.stencilAppLoaded');
 
   const fullUrl = browserUrl + url.substring(1);
 
-  let timedOut = false;
-  try {
-    await page._e2eGoto(fullUrl, {
-      waitUntil: 'load'
-    });
+  const rsp = await page._e2eGoto(fullUrl);
 
-    const tmr = setTimeout(async () => {
-      timedOut = true;
-      console.error(`App did not load in allowed time. Please ensure the url ${url} loads a stencil application.`);
-      await closePage(page);
-    }, 4500);
-
-    await appLoaded;
-
-    clearTimeout(tmr);
-
-  } catch (e) {
-    if (!timedOut) {
-      console.error(`error goto: ${url}, ${e}`);
-      await closePage(page);
-    }
+  if (!rsp.ok()) {
+    await closePage(page);
+    return `Testing unable to load ${url}, HTTP status: ${rsp.status()}`;
   }
+
+  const tmr = setTimeout(async () => {
+    await closePage(page);
+    throw new Error(`App did not load in allowed time. Please ensure the url ${url} loads a stencil application.`);
+  }, 4500);
+
+  await page.waitForFunction('window.stencilAppLoaded');
+
+  clearTimeout(tmr);
+
+  return null;
 }
 
 
 async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
   try {
     if (page.isClosed()) {
-      console.error('e2eSetContent unavailable: page already closed');
-      return;
+      return 'e2eSetContent unavailable: page already closed';
     }
   } catch (e) {
-    return;
+    return null;
   }
 
   if (typeof html !== 'string') {
-    console.error('invalid e2eSetContent() html');
     await closePage(page);
-    return;
+    return 'invalid e2eSetContent() html';
   }
 
   const loaderUrl = (process.env as d.E2EProcessEnv).__STENCIL_LOADER_URL__;
   if (typeof loaderUrl !== 'string') {
-    console.error('invalid e2eSetContent() loader script url');
     await closePage(page);
-    return;
+    return 'invalid e2eSetContent() loader script url';
   }
 
   const url = [
@@ -158,20 +149,23 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     html
   ];
 
-  try {
-    // resolves once the stencil app has finished loading
-    const appLoaded = page.waitForFunction('window.stencilAppLoaded');
+  const rsp = await page._e2eGoto(url.join(''));
 
-    await page._e2eGoto(url.join(''), {
-      waitUntil: 'load'
-    });
-
-    await appLoaded;
-
-  } catch (e) {
-    console.error(`e2eSetContent: ${e}`);
+  if (!rsp.ok()) {
     await closePage(page);
+    return `Testing unable to load content`;
   }
+
+  const tmr = setTimeout(async () => {
+    await closePage(page);
+    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+  }, 4500);
+
+  await page.waitForFunction('window.stencilAppLoaded');
+
+  clearTimeout(tmr);
+
+  return null;
 }
 
 
