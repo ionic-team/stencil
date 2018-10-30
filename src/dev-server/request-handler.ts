@@ -22,7 +22,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         return res.end();
       }
 
-      if (!req.pathname.startsWith(devServerConfig.baseUrl)) {
+      if (!req.url.startsWith(devServerConfig.baseUrl)) {
         return serve404Content(res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
       }
 
@@ -99,7 +99,7 @@ export function isValidHistoryApi(devServerConfig: d.DevServerConfig, req: d.Htt
   if (req.method !== 'GET') {
     return false;
   }
-  if (!req.acceptHeader.includes('text/html') && req.acceptHeader !== '*/*') {
+  if (!req.acceptHeader.includes('text/html')) {
     return false;
   }
   if (!devServerConfig.historyApiFallback.disableDotRule && req.pathname.includes('.')) {

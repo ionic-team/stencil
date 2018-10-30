@@ -72,9 +72,9 @@ describe('request-handler', async () => {
       const handler = createRequestHandler(config, fs);
 
       req.headers = {
-        accept: '*/*'
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
       };
-      req.url = 'http://stenciljs.com/about.us';
+      req.url = '/about.us';
       req.method = 'GET';
 
       await handler(req, res);
@@ -89,9 +89,9 @@ describe('request-handler', async () => {
       const handler = createRequestHandler(config, fs);
 
       req.headers = {
-        accept: '*/*'
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
       };
-      req.url = 'http://stenciljs.com/about.us';
+      req.url = '/about.us';
       req.method = 'GET';
 
       await handler(req, res);
