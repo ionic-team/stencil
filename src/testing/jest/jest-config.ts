@@ -39,6 +39,10 @@ export function buildJestConfig(config: d.Config) {
 
   jestConfig.rootDir = config.rootDir;
 
+  if (Array.isArray(config.testing.reporters)) {
+    jestConfig.reporters = config.testing.reporters;
+  }
+
   return JSON.stringify(jestConfig);
 }
 

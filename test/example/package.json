@@ -11,6 +11,7 @@
     "@types/puppeteer": "1.6.4",
     "jest": "23.6.0",
     "jest-cli": "23.6.0",
+    "jest-junit": "^5.2.0",
     "puppeteer": "1.8.0",
     "workbox-build": "3.4.1"
   }

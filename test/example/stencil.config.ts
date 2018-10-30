@@ -8,7 +8,7 @@ export const config: Config = {
   ],
 
   testing: {
-    // testRegex: ''
+    reporters: ['default', ['jest-junit', { output: 'www/junit.xml' }]]
   }
 
 };

@@ -102,6 +102,29 @@ describe('jest-config', () => {
     expect(parsedConfig.testMatch).toEqual(['hello.spec.ts']);
   });
 
+  it('set jestArgv config reporters', () => {
+    const rootDir = path.resolve('/');
+    const process: any = {
+      argv: ['node stencil test']
+    };
+    const config = new TestingConfig();
+    config.rootDir = rootDir;
+    config.flags = parseFlags(process);
+    config.testing = {
+      reporters: [
+        'default',
+        ['jest-junit', { suiteName: 'jest tests' } ]
+      ]
+    };
+
+    const jestArgv = buildJestArgv(config);
+    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    expect(parsedConfig.reporters).toHaveLength(2);
+    expect(parsedConfig.reporters[0]).toBe('default');
+    expect(parsedConfig.reporters[1][0]).toBe('jest-junit');
+    expect(parsedConfig.reporters[1][1].suiteName).toBe('jest tests');
+  });
+
   it('set jestArgv config rootDir', () => {
     const rootDir = path.resolve('/');
     const process: any = {
