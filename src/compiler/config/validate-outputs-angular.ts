@@ -9,6 +9,7 @@ export function validateOutputTargetAngular(config: d.Config) {
 
   distOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];
+    outputTarget.useDirectives = !!outputTarget.useDirectives;
 
     if (!path.isAbsolute(outputTarget.directivesProxyFile)) {
       outputTarget.directivesProxyFile = normalizePath(path.join(config.rootDir, outputTarget.directivesProxyFile));

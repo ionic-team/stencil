@@ -4,6 +4,7 @@ import * as d from '../declarations';
 export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
   const now: d.Now = () => win.performance.now();
 
+  const async = App.asyncQueue !== false;
   const resolved = Promise.resolve();
   const highPriority: d.RafCallback[] = [];
   const domReads: d.RafCallback[] = [];
@@ -65,11 +66,13 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     // DOM READS!!!
     consume(domReads);
 
-    const start = now() + (7 * Math.ceil(congestion * (1.0 / 22.0)));
+    const timeout = async
+      ? now() + (7 * Math.ceil(congestion * (1.0 / 22.0)))
+      : Infinity;
 
     // DOM WRITES!!!
-    consumeTimeout(domWrites, start);
-    consumeTimeout(domWritesLow, start);
+    consumeTimeout(domWrites, timeout);
+    consumeTimeout(domWritesLow, timeout);
 
     if (domWrites.length > 0) {
       domWritesLow.push(...domWrites);
