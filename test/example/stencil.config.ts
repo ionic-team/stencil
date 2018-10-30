@@ -8,7 +8,6 @@ export const config: Config = {
   ],
 
   testing: {
-    reporters: ['default', ['jest-junit', { output: 'www/junit.xml' }]]
   }
 
 };
