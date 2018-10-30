@@ -35,6 +35,7 @@ export interface ComponentMeta {
   jsdoc?: JsDoc;
   styleDocs?: StyleDoc[];
   hmrLoad?: () => void;
+  delegatesFocus?: boolean;
 }
 
 

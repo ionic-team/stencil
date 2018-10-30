@@ -47,7 +47,8 @@ It will be removed in future versions. Please use the "hostData()" method instea
     assetsDirsMeta: [],
     hostMeta: getHostMeta(diagnostics, componentOptions.host),
     dependencies: [],
-    jsdoc: serializeSymbol(checker, symbol)
+    jsdoc: serializeSymbol(checker, symbol),
+    delegatesFocus: componentOptions.delegatesFocus
   };
 
   // normalizeEncapsulation

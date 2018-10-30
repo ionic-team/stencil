@@ -17,6 +17,7 @@ export interface ComponentOptions {
   host?: d.HostMeta;
   assetsDir?: string;
   assetsDirs?: string[];
+  delegatesFocus?: boolean;
 }
 
 
