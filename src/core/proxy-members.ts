@@ -1,147 +1,116 @@
 import * as d from '../declarations';
-import { elementHasProperty } from './element-has-property';
-import { isDef } from '../util/helpers';
-import { parsePropertyValue } from '../util/data-parse';
 import { queueUpdate } from './update';
 
+let tmpMeta: d.InternalMeta;
 
-export function defineMember(
-  plt: d.PlatformApi,
-  meta: d.InternalMeta,
-  property: d.ComponentConstructorProperty,
-  instance: d.ComponentInstance,
-  memberName: string,
-  hostSnapshot: d.HostSnapshot,
-  hostAttributes?: d.HostSnapshotAttributes,
-  hostAttrValue?: string
-) {
-  const {valuesMap, element} = meta;
-  function getComponentProp() {
-    // component instance prop/state getter
-    // get the property value directly from our internal values
-    return valuesMap[memberName];
-  }
-
-  function setComponentProp(newValue: any) {
-    // component instance prop/state setter (cannot be arrow fn)
-    if (element) {
-      if (property.state || property.mutable) {
-        setValue(plt, meta, element, memberName, newValue);
-
-      } else if (__BUILD_CONDITIONALS__.verboseError) {
-        console.warn(`@Prop() "${memberName}" on "${element.tagName}" cannot be modified.`);
-      }
-    }
-  }
-
-  if (property.type || property.state) {
-    const values = meta.valuesMap;
-
-    if (!property.state) {
-      if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
-        // check the prop value from the host element attribute
-        if ((hostAttributes = hostSnapshot && hostSnapshot.$attributes) && isDef(hostAttrValue = hostAttributes[property.attr])) {
-          // looks like we've got an attribute value
-          // let's set it to our internal values
-          values[memberName] = parsePropertyValue(property.type, hostAttrValue);
-        }
-      }
-
-      if (__BUILD_CONDITIONALS__.clientSide) {
-        // client-side
-        // within the browser, the element's prototype
-        // already has its getter/setter set, but on the
-        // server the prototype is shared causing issues
-        // so instead the server's elm has the getter/setter
-        // directly on the actual element instance, not its prototype
-        // so on the browser we can use "hasOwnProperty"
-        if (element.hasOwnProperty(memberName)) {
-          // @Prop or @Prop({mutable:true})
-          // property values on the host element should override
-          // any default values on the component instance
-          if (values[memberName] === undefined) {
-            values[memberName] = parsePropertyValue(property.type, (element as any)[memberName]);
-          }
-
-          // for the client only, let's delete its "own" property
-          // this way our already assigned getter/setter on the prototype kicks in
-          // the very special case is to NOT do this for "mode"
-          if (memberName !== 'mode') {
-            delete (element as any)[memberName];
-          }
-        }
-
-      } else {
-        // server-side
-        // server-side elm has the getter/setter
-        // on the actual element instance, not its prototype
-        // on the server we cannot accurately use "hasOwnProperty"
-        // instead we'll do a direct lookup to see if the
-        // constructor has this property
-        if (elementHasProperty(meta.cmpMeta, element, memberName)) {
-          // @Prop or @Prop({mutable:true})
-          // property values on the host element should override
-          // any default values on the component instance
-          if (values[memberName] === undefined) {
-            values[memberName] = (element as any)[memberName];
-          }
-        }
-      }
-    }
-
-    if (instance.hasOwnProperty(memberName) && values[memberName] === undefined) {
-      // @Prop() or @Prop({mutable:true}) or @State()
-      // we haven't yet got a value from the above checks so let's
-      // read any "own" property instance values already set
-      // to our internal value as the source of getter data
-      // we're about to define a property and it'll overwrite this "own" property
-      values[memberName] = (instance as any)[memberName];
-    }
-
-    if (property.watchCallbacks) {
-      values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
-    }
-
-    // add getter/setter to the component instance
-    // these will be pointed to the internal data set from the above checks
-    definePropertyGetterSetter(
-      instance,
-      memberName,
-      getComponentProp,
-      setComponentProp
-    );
-
-  } else if (__BUILD_CONDITIONALS__.element && property.elementRef) {
-    // @Element()
-    // add a getter to the element reference using
-    // the member name the component meta provided
-    definePropertyValue(instance, memberName, element);
-
-  } else if (__BUILD_CONDITIONALS__.method && property.method) {
-    // @Method()
-    // add a property "value" on the host element
-    // which we'll bind to the instance's method
-    definePropertyValue(element, memberName, instance[memberName].bind(instance));
-
-  } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
-    // @Prop({ context: 'config' })
-    const contextObj = plt.getContextItem(property.context);
-    if (contextObj !== undefined) {
-      definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(element)) || contextObj);
-    }
-
-  } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
-    // @Prop({ connect: 'ion-loading-ctrl' })
-    definePropertyValue(instance, memberName, plt.propConnect(property.connect));
-  }
+export function createInstance(plt: d.PlatformApi, meta: d.InternalMeta, cmpConstructor: d.ComponentConstructor) {
+  tmpMeta = meta;
+  const instance = new cmpConstructor();
+  meta.instance = instance;
+  plt.metaInstanceMap.set(instance, meta);
+  tmpMeta = undefined;
+  return instance;
 }
 
+export function initInstanceProto(plt: d.PlatformApi, cmpConstructor: d.ComponentConstructor) {
+  if (__BUILD_CONDITIONALS__.event) {
+    // add each of the event emitters which wire up instance methods
+    // to fire off dom events from the host element
+    initEventEmitters(plt, cmpConstructor);
+  }
+  initProperties(plt, cmpConstructor);
+}
+
+function initProperties(plt: d.PlatformApi, cmpConstructor: d.ComponentConstructor) {
+
+  const properties: any = {};
+  const props: [string, d.ComponentConstructorProperty][] = Object.entries({
+    color: { type: String },
+    ...cmpConstructor.properties,
+    mode: { type: String },
+  });
+  props.forEach(([memberName, property]) => {
+
+    function getElement() {
+      // component instance prop/state getter
+      // get the property value directly from our internal values
+      const meta = plt.metaInstanceMap.get(this) || tmpMeta;
+      return meta.element;
+    }
+
+    function getComponentProp() {
+      // component instance prop/state getter
+      // get the property value directly from our internal values
+      const meta = plt.metaInstanceMap.get(this) || tmpMeta;
+      return meta.values.get(memberName);
+    }
+
+    function setComponentProp(newValue: any) {
+      const meta = plt.metaInstanceMap.get(this) || tmpMeta;
+      setValue(plt, meta, meta.element, memberName, newValue);
+    }
+
+    if (property.type || property.state === true) {
+
+      // add getter/setter to the component instance
+      // these will be pointed to the internal data set from the above checks
+      properties[memberName] = definePropertyGetterSetter(
+        getComponentProp,
+        setComponentProp
+      );
+
+    } else if (__BUILD_CONDITIONALS__.element && property.elementRef) {
+      // @Element()
+      // add a getter to the element reference using
+      // the member name the component meta provided
+      properties[memberName] = definePropertyGetter(getElement);
+
+    } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
+      // @Prop({ context: 'config' })
+      // const contextObj = plt.getContextItem(property.context);
+      // if (contextObj !== undefined) {
+      //   properties[memberName] = definePropertyGetter(getElement)
+
+      //   definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(element)) || contextObj);
+      // }
+
+    } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
+      // @Prop({ connect: 'ion-loading-ctrl' })
+      properties[memberName] = definePropertyValue(plt.propConnect(property.connect));
+    }
+  });
+  Object.defineProperties(cmpConstructor.prototype, properties);
+}
+
+export function initEventEmitters(plt: d.PlatformApi, cmpConstructor: d.ComponentConstructor) {
+  const cmpEvents = cmpConstructor.events;
+  if (cmpEvents) {
+    const properties: any = {};
+    cmpEvents.forEach(eventMeta => {
+      function getEventEmitter() {
+        const elm = plt.metaInstanceMap.get(this).element;
+        return {
+          emit: (data: any) => {
+            plt.emitEvent(elm, eventMeta.name, {
+              bubbles: eventMeta.bubbles,
+              composed: eventMeta.composed,
+              cancelable: eventMeta.cancelable,
+              detail: data
+            });
+          }
+        };
+      }
+      properties[eventMeta.method] = definePropertyGetter(getEventEmitter);
+    });
+    Object.defineProperties(cmpConstructor.prototype, properties);
+  }
+}
 
 export function setValue(plt: d.PlatformApi, meta: d.InternalMeta, elm: d.HostElement, memberName: string, newVal: any) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  const values = meta.valuesMap;
-  const oldVal = values[memberName];
+  const values = meta.values;
+  const oldVal = values.get(memberName);
 
   // check our new property value against our internal value
   if (newVal !== oldVal) {
@@ -149,14 +118,14 @@ export function setValue(plt: d.PlatformApi, meta: d.InternalMeta, elm: d.HostEl
 
     // set our new value!
     // https://youtu.be/dFtLONl4cNc?t=22
-    values[memberName] = newVal;
+    values.set(memberName, newVal);
 
     const instance = meta.instance;
 
     if (instance) {
       // get an array of method names of watch functions to call
       if (__BUILD_CONDITIONALS__.watchCallback) {
-        const watchMethods = values[WATCH_CB_PREFIX + memberName];
+        const watchMethods = values.get(WATCH_CB_PREFIX + memberName);
         if (watchMethods) {
           // this instance is watching for when this property changed
           for (let i = 0; i < watchMethods.length; i++) {
@@ -182,23 +151,29 @@ export function setValue(plt: d.PlatformApi, meta: d.InternalMeta, elm: d.HostEl
 }
 
 
-export function definePropertyValue(obj: any, propertyKey: string, value: any) {
+export function definePropertyGetter(get: any) {
   // minification shortcut
-  Object.defineProperty(obj, propertyKey, {
+  return {
     'configurable': true,
-    'value': value
-  });
+    'get': get
+  };
 }
 
-
-export function definePropertyGetterSetter(obj: any, propertyKey: string, get: any, set: any) {
+export function definePropertyValue(value: any) {
   // minification shortcut
-  Object.defineProperty(obj, propertyKey, {
+  return {
+    'configurable': true,
+    'value': value
+  };
+}
+
+export function definePropertyGetterSetter(get: any, set: any) {
+  // minification shortcut
+  return {
     'configurable': true,
     'get': get,
     'set': set
-  });
+  };
 }
-
 
 const WATCH_CB_PREFIX = `wc-`;

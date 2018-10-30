@@ -31,7 +31,7 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
   // create a callback for when this component finishes hmr
   elm['s-hmr-load'] = () => {
     // finished hmr for this element
-    delete elm['s-hmr-load'];
+    elm['s-hmr-load'] = undefined;
     hmrFinish(plt, meta, cmpMeta, elm);
   };
 

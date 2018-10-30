@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 
 
-export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
+export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, attribName?: string) {
   // the host element has connected to the dom
   // and we've waited a tick to make sure all frameworks
   // have finished adding attributes and child nodes to the host
@@ -59,20 +59,20 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     }
   }
 
-  // create a host snapshot object we'll
-  // use to store all host data about to be read later
-  hostSnapshot = {
-    $id: hostElm['s-id'],
-    $attributes: {}
-  };
+  const attributes: any = {};
 
   // loop through and gather up all the original attributes on the host
   // this is useful later when we're creating the component instance
   cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     if (attribName = cmpMeta.membersMeta[memberName].attribName) {
-      hostSnapshot.$attributes[attribName] = domApi.$getAttribute(hostElm, attribName);
+      attributes[attribName] = domApi.$getAttribute(hostElm, attribName);
     }
   });
 
-  return hostSnapshot;
+  // create a host snapshot object we'll
+  // use to store all host data about to be read later
+  return {
+    $id: hostElm['s-id'],
+    $attributes: {}
+  };
 }

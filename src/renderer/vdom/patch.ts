@@ -20,30 +20,30 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   // which gets called numerous times by each component
 
   // internal variables to be reused per patch() call
-  let useNativeShadowDom: boolean,
-  ssrId: number,
-  scopeId: string,
-  checkSlotFallbackVisibility: boolean,
-  checkSlotRelocate: boolean,
-  contentRef: d.RenderNode,
-  hostTagName: string,
-  hostElm: d.HostElement;
+  let useNativeShadowDom = false;
+  let ssrId: number;
+  let scopeId: string;
+  let checkSlotFallbackVisibility = false;
+  let checkSlotRelocate = false;
+  let contentRef: d.RenderNode;
+  let hostTagName: string;
+  let hostElm: d.HostElement;
 
 
-  function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) {
-    newVNode = newParentVNode.vchildren[childIndex];
+  function createElm(oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) {
+    const newVNode: d.VNode = newParentVNode.vchildren[childIndex];
 
-    if (__BUILD_CONDITIONALS__.slotPolyfill && !useNativeShadowDom) {
+    if (__BUILD_CONDITIONALS__.slotPolyfill && useNativeShadowDom === false) {
       // remember for later we need to check to relocate nodes
       checkSlotRelocate = true;
 
       if (newVNode.vtag === 'slot') {
-        if (scopeId) {
+        if (scopeId !== undefined) {
           // scoped css needs to add its scoped id to the parent element
           domApi.$addClass(parentElm, scopeId + '-s');
         }
 
-        if (!newVNode.vchildren) {
+        if (newVNode.vchildren === null) {
           // slot element does not have fallback content
           // create an html comment we'll use to always reference
           // where actual slot content should sit next to
@@ -67,13 +67,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else {
       // create element
-      elm = newVNode.elm = ((__BUILD_CONDITIONALS__.hasSvg && (isSvgMode || newVNode.vtag === 'svg')) ?
+      const elm = newVNode.elm = ((__BUILD_CONDITIONALS__.hasSvg && (isSvgMode || newVNode.vtag === 'svg')) ?
                         domApi.$createElementNS('http://www.w3.org/2000/svg', newVNode.vtag) :
                         domApi.$createElement(
                           (__BUILD_CONDITIONALS__.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag)
                         );
       const c = plt.metaHostMap.get(elm);
-      if (c) {
+      if (c !== undefined) {
         c.isCmpReady = false;
       }
 
@@ -102,13 +102,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         );
       }
 
-      if (newVNode.vchildren) {
-        for (i = 0; i < newVNode.vchildren.length; ++i) {
+      if (newVNode.vchildren !== null) {
+        for (let i = 0; i < newVNode.vchildren.length; ++i) {
           // create the node
-          childNode = createElm(oldParentVNode, newVNode, i, elm);
+          const childNode = createElm(oldParentVNode, newVNode, i, elm);
 
           // return node could have been null
-          if (childNode) {
+          if (childNode !== undefined) {
             if (__BUILD_CONDITIONALS__.ssrServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
               // SSR ONLY: add the text node's start comment
               domApi.$appendChild(elm, domApi.$createComment('s.' + ssrId + '.' + i));
@@ -135,7 +135,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     if (__BUILD_CONDITIONALS__.slotPolyfill) {
       newVNode.elm['s-hn'] = hostTagName;
 
-      if (newVNode.isSlotFallback || newVNode.isSlotReference) {
+      if (newVNode.isSlotFallback === true || newVNode.isSlotReference === true) {
         // remember the content reference comment
         newVNode.elm['s-sr'] = true;
 
@@ -146,8 +146,8 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         newVNode.elm['s-sn'] = newVNode.vname || '';
 
         // check if we've got an old vnode for this slot
-        oldVNode = oldParentVNode && oldParentVNode.vchildren && oldParentVNode.vchildren[childIndex];
-        if (oldVNode && oldVNode.vtag === newVNode.vtag && oldParentVNode.elm) {
+        const oldVNode = oldParentVNode && oldParentVNode.vchildren && oldParentVNode.vchildren[childIndex];
+        if (oldVNode !== undefined && oldVNode.vtag === newVNode.vtag && oldParentVNode.elm) {
           // we've got an old slot vnode and the wrapper is being replaced
           // so let's move the old slot content back to it's original location
           putBackInOriginalLocation(oldParentVNode.elm);
@@ -197,22 +197,20 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     vnodes: d.VNode[],
     startIdx: number,
     endIdx: number,
-    containerElm?: d.RenderNode,
-    childNode?: Node
   ) {
     const contentRef = parentElm['s-cr'];
-    containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
+    let containerElm = ((contentRef && domApi.$parentNode(contentRef)) || parentElm) as any;
     if ((containerElm as any).shadowRoot && domApi.$tagName(containerElm) === hostTagName) {
       containerElm = (containerElm as any).shadowRoot;
     }
 
     for (; startIdx <= endIdx; ++startIdx) {
       if (vnodes[startIdx]) {
-        childNode = isDef(vnodes[startIdx].vtext) ?
-                    domApi.$createTextNode(vnodes[startIdx].vtext) :
-                    createElm(null, parentVNode, startIdx, parentElm);
+        const childNode = isDef(vnodes[startIdx].vtext)
+          ? domApi.$createTextNode(vnodes[startIdx].vtext)
+          : createElm(null, parentVNode, startIdx, parentElm);
 
-        if (childNode) {
+        if (childNode !== undefined) {
           vnodes[startIdx].elm = childNode as any;
           domApi.$insertBefore(containerElm, childNode, referenceNode(before));
         }
@@ -220,11 +218,11 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
   }
 
-  function removeVnodes(vnodes: d.VNode[], startIdx: number, endIdx: number, node?: d.RenderNode) {
+  function removeVnodes(vnodes: d.VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
       if (isDef(vnodes[startIdx])) {
 
-        node = vnodes[startIdx].elm;
+        const node = vnodes[startIdx].elm;
 
         if (__BUILD_CONDITIONALS__.slotPolyfill) {
           // we're removing this element
@@ -248,7 +246,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
   }
 
-  function updateChildren(parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[], idxInOld?: number, i?: number, node?: Node, elmToMove?: d.VNode) {
+  function updateChildren(parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[]) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -303,16 +301,17 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
       } else {
         // createKeyToOldIdx
-        idxInOld = null;
-        for (i = oldStartIdx; i <= oldEndIdx; ++i) {
+        let idxInOld = -1;
+        for (let i = oldStartIdx; i <= oldEndIdx; ++i) {
           if (oldCh[i] && isDef(oldCh[i].vkey) && oldCh[i].vkey === newStartVnode.vkey) {
             idxInOld = i;
             break;
           }
         }
 
-        if (isDef(idxInOld)) {
-          elmToMove = oldCh[idxInOld];
+        let node: d.RenderNode;
+        if (idxInOld !== -1) {
+          const elmToMove = oldCh[idxInOld];
 
           if (elmToMove.vtag !== newStartVnode.vtag) {
             node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
@@ -331,20 +330,21 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
           newStartVnode = newCh[++newStartIdx];
         }
 
-        if (node) {
+        if (node !== undefined) {
           domApi.$insertBefore(parentReferenceNode(oldStartVnode.elm), node, referenceNode(oldStartVnode.elm));
         }
       }
     }
 
     if (oldStartIdx > oldEndIdx) {
-      addVnodes(parentElm,
-                (newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm),
-                newVNode,
-                newCh,
-                newStartIdx,
-                newEndIdx
-              );
+      addVnodes(
+        parentElm,
+        (newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm),
+        newVNode,
+        newCh,
+        newStartIdx,
+        newEndIdx
+      );
 
     } else if (newStartIdx > newEndIdx) {
       removeVnodes(oldCh, oldStartIdx, oldEndIdx);
@@ -685,7 +685,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 }
 
 
-export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
+export function callNodeRefs(vNode: d.VNode, isDestroy: boolean) {
   if (vNode) {
     vNode.vattrs && vNode.vattrs.ref && vNode.vattrs.ref(isDestroy ? null : vNode.elm);
 

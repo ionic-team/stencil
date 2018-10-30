@@ -15,6 +15,7 @@ import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 import { newInternalMeta } from '../core/internal-meta';
+import { initInstanceProto } from '../core/proxy-members';
 
 export function createPlatformMain(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) {
   const cmpRegistry: d.ComponentMap = new Map([['html', {}]]);
@@ -88,10 +89,10 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
   rootElm['s-ld'] = [];
   rootElm['s-rn'] = true;
 
+  const rootMeta = newInternalMeta(rootElm, undefined);
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    // TODO
-    // plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    rootMeta.isCmpReady = App.loaded = plt.isAppLoaded = true;
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace } });
   };
 
@@ -159,6 +160,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
           cmpMeta.componentConstructor = cmpConstructor;
+          initInstanceProto(plt, cmpConstructor);
           initStyleTemplate(
             domApi,
             cmpMeta,
@@ -204,13 +206,15 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // get the component constructor from the module
           // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
-          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+          const cmpContructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+          cmpMeta.componentConstructor = cmpContructor;
+          initInstanceProto(plt, cmpContructor);
           initStyleTemplate(
             domApi,
             cmpMeta,
             cmpMeta.encapsulationMeta,
-            cmpMeta.componentConstructor.style,
-            cmpMeta.componentConstructor.styleMode
+            cmpContructor.style,
+            cmpContructor.styleMode
           );
 
           // bundle all loaded up, let's continue

@@ -107,7 +107,7 @@ export function render(plt: d.PlatformApi, meta: d.InternalMeta, hostElm: d.Host
 
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
-      const oldVNode = meta.vnodeMap || {};
+      const oldVNode = meta.vnode || {};
       oldVNode.elm = rootElm;
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
@@ -120,7 +120,7 @@ export function render(plt: d.PlatformApi, meta: d.InternalMeta, hostElm: d.Host
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      meta.vnodeMap = plt.render(
+      meta.vnode = plt.render(
         hostElm,
         oldVNode,
         hostVNode,

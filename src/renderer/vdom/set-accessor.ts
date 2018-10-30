@@ -19,16 +19,14 @@ export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: H
 
       // add classes from newValue that are not in oldList or classList
       const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
-      classList.push(...toAdd);
-
-      elm.className = classList.join(' ');
+      elm.className = classList.concat(toAdd).join(' ');
     }
 
   } else if (memberName === 'style') {
     // update style attribute, css properties and values
     for (const prop in oldValue) {
       if (!newValue || newValue[prop] == null) {
-        if (/-/.test(prop)) {
+        if (prop.indexOf('-') >= 0) {
           elm.style.removeProperty(prop);
         } else {
           (elm as any).style[prop] = '';
@@ -38,7 +36,7 @@ export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: H
 
     for (const prop in newValue) {
       if (!oldValue || newValue[prop] !== oldValue[prop]) {
-        if (/-/.test(prop)) {
+        if (prop.indexOf('-') >= 0) {
           elm.style.setProperty(prop, newValue[prop]);
         } else {
           (elm as any).style[prop] = newValue[prop];
@@ -51,13 +49,13 @@ export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: H
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
     // then we're assuming it's an event listener
-
-    if (toLowerCase(memberName) in elm) {
+    const lowerCaseName = toLowerCase(memberName);
+    if (lowerCaseName in elm) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
       // member name "onmouseover" is on the element's prototype
       // so let's add the listener "mouseover", which is all lowercased
-      memberName = toLowerCase(memberName.substring(2));
+      memberName = lowerCaseName.substring(2);
 
     } else {
       // custom event
@@ -65,7 +63,7 @@ export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: H
       // so let's trim off the "on" prefix and lowercase the first character
       // and add the listener "myCustomEvent"
       // except for the first character, we keep the event name case
-      memberName = toLowerCase(memberName[2]) + memberName.substring(3);
+      memberName = lowerCaseName[2] + memberName.substring(3);
     }
 
     if (newValue) {
@@ -125,7 +123,7 @@ export function setAccessor(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: H
 
 
 function parseClassList(value: string | undefined | null): string[] {
-  return (value == null || value === '') ? [] : value.trim().split(/\s+/);
+  return !value ? [] : value.split(' ');
 }
 
 /**

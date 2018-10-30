@@ -186,12 +186,12 @@ export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpM
 
   const elm = domApi.$createElement('ion-cmp') as d.HostElement;
 
-  const hostSnapshot: d.HostSnapshot = {
-    $attributes: {}
-  };
+  // const hostSnapshot: d.HostSnapshot = {
+  //   $attributes: {}
+  // };
 
   const meta = newInternalMeta(elm, cmpMeta);
-  return initComponentInstance(plt, meta, hostSnapshot);
+  return initComponentInstance(plt, meta);
 }
 
 

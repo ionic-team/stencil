@@ -19,23 +19,22 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
       const memberType = member.memberType;
 
       if (memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable)) {
-        meta.valuesMap[memberName] = (hostPrototype as any)[memberName];
+        meta.values.set(memberName, (hostPrototype as any)[memberName]);
       }
     });
   }
 
+  const properties: any = {};
   membersEntries.forEach(([memberName, member]) => {
     // add getters/setters
     const memberType = member.memberType;
     if (memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable)) {
       // @Prop() or @Prop({ mutable: true })
-      definePropertyGetterSetter(
-        hostPrototype,
-        memberName,
+      properties[memberName] = definePropertyGetterSetter(
         function getHostElementProp(this: d.HostElement) {
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
-          return plt.metaHostMap.get(this).valuesMap[memberName];
+          return plt.metaHostMap.get(this).values.get(memberName);
         },
         function setHostElementProp(this: d.HostElement, newValue: any) {
           // host element setter (cannot be arrow fn)
@@ -48,8 +47,9 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
       // @Method()
       // add a placeholder noop value on the host element's prototype
       // incase this method gets called before setup
-      definePropertyValue(hostPrototype, memberName, noop);
+      properties[memberName] = definePropertyValue(noop);
     }
   });
+  Object.defineProperties(hostPrototype, properties);
 }
 

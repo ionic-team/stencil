@@ -58,7 +58,7 @@ export async function update(plt: d.PlatformApi, meta: d.InternalMeta) {
       // haven't created a component instance for this host element yet!
       // create the instance from the user's component class
       // https://www.youtube.com/watch?v=olLxrojmvMg
-      instance = initComponentInstance(plt, meta, meta.hostSnapshot);
+      instance = initComponentInstance(plt, meta);
 
       if (__BUILD_CONDITIONALS__.cmpWillLoad && instance) {
         // this is the initial load and the instance was just created

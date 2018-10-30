@@ -1,33 +1,21 @@
 import * as d from '../declarations';
 import { callNodeRefs } from '../renderer/vdom/patch';
-import { initEventEmitters } from './init-event-emitters';
 import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
-import { proxyComponentInstance } from './proxy-component-instance';
+import { createInstance } from './proxy-members';
 
 
 export function initComponentInstance(
   plt: d.PlatformApi,
   meta: d.InternalMeta,
-  hostSnapshot: d.HostSnapshot,
 ) {
   let instance: any;
   try {
     // using the user's component class, let's create a new instance
     const componentConstructor = meta.cmpMeta.componentConstructor;
-    instance = new componentConstructor();
+    instance = createInstance(plt, meta, componentConstructor);
 
     // ok cool, we've got an host element now, and a actual instance
     // and there were no errors creating the instance
-
-    // let's upgrade the data on the host element
-    // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, meta, componentConstructor, instance, hostSnapshot);
-
-    if (__BUILD_CONDITIONALS__.event) {
-      // add each of the event emitters which wire up instance methods
-      // to fire off dom events from the host element
-      initEventEmitters(plt, meta, componentConstructor.events, instance);
-    }
 
     if (__BUILD_CONDITIONALS__.listener) {
       try {
@@ -58,9 +46,9 @@ export function initComponentInstance(
     // but chances are the app isn't fully working cuz this component has issues
     instance = {};
     plt.onError(e, RUNTIME_ERROR.InitInstanceError, meta.element, true);
+    meta.instance = instance;
+    plt.metaInstanceMap.set(instance, meta);
   }
-  plt.metaInstanceMap.set(instance, meta);
-  meta.instance = instance;
   return instance;
 }
 
@@ -105,7 +93,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 
     try {
       // fire off the ref if it exists
-      callNodeRefs(meta.vnodeMap);
+      callNodeRefs(meta.vnode, false);
 
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)

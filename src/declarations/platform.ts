@@ -15,8 +15,8 @@ export interface InternalMeta {
   isQueuedForUpdate: boolean;
   onReadyCallbacks: d.OnReadyCallback[];
   queuedEvents: any[];
-  vnodeMap: d.VNode;
-  valuesMap: any;
+  vnode: d.VNode;
+  values: Map<string, any>;
 }
 
 export interface PlatformApi {

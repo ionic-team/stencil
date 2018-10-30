@@ -21,7 +21,7 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
       ssrVNode = {};
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
-      getInternalMeta(plt, elm).vnodeMap = ssrVNode;
+      getInternalMeta(plt, elm).vnode = ssrVNode;
 
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
         addChildSsrVNodes(domApi, elm.childNodes[j] as d.RenderNode, ssrVNode, ssrVNodeId, true);

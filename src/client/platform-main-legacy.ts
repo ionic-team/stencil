@@ -14,6 +14,7 @@ import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
+import { newInternalMeta } from 'core/internal-meta';
 
 
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
@@ -95,9 +96,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   rootElm['s-ld'] = [];
   rootElm['s-rn'] = true;
 
+  const rootMeta = newInternalMeta(rootElm, undefined);
+
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    // plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    rootMeta.isCmpReady = App.loaded = plt.isAppLoaded = true;
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 

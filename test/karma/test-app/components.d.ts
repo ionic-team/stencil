@@ -76,6 +76,32 @@ export namespace Components {
     'strAttr'?: string;
   }
 
+  interface BenchCreationRoot {
+    'nu': number;
+  }
+  interface BenchCreationRootAttributes extends StencilHTMLAttributes {
+    'nu'?: number;
+  }
+
+  interface BenchCreation {
+    'index': number;
+    'index1': number;
+    'index2': number;
+    'index3': number;
+    'index4': number;
+    'index5': number;
+    'index6': number;
+  }
+  interface BenchCreationAttributes extends StencilHTMLAttributes {
+    'index'?: number;
+    'index1'?: number;
+    'index2'?: number;
+    'index3'?: number;
+    'index4'?: number;
+    'index5'?: number;
+    'index6'?: number;
+  }
+
   interface ConditionalBasic {}
   interface ConditionalBasicAttributes extends StencilHTMLAttributes {}
 
@@ -365,6 +391,8 @@ declare global {
     'AttributeComplex': Components.AttributeComplex;
     'AttributeHost': Components.AttributeHost;
     'AttributeHtmlRoot': Components.AttributeHtmlRoot;
+    'BenchCreationRoot': Components.BenchCreationRoot;
+    'BenchCreation': Components.BenchCreation;
     'ConditionalBasic': Components.ConditionalBasic;
     'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
     'ConditionalRerender': Components.ConditionalRerender;
@@ -438,6 +466,8 @@ declare global {
     'attribute-complex': Components.AttributeComplexAttributes;
     'attribute-host': Components.AttributeHostAttributes;
     'attribute-html-root': Components.AttributeHtmlRootAttributes;
+    'bench-creation-root': Components.BenchCreationRootAttributes;
+    'bench-creation': Components.BenchCreationAttributes;
     'conditional-basic': Components.ConditionalBasicAttributes;
     'conditional-rerender-root': Components.ConditionalRerenderRootAttributes;
     'conditional-rerender': Components.ConditionalRerenderAttributes;
@@ -544,6 +574,18 @@ declare global {
   var HTMLAttributeHtmlRootElement: {
     prototype: HTMLAttributeHtmlRootElement;
     new (): HTMLAttributeHtmlRootElement;
+  };
+
+  interface HTMLBenchCreationRootElement extends Components.BenchCreationRoot, HTMLStencilElement {}
+  var HTMLBenchCreationRootElement: {
+    prototype: HTMLBenchCreationRootElement;
+    new (): HTMLBenchCreationRootElement;
+  };
+
+  interface HTMLBenchCreationElement extends Components.BenchCreation, HTMLStencilElement {}
+  var HTMLBenchCreationElement: {
+    prototype: HTMLBenchCreationElement;
+    new (): HTMLBenchCreationElement;
   };
 
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
@@ -932,6 +974,8 @@ declare global {
     'attribute-complex': HTMLAttributeComplexElement
     'attribute-host': HTMLAttributeHostElement
     'attribute-html-root': HTMLAttributeHtmlRootElement
+    'bench-creation-root': HTMLBenchCreationRootElement
+    'bench-creation': HTMLBenchCreationElement
     'conditional-basic': HTMLConditionalBasicElement
     'conditional-rerender-root': HTMLConditionalRerenderRootElement
     'conditional-rerender': HTMLConditionalRerenderElement
@@ -1005,6 +1049,8 @@ declare global {
     'attribute-complex': HTMLAttributeComplexElement;
     'attribute-host': HTMLAttributeHostElement;
     'attribute-html-root': HTMLAttributeHtmlRootElement;
+    'bench-creation-root': HTMLBenchCreationRootElement;
+    'bench-creation': HTMLBenchCreationElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
     'conditional-rerender': HTMLConditionalRerenderElement;

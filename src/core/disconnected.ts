@@ -21,7 +21,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     propagateComponentReady(plt, meta, elm);
 
     // since we're disconnecting, call all of the JSX ref's with null
-    callNodeRefs(meta.vnodeMap, true);
+    callNodeRefs(meta.vnode, true);
 
     // detatch any event listeners that may have been added
     // because we're not passing an exact event name it'll

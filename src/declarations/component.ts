@@ -1,7 +1,7 @@
 import * as d from '.';
 
 export interface ComponentConstructor {
-  new (): any;
+  new (plt?: d.PlatformApi, meta?: d.InternalMeta): any;
 
   is?: string;
   properties?: ComponentConstructorProperties;
