@@ -116,7 +116,7 @@ async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readme
 
   const content: string[] = [];
 
-  const existingLines = existingContent.split(/(\r?\n)/);
+  const existingLines = existingContent.split('\n');
   let foundAutoGenerate = false;
 
   for (var i = 0; i < existingLines.length; i++) {
@@ -124,10 +124,7 @@ async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readme
       foundAutoGenerate = true;
       break;
     }
-
-    if (existingLines[i] !== '\n' && existingLines[i] !== '\r') {
-      content.push(existingLines[i]);
-    }
+    content.push(existingLines[i]);
   }
 
   if (!foundAutoGenerate) {
