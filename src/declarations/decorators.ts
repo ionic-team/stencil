@@ -13,13 +13,14 @@ export interface ComponentOptions {
   styleUrls?: string[] | d.ModeStyles;
   styles?: string;
   scoped?: boolean;
-  shadow?: boolean;
+  shadow?: boolean | ShadowDomOptions;
   host?: d.HostMeta;
   assetsDir?: string;
   assetsDirs?: string[];
+}
+export interface ShadowDomOptions {
   delegatesFocus?: boolean;
 }
-
 
 export interface PropDecorator {
   (opts?: PropOptions): PropertyDecorator;

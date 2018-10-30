@@ -54,16 +54,6 @@ describe('host-snapshot', () => {
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
 
-  it('delegates focus is set', () => {
-    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
-    domApi.$supportsShadowDom = true;
-    let delegatesFocusWasSet = false;
-    cmpMeta.delegatesFocus = true;
-    domApi.$attachShadow = (_, o) => delegatesFocusWasSet = o.delegatesFocus;
-    initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(delegatesFocusWasSet).toBe(true);
-  });
-
   it('do not set content reference node is shadow and supports shadow', () => {
     domApi.$attachShadow = () => {/**/};
     domApi.$supportsShadowDom = true;

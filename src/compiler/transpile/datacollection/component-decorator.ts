@@ -1,10 +1,9 @@
 import * as d from '../../../declarations';
 import { buildWarn } from '../../util';
-import { ENCAPSULATION } from '../../../util/constants';
+import { ENCAPSULATION, DEFAULT_SHADOW_ROOT_INIT } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import { getStylesMeta } from './styles-meta';
 import ts from 'typescript';
-
 
 export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
   if (!node.decorators) {
@@ -47,15 +46,24 @@ It will be removed in future versions. Please use the "hostData()" method instea
     assetsDirsMeta: [],
     hostMeta: getHostMeta(diagnostics, componentOptions.host),
     dependencies: [],
-    jsdoc: serializeSymbol(checker, symbol),
-    delegatesFocus: componentOptions.delegatesFocus
+    jsdoc: serializeSymbol(checker, symbol)    
   };
 
-  // normalizeEncapsulation
-  cmpMeta.encapsulationMeta =
-      componentOptions.shadow ? ENCAPSULATION.ShadowDom :
+  // shadow dom options
+  if(componentOptions.shadow){
+    cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom
+    if(isShadowDomOptions(componentOptions.shadow)) {
+      cmpMeta.shadowRootInit = Object.assign({}, DEFAULT_SHADOW_ROOT_INIT, {
+        delegatesFocus: componentOptions.shadow.delegatesFocus
+      });
+    }else {
+      cmpMeta.shadowRootInit = DEFAULT_SHADOW_ROOT_INIT;
+    }
+  } else {
+    cmpMeta.encapsulationMeta =
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;
+  }
 
   // assetsDir: './somedir'
   if (componentOptions.assetsDir) {
@@ -107,4 +115,8 @@ function getHostMeta(diagnostics: d.Diagnostic[], hostData: d.HostMeta) {
   });
 
   return hostData;
+}
+
+function isShadowDomOptions(o: any): o is d.ShadowDomOptions {
+  return typeof(o) != typeof(true);
 }
