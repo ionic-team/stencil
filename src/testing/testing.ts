@@ -76,6 +76,10 @@ export class Testing implements d.Testing {
 
       let buildTask: Promise<d.BuildResults> = null;
 
+      (config.outputTargets as d.OutputTargetWww[]).forEach(outputTarget => {
+        outputTarget.empty = false;
+      });
+
       const doBuild = !(config.flags && config.flags.build === false);
       if (doBuild) {
         buildTask = compiler.build();
