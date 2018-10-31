@@ -1,10 +1,12 @@
-<a name="0.15.2-0"></a>
-## 🦄 [Prerelease] [0.15.2-0](https://github.com/ionic-team/stencil/compare/v0.15.1...v0.15.2-0) (2018-10-30)
-
+<a name="0.15.2-1"></a>
+## 🛥 [Prerelease] [0.15.2-1](https://github.com/ionic-team/stencil/compare/v0.15.1...v0.15.2-1) (2018-10-31)
 
 ### Bug Fixes
 
+* **compiler:** fix doc generation issue for windows ([#1195](https://github.com/ionic-team/stencil/issues/1195)) ([56c4185](https://github.com/ionic-team/stencil/commit/56c4185))
 * **e2e:** throw errors for 404 tests ([d83beb8](https://github.com/ionic-team/stencil/commit/d83beb8))
+* **exit:** integrate exit module ([3557a4a](https://github.com/ionic-team/stencil/commit/3557a4a))
+* **fs:** integrate graceful-fs ([af78764](https://github.com/ionic-team/stencil/commit/af78764)), closes [#1126](https://github.com/ionic-team/stencil/issues/1126)
 * **queue:** allow option to disable async queue ([#1186](https://github.com/ionic-team/stencil/issues/1186)) ([373e58c](https://github.com/ionic-team/stencil/commit/373e58c))
 
 
