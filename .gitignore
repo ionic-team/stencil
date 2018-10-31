@@ -13,6 +13,7 @@ log.txt
 .sass-cache/
 .versions/
 node_modules/
+coverage/
 
 /dist/
 **/www/build/
