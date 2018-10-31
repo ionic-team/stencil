@@ -1,4 +1,4 @@
-import { ENCAPSULATION, DEFAULT_SHADOW_ROOT_INIT } from '../../../../util/constants';
+import { ENCAPSULATION } from '../../../../util/constants';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import { gatherMetadata } from './test-utils';
 import * as path from 'path';
@@ -42,7 +42,6 @@ describe('component decorator', () => {
         hostMeta: {},
         stylesMeta: {},
         encapsulationMeta: ENCAPSULATION.ShadowDom,
-        shadowRootInit: DEFAULT_SHADOW_ROOT_INIT,
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
@@ -66,7 +65,7 @@ describe('component decorator', () => {
         hostMeta: {},
         stylesMeta: {},
         encapsulationMeta: ENCAPSULATION.ShadowDom,
-        shadowRootInit: Object.assign({}, DEFAULT_SHADOW_ROOT_INIT, { delegatesFocus: true }),
+        shadowRootOptions: { delegatesFocus: true },
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',

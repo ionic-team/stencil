@@ -28,14 +28,14 @@ export interface ComponentMeta {
   listenersMeta?: ListenMeta[];
   hostMeta?: HostMeta;
   encapsulationMeta?: number;
-  shadowRootInit?: Readonly<ShadowRootInit>;
+  shadowRootOptions?: Readonly<d.ShadowDomOptions>;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;
   dependencies?: ComponentDependencies;
   jsdoc?: JsDoc;
   styleDocs?: StyleDoc[];
-  hmrLoad?: () => void;  
+  hmrLoad?: () => void;
 }
 
 

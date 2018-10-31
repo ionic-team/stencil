@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildWarn } from '../../util';
-import { ENCAPSULATION, DEFAULT_SHADOW_ROOT_INIT } from '../../../util/constants';
+import { ENCAPSULATION } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import { getStylesMeta } from './styles-meta';
 import ts from 'typescript';
@@ -46,18 +46,14 @@ It will be removed in future versions. Please use the "hostData()" method instea
     assetsDirsMeta: [],
     hostMeta: getHostMeta(diagnostics, componentOptions.host),
     dependencies: [],
-    jsdoc: serializeSymbol(checker, symbol)    
+    jsdoc: serializeSymbol(checker, symbol)
   };
 
   // shadow dom options
   if(componentOptions.shadow){
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom
     if(isShadowDomOptions(componentOptions.shadow)) {
-      cmpMeta.shadowRootInit = Object.assign({}, DEFAULT_SHADOW_ROOT_INIT, {
-        delegatesFocus: componentOptions.shadow.delegatesFocus
-      });
-    }else {
-      cmpMeta.shadowRootInit = DEFAULT_SHADOW_ROOT_INIT;
+      cmpMeta.shadowRootOptions = componentOptions.shadow;
     }
   } else {
     cmpMeta.encapsulationMeta =
@@ -118,5 +114,5 @@ function getHostMeta(diagnostics: d.Diagnostic[], hostData: d.HostMeta) {
 }
 
 function isShadowDomOptions(o: any): o is d.ShadowDomOptions {
-  return typeof(o) != typeof(true);
+  return o && typeof(o) === 'object';
 }

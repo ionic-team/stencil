@@ -52,13 +52,6 @@ export const enum ENCAPSULATION {
   ScopedCss = 2,
 }
 
-/**
- * DEFAULT_SHADOW_ROOT_INIT
- */
-export const DEFAULT_SHADOW_ROOT_INIT: Readonly<ShadowRootInit> = { 
-  mode: 'open' 
-};
-
 
 /**
  * Node Types
