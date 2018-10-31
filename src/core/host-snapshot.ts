@@ -55,7 +55,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       // this component is using shadow dom
       // and this browser supports shadow dom
       // add the read-only property "shadowRoot" to the host element
-      domApi.$attachShadow(hostElm, { mode: "open", ...cmpMeta.shadowRootOptions });
+      domApi.$attachShadow(hostElm, { mode: 'open', ...cmpMeta.shadowRootOptions });
     }
   }
 
