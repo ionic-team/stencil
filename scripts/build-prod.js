@@ -70,7 +70,14 @@ function copyLicense(moduleId) {
       const licensePath = path.join(__dirname, '..', 'node_modules', moduleId, 'LICENSE.md');
       fs.accessSync(licensePath);
       licenseSrcPath = licensePath;
-    } catch (e) {}
+
+    } catch (e) {
+      try {
+        const licensePath = path.join(__dirname, '..', 'node_modules', moduleId, 'LICENSE-MIT');
+        fs.accessSync(licensePath);
+        licenseSrcPath = licensePath;
+      } catch (e) {}
+    }
   }
 
   if (licenseSrcPath != null) {
