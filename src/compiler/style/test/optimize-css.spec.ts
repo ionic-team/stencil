@@ -271,7 +271,7 @@ describe('optimizeCss',  () => {
   //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
 
   //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`a{border:none}`);
+  //   expect(output).toBe(`a{border:var(--border-width) var(--border-style) var(--btn-border-color)}`);
   // });
 
   it('discard-duplicates', async () => {
