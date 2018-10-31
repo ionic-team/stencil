@@ -158,6 +158,7 @@ export namespace Components {
   }
   interface SlotLightDomContent {}
   interface SlotLightDomRoot {}
+
   interface SlotMapOrder {}
   interface SlotMapOrderRoot {}
   interface SlotReorder {
