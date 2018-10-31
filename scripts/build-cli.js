@@ -14,8 +14,8 @@ const success = transpile(path.join('..', 'src', 'cli', 'tsconfig.json'));
 
 if (success) {
 
-  function bundle() {
-    rollup.rollup({
+  async function buildCli() {
+    const build = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'child_process',
@@ -33,29 +33,17 @@ if (success) {
         if (/top level of an ES module/.test(message)) return;
         console.error( message );
       }
+    });
 
-    }).then(bundle => {
-
-      bundle.write({
-        format: 'cjs',
-        file: DEST_FILE
-
-      }).catch(err => {
-        console.log(`build cli error: ${err}`);
-        process.exit(1);
-      });
-
-    }).catch(err => {
-      console.log(`build cli error: ${err}`);
-      process.exit(1);
+    await build.write({
+      format: 'cjs',
+      file: DEST_FILE
     });
   }
 
+  buildCli();
 
-  bundle();
-
-
-  process.on('exit', (code) => {
+  process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
     console.log(`✅ cli: ${DEST_FILE}`);
   });

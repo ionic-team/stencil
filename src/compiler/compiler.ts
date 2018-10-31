@@ -8,7 +8,6 @@ import { getCompilerCtx } from './build/compiler-ctx';
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
 import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
-import { prerelease } from 'semver';
 
 
 export class Compiler implements d.Compiler {
@@ -30,7 +29,7 @@ export class Compiler implements d.Compiler {
 
       config.logger.info(config.logger.cyan(startupMsg));
 
-      if (prerelease(config.sys.compiler.version)) {
+      if (config.sys.semver.prerelease(config.sys.compiler.version)) {
         config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
       }
       config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);

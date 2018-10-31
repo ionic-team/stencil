@@ -44,6 +44,7 @@ export interface StencilSystem {
     plugins: {[pluginName: string]: any};
   };
   scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
+  semver?: Semver;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
   url?: {
@@ -56,6 +57,16 @@ export interface StencilSystem {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
+}
+
+
+export interface Semver {
+  lt(v1: string, v2: string): boolean;
+  lte(v1: string, v2: string): boolean;
+  gt(v1: string, v2: string): boolean;
+  gte(v1: string, v2: string): boolean;
+  prerelease(v: string): string[] | null;
+  satisfies(version: string, range: string): boolean;
 }
 
 
