@@ -35,6 +35,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'autoprefixer',
   'cssnano',
   'css-what',
+  'exit',
   'glob',
   'graceful-fs',
   'is-glob',

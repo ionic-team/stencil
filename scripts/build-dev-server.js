@@ -37,9 +37,19 @@ if (success) {
         'path',
         'querystring',
         'url',
-        'zlib'
+        'zlib',
+        '../sys/node/graceful-fs.js'
       ],
       plugins: [
+        (() => {
+          return {
+            resolveId(importee) {
+              if (importee === 'graceful-fs') {
+                return '../sys/node/graceful-fs.js';
+              }
+            }
+          }
+        })(),
         rollupResolve(),
         rollupCommonjs()
       ],
