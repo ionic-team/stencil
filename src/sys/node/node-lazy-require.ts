@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { dirname } from 'path';
 import { NodeResolveModule } from './node-resolve-module';
-import { readFile } from 'fs';
+import { readFile } from 'graceful-fs';
 import { satisfies } from 'semver';
 import { SpawnOptions, spawn } from 'child_process';
 

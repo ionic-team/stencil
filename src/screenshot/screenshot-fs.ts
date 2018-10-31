@@ -1,6 +1,6 @@
 import * as d from '../declarations';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'path';
 
 
 export async function writeScreenshotImage(imagePath: string, screenshotBuf: Buffer) {

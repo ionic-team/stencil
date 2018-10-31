@@ -17,6 +17,7 @@ function minify(filePath) {
 
 const DIST = path.join(__dirname, '..', 'dist');
 [
+  path.join(DIST, 'sys', 'node', 'graceful-fs.js'),
   path.join(DIST, 'sys', 'node', 'node-fetch.js'),
   path.join(DIST, 'sys', 'node', 'open-in-editor.js'),
   path.join(DIST, 'sys', 'node', 'sys-worker.js'),
@@ -35,6 +36,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'cssnano',
   'css-what',
   'glob',
+  'graceful-fs',
   'is-glob',
   'minimatch',
   'node-fetch',

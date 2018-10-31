@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import * as fs from 'fs';
+import fs from 'graceful-fs';
 
 
 export class NodeFs implements d.FileSystem {

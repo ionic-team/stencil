@@ -27,9 +27,19 @@ if (success) {
         'net',
         'os',
         'path',
-        'url'
+        'url',
+        '../sys/node/graceful-fs.js'
       ],
       plugins: [
+        (() => {
+          return {
+            resolveId(importee) {
+              if (importee === 'graceful-fs') {
+                return '../sys/node/graceful-fs.js';
+              }
+            }
+          }
+        })(),
         rollupResolve({
           preferBuiltins: true
         }),
@@ -66,9 +76,19 @@ if (success) {
         'process',
         'stream',
         'util',
-        'zlib'
+        'zlib',
+        '../dist/sys/node/graceful-fs.js'
       ],
       plugins: [
+        (() => {
+          return {
+            resolveId(importee) {
+              if (importee === 'graceful-fs') {
+                return '../dist/sys/node/graceful-fs.js';
+              }
+            }
+          }
+        })(),
         rollupResolve({
           preferBuiltins: true
         }),
