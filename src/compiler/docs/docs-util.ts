@@ -161,7 +161,7 @@ export function getEventDetailType(eventType: d.AttributeTypeInfo) {
   if (eventType && eventType.text && typeof eventType.text === 'string' && eventType.text !== 'void') {
     return eventType.text.trim();
   }
-  return '';
+  return 'void';
 }
 
 

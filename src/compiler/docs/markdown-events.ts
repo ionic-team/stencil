@@ -27,13 +27,17 @@ export class MarkdownEvents {
 
     const table = new MarkdownTable();
 
-    table.addHeader(['Event', 'Detail', 'Description']);
+    table.addHeader([
+      'Event',
+      'Description',
+      'Detail'
+    ]);
 
     rows.forEach(row => {
       table.addRow([
         '`' + row.eventName + '`',
+        row.description,
         row.detail,
-        row.description
       ]);
     });
 

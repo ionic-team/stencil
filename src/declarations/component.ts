@@ -167,6 +167,7 @@ export interface JsDoc {
   documentation: string;
   type: string;
   tags: JSDocTagInfo[];
+  default?: string;
   parameters?: JsDoc[];
   returns?: {
     type: string;

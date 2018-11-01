@@ -70,6 +70,7 @@ describe('props decorator', () => {
           name: 'withOptions',
           tags: [],
           type: 'number',
+          default: '88'
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
@@ -164,6 +165,7 @@ describe('props decorator', () => {
           name: 'color',
           tags: [],
           type: `"primary" | "secondary"`,
+          default: '"primary"'
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,

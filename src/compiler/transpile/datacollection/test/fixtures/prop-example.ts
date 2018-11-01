@@ -43,7 +43,7 @@ class ActionSheet {
 
   @Prop() enabled?: boolean | string;
 
-  @Prop() color?: Color;
+  @Prop() color?: Color = "primary";
 
   @Prop() config?: ConfigProps;
 

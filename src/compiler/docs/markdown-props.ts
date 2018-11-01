@@ -32,7 +32,8 @@ export class MarkdownProps {
       'Property',
       'Attribute',
       'Description',
-      'Type'
+      'Type',
+      'Default'
     ]);
 
     rows.forEach(row => {
@@ -40,7 +41,8 @@ export class MarkdownProps {
         row.propName,
         row.attrName,
         row.description,
-        row.type
+        row.type,
+        row.default
       ]);
     });
 
@@ -81,6 +83,9 @@ export class PropRow {
     return `\`${this.memberMeta.jsdoc.type}\``;
   }
 
+  get default() {
+    return `\`${this.memberMeta.jsdoc.default}\``;
+  }
 }
 
 function filterRow(row: PropRow) {

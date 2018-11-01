@@ -214,6 +214,7 @@ describe('component', () => {
               'name': 'enableBackdropDismiss',
               'tags': [],
               'type': 'boolean',
+              'default': 'true'
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Boolean,

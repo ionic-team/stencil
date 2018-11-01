@@ -42,6 +42,12 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
         memberData.reflectToAttrib = getReflectToAttr(propOptions);
         memberData.propType = propTypeFromTSType(type);
         memberData.jsdoc = serializeSymbol(checker, symbol);
+
+        // extract default value
+        const initializer = prop.initializer;
+        if (initializer) {
+          memberData.jsdoc.default = initializer.getText();
+        }
       }
 
       allMembers[memberName] = memberData;
