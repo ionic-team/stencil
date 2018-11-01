@@ -32,5 +32,6 @@ export interface CssImportData {
   updatedImport?: string;
   url: string;
   filePath?: string;
+  altFilePath?: string;
   styleText?: string;
 }
