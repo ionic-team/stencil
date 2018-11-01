@@ -1,3 +1,19 @@
+<a name="0.16.0-0"></a>
+# 👾 [0.16.0-0](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-0) (2018-11-01)
+
+
+### Bug Fixes
+
+* **test:** add getBoundingClientRect() to mock-doc ([88292c0](https://github.com/ionic-team/stencil/commit/88292c0)), closes [#1198](https://github.com/ionic-team/stencil/issues/1198)
+
+
+### Features
+
+* **prop:** extract default value of props ([8bed57e](https://github.com/ionic-team/stencil/commit/8bed57e))
+* **types:** add support for JSX required props ([#1199](https://github.com/ionic-team/stencil/issues/1199)) ([3f39b1b](https://github.com/ionic-team/stencil/commit/3f39b1b))
+
+
+
 <a name="0.15.2"></a>
 ## 🌯 [0.15.2](https://github.com/ionic-team/stencil/compare/v0.15.1...v0.15.2) (2018-11-01)
 
