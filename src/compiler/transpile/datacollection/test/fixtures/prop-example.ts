@@ -37,4 +37,8 @@ class ActionSheet {
   @Prop() enabled?: boolean | string;
 
   @Prop() color?: Color;
+
+  @Prop() mode!: string;
+
+  @Prop() required!: string;
 }

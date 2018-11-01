@@ -27,6 +27,7 @@ describe('method decorator', () => {
         attribType: {
           text: '(opts?: any) => any',
           optional: false,
+          required: false,
           typeReferences: {
             ActionSheet: {
               referenceLocation: 'global',
@@ -84,6 +85,7 @@ describe('method decorator', () => {
         attribType: {
           text: '(opts?: ActionSheetOptions) => any',
           optional: false,
+          required: false,
           typeReferences: {
             ActionSheetOptions: {
               referenceLocation: 'local',
@@ -134,6 +136,7 @@ describe('method decorator', () => {
         attribType: {
           text: '(opts?: t.CoreContext) => any',
           optional: false,
+          required: false,
           typeReferences: {
             Promise: {
               referenceLocation: 'global',

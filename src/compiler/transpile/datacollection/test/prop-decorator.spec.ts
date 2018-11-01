@@ -19,6 +19,7 @@ describe('props decorator', () => {
         attribType: {
           text: '(_) => Promise<OtherThing>',
           optional: false,
+          required: false,
           typeReferences: {
             OtherThing: {
               importReferenceLocation: '../../../../../index',
@@ -44,6 +45,7 @@ describe('props decorator', () => {
         attribType: {
           text: 'string',
           optional: false,
+          required: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -61,6 +63,7 @@ describe('props decorator', () => {
         attribType: {
           text: 'number',
           optional: false,
+          required: false,
         },
         jsdoc: {
           documentation: '',
@@ -77,6 +80,7 @@ describe('props decorator', () => {
         attribType: {
           text: 'number',
           optional: true,
+          required: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -94,6 +98,7 @@ describe('props decorator', () => {
         attribType: {
           text: `'auto' | 'manual'`,
           optional: true,
+          required: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -111,6 +116,7 @@ describe('props decorator', () => {
         attribType: {
           text: `number | number[]`,
           optional: true,
+          required: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -128,6 +134,7 @@ describe('props decorator', () => {
         attribType: {
           text: `boolean | string`,
           optional: true,
+          required: false,
           typeReferences: {}
         },
         jsdoc: {
@@ -145,6 +152,7 @@ describe('props decorator', () => {
         attribType: {
           text: `Color`,
           optional: true,
+          required: false,
           typeReferences: {
             Color: {
               referenceLocation: 'global'
@@ -156,6 +164,42 @@ describe('props decorator', () => {
           name: 'color',
           tags: [],
           type: `"primary" | "secondary"`,
+        },
+        memberType: MEMBER_TYPE.Prop,
+        propType: PROP_TYPE.String,
+        reflectToAttrib: false
+      },
+      mode: {
+        attribName: 'mode',
+        attribType: {
+          text: `string`,
+          optional: false,
+          required: false,
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'mode',
+          tags: [],
+          type: `string`,
+        },
+        memberType: MEMBER_TYPE.Prop,
+        propType: PROP_TYPE.String,
+        reflectToAttrib: false
+      },
+      required: {
+        attribName: 'required',
+        attribType: {
+          text: `string`,
+          optional: false,
+          required: true,
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'required',
+          tags: [],
+          type: `string`,
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.String,
