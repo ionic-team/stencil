@@ -30,6 +30,12 @@ execSync('node build-mock-doc.js', {
 
 ].forEach(script => fork(path.join(SCRIPTS_DIR, script), [`--build-id=${BUILD_ID}`]));
 
+process.on('exit', () => {
+  const buildConditionals = path.join(DIST_DIR, 'transpiled-build-conditionals');
+  fs.removeSync(buildConditionals);
+  console.log(`✅ done`);
+});
+
 
 function getBuildId() {
   const d = new Date();
