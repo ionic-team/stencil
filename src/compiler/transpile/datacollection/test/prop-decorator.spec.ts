@@ -169,6 +169,28 @@ describe('props decorator', () => {
         propType: PROP_TYPE.String,
         reflectToAttrib: false
       },
+      config: {
+        attribName: 'config',
+        attribType: {
+          text: `ConfigProps`,
+          optional: true,
+          required: false,
+          typeReferences: {
+            ConfigProps: {
+              referenceLocation: 'local'
+            }
+          }
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'config',
+          tags: [],
+          type: `"duration" | "timeout"`,
+        },
+        memberType: MEMBER_TYPE.Prop,
+        propType: PROP_TYPE.String,
+        reflectToAttrib: false
+      },
       mode: {
         attribName: 'mode',
         attribType: {
