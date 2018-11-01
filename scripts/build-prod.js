@@ -95,3 +95,9 @@ function copyLicense(moduleId) {
   }
 
 }
+
+process.on('exit', () => {
+  const buildConditionals = path.join(__dirname, '..', 'dist', 'transpiled-build-conditionals');
+  fs.removeSync(buildConditionals);
+  console.log(`✅ prod build optimized`);
+});
