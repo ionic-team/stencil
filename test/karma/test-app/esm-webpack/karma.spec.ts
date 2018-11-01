@@ -12,6 +12,8 @@ describe('esm-webpack', () => {
 
   it('webpack', async () => {
     await testEsmImport(app);
+    const hydratedElm = app.querySelector('esm-import.hydrated')
+    expect(hydratedElm).not.toBe(null);
   });
 
 });

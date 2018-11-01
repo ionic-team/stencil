@@ -1,6 +1,6 @@
 
 
-export function applyPolyfills(window, cb) {
+export function applyPolyfills(window) {
   /*!
   es6-promise - a tiny implementation of Promises/A+.
   Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
@@ -45,11 +45,9 @@ export function applyPolyfills(window, cb) {
     promises.push(import('./polyfills/url.js'));
   }
 
-  Promise.all(promises).then(function(results) {
+  return Promise.all(promises).then(function(results) {
     results.forEach(function(polyfillModule) {
       polyfillModule.applyPolyfill(window, window.document);
     });
-
-    cb();
   });
 }
