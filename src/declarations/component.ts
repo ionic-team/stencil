@@ -81,6 +81,7 @@ export interface AttributeTypeReferences {
 export interface AttributeTypeInfo {
   text: string;
   optional: boolean;
+  required: boolean;
   typeReferences?: AttributeTypeReferences;
 }
 

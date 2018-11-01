@@ -291,7 +291,7 @@ export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: strin
     ...propAttributes,
     ...methodAttributes
   }, false);
-  const stencilComponentAttributesOptional = attributesToMultiLineString({
+  const stencilComponentJSXAttributes = attributesToMultiLineString({
     ...propAttributes,
     ...eventAttributes
   }, true);
@@ -304,7 +304,7 @@ interface ${tagNameAsPascal} {${
 }}`,
     JSXElements: `
 interface ${jsxInterfaceName} extends StencilHTMLAttributes {${
-  stencilComponentAttributesOptional !== '' ? `\n${stencilComponentAttributesOptional}\n` : ''
+  stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
 }}`,
     global: `
 interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
@@ -322,11 +322,12 @@ interface TypeInfo {
   [key: string]: {
     type: string;
     optional: boolean;
+    required: boolean;
     jsdoc?: string;
   };
 }
 
-function attributesToMultiLineString(attributes: TypeInfo, optional = true, paddingString = '') {
+function attributesToMultiLineString(attributes: TypeInfo, jsxAttributes: boolean, paddingString = '') {
   if (Object.keys(attributes).length === 0) {
     return '';
   }
@@ -340,7 +341,12 @@ function attributesToMultiLineString(attributes: TypeInfo, optional = true, padd
         fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
         fullList.push(` */`);
       }
-      fullList.push(`'${key}'${ optional || type.optional ? '?' : '' }: ${type.type};`);
+      const optional = (jsxAttributes)
+        ? !type.required
+        : type.optional;
+
+      fullList.push(`'${key}'${ optional ? '?' : '' }: ${type.type};`);
+
       return fullList;
     }, <string[]>[])
     .map(item => `${paddingString}${item}`)
@@ -356,7 +362,8 @@ function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
         type: member.attribType.text,
-        optional: member.attribType.optional
+        optional: member.attribType.optional,
+        required: member.attribType.required
       };
 
       if (member.jsdoc) {
@@ -378,7 +385,8 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
         type: member.attribType.text,
-        optional: false
+        optional: false,
+        required: false,
       };
 
       if (member.jsdoc) {
@@ -399,7 +407,8 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
       const eventType = (eventMetaObj.eventType) ? `CustomEvent<${eventMetaObj.eventType.text}>` : `CustomEvent`;
       obj[memberName] = {
         type: `(event: ${eventType}) => void`, // TODO this is not good enough
-        optional: false
+        optional: false,
+        required: false
       };
 
       if (eventMetaObj.jsdoc) {

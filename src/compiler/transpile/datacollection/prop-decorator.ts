@@ -38,7 +38,7 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
-        memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
+        memberData.attribType = getAttribType(diagnostics, sourceFile, prop, memberName);
         memberData.reflectToAttrib = getReflectToAttr(propOptions);
         memberData.propType = propTypeFromTSType(type);
         memberData.jsdoc = serializeSymbol(checker, symbol);
@@ -92,7 +92,7 @@ function getReflectToAttr(propOptions: d.PropOptions) {
 }
 
 
-function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration) {
+function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, memberName: string) {
   let attribType: d.AttributeTypeInfo;
 
   // If the @Prop() attribute does not have a defined type then infer it
@@ -108,11 +108,13 @@ function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, p
 
     attribType = {
       text: attribTypeText,
+      required: prop.exclamationToken !== undefined && memberName !== 'mode',
       optional: prop.questionToken !== undefined
     };
   } else {
     attribType = {
       text: prop.type.getText(),
+      required: prop.exclamationToken !== undefined && memberName !== 'mode',
       optional: prop.questionToken !== undefined,
       typeReferences: getAttributeTypeInfo(prop.type, sourceFile)
     };

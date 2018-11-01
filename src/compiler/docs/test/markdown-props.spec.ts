@@ -9,7 +9,8 @@ describe('markdown props', () => {
     const row = new PropRow('name', {
       attribType: {
         text: `(AlertButton | string)[]`,
-        optional: false
+        optional: false,
+        required: false,
       },
       jsdoc: {
         type: '(AlertButton | string)[]'
