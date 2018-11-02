@@ -208,7 +208,11 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
-  coreBuild.styles = coreBuild.styles || !!cmpMeta.stylesMeta;
+
+  if (!coreBuild.styles && cmpMeta.stylesMeta && Object.keys(cmpMeta.stylesMeta).length > 0) {
+    coreBuild.styles = true;
+  }
+
   coreBuild.hostTheme = coreBuild.hostTheme || !!(cmpMeta.hostMeta && cmpMeta.hostMeta.theme);
 
   if (cmpMeta.membersMeta) {

@@ -203,14 +203,16 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // it is possible for the same component to have difficult styles applied in the same app
           cmpMeta.componentConstructor = cmpConstructor;
 
-          initStyleTemplate(
-            domApi,
-            cmpMeta,
-            cmpMeta.encapsulationMeta,
-            cmpConstructor.style,
-            cmpConstructor.styleMode,
-            perf
-          );
+          if (__BUILD_CONDITIONALS__.styles) {
+            initStyleTemplate(
+              domApi,
+              cmpMeta,
+              cmpMeta.encapsulationMeta,
+              cmpConstructor.style,
+              cmpConstructor.styleMode,
+              perf
+            );
+          }
 
         } catch (e) {
           // oh man, something's up
@@ -257,14 +259,16 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
           // it is possible for the same component to have difficult styles applied in the same app
           cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
 
-          initStyleTemplate(
-            domApi,
-            cmpMeta,
-            cmpMeta.encapsulationMeta,
-            cmpMeta.componentConstructor.style,
-            cmpMeta.componentConstructor.styleMode,
-            perf
-          );
+          if (__BUILD_CONDITIONALS__.styles) {
+            initStyleTemplate(
+              domApi,
+              cmpMeta,
+              cmpMeta.encapsulationMeta,
+              cmpMeta.componentConstructor.style,
+              cmpMeta.componentConstructor.styleMode,
+              perf
+            );
+          }
 
           // bundle all loaded up, let's continue
           queueUpdate(plt, elm, perf);
