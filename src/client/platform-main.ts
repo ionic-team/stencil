@@ -116,8 +116,8 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     }
   };
 
-  if (__BUILD_CONDITIONALS__.browserModuleLoader) {
-    // if the HTML was generated from SSR
+  if (__BUILD_CONDITIONALS__.prerenderClientSide) {
+    // if the HTML was generated from prerendering
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);
   }

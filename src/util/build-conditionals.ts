@@ -1,6 +1,7 @@
 import * as d from '../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { isTsFile } from '../compiler/util';
+import { shouldPrerender } from '../compiler/prerender/prerender-app';
 
 
 export function getDefaultBuildConditionals(): d.BuildConditionals {
@@ -11,6 +12,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     shadowDom: true,
     slotPolyfill: true,
     ssrServerSide: true,
+    prerenderClientSide: true,
     devInspector: true,
     hotModuleReplacement: true,
     verboseError: true,
@@ -79,6 +81,7 @@ export async function setBuildConditionals(
     es5: false,
     cssVarShim: false,
     ssrServerSide: false,
+    prerenderClientSide: false,
     shadowDom: false,
     slotPolyfill: false,
     event: false,
@@ -118,6 +121,7 @@ export async function setBuildConditionals(
     if (coreBuild.slotPolyfill) {
       coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
     }
+    coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
@@ -126,6 +130,7 @@ export async function setBuildConditionals(
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
+    coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {

@@ -123,9 +123,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   };
 
-  // if the HTML was generated from SSR
-  // then let's walk the tree and generate vnodes out of the data
-  createVNodesFromSsr(plt, domApi, rootElm);
+  if (__BUILD_CONDITIONALS__.prerenderClientSide) {
+    // if the HTML was generated from prerendering
+    // then let's walk the tree and generate vnodes out of the data
+    createVNodesFromSsr(plt, domApi, rootElm);
+  }
 
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {

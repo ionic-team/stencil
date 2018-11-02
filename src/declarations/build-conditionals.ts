@@ -22,6 +22,7 @@ export interface BuildConditionals {
 
   // ssr
   ssrServerSide: boolean;
+  prerenderClientSide: boolean;
 
   // encapsulation
   styles: boolean;
