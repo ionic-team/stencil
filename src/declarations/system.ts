@@ -37,12 +37,7 @@ export interface StencilSystem {
   path?: Path;
   requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string): string;
-  rollup?: {
-    rollup: {
-      (config: any): Promise<any>;
-    };
-    plugins: {[pluginName: string]: any};
-  };
+  rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
   semver?: Semver;
   storage?: Storage;
@@ -56,6 +51,18 @@ export interface StencilSystem {
   vm?: {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
+  };
+}
+
+
+export interface RollupInterface {
+  rollup: {
+    (config: any): Promise<any>;
+  };
+  plugins: {
+    nodeResolve(opts: any): any;
+    emptyJsResolver(): any;
+    commonjs(opts: any): any;
   };
 }
 

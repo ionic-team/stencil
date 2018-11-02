@@ -95,6 +95,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           jsnext: true,
           main: true
         }),
+        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
