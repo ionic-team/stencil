@@ -181,7 +181,9 @@ describe('build conditionals', () => {
     });
 
     it('styles', () => {
-      cmpMeta.stylesMeta = {};
+      cmpMeta.stylesMeta = {
+        $: {externalStyles: [{cmpRelativePath: 'styles.css'}]}
+      };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
         shadowDom: false,
