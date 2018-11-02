@@ -29,6 +29,7 @@ export interface BuildConditionals {
 
   // dom
   shadowDom: boolean;
+  scoped: boolean;
   slotPolyfill: boolean;
 
   // vdom

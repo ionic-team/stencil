@@ -10,6 +10,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     polyfills: false,
     cssVarShim: true,
     shadowDom: true,
+    scoped: true,
     slotPolyfill: true,
     ssrServerSide: true,
     prerenderClientSide: true,
@@ -83,6 +84,7 @@ export async function setBuildConditionals(
     ssrServerSide: false,
     prerenderClientSide: false,
     shadowDom: false,
+    scoped: false,
     slotPolyfill: false,
     event: false,
     listener: false,
@@ -116,15 +118,14 @@ export async function setBuildConditionals(
   await Promise.all(promises);
 
   if (coreId === 'core') {
+    // modern build
     coreBuild.browserModuleLoader = true;
-    coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
-    if (coreBuild.slotPolyfill) {
-      coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-    }
+    coreBuild.slotPolyfill = (coreBuild.scoped && buildCtx.hasSlot);
     coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
+    // polyfilled build
     coreBuild.browserModuleLoader = true;
     coreBuild.es5 = true;
     coreBuild.polyfills = true;
@@ -134,6 +135,7 @@ export async function setBuildConditionals(
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {
+    // es5 build to be imported by bundlers
     coreBuild.es5 = true;
     coreBuild.externalModuleLoader = true;
     coreBuild.cssVarShim = true;
@@ -141,15 +143,11 @@ export async function setBuildConditionals(
     compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
 
   } else if (coreId === 'esm.es2017') {
+    // es2017 build to be imported by bundlers
     coreBuild.externalModuleLoader = true;
-    coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
-    if (coreBuild.slotPolyfill) {
-      coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-    }
+    coreBuild.slotPolyfill = (coreBuild.scoped && buildCtx.hasSlot);
     compilerCtx.lastBuildConditionalsEsmEs2017 = coreBuild;
   }
-
-  coreBuild.slotPolyfill = true;
 
   return coreBuild;
 }
@@ -209,7 +207,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   }
 
   coreBuild.shadowDom = coreBuild.shadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
-  coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
+  coreBuild.scoped = coreBuild.scoped || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss;
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
   coreBuild.styles = coreBuild.styles || !!(cmpMeta.stylesMeta && Object.keys(cmpMeta.stylesMeta).length > 0);
