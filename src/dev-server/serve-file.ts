@@ -31,7 +31,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
           'Vary': 'Accept-Encoding'
         }));
 
-        zlib.gzip(content, (_, data) => {
+        zlib.gzip(content, { level: 9 }, (_, data) => {
           res.end(data);
         });
 
