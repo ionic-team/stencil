@@ -145,7 +145,6 @@ export async function setBuildConditionals(
   }
 
   coreBuild.slotPolyfill = true;
-  coreBuild.hasSvg = true;
 
   return coreBuild;
 }

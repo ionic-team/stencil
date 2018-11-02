@@ -6,10 +6,14 @@ export function updateAttribute(
   memberName: string,
   newValue: any,
   isBooleanAttr = typeof newValue === 'boolean',
+  isXlinkNs?: boolean
 ) {
-  const isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+  if (__BUILD_CONDITIONALS__.hasSvg) {
+    isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+  }
+
   if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
-    if (isXlinkNs) {
+    if (__BUILD_CONDITIONALS__.hasSvg && isXlinkNs) {
       elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
 
     } else {
@@ -22,7 +26,7 @@ export function updateAttribute(
     } else {
       newValue = newValue.toString();
     }
-    if (isXlinkNs) {
+    if (__BUILD_CONDITIONALS__.hasSvg && isXlinkNs) {
       elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
 
     } else {
