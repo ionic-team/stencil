@@ -166,7 +166,7 @@ export interface E2EElement {
     /**
      * Checks if specified class value exists in class attribute of the element.
      */
-    contains: (className: string) => void;
+    contains: (className: string) => boolean;
   };
 
   /**
