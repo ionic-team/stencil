@@ -62,7 +62,6 @@ export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   // create a host snapshot object we'll
   // use to store all host data about to be read later
   hostSnapshot = {
-    $id: hostElm['s-id'],
     $attributes: {}
   };
 

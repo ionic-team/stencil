@@ -22,13 +22,12 @@ export const connectedCallback = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
   plt.isDisconnectedMap.delete(elm);
 
   if (!plt.hasConnectedMap.has(elm)) {
-    if (!elm['s-id']) {
-      // assign a unique id to this host element
-      // it's possible this was already given an element id
-      elm['s-id'] = plt.nextId();
-    }
-
     if (_BUILD_.profile) {
+      if (!elm['s-id']) {
+        // assign a unique id to this host element
+        // it's possible this was already given an element id
+        elm['s-id'] = plt.nextId();
+      }
       perf.mark(`connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 

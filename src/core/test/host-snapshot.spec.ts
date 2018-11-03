@@ -97,11 +97,4 @@ describe('host-snapshot', () => {
     expect(s.$attributes['last-name']).toBe('McFly');
   });
 
-  it('set id, no members', () => {
-    hostElm['s-id'] = 'App88';
-    const s = initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(s.$id).toBe('App88');
-    expect(s.$attributes).toEqual({});
-  });
-
 });

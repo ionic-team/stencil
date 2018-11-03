@@ -18,9 +18,6 @@ import { queueUpdate } from '../core/update';
 
 export const createPlatformMain = (namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[]) => {
 
-  // internal id increment for unique ids
-  let ids = 0;
-
   const perf = win.performance;
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: d.HostElement} = {};
@@ -81,7 +78,6 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
-    nextId: () => namespace + (ids++),
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
@@ -147,7 +143,6 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
           // bundle all loaded up, let's continue
           queueUpdate(plt, elm, perf);
         });
-
 
       } else if (_BUILD_.browserModuleLoader) {
         // self loading module using built-in browser's import()
@@ -247,6 +242,12 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
 
   if (_BUILD_.event) {
     plt.emitEvent = Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
+  }
+
+  if (_BUILD_.profile) {
+    // internal id increment for unique ids
+    let ids = 0;
+    plt.nextId = () => namespace + (ids++);
   }
 
   // add the h() fn to the app's global namespace
