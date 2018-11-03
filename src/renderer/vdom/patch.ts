@@ -283,7 +283,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
       } else if (isSameVnode(oldStartVnode, newEndVnode)) {
         // Vnode moved right
-        if (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot') {
+        if (_BUILD_.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
           putBackInOriginalLocation(domApi.$parentNode(oldStartVnode.elm));
         }
         patchVNode(oldStartVnode, newEndVnode);
@@ -293,7 +293,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
       } else if (isSameVnode(oldEndVnode, newStartVnode)) {
         // Vnode moved left
-        if (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot') {
+        if (_BUILD_.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
           putBackInOriginalLocation(domApi.$parentNode(oldEndVnode.elm));
         }
         patchVNode(oldEndVnode, newStartVnode);
@@ -332,7 +332,11 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         }
 
         if (node) {
-          domApi.$insertBefore(parentReferenceNode(oldStartVnode.elm), node, referenceNode(oldStartVnode.elm));
+          if (_BUILD_.slotPolyfill) {
+            domApi.$insertBefore(parentReferenceNode(oldStartVnode.elm), node, referenceNode(oldStartVnode.elm));
+          } else {
+            domApi.$insertBefore(domApi.$parentNode(oldStartVnode.elm), node, oldStartVnode.elm);
+          }
         }
       }
     }
@@ -366,16 +370,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   }
 
   function referenceNode(node: d.RenderNode) {
-    if (_BUILD_.slotPolyfill) {
-      if (node && node['s-ol']) {
-        // this node was relocated to a new location in the dom
-        // because of some other component's slot
-        // but we still have an html comment in place of where
-        // it's original location was according to it's original vdom
-        return node['s-ol'];
-      }
+    if (node && node['s-ol']) {
+      // this node was relocated to a new location in the dom
+      // because of some other component's slot
+      // but we still have an html comment in place of where
+      // it's original location was according to it's original vdom
+      return node['s-ol'];
     }
-
     return node;
   }
 
