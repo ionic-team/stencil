@@ -30,16 +30,14 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
 
   const defineComponent = (cmpMeta: d.ComponentMeta, HostElementConstructor: any) => {
 
-    const tagNameMeta = cmpMeta.tagNameMeta;
-
-    if (!win.customElements.get(tagNameMeta)) {
+    if (!win.customElements.get(cmpMeta.tagNameMeta)) {
 
       // define the custom element
       // initialize the members on the host element prototype
       // keep a ref to the metadata with the tag as the key
       initHostElement(
         plt,
-        (cmpRegistry[tagNameMeta] = cmpMeta),
+        (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
         hydratedCssClass,
         perf

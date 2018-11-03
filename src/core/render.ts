@@ -5,7 +5,7 @@ import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance, perf: Performance) {
+export const render = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance, perf: Performance) => {
   try {
     if (_BUILD_.profile) {
       perf.mark(`render_start:${hostElm.nodeName.toLowerCase()}`);
@@ -158,10 +158,10 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     plt.activeRender = false;
     plt.onError(e, RUNTIME_ERROR.RenderError, hostElm, true);
   }
-}
+};
 
 
-export function applyComponentHostData(vnodeHostData: d.VNodeData, hostMeta: d.ComponentConstructorHost, instance: any) {
+export const applyComponentHostData = (vnodeHostData: d.VNodeData, hostMeta: d.ComponentConstructorHost, instance: any) => {
   vnodeHostData = vnodeHostData || {};
 
   // component meta data has a "theme"
@@ -195,10 +195,10 @@ export function applyComponentHostData(vnodeHostData: d.VNodeData, hostMeta: d.C
   });
 
   return vnodeHostData;
-}
+};
 
 
-export function convertCssNamesToObj(cssClassObj: { [className: string]: boolean}, className: string, mode?: string, color?: string) {
+export const convertCssNamesToObj = (cssClassObj: { [className: string]: boolean}, className: string, mode?: string, color?: string) => {
   className.split(' ').forEach(cssClass => {
     cssClassObj[cssClass] = true;
 
@@ -210,10 +210,10 @@ export function convertCssNamesToObj(cssClassObj: { [className: string]: boolean
       }
     }
   });
-}
+};
 
 
-export function reflectInstanceValuesToHostAttributes(properties: d.ComponentConstructorProperties, instance: d.ComponentInstance, reflectHostAttr?: d.VNodeData) {
+export const reflectInstanceValuesToHostAttributes = (properties: d.ComponentConstructorProperties, instance: d.ComponentInstance, reflectHostAttr?: d.VNodeData) => {
   if (properties) {
 
     Object.keys(properties).forEach(memberName => {
@@ -226,4 +226,4 @@ export function reflectInstanceValuesToHostAttributes(properties: d.ComponentCon
   }
 
   return reflectHostAttr;
-}
+};

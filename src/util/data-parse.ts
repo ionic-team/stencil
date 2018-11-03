@@ -3,7 +3,7 @@ import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
-export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData): d.ComponentMeta => {
+export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData, i?: number, cmpData?: any): d.ComponentMeta => {
   // tag name will always be lower case
   // parse member meta
   // this data only includes props that are attributes that need to be observed
@@ -18,13 +18,13 @@ export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData): d.Co
   };
 
   if (memberData) {
-    for (let i = 0; i < memberData.length; i++) {
-      const d = memberData[i];
-      membersMeta[d[0]] = {
-        memberType: d[1],
-        reflectToAttrib: !!d[2],
-        attribName: typeof d[3] === 'string' ? d[3] : d[3] ? d[0] : 0 as any,
-        propType: d[4]
+    for (i = 0; i < memberData.length; i++) {
+      cmpData = memberData[i];
+      membersMeta[cmpData[0]] = {
+        memberType: cmpData[1],
+        reflectToAttrib: !!cmpData[2],
+        attribName: typeof cmpData[3] === 'string' ? cmpData[3] : cmpData[3] ? cmpData[0] : 0 as any,
+        propType: cmpData[4]
       };
     }
   }
@@ -77,6 +77,9 @@ export const parsePropertyValue = (propType: d.PropertyType | PROP_TYPE, propVal
       // but we still want it as a string
       return propValue.toString();
     }
+
+    // redundant return here for better minification
+    return propValue;
   }
 
   // not sure exactly what type we want

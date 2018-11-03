@@ -118,11 +118,12 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
       // remember the original name before we possibly change it
       let attachToElm = assignerElm;
       let eventListener = listenerCallback;
-      assignersEventName = eventName;
 
       // get the existing unregister listeners for
       // this element from the unregister listeners weakmap
       let assignersUnregListeners = unregisterListenerFns.get(assignerElm);
+
+      assignersEventName = eventName;
 
       if (assignersUnregListeners && assignersUnregListeners[assignersEventName]) {
         // removed any existing listeners for this event for the assigner element
