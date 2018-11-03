@@ -32,7 +32,7 @@ export function defineMember(
       if (property.state || property.mutable) {
         setValue(plt, elm, memberName, newValue, perf);
 
-      } else if (__BUILD_CONDITIONALS__.verboseError) {
+      } else if (_BUILD_.verboseError) {
         console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
       }
     }
@@ -51,7 +51,7 @@ export function defineMember(
         }
       }
 
-      if (__BUILD_CONDITIONALS__.clientSide) {
+      if (_BUILD_.clientSide) {
         // client-side
         // within the browser, the element's prototype
         // already has its getter/setter set, but on the
@@ -115,26 +115,26 @@ export function defineMember(
       setComponentProp
     );
 
-  } else if (__BUILD_CONDITIONALS__.element && property.elementRef) {
+  } else if (_BUILD_.element && property.elementRef) {
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
     definePropertyValue(instance, memberName, elm);
 
-  } else if (__BUILD_CONDITIONALS__.method && property.method) {
+  } else if (_BUILD_.method && property.method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
     definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
-  } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
+  } else if (_BUILD_.propContext && property.context) {
     // @Prop({ context: 'config' })
     const contextObj = plt.getContextItem(property.context);
     if (contextObj !== undefined) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
-  } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
+  } else if (_BUILD_.propConnect && property.connect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
     definePropertyValue(instance, memberName, plt.propConnect(property.connect));
   }
@@ -163,7 +163,7 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
 
     if (instance) {
       // get an array of method names of watch functions to call
-      if (__BUILD_CONDITIONALS__.watchCallback) {
+      if (_BUILD_.watchCallback) {
         const watchMethods = values[WATCH_CB_PREFIX + memberName];
         if (watchMethods) {
           // this instance is watching for when this property changed

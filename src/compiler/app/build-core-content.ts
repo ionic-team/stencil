@@ -9,9 +9,9 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
     return '';
   }
 
-  // Replace all __BUILD_CONDITIONALS__ with the current coreBuild obj
+  // Replace all _BUILD_ with the current coreBuild obj
   const replaceObj = Object.keys(coreBuild).reduce((all, key) => {
-    all[`__BUILD_CONDITIONALS__.${key}`] = coreBuild[key];
+    all[`_BUILD_.${key}`] = coreBuild[key];
     return all;
   }, <{ [key: string]: any}>{});
 

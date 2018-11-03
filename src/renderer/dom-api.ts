@@ -14,7 +14,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
 
   const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
 
-  if (__BUILD_CONDITIONALS__.es5) {
+  if (_BUILD_.es5) {
     if (typeof win.CustomEvent !== 'function') {
       // CustomEvent polyfill
       win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
@@ -57,7 +57,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       parentNode.appendChild(childNode),
 
     $addClass: (elm: Element, cssClass: string) => {
-      if (__BUILD_CONDITIONALS__.hasSvg && __BUILD_CONDITIONALS__.es5) {
+      if (_BUILD_.hasSvg && _BUILD_.es5) {
         if (elm.classList) {
           elm.classList.add(cssClass);
 
@@ -254,7 +254,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode
   };
 
-  if (__BUILD_CONDITIONALS__.isDev) {
+  if (_BUILD_.isDev) {
     if ((win as Window).location.search.indexOf('shadow=false') > 0) {
       // by adding ?shadow=false it'll force the slot polyfill
       // only add this check when in dev mode
@@ -262,11 +262,11 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     }
   }
 
-  if (__BUILD_CONDITIONALS__.shadowDom) {
+  if (_BUILD_.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
   }
 
-  if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {
+  if (_BUILD_.event || _BUILD_.listener) {
     // test if this browser supports event options or not
     try {
       (win as Window).addEventListener('e', null,

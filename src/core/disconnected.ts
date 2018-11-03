@@ -8,7 +8,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
       perf.mark(`disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -31,7 +31,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
     plt.domApi.$removeEventListener(elm);
     plt.hasListenersMap.delete(elm);
 
-    if (__BUILD_CONDITIONALS__.cmpDidUnload) {
+    if (_BUILD_.cmpDidUnload) {
       // call instance componentDidUnload
       // if we've created an instance for this
       const instance = plt.instanceMap.get(elm);
@@ -42,7 +42,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
     }
 
     // clear CSS var-shim tracking
-    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
+    if (_BUILD_.cssVarShim && plt.customStyle) {
       plt.customStyle.removeHost(elm);
     }
 
@@ -55,7 +55,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
       plt.hostSnapshotMap
     ].forEach(wm => wm.delete(elm));
 
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
       perf.mark(`disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       perf.measure(`disconnected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }

@@ -7,7 +7,7 @@ import { RUNTIME_ERROR } from '../util/constants';
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, instance: d.ComponentInstance, perf: Performance) {
   try {
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
       perf.mark(`render_start:${hostElm.nodeName.toLowerCase()}`);
     }
 
@@ -25,7 +25,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     let reflectHostAttr: d.VNodeData;
     let rootElm: HTMLElement = hostElm;
 
-    if (__BUILD_CONDITIONALS__.reflectToAttr) {
+    if (_BUILD_.reflectToAttr) {
       reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpMeta.componentConstructor.properties, instance);
     }
 
@@ -35,11 +35,11 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     // let's create that shadow root
     // test if this component should be shadow dom
     // and if so does the browser supports it
-    if (__BUILD_CONDITIONALS__.shadowDom && useNativeShadowDom) {
+    if (_BUILD_.shadowDom && useNativeShadowDom) {
       rootElm = hostElm.shadowRoot as any;
     }
 
-    if (__BUILD_CONDITIONALS__.styles && !hostElm['s-rn']) {
+    if (_BUILD_.styles && !hostElm['s-rn']) {
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
@@ -63,12 +63,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       const vnodeChildren = instance.render && instance.render();
 
       let vnodeHostData: d.VNodeData;
-      if (__BUILD_CONDITIONALS__.hostData) {
+      if (_BUILD_.hostData) {
         // user component provided a "hostData()" method
         // the returned data/attributes are used on the host element
         vnodeHostData = instance.hostData && instance.hostData();
 
-        if (__BUILD_CONDITIONALS__.isDev) {
+        if (_BUILD_.isDev) {
           if (vnodeHostData && cmpMeta.membersMeta) {
             const foundHostKeys = Object.keys(vnodeHostData).reduce((err, k) => {
               if (cmpMeta.membersMeta[k]) {
@@ -92,7 +92,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
         }
       }
 
-      if (__BUILD_CONDITIONALS__.reflectToAttr && reflectHostAttr) {
+      if (_BUILD_.reflectToAttr && reflectHostAttr) {
         vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
       }
 
@@ -100,7 +100,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // now any changes will again queue
       plt.activeRender = false;
 
-      if (__BUILD_CONDITIONALS__.hostTheme && hostMeta) {
+      if (_BUILD_.hostTheme && hostMeta) {
         // component meta data has a "theme"
         // use this to automatically generate a good css class
         // from the mode and color to add to the host element
@@ -116,7 +116,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
-      if (__BUILD_CONDITIONALS__.reflectToAttr) {
+      if (_BUILD_.reflectToAttr) {
         // only care if we're reflecting values to the host element
         hostVNode.ishost = true;
       }
@@ -134,7 +134,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
     }
 
     // update styles!
-    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
+    if (_BUILD_.cssVarShim && plt.customStyle) {
       plt.customStyle.updateHost(hostElm);
     }
 
@@ -149,7 +149,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       hostElm['s-rc'] = null;
     }
 
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
       perf.mark(`render_end:${hostElm.nodeName.toLowerCase()}`);
       perf.measure(`render:${hostElm.nodeName.toLowerCase()}`, `render_start:${hostElm.nodeName.toLowerCase()}`, `render_end:${hostElm.nodeName.toLowerCase()}`);
     }

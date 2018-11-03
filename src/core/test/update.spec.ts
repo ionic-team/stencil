@@ -12,7 +12,7 @@ describe('instance update', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
-    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
+    _BUILD_ = getDefaultBuildConditionals();
   });
 
 
@@ -30,7 +30,7 @@ describe('instance update', () => {
     });
 
     const node = await mockConnect(plt, '<ion-test></ion-test>');
-    __BUILD_CONDITIONALS__.hostData = false;
+    _BUILD_.hostData = false;
     const elm = await waitForLoad(plt, node, 'ion-test');
     const vnode = plt.vnodeMap.get(elm);
     expect(vnode.elm.textContent).toBe('88');

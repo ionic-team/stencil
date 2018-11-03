@@ -15,7 +15,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     hostElm.mode = domApi.$getMode(hostElm);
   }
 
-  if (__BUILD_CONDITIONALS__.slotPolyfill) {
+  if (_BUILD_.slotPolyfill) {
     // if the slot polyfill is required we'll need to put some nodes
     // in here to act as original content anchors as we move nodes around
     // host element has been connected to the DOM
@@ -36,7 +36,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
 
-      if (__BUILD_CONDITIONALS__.isDev && __BUILD_CONDITIONALS__.clientSide) {
+      if (_BUILD_.isDev && _BUILD_.clientSide) {
         // it's possible we're manually forcing the slot polyfill
         // but this browser may already support the read-only shadowRoot
         // do an extra check here, but only for dev mode on the client
@@ -50,7 +50,7 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     }
   }
 
-  if (__BUILD_CONDITIONALS__.shadowDom) {
+  if (_BUILD_.shadowDom) {
     if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom && !hostElm.shadowRoot) {
       // this component is using shadow dom
       // and this browser supports shadow dom

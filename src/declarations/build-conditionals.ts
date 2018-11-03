@@ -62,7 +62,7 @@ export interface BuildConditionals {
 }
 
 declare global {
-  var __BUILD_CONDITIONALS__: BuildConditionals;
+  var _BUILD_: BuildConditionals;
 }
 
 export interface UserBuildConditionals {

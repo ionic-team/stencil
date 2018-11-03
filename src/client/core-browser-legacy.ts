@@ -14,9 +14,9 @@ declare const components: d.ComponentHostData[];
 // and requires the es5 way of extending HTMLElement
 
 let customStyle: CustomStyle;
-if (__BUILD_CONDITIONALS__.cssVarShim) {
+if (_BUILD_.cssVarShim) {
   let needShim = !supportsCssVars(window);
-  if (__BUILD_CONDITIONALS__.isDev) {
+  if (_BUILD_.isDev) {
     if (window.location.search.indexOf('cssvars=false') > 0) {
       // by adding ?shadow=false it'll force the slot polyfill
       // only add this check when in dev mode

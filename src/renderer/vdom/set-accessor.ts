@@ -81,7 +81,7 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
 
   } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
     (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
-    || (!__BUILD_CONDITIONALS__.clientSide && elementHasProperty(plt, elm, memberName))) {
+    || (!_BUILD_.clientSide && elementHasProperty(plt, elm, memberName))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
@@ -94,7 +94,7 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
       // set it directly as property on the element
       setProperty(elm, memberName, newValue);
 
-      if (__BUILD_CONDITIONALS__.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
+      if (_BUILD_.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
         // we also want to set this data to the attribute
         updateAttribute(
           elm,

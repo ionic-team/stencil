@@ -8,7 +8,7 @@ import { applyWindowToGlobal } from '@stencil/core/mock-doc';
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global.__BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
+  global._BUILD_ = getDefaultBuildConditionals();
   global.Context = {};
   global.h = h;
   global.resourcesUrl = '/build';

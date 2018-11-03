@@ -10,7 +10,7 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
   // the setters allows us to know when data has changed so we can re-render
 
 
-  if (!__BUILD_CONDITIONALS__.clientSide) {
+  if (!_BUILD_.clientSide) {
     // in just a server-side build
     // let's set the properties to the values immediately
     let values = plt.valuesMap.get(hostPrototype);

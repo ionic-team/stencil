@@ -37,7 +37,7 @@ export function initHostElement(
     queueUpdate(plt, this, perf);
   };
 
-  if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
+  if (_BUILD_.hotModuleReplacement) {
     HostElementConstructor['s-hmr'] = function(hmrVersionId) {
       hmrStart(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
     };
@@ -45,7 +45,7 @@ export function initHostElement(
 
   if (cmpMeta.membersMeta) {
     const entries = Object.entries(cmpMeta.membersMeta);
-    if (__BUILD_CONDITIONALS__.observeAttr) {
+    if (_BUILD_.observeAttr) {
       let attrToProp: any = {};
       entries.forEach(([propName, {attribName}]) => {
         if (attribName) {
