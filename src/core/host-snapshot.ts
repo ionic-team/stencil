@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 
 
-export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
+export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) => {
   // the host element has connected to the dom
   // and we've waited a tick to make sure all frameworks
   // have finished adding attributes and child nodes to the host
@@ -75,4 +75,4 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   });
 
   return hostSnapshot;
-}
+};

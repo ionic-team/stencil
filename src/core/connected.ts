@@ -3,7 +3,7 @@ import { initHostSnapshot } from './host-snapshot';
 import { initElementListeners } from './listeners';
 
 
-export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, perf: Performance) {
+export const connectedCallback = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, perf: Performance) => {
   if (_BUILD_.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
@@ -60,10 +60,10 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       plt.requestBundle(cmpMeta, elm);
     });
   }
-}
+};
 
 
-export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) {
+export const registerWithParentComponent = (plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) => {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   ancestorHostElement = elm;
@@ -86,4 +86,4 @@ export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostEleme
       break;
     }
   }
-}
+};

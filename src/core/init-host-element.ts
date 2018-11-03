@@ -8,13 +8,13 @@ import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
 
 
-export function initHostElement(
+export const initHostElement = (
   plt: d.PlatformApi,
   cmpMeta: d.ComponentMeta,
   HostElementConstructor: d.HostElement,
   hydratedCssClass: string,
   perf: Performance
-) {
+) => {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
   // note: these cannot be arrow functions cuz "this" is important here hombre
@@ -65,4 +65,4 @@ export function initHostElement(
     // should create the public API to this component
     proxyHostElementPrototype(plt, entries, HostElementConstructor, perf);
   }
-}
+};

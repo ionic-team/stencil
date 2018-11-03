@@ -4,7 +4,7 @@ import { render } from './render';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement, perf: Performance) {
+export const queueUpdate = (plt: d.PlatformApi, elm: d.HostElement, perf: Performance) => {
   if (_BUILD_.profile) {
     perf.mark(`queue:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
@@ -29,10 +29,10 @@ export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement, perf: Perfor
       plt.queue.tick(() => update(plt, elm, perf));
     }
   }
-}
+};
 
 
-export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Performance, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) {
+export const update = async (plt: d.PlatformApi, elm: d.HostElement, perf: Performance, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) => {
   if (_BUILD_.isDev) {
     perf.mark(`update_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
@@ -129,4 +129,4 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
   }
-}
+};

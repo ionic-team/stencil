@@ -1,13 +1,13 @@
 import { toLowerCase } from '../../util/helpers';
 
 
-export function updateAttribute(
+export const updateAttribute = (
   elm: HTMLElement,
   memberName: string,
   newValue: any,
   isBooleanAttr = typeof newValue === 'boolean',
   isXlinkNs?: boolean
-) {
+) => {
   if (_BUILD_.hasSvg) {
     isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
   }
@@ -33,6 +33,6 @@ export function updateAttribute(
       elm.setAttribute(memberName, newValue);
     }
   }
-}
+};
 
 const XLINK_NS = 'http://www.w3.org/1999/xlink';

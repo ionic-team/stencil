@@ -4,7 +4,7 @@ import { NODE_TYPE } from '../util/constants';
 import { propagateComponentReady } from './init-component-instance';
 
 
-export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: Performance) {
+export const disconnectedCallback = (plt: PlatformApi, elm: HostElement, perf: Performance) => {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
@@ -60,14 +60,14 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, perf: P
       perf.measure(`disconnected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
   }
-}
+};
 
 
-export function isDisconnected(domApi: DomApi, elm: Node): any {
+export const isDisconnected = (domApi: DomApi, elm: Node): any => {
   while (elm) {
     if (!domApi.$parentNode(elm)) {
       return domApi.$nodeType(elm) !== NODE_TYPE.DocumentNode;
     }
     elm = domApi.$parentNode(elm);
   }
-}
+};

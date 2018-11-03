@@ -5,7 +5,7 @@ import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(
+export const initComponentInstance = (
   plt: d.PlatformApi,
   elm: d.HostElement,
   hostSnapshot: d.HostSnapshot,
@@ -14,7 +14,7 @@ export function initComponentInstance(
   componentConstructor?: d.ComponentConstructor,
   queuedEvents?: any[],
   i?: number
-) {
+) => {
   try {
 
     if (_BUILD_.profile) {
@@ -82,7 +82,7 @@ export function initComponentInstance(
 }
 
 
-export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any {
+export const initComponentLoaded = (plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any => {
 
   if (_BUILD_.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
@@ -185,10 +185,10 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     // the deepest elements load first then bubbles up
     propagateComponentReady(plt, elm);
   }
-}
+};
 
 
-function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
+const allChildrenHaveConnected = (plt: d.PlatformApi, elm: d.HostElement) => {
   // Note: in IE11 <svg> does not have the "children" property
   for (let i = 0; i < elm.childNodes.length; i++) {
     const child = elm.childNodes[i] as d.HostElement;
@@ -206,10 +206,10 @@ function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
   }
   // everything has connected, we're good
   return true;
-}
+};
 
 
-export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) {
+export const propagateComponentReady = (plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) => {
 
   // we're no longer processing this component
   plt.processingCmp.delete(elm);
@@ -249,4 +249,4 @@ export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, 
       cb();
     }
   }
-}
+};

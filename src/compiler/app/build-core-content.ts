@@ -192,7 +192,7 @@ const PROD_MINIFY_OPTS: any = {
     keep_infinity: true,
     loops: true,
     negate_iife: false,
-    passes: 2,
+    passes: 3,
     properties: true,
     pure_funcs: null,
     pure_getters: false,

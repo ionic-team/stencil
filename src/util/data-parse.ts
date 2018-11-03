@@ -3,7 +3,7 @@ import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
-export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.ComponentMeta {
+export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData): d.ComponentMeta => {
   // tag name will always be lower case
   // parse member meta
   // this data only includes props that are attributes that need to be observed
@@ -16,6 +16,7 @@ export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.Co
     // but only color should observe any attribute changes
     'color': { attribName: 'color' }
   };
+
   if (memberData) {
     for (let i = 0; i < memberData.length; i++) {
       const d = memberData[i];
@@ -41,20 +42,18 @@ export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.Co
     // parse listener meta
     listenersMeta: listenerMeta ? listenerMeta.map(parseListenerData) : undefined
   };
-}
+};
 
-function parseListenerData(listenerData: d.ComponentListenersData) {
-  return {
-    eventName: listenerData[0],
-    eventMethodName: listenerData[1],
-    eventDisabled: !!listenerData[2],
-    eventPassive: !!listenerData[3],
-    eventCapture: !!listenerData[4]
-  };
-}
+const parseListenerData = (listenerData: d.ComponentListenersData) => ({
+  eventName: listenerData[0],
+  eventMethodName: listenerData[1],
+  eventDisabled: !!listenerData[2],
+  eventPassive: !!listenerData[3],
+  eventCapture: !!listenerData[4]
+});
 
 
-export function parsePropertyValue(propType: d.PropertyType | PROP_TYPE, propValue: any) {
+export const parsePropertyValue = (propType: d.PropertyType | PROP_TYPE, propValue: any) => {
   // ensure this value is of the correct prop type
   // we're testing both formats of the "propType" value because
   // we could have either gotten the data from the attribute changed callback,
@@ -83,4 +82,4 @@ export function parsePropertyValue(propType: d.PropertyType | PROP_TYPE, propVal
   // not sure exactly what type we want
   // so no need to change to a different type
   return propValue;
-}
+};

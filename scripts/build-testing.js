@@ -72,6 +72,7 @@ if (success) {
         })
       ],
       onwarn: (message) => {
+        if (message.code === 'THIS_IS_UNDEFINED') return;
         if (message.code === 'UNUSED_EXTERNAL_IMPORT') return;
         if (message.code === 'CIRCULAR_DEPENDENCY') return;
         console.error(message);

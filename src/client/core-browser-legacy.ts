@@ -1,13 +1,15 @@
-import * as d from '../declarations';
+import * as dec from '../declarations';
 import { createPlatformMainLegacy } from './platform-main-legacy';
 import { CustomStyle, supportsCssVars } from './polyfills/css-shim/custom-style';
 
 
-declare const namespace: string;
-declare const Context: d.CoreContext;
-declare const resourcesUrl: string;
-declare const hydratedCssClass: string;
-declare const components: d.ComponentHostData[];
+declare const w: Window;
+declare const d: Document;
+declare const n: string;
+declare const x: dec.CoreContext;
+declare const r: string;
+declare const h: string;
+declare const c: dec.ComponentHostData[];
 
 
 // es5 build which does not use es module imports or dynamic imports
@@ -24,8 +26,8 @@ if (_BUILD_.cssVarShim) {
     }
   }
   if (needShim) {
-    customStyle = new CustomStyle(window, document);
+    customStyle = new CustomStyle(w, d);
   }
 }
 
-createPlatformMainLegacy(namespace, Context, window, document, resourcesUrl, hydratedCssClass, components, customStyle);
+createPlatformMainLegacy(n, x, w, d, r, h, c, customStyle);

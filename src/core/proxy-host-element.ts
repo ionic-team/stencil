@@ -5,10 +5,9 @@ import { noop } from '../util/helpers';
 import { parsePropertyValue } from '../util/data-parse';
 
 
-export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [string, d.MemberMeta][], hostPrototype: d.HostElement, perf: Performance) {
+export const proxyHostElementPrototype = (plt: d.PlatformApi, membersEntries: [string, d.MemberMeta][], hostPrototype: d.HostElement, perf: Performance) => {
   // create getters/setters on the host element prototype to represent the public API
   // the setters allows us to know when data has changed so we can re-render
-
 
   if (!_BUILD_.clientSide) {
     // in just a server-side build
@@ -53,5 +52,5 @@ export function proxyHostElementPrototype(plt: d.PlatformApi, membersEntries: [s
       definePropertyValue(hostPrototype, memberName, noop);
     }
   });
-}
+};
 

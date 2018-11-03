@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, win?: any, apps?: string[], queuedComponentOnReadys?: d.QueuedComponentOnReady[], i?: number) {
+export const initCoreComponentOnReady = (plt: d.PlatformApi, App: d.AppGlobal, win?: any, apps?: string[], queuedComponentOnReadys?: d.QueuedComponentOnReady[], i?: number) => {
 
   // add componentOnReady() to the App object
   // this also is used to know that the App's core is ready
@@ -63,4 +63,4 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal, w
     }
     queuedComponentOnReadys.length = 0;
   }
-}
+};

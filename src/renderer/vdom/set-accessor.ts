@@ -5,7 +5,7 @@ import { toLowerCase } from '../../util/helpers';
 import { updateAttribute } from './update-attribute';
 
 
-export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) {
+export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) => {
   if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
@@ -122,19 +122,19 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
     // remove svg attribute
     plt.domApi.$removeAttribute(elm, memberName);
   }
-}
+};
 
 
-function parseClassList(value: string | undefined | null): string[] {
-  return (value == null || value === '') ? [] : value.trim().split(/\s+/);
-}
+const parseClassList = (value: string | undefined | null): string[] =>
+  (value == null || value === '') ? [] : value.trim().split(/\s+/);
+
 
 /**
  * Attempt to set a DOM property to the given value.
  * IE & FF throw for certain property-value combinations.
  */
-function setProperty(elm: any, name: string, value: any) {
+const setProperty = (elm: any, name: string, value: any) => {
   try {
     elm[name] = value;
   } catch (e) { }
-}
+};

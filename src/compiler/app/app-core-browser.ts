@@ -24,7 +24,7 @@ export async function generateCoreBrowser(config: d.Config, compilerCtx: d.Compi
   }
 
   // wrap the core js code together
-  jsContent = wrapCoreJs(config, jsContent, cmpRegistry);
+  jsContent = wrapCoreJs(config, jsContent, cmpRegistry, buildConditionals);
 
   if (buildConditionals.polyfills) {
     // this build wants polyfills so let's
@@ -51,7 +51,7 @@ export async function generateCoreBrowser(config: d.Config, compilerCtx: d.Compi
 }
 
 
-export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.ComponentRegistry) {
+export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.ComponentRegistry, buildConditionals: d.BuildConditionals) {
   if (typeof jsContent !== 'string') {
     jsContent = '';
   }
@@ -62,9 +62,9 @@ export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.C
 
   const output = [
     generatePreamble(config) + '\n',
-    `(function(window,document,Context,namespace,hydratedCssClass,components,resourcesUrl){`,
+    `(${buildConditionals.es5 ? 'function' : ''}(w,d,x,n,h,c,r)${buildConditionals.es5 ? '' : '=>'}{`,
     `"use strict";\n`,
-    `(function(s){s&&(resourcesUrl=s.getAttribute('data-resources-url'))})(document.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
+    `(${buildConditionals.es5 ? 'function' : ''}(s)${buildConditionals.es5 ? '' : '=>'}{s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
     jsContent.trim(),
     `\n})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",${cmpLoaderRegistryStr});`
   ].join('');

@@ -5,7 +5,7 @@ import { parsePropertyValue } from '../util/data-parse';
 import { queueUpdate } from './update';
 
 
-export function defineMember(
+export const defineMember = (
   plt: d.PlatformApi,
   property: d.ComponentConstructorProperty,
   elm: d.HostElement,
@@ -15,7 +15,7 @@ export function defineMember(
   perf: Performance,
   hostAttributes?: d.HostSnapshotAttributes,
   hostAttrValue?: string
-) {
+) => {
 
   function getComponentProp(this: d.ComponentInstance, values?: any) {
     // component instance prop/state getter
@@ -102,8 +102,10 @@ export function defineMember(
       values[memberName] = (instance as any)[memberName];
     }
 
-    if (property.watchCallbacks) {
-      values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
+    if (_BUILD_.watchCallback) {
+      if (property.watchCallbacks) {
+        values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
+      }
     }
 
     // add getter/setter to the component instance
@@ -138,13 +140,13 @@ export function defineMember(
     // @Prop({ connect: 'ion-loading-ctrl' })
     definePropertyValue(instance, memberName, plt.propConnect(property.connect));
   }
-}
+};
 
 
-export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, perf: Performance, instance?: d.ComponentInstance) {
+export const setValue = (plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, perf: Performance, instance?: d.ComponentInstance, values?: any) => {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  let values = plt.valuesMap.get(elm);
+  values = plt.valuesMap.get(elm);
   if (!values) {
     plt.valuesMap.set(elm, values = {});
   }
@@ -187,26 +189,26 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
       }
     }
   }
-}
+};
 
 
-export function definePropertyValue(obj: any, propertyKey: string, value: any) {
+export const definePropertyValue = (obj: any, propertyKey: string, value: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
     'configurable': true,
     'value': value
   });
-}
+};
 
 
-export function definePropertyGetterSetter(obj: any, propertyKey: string, get: any, set: any) {
+export const definePropertyGetterSetter = (obj: any, propertyKey: string, get: any, set: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
     'configurable': true,
     'get': get,
     'set': set
   });
-}
+};
 
 
 const WATCH_CB_PREFIX = `wc-`;

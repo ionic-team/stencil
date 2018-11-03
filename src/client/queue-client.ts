@@ -1,35 +1,29 @@
 import * as d from '../declarations';
 
 
-export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
-  const now: d.Now = () => win.performance.now();
+export const createQueueClient = (App: d.AppGlobal, win: Window): d.QueueApi => {
+  let congestion = 0;
+  let rafPending = false;
 
+  const now: d.Now = () => win.performance.now();
   const async = App.asyncQueue !== false;
   const resolved = Promise.resolve();
   const highPriority: d.RafCallback[] = [];
   const domReads: d.RafCallback[] = [];
   const domWrites: d.RafCallback[] = [];
   const domWritesLow: d.RafCallback[] = [];
-  let congestion = 0;
-  let rafPending = false;
 
-  if (!App.raf) {
-    App.raf = win.requestAnimationFrame.bind(win);
-  }
+  const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
+    // queue dom reads
+    queue.push(cb);
 
-  function queueTask(queue: d.RafCallback[]) {
-    return (cb: d.RafCallback) => {
-      // queue dom reads
-      queue.push(cb);
+    if (!rafPending) {
+      rafPending = true;
+      App.raf(flush);
+    }
+  };
 
-      if (!rafPending) {
-        rafPending = true;
-        App.raf(flush);
-      }
-    };
-  }
-
-  function consume(queue: d.RafCallback[]) {
+  const consume = (queue: d.RafCallback[]) => {
     for (let i = 0; i < queue.length; i++) {
       try {
         queue[i](now());
@@ -38,9 +32,9 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
       }
     }
     queue.length = 0;
-  }
+  };
 
-  function consumeTimeout(queue: d.RafCallback[], timeout: number) {
+  const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
     let i = 0;
     let ts: number;
     while (i < queue.length && (ts = now()) < timeout) {
@@ -55,9 +49,9 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     } else if (i !== 0) {
       queue.splice(0, i);
     }
-  }
+  };
 
-  function flush() {
+  const flush = () => {
     congestion++;
 
     // always force a bunch of medium callbacks to run, but still have
@@ -86,6 +80,10 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     } else {
       congestion = 0;
     }
+  };
+
+  if (!App.raf) {
+    App.raf = win.requestAnimationFrame.bind(win);
   }
 
   return {
@@ -104,4 +102,4 @@ export function createQueueClient(App: d.AppGlobal, win: Window): d.QueueApi {
     write: queueTask(domWrites),
 
   };
-}
+};
