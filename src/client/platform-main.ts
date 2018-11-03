@@ -77,7 +77,6 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
   const plt: d.PlatformApi = {
     domApi,
     defineComponent,
-    emitEvent: Context.emit,
     getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
@@ -247,7 +246,7 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
   }
 
   if (_BUILD_.event) {
-    Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
+    plt.emitEvent = Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
   // add the h() fn to the app's global namespace

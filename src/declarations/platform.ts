@@ -7,7 +7,7 @@ export interface PlatformApi {
   customStyle?: any;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi: d.DomApi;
-  emitEvent: (elm: Element, eventName: string, data: d.EventEmitterData) => CustomEvent;
+  emitEvent?: (elm: Element, eventName: string, data: d.EventEmitterData) => CustomEvent;
   getComponentMeta: (elm: Element) => d.ComponentMeta;
   getContextItem: (contextKey: string) => any;
   isClient?: boolean;

@@ -75,7 +75,7 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
 }
 
 
-export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement) {
+export const attachStyles = (plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement) => {
   // first see if we've got a style for a specific mode
   // either this host element should use scoped css
   // or it wants to use shadow dom but the browser doesn't support it
@@ -184,4 +184,4 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
       }
     }
   }
-}
+};
