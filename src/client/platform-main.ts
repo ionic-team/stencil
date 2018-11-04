@@ -77,7 +77,6 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
-    propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: (Context.queue = createQueueClient(App, win)),
 
     requestBundle: (cmpMeta: d.ComponentMeta, elm: d.HostElement, hmrVersionId: string) => {
@@ -240,6 +239,10 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
 
   if (_BUILD_.event) {
     plt.emitEvent = Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
+  }
+
+  if (_BUILD_.propConnect) {
+    plt.propConnect = ctrlTag => proxyController(domApi, controllerComponents, ctrlTag);
   }
 
   if (_BUILD_.profile) {

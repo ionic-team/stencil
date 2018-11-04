@@ -18,7 +18,7 @@ export interface PlatformApi {
   onAppLoad?: (rootElm: d.HostElement, failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
-  propConnect: (ctrlTag: string) => PropConnect;
+  propConnect?: (ctrlTag: string) => PropConnect;
   queue: d.QueueApi;
   render?: d.RendererApi;
   tmpDisconnected: boolean;

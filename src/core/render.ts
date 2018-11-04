@@ -109,12 +109,12 @@ export const render = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
 
+      const hostVNode = h(null, vnodeHostData, vnodeChildren);
+
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
       const oldVNode = plt.vnodeMap.get(hostElm) || ({} as d.VNode);
       oldVNode.elm = rootElm;
-
-      const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
       if (_BUILD_.reflectToAttr) {
         // only care if we're reflecting values to the host element
