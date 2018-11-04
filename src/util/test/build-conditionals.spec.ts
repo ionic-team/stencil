@@ -176,6 +176,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -191,6 +192,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -204,6 +206,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: true,
         scoped: false,
         event: false,
@@ -217,6 +220,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: true,
         event: false,
@@ -230,6 +234,7 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -244,6 +249,7 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.listener).toBeTruthy();
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -257,6 +263,7 @@ describe('build conditionals', () => {
       cmpMeta.eventsMeta = [{ eventName: 'name' }];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: true,
@@ -273,6 +280,7 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.element).toBeTruthy();
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -289,6 +297,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -305,6 +314,7 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
         event: false,
@@ -321,13 +331,66 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
+        propConnect: true,
         event: false,
         listener: false,
         styles: false,
-        hostTheme: false,
-        propConnect: true
+        hostTheme: false
+      });
+    });
+
+    it('prop', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.Prop,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        prop: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
+    });
+
+    it('propMutable', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.PropMutable,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        prop: true,
+        propMutable: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
+      });
+    });
+
+    it('state', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.State,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        state: true,
+        event: false,
+        listener: false,
+        styles: false,
+        hostTheme: false
       });
     });
 
@@ -338,8 +401,10 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
+        prop: true,
         event: false,
         listener: false,
         styles: false,
@@ -355,8 +420,10 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
+        prop: true,
         event: false,
         listener: false,
         styles: false,
@@ -372,9 +439,11 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
         event: false,
+        prop: true,
         listener: false,
         styles: false,
         hostTheme: false,
@@ -389,8 +458,10 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
         scoped: false,
+        prop: true,
         event: false,
         listener: false,
         styles: false,
@@ -399,24 +470,10 @@ describe('build conditionals', () => {
       });
     });
 
-    it('do not set observeAttr w/out valid prop type', () => {
-      cmpMeta.membersMeta.name = {
-        memberType: MEMBER_TYPE.Prop,
-      };
-      setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild).toEqual({
-        shadowDom: false,
-        scoped: false,
-        event: false,
-        listener: false,
-        styles: false,
-        hostTheme: false
-      });
-    });
-
     it('should do nothing with no member meta', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
         scoped: false,
         event: false,

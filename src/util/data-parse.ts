@@ -17,7 +17,7 @@ export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData, i?: n
     'color': { attribName: 'color' }
   };
 
-  if (memberData) {
+  if (_BUILD_.hasMembers && memberData) {
     for (i = 0; i < memberData.length; i++) {
       cmpData = memberData[i];
       membersMeta[cmpData[0]] = {
@@ -28,6 +28,7 @@ export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData, i?: n
       };
     }
   }
+
   return {
     tagNameMeta,
 

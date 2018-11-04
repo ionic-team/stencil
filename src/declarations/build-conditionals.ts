@@ -44,7 +44,11 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
+  prop: boolean;
+  propMutable: boolean;
+  state: boolean;
   watchCallback: boolean;
+  hasMembers: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;

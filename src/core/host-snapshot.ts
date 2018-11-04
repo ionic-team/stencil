@@ -65,13 +65,15 @@ export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
     $attributes: {}
   };
 
-  // loop through and gather up all the original attributes on the host
-  // this is useful later when we're creating the component instance
-  cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-    if (attribName = cmpMeta.membersMeta[memberName].attribName) {
-      hostSnapshot.$attributes[attribName] = domApi.$getAttribute(hostElm, attribName);
-    }
-  });
+  if (_BUILD_.hasMembers) {
+    // loop through and gather up all the original attributes on the host
+    // this is useful later when we're creating the component instance
+    cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+      if (attribName = cmpMeta.membersMeta[memberName].attribName) {
+        hostSnapshot.$attributes[attribName] = domApi.$getAttribute(hostElm, attribName);
+      }
+    });
+  }
 
   return hostSnapshot;
 };

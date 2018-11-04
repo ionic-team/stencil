@@ -31,8 +31,12 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     event: true,
     listener: true,
     method: true,
+    prop: true,
+    propMutable: true,
     propConnect: true,
     propContext: true,
+    state: true,
+    hasMembers: true,
     watchCallback: true,
     cmpDidLoad: true,
     cmpWillLoad: true,
@@ -91,8 +95,12 @@ export async function setBuildConditionals(
     styles: false,
     hostTheme: false,
     observeAttr: false,
+    prop: false,
+    propMutable: false,
     propConnect: false,
     propContext: false,
+    state: false,
+    hasMembers: false,
     method: false,
     element: false,
     watchCallback: false,
@@ -216,15 +224,26 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
 
+    coreBuild.hasMembers = coreBuild.hasMembers || (memberNames.length > 0);
+
     memberNames.forEach(memberName => {
       const memberMeta = cmpMeta.membersMeta[memberName];
       const memberType = memberMeta.memberType;
       const propType = memberMeta.propType;
 
       if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
+        coreBuild.prop = true;
+
+        if (memberType === MEMBER_TYPE.PropMutable) {
+          coreBuild.propMutable = true;
+        }
+
         if (propType === PROP_TYPE.String || propType === PROP_TYPE.Number || propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Any) {
           coreBuild.observeAttr = true;
         }
+
+      } else if (memberType === MEMBER_TYPE.State) {
+        coreBuild.state = true;
 
       } else if (memberType === MEMBER_TYPE.PropConnect) {
         coreBuild.propConnect = true;

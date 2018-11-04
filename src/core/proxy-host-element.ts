@@ -29,7 +29,7 @@ export const proxyHostElementPrototype = (plt: d.PlatformApi, membersEntries: [s
   membersEntries.forEach(([memberName, member]) => {
     // add getters/setters
     const memberType = member.memberType;
-    if (memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable)) {
+    if ((memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable)) && (_BUILD_.prop)) {
       // @Prop() or @Prop({ mutable: true })
       definePropertyGetterSetter(
         hostPrototype,
@@ -45,7 +45,7 @@ export const proxyHostElementPrototype = (plt: d.PlatformApi, membersEntries: [s
         }
       );
 
-    } else if (memberType === MEMBER_TYPE.Method) {
+    } else if (_BUILD_.method && memberType === MEMBER_TYPE.Method) {
       // @Method()
       // add a placeholder noop value on the host element's prototype
       // incase this method gets called before setup

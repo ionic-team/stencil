@@ -43,7 +43,7 @@ export const initHostElement = (
     };
   }
 
-  if (cmpMeta.membersMeta) {
+  if (_BUILD_.hasMembers && cmpMeta.membersMeta) {
     const entries = Object.entries(cmpMeta.membersMeta);
     if (_BUILD_.observeAttr) {
       let attrToProp: any = {};

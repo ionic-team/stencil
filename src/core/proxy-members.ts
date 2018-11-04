@@ -29,7 +29,7 @@ export const defineMember = (
     elm = plt.hostElementMap.get(this);
 
     if (elm) {
-      if (property.state || property.mutable) {
+      if ((_BUILD_.state && property.state) || property.mutable) {
         setValue(plt, elm, memberName, newValue, perf);
 
       } else if (_BUILD_.verboseError) {
@@ -38,10 +38,10 @@ export const defineMember = (
     }
   }
 
-  if (property.type || property.state) {
+  if ((_BUILD_.prop && property.type) || (_BUILD_.state && property.state)) {
     const values = plt.valuesMap.get(elm);
 
-    if (!property.state) {
+    if ((!_BUILD_.state || !property.state) && (_BUILD_.prop)) {
       if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
         // check the prop value from the host element attribute
         if ((hostAttributes = hostSnapshot && hostSnapshot.$attributes) && isDef(hostAttrValue = hostAttributes[property.attr])) {
