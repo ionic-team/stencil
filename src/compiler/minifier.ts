@@ -17,14 +17,12 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
     opts.output.beautify = false;
 
   } else {
-    opts.ecma = 6;
+    opts.ecma = 7;
     opts.toplevel = true;
-    opts.module = true;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
-    opts.toplevel = true;
+    opts.output.ecma = 7;
+    opts.compress.ecma = 7;
     opts.compress.arrows = true;
-    opts.compress.pure_getters = true;
+    opts.compress.module = true;
     opts.output.beautify = false;
   }
 

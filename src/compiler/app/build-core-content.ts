@@ -50,6 +50,12 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
+
+  } else {
+    opts.ecma = 7;
+    opts.output.ecma = 7;
+    opts.compress.ecma = 7;
+    opts.compress.module = true;
   }
 
   opts.compress.toplevel = true;
@@ -187,7 +193,7 @@ const PROD_MINIFY_OPTS: any = {
     if_return: true,
     inline: true,
     join_vars: true,
-    keep_fargs: true,
+    keep_fargs: false,
     keep_fnames: true,
     keep_infinity: true,
     loops: true,

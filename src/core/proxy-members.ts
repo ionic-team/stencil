@@ -195,8 +195,8 @@ export const setValue = (plt: d.PlatformApi, elm: d.HostElement, memberName: str
 export const definePropertyValue = (obj: any, propertyKey: string, value: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
-    'configurable': true,
-    'value': value
+    configurable: true,
+    value
   });
 };
 
@@ -204,9 +204,9 @@ export const definePropertyValue = (obj: any, propertyKey: string, value: any) =
 export const definePropertyGetterSetter = (obj: any, propertyKey: string, get: any, set: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
-    'configurable': true,
-    'get': get,
-    'set': set
+    configurable: true,
+    get,
+    set
   });
 };
 

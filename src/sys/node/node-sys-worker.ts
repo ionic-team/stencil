@@ -10,7 +10,7 @@ import { validateTypesWorker } from '../../compiler/transpile/validate-types-wor
 
 
 
-const Terser = require('terser/dist/browser.bundle.js');
+const Terser = require('terser/dist/bundle.js');
 
 
 export class NodeSystemWorker {
