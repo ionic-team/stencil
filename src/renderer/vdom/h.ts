@@ -107,42 +107,7 @@ export function h(nodeName: any, vnodeData: any) {
 }
 
 
-const childToVNode = (child: d.ChildNode) => ({
-  vtag: child['vtag'],
-  vchildren: child['vchildren'],
-  vtext: child['vtext'],
-  vattrs: child['vattrs'],
-  vkey: child['vkey'],
-  vname: child['vname']
-});
-
-
-const VNodeToChild = (vnode: d.VNode): d.ChildNode => ({
-  'vtag': vnode.vtag,
-  'vchildren': vnode.vchildren,
-  'vtext': vnode.vtext,
-  'vattrs': vnode.vattrs,
-  'vkey': vnode.vkey,
-  'vname': vnode.vname
-});
-
-
 const utils: FunctionalUtilities = {
-  'forEach': (children, cb) =>
-    children.forEach((item, index, array) =>
-      cb(
-        VNodeToChild(item),
-        index,
-        array
-      )
-    ),
-  'map': (children, cb): d.VNode[] =>
-    children.map((item, index, array) => childToVNode(
-        cb(
-          VNodeToChild(item),
-          index,
-          array
-        )
-      )
-    )
+  'forEach': (children, cb) => children.forEach(cb),
+  'map': (children, cb) => children.map(cb)
 };

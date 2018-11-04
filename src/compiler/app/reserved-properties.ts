@@ -103,6 +103,15 @@ export const RESERVED_PROPERTIES: string[] = [
   'getAttributes',
   'replaceAttributes',
 
+  /**
+   * VDom
+   */
+  'vtag',
+  'vchildren',
+  'vtext',
+  'vattrs',
+  'vkey',
+  'vname',
 
   /**
    * Web Standards / DOM
