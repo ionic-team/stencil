@@ -11,10 +11,12 @@ export const updateElement = (plt: d.PlatformApi, oldVnode: d.VNode | null, newV
   const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
   const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
-  // remove attributes no longer present on the vnode by setting them to undefined
-  for (memberName in oldVnodeAttrs) {
-    if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.ishost);
+  if (_BUILD_.updatable) {
+    // remove attributes no longer present on the vnode by setting them to undefined
+    for (memberName in oldVnodeAttrs) {
+      if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
+        setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.ishost);
+      }
     }
   }
 

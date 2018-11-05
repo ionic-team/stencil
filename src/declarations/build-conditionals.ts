@@ -50,6 +50,7 @@ export interface BuildConditionals {
   state: boolean;
   watchCallback: boolean;
   hasMembers: boolean;
+  updatable: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;

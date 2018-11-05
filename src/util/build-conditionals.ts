@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, DEFAULT_STYLE_MODE } from './constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { isTsFile } from '../compiler/util';
 import { shouldPrerender } from '../compiler/prerender/prerender-app';
 
@@ -38,6 +38,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     propContext: true,
     state: true,
     hasMembers: true,
+    updatable: true,
     watchCallback: true,
     cmpDidLoad: true,
     cmpWillLoad: true,
@@ -103,6 +104,7 @@ export async function setBuildConditionals(
     propContext: false,
     state: false,
     hasMembers: false,
+    updatable: false,
     method: false,
     element: false,
     watchCallback: false,
@@ -279,6 +281,8 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
       }
     });
   }
+
+  coreBuild.updatable = coreBuild.updatable || (coreBuild.prop || coreBuild.state);
 }
 
 

@@ -350,7 +350,7 @@ export const createRendererPatch = (plt: d.PlatformApi, domApi: d.DomApi): d.Ren
                 newEndIdx
               );
 
-    } else if (newStartIdx > newEndIdx) {
+    } else if (_BUILD_.updatable && newStartIdx > newEndIdx) {
       removeVnodes(oldCh, oldStartIdx, oldEndIdx);
     }
   };
@@ -409,20 +409,20 @@ export const createRendererPatch = (plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         updateElement(plt, oldVNode, newVNode, isSvgMode);
       }
 
-      if (isDef(oldChildren) && isDef(newChildren)) {
+      if (_BUILD_.updatable && isDef(oldChildren) && isDef(newChildren)) {
         // looks like there's child vnodes for both the old and new vnodes
         updateChildren(elm, oldChildren, newVNode, newChildren);
 
       } else if (isDef(newChildren)) {
         // no old child vnodes, but there are new child vnodes to add
-        if (isDef(oldVNode.vtext)) {
+        if (_BUILD_.updatable && isDef(oldVNode.vtext)) {
           // the old vnode was text, so be sure to clear it out
           domApi.$setTextContent(elm, '');
         }
         // add the new vnode children
         addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
 
-      } else if (isDef(oldChildren)) {
+      } else if (_BUILD_.updatable && isDef(oldChildren)) {
         // no new child vnodes, but there are old child vnodes to remove
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }

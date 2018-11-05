@@ -8,30 +8,37 @@ import { updateAttribute } from './update-attribute';
 export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) => {
   if (memberName === 'class' && !isSvg) {
     // Class
-    if (oldValue !== newValue) {
-      const oldList = parseClassList(oldValue);
-      const newList = parseClassList(newValue);
+    if (_BUILD_.updatable) {
+      if (oldValue !== newValue) {
+        const oldList = parseClassList(oldValue);
+        const newList = parseClassList(newValue);
 
-      // remove classes in oldList, not included in newList
-      const toRemove = oldList.filter(item => !newList.includes(item));
-      const classList = parseClassList(elm.className)
-        .filter(item => !toRemove.includes(item));
+        // remove classes in oldList, not included in newList
+        const toRemove = oldList.filter(item => !newList.includes(item));
+        const classList = parseClassList(elm.className)
+          .filter(item => !toRemove.includes(item));
 
-      // add classes from newValue that are not in oldList or classList
-      const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
-      classList.push(...toAdd);
+        // add classes from newValue that are not in oldList or classList
+        const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
+        classList.push(...toAdd);
 
-      elm.className = classList.join(' ');
+        elm.className = classList.join(' ');
+      }
+
+    } else {
+      elm.className = newValue;
     }
 
   } else if (memberName === 'style') {
     // update style attribute, css properties and values
-    for (const prop in oldValue) {
-      if (!newValue || newValue[prop] == null) {
-        if (/-/.test(prop)) {
-          elm.style.removeProperty(prop);
-        } else {
-          (elm as any).style[prop] = '';
+    if (_BUILD_.updatable) {
+      for (const prop in oldValue) {
+        if (!newValue || newValue[prop] == null) {
+          if (/-/.test(prop)) {
+            elm.style.removeProperty(prop);
+          } else {
+            (elm as any).style[prop] = '';
+          }
         }
       }
     }
@@ -74,7 +81,7 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
         plt.domApi.$addEventListener(elm, memberName, newValue);
       }
 
-    } else {
+    } else if (_BUILD_.updatable) {
       // remove listener
       plt.domApi.$removeEventListener(elm, memberName);
     }
