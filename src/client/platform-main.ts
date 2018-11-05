@@ -146,9 +146,9 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
         // this is when not using a 3rd party bundler
         // and components are able to lazy load themselves
         // through standardized browser APIs
-        const bundleId = (typeof cmpMeta.bundleIds === 'string')
-          ? cmpMeta.bundleIds
-          : (cmpMeta.bundleIds as d.BundleIds)[elm.mode];
+        const bundleId = (_BUILD_.hasMode && typeof cmpMeta.bundleIds !== 'string')
+          ? (cmpMeta.bundleIds as d.BundleIds)[elm.mode]
+          : cmpMeta.bundleIds;
 
         const useScopedCss = _BUILD_.shadowDom && !domApi.$supportsShadowDom;
         let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.entry.js';

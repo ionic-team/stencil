@@ -181,12 +181,11 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: true
       });
     });
 
-    it('styles', () => {
+    it('styles, no modes', () => {
       cmpMeta.stylesMeta = {
         $: {externalStyles: [{cmpRelativePath: 'styles.css'}]}
       };
@@ -202,6 +201,24 @@ describe('build conditionals', () => {
       });
     });
 
+    it('styles, with modes', () => {
+      cmpMeta.stylesMeta = {
+        ios: {externalStyles: [{cmpRelativePath: 'ios.css'}]},
+        md: {externalStyles: [{cmpRelativePath: 'md.css'}]}
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: false,
+        shadowDom: false,
+        scoped: false,
+        event: false,
+        listener: false,
+        styles: true,
+        hasMode: true,
+        hostTheme: false
+      });
+    });
+
     it('shadowDom', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
@@ -211,7 +228,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -225,7 +241,6 @@ describe('build conditionals', () => {
         scoped: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -239,7 +254,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -254,7 +268,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: true,
-        styles: false,
         hostTheme: false
       });
     });
@@ -268,7 +281,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: true,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -285,7 +297,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         element: true
       });
@@ -302,7 +313,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         method: true
       });
@@ -319,7 +329,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         propContext: true
       });
@@ -337,7 +346,6 @@ describe('build conditionals', () => {
         propConnect: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -354,7 +362,6 @@ describe('build conditionals', () => {
         prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -372,7 +379,6 @@ describe('build conditionals', () => {
         propMutable: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -389,7 +395,6 @@ describe('build conditionals', () => {
         state: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });
@@ -407,7 +412,6 @@ describe('build conditionals', () => {
         prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         observeAttr: true
       });
@@ -426,7 +430,6 @@ describe('build conditionals', () => {
         prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         observeAttr: true
       });
@@ -445,7 +448,6 @@ describe('build conditionals', () => {
         event: false,
         prop: true,
         listener: false,
-        styles: false,
         hostTheme: false,
         observeAttr: true
       });
@@ -464,7 +466,6 @@ describe('build conditionals', () => {
         prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
         observeAttr: true
       });
@@ -478,7 +479,6 @@ describe('build conditionals', () => {
         scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false
       });
     });

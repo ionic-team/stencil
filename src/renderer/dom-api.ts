@@ -92,9 +92,6 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     $hasAttribute: (elm: Element, key) =>
       elm.hasAttribute(key),
 
-    $getMode: (elm: Element) =>
-      elm.getAttribute('mode') || (App.Context || {}).mode,
-
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {
         return elm.firstElementChild;
@@ -131,7 +128,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         assignersUnregListeners[assignersEventName]();
       }
 
-      if (typeof attachTo === 'string') {
+      if (_BUILD_.event && typeof attachTo === 'string') {
         // attachTo is a string, and is probably something like
         // "parent", "window", or "document"
         // and the eventName would be like "mouseover" or "mousemove"
@@ -141,7 +138,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         // we were passed in an actual element to attach to
         attachToElm = attachTo;
 
-      } else {
+      } else if (_BUILD_.event) {
         // depending on the event name, we could actually be attaching
         // this element to something like the document or window
         splt = eventName.split(':');
@@ -159,21 +156,23 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         // somehow we're referencing an element that doesn't exist
         // let's not continue
 
-        // test to see if we're looking for an exact keycode
-        splt = eventName.split('.');
+        if (_BUILD_.event) {
+          // test to see if we're looking for an exact keycode
+          splt = eventName.split('.');
 
-        if (splt.length > 1) {
-          // looks like this listener is also looking for a keycode
-          // keyup.enter
-          eventName = splt[0];
+          if (splt.length > 1) {
+            // looks like this listener is also looking for a keycode
+            // keyup.enter
+            eventName = splt[0];
 
-          eventListener = (ev: any) => {
-            // wrap the user's event listener with our own check to test
-            // if this keyboard event has the keycode they're looking for
-            if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
-              listenerCallback(ev);
-            }
-          };
+            eventListener = (ev: any) => {
+              // wrap the user's event listener with our own check to test
+              // if this keyboard event has the keycode they're looking for
+              if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
+                listenerCallback(ev);
+              }
+            };
+          }
         }
 
         // create the actual event listener options to use
@@ -259,6 +258,11 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
 
   if (_BUILD_.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+  }
+
+  if (_BUILD_.hasMode) {
+    domApi.$getMode = (elm: Element) =>
+      domApi.$getAttribute(elm, 'mode') || (App.Context || {}).mode;
   }
 
   if (!App.ael) {

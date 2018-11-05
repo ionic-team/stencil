@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, DEFAULT_STYLE_MODE } from './constants';
 import { isTsFile } from '../compiler/util';
 import { shouldPrerender } from '../compiler/prerender/prerender-app';
 
@@ -23,6 +23,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     reflectToAttr: true,
     hasSlot: true,
     hasSvg: true,
+    hasMode: true,
     observeAttr: true,
     isDev: true,
     isProd: false,
@@ -90,6 +91,7 @@ export async function setBuildConditionals(
     shadowDom: false,
     scoped: false,
     slotPolyfill: false,
+    hasMode: false,
     event: false,
     listener: false,
     styles: false,
@@ -218,8 +220,18 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   coreBuild.scoped = coreBuild.scoped || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss;
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
-  coreBuild.styles = coreBuild.styles || !!(cmpMeta.stylesMeta && Object.keys(cmpMeta.stylesMeta).length > 0);
   coreBuild.hostTheme = coreBuild.hostTheme || !!(cmpMeta.hostMeta && cmpMeta.hostMeta.theme);
+
+  if (cmpMeta.stylesMeta) {
+    const modeNames = Object.keys(cmpMeta.stylesMeta);
+    if (modeNames.length > 0) {
+      coreBuild.styles = true;
+
+      if (!coreBuild.hasMode && modeNames.length > 1) {
+        coreBuild.hasMode = modeNames.filter(m => m !== DEFAULT_STYLE_MODE).length > 0;
+      }
+    }
+  }
 
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);

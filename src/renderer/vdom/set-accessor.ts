@@ -87,7 +87,7 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
+    if (_BUILD_.hasMembers && cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
       // we know for a fact that this element is a known component
       // and this component has this member name as a property,
       // let's set the known @Prop on this element

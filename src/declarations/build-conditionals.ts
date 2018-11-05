@@ -26,6 +26,7 @@ export interface BuildConditionals {
 
   // encapsulation
   styles: boolean;
+  hasMode: boolean;
 
   // dom
   shadowDom: boolean;

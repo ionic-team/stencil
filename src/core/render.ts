@@ -20,7 +20,7 @@ export const render = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, hostElm: d.
 
     // test if this component should be shadow dom
     // and if so does the browser supports it
-    const useNativeShadowDom = (encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
+    const useNativeShadowDom = (_BUILD_.shadowDom && encapsulation === 'shadow' && plt.domApi.$supportsShadowDom);
 
     let reflectHostAttr: d.VNodeData;
     let rootElm: HTMLElement = hostElm;
