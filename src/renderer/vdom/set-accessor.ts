@@ -122,6 +122,9 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
     }
 
   } else if (newValue != null && memberName !== 'key') {
+    if (_BUILD_.isDev && memberName === 'htmlfor') {
+      console.error(`Attribute "htmlfor" set on ${elm.tagName.toLowerCase()}, with the lower case "f" must be replaced with a "htmlFor" (capital "F")`);
+    }
     // Element Attributes
     updateAttribute(elm, memberName, newValue);
 
