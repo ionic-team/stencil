@@ -92,6 +92,9 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     $hasAttribute: (elm: Element, key) =>
       elm.hasAttribute(key),
 
+    $getMode: (elm: Element) =>
+      elm.getAttribute('mode') || (App.Context || {}).mode,
+
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {
         return elm.firstElementChild;
@@ -258,11 +261,6 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
 
   if (_BUILD_.shadowDom) {
     domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
-  }
-
-  if (_BUILD_.hasMode) {
-    domApi.$getMode = (elm: Element) =>
-      domApi.$getAttribute(elm, 'mode') || (App.Context || {}).mode;
   }
 
   if (!App.ael) {

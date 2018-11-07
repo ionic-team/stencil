@@ -362,7 +362,8 @@ describe('build conditionals', () => {
         prop: true,
         event: false,
         listener: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: true
       });
     });
 
@@ -379,7 +380,8 @@ describe('build conditionals', () => {
         propMutable: true,
         event: false,
         listener: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: true
       });
     });
 
@@ -395,7 +397,8 @@ describe('build conditionals', () => {
         state: true,
         event: false,
         listener: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: true
       });
     });
 
@@ -413,7 +416,8 @@ describe('build conditionals', () => {
         event: false,
         listener: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -431,7 +435,8 @@ describe('build conditionals', () => {
         event: false,
         listener: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -449,7 +454,8 @@ describe('build conditionals', () => {
         prop: true,
         listener: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -467,7 +473,8 @@ describe('build conditionals', () => {
         event: false,
         listener: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
