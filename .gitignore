@@ -32,4 +32,4 @@ coverage/
 /screenshot/local-connector.js
 /screenshot/pixel-match.js
 
-test/example/www/*
+test/**/www/*

@@ -1,0 +1,13 @@
+{
+  "name": "@stencil/hello-world",
+  "private": true,
+  "scripts": {
+    "analysis": "node ./.scripts/analysis.js",
+    "build": "npm run build.hello && npm run build.todo && npm run analysis",
+    "build.hello": "cd ./hello-world && npm run build",
+    "build.todo": "cd ./todo-app && npm run build"
+  },
+  "devDependencies": {
+    "brotli": "^1.3.2"
+  }
+}
