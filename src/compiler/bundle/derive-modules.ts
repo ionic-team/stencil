@@ -100,6 +100,6 @@ async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, 
 
 function generateIntro(config: d.Config, isBrowser: boolean) {
   return isBrowser
-    ? `const { h } = window.${config.namespace};`
+    ? `const h = window.${config.namespace}.h;`
     : `import { h } from '../${getCoreEsmFileName(config)}';`;
 }

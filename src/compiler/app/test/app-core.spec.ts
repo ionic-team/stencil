@@ -28,7 +28,7 @@ describe('app-core', () => {
     });
 
     it('starts with the preamble', () => {
-      const preamble = generatePreamble(config).trim();
+      const preamble = generatePreamble(config, {defaultBanner: true}).trim();
       const lines = core.wrapCoreJs(config, '', cmpRegistry, {} as any).split('\n');
       expect(lines[0]).toEqual(preamble);
     });

@@ -3,7 +3,7 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| hello-world.entry.js       | 110B     | 146B     | 159B     |
+| hello-world.entry.js       | 106B     | 135B     | 144B     |
 | app.core.js                | 3.52KB   | 3.90KB   | 8.33KB   |
 
 

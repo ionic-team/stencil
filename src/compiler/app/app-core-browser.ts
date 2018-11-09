@@ -61,7 +61,7 @@ export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.C
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
   const output = [
-    generatePreamble(config) + '\n',
+    generatePreamble(config, {defaultBanner: true}) + '\n',
     `(${buildConditionals.es5 ? 'function' : ''}(w,d,x,n,h,c,r)${buildConditionals.es5 ? '' : '=>'}{`,
     buildConditionals.es5 ? `"use strict";\n` : ``,
     `(${buildConditionals.es5 ? 'function' : ''}(s)${buildConditionals.es5 ? '' : '=>'}{s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,

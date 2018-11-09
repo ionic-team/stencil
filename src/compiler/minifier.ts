@@ -6,7 +6,11 @@ import { generatePreamble } from './util';
  * Interal minifier, not exposed publicly.
  */
 export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string): Promise<string> {
-  const opts: any = { output: {}, compress: {}, mangle: true };
+  const opts: any = {
+    output: {beautify: false},
+    compress: {},
+    mangle: true
+  };
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
@@ -14,16 +18,16 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
     opts.compress.pure_getters = true;
-    opts.output.beautify = false;
 
   } else {
     opts.ecma = 7;
     opts.toplevel = true;
+    opts.module = true;
     opts.output.ecma = 7;
     opts.compress.ecma = 7;
     opts.compress.arrows = true;
     opts.compress.module = true;
-    opts.output.beautify = false;
+    opts.compress.pure_getters = true;
   }
 
   if (config.logLevel === 'debug') {
@@ -55,9 +59,9 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
   }
 
   const r = await config.sys.minifyJs(jsText, opts);
-
-  if (compilerCtx) {
-    if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
+  if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
+    r.output = auxMinify(r.output);
+    if (compilerCtx) {
       await compilerCtx.cache.put(cacheKey, r.output);
     }
   }
@@ -68,4 +72,8 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
   } else {
     return r.output;
   }
+}
+
+function auxMinify(jsText: string) {
+  return jsText.replace(/^window;/, '');
 }
