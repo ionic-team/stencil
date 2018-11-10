@@ -238,6 +238,10 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
       elm.setAttributeNS(namespaceURI, qualifiedName, val);
   }
 
+  if (_BUILD_.shadowDom) {
+    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+  }
+
   if (_BUILD_.es5) {
     if (typeof win.CustomEvent !== 'function') {
       // CustomEvent polyfill
@@ -259,9 +263,6 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     }
   }
 
-  if (_BUILD_.shadowDom) {
-    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
-  }
 
   if (!App.ael) {
     App.ael = (elm, eventName, cb, opts) => elm.addEventListener(eventName, cb, opts);

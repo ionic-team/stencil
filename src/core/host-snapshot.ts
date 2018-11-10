@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 
 
 export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) => {
@@ -8,11 +8,13 @@ export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
   // have finished adding attributes and child nodes to the host
   // before we go all out and hydrate this beast
   // let's first take a snapshot of its original layout before render
-  if (!hostElm.mode) {
+  if (_BUILD_.hasMode && !hostElm.mode) {
     // looks like mode wasn't set as a property directly yet
     // first check if there's an attribute
     // next check the app's global
     hostElm.mode = domApi.$getMode(hostElm);
+  } else {
+    hostElm.mode = DEFAULT_STYLE_MODE;
   }
 
   if (_BUILD_.slotPolyfill) {

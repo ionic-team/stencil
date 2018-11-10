@@ -83,17 +83,19 @@ export const attachStyles = (plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
   // and add the scope attribute to the host
 
   // create the style id w/ the host element's mode
-  let styleId = cmpMeta.tagNameMeta + hostElm.mode;
+  let styleId = cmpMeta.tagNameMeta + (_BUILD_.hasMode ? hostElm.mode : DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpMeta as any)[styleId];
 
-  const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
-  if (shouldScopeCss) {
-    hostElm['s-sc'] = styleTemplate
-      ? getScopeId(cmpMeta, hostElm.mode)
-      : getScopeId(cmpMeta);
-  }
+  // if (_BUILD_.scoped || _BUILD_.shadowDom) {
+    const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
+    if (shouldScopeCss) {
+      hostElm['s-sc'] = styleTemplate
+        ? getScopeId(cmpMeta, hostElm.mode)
+        : getScopeId(cmpMeta);
+    }
+  // }
 
-  if (!styleTemplate) {
+  if (_BUILD_.hasMode && !styleTemplate) {
     // doesn't look like there's a style template with the mode
     // create the style id using the default style mode and try again
     styleId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
@@ -114,14 +116,9 @@ export const attachStyles = (plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
       } else {
         // climb up the dom and see if we're in a shadow dom
-        let root: d.HostElement = hostElm;
-        while (root = domApi.$parentNode(root) as d.HostElement) {
-          if (root.host && root.host.shadowRoot) {
-            // looks like we are in shadow dom, let's use
-            // this shadow root as the container for these styles
-            styleContainerNode = (root.host.shadowRoot) as any;
-            break;
-          }
+        const rootEl = (hostElm as any).getRootNode();
+        if (rootEl.host) {
+          styleContainerNode = rootEl;
         }
       }
     }
@@ -138,7 +135,7 @@ export const attachStyles = (plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     if (!appliedStyles[styleId]) {
       let styleElm: HTMLStyleElement;
       if (_BUILD_.es5) {
-        // es5 builds are not usig <template> because of ie11 issues
+        // es5 builds are not using <template> because of ie11 issues
         // instead the "template" is just the style text as a string
         // create a new style element and add as innerHTML
 

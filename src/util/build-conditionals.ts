@@ -68,7 +68,7 @@ export async function setBuildConditionals(
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild = {
+  const coreBuild: d.BuildConditionals = {
     coreId: coreId,
     clientSide: true,
     isDev: !!config.devMode,
@@ -229,7 +229,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
     if (modeNames.length > 0) {
       coreBuild.styles = true;
 
-      if (!coreBuild.hasMode && modeNames.length > 1) {
+      if (!coreBuild.hasMode) {
         coreBuild.hasMode = modeNames.filter(m => m !== DEFAULT_STYLE_MODE).length > 0;
       }
     }
@@ -282,7 +282,7 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
     });
   }
 
-  coreBuild.updatable = coreBuild.updatable || (coreBuild.prop || coreBuild.state);
+  coreBuild.updatable = (coreBuild.updatable || !!(coreBuild.prop || coreBuild.state));
 }
 
 
