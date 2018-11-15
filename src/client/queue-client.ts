@@ -4,10 +4,15 @@ import * as d from '../declarations';
 export const createQueueClient = (App: d.AppGlobal, win: Window): d.QueueApi => {
   if (!_BUILD_.updatable) {
     const resolved = Promise.resolve();
-    const now: d.Now = () => win.performance.now();
-    function tick(cb: d.RafCallback) {
-      resolved.then(() => cb(now()));
-    }
+    const tick = (cb: d.RafCallback) => {
+      resolved.then(() => {
+        try {
+          cb(win.performance.now());
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    };
     return {
       tick: tick,
       read: tick,
