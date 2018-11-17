@@ -1,49 +1,112 @@
 import * as d from '../../declarations';
 import { pathJoin } from '../util';
+import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 
 
 export function validateDocs(config: d.Config) {
-  if (config.flags.docs || typeof config.flags.docsJson === 'string') {
-    // docs flag
+  _deprecatedDocsConfig(config);
+
+  if (typeof config.flags.docsApi === 'string') {
+    // api docs flag
     config.outputTargets = config.outputTargets || [];
 
-    if (!config.outputTargets.some(o => o.type === 'docs')) {
+    if (!(config.outputTargets as d.OutputTargetDocsApi[]).some(o => o.type === 'docs-api')) {
       // didn't provide a docs config, so let's add one
-      const outputTarget: d.OutputTargetDocs = {
+      const outputTarget: d.OutputTargetDocsApi = {
+        type: 'docs-api'
+      };
+      config.outputTargets.push(outputTarget);
+    }
+
+    const apiDocsOutputs = (config.outputTargets as d.OutputTargetDocsApi[]).filter(o => o.type === 'docs-api');
+    apiDocsOutputs.forEach(apiDocsOutput => {
+      validateApiDocsOutputTarget(config, apiDocsOutput);
+    });
+
+  } else if (config.outputTargets) {
+    // remove api docs if there is no flag
+    config.outputTargets = (config.outputTargets as d.OutputTargetDocsApi[]).filter(o => o.type !== 'docs-api');
+  }
+
+  if (typeof config.flags.docsJson === 'string') {
+    // json docs flag
+    config.outputTargets = config.outputTargets || [];
+
+    if (!(config.outputTargets as d.OutputTargetDocsJson[]).some(o => o.type === 'docs-json')) {
+      // didn't provide a docs config, so let's add one
+      const outputTarget: d.OutputTargetDocsJson = {
+        type: 'docs-json'
+      };
+      config.outputTargets.push(outputTarget);
+    }
+
+    const jsonDocsOutputs = (config.outputTargets as d.OutputTargetDocsJson[]).filter(o => o.type === 'docs-json');
+    jsonDocsOutputs.forEach(jsonDocsOutput => {
+      validateJsonDocsOutputTarget(config, jsonDocsOutput);
+    });
+
+  } else if (config.outputTargets) {
+    // remove json docs if there is no flag
+    config.outputTargets = (config.outputTargets as d.OutputTargetDocsJson[]).filter(o => o.type !== 'docs-json');
+  }
+
+  if (config.flags.docs) {
+    // readme docs flag
+    config.outputTargets = config.outputTargets || [];
+
+    if (!(config.outputTargets as d.OutputTargetDocsReadme[]).some(o => o.type === 'docs')) {
+      // didn't provide a docs config, so let's add one
+      const outputTarget: d.OutputTargetDocsReadme = {
         type: 'docs'
       };
       config.outputTargets.push(outputTarget);
     }
 
-    const docsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
-    docsOutputs.forEach(outputTarget => {
-      validateDocsOutputTarget(config, outputTarget);
+    const readmeDocsOutputs = (config.outputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type === 'docs');
+    readmeDocsOutputs.forEach(readmeDocsOutput => {
+      validateReadmeOutputTarget(config, readmeDocsOutput);
     });
 
-  } else {
-    if (config.outputTargets) {
-      // remove docs if there is no docs flag
-      config.outputTargets = config.outputTargets.filter(o => o.type !== 'docs');
-    }
+  } else if (config.outputTargets) {
+    // remove json docs if there is no flag
+    config.outputTargets = (config.outputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type !== 'docs');
   }
 }
 
 
-function validateDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocs) {
-  if (typeof config.flags.docsJson === 'string' && typeof outputTarget.jsonFile !== 'string') {
-    outputTarget.jsonFile = config.flags.docsJson;
+function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsReadme) {
+  if (config.flags.docs && typeof outputTarget.dir !== 'string') {
+    outputTarget.dir = config.srcDir;
   }
 
-  if (config.flags.docs && typeof outputTarget.readmeDir !== 'string') {
-    outputTarget.readmeDir = config.srcDir;
+  if (typeof outputTarget.dir === 'string' && !config.sys.path.isAbsolute(outputTarget.dir)) {
+    outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
   }
 
-  if (typeof outputTarget.readmeDir === 'string' && !config.sys.path.isAbsolute(outputTarget.readmeDir)) {
-    outputTarget.readmeDir = pathJoin(config, config.rootDir, outputTarget.readmeDir);
+  outputTarget.strict = !!outputTarget.strict;
+}
+
+
+function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsJson) {
+  if (typeof config.flags.docsJson === 'string' && typeof outputTarget.file !== 'string') {
+    outputTarget.file = config.flags.docsJson;
   }
 
-  if (typeof outputTarget.jsonFile === 'string') {
-    outputTarget.jsonFile = pathJoin(config, config.rootDir, outputTarget.jsonFile);
+  if (typeof outputTarget.file === 'string') {
+    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
+  }
+
+  outputTarget.strict = !!outputTarget.strict;
+}
+
+
+function validateApiDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsApi) {
+  if (typeof config.flags.docsApi === 'string' && typeof outputTarget.file !== 'string') {
+    outputTarget.file = config.flags.docsApi;
+  }
+
+  if (typeof outputTarget.file === 'string') {
+    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
   }
 
   outputTarget.strict = !!outputTarget.strict;

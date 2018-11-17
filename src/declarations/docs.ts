@@ -1,14 +1,82 @@
+import * as d from '.';
+
+
+export interface DocsData {
+  components: DocsDataComponent[];
+}
+
+
+export interface DocsDataComponent {
+  dirPath: string;
+  fileName: string;
+  filePath: string;
+  readmePath: string;
+  usagesDir: string;
+  moduleFile: d.ModuleFile;
+  cmpMeta: d.ComponentMeta;
+}
+
+
+export interface ApiDocs {
+  components: ApiDocsComponent[];
+}
+
+
+export interface ApiDocsComponent {
+  tag?: string;
+  props?: ApiDocsProp[];
+  methods?: ApiDocsMethod[];
+  events?: ApiDocsEvent[];
+  styles?: ApiDocsStyle[];
+}
+
+
+export interface ApiDocsProp {
+  name?: string;
+  type?: string;
+  mutable?: boolean;
+  attr?: string;
+  reflectToAttr?: boolean;
+}
+
+
+export interface ApiDocsMethod {
+  name: string;
+  returns?: JsonDocsMethodReturn;
+  parameters?: JsonDocMethodParameter[];
+}
+
+
+export interface ApiDocsEvent {
+  event: string;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+  detail?: string;
+}
+
+
+export interface ApiDocsStyle {
+  name: string;
+  annotation?: string;
+}
 
 
 export interface JsonDocs {
   components: JsonDocsComponent[];
+  timestamp: string;
+  compiler: {
+    name: string;
+    version: string;
+    typescriptVersion: string;
+  };
 }
 
 
 export interface JsonDocsComponent {
   tag?: string;
   readme?: string;
-  docs?: string,
+  docs?: string;
   usage?: JsonDocsUsage;
   props?: JsonDocsProp[];
   methods?: JsonDocsMethod[];

@@ -169,12 +169,26 @@ export interface OutputTargetDist extends OutputTargetBase {
   esmLoaderPath?: string;
 }
 
-
-export interface OutputTargetDocs extends OutputTargetBase {
+export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs';
 
-  readmeDir?: string;
-  jsonFile?: string;
+  dir?: string;
+  strict?: boolean;
+}
+
+
+export interface OutputTargetDocsJson extends OutputTargetBase {
+  type: 'docs-json';
+
+  file?: string;
+  strict?: boolean;
+}
+
+
+export interface OutputTargetDocsApi extends OutputTargetBase {
+  type: 'docs-api';
+
+  file?: string;
   strict?: boolean;
 }
 
@@ -212,7 +226,9 @@ export type OutputTargetBuild =
 export type OutputTarget =
  | OutputTargetAngular
  | OutputTargetStats
- | OutputTargetDocs
+ | OutputTargetDocsApi
+ | OutputTargetDocsJson
+ | OutputTargetDocsReadme
  | OutputTargetHydrate
  | OutputTargetDist
  | OutputTargetWww;

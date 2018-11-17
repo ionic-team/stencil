@@ -2,8 +2,12 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { generateReadmes } from './generate-readmes';
+import { generateApiDocs } from './generate-api-docs';
+import { generateDocData } from './generate-doc-data';
+import { generateJsonDocs } from './generate-json-docs';
+import { generateReadmeDocs } from './generate-readme-docs';
 import { getCompilerCtx } from '../build/compiler-ctx';
+import { strickCheckDocs } from './strict-check';
 import { transpileApp } from '../transpile/transpile-app';
 
 
@@ -48,9 +52,33 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 
 
 export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const docsOutputTargets = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocs[];
+  const docsOutputTargets = config.outputTargets.filter(o => {
+    return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-api';
+  });
 
-  if (docsOutputTargets.length > 0) {
-    await generateReadmes(config, compilerCtx, docsOutputTargets);
+  if (docsOutputTargets.length === 0) {
+    return;
+  }
+
+  const docsData = await generateDocData(config, compilerCtx);
+
+  const strictCheck = (docsOutputTargets as d.OutputTargetDocsReadme[]).some(o => !!o.strict);
+  if (strictCheck) {
+    strickCheckDocs(config, docsData);
+  }
+
+  const readmeTargets = (docsOutputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type === 'docs');
+  if (readmeTargets.length > 0) {
+    await generateReadmeDocs(config, compilerCtx, readmeTargets, docsData);
+  }
+
+  const jsonTargets = (docsOutputTargets as d.OutputTargetDocsJson[]).filter(o => o.type === 'docs-json');
+  if (jsonTargets.length > 0) {
+    await generateJsonDocs(config, compilerCtx, jsonTargets, docsData);
+  }
+
+  const apiTargets = (docsOutputTargets as d.OutputTargetDocsApi[]).filter(o => o.type === 'docs-api');
+  if (apiTargets.length > 0) {
+    await generateApiDocs(compilerCtx, apiTargets, docsData);
   }
 }

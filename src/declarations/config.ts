@@ -206,6 +206,7 @@ export interface ConfigFlags {
   debug?: boolean;
   dev?: boolean;
   docs?: boolean;
+  docsApi?: string;
   docsJson?: string;
   e2e?: boolean;
   emulate?: string;
