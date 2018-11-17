@@ -7,9 +7,8 @@ import { generateDocData } from './generate-doc-data';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
 import { getCompilerCtx } from '../build/compiler-ctx';
-import { strickCheckDocs } from './strict-check';
 import { transpileApp } from '../transpile/transpile-app';
-
+import { strickCheckDocs } from './strict-check';
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   compilerCtx = getCompilerCtx(config, compilerCtx);
@@ -27,7 +26,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
     await transpileApp(config, compilerCtx, buildCtx);
 
     // generate each of the docs
-    await generateDocs(config, compilerCtx);
+    await generateDocs(config, compilerCtx, buildCtx);
 
   } catch (e) {
     // catch all phase
@@ -51,7 +50,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 }
 
 
-export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const docsOutputTargets = config.outputTargets.filter(o => {
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-api';
   });
@@ -60,24 +59,24 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx)
     return;
   }
 
-  const docsData = await generateDocData(config, compilerCtx);
+  const docsData = await generateDocData(config, compilerCtx, buildCtx.diagnostics);
 
   const strictCheck = (docsOutputTargets as d.OutputTargetDocsReadme[]).some(o => !!o.strict);
   if (strictCheck) {
     strickCheckDocs(config, docsData);
   }
 
-  const readmeTargets = (docsOutputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type === 'docs');
+  const readmeTargets = docsOutputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
   if (readmeTargets.length > 0) {
     await generateReadmeDocs(config, compilerCtx, readmeTargets, docsData);
   }
 
-  const jsonTargets = (docsOutputTargets as d.OutputTargetDocsJson[]).filter(o => o.type === 'docs-json');
+  const jsonTargets = docsOutputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
   if (jsonTargets.length > 0) {
-    await generateJsonDocs(config, compilerCtx, jsonTargets, docsData);
+    await generateJsonDocs(compilerCtx, jsonTargets, docsData);
   }
 
-  const apiTargets = (docsOutputTargets as d.OutputTargetDocsApi[]).filter(o => o.type === 'docs-api');
+  const apiTargets = docsOutputTargets.filter(o => o.type === 'docs-api') as d.OutputTargetDocsApi[];
   if (apiTargets.length > 0) {
     await generateApiDocs(compilerCtx, apiTargets, docsData);
   }

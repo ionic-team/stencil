@@ -23,9 +23,6 @@ export function validateDocs(config: d.Config) {
       validateApiDocsOutputTarget(config, apiDocsOutput);
     });
 
-  } else if (config.outputTargets) {
-    // remove api docs if there is no flag
-    config.outputTargets = (config.outputTargets as d.OutputTargetDocsApi[]).filter(o => o.type !== 'docs-api');
   }
 
   if (typeof config.flags.docsJson === 'string') {

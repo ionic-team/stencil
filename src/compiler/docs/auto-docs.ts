@@ -1,58 +1,24 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
-import { MarkdownCssCustomProperties } from './markdown-css-props';
-import { MarkdownEvents } from './markdown-events';
-import { MarkdownMethods } from './markdown-methods';
-import { MarkdownProps } from './markdown-props';
-import { MEMBER_TYPE } from '../../util/constants';
+import { propsToMarkdown } from './markdown-props';
+import { eventsToMarkdown } from './markdown-events';
+import { methodsToMarkdown } from './markdown-methods';
+import { stylesToMarkdown } from './markdown-css-props';
 
 
-export function addAutoGenerate(cmpMeta: d.ComponentMeta, content: string[]) {
+export function addAutoGenerate(cmp: d.JsonDocsComponent, content: string[]) {
   content.push(AUTO_GENERATE_COMMENT);
   content.push(``);
   content.push(``);
-
-  const markdownContent = generateMemberMarkdown(cmpMeta);
-  content.push(...markdownContent);
+  content.push(...[
+    ...propsToMarkdown(cmp.props),
+    ...eventsToMarkdown(cmp.events),
+    ...methodsToMarkdown(cmp.methods),
+    ...stylesToMarkdown(cmp.styles)
+  ]);
 
   content.push(`----------------------------------------------`);
   content.push(``);
   content.push(NOTE);
   content.push(``);
-}
-
-
-function generateMemberMarkdown(cmpMeta: d.ComponentMeta) {
-  const events = new MarkdownEvents();
-  const methods = new MarkdownMethods();
-  const props = new MarkdownProps();
-  const cssCustomProps = new MarkdownCssCustomProperties();
-
-  cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-    const memberMeta = cmpMeta.membersMeta[memberName];
-
-    if (memberMeta.memberType === MEMBER_TYPE.Prop || memberMeta.memberType === MEMBER_TYPE.PropMutable) {
-      props.addRow(memberName, memberMeta);
-
-    } else if (memberMeta.memberType === MEMBER_TYPE.Method) {
-      methods.addRow(memberName, memberMeta);
-    }
-  });
-
-  cmpMeta.eventsMeta && cmpMeta.eventsMeta.forEach(ev => {
-    events.addRow(ev);
-  });
-
-  cmpMeta.styleDocs && cmpMeta.styleDocs.forEach(styleDoc => {
-    if (styleDoc.annotation === 'prop') {
-      cssCustomProps.addRow(styleDoc);
-    }
-  });
-
-  return [
-    ...props.toMarkdown(),
-    ...events.toMarkdown(),
-    ...methods.toMarkdown(),
-    ...cssCustomProps.toMarkdown()
-  ];
 }

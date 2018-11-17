@@ -3,14 +3,14 @@ import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
 
 
-export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.DocsData) {
-  await Promise.all(docs.components.map(async (cmpData) => {
+export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
+  await Promise.all(docs.components.map(async cmpData => {
     await generateReadme(config, compilerCtx, readmeOutputs, cmpData);
   }));
 }
 
 
-async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], cmpData: d.DocsDataComponent) {
+async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], cmpData: d.JsonDocsComponent) {
   let existingContent: string = null;
 
   try {
@@ -28,32 +28,32 @@ async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, read
 }
 
 
-async function createReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], cmpData: d.DocsDataComponent) {
+async function createReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent) {
   const content: string[] = [];
 
-  content.push(`# ${cmpData.cmpMeta.tagNameMeta}`);
+  content.push(`# ${docsData.tag}`);
   content.push(``);
   content.push(``);
   content.push(``);
-  addAutoGenerate(cmpData.cmpMeta, content);
+  addAutoGenerate(docsData, content);
 
   const readmeContent = content.join('\n');
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (readmeOutput.dir) {
-      const relPath = config.sys.path.relative(config.srcDir, cmpData.readmePath);
+      const relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
       const absPath = config.sys.path.join(readmeOutput.dir, relPath);
       await compilerCtx.fs.writeFile(absPath, readmeContent);
     }
 
-    await compilerCtx.fs.writeFile(cmpData.readmePath, readmeContent);
+    await compilerCtx.fs.writeFile(docsData.readmePath, readmeContent);
   }));
 
-  config.logger.info(`created readme docs: ${cmpData.cmpMeta.tagNameMeta}`);
+  config.logger.info(`created readme docs: ${docsData.tag}`);
 }
 
 
-async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], cmpData: d.DocsDataComponent, existingContent: string) {
+async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], cmpData: d.JsonDocsComponent, existingContent: string) {
   if (typeof existingContent !== 'string' || existingContent.trim() === '') {
     throw new Error('missing existing content');
   }
@@ -76,14 +76,14 @@ async function updateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readme
     return true;
   }
 
-  addAutoGenerate(cmpData.moduleFile.cmpMeta, content);
+  addAutoGenerate(cmpData, content);
 
   const updatedContent = content.join('\n');
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (updatedContent.trim() !== existingContent.trim()) {
       await compilerCtx.fs.writeFile(cmpData.readmePath, updatedContent);
-      config.logger.info(`updated readme docs: ${cmpData.cmpMeta.tagNameMeta}`);
+      config.logger.info(`updated readme docs: ${cmpData.tag}`);
     }
 
     if (readmeOutput.dir) {
