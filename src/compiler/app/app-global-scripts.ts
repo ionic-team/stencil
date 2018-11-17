@@ -157,7 +157,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     jsContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, jsContent, sourceTarget, false);
   }
 
-  return `\n(function(Context, resourcesUrl){${jsContent}\n})(Context,resourcesUrl);\n`;
+  return `\n(function(Context, resourcesUrl){${jsContent}\n})(x,r);\n`;
 }
 
 
