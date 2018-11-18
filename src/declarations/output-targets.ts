@@ -196,7 +196,7 @@ export interface OutputTargetDocsApi extends OutputTargetBase {
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
-  generator: (docs: JsonDocs) => void;
+  generator: (docs: JsonDocs) => void | Promise<void>;
   strict?: boolean;
 }
 
