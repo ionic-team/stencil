@@ -11,13 +11,15 @@ export function _deprecatedDocsConfig(config: d.Config) {
 
   let jsonFile: string = null;
 
-  (config.outputTargets as any).forEach((outputTarget: any) => {
+
+  config.outputTargets = config.outputTargets.filter((outputTarget: any) => {
     if (outputTarget.type === 'docs') {
 
       if (typeof outputTarget.jsonFile === 'string') {
         jsonFile = outputTarget.jsonFile;
         delete outputTarget.jsonFile;
         config.logger.warn(`Stencil config docs outputTarget using the "jsonFile" property has been refactored as a new outputTarget type "docs-json". Please see the stencil docs for more information.`);
+        return false;
       }
 
       if (typeof outputTarget.readmeDir === 'string') {
@@ -26,6 +28,7 @@ export function _deprecatedDocsConfig(config: d.Config) {
         config.logger.warn(`Stencil config docs outputTarget using the "readmeDir" property has been rename to "dir". Please see the stencil docs for more information.`);
       }
     }
+    return true;
   });
 
   if (typeof jsonFile === 'string' && jsonFile) {

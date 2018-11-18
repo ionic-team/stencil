@@ -52,7 +52,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 
 
 export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
+  if (!config.buildDocs) {
     return;
   }
   const docsOutputTargets = config.outputTargets.filter(o => {

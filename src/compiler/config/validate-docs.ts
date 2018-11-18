@@ -7,15 +7,15 @@ export function validateDocs(config: d.Config) {
   _deprecatedDocsConfig(config);
   config.outputTargets = config.outputTargets || [];
 
+  let buildDocs = !config.devMode;
+
   // api docs flag
   if (typeof config.flags.docsApi === 'string') {
-    if (!config.outputTargets.some(o => o.type === 'docs-api')) {
-      // didn't provide a docs config, so let's add one
-      config.outputTargets.push({
-        type: 'docs-api',
-        file: config.flags.docsApi
-     });
-    }
+    buildDocs = true;
+    config.outputTargets.push({
+      type: 'docs-api',
+      file: config.flags.docsApi
+    });
   }
   const apiDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-api') as d.OutputTargetDocsApi[];
   apiDocsOutputs.forEach(apiDocsOutput => {
@@ -24,13 +24,11 @@ export function validateDocs(config: d.Config) {
 
   // json docs flag
   if (typeof config.flags.docsJson === 'string') {
-    if (!config.outputTargets.some(o => o.type === 'docs-json')) {
-      // didn't provide a docs config, so let's add one
-      config.outputTargets.push({
-        type: 'docs-json',
-        file: config.flags.docsJson
-      });
-    }
+    buildDocs = true;
+    config.outputTargets.push({
+      type: 'docs-json',
+      file: config.flags.docsJson
+    });
   }
   const jsonDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
   jsonDocsOutputs.forEach(jsonDocsOutput => {
@@ -39,6 +37,7 @@ export function validateDocs(config: d.Config) {
 
   // readme docs flag
   if (config.flags.docs) {
+    buildDocs = true;
     if (!config.outputTargets.some(o => o.type === 'docs')) {
       // didn't provide a docs config, so let's add one
       config.outputTargets.push({ type: 'docs' });
@@ -49,6 +48,8 @@ export function validateDocs(config: d.Config) {
   readmeDocsOutputs.forEach(readmeDocsOutput => {
     validateReadmeOutputTarget(config, readmeDocsOutput);
   });
+
+  config.buildDocs = buildDocs;
 }
 
 
