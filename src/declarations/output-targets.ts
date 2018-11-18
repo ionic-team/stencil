@@ -180,7 +180,7 @@ export interface OutputTargetDocsReadme extends OutputTargetBase {
 export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
-  file?: string;
+  file: string;
   strict?: boolean;
 }
 
@@ -188,7 +188,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 export interface OutputTargetDocsApi extends OutputTargetBase {
   type: 'docs-api';
 
-  file?: string;
+  file: string;
   strict?: boolean;
 }
 

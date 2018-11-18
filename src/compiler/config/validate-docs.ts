@@ -5,109 +5,80 @@ import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 
 export function validateDocs(config: d.Config) {
   _deprecatedDocsConfig(config);
+  config.outputTargets = config.outputTargets || [];
 
+  // api docs flag
   if (typeof config.flags.docsApi === 'string') {
-    // api docs flag
-    config.outputTargets = config.outputTargets || [];
-
-    if (!(config.outputTargets as d.OutputTargetDocsApi[]).some(o => o.type === 'docs-api')) {
+    if (!config.outputTargets.some(o => o.type === 'docs-api')) {
       // didn't provide a docs config, so let's add one
-      const outputTarget: d.OutputTargetDocsApi = {
-        type: 'docs-api'
-      };
-      config.outputTargets.push(outputTarget);
+      config.outputTargets.push({
+        type: 'docs-api',
+        file: config.flags.docsApi
+     });
     }
-
-    const apiDocsOutputs = (config.outputTargets as d.OutputTargetDocsApi[]).filter(o => o.type === 'docs-api');
-    apiDocsOutputs.forEach(apiDocsOutput => {
-      validateApiDocsOutputTarget(config, apiDocsOutput);
-    });
-
-  } else if (config.outputTargets) {
-    // remove api docs if there is no flag
-    config.outputTargets = (config.outputTargets as d.OutputTargetDocsApi[]).filter(o => o.type !== 'docs-api');
   }
+  const apiDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-api') as d.OutputTargetDocsApi[];
+  apiDocsOutputs.forEach(apiDocsOutput => {
+    validateApiDocsOutputTarget(config, apiDocsOutput);
+  });
 
+  // json docs flag
   if (typeof config.flags.docsJson === 'string') {
-    // json docs flag
-    config.outputTargets = config.outputTargets || [];
-
-    if (!(config.outputTargets as d.OutputTargetDocsJson[]).some(o => o.type === 'docs-json')) {
+    if (!config.outputTargets.some(o => o.type === 'docs-json')) {
       // didn't provide a docs config, so let's add one
-      const outputTarget: d.OutputTargetDocsJson = {
-        type: 'docs-json'
-      };
-      config.outputTargets.push(outputTarget);
+      config.outputTargets.push({
+        type: 'docs-json',
+        file: config.flags.docsJson
+      });
     }
-
-    const jsonDocsOutputs = (config.outputTargets as d.OutputTargetDocsJson[]).filter(o => o.type === 'docs-json');
-    jsonDocsOutputs.forEach(jsonDocsOutput => {
-      validateJsonDocsOutputTarget(config, jsonDocsOutput);
-    });
-
-  } else if (config.outputTargets) {
-    // remove json docs if there is no flag
-    config.outputTargets = (config.outputTargets as d.OutputTargetDocsJson[]).filter(o => o.type !== 'docs-json');
   }
+  const jsonDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+  jsonDocsOutputs.forEach(jsonDocsOutput => {
+    validateJsonDocsOutputTarget(config, jsonDocsOutput);
+  });
 
+  // readme docs flag
   if (config.flags.docs) {
-    // readme docs flag
-    config.outputTargets = config.outputTargets || [];
-
-    if (!(config.outputTargets as d.OutputTargetDocsReadme[]).some(o => o.type === 'docs')) {
+    if (!config.outputTargets.some(o => o.type === 'docs')) {
       // didn't provide a docs config, so let's add one
-      const outputTarget: d.OutputTargetDocsReadme = {
-        type: 'docs'
-      };
-      config.outputTargets.push(outputTarget);
+      config.outputTargets.push({ type: 'docs' });
     }
-
-    const readmeDocsOutputs = (config.outputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type === 'docs');
-    readmeDocsOutputs.forEach(readmeDocsOutput => {
-      validateReadmeOutputTarget(config, readmeDocsOutput);
-    });
-
-  } else if (config.outputTargets) {
-    // remove json docs if there is no flag
-    config.outputTargets = (config.outputTargets as d.OutputTargetDocsReadme[]).filter(o => o.type !== 'docs');
   }
+
+  const readmeDocsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
+  readmeDocsOutputs.forEach(readmeDocsOutput => {
+    validateReadmeOutputTarget(config, readmeDocsOutput);
+  });
 }
 
 
 function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsReadme) {
-  if (config.flags.docs && typeof outputTarget.dir !== 'string') {
+  if (typeof outputTarget.dir !== 'string') {
     outputTarget.dir = config.srcDir;
   }
 
-  if (typeof outputTarget.dir === 'string' && !config.sys.path.isAbsolute(outputTarget.dir)) {
+  if (!config.sys.path.isAbsolute(outputTarget.dir)) {
     outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
   }
-
   outputTarget.strict = !!outputTarget.strict;
 }
 
 
 function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsJson) {
-  if (typeof config.flags.docsJson === 'string' && typeof outputTarget.file !== 'string') {
-    outputTarget.file = config.flags.docsJson;
+  if (typeof outputTarget.file !== 'string') {
+    throw new Error(`docs-json outputTarget missing the "file" option`);
   }
 
-  if (typeof outputTarget.file === 'string') {
-    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
-  }
-
+  outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
   outputTarget.strict = !!outputTarget.strict;
 }
 
 
 function validateApiDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsApi) {
-  if (typeof config.flags.docsApi === 'string' && typeof outputTarget.file !== 'string') {
-    outputTarget.file = config.flags.docsApi;
+  if (typeof outputTarget.file !== 'string') {
+    throw new Error(`docs-api outputTarget missing the "file" option`);
   }
 
-  if (typeof outputTarget.file === 'string') {
-    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
-  }
-
+  outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
   outputTarget.strict = !!outputTarget.strict;
 }
