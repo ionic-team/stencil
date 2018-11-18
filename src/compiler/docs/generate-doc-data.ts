@@ -162,11 +162,9 @@ function getAttrName(memberMeta: d.MemberMeta) {
 }
 
 async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: string) {
-  const userContent: string[] = [];
-
   try {
+    const userContent: string[] = [];
     const existingContent = await compilerCtx.fs.readFile(readmePath);
-
     const existingLines = existingContent.split('\n');
 
     for (let i = 0; i < existingLines.length; i++) {
@@ -175,10 +173,10 @@ async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: stri
       }
       userContent.push(existingLines[i]);
     }
+    return userContent.join('\n');
 
   } catch (e) {}
-
-  return userContent.join('\n').trim();
+  return undefined;
 }
 
 
