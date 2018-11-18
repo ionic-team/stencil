@@ -9,6 +9,9 @@ import * as v from './validate-package-json';
 
 
 export async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
+  if (config.devMode) {
+    return;
+  }
   await Promise.all([
     generateAngularProxies(config, compilerCtx, cmpRegistry)
   ]);

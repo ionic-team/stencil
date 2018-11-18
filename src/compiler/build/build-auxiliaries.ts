@@ -6,7 +6,7 @@ import { prerenderOutputTargets } from '../prerender/prerender-app';
 
 
 export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
-  if (config.devMode || buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
     return;
   }
 
