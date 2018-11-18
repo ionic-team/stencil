@@ -45,4 +45,4 @@ export function validateOutputTargets(config: d.Config) {
 }
 
 
-const VALID_TYPES = ['angular', 'dist', 'docs', 'docs-json', 'stats', 'www'];
+const VALID_TYPES = ['angular', 'dist', 'docs', 'docs-json', 'docs-api', 'stats', 'www'];

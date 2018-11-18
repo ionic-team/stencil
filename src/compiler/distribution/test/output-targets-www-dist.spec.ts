@@ -34,8 +34,7 @@ describe('outputTargets', () => {
       },
       {
         type: 'docs',
-        format: 'readme'
-      } as d.OutputTargetDocs
+      } as d.OutputTargetDocsReadme
     ];
 
     c = new TestingCompiler(config);

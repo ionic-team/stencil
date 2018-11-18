@@ -177,10 +177,6 @@ export function getPlatform(jsDoc: d.JsDoc) {
   return tag.text || 'all';
 }
 
-export function isMemberInternal(jsDoc: d.JsDoc) {
-  return jsDoc && jsDoc.tags && jsDoc.tags.find(p => p.name === 'internal');
-}
-
 export function getMemberType(jsDoc: d.JsDoc) {
   if (jsDoc && typeof jsDoc.type === 'string') {
     return jsDoc.type.trim();

@@ -145,6 +145,7 @@ export interface StencilConfig {
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
+  buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
   flags?: ConfigFlags;
