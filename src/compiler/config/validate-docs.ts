@@ -43,10 +43,15 @@ export function validateDocs(config: d.Config) {
       config.outputTargets.push({ type: 'docs' });
     }
   }
-
   const readmeDocsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
   readmeDocsOutputs.forEach(readmeDocsOutput => {
     validateReadmeOutputTarget(config, readmeDocsOutput);
+  });
+
+  // custom docs
+  const customDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
+  customDocsOutputs.forEach(jsonDocsOutput => {
+    validateCustomDocsOutputTarget(jsonDocsOutput);
   });
 
   config.buildDocs = buildDocs;
@@ -81,5 +86,14 @@ function validateApiDocsOutputTarget(config: d.Config, outputTarget: d.OutputTar
   }
 
   outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
+  outputTarget.strict = !!outputTarget.strict;
+}
+
+
+function validateCustomDocsOutputTarget(outputTarget: d.OutputTargetDocsCustom) {
+  if (typeof outputTarget.generator !== 'function') {
+    throw new Error(`docs-custom outputTarget missing the "generator" function`);
+  }
+
   outputTarget.strict = !!outputTarget.strict;
 }
