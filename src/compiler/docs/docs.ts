@@ -7,8 +7,9 @@ import { generateDocData } from './generate-doc-data';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
 import { getCompilerCtx } from '../build/compiler-ctx';
-import { transpileApp } from '../transpile/transpile-app';
 import { strickCheckDocs } from './strict-check';
+import { transpileApp } from '../transpile/transpile-app';
+
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   compilerCtx = getCompilerCtx(config, compilerCtx);
