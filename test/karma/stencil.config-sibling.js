@@ -9,5 +9,6 @@ exports.config = {
       empty: false
     }
   ],
-  excludeSrc: []
+  excludeSrc: [],
+  globalScript: 'test-sibling/global.ts'
 };
