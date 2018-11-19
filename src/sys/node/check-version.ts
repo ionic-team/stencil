@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { lt } from 'semver';
 import { request } from 'https';
 
 
@@ -41,7 +40,7 @@ export async function validateCompilerVersion(config: d.Config, latestVersionPro
 
   const currentVersion = config.sys.compiler.version;
 
-  if (lt(currentVersion, latestVersion)) {
+  if (config.sys.semver.lt(currentVersion, latestVersion)) {
     printUpdateMessage(config.logger, currentVersion, latestVersion);
   }
 }

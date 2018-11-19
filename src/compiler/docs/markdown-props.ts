@@ -1,88 +1,38 @@
 import * as d from '../../declarations';
-import { MarkdownTable, getMemberDocumentation } from './docs-util';
-import { PROP_TYPE } from '../../util/constants';
+import { MarkdownTable } from './docs-util';
 
-
-export class MarkdownProps {
-  private rows: PropRow[] = [];
-
-  addRow(propName: string, memberMeta: d.MemberMeta) {
-    this.rows.push(new PropRow(propName, memberMeta));
-  }
-
-  toMarkdown() {
-    const content: string[] = [];
-    let rows = this.rows.filter(filterRow);
-    if (rows.length === 0) {
-      return content;
-    }
-
-    content.push(`## Properties`);
-    content.push(``);
-
-    rows = rows.sort((a, b) => {
-      if (a.propName < b.propName) return -1;
-      if (a.propName > b.propName) return 1;
-      return 0;
-    });
-
-    const table = new MarkdownTable();
-
-    table.addHeader([
-      'Property',
-      'Attribute',
-      'Description',
-      'Type'
-    ]);
-
-    rows.forEach(row => {
-      table.addRow([
-        row.propName,
-        row.attrName,
-        row.description,
-        row.type
-      ]);
-    });
-
-    content.push(...table.toMarkdown());
-    content.push(``);
-    content.push(``);
-
-
+export function propsToMarkdown(props: d.JsonDocsProp[]) {
+  const content: string[] = [];
+  if (props.length === 0) {
     return content;
   }
-}
 
+  content.push(`## Properties`);
+  content.push(``);
 
-export class PropRow {
+  const table = new MarkdownTable();
 
-  constructor(public memberName: string, private memberMeta: d.MemberMeta) {}
+  table.addHeader([
+    'Property',
+    'Attribute',
+    'Description',
+    'Type',
+    'Default'
+  ]);
 
-  get propName() {
-    return '`' + this.memberName + '`';
-  }
+  props.forEach(prop => {
+    table.addRow([
+      `\`${prop.name}\``,
+      prop.attr ? `\`${prop.attr}\`` : '--',
+      prop.docs,
+      `\`${prop.type}\``,
+      `\`${prop.default}\``
+    ]);
+  });
 
-  get attrName() {
-    if (this.memberMeta.attribName) {
-      const propType = this.memberMeta.propType;
+  content.push(...table.toMarkdown());
+  content.push(``);
+  content.push(``);
 
-      if (propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Number || propType === PROP_TYPE.String) {
-        return '`' + this.memberMeta.attribName + '`';
-      }
-    }
-    return '--';
-  }
-
-  get description() {
-    return getMemberDocumentation(this.memberMeta.jsdoc);
-  }
-
-  get type() {
-    return `\`${this.memberMeta.jsdoc.type}\``;
-  }
-
-}
-
-function filterRow(row: PropRow) {
-  return row.memberName[0] !== '_' && row.description.indexOf('@internal') < 0;
+  return content;
 }

@@ -19,8 +19,11 @@ export function h(nodeName: any, vnodeData: any) {
   let children: any[] = null;
   let lastSimple = false;
   let simple = false;
+  let i = arguments.length;
+  let vkey: any;
+  let vname: string;
 
-  for (var i = arguments.length; i-- > 2;) {
+  for (; i-- > 2;) {
     stack.push(arguments[i]);
   }
 
@@ -59,9 +62,6 @@ export function h(nodeName: any, vnodeData: any) {
       lastSimple = simple;
     }
   }
-
-  let vkey: any;
-  let vname: string;
 
   if (vnodeData != null) {
     // normalize class / classname attributes
@@ -106,46 +106,8 @@ export function h(nodeName: any, vnodeData: any) {
   } as d.VNode;
 }
 
-function childToVNode(child: d.ChildNode) {
-  return {
-    vtag: child['vtag'],
-    vchildren: child['vchildren'],
-    vtext: child['vtext'],
-    vattrs: child['vattrs'],
-    vkey: child['vkey'],
-    vname: child['vname']
-  };
-}
-
-function VNodeToChild(vnode: d.VNode): d.ChildNode {
-  return {
-    'vtag': vnode.vtag,
-    'vchildren': vnode.vchildren,
-    'vtext': vnode.vtext,
-    'vattrs': vnode.vattrs,
-    'vkey': vnode.vkey,
-    'vname': vnode.vname
-  };
-}
 
 const utils: FunctionalUtilities = {
-  'forEach': (children, cb) => {
-    children.forEach((item, index, array) =>
-      cb(
-        VNodeToChild(item),
-        index,
-        array
-      )
-    );
-  },
-  'map': (children, cb): d.VNode[] => {
-    return children.map((item, index, array) => childToVNode(
-        cb(
-          VNodeToChild(item),
-          index,
-          array
-        )
-      )
-    );
-  }
+  'forEach': (children, cb) => children.forEach(cb),
+  'map': (children, cb) => children.map(cb)
 };

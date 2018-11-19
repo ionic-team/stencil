@@ -117,14 +117,23 @@ export function waitForChanges() {
   const win = window as any;
 
   return new Promise(resolve => {
-    window.requestAnimationFrame(() => {
-      const promises = win['s-apps'].map((appNamespace: string) => {
-        return win[appNamespace].onReady();
-      });
 
-      Promise.all(promises).then(() => {
-        window.requestAnimationFrame(resolve);
-      });
-    });
+    function pageLoaded() {
+      setTimeout(() => {
+        const promises = win['s-apps'].map((appNamespace: string) => {
+          return win[appNamespace].onReady();
+        });
+
+        Promise.all(promises).then(() => {
+          window.requestAnimationFrame(resolve);
+        });
+      }, 32);
+    }
+
+    if (document.readyState === 'complete') {
+      pageLoaded();
+    } else {
+      window.addEventListener("onload", pageLoaded, false);
+    }
   });
 }

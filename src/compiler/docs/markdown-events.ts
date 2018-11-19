@@ -1,69 +1,36 @@
-import { EventMeta } from '../../declarations';
-import { MarkdownTable, getMemberDocumentation, isMemberInternal, getEventDetailType } from './docs-util';
+import * as d from '../../declarations';
+import { MarkdownTable } from './docs-util';
 
 
-export class MarkdownEvents {
-  private rows: Row[] = [];
+export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
 
-  addRow(eventMeta: EventMeta) {
-    this.rows.push(new Row(eventMeta));
-  }
-
-  toMarkdown() {
-    const content: string[] = [];
-    let rows = this.rows.filter(filterRow);
-    if (rows.length === 0) {
-      return content;
-    }
-
-    content.push(`## Events`);
-    content.push(``);
-
-    rows = rows.sort((a, b) => {
-      if (a.eventMeta.eventName < b.eventMeta.eventName) return -1;
-      if (a.eventMeta.eventName > b.eventMeta.eventName) return 1;
-      return 0;
-    });
-
-    const table = new MarkdownTable();
-
-    table.addHeader(['Event', 'Detail', 'Description']);
-
-    rows.forEach(row => {
-      table.addRow([
-        '`' + row.eventName + '`',
-        row.detail,
-        row.description
-      ]);
-    });
-
-    content.push(...table.toMarkdown());
-    content.push(``);
-    content.push(``);
-
+  const content: string[] = [];
+  if (events.length === 0) {
     return content;
   }
-}
 
+  content.push(`## Events`);
+  content.push(``);
 
-class Row {
+  const table = new MarkdownTable();
 
-  constructor(public eventMeta: EventMeta) {}
+  table.addHeader([
+    'Event',
+    'Description',
+    'Detail'
+  ]);
 
-  get eventName() {
-    return this.eventMeta.eventName;
-  }
+  events.forEach(ev => {
+    table.addRow([
+      `\`${ev.event}\``,
+      ev.docs,
+      ev.detail,
+    ]);
+  });
 
-  get detail() {
-    return getEventDetailType(this.eventMeta.eventType);
-  }
+  content.push(...table.toMarkdown());
+  content.push(``);
+  content.push(``);
 
-  get description() {
-    return getMemberDocumentation(this.eventMeta.jsdoc);
-  }
-
-}
-
-function filterRow(row: Row) {
-  return row.eventName[0] !== '_' && !isMemberInternal(row.eventMeta.jsdoc);
+  return content;
 }

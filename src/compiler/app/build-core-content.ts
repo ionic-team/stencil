@@ -9,9 +9,9 @@ export async function buildCoreContent(config: d.Config, compilerCtx: d.Compiler
     return '';
   }
 
-  // Replace all __BUILD_CONDITIONALS__ with the current coreBuild obj
+  // Replace all _BUILD_ with the current coreBuild obj
   const replaceObj = Object.keys(coreBuild).reduce((all, key) => {
-    all[`__BUILD_CONDITIONALS__.${key}`] = coreBuild[key];
+    all[`_BUILD_.${key}`] = coreBuild[key];
     return all;
   }, <{ [key: string]: any}>{});
 
@@ -50,6 +50,12 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
+
+  } else {
+    opts.ecma = 7;
+    opts.output.ecma = 7;
+    opts.compress.ecma = 7;
+    opts.compress.module = true;
   }
 
   opts.compress.toplevel = true;
@@ -187,12 +193,12 @@ const PROD_MINIFY_OPTS: any = {
     if_return: true,
     inline: true,
     join_vars: true,
-    keep_fargs: true,
+    keep_fargs: false,
     keep_fnames: true,
     keep_infinity: true,
     loops: true,
     negate_iife: false,
-    passes: 2,
+    passes: 3,
     properties: true,
     pure_funcs: null,
     pure_getters: false,

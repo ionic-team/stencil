@@ -1,12 +1,12 @@
 import * as d from '../declarations';
-import { createReadStream } from 'fs';
+import fs from 'graceful-fs';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
 
 function getMismatchedPixels(pixelMatchInput: d.PixelMatchInput) {
-  const imgA = createReadStream(pixelMatchInput.imageAPath).pipe(new PNG()).on('parsed', doneReading);
-  const imgB = createReadStream(pixelMatchInput.imageBPath).pipe(new PNG()).on('parsed', doneReading);
+  const imgA = fs.createReadStream(pixelMatchInput.imageAPath).pipe(new PNG()).on('parsed', doneReading);
+  const imgB = fs.createReadStream(pixelMatchInput.imageBPath).pipe(new PNG()).on('parsed', doneReading);
 
   let filesRead = 0;
 

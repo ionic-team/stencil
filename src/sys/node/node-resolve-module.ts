@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'path';
 import { normalizePath } from '../../compiler/util';
 
 

@@ -5,33 +5,40 @@ import { toLowerCase } from '../../util/helpers';
 import { updateAttribute } from './update-attribute';
 
 
-export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) {
+export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) => {
   if (memberName === 'class' && !isSvg) {
     // Class
-    if (oldValue !== newValue) {
-      const oldList = parseClassList(oldValue);
-      const newList = parseClassList(newValue);
+    if (_BUILD_.updatable) {
+      if (oldValue !== newValue) {
+        const oldList = parseClassList(oldValue);
+        const newList = parseClassList(newValue);
 
-      // remove classes in oldList, not included in newList
-      const toRemove = oldList.filter(item => !newList.includes(item));
-      const classList = parseClassList(elm.className)
-        .filter(item => !toRemove.includes(item));
+        // remove classes in oldList, not included in newList
+        const toRemove = oldList.filter(item => !newList.includes(item));
+        const classList = parseClassList(elm.className)
+          .filter(item => !toRemove.includes(item));
 
-      // add classes from newValue that are not in oldList or classList
-      const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
-      classList.push(...toAdd);
+        // add classes from newValue that are not in oldList or classList
+        const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
+        classList.push(...toAdd);
 
-      elm.className = classList.join(' ');
+        elm.className = classList.join(' ');
+      }
+
+    } else {
+      elm.className = newValue;
     }
 
   } else if (memberName === 'style') {
     // update style attribute, css properties and values
-    for (const prop in oldValue) {
-      if (!newValue || newValue[prop] == null) {
-        if (/-/.test(prop)) {
-          elm.style.removeProperty(prop);
-        } else {
-          (elm as any).style[prop] = '';
+    if (_BUILD_.updatable) {
+      for (const prop in oldValue) {
+        if (!newValue || newValue[prop] == null) {
+          if (/-/.test(prop)) {
+            elm.style.removeProperty(prop);
+          } else {
+            (elm as any).style[prop] = '';
+          }
         }
       }
     }
@@ -74,27 +81,27 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
         plt.domApi.$addEventListener(elm, memberName, newValue);
       }
 
-    } else {
+    } else if (_BUILD_.updatable) {
       // remove listener
       plt.domApi.$removeEventListener(elm, memberName);
     }
 
   } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
     (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
-    || (!__BUILD_CONDITIONALS__.clientSide && elementHasProperty(plt, elm, memberName))) {
+    || (!_BUILD_.clientSide && elementHasProperty(plt, elm, memberName))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
+    if (_BUILD_.hasMembers && cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
       // we know for a fact that this element is a known component
       // and this component has this member name as a property,
       // let's set the known @Prop on this element
       // set it directly as property on the element
       setProperty(elm, memberName, newValue);
 
-      if (__BUILD_CONDITIONALS__.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
+      if (_BUILD_.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
         // we also want to set this data to the attribute
         updateAttribute(
           elm,
@@ -115,6 +122,9 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
     }
 
   } else if (newValue != null && memberName !== 'key') {
+    if (_BUILD_.isDev && memberName === 'htmlfor') {
+      console.error(`Attribute "htmlfor" set on ${elm.tagName.toLowerCase()}, with the lower case "f" must be replaced with a "htmlFor" (capital "F")`);
+    }
     // Element Attributes
     updateAttribute(elm, memberName, newValue);
 
@@ -122,19 +132,19 @@ export function setAccessor(plt: d.PlatformApi, elm: HTMLElement, memberName: st
     // remove svg attribute
     plt.domApi.$removeAttribute(elm, memberName);
   }
-}
+};
 
 
-function parseClassList(value: string | undefined | null): string[] {
-  return (value == null || value === '') ? [] : value.trim().split(/\s+/);
-}
+const parseClassList = (value: string | undefined | null): string[] =>
+  (value == null || value === '') ? [] : value.trim().split(/\s+/);
+
 
 /**
  * Attempt to set a DOM property to the given value.
  * IE & FF throw for certain property-value combinations.
  */
-function setProperty(elm: any, name: string, value: any) {
+const setProperty = (elm: any, name: string, value: any) => {
   try {
     elm[name] = value;
   } catch (e) { }
-}
+};

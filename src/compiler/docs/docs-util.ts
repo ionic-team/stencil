@@ -161,7 +161,7 @@ export function getEventDetailType(eventType: d.AttributeTypeInfo) {
   if (eventType && eventType.text && typeof eventType.text === 'string' && eventType.text !== 'void') {
     return eventType.text.trim();
   }
-  return '';
+  return 'void';
 }
 
 
@@ -175,10 +175,6 @@ export function getMemberDocumentation(jsDoc: d.JsDoc) {
 export function getPlatform(jsDoc: d.JsDoc) {
   const tag = jsDoc.tags.find(t => t.name === 'platform');
   return tag.text || 'all';
-}
-
-export function isMemberInternal(jsDoc: d.JsDoc) {
-  return jsDoc && jsDoc.tags && jsDoc.tags.find(p => p.name === 'internal');
 }
 
 export function getMemberType(jsDoc: d.JsDoc) {

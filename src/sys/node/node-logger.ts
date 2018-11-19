@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import color from 'ansi-colors';
-import * as fs from 'fs';
+import fs from 'graceful-fs';
 
 
 export class NodeLogger implements d.Logger {

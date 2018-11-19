@@ -95,6 +95,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           jsnext: true,
           main: true
         }),
+        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
@@ -156,7 +157,7 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     jsContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, jsContent, sourceTarget, false);
   }
 
-  return `\n(function(resourcesUrl){${jsContent}\n})(resourcesUrl);\n`;
+  return `\n(function(Context, resourcesUrl){${jsContent}\n})(x,r);\n`;
 }
 
 
@@ -176,7 +177,7 @@ export function generateGlobalJs(config: Config, globalJsContents: string) {
 export function generateGlobalEsm(config: Config, globalJsContents: string) {
   const output = [
     generatePreamble(config) + '\n',
-    `export default function appGlobal(namespace, Context, window, document, resourcesUrl, hydratedCssClass) {`,
+    `export default function appGlobal(n, x, w, d, r, h) {`,
     globalJsContents,
     `\n}`
   ].join('');

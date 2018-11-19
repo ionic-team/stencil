@@ -7,7 +7,7 @@ export interface PlatformApi {
   customStyle?: any;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi: d.DomApi;
-  emitEvent: (elm: Element, eventName: string, data: d.EventEmitterData) => CustomEvent;
+  emitEvent?: (elm: Element, eventName: string, data: d.EventEmitterData) => CustomEvent;
   getComponentMeta: (elm: Element) => d.ComponentMeta;
   getContextItem: (contextKey: string) => any;
   isClient?: boolean;
@@ -18,7 +18,7 @@ export interface PlatformApi {
   onAppLoad?: (rootElm: d.HostElement, failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
-  propConnect: (ctrlTag: string) => PropConnect;
+  propConnect?: (ctrlTag: string) => PropConnect;
   queue: d.QueueApi;
   render?: d.RendererApi;
   tmpDisconnected: boolean;

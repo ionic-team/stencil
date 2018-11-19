@@ -5,7 +5,7 @@ import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(
+export const initComponentInstance = (
   plt: d.PlatformApi,
   elm: d.HostElement,
   hostSnapshot: d.HostSnapshot,
@@ -14,10 +14,10 @@ export function initComponentInstance(
   componentConstructor?: d.ComponentConstructor,
   queuedEvents?: any[],
   i?: number
-) {
+) => {
   try {
 
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
       perf.mark(`init_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -32,13 +32,13 @@ export function initComponentInstance(
     // and let the getters/setters do their jobs
     proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot, perf);
 
-    if (__BUILD_CONDITIONALS__.event) {
+    if (_BUILD_.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
       initEventEmitters(plt, componentConstructor.events, instance);
     }
 
-    if (__BUILD_CONDITIONALS__.listener) {
+    if (_BUILD_.listener) {
       try {
         // replay any event listeners on the instance that
         // were queued up between the time the element was
@@ -73,7 +73,7 @@ export function initComponentInstance(
 
   plt.instanceMap.set(elm, instance);
 
-  if (__BUILD_CONDITIONALS__.profile) {
+  if (_BUILD_.profile) {
     perf.mark(`init_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     perf.measure(`init_instance:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
@@ -82,9 +82,9 @@ export function initComponentInstance(
 }
 
 
-export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any {
+export const initComponentLoaded = (plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any => {
 
-  if (__BUILD_CONDITIONALS__.polyfills && !allChildrenHaveConnected(plt, elm)) {
+  if (_BUILD_.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
     // since the polyfill uses MutationObserver which causes the
     // connectedCallbacks to fire async, which isn't ideal for the code below
@@ -106,7 +106,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     plt.isCmpReady.set(elm, true);
 
     if (!(hasCmpLoaded = plt.isCmpLoaded.has(elm))) {
-      if (__BUILD_CONDITIONALS__.profile) {
+      if (_BUILD_.profile) {
         perf.mark(`init_loaded_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       }
 
@@ -133,35 +133,35 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
         plt.onReadyCallbacksMap.delete(elm);
       }
 
-      if (__BUILD_CONDITIONALS__.cmpDidLoad && !hasCmpLoaded && instance.componentDidLoad) {
+      if (_BUILD_.cmpDidLoad && !hasCmpLoaded && instance.componentDidLoad) {
         // we've never loaded this component
         // fire off the user's componentDidLoad method (if one was provided)
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called
         // and all the child componenets have finished loading
-        if (__BUILD_CONDITIONALS__.profile) {
+        if (_BUILD_.profile) {
           perf.mark(`componentDidLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
 
         instance.componentDidLoad();
 
-        if (__BUILD_CONDITIONALS__.profile) {
+        if (_BUILD_.profile) {
           perf.mark(`componentDidLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           perf.measure(`componentDidLoad:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
 
-      } else if (__BUILD_CONDITIONALS__.cmpDidUpdate && hasCmpLoaded && instance.componentDidUpdate) {
+      } else if (_BUILD_.cmpDidUpdate && hasCmpLoaded && instance.componentDidUpdate) {
         // we've already loaded this component
         // fire off the user's componentDidUpdate method (if one was provided)
         // componentDidUpdate runs AFTER render() has been called
         // and all child components have finished updating
-        if (__BUILD_CONDITIONALS__.profile) {
+        if (_BUILD_.profile) {
           perf.mark(`componentDidUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
 
         instance.componentDidUpdate();
 
-        if (__BUILD_CONDITIONALS__.profile) {
+        if (_BUILD_.profile) {
           perf.mark(`componentDidUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           perf.measure(`componentDidUpdate:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         }
@@ -171,7 +171,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);
     }
 
-    if (__BUILD_CONDITIONALS__.profile && !hasCmpLoaded) {
+    if (_BUILD_.profile && !hasCmpLoaded) {
       perf.mark(`init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       perf.measure(`init_loaded:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       perf.measure(`loaded:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
@@ -185,10 +185,10 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
     // the deepest elements load first then bubbles up
     propagateComponentReady(plt, elm);
   }
-}
+};
 
 
-function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
+const allChildrenHaveConnected = (plt: d.PlatformApi, elm: d.HostElement) => {
   // Note: in IE11 <svg> does not have the "children" property
   for (let i = 0; i < elm.childNodes.length; i++) {
     const child = elm.childNodes[i] as d.HostElement;
@@ -206,10 +206,10 @@ function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
   }
   // everything has connected, we're good
   return true;
-}
+};
 
 
-export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) {
+export const propagateComponentReady = (plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) => {
 
   // we're no longer processing this component
   plt.processingCmp.delete(elm);
@@ -249,4 +249,4 @@ export function propagateComponentReady(plt: d.PlatformApi, elm: d.HostElement, 
       cb();
     }
   }
-}
+};

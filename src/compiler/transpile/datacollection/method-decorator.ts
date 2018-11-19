@@ -52,6 +52,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
         attribType: {
           text: typeString,
           optional: false,
+          required: false,
           typeReferences: {
             ...methodReturnTypes,
             ...getAttributeTypeInfo(member, sourceFile)

@@ -8,13 +8,13 @@ import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
 
 
-export function initHostElement(
+export const initHostElement = (
   plt: d.PlatformApi,
   cmpMeta: d.ComponentMeta,
   HostElementConstructor: d.HostElement,
   hydratedCssClass: string,
   perf: Performance
-) {
+) => {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
   // note: these cannot be arrow functions cuz "this" is important here hombre
@@ -37,15 +37,15 @@ export function initHostElement(
     queueUpdate(plt, this, perf);
   };
 
-  if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
+  if (_BUILD_.hotModuleReplacement) {
     HostElementConstructor['s-hmr'] = function(hmrVersionId) {
       hmrStart(plt, cmpMeta, (this as d.HostElement), hmrVersionId);
     };
   }
 
-  if (cmpMeta.membersMeta) {
+  if (_BUILD_.hasMembers && cmpMeta.membersMeta) {
     const entries = Object.entries(cmpMeta.membersMeta);
-    if (__BUILD_CONDITIONALS__.observeAttr) {
+    if (_BUILD_.observeAttr) {
       let attrToProp: any = {};
       entries.forEach(([propName, {attribName}]) => {
         if (attribName) {
@@ -65,4 +65,4 @@ export function initHostElement(
     // should create the public API to this component
     proxyHostElementPrototype(plt, entries, HostElementConstructor, perf);
   }
-}
+};

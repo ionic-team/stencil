@@ -9,9 +9,9 @@ import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From
 import ts from 'typescript';
 
 
-export async function upgradeCollection(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {
+export async function upgradeCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {
   try {
-    const upgradeTransforms = validateCollectionCompatibility(collection);
+    const upgradeTransforms = validateCollectionCompatibility(config, collection);
 
     if (upgradeTransforms.length === 0) {
       return;

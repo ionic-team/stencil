@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
-import { lt } from 'semver';
 
 
 export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -220,7 +219,7 @@ export function parseComponentDataToModuleFile(config: d.Config, collection: d.C
   parseModuleJsFilePath(config, collectionDir, cmpData, moduleFile);
   parseStyles(config, collectionDir, cmpData, cmpMeta);
   parseAssetsDir(config, collectionDir, cmpData, cmpMeta);
-  parseProps(collection, cmpData, cmpMeta);
+  parseProps(config, collection, cmpData, cmpMeta);
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
@@ -459,7 +458,7 @@ function serializeProps(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   });
 }
 
-function parseProps(collection: d.Collection, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
+function parseProps(config: d.Config, collection: d.Collection, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -497,7 +496,7 @@ function parseProps(collection: d.Collection, cmpData: d.ComponentData, cmpMeta:
     } else if (type === ANY_KEY.toLowerCase()) {
       member.propType = PROP_TYPE.Any;
 
-    } else if (!collection.compiler || !collection.compiler.version || lt(collection.compiler.version, '0.0.6-23')) {
+    } else if (!collection.compiler || !collection.compiler.version || config.sys.semver.lt(collection.compiler.version, '0.0.6-23')) {
       // older compilers didn't remember "any" type
       member.propType = PROP_TYPE.Any;
     }

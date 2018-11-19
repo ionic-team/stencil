@@ -1,46 +1,40 @@
-import { PropRow } from '../markdown-props';
-import { PROP_TYPE } from '../../../util/constants';
-import { JsDoc } from '../../../declarations';
+import { propsToMarkdown } from '../markdown-props';
 
 
 describe('markdown props', () => {
 
   it('advanced union types', () => {
-    const row = new PropRow('name', {
-      attribType: {
-        text: `(AlertButton | string)[]`,
-        optional: false
+    const markdown = propsToMarkdown([
+      {
+        name: 'hello',
+        attr: 'hello',
+        docs: 'This is a prop',
+        default: 'false',
+        type: 'boolean | string',
+        mutable: false,
+        optional: false,
+        required: false,
+        reflectToAttr: false
       },
-      jsdoc: {
-        type: '(AlertButton | string)[]'
-      } as JsDoc
-    });
-
-    expect(row.type).toBe('`(AlertButton | string)[]`');
-  });
-
-  it('description', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.String,
-      jsdoc: {
-        documentation: 'Description',
-        tags: [],
-        name: '',
-        type: ''
+      {
+        name: 'hello',
+        attr: undefined,
+        docs: 'This is a prop',
+        default: 'false',
+        type: 'boolean | string',
+        mutable: false,
+        optional: false,
+        required: false,
+        reflectToAttr: false
       }
-    });
+    ]).join('\n');
+    expect(markdown).toEqual(`## Properties
 
-    expect(row.propName).toBe('`name`');
-    expect(row.description).toBe('Description');
+| Property | Attribute | Description    | Type                | Default |
+| -------- | --------- | -------------- | ------------------- | ------- |
+| \`hello\`  | \`hello\`   | This is a prop | \`boolean \\| string\` | \`false\` |
+| \`hello\`  | --        | This is a prop | \`boolean \\| string\` | \`false\` |
+
+`);
   });
-
-  it('no description', () => {
-    const row = new PropRow('name', {
-      propType: PROP_TYPE.String
-    });
-
-    expect(row.propName).toBe('`name`');
-    expect(row.description).toBe('');
-  });
-
 });

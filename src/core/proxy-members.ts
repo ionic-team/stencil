@@ -5,7 +5,7 @@ import { parsePropertyValue } from '../util/data-parse';
 import { queueUpdate } from './update';
 
 
-export function defineMember(
+export const defineMember = (
   plt: d.PlatformApi,
   property: d.ComponentConstructorProperty,
   elm: d.HostElement,
@@ -15,7 +15,7 @@ export function defineMember(
   perf: Performance,
   hostAttributes?: d.HostSnapshotAttributes,
   hostAttrValue?: string
-) {
+) => {
 
   function getComponentProp(this: d.ComponentInstance, values?: any) {
     // component instance prop/state getter
@@ -29,19 +29,19 @@ export function defineMember(
     elm = plt.hostElementMap.get(this);
 
     if (elm) {
-      if (property.state || property.mutable) {
+      if ((_BUILD_.state && property.state) || property.mutable) {
         setValue(plt, elm, memberName, newValue, perf);
 
-      } else if (__BUILD_CONDITIONALS__.verboseError) {
+      } else if (_BUILD_.verboseError) {
         console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
       }
     }
   }
 
-  if (property.type || property.state) {
+  if ((_BUILD_.prop && property.type) || (_BUILD_.state && property.state)) {
     const values = plt.valuesMap.get(elm);
 
-    if (!property.state) {
+    if ((!_BUILD_.state || !property.state) && (_BUILD_.prop)) {
       if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
         // check the prop value from the host element attribute
         if ((hostAttributes = hostSnapshot && hostSnapshot.$attributes) && isDef(hostAttrValue = hostAttributes[property.attr])) {
@@ -51,7 +51,7 @@ export function defineMember(
         }
       }
 
-      if (__BUILD_CONDITIONALS__.clientSide) {
+      if (_BUILD_.clientSide) {
         // client-side
         // within the browser, the element's prototype
         // already has its getter/setter set, but on the
@@ -102,8 +102,10 @@ export function defineMember(
       values[memberName] = (instance as any)[memberName];
     }
 
-    if (property.watchCallbacks) {
-      values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
+    if (_BUILD_.watchCallback) {
+      if (property.watchCallbacks) {
+        values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
+      }
     }
 
     // add getter/setter to the component instance
@@ -115,36 +117,36 @@ export function defineMember(
       setComponentProp
     );
 
-  } else if (__BUILD_CONDITIONALS__.element && property.elementRef) {
+  } else if (_BUILD_.element && property.elementRef) {
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
     definePropertyValue(instance, memberName, elm);
 
-  } else if (__BUILD_CONDITIONALS__.method && property.method) {
+  } else if (_BUILD_.method && property.method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
     definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
-  } else if (__BUILD_CONDITIONALS__.propContext && property.context) {
+  } else if (_BUILD_.propContext && property.context) {
     // @Prop({ context: 'config' })
     const contextObj = plt.getContextItem(property.context);
     if (contextObj !== undefined) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
-  } else if (__BUILD_CONDITIONALS__.propConnect && property.connect) {
+  } else if (_BUILD_.propConnect && property.connect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
     definePropertyValue(instance, memberName, plt.propConnect(property.connect));
   }
-}
+};
 
 
-export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, perf: Performance, instance?: d.ComponentInstance) {
+export const setValue = (plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, perf: Performance, instance?: d.ComponentInstance, values?: any) => {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  let values = plt.valuesMap.get(elm);
+  values = plt.valuesMap.get(elm);
   if (!values) {
     plt.valuesMap.set(elm, values = {});
   }
@@ -163,7 +165,7 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
 
     if (instance) {
       // get an array of method names of watch functions to call
-      if (__BUILD_CONDITIONALS__.watchCallback) {
+      if (_BUILD_.watchCallback) {
         const watchMethods = values[WATCH_CB_PREFIX + memberName];
         if (watchMethods) {
           // this instance is watching for when this property changed
@@ -187,26 +189,26 @@ export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: str
       }
     }
   }
-}
+};
 
 
-export function definePropertyValue(obj: any, propertyKey: string, value: any) {
+export const definePropertyValue = (obj: any, propertyKey: string, value: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
-    'configurable': true,
-    'value': value
+    configurable: true,
+    value
   });
-}
+};
 
 
-export function definePropertyGetterSetter(obj: any, propertyKey: string, get: any, set: any) {
+export const definePropertyGetterSetter = (obj: any, propertyKey: string, get: any, set: any) => {
   // minification shortcut
   Object.defineProperty(obj, propertyKey, {
-    'configurable': true,
-    'get': get,
-    'set': set
+    configurable: true,
+    get,
+    set
   });
-}
+};
 
 
 const WATCH_CB_PREFIX = `wc-`;

@@ -3,19 +3,27 @@ import { MockElement } from './node';
 
 
 export class MockEvent {
-  bubbles: boolean;
-  cancelBubble: boolean;
-  cancelable: boolean;
-  composed: boolean;
-  currentTarget: MockElement;
-  defaultPrevented: boolean;
-  target: MockElement;
+  bubbles = false;
+  cancelBubble = false;
+  cancelable = false;
+  composed = false;
+  currentTarget: MockElement = null;
+  defaultPrevented = false;
+  srcElement: MockElement = null;
+  target: MockElement = null;
   timeStamp: number;
   type: string;
 
-  constructor(type: string) {
+  constructor(type: string, eventInitDict?: any) {
+    if (typeof type !== 'string') {
+      throw new Error(`Event type required`);
+    }
     this.type = type;
     this.timeStamp = Date.now();
+
+    if (eventInitDict != null) {
+      Object.assign(this, eventInitDict);
+    }
   }
 
   preventDefault() {
@@ -34,11 +42,14 @@ export class MockEvent {
 
 
 export class MockCustomEvent extends MockEvent {
-  detail: any;
+  detail: any = null;
 
-  constructor(type: string, detail: any) {
+  constructor(type: string, eventInitDict?: any) {
     super(type);
-    this.detail = detail;
+
+    if (eventInitDict != null) {
+      Object.assign(this, eventInitDict);
+    }
   }
 
 }

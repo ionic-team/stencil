@@ -54,7 +54,7 @@ async function writeEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   jsContent = jsContent.replace('__APP__HYDRATED__CSS__PLACEHOLDER__', config.hydratedCssClass);
 
-  jsContent = generatePreamble(config, { prefix: `${config.namespace}: Core, ${sourceTarget}` }) + '\n' + jsContent;
+  jsContent = generatePreamble(config, { prefix: `${config.namespace}: Core, ${sourceTarget}`, defaultBanner: true }) + '\n' + jsContent;
 
   await compilerCtx.fs.writeFile(coreEsm, jsContent);
 

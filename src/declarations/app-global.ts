@@ -26,6 +26,7 @@ export interface WindowData extends Window {
 
 export interface AppGlobal {
   ael?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
+  asyncQueue?: boolean;
   resourcesUrl?: string;
   componentOnReady?: (elm: d.HostElement, resolve: (elm: d.HostElement) => void) => boolean;
   Context?: any;

@@ -20,9 +20,9 @@ export interface DomApi {
   $getTextContent(node: any): string;
   $setTextContent(node: Node, text: string): void;
   $getAttribute(elm: any, key: string): string;
-  $getMode(elm: any): string;
+  $getMode?(elm: any): string;
   $setAttribute(elm: any, key: string, val: any): void;
-  $setAttributeNS(elm: any, namespaceURI: string, qualifiedName: string, value: string): void;
+  $setAttributeNS?(elm: any, namespaceURI: string, qualifiedName: string, value: string): void;
   $removeAttribute(elm: any, key: string): void;
   $hasAttribute(elm: any, key: string): boolean;
   $elementRef?(elm: any, referenceName: string): any;

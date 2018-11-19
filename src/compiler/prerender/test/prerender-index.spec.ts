@@ -11,7 +11,7 @@ jest.setTimeout(20000);
 describe('prerender index', () => {
 
   beforeEach(() => {
-    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
+    _BUILD_ = getDefaultBuildConditionals();
   });
 
 
@@ -21,9 +21,9 @@ describe('prerender index', () => {
 
   it('should pass properties down in prerendering', async () => {
     config = new TestingConfig();
-    __BUILD_CONDITIONALS__.shadowDom = false;
-    __BUILD_CONDITIONALS__.slotPolyfill = true;
-    __BUILD_CONDITIONALS__.ssrServerSide = true;
+    _BUILD_.shadowDom = false;
+    _BUILD_.slotPolyfill = true;
+    _BUILD_.ssrServerSide = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
 
@@ -72,8 +72,8 @@ describe('prerender index', () => {
 
   it('should prerender w/ defaults', async () => {
     config = new TestingConfig();
-    __BUILD_CONDITIONALS__.shadowDom = false;
-    __BUILD_CONDITIONALS__.slotPolyfill = true;
+    _BUILD_.shadowDom = false;
+    _BUILD_.slotPolyfill = true;
     config.buildAppCore = true;
     config.flags.prerender = true;
     config.outputTargets = [

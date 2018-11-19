@@ -1,4 +1,5 @@
 import * as d from '../declarations';
+import exit from 'exit';
 
 
 export async function taskTest(config: d.Config) {
@@ -38,18 +39,18 @@ export async function taskTest(config: d.Config) {
 
     const testing: d.Testing = new Testing(config);
     if (!testing.isValid) {
-      process.exit(1);
+      exit(1);
     }
 
     const passed = await testing.runTests();
     await testing.destroy();
 
     if (!passed) {
-      process.exit(1);
+      exit(1);
     }
 
   } catch (e) {
     config.logger.error(e);
-    process.exit(1);
+    exit(1);
   }
 }

@@ -4,8 +4,8 @@ import { render } from './render';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
-export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement, perf: Performance) {
-  if (__BUILD_CONDITIONALS__.profile) {
+export const queueUpdate = (plt: d.PlatformApi, elm: d.HostElement, perf: Performance) => {
+  if (_BUILD_.profile) {
     perf.mark(`queue:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
 
@@ -29,11 +29,11 @@ export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement, perf: Perfor
       plt.queue.tick(() => update(plt, elm, perf));
     }
   }
-}
+};
 
 
-export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Performance, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) {
-  if (__BUILD_CONDITIONALS__.isDev) {
+export const update = async (plt: d.PlatformApi, elm: d.HostElement, perf: Performance, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement) => {
+  if (_BUILD_.isDev) {
     perf.mark(`update_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
   }
 
@@ -67,20 +67,20 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
       // https://www.youtube.com/watch?v=olLxrojmvMg
       instance = initComponentInstance(plt, elm, plt.hostSnapshotMap.get(elm), perf);
 
-      if (__BUILD_CONDITIONALS__.cmpWillLoad && instance) {
+      if (_BUILD_.cmpWillLoad && instance) {
         // this is the initial load and the instance was just created
         // fire off the user's componentWillLoad method (if one was provided)
         // componentWillLoad only runs ONCE, after instance's element has been
         // assigned as the host element, but BEFORE render() has been called
         try {
           if (instance.componentWillLoad) {
-            if (__BUILD_CONDITIONALS__.profile) {
+            if (_BUILD_.profile) {
               perf.mark(`componentWillLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
             }
 
             await instance.componentWillLoad();
 
-            if (__BUILD_CONDITIONALS__.profile) {
+            if (_BUILD_.profile) {
               perf.mark(`componentWillLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
               perf.measure(`componentWillLoad:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentWillLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentWillLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
             }
@@ -90,7 +90,7 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
         }
       }
 
-    } else if (__BUILD_CONDITIONALS__.cmpWillUpdate && instance) {
+    } else if (_BUILD_.cmpWillUpdate && instance) {
       // component already initialized, this is an update
       // already created an instance and this is an update
       // fire off the user's componentWillUpdate method (if one was provided)
@@ -99,13 +99,13 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
       // get the returned promise (if one was provided)
       try {
         if (instance.componentWillUpdate) {
-          if (__BUILD_CONDITIONALS__.profile) {
+          if (_BUILD_.profile) {
             perf.mark(`componentWillUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           }
 
           await instance.componentWillUpdate();
 
-          if (__BUILD_CONDITIONALS__.profile) {
+          if (_BUILD_.profile) {
             perf.mark(`componentWillUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
           }
         }
@@ -118,15 +118,15 @@ export async function update(plt: d.PlatformApi, elm: d.HostElement, perf: Perfo
     // it off and generate a vnode for this
     render(plt, plt.getComponentMeta(elm), elm, instance, perf);
 
-    if (__BUILD_CONDITIONALS__.isDev) {
+    if (_BUILD_.isDev) {
       perf.mark(`update_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       perf.measure(`update:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `update_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `update_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
     elm['s-init']();
 
-    if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
+    if (_BUILD_.hotModuleReplacement) {
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
   }
-}
+};

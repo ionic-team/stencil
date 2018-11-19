@@ -29,6 +29,17 @@ export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.Co
 }
 
 
+export function shouldPrerender(config: d.Config) {
+  if (!config.srcIndexHtml) {
+    return false;
+  }
+  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => {
+    return o.type === 'www' && o.indexHtml && o.hydrateComponents && o.prerenderLocations && o.prerenderLocations.length > 0;
+  });
+  return (outputTargets.length > 0);
+}
+
+
 async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[]) {
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path

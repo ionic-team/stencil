@@ -3,8 +3,8 @@ import { initHostSnapshot } from './host-snapshot';
 import { initElementListeners } from './listeners';
 
 
-export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, perf: Performance) {
-  if (__BUILD_CONDITIONALS__.listener) {
+export const connectedCallback = (plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, perf: Performance) => {
+  if (_BUILD_.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
     // have fired even before the instance is ready
@@ -22,13 +22,12 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
   plt.isDisconnectedMap.delete(elm);
 
   if (!plt.hasConnectedMap.has(elm)) {
-    if (!elm['s-id']) {
-      // assign a unique id to this host element
-      // it's possible this was already given an element id
-      elm['s-id'] = plt.nextId();
-    }
-
-    if (__BUILD_CONDITIONALS__.profile) {
+    if (_BUILD_.profile) {
+      if (!elm['s-id']) {
+        // assign a unique id to this host element
+        // it's possible this was already given an element id
+        elm['s-id'] = plt.nextId();
+      }
       perf.mark(`connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
     }
 
@@ -52,7 +51,7 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       // if it's already loaded then the callback will be synchronous
       plt.hostSnapshotMap.set(elm, initHostSnapshot(plt.domApi, cmpMeta, elm));
 
-      if (__BUILD_CONDITIONALS__.profile) {
+      if (_BUILD_.profile) {
         perf.mark(`connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
         perf.measure(`connected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       }
@@ -60,10 +59,10 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
       plt.requestBundle(cmpMeta, elm);
     });
   }
-}
+};
 
 
-export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) {
+export const registerWithParentComponent = (plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) => {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   ancestorHostElement = elm;
@@ -86,4 +85,4 @@ export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostEleme
       break;
     }
   }
-}
+};

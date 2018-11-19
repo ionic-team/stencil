@@ -2,6 +2,13 @@ import { Component, Method, OtherThing } from '../../../../../index';
 
 type Color = 'primary' | 'secondary';
 
+export interface Config {
+  duration: number;
+  timeout: number;
+}
+
+export type ConfigProps = keyof Config;
+
 /**
  * This is an actionSheet class
  */
@@ -36,5 +43,11 @@ class ActionSheet {
 
   @Prop() enabled?: boolean | string;
 
-  @Prop() color?: Color;
+  @Prop() color?: Color = "primary";
+
+  @Prop() config?: ConfigProps;
+
+  @Prop() mode!: string;
+
+  @Prop() required!: string;
 }

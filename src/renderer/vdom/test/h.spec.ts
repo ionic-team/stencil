@@ -408,9 +408,11 @@ describe('h()', () => {
         });
         return h('article', null);
       };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
+      h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
       expect(output).toEqual([
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             id: 'blue',
           },
@@ -432,6 +434,8 @@ describe('h()', () => {
           vtext: undefined,
         },
         {
+          elm: undefined,
+          ishost: false,
           vattrs: null,
           vchildren: null,
           vkey: undefined,
@@ -457,6 +461,8 @@ describe('h()', () => {
       const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'), h('span', null));
       expect(vnode).toEqual([
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             class: 'my-class',
             id: 'blue'
@@ -472,6 +478,8 @@ describe('h()', () => {
           vtext: undefined
         },
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             class: 'my-class'
           },

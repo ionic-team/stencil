@@ -3,29 +3,11 @@ import { KEY_CODE_MAP, NODE_TYPE } from '../util/constants';
 import { toLowerCase } from '../util/helpers';
 
 
-export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
+export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi => {
   // using the $ prefix so that closure is
   // cool with property renaming each of these
 
-  if (!App.ael) {
-    App.ael = (elm, eventName, cb, opts) => elm.addEventListener(eventName, cb, opts);
-    App.rel = (elm, eventName, cb, opts) => elm.removeEventListener(eventName, cb, opts);
-  }
-
   const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
-
-  if (__BUILD_CONDITIONALS__.es5) {
-    if (typeof win.CustomEvent !== 'function') {
-      // CustomEvent polyfill
-      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-        evt = doc.createEvent('CustomEvent');
-        data = data || {};
-        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
-        return evt;
-      };
-      win.CustomEvent.prototype = win.Event.prototype;
-    }
-  }
 
   const domApi: DomApi = {
 
@@ -57,7 +39,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       parentNode.appendChild(childNode),
 
     $addClass: (elm: Element, cssClass: string) => {
-      if (__BUILD_CONDITIONALS__.hasSvg && __BUILD_CONDITIONALS__.es5) {
+      if (_BUILD_.hasSvg && _BUILD_.es5) {
         if (elm.classList) {
           elm.classList.add(cssClass);
 
@@ -104,9 +86,6 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     $setAttribute: (elm: Element, key: string, val: string) =>
       elm.setAttribute(key, val),
 
-    $setAttributeNS: (elm, namespaceURI: string, qualifiedName: string, val: string) =>
-      elm.setAttributeNS(namespaceURI, qualifiedName, val),
-
     $removeAttribute: (elm, key) =>
       elm.removeAttribute(key),
 
@@ -135,14 +114,16 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       return elm;
     },
 
-    $addEventListener: (assignerElm, eventName, listenerCallback, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[]) => {
+    $addEventListener: (assignerElm, eventName, listenerCallback, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[], assignersEventName?: string) => {
       // remember the original name before we possibly change it
-      const assignersEventName = eventName;
       let attachToElm = assignerElm;
+      let eventListener = listenerCallback;
 
       // get the existing unregister listeners for
       // this element from the unregister listeners weakmap
       let assignersUnregListeners = unregisterListenerFns.get(assignerElm);
+
+      assignersEventName = eventName;
 
       if (assignersUnregListeners && assignersUnregListeners[assignersEventName]) {
         // removed any existing listeners for this event for the assigner element
@@ -150,7 +131,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         assignersUnregListeners[assignersEventName]();
       }
 
-      if (typeof attachTo === 'string') {
+      if (_BUILD_.event && typeof attachTo === 'string') {
         // attachTo is a string, and is probably something like
         // "parent", "window", or "document"
         // and the eventName would be like "mouseover" or "mousemove"
@@ -160,7 +141,7 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         // we were passed in an actual element to attach to
         attachToElm = attachTo;
 
-      } else {
+      } else if (_BUILD_.event) {
         // depending on the event name, we could actually be attaching
         // this element to something like the document or window
         splt = eventName.split(':');
@@ -174,59 +155,56 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         }
       }
 
-      if (!attachToElm) {
+      if (attachToElm) {
         // somehow we're referencing an element that doesn't exist
         // let's not continue
-        return;
-      }
 
-      let eventListener = listenerCallback;
+        if (_BUILD_.event) {
+          // test to see if we're looking for an exact keycode
+          splt = eventName.split('.');
 
-      // test to see if we're looking for an exact keycode
-      splt = eventName.split('.');
+          if (splt.length > 1) {
+            // looks like this listener is also looking for a keycode
+            // keyup.enter
+            eventName = splt[0];
 
-      if (splt.length > 1) {
-        // looks like this listener is also looking for a keycode
-        // keyup.enter
-        eventName = splt[0];
-
-        eventListener = (ev: any) => {
-          // wrap the user's event listener with our own check to test
-          // if this keyboard event has the keycode they're looking for
-          if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
-            listenerCallback(ev);
+            eventListener = (ev: any) => {
+              // wrap the user's event listener with our own check to test
+              // if this keyboard event has the keycode they're looking for
+              if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
+                listenerCallback(ev);
+              }
+            };
           }
+        }
+
+        // create the actual event listener options to use
+        // this browser may not support event options
+        eventListenerOpts = domApi.$supportsEventOptions ? {
+          capture: !!useCapture,
+          passive: !!usePassive
+        } : !!useCapture;
+
+        // ok, good to go, let's add the actual listener to the dom element
+        App.ael(attachToElm, eventName, eventListener, eventListenerOpts);
+
+        if (!assignersUnregListeners) {
+          // we don't already have a collection, let's create it
+          unregisterListenerFns.set(assignerElm, assignersUnregListeners = {});
+        }
+
+        // add the unregister listener to this element's collection
+        assignersUnregListeners[assignersEventName] = () => {
+          // looks like it's time to say goodbye
+          attachToElm && App.rel(attachToElm, eventName, eventListener, eventListenerOpts);
+          assignersUnregListeners[assignersEventName] = null;
         };
       }
-
-      // create the actual event listener options to use
-      // this browser may not support event options
-      eventListenerOpts = domApi.$supportsEventOptions ? {
-        capture: !!useCapture,
-        passive: !!usePassive
-      } : !!useCapture;
-
-      // ok, good to go, let's add the actual listener to the dom element
-      App.ael(attachToElm, eventName, eventListener, eventListenerOpts);
-
-      if (!assignersUnregListeners) {
-        // we don't already have a collection, let's create it
-        unregisterListenerFns.set(assignerElm, assignersUnregListeners = {});
-      }
-
-      // add the unregister listener to this element's collection
-      assignersUnregListeners[assignersEventName] = () => {
-        // looks like it's time to say goodbye
-        attachToElm && App.rel(attachToElm, eventName, eventListener, eventListenerOpts);
-        assignersUnregListeners[assignersEventName] = null;
-      };
     },
 
-    $removeEventListener: (elm, eventName) => {
+    $removeEventListener: (elm, eventName, assignersUnregListeners?: any) => {
       // get the unregister listener functions for this element
-      const assignersUnregListeners = unregisterListenerFns.get(elm);
-
-      if (assignersUnregListeners) {
+      if ((assignersUnregListeners = unregisterListenerFns.get(elm))) {
         // this element has unregister listeners
         if (eventName) {
           // passed in one specific event name to remove
@@ -240,9 +218,10 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
         }
       }
     },
-    $dispatchEvent: (elm, eventName, data) => {
+
+    $dispatchEvent: (elm, eventName, data, e?: any) => {
       // create and return the custom event, allows for cancel checks
-      const e = new win.CustomEvent(eventName, data);
+      e = new win.CustomEvent(eventName, data);
       elm && elm.dispatchEvent(e);
       return e;
     },
@@ -254,7 +233,29 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
       ((parentNode = domApi.$parentNode(elm)) && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment) ? parentNode.host : parentNode
   };
 
-  if (__BUILD_CONDITIONALS__.isDev) {
+  if (_BUILD_.hasSvg) {
+    domApi.$setAttributeNS = (elm, namespaceURI: string, qualifiedName: string, val: string) =>
+      elm.setAttributeNS(namespaceURI, qualifiedName, val);
+  }
+
+  if (_BUILD_.shadowDom) {
+    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+  }
+
+  if (_BUILD_.es5) {
+    if (typeof win.CustomEvent !== 'function') {
+      // CustomEvent polyfill
+      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+        evt = doc.createEvent('CustomEvent');
+        data = data || {};
+        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+        return evt;
+      };
+      win.CustomEvent.prototype = win.Event.prototype;
+    }
+  }
+
+  if (_BUILD_.isDev) {
     if ((win as Window).location.search.indexOf('shadow=false') > 0) {
       // by adding ?shadow=false it'll force the slot polyfill
       // only add this check when in dev mode
@@ -262,11 +263,13 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     }
   }
 
-  if (__BUILD_CONDITIONALS__.shadowDom) {
-    domApi.$attachShadow = (elm, shadowRootInit) => elm.attachShadow(shadowRootInit);
+
+  if (!App.ael) {
+    App.ael = (elm, eventName, cb, opts) => elm.addEventListener(eventName, cb, opts);
+    App.rel = (elm, eventName, cb, opts) => elm.removeEventListener(eventName, cb, opts);
   }
 
-  if (__BUILD_CONDITIONALS__.event || __BUILD_CONDITIONALS__.listener) {
+  if (_BUILD_.event || _BUILD_.listener) {
     // test if this browser supports event options or not
     try {
       (win as Window).addEventListener('e', null,
@@ -278,7 +281,8 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   }
 
   return domApi;
-}
+};
+
 
 interface ElementUnregisterListeners {
   [referenceName: string]: Function;

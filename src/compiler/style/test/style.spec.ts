@@ -100,7 +100,7 @@ describe('component-styles', () => {
     expect(iosContent).toContain(`body{font-family:Helvetica}`);
     expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'o.entry.js'));
+    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'h.entry.js'));
     expect(mdContent).toContain(`body{font-family:Roboto}`);
     expect(mdContent).toContain(`static get styleMode(){return"md"}`);
   });

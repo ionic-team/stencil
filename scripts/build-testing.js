@@ -20,7 +20,7 @@ if (success) {
 
   const buildConditionals = getDefaultBuildConditionals();
   const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    all[`_BUILD_.${key}`] = buildConditionals[key];
     return all;
   }, {});
 
@@ -72,6 +72,7 @@ if (success) {
         })
       ],
       onwarn: (message) => {
+        if (message.code === 'THIS_IS_UNDEFINED') return;
         if (message.code === 'UNUSED_EXTERNAL_IMPORT') return;
         if (message.code === 'CIRCULAR_DEPENDENCY') return;
         console.error(message);

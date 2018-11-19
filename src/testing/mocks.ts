@@ -215,7 +215,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: d.ComponentMeta) {
 }
 
 export function mockDispatchEvent(elm: HTMLElement, name: string, detail: any = {}): boolean {
-  const ev = new MockCustomEvent(name, detail);
+  const ev = new MockCustomEvent(name, { detail });
   return elm.dispatchEvent(ev as any);
 }
 

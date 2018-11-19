@@ -54,22 +54,14 @@ describe('build', () => {
     expect(r.diagnostics).toEqual([]);
 
     const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.entry.js'));
-    expect(cmpA).toContain('Built with http://stenciljs.com');
-    expect(cmpA).toContain('App.loadBundle("cmp-a"');
-    expect(cmpA).toContain('someFn(!0)');
-    expect(cmpA).not.toContain('/** minify me plz **/');
+    expect(cmpA).toEqual(`App.loadBundle("cmp-a",["exports","./chunk-97e00951.js"],function(e,n){window;var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-a"},enumerable:!0,configurable:!0}),e}();e.CmpA=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
 
     const cmpB = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-b.es5.entry.js'));
-    expect(cmpB).toContain('Built with http://stenciljs.com');
-    expect(cmpB).toContain('App.loadBundle("cmp-b"');
-    expect(cmpB).toContain('someFn(!0)');
-    expect(cmpB).not.toContain('/** minify me plz **/');
+    expect(cmpB).toEqual(`App.loadBundle("cmp-b",["exports","./chunk-97e00951.js"],function(e,n){window;var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-b"},enumerable:!0,configurable:!0}),e}();e.CmpB=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
 
     const chunkFileName = r.filesWritten.find(f => f.includes('chunk') && f.includes('es5'));
     const chunk = await c.fs.readFile(chunkFileName);
-    expect(chunk).toContain('Built with http://stenciljs.com');
-    expect(chunk).toContain('.someFn=function(');
-    expect(chunk).toContain('console.log(!0)');
+    expect(chunk).toEqual(`App.loadBundle("chunk-97e00951.js",["exports"],function(o){window,o.someFn=function(o){o?console.log(!0):console.log(!1)}});`);
   });
 
   it('should minify es2017 build', async () => {
@@ -85,7 +77,7 @@ describe('build', () => {
     expect(r.hasSvg).toBe(false);
 
     const output = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
-    expect(output).toContain('/*! Built with http://stenciljs.com */\nconst{h:t}=window.App;class s{static get is(){return"cmp-a"}}export{s as CmpA};');
+    expect(output).toEqual('class t{static get is(){return"cmp-a"}}export{t as CmpA};');
   });
 
   it('should build app files, app global and component', async () => {

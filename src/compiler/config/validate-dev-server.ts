@@ -4,6 +4,9 @@ import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-uti
 
 
 export function validateDevServer(config: d.Config) {
+  if (config.devServer === false || config.devServer === null) {
+    return config.devServer = null;
+  }
   config.devServer = config.devServer || {};
 
   if (typeof config.flags.address === 'string') {

@@ -1,13 +1,15 @@
-import * as d from '../declarations';
+import * as dec from '../declarations';
 import { createPlatformMain } from './platform-main';
 
 
-declare const namespace: string;
-declare const Context: d.CoreContext;
-declare const resourcesUrl: string;
-declare const hydratedCssClass: string;
-declare const components: d.ComponentHostData[];
+declare const w: Window;
+declare const d: Document;
+declare const n: string;
+declare const x: dec.CoreContext;
+declare const r: string;
+declare const h: string;
+declare const c: dec.ComponentHostData[];
 
 
 // esm build which uses es module imports and dynamic imports
-createPlatformMain(namespace, Context, window, document, resourcesUrl, hydratedCssClass, components);
+createPlatformMain(n, x, w, d, r, h, c);

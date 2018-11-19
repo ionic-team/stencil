@@ -22,8 +22,8 @@ describe('stats and docs', () => {
       { type: 'stats' } as d.OutputTargetStats,
       { type: 'stats', file: 'my-stats.json' } as d.OutputTargetStats,
       { type: 'stats', file: path.join(root, 'I', 'do', 'what', 'I', 'want', 'some-stats.json') } as d.OutputTargetStats,
-      { type: 'docs' } as d.OutputTargetDocs,
-      { type: 'docs', readmeDir: path.join(root, 'docs', '/') } as d.OutputTargetDocs
+      { type: 'docs' } as d.OutputTargetDocsReadme,
+      { type: 'docs', dir: path.join(root, 'docs', '/') } as d.OutputTargetDocsReadme
     ];
 
     c = new TestingCompiler(config);

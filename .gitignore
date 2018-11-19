@@ -13,8 +13,9 @@ log.txt
 .sass-cache/
 .versions/
 node_modules/
+coverage/
 
-/dist/
+dist/
 **/www/build/
 
 # submodule packages
@@ -31,4 +32,4 @@ node_modules/
 /screenshot/local-connector.js
 /screenshot/pixel-match.js
 
-test/example/www/*
+test/**/www/*

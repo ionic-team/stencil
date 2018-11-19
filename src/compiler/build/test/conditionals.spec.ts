@@ -98,6 +98,15 @@ describe('build conditionals', () => {
 
     // kick off a rebuild
     c.trigger('fileAdd', path.join(root, 'src', 'global.css'));
+    await c.fs.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `
+      @Component({ tag: 'cmp-a' }) export class CmpA {
+
+        render() {
+          return [<slot/>];
+        }
+      }
+    `, { clearFileCache: true });
+    await c.fs.commit();
 
     // wait for the rebuild to finish
     // get the rebuild results
@@ -105,7 +114,14 @@ describe('build conditionals', () => {
     expect(r.diagnostics).toEqual([]);
 
     expect(r.hasSlot).toBe(true);
-    expect(r.hasSvg).toBe(true);
+    expect(r.hasSvg).toBe(false);
+
+    c.trigger('fileAdd', path.join(root, 'src', 'global2.css'));
+    r = await rebuildListener;
+    expect(r.diagnostics).toEqual([]);
+
+    expect(r.hasSlot).toBe(true);
+    expect(r.hasSvg).toBe(false);
   });
 
   it('svg not in build', async () => {

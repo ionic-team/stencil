@@ -22,12 +22,15 @@ export interface BuildConditionals {
 
   // ssr
   ssrServerSide: boolean;
+  prerenderClientSide: boolean;
 
   // encapsulation
   styles: boolean;
+  hasMode: boolean;
 
   // dom
   shadowDom: boolean;
+  scoped: boolean;
   slotPolyfill: boolean;
 
   // vdom
@@ -42,7 +45,12 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
+  prop: boolean;
+  propMutable: boolean;
+  state: boolean;
   watchCallback: boolean;
+  hasMembers: boolean;
+  updatable: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;
@@ -60,7 +68,7 @@ export interface BuildConditionals {
 }
 
 declare global {
-  var __BUILD_CONDITIONALS__: BuildConditionals;
+  var _BUILD_: BuildConditionals;
 }
 
 export interface UserBuildConditionals {

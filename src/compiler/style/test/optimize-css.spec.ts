@@ -243,21 +243,36 @@ describe('optimizeCss',  () => {
     expect(output).toBe(`h1{width:calc(10px - (100px / var(--test)))}`);
   });
 
-  it('merge-longhand', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      h1 {
-        margin-top: 10px;
-        margin-right: 20px;
-        margin-bottom: 10px;
-        margin-left: 20px;
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+  // it('merge-longhand', async () => {
+  //   config.minifyCss = true;
+  //   const styleText = `
+  //     h1 {
+  //       margin-top: 10px;
+  //       margin-right: 20px;
+  //       margin-bottom: 10px;
+  //       margin-left: 20px;
+  //     }
+  //   `;
+  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
 
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{margin:10px 20px}`);
-  });
+  //   expect(diagnostics).toHaveLength(0);
+  //   expect(output).toBe(`h1{margin:10px 20px}`);
+  // });
+
+  // it('merge-longhand w/ css vars', async () => {
+  //   config.minifyCss = true;
+  //   const styleText = `
+  //     a {
+  //       border-width: var(--border-width);
+  //       border-style: var(--border-style);
+  //       border-color: var(--btn-border-color);
+  //     }
+  //   `;
+  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+
+  //   expect(diagnostics).toHaveLength(0);
+  //   expect(output).toBe(`a{border:var(--border-width) var(--border-style) var(--btn-border-color)}`);
+  // });
 
   it('discard-duplicates', async () => {
     config.minifyCss = true;

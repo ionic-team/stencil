@@ -24,7 +24,7 @@ if (success) {
 
   const buildConditionals = getDefaultBuildConditionals();
   const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`__BUILD_CONDITIONALS__.${key}`] = buildConditionals[key];
+    all[`_BUILD_.${key}`] = buildConditionals[key];
     return all;
   }, {});
 

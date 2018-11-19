@@ -58,6 +58,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
         values: replaceObj
       }),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
+      config.sys.rollup.plugins.emptyJsResolver(),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),

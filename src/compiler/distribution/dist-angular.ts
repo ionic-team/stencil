@@ -26,7 +26,8 @@ function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegi
 
 async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, cmpRegistry: d.ComponentRegistry) {
   const components = getComponents(outputTarget.excludeComponents, cmpRegistry);
-  const { hasDirectives, hasOutputs, proxies } = generateProxies(components);
+  const useDirectives = outputTarget.useDirectives;
+  const { hasOutputs, proxies } = generateProxies(components, useDirectives);
 
   const auxFunctions: string[] = [
     inputsAuxFunction(),
@@ -37,10 +38,15 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
     'ElementRef'
   ];
 
-  if (hasDirectives) {
-    angularImports.push('Component');
-    angularImports.push('ViewEncapsulation');
-    angularImports.push('ChangeDetectionStrategy');
+  if (components.length > 0) {
+    if (useDirectives) {
+      angularImports.push('Directive');
+    } else {
+      angularImports.push('Component');
+      angularImports.push('ViewEncapsulation');
+      angularImports.push('ChangeDetectionStrategy');
+      angularImports.push('ChangeDetectorRef');
+    }
   }
 
   if (hasOutputs) {
@@ -111,15 +117,13 @@ export function proxyMethods(instance: any, el: any, methods: string[]) {
 `;
 }
 
-function generateProxies(components: d.ComponentMeta[]) {
-  let hasDirectives = false;
+function generateProxies(components: d.ComponentMeta[], useDirectives: boolean) {
   let hasMethods = false;
   let hasOutputs = false;
   let hasInputs = false;
 
   const lines = components.map(cmpMeta => {
-    const proxy = generateProxy(cmpMeta);
-    hasDirectives = true;
+    const proxy = generateProxy(cmpMeta, useDirectives);
     if (proxy.hasInputs) {
       hasInputs = true;
     }
@@ -134,14 +138,13 @@ function generateProxies(components: d.ComponentMeta[]) {
 
   return {
     proxies: lines.join('\n'),
-    hasDirectives,
     hasInputs,
     hasMethods,
     hasOutputs
   };
 }
 
-function generateProxy(cmpMeta: d.ComponentMeta) {
+function generateProxy(cmpMeta: d.ComponentMeta, useDirectives: boolean) {
   // Collect component meta
   const inputs = getInputs(cmpMeta);
   const outputs = getOutputs(cmpMeta);
@@ -154,12 +157,17 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   const hasContructor = hasInputs || hasOutputs || hasMethods;
 
   // Generate Angular @Directive
+  const decorator = useDirectives ? 'Directive' : 'Component';
   const directiveOpts = [
     `selector: \'${cmpMeta.tagNameMeta}\'`,
-    `changeDetection: ChangeDetectionStrategy.OnPush`,
-    `encapsulation: ViewEncapsulation.None`,
-    `template: '<ng-content></ng-content>'`
   ];
+  if (!useDirectives) {
+    directiveOpts.push(
+      `changeDetection: ChangeDetectionStrategy.OnPush`,
+      `encapsulation: ViewEncapsulation.None`,
+      `template: '<ng-content></ng-content>'`
+    );
+  }
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
@@ -167,7 +175,7 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
 export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
-@Component({ ${directiveOpts.join(', ')} })
+@${decorator}({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
@@ -177,9 +185,16 @@ export class ${cmpMeta.componentClass} {`];
 
   // Generate component constructor
   if (hasContructor) {
-    lines.push(`
+    if (useDirectives) {
+      lines.push(`
   constructor(r: ElementRef) {
     const el = r.nativeElement;`);
+    } else {
+      lines.push(`
+  constructor(c: ChangeDetectorRef, r: ElementRef) {
+    c.detach();
+    const el = r.nativeElement;`);
+    }
   }
 
   if (hasMethods) {

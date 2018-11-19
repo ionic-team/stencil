@@ -134,6 +134,7 @@ describe('component', () => {
             'attribType': {
               'text': 'string',
               'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -158,6 +159,7 @@ describe('component', () => {
             'attribType': {
               'text': 'ActionSheetButton[]',
               'optional': false,
+              'required': false,
               'typeReferences': {
                 'ActionSheetButton': {
                   'referenceLocation': 'local',
@@ -183,6 +185,7 @@ describe('component', () => {
             'attribType': {
               'text': 'string',
               'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -203,6 +206,7 @@ describe('component', () => {
             'attribType': {
               'text': 'boolean',
               'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -210,6 +214,7 @@ describe('component', () => {
               'name': 'enableBackdropDismiss',
               'tags': [],
               'type': 'boolean',
+              'default': 'true'
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Boolean,
@@ -220,6 +225,7 @@ describe('component', () => {
             'attribType': {
               'text': 'AnimationBuilder',
               'optional': false,
+              'required': false,
               'typeReferences': {
                 'AnimationBuilder': {
                   'referenceLocation': 'global',
@@ -241,6 +247,7 @@ describe('component', () => {
             'attribType': {
               'text': 'AnimationBuilder',
               'optional': false,
+              'required': false,
               'typeReferences': {
                 'AnimationBuilder': {
                   'referenceLocation': 'global',
@@ -265,6 +272,7 @@ describe('component', () => {
             'attribType': {
               'text': 'string',
               'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
@@ -282,6 +290,7 @@ describe('component', () => {
             'attribType': {
               'text': 'string',
               'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {

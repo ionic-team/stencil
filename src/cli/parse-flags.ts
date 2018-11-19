@@ -188,6 +188,7 @@ const ARG_OPTS = {
   string: [
     'address',
     'config',
+    'docs-api',
     'docs-json',
     'emulate',
     'log-level',

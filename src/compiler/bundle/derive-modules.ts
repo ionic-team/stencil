@@ -13,7 +13,7 @@ export async function deriveModules(config: d.Config, compilerCtx: d.CompilerCtx
   }
   const modules = await Promise.all([
     deriveModule(config, compilerCtx, buildCtx, 'es2017', true, true, moduleFormats.esm),   // browser ES2017
-    deriveModule(config, compilerCtx, buildCtx, 'es2017', false, false, moduleFormats.esm),  // esm ES2017
+    deriveModule(config, compilerCtx, buildCtx, 'es2017', false, false, moduleFormats.esm), // esm ES2017
     deriveModule(config, compilerCtx, buildCtx, 'es5', false, true, moduleFormats.esm),     // esm ES5
     deriveModule(config, compilerCtx, buildCtx, 'es5', true, true, moduleFormats.amd),      // browser ES5
   ]);
@@ -100,6 +100,6 @@ async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, 
 
 function generateIntro(config: d.Config, isBrowser: boolean) {
   return isBrowser
-    ? `const { h } = window.${config.namespace};`
+    ? `const h = window.${config.namespace}.h;`
     : `import { h } from '../${getCoreEsmFileName(config)}';`;
 }

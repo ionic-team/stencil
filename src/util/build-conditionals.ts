@@ -1,6 +1,7 @@
 import * as d from '../declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { isTsFile } from '../compiler/util';
+import { shouldPrerender } from '../compiler/prerender/prerender-app';
 
 
 export function getDefaultBuildConditionals(): d.BuildConditionals {
@@ -9,8 +10,10 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     polyfills: false,
     cssVarShim: true,
     shadowDom: true,
+    scoped: true,
     slotPolyfill: true,
     ssrServerSide: true,
+    prerenderClientSide: true,
     devInspector: true,
     hotModuleReplacement: true,
     verboseError: true,
@@ -20,6 +23,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     reflectToAttr: true,
     hasSlot: true,
     hasSvg: true,
+    hasMode: true,
     observeAttr: true,
     isDev: true,
     isProd: false,
@@ -28,8 +32,13 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     event: true,
     listener: true,
     method: true,
+    prop: true,
+    propMutable: true,
     propConnect: true,
     propContext: true,
+    state: true,
+    hasMembers: true,
+    updatable: true,
     watchCallback: true,
     cmpDidLoad: true,
     cmpWillLoad: true,
@@ -59,7 +68,7 @@ export async function setBuildConditionals(
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild = {
+  const coreBuild: d.BuildConditionals = {
     coreId: coreId,
     clientSide: true,
     isDev: !!config.devMode,
@@ -79,15 +88,23 @@ export async function setBuildConditionals(
     es5: false,
     cssVarShim: false,
     ssrServerSide: false,
+    prerenderClientSide: false,
     shadowDom: false,
+    scoped: false,
     slotPolyfill: false,
+    hasMode: false,
     event: false,
     listener: false,
     styles: false,
     hostTheme: false,
     observeAttr: false,
+    prop: false,
+    propMutable: false,
     propConnect: false,
     propContext: false,
+    state: false,
+    hasMembers: false,
+    updatable: false,
     method: false,
     element: false,
     watchCallback: false,
@@ -113,22 +130,24 @@ export async function setBuildConditionals(
   await Promise.all(promises);
 
   if (coreId === 'core') {
+    // modern build
     coreBuild.browserModuleLoader = true;
-    coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
-    if (coreBuild.slotPolyfill) {
-      coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-    }
+    coreBuild.slotPolyfill = (coreBuild.scoped && buildCtx.hasSlot);
+    coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
+    // polyfilled build
     coreBuild.browserModuleLoader = true;
     coreBuild.es5 = true;
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
+    coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {
+    // es5 build to be imported by bundlers
     coreBuild.es5 = true;
     coreBuild.externalModuleLoader = true;
     coreBuild.cssVarShim = true;
@@ -136,16 +155,11 @@ export async function setBuildConditionals(
     compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
 
   } else if (coreId === 'esm.es2017') {
+    // es2017 build to be imported by bundlers
     coreBuild.externalModuleLoader = true;
-    coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
-    if (coreBuild.slotPolyfill) {
-      coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
-    }
+    coreBuild.slotPolyfill = (coreBuild.scoped && buildCtx.hasSlot);
     compilerCtx.lastBuildConditionalsEsmEs2017 = coreBuild;
   }
-
-  coreBuild.slotPolyfill = true;
-  coreBuild.hasSvg = true;
 
   return coreBuild;
 }
@@ -205,14 +219,26 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
   }
 
   coreBuild.shadowDom = coreBuild.shadowDom || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom;
-  coreBuild.slotPolyfill = coreBuild.slotPolyfill || cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom;
+  coreBuild.scoped = coreBuild.scoped || cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss;
   coreBuild.event = coreBuild.event || !!(cmpMeta.eventsMeta && cmpMeta.eventsMeta.length > 0);
   coreBuild.listener = coreBuild.listener || !!(cmpMeta.listenersMeta && cmpMeta.listenersMeta.length > 0);
-  coreBuild.styles = coreBuild.styles || !!cmpMeta.stylesMeta;
   coreBuild.hostTheme = coreBuild.hostTheme || !!(cmpMeta.hostMeta && cmpMeta.hostMeta.theme);
+
+  if (cmpMeta.stylesMeta) {
+    const modeNames = Object.keys(cmpMeta.stylesMeta);
+    if (modeNames.length > 0) {
+      coreBuild.styles = true;
+
+      if (!coreBuild.hasMode) {
+        coreBuild.hasMode = modeNames.filter(m => m !== DEFAULT_STYLE_MODE).length > 0;
+      }
+    }
+  }
 
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
+
+    coreBuild.hasMembers = coreBuild.hasMembers || (memberNames.length > 0);
 
     memberNames.forEach(memberName => {
       const memberMeta = cmpMeta.membersMeta[memberName];
@@ -220,9 +246,18 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
       const propType = memberMeta.propType;
 
       if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
+        coreBuild.prop = true;
+
+        if (memberType === MEMBER_TYPE.PropMutable) {
+          coreBuild.propMutable = true;
+        }
+
         if (propType === PROP_TYPE.String || propType === PROP_TYPE.Number || propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Any) {
           coreBuild.observeAttr = true;
         }
+
+      } else if (memberType === MEMBER_TYPE.State) {
+        coreBuild.state = true;
 
       } else if (memberType === MEMBER_TYPE.PropConnect) {
         coreBuild.propConnect = true;
@@ -246,6 +281,8 @@ export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMet
       }
     });
   }
+
+  coreBuild.updatable = (coreBuild.updatable || !!(coreBuild.prop || coreBuild.state));
 }
 
 
@@ -264,7 +301,7 @@ export function setBuildFromComponentContent(coreBuild: d.BuildConditionals, jsT
 
   coreBuild.cmpWillLoad = coreBuild.cmpWillLoad || jsText.includes('componentWillLoad');
   coreBuild.cmpDidLoad = coreBuild.cmpDidLoad || jsText.includes('componentDidLoad');
-  coreBuild.cmpWillUpdate = coreBuild.cmpWillLoad || jsText.includes('componentWillUpdate');
+  coreBuild.cmpWillUpdate = coreBuild.cmpWillUpdate || jsText.includes('componentWillUpdate');
   coreBuild.cmpDidUpdate = coreBuild.cmpDidUpdate || jsText.includes('componentDidUpdate');
   coreBuild.cmpDidUnload = coreBuild.cmpDidUnload || jsText.includes('componentDidUnload');
   coreBuild.hostData = coreBuild.hostData || jsText.includes('hostData');

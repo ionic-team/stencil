@@ -12,6 +12,7 @@ import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
 import opn from 'opn';
+import semver from 'semver';
 import { WorkerManager } from './worker/index';
 
 
@@ -34,6 +35,15 @@ export class NodeSystem implements d.StencilSystem {
 
   fs: d.FileSystem;
   path: d.Path;
+
+  semver: d.Semver = {
+    lt: semver.lt,
+    lte: semver.lte,
+    gt: semver.gt,
+    gte: semver.gte,
+    prerelease: semver.prerelease,
+    satisfies: semver.satisfies
+  };
 
   constructor(fs?: d.FileSystem) {
     this.fs = fs || new NodeFs();
@@ -181,7 +191,7 @@ export class NodeSystem implements d.StencilSystem {
 
   get lazyRequire() {
     if (!this.nodeLazyRequire) {
-      this.nodeLazyRequire = new NodeLazyRequire(this.nodeResolveModule, this.packageJsonData);
+      this.nodeLazyRequire = new NodeLazyRequire(this.semver, this.nodeResolveModule, this.packageJsonData);
     }
     return this.nodeLazyRequire;
   }
