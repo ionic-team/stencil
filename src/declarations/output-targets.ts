@@ -1,4 +1,5 @@
 import * as d from '.';
+import { JsonDocs } from './docs';
 
 
 export interface OutputTargetWww extends OutputTargetBase {
@@ -192,6 +193,13 @@ export interface OutputTargetDocsApi extends OutputTargetBase {
   strict?: boolean;
 }
 
+export interface OutputTargetDocsCustom extends OutputTargetBase {
+  type: 'docs-custom';
+
+  generator: (docs: JsonDocs) => void | Promise<void>;
+  strict?: boolean;
+}
+
 
 export interface OutputTargetStats extends OutputTargetBase {
   type: 'stats';
@@ -228,6 +236,7 @@ export type OutputTarget =
  | OutputTargetStats
  | OutputTargetDocsApi
  | OutputTargetDocsJson
+ | OutputTargetDocsCustom
  | OutputTargetDocsReadme
  | OutputTargetHydrate
  | OutputTargetDist
