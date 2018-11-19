@@ -87,24 +87,6 @@ export class Compiler implements d.Compiler {
     return devServer;
   }
 
-  async startDiagnosticServer() {
-    if (this.config.sys.details.runtime !== 'node') {
-      throw new Error(`Diagnostic Server only availabe in node`);
-    }
-
-    // start up the diagnostic server
-    const diagnosticServer = await startDevServerMain(this.config, this.ctx);
-
-    if (diagnosticServer) {
-      // get the browser url to be logged out at the end of the build
-      this.config.devServer.browserUrl = diagnosticServer.browserUrl;
-
-      this.config.logger.debug(`diagnostic server started: ${diagnosticServer.browserUrl}`);
-    }
-
-    return diagnosticServer;
-  }
-
   on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
   on(eventName: 'buildLog', cb: (buildResults: d.BuildLog) => void): Function;
