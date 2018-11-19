@@ -47,7 +47,6 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
     let copyTaskPromise: Promise<void>;
-
     if (!config.flags.dryRun) {
       // start copy tasks from the config.copy and component assets
       // but don't wait right now (running in worker)
