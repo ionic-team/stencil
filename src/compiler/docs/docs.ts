@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { generateApiDocs } from './generate-api-docs';
 import { generateDocData } from './generate-doc-data';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
@@ -57,7 +56,7 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
   const docsOutputTargets = config.outputTargets.filter(o => {
-    return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-api' || o.type == 'docs-custom';
+    return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
 
   if (docsOutputTargets.length === 0) {
@@ -79,11 +78,6 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
   const jsonTargets = docsOutputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
   if (jsonTargets.length > 0) {
     await generateJsonDocs(compilerCtx, jsonTargets, docsData);
-  }
-
-  const apiTargets = docsOutputTargets.filter(o => o.type === 'docs-api') as d.OutputTargetDocsApi[];
-  if (apiTargets.length > 0) {
-    await generateApiDocs(compilerCtx, apiTargets, docsData);
   }
 
   const customTargets = docsOutputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];

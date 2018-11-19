@@ -50,7 +50,6 @@ const VALID_TYPES = [
   'dist',
   'docs',
   'docs-json',
-  'docs-api',
   'docs-custom',
   'stats',
   'www'
