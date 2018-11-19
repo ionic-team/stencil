@@ -68,8 +68,8 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
-    // should we write any files?
-    // if we're in diagnostics mode, the answer is no
+    // should we write these files?
+    // if we're in dryRun mode, the answer is no
     if (config.flags.dryRun) return buildCtx.finish();
 
     // generate the app files, such as app.js, app.core.js
