@@ -21,7 +21,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // and we've got a clean slate
     config.sys.cancelWorkerTasks();
 
-    if (!config.devServer || !config.flags.serve) {
+    if ((!config.devServer || !config.flags.serve) && !config.flags.dryRun) {
       // create an initial index.html file if one doesn't already exist
       await initIndexHtmls(config, compilerCtx, buildCtx);
       if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
@@ -46,10 +46,14 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     const entryModules = generateEntryModules(config, compilerCtx, buildCtx);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
-    // start copy tasks from the config.copy and component assets
-    // but don't wait right now (running in worker)
-    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    let copyTaskPromise: Promise<void>;
+
+    if (!config.flags.dryRun) {
+      // start copy tasks from the config.copy and component assets
+      // but don't wait right now (running in worker)
+      copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
+      if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    }
 
     // bundle js modules and create each of the components's styles
     // these can run in parallel
@@ -64,6 +68,10 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // generate each of the output bundles
     const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+
+    // should we write any files?
+    // if we're in diagnostics mode, the answer is no
+    if (config.flags.dryRun) return buildCtx.finish();
 
     // generate the app files, such as app.js, app.core.js
     await generateAppFiles(config, compilerCtx, buildCtx, entryModules, cmpRegistry);

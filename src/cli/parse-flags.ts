@@ -162,6 +162,7 @@ const ARG_OPTS = {
     'debug',
     'dev',
     'docs',
+    'dry-run',
     'e2e',
     'es5',
     'headless',

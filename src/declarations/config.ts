@@ -209,6 +209,7 @@ export interface ConfigFlags {
   docs?: boolean;
   docsApi?: string;
   docsJson?: string;
+  dryRun?: boolean;
   e2e?: boolean;
   emulate?: string;
   es5?: boolean;

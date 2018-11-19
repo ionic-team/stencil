@@ -41,6 +41,8 @@ export class Compiler implements d.Compiler {
       const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
       config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
 
+      config.logger.debug(`dryRun: ${config.flags.dryRun}`);
+
       config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
 
       this.ctx = getCompilerCtx(config);
@@ -83,6 +85,24 @@ export class Compiler implements d.Compiler {
     }
 
     return devServer;
+  }
+
+  async startDiagnosticServer() {
+    if (this.config.sys.details.runtime !== 'node') {
+      throw new Error(`Diagnostic Server only availabe in node`);
+    }
+
+    // start up the diagnostic server
+    const diagnosticServer = await startDevServerMain(this.config, this.ctx);
+
+    if (diagnosticServer) {
+      // get the browser url to be logged out at the end of the build
+      this.config.devServer.browserUrl = diagnosticServer.browserUrl;
+
+      this.config.logger.debug(`diagnostic server started: ${diagnosticServer.browserUrl}`);
+    }
+
+    return diagnosticServer;
   }
 
   on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;
