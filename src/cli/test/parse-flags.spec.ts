@@ -237,6 +237,12 @@ describe('parseFlags', () => {
     expect(flags.docsJson).toBe('some/path/docs.json');
   });
 
+  it('should parse --dry-run', () => {
+    process.argv[2] = '--dry-run';
+    const flags = parseFlags(process);
+    expect(flags.dryRun).toBe(true);
+  });
+
   it('should parse --e2e', () => {
     process.argv[2] = '--e2e';
     const flags = parseFlags(process);
