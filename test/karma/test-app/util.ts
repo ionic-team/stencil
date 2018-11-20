@@ -133,7 +133,7 @@ export function waitForChanges() {
     if (document.readyState === 'complete') {
       pageLoaded();
     } else {
-      window.addEventListener("onload", pageLoaded, false);
+      window.addEventListener('load', pageLoaded, false);
     }
   });
 }

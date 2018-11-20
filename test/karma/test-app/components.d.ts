@@ -241,6 +241,16 @@ export namespace Components {
   interface ShadowDomBasic {}
   interface ShadowDomBasicAttributes extends StencilHTMLAttributes {}
 
+  interface ShadowDomModeRoot {}
+  interface ShadowDomModeRootAttributes extends StencilHTMLAttributes {}
+
+  interface ShadowDomMode {
+    'mode': string;
+  }
+  interface ShadowDomModeAttributes extends StencilHTMLAttributes {
+    'mode'?: string;
+  }
+
   interface ShadowDomSlotBasic {}
   interface ShadowDomSlotBasicAttributes extends StencilHTMLAttributes {}
 
@@ -398,6 +408,8 @@ declare global {
     'ShadowDomArray': Components.ShadowDomArray;
     'ShadowDomBasicRoot': Components.ShadowDomBasicRoot;
     'ShadowDomBasic': Components.ShadowDomBasic;
+    'ShadowDomModeRoot': Components.ShadowDomModeRoot;
+    'ShadowDomMode': Components.ShadowDomMode;
     'ShadowDomSlotBasic': Components.ShadowDomSlotBasic;
     'ShadowDomSlotNestedRoot': Components.ShadowDomSlotNestedRoot;
     'ShadowDomSlotNested': Components.ShadowDomSlotNested;
@@ -471,6 +483,8 @@ declare global {
     'shadow-dom-array': Components.ShadowDomArrayAttributes;
     'shadow-dom-basic-root': Components.ShadowDomBasicRootAttributes;
     'shadow-dom-basic': Components.ShadowDomBasicAttributes;
+    'shadow-dom-mode-root': Components.ShadowDomModeRootAttributes;
+    'shadow-dom-mode': Components.ShadowDomModeAttributes;
     'shadow-dom-slot-basic': Components.ShadowDomSlotBasicAttributes;
     'shadow-dom-slot-nested-root': Components.ShadowDomSlotNestedRootAttributes;
     'shadow-dom-slot-nested': Components.ShadowDomSlotNestedAttributes;
@@ -744,6 +758,18 @@ declare global {
     new (): HTMLShadowDomBasicElement;
   };
 
+  interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {}
+  var HTMLShadowDomModeRootElement: {
+    prototype: HTMLShadowDomModeRootElement;
+    new (): HTMLShadowDomModeRootElement;
+  };
+
+  interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {}
+  var HTMLShadowDomModeElement: {
+    prototype: HTMLShadowDomModeElement;
+    new (): HTMLShadowDomModeElement;
+  };
+
   interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {}
   var HTMLShadowDomSlotBasicElement: {
     prototype: HTMLShadowDomSlotBasicElement;
@@ -965,6 +991,8 @@ declare global {
     'shadow-dom-array': HTMLShadowDomArrayElement
     'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
     'shadow-dom-basic': HTMLShadowDomBasicElement
+    'shadow-dom-mode-root': HTMLShadowDomModeRootElement
+    'shadow-dom-mode': HTMLShadowDomModeElement
     'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement
     'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement
     'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement
@@ -1038,6 +1066,8 @@ declare global {
     'shadow-dom-array': HTMLShadowDomArrayElement;
     'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
     'shadow-dom-basic': HTMLShadowDomBasicElement;
+    'shadow-dom-mode-root': HTMLShadowDomModeRootElement;
+    'shadow-dom-mode': HTMLShadowDomModeElement;
     'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
     'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
     'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
