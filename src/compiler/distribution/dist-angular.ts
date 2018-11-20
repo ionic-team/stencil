@@ -180,7 +180,7 @@ export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
   outputs.forEach(output => {
-    lines.push(`  ${output}: EventEmitter<CustomEvent>;`);
+    lines.push(`  ${output}!: EventEmitter<CustomEvent>;`);
   });
 
   // Generate component constructor
