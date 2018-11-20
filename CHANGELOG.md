@@ -1,5 +1,5 @@
-<a name="0.16.0-1"></a>
-# 🍪 [Prerelease] [0.16.0-1](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-1) (2018-11-20)
+<a name="0.16.0-2"></a>
+# 🍓 [Prerelease] [0.16.0-2](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-2) (2018-11-20)
 
 
 ### Features
@@ -31,6 +31,8 @@
 * **mock-doc:** fix Event and CustomEvent eventInitDict ([32c5737](https://github.com/ionic-team/stencil/commit/32c5737)), closes [#1206](https://github.com/ionic-team/stencil/issues/1206)
 * **test:** add getBoundingClientRect() to mock-doc ([88292c0](https://github.com/ionic-team/stencil/commit/88292c0)), closes [#1198](https://github.com/ionic-team/stencil/issues/1198)
 * **types:** fix signature for classList.contains ([193cc6e](https://github.com/ionic-team/stencil/commit/193cc6e)), closes [#1207](https://github.com/ionic-team/stencil/issues/1207)
+* **polyfill:** add array.fill() polyfill ([#1230](https://github.com/ionic-team/stencil/issues/1230)) ([7042932](https://github.com/ionic-team/stencil/commit/7042932))
+* **testing:** do not ignore docs dir output ([7656292](https://github.com/ionic-team/stencil/commit/7656292))
 
 
 
