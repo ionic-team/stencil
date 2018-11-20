@@ -1,16 +1,36 @@
-<a name="0.16.0-0"></a>
-# 👾 [0.16.0-0](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-0) (2018-11-01)
-
-
-### Bug Fixes
-
-* **test:** add getBoundingClientRect() to mock-doc ([88292c0](https://github.com/ionic-team/stencil/commit/88292c0)), closes [#1198](https://github.com/ionic-team/stencil/issues/1198)
+<a name="0.16.0-1"></a>
+# 🍪 [Prerelease] [0.16.0-1](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-1) (2018-11-20)
 
 
 ### Features
 
+* **build:** conditionally include client side prerender hydration ([badf06f](https://github.com/ionic-team/stencil/commit/badf06f))
+* **build:** conditionally include slot polyfill ([582ff53](https://github.com/ionic-team/stencil/commit/582ff53))
+* **build:** conditionally include svg build features ([7d2e2df](https://github.com/ionic-team/stencil/commit/7d2e2df))
+* **docs:** custom docs generators ([#1227](https://github.com/ionic-team/stencil/issues/1227)) ([1c08e90](https://github.com/ionic-team/stencil/commit/1c08e90))
+* **docs:** generate api data ([2db19d3](https://github.com/ionic-team/stencil/commit/2db19d3))
 * **prop:** extract default value of props ([8bed57e](https://github.com/ionic-team/stencil/commit/8bed57e))
 * **types:** add support for JSX required props ([#1199](https://github.com/ionic-team/stencil/issues/1199)) ([3f39b1b](https://github.com/ionic-team/stencil/commit/3f39b1b))
+* **typescript:** update typescript ([127f0d5](https://github.com/ionic-team/stencil/commit/127f0d5))
+
+
+### Performance Improvements
+
+* **minify:** remove h() function when not used ([972cf6f](https://github.com/ionic-team/stencil/commit/972cf6f))
+* **queue:** remove queue when it's not updatable ([9b18a97](https://github.com/ionic-team/stencil/commit/9b18a97))
+* **styles:** remove logic for modes ([3119bbb](https://github.com/ionic-team/stencil/commit/3119bbb))
+
+
+### Bug Fixes
+
+* **build:** fix mode and resourceUrl ([9d79013](https://github.com/ionic-team/stencil/commit/9d79013))
+* **bundling:** fix bundling node resolved import when using browser entry ([c78fe51](https://github.com/ionic-team/stencil/commit/c78fe51)), closes [#1185](https://github.com/ionic-team/stencil/issues/1185)
+* **esm:** fix global script for esm ([39940f3](https://github.com/ionic-team/stencil/commit/39940f3))
+* **htmlFor:** remove htmlfor from jsx attributes ([d4b35a9](https://github.com/ionic-team/stencil/commit/d4b35a9)), closes [#1183](https://github.com/ionic-team/stencil/issues/1183)
+* **jsx:** fix jsx htmlfor incompatibility ([2022ca5](https://github.com/ionic-team/stencil/commit/2022ca5))
+* **mock-doc:** fix Event and CustomEvent eventInitDict ([32c5737](https://github.com/ionic-team/stencil/commit/32c5737)), closes [#1206](https://github.com/ionic-team/stencil/issues/1206)
+* **test:** add getBoundingClientRect() to mock-doc ([88292c0](https://github.com/ionic-team/stencil/commit/88292c0)), closes [#1198](https://github.com/ionic-team/stencil/issues/1198)
+* **types:** fix signature for classList.contains ([193cc6e](https://github.com/ionic-team/stencil/commit/193cc6e)), closes [#1207](https://github.com/ionic-team/stencil/issues/1207)
 
 
 
