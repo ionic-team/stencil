@@ -73,4 +73,31 @@ describe('validateTesting', () => {
     ]);
   });
 
+  it('set default testPathIgnorePatterns', () => {
+    config.flags.e2e = true;
+    validateConfig(config);
+    expect(config.testing.testPathIgnorePatterns).toEqual([
+      "/User/some/path/.vscode",
+      "/User/some/path/.stencil",
+      "/User/some/path/node_modules",
+      "/www",
+    ]);
+  });
+
+  it('set default testPathIgnorePatterns with custom outputTargets', () => {
+    config.flags.e2e = true;
+    config.outputTargets = [
+      { type: 'dist', dir: './dist-folder' },
+      { type: 'www', dir: './www-folder' },
+      { type: 'docs', dir: './docs' },
+    ];
+    validateConfig(config);
+    expect(config.testing.testPathIgnorePatterns).toEqual([
+      "/User/some/path/.vscode",
+      "/User/some/path/.stencil",
+      "/User/some/path/node_modules",
+      "/User/some/path/dist-folder",
+      "/User/some/path/www-folder",
+    ]);
+  });
 });
