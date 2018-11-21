@@ -1,22 +1,24 @@
 import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../validate-config';
+import * as path from 'path';
 
 
 describe('validateTesting', () => {
 
   let config: d.Config;
+  const ROOT = path.resolve('/');
 
   beforeEach(() => {
     config = {
       sys: mockStencilSystem(),
       logger: mockLogger(),
-      rootDir: '/User/some/path/',
-      srcDir: '/User/some/path/src/',
+      rootDir: path.join(ROOT, 'User', 'some', 'path'),
+      srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
       outputTargets: [{
         type: 'www',
-        dir: '/www'
+        dir: path.join(ROOT, 'www')
       } as any as d.OutputTargetStats]
     };
   });
@@ -77,27 +79,27 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      "/User/some/path/.vscode",
-      "/User/some/path/.stencil",
-      "/User/some/path/node_modules",
-      "/www",
+      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+      path.join(ROOT, 'www')
     ]);
   });
 
   it('set default testPathIgnorePatterns with custom outputTargets', () => {
     config.flags.e2e = true;
     config.outputTargets = [
-      { type: 'dist', dir: './dist-folder' },
-      { type: 'www', dir: './www-folder' },
-      { type: 'docs', dir: './docs' },
+      { type: 'dist', dir: 'dist-folder' },
+      { type: 'www', dir: 'www-folder' },
+      { type: 'docs', dir: 'docs' },
     ];
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      "/User/some/path/.vscode",
-      "/User/some/path/.stencil",
-      "/User/some/path/node_modules",
-      "/User/some/path/dist-folder",
-      "/User/some/path/www-folder",
+      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+      path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
+      path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
     ]);
   });
 });
