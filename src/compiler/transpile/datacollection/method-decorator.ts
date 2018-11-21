@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
+import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol, typeToString } from './utils';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { validatePublicName } from './reserved-public-members';
 import ts from 'typescript';
@@ -19,7 +19,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
       const methodName = member.name.getText();
       const methodSignature = checker.getSignatureFromDeclaration(member);
 
-      const flags = ts.TypeFormatFlags.WriteArrowStyleSignature;
+      const flags = ts.TypeFormatFlags.WriteArrowStyleSignature | ts.TypeFormatFlags.NoTruncation;
       const returnType = checker.getReturnTypeOfSignature(methodSignature);
       const jsDocReturnTag = ts.getJSDocReturnTag(member);
       const typeString = checker.signatureToString(
@@ -61,7 +61,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
         jsdoc: {
           ...serializeSymbol(checker, symbol),
           returns: {
-            type: checker.typeToString(returnType),
+            type: typeToString(checker, returnType),
             documentation: jsDocReturnTag ? jsDocReturnTag.comment : ''
           },
           parameters: methodSignature.parameters.map(parmSymbol =>
@@ -79,6 +79,6 @@ function isPromise(checker: ts.TypeChecker, type: ts.Type) {
   if (type.isUnionOrIntersection()) {
     return false;
   }
-  const typeText = checker.typeToString(type);
+  const typeText = typeToString(checker, type);
   return typeText === 'void' || typeText.startsWith('Promise<');
 }
