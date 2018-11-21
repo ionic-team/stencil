@@ -1,6 +1,5 @@
-<a name="0.16.0-4"></a>
-# 🔮 [Prerelease] [0.16.0-4](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-4) (2018-11-20)
-
+<a name="0.16.0-5"></a>
+# 🚃 Prerelease] [0.16.0-5](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-5) (2018-11-21)
 
 ### Features
 
@@ -26,6 +25,7 @@
 * **angular:** fix error in strict mode ([09cff8b](https://github.com/ionic-team/stencil/commit/09cff8b))
 * **build:** fix mode and resourceUrl ([9d79013](https://github.com/ionic-team/stencil/commit/9d79013))
 * **bundling:** fix bundling node resolved import when using browser entry ([c78fe51](https://github.com/ionic-team/stencil/commit/c78fe51)), closes [#1185](https://github.com/ionic-team/stencil/issues/1185)
+* **css-vars:** fix css vars polyfill for ie11 using defineCustomElements() ([7ce800b](https://github.com/ionic-team/stencil/commit/7ce800b))
 * **esm:** fix global script for esm ([39940f3](https://github.com/ionic-team/stencil/commit/39940f3))
 * **htmlFor:** remove htmlfor from jsx attributes ([d4b35a9](https://github.com/ionic-team/stencil/commit/d4b35a9)), closes [#1183](https://github.com/ionic-team/stencil/issues/1183)
 * **jsx:** fix jsx htmlfor incompatibility ([2022ca5](https://github.com/ionic-team/stencil/commit/2022ca5))
