@@ -32,6 +32,10 @@ export function applyPolyfills(window) {
     promises.push(import('./polyfills/fetch.js'));
   }
 
+  if (!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'))) {
+    promises.push(import('./polyfills/css-shim.js'));
+  }
+
   function checkIfURLIsSupported() {
     try {
       var u = new URL('b', 'http://a');

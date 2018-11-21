@@ -1,12 +1,14 @@
 const fs = require('fs-extra');
 const path = require('path');
+const rollup = require('rollup');
+const ts = require('typescript');
+const terser = require('terser');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 
 
-module.exports = function buildPolyfills(outputPolyfillsDir) {
-
+module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
   fs.emptyDirSync(outputPolyfillsDir);
 
   const esmDir = path.join(outputPolyfillsDir, 'esm');
@@ -26,9 +28,41 @@ module.exports = function buildPolyfills(outputPolyfillsDir) {
 
     const esmWrapped = (fileName === 'tslib.js')
       ? polyfillContent
-      : `export function applyPolyfill(window, document) {${polyfillContent}}`;
+      : esmWrap(polyfillContent);
 
     fs.writeFileSync(esmFilePath, esmWrapped);
     fs.writeFileSync(es5FilePath, polyfillContent);
   });
+
+
+  const build = await rollup.rollup({
+    input: path.join(transpiledPolyfillsDir, 'css-shim', 'index.js'),
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
+  });
+
+  const bundleResults = await build.generate({
+    format: 'es'
+  });
+
+  const transpile = ts.transpileModule(bundleResults.code, {
+    compilerOptions: {
+      target: ts.ScriptTarget.ES5
+    }
+  });
+
+  const minify = terser.minify(transpile.outputText);
+
+  const esmFilePath = path.join(esmDir, 'css-shim.js');
+  const es5FilePath = path.join(es5Dir, 'css-shim.js');
+
+  fs.writeFileSync(esmFilePath, esmWrap(minify.code));
+  fs.writeFileSync(es5FilePath, minify.code);
 };
+
+
+function esmWrap(polyfillContent) {
+  return `export function applyPolyfill(window, document) {${polyfillContent}}`;
+}

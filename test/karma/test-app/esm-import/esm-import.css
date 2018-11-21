@@ -4,8 +4,9 @@
   padding: 20px;
   border: 10px solid rgb(0, 0, 255);
   color: rgb(128, 0, 128);
+  --color: rgb(0, 128, 0);
 }
 
 p {
-  color: rgb(0, 128, 0);
+  color: var(--color);
 }

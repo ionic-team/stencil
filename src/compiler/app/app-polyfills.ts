@@ -46,5 +46,6 @@ const INLINE_POLYFILLS = [
 
 const POLYFILLS = [
   ...INLINE_POLYFILLS,
+  'css-shim.js',
   'tslib.js'
 ];
