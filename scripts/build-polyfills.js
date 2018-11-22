@@ -55,11 +55,18 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
 
   const minify = terser.minify(transpile.outputText);
 
+  const cssShimOutput = minify.code;
+
+  const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
+  const mapPolyfill = fs.readFileSync(mapPolyfillFilePath, 'utf8');
+
+  const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
+
   const esmFilePath = path.join(esmDir, 'css-shim.js');
   const es5FilePath = path.join(es5Dir, 'css-shim.js');
 
-  fs.writeFileSync(esmFilePath, esmWrap(minify.code));
-  fs.writeFileSync(es5FilePath, minify.code);
+  fs.writeFileSync(esmFilePath, esmWrap(cssShimMapPolyfill));
+  fs.writeFileSync(es5FilePath, cssShimMapPolyfill);
 };
 
 

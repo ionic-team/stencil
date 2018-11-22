@@ -50,6 +50,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
+    opts.compress.module = false;
 
   } else {
     opts.ecma = 7;
@@ -57,8 +58,6 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
     opts.compress.ecma = 7;
     opts.compress.module = true;
   }
-
-  opts.compress.toplevel = true;
 
   if (config.minifyJs) {
     if (sourceTarget !== 'es5') {
@@ -139,8 +138,9 @@ const DEV_MINIFY_OPTS: any = {
     sequences: true,
     side_effects: true,
     switches: false,
-    typeofs: false,
+    toplevel: true,
     top_retain: false,
+    typeofs: false,
     unsafe: false,
     unsafe_arrows: false,
     unsafe_comps: false,
@@ -206,6 +206,7 @@ const PROD_MINIFY_OPTS: any = {
     sequences: true,
     side_effects: true,
     switches: true,
+    toplevel: true,
     typeofs: true,
     unsafe: false,
     unsafe_arrows: false,

@@ -40,6 +40,7 @@ const INLINE_POLYFILLS = [
   'object.js',
   'string.js',
   'promise.js',
+  'map.js',
   'fetch.js',
   'url.js'
 ];
