@@ -55,34 +55,45 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
       );
     }
 
-    // polyfills have been applied if need be
-    (cmpData as d.ComponentHostData[]).forEach(c => {
-      let HostElementConstructor: any;
+    function defineComponents() {
+      // polyfills have been applied if need be
+      (cmpData as d.ComponentHostData[]).forEach(c => {
+        let HostElementConstructor: any;
 
-      if (isNative(win.customElements.define)) {
-        // native custom elements supported
-        const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
-        HostElementConstructor = createHostConstructor(win);
+        if (isNative(win.customElements.define)) {
+          // native custom elements supported
+          const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
+          HostElementConstructor = createHostConstructor(win);
 
-      } else {
-        // using polyfilled custom elements
-        HostElementConstructor = function(self: any) {
-          return (win as any).HTMLElement.call(this, self);
-        };
+        } else {
+          // using polyfilled custom elements
+          HostElementConstructor = function(self: any) {
+            return (win as any).HTMLElement.call(this, self);
+          };
 
-        HostElementConstructor.prototype = Object.create(
-          (win as any).HTMLElement.prototype,
-          { constructor: { value: HostElementConstructor, configurable: true } }
+          HostElementConstructor.prototype = Object.create(
+            (win as any).HTMLElement.prototype,
+            { constructor: { value: HostElementConstructor, configurable: true } }
+          );
+        }
+
+        // convert the static constructor data to cmp metadata
+        // define the component as a custom element
+        pltMap[namespace].defineComponent(
+          buildComponentLoader(c),
+          HostElementConstructor
         );
-      }
+      });
+    }
 
-      // convert the static constructor data to cmp metadata
-      // define the component as a custom element
-      pltMap[namespace].defineComponent(
-        buildComponentLoader(c),
-        HostElementConstructor
-      );
-    });
+    if (_BUILD_.cssVarShim && (window as any).customStyleShim) {
+      pltMap[namespace].customStyle = (window as any).customStyleShim;
+
+      pltMap[namespace].customStyle.initShim().then(defineComponents);
+
+    } else {
+      defineComponents();
+    }
 
   });
 }

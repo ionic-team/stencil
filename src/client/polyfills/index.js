@@ -32,6 +32,10 @@ export function applyPolyfills(window) {
     promises.push(import('./polyfills/fetch.js'));
   }
 
+  if (typeof WeakMap == 'undefined' || !(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'))) {
+    promises.push(import('./polyfills/css-shim.js'));
+  }
+
   function checkIfURLIsSupported() {
     try {
       var u = new URL('b', 'http://a');
@@ -47,7 +51,11 @@ export function applyPolyfills(window) {
 
   return Promise.all(promises).then(function(results) {
     results.forEach(function(polyfillModule) {
-      polyfillModule.applyPolyfill(window, window.document);
+      try {
+        polyfillModule.applyPolyfill(window, window.document);
+      } catch (e) {
+        console.error(e);
+      }
     });
   });
 }

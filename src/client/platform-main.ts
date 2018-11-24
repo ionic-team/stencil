@@ -84,16 +84,7 @@ export const createPlatformMain = (namespace: string, Context: d.CoreContext, wi
         perf.mark(`request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
       }
 
-      if (cmpMeta.componentConstructor) {
-        // we're already all loaded up :)
-        queueUpdate(plt, elm, perf);
-
-        if (_BUILD_.profile) {
-          perf.mark(`request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
-          perf.measure(`request_bundle:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `request_bundle_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
-        }
-
-      } else if (_BUILD_.externalModuleLoader) {
+      if (_BUILD_.externalModuleLoader) {
         // using a 3rd party bundler to import modules
         // at this point the cmpMeta will already have a
         // static function as a the bundleIds that returns the module

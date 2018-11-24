@@ -61,10 +61,8 @@ export function validateTesting(config: d.Config) {
       return config.sys.path.join(testing.rootDir, ignorePattern);
     });
 
-    config.outputTargets.forEach((outputTarget: d.OutputTargetWww) => {
-      if (outputTarget.dir) {
-        testing.testPathIgnorePatterns.push(outputTarget.dir);
-      }
+    config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
+      testing.testPathIgnorePatterns.push(outputTarget.dir);
     });
   }
 
