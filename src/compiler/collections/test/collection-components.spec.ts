@@ -301,10 +301,10 @@ describe('collection components', () => {
       }
     };
     const cmpData = serializeComponent(config, collectionDir, moduleFile);
-    expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.scss');
+    expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.css');
     b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
-    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].cmpRelativePath).toBe('cmp-a.scss');
-    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
+    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].cmpRelativePath).toBe('cmp-a.css');
+    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.css');
   });
 
   it('stylesMeta styleStr', () => {

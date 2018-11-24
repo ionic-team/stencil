@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
-  serializeAppCollection, serializeAppGlobal } from '../collection-data';
+  serializeAppCollection, serializeAppGlobal, serializeStyle } from '../collection-data';
 import { mockConfig } from '../../../testing/mocks';
 import { normalizePath } from '../../util';
 import * as path from 'path';
@@ -143,4 +143,19 @@ describe('manifest-data serialize/parse', () => {
     expect(r).toBe(true);
   });
 
+  it('always expect css stylesheets', () => {
+
+    const stylesMeta = {
+      externalStyles: [
+        {
+          cmpRelativePath: 'component.scssOrOther'
+        }
+      ]
+    };
+
+    const styleData = serializeStyle(config, 'some-path', stylesMeta );
+    expect(styleData).toEqual({
+      stylePaths:['some-path/component.css']
+    });
+  })
 });
