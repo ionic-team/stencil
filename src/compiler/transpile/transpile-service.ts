@@ -83,6 +83,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.suppressOutputPathCheck = true;
   compilerOptions.allowNonTsExtensions = true;
   compilerOptions.removeComments = !config.devMode;
+  compilerOptions.sourceMap = false;
   compilerOptions.lib = undefined;
   compilerOptions.types = undefined;
   compilerOptions.noEmit = undefined;

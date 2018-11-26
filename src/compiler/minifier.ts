@@ -9,6 +9,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
   const opts: any = {
     output: {beautify: false},
     compress: {},
+    sourceMap: false,
     mangle: true
   };
 
