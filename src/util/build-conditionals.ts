@@ -161,6 +161,9 @@ export async function setBuildConditionals(
     compilerCtx.lastBuildConditionalsEsmEs2017 = coreBuild;
   }
 
+  // TODO: hasSlot does not account for dependencies
+  coreBuild.slotPolyfill = true;
+
   return coreBuild;
 }
 
