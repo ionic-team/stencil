@@ -1,5 +1,5 @@
-<a name="0.16.0-5"></a>
-# 🚃 Prerelease] [0.16.0-5](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-5) (2018-11-21)
+<a name="0.16.0-6"></a>
+# 🦁 [Prerelease] [0.16.0-6](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-6) (2018-11-26)
 
 ### Features
 
@@ -35,6 +35,9 @@
 * **types:** fix signature for classList.contains ([193cc6e](https://github.com/ionic-team/stencil/commit/193cc6e)), closes [#1207](https://github.com/ionic-team/stencil/issues/1207)
 * **polyfill:** add array.fill() polyfill ([#1230](https://github.com/ionic-team/stencil/issues/1230)) ([7042932](https://github.com/ionic-team/stencil/commit/7042932))
 * **testing:** do not ignore docs dir output ([7656292](https://github.com/ionic-team/stencil/commit/7656292))
+* **esm:** fix minify es5 for esm ([5d8154c](https://github.com/ionic-team/stencil/commit/5d8154c))
+* **host:** no mode still needs the mode to be set ([784c32a](https://github.com/ionic-team/stencil/commit/784c32a))
+* **types:** resolve more types in docs ([bb48234](https://github.com/ionic-team/stencil/commit/bb48234))
 
 
 
