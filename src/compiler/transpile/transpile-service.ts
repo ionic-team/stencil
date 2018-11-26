@@ -17,8 +17,6 @@ import ts from 'typescript';
 
 
 export async function transpileService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  (ts as any).defaultMaximumTruncationLength = 400;
-
   let changedTsFiles: string[];
 
   if (shouldScanForTsChanges(compilerCtx, buildCtx)) {
