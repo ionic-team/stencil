@@ -3,6 +3,7 @@ import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
 import { propsToMarkdown } from './markdown-props';
 import { eventsToMarkdown } from './markdown-events';
 import { methodsToMarkdown } from './markdown-methods';
+import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
 
 export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
@@ -39,6 +40,7 @@ export function generateMarkdown(userContent: string, cmp: d.JsonDocsComponent) 
     AUTO_GENERATE_COMMENT,
     '',
     '',
+    ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),
     ...methodsToMarkdown(cmp.methods),
