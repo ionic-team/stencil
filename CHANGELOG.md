@@ -1,5 +1,5 @@
-<a name="0.16.0-6"></a>
-# 🦁 [Prerelease] [0.16.0-6](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0-6) (2018-11-26)
+<a name="0.16.0"></a>
+# 🏀 [0.16.0](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0) (2018-11-29)
 
 ### Features
 
@@ -8,6 +8,7 @@
 * **build:** conditionally include svg build features ([7d2e2df](https://github.com/ionic-team/stencil/commit/7d2e2df))
 * **docs:** custom docs generators ([#1227](https://github.com/ionic-team/stencil/issues/1227)) ([1c08e90](https://github.com/ionic-team/stencil/commit/1c08e90))
 * **docs:** generate api data ([2db19d3](https://github.com/ionic-team/stencil/commit/2db19d3))
+* **docs:** include usages in the markdown ([#1254](https://github.com/ionic-team/stencil/issues/1254)) ([300df72](https://github.com/ionic-team/stencil/commit/300df72))
 * **prop:** extract default value of props ([8bed57e](https://github.com/ionic-team/stencil/commit/8bed57e))
 * **types:** add support for JSX required props ([#1199](https://github.com/ionic-team/stencil/issues/1199)) ([3f39b1b](https://github.com/ionic-team/stencil/commit/3f39b1b))
 * **typescript:** update typescript ([127f0d5](https://github.com/ionic-team/stencil/commit/127f0d5))
