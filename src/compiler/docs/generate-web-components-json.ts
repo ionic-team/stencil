@@ -16,7 +16,6 @@ export async function generateWebComponentsJson(config: d.Config, compilerCtx: d
   };
   const jsonContent = JSON.stringify(json, null, 2);
   await Promise.all(distOutputs.map(async distOutput => {
-    // create an absolute file path to the actual collection json file
     const filePath = normalizePath(config.sys.path.join(distOutput.buildDir, WEB_COMPONENTS_JSON_FILE_NAME));
     await compilerCtx.fs.writeFile(filePath, jsonContent);
   }));
