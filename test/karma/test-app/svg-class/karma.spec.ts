@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('svg class', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -21,7 +21,7 @@ describe('svg class', () => {
     const button = app.querySelector('button');
     button.click();
 
-    await flush(app);
+    await waitForChanges();
 
     expect(svg.getAttribute('class')).toBe('primary');
     expect(circle.getAttribute('class')).toBe('red');

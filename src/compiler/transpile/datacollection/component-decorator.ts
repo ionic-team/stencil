@@ -3,7 +3,7 @@ import { buildWarn } from '../../util';
 import { ENCAPSULATION } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import { getStylesMeta } from './styles-meta';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {

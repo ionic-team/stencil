@@ -4,6 +4,8 @@ import { mockConfig } from '../../../testing/mocks';
 
 describe('collection-compatibility', () => {
 
+  const config = mockConfig();
+
   describe('calculateRequiredUpgrades', () => {
 
     it('should upgrade metadata', () => {
@@ -23,7 +25,5 @@ describe('collection-compatibility', () => {
     });
 
   });
-
-  const config = mockConfig();
 
 });

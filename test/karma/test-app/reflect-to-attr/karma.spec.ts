@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('reflect-to-attr', function() {
@@ -28,7 +28,7 @@ describe('reflect-to-attr', function() {
     cmp.bool = true;
     cmp.otherBool = false;
 
-    await flush(app);
+    await waitForChanges();
 
     expect(cmp.getAttribute('str')).toEqual('second');
     expect(cmp.getAttribute('nu')).toEqual('-12.2');

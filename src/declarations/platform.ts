@@ -7,7 +7,7 @@ export interface PlatformApi {
   customStyle?: any;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi: d.DomApi;
-  emitEvent: (elm: Element, eventName: string, data: d.EventEmitterData) => void;
+  emitEvent?: (elm: Element, eventName: string, data: d.EventEmitterData) => CustomEvent;
   getComponentMeta: (elm: Element) => d.ComponentMeta;
   getContextItem: (contextKey: string) => any;
   isClient?: boolean;
@@ -18,17 +18,19 @@ export interface PlatformApi {
   onAppLoad?: (rootElm: d.HostElement, failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
-  propConnect: (ctrlTag: string) => PropConnect;
+  propConnect?: (ctrlTag: string) => PropConnect;
   queue: d.QueueApi;
   render?: d.RendererApi;
   tmpDisconnected: boolean;
   nextId?: () => string;
+  hasConnectedComponent?: boolean;
 
   ancestorHostElementMap: WeakMap<d.HostElement, d.HostElement>;
   componentAppliedStyles: WeakMap<Node, d.ComponentAppliedStyles>;
   hasConnectedMap: WeakMap<d.HostElement, boolean>;
   hasListenersMap: WeakMap<d.HostElement, boolean>;
-  hasLoadedMap: WeakMap<d.HostElement, boolean>;
+  isCmpLoaded: WeakMap<d.HostElement, boolean>;
+  isCmpReady: WeakMap<d.HostElement, boolean>;
   hostSnapshotMap: WeakMap<d.HostElement, d.HostSnapshot>;
   hostElementMap: WeakMap<d.ComponentInstance, d.HostElement>;
   instanceMap: WeakMap<d.HostElement, d.ComponentInstance>;
@@ -38,6 +40,8 @@ export interface PlatformApi {
   queuedEvents: WeakMap<d.HostElement, any[]>;
   vnodeMap: WeakMap<d.HostElement, d.VNode>;
   valuesMap: WeakMap<d.HostElement, any>;
+  processingCmp: Set<d.HostElement>;
+  onAppReadyCallbacks: Function[];
 }
 
 

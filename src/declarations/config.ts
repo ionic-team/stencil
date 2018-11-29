@@ -5,6 +5,14 @@ import * as d from '.';
  */
 export interface StencilConfig {
   /**
+   * By default, Stencil will use the appropriate config to automatically prefix css. For example,
+   * developers can write modern and standard css properties, such as "transform", and Stencil
+   * will automatically add in the prefixed version, such as "-webkit-transform". To disable
+   * autoprefixing css, set this value to `false`.
+   */
+  autoprefixCss?: boolean | any;
+
+  /**
    * By default, Stencil will statically analyze the application and generate a component graph of
    * how all the components are interconnected.
    *
@@ -104,8 +112,8 @@ export interface StencilConfig {
   srcDir?: string;
 
   assetVersioning?: ConfigAssetVersioning;
-  autoprefixCss?: boolean | any;
   buildEs5?: boolean;
+  buildEsm?: boolean;
   buildScoped?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
@@ -137,6 +145,7 @@ export interface StencilConfig {
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
+  buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
   flags?: ConfigFlags;
@@ -186,9 +195,11 @@ export interface NodeResolveConfig {
 export interface ConfigFlags {
   task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
   args?: string[];
+  knownArgs?: string[];
+  unknownArgs?: string[];
   address?: string;
+  build?: boolean;
   cache?: boolean;
-  channel?: string;
   checkVersion?: boolean;
   ci?: boolean;
   compare?: boolean;
@@ -196,8 +207,10 @@ export interface ConfigFlags {
   debug?: boolean;
   dev?: boolean;
   docs?: boolean;
+  docsApi?: string;
   docsJson?: string;
   e2e?: boolean;
+  emulate?: string;
   es5?: boolean;
   headless?: boolean;
   help?: boolean;
@@ -208,13 +221,16 @@ export interface ConfigFlags {
   port?: number;
   prerender?: boolean;
   prod?: boolean;
+  profile?: boolean;
   root?: string;
   screenshot?: boolean;
+  screenshotConnector?: string;
   serve?: boolean;
   serviceWorker?: boolean;
   spec?: boolean;
   ssr?: boolean;
   stats?: boolean;
+  updateScreenshot?: boolean;
   version?: boolean;
   watch?: boolean;
 }
@@ -284,7 +300,7 @@ export interface ConfigBundle {
 
 
 export interface ServiceWorkerConfig {
-  // https://workboxjs.org/reference-docs/latest/module-workbox-build.html#.Configuration
+  // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];

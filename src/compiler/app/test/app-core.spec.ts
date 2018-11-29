@@ -8,12 +8,14 @@ describe('app-core', () => {
 
   let config: d.Config;
   let outputTarget: d.OutputTargetWww;
-  let ctx: d.CompilerCtx;
+  let cmpRegistry: d.ComponentRegistry;
 
   beforeEach(() => {
     config = mockConfig();
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-    ctx = {};
+    cmpRegistry = {
+
+    };
   });
 
 
@@ -26,21 +28,29 @@ describe('app-core', () => {
     });
 
     it('starts with the preamble', () => {
-      const preamble = generatePreamble(config).trim();
-      const lines = core.wrapCoreJs(config, '').split('\n');
+      const preamble = generatePreamble(config, {defaultBanner: true}).trim();
+      const lines = core.wrapCoreJs(config, '', cmpRegistry, {} as any).split('\n');
       expect(lines[0]).toEqual(preamble);
     });
 
-    it('wraps the JS content in an IFEE', () => {
-      const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is').split('\n');
-      expect(lines[1]).toEqual(`(function(Context,namespace,hydratedCssClass,resourcesUrl,s){"use strict";`);
+    it('wraps the JS content in an IFEE, arrow function', () => {
+      const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is', cmpRegistry, {} as any).split('\n');
+      expect(lines[1].toString().startsWith(`((w,d,x,n,h,c,r)=>{`)).toBe(true);
+      expect(lines[2]).toEqual('this is JavaScript code, really it is');
+      expect(lines[3]).toEqual(`})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",[]);`);
+    });
+
+    it('wraps the JS content in an IFEE, es5', () => {
+      const buildConditions = { es5: true } as d.BuildConditionals;
+      const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is', cmpRegistry, buildConditions).split('\n');
+      expect(lines[1]).toEqual(`(function(w,d,x,n,h,c,r){"use strict";`);
       expect(lines[3]).toEqual('this is JavaScript code, really it is');
-      expect(lines[4]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}");`);
+      expect(lines[4]).toEqual(`})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",[]);`);
     });
 
     it('trims the JS content', () => {
-      const lines = core.wrapCoreJs(config, '  this is JavaScript code, really it is     ').split('\n');
-      expect(lines[3]).toEqual('this is JavaScript code, really it is');
+      const lines = core.wrapCoreJs(config, '  this is JavaScript code, really it is     ', cmpRegistry, {} as any).split('\n');
+      expect(lines[2]).toEqual('this is JavaScript code, really it is');
     });
 
   });

@@ -16,7 +16,7 @@ export class AttributeComplex {
   @Prop() str1: string;
 
   @Method()
-  getInstance() {
+  async getInstance() {
     return this;
   }
 }

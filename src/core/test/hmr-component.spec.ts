@@ -73,10 +73,16 @@ describe('hmr-component', () => {
       expect(plt.hostElementMap.has(instance)).toBe(false);
     });
 
-    it('should remove hasLoaded', () => {
-      plt.hasLoadedMap.set(elm, true);
+    it('should remove isCmpLoaded', () => {
+      plt.isCmpLoaded.set(elm, true);
       hmrStart(plt, cmpMeta, elm, '1234');
-      expect(plt.hasLoadedMap.has(elm)).toBe(false);
+      expect(plt.isCmpLoaded.has(elm)).toBe(false);
+    });
+
+    it('should remove isCmpReady', () => {
+      plt.isCmpReady.set(elm, true);
+      hmrStart(plt, cmpMeta, elm, '1234');
+      expect(plt.isCmpReady.has(elm)).toBe(false);
     });
 
     it('should remove old constructor', () => {

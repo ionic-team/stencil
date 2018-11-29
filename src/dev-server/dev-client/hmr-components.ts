@@ -28,7 +28,7 @@ function hmrComponent(updatedTags: string[], elm: Element, versionId: string, hm
     }
   }
 
-  if (elm.shadowRoot) {
+  if (elm.shadowRoot && elm.shadowRoot.nodeType === 11 && elm.shadowRoot !== (elm as any)) {
     hmrComponent(updatedTags, elm.shadowRoot as any, versionId, hmrTagName);
   }
 

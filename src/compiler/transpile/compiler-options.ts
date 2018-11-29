@@ -1,31 +1,37 @@
 import * as d from '../../declarations';
+import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { normalizePath } from '../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
-export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (compilerCtx.compilerOptions) {
     return compilerCtx.compilerOptions;
   }
 
-  let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
+  let compilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
-    const normalizedConfigPath = normalizePath(config.tsconfig);
+    const tsconfigFilePath = normalizePath(config.tsconfig);
 
-    const sourceText = await compilerCtx.fs.readFile(normalizedConfigPath);
+    const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
-    try {
-      const sourceJson = JSON.parse(sourceText);
-      const parsedCompilerOptions: ts.CompilerOptions = ts.convertCompilerOptionsFromJson(sourceJson.compilerOptions, '.').options;
+    if (tsconfigResults.error) {
+      if (!config._isTesting) {
+        buildCtx.diagnostics.push(loadTypeScriptDiagnostic(config, tsconfigResults.error));
+      }
 
-      compilerOptions = {
-        ...compilerOptions,
-        ...parsedCompilerOptions
-      };
+    } else {
+      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, '.');
+      if (parseResult.errors && parseResult.errors.length > 0) {
+        loadTypeScriptDiagnostics(config, buildCtx.diagnostics, parseResult.errors);
 
-    } catch (e) {
-      config.logger.warn('tsconfig.json is malformed, using default settings');
+      } else {
+        compilerOptions = {
+          ...compilerOptions,
+          ...parseResult.options
+        };
+      }
     }
 
   } catch (e) {
@@ -54,6 +60,22 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     compilerOptions.declaration = false;
   }
 
+  if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module) {
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
+  }
+
+  if (compilerOptions.target !==  DEFAULT_COMPILER_OPTIONS.target) {
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`);
+  }
+
+  if (compilerOptions.esModuleInterop !== true) {
+    config.logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
+  }
+
+  if (compilerOptions.allowSyntheticDefaultImports !== true) {
+    config.logger.warn(`To standardize default imports, it is recommend to set the tsconfig.json "allowSyntheticDefaultImports" setting to "true".`);
+  }
+
   validateCompilerOptions(compilerOptions);
 
   compilerCtx.compilerOptions = compilerOptions;
@@ -74,12 +96,9 @@ function validateCompilerOptions(compilerOptions: ts.CompilerOptions) {
   compilerOptions.experimentalDecorators = DEFAULT_COMPILER_OPTIONS.experimentalDecorators;
   compilerOptions.noEmitOnError = DEFAULT_COMPILER_OPTIONS.noEmit;
   compilerOptions.suppressOutputPathCheck = DEFAULT_COMPILER_OPTIONS.suppressOutputPathCheck;
-  compilerOptions.module = DEFAULT_COMPILER_OPTIONS.module;
   compilerOptions.moduleResolution = DEFAULT_COMPILER_OPTIONS.moduleResolution;
-
-  if (compilerOptions.target === ts.ScriptTarget.ES3 || compilerOptions.target === ts.ScriptTarget.ES5) {
-    compilerOptions.target = DEFAULT_COMPILER_OPTIONS.target;
-  }
+  compilerOptions.module = DEFAULT_COMPILER_OPTIONS.module;
+  compilerOptions.target = DEFAULT_COMPILER_OPTIONS.target;
 }
 
 
@@ -95,7 +114,6 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   // to verify that there are no conflicts between input and output paths.
   suppressOutputPathCheck: true,
 
-  // // Clear out other settings that would not be used in transpiling this module
   lib: [
     'lib.dom.d.ts',
     'lib.es5.d.ts',
@@ -104,11 +122,9 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
     'lib.es2017.d.ts'
   ],
 
-  // We are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
-  // noResolve: true,
-
   allowSyntheticDefaultImports: true,
+
+  esModuleInterop: true,
 
   // must always allow decorators
   experimentalDecorators: true,
@@ -116,7 +132,7 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   // transpile down to es2017
   target: ts.ScriptTarget.ES2017,
 
-  // create es2015 modules
+  // create esNext modules
   module: ts.ModuleKind.ESNext,
 
   // resolve using NodeJs style

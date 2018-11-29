@@ -16,7 +16,12 @@ import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 
 
-export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, customStyle: CustomStyle) {
+export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: d.WindowData, doc: Document, resourcesUrl: string, hydratedCssClass: string, components: d.ComponentHostData[], customStyle: CustomStyle) {
+  const perf = win.performance;
+  if (_BUILD_.profile) {
+    perf.mark(`app_load_start`);
+  }
+
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles = new Map<string, d.CjsExports>();
@@ -25,7 +30,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
-  if (__BUILD_CONDITIONALS__.isDev && __BUILD_CONDITIONALS__.shadowDom && domApi.$supportsShadowDom && customStyle) {
+  if (_BUILD_.isDev && _BUILD_.shadowDom && domApi.$supportsShadowDom && customStyle) {
     console.error('Unsupported browser. Native shadow-dom available but CSS Custom Properites are not.');
   }
 
@@ -36,11 +41,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   Context.document = doc;
   Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
-  if (__BUILD_CONDITIONALS__.listener) {
+  if (_BUILD_.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
-  if (__BUILD_CONDITIONALS__.event) {
+  if (_BUILD_.event) {
     Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
@@ -49,8 +54,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   App.Context = Context;
 
   // keep a global set of tags we've already defined
-  // DEPRECATED $definedCmps 2018-05-22
-  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win as any)['$definedCmps'] = (win['s-defined'] || (win as any)['$definedCmps'] || {});
+  const globalDefined: {[tag: string]: boolean} = win['s-defined'] = (win['s-defined'] || {});
 
   // internal id increment for unique ids
   let ids = 0;
@@ -78,7 +82,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     componentAppliedStyles: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
-    hasLoadedMap: new WeakMap(),
+    isCmpLoaded: new WeakMap(),
+    isCmpReady: new WeakMap(),
     hostElementMap: new WeakMap(),
     hostSnapshotMap: new WeakMap(),
     instanceMap: new WeakMap(),
@@ -87,8 +92,16 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     onReadyCallbacksMap: new WeakMap(),
     queuedEvents: new WeakMap(),
     vnodeMap: new WeakMap(),
-    valuesMap: new WeakMap()
+    valuesMap: new WeakMap(),
+
+    processingCmp: new Set(),
+    onAppReadyCallbacks: []
   };
+
+  // create a method that returns a promise
+  // which gets resolved when the app's queue is empty
+  // and app is idle, works for both initial load and updates
+  App.onReady = () => new Promise(resolve => plt.queue.write(() => plt.processingCmp.size ? plt.onAppReadyCallbacks.push(resolve) : resolve()));
 
   // create the renderer that will be used
   plt.render = createRendererPatch(plt, domApi);
@@ -101,13 +114,20 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   // this will fire when all components have finished loaded
   rootElm['s-init'] = () => {
-    plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    plt.isCmpReady.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
+
+    if (_BUILD_.profile) {
+      perf.mark('app_load_end');
+      perf.measure('app_load', 'app_load_start', 'app_load_end');
+    }
   };
 
-  // if the HTML was generated from SSR
-  // then let's walk the tree and generate vnodes out of the data
-  createVNodesFromSsr(plt, domApi, rootElm);
+  if (_BUILD_.prerenderClientSide) {
+    // if the HTML was generated from prerendering
+    // then let's walk the tree and generate vnodes out of the data
+    createVNodesFromSsr(plt, domApi, rootElm);
+  }
 
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
@@ -121,10 +141,11 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       initHostElement(plt,
         (cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta),
         HostElementConstructor.prototype,
-        hydratedCssClass
+        hydratedCssClass,
+        perf
       );
 
-      if (__BUILD_CONDITIONALS__.observeAttr) {
+      if (_BUILD_.observeAttr) {
         // add which attributes should be observed
         const observedAttributes: string[] = [];
 
@@ -145,13 +166,22 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
         HostElementConstructor.observedAttributes = observedAttributes;
       }
 
+      if (_BUILD_.profile) {
+        perf.mark(`define_start:${cmpMeta.tagNameMeta}`);
+      }
+
       // define the custom element
       win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
+
+      if (_BUILD_.profile) {
+        perf.mark(`define_end:${cmpMeta.tagNameMeta}`);
+        perf.measure(`define:${cmpMeta.tagNameMeta}`, `define_start:${cmpMeta.tagNameMeta}`, `define_end:${cmpMeta.tagNameMeta}`);
+      }
     }
   }
 
   function getLoadedBundle(bundleId: string, hmrVersionId?: string) {
-    if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
+    if (_BUILD_.hotModuleReplacement && hmrVersionId) {
       loadedBundles.delete(bundleId.replace(/^\.\//, ''));
     }
 
@@ -206,7 +236,9 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
               // get the component constructor from the module
               cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
-              initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode);
+              if (_BUILD_.styles) {
+                initStyleTemplate(domApi, cmpMeta, cmpMeta.encapsulationMeta, cmpMeta.componentConstructor.style, cmpMeta.componentConstructor.styleMode, perf);
+              }
             }
             break;
           }
@@ -251,8 +283,8 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
 
   let requestBundleQueue: Function[] = [];
-  if (__BUILD_CONDITIONALS__.cssVarShim && customStyle) {
-    customStyle.init().then(() => {
+  if (_BUILD_.cssVarShim && customStyle) {
+    customStyle.initShim().then(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
         requestBundleQueue.shift()();
@@ -271,17 +303,17 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
     if (getLoadedBundle(bundleId, hmrVersionId)) {
       // sweet, we've already loaded this bundle
-      queueUpdate(plt, elm);
+      queueUpdate(plt, elm, perf);
 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
       bundleQueue.push([undefined, [bundleId], () => {
-        queueUpdate(plt, elm);
+        queueUpdate(plt, elm, perf);
       }]);
 
       // when to request the bundle depends is we're using the css shim or not
-      if (__BUILD_CONDITIONALS__.cssVarShim && customStyle) {
+      if (_BUILD_.cssVarShim && customStyle) {
         // using css shim, so we've gotta wait until it's ready
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
@@ -304,10 +336,10 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
   function requestComponentBundle(bundleId: string, hmrVersionId: string) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    const useScopedCss = __BUILD_CONDITIONALS__.shadowDom && !domApi.$supportsShadowDom;
-    let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.es5.js';
+    const useScopedCss = _BUILD_.shadowDom && !domApi.$supportsShadowDom;
+    let url = resourcesUrl + bundleId + (useScopedCss ? '.sc' : '') + '.es5.entry.js';
 
-    if (__BUILD_CONDITIONALS__.hotModuleReplacement && hmrVersionId) {
+    if (_BUILD_.hotModuleReplacement && hmrVersionId) {
       url += '?s-hmr=' + hmrVersionId;
     }
 
@@ -352,35 +384,51 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
-  if (__BUILD_CONDITIONALS__.styles) {
+  if (_BUILD_.styles) {
     plt.attachStyles = (plt, domApi, cmpMeta, elm) => {
       attachStyles(plt, domApi, cmpMeta, elm);
     };
   }
 
-  if (__BUILD_CONDITIONALS__.devInspector) {
-    generateDevInspector(App, namespace, win, plt);
+  if (_BUILD_.devInspector) {
+    generateDevInspector(namespace, win, plt, components);
   }
 
   // register all the components now that everything's ready
-  (App.components || [])
+  if (_BUILD_.profile) {
+    perf.mark(`define_custom_elements_start`);
+  }
+
+  components
     .map(data => {
       const cmpMeta = parseComponentLoader(data);
       return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
     })
     .forEach(cmpMeta => {
-    // es5 way of extending HTMLElement
-    function HostElement(self: any) {
-      return HTMLElement.call(this, self);
+      // es5 way of extending HTMLElement
+      function HostElement(self: any) {
+        return HTMLElement.call(this, self);
+      }
+
+      HostElement.prototype = Object.create(
+        HTMLElement.prototype,
+        { constructor: { value: HostElement, configurable: true } }
+      );
+
+      defineComponent(cmpMeta, HostElement);
     }
+  );
 
-    HostElement.prototype = Object.create(
-      HTMLElement.prototype,
-      { constructor: { value: HostElement, configurable: true } }
-    );
+  if (_BUILD_.profile) {
+    perf.mark(`define_custom_elements_end`);
+    perf.measure(`define_custom_elements`, `define_custom_elements_start`, `define_custom_elements_end`);
+  }
 
-    defineComponent(cmpMeta, HostElement);
-  });
+  if (!plt.hasConnectedComponent) {
+    // we just defined call the custom elements but no
+    // connectedCallbacks happened, so no components in the dom :(
+    rootElm['s-init']();
+  }
 
   // create the componentOnReady fn
   initCoreComponentOnReady(plt, App, win, win['s-apps'], win['s-cr']);

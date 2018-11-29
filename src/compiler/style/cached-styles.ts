@@ -109,7 +109,7 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
   }
 
   const isChangedImport = buildCtx.filesChanged.some(changedFilePath => {
-    return cssImports.some(c => c.filePath === changedFilePath);
+    return cssImports.some(c => c.filePath === changedFilePath || c.altFilePath === changedFilePath);
   });
 
   if (isChangedImport) {
@@ -118,8 +118,14 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
   }
 
   // keep diggin'
-  const promises = cssImports.map(cssImportData => {
-    return hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, checkedFiles);
+  const promises = cssImports.map(async (cssImportData) => {
+    let hasChanged = await hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, checkedFiles);
+
+    if (!hasChanged && typeof cssImportData.altFilePath === 'string') {
+      hasChanged = await hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.altFilePath, checkedFiles);
+    }
+
+    return hasChanged;
   });
 
   const results = await Promise.all(promises);

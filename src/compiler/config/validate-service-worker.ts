@@ -76,5 +76,5 @@ function addGlobIgnores(config: d.Config, globIgnores: string[]) {
 }
 
 
-const DEFAULT_GLOB_PATTERNS = '**/*.{js,css,json,html,ico,png,svg}';
+const DEFAULT_GLOB_PATTERNS = '**/*.{js,css,json,html}';
 const DEFAULT_FILENAME = 'sw.js';

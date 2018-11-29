@@ -6,6 +6,8 @@
     "declaration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmitHelpers": true,
+    "importHelpers": true,
     "lib": [
       "dom",
       "es2017"
@@ -19,6 +21,12 @@
     "outDir": "../../dist/transpiled-testing",
     "pretty": true,
     "rootDir": "../",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/mock-doc": [
+        "../../dist/mock-doc"
+      ]
+    },
     "target": "es2015"
   },
   "include": [

@@ -1,43 +1,30 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const ts = require('typescript');
 
 
-function buildCoreEsm(inputFile, outputFile) {
-  return rollup.rollup({
+async function buildCoreEsm(inputFile, outputFile) {
+  const build = await rollup.rollup({
     input: inputFile,
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
       console.error( message );
     }
-  })
-  .then(bundle => {
-    generateBundle(inputFile, outputFile, bundle, 'es');
-  })
-  .catch(err => {
-    console.log(err);
-    console.log(err.stack);
-    process.exit(1);
   });
-}
 
+  const clientCore = await build.generate({
+    format: 'es'
+  });
 
-function generateBundle(inputFile, outputFile, bundle, format) {
-  bundle.generate({
-    format: format
+  let code = clientCore.code.trim();
+  code = dynamicImportFnHack(code);
+  code = polyfillsHack(code);
 
-  }).then(clientCore => {
-    let code = clientCore.code.trim();
-    code = dynamicImportFnHack(code);
-    code = polyfillsHack(code);
-
-    fs.writeFile(outputFile, code, (err) => {
-      if (err) {
-        console.log(err);
-        process.exit(1);
-      }
-    });
+  fs.writeFile(outputFile, code, (err) => {
+    if (err) {
+      console.log(err);
+      process.exit(1);
+    }
   });
 }
 

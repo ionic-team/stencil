@@ -14,15 +14,15 @@ export function validateTesting(config: d.Config) {
     testing.browserHeadless = true;
   }
 
-  if (config.flags.ci) {
-    testing.browserArgs = testing.browserArgs || [];
-    if (!testing.browserArgs.includes('--no-sandbox')) {
-      testing.browserArgs.push('--no-sandbox');
-    }
-    if (!testing.browserArgs.includes('--disable-setuid-sandbox')) {
-      testing.browserArgs.push('--disable-setuid-sandbox');
-    }
+  testing.browserArgs = testing.browserArgs || [];
+  addOption(testing.browserArgs, '--disable-gpu');
+  addOption(testing.browserArgs, '--disable-canvas-aa');
+  addOption(testing.browserArgs, '--disable-composited-antialiasing');
+  addOption(testing.browserArgs, '--disable-composited-antialiasing');
 
+  if (config.flags.ci) {
+    addOption(testing.browserArgs, '--no-sandbox');
+    addOption(testing.browserArgs, '--disable-setuid-sandbox');
     testing.browserHeadless = true;
   }
 
@@ -37,6 +37,21 @@ export function validateTesting(config: d.Config) {
     testing.rootDir = config.rootDir;
   }
 
+  if (config.flags && typeof config.flags.screenshotConnector === 'string') {
+    testing.screenshotConnector = config.flags.screenshotConnector;
+  }
+
+  if (typeof testing.screenshotConnector === 'string') {
+    if (!path.isAbsolute(testing.screenshotConnector)) {
+      testing.screenshotConnector = path.join(config.rootDir, testing.screenshotConnector);
+    }
+
+  } else {
+    testing.screenshotConnector = config.sys.path.join(
+      config.sys.compiler.packageDir, 'screenshot', 'local-connector.js'
+    );
+  }
+
   if (!Array.isArray(testing.moduleFileExtensions)) {
     testing.moduleFileExtensions = DEFAULT_MODULE_FILE_EXTENSIONS;
   }
@@ -46,16 +61,14 @@ export function validateTesting(config: d.Config) {
       return config.sys.path.join(testing.rootDir, ignorePattern);
     });
 
-    config.outputTargets.forEach((outputTarget: d.OutputTargetWww) => {
-      if (outputTarget.dir) {
-        testing.testPathIgnorePatterns.push(outputTarget.dir);
-      }
+    config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
+      testing.testPathIgnorePatterns.push(outputTarget.dir);
     });
   }
 
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.setuptest.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
     );
 
   } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
@@ -77,6 +90,30 @@ export function validateTesting(config: d.Config) {
     );
   }
 
+  if (typeof testing.allowableMismatchedPixels === 'number') {
+    if (testing.allowableMismatchedPixels < 0) {
+      throw new Error(`allowableMismatchedPixels must be a value that is 0 or greater`);
+    }
+
+  } else {
+    testing.allowableMismatchedPixels = DEFAULT_ALLOWABLE_MISMATCHED_PIXELS;
+  }
+
+  if (typeof testing.allowableMismatchedRatio === 'number') {
+    if (testing.allowableMismatchedRatio < 0 || testing.allowableMismatchedRatio > 1) {
+      throw new Error(`allowableMismatchedRatio must be a value ranging from 0 to 1`);
+    }
+  }
+
+  if (typeof testing.pixelmatchThreshold === 'number') {
+    if (testing.pixelmatchThreshold < 0 || testing.pixelmatchThreshold > 1) {
+      throw new Error(`pixelmatchThreshold must be a value ranging from 0 to 1`);
+    }
+
+  } else {
+    testing.pixelmatchThreshold = DEFAULT_PIXEL_MATCH_THRESHOLD;
+  }
+
   if (Array.isArray(testing.testMatch)) {
     delete testing.testRegex;
 
@@ -84,16 +121,30 @@ export function validateTesting(config: d.Config) {
     delete testing.testMatch;
 
   } else {
-    const types: string[] = [];
-    if (config.flags.e2e) {
-      types.push('e2e');
-    }
-    if (config.flags.spec) {
-      types.push('spec');
-    }
-
     testing.testMatch = [
-      `**/+(*.)+(${types.join('|')}).+(ts|tsx|js)?(x)`
+      `**/*(*.)+(e2e|spec).+(ts)?(x)`
+    ];
+  }
+
+  if (typeof testing.runner !== 'string') {
+    testing.runner = path.join(
+      config.sys.compiler.packageDir, 'testing', 'jest.runner.js'
+    );
+  }
+
+  if (!Array.isArray(testing.emulate) || testing.emulate.length === 0) {
+    testing.emulate = [
+      {
+        userAgent: 'default',
+        viewport: {
+          width: 600,
+          height: 600,
+          deviceScaleFactor: 1,
+          isMobile: false,
+          hasTouch: false,
+          isLandscape: false,
+        }
+      }
     ];
   }
 
@@ -127,3 +178,13 @@ const DEFAULT_IGNORE_PATTERNS = [
   '.stencil',
   'node_modules',
 ];
+
+function addOption(setArray: string[], option: string) {
+  if (!setArray.includes(option)) {
+    setArray.push(option);
+  }
+}
+
+
+const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
+const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;

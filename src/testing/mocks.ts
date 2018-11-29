@@ -8,24 +8,29 @@ import { createRendererPatch } from '../renderer/vdom/patch';
 import { initComponentInstance } from '../core/init-component-instance';
 import { initHostElement } from '../core/init-host-element';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
-import { MockCustomEvent } from './mock-doc/event';
-import { MockDocument } from './mock-doc/document';
-import { MockWindow } from './mock-doc/window';
 import { TestingConfig } from './testing-config';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
+import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
+import { noop } from '../util/helpers';
 
 
-export function mockWindow() {
-  const win = new MockWindow();
-  return (win as any) as Window;
-}
+export { mockDocument, mockWindow };
 
-export function mockDocument(html?: string) {
-  const doc = new MockDocument(html);
-  return (doc as any) as Document;
+
+export const testingPerf = { mark: noop, measure: noop } as any;
+
+
+export function mockDom(url: string, html: string): { win: Window, doc: HTMLDocument } {
+  const win = mockWindow() as any;
+  win.location.href = url;
+
+  const doc = mockDocument(html);
+  win.document = doc;
+
+  return { win, doc };
 }
 
 
@@ -188,7 +193,7 @@ export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpM
     $attributes: {}
   };
 
-  return initComponentInstance(plt, elm, hostSnapshot);
+  return initComponentInstance(plt, elm, hostSnapshot, testingPerf);
 }
 
 
@@ -210,7 +215,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: d.ComponentMeta) {
 }
 
 export function mockDispatchEvent(elm: HTMLElement, name: string, detail: any = {}): boolean {
-  const ev = new MockCustomEvent(name, detail);
+  const ev = new MockCustomEvent(name, { detail });
   return elm.dispatchEvent(ev as any);
 }
 
@@ -234,7 +239,7 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
     if (!plt.hasConnectedMap.has(node)) {
       const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated');
+        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated', testingPerf);
         (node as d.HostElement).connectedCallback();
       }
     }

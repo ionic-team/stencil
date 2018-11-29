@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('key-reorder', function() {
@@ -32,7 +32,7 @@ describe('key-reorder', function() {
     const button = app.querySelector('button');
     button.click();
 
-    await flush(app);
+    await waitForChanges();
 
     item0 = app.querySelector('#item-0') as any;
     item1 = app.querySelector('#item-1') as any;

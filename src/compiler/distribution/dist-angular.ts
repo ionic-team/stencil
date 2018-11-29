@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { MEMBER_TYPE } from '../../util/constants';
-import { basename, dirname, relative } from 'path';
 import { dashToPascalCase } from '../../util/helpers';
+import { MEMBER_TYPE } from '../../util/constants';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
@@ -27,7 +26,8 @@ function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegi
 
 async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, cmpRegistry: d.ComponentRegistry) {
   const components = getComponents(outputTarget.excludeComponents, cmpRegistry);
-  const { hasDirectives, hasOutputs, proxies } = generateProxies(components);
+  const useDirectives = outputTarget.useDirectives;
+  const { hasOutputs, proxies } = generateProxies(components, useDirectives);
 
   const auxFunctions: string[] = [
     inputsAuxFunction(),
@@ -38,10 +38,15 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
     'ElementRef'
   ];
 
-  if (hasDirectives) {
-    angularImports.push('Component');
-    angularImports.push('ViewEncapsulation');
-    angularImports.push('ChangeDetectionStrategy');
+  if (components.length > 0) {
+    if (useDirectives) {
+      angularImports.push('Directive');
+    } else {
+      angularImports.push('Component');
+      angularImports.push('ViewEncapsulation');
+      angularImports.push('ChangeDetectionStrategy');
+      angularImports.push('ChangeDetectorRef');
+    }
   }
 
   if (hasOutputs) {
@@ -57,8 +62,8 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
     : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
 
   const final: string[] = [
-    '/* auto-generated angular directive proxies */',
     '/* tslint:disable */',
+    '/* auto-generated angular directive proxies */',
     imports,
     sourceImports,
     auxFunctions.join('\n'),
@@ -68,7 +73,7 @@ import { ${angularImports.sort().join(', ')} } from '@angular/core';
   const finalText = final.join('\n') + '\n';
   await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
   if (outputTarget.directivesArrayFile) {
-    const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+    const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
     const a = angularArray(components, proxyPath);
     await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, a);
   }
@@ -112,15 +117,13 @@ export function proxyMethods(instance: any, el: any, methods: string[]) {
 `;
 }
 
-function generateProxies(components: d.ComponentMeta[]) {
-  let hasDirectives = false;
+function generateProxies(components: d.ComponentMeta[], useDirectives: boolean) {
   let hasMethods = false;
   let hasOutputs = false;
   let hasInputs = false;
 
   const lines = components.map(cmpMeta => {
-    const proxy = generateProxy(cmpMeta);
-    hasDirectives = true;
+    const proxy = generateProxy(cmpMeta, useDirectives);
     if (proxy.hasInputs) {
       hasInputs = true;
     }
@@ -135,14 +138,13 @@ function generateProxies(components: d.ComponentMeta[]) {
 
   return {
     proxies: lines.join('\n'),
-    hasDirectives,
     hasInputs,
     hasMethods,
     hasOutputs
   };
 }
 
-function generateProxy(cmpMeta: d.ComponentMeta) {
+function generateProxy(cmpMeta: d.ComponentMeta, useDirectives: boolean) {
   // Collect component meta
   const inputs = getInputs(cmpMeta);
   const outputs = getOutputs(cmpMeta);
@@ -155,35 +157,44 @@ function generateProxy(cmpMeta: d.ComponentMeta) {
   const hasContructor = hasInputs || hasOutputs || hasMethods;
 
   // Generate Angular @Directive
+  const decorator = useDirectives ? 'Directive' : 'Component';
   const directiveOpts = [
     `selector: \'${cmpMeta.tagNameMeta}\'`,
-    `changeDetection: ChangeDetectionStrategy.OnPush`,
-    `encapsulation: ViewEncapsulation.None`,
-    `template: '<ng-content></ng-content>'`
   ];
+  if (!useDirectives) {
+    directiveOpts.push(
+      `changeDetection: ChangeDetectionStrategy.OnPush`,
+      `encapsulation: ViewEncapsulation.None`,
+      `template: '<ng-content></ng-content>'`
+    );
+  }
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
-  // if (outputs.length > 0) {
-  //   directiveOpts.push(`outputs: ['${outputs.join(`', '`)}']`);
-  // }
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const lines = [`
 export declare interface ${cmpMeta.componentClass} extends StencilComponents<'${tagNameAsPascal}'> {}
-@Component({ ${directiveOpts.join(', ')} })
+@${decorator}({ ${directiveOpts.join(', ')} })
 export class ${cmpMeta.componentClass} {`];
 
   // Generate outputs
   outputs.forEach(output => {
-    lines.push(`  ${output}: EventEmitter<CustomEvent>;`);
+    lines.push(`  ${output}!: EventEmitter<CustomEvent>;`);
   });
 
   // Generate component constructor
   if (hasContructor) {
-    lines.push(`
+    if (useDirectives) {
+      lines.push(`
   constructor(r: ElementRef) {
     const el = r.nativeElement;`);
+    } else {
+      lines.push(`
+  constructor(c: ChangeDetectorRef, r: ElementRef) {
+    c.detach();
+    const el = r.nativeElement;`);
+    }
   }
 
   if (hasMethods) {
@@ -231,10 +242,10 @@ function getMethods(cmpMeta: d.ComponentMeta) {
 }
 
 
-function relativeImport(pathFrom: string, pathTo: string) {
-  let relativePath = relative(dirname(pathFrom), dirname(pathTo));
+function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
+  let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
   relativePath = relativePath === '' ? '.' : relativePath;
-  return `${relativePath}/${basename(pathTo, '.ts')}`;
+  return `${relativePath}/${config.sys.path.basename(pathTo, '.ts')}`;
 }
 
 function angularArray(components: d.ComponentMeta[], proxyPath: string) {

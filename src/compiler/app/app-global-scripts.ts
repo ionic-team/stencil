@@ -8,39 +8,44 @@ import { minifyJs } from '../minifier';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 
-export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
-  const globalJsContents = await generateAppGlobalContents(config, compilerCtx, buildCtx, sourceTarget);
+export async function generateBrowserAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget: SourceTarget) {
+  const globalJsContents = await generateAppGlobalContent(config, compilerCtx, buildCtx, sourceTarget);
 
   if (globalJsContents.length > 0) {
     appRegistry.global = getGlobalFileName(config);
 
     const globalJsContent = generateGlobalJs(config, globalJsContents);
-    const globalEsmContent = generateGlobalEsm(config, globalJsContents);
 
     compilerCtx.appFiles.global = globalJsContent;
 
-    const promises: Promise<any>[] = [];
-
     if (sourceTarget !== 'es5') {
-      config.outputTargets.filter(o => o.appBuild).forEach(outputTarget => {
+      const promises = config.outputTargets.filter(o => o.appBuild).map(outputTarget => {
         const appGlobalFilePath = getGlobalJsBuildPath(config, outputTarget as any);
-        promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent));
+        return compilerCtx.fs.writeFile(appGlobalFilePath, globalJsContent);
       });
-    } else {
-      config.outputTargets.filter(o => o.type === 'dist').forEach(outputTarget => {
-        const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget as any, 'es5');
-        promises.push(compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent));
-      });
+      await Promise.all(promises);
     }
+  }
+  return globalJsContents;
+}
 
+export async function generateEsmAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
+  const globalJsContents = await generateAppGlobalContent(config, compilerCtx, buildCtx, sourceTarget);
+
+  if (globalJsContents.length > 0) {
+    const globalEsmContent = generateGlobalEsm(config, globalJsContents);
+    const promises = config.outputTargets.filter(o => o.type === 'dist').map(outputTarget => {
+      const appGlobalFilePath = getGlobalEsmBuildPath(config, outputTarget as any, sourceTarget);
+      return compilerCtx.fs.writeFile(appGlobalFilePath, globalEsmContent);
+    });
     await Promise.all(promises);
   }
 
-  return globalJsContents.join('\n').trim();
+  return globalJsContents;
 }
 
 
-export async function generateAppGlobalContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
+export async function generateAppGlobalContent(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget) {
   const [projectGlobalJsContent, dependentGlobalJsContents] = await Promise.all([
     bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, config.namespace, config.globalScript),
     loadDependentGlobalJsContents(config, compilerCtx, buildCtx, sourceTarget),
@@ -49,7 +54,7 @@ export async function generateAppGlobalContents(config: Config, compilerCtx: Com
   return [
     projectGlobalJsContent,
     ...dependentGlobalJsContents
-  ];
+  ].join('\n').trim();
 }
 
 
@@ -90,6 +95,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           jsnext: true,
           main: true
         }),
+        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
@@ -148,24 +154,19 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
   }
 
   if (config.minifyJs) {
-    const minifyResults = await minifyJs(config, compilerCtx, jsContent, sourceTarget, false);
-    if (minifyResults.diagnostics && minifyResults.diagnostics.length) {
-      buildCtx.diagnostics.push(...minifyResults.diagnostics);
-    } else {
-      jsContent = minifyResults.output;
-    }
+    jsContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, jsContent, sourceTarget, false);
   }
 
-  return `\n(function(resourcesUrl){${jsContent}\n})(resourcesUrl);\n`;
+  return `\n(function(Context, resourcesUrl){${jsContent}\n})(x,r);\n`;
 }
 
 
-export function generateGlobalJs(config: Config, globalJsContents: string[]) {
+export function generateGlobalJs(config: Config, globalJsContents: string) {
   const output = [
     generatePreamble(config) + '\n',
     `(function(namespace,resourcesUrl){`,
     `"use strict";\n`,
-    globalJsContents.join('\n').trim(),
+    globalJsContents,
     `\n})("${config.namespace}");`
   ].join('');
 
@@ -173,11 +174,11 @@ export function generateGlobalJs(config: Config, globalJsContents: string[]) {
 }
 
 
-export function generateGlobalEsm(config: Config, globalJsContents: string[]) {
+export function generateGlobalEsm(config: Config, globalJsContents: string) {
   const output = [
     generatePreamble(config) + '\n',
-    `export default function appGlobal(namespace, Context, window, document, resourcesUrl, hydratedCssClass) {`,
-    globalJsContents.join('\n').trim(),
+    `export default function appGlobal(n, x, w, d, r, h) {`,
+    globalJsContents,
     `\n}`
   ].join('');
 

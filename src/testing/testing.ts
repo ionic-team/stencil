@@ -1,7 +1,8 @@
 import * as d from '../declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '../compiler/util';
-import { runJest, setupJestConfig } from './jest/jest-runner';
+import { runJest } from './jest/jest-runner';
+import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import * as puppeteer from 'puppeteer';
 
@@ -12,7 +13,6 @@ export class Testing implements d.Testing {
   config: d.Config;
   devServer: d.DevServer;
   puppeteerBrowser: puppeteer.Browser;
-  jestConfigPath: string;
 
   constructor(config: d.Config) {
     const { Compiler } = require('../compiler/index.js');
@@ -32,7 +32,7 @@ export class Testing implements d.Testing {
 
   async runTests() {
     if (!this.isValid || !this.compiler) {
-      return;
+      return false;
     }
 
     const env: d.E2EProcessEnv = process.env;
@@ -41,7 +41,7 @@ export class Testing implements d.Testing {
     const { isValid, outputTarget } = getOutputTarget(config);
     if (!isValid) {
       this.isValid = false;
-      return;
+      return false;
     }
 
     const msg: string[] = [];
@@ -53,37 +53,52 @@ export class Testing implements d.Testing {
 
     if (config.flags.spec) {
       msg.push('spec');
+      env.__STENCIL_SPEC_TESTS__ = 'true';
     }
 
     config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
 
     const doScreenshots = !!(config.flags.e2e && config.flags.screenshot);
     if (doScreenshots) {
-      env.__STENCIL_SCREENSHOTS__ = 'true';
-      config.logger.info(config.logger.magenta(`generating screenshots`));
-    }
+      env.__STENCIL_SCREENSHOT__ = 'true';
 
-    const jestEnvNodeModule = config.sys.lazyRequire.getModulePath('jest-environment-node');
-    env.__STENCIL_JEST_ENVIRONMENT_NODE_MODULE__ = jestEnvNodeModule;
-    config.logger.debug(`jest-environment-node: ${jestEnvNodeModule}`);
+      if (config.flags.updateScreenshot) {
+        config.logger.info(config.logger.magenta(`updating master screenshots`));
+      } else {
+        config.logger.info(config.logger.magenta(`comparing against master screenshots`));
+      }
+    }
 
     if (config.flags.e2e) {
       // e2e tests only
       // do a build, start a dev server
       // and spin up a puppeteer browser
+
+      let buildTask: Promise<d.BuildResults> = null;
+
+      (config.outputTargets as d.OutputTargetWww[]).forEach(outputTarget => {
+        outputTarget.empty = false;
+      });
+
+      const doBuild = !(config.flags && config.flags.build === false);
+      if (doBuild) {
+        buildTask = compiler.build();
+      }
+
       const startupResults = await Promise.all([
-        compiler.build(),
         compiler.startDevServer(),
         startPuppeteerBrowser(config),
       ]);
 
-      const results = startupResults[0];
-      this.devServer = startupResults[1];
-      this.puppeteerBrowser = startupResults[2];
+      this.devServer = startupResults[0];
+      this.puppeteerBrowser = startupResults[1];
 
-      if (!results || (!config.watch && hasError(results && results.diagnostics))) {
-        await this.destroy();
-        process.exit(1);
+      if (doBuild) {
+        const results = await buildTask;
+        if (!results || (!config.watch && hasError(results && results.diagnostics))) {
+          await this.destroy();
+          return false;
+        }
       }
 
       if (this.devServer) {
@@ -95,25 +110,25 @@ export class Testing implements d.Testing {
       }
     }
 
-    this.jestConfigPath = await setupJestConfig(config);
+    let passed = false;
 
     try {
-      await runJest(config, this.jestConfigPath, doScreenshots);
+      if (doScreenshots) {
+        passed = await runJestScreenshot(config, env);
+      } else {
+        passed = await runJest(config, env);
+      }
+      config.logger.info('');
+
     } catch (e) {
       config.logger.error(e);
     }
 
-    config.logger.info('');
+    return passed;
   }
 
   async destroy() {
     if (this.config) {
-      if (this.jestConfigPath) {
-        try {
-          await this.config.sys.fs.unlink(this.jestConfigPath);
-        } catch (e) {}
-      }
-
       this.config.sys.destroy();
       this.config = null;
     }

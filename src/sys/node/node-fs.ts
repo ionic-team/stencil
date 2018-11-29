@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import * as fs from 'fs';
+import fs from 'graceful-fs';
 
 
 export class NodeFs implements d.FileSystem {
@@ -63,6 +63,16 @@ export class NodeFs implements d.FileSystem {
         }
       });
     });
+  }
+
+  exists(filePath: string) {
+    return new Promise<boolean>(resolve => {
+      fs.exists(filePath, resolve);
+    });
+  }
+
+  existsSync(filePath: string) {
+    return fs.existsSync(filePath);
   }
 
   readFileSync(filePath: string) {

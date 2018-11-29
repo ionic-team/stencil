@@ -1,5 +1,7 @@
 import * as d from '../../declarations';
 import { buildError, normalizePath } from '../util';
+import isGlob from 'is-glob';
+import minimatch from 'minimatch';
 
 
 export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx) {
@@ -41,7 +43,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
     throw new Error(`copy missing "src" property`);
   }
 
-  if (copyTask.dest && config.sys.isGlob(copyTask.dest)) {
+  if (copyTask.dest && isGlob(copyTask.dest)) {
     throw new Error(`copy "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
@@ -49,7 +51,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
     return outputTarget.appBuild;
   });
 
-  if (config.sys.isGlob(copyTask.src)) {
+  if (isGlob(copyTask.src)) {
     const copyTasks = await processGlob(config, outputTargets, copyTask);
     allCopyTasks.push(...copyTasks);
     return;
@@ -165,10 +167,10 @@ export function isCopyTaskFile(config: d.Config, filePath: string) {
   for (let i = 0; i < config.copy.length; i++) {
     var copySrc = config.copy[i].src;
 
-    if (config.sys.isGlob(copySrc)) {
+    if (isGlob(copySrc)) {
       // test the glob
       copySrc = config.sys.path.join(config.srcDir, copySrc);
-      if (config.sys.minimatch(filePath, copySrc)) {
+      if (minimatch(filePath, copySrc)) {
         return true;
       }
 

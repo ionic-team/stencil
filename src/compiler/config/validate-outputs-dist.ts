@@ -33,6 +33,10 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.collectionDir = normalizePath(path.join(outputTarget.dir, outputTarget.collectionDir));
     }
 
+    if (!outputTarget.esmLoaderPath) {
+      outputTarget.esmLoaderPath = DEFAULT_ESM_LOADER_DIR;
+    }
+
     if (!outputTarget.typesDir) {
       outputTarget.typesDir = DEFAULT_TYPES_DIR;
     }
@@ -57,3 +61,4 @@ const DEFAULT_BUILD_DIR = '';
 const DEFAULT_EMPTY_DIR = true;
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
+const DEFAULT_ESM_LOADER_DIR = 'loader';

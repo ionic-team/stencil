@@ -2,9 +2,21 @@
   "name": "@stencil/test-testing",
   "private": true,
   "scripts": {
+    "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
     "test": "node ../../bin/stencil test --e2e --spec",
-    "test.e2e": "node ../../bin/stencil test --e2e",
-    "test.spec": "node ../../bin/stencil test --spec"
+    "test.e2e": "node ../../bin/stencil test --e2e --debug",
+    "test.spec": "node ../../bin/stencil test --spec --debug",
+    "jest": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "1.6.4",
+    "jest": "23.6.0",
+    "jest-cli": "23.6.0",
+    "puppeteer": "1.8.0",
+    "workbox-build": "3.4.1"
+  },
+  "jest": {
+    "preset": "../../testing/jest.preset.js"
   }
 }

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { MAX_ERRORS, splitLineBreaks } from './logger-util';
 import { normalizePath } from '../../compiler/util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 /**
@@ -13,12 +13,12 @@ export function loadTypeScriptDiagnostics(config: d.Config, resultsDiagnostics: 
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (let i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadDiagnostic(config, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadTypeScriptDiagnostic(config, tsDiagnostics[i]));
   }
 }
 
 
-function loadDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
+export function loadTypeScriptDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
 
   const d: d.Diagnostic = {
     level: 'warn',

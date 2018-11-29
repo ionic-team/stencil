@@ -35,7 +35,7 @@ describe('transpile', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const content = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(content).toContain('console.log(1,2,3)');
   });
 
@@ -67,9 +67,9 @@ describe('transpile', () => {
     r = await rebuildListener;
     expect(r.diagnostics).toEqual([]);
 
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(false);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(false);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(false);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'))).toBe(false);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'))).toBe(false);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.entry.js'))).toBe(false);
 
     expect(r.entries[0].components).toHaveLength(1);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
@@ -85,7 +85,7 @@ describe('transpile', () => {
     // kick off the initial build, wait for it to finish
     let r = await c.build();
     expect(r.diagnostics).toEqual([]);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'))).toBe(true);
 
     // create a rebuild listener
     const rebuildListener = c.once('buildFinish');
@@ -109,9 +109,9 @@ describe('transpile', () => {
     expect(r.filesAdded).toContain(normalizePath(path.join(root, 'src', 'new-dir', 'cmp-c.tsx')));
 
     expect(r.transpileBuildCount).toBe(2);
-    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-a.js')))).toBe(false);
-    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-b.js')))).toBe(true);
-    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-c.js')))).toBe(true);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js')))).toBe(false);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js')))).toBe(true);
+    expect(wroteFile(r, normalizePath(path.join(root, 'www', 'build', 'app', 'cmp-c.entry.js')))).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.entries[1].components[0].tag).toEqual('cmp-b');
     expect(r.entries[2].components[0].tag).toEqual('cmp-c');
@@ -144,7 +144,7 @@ describe('transpile', () => {
     expect(r.filesChanged).toContain(normalizePath(path.join(root, 'src', 'cmp-a.tsx')));
 
     expect(r.buildId).toBe(1);
-    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(newJs).toContain('console.log');
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
@@ -185,8 +185,8 @@ describe('transpile', () => {
     expect(r.filesChanged).toContain(normalizePath(path.join(root, 'src', 'cmp-a.tsx')));
 
     expect(r.buildId).toBe(1);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
-    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'))).toBe(true);
+    const newJs = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(newJs).not.toContain('@stencil/core');
     expect(r.transpileBuildCount).toBe(0);
     expect(r.styleBuildCount).toBe(1);
@@ -254,9 +254,9 @@ describe('transpile', () => {
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app.js'))).toBe(true);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'app.core.js'))).toBe(true);
     expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'app.registry.json'))).toBe(true);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.js'))).toBe(true);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.js'))).toBe(true);
-    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.js'))).toBe(true);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'))).toBe(true);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'))).toBe(true);
+    expect(wroteFile(r, path.join(root, 'www', 'build', 'app', 'cmp-c.entry.js'))).toBe(true);
 
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
   });

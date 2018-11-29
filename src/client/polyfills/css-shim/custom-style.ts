@@ -22,7 +22,7 @@ export class CustomStyle {
     private doc: Document,
   ) {}
 
-  init() {
+  initShim() {
     return new Promise(resolve => {
       this.win.requestAnimationFrame(() => {
         loadDocument(this.doc, this.globalScopes).then(() => resolve());

@@ -34,11 +34,12 @@ export interface CompilerCtx {
   lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
   lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
   lastBuildConditionalsEsmEs5?: d.BuildConditionals;
+  lastBuildConditionalsEsmEs2017?: d.BuildConditionals;
   lastComponentStyleInput?: Map<string, string>;
   lastBuildHadError?: boolean;
   lastBuildResults?: d.BuildResults;
   lastBuildStyles?: Map<string, string>;
-  lastJsModules?: d.JSModuleMap;
+  lastRawModules?: d.DerivedModule[];
   localPrerenderServer?: any;
   moduleFiles?: d.ModuleFiles;
   resolvedCollections?: string[];

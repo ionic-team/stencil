@@ -15,7 +15,7 @@ describe('hydrate', () => {
     outputTarget = config.outputTargets[0] as OutputTargetHydrate;
   });
 
-  it('should add scope attributes', async () => {
+  it('should add scope classes', async () => {
     const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
@@ -60,7 +60,7 @@ describe('hydrate', () => {
           </style>
         </head>
         <body>
-          <ion-test class="sc-ion-test-h ${config.hydratedCssClass}" ssrv="0">
+          <ion-test class="sc-ion-test-h sc-ion-test-s ${config.hydratedCssClass}" ssrv="0">
             <div class="sc-ion-test" ssrc="0.0."></div>
           </ion-test>
         </body>

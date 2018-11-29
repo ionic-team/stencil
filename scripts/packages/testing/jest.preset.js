@@ -8,7 +8,7 @@ module.exports = {
     'js',
     'json'
   ],
-  setupTestFrameworkScriptFile: path.join(__dirname, 'jest.setuptest.js'),
+  setupTestFrameworkScriptFile: path.join(__dirname, 'jest.setuptestframework.js'),
   testEnvironment: path.join(__dirname, 'jest.environment.js'),
   testPathIgnorePatterns: [
     '/.stencil',

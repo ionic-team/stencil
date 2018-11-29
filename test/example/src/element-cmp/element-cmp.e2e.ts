@@ -31,4 +31,26 @@ describe('@Element', () => {
     expect(elm).not.toHaveClass('class3');
   });
 
+  it('should set innerHTML', async () => {
+    const page = await newE2EPage({ html: `
+      <element-cmp id="my-elm"></element-cmp>
+    `});
+
+    const elm = await page.find('#my-elm');
+
+    elm.innerHTML = '<div>inner content</div>';
+
+    await page.waitForChanges();
+
+    expect(elm).toEqualHtml(`
+      <element-cmp id="my-elm" class="hydrated">
+        <div>
+          inner content
+        </div>
+      </element-cmp>
+    `);
+
+    expect(elm).toEqualText('inner content');
+  });
+
 });

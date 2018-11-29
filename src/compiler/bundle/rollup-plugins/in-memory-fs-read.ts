@@ -12,6 +12,11 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
     name: 'inMemoryFsRead',
 
     async resolveId(importee: string, importer: string) {
+      if (/\0/.test(importee)) {
+        // ignore IDs with null character, these belong to other plugins
+        return null;
+      }
+
       // note: node-resolve plugin has already ran
       // we can assume the importee is a file path
       if (!buildCtx.isActiveBuild) {

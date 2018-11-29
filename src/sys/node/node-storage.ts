@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import * as crypto from 'crypto';
-import * as os from 'os';
-import * as path from 'path';
+import { createHash } from 'crypto';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 
 export class NodeStorage implements d.Storage {
@@ -9,9 +9,9 @@ export class NodeStorage implements d.Storage {
   private data: any;
 
   constructor(private fs: d.FileSystem) {
-    const appKey = crypto.createHash('md5').update(__dirname).digest('base64').replace(/\W/g, '');
+    const appKey = createHash('md5').update(__dirname).digest('base64').replace(/\W/g, '');
     const storageFile = `stencil-storage-${appKey}.json`;
-    this.storagePath = path.join(os.tmpdir(), storageFile);
+    this.storagePath = join(tmpdir(), storageFile);
   }
 
   async get(key: string) {

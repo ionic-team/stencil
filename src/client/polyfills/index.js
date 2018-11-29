@@ -1,6 +1,6 @@
 
 
-export function applyPolyfills(window, cb) {
+export function applyPolyfills(window) {
   /*!
   es6-promise - a tiny implementation of Promises/A+.
   Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
@@ -32,6 +32,10 @@ export function applyPolyfills(window, cb) {
     promises.push(import('./polyfills/fetch.js'));
   }
 
+  if (typeof WeakMap == 'undefined' || !(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'))) {
+    promises.push(import('./polyfills/css-shim.js'));
+  }
+
   function checkIfURLIsSupported() {
     try {
       var u = new URL('b', 'http://a');
@@ -45,11 +49,13 @@ export function applyPolyfills(window, cb) {
     promises.push(import('./polyfills/url.js'));
   }
 
-  Promise.all(promises).then(function(results) {
+  return Promise.all(promises).then(function(results) {
     results.forEach(function(polyfillModule) {
-      polyfillModule.applyPolyfill(window, window.document);
+      try {
+        polyfillModule.applyPolyfill(window, window.document);
+      } catch (e) {
+        console.error(e);
+      }
     });
-
-    cb();
   });
 }

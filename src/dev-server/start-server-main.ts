@@ -18,14 +18,22 @@ export async function startDevServerMain(config: d.Config, compilerCtx: d.Compil
   // get the path of the dev server module
   const program = require.resolve(config.sys.path.join(config.devServer.devServerDir, 'index.js'));
 
-  const parameters: string[] = [];
+  const args: string[] = [];
+
+  const filteredExecArgs = process.execArgv.filter(
+    v => !/^--(debug|inspect)/.test(v)
+  );
+
   const options = {
+    execArgv: filteredExecArgs,
+    env: process.env,
+    cwd: process.cwd(),
     stdio: ['pipe', 'pipe', 'pipe', 'ipc']
   };
 
   // start a new child process of the CLI process
   // for the http and web socket server
-  const serverProcess = fork(program, parameters, options);
+  const serverProcess = fork(program, args, options);
 
   const devServerConfig = await startServer(config, compilerCtx, serverProcess);
 
@@ -53,7 +61,6 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
 
     serverProcess.stderr.on('data', (data: any) => {
       // the child server process has console logged an error
-      config.logger.error(`dev server error: ${data}`);
       reject(`dev server error: ${data}`);
     });
 

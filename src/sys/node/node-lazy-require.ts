@@ -1,14 +1,14 @@
 import * as d from '../../declarations';
+import { dirname } from 'path';
 import { NodeResolveModule } from './node-resolve-module';
-import * as cp from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { readFile } from 'graceful-fs';
+import { SpawnOptions, spawn } from 'child_process';
 
 
 export class NodeLazyRequire implements d.LazyRequire {
   private moduleData = new Map<string, { fromDir: string, modulePath: string }>();
 
-  constructor(private nodeResolveModule: NodeResolveModule, private semver: d.Semver, private stencilPackageJson: d.PackageJsonData) {
+  constructor(private semver: d.Semver, private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData) {
   }
 
   async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[]) {
@@ -21,6 +21,7 @@ export class NodeLazyRequire implements d.LazyRequire {
     }
 
     const depsToInstall: DepToInstall[] = [];
+    let isUpdate = false;
 
     const promises = ensureModuleIds.map(async ensureModuleId => {
       const existingModuleData = this.moduleData.get(ensureModuleId);
@@ -35,10 +36,12 @@ export class NodeLazyRequire implements d.LazyRequire {
 
         const installedPkgJson = await readPackageJson(resolvedPkgJsonPath);
 
+        isUpdate = true;
+
         if (this.semver.satisfies(installedPkgJson.version, requiredVersionRange)) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
-            modulePath: path.dirname(resolvedPkgJsonPath)
+            modulePath: dirname(resolvedPkgJsonPath)
           });
           return;
         }
@@ -56,7 +59,9 @@ export class NodeLazyRequire implements d.LazyRequire {
       return Promise.resolve();
     }
 
-    logger.info(logger.magenta(`Please wait while missing dependencies are installed. This may take a few moments and will only be required for the first run.`));
+    const msg = `Please wait while required dependencies are ${isUpdate ? `updated` : `installed`}. This may take a few moments and will only be required for the initial run.`;
+
+    logger.info(logger.magenta(msg));
 
     const moduleIds = depsToInstall.map(dep => dep.moduleId);
     const timeSpan = logger.createTimeSpan(`installing dependenc${moduleIds.length > 1 ? 'ies' : 'y'}: ${moduleIds.join(', ')}`);
@@ -95,7 +100,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
     if (!moduleData.modulePath) {
       const modulePkgJsonPath = this.nodeResolveModule.resolveModule(moduleData.fromDir, moduleId);
-      moduleData.modulePath = path.dirname(modulePkgJsonPath);
+      moduleData.modulePath = dirname(modulePkgJsonPath);
       this.moduleData.set(moduleId, moduleData);
     }
 
@@ -111,7 +116,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
     if (!moduleData.modulePath) {
       const modulePkgJsonPath = this.nodeResolveModule.resolveModule(moduleData.fromDir, moduleId);
-      moduleData.modulePath = path.dirname(modulePkgJsonPath);
+      moduleData.modulePath = dirname(modulePkgJsonPath);
       this.moduleData.set(moduleId, moduleData);
     }
 
@@ -133,22 +138,22 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       '--save-dev'
     ];
 
-    const opts: cp.SpawnOptions = {
+    const opts: SpawnOptions = {
       shell: true,
       cwd: fromDir,
-      env: Object.assign({}, process.env)
+      env: Object.assign({}, process.env),
+      stdio: 'inherit'
     };
     opts.env.NODE_ENV = 'development';
 
     if (logger.level === 'debug') {
       args.push('--verbose');
-      opts.stdio = 'inherit';
     }
 
     logger.debug(`${cmd} ${args.join(' ')}`);
     logger.debug(`${cmd}, cwd: ${fromDir}`);
 
-    const childProcess = cp.spawn(cmd, args, opts);
+    const childProcess = spawn(cmd, args, opts);
 
     let error = '';
 
@@ -176,7 +181,7 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
 
 function readPackageJson(pkgJsonPath: string) {
   return new Promise<d.PackageJsonData>((resolve, reject) => {
-    fs.readFile(pkgJsonPath, 'utf8', (err, data) => {
+    readFile(pkgJsonPath, 'utf8', (err, data) => {
       if (err) {
         reject(err);
 

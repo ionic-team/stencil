@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { normalizePath } from '../compiler/util';
+import exit from 'exit';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
@@ -7,7 +8,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
 
   const compiler: d.Compiler = new Compiler(config);
   if (!compiler.isValid) {
-    process.exit(1);
+    exit(1);
   }
 
   config.flags.serve = true;
@@ -25,11 +26,13 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
   config.devServer.root = normalizePath(config.devServer.root);
 
   const devServer = await compiler.startDevServer();
-  compiler.config.logger.info(`dev server: ${devServer.browserUrl}`);
+  if (devServer) {
+    compiler.config.logger.info(`dev server: ${devServer.browserUrl}`);
+  }
 
   process.once('SIGINT', () => {
     compiler.config.sys.destroy();
-    devServer.close();
-    process.exit(0);
+    devServer && devServer.close();
+    exit(0);
   });
 }

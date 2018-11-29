@@ -5,16 +5,22 @@ import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(
+export const initComponentInstance = (
   plt: d.PlatformApi,
   elm: d.HostElement,
   hostSnapshot: d.HostSnapshot,
+  perf: Performance,
   instance?: d.ComponentInstance,
   componentConstructor?: d.ComponentConstructor,
   queuedEvents?: any[],
   i?: number
-) {
+) => {
   try {
+
+    if (_BUILD_.profile) {
+      perf.mark(`init_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
+
     // using the user's component class, let's create a new instance
     componentConstructor = plt.getComponentMeta(elm).componentConstructor;
     instance = new (componentConstructor as any)();
@@ -24,15 +30,15 @@ export function initComponentInstance(
 
     // let's upgrade the data on the host element
     // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot);
+    proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot, perf);
 
-    if (__BUILD_CONDITIONALS__.event) {
+    if (_BUILD_.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
       initEventEmitters(plt, componentConstructor.events, instance);
     }
 
-    if (__BUILD_CONDITIONALS__.listener) {
+    if (_BUILD_.listener) {
       try {
         // replay any event listeners on the instance that
         // were queued up between the time the element was
@@ -67,13 +73,18 @@ export function initComponentInstance(
 
   plt.instanceMap.set(elm, instance);
 
+  if (_BUILD_.profile) {
+    perf.mark(`init_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    perf.measure(`init_instance:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_instance_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_instance_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+  }
+
   return instance;
 }
 
 
-export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[]): any {
+export const initComponentLoaded = (plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any => {
 
-  if (__BUILD_CONDITIONALS__.polyfills && !allChildrenHaveConnected(plt, elm)) {
+  if (_BUILD_.polyfills && !allChildrenHaveConnected(plt, elm)) {
     // this check needs to be done when using the customElements polyfill
     // since the polyfill uses MutationObserver which causes the
     // connectedCallbacks to fire async, which isn't ideal for the code below
@@ -84,20 +95,32 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
   if (
-    !plt.hasLoadedMap.has(elm) &&
     (instance = plt.instanceMap.get(elm)) &&
     !plt.isDisconnectedMap.has(elm) &&
     (!elm['s-ld'] || !elm['s-ld'].length)
   ) {
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
-    // ensure we remove any child references cuz it doesn't matter at this point
-    elm['s-ld'] = undefined;
 
-    // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
-    // elm._hasLoaded = true;
-    plt.hasLoadedMap.set(elm, true);
+    plt.isCmpReady.set(elm, true);
+
+    if (!(hasCmpLoaded = plt.isCmpLoaded.has(elm))) {
+      if (_BUILD_.profile) {
+        perf.mark(`init_loaded_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      }
+
+      // remember that this component has loaded
+      // isCmpLoaded map is useful to know if we should fire
+      // the lifecycle componentDidLoad() or componentDidUpdate()
+      plt.isCmpLoaded.set(elm, true);
+
+      // ensure we remove any child references cuz it doesn't matter at this point
+      elm['s-ld'] = undefined;
+
+      // add the css class that this element has officially hydrated
+      plt.domApi.$addClass(elm, hydratedCssClass);
+    }
 
     try {
       // fire off the ref if it exists
@@ -110,20 +133,49 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
         plt.onReadyCallbacksMap.delete(elm);
       }
 
-      if (__BUILD_CONDITIONALS__.cmpDidLoad) {
+      if (_BUILD_.cmpDidLoad && !hasCmpLoaded && instance.componentDidLoad) {
+        // we've never loaded this component
         // fire off the user's componentDidLoad method (if one was provided)
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called
-        // we'll also fire this method off on the element, just to
-        instance.componentDidLoad && instance.componentDidLoad();
+        // and all the child componenets have finished loading
+        if (_BUILD_.profile) {
+          perf.mark(`componentDidLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
+
+        instance.componentDidLoad();
+
+        if (_BUILD_.profile) {
+          perf.mark(`componentDidLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+          perf.measure(`componentDidLoad:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidLoad_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidLoad_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
+
+      } else if (_BUILD_.cmpDidUpdate && hasCmpLoaded && instance.componentDidUpdate) {
+        // we've already loaded this component
+        // fire off the user's componentDidUpdate method (if one was provided)
+        // componentDidUpdate runs AFTER render() has been called
+        // and all child components have finished updating
+        if (_BUILD_.profile) {
+          perf.mark(`componentDidUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
+
+        instance.componentDidUpdate();
+
+        if (_BUILD_.profile) {
+          perf.mark(`componentDidUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+          perf.measure(`componentDidUpdate:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidUpdate_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `componentDidUpdate_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+        }
       }
 
     } catch (e) {
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);
     }
 
-    // add the css class that this element has officially hydrated
-    plt.domApi.$addClass(elm, hydratedCssClass);
+    if (_BUILD_.profile && !hasCmpLoaded) {
+      perf.mark(`init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      perf.measure(`init_loaded:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      perf.measure(`loaded:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `connected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `init_loaded_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
 
     // ( •_•)
     // ( •_•)>⌐■-■
@@ -131,12 +183,12 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    propagateComponentLoaded(plt, elm);
+    propagateComponentReady(plt, elm);
   }
-}
+};
 
 
-function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
+const allChildrenHaveConnected = (plt: d.PlatformApi, elm: d.HostElement) => {
   // Note: in IE11 <svg> does not have the "children" property
   for (let i = 0; i < elm.childNodes.length; i++) {
     const child = elm.childNodes[i] as d.HostElement;
@@ -154,19 +206,21 @@ function allChildrenHaveConnected(plt: d.PlatformApi, elm: d.HostElement) {
   }
   // everything has connected, we're good
   return true;
-}
+};
 
 
-export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[]) {
+export const propagateComponentReady = (plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[], ancestorHostElement?: d.HostElement, cb?: Function) => {
+
+  // we're no longer processing this component
+  plt.processingCmp.delete(elm);
+
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
-  const ancestorHostElement = plt.ancestorHostElementMap.get(elm);
-
-  if (ancestorHostElement) {
+  if ((ancestorHostElement = plt.ancestorHostElementMap.get(elm))) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = ancestorHostElement['s-ld'] || (ancestorHostElement as any)['$activeLoading'];
+    ancestorsActivelyLoadingChildren = ancestorHostElement['s-ld'];
 
     if (ancestorsActivelyLoadingChildren) {
       index = ancestorsActivelyLoadingChildren.indexOf(elm);
@@ -182,12 +236,17 @@ export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement,
       // (which actually ends up as this method again but for the ancestor)
       if (!ancestorsActivelyLoadingChildren.length) {
         ancestorHostElement['s-init'] && ancestorHostElement['s-init']();
-
-        // $initLoad deprecated 2018-04-02
-        (ancestorHostElement as any)['$initLoad'] && (ancestorHostElement as any)['$initLoad']();
       }
     }
 
     plt.ancestorHostElementMap.delete(elm);
   }
-}
+
+  if (plt.onAppReadyCallbacks.length && !plt.processingCmp.size) {
+    // we've got some promises waiting on the entire app to be done processing
+    // so it should have an empty queue and no longer rendering
+    while ((cb = plt.onAppReadyCallbacks.shift())) {
+      cb();
+    }
+  }
+};

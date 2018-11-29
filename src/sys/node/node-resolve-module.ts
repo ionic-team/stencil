@@ -1,5 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'graceful-fs';
+import path from 'path';
+import { normalizePath } from '../../compiler/util';
 
 
 export class NodeResolveModule {
@@ -22,17 +23,17 @@ export class NodeResolveModule {
     fromDir = path.resolve(fromDir);
     const fromFile = path.join(fromDir, 'noop.js');
 
-    let dir = Module._resolveFilename(moduleId, {
+    let dir = normalizePath(Module._resolveFilename(moduleId, {
       id: fromFile,
       filename: fromFile,
       paths: Module._nodeModulePaths(fromDir)
-    });
+    }));
 
-    const root = path.parse(fromDir).root;
+    const root = normalizePath(path.parse(fromDir).root);
     let packageJsonFilePath: string;
 
     while (dir !== root) {
-      dir = path.dirname(dir);
+      dir = normalizePath(path.dirname(dir));
       packageJsonFilePath = path.join(dir, 'package.json');
 
       if (!hasAccess(packageJsonFilePath)) {
@@ -50,13 +51,13 @@ export class NodeResolveModule {
   resolveTypesModule(fromDir: string, moduleId: string, cacheKey: string) {
     const moduleSplt = moduleId.split('/');
 
-    const root = path.parse(fromDir).root;
+    const root = normalizePath(path.parse(fromDir).root);
 
-    let dir = path.join(fromDir, 'noop.js');
+    let dir = normalizePath(path.join(fromDir, 'noop.js'));
     let typesPackageJsonFilePath: string;
 
     while (dir !== root) {
-      dir = path.dirname(dir);
+      dir = normalizePath(path.dirname(dir));
       typesPackageJsonFilePath = path.join(dir, 'node_modules', moduleSplt[0], moduleSplt[1], 'package.json');
 
       if (!hasAccess(typesPackageJsonFilePath)) {

@@ -42,7 +42,8 @@ describe('componentOnReady', () => {
       initCoreComponentOnReady(plt, App);
 
       const elm = new MyElement();
-      plt.hasLoadedMap.set(elm as any, true);
+      plt.isCmpReady.set(elm as any, true);
+      plt.isCmpLoaded.set(elm as any, true);
 
       const resolvedElm = await elm.componentOnReady();
       expect(resolvedElm).toBe(elm);
@@ -65,6 +66,31 @@ describe('componentOnReady', () => {
       initCoreComponentOnReady(plt, App);
 
       const elm = new MyElement();
+      elm.componentOnReady().then(_ => {
+        /**/
+      });
+
+      expect(plt.onReadyCallbacksMap.has(elm as any)).toBe(true);
+    });
+
+    it('should not resolve if elm has loaded, but isnt ready, and is a known component', () => {
+      const cmpRegistry: d.ComponentRegistry = {
+        'ion-cmp': {}
+      };
+      plt = mockPlatform(null, null, cmpRegistry);
+
+      class MyElement {
+        nodeName = 'ion-cmp';
+        componentOnReady: Function;
+      }
+
+      createComponentOnReadyPrototype(win, 'MyApp', MyElement.prototype);
+      initCoreComponentOnReady(plt, App);
+
+      const elm = new MyElement();
+      plt.isCmpReady.delete(elm as any);
+      plt.isCmpLoaded.set(elm as any, true);
+
       elm.componentOnReady().then(_ => {
         /**/
       });

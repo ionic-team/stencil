@@ -13,16 +13,23 @@ log.txt
 .sass-cache/
 .versions/
 node_modules/
+coverage/
 
-/dist/
+dist/
 **/www/build/
 
 # submodule packages
 /compiler
+/mock-doc
 /polyfills
-/screenshot
 /server
 /sys
 /testing
 
-test/example/www/*
+/screenshot/index.js
+/screenshot/package.json
+/screenshot/connector.js
+/screenshot/local-connector.js
+/screenshot/pixel-match.js
+
+test/**/www/*

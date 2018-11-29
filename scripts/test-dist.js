@@ -56,6 +56,36 @@ function testPackage(testPkg) {
     ]
   },
   {
+    packageJson: '../mock-doc/package.json',
+    exports: [
+      'applyWindowToGlobal',
+      'MockComment',
+      'mockDocument',
+      'MockDocument',
+      'MockElement',
+      'MockElement',
+      'MockNode',
+      'MockTextNode',
+      'mockWindow',
+      'MockWindow',
+      'parseHtmlToDocument',
+      'parseHtmlToFragment',
+      'serializeNodeToHtml'
+    ]
+  },
+  {
+    packageJson: '../screenshot/package.json',
+    files: [
+      'compare/',
+      'index.js',
+      'connector.js'
+    ],
+    exports: [
+      'ScreenshotConnector',
+      'ScreenshotLocalConnector'
+    ]
+  },
+  {
     packageJson: '../server/package.json',
     exports: [
       'h',
@@ -68,13 +98,10 @@ function testPackage(testPkg) {
   {
     packageJson: '../testing/package.json',
     exports: [
-      'applyWindowToGlobal',
       'createJestPuppeteerEnvironment',
       'h',
       'jestPreprocessor',
       'jestSetupTestFramework',
-      'mockDocument',
-      'mockWindow',
       'newE2EPage',
       'Testing',
       'transpile'
@@ -93,6 +120,8 @@ function testPackage(testPkg) {
       "bin/",
       "dist/",
       "compiler/",
+      "mock-doc/",
+      "screenshot/",
       "server/",
       "sys/",
       "testing/"
@@ -100,5 +129,7 @@ function testPackage(testPkg) {
     exports: []
   }
 ].forEach(testPackage);
+
+
 
 console.log(`✅ test.dist`);

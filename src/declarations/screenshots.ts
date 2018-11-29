@@ -1,55 +1,220 @@
+import * as d from '.';
 
-export interface E2EData {
-  masterSnapshotId: string;
-  snapshots: E2ESnapshot[];
+
+export interface ScreenshotConnector {
+  initBuild(opts: d.ScreenshotConnectorOptions): Promise<void>;
+  completeBuild(masterBuild: d.ScreenshotBuild): Promise<ScreenshotBuildResults>;
+  getMasterBuild(): Promise<d.ScreenshotBuild>;
+  pullMasterBuild(): Promise<void>;
+  publishBuild(buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotBuildResults>;
+  getScreenshotCache(): Promise<d.ScreenshotCache>;
+  updateScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotCache>;
+  generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
+  sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
+  toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache): string;
 }
 
 
-export interface E2ESnapshot {
+export interface ScreenshotBuildResults {
+  appNamespace: string;
+  masterBuild: d.ScreenshotBuild;
+  currentBuild: d.ScreenshotBuild;
+  compare: ScreenshotCompareResults;
+}
+
+
+export interface ScreenshotCompareResults {
   id: string;
-  msg?: string;
-  repoUrl?: string;
-  imagesDir?: string;
-  dataDir?: string;
-  appRootDir?: string;
-  packageDir?: string;
+  a: {
+    id: string;
+    message: string;
+    author: string;
+    url: string;
+    previewUrl: string;
+  };
+  b: {
+    id: string;
+    message: string;
+    author: string;
+    url: string;
+    previewUrl: string;
+  };
   timestamp: number;
-  screenshots?: E2EScreenshot[];
-  compilerVersion?: string;
-  channel?: string;
+  url: string;
+  appNamespace: string;
+  diffs: d.ScreenshotDiff[];
 }
 
 
-export interface E2EScreenshot {
+export interface ScreenshotConnectorOptions {
+  buildId: string;
+  buildMessage: string;
+  buildAuthor?: string;
+  buildUrl?: string;
+  previewUrl?: string;
+  appNamespace: string;
+  buildTimestamp: number;
+  logger: d.Logger;
+  rootDir: string;
+  cacheDir: string;
+  packageDir: string;
+  screenshotDirName?: string;
+  imagesDirName?: string;
+  buildsDirName?: string;
+  currentBuildDir?: string;
+  updateMaster?: boolean;
+  allowableMismatchedPixels?: number;
+  allowableMismatchedRatio?: number;
+  pixelmatchThreshold?: number;
+  timeoutBeforeScreenshot?: number;
+  pixelmatchModulePath?: string;
+}
+
+
+export interface ScreenshotBuildData {
+  buildId: string;
+  rootDir: string;
+  screenshotDir: string;
+  imagesDir: string;
+  buildsDir: string;
+  currentBuildDir: string;
+  updateMaster: boolean;
+  allowableMismatchedPixels: number;
+  allowableMismatchedRatio: number;
+  pixelmatchThreshold: number;
+  masterScreenshots: {[screenshotId: string]: string};
+  cache: {[cacheKey: string]: number};
+  timeoutBeforeScreenshot: number;
+  pixelmatchModulePath: string;
+}
+
+
+export interface PixelMatchInput {
+  imageAPath: string;
+  imageBPath: string;
+  width: number;
+  height: number;
+  pixelmatchThreshold: number;
+}
+
+
+export interface ScreenshotBuild {
   id: string;
-  desc: string;
+  message: string;
+  author?: string;
+  url?: string;
+  previewUrl?: string;
+  appNamespace: string;
+  timestamp: number;
+  screenshots: Screenshot[];
+}
+
+
+export interface ScreenshotCache {
+  timestamp?: number;
+  lastBuildId?: string;
+  size?: number;
+  items?: {
+    /**
+     * Cache key
+     */
+    key: string;
+
+    /**
+     * Timestamp used to remove the oldest data
+     */
+    ts: number;
+
+    /**
+     * Mismatched pixels
+     */
+    mp: number;
+  }[];
+}
+
+
+export interface Screenshot {
+  id: string;
+  desc?: string;
   image: string;
   device?: string;
+  userAgent?: string;
   width?: number;
   height?: number;
   deviceScaleFactor?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
   isMobile?: boolean;
-  mediaType?: string;
+  testPath?: string;
+  diff?: ScreenshotDiff;
 }
 
 
-export interface ScreenshotConnector {
-  deleteSnapshot(snapshotId: string): Promise<E2EData>;
-  getData(): Promise<E2EData>;
-  getMasterSnapshot(): Promise<E2ESnapshot>;
-  getSnapshot(snapshotId: string): Promise<E2ESnapshot>;
-  postSnapshot(snapshot: E2ESnapshot): Promise<void>;
-  readImage(imageFileName: string): any;
-  setMasterSnapshot(snapshotId: string): Promise<E2EData>;
+export interface ScreenshotDiff {
+  mismatchedPixels: number;
+  id?: string;
+  desc?: string;
+  imageA?: string;
+  imageB?: string;
+  device?: string;
+  userAgent?: string;
+  width?: number;
+  height?: number;
+  deviceScaleFactor?: number;
+  hasTouch?: boolean;
+  isLandscape?: boolean;
+  isMobile?: boolean;
+  allowableMismatchedPixels: number;
+  allowableMismatchedRatio: number;
+  testPath?: string;
+  cacheKey?: string;
 }
 
 
-export interface ScreenshotServer {
-  start(connector: ScreenshotConnector): Promise<void>;
-  getRootUrl(): string;
-  getCompareUrl(snapshotIdA: string, snapshotIdB: string): string;
-  getSnapshotUrl(snapshotId: string): string;
-  isListening(): boolean;
+export interface ScreenshotOptions {
+  /**
+   * When true, takes a screenshot of the full scrollable page.
+   * Default: `false`
+   */
+  fullPage?: boolean;
+
+  /**
+   * An object which specifies clipping region of the page.
+   */
+  clip?: ScreenshotBoundingBox;
+
+  /**
+   * Hides default white background and allows capturing screenshots with transparency.
+   * Default: `false`
+   */
+  omitBackground?: boolean;
+
+  /**
+   * Matching threshold, ranges from `0` to 1. Smaller values make the comparison
+   * more sensitive. Defaults to the testing config `pixelmatchThreshold` value;
+   */
+  pixelmatchThreshold?: number;
+}
+
+
+export interface ScreenshotBoundingBox {
+  /**
+   * The x-coordinate of top-left corner.
+   */
+  x: number;
+
+  /**
+   * The y-coordinate of top-left corner.
+   */
+  y: number;
+
+  /**
+   * The width in pixels.
+   */
+  width: number;
+
+  /**
+   * The height in pixels.
+   */
+  height: number;
 }

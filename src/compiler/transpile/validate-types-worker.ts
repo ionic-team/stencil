@@ -6,7 +6,7 @@ import { removeStencilImports } from './transformers/remove-stencil-imports';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { normalizePath } from '../util';
 
 

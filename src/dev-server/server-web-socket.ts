@@ -48,7 +48,9 @@ export function createWebSocket(process: NodeJS.Process, httpServer: http.Server
     if (msg) {
       const data = JSON.stringify(msg);
       wsServer.clients.forEach(ws => {
-        ws.send(data);
+        if (ws.readyState === ws.OPEN) {
+          ws.send(data);
+        }
       });
     }
   }

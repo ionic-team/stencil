@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('slot-light-dom', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -47,7 +47,7 @@ describe('slot-light-dom', () => {
 
     const button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     results = app.querySelector('.results1 article');
     expect(results.textContent).toBe('A');

@@ -1,6 +1,7 @@
 import * as d from '../declarations';
 import { getLatestCompilerVersion, validateCompilerVersion } from '../sys/node/check-version';
 import { hasError } from './cli-utils';
+import exit from 'exit';
 
 
 export async function taskBuild(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
@@ -8,12 +9,17 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
 
   const compiler: d.Compiler = new Compiler(config);
   if (!compiler.isValid) {
-    process.exit(1);
+    exit(1);
   }
 
   let devServerStart: Promise<d.DevServer> = null;
   if (config.devServer && flags.serve) {
-    devServerStart = compiler.startDevServer();
+    try {
+      devServerStart = compiler.startDevServer();
+    } catch (e) {
+      config.logger.error(e);
+      exit(1);
+    }
   }
 
   const latestVersion = getLatestCompilerVersion(config.sys, config.logger);
@@ -32,7 +38,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
       await devServer.close();
     }
 
-    process.exit(1);
+    exit(1);
   }
 
   if (config.watch || devServerStart) {

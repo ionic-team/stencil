@@ -1,12 +1,9 @@
 import * as d from '../../declarations';
 import { connectBrowser, disconnectBrowser, newBrowserPage } from '../puppeteer/puppeteer-browser';
+import NodeEnvironment from 'jest-environment-node';
 
 
 export function createJestPuppeteerEnvironment() {
-
-  const jestEnvNodeModulePath = (process.env as d.E2EProcessEnv).__STENCIL_JEST_ENVIRONMENT_NODE_MODULE__ || 'jest-environment-node';
-  const NodeEnvironment = require(jestEnvNodeModulePath);
-
 
   const JestEnvironment = class extends NodeEnvironment {
     global: d.JestEnvironmentGlobal;

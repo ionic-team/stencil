@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import * as https from 'https';
+import { request } from 'https';
 
 
 export async function getLatestCompilerVersion(sys: d.StencilSystem, logger: d.Logger) {
@@ -47,7 +47,7 @@ export async function validateCompilerVersion(config: d.Config, latestVersionPro
 
 
 export async function requestLatestCompilerVersion() {
-  const body = await request(REGISTRY_URL);
+  const body = await requestUrl(REGISTRY_URL);
 
   const data = JSON.parse(body) as d.PackageJsonData;
 
@@ -55,9 +55,9 @@ export async function requestLatestCompilerVersion() {
 }
 
 
-async function request(url: string) {
+async function requestUrl(url: string) {
   return new Promise<string>((resolve, reject) => {
-    const req = https.request(url, res => {
+    const req = request(url, res => {
       if (res.statusCode > 299) {
         reject(`url: ${url}, staus: ${res.statusCode}`);
         return;

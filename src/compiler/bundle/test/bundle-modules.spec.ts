@@ -38,8 +38,8 @@ describe('bundle-module', () => {
       expect(r.bundleBuildCount).toBe(2);
 
       expectFiles(c.fs, [
-        path.join(root, 'www', 'build', 'app', 'cmp-a.js'),
-        path.join(root, 'www', 'build', 'app', 'cmp-c.js')
+        path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'),
+        path.join(root, 'www', 'build', 'app', 'cmp-c.entry.js')
       ]);
     });
 
@@ -71,9 +71,11 @@ describe('bundle-module', () => {
       expect(r.diagnostics).toEqual([]);
 
       expectFiles(c.fs, [
-        path.join(root, 'www', 'build', 'app', 'cmp-a.js'),
-        path.join(root, 'www', 'build', 'app', 'cmp-b.js'),
-        path.join(root, 'www', 'build', 'app', 'chunk-304ba7c3.js')
+        path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'),
+        path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'),
+        path.join(root, 'www', 'build', 'app', 'cmp-a.sc.entry.js'),
+        path.join(root, 'www', 'build', 'app', 'cmp-b.sc.entry.js'),
+        path.join(root, 'www', 'build', 'app', 'chunk-304ba7c3.js'),
       ]);
     });
 

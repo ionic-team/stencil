@@ -223,6 +223,17 @@ describe('collection components', () => {
     expect(b.cmpMeta.membersMeta.propMutable.propType).toBe(PROP_TYPE.Number);
   });
 
+  it('membersMeta prop reflectToAttrib', () => {
+    a.membersMeta = {
+      'propAttributeName': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Number, attribName: 'my-attr-name', reflectToAttrib: true }
+    };
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.propAttributeName.attribName).toBe('my-attr-name');
+    expect(b.cmpMeta.membersMeta.propAttributeName.reflectToAttrib).toBe(true);
+  });
+
   it('membersMeta prop type any', () => {
     a.membersMeta = {
       'prop': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Any }

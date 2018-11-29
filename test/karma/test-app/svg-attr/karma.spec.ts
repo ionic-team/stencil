@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('svg attr', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -15,11 +15,11 @@ describe('svg attr', () => {
 
     const button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
     expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
 
     button.click();
-    await flush(app);
+    await waitForChanges();
     expect(rect.getAttribute('transform')).toBe(null);
   });
 

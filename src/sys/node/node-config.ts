@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { normalizePath } from '../../compiler/util';
 
 

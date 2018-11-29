@@ -29,6 +29,9 @@ export class Compiler implements d.Compiler {
 
       config.logger.info(config.logger.cyan(startupMsg));
 
+      if (config.sys.semver.prerelease(config.sys.compiler.version)) {
+        config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+      }
       config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
       config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
@@ -72,10 +75,12 @@ export class Compiler implements d.Compiler {
     // start up the dev server
     const devServer = await startDevServerMain(this.config, this.ctx);
 
-    // get the browser url to be logged out at the end of the build
-    this.config.devServer.browserUrl = devServer.browserUrl;
+    if (devServer) {
+      // get the browser url to be logged out at the end of the build
+      this.config.devServer.browserUrl = devServer.browserUrl;
 
-    this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
+      this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
+    }
 
     return devServer;
   }

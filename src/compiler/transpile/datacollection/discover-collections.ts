@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '../../util';
 import { parseCollectionModule } from '../../collections/parse-collection-module';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getCollections(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.Collection[], moduleFile: d.ModuleFile, importNode: ts.ImportDeclaration) {

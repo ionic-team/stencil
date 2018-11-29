@@ -18,7 +18,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
   const doc = win.document;
   const hydratedCssClass = opts.hydratedCssClass || '__APP__HYDRATED__CSS__PLACEHOLDER__';
 
-  const styleCmps = cmpDataArray.filter(([hasStyles]) => hasStyles).map(c => c[0]);
+  const styleCmps = cmpDataArray.map(c => c[0]);
   if (styleCmps.length > 0) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
@@ -35,7 +35,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
     createComponentOnReadyPrototype(win, namespace, (win as any).HTMLElement.prototype);
   }
 
-  applyPolyfills(win, () => {
+  return applyPolyfills(win).then(() => {
 
     if (!pltMap[namespace]) {
       const Context: d.CoreContext = {};
@@ -50,38 +50,50 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
         win,
         doc,
         resourcesUrl,
-        hydratedCssClass
+        hydratedCssClass,
+        cmpDataArray
       );
     }
 
-    // polyfills have been applied if need be
-    (cmpData as d.ComponentHostData[]).forEach(c => {
-      let HostElementConstructor: any;
+    function defineComponents() {
+      // polyfills have been applied if need be
+      (cmpData as d.ComponentHostData[]).forEach(c => {
+        let HostElementConstructor: any;
 
-      if (isNative(win.customElements.define)) {
-        // native custom elements supported
-        const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
-        HostElementConstructor = createHostConstructor(win);
+        if (isNative(win.customElements.define)) {
+          // native custom elements supported
+          const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
+          HostElementConstructor = createHostConstructor(win);
 
-      } else {
-        // using polyfilled custom elements
-        HostElementConstructor = function(self: any) {
-          return (win as any).HTMLElement.call(this, self);
-        };
+        } else {
+          // using polyfilled custom elements
+          HostElementConstructor = function(self: any) {
+            return (win as any).HTMLElement.call(this, self);
+          };
 
-        HostElementConstructor.prototype = Object.create(
-          (win as any).HTMLElement.prototype,
-          { constructor: { value: HostElementConstructor, configurable: true } }
+          HostElementConstructor.prototype = Object.create(
+            (win as any).HTMLElement.prototype,
+            { constructor: { value: HostElementConstructor, configurable: true } }
+          );
+        }
+
+        // convert the static constructor data to cmp metadata
+        // define the component as a custom element
+        pltMap[namespace].defineComponent(
+          buildComponentLoader(c),
+          HostElementConstructor
         );
-      }
+      });
+    }
 
-      // convert the static constructor data to cmp metadata
-      // define the component as a custom element
-      pltMap[namespace].defineComponent(
-        buildComponentLoader(c),
-        HostElementConstructor
-      );
-    });
+    if (_BUILD_.cssVarShim && (window as any).customStyleShim) {
+      pltMap[namespace].customStyle = (window as any).customStyleShim;
+
+      pltMap[namespace].customStyle.initShim().then(defineComponents);
+
+    } else {
+      defineComponents();
+    }
 
   });
 }
@@ -101,7 +113,11 @@ function buildComponentLoader(c: d.ComponentHostData) {
 }
 
 function loadBundle(bundleId: string, useScopedCss: boolean, className: string) {
-  return import(`./components/${bundleId}${(useScopedCss ? '.sc' : '')}.js`).then(m => m[className]);
+  return import(
+    /* webpackInclude: /\.entry\.js$/ */
+    /* webpackMode: "lazy" */
+    `./build/${bundleId}${(useScopedCss ? '.sc' : '')}.entry.js`
+  ).then(m => m[className]);
 }
 
 function isNative(fn: Function) {

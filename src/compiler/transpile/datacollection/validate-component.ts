@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { buildWarn } from '../../util';
 import { isMethod } from './utils';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function validateComponentClass(diagnostics: d.Diagnostic[], cmpMeta: d.ComponentMeta, classNode: ts.ClassDeclaration) {

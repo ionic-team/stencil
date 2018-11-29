@@ -25,6 +25,7 @@ export * from './in-memory-fs';
 export * from './jsx';
 export * from './logger';
 export * from './minify-js';
+export * from './optimize-css';
 export * from './output-targets';
 export * from './platform';
 export * from './plugin';

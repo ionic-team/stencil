@@ -1,0 +1,6 @@
+{
+  "name": "@stencil/core/mock-doc",
+  "private": true,
+  "main": "./index.js",
+  "types": "../dist/mock-doc/index.d.ts"
+}

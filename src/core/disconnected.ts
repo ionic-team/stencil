@@ -1,13 +1,16 @@
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
-import { propagateComponentLoaded } from './init-component-instance';
+import { propagateComponentReady } from './init-component-instance';
 
 
-export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
+export const disconnectedCallback = (plt: PlatformApi, elm: HostElement, perf: Performance) => {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
   if (!plt.tmpDisconnected && isDisconnected(plt.domApi, elm)) {
+    if (_BUILD_.profile) {
+      perf.mark(`disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
 
     // ok, let's officially destroy this thing
     // set this to true so that any of our pending async stuff
@@ -17,7 +20,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
 
     // double check that we've informed the ancestor host elements
     // that they're good to go and loaded (cuz this one is on its way out)
-    propagateComponentLoaded(plt, elm);
+    propagateComponentReady(plt, elm);
 
     // since we're disconnecting, call all of the JSX ref's with null
     callNodeRefs(plt.vnodeMap.get(elm), true);
@@ -28,7 +31,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     plt.domApi.$removeEventListener(elm);
     plt.hasListenersMap.delete(elm);
 
-    if (__BUILD_CONDITIONALS__.cmpDidUnload) {
+    if (_BUILD_.cmpDidUnload) {
       // call instance componentDidUnload
       // if we've created an instance for this
       const instance = plt.instanceMap.get(elm);
@@ -39,7 +42,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     }
 
     // clear CSS var-shim tracking
-    if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
+    if (_BUILD_.cssVarShim && plt.customStyle) {
       plt.customStyle.removeHost(elm);
     }
 
@@ -51,15 +54,20 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
       plt.onReadyCallbacksMap,
       plt.hostSnapshotMap
     ].forEach(wm => wm.delete(elm));
+
+    if (_BUILD_.profile) {
+      perf.mark(`disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+      perf.measure(`disconnected:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_start:${elm.nodeName.toLowerCase()}:${elm['s-id']}`, `disconnected_end:${elm.nodeName.toLowerCase()}:${elm['s-id']}`);
+    }
   }
-}
+};
 
 
-export function isDisconnected(domApi: DomApi, elm: Node): any {
+export const isDisconnected = (domApi: DomApi, elm: Node): any => {
   while (elm) {
     if (!domApi.$parentNode(elm)) {
       return domApi.$nodeType(elm) !== NODE_TYPE.DocumentNode;
     }
     elm = domApi.$parentNode(elm);
   }
-}
+};

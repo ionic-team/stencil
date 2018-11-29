@@ -2,6 +2,12 @@ import * as d from '../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 
 
+export function formatBrowserLoaderComponentTagNames(cmpRegistry: d.ComponentRegistry) {
+  // ensure we've got a standard order of the component tagnames
+  return Object.keys(cmpRegistry).sort();
+}
+
+
 export function formatBrowserLoaderComponentRegistry(cmpRegistry: d.ComponentRegistry) {
   // ensure we've got a standard order of the components
   return Object.keys(cmpRegistry).sort().map(tag => {
@@ -380,6 +386,9 @@ export function getStyleIdPlaceholder(tagName: string) {
   return `/**style-id-placeholder:${tagName}:**/`;
 }
 
+export function getIntroPlaceholder() {
+  return `/**:intro-placeholder:**/`;
+}
 
 export function getBundleIdPlaceholder() {
   return `/**:bundle-id:**/`;

@@ -11,6 +11,16 @@ describe('parseFlags', () => {
     process.argv = ['/node', '/stencil'];
   });
 
+  it('should get known and unknown args', () => {
+    process.argv.push('serve', '--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts');
+
+    const flags = parseFlags(process);
+    expect(flags.task).toBe('serve');
+    expect(flags.args).toEqual(['--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts']);
+    expect(flags.knownArgs).toEqual(['--address', '127.0.0.1']);
+    expect(flags.unknownArgs).toEqual(['--coverage', '--reporters', 'test.spec.ts']);
+  });
+
   it('should use cli args, no npm cmds', () => {
     // user command line args
     // $ npm run serve --port 4444
@@ -91,6 +101,26 @@ describe('parseFlags', () => {
     process.argv[2] = '--flag';
     const flags = parseFlags(process);
     expect(flags.task).toBe(null);
+  });
+
+  it('should parse build flag to true', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(true);
+  });
+
+  it('should parse build flag to false', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--no-build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(false);
+  });
+
+  it('should not parse build flag, default null', () => {
+    process.argv[2] = 'test';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(null);
   });
 
   it('should parse --cache', () => {
@@ -213,6 +243,24 @@ describe('parseFlags', () => {
     expect(flags.e2e).toBe(true);
   });
 
+  it('should parse --emulate=android', () => {
+    process.argv[2] = '--emulate=android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should parse --emulate android', () => {
+    process.argv[2] = '--emulate';
+    process.argv[3] = 'android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should not parse --emulate', () => {
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe(null);
+  });
+
   it('should parse --es5', () => {
     process.argv[2] = '--es5';
     const flags = parseFlags(process);
@@ -300,6 +348,12 @@ describe('parseFlags', () => {
     expect(flags.prod).toBe(true);
   });
 
+  it('should parse --profile', () => {
+    process.argv[2] = '--profile';
+    const flags = parseFlags(process);
+    expect(flags.profile).toBe(true);
+  });
+
   it('should parse --prerender', () => {
     process.argv[2] = '--prerender';
     const flags = parseFlags(process);
@@ -317,6 +371,24 @@ describe('parseFlags', () => {
     process.argv[2] = '--screenshot';
     const flags = parseFlags(process);
     expect(flags.screenshot).toBe(true);
+  });
+
+  it('should parse --screenshot-connector scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector';
+    process.argv[3] = 'scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should parse --screenshot-connector=scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector=scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should not parse --screenshot-connector', () => {
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(null);
   });
 
   it('should parse --serve', () => {
@@ -343,22 +415,15 @@ describe('parseFlags', () => {
     expect(flags.stats).toBe(true);
   });
 
-  it('should parse --channel=production', () => {
-    process.argv[2] = '--channel=production';
+  it('should parse --update-screenshot', () => {
+    process.argv[2] = '--update-screenshot';
     const flags = parseFlags(process);
-    expect(flags.channel).toBe('production');
+    expect(flags.updateScreenshot).toBe(true);
   });
 
-  it('should parse --channel production', () => {
-    process.argv[2] = '--channel';
-    process.argv[3] = 'production';
+  it('should not parse --update-screenshot', () => {
     const flags = parseFlags(process);
-    expect(flags.channel).toBe('production');
-  });
-
-  it('should not parse --channel', () => {
-    const flags = parseFlags(process);
-    expect(flags.channel).toBe(null);
+    expect(flags.updateScreenshot).toBe(null);
   });
 
   it('should parse --version', () => {

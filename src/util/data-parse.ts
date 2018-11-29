@@ -3,7 +3,7 @@ import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
-export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.ComponentMeta {
+export const parseComponentLoader = (cmpRegistryData: d.ComponentHostData, i?: number, cmpData?: any): d.ComponentMeta => {
   // tag name will always be lower case
   // parse member meta
   // this data only includes props that are attributes that need to be observed
@@ -16,17 +16,19 @@ export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.Co
     // but only color should observe any attribute changes
     'color': { attribName: 'color' }
   };
-  if (memberData) {
-    for (let i = 0; i < memberData.length; i++) {
-      const d = memberData[i];
-      membersMeta[d[0]] = {
-        memberType: d[1],
-        reflectToAttrib: !!d[2],
-        attribName: typeof d[3] === 'string' ? d[3] : d[3] ? d[0] : 0 as any,
-        propType: d[4]
+
+  if (_BUILD_.hasMembers && memberData) {
+    for (i = 0; i < memberData.length; i++) {
+      cmpData = memberData[i];
+      membersMeta[cmpData[0]] = {
+        memberType: cmpData[1],
+        reflectToAttrib: !!cmpData[2],
+        attribName: typeof cmpData[3] === 'string' ? cmpData[3] : cmpData[3] ? cmpData[0] : 0 as any,
+        propType: cmpData[4]
       };
     }
   }
+
   return {
     tagNameMeta,
 
@@ -41,20 +43,18 @@ export function parseComponentLoader(cmpRegistryData: d.ComponentHostData): d.Co
     // parse listener meta
     listenersMeta: listenerMeta ? listenerMeta.map(parseListenerData) : undefined
   };
-}
+};
 
-function parseListenerData(listenerData: d.ComponentListenersData) {
-  return {
-    eventName: listenerData[0],
-    eventMethodName: listenerData[1],
-    eventDisabled: !!listenerData[2],
-    eventPassive: !!listenerData[3],
-    eventCapture: !!listenerData[4]
-  };
-}
+const parseListenerData = (listenerData: d.ComponentListenersData) => ({
+  eventName: listenerData[0],
+  eventMethodName: listenerData[1],
+  eventDisabled: !!listenerData[2],
+  eventPassive: !!listenerData[3],
+  eventCapture: !!listenerData[4]
+});
 
 
-export function parsePropertyValue(propType: d.PropertyType | PROP_TYPE, propValue: any) {
+export const parsePropertyValue = (propType: d.PropertyType | PROP_TYPE, propValue: any) => {
   // ensure this value is of the correct prop type
   // we're testing both formats of the "propType" value because
   // we could have either gotten the data from the attribute changed callback,
@@ -78,9 +78,12 @@ export function parsePropertyValue(propType: d.PropertyType | PROP_TYPE, propVal
       // but we still want it as a string
       return propValue.toString();
     }
+
+    // redundant return here for better minification
+    return propValue;
   }
 
   // not sure exactly what type we want
   // so no need to change to a different type
   return propValue;
-}
+};

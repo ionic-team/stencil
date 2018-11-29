@@ -1,32 +1,20 @@
-import * as d from '../../declarations';
-import { transpile } from '../test-transpile';
-import * as ts from 'typescript';
+import { formatDiagnostic, getCompilerOptions, transpile } from '../test-transpile';
 
 
 export const jestPreprocessor = {
 
-  process(sourceText: string, filePath: string) {
-
+  process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
     if (filePath.endsWith('.d.ts')) {
       // .d.ts file doesn't need to be transpiled for testing
       return '';
     }
 
     if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
-      const opts: any = {
-        module: 'commonjs',
-        target: 'es2015'
-      };
-
-      if (filePath.endsWith('.tsx')) {
-        opts.jsx = ts.JsxEmit.React;
-        opts.jsxFactory = 'h';
-        opts.esModuleInterop = true;
-      }
+      const opts = Object.assign({}, this.getCompilerOptions(jestConfig.rootDir));
 
       const results = transpile(sourceText, opts, filePath);
       if (results.diagnostics && results.diagnostics.length > 0) {
-        const msg = results.diagnostics.map(formatDiagnostics).join('\n\n');
+        const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
         throw new Error(msg);
       }
 
@@ -37,26 +25,36 @@ export const jestPreprocessor = {
     }
 
     return sourceText;
+  },
+
+  getCompilerOptions(rootDir: string) {
+    if (!this._tsCompilerOptions) {
+      this._tsCompilerOptions = getCompilerOptions(rootDir);
+    }
+
+    return this._tsCompilerOptions;
+  },
+
+  getCacheKey(code: string, filePath: string, jestConfigStr: string, transformOptions: { instrument: boolean; rootDir: string }) {
+    // https://github.com/facebook/jest/blob/v23.6.0/packages/jest-runtime/src/script_transformer.js#L61-L90
+    if (!this._tsCompilerOptionsKey) {
+      const opts = this.getCompilerOptions(transformOptions.rootDir);
+      this._compilerOptionsKey = JSON.stringify(opts);
+    }
+
+    const key = [
+      process.version,
+      CACHE_BUSTER,
+      this._tsCompilerOptionsKey,
+      code,
+      filePath,
+      jestConfigStr,
+      !!transformOptions.instrument
+    ];
+
+    return key.join(':');
   }
 
 };
 
-
-function formatDiagnostics(diagnostic: d.Diagnostic) {
-  var m = '';
-
-  if (diagnostic.relFilePath) {
-    m += diagnostic.relFilePath;
-    if (typeof diagnostic.lineNumber === 'number') {
-      m += ':' + diagnostic.lineNumber + 1;
-      if (typeof diagnostic.columnNumber === 'number') {
-        m += ':' + diagnostic.columnNumber;
-      }
-    }
-    m += '\n';
-  }
-
-  m += diagnostic.messageText;
-
-  return m;
-}
+const CACHE_BUSTER = 0;

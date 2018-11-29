@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('attribute-basic', function() {
@@ -14,11 +14,12 @@ describe('attribute-basic', function() {
     expect(app.querySelector('.single').textContent).toBe('single');
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord');
     expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr');
+    expect(app.querySelector('.htmlForLabel').getAttribute('for')).toBe('a');
 
     const button = app.querySelector('button');
     button.click();
 
-    await flush(app);
+    await waitForChanges();
 
     expect(app.querySelector('.single').textContent).toBe('single-update');
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');

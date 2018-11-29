@@ -1,7 +1,7 @@
+import { compileTemplate, executeTemplate } from './template';
 import { CSSScope, CSSSelector, CSSTemplate, Declaration } from './interfaces';
 import { StyleNode, types } from './css-parser';
-import { compileTemplate, executeTemplate } from './template';
-import { getScopesForElement } from './scope';
+
 
 export function resolveValues(selectors: CSSSelector[]) {
   const props: {[prop: string]: CSSTemplate} = {};
@@ -116,6 +116,19 @@ export function getActiveSelectors(
 
   // sort selectors by specifity
   return sortSelectors(activeSelectors);
+}
+
+
+function getScopesForElement(hostTemplateMap: WeakMap<HTMLElement, CSSScope>, node: HTMLElement) {
+  const scopes: CSSScope[] = [];
+  while (node) {
+    const scope = hostTemplateMap.get(node);
+    if (scope) {
+      scopes.push(scope);
+    }
+    node = node.parentElement;
+  }
+  return scopes;
 }
 
 

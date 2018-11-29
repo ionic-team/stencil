@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('esm-import', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -38,13 +38,13 @@ export async function testEsmImport(app: HTMLElement) {
   expect(listenVal.textContent.trim()).toBe('listenVal: 0');
 
   buttonClick(button);
-  await flush(app);
+  await waitForChanges();
 
   expect(propVal.textContent.trim()).toBe('propVal: 89');
   expect(listenVal.textContent.trim()).toBe('listenVal: 1');
 
   buttonClick(button);
-  await flush(app);
+  await waitForChanges();
 
   expect(propVal.textContent.trim()).toBe('propVal: 90');
   expect(listenVal.textContent.trim()).toBe('listenVal: 2');
@@ -57,6 +57,7 @@ if (typeof (window as any).CustomEvent !== 'function') {
   // CustomEvent polyfill
   (window as any).CustomEvent = (event: any, data: any) => {
     const evt = document.createEvent('CustomEvent');
+    data = data || {};
     evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
     return evt;
   };

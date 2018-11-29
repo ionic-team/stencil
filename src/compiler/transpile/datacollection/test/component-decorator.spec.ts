@@ -22,6 +22,7 @@ describe('component decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
+          tags: [],
           type: 'typeof ActionSheet'
         },
         assetsDirsMeta: [],
@@ -44,6 +45,7 @@ describe('component decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
+          tags: [],
           type: 'typeof ActionSheet'
         },
         assetsDirsMeta: [],
@@ -67,6 +69,7 @@ describe('component decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'ActionSheet',
+          tags: [],
           type: 'typeof ActionSheet'
         },
         dependencies: []
@@ -86,6 +89,7 @@ describe('component decorator', () => {
         jsdoc: {
           documentation: 'This is an actionSheet class',
           name: 'ActionSheet',
+          tags: [],
           type: 'typeof ActionSheet'
         },
         hostMeta: {

@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { getModuleFile } from '../../build/compiler-ctx';
 import { MEMBER_TYPE } from '../../../util/constants';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function componentDependencies(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {

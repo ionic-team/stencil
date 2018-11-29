@@ -26,14 +26,15 @@ export interface WindowData extends Window {
 
 export interface AppGlobal {
   ael?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
+  asyncQueue?: boolean;
   resourcesUrl?: string;
-  components?: d.ComponentHostData[];
   componentOnReady?: (elm: d.HostElement, resolve: (elm: d.HostElement) => void) => boolean;
   Context?: any;
   loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
   loaded?: boolean;
   h?: Function;
   initialized?: boolean;
+  onReady?: () => Promise<void>;
   raf?: DomControllerCallback;
   rel?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
 }
@@ -54,7 +55,7 @@ export interface QueuedComponentOnReady {
 
 export interface CoreContext {
   attr?: number;
-  emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => void;
+  emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => CustomEvent;
   enableListener?: d.EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
   isClient?: boolean;

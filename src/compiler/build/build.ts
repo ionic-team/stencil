@@ -53,18 +53,16 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // bundle js modules and create each of the components's styles
     // these can run in parallel
-    const results = await Promise.all([
+    const [rawModules] = await Promise.all([
       generateModuleMap(config, compilerCtx, buildCtx, entryModules),
       generateStyles(config, compilerCtx, buildCtx, entryModules)
     ]);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
-    const jsModules = results[0];
-
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, jsModules);
+    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
     if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
 
     // generate the app files, such as app.js, app.core.js

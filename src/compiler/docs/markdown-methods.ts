@@ -1,55 +1,48 @@
 import * as d from '../../declarations';
-import { MarkdownTable, getMemberDocumentation } from './docs-util';
+import { MarkdownTable } from './docs-util';
 
 
-export class MarkdownMethods {
-  private rows: Row[] = [];
-
-  addRow(methodName: string, memberMeta: d.MemberMeta) {
-    this.rows.push(new Row(methodName, memberMeta));
-  }
-
-  toMarkdown() {
-    const content: string[] = [];
-    if (!this.rows.length) {
-      return content;
-    }
-
-    content.push(`## Methods`);
-    content.push(``);
-
-    this.rows = this.rows.sort((a, b) => {
-      if (a.methodName < b.methodName) return -1;
-      if (a.methodName > b.methodName) return 1;
-      return 0;
-    });
-
-    const table = new MarkdownTable();
-
-    table.addHeader(['Method', 'Description']);
-
-    this.rows.forEach(row => {
-      table.addRow([
-        '`' + row.methodName + '`',
-        row.description
-      ]);
-    });
-
-    content.push(...table.toMarkdown());
-    content.push(``);
-    content.push(``);
-
+export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
+  const content: string[] = [];
+  if (methods.length === 0) {
     return content;
   }
-}
 
+  content.push(`## Methods`);
+  content.push(``);
 
-class Row {
+  methods.forEach(method => {
+    content.push(`### \`${method.signature}\``);
+    content.push(``);
+    content.push(method.docs);
+    content.push(``);
 
-  constructor(public methodName: string, private memberMeta: d.MemberMeta) {}
+    if (method.parameters.length > 0) {
+      const parmsTable = new MarkdownTable();
 
-  get description() {
-    return getMemberDocumentation(this.memberMeta.jsdoc);
-  }
+      parmsTable.addHeader(['Name', 'Type', 'Description']);
 
+      method.parameters.forEach(({ name, type, docs }) => {
+        parmsTable.addRow(['`' + name + '`', '`' + type + '`', docs]);
+      });
+
+      content.push(`#### Parameters`);
+      content.push(``);
+      content.push(...parmsTable.toMarkdown());
+      content.push(``);
+    }
+
+    if (method.returns) {
+      content.push(`#### Returns`);
+      content.push(``);
+      content.push(`Type: \`${method.returns.type}\``);
+      content.push(``);
+      content.push(method.returns.docs);
+      content.push(``);
+    }
+  });
+
+  content.push(``);
+
+  return content;
 }

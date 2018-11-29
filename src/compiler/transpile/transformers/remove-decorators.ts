@@ -1,5 +1,5 @@
 import { isComponentClass } from './util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
 

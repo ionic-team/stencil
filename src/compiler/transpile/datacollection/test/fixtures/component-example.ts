@@ -29,29 +29,14 @@ class ActionSheet {
    */
   @Event() ionActionSheetDidLoad: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has presented.
-   */
   @Event() ionActionSheetDidPresent: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted before the alert has presented.
-   */
   @Event() ionActionSheetWillPresent: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted before the alert has dismissed.
-   */
   @Event() ionActionSheetWillDismiss: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has dismissed.
-   */
   @Event() ionActionSheetDidDismiss: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has unloaded.
-   */
   @Event() ionActionSheetDidUnload: any;
 
   @Prop({ connect: 'ion-animation-controller' }) animationCtrl: AnimationController;
@@ -64,7 +49,15 @@ class ActionSheet {
   @Prop() enableBackdropDismiss: boolean = true;
 
   @Prop() enterAnimation: AnimationBuilder;
+
+  /**
+   * @return this is a property
+   */
   @Prop() exitAnimation: AnimationBuilder;
+
+  /**
+   * @internal
+   */
   @Prop() actionSheetId: string;
 
 

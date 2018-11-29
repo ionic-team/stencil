@@ -140,4 +140,21 @@ describe('@Event', () => {
     expect(eventSpy).toHaveReceivedEventDetail(88);
   });
 
+  it('page waitForEvent', async () => {
+    const page = await newE2EPage({ html: `
+      <event-cmp></event-cmp>
+    `});
+
+    setTimeout(async () => {
+      const elm = await page.find('event-cmp');
+      await elm.triggerEvent('someEvent', { detail: 88 });
+      await page.waitForChanges();
+    }, 100);
+
+    const ev = await page.waitForEvent('someEvent');
+
+    expect(ev.type).toBe('someEvent');
+    expect(ev.detail).toBe(88);
+  });
+
 });

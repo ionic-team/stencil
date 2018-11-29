@@ -5,7 +5,7 @@ import { pathJoin } from '../util';
 
 export async function getAppBrowserCorePolyfills(config: d.Config) {
   // first load up all of the polyfill content
-  const readFilePromises = POLYFILLS.map(polyfillFile => {
+  const readFilePromises = INLINE_POLYFILLS.map(polyfillFile => {
     const staticName = config.sys.path.join('polyfills', 'es5', polyfillFile);
     return config.sys.getClientCoreFile({ staticName: staticName });
   });
@@ -19,7 +19,7 @@ export async function getAppBrowserCorePolyfills(config: d.Config) {
 
 
 export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget);
+  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget, 'es5');
 
   await POLYFILLS.map(async polyfillFile => {
     const staticName = config.sys.path.join('polyfills', 'esm', polyfillFile);
@@ -34,12 +34,19 @@ export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.Comp
 
 // order of the polyfills matters!! test test test
 // actual source of the polyfills are found in /src/client/polyfills/
-const POLYFILLS = [
+const INLINE_POLYFILLS = [
   'dom.js',
   'array.js',
   'object.js',
   'string.js',
   'promise.js',
+  'map.js',
   'fetch.js',
-  'url.js',
+  'url.js'
+];
+
+const POLYFILLS = [
+  ...INLINE_POLYFILLS,
+  'css-shim.js',
+  'tslib.js'
 ];

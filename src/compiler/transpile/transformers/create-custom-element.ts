@@ -1,4 +1,4 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as d from '../../../declarations';
 
 export function createCustomElements(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {

@@ -3,22 +3,111 @@
 declare global {
   namespace jest {
     interface Matchers<R> {
+      /**
+       * Compares HTML, but first normalizes the HTML so all
+       * whitespace, attribute order and css class order are
+       * the same. When given an element, it will compare
+       * the element's `outerHTML`. When given a Document Fragment,
+       * such as a Shadow Root, it'll compare its `innerHTML`.
+       * Otherwise it'll compare two strings representing HTML.
+       */
       toEqualHtml(expectHtml: string): void;
+
+      /**
+       * When given an element, it'll compare the element's
+       * `textContent`. Otherwise it'll compare two strings. This
+       * matcher will also `trim()` each string before comparing.
+       */
       toEqualText(expectTextContent: string): void;
 
+      /**
+       * Checks if an element simply has the attribute. It does
+       * not check any values of the attribute
+       */
       toHaveAttribute(expectAttrName: string): void;
-      toEqualAttribute(expectAttrName: string, expectAttrValue: string): void;
+
+      /**
+       * Checks if an element's attribute value equals the expect value.
+       */
+      toEqualAttribute(expectAttrName: string, expectAttrValue: any): void;
+
+      /**
+       * Checks if an element's has each of the expected attribute
+       * names and values.
+       */
       toEqualAttributes(expectAttrs: {[attrName: string]: any}): void;
 
+      /**
+       * Checks if an element has the expected css class.
+       */
       toHaveClass(expectClassName: string): void;
+
+      /**
+       * Checks if an element has each of the expected css classes
+       * in the array.
+       */
       toHaveClasses(expectClassNames: string[]): void;
+
+      /**
+       * Checks if an element has the exact same css classes
+       * as the expected array of css classes.
+       */
       toMatchClasses(expectClassNames: string[]): void;
 
+      /**
+       * When given an EventSpy, checks if the event has been
+       * received or not.
+       */
       toHaveReceivedEvent(): void;
+
+      /**
+       * When given an EventSpy, checks how many times the
+       * event has been received.
+       */
       toHaveReceivedEventTimes(count: number): void;
+
+      /**
+       * When given an EventSpy, checks the event has
+       * received the correct custom event `detail` data.
+       */
       toHaveReceivedEventDetail(eventDetail: any): void;
+
+      /**
+       * Used to evaluate the results of `compareScreenshot()`, such as
+       * `expect(compare).toMatchScreenshot()`. The `allowableMismatchedRatio`
+       * value from the testing config is used by default if
+       * `MatchScreenshotOptions` were not provided.
+       */
+      toMatchScreenshot(opts?: MatchScreenshotOptions): void;
     }
   }
+}
+
+
+export interface MatchScreenshotOptions {
+  /**
+   * The `allowableMismatchedPixels` value is the total number of pixels
+   * that can be mismatched until the test fails. For example, if the value
+   * is `100`, and if there were `101` pixels that were mismatched then the
+   * test would fail. If the `allowableMismatchedRatio` is provided it will
+   * take precedence, otherwise `allowableMismatchedPixels` will be used.
+   */
+  allowableMismatchedPixels?: number;
+
+  /**
+   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
+   * determine an acceptable ratio of pixels that can be mismatched before
+   * the image is considered to have changes. Realistically, two screenshots
+   * representing the same content may have a small number of pixels that
+   * are not identical due to anti-aliasing, which is perfectly normal. The
+   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
+   * divided by the total number of pixels in the screenshot. For example,
+   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
+   * the image is considered to have changes. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedRatio?: number;
 }
 
 
@@ -59,12 +148,19 @@ export interface EventInitDict {
 
 
 export interface JestEnvironmentGlobal {
-  __BUILD_CONDITIONALS__: any;
+  _BUILD_: any;
   __NEW_TEST_PAGE__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
   resourcesUrl: string;
+  currentSpec?: {
+    id: string;
+    description: string;
+    fullName: string;
+    testPath: string;
+  };
+  screenshotDescriptions: Set<string>;
 }
 
 
@@ -75,57 +171,31 @@ export interface E2EProcessEnv {
   STENCIL_SCREENSHOT_CONNECTOR?: string;
   STENCIL_SCREENSHOT_SERVER?: string;
 
+  __STENCIL_EMULATE_CONFIGS__?: string;
   __STENCIL_EMULATE__?: string;
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_LOADER_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
-  __STENCIL_SCREENSHOTS__?: 'true';
-  __STENCIL_SCREENSHOT_IMAGES_DIR__?: string;
-  __STENCIL_SCREENSHOT_DATA_DIR__?: string;
+
+  __STENCIL_SCREENSHOT__?: 'true';
+  __STENCIL_SCREENSHOT_BUILD__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
+  __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
-  __STENCIL_JEST_ENVIRONMENT_NODE_MODULE__?: string;
+  __STENCIL_DEFAULT_TIMEOUT__?: string;
 }
 
 
 export interface Testing {
   isValid: boolean;
-  runTests(): Promise<void>;
+  runTests(): Promise<boolean>;
   destroy(): Promise<void>;
 }
 
 
-export interface TestingConfig {
-  /**
-   * Additional arguments to pass to the browser instance.
-   */
-  browserArgs?: string[];
-
-  /**
-   * Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
-   */
-  browserExecutablePath?: string;
-
-  /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
-   */
-  browserHeadless?: boolean;
-
-  /**
-   * Slows down e2e browser operations by the specified amount of milliseconds.
-   * Useful so that you can see what is going on.
-   */
-  browserSlowMo?: number;
-
-  /**
-   * Array of browser emulations to be using during e2e tests. A full e2e
-   * test is ran for each emulation.
-   */
-  emulate?: EmulateConfig[];
-
-
+export interface JestConfig {
   /**
    * This option tells Jest that all imported modules in your tests should be mocked automatically.
    * All modules used in your tests will have a replacement implementation, keeping the API surface. Default: false
@@ -253,6 +323,81 @@ export interface TestingConfig {
   watchPathIgnorePatterns?: any[];
 }
 
+export interface JestArgv extends JestConfig {
+  _: string[];
+  ci: boolean;
+  config: string;
+  maxWorkers: number;
+}
+
+
+export interface TestingConfig extends JestConfig {
+  /**
+   * The `allowableMismatchedPixels` value is used to determine an acceptable
+   * number of pixels that can be mismatched before the image is considered
+   * to have changes. Realistically, two screenshots representing the same
+   * content may have a small number of pixels that are not identical due to
+   * anti-aliasing, which is perfectly normal. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedPixels?: number;
+
+  /**
+   * The `allowableMismatchedRatio` ranges from `0` to `1` and is used to
+   * determine an acceptable ratio of pixels that can be mismatched before
+   * the image is considered to have changes. Realistically, two screenshots
+   * representing the same content may have a small number of pixels that
+   * are not identical due to anti-aliasing, which is perfectly normal. The
+   * `allowableMismatchedRatio` is the number of pixels that were mismatched,
+   * divided by the total number of pixels in the screenshot. For example,
+   * a ratio value of `0.06` means 6% of the pixels can be mismatched before
+   * the image is considered to have changes. If the `allowableMismatchedRatio`
+   * is provided it will take precedence, otherwise `allowableMismatchedPixels`
+   * will be used.
+   */
+  allowableMismatchedRatio?: number;
+
+  /**
+   * Matching threshold while comparing two screenshots. Value ranges from `0` to `1`.
+   * Smaller values make the comparison more sensitive. The `pixelmatchThreshold`
+   * value helps to ignore anti-aliasing. Default: `0.1`
+   */
+  pixelmatchThreshold?: number;
+
+  /**
+   * Additional arguments to pass to the browser instance.
+   */
+  browserArgs?: string[];
+
+  /**
+   * Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
+   */
+  browserExecutablePath?: string;
+
+  /**
+   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   */
+  browserHeadless?: boolean;
+
+  /**
+   * Slows down e2e browser operations by the specified amount of milliseconds.
+   * Useful so that you can see what is going on.
+   */
+  browserSlowMo?: number;
+
+  /**
+   * Array of browser emulations to be using during e2e tests. A full e2e
+   * test is ran for each emulation.
+   */
+  emulate?: EmulateConfig[];
+
+  /**
+   * Path to the Screenshot Connector module.
+   */
+  screenshotConnector?: string;
+}
+
 
 export interface EmulateConfig {
   /**
@@ -262,14 +407,25 @@ export interface EmulateConfig {
   device?: string;
 
   /**
+   * User-Agent to be used. Defaults to the user-agent of the installed Puppeteer version.
+   */
+  userAgent?: string;
+
+  viewport?: EmulateViewport;
+}
+
+
+export interface EmulateViewport {
+
+  /**
    * Page width in pixels.
    */
-  width?: number;
+  width: number;
 
   /**
    * page height in pixels.
    */
-  height?: number;
+  height: number;
 
   /**
    * Specify device scale factor (can be thought of as dpr). Defaults to 1.
@@ -291,39 +447,4 @@ export interface EmulateConfig {
    */
   isLandscape?: boolean;
 
-  userAgent?: string;
-
-  /**
-   * Changes the CSS media type of the page. The only allowed values are 'screen', 'print' and null. Passing null disables media emulation.
-   */
-  mediaType?: 'screen' | 'print';
-}
-
-
-export interface E2EScreenshotOptions {
-  /**
-   * When true, takes a screenshot of the full scrollable page.
-   * @default false
-   */
-  fullPage?: boolean;
-
-  /**
-   * Hides default white background and allows capturing screenshots with transparency.
-   * @default false
-   */
-  omitBackground?: boolean;
-
-  /**
-   * An object which specifies clipping region of the page.
-   */
-  clip?: {
-    /** The x-coordinate of top-left corner. */
-    x: number;
-    /** The y-coordinate of top-left corner. */
-    y: number;
-    /** The width. */
-    width: number;
-    /** The height. */
-    height: number;
-  };
 }

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, normalizePath } from '../util';
+import { buildError, normalizePath, pathJoin } from '../util';
 import { parseStyleDocs } from '../docs/style-docs';
 
 
@@ -33,16 +33,36 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
 
 
 async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) {
-  try {
-    cssImportData.styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
+  cssImportData.styleText = await loadStyleText(compilerCtx, cssImportData);
+
+  if (typeof cssImportData.styleText === 'string') {
     cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop, styleDocs);
 
-  } catch (e) {
+  } else {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
     err.absFilePath = normalizePath(srcFilePath);
     err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, srcFilePath));
   }
+}
+
+
+async function loadStyleText(compilerCtx: d.CompilerCtx, cssImportData: d.CssImportData) {
+  let styleText: string = null;
+
+  try {
+    styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
+
+  } catch (e) {
+    if (cssImportData.altFilePath) {
+      try {
+        styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
+
+      } catch (e) {}
+    }
+  }
+
+  return styleText;
 }
 
 
@@ -81,12 +101,19 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
       cssImportData.filePath = normalizePath(cssImportData.url);
 
     } else {
-      // relatie path
+      // relative path
       cssImportData.filePath = normalizePath(config.sys.path.join(dir, cssImportData.url));
     }
 
     if (importeeExt !== 'css' && !cssImportData.filePath.toLowerCase().endsWith('.css')) {
       cssImportData.filePath += `.${importeeExt}`;
+
+      if (importeeExt === 'scss') {
+        const fileName = '_' + config.sys.path.basename(cssImportData.filePath);
+        const dirPath = config.sys.path.dirname(cssImportData.filePath);
+
+        cssImportData.altFilePath = pathJoin(config, dirPath, fileName);
+      }
     }
 
     if (typeof cssImportData.filePath === 'string') {

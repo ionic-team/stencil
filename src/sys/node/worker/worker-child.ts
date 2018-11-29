@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import exit from 'exit';
 
 
 export class WorkerChild {
@@ -7,7 +8,7 @@ export class WorkerChild {
 
   async receiveMessageFromMain(msgFromMain: d.WorkerMessage) {
     if (msgFromMain.exit) {
-      this.exit();
+      exit(0);
     }
 
     const msgToMain: d.WorkerMessage = {
@@ -33,13 +34,9 @@ export class WorkerChild {
   sendMessageToMain(msg: d.WorkerMessage) {
     this.process.send(msg, (err: NodeJS.ErrnoException) => {
       if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
-        this.exit();
+        exit(0);
       }
     });
-  }
-
-  exit() {
-    this.process.exit(0);
   }
 }
 

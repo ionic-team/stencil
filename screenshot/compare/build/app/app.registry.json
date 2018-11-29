@@ -1,0 +1,74 @@
+{
+  "namespace": "App",
+  "fsNamespace": "app",
+  "loader": "../app.js",
+  "core": "app.qqwwbd7c.js",
+  "corePolyfilled": "app.ibumv4zp.js",
+  "components": {
+    "app-root": {
+      "bundleIds": {
+        "$": "tjnmfg6d"
+      }
+    },
+    "compare-analysis": {
+      "bundleIds": {
+        "$": "n5umzvjk"
+      },
+      "encapsulation": "shadow"
+    },
+    "compare-filter": {
+      "bundleIds": {
+        "$": "uuxzmktj"
+      },
+      "encapsulation": "shadow"
+    },
+    "compare-header": {
+      "bundleIds": {
+        "$": "uuxzmktj"
+      },
+      "encapsulation": "shadow"
+    },
+    "compare-row": {
+      "bundleIds": {
+        "$": "n5umzvjk"
+      }
+    },
+    "compare-thead": {
+      "bundleIds": {
+        "$": "n5umzvjk"
+      },
+      "encapsulation": "shadow"
+    },
+    "screenshot-compare": {
+      "bundleIds": {
+        "$": "n5umzvjk"
+      }
+    },
+    "screenshot-lookup": {
+      "bundleIds": {
+        "$": "l6dfzrmf"
+      },
+      "encapsulation": "shadow"
+    },
+    "screenshot-preview": {
+      "bundleIds": {
+        "$": "toatahed"
+      }
+    },
+    "stencil-route": {
+      "bundleIds": {
+        "$": "tjnmfg6d"
+      }
+    },
+    "stencil-route-switch": {
+      "bundleIds": {
+        "$": "tjnmfg6d"
+      }
+    },
+    "stencil-router": {
+      "bundleIds": {
+        "$": "tjnmfg6d"
+      }
+    }
+  }
+}
