@@ -3,6 +3,7 @@ import { BuildContext } from '../build/build-ctx';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { generateDocData } from './generate-doc-data';
+import { generateWebComponentsJson } from './generate-web-components-json';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
 import { generateCustomDocs } from './generate-custom-docs';
@@ -55,13 +56,10 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
   if (!config.buildDocs) {
     return;
   }
+  const distOutputTargets = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
   const docsOutputTargets = config.outputTargets.filter(o => {
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
-
-  if (docsOutputTargets.length === 0) {
-    return;
-  }
 
   const docsData = await generateDocData(config, compilerCtx, buildCtx.diagnostics);
 
@@ -70,16 +68,22 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
     strickCheckDocs(config, docsData);
   }
 
+  // generate web-components.json
+  await generateWebComponentsJson(config, compilerCtx, distOutputTargets, docsData);
+
+  // generate READMEs docs
   const readmeTargets = docsOutputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
   if (readmeTargets.length > 0) {
     await generateReadmeDocs(config, compilerCtx, readmeTargets, docsData);
   }
 
+  // generate json docs
   const jsonTargets = docsOutputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
   if (jsonTargets.length > 0) {
     await generateJsonDocs(compilerCtx, jsonTargets, docsData);
   }
 
+  // generate custom docs
   const customTargets = docsOutputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
   if (customTargets.length > 0) {
     await generateCustomDocs(config, customTargets, docsData);
