@@ -79,9 +79,7 @@ export interface FsWriteResults {
 }
 
 
-export interface FsItems {
-  [filePath: string]: FsItem;
-}
+export type FsItems = Map<string, FsItem>;
 
 
 export interface FsItem {
