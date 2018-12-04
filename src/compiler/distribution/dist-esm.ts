@@ -59,12 +59,18 @@ export async function generateEsmHosts(config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
-  await Promise.all([
-    generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es5'),
-    generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es2017'),
+  const hosts = [
+    generateEsmLoader(config, compilerCtx, outputTarget),
 
-    generateEsmLoader(config, compilerCtx, outputTarget)
-  ]);
+    generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es2017'),
+  ];
+  if (config.buildEs5) {
+    hosts.push(
+      generateEsmHost(config, compilerCtx, cmpRegistry, outputTarget, 'es5')
+    );
+  }
+
+  await Promise.all(hosts);
 }
 
 export async function generateEsmHost(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
@@ -124,14 +130,15 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
     'es2017': './index.es2017.js'
   }, null, 2);
 
+  const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
   const indexDtsContent = `export declare function defineCustomElements(win: any): Promise<void>;`;
-  const indexES5Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es5EntryPoint))}';`;
+  const indexContent = `export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
   const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
 
   await Promise.all([
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent),
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.d.ts'), indexDtsContent),
-    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.js'), indexES5Content),
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.js'), indexContent),
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.es2017.js'), indexES2017Content)
   ]);
 }
