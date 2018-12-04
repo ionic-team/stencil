@@ -1,3 +1,25 @@
+<a name="0.16.1-0"></a>
+## ❄️ [Prerelease] [0.16.1-0](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-0) (2018-12-04)
+
+
+### Bug Fixes
+
+* **docs:** do not serialize path metadata ([a7d5e3a](https://github.com/ionic-team/stencil/commit/a7d5e3a))
+
+
+### Features
+
+* generate experimental web-components.json ([#1256](https://github.com/ionic-team/stencil/issues/1256)) ([8924561](https://github.com/ionic-team/stencil/commit/8924561))
+
+
+### Performance Improvements
+
+* **build:** esm build without es5 ([fae97dd](https://github.com/ionic-team/stencil/commit/fae97dd))
+* **bundling:** rollup cache + non-treeshake ([b7d2342](https://github.com/ionic-team/stencil/commit/b7d2342))
+* **fs:** use Map ([f03ec9d](https://github.com/ionic-team/stencil/commit/f03ec9d))
+
+
+
 <a name="0.16.0"></a>
 # 🏀 [0.16.0](https://github.com/ionic-team/stencil/compare/v0.15.2...v0.16.0) (2018-11-29)
 
