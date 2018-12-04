@@ -16,7 +16,10 @@ export async function generateEsmIndexes(config: d.Config, compilerCtx: d.Compil
 
 async function generateEsmIndexShortcut(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const indexPath = getDistEsmIndexPath(config, outputTarget);
-  const contentJs = `export * from './es5/index.js';`;
+  const contentJs = config.buildEs5
+    ? `export * from './es5/index.js';`
+    : `export * from './es2017/index.js';`;
+
   await compilerCtx.fs.writeFile(indexPath, contentJs);
 }
 
