@@ -48,7 +48,6 @@ async function writeEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   const timespan = buildCtx.createTimeSpan(`generateEsmCoreEs5 started, ${relPath}`, true);
 
-  buildConditionals.es5 = true;
   jsContent = await buildCoreContent(config, compilerCtx, buildCtx, buildConditionals, jsContent);
 
   // fighting with typescript/webpack/es5 builds too much

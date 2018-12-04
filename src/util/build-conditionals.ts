@@ -132,7 +132,6 @@ export async function setBuildConditionals(
   if (coreId === 'core') {
     // modern build
     coreBuild.browserModuleLoader = true;
-    coreBuild.slotPolyfill = (coreBuild.scoped && buildCtx.hasSlot);
     coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
@@ -142,7 +141,6 @@ export async function setBuildConditionals(
     coreBuild.es5 = true;
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
-    coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
     coreBuild.prerenderClientSide = shouldPrerender(config);
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
@@ -151,6 +149,7 @@ export async function setBuildConditionals(
     coreBuild.es5 = true;
     coreBuild.externalModuleLoader = true;
     coreBuild.cssVarShim = true;
+    coreBuild.polyfills = true;
     coreBuild.slotPolyfill = true;
     compilerCtx.lastBuildConditionalsEsmEs5 = coreBuild;
 
