@@ -1,10 +1,13 @@
-<a name="0.16.1-0"></a>
-## ❄️ [Prerelease] [0.16.1-0](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-0) (2018-12-04)
+<a name="0.16.1-1"></a>
+## 😸 [Prerelease] [0.16.1-1](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-1) (2018-12-05)
 
 
 ### Bug Fixes
 
 * **docs:** do not serialize path metadata ([a7d5e3a](https://github.com/ionic-team/stencil/commit/a7d5e3a))
+* **esm:** generate esm/es2017 correctly ([5ab6beb](https://github.com/ionic-team/stencil/commit/5ab6beb))
+* **esm:** shortcut index should point to valid esm ([e4e5cca](https://github.com/ionic-team/stencil/commit/e4e5cca))
+* **workers:** detect number of CPUs correctly ([b5f9ddc](https://github.com/ionic-team/stencil/commit/b5f9ddc))
 
 
 ### Features
