@@ -24,6 +24,7 @@ export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCt
     const appEntryTags = getAppEntryTags(allModules);
 
     buildCtx.entryPoints = generateComponentEntries(
+      config,
       buildCtx,
       allModules,
       userConfigEntryModulesTags,
@@ -172,7 +173,7 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
       return 0;
     });
 
-  const definedTags: string[] = [];
+  const definedTags = new Set<string>();
   const entryTags = configBundles
     .map(b => {
     return b.components
@@ -186,13 +187,13 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
           warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
         }
 
-        if (definedTags.includes(tag)) {
+        if (definedTags.has(tag)) {
           const warn = buildWarn(buildCtx.diagnostics);
           warn.header = `Stencil Config`;
           warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
         }
 
-        definedTags.push(tag);
+        definedTags.add(tag);
         return tag;
       })
       .sort();
@@ -203,31 +204,22 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
 
 
 export function validateComponentEntries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const definedTags: {[tag: string]: string[]} = {};
-
-  const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => {
+  const definedTags = new Set<string>();
+  return Object.keys(compilerCtx.moduleFiles).map(filePath => {
     const moduleFile = compilerCtx.moduleFiles[filePath];
 
     if (moduleFile.cmpMeta) {
       const tag = moduleFile.cmpMeta.tagNameMeta;
-      definedTags[tag] = definedTags[tag] || [];
-      definedTags[tag].push(moduleFile.sourceFilePath);
+      if (definedTags.has(tag)) {
+        const error = buildError(buildCtx.diagnostics);
+        error.messageText = `Component tag "${tag}" has been defined in multiple files: ${config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath)}`;
+      } else {
+        definedTags.add(tag);
+      }
     }
 
     return moduleFile;
   });
-
-  Object.keys(definedTags).forEach(tag => {
-    const filePaths = definedTags[tag];
-    if (filePaths.length > 1) {
-      const error = buildError(buildCtx.diagnostics);
-      error.messageText = `Component tag "${tag}" has been defined in multiple files: ${filePaths.map(f => {
-        return config.sys.path.relative(config.rootDir, f);
-      }).join(', ')}`;
-    }
-  });
-
-  return allModules;
 }
 
 function sortModuleFiles(a: d.ModuleFile, b: d.ModuleFile) {

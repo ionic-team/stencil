@@ -4,36 +4,38 @@ import { processAppGraph } from './app-graph';
 
 
 export function generateComponentEntries(
+  config: d.Config,
   buildCtx: d.BuildCtx,
   allModules: d.ModuleFile[],
   userConfigEntryTags: string[][],
   appEntryTags: string[]
-) {
+): d.EntryPoint[] {
+  // In dev mode we create an entry poitn for each component
+  if (config.devMode) {
+    return appEntryTags.map(tag => [{tag}]);
+  }
+
   // user config entry modules you leave as is
   // whatever the user put in the bundle is how it goes
-  const entryPoints: d.EntryPoint[] = [];
 
   // get all the config.bundle entry tags the user may have manually configured
   const userConfigEntryPoints = processUserConfigBundles(userConfigEntryTags);
-  const hasUserConfigEntries = (userConfigEntryPoints.length > 0);
-
-  // start out by adding all the user config entry points first
-  entryPoints.push(...userConfigEntryPoints);
 
   // process all of the app's components not already found
   // in the config or the root html
-  const appEntries = processAppComponentEntryTags(buildCtx, hasUserConfigEntries, allModules, entryPoints, appEntryTags);
-  entryPoints.push(...appEntries);
+  const appEntries = processAppComponentEntryTags(buildCtx, allModules, userConfigEntryPoints, appEntryTags);
 
-  return entryPoints;
+  return [
+    ...userConfigEntryPoints,
+    ...appEntries
+  ];
 }
 
 
-export function processAppComponentEntryTags(buildCtx: d.BuildCtx, hasUserConfigEntries: boolean, allModules: d.ModuleFile[], entryPoints: d.EntryPoint[], appEntryTags: string[]) {
+export function processAppComponentEntryTags(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryPoints: d.EntryPoint[], appEntryTags: string[]) {
   // remove any tags already found in user config
   appEntryTags = appEntryTags.filter(tag => !entryPoints.some(ep => ep.some(em => em.tag === tag)));
-
-  if (hasUserConfigEntries && appEntryTags.length > 0) {
+  if (entryPoints.length > 0 && appEntryTags.length > 0) {
     appEntryTags.forEach(appEntryTag => {
       const warn = buildWarn(buildCtx.diagnostics);
       warn.header = `Stencil Config`;
