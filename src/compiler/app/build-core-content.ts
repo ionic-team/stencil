@@ -183,7 +183,7 @@ const PROD_MINIFY_OPTS: any = {
     comparisons: true,
     conditionals: true,
     dead_code: true,
-    drop_console: true,
+    drop_console: false,
     drop_debugger: true,
     evaluate: true,
     expression: true,
