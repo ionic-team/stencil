@@ -176,7 +176,7 @@ function generateProxy(cmpMeta: d.ComponentMeta, useDirectives: boolean) {
   const lines = [`
 export declare interface ${tagNameAsPascal} extends StencilComponents<'${tagNameAsPascal}'> {}
 @${decorator}({ ${directiveOpts.join(', ')} })
-export class ${cmpMeta.componentClass} {`];
+export class ${tagNameAsPascal} {`];
 
   // Generate outputs
   outputs.forEach(output => {
