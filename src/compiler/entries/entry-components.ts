@@ -4,17 +4,12 @@ import { processAppGraph } from './app-graph';
 
 
 export function generateComponentEntries(
-  config: d.Config,
+  _config: d.Config,
   buildCtx: d.BuildCtx,
   allModules: d.ModuleFile[],
   userConfigEntryTags: string[][],
   appEntryTags: string[]
 ): d.EntryPoint[] {
-  // In dev mode we create an entry poitn for each component
-  if (config.devMode) {
-    return appEntryTags.map(tag => [{tag}]);
-  }
-
   // user config entry modules you leave as is
   // whatever the user put in the bundle is how it goes
 
