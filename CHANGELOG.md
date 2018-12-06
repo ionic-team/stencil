@@ -1,5 +1,5 @@
-<a name="0.16.1-1"></a>
-## 😸 [Prerelease] [0.16.1-1](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-1) (2018-12-05)
+<a name="0.16.1-2"></a>
+## 🍏 [Prerelease] [0.16.1-2](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-2) (2018-12-06)
 
 
 ### Bug Fixes
@@ -8,6 +8,11 @@
 * **esm:** generate esm/es2017 correctly ([5ab6beb](https://github.com/ionic-team/stencil/commit/5ab6beb))
 * **esm:** shortcut index should point to valid esm ([e4e5cca](https://github.com/ionic-team/stencil/commit/e4e5cca))
 * **workers:** detect number of CPUs correctly ([b5f9ddc](https://github.com/ionic-team/stencil/commit/b5f9ddc))
+* **angular:** also update class name ([483a269](https://github.com/ionic-team/stencil/commit/483a269))
+* **angular:** sort using tag-name ([24c9448](https://github.com/ionic-team/stencil/commit/24c9448))
+* **angular:** use PascalCase tagname as class name ([7c9702a](https://github.com/ionic-team/stencil/commit/7c9702a))
+* **console:** do not drop console for prod builds ([bcf4219](https://github.com/ionic-team/stencil/commit/bcf4219))
+* **core:** always include svg support ([5308931](https://github.com/ionic-team/stencil/commit/5308931))
 
 
 ### Features
