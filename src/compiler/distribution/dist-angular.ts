@@ -18,8 +18,8 @@ function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegi
     .map(key => cmpRegistry[key])
     .filter(c => !excludeComponents.includes(c.tagNameMeta))
     .sort((a, b) => {
-      if (a.componentClass < b.componentClass) return -1;
-      if (a.componentClass > b.componentClass) return 1;
+      if (a.tagNameMeta < b.tagNameMeta) return -1;
+      if (a.tagNameMeta > b.tagNameMeta) return 1;
       return 0;
     });
 }
@@ -249,7 +249,11 @@ function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
 }
 
 function angularArray(components: d.ComponentMeta[], proxyPath: string) {
-  const directives = components.map(cmpMeta => `d.${cmpMeta.componentClass}`).join(',\n  ');
+  const directives = components
+    .map(cmpMeta => dashToPascalCase(cmpMeta.tagNameMeta))
+    .map(className => `d.${className}`)
+    .join(',\n  ');
+
   return `
 import * as d from '${proxyPath}';
 
