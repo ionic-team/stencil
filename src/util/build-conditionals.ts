@@ -162,6 +162,8 @@ export async function setBuildConditionals(
 
   // TODO: hasSlot does not account for dependencies
   coreBuild.slotPolyfill = true;
+  // TODO: hasSvg does not account for dependencies
+  coreBuild.hasSvg = true;
 
   return coreBuild;
 }
