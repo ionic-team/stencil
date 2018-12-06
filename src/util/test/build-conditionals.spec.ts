@@ -92,7 +92,7 @@ describe('build conditionals', () => {
 
     it('default Build.hasSvg false', async () => {
       const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
-      expect(bc.hasSvg).toBe(false);
+      expect(bc.hasSvg).toBe(true);
     });
 
     it('set Build.hasSvg true', async () => {
