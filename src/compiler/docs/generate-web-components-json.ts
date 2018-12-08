@@ -6,7 +6,7 @@ export async function generateWebComponentsJson(config: d.Config, compilerCtx: d
   const json = {
     'tags': docsData.components.map(cmp => ({
       'label': cmp.tag,
-      'description': cmp.readme,
+      'description': cmp.docs,
       'attributes': cmp.props.filter(p => p.attr).map(p => ({
         'label': p.attr,
         'description': p.docs,

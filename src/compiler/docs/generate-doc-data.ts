@@ -48,6 +48,8 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         .map(memberName => [memberName, moduleFile.cmpMeta.membersMeta[memberName]] as [string, d.MemberMeta])
         .filter(([_, member]) => isPublic(member.jsdoc));
 
+      const readme = await getUserReadmeContent(compilerCtx, readmePath);
+
       return {
         dirPath,
         filePath,
@@ -55,9 +57,9 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         readmePath,
         usagesDir,
         tag: moduleFile.cmpMeta.tagNameMeta,
-        docs: getMemberDocumentation(moduleFile.cmpMeta.jsdoc),
-        readme: await getUserReadmeContent(compilerCtx, readmePath),
-        usage: await generateJsDocsUsages(config, compilerCtx, usagesDir),
+        readme,
+        docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
+        usage: await generateUsages(config, compilerCtx, usagesDir),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
@@ -163,24 +165,42 @@ function getAttrName(memberMeta: d.MemberMeta) {
 
 async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: string) {
   try {
-    const userContent: string[] = [];
     const existingContent = await compilerCtx.fs.readFile(readmePath);
-    const existingLines = existingContent.split('\n');
-
-    for (let i = 0; i < existingLines.length; i++) {
-      if (existingLines[i].trim() === AUTO_GENERATE_COMMENT) {
-        break;
-      }
-      userContent.push(existingLines[i]);
+    const userContentIndex = existingContent.indexOf(AUTO_GENERATE_COMMENT) - 1;
+    if (userContentIndex >= 0) {
+      return existingContent.substring(0, userContentIndex);
     }
-    return userContent.join('\n');
-
   } catch (e) {}
   return undefined;
 }
 
 
-async function generateJsDocsUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
+function generateDocs(readme: string, jsdoc: d.JsDoc) {
+  const docs = getMemberDocumentation(jsdoc);
+  if (docs !== '' || !readme) {
+    return docs;
+  }
+
+  let isContent = false;
+  const lines = readme.split('\n');
+  const contentLines = [];
+  for (const line of lines) {
+    const isHeader = line.startsWith('#');
+    if (isHeader && isContent) {
+      break;
+    }
+    if (!isHeader && !isContent) {
+      isContent = true;
+    }
+    if (isContent) {
+      contentLines.push(line);
+    }
+  }
+  return contentLines.join('\n').trim();
+}
+
+
+async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
   const rtn: d.JsonDocsUsage = {};
 
   try {
