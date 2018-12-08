@@ -186,13 +186,6 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 }
 
 
-export interface OutputTargetDocsApi extends OutputTargetBase {
-  type: 'docs-api';
-
-  file: string;
-  strict?: boolean;
-}
-
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
@@ -234,7 +227,6 @@ export type OutputTargetBuild =
 export type OutputTarget =
  | OutputTargetAngular
  | OutputTargetStats
- | OutputTargetDocsApi
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme

@@ -221,7 +221,7 @@ export class NodeSystem implements d.StencilSystem {
     try {
       const sysCpus = cpus();
       details.cpuModel = sysCpus[0].model;
-      details.cpus = cpus.length;
+      details.cpus = sysCpus.length;
       details.platform = platform();
       details.release = release();
       details.runtimeVersion = process.version;

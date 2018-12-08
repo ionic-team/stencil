@@ -38,6 +38,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   // see if any of the active modules are using slot or svg
   // useful for the build process later on
+  // TODO: hasSlot and hasSvg does not account for dependencies
   buildCtx.hasSlot = moduleFiles.some(mf => mf.hasSlot);
   buildCtx.hasSvg = moduleFiles.some(mf => mf.hasSvg);
 

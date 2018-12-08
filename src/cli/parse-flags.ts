@@ -164,6 +164,7 @@ const ARG_OPTS = {
     'docs',
     'e2e',
     'es5',
+    'esm',
     'headless',
     'help',
     'log',
@@ -188,7 +189,6 @@ const ARG_OPTS = {
   string: [
     'address',
     'config',
-    'docs-api',
     'docs-json',
     'emulate',
     'log-level',

@@ -9,19 +9,6 @@ export function validateDocs(config: d.Config) {
 
   let buildDocs = !config.devMode;
 
-  // api docs flag
-  if (typeof config.flags.docsApi === 'string') {
-    buildDocs = true;
-    config.outputTargets.push({
-      type: 'docs-api',
-      file: config.flags.docsApi
-    });
-  }
-  const apiDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-api') as d.OutputTargetDocsApi[];
-  apiDocsOutputs.forEach(apiDocsOutput => {
-    validateApiDocsOutputTarget(config, apiDocsOutput);
-  });
-
   // json docs flag
   if (typeof config.flags.docsJson === 'string') {
     buildDocs = true;
@@ -73,16 +60,6 @@ function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTarg
 function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsJson) {
   if (typeof outputTarget.file !== 'string') {
     throw new Error(`docs-json outputTarget missing the "file" option`);
-  }
-
-  outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
-  outputTarget.strict = !!outputTarget.strict;
-}
-
-
-function validateApiDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsApi) {
-  if (typeof outputTarget.file !== 'string') {
-    throw new Error(`docs-api outputTarget missing the "file" option`);
   }
 
   outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);

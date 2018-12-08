@@ -61,16 +61,28 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
     set.add('boolean');
   }
 
-  const parts = Array.from(set.keys()).sort();
+  let parts = Array.from(set.keys()).sort();
+  if (parts.length > 1) {
+    parts = parts.map(p => (p.indexOf('=>') >= 0) ? `(${p})` : p);
+  }
   if (parts.length > 20) {
-    return checker.typeToString(type);
+    return typeToString(checker, type);
   } else {
     return parts.join(' | ');
   }
 }
 
+const TYPE_FORMAT_FLAGS =
+  ts.TypeFormatFlags.NoTruncation |
+  ts.TypeFormatFlags.InTypeAlias |
+  ts.TypeFormatFlags.InElementType;
+
+export function typeToString(checker: ts.TypeChecker, type: ts.Type) {
+  return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
+}
+
 export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) {
-  const text = checker.typeToString(type);
+  const text = typeToString(checker, type);
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach(t => {
       parseDocsType(checker, t, parts);

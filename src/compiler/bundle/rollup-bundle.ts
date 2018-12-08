@@ -50,8 +50,8 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     input: entryModules.map(b => b.filePath),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
-    optimizeChunks: true,
-    chunkGroupingSize: 5500,
+    treeshake: !config.devMode,
+    cache: config.enableCache ? compilerCtx.rollupCache : undefined,
     plugins: [
       abortPlugin(buildCtx),
       rollupPluginReplace({
@@ -75,8 +75,10 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
 
   try {
     rollupBundle = await config.sys.rollup.rollup(rollupConfig);
-
   } catch (err) {
+    // clean rollup cache if error
+    compilerCtx.rollupCache = undefined;
+
     // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
@@ -85,6 +87,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       buildCtx.debug(`createBundle errors ignored, not active build`);
     }
   }
+  compilerCtx.rollupCache = rollupBundle.cache;
 
   timeSpan.finish(`createBundle finished`);
 

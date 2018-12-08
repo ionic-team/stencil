@@ -3,7 +3,7 @@ import { normalizePath } from '../compiler/util';
 
 
 export class InMemoryFileSystem implements d.InMemoryFileSystem {
-  private items: d.FsItems = {};
+  private items: d.FsItems = new Map();
 
   constructor(public disk: d.FileSystem, private sys: d.StencilSystem) {}
 
@@ -97,9 +97,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
       const inMemoryDirs = dirPath.split('/');
 
-      const filePaths = Object.keys(this.items);
-
-      filePaths.forEach(filePath => {
+      this.items.forEach((d, filePath) => {
         if (!filePath.startsWith(dirPath)) {
           return;
         }
@@ -107,8 +105,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         const parts = filePath.split('/');
 
         if (parts.length === inMemoryDirs.length + 1 || (opts.recursive && parts.length > inMemoryDirs.length)) {
-          const d = this.items[filePath];
-
           if (d.exists) {
             const item: d.FsReaddirItem = {
               absPath: filePath,
@@ -484,9 +480,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   clearDirCache(dirPath: string) {
     dirPath = normalizePath(dirPath);
 
-    const filePaths = Object.keys(this.items);
-
-    filePaths.forEach(f => {
+    this.items.forEach((_, f) => {
       const filePath = this.sys.path.relative(dirPath, f).split('/')[0];
       if (!filePath.startsWith('.') && !filePath.startsWith('/')) {
         this.clearFileCache(f);
@@ -496,9 +490,9 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
   clearFileCache(filePath: string) {
     filePath = normalizePath(filePath);
-    const item = this.items[filePath];
+    const item = this.items.get(filePath);
     if (item && !item.queueWriteToDisk) {
-      delete this.items[filePath];
+      this.items.delete(filePath);
     }
   }
 
@@ -522,23 +516,24 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
   getItem(itemPath: string): d.FsItem {
     itemPath = normalizePath(itemPath);
-    const item = this.items[itemPath];
+    let item = this.items.get(itemPath);
     if (item) {
       return item;
     }
-    return this.items[itemPath] = {};
+    this.items.set(itemPath, item = {});
+    return item;
   }
 
   clearCache() {
-    this.items = {};
+    this.items = new Map();
   }
 
   get keys() {
-    return Object.keys(this.items).sort();
+    return Array.from(this.items.keys()).sort();
   }
 
   getMemoryStats() {
-    return `data length: ${Object.keys(this.items).length}`;
+    return `data length: ${this.items.size}`;
   }
 
 }
@@ -552,8 +547,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
     dirsToEnsure: [] as string[]
   };
 
-  Object.keys(d).forEach(itemPath => {
-    const item = d[itemPath];
+  d.forEach((item, itemPath) => {
 
     if (item.queueWriteToDisk) {
 
@@ -648,7 +642,8 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
   });
 
   instructions.dirsToEnsure = instructions.dirsToEnsure.filter(dir => {
-    if (d[dir] && d[dir].exists && d[dir].isDirectory) {
+    const item = d.get(dir);
+    if (item && item.exists && item.isDirectory) {
       return false;
     }
     if (dir === '/' || dir.endsWith(':/')) {

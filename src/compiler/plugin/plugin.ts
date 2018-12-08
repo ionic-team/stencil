@@ -88,7 +88,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // when the entry file is a .css file (not .scss)
     // do this BEFORE transformations on css files
     const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-api';
+      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
     if (shouldParseCssDocs && moduleFile.cmpMeta) {
@@ -145,7 +145,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // files into one file like we did for raw .css files.
     // do this AFTER transformations on non-css files
     const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-api';
+      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
     if (shouldParseCssDocs && moduleFile.cmpMeta) {

@@ -1,4 +1,9 @@
 /*!
+Array.prototype.fill
+*/
+Array.prototype.fill||Object.defineProperty(Array.prototype,"fill",{value:function(t){var r,e,i,n,o,a,l;if(null==this)throw new TypeError("this is null or not defined");for(e=(r=Object(this)).length>>>0,n=(i=arguments[1]>>0)<0?Math.max(e+i,0):Math.min(i,e),l=(a=void 0===(o=arguments[2])?e:o>>0)<0?Math.max(e+a,0):Math.min(a,e);n<l;)r[n]=t,n++;return r}});
+
+/*!
 Array.prototype.find
 */
 Array.prototype.find||Object.defineProperty(Array.prototype,"find",{writable:!0,configurable:!0,value:function(c,e){if(null==this)throw new TypeError('"this" is null or not defined');var b=Object(this),f=b.length>>>0;if("function"!==typeof c)throw new TypeError("predicate must be a function");for(var a=0;a<f;){var d=b[a];if(c.call(e,d,a,b))return d;a++}}});

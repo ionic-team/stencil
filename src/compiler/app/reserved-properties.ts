@@ -234,5 +234,11 @@ export const RESERVED_PROPERTIES: string[] = [
   'warn',
   'webkitMatchesSelector',
   'window',
-  'HTMLElement'
+  'HTMLElement',
+
+  /** CSS Vars Shim */
+  'createHostStyle',
+  'initShim',
+  'customStyleShim',
+  'updateHost'
 ];

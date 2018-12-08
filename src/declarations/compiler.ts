@@ -20,6 +20,7 @@ export interface CompilerCtx {
     registryJson?: string;
   };
   cache?: d.Cache;
+  rollupCache?: any;
   cachedStyleMeta?: Map<string, d.StyleMeta>;
   collections?: d.Collection[];
   compiledModuleJsText?: d.ModuleBundles;

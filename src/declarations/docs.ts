@@ -12,11 +12,11 @@ export interface JsonDocs {
 
 
 export interface JsonDocsComponent {
-  dirPath: string;
-  fileName: string;
-  filePath: string;
-  readmePath: string;
-  usagesDir: string;
+  dirPath?: string;
+  fileName?: string;
+  filePath?: string;
+  readmePath?: string;
+  usagesDir?: string;
 
   tag: string;
   readme: string;

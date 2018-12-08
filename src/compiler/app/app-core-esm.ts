@@ -11,10 +11,15 @@ export async function generateEsmCores(config: d.Config, compilerCtx: d.Compiler
     // mega-minify the core w/ property renaming, but not the user's globals
     // hardcode which features should and should not go in the core builds
     // process the transpiled code by removing unused code and minify when configured to do so
-    await Promise.all([
-      generateEsmCore(config, compilerCtx, buildCtx, outputTarget, entryModules, 'es5', 'esm.es5'),
+    const cores = [
       generateEsmCore(config, compilerCtx, buildCtx, outputTarget, entryModules, 'es2017', 'esm.es2017')
-    ]);
+    ];
+    if (config.buildEs5) {
+      cores.push(
+        generateEsmCore(config, compilerCtx, buildCtx, outputTarget, entryModules, 'es5', 'esm.es5'),
+      );
+    }
+    await Promise.all(cores);
   }
 }
 
@@ -43,7 +48,6 @@ async function writeEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   const timespan = buildCtx.createTimeSpan(`generateEsmCoreEs5 started, ${relPath}`, true);
 
-  buildConditionals.es5 = true;
   jsContent = await buildCoreContent(config, compilerCtx, buildCtx, buildConditionals, jsContent);
 
   // fighting with typescript/webpack/es5 builds too much

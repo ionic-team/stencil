@@ -19,6 +19,7 @@ export async function transpileToEs5Worker(cwd: string, input: string, inlineHel
 
   const transpileOpts: ts.TranspileOptions = {
     compilerOptions: {
+      sourceMap: false,
       allowJs: true,
       declaration: false,
       target: ts.ScriptTarget.ES5,

@@ -284,7 +284,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
   let requestBundleQueue: Function[] = [];
   if (_BUILD_.cssVarShim && customStyle) {
-    customStyle.init().then(() => {
+    customStyle.initShim().then(() => {
       // loaded all the css, let's run all the request bundle callbacks
       while (requestBundleQueue.length) {
         requestBundleQueue.shift()();

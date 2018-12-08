@@ -40,11 +40,13 @@ const INLINE_POLYFILLS = [
   'object.js',
   'string.js',
   'promise.js',
+  'map.js',
   'fetch.js',
   'url.js'
 ];
 
 const POLYFILLS = [
   ...INLINE_POLYFILLS,
+  'css-shim.js',
   'tslib.js'
 ];

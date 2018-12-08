@@ -16,7 +16,6 @@ describe('bundle-module', () => {
       await c.fs.commit();
     });
 
-
     it('should build 2 bundles of 3 components', async () => {
       c.config.bundles = [
         { components: ['cmp-a', 'cmp-b'] },
