@@ -1,5 +1,5 @@
-<a name="0.16.1-2"></a>
-## 🍏 [Prerelease] [0.16.1-2](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-2) (2018-12-06)
+<a name="0.16.1-3"></a>
+## 🐣 [Prerelease] [0.16.1-3](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-3) (2018-12-08)
 
 
 ### Bug Fixes
@@ -13,6 +13,8 @@
 * **angular:** use PascalCase tagname as class name ([7c9702a](https://github.com/ionic-team/stencil/commit/7c9702a))
 * **console:** do not drop console for prod builds ([bcf4219](https://github.com/ionic-team/stencil/commit/bcf4219))
 * **core:** always include svg support ([5308931](https://github.com/ionic-team/stencil/commit/5308931))
+* **docs:** generate component docs based in readme by default ([3612a05](https://github.com/ionic-team/stencil/commit/3612a05))
+* **esm:** expose defineCustomElement() ([5d730ad](https://github.com/ionic-team/stencil/commit/5d730ad))
 
 
 ### Features
