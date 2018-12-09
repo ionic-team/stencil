@@ -14,10 +14,14 @@ export { h } from '../renderer/vdom/h';
 
 
 export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | d.ComponentHostData[], opts: CustomElementsDefineOptions = {}) {
-  const cmpDataArray = (Array.isArray(cmpData) ? cmpData : [cmpData]) as d.ComponentHostData[];
+  let cmpDataArray = (Array.isArray(cmpData) ? cmpData : [cmpData]) as d.ComponentHostData[];
   const doc = win.document;
   const hydratedCssClass = opts.hydratedCssClass || '__APP__HYDRATED__CSS__PLACEHOLDER__';
 
+  const exclude = opts['exclude'];
+  if (exclude) {
+    cmpDataArray = cmpDataArray.filter(c => exclude.indexOf(c[0]) === -1);
+  }
   const styleCmps = cmpDataArray.map(c => c[0]);
   if (styleCmps.length > 0) {
     // auto hide components until they been fully hydrated
@@ -57,7 +61,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
 
     function defineComponents() {
       // polyfills have been applied if need be
-      (cmpData as d.ComponentHostData[]).forEach(c => {
+      (cmpDataArray as d.ComponentHostData[]).forEach(c => {
         let HostElementConstructor: any;
 
         if (isNative(win.customElements.define)) {
@@ -129,4 +133,5 @@ export interface CustomElementsDefineOptions {
   hydratedCssClass?: string;
   namespace?: string;
   resourcesUrl?: string;
+  exclude?: string[];
 }
