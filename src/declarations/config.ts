@@ -221,6 +221,7 @@ export interface ConfigFlags {
   open?: boolean;
   port?: number;
   prerender?: boolean;
+  prerenderExternal?: boolean;
   prod?: boolean;
   profile?: boolean;
   root?: string;
