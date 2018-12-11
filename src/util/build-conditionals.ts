@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { isTsFile } from '../compiler/util';
-import { shouldPrerender } from '../compiler/prerender/prerender-app';
+import { shouldPrerender, shouldPrerenderExternal } from '../compiler/prerender/prerender-app';
 
 
 export function getDefaultBuildConditionals(): d.BuildConditionals {
@@ -135,7 +135,7 @@ export async function setBuildConditionals(
     // modern build
     coreBuild.browserModuleLoader = true;
     coreBuild.prerenderClientSide = shouldPrerender(config);
-    coreBuild.prerenderExternal = config.flags.prerenderExternal;
+    coreBuild.prerenderExternal = shouldPrerenderExternal(config);
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
@@ -145,7 +145,7 @@ export async function setBuildConditionals(
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.prerenderClientSide = shouldPrerender(config);
-    coreBuild.prerenderExternal = config.flags.prerenderExternal;
+    coreBuild.prerenderExternal = shouldPrerenderExternal(config);
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {

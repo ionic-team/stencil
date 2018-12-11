@@ -39,6 +39,13 @@ export function shouldPrerender(config: d.Config) {
   return (outputTargets.length > 0);
 }
 
+export function shouldPrerenderExternal(config: d.Config) {
+  if (!config.srcIndexHtml) {
+    return false;
+  }
+  return config.flags && config.flags.prerenderExternal;
+}
+
 
 async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[]) {
   // if there was src index.html file, then the process before this one
