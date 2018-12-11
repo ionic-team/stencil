@@ -14,6 +14,7 @@ export function getDefaultBuildConditionals(): d.BuildConditionals {
     slotPolyfill: true,
     ssrServerSide: true,
     prerenderClientSide: true,
+    prerenderExternal: false,
     devInspector: true,
     hotModuleReplacement: true,
     verboseError: true,
@@ -89,6 +90,7 @@ export async function setBuildConditionals(
     cssVarShim: false,
     ssrServerSide: false,
     prerenderClientSide: false,
+    prerenderExternal: false,
     shadowDom: false,
     scoped: false,
     slotPolyfill: false,
@@ -133,6 +135,7 @@ export async function setBuildConditionals(
     // modern build
     coreBuild.browserModuleLoader = true;
     coreBuild.prerenderClientSide = shouldPrerender(config);
+    coreBuild.prerenderExternal = config.flags.prerenderExternal;
     compilerCtx.lastBuildConditionalsBrowserEsm = coreBuild;
 
   } else if (coreId === 'core.pf') {
@@ -142,6 +145,7 @@ export async function setBuildConditionals(
     coreBuild.polyfills = true;
     coreBuild.cssVarShim = true;
     coreBuild.prerenderClientSide = shouldPrerender(config);
+    coreBuild.prerenderExternal = config.flags.prerenderExternal;
     compilerCtx.lastBuildConditionalsBrowserEs5 = coreBuild;
 
   } else if (coreId === 'esm.es5') {

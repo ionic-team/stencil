@@ -123,7 +123,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   };
 
-  if (_BUILD_.prerenderClientSide) {
+  if (_BUILD_.prerenderClientSide || _BUILD_.prerenderExternal) {
     // if the HTML was generated from prerendering
     // then let's walk the tree and generate vnodes out of the data
     createVNodesFromSsr(plt, domApi, rootElm);
