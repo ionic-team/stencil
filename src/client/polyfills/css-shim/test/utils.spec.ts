@@ -58,6 +58,8 @@ describe('utils', () => {
       .class2 {
         color: black;
       }
+      ion-button {
+      }
       .inner-class {
         fallback: fallback;
         ioncolor": fallback;
