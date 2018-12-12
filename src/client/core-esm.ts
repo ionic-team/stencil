@@ -93,7 +93,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
     if (_BUILD_.cssVarShim && (window as any).customStyleShim) {
       pltMap[namespace].customStyle = (window as any).customStyleShim;
 
-      pltMap[namespace].customStyle.initShim().then(defineComponents);
+      return pltMap[namespace].customStyle.initShim().then(defineComponents);
 
     } else {
       defineComponents();
