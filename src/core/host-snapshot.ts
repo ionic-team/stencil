@@ -36,15 +36,7 @@ export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
 
-      if (_BUILD_.isDev && _BUILD_.clientSide) {
-        // it's possible we're manually forcing the slot polyfill
-        // but this browser may already support the read-only shadowRoot
-        // do an extra check here, but only for dev mode on the client
-        if (!('shadowRoot' in HTMLElement.prototype)) {
-          (hostElm as any).shadowRoot = hostElm;
-        }
-
-      } else {
+      if (!('shadowRoot' in HTMLElement.prototype)) {
         (hostElm as any).shadowRoot = hostElm;
       }
     }
