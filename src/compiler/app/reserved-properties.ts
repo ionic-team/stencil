@@ -238,7 +238,9 @@ export const RESERVED_PROPERTIES: string[] = [
 
   /** CSS Vars Shim */
   'createHostStyle',
-  'initShim',
   'customStyleShim',
-  'updateHost'
+  'initShim',
+  'removeHost',
+  'updateGlobal',
+  'updateHost',
 ];
