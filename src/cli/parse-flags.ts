@@ -170,6 +170,7 @@ const ARG_OPTS = {
     'log',
     'open',
     'prerender',
+    'prerender-external',
     'prod',
     'profile',
     'service-worker',

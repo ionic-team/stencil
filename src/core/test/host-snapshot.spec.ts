@@ -47,6 +47,7 @@ describe('host-snapshot', () => {
   });
 
   it('manually set shadowRoot to host element if no shadow dom $supportsShadowDom', () => {
+    (window as any).HTMLElement = { prototype: {} };
     domApi.$supportsShadowDom = false;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
     _BUILD_.isDev = false;

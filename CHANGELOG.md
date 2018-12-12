@@ -1,5 +1,5 @@
-<a name="0.16.1-3"></a>
-## 🐣 [Prerelease] [0.16.1-3](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-3) (2018-12-08)
+<a name="0.16.1-4"></a>
+## 🐂 [Prerelease] [0.16.1-4](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-4) (2018-12-09)
 
 
 ### Bug Fixes
@@ -20,6 +20,7 @@
 ### Features
 
 * generate experimental web-components.json ([#1256](https://github.com/ionic-team/stencil/issues/1256)) ([8924561](https://github.com/ionic-team/stencil/commit/8924561))
+* **loader:** add exclude option ([ea289f3](https://github.com/ionic-team/stencil/commit/ea289f3))
 
 
 ### Performance Improvements

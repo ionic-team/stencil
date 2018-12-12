@@ -4,4 +4,3 @@ export const VAR_ASSIGN_START = /\B--[\w-]+\s*:/;
 
 export const COMMENTS = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//gim;
 export const TRAILING_LINES = /^[\t ]+\n/gm;
-export const EMPTY_SELECTORS = /[^{}]*{\s*}/gm;

@@ -231,6 +231,7 @@ describe('css-shim', () => {
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
+        html{}
         p {
           color: red;
         }
@@ -276,6 +277,7 @@ describe('css-shim', () => {
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
+        html{}
         .transform {
           transform: translate3d(0, 88px, 0);
         }
@@ -301,6 +303,7 @@ describe('css-shim', () => {
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
+        html{}
         @keyframes animation {
           0% { opacity: 0.3; }
           100% { opacity: 0.8; }
@@ -327,6 +330,7 @@ describe('css-shim', () => {
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
+        html{}
         @media only screen {
           body {
             color: red;
@@ -358,6 +362,7 @@ describe('css-shim', () => {
 
     expect(css(styleElm.innerHTML)).toBe(
       css(`
+        html{}
         div {
           animation-name: slidein;
           animation-duration: 3s;
