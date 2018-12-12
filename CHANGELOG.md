@@ -1,32 +1,34 @@
-<a name="0.16.1-4"></a>
-## 🐂 [Prerelease] [0.16.1-4](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-4) (2018-12-09)
-
+<a name="0.16.1-5"></a>
+## 🍍 [Prerelease] [0.16.1-5](https://github.com/ionic-team/stencil/compare/v0.16.0...v0.16.1-5) (2018-12-12)
 
 ### Bug Fixes
 
-* **docs:** do not serialize path metadata ([a7d5e3a](https://github.com/ionic-team/stencil/commit/a7d5e3a))
-* **esm:** generate esm/es2017 correctly ([5ab6beb](https://github.com/ionic-team/stencil/commit/5ab6beb))
-* **esm:** shortcut index should point to valid esm ([e4e5cca](https://github.com/ionic-team/stencil/commit/e4e5cca))
-* **workers:** detect number of CPUs correctly ([b5f9ddc](https://github.com/ionic-team/stencil/commit/b5f9ddc))
 * **angular:** also update class name ([483a269](https://github.com/ionic-team/stencil/commit/483a269))
 * **angular:** sort using tag-name ([24c9448](https://github.com/ionic-team/stencil/commit/24c9448))
 * **angular:** use PascalCase tagname as class name ([7c9702a](https://github.com/ionic-team/stencil/commit/7c9702a))
+* **docs:** do not serialize path metadata ([a7d5e3a](https://github.com/ionic-team/stencil/commit/a7d5e3a))
 * **console:** do not drop console for prod builds ([bcf4219](https://github.com/ionic-team/stencil/commit/bcf4219))
 * **core:** always include svg support ([5308931](https://github.com/ionic-team/stencil/commit/5308931))
 * **docs:** generate component docs based in readme by default ([3612a05](https://github.com/ionic-team/stencil/commit/3612a05))
 * **esm:** expose defineCustomElement() ([5d730ad](https://github.com/ionic-team/stencil/commit/5d730ad))
+* **esm:** generate esm/es2017 correctly ([5ab6beb](https://github.com/ionic-team/stencil/commit/5ab6beb))
+* **esm:** shortcut index should point to valid esm ([e4e5cca](https://github.com/ionic-team/stencil/commit/e4e5cca))
+* **shadow:** ensure es5 build checks shadowRoot ([c5f9257](https://github.com/ionic-team/stencil/commit/c5f9257))
+* **workers:** detect number of CPUs correctly ([b5f9ddc](https://github.com/ionic-team/stencil/commit/b5f9ddc))
 
 
 ### Features
 
 * generate experimental web-components.json ([#1256](https://github.com/ionic-team/stencil/issues/1256)) ([8924561](https://github.com/ionic-team/stencil/commit/8924561))
 * **loader:** add exclude option ([ea289f3](https://github.com/ionic-team/stencil/commit/ea289f3))
+* **prerender:** Adding the prerender-external cli flag ([686c277](https://github.com/ionic-team/stencil/commit/686c277))
 
 
 ### Performance Improvements
 
 * **build:** esm build without es5 ([fae97dd](https://github.com/ionic-team/stencil/commit/fae97dd))
 * **bundling:** rollup cache + non-treeshake ([b7d2342](https://github.com/ionic-team/stencil/commit/b7d2342))
+* **css-vars:** remove empty selector regex ([cb0b271](https://github.com/ionic-team/stencil/commit/cb0b271))
 * **fs:** use Map ([f03ec9d](https://github.com/ionic-team/stencil/commit/f03ec9d))
 
 
