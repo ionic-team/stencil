@@ -66,7 +66,7 @@ export function defineCustomElement(win: Window, cmpData: d.ComponentHostData | 
 
         if (isNative(win.customElements.define)) {
           // native custom elements supported
-          const createHostConstructor = new Function('w', 'return class extends w.HTMLElement{}');
+          const createHostConstructor = (w) => { return class extends w.HTMLElement{}; };
           HostElementConstructor = createHostConstructor(win);
 
         } else {
