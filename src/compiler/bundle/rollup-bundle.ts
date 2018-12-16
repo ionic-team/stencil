@@ -6,7 +6,6 @@ import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { RollupBuild, RollupDirOptions } from 'rollup'; // types only
-import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
 import pluginHelper from './rollup-plugins/plugin-helper';
 import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
@@ -18,14 +17,10 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     buildCtx.debug(`createBundle aborted, not active build`);
   }
 
-  const buildConditionals = {
-    isDev: !!config.devMode
-  } as d.BuildConditionals;
-
-  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`Build.${key}`] = buildConditionals[key];
-    return all;
-  }, <{ [key: string]: any}>{});
+  const replaceObj = {
+    'Build.isDev': !!config.devMode,
+    'process.env.NODE_ENV': config.devMode ? 'development' : 'production'
+  };
 
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
@@ -64,7 +59,6 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
-      nodeEnvVars(config),
       ...config.plugins,
       statsPlugin(buildCtx),
       pluginHelper(config, compilerCtx, buildCtx),
@@ -75,6 +69,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
 
   try {
     rollupBundle = await config.sys.rollup.rollup(rollupConfig);
+    compilerCtx.rollupCache = rollupBundle.cache;
   } catch (err) {
     // clean rollup cache if error
     compilerCtx.rollupCache = undefined;
@@ -87,9 +82,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       buildCtx.debug(`createBundle errors ignored, not active build`);
     }
   }
-  compilerCtx.rollupCache = rollupBundle.cache;
 
   timeSpan.finish(`createBundle finished`);
-
   return rollupBundle;
 }
