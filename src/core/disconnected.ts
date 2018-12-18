@@ -25,12 +25,6 @@ export const disconnectedCallback = (plt: PlatformApi, elm: HostElement, perf: P
     // since we're disconnecting, call all of the JSX ref's with null
     callNodeRefs(plt.vnodeMap.get(elm), true);
 
-    // detatch any event listeners that may have been added
-    // because we're not passing an exact event name it'll
-    // remove all of this element's event, which is good
-    plt.domApi.$removeEventListener(elm);
-    plt.hasListenersMap.delete(elm);
-
     if (_BUILD_.cmpDidUnload) {
       // call instance componentDidUnload
       // if we've created an instance for this
@@ -40,6 +34,12 @@ export const disconnectedCallback = (plt: PlatformApi, elm: HostElement, perf: P
         instance.componentDidUnload();
       }
     }
+
+    // detatch any event listeners that may have been added
+    // because we're not passing an exact event name it'll
+    // remove all of this element's event, which is good
+    plt.domApi.$removeEventListener(elm);
+    plt.hasListenersMap.delete(elm);
 
     // clear CSS var-shim tracking
     if (_BUILD_.cssVarShim && plt.customStyle) {
