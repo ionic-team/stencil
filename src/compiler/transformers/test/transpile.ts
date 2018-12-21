@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
-import { convertDecoratorsToStatic } from '../convert-to-static/convert-decorators';
-import { gatherMeta } from '../meta-from-static/gather-meta';
+import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
+import { gatherMeta } from '../static-to-meta/gather-meta';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import ts from 'typescript';
 
