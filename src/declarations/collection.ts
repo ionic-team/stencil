@@ -52,6 +52,7 @@ export interface ModuleFile {
   jsFilePath?: string;
   dtsFilePath?: string;
   cmpMeta?: d.ComponentMeta;
+  cmpCompilerMeta?: d.ComponentCompilerMeta;
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;

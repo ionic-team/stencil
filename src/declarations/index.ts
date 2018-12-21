@@ -7,6 +7,7 @@ export * from './cache';
 export * from './collection';
 export * from './compiler';
 export * from './component';
+export * from './component-compiler-meta';
 export * from './component-interfaces';
 export * from './config';
 export * from './copy';
