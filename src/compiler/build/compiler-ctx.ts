@@ -44,31 +44,30 @@ export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string
 
 export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   // reusable data between builds
-  compilerCtx = compilerCtx || {};
-  compilerCtx.isActivelyBuilding = false;
-  compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys);
+  compilerCtx = compilerCtx || {
+    activeBuildId: -1,
+    cache: null,
+    cachedStyleMeta: new Map(),
+    collections: [],
+    events: new BuildEvents(),
+    isActivelyBuilding: false,
+    fs: new InMemoryFileSystem(config.sys.fs, config.sys),
+    lastBuildStyles: new Map(),
+    lastComponentStyleInput: new Map(),
+    moduleMap: new Map(),
+    resolvedCollections: new Set()
+  };
 
   if (!compilerCtx.cache) {
     compilerCtx.cache = new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys));
     compilerCtx.cache.initCacheDir();
   }
 
-  compilerCtx.events = compilerCtx.events || new BuildEvents();
+  /** OLD WAY */
   compilerCtx.appFiles = compilerCtx.appFiles || {};
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
-  compilerCtx.moduleMap = compilerCtx.moduleMap || new Map();
-  compilerCtx.collections = compilerCtx.collections || [];
-  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || new Set();
   compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
   compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
-
-  compilerCtx.lastBuildStyles = compilerCtx.lastBuildStyles || new Map();
-  compilerCtx.cachedStyleMeta = compilerCtx.cachedStyleMeta || new Map();
-  compilerCtx.lastComponentStyleInput = compilerCtx.lastComponentStyleInput || new Map();
-
-  if (typeof compilerCtx.activeBuildId !== 'number') {
-    compilerCtx.activeBuildId = -1;
-  }
 
   return compilerCtx;
 }
