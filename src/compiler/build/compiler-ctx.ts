@@ -58,7 +58,7 @@ export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
   compilerCtx.moduleMap = compilerCtx.moduleMap || new Map();
   compilerCtx.collections = compilerCtx.collections || [];
-  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || [];
+  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || new Set();
   compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
   compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
 
@@ -79,8 +79,9 @@ export function resetCompilerCtx(compilerCtx: d.CompilerCtx) {
   compilerCtx.cache.clear();
   compilerCtx.appFiles = {};
   compilerCtx.moduleFiles = {};
+  compilerCtx.moduleMap.clear();
   compilerCtx.collections.length = 0;
-  compilerCtx.resolvedCollections.length = 0;
+  compilerCtx.resolvedCollections.clear();
   compilerCtx.compiledModuleJsText = {};
   compilerCtx.compiledModuleLegacyJsText = {};
   compilerCtx.compilerOptions = null;

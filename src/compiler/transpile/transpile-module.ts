@@ -35,7 +35,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
   const compilerCtx: d.CompilerCtx = {
     collections: [],
     moduleFiles: {},
-    resolvedCollections: [],
+    resolvedCollections: new Set(),
     events: {
       emit: noop,
       subscribe: noop,

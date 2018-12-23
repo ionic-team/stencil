@@ -48,7 +48,7 @@ export interface CompilerCtx {
 
   moduleMap?: d.ModuleMap;
 
-  resolvedCollections?: string[];
+  resolvedCollections?: Set<string>;
   rootTsFiles?: string[];
   tsService?: TsService;
 }

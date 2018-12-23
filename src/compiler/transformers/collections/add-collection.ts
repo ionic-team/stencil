@@ -10,14 +10,14 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
     moduleFile.externalImports.sort();
   }
 
-  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || [];
-  if (compilerCtx.resolvedCollections.includes(moduleId)) {
+  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || new Set();
+  if (compilerCtx.resolvedCollections.has(moduleId)) {
     // we've already handled this collection moduleId before
     return;
   }
 
   // cache that we've already parsed this
-  compilerCtx.resolvedCollections.push(moduleId);
+  compilerCtx.resolvedCollections.add(moduleId);
 
   let pkgJsonFilePath: string;
   try {
