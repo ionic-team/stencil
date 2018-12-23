@@ -5,14 +5,40 @@ import { InMemoryFileSystem } from '../../util/in-memory-fs';
 import { normalizePath } from '../util';
 
 
+export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+  sourceFilePath = normalizePath(sourceFilePath);
+
+  const module = compilerCtx.moduleMap.get(sourceFilePath);
+  if (module) {
+    return module;
+
+  } else {
+    const module: d.Module = {
+      cmpCompilerMeta: null,
+      collectionName: null,
+      externalImports: [],
+      isCollectionDependency: false,
+      localImports: [],
+      potentialCmpRefs: [],
+      sourceFilePath: sourceFilePath
+    };
+    compilerCtx.moduleMap.set(sourceFilePath, module);
+    return module;
+  }
+}
+
 export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+  /** OLD WAY */
   sourceFilePath = normalizePath(sourceFilePath);
   return compilerCtx.moduleFiles[sourceFilePath] = compilerCtx.moduleFiles[sourceFilePath] || {
     sourceFilePath: sourceFilePath,
+    cmpMeta: null,
     localImports: [],
     externalImports: [],
-    potentialCmpRefs: []
-  };
+    potentialCmpRefs: [],
+    isCollectionDependency: false,
+    collectionName: null
+  } as d.ModuleFile;
 }
 
 
@@ -30,6 +56,7 @@ export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
   compilerCtx.events = compilerCtx.events || new BuildEvents();
   compilerCtx.appFiles = compilerCtx.appFiles || {};
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
+  compilerCtx.moduleMap = compilerCtx.moduleMap || new Map();
   compilerCtx.collections = compilerCtx.collections || [];
   compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || [];
   compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};

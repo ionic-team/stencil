@@ -22,7 +22,7 @@ export interface CompilerCtx {
   cache?: d.Cache;
   rollupCache?: any;
   cachedStyleMeta?: Map<string, d.StyleMeta>;
-  collections?: d.Collection[];
+  collections?: d.CollectionCompilerMeta[];
   compiledModuleJsText?: d.ModuleBundles;
   compiledModuleLegacyJsText?: d.ModuleBundles;
   compilerOptions?: any;
@@ -42,7 +42,12 @@ export interface CompilerCtx {
   lastBuildStyles?: Map<string, string>;
   lastRawModules?: d.DerivedModule[];
   localPrerenderServer?: any;
+
+  /** OLD moduleFile object, migrate to use moduleMap instead */
   moduleFiles?: d.ModuleFiles;
+
+  moduleMap?: d.ModuleMap;
+
   resolvedCollections?: string[];
   rootTsFiles?: string[];
   tsService?: TsService;

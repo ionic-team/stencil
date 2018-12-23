@@ -1,11 +1,12 @@
 import * as d from '../../../declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { gatherMeta } from '../static-to-meta/gather-meta';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { gatherModuleImports } from '../module-imports';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import ts from 'typescript';
 
 
-export function transpileModule(input: string) {
+export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
   // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
@@ -67,16 +68,19 @@ export function transpileModule(input: string) {
   const typeChecker = program.getTypeChecker();
   const diagnostics: d.Diagnostic[] = [];
 
-  const config = mockConfig();
-  const compilerCtx = mockCompilerCtx();
-  compilerCtx.moduleFiles = {};
+  config = config || mockConfig();
+  compilerCtx = compilerCtx || mockCompilerCtx();
+  compilerCtx.moduleMap = compilerCtx.moduleMap || new Map();
 
-  program.emit(/*targetSourceFile*/ undefined, /*writeFile*/ undefined, /*cancellationToken*/ undefined, /*emitOnlyDtsFiles*/ undefined, {
+  const buildCtx = mockBuildCtx(config, compilerCtx);
+
+  program.emit(undefined, undefined, undefined, undefined, {
     before: [
       convertDecoratorsToStatic(diagnostics, typeChecker)
     ],
     after: [
-      gatherMeta(config, compilerCtx, diagnostics, typeChecker)
+      gatherMeta(config, compilerCtx, diagnostics, typeChecker, null),
+      gatherModuleImports(config, compilerCtx, buildCtx)
     ]
   });
 
@@ -86,7 +90,7 @@ export function transpileModule(input: string) {
 
   outputText = outputText.replace(/\"/g, `'`);
 
-  const moduleFile = compilerCtx.moduleFiles[Object.keys(compilerCtx.moduleFiles)[0]];
+  const moduleFile = compilerCtx.moduleMap.values().next().value;
   const cmpCompilerMeta: d.ComponentCompilerMeta = moduleFile ? moduleFile.cmpCompilerMeta : null;
   const tagName = cmpCompilerMeta ? cmpCompilerMeta.tagName : null;
   const componentClassName = cmpCompilerMeta ? cmpCompilerMeta.componentClassName : null;
@@ -104,6 +108,8 @@ export function transpileModule(input: string) {
 
   return {
     outputText,
+    compilerCtx,
+    buildCtx,
     moduleFile,
     cmpCompilerMeta,
     componentClassName,

@@ -1,6 +1,7 @@
 import * as d from '.';
 
 
+/** OLD WAY */
 export interface Collection {
   collectionName?: string;
   moduleDir?: string;
@@ -41,18 +42,18 @@ export interface AppRegistryComponents {
   };
 }
 
-
+/** OLD WAY */
 export interface ModuleFiles {
   [filePath: string]: ModuleFile;
 }
 
 
+/** OLD WAY */
 export interface ModuleFile {
   sourceFilePath: string;
   jsFilePath?: string;
   dtsFilePath?: string;
   cmpMeta?: d.ComponentMeta;
-  cmpCompilerMeta?: d.ComponentCompilerMeta;
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;
