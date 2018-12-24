@@ -30,6 +30,7 @@
     "build.dev.server.client": "node scripts/build-dev-server-client.js",
     "build.mock-doc": "node scripts/build-mock-doc.js",
     "build.prod": "node scripts/build-prod.js",
+    "build.runtime": "node scripts/build-core-runtime.js",
     "build.screenshot": "node scripts/build-screenshot.js",
     "build.submodules": "node scripts/build-submodules.js",
     "build.sys.node": "node scripts/build-sys-node.js",
