@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse component', () => {
@@ -11,7 +11,7 @@ describe('parse component', () => {
       export class CmpA {}
     `);
 
-    expect(t.outputText).toContain(`static get is() { return 'cmp-a'; }`);
+    expect(getStaticGetter(t.outputText, 'is')).toEqual('cmp-a');
     expect(t.tagName).toBe('cmp-a');
   });
 

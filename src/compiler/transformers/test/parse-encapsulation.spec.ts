@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse encapsulation', () => {
@@ -12,7 +12,7 @@ describe('parse encapsulation', () => {
       export class CmpA {}
     `);
 
-    expect(t.outputText).toContain(`static get encapsulation() { return 'shadow'; }`);
+    expect(getStaticGetter(t.outputText, 'encapsulation')).toEqual('shadow');
     expect(t.cmpCompilerMeta.encapsulation).toBe('shadow');
   });
 
@@ -25,7 +25,7 @@ describe('parse encapsulation', () => {
       export class CmpA {}
     `);
 
-    expect(t.outputText).toContain(`static get encapsulation() { return 'scoped'; }`);
+    expect(getStaticGetter(t.outputText, 'encapsulation')).toEqual('scoped');
     expect(t.cmpCompilerMeta.encapsulation).toBe('scoped');
   });
 

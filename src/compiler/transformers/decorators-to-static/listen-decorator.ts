@@ -3,13 +3,7 @@ import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, is
 import ts from 'typescript';
 
 
-export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const decoratedProps = cmpNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
-
-  if (decoratedProps.length === 0) {
-    return;
-  }
-
+export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
   const listeners: ts.ArrayLiteralExpression[] = [];
 
   decoratedProps.forEach((prop: ts.PropertyDeclaration) => {
@@ -23,7 +17,7 @@ export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFil
 
 
 function listenDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, listeners: any[], prop: ts.PropertyDeclaration) {
-  const listenDecorator = prop.decorators.find(isDecoratorNamed('Listen'));
+  const listenDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Listen'));
 
   if (listenDecorator == null) {
     return;

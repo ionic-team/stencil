@@ -48,12 +48,15 @@ function visitComponentClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeCh
 
   componentDecoratorToStatic(cmpNode, newMembers, componentDecorator);
 
-  propDecoratorsToStatic(diagnostics, tsSourceFile, cmpNode, typeChecker, newMembers);
-  stateDecoratorsToStatic(diagnostics, tsSourceFile, cmpNode, typeChecker, newMembers);
-  listenDecoratorsToStatic(diagnostics, tsSourceFile, cmpNode, typeChecker, newMembers);
-  eventDecoratorsToStatic(diagnostics, tsSourceFile, cmpNode, typeChecker, newMembers);
-  methodDecoratorsToStatic(diagnostics, tsSourceFile, cmpNode, typeChecker, newMembers);
-  elementDecoratorsToStatic(diagnostics, cmpNode, typeChecker, newMembers);
+  const decoratedProps = cmpNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
+  if (decoratedProps.length > 0) {
+    propDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
+    stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
+    listenDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
+    eventDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
+    methodDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
+    elementDecoratorsToStatic(diagnostics, decoratedProps, typeChecker, newMembers);
+  }
 
   return ts.updateClassDeclaration(
     cmpNode,

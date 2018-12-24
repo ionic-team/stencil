@@ -29,13 +29,13 @@ export interface ComponentCompilerFeatures {
   isUpdateable: boolean;
 }
 
-export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
+export interface ComponentCompilerMeta {
   bundleIds: ComponentBundleId;
   componentClassName: string;
   elementRef: string;
   encapsulation: string;
-  events: ComponentCompilerEvent[];
   jsdoc: CompilerJsDoc;
+  events: ComponentCompilerEvent[];
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
   properties: ComponentCompilerProperty[];
@@ -43,6 +43,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styleDocs: CompilerStyleDoc[];
   styles: any;
   tagName: string;
+  features: ComponentCompilerFeatures;
 }
 
 export type ComponentBundleId = string | ComponentBundleModeIds;
@@ -51,21 +52,37 @@ export interface ComponentBundleModeIds {
   [modeName: string]: string;
 }
 
-export interface ComponentCompilerProperty {
-  name: string;
+export interface ComponentCompilerStaticProperty {
+  mutable: boolean;
+  optional: boolean;
+  required: boolean;
+  type: ComponentCompilerPropertyType;
+  complexType: ComponentCompilerPropertyComplexType;
   attr?: string;
-  method?: boolean;
-  mutable?: boolean;
-  optional?: boolean;
   reflectToAttr?: boolean;
-  required?: boolean;
-  type?: ComponentCompilerPropertyType;
-  complexType?: ComponentCompilerPropertyComplexType;
+  defaultValue?: string;
 }
 
-export type ComponentCompilerPropertyType = 'string' | 'boolean' | 'number' | 'array' | 'object' | 'function' | 'unknown';
+export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
+  name: string;
+}
 
-export type ComponentCompilerPropertyComplexType = string;
+export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
+
+export interface ComponentCompilerPropertyComplexType {
+  text: string;
+  resolved: string;
+  references: ComponentCompilerTypeReferences;
+}
+
+export interface ComponentCompilerTypeReferences {
+  [key: string]: ComponentCompilerTypeReference;
+}
+
+export interface ComponentCompilerTypeReference {
+  location: 'local' | 'global' | 'import';
+  path?: string;
+}
 
 export interface ComponentCompilerEvent {
   name: string;
@@ -89,10 +106,6 @@ export interface ComponentCompilerMethod {
 
 export interface ComponentCompilerState {
   name: string;
-  optional?: boolean;
-  required?: boolean;
-  type?: ComponentCompilerPropertyType;
-  complexType?: ComponentCompilerPropertyComplexType;
 }
 
 export interface CompilerJsDoc {

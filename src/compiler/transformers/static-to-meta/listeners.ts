@@ -3,21 +3,19 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticListeners(staticMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
+export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.ComponentCompilerListener[] {
   const parsedListeners = getStaticValue(staticMembers, 'listeners');
   if (!parsedListeners || parsedListeners.length === 0) {
-    return;
+    return [];
   }
 
-  parsedListeners.forEach(parsedListener => {
-    const p: d.ComponentCompilerListener = {
+  return parsedListeners.map(parsedListener => {
+    return {
       name: parsedListener.name,
       method: parsedListener.method,
       capture: !!parsedListener.capture,
       passive: !!parsedListener.passive,
       disabled: !!parsedListener.disabled
     };
-
-    cmpMeta.listeners.push(p);
   });
 }

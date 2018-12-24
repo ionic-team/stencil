@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse methods', () => {
@@ -14,7 +14,7 @@ describe('parse methods', () => {
       }
     `);
 
-    expect(t.outputText).toContain(`static get methods() { return { 'someMethod': {} }; }`);
+    expect(getStaticGetter(t.outputText, 'methods')).toEqual({ 'someMethod': {} });
     expect(t.method.name).toBe('someMethod');
   });
 

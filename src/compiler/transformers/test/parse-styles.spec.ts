@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse styles', () => {
@@ -12,7 +12,7 @@ describe('parse styles', () => {
       export class CmpA {}
     `);
 
-    expect(t.outputText).toContain(`static get styleUrl() { return 'style.css'; }`);
+    expect(getStaticGetter(t.outputText, 'styleUrl')).toEqual('style.css');
   });
 
   it('add static "styleUrls"', () => {
@@ -23,8 +23,7 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-
-    expect(t.outputText).toContain(`static get styleUrls() { return ['style.css']; }`);
+    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual(['style.css']);
   });
 
   it('add static "styles"', () => {
@@ -36,7 +35,7 @@ describe('parse styles', () => {
       export class CmpA {}
     `);
 
-    expect(t.outputText).toContain(`static get styles() { return 'p{color:red}'; }`);
+    expect(getStaticGetter(t.outputText, 'styles')).toEqual('p{color:red}');
   });
 
 });

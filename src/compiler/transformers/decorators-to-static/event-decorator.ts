@@ -4,13 +4,7 @@ import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, is
 import ts from 'typescript';
 
 
-export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const decoratedProps = cmpNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
-
-  if (decoratedProps.length === 0) {
-    return;
-  }
-
+export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
   const events = decoratedProps.map((prop: ts.PropertyDeclaration) => {
     return eventDecoratorToStatic(diagnostics, sourceFile, typeChecker, prop);
   }).filter(event => !!event);
@@ -22,7 +16,7 @@ export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile:
 
 
 function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
-  const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
+  const eventDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
     return null;

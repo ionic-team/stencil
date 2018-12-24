@@ -32,12 +32,7 @@ function visitClass(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d
     return;
   }
 
-  const staticMembers = classNode.members.filter(member => {
-    return (member.kind === ts.SyntaxKind.GetAccessor && member.modifiers && member.modifiers.some(modifier => {
-      return modifier.kind === ts.SyntaxKind.StaticKeyword;
-    }));
-  });
-
+  const staticMembers = classNode.members.filter(isStaticGetter);
   if (staticMembers.length === 0) {
     return;
   }
@@ -46,4 +41,11 @@ function visitClass(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d
   if (typeof tagName === 'string' && tagName.includes('-')) {
     parseStaticComponentMeta(config, compilerCtx, diagnostics, moduleFile, typeChecker, tsSourceFile, classNode, staticMembers, tagName);
   }
+}
+
+function isStaticGetter(member: ts.ClassElement) {
+  return (
+    member.kind === ts.SyntaxKind.GetAccessor &&
+    member.modifiers && member.modifiers.some(({kind}) => kind === ts.SyntaxKind.StaticKeyword)
+  );
 }

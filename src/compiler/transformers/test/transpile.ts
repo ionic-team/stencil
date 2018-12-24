@@ -12,6 +12,7 @@ export function transpileModule(input: string) {
   options.suppressOutputPathCheck = true;
   // Filename can be non-ts file.
   options.allowNonTsExtensions = true;
+  options.removeComments = false;
   // We are not returning a sourceFile for lib file when asked by the program,
   // so pass --noLib to avoid reporting a file not found error.
   options.noLib = true;
@@ -84,8 +85,6 @@ export function transpileModule(input: string) {
     outputText = outputText.replace(/  /g, ' ');
   }
 
-  outputText = outputText.replace(/\"/g, `'`);
-
   const moduleFile = compilerCtx.moduleFiles[Object.keys(compilerCtx.moduleFiles)[0]];
   const cmpCompilerMeta: d.ComponentCompilerMeta = moduleFile ? moduleFile.cmpCompilerMeta : null;
   const tagName = cmpCompilerMeta ? cmpCompilerMeta.tagName : null;
@@ -120,4 +119,15 @@ export function transpileModule(input: string) {
     method,
     elementRef
   };
+}
+
+export function getStaticGetter(output: string, prop: string) {
+  const toEvaludate = `return ${output.replace('export', '')}`;
+  try {
+    const Obj = new Function(toEvaludate);
+    return Obj()[prop];
+  } catch (e) {
+    console.error(e);
+    console.error(toEvaludate);
+  }
 }

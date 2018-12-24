@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse element', () => {
@@ -11,7 +11,7 @@ describe('parse element', () => {
       }
     `);
 
-    expect(t.outputText).toContain(`static get elementRef() { return 'val'; }`);
+    expect(getStaticGetter(t.outputText, 'elementRef')).toEqual('val');
     expect(t.elementRef).toBe('val');
   });
 

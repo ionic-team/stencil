@@ -3,22 +3,20 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticMethods(staticMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
+export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] {
   const parsedMethods = getStaticValue(staticMembers, 'methods');
   if (!parsedMethods) {
-    return;
+    return [];
   }
 
   const methodNames = Object.keys(parsedMethods);
   if (methodNames.length === 0) {
-    return;
+    return [];
   }
 
-  methodNames.forEach(methodName => {
-    const p: d.ComponentCompilerMethod = {
+  return methodNames.map(methodName => {
+    return {
       name: methodName
     };
-
-    cmpMeta.methods.push(p);
   });
 }

@@ -1,4 +1,4 @@
-import { transpileModule } from './transpile';
+import { transpileModule, getStaticGetter } from './transpile';
 
 
 describe('parse states', () => {
@@ -11,7 +11,7 @@ describe('parse states', () => {
       }
     `);
 
-    expect(t.outputText).toContain(`{ 'val': {} }`);
+    expect(getStaticGetter(t.outputText, 'states')).toEqual({ 'val': {} });
     expect(t.state.name).toBe('val');
   });
 

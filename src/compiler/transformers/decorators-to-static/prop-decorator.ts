@@ -1,18 +1,12 @@
 import * as d from '../../../declarations';
 import { catchError } from '../../util';
-import { createStaticGetter, isDecoratorNamed, removeDecorator } from '../transform-utils';
+import { createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, objectToObjectLiteral, removeDecorator, resolveType, getLeadingComments, copyComments, typeToString } from '../transform-utils';
 import { toDashCase } from '../../../util/helpers';
 import ts from 'typescript';
 
 
-export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const decoratedProps = cmpNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
-
-  if (decoratedProps.length === 0) {
-    return;
-  }
-
-  const properties: ts.ObjectLiteralElementLike[] = decoratedProps.map((prop: ts.PropertyDeclaration) => {
+export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+  const properties = decoratedProps.map((prop: ts.PropertyDeclaration) => {
     return propDecoratorToStatic(diagnostics, typeChecker, prop);
   }).filter(prop => prop != null);
 
@@ -22,8 +16,8 @@ export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile:
 }
 
 
-function propDecoratorToStatic(diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
-  const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
+function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
+  const propDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
   }
@@ -31,112 +25,52 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], _typeChecker: ts.Typ
   removeDecorator(prop, 'Prop');
 
   const propName = (prop.name as ts.Identifier).text;
-
-  const propData: ts.ObjectLiteralElementLike[] = [];
-
   const propOptions = getPropOptions(propDecorator, diagnostics);
+  const type = typeChecker.getTypeAtLocation(prop);
+  const typeStr = propTypeFromTSType(type);
 
-  // const type = typeChecker.getTypeAtLocation(prop);
-  let canHaveAttribute = false;
+  const propMeta: d.ComponentCompilerStaticProperty = {
+    type: typeStr,
+    mutable: !!propOptions.mutable,
+    complexType: getComplexType(typeChecker, prop, type),
+    required: prop.exclamationToken !== undefined && propName !== 'mode',
+    optional: prop.questionToken !== undefined,
+  };
 
-  if (!prop.type) {
-    const expression = prop.initializer;
-    if (expression != null) {
-      if (ts.isStringLiteral(expression)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('string')));
-        canHaveAttribute = true;
-
-      } else if (ts.isNumericLiteral(expression)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('number')));
-        canHaveAttribute = true;
-
-      } else if (BOOLEAN_KEYWORD.includes(expression.kind)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('boolean')));
-        canHaveAttribute = true;
-
-      } else if (ts.isRegularExpressionLiteral(expression)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('regex')));
-
-      } else if (ts.isArrayLiteralExpression(expression)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('array')));
-
-      } else if (ts.isObjectLiteralExpression(expression)) {
-        propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('object')));
-
-      } else {
-        // unknown type
-        canHaveAttribute = true;
-      }
-    }
-
-  } else {
-    const type = prop.type.getText();
-    if (type === 'string' || type === 'number' || type === 'boolean') {
-      propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral(type)));
-      canHaveAttribute = true;
-
-    } else if (prop.type.kind === ts.SyntaxKind.ArrayType) {
-      propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('array')));
-
-    } else if (prop.type.kind === ts.SyntaxKind.TypeReference) {
-      propData.push(ts.createPropertyAssignment(ts.createLiteral('type'), ts.createLiteral('object')));
-
-    } else {
-      // unknown type
-      canHaveAttribute = true;
-    }
+  // prop can have an attribute if type is NOT "unknown"
+  if (typeStr !== 'unknown') {
+    propMeta.attr = getAttributeName(propName, propOptions);
+    propMeta.reflectToAttr = !!propOptions.reflectToAttr;
   }
 
-  if (canHaveAttribute) {
-    let attrName: string;
-    if (propOptions && typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
-      attrName = propOptions.attr.trim();
-
-    } else {
-      attrName = toDashCase(propName);
-    }
-
-    propData.push(ts.createPropertyAssignment(ts.createLiteral('attr'), ts.createLiteral(attrName)));
-
-    if (propOptions && propOptions.reflectToAttr) {
-      propData.push(ts.createPropertyAssignment(ts.createLiteral('reflectToAttr'), ts.createLiteral(true)));
-    }
+  // extract default value
+  const initializer = prop.initializer;
+  if (initializer) {
+    propMeta.defaultValue = initializer.getText();
   }
 
-  if (propOptions && propOptions.mutable) {
-    propData.push(ts.createPropertyAssignment(ts.createLiteral('mutable'), ts.createLiteral(true)));
-  }
+  const staticProp = ts.createPropertyAssignment(
+    ts.createLiteral(propName),
+    objectToObjectLiteral(propMeta)
+  );
 
-  if (prop.exclamationToken !== undefined && propName !== 'mode') {
-    propData.push(ts.createPropertyAssignment(ts.createLiteral('required'), ts.createLiteral(true)));
-  }
+  // copy comments from prop to static object
+  copyComments(prop, staticProp);
 
-  if (prop.questionToken !== undefined) {
-    propData.push(ts.createPropertyAssignment(ts.createLiteral('optional'), ts.createLiteral(true)));
-  }
-
-  // // extract default value
-  // const initializer = prop.initializer;
-  // if (initializer) {
-  //   memberData.jsdoc.default = initializer.getText();
-  // }
-
-
-  const propertyAssignment = ts.createPropertyAssignment(ts.createLiteral(propName), ts.createObjectLiteral(propData, true));
-
-  // const symbol = typeChecker.getSymbolAtLocation(prop.name);
-  // const jsdoc = serializeSymbol(typeChecker, symbol);
-
-  return propertyAssignment;
+  return staticProp;
 }
 
-
-export
-
+function getAttributeName(propName: string, propOptions: d.PropOptions) {
+  if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
+    return propOptions.attr.trim();
+  } else {
+    return toDashCase(propName);
+  }
+}
 
 function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]) {
   if (propDecorator.expression == null) {
-    return null;
+    return {};
   }
 
   const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments
@@ -151,15 +85,25 @@ function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
   });
 
   const propOptions: d.PropOptions = suppliedOptions[0];
-  return propOptions;
+  return propOptions || {};
 }
 
+
+function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType {
+  const sourceFile = node.getSourceFile();
+  const nodeType = node.type;
+  return {
+    text: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
+    resolved: resolveType(typeChecker, type),
+    references: getAttributeTypeInfo(node, sourceFile)
+  };
+}
 
 export function propTypeFromTSType(type: ts.Type) {
   const isAnyType = checkType(type, isAny);
 
   if (isAnyType) {
-    return 'Any';
+    return 'any';
   }
 
   const isStr = checkType(type, isString);
@@ -168,23 +112,21 @@ export function propTypeFromTSType(type: ts.Type) {
 
   // if type is more than a primitive type at the same time, we mark it as any
   if (Number(isStr) + Number(isNu) + Number(isBool) > 1) {
-    return 'Any';
+    return 'any';
   }
 
   // at this point we know the prop's type is NOT the mix of primitive types
   if (isStr) {
-    return String;
+    return 'string';
   }
   if (isNu) {
-    return Number;
+    return 'number';
   }
   if (isBool) {
-    return Boolean;
+    return 'boolean';
   }
-  return 'Unknown';
+  return 'unknown';
 }
-
-const BOOLEAN_KEYWORD = [ ts.SyntaxKind.BooleanKeyword, ts.SyntaxKind.TrueKeyword, ts.SyntaxKind.FalseKeyword ];
 
 function checkType(type: ts.Type, check: (type: ts.Type) => boolean ): boolean {
   if (type.flags & ts.TypeFlags.Union) {

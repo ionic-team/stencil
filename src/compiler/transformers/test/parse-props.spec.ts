@@ -1,21 +1,35 @@
-import { transpileModule } from './transpile';
+import { getStaticGetter, transpileModule } from './transpile';
 
 
 describe('parse props', () => {
 
-  it('prop required', () => {
+  it('prop optional', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
         @Prop() val?: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val', 'optional': true } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'mutable': false,
+        'optional': true,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'string'
+      }
+    });
 
     expect(t.property.attr).toBe('val');
     expect(t.property.type).toBe('string');
     expect(t.property.optional).toBe(true);
-    expect(t.cmpCompilerMeta.hasProp).toBe(true);
+    expect(t.cmpCompilerMeta.features.hasProp).toBe(true);
   });
 
   it('prop required', () => {
@@ -25,7 +39,21 @@ describe('parse props', () => {
         @Prop() val!: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val', 'required': true } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': true,
+        'type': 'string'
+      }
+    });
     expect(t.property.required).toBe(true);
   });
 
@@ -36,7 +64,22 @@ describe('parse props', () => {
         @Prop({ mutable: true }) val: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val', 'mutable': true } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'defaultValue': undefined,
+        'mutable': true,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'string'
+      }
+    });
     expect(t.property.mutable).toBe(true);
   });
 
@@ -47,9 +90,23 @@ describe('parse props', () => {
         @Prop({ reflectToAttr: true }) val: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val', 'reflectToAttr': true } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': true,
+        'required': false,
+        'type': 'string'
+      }
+    });
     expect(t.property.reflectToAttr).toBe(true);
-    expect(t.cmpCompilerMeta.hasReflectToAttr).toBe(true);
+    expect(t.cmpCompilerMeta.features.hasReflectToAttr).toBe(true);
   });
 
   it('prop array', () => {
@@ -59,8 +116,20 @@ describe('parse props', () => {
         @Prop() val: string[];
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'array' } }`);
-    expect(t.property.type).toBe('array');
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'complexType': {
+          'references': {},
+          'resolved': '{}', // TODO, needs to be string[]
+          'text': 'string[]'
+        },
+        'mutable': false,
+        'optional': false,
+        'required': false,
+        'type': 'unknown'
+      }
+    });
+    expect(t.property.type).toBe('unknown');
     expect(t.property.attr).toBe(null);
     expect(t.property.reflectToAttr).toBe(false);
   });
@@ -72,9 +141,27 @@ describe('parse props', () => {
         @Prop() val: Object;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'object' } }`);
-    expect(t.property.type).toBe('object');
-    expect(t.property.attr).toBe(null);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {
+            'Object': {
+              'location': 'global'
+            }
+          },
+          'resolved': 'any',
+          'text': 'Object'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'any'
+      }
+    });
+    expect(t.property.type).toBe('any');
+    expect(t.property.attr).toBe('val');
     expect(t.property.reflectToAttr).toBe(false);
   });
 
@@ -85,8 +172,22 @@ describe('parse props', () => {
         @Prop() multiWord: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'multiWord': { 'type': 'string', 'attr': 'multi-word' } }`);
-
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'multiWord': {
+        'attr': 'multi-word',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'defaultValue': undefined,
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'string'
+      }
+    });
     expect(t.property.name).toBe('multiWord');
     expect(t.property.attr).toBe('multi-word');
   });
@@ -98,7 +199,21 @@ describe('parse props', () => {
         @Prop() val: string;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'string'
+      }
+    });
     expect(t.property.type).toBe('string');
     expect(t.property.attr).toBe('val');
   });
@@ -110,7 +225,21 @@ describe('parse props', () => {
         @Prop() val: number;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'number', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'number',
+          'text': 'number'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'number'
+      }
+    });
     expect(t.property.type).toBe('number');
     expect(t.property.attr).toBe('val');
   });
@@ -122,7 +251,21 @@ describe('parse props', () => {
         @Prop() val: boolean;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'boolean', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'boolean',
+          'text': 'boolean'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'boolean'
+      }
+    });
     expect(t.property.type).toBe('boolean');
     expect(t.property.attr).toBe('val');
   });
@@ -134,8 +277,22 @@ describe('parse props', () => {
         @Prop() val: any;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'attr': 'val' } }`);
-    expect(t.property.type).toBe('unknown');
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'any',
+          'text': 'any'
+        },
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'any'
+      }
+    });
+    expect(t.property.type).toBe('any');
     expect(t.property.attr).toBe('val');
   });
 
@@ -146,7 +303,22 @@ describe('parse props', () => {
         @Prop() val = 'mph';
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'string', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'string',
+          'text': 'string'
+        },
+        'defaultValue': `'mph'`,
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'string'
+      }
+    });
     expect(t.property.type).toBe('string');
     expect(t.property.attr).toBe('val');
   });
@@ -158,7 +330,22 @@ describe('parse props', () => {
         @Prop() val = 88;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'number', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'number',
+          'text': 'number'
+        },
+        'defaultValue': '88',
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'number'
+      }
+    });
     expect(t.property.type).toBe('number');
     expect(t.property.attr).toBe('val');
   });
@@ -170,7 +357,22 @@ describe('parse props', () => {
         @Prop() val = false;
       }
     `);
-    expect(t.outputText).toContain(`{ 'val': { 'type': 'boolean', 'attr': 'val' } }`);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'boolean',
+          'text': 'boolean'
+        },
+        'defaultValue': 'false',
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'boolean'
+      }
+    });
     expect(t.property.type).toBe('boolean');
     expect(t.property.attr).toBe('val');
   });
@@ -183,8 +385,23 @@ describe('parse props', () => {
       }
     `);
 
-    expect(t.outputText).toContain(`{ 'val': { 'attr': 'val' } }`);
-    expect(t.property.type).toBe('unknown');
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      'val': {
+        'attr': 'val',
+        'complexType': {
+          'references': {},
+          'resolved': 'any',
+          'text': 'any'
+        },
+        'defaultValue': 'null',
+        'mutable': false,
+        'optional': false,
+        'reflectToAttr': false,
+        'required': false,
+        'type': 'any'
+      }
+    });
+    expect(t.property.type).toBe('any');
     expect(t.property.attr).toBe('val');
   });
 

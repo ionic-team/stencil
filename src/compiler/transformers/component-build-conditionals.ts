@@ -3,26 +3,26 @@ import * as d from '../../declarations';
 
 
 export function gatherComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) {
-
-  if (cmpMeta.properties && cmpMeta.properties.length > 0) {
-    cmpMeta.hasProp = true;
-    cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
-    cmpMeta.hasReflectToAttr = cmpMeta.properties.some(p => p.reflectToAttr);
-    cmpMeta.hasAttr = cmpMeta.properties.some(p => typeof p.attr === 'string');
+  const features = cmpMeta.features;
+  if (cmpMeta.properties.length > 0) {
+    features.hasProp = true;
+    features.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
+    features.hasReflectToAttr = cmpMeta.properties.some(p => p.reflectToAttr);
+    features.hasAttr = cmpMeta.properties.some(p => typeof p.attr === 'string');
     // cmpMeta.hasWatchCallback = cmpMeta.properties.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
   }
 
-  if (cmpMeta.states && cmpMeta.states.length > 0) {
-    cmpMeta.hasState = true;
+  if (cmpMeta.states.length > 0) {
+    features.hasState = true;
 
-    if (!cmpMeta.hasWatchCallback) {
+    if (!features.hasWatchCallback) {
       // cmpMeta.hasWatchCallback = cmpMeta.states.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
     }
   }
 
-  cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);
+  features.hasMember = (features.hasProp || features.hasState || features.hasElement || features.hasMethod);
 
-  cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);
+  features.isUpdateable = (features.hasProp || features.hasState);
 
   // if (cmpMeta.stylesMeta) {
   //   const modeNames = Object.keys(cmpMeta.stylesMeta);
