@@ -1,5 +1,4 @@
 import * as d from '../../../declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { normalizePath } from '../../util';
 
 
@@ -31,7 +30,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   parseModuleJsFilePath(config, collectionDir, cmpData, moduleFile);
   parseStyles(config, collectionDir, cmpData, cmpMeta);
   parseAssetsDir(config, collectionDir, cmpData, cmpMeta);
-  parseProps(config, collection, cmpData, cmpMeta);
+  parseProps(cmpData, cmpMeta);
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
@@ -169,7 +168,7 @@ function parseStyle(config: d.Config, collectionDir: string, cmpData: d.Componen
 }
 
 
-function parseProps(config: d.Config, collection: d.CollectionCompilerMeta, cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -339,4 +338,3 @@ function invalidArrayData(arr: any[]) {
 const BOOLEAN_KEY = 'Boolean';
 const NUMBER_KEY = 'Number';
 const STRING_KEY = 'String';
-const ANY_KEY = 'Any';

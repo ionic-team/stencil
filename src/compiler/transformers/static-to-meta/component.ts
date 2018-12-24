@@ -11,7 +11,7 @@ import { parseStaticStates } from './states';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(_config: d.Config, _compilerCtx: d.CompilerCtx, _diagnostics: d.Diagnostic[], moduleFile: d.ModuleFile, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
+export function parseStaticComponentMeta(_config: d.Config, _compilerCtx: d.CompilerCtx, _diagnostics: d.Diagnostic[], moduleFile: d.Module, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
   const cmpMeta: d.ComponentCompilerMeta = {
     bundleIds: null,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),

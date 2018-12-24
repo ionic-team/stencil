@@ -4,7 +4,7 @@ import ts from 'typescript';
 
 
 export function parseStaticListeners(staticMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
-  const parsedListeners = getStaticValue(staticMembers, 'listeners');
+  const parsedListeners: d.ComponentCompilerListener[] = getStaticValue(staticMembers, 'listeners');
   if (!parsedListeners || parsedListeners.length === 0) {
     return;
   }

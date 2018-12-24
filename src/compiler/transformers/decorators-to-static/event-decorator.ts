@@ -74,16 +74,3 @@ export function validateEventEmitterMemeberName(diagnostics: d.Diagnostic[], mem
     ].join('');
   }
 }
-
-
-function gatherEventEmitterGeneric(type: ts.TypeNode): ts.TypeNode | null {
-  if (ts.isTypeReferenceNode(type) &&
-    ts.isIdentifier(type.typeName) &&
-    type.typeName.text === 'EventEmitter' &&
-    type.typeArguments &&
-    type.typeArguments.length > 0) {
-      const eeGen = type.typeArguments[0];
-      return eeGen as ts.TypeNode;
-  }
-  return null;
-}
