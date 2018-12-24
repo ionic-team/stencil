@@ -30,6 +30,7 @@ export interface ComponentCompilerFeatures {
 }
 
 export interface ComponentCompilerMeta {
+  assetsDirs?: CompilerAssetDir[];
   bundleIds: ComponentBundleId;
   componentClassName: string;
   elementRef: string;
@@ -130,4 +131,11 @@ export interface CompilerStyleDoc {
   name: string;
   docs: string;
   annotation: 'prop';
+}
+
+export interface CompilerAssetDir {
+  absolutePath?: string;
+  cmpRelativePath?: string;
+  originalComponentPath?: string;
+  originalCollectionPath?: string;
 }

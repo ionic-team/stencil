@@ -9,6 +9,7 @@ export interface StencilSystem {
     typescriptVersion?: string;
     runtime?: string;
     packageDir?: string;
+    distDir?: string;
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   createDom?(): CreateDom;
@@ -133,7 +134,7 @@ export interface PackageJsonData {
   collection?: string;
   types?: string;
   files?: string[];
-  ['dist-tags']: {
+  ['dist-tags']?: {
     latest: string;
   };
   dependencies?: {

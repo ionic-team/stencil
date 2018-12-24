@@ -124,6 +124,9 @@ export interface StencilConfig {
   devMode?: boolean;
   devServer?: d.DevServerConfig;
   enableCacheStats?: boolean;
+  exposeEventListener?: boolean;
+  exposeRequestAnimationFrame?: boolean;
+  exposeTaskQueue?: boolean;
   globalScript?: string;
   hydratedCssClass?: string;
   includeSrc?: string[];

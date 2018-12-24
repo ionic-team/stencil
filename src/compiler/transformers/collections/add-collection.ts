@@ -1,33 +1,16 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '../../util';
-import { parseCollectionModule } from '../../collections/parse-collection-module';
-import ts from 'typescript';
+import { parseCollection } from './parse-collection-module';
 
 
-export function getCollections(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.Collection[], moduleFile: d.ModuleFile, importNode: ts.ImportDeclaration) {
-  if (!importNode.moduleSpecifier || !compilerCtx || !collections) {
-    return;
-  }
-
-  const moduleId = (importNode.moduleSpecifier as ts.StringLiteral).text;
-
-  // see if we can add this collection dependency
-  addCollection(config, compilerCtx, collections, moduleFile, config.rootDir, moduleId);
-}
-
-
-export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.Collection[], moduleFile: d.ModuleFile, resolveFromDir: string, moduleId: string) {
-  if (moduleId.startsWith('.') || moduleId.startsWith('/')) {
-    // not a node module import, so don't bother
-    return;
-  }
-
+export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.CollectionCompilerMeta[], moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
   moduleFile.externalImports = moduleFile.externalImports || [];
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
     moduleFile.externalImports.sort();
   }
 
+  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || new Set();
   if (compilerCtx.resolvedCollections.has(moduleId)) {
     // we've already handled this collection moduleId before
     return;
@@ -56,15 +39,20 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
   const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
   const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
 
-  if (!pkgData.collection || !pkgData.types) {
+  if (typeof pkgData.collection !== 'string' || !pkgData.collection.endsWith('.json')) {
     // this import is not a stencil collection
+    return;
+  }
+
+  if (typeof pkgData.types !== 'string' || !pkgData.types.endsWith('.d.ts')) {
+    // this import should have types
     return;
   }
 
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollectionModule(config, compilerCtx, pkgJsonFilePath, pkgData);
+  const collection = parseCollection(config, compilerCtx, pkgJsonFilePath, pkgData);
 
   // check if we already added this collection to the build context
   const alreadyHasCollection = collections.some(c => {

@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
-import { getModuleFile } from '../../build/compiler-ctx';
+import { getModule } from '../../build/compiler-ctx';
 import { getStaticValue } from '../transform-utils';
 import { parseStaticComponentMeta } from './component';
 import ts from 'typescript';
 
 
-export function gatherMeta(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
+export function gatherMeta(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
@@ -20,7 +20,12 @@ export function gatherMeta(config: d.Config, compilerCtx: d.CompilerCtx, diagnos
     }
 
     return tsSourceFile => {
-      const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
+      const moduleFile = getModule(compilerCtx, tsSourceFile.fileName);
+      if (collection) {
+        moduleFile.isCollectionDependency = true;
+        moduleFile.collectionName = collection.collectionName;
+        collection.moduleFiles.push(moduleFile);
+      }
       return visit(moduleFile, tsSourceFile, tsSourceFile) as ts.SourceFile;
     };
   };
