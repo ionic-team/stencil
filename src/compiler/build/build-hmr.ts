@@ -87,11 +87,8 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   const changedScriptFiles: string[] = [];
-  const checkedFiles: string[] = [];
-
-  const allModuleFiles = Object.keys(compilerCtx.moduleFiles)
-    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
-    .filter(moduleFile => moduleFile.localImports && moduleFile.localImports.length > 0);
+  const checkedFiles = new Set<string>();
+  const allModuleFiles = buildCtx.moduleFiles.filter(m => m.localImports && m.localImports.length > 0);
 
   while (filesToLookForImporters.length > 0) {
     const scriptFile = filesToLookForImporters.shift();
@@ -99,10 +96,10 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
-    const moduleFile = compilerCtx.moduleFiles[changedTsFile];
-    if (moduleFile && moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta) {
-      if (!tags.includes(moduleFile.cmpMeta.tagNameMeta)) {
-        tags.push(moduleFile.cmpMeta.tagNameMeta);
+    const moduleFile = compilerCtx.moduleMap.get(changedTsFile);
+    if (moduleFile && moduleFile.cmpCompilerMeta && moduleFile.cmpCompilerMeta.tagName) {
+      if (!tags.includes(moduleFile.cmpCompilerMeta.tagName)) {
+        tags.push(moduleFile.cmpCompilerMeta.tagName);
       }
     }
     return tags;
@@ -116,17 +113,17 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
 }
 
 
-function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: string[], changedScriptFiles: string[], scriptFile: string) {
+function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);
   }
 
-  if (checkedFiles.includes(scriptFile)) {
+  if (checkedFiles.has(scriptFile)) {
     // already checked this file
     return;
   }
-  checkedFiles.push(scriptFile);
+  checkedFiles.add(scriptFile);
 
   // get all the ts files that import this ts file
   const tsFilesThatImportsThisTsFile = allModuleFiles.reduce((arr, moduleFile) => {

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { generateComponentTypes } from './create-component-types';
+import { generateComponentTypes } from '../types/generate-component-types';
 import { transpileService } from './transpile-service';
 import { validateTypesMain } from './validate-types-main';
 
@@ -33,62 +33,55 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   // hold on to stuff we know is being used
   cleanModuleFileCache(compilerCtx);
 
-  // get all the active module files
-  const moduleFiles = Object.keys(compilerCtx.moduleFiles).map(key => compilerCtx.moduleFiles[key]);
-
-  // see if any of the active modules are using slot or svg
-  // useful for the build process later on
-  // TODO: hasSlot and hasSvg does not account for dependencies
-  buildCtx.hasSlot = moduleFiles.some(mf => mf.hasSlot);
-  buildCtx.hasSvg = moduleFiles.some(mf => mf.hasSvg);
-
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!
     // create the components.d.ts file and write to disk
     await generateComponentTypes(config, compilerCtx, buildCtx);
 
     if (!config._isTesting) {
-      // now that we've updated teh components.d.ts file
+      // now that we've updated the components.d.ts file
       // lets do a full typescript build (but in another thread)
       validateTypesMain(config, compilerCtx, buildCtx);
     }
   }
+
+  buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
 }
 
 
 function cleanModuleFileCache(compilerCtx: d.CompilerCtx) {
   // let's clean up the module file cache so we only
   // hold on to stuff we know is being used
-  const foundSourcePaths: string[] = [];
+  const foundSourcePaths = new Set<string>();
 
-  compilerCtx.rootTsFiles.forEach(rootTsFile => {
-    const moduleFile = compilerCtx.moduleFiles[rootTsFile];
+  compilerCtx.rootTsFiles.sort().forEach(rootTsFile => {
+    const moduleFile = compilerCtx.moduleMap.get(rootTsFile);
     addSourcePaths(compilerCtx, foundSourcePaths, moduleFile);
   });
 
-  const cachedSourcePaths = Object.keys(compilerCtx.moduleFiles);
+  compilerCtx.moduleMap.forEach(moduleFile => {
+    const sourcePath = moduleFile.sourceFilePath;
 
-  cachedSourcePaths.forEach(sourcePath => {
     if (sourcePath.endsWith('.d.ts') || sourcePath.endsWith('.js')) {
       // don't bother cleaning up for .d.ts and .js modules files
       return;
     }
 
-    if (!foundSourcePaths.includes(sourcePath)) {
+    if (!foundSourcePaths.has(sourcePath)) {
       // this source path is a typescript file
       // but we never found it again, so let's forget it
-      delete compilerCtx.moduleFiles[sourcePath];
+      compilerCtx.moduleMap.delete(sourcePath);
     }
   });
 }
 
 
-function addSourcePaths(compilerCtx: d.CompilerCtx, foundSourcePaths: string[], moduleFile: d.ModuleFile) {
-  if (moduleFile && !foundSourcePaths.includes(moduleFile.sourceFilePath)) {
-    foundSourcePaths.push(moduleFile.sourceFilePath);
+function addSourcePaths(compilerCtx: d.CompilerCtx, foundSourcePaths: Set<string>, moduleFile: d.Module) {
+  if (moduleFile && !foundSourcePaths.has(moduleFile.sourceFilePath)) {
+    foundSourcePaths.add(moduleFile.sourceFilePath);
 
     moduleFile.localImports.forEach(localImport => {
-      const moduleFile = compilerCtx.moduleFiles[localImport];
+      const moduleFile = compilerCtx.moduleMap.get(localImport);
       if (moduleFile) {
         addSourcePaths(compilerCtx, foundSourcePaths, moduleFile);
       }

@@ -8,7 +8,7 @@ import { scopeComponentCss } from './scope-css';
 
 
 export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return;
   }
 
@@ -61,7 +61,7 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 
 async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return '/* build aborted */';
   }
 

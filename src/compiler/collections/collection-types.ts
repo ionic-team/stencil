@@ -1,12 +1,11 @@
 import * as d from '../../declarations';
-import { isDtsFile, pathJoin } from '../util';
 import { copyStencilCoreDts, updateStencilTypesImports } from '../distribution/stencil-types';
+import { isDtsFile, pathJoin } from '../util';
+import { generateComponentTypes } from '../types/generate-component-types';
 import { validateTypes, validateTypesExist } from '../distribution/validate-package-json';
-import { generateComponentTypes } from '../transpile/create-component-types';
 
 
 export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData) {
-
   // Before generating the types, let's check if the package.json values are correct
   if (!validateTypes(config, outputTarget, buildCtx.diagnostics, pkgData)) {
     return;

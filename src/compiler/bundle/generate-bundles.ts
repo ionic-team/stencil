@@ -9,7 +9,7 @@ import { OutputTargetDist } from '../../declarations';
 
 export async function generateBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], rawModules: d.DerivedModule[]) {
   if (!rawModules || canSkipGenerateBundles(buildCtx)) {
-    return {} as d.ComponentRegistry;
+    return;
   }
 
   // both styles and modules are done bundling
@@ -31,17 +31,12 @@ export async function generateBundles(config: d.Config, compilerCtx: d.CompilerC
     ...rawModules.map(mod => generateChunkFiles(config, compilerCtx, buildCtx, mod, entryModulesMap))
   ]);
 
-  // create the registry of all the components
-  const cmpRegistry = createComponentRegistry(entryModules);
-
   timeSpan.finish(`generate bundles finished`);
-
-  return cmpRegistry;
 }
 
 
 async function generateChunkFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, module: d.DerivedModule, entryModulesMap: Map<string, d.EntryModule>) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return;
   }
 
@@ -328,34 +323,9 @@ export function getBundleIdDev(entryModule: d.EntryModule, modeName: string) {
   return `${tags[0]}.${modeName}`;
 }
 
-function createComponentRegistry(entryModules: d.EntryModule[]) {
-  const registryComponents: d.ComponentMeta[] = [];
-  const cmpRegistry: d.ComponentRegistry = {};
-
-  return entryModules
-    .reduce((rcs, bundle) => {
-      const cmpMetas = bundle.moduleFiles
-        .filter(m => m.cmpMeta)
-        .map(moduleFile => moduleFile.cmpMeta);
-
-      return rcs.concat(cmpMetas);
-    }, registryComponents)
-    .sort((a, b) => {
-      if (a.tagNameMeta < b.tagNameMeta) return -1;
-      if (a.tagNameMeta > b.tagNameMeta) return 1;
-      return 0;
-    })
-    .reduce((registry, cmpMeta) => {
-      return {
-        ...registry,
-        [cmpMeta.tagNameMeta]: cmpMeta
-      };
-    }, cmpRegistry);
-}
-
 
 function canSkipGenerateBundles(buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return true;
   }
 

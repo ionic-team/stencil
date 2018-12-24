@@ -1,18 +1,14 @@
 import * as d from '../../declarations';
 import { addCollection } from './datacollection/discover-collections';
-import addComponentMetadata from './transformers/add-component-metadata';
-import { componentDependencies } from './transformers/component-dependencies';
-import { gatherMetadata } from './datacollection/gather-metadata';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { gatherMeta } from '../transformers/static-to-meta/gather-meta';
+import { gatherModuleImports } from '../transformers/module-imports';
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
-import { getModuleFile } from '../build/compiler-ctx';
-import { getModuleImports } from './transformers/module-imports';
+import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import minimatch from 'minimatch';
-import { normalizePath, pathJoin } from '../util';
-import { removeCollectionImports } from './transformers/remove-collection-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { removeStencilImports } from './transformers/remove-stencil-imports';
+import { normalizePath } from '../util';
 import ts from 'typescript';
 
 
@@ -38,11 +34,9 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
     });
   }
 
-  if (!compilerCtx.tsService) {
+  if (compilerCtx.tsService == null) {
     // create the typescript language service
-    const timeSpan = buildCtx.createTimeSpan(`buildTsService started`, true);
     compilerCtx.tsService = await buildTsService(config, compilerCtx, buildCtx);
-    timeSpan.finish(`buildTsService finished`);
   }
 
   const doTranspile = (changedTsFiles.length > 0);
@@ -123,15 +117,11 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
       return {
         before: [
-          gatherMetadata(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker),
-          removeDecorators(),
-          addComponentMetadata(transpileCtx.compilerCtx.moduleFiles),
+          convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          removeStencilImports(),
-          removeCollectionImports(transpileCtx.compilerCtx),
-          getModuleImports(config, transpileCtx.compilerCtx),
-          componentDependencies(transpileCtx.compilerCtx)
+          gatherMeta(config, compilerCtx, transpileCtx.buildCtx.diagnostics, typeChecker, null),
+          gatherModuleImports(config, compilerCtx, buildCtx)
         ]
       };
     }
@@ -219,7 +209,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       // and there you go, thanks fs cache!
       // put the cached module file data in our context
-      ctx.compilerCtx.moduleFiles[tsFilePath] = cachedModuleFile.moduleFile;
+      ctx.compilerCtx.moduleMap.set(tsFilePath, cachedModuleFile.moduleFile);
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
@@ -227,7 +217,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
       });
 
       // write the cached js output too
-      await outputFile(config, ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
+      await outputFile(ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
       return;
     }
 
@@ -235,7 +225,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     // purposely not using the fs cache
     // this is probably when we want to prime the
     // in-memory ts cache after the first build has completed
-    const existingModuleFile = ctx.compilerCtx.moduleFiles[tsFilePath];
+    const existingModuleFile = ctx.compilerCtx.moduleMap.get(tsFilePath);
     if (existingModuleFile && Array.isArray(existingModuleFile.externalImports)) {
       ensureExternalImports = existingModuleFile.externalImports.slice();
     }
@@ -271,7 +261,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
     if (outputFilePath.endsWith('.js')) {
       // this is the JS output of the typescript file transpiling
-      const moduleFile = getModuleFile(ctx.compilerCtx, tsFilePath);
+      const moduleFile = getModule(ctx.compilerCtx, tsFilePath);
       moduleFile.jsFilePath = outputFilePath;
 
       if (Array.isArray(ensureExternalImports)) {
@@ -294,12 +284,12 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     }
 
     // write the text to our in-memory fs and output targets
-    await outputFile(config, ctx, outputFilePath, tsOutput.text);
+    await outputFile(ctx, outputFilePath, tsOutput.text);
   }));
 }
 
 
-async function outputFile(config: d.Config, ctx: TranspileContext, outputFilePath: string, outputText: string) {
+async function outputFile(ctx: TranspileContext, outputFilePath: string, outputText: string) {
   // the in-memory .js version is be virtually next to the source ts file
   // but it never actually gets written to disk, just there in spirit
   await ctx.compilerCtx.fs.writeFile(
@@ -307,20 +297,11 @@ async function outputFile(config: d.Config, ctx: TranspileContext, outputFilePat
     outputText,
     { inMemoryOnly: true }
   );
-
-  // also write the output to each of the output targets
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
-  await Promise.all(outputTargets.map(async outputTarget => {
-    const relPath = config.sys.path.relative(config.srcDir, outputFilePath);
-    const outputTargetFilePath = pathJoin(config, outputTarget.collectionDir, relPath);
-
-    await ctx.compilerCtx.fs.writeFile(outputTargetFilePath, outputText);
-  }));
 }
 
 
 interface CachedModuleFile {
-  moduleFile: d.ModuleFile;
+  moduleFile: d.Module;
   jsText: string;
 }
 

@@ -45,13 +45,6 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
   // remember the source of this collection node_module
   collection.moduleDir = collectionPackageRootDir;
 
-  // append any collection data
-  collection.moduleFiles.forEach(collectionModuleFile => {
-    if (!compilerCtx.moduleFiles[collectionModuleFile.jsFilePath]) {
-      compilerCtx.moduleFiles[collectionModuleFile.jsFilePath] = collectionModuleFile;
-    }
-  });
-
   // cache it for later yo
   compilerCtx.collections.push(collection);
 

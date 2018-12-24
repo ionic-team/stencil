@@ -56,7 +56,7 @@ export function parseGlobal(config: d.Config, collectionDir: string, collectionM
 export function parseBundles(collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
   if (invalidArrayData(collectionManifest.bundles)) {
     collection.bundles = [];
-    return [];
+    return;
   }
 
   collection.bundles = collectionManifest.bundles.map(b => {

@@ -2,9 +2,9 @@ import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
 import { catchError } from './util';
+import { CompilerContext } from './build/compiler-ctx';
 import { docs } from './docs/docs';
 import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
-import { getCompilerCtx } from './build/compiler-ctx';
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
 import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
@@ -51,7 +51,7 @@ export class Compiler implements d.Compiler {
 
       config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
 
-      this.ctx = getCompilerCtx(config);
+      this.ctx = new CompilerContext(config);
 
       this.on('fsChange', fsWatchResults => {
         this.rebuild(fsWatchResults);

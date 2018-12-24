@@ -7,13 +7,11 @@ import { generateWebComponentsJson } from './generate-web-components-json';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
 import { generateCustomDocs } from './generate-custom-docs';
-import { getCompilerCtx } from '../build/compiler-ctx';
 import { strickCheckDocs } from './strict-check';
 import { transpileApp } from '../transpile/transpile-app';
 
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
-  compilerCtx = getCompilerCtx(config, compilerCtx);
   const buildCtx = new BuildContext(config, compilerCtx);
 
   config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));

@@ -4,24 +4,32 @@ import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script
 
 
 export async function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (!config.srcIndexHtml) {
     return;
   }
 
-  const indexHtmlOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.indexHtml);
+  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => {
+    return o.indexHtml;
+  });
 
-  await Promise.all(indexHtmlOutputs.map(async outputTarget => {
+  if (outputTargets.length === 0) {
+    return;
+  }
+
+  const timespan = buildCtx.createTimeSpan(`generate index.html started`, true);
+
+  const promises = outputTargets.map(async outputTarget => {
     await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
-  }));
+  });
+
+  await Promise.all(promises);
+
+  timespan.finish(`generate index.html finished`);
 }
 
 
-export async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (!outputTarget.indexHtml || !config.srcIndexHtml) {
-    return;
-  }
-
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+  if (buildCtx.shouldAbort) {
     return;
   }
 
@@ -37,10 +45,9 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
     try {
       indexSrcHtml = await updateIndexHtmlServiceWorker(config, buildCtx, outputTarget, indexSrcHtml);
 
-      // add the prerendered html to our list of files to write
-      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
+      await writeIndexHtmlOutput(compilerCtx, outputTarget, indexSrcHtml);
 
-      buildCtx.debug(`optimizeHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
+      buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
     } catch (e) {
       catchError(buildCtx.diagnostics, e);
@@ -50,4 +57,9 @@ export async function generateIndexHtml(config: d.Config, compilerCtx: d.Compile
     // it's ok if there's no index file
     buildCtx.debug(`no index html: ${config.srcIndexHtml}`);
   }
+}
+
+
+async function writeIndexHtmlOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string) {
+  await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
 }

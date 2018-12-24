@@ -7,7 +7,6 @@ export class BuildContext implements d.BuildCtx {
   appFileBuildCount = 0;
   buildId = -1;
   buildMessages: string[] = [];
-  timestamp: string;
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
@@ -37,6 +36,7 @@ export class BuildContext implements d.BuildCtx {
   hasSvg: boolean = null;
   indexBuildCount = 0;
   isRebuild = false;
+  moduleFiles: d.Module[] = [];
   requiresFullBuild = true;
   scriptsAdded: string[] = [];
   scriptsDeleted: string[] = [];
@@ -44,6 +44,7 @@ export class BuildContext implements d.BuildCtx {
   styleBuildCount = 0;
   stylesUpdated = [] as d.BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan = null;
+  timestamp: string;
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
@@ -137,6 +138,10 @@ export class BuildContext implements d.BuildCtx {
     }
 
     return false;
+  }
+
+  get shouldAbort() {
+    return (!this.isActiveBuild || this.hasError);
   }
 
   get hasWarning() {

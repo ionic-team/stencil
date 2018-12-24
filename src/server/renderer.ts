@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '../compiler/util';
-import { getCompilerCtx } from '../compiler/build/compiler-ctx';
-import { getGlobalJsBuildPath } from '../compiler/app/app-file-naming';
+import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { hydrateHtml } from './hydrate-html';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
@@ -21,7 +20,7 @@ export class Renderer {
     config.sys.initWorkers(1, 1);
 
     // init the build context
-    this.ctx = getCompilerCtx(config, ctx);
+    this.ctx = ctx || new CompilerContext(config);
 
     this.outputTarget = outputTarget || config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
 
@@ -77,20 +76,20 @@ export class Renderer {
 }
 
 
-function loadAppGlobal(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  compilerCtx.appFiles = compilerCtx.appFiles || {};
+function loadAppGlobal(_config: d.Config, _compilerCtx: d.CompilerCtx, _outputTarget: d.OutputTargetWww) {
+  // compilerCtx.appFiles = compilerCtx.appFiles || {};
 
-  if (compilerCtx.appFiles.global) {
-    // already loaded the global js content
-    return;
-  }
+  // if (compilerCtx.appFiles.global) {
+  //   // already loaded the global js content
+  //   return;
+  // }
 
-  // let's load the app global js content
-  const appGlobalPath = getGlobalJsBuildPath(config, outputTarget);
-  try {
-    compilerCtx.appFiles.global = compilerCtx.fs.readFileSync(appGlobalPath);
+  // // let's load the app global js content
+  // const appGlobalPath = getGlobalJsBuildPath(config, outputTarget);
+  // try {
+  //   compilerCtx.appFiles.global = compilerCtx.fs.readFileSync(appGlobalPath);
 
-  } catch (e) {
-    config.logger.debug(`missing app global: ${appGlobalPath}`);
-  }
+  // } catch (e) {
+  //   config.logger.debug(`missing app global: ${appGlobalPath}`);
+  // }
 }

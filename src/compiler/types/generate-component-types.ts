@@ -1,23 +1,23 @@
 import * as d from '../../declarations';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../app/app-file-naming';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-file-naming';
 import { MEMBER_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
-import { updateStencilTypesImports } from '../distribution/stencil-types';
+import { updateStencilTypesImports } from './stencil-types';
 
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination = 'src') {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
-  const metadata: d.ModuleFile[] = compilerCtx.rootTsFiles
+  const moduleFiles = compilerCtx.rootTsFiles
     .slice()
     .sort()
-    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
-    .filter(moduleFile => moduleFile && moduleFile.cmpMeta);
+    .map(tsFilePath => compilerCtx.moduleMap.get(tsFilePath))
+    .filter(m => m && m.cmpCompilerMeta);
 
   // Generate d.ts files for component types
-  let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata, destination);
+  let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, moduleFiles, destination);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
@@ -37,7 +37,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, metadata: d.ModuleFile[], destination: string) {
+async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], destination: string) {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   const defineGlobalIntrinsicElements = destination === 'src';
@@ -48,8 +48,8 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   })
   .join('\n');
 
-  const modules = metadata.map(moduleFile => {
-    const cmpMeta = moduleFile.cmpMeta;
+  const modules = moduleFiles.map(moduleFile => {
+    const cmpMeta = moduleFile.cmpCompilerMeta;
     const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
         .replace(/\.(tsx|ts)$/, ''));
 
@@ -116,30 +116,16 @@ ${typeData.sort(sortImportNames).map(td => {
  */`;
 
   const code = `
-import '@stencil/core';
+import { JSXElements } from '@stencil/core';
 
 ${collectionTypesImportsString}
 ${typeImportString}
 ${componentsFileString}
-${defineGlobalIntrinsicElements ? generateLocalTypesFile() : ''}
 }
 `;
   return `${header}
 
 ${indentTypes(code)}`;
-}
-
-function generateLocalTypesFile() {
-
-  return `
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
-`;
 }
 
 function indentTypes(code: string) {
@@ -187,36 +173,36 @@ function sortImportNames(a: MemberNameData, b: MemberNameData) {
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: d.ComponentMeta, filePath: string) {
+function updateReferenceTypeImports(_config: d.Config, importDataObj: ImportData, _allTypes: { [key: string]: number }, _cmpMeta: d.ComponentCompilerMeta, _filePath: string) {
+
+  // TODO!!
+  // const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
+
+  // importDataObj = Object.keys(cmpMeta.membersMeta)
+  // .filter((memberName) => {
+  //   const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
+
+  //   return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable, MEMBER_TYPE.Method ].indexOf(member.memberType) !== -1 &&
+  //     member.attribType.typeReferences;
+  // })
+  // .reduce((obj, memberName) => {
+  //   const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
+  //   return updateImportReferences(obj, member.attribType.typeReferences);
+  // }, importDataObj);
 
 
-  const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
-
-  importDataObj = Object.keys(cmpMeta.membersMeta)
-  .filter((memberName) => {
-    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
-
-    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable, MEMBER_TYPE.Method ].indexOf(member.memberType) !== -1 &&
-      member.attribType.typeReferences;
-  })
-  .reduce((obj, memberName) => {
-    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
-    return updateImportReferences(obj, member.attribType.typeReferences);
-  }, importDataObj);
-
-
-  cmpMeta.eventsMeta
-  .filter((meta: d.EventMeta) => {
-    return meta.eventType && meta.eventType.typeReferences;
-  })
-  .reduce((obj, meta) => {
-    return updateImportReferences(obj, meta.eventType.typeReferences);
-  }, importDataObj);
+  // cmpMeta.eventsMeta
+  // .filter((meta: d.EventMeta) => {
+  //   return meta.eventType && meta.eventType.typeReferences;
+  // })
+  // .reduce((obj, meta) => {
+  //   return updateImportReferences(obj, meta.eventType.typeReferences);
+  // }, importDataObj);
 
   return importDataObj;
 }
 
-function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string]: number }, filePath: string) {
+export function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string]: number }, filePath: string) {
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {
       allTypes[name] = 1;
@@ -279,21 +265,21 @@ function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string
  * @param cmpMeta the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: string) {
-  const tagName = cmpMeta.tagNameMeta;
-  const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
+export function createTypesAsString(cmpMeta: d.ComponentCompilerMeta, _importPath: string) {
+  const tagName = cmpMeta.tagName;
+  const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
-  const propAttributes = membersToPropAttributes(cmpMeta.membersMeta);
-  const methodAttributes = membersToMethodAttributes(cmpMeta.membersMeta);
-  const eventAttributes = membersToEventAttributes(cmpMeta.eventsMeta);
+  // const propAttributes = membersToPropAttributes(cmpMeta.membersMeta);
+  // const methodAttributes = membersToMethodAttributes(cmpMeta.membersMeta);
+  // const eventAttributes = membersToEventAttributes(cmpMeta.eventsMeta);
   const stencilComponentAttributes = attributesToMultiLineString({
-    ...propAttributes,
-    ...methodAttributes
+    // ...propAttributes,
+    // ...methodAttributes
   }, false);
   const stencilComponentJSXAttributes = attributesToMultiLineString({
-    ...propAttributes,
-    ...eventAttributes
+    // ...propAttributes,
+    // ...eventAttributes
   }, true);
 
   return {
@@ -303,11 +289,11 @@ interface ${tagNameAsPascal} {${
   stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
 }}`,
     JSXElements: `
-interface ${jsxInterfaceName} extends StencilHTMLAttributes {${
+interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
 }}`,
     global: `
-interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
+interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLElement {}
 var ${interfaceName}: {
   prototype: ${interfaceName};
   new (): ${interfaceName};
@@ -353,7 +339,7 @@ function attributesToMultiLineString(attributes: TypeInfo, jsxAttributes: boolea
     .join(`\n`);
 }
 
-function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
+export function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
   const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
       return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ].indexOf(membersMeta[memberName].memberType) !== -1;
@@ -376,7 +362,7 @@ function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
   return interfaceData;
 }
 
-function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
+export function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
   const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
       return [ MEMBER_TYPE.Method ].indexOf(membersMeta[memberName].memberType) !== -1;
@@ -400,7 +386,7 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
 }
 
 
-function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
+export function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
   const interfaceData = eventMetaList
     .reduce((obj, eventMetaObj) => {
       const memberName = `on${captializeFirstLetter(eventMetaObj.eventName)}`;

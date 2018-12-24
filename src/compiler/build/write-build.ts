@@ -5,7 +5,7 @@ import { writeAppCollections } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return;
   }
 

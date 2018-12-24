@@ -77,8 +77,8 @@ export function serializeCollectionDependencies(compilerCtx: d.CompilerCtx) {
     const collectionDeps: d.CollectionDependencyData = {
       name: c.collectionName,
       tags: c.moduleFiles.filter(m => {
-        return !!m.cmpMeta;
-      }).map(m => m.cmpMeta.tagNameMeta).sort()
+        return !!m.cmpCompilerMeta;
+      }).map(m => m.cmpCompilerMeta.tagName).sort()
     };
     return collectionDeps;
   });

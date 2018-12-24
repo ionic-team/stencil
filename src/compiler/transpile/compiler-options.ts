@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 
 export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (compilerCtx.compilerOptions) {
+  if (compilerCtx.compilerOptions != null) {
     return compilerCtx.compilerOptions;
   }
 
