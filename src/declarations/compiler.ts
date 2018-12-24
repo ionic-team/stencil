@@ -11,46 +11,30 @@ export interface Compiler {
 
 
 export interface CompilerCtx {
-  activeBuildId?: number;
-  appCoreWWWPath?: string;
-  appFiles?: {
-    core?: string;
-    corePolyfilled?: string;
-    global?: string;
-    registryJson?: string;
-  };
-  cache?: d.Cache;
+  activeBuildId: number;
+  cache: d.Cache;
+  cachedStyleMeta: Map<string, d.StyleMeta>;
+  collections: d.CollectionCompilerMeta[];
+  compilerOptions: any;
+  events: d.BuildEvents;
+  fs: d.InMemoryFileSystem;
+  hasLoggedServerUrl: boolean;
+  hasSuccessfulBuild: boolean;
+  hasWatch: boolean;
+  isActivelyBuilding: boolean;
+  lastComponentStyleInput: Map<string, string>;
+  lastBuildHadError: boolean;
+  lastBuildResults: d.BuildResults;
+  lastBuildStyles: Map<string, string>;
+  lastRawModules: d.DerivedModule[];
+  localPrerenderServer: any;
+  moduleMap: d.ModuleMap;
+  resolvedCollections: Set<string>;
   rollupCache?: any;
-  cachedStyleMeta?: Map<string, d.StyleMeta>;
-  collections?: d.CollectionCompilerMeta[];
-  compiledModuleJsText?: d.ModuleBundles;
-  compiledModuleLegacyJsText?: d.ModuleBundles;
-  compilerOptions?: any;
-  events?: d.BuildEvents;
-  fs?: d.InMemoryFileSystem;
-  hasLoggedServerUrl?: boolean;
-  hasSuccessfulBuild?: boolean;
-  hasWatch?: boolean;
-  isActivelyBuilding?: boolean;
-  lastBuildConditionalsBrowserEsm?: d.BuildConditionals;
-  lastBuildConditionalsBrowserEs5?: d.BuildConditionals;
-  lastBuildConditionalsEsmEs5?: d.BuildConditionals;
-  lastBuildConditionalsEsmEs2017?: d.BuildConditionals;
-  lastComponentStyleInput?: Map<string, string>;
-  lastBuildHadError?: boolean;
-  lastBuildResults?: d.BuildResults;
-  lastBuildStyles?: Map<string, string>;
-  lastRawModules?: d.DerivedModule[];
-  localPrerenderServer?: any;
+  rootTsFiles: string[];
+  tsService: TsService;
 
-  /** OLD moduleFile object, migrate to use moduleMap instead */
-  moduleFiles?: d.ModuleFiles;
-
-  moduleMap?: d.ModuleMap;
-
-  resolvedCollections?: Set<string>;
-  rootTsFiles?: string[];
-  tsService?: TsService;
+  reset(): void;
 }
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<any>;

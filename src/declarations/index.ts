@@ -12,6 +12,7 @@ export * from './component-compiler-meta';
 export * from './component-interfaces';
 export * from './config';
 export * from './copy';
+export * from './core-runtime';
 export * from './decorators';
 export * from './dev-inspector';
 export * from './dev-server';

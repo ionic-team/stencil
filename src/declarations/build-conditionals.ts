@@ -1,77 +1,99 @@
+import * as d from '.';
 
 
-export type BuildCoreIds = 'core' | 'core.pf' | 'esm.es5' | 'esm.es2017';
-
-export interface BuildConditionals {
-  [key: string]: any;
-  coreId: BuildCoreIds;
-  polyfills: boolean;
-  es5: boolean;
-  cssVarShim: boolean;
-  clientSide: boolean;
-  browserModuleLoader: boolean;
-  externalModuleLoader: boolean;
-
-  // dev
-  isDev: boolean;
-  isProd: boolean;
-  devInspector: boolean;
-  hotModuleReplacement: boolean;
-  verboseError: boolean;
-  profile: boolean;
-
-  // ssr
-  ssrServerSide: boolean;
-  prerenderClientSide: boolean;
-  prerenderExternal: boolean;
+export interface BuildFeatures {
+  appModuleFiles: d.Module[];
 
   // encapsulation
-  styles: boolean;
-  hasMode: boolean;
+  style: boolean;
+  mode: boolean;
 
   // dom
   shadowDom: boolean;
   scoped: boolean;
-  slotPolyfill: boolean;
+
+  // render
+  render: boolean;
+  noRender: boolean;
+  hostData: boolean;
 
   // vdom
-  hostData: boolean;
-  hostTheme: boolean;
-  reflectToAttr: boolean;
+  vdomRender: boolean;
+  noVdomRender: boolean;
+  vdomAttribute: boolean;
+  vdomClass: boolean;
+  vdomStyle: boolean;
+  vdomKey: boolean;
+  vdomRef: boolean;
+  vdomListener: boolean;
+  vdomFunctional: boolean;
+  vdomText: boolean;
+
+  // elements
+  slot: boolean;
+  svg: boolean;
 
   // decorators
   element: boolean;
   event: boolean;
   listener: boolean;
   method: boolean;
-  propConnect: boolean;
-  propContext: boolean;
   prop: boolean;
   propMutable: boolean;
   state: boolean;
   watchCallback: boolean;
-  hasMembers: boolean;
+  member: boolean;
   updatable: boolean;
 
   // lifecycle events
+  asyncLifecycle: boolean;
+  lifecycle: boolean;
   cmpDidLoad: boolean;
   cmpWillLoad: boolean;
   cmpDidUpdate: boolean;
   cmpWillUpdate: boolean;
   cmpDidUnload: boolean;
+  connectedCallback: boolean;
+  disconnectedCallback: boolean;
 
   // attr
   observeAttr: boolean;
+  reflectToAttr: boolean;
+}
 
-  // elements
-  hasSlot: boolean;
-  hasSvg: boolean;
+export interface Build extends BuildFeatures {
+  appNamespace: string;
+  appNamespaceLower: string;
+  clientSide: boolean;
+  devInspector: boolean;
+  es5: boolean;
+  exposeEventListener: boolean;
+  exposeRequestAnimationFrame: boolean;
+  exposeTaskQueue: boolean;
+  externalModuleLoader: boolean;
+  hotModuleReplacement: boolean;
+  isDev: boolean;
+  isProd: boolean;
+  lazyLoad: boolean;
+  prerenderServerSide: boolean;
+  prerenderClientSide: boolean;
+  polyfills: boolean;
+  profile: boolean;
+  slotPolyfill: boolean;
+  syncQueue: boolean;
+  taskQueue: boolean;
+  updatable: boolean;
 }
 
 declare global {
-  var _BUILD_: BuildConditionals;
+  var BUILD: Build;
 }
 
 export interface UserBuildConditionals {
   isDev: boolean;
+}
+
+declare global {
+  /** OLD WAY */
+  var _BUILD_: any;
 }

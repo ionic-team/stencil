@@ -170,6 +170,17 @@ export interface OutputTargetDist extends OutputTargetBase {
   esmLoaderPath?: string;
 }
 
+
+export interface OutputTargetWebComponent extends OutputTargetBase {
+  type: 'webcomponent';
+
+  dir?: string;
+  buildDir?: string;
+  resourcesUrl?: string;
+  empty?: boolean;
+}
+
+
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs';
 
@@ -232,4 +243,5 @@ export type OutputTarget =
  | OutputTargetDocsReadme
  | OutputTargetHydrate
  | OutputTargetDist
+ | OutputTargetWebComponent
  | OutputTargetWww;

@@ -59,7 +59,7 @@ export interface ComponentDataDeprecated {
   componentPath?: string;
   componentClass?: string;
   dependencies?: string[];
-  styles?: StyleDataDeprecated;
+  styles?: StylesDataDeprecated;
   props?: PropManifestDeprecated[];
   states?: StateManifestDeprecated[];
   listeners?: ListenerManifestDeprecated[];

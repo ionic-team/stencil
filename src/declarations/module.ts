@@ -18,4 +18,13 @@ export interface Module {
   potentialCmpRefs?: d.PotentialComponentRef[];
   hasSlot?: boolean;
   hasSvg?: boolean;
+  hasVdomRender?: boolean;
+  hasVdomAttribute?: boolean;
+  hasVdomClass?: boolean;
+  hasVdomFunctional?: boolean;
+  hasVdomKey?: boolean;
+  hasVdomListener?: boolean;
+  hasVdomRef?: boolean;
+  hasVdomStyle?: boolean;
+  hasVdomText?: boolean;
 }
