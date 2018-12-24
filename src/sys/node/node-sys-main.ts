@@ -117,6 +117,7 @@ export class NodeSystem implements d.StencilSystem {
       version: this.packageJsonData.version,
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
       packageDir: this.packageDir,
+      distDir: this.distDir,
       typescriptVersion: this.typescriptPackageJson.version
     };
   }
