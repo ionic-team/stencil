@@ -30,7 +30,7 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
     const rollupBundle = await createBundle(config, compilerCtx, buildCtx, entryModules);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+    if (buildCtx.shouldAbort) {
       // rollup errored, so let's not continue
       return undefined;
     }
@@ -43,7 +43,7 @@ export async function generateBundleModules(config: d.Config, compilerCtx: d.Com
       await writeAmdModules(config, rollupBundle, entryModules),
     ]);
 
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+    if (buildCtx.shouldAbort) {
       // someone could have errored
       return undefined;
     }

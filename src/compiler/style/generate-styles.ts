@@ -42,7 +42,7 @@ export async function generateComponentStyles(config: d.Config, compilerCtx: d.C
 
 
 function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return true;
   }
 

@@ -60,11 +60,7 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         })
       };
 
-      const moduleFiles = compilerCtx.rootTsFiles.map(rootTsFile => {
-        return compilerCtx.moduleFiles[rootTsFile];
-      });
-
-      moduleFiles
+      buildCtx.moduleFiles
         .sort((a, b) => {
           if (a.sourceFilePath < b.sourceFilePath) return -1;
           if (a.sourceFilePath > b.sourceFilePath) return 1;

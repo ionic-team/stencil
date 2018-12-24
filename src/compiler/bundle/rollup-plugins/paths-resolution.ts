@@ -42,10 +42,8 @@ export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerC
 
             const finalPath = normalizePath(config.sys.path.join(config.rootDir, enrichedSubrule));
 
-            const moduleFiles = compilerCtx.moduleFiles;
-
             for (let i = 0; i < extensions.length; i++) {
-              const moduleFile = moduleFiles[`${finalPath}.${extensions[i]}`];
+              const moduleFile = compilerCtx.moduleMap.get(`${finalPath}.${extensions[i]}`);
 
               if (moduleFile) {
                 return moduleFile.jsFilePath;

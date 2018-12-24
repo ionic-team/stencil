@@ -57,7 +57,7 @@ async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx,
     return true;
   }
 
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return true;
   }
 

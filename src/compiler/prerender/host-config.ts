@@ -18,7 +18,7 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
   });
 
   hydrateResultss.forEach(hydrateResults => {
-    const hostRule = generateHostRule(config, compilerCtx, outputTarget, entryModules, hydrateResults);
+    const hostRule = generateHostRule(config, outputTarget, entryModules, hydrateResults);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
@@ -34,10 +34,10 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
 }
 
 
-export function generateHostRule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
+export function generateHostRule(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRule: d.HostRule = {
     include: hydrateResults.path,
-    headers: generateHostRuleHeaders(config, compilerCtx, outputTarget, entryModules, hydrateResults)
+    headers: generateHostRuleHeaders(config, outputTarget, entryModules, hydrateResults)
   };
 
   if (hostRule.headers.length === 0) {
@@ -48,11 +48,11 @@ export function generateHostRule(config: d.Config, compilerCtx: d.CompilerCtx, o
 }
 
 
-export function generateHostRuleHeaders(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
+export function generateHostRuleHeaders(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, hydrateResults);
-  addCoreJs(config, outputTarget, compilerCtx.appCoreWWWPath, hostRuleHeaders);
+  addCoreJs(config, outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
   addScripts(config, hostRuleHeaders, hydrateResults);
   addImgs(config, hostRuleHeaders, hydrateResults);

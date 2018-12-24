@@ -5,7 +5,7 @@ import { generateBundleModules } from './bundle-modules';
 
 
 export async function generateModuleMap(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.shouldAbort) {
     return null;
   }
 

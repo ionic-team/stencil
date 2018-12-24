@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
+import { AUTO_GENERATE_COMMENT } from './constants';
 import { buildWarn, normalizePath } from '../util';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
-import { AUTO_GENERATE_COMMENT } from './constants';
 import { getBuildTimestamp } from '../build/build-ctx';
 
 
@@ -20,11 +20,13 @@ export async function generateDocData(config: d.Config, compilerCtx: d.CompilerC
 
 async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocsComponent[]> {
   const cmpDirectories: Set<string> = new Set();
-  const promises = Object.keys(compilerCtx.moduleFiles)
-    .sort()
+
+  const fileNames = Array.from(compilerCtx.moduleMap.keys()).sort();
+
+  const promises = fileNames
     .filter(filePath => {
-      const moduleFile = compilerCtx.moduleFiles[filePath];
-      if (!moduleFile.cmpMeta || moduleFile.isCollectionDependency) {
+      const moduleFile = compilerCtx.moduleMap.get(filePath);
+      if (!moduleFile.cmpCompilerMeta || moduleFile.isCollectionDependency) {
         return false;
       }
       const dirPath = normalizePath(config.sys.path.dirname(filePath));
@@ -38,15 +40,16 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       return true;
     })
     .map(async filePath => {
-      const moduleFile = compilerCtx.moduleFiles[filePath];
+      const moduleFile = compilerCtx.moduleMap.get(filePath);
       const dirPath = normalizePath(config.sys.path.dirname(filePath));
       const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
       const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
 
-      const membersMeta = Object.keys(moduleFile.cmpMeta.membersMeta)
-        .sort()
-        .map(memberName => [memberName, moduleFile.cmpMeta.membersMeta[memberName]] as [string, d.MemberMeta])
-        .filter(([_, member]) => isPublic(member.jsdoc));
+      const membersMeta: any = [];
+      //  Object.keys(moduleFile.cmpCompilerMeta.membersMeta)
+      //   .sort()
+      //   .map(memberName => [memberName, moduleFile.cmpCompilerMeta.membersMeta[memberName]] as [string, d.MemberMeta])
+      //   .filter(([_, member]) => isPublic(member.jsdoc));
 
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
 
@@ -56,17 +59,18 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         fileName: config.sys.path.basename(filePath),
         readmePath,
         usagesDir,
-        tag: moduleFile.cmpMeta.tagNameMeta,
+        tag: moduleFile.cmpCompilerMeta.tagName,
         readme,
-        docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
+        docs: generateDocs(readme, moduleFile.cmpCompilerMeta.jsdoc),
         usage: await generateUsages(config, compilerCtx, usagesDir),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
-        events: getEvents(moduleFile.cmpMeta),
-        styles: getStyles(moduleFile.cmpMeta)
+        events: getEvents(moduleFile.cmpCompilerMeta),
+        styles: getStyles(moduleFile.cmpCompilerMeta)
       };
     });
+
   return Promise.all(promises);
 }
 

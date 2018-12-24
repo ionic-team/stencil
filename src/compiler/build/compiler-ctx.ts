@@ -5,6 +5,52 @@ import { InMemoryFileSystem } from '../../util/in-memory-fs';
 import { normalizePath } from '../util';
 
 
+export class CompilerContext implements d.CompilerCtx {
+  activeBuildId = -1;
+  cache: d.Cache;
+  cachedStyleMeta = new Map<string, d.StyleMeta>();
+  collections: d.CollectionCompilerMeta[] = [];
+  compilerOptions: any = null;
+  events = new BuildEvents();
+  fs: d.InMemoryFileSystem;
+  hasLoggedServerUrl = false;
+  hasSuccessfulBuild = false;
+  hasWatch = false;
+  isActivelyBuilding = false;
+  lastComponentStyleInput = new Map<string, string>();
+  lastBuildHadError = false;
+  lastBuildResults: d.BuildResults = null;
+  lastBuildStyles = new Map<string, string>();
+  lastRawModules: d.DerivedModule[] = null;
+  localPrerenderServer: any = null;
+  moduleMap: d.ModuleMap = new Map();
+  resolvedCollections = new Set<string>();
+  rollupCache: any = null;
+  rootTsFiles: string[] = [];
+  tsService: d.TsService = null;
+
+  constructor(config: d.Config) {
+    this.cache = new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys));
+    this.cache.initCacheDir();
+
+    this.fs = new InMemoryFileSystem(config.sys.fs, config.sys);
+  }
+
+  reset() {
+    this.cache.clear();
+    this.cachedStyleMeta.clear();
+    this.collections.length = 0;
+    this.compilerOptions = null;
+    this.fs.clearCache();
+    this.lastComponentStyleInput.clear();
+    this.moduleMap.clear();
+    this.resolvedCollections.clear();
+    this.rootTsFiles.length = 0;
+    this.tsService = null;
+  }
+}
+
+
 export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
   sourceFilePath = normalizePath(sourceFilePath);
 
@@ -25,69 +71,4 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
     compilerCtx.moduleMap.set(sourceFilePath, module);
     return module;
   }
-}
-
-export function getModuleFile(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
-  /** OLD WAY */
-  sourceFilePath = normalizePath(sourceFilePath);
-  return compilerCtx.moduleFiles[sourceFilePath] = compilerCtx.moduleFiles[sourceFilePath] || {
-    sourceFilePath: sourceFilePath,
-    cmpMeta: null,
-    localImports: [],
-    externalImports: [],
-    potentialCmpRefs: [],
-    isCollectionDependency: false,
-    collectionName: null
-  } as d.ModuleFile;
-}
-
-
-export function getCompilerCtx(config: d.Config, compilerCtx?: d.CompilerCtx) {
-  // reusable data between builds
-  compilerCtx = compilerCtx || {
-    activeBuildId: -1,
-    cache: null,
-    cachedStyleMeta: new Map(),
-    collections: [],
-    events: new BuildEvents(),
-    isActivelyBuilding: false,
-    fs: new InMemoryFileSystem(config.sys.fs, config.sys),
-    lastBuildStyles: new Map(),
-    lastComponentStyleInput: new Map(),
-    moduleMap: new Map(),
-    resolvedCollections: new Set()
-  };
-
-  if (!compilerCtx.cache) {
-    compilerCtx.cache = new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys));
-    compilerCtx.cache.initCacheDir();
-  }
-
-  /** OLD WAY */
-  compilerCtx.appFiles = compilerCtx.appFiles || {};
-  compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
-  compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
-  compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
-
-  return compilerCtx;
-}
-
-
-export function resetCompilerCtx(compilerCtx: d.CompilerCtx) {
-  compilerCtx.fs.clearCache();
-  compilerCtx.cache.clear();
-  compilerCtx.appFiles = {};
-  compilerCtx.moduleFiles = {};
-  compilerCtx.moduleMap.clear();
-  compilerCtx.collections.length = 0;
-  compilerCtx.resolvedCollections.clear();
-  compilerCtx.compiledModuleJsText = {};
-  compilerCtx.compiledModuleLegacyJsText = {};
-  compilerCtx.compilerOptions = null;
-  compilerCtx.cachedStyleMeta.clear();
-  compilerCtx.lastComponentStyleInput.clear();
-  compilerCtx.tsService = null;
-  compilerCtx.rootTsFiles = null;
-
-  // do NOT reset 'hasSuccessfulBuild'
 }

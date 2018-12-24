@@ -6,18 +6,12 @@ import { generateComponentEntries } from './entry-components';
 import { validateComponentTag } from '../config/validate-component';
 
 
-export function generateEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  buildCtx.entryModules = [];
-
-  const moduleFiles = Object.keys(compilerCtx.moduleFiles).map(filePath => {
-    return compilerCtx.moduleFiles[filePath];
-  });
-
+export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
   // figure out how modules and components connect
-  calcComponentDependencies(moduleFiles);
+  calcComponentDependencies(buildCtx.moduleFiles);
 
   try {
-    const allModules = validateComponentEntries(config, compilerCtx, buildCtx);
+    const allModules = validateComponentEntries(config, buildCtx);
 
     const userConfigEntryModulesTags = getUserConfigEntryTags(buildCtx, config.bundles, allModules);
 
@@ -203,13 +197,12 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
 }
 
 
-export function validateComponentEntries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx) {
   const definedTags = new Set<string>();
-  return Object.keys(compilerCtx.moduleFiles).map(filePath => {
-    const moduleFile = compilerCtx.moduleFiles[filePath];
 
-    if (moduleFile.cmpMeta) {
-      const tag = moduleFile.cmpMeta.tagNameMeta;
+  return buildCtx.moduleFiles.map(moduleFile => {
+    if (moduleFile.cmpCompilerMeta) {
+      const tag = moduleFile.cmpCompilerMeta.tagName;
       if (definedTags.has(tag)) {
         const error = buildError(buildCtx.diagnostics);
         error.messageText = `Component tag "${tag}" has been defined in multiple files: ${config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath)}`;

@@ -47,20 +47,20 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
 
       // it's possible the importee is a file pointing directly to the source ts file
       // if it is a ts file path, then we're good to go
-      var moduleFile = compilerCtx.moduleFiles[importee];
-      if (compilerCtx.moduleFiles[importee]) {
+      let moduleFile = compilerCtx.moduleMap.get(importee);
+      if (moduleFile) {
         return moduleFile.jsFilePath;
       }
 
       if (!tsFileNames) {
         // get all the module files as filenames
         // caching the filenames so we don't have to keep doing this
-        tsFileNames = Object.keys(compilerCtx.moduleFiles);
+        tsFileNames = Array.from(compilerCtx.moduleMap.keys());
       }
 
       for (let i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeE
-        moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
+        moduleFile = compilerCtx.moduleMap.get(tsFileNames[i]);
         const moduleJsFilePath = moduleFile.jsFilePath;
 
         if (moduleJsFilePath === importee) {
@@ -85,7 +85,7 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
         // get the original ts source path importer from this js path importer
         for (let i = 0; i < tsFileNames.length; i++) {
           const tsFilePath = tsFileNames[i];
-          moduleFile = compilerCtx.moduleFiles[tsFilePath];
+          moduleFile = compilerCtx.moduleMap.get(tsFilePath);
           if (moduleFile.jsFilePath !== importer) {
             continue;
           }
@@ -121,13 +121,13 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
       // think slide's swiper dependency
       for (let i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeR
-        moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
+        moduleFile = compilerCtx.moduleMap.get(tsFileNames[i]);
         if (moduleFile.jsFilePath === importer) {
           // awesome, there's a module file for this js file via importeR
           // now let's check if this module has an assets directory
-          if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
-            for (var j = 0; j < moduleFile.cmpMeta.assetsDirsMeta.length; j++) {
-              const assetsAbsPath = moduleFile.cmpMeta.assetsDirsMeta[j].absolutePath;
+          if (moduleFile.cmpCompilerMeta && moduleFile.cmpCompilerMeta.assetsDirs) {
+            for (var j = 0; j < moduleFile.cmpCompilerMeta.assetsDirs.length; j++) {
+              const assetsAbsPath = moduleFile.cmpCompilerMeta.assetsDirs[j].absolutePath;
               const importeeFileName = path.basename(importee);
               const assetsFilePath = normalizePath(path.join(assetsAbsPath, importeeFileName));
 

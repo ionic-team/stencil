@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { resetCompilerCtx } from '../build/compiler-ctx';
 import { validateConfig } from './validate-config';
 
 
@@ -10,7 +9,7 @@ export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
     configReload(config, updatedConfig);
 
     // reset the compiler context cache
-    resetCompilerCtx(compilerCtx);
+    compilerCtx.reset();
 
   } catch (e) {
     config.logger.error(e);
