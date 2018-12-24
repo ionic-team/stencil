@@ -34,7 +34,7 @@ export function createPlatformServer(
   const perf = { mark: noop, measure: noop } as any;
 
   // init build context
-  compilerCtx = compilerCtx || {};
+  compilerCtx = compilerCtx || {} as any;
 
   // the root <html> element is always the top level registered component
   cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
@@ -304,11 +304,11 @@ export function createPlatformServer(
 
 
   function runGlobalScripts() {
-    if (!compilerCtx || !compilerCtx.appFiles || !compilerCtx.appFiles.global) {
-      return;
-    }
+    // if (!compilerCtx || !compilerCtx.appFiles || !compilerCtx.appFiles.global) {
+    //   return;
+    // }
 
-    config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
+    // config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
   }
 
   function onError(err: Error, type: RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {
