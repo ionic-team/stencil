@@ -1,4 +1,4 @@
-import { transpileModule, getStaticGetter } from './transpile';
+import { getStaticGetter, transpileModule } from './transpile';
 
 
 describe('parse styles', () => {

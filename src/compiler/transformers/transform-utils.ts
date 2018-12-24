@@ -2,7 +2,7 @@ import ts from 'typescript';
 import * as d from '../../declarations';
 
 export function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
-  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key=> {
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
     const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
     return prop;
   });
