@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
 import { createStaticGetter, isDecoratorNamed, removeDecorator } from '../transform-utils';
 import ts from 'typescript';
-import { TLSSocket } from 'tls';
 
 
 export function elementDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
