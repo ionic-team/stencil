@@ -29,7 +29,7 @@ describe('parse props', () => {
     expect(t.property.attr).toBe('val');
     expect(t.property.type).toBe('string');
     expect(t.property.optional).toBe(true);
-    expect(t.cmpCompilerMeta.features.hasProp).toBe(true);
+    expect(t.cmpCompilerMeta.hasProp).toBe(true);
   });
 
   it('prop required', () => {
@@ -106,7 +106,7 @@ describe('parse props', () => {
       }
     });
     expect(t.property.reflectToAttr).toBe(true);
-    expect(t.cmpCompilerMeta.features.hasReflectToAttr).toBe(true);
+    expect(t.cmpCompilerMeta.hasReflectToAttr).toBe(true);
   });
 
   it('prop array', () => {

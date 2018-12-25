@@ -406,6 +406,7 @@ export function getLeadingComments(node: ts.Node, sourceFile: ts.SourceFile) {
       }
     }
   }
+  return undefined;
 }
 
 export function copyComments(src: ts.Node, dst: ts.Node) {

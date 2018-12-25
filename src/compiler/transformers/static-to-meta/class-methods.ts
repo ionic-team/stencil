@@ -12,37 +12,36 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
   if (classMethods.length === 0) {
     return;
   }
-  const features = cmpMeta.features;
 
-  features.hasAttributeChangedCallbackFn = classMethods.some(m => isMethod(m, 'attributeChangedCallback'));
-  features.hasConnectedCallbackFn = classMethods.some(m => isMethod(m, 'connectedCallback'));
-  features.hasDisonnectedCallbackFn = classMethods.some(m => isMethod(m, 'disconnectedCallback'));
+  cmpMeta.hasAttributeChangedCallbackFn = classMethods.some(m => isMethod(m, 'attributeChangedCallback'));
+  cmpMeta.hasConnectedCallbackFn = classMethods.some(m => isMethod(m, 'connectedCallback'));
+  cmpMeta.hasDisonnectedCallbackFn = classMethods.some(m => isMethod(m, 'disconnectedCallback'));
 
   const cmpWillLoadMethod = classMethods.find(m => isMethod(m, 'componentWillLoad')) as ts.MethodDeclaration;
   if (cmpWillLoadMethod) {
-    features.hasComponentWillLoadFn = true;
+    cmpMeta.hasComponentWillLoadFn = true;
 
     if (isAsyncFn(typeChecker, cmpWillLoadMethod)) {
-      features.hasAsyncLifecycle = true;
+      cmpMeta.hasAsyncLifecycle = true;
     }
   }
 
   const cmpWillUpdateMethod = classMethods.find(m => isMethod(m, 'componentWillUpdate')) as ts.MethodDeclaration;
   if (cmpWillUpdateMethod) {
-    features.hasComponentWillUpdateFn = true;
+    cmpMeta.hasComponentWillUpdateFn = true;
 
-    if (!features.hasAsyncLifecycle && isAsyncFn(typeChecker, cmpWillUpdateMethod)) {
-      features.hasAsyncLifecycle = true;
+    if (!cmpMeta.hasAsyncLifecycle && isAsyncFn(typeChecker, cmpWillUpdateMethod)) {
+      cmpMeta.hasAsyncLifecycle = true;
     }
   }
 
-  features.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
-  features.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
-  features.hasComponentWillUnloadFn = classMethods.some(m => isMethod(m, 'componentWillUnload'));
-  features.hasLifecycle = (features.hasComponentWillLoadFn || features.hasComponentDidLoadFn || features.hasComponentWillUpdateFn || features.hasComponentDidUpdateFn);
+  cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
+  cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
+  cmpMeta.hasComponentWillUnloadFn = classMethods.some(m => isMethod(m, 'componentWillUnload'));
+  cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn);
 
-  features.hasRenderFn = classMethods.some(m => isMethod(m, 'render'));
-  features.hasHostDataFn = classMethods.some(m => isMethod(m, 'hostData'));
+  cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render'));
+  cmpMeta.hasHostDataFn = classMethods.some(m => isMethod(m, 'hostData'));
 }
 
 

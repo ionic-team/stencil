@@ -29,7 +29,7 @@ export interface ComponentCompilerFeatures {
   isUpdateable: boolean;
 }
 
-export interface ComponentCompilerMeta {
+export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs?: CompilerAssetDir[];
   bundleIds: ComponentBundleId;
   componentClassName: string;
@@ -44,7 +44,6 @@ export interface ComponentCompilerMeta {
   styleDocs: CompilerStyleDoc[];
   styles: any;
   tagName: string;
-  features: ComponentCompilerFeatures;
 }
 
 export type ComponentBundleId = string | ComponentBundleModeIds;
@@ -58,7 +57,7 @@ export interface ComponentCompilerStaticProperty {
   optional: boolean;
   required: boolean;
   type: ComponentCompilerPropertyType;
-  complexType: ComponentCompilerPropertyComplexType;
+  complexType?: ComponentCompilerPropertyComplexType;
   attr?: string;
   reflectToAttr?: boolean;
   defaultValue?: string;

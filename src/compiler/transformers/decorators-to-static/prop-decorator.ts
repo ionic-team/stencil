@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { catchError } from '../../util';
-import { createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, objectToObjectLiteral, removeDecorator, resolveType, getLeadingComments, copyComments, typeToString } from '../transform-utils';
+import { copyComments, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, objectToObjectLiteral, removeDecorator, resolveType, typeToString } from '../transform-utils';
 import { toDashCase } from '../../../util/helpers';
 import ts from 'typescript';
 

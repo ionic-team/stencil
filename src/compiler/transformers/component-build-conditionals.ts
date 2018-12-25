@@ -3,26 +3,25 @@ import * as d from '../../declarations';
 
 
 export function gatherComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) {
-  const features = cmpMeta.features;
   if (cmpMeta.properties.length > 0) {
-    features.hasProp = true;
-    features.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
-    features.hasReflectToAttr = cmpMeta.properties.some(p => p.reflectToAttr);
-    features.hasAttr = cmpMeta.properties.some(p => typeof p.attr === 'string');
+    cmpMeta.hasProp = true;
+    cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
+    cmpMeta.hasReflectToAttr = cmpMeta.properties.some(p => p.reflectToAttr);
+    cmpMeta.hasAttr = cmpMeta.properties.some(p => typeof p.attr === 'string');
     // cmpMeta.hasWatchCallback = cmpMeta.properties.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
   }
 
   if (cmpMeta.states.length > 0) {
-    features.hasState = true;
+    cmpMeta.hasState = true;
 
-    if (!features.hasWatchCallback) {
+    if (!cmpMeta.hasWatchCallback) {
       // cmpMeta.hasWatchCallback = cmpMeta.states.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
     }
   }
 
-  features.hasMember = (features.hasProp || features.hasState || features.hasElement || features.hasMethod);
+  cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);
 
-  features.isUpdateable = (features.hasProp || features.hasState);
+  cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);
 
   // if (cmpMeta.stylesMeta) {
   //   const modeNames = Object.keys(cmpMeta.stylesMeta);

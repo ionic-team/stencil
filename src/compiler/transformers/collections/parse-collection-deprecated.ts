@@ -180,6 +180,8 @@ function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentComp
       name: propData.name,
       attr: (typeof propData.attr === 'string' ? propData.attr : null),
       mutable: !!propData.mutable,
+      optional: false, // TODO
+      required: false, // TODO
       reflectToAttr: !!propData.reflectToAttr,
       type: 'unknown'
     };
