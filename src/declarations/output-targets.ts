@@ -1,5 +1,4 @@
 import * as d from '.';
-import { JsonDocs } from './docs';
 
 
 export interface OutputTargetWww extends OutputTargetBase {
@@ -200,7 +199,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
-  generator: (docs: JsonDocs) => void | Promise<void>;
+  generator: (docs: d.JsonDocs) => void | Promise<void>;
   strict?: boolean;
 }
 

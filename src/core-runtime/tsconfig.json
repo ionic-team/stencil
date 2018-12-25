@@ -23,6 +23,7 @@
     "target": "es2017",
   },
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "../index.ts"
   ]
 }

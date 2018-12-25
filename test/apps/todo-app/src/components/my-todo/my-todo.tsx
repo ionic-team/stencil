@@ -1,4 +1,6 @@
-import { Component, State, Listen } from '../../../../../../dist/index';
+import { Component, State, Listen, h } from '../../../../../../dist/index';
+
+// var h = () => {};
 
 @Component({
   tag: 'my-todo',

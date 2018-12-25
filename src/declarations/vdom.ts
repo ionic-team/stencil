@@ -11,10 +11,6 @@ export interface Hyperscript {
   (sel: any, data: VNodeData, children: VNode): VNode;
 }
 
-declare global {
-  export var h: Hyperscript;
-}
-
 export interface VNode extends d.FVNode {
   elm?: d.RenderNode;
 }

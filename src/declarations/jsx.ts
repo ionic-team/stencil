@@ -1,18 +1,4 @@
-/**
- * This file gets copied to all distributions of stencil component collections.
- * - no imports
- */
 
-declare global {
-  interface HTMLStencilElement extends HTMLElement {
-    componentOnReady(): Promise<this>;
-    forceUpdate(): void;
-  }
-  interface StencilHTMLAttributes extends JSXElements.HTMLAttributes {}
-  interface StencilIntrinsicElements extends JSXElements.DefaultIntrinsicElements {}
-  interface StencilElementInterfaces {}
-  interface StencilGlobalHTMLAttributes {}
-}
 
 export namespace JSXElements {
   export interface DefaultIntrinsicElements {
@@ -568,7 +554,7 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface HTMLAttributes<T = HTMLElement> extends StencilGlobalHTMLAttributes, DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes {
     // vdom specific
     innerHTML?: string;
     ref?: (elm?: T) => void;
@@ -637,7 +623,7 @@ export namespace JSXElements {
     unselectable?: boolean;
   }
 
-  export interface SVGAttributes extends StencilGlobalHTMLAttributes, DOMAttributes {
+  export interface SVGAttributes extends DOMAttributes {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
