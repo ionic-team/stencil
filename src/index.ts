@@ -13,7 +13,6 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXElements,
-  Hyperscript
 } from './declarations/index';
 
 /**
@@ -72,3 +71,5 @@ export declare const PropWillChange: d.WatchDecorator;
 export declare const PropDidChange: d.WatchDecorator;
 
 export interface HostElement extends HTMLElement {}
+
+export declare function h(): void;

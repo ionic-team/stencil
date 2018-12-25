@@ -1,4 +1,4 @@
-import { Component, State, Event, EventEmitter } from '../../../../../../dist/index';
+import { Component, State, Event, EventEmitter, h } from '../../../../../../dist/index';
 
 @Component({
   tag: 'todo-input',

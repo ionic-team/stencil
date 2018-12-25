@@ -1,4 +1,4 @@
-import { Component, Prop, Event, EventEmitter } from '../../../../../../dist/index';
+import { Component, Prop, Event, EventEmitter, h } from '../../../../../../dist/index';
 
 @Component({
   tag: 'todo-item',
