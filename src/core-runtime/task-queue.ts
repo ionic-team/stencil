@@ -2,12 +2,14 @@ import * as d from '../declarations';
 import { consoleError } from './log';
 
 
-let congestion = 0;
-let rafPending = false;
-
+const state = {
+  congestion: 0,
+  rafPending: false
+};
 const domReads: d.RafCallback[] = [];
 const domWrites: d.RafCallback[] = [];
 const domWritesLow: d.RafCallback[] = [];
+
 export const resolved = (BUILD.taskQueue ? Promise.resolve() : undefined);
 
 
@@ -15,8 +17,8 @@ const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
   // queue dom reads
   queue.push(cb);
 
-  if (!rafPending) {
-    rafPending = true;
+  if (!state.rafPending) {
+    state.rafPending = true;
 
     if (BUILD.exposeRequestAnimationFrame) {
       if ((window as any)[BUILD.appNamespace] && (window as any)[BUILD.appNamespace].raf) {
@@ -62,7 +64,7 @@ const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
 
 
 const flush = () => {
-  congestion++;
+  state.congestion++;
 
   // always force a bunch of medium callbacks to run, but still have
   // a throttle on how many can run in a certain time
@@ -70,7 +72,7 @@ const flush = () => {
   // DOM READS!!!
   consume(domReads);
 
-  const timeout = performance.now() + (7 * Math.ceil(congestion * (1.0 / 22.0)));
+  const timeout = performance.now() + (7 * Math.ceil(state.congestion * (1.0 / 22.0)));
 
   // DOM WRITES!!!
   consumeTimeout(domWrites, timeout);
@@ -81,7 +83,7 @@ const flush = () => {
     domWrites.length = 0;
   }
 
-  if (rafPending = ((domReads.length + domWrites.length + domWritesLow.length) > 0)) {
+  if (state.rafPending = ((domReads.length + domWrites.length + domWritesLow.length) > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
     if (BUILD.exposeRequestAnimationFrame) {
@@ -95,10 +97,10 @@ const flush = () => {
     }
 
   } else {
-    congestion = 0;
+    state.congestion = 0;
   }
 };
 
 
-export const readTask = queueTask(domReads);
-export const writeTask = queueTask(domWrites);
+export const readTask = BUILD.taskQueue ? queueTask(domReads) : undefined;
+export const writeTask = BUILD.taskQueue ? queueTask(domWrites) : undefined;

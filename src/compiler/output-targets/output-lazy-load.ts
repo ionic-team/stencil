@@ -3,36 +3,29 @@ import { generateAppCore } from '../app-core/generate-app-core';
 import { generateBundles } from '../bundle/generate-bundles';
 import { getAppBuildCorePath } from './output-file-naming';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { generateModuleMap } from '../bundle/bundle';
 
 
-export async function generateLazyLoad(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], rawModules: d.DerivedModule[]) {
+export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], stylesPromise: Promise<void>) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
 
   const outputTargets = (config.outputTargets as d.OutputTargetBuild[]).filter(o => {
-    return o.type === 'www' || o.type === 'dist';
+    return ((o.type === 'www' || o.type === 'dist') && buildCtx.moduleFiles.length >= MIN_FOR_LAZY_LOAD);
   });
 
   if (outputTargets.length === 0) {
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate lazy load started`, true);
+  const rawModules = await generateModuleMap(config, compilerCtx, buildCtx, entryModules);
 
-  const promises = [
-    generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules),
-    generateLazyLoadCore(config, compilerCtx, buildCtx, outputTargets)
-  ];
+  await stylesPromise;
 
-  await Promise.all(promises);
+  const timespan = buildCtx.createTimeSpan(`generate app lazy components started`, true);
 
-  timespan.finish(`generate lazy load finished`);
-}
-
-
-async function generateLazyLoadCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[]) {
-  const timespan = buildCtx.createTimeSpan(`generate lazy load core started`, true);
+  await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
 
   const appModuleFiles = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta);
 
@@ -51,9 +44,9 @@ async function generateLazyLoadCore(config: d.Config, compilerCtx: d.CompilerCtx
 
   if (!buildCtx.hasError && typeof outputText === 'string') {
     await writeLazyLoadCore(config, compilerCtx, outputTargets, outputText);
-
-    timespan.finish(`generate lazy load core finished`);
   }
+
+  timespan.finish(`generate app lazy components finished`);
 }
 
 
@@ -65,3 +58,6 @@ async function writeLazyLoadCore(config: d.Config, compilerCtx: d.CompilerCtx, o
 
   await Promise.all(promises);
 }
+
+
+export const MIN_FOR_LAZY_LOAD = 6;

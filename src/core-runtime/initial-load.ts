@@ -69,8 +69,8 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       }
     }
 
-    try {
-      if (BUILD.lazyLoad) {
+    if (BUILD.lazyLoad) {
+      try {
         const LazyCstr = await loadModuleImport(elm, cmpMeta.lazyBundleIds);
 
         if (BUILD.member && !LazyCstr.isProxied) {
@@ -87,23 +87,27 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
         elmData.instance = new (LazyCstr as any)(elm);
         BUILD.member && (elmData.isConstructingInstance = false);
 
-      } else {
-        elmData.instance = elm;
+      } catch (e) {
+        consoleError(e);
       }
 
-      if (BUILD.observeAttr && cmpMeta.members) {
-        // initUpdate, webWorker.initInstance - BUILD.member
-        cmpMeta.members.forEach(member => {
-          if (member[3] && elm.hasAttribute(member[3] as any)) {
-            elmData.instanceValues.set(member[0], elm.getAttribute(member[3] as any));
-          }
-        });
-      }
+    } else {
+      elmData.instance = elm;
+    }
 
+    if (BUILD.observeAttr && cmpMeta.members) {
+      // initUpdate, webWorker.initInstance - BUILD.member
+      cmpMeta.members.forEach(member => {
+        if (member[3] && elm.hasAttribute(member[3] as any)) {
+          elmData.instanceValues.set(member[0], elm.getAttribute(member[3] as any));
+        }
+      });
+    }
+
+    if (BUILD.taskQueue) {
       writeTask(() => update(elm, elmData.instance, elmData, cmpMeta, true));
-
-    } catch (e) {
-      consoleError(e);
+    } else {
+      update(elm, elmData.instance, elmData, cmpMeta, true);
     }
   }
 };

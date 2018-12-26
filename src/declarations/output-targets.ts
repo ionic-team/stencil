@@ -231,6 +231,7 @@ export interface OutputTargetBase {
 export type OutputTargetBuild =
  | OutputTargetDist
  | OutputTargetHydrate
+ | OutputTargetWebComponent
  | OutputTargetWww;
 
 

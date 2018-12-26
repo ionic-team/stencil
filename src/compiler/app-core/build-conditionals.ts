@@ -10,6 +10,7 @@ export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.
   });
 
   const f: d.BuildFeatures = {
+    allRenderFn: cmps.every(c => c.hasRenderFn),
     appModuleFiles: appModuleFiles,
     asyncLifecycle: cmps.some(c => c.hasAsyncLifecycle),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
@@ -21,19 +22,19 @@ export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.
     disconnectedCallback: cmps.some(c => c.hasDisonnectedCallbackFn),
     element: cmps.some(c => c.hasElement),
     event: cmps.some(c => c.hasEvent),
+    hasRenderFn: cmps.some(c => (c.hasRenderFn || c.hasHostDataFn)),
     hostData: cmps.some(c => c.hasHostDataFn),
     lifecycle: cmps.some(c => c.hasLifecycle),
     listener: cmps.some(c => c.hasListener),
     member: cmps.some(c => c.hasMember),
     method: cmps.some(c => c.hasMethod),
     mode: cmps.some(c => c.hasMode),
-    noRender: cmps.every(cmpMeta => !cmpMeta.hasRenderFn),
+    noRenderFn: cmps.every(cmpMeta => !cmpMeta.hasRenderFn),
     noVdomRender: moduleFileTree.every(m => !m.hasVdomRender),
     observeAttr: cmps.some(c => c.hasAttr),
     prop: cmps.some(c => c.hasProp),
     propMutable: cmps.some(c => c.hasPropMutable),
     reflectToAttr: cmps.some(c => c.hasReflectToAttr),
-    render: cmps.some(c => (c.hasRenderFn || c.hasHostDataFn)),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
     shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
     slot: moduleFileTree.some(m => m.hasSlot),
@@ -60,11 +61,13 @@ export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.appNamespace = config.namespace;
   b.appNamespaceLower = config.fsNamespace;
+  b.isDebug = config.logLevel === 'debug';
   b.isDev = !!config.devMode;
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
   b.profile = !!(config.flags && config.flags.profile);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle || b.lazyLoad);
+  b.refs = (b.updatable || b.member || b.lifecycle || b.listener);
 
   b.exposeTaskQueue = (b.taskQueue && !!config.exposeTaskQueue);
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
@@ -94,6 +97,7 @@ function loadModuleFileTree(allModulesFiles: d.ModuleFile[], moduleFileTree: d.M
 
 export function getDefaultBuildConditionals() {
   const b: d.Build = {
+    allRenderFn: false,
     appNamespace: 'App',
     appNamespaceLower: 'app',
     appModuleFiles: [],
@@ -109,8 +113,9 @@ export function getDefaultBuildConditionals() {
     devInspector: true,
     hotModuleReplacement: true,
     style: true,
-    render: true,
-    noRender: false,
+    refs: true,
+    hasRenderFn: true,
+    noRenderFn: false,
     hostData: true,
     vdomRender: true,
     noVdomRender: false,
@@ -127,6 +132,7 @@ export function getDefaultBuildConditionals() {
     svg: true,
     mode: true,
     observeAttr: true,
+    isDebug: false,
     isDev: true,
     isProd: false,
     profile: false,

@@ -4,9 +4,7 @@ import { catchError } from '../util';
 import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
-import { generateModuleMap } from '../bundle/bundle';
 import { generateOutputTargets } from '../output-targets/generate-outputs';
-import { generateStyles } from '../style/generate-styles';
 import { initIndexHtmls } from '../html/init-index-html';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
@@ -43,16 +41,8 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
-    // bundle js modules and create each of the components's styles
-    // these can run in parallel
-    const [rawModules] = await Promise.all([
-      generateModuleMap(config, compilerCtx, buildCtx, entryModules),
-      generateStyles(config, compilerCtx, buildCtx, entryModules)
-    ]);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
-
     // generate the core app files
-    await generateOutputTargets(config, compilerCtx, buildCtx, entryModules, rawModules);
+    await generateOutputTargets(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // wait on some promises we kicked off earlier

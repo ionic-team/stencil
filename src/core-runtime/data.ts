@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 
-export const refs: d.RefMap = new WeakMap();
+export const refs: d.RefMap =  (BUILD.refs ? new WeakMap() : undefined);
 
 export const styles: d.StyleMap = (BUILD.style ? new Map() : undefined);
 

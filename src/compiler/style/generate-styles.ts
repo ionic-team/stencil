@@ -3,17 +3,15 @@ import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
 
 
-export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (canSkipGenerateStyles(buildCtx)) {
     return;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
-  const componentStyles = await Promise.all(entryModules.map(async bundle => {
-    await Promise.all(bundle.moduleFiles.map(async moduleFile => {
-      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
-    }));
+  const componentStyles = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
+    await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
   }));
 
   // create the global styles
@@ -32,11 +30,11 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile) {
-  const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
+export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module) {
+  const styles = moduleFile.cmpCompilerMeta.styles = moduleFile.cmpCompilerMeta.styles || {};
 
-  await Promise.all(Object.keys(stylesMeta).map(async modeName => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName], modeName);
+  await Promise.all(Object.keys(styles).map(async modeName => {
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, styles[modeName], modeName);
   }));
 }
 

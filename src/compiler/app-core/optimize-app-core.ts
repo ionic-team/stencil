@@ -73,6 +73,8 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
 
     if (!build.lazyLoad) {
       results.output = results.output.replace(/export(.*);/, '');
+
+      results.output = results.output.replace(/disconnectedCallback\(\){}/g, '');
     }
 
     await compilerCtx.cache.put(cacheKey, results.output);

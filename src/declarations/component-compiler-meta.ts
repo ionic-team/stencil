@@ -42,9 +42,32 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   properties: ComponentCompilerProperty[];
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
-  styles: any;
+  styles: StylesCompiler;
   tagName: string;
 }
+
+
+export interface StylesCompiler {
+  [modeName: string]: StyleCompiler;
+}
+
+
+export interface StyleCompiler {
+  styleId?: string;
+  styleStr?: string;
+  externalStyles?: ExternalStyleCompiler[];
+  compiledStyleText?: string;
+  compiledStyleTextScoped?: string;
+}
+
+
+export interface ExternalStyleCompiler {
+  absolutePath?: string;
+  cmpRelativePath?: string;
+  originalComponentPath?: string;
+  originalCollectionPath?: string;
+}
+
 
 export type ComponentBundleId = string | ComponentBundleModeIds;
 

@@ -13,8 +13,18 @@ export interface BuildFeatures {
   scoped: boolean;
 
   // render
-  render: boolean;
-  noRender: boolean;
+  /**
+   * Every component has a render function
+   */
+  allRenderFn: boolean;
+  /**
+   * At least one component has a render function
+   */
+  hasRenderFn: boolean;
+  /**
+   * No components have a render function
+   */
+  noRenderFn: boolean;
   hostData: boolean;
 
   // vdom
@@ -72,6 +82,7 @@ export interface Build extends BuildFeatures {
   exposeTaskQueue: boolean;
   externalModuleLoader: boolean;
   hotModuleReplacement: boolean;
+  isDebug: boolean;
   isDev: boolean;
   isProd: boolean;
   lazyLoad: boolean;
@@ -79,6 +90,7 @@ export interface Build extends BuildFeatures {
   prerenderClientSide: boolean;
   polyfills: boolean;
   profile: boolean;
+  refs: boolean;
   slotPolyfill: boolean;
   syncQueue: boolean;
   taskQueue: boolean;

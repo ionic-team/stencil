@@ -7,7 +7,7 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleMeta, modeName: string) {
   if (buildCtx.shouldAbort) {
     return;
   }
@@ -25,7 +25,7 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, styleMeta);
 
   // format and set the styles for use later
-  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, styleMeta.externalStyles, compiledStyles);
+  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpCompilerMeta, modeName, styleMeta.externalStyles, compiledStyles);
 
   styleMeta.compiledStyleText = compiledStyleMeta.compiledStyleText;
   styleMeta.compiledStyleTextScoped = compiledStyleMeta.compiledStyleTextScoped;
@@ -38,7 +38,7 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
 }
 
 
-async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleMeta) {
   // get all the absolute paths for each style
   const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
@@ -60,7 +60,7 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 }
 
 
-async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
+async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, extStylePath: string) {
   if (buildCtx.shouldAbort) {
     return '/* build aborted */';
   }

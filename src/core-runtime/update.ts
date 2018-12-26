@@ -32,7 +32,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
     elm.attachShadow({ mode: 'open' });
   }
 
-  if (BUILD.render) {
+  if (BUILD.hasRenderFn) {
     // tell the platform we're actively rendering
     // if a value is changed within a render() then
     // this tells the platform not to queue the change
@@ -46,7 +46,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
         // reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpCstr.properties, elmData.instance);
       }
 
-      if ((BUILD.render || BUILD.hostData || BUILD.reflectToAttr)) {
+      if ((BUILD.hasRenderFn || BUILD.hostData || BUILD.reflectToAttr)) {
         // tell the platform we're actively rendering
         // if a value is changed within a render() then
         // this tells the platform not to queue the change
@@ -92,12 +92,13 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
             elm,
             cmpMeta,
             elmData.vnode || {},
-            instance.render && instance.render(),
+            (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
             instance.hostData && instance.hostData()
           );
 
         } else if (BUILD.noVdomRender) {
-          (BUILD.shadowDom ? elm.shadowRoot || elm : elm).textContent = instance.render && instance.render() as string;
+          (BUILD.shadowDom ? elm.shadowRoot || elm : elm).textContent =
+            (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()) as string;
         }
       }
 
