@@ -10,19 +10,18 @@ const rootDir = path.join(__dirname, '..');
 analysis(
   'Hello World',
   [
-    path.join(rootDir, 'hello-world', 'www', 'build', 'app', 'hello-world.entry.js'),
-    path.join(rootDir, 'hello-world', 'www', 'build', 'app', 'app.core.js'),
+    path.join(rootDir, 'hello-world', 'www', 'build', 'app.js'),
   ]
 );
 
-analysis(
-  'Todo App',
-  [
-    path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'my-todo.entry.js'),
-    path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'app.core.js'),
-    path.join(rootDir, 'todo-app', 'www', 'build', 'app.css'),
-  ]
-);
+// analysis(
+//   'Todo App',
+//   [
+//     path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'my-todo.entry.js'),
+//     path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'app.core.js'),
+//     path.join(rootDir, 'todo-app', 'www', 'build', 'app.css'),
+//   ]
+// );
 
 
 function analysis(appName, filePaths) {

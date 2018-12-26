@@ -1,5 +1,5 @@
 {
-  "name": "@stencil/hello-world",
+  "name": "stencil-test-apps",
   "private": true,
   "scripts": {
     "analysis": "node ./.scripts/analysis.js",
