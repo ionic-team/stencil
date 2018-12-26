@@ -52,5 +52,6 @@ const VALID_TYPES = [
   'docs-json',
   'docs-custom',
   'stats',
+  'webcomponent',
   'www'
 ];

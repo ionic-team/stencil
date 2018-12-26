@@ -1,16 +1,15 @@
 import * as d from '../../declarations';
 import { formatBrowserLoaderBundleIds, formatBrowserLoaderComponent } from '../../util/data-serialize';
-import { STENCIL_CORE } from './bundle-app-core';
 import { updateComponentSource } from './generate-component';
 
 
-export async function generateNativeAppCore(_config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
+export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
 
-  c.push(`import * as Stencil from '${coreImportPath}';`);
+  c.push(`import { proxyComponent } from '${coreImportPath}';`);
 
   const promises = build.appModuleFiles.map(moduleFile => {
-    return updateToNativeComponent(compilerCtx, buildCtx, STENCIL_CORE, build, moduleFile);
+    return updateToNativeComponent(config, compilerCtx, buildCtx, coreImportPath, build, moduleFile);
   });
 
   const cmps = await Promise.all(promises);
@@ -71,10 +70,10 @@ export async function generateNativeAppCore(_config: d.Config, compilerCtx: d.Co
 }
 
 
-async function updateToNativeComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
+async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
   const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
-  const output = updateComponentSource(buildCtx, coreImportPath, build, moduleFile, inputJsText);
+  const output = updateComponentSource(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
 
   return {
     cmpData: formatBrowserLoaderComponent(moduleFile.cmpCompilerMeta),

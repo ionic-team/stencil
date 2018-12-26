@@ -122,7 +122,7 @@ function getClassMembers(classNode: ts.ClassDeclaration) {
 }
 
 
-export function updateComponentSource(buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+export function updateComponentSource(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -133,6 +133,7 @@ export function updateComponentSource(buildCtx: d.BuildCtx, coreImportPath: stri
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ts.ModuleKind.ESNext,
+        removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
       },
       fileName: moduleFile.jsFilePath,
