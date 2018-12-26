@@ -20,7 +20,7 @@ export async function generateAppCore(config: d.Config, compilerCtx: d.CompilerC
   }
 
   // bundle up the input into a nice pretty file
-  const bundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, files, bundleInput);
+  const bundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, coreImportPath, files, bundleInput);
   if (buildCtx.hasError) {
     return null;
   }

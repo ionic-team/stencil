@@ -1,4 +1,4 @@
-import { Component, State, Event, EventEmitter, h } from '../../../../../../dist/index';
+import { Component, State, Event, EventEmitter, h } from '@stencil/core';
 
 @Component({
   tag: 'todo-input',

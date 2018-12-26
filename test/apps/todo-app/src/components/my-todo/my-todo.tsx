@@ -1,6 +1,5 @@
-import { Component, State, Listen, h } from '../../../../../../dist/index';
+import { Component, State, Listen, h } from '@stencil/core';
 
-// var h = () => {};
 
 @Component({
   tag: 'my-todo',

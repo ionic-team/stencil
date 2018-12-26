@@ -5,7 +5,7 @@
  */
 
 
-import '@stencil/core';
+import { JSXElements } from '@stencil/core';
 
 
 
@@ -13,25 +13,13 @@ import '@stencil/core';
 export namespace Components {
 
   interface MyTodo {}
-  interface MyTodoAttributes extends StencilHTMLAttributes {}
+  interface MyTodoAttributes extends JSXElements.HTMLAttributes {}
 
   interface TodoInput {}
-  interface TodoInputAttributes extends StencilHTMLAttributes {
-    'onOnTodoInputSubmit'?: (event: CustomEvent) => void;
-  }
+  interface TodoInputAttributes extends JSXElements.HTMLAttributes {}
 
-  interface TodoItem {
-    'checked': boolean;
-    'index': number;
-    'text': string;
-  }
-  interface TodoItemAttributes extends StencilHTMLAttributes {
-    'checked'?: boolean;
-    'index'?: number;
-    'onOnTodoItemChecked'?: (event: CustomEvent) => void;
-    'onOnTodoItemRemove'?: (event: CustomEvent) => void;
-    'text'?: string;
-  }
+  interface TodoItem {}
+  interface TodoItemAttributes extends JSXElements.HTMLAttributes {}
 }
 
 declare global {
@@ -48,19 +36,19 @@ declare global {
   }
 
 
-  interface HTMLMyTodoElement extends Components.MyTodo, HTMLStencilElement {}
+  interface HTMLMyTodoElement extends Components.MyTodo, HTMLElement {}
   var HTMLMyTodoElement: {
     prototype: HTMLMyTodoElement;
     new (): HTMLMyTodoElement;
   };
 
-  interface HTMLTodoInputElement extends Components.TodoInput, HTMLStencilElement {}
+  interface HTMLTodoInputElement extends Components.TodoInput, HTMLElement {}
   var HTMLTodoInputElement: {
     prototype: HTMLTodoInputElement;
     new (): HTMLTodoInputElement;
   };
 
-  interface HTMLTodoItemElement extends Components.TodoItem, HTMLStencilElement {}
+  interface HTMLTodoItemElement extends Components.TodoItem, HTMLElement {}
   var HTMLTodoItemElement: {
     prototype: HTMLTodoItemElement;
     new (): HTMLTodoItemElement;
@@ -77,14 +65,5 @@ declare global {
     'todo-input': HTMLTodoInputElement;
     'todo-item': HTMLTodoItemElement;
   }
-
-
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
 
 }

@@ -4,14 +4,14 @@ import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import { normalizePath } from '../util';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, files: Map<string, string>, bundleInput: string) {
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, files: Map<string, string>, bundleInput: string) {
   let output = '';
 
   try {
     const rollup = await config.sys.rollup.rollup({
       input: INPUT_ENTRY,
       plugins: [
-        filePlugin(files, bundleInput),
+        filePlugin(coreImportPath, files, bundleInput),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -42,13 +42,16 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
 }
 
 
-function filePlugin(files: Map<string, string>, bundleInput: string) {
+function filePlugin(coreImportPath: string, files: Map<string, string>, bundleInput: string) {
   return {
     resolveId(id: string) {
       id = normalizePath(id);
 
-      if (id === INPUT_ENTRY || id === STENCIL_CORE) {
+      if (id === INPUT_ENTRY) {
         return INPUT_ENTRY;
+      }
+      if (id === STENCIL_CORE) {
+        return coreImportPath;
       }
       if (files.has(id)) {
         return id;
@@ -56,7 +59,7 @@ function filePlugin(files: Map<string, string>, bundleInput: string) {
       return null;
     },
     load(id: string) {
-      if (id === INPUT_ENTRY || id === STENCIL_CORE) {
+      if (id === INPUT_ENTRY) {
         return bundleInput;
       }
       return files.get(id);
