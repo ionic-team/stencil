@@ -66,7 +66,7 @@ export async function writeAppRegistry(config: d.Config, compilerCtx: d.Compiler
     const registryJson = JSON.stringify(appRegistry, null, 2);
 
     // cache so we can check if it changed on rebuilds
-    compilerCtx.appFiles.registryJson = registryJson;
+    // compilerCtx.appFiles.registryJson = registryJson;
 
     const appRegistryWWW = getRegistryJson(config, outputTarget);
 
