@@ -1,4 +1,4 @@
-import { Component } from '../../../../../dist/index';
+import { Component } from '@stencil/core';
 
 @Component({
   tag: 'hello-world'

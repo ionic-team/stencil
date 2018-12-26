@@ -7,7 +7,12 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
+      serviceWorker: null,
+      empty: false
+    },
+    {
+      type: 'webcomponent',
+      dir: 'www/webcomponents'
     }
   ],
 
