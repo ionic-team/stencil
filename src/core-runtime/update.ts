@@ -106,8 +106,6 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
       consoleError(e);
     }
 
-    elmData.hasRendered = true;
-
     if (BUILD.updatable) {
       // tell the platform we're done rendering
       // now any changes will again queue

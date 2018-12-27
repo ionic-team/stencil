@@ -7,8 +7,9 @@ import { update } from './update';
 import { writeTask } from './task-queue';
 
 
-export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta) => {
+export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cmpMeta?: d.ComponentRuntimeMeta) => {
   // initialConnect
+  cmpMeta = (elm as any).constructor.cmpMeta;
 
   if (BUILD.lifecycle && elmData.ancestorHostElement && !elmData.ancestorHostElement['s-rn']) {
     // initUpdate, BUILD.lifecycle
@@ -19,7 +20,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
     (elmData.ancestorHostElement['s-rc'] = elmData.ancestorHostElement['s-rc'] || []).push(() =>
       // this will get fired off when the ancestor host element
       // finally gets around to rendering its lazy self
-      initialLoad(elm, elmData, cmpMeta)
+      initialLoad(elm, elmData)
     );
 
   } else {
@@ -71,12 +72,12 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
 
     if (BUILD.lazyLoad) {
       try {
-        const LazyCstr = await loadModuleImport(elm, cmpMeta.lazyBundleIds);
+        const LazyCstr = await loadModuleImport(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
 
-        if (BUILD.member && !LazyCstr.isProxied) {
+        if (BUILD.member && !LazyCstr.isProxied && cmpMeta.members) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
-          proxyComponent(LazyCstr, cmpMeta, cmpMeta.members, true);
+          proxyComponent(LazyCstr.prototype, cmpMeta, true);
           LazyCstr.isProxied = true;
         }
 
@@ -90,9 +91,6 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       } catch (e) {
         consoleError(e);
       }
-
-    } else {
-      elmData.instance = elm;
     }
 
     if (BUILD.observeAttr && cmpMeta.members) {

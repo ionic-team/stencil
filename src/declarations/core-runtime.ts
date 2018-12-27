@@ -3,38 +3,15 @@ import * as d from '.';
 
 export interface ComponentRuntimeMeta {
   attrNameToPropName?: Map<string, string>;
-  lazyBundleIds?: any;
   members?: d.ComponentRuntimeMember[];
   scopedDomEncapsulation?: boolean;
   shadowDomEncapsulation?: boolean;
 }
 
 
-export interface ComponentLazyMeta {
-  /**
-   * tag name (ion-badge)
-   */
-  [0]: string;
-
-  /**
-   * map of bundle ids
-   */
-  [1]: ModeBundleId;
-
-  /**
-   * has styles
-   */
-  [2]: boolean;
-
-  /**
-   * members
-   */
-  [3]: ComponentRuntimeMember[];
-
-  /**
-   * encapsulated
-   */
-  [4]: number;
+export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
+  tagNameMeta?: string;
+  lazyBundleIds?: ModeBundleId;
 }
 
 

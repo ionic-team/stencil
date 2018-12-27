@@ -1,8 +1,15 @@
 import * as d from '../../declarations';
 
 
-export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta) {
+export function formatComponentRuntimeMeta(build: d.Build, compilerMeta: d.ComponentCompilerMeta) {
   const runtimeMeta: d.ComponentRuntimeMeta = {};
+
+  if (build.member) {
+    const members = formatComponentRuntimeMembers(compilerMeta);
+    if (members.length > 0) {
+      runtimeMeta.members = members;
+    }
+  }
 
   if (compilerMeta.encapsulation === 'shadow') {
     runtimeMeta.shadowDomEncapsulation = true;
@@ -14,8 +21,8 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 }
 
 
-export function formatComponentRuntimeMembers(_compilerMeta: d.ComponentCompilerMeta) {
+function formatComponentRuntimeMembers(_compilerMeta: d.ComponentCompilerMeta) {
   const runtimeMembers: d.ComponentRuntimeMember[] = [];
 
-  return JSON.stringify(runtimeMembers);
+  return runtimeMembers;
 }

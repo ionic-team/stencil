@@ -1,12 +1,10 @@
 import * as d from '../../declarations';
-import { formatComponentRuntimeMembers, formatComponentRuntimeMeta } from './format-component-runtime-meta';
+import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { updateComponentSource } from './generate-component';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
-
-  c.push(`import { proxyComponent } from '${coreImportPath}';`);
 
   const promises = build.appModuleFiles.map(moduleFile => {
     return updateToNativeComponent(config, compilerCtx, buildCtx, coreImportPath, build, moduleFile);
@@ -20,64 +18,27 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
     return 0;
   });
 
+  c.push(`import { initHostComponent } from '${coreImportPath}';`);
+
   cmps.forEach(cmpData => {
     c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
 
     files.set(cmpData.filePath, cmpData.outputText);
   });
 
-  if (build.member) {
-    // add proxies to the component's prototype
+  if (cmps.length === 1) {
+    // only one component, so get straight to the point
+    const cmp = cmps[0];
 
-    if (cmps.length === 1) {
-      // only one component, so get straight to the point
-      c.push(`// define and proxy component`);
-      const cmp = cmps[0];
-      c.push(
-        `customElements.define(
-          '${cmp.tagName}',
-          proxyComponent(
-            ${cmp.componentClassName},
-            ${formatComponentRuntimeMeta(cmp.cmpMeta)},
-            ${formatComponentRuntimeMembers(cmp.cmpMeta)},
-            1
-          )
-        );`
-      );
-
-    } else {
-      // numerous components, so make it easy on minifying
-      c.push(`// define and proxy components`);
-      c.push(formatComponentRuntimeArrays(cmps));
-      c.push(`.forEach(cmp =>
-        customElements.define(
-          cmp[0],
-          proxyComponent(
-            cmp[1],
-            cmp[2],
-            cmp[3],
-            1
-          )
-        ));`);
-    }
+    c.push(`customElements.define('${cmp.tagName}', initHostComponent(
+      ${cmp.componentClassName},
+      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpMeta))}
+    ));`);
 
   } else {
-    // no members to proxy
-    if (cmps.length === 1) {
-      // only one component, so get straight to the point
-      c.push(`// define component`);
-      const cmp = cmps[0];
-      c.push(
-        `customElements.define('${cmp.tagName}', ${cmp.componentClassName});`
-      );
-
-    } else {
-      // numerous components, so make it easy on minifying
-      c.push(`// define components`);
-      c.push(formatComponentRuntimeArrays(cmps));
-      c.push(`.forEach(cmp =>
-        customElements.define(cmp[0],cmp[1]));`);
-    }
+    // numerous components, so make it easy on minifying
+    c.push(formatComponentRuntimeArrays(build, cmps));
+    c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2])));`);
   }
 
   return c.join('\n');
@@ -101,29 +62,28 @@ async function updateToNativeComponent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-function formatComponentRuntimeArrays(cmps: ComponentSourceData[]) {
-  return `[${cmps.map(formatComponentRuntimeArray).join(', ')}]`;
+function formatComponentRuntimeArrays(build: d.Build, cmps: ComponentSourceData[]) {
+  return `[${cmps.map(cmp => {
+    return formatComponentRuntimeArray(build, cmp);
+  }).join(',\n')}]`;
 }
 
 
-function formatComponentRuntimeArray(cmp: ComponentSourceData) {
+function formatComponentRuntimeArray(build: d.Build, cmp: ComponentSourceData) {
   const c: string[] = [];
 
   c.push(`[`);
 
   // 0
-  c.push(`/* TagName */ '${cmp.tagName}'`);
+  c.push(`\n'${cmp.tagName}'`);
 
   // 1
-  c.push(`, /* Constructor */ ${cmp.componentClassName}`);
+  c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`, /* Meta */ ${formatComponentRuntimeMeta(cmp.cmpMeta)}`);
+  c.push(`,\n${formatComponentRuntimeMeta(build, cmp.cmpMeta)}`);
 
-  // 3
-  c.push(`, /* Members */ ${formatComponentRuntimeMembers(cmp.cmpMeta)}`);
-
-  c.push(`]`);
+  c.push(`]\n`);
 
   return c.join('');
 }

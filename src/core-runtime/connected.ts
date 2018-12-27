@@ -4,7 +4,7 @@ import { refs } from './data';
 import { resolved } from './task-queue';
 
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, elmData?: d.ElementData) => {
+export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData) => {
   // connectedCallback
 
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.listener) {
@@ -35,17 +35,17 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
       if (BUILD.taskQueue) {
         // connectedCallback, initUpdate BUILD.taskQueue
-        resolved.then(() => initialLoad(elm, elmData, cmpMeta));
+        resolved.then(() => initialLoad(elm, elmData));
 
       } else {
         // connectedCallback, initUpdate
-        initialLoad(elm, elmData, cmpMeta);
+        initialLoad(elm, elmData);
       }
     }
 
   } else {
     // connectedCallback, initUpdate
-    initialLoad(elm, { instance: elm }, cmpMeta);
+    initialLoad(elm, { instance: elm });
   }
 };
 

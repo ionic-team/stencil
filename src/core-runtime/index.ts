@@ -5,4 +5,4 @@ export { connectedCallback } from './connected';
 export { disconnectedCallback } from './disconnected';
 export { getElement } from './element';
 export { h } from '../renderer/vdom/h';
-export { proxyComponent } from './proxy-component';
+export { initHostComponent } from './init-host-component';

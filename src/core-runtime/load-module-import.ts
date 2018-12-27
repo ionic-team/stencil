@@ -7,7 +7,7 @@ import { consoleError } from './log';
 // import { queueUpdate } from '../core/queue-update';
 
 
-export const loadModuleImport = (elm: d.HostElement, bundleIds: any, hmrVersionId?: string) => {
+export const loadModuleImport = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {
   // self loading module using built-in browser's import()
   // this is when not using a 3rd party bundler
   // and components are able to lazy load themselves

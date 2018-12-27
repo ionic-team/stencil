@@ -9,6 +9,8 @@ export interface ComponentConstructor {
   style?: string;
   styleMode?: string;
   encapsulation?: Encapsulation;
+  cmpMeta?: d.ComponentRuntimeMeta;
+  observedAttributes?: string[];
 }
 
 

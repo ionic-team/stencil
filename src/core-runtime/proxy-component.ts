@@ -5,13 +5,13 @@ import { refs } from './data';
 import { setValue } from './set-value';
 
 
-export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, members: d.ComponentRuntimeMember[], proxyState?: boolean) => {
+export const proxyComponent = (CstrPrototype: any, cmpMeta: d.ComponentRuntimeMeta, proxyState?: boolean) =>
   // proxyComponent
-  members && members.forEach(cmpMember => {
+  cmpMeta.members.forEach(cmpMember => {
 
     if ((BUILD.prop && ((cmpMember[1] === MEMBER_TYPE.Prop) || (cmpMember[1] === MEMBER_TYPE.PropMutable))) || (BUILD.state && (cmpMember[1] === MEMBER_TYPE.State) && proxyState)) {
       // proxyMember - prop
-      Object.defineProperty((Cstr as any).prototype, cmpMember[0],
+      Object.defineProperty(CstrPrototype, cmpMember[0],
         {
           get(this: d.HostElement) {
             // proxyMember, get value
@@ -27,12 +27,9 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
     } else if (BUILD.method && (cmpMember[1] === MEMBER_TYPE.Method)) {
       // proxyMember - method
-      Object.defineProperty((Cstr as any).prototype, cmpMember[0], {
+      Object.defineProperty(CstrPrototype, cmpMember[0], {
         value: noop,
         configurable: true
       });
     }
   });
-
-  return Cstr;
-};
