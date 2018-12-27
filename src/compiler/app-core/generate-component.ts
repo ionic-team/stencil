@@ -4,12 +4,12 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 
 
-export function updateComponentForBuild(moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
+export function updateComponentForBuild(build: d.Build, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
   return (transformContext) => {
 
     function visitNode(node: ts.Node) {
       if (isComponentClassNode(node, moduleFile)) {
-        return updateComponentClass(node);
+        return updateComponentClass(build, node);
       }
       return node;
     }
@@ -19,7 +19,7 @@ export function updateComponentForBuild(moduleFile: d.Module): ts.TransformerFac
 }
 
 
-function updateComponentClass(classNode: ts.ClassDeclaration) {
+function updateComponentClass(build: d.Build, classNode: ts.ClassDeclaration) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -27,7 +27,7 @@ function updateComponentClass(classNode: ts.ClassDeclaration) {
     classNode.name,
     classNode.typeParameters,
     getClassHeritageClauses(classNode),
-    getClassMembers(classNode)
+    getClassMembers(build, classNode)
   );
 }
 
@@ -79,7 +79,7 @@ function addDisconnectedCallback() {
 }
 
 
-function getClassMembers(classNode: ts.ClassDeclaration) {
+function getClassMembers(_build: d.Build, classNode: ts.ClassDeclaration) {
   const classMembers: ts.ClassElement[] = [];
 
   classMembers.push(
@@ -95,19 +95,7 @@ function getClassMembers(classNode: ts.ClassDeclaration) {
       const memberName = (classMember.name as any).escapedText;
 
       if (classMember.modifiers.some(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
-        if (memberName === 'is') {
-          return;
-        }
-        if (memberName === 'properties') {
-          return;
-        }
-        if (memberName === 'encapsulation') {
-          return;
-        }
-        if (memberName === 'style') {
-          return;
-        }
-        if (memberName === 'styleMode') {
+        if (REMOVE_STATIC_GETTERS.has(memberName)) {
           return;
         }
       }
@@ -120,6 +108,10 @@ function getClassMembers(classNode: ts.ClassDeclaration) {
 
   return classMembers;
 }
+
+const REMOVE_STATIC_GETTERS = new Set([
+  'is', 'properties', 'encapsulation', 'events', 'listeners', 'states', 'style', 'styleMode', 'styleUrl'
+]);
 
 
 export function updateComponentSource(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
@@ -139,7 +131,7 @@ export function updateComponentSource(config: d.Config, buildCtx: d.BuildCtx, co
       fileName: moduleFile.jsFilePath,
       transformers: {
         after: [
-          updateComponentForBuild(moduleFile)
+          updateComponentForBuild(build, moduleFile)
         ]
       }
     };

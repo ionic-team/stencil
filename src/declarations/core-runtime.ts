@@ -4,7 +4,7 @@ import * as d from '.';
 export interface ComponentRuntimeMeta {
   attrNameToPropName?: Map<string, string>;
   lazyBundleIds?: any;
-  members?: d.ComponentMember[];
+  members?: d.ComponentRuntimeMember[];
   scopedDomEncapsulation?: boolean;
   shadowDomEncapsulation?: boolean;
 }
@@ -29,7 +29,7 @@ export interface ComponentLazyMeta {
   /**
    * members
    */
-  [3]: ComponentMember[];
+  [3]: ComponentRuntimeMember[];
 
   /**
    * encapsulated
@@ -38,7 +38,7 @@ export interface ComponentLazyMeta {
 }
 
 
-export interface ComponentMember {
+export interface ComponentRuntimeMember {
   /**
    * member name
    */

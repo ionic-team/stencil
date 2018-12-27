@@ -5,7 +5,7 @@ import { refs } from './data';
 import { setValue } from './set-value';
 
 
-export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, members: d.ComponentMember[], proxyState?: boolean) =>
+export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, members: d.ComponentRuntimeMember[], proxyState?: boolean) => {
   // proxyComponent
   members && members.forEach(cmpMember => {
 
@@ -33,3 +33,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       });
     }
   });
+
+  return Cstr;
+};

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { formatBrowserLoaderBundleIds, formatBrowserLoaderComponent } from '../../util/data-serialize';
+import { formatComponentRuntimeMembers, formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { updateComponentSource } from './generate-component';
 
 
@@ -14,55 +14,69 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
   const cmps = await Promise.all(promises);
 
-  const cmpData: {
-    /** componentClass */
-    [0]: string;
-    [1]: any ;
-  }[] = [];
-
   cmps.sort((a, b) => {
     if (a.componentClassName < b.componentClassName) return -1;
     if (a.componentClassName > b.componentClassName) return 1;
     return 0;
-  }).forEach(mutatedComponent => {
-    c.push(`import { ${mutatedComponent.componentClassName} } from '${mutatedComponent.filePath}';`);
-    files.set(mutatedComponent.filePath, mutatedComponent.output);
+  });
 
-    cmpData.push([
-      mutatedComponent.componentClassName,
-      mutatedComponent.cmpData
-    ]);
+  cmps.forEach(cmpData => {
+    c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
+
+    files.set(cmpData.filePath, cmpData.outputText);
   });
 
   if (build.member) {
     // add proxies to the component's prototype
 
-    if (cmpData.length === 1) {
+    if (cmps.length === 1) {
       // only one component, so get straight to the point
-      const cmp = cmpData[0];
+      c.push(`// define and proxy component`);
+      const cmp = cmps[0];
       c.push(
-        `customElements.define('${cmp[1][0]}', proxyComponent(plt, ${cmp[0]}, ${JSON.stringify(cmp[1])}, 1));`
+        `customElements.define(
+          '${cmp.tagName}',
+          proxyComponent(
+            ${cmp.componentClassName},
+            ${formatComponentRuntimeMeta(cmp.cmpMeta)},
+            ${formatComponentRuntimeMembers(cmp.cmpMeta)},
+            1
+          )
+        );`
       );
 
     } else {
       // numerous components, so make it easy on minifying
-      c.push(`${JSON.stringify(cmps)}
-        .forEach(cmp => customElements.define(
-          cmp[1][0],
-          proxyComponent(plt, cmp[0], cmp[1], 1)
+      c.push(`// define and proxy components`);
+      c.push(formatComponentRuntimeArrays(cmps));
+      c.push(`.forEach(cmp =>
+        customElements.define(
+          cmp[0],
+          proxyComponent(
+            cmp[1],
+            cmp[2],
+            cmp[3],
+            1
+          )
         ));`);
     }
 
   } else {
     // no members to proxy
-    if (build.appModuleFiles.length === 1) {
-      const cmpMeta = build.appModuleFiles[0].cmpCompilerMeta;
-
-      c.push(`customElements.define('${cmpMeta.tagName}', ${cmpMeta.componentClassName});`);
+    if (cmps.length === 1) {
+      // only one component, so get straight to the point
+      c.push(`// define component`);
+      const cmp = cmps[0];
+      c.push(
+        `customElements.define('${cmp.tagName}', ${cmp.componentClassName});`
+      );
 
     } else {
-      c.push(`[${build.appModuleFiles.map(m => m.cmpCompilerMeta.componentClassName).join(', ')}]
-        .forEach(c => customElements.define(c.is, c));`);
+      // numerous components, so make it easy on minifying
+      c.push(`// define components`);
+      c.push(formatComponentRuntimeArrays(cmps));
+      c.push(`.forEach(cmp =>
+        customElements.define(cmp[0],cmp[1]));`);
     }
   }
 
@@ -73,13 +87,52 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
   const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
-  const output = updateComponentSource(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
+  const outputText = updateComponentSource(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
 
-  return {
-    cmpData: formatBrowserLoaderComponent(moduleFile.cmpCompilerMeta),
+  const cmpData: ComponentSourceData = {
     filePath: moduleFile.jsFilePath,
-    output: output,
+    outputText: outputText,
+    tagName: moduleFile.cmpCompilerMeta.tagName,
     componentClassName: moduleFile.cmpCompilerMeta.componentClassName,
-    bundleIds: formatBrowserLoaderBundleIds(moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds),
+    cmpMeta: moduleFile.cmpCompilerMeta
   };
+
+  return cmpData;
+}
+
+
+function formatComponentRuntimeArrays(cmps: ComponentSourceData[]) {
+  return `[${cmps.map(formatComponentRuntimeArray).join(', ')}]`;
+}
+
+
+function formatComponentRuntimeArray(cmp: ComponentSourceData) {
+  const c: string[] = [];
+
+  c.push(`[`);
+
+  // 0
+  c.push(`/* TagName */ '${cmp.tagName}'`);
+
+  // 1
+  c.push(`, /* Constructor */ ${cmp.componentClassName}`);
+
+  // 2
+  c.push(`, /* Meta */ ${formatComponentRuntimeMeta(cmp.cmpMeta)}`);
+
+  // 3
+  c.push(`, /* Members */ ${formatComponentRuntimeMembers(cmp.cmpMeta)}`);
+
+  c.push(`]`);
+
+  return c.join('');
+}
+
+
+interface ComponentSourceData {
+  filePath: string;
+  outputText: string;
+  tagName: string;
+  componentClassName: string;
+  cmpMeta: d.ComponentCompilerMeta;
 }

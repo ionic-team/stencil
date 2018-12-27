@@ -14,14 +14,13 @@ analysis(
   ]
 );
 
-// analysis(
-//   'Todo App',
-//   [
-//     path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'my-todo.entry.js'),
-//     path.join(rootDir, 'todo-app', 'www', 'build', 'app', 'app.core.js'),
-//     path.join(rootDir, 'todo-app', 'www', 'build', 'app.css'),
-//   ]
-// );
+analysis(
+  'Todo App',
+  [
+    path.join(rootDir, 'todo-app', 'www', 'build', 'app.js'),
+    path.join(rootDir, 'todo-app', 'www', 'build', 'app.css'),
+  ]
+);
 
 
 function analysis(appName, filePaths) {
