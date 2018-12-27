@@ -60,16 +60,23 @@ export declare const State: d.StateDecorator;
  */
 export declare const Watch: d.WatchDecorator;
 
-/**
- * Deprecated: Please use @Watch decorator instead
- */
-export declare const PropWillChange: d.WatchDecorator;
-
-/**
- * Deprecated: Please use @Watch decorator instead
- */
-export declare const PropDidChange: d.WatchDecorator;
 
 export interface HostElement extends HTMLElement {}
 
-export declare function h(): void;
+export declare namespace h {
+  export function h(sel: any): d.VNode;
+  export function h(sel: Node, data: d.VNodeData): d.VNode;
+  export function h(sel: any, data: d.VNodeData): d.VNode;
+  export function h(sel: any, text: string): d.VNode;
+  export function h(sel: any, children: Array<d.VNode | undefined | null>): d.VNode;
+  export function h(sel: any, data: d.VNodeData, text: string): d.VNode;
+  export function h(sel: any, data: d.VNodeData, children: Array<d.VNode | undefined | null>): d.VNode;
+  export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
+
+  export namespace JSX {
+    export interface Element {}
+    export interface IntrinsicElements extends d.JSXElements.DefaultIntrinsicElements {
+      [tagName: string]: any;
+    }
+  }
+}
