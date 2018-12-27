@@ -93,8 +93,8 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       }
     }
 
-    if (BUILD.observeAttr && cmpMeta.members) {
-      // initUpdate, webWorker.initInstance - BUILD.member
+    if (BUILD.member && cmpMeta.members) {
+      // initUpdate BUILD.member
       cmpMeta.members.forEach(member => {
         if (member[3] && elm.hasAttribute(member[3] as any)) {
           elmData.instanceValues.set(member[0], elm.getAttribute(member[3] as any));

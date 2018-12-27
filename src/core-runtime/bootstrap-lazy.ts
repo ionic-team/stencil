@@ -15,18 +15,6 @@ export const bootstrapLazy = (cmpLazyMetaData: d.ComponentLazyRuntimeMeta[]) => 
     class StencilLayHost extends HTMLElement {
       // StencilLazyHost
 
-      constructor() {
-        super();
-
-        const elmData: d.ElementData = {
-          elm: this,
-          instanceValues: new Map(),
-          instance: null
-        };
-
-        refs.set(this, elmData);
-      }
-
       connectedCallback() {
         connectedCallback(this);
       }

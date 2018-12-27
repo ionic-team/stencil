@@ -10,6 +10,14 @@ export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData) =
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.listener) {
     elmData = refs.get(elm);
 
+    if (!elmData) {
+      refs.set(elm, elmData = {
+        elm: elm,
+        instanceValues: new Map(),
+        instance: BUILD.lazyLoad ? null : elm
+      });
+    }
+
     if (BUILD.listener) {
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
