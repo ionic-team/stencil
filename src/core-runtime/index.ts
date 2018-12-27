@@ -1,5 +1,4 @@
 
-export { attributeChangedCallback } from './attribute-changed';
 export { bootstrapLazy } from './bootstrap-lazy';
 export { connectedCallback } from './connected';
 export { disconnectedCallback } from './disconnected';

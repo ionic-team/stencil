@@ -26,10 +26,6 @@ export function updateComponentForBuild(build: d.Build, coreImportPath: string, 
 
       addImport(cmp, 'connectedCallback');
 
-      if (cmp.build.observeAttr) {
-        addImport(cmp, 'attributeChangedCallback');
-      }
-
       return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
     };
   };
@@ -75,18 +71,12 @@ function getClassHeritageClauses(classNode: ts.ClassDeclaration) {
 }
 
 
-function getClassMembers(cmp: ComponentData, classNode: ts.ClassDeclaration) {
+function getClassMembers(_cmp: ComponentData, classNode: ts.ClassDeclaration) {
   const classMembers: ts.ClassElement[] = [];
 
   classMembers.push(
     addComponentCallback('connectedCallback')
   );
-
-  if (cmp.build.observeAttr) {
-    classMembers.push(
-      addComponentCallback('attributeChangedCallback')
-    );
-  }
 
   classNode.members.forEach(classMember => {
     if (classMember.modifiers) {

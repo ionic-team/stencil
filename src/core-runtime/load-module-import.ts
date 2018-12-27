@@ -1,17 +1,11 @@
 import * as d from '../declarations';
+import { consoleError } from './log';
 import { dashToPascalCase } from '../util/helpers';
 import { supportsShadowDom } from './data';
-import { consoleError } from './log';
-// import { initStyleTemplate } from '../core/styles';
-// import * as perf from '../util/perf';
-// import { queueUpdate } from '../core/queue-update';
 
 
 export const loadModuleImport = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {
-  // self loading module using built-in browser's import()
-  // this is when not using a 3rd party bundler
-  // and components are able to lazy load themselves
-  // through standardized browser APIs
+  // loadModuleImport
   const bundleId = (BUILD.mode && typeof bundleIds !== 'string')
     ? (bundleIds as d.BundleIds)[elm.mode]
     : bundleIds;

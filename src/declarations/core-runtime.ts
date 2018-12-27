@@ -2,7 +2,6 @@ import * as d from '.';
 
 
 export interface ComponentRuntimeMeta {
-  attrNameToPropName?: Map<string, string>;
   members?: d.ComponentRuntimeMember[];
   scopedDomEncapsulation?: boolean;
   shadowDomEncapsulation?: boolean;

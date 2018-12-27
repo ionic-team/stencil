@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { attributeChangedCallback } from './attribute-changed';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initHostComponent } from './init-host-component';
@@ -22,12 +21,6 @@ export const bootstrapLazy = (cmpLazyMetaData: d.ComponentLazyRuntimeMeta[]) => 
       disconnectedCallback() {
         if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.listener) {
           disconnectedCallback(this);
-        }
-      }
-
-      attributeChangedCallback(attrName: string, _oldValue: string, newValue: string) {
-        if (BUILD.observeAttr) {
-          attributeChangedCallback(this, cmpMeta.attrNameToPropName, attrName, newValue);
         }
       }
 
