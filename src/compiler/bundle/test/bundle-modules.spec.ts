@@ -69,7 +69,6 @@ describe('bundle-module', () => {
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      console.log(c.fs.keys);
       expectFiles(c.fs, [
         path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'),
