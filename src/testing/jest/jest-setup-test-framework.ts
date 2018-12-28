@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { expectExtend } from '../matchers';
-import { getDefaultBuildConditionals } from '../../build-conditionals';
+import { getDefaultBuildConditionals } from '../../compiler/app-core/build-conditionals';
 import { h } from '../../renderer/vdom/h';
 import { applyWindowToGlobal } from '@stencil/core/mock-doc';
 
@@ -8,7 +8,7 @@ import { applyWindowToGlobal } from '@stencil/core/mock-doc';
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global._BUILD_ = getDefaultBuildConditionals();
+  global.BUILD = getDefaultBuildConditionals();
   global.Context = {};
   global.h = h;
   global.resourcesUrl = '/build';

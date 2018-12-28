@@ -1,19 +1,19 @@
 
 export interface StyleCompiler {
   modeName: string;
-  styleId?: string;
-  styleStr?: string;
-  externalStyles?: ExternalStyleCompiler[];
-  compiledStyleText?: string;
-  compiledStyleTextScoped?: string;
+  styleId: string;
+  styleStr: string;
+  externalStyles: ExternalStyleCompiler[];
+  compiledStyleText: string;
+  compiledStyleTextScoped: string;
 }
 
 
 export interface ExternalStyleCompiler {
-  absolutePath?: string;
-  cmpRelativePath?: string;
-  originalComponentPath?: string;
-  originalCollectionPath?: string;
+  absolutePath: string;
+  relativePath: string;
+  originalComponentPath: string;
+  originalCollectionPath: string;
 }
 
 

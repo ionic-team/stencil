@@ -142,26 +142,29 @@ function parseAssetsDir(config: d.Config, collectionDir: string, cmpData: d.Comp
 function parseStyle(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
   const modeStyle: d.StyleCompiler = {
     modeName: modeName,
-    styleStr: modeStyleData.style
+    styleId: null,
+    styleStr: modeStyleData.style,
+    externalStyles: [],
+    compiledStyleText: null,
+    compiledStyleTextScoped: null
   };
 
-  if (modeStyleData.stylePaths) {
-    modeStyle.externalStyles = modeStyleData.stylePaths.map(stylePath => {
-      const externalStyle: d.ExternalStyleCompiler = {};
+  if (Array.isArray(modeStyleData.stylePaths)) {
+    modeStyleData.stylePaths.forEach(stylePath => {
+      const externalStyle: d.ExternalStyleCompiler = {
+        absolutePath: normalizePath(config.sys.path.join(
+          collectionDir,
+          stylePath
+        )),
+        relativePath: normalizePath(config.sys.path.relative(
+          config.sys.path.dirname(cmpData.componentPath),
+          stylePath
+        )),
+        originalCollectionPath: stylePath,
+        originalComponentPath: stylePath
+      };
 
-      externalStyle.absolutePath = normalizePath(config.sys.path.join(
-        collectionDir,
-        stylePath
-      ));
-
-      externalStyle.cmpRelativePath = normalizePath(config.sys.path.relative(
-        config.sys.path.dirname(cmpData.componentPath),
-        stylePath
-      ));
-
-      externalStyle.originalCollectionPath = normalizePath(stylePath);
-
-      return externalStyle;
+      modeStyle.externalStyles.push(externalStyle);
     });
   }
 

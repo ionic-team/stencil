@@ -148,7 +148,7 @@ export interface EventInitDict {
 
 
 export interface JestEnvironmentGlobal {
-  _BUILD_: any;
+  BUILD: any;
   __NEW_TEST_PAGE__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;

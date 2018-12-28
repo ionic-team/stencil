@@ -5,7 +5,6 @@ const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const rollupJson = require('rollup-plugin-json');
 const transpile = require('./transpile');
-const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-testing');
@@ -17,12 +16,6 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const success = transpile(path.join('..', 'src', 'testing', 'tsconfig.json'));
 
 if (success) {
-
-  const buildConditionals = getDefaultBuildConditionals();
-  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`_BUILD_.${key}`] = buildConditionals[key];
-    return all;
-  }, {});
 
   function bundleTestingUtils() {
     rollup.rollup({
@@ -66,10 +59,7 @@ if (success) {
           preferBuiltins: true
         }),
         rollupCommonjs(),
-        rollupJson(),
-        rollupPluginReplace({
-          values: replaceObj
-        })
+        rollupJson()
       ],
       onwarn: (message) => {
         if (message.code === 'THIS_IS_UNDEFINED') return;

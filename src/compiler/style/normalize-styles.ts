@@ -1,74 +1,40 @@
-import { Config, ExternalStyleMeta, StylesMeta } from '../../declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function normalizeStyles(config: Config, componentFilePath: string, stylesMeta: StylesMeta) {
-  const newStylesMeta: StylesMeta = {};
-
-  Object.keys(stylesMeta).forEach((modeName) => {
-    newStylesMeta[modeName] = {
-      externalStyles: []
-    };
-
-    const externalStyles = stylesMeta[modeName].externalStyles || [];
-
-    newStylesMeta[modeName].externalStyles = externalStyles.map(externalStyle => {
-      const { cmpRelativePath, absolutePath } = normalizeModeStylePaths(config, componentFilePath, externalStyle.originalComponentPath);
-
-      const normalizedExternalStyles: ExternalStyleMeta = {
-        absolutePath: absolutePath,
-        cmpRelativePath: cmpRelativePath,
-        originalComponentPath: externalStyle.originalComponentPath,
-        originalCollectionPath: externalStyle.originalCollectionPath
-      };
-
-      return normalizedExternalStyles;
-    });
-
-    if (typeof stylesMeta[modeName].styleStr === 'string') {
-      newStylesMeta[modeName].styleStr = stylesMeta[modeName].styleStr;
+export function normalizeStyles(config: d.Config, componentFilePath: string, styles: d.StyleCompiler[]) {
+  styles.forEach(style => {
+    if (Array.isArray(style.externalStyles)) {
+      style.externalStyles.forEach(externalStyle => {
+        normalizeExternalStyle(config, componentFilePath, externalStyle);
+      });
     }
   });
-
-  return newStylesMeta;
 }
 
 
-function normalizeModeStylePaths(config: Config, componentFilePath: string, stylePath: string) {
-  let cmpRelativePath: string;
-  let absolutePath: string;
+function normalizeExternalStyle(config: d.Config, componentFilePath: string, externalStyle: d.ExternalStyleCompiler) {
+  if (typeof externalStyle.originalComponentPath !== 'string' || externalStyle.originalComponentPath.trim().length === 0) {
+    return;
+  }
 
   // get the absolute path of the directory which the component is sitting in
-  const componentDir = normalizePath(config.sys.path.dirname(componentFilePath));
+  const componentDir = config.sys.path.dirname(componentFilePath);
 
-  // get the relative path from the component file to the style
-  let componentRelativeStylePath = normalizePath(stylePath.trim());
-
-  if (config.sys.path.isAbsolute(componentRelativeStylePath)) {
+  if (config.sys.path.isAbsolute(externalStyle.originalComponentPath)) {
     // this path is absolute already!
     // add to our list of style absolute paths
-    absolutePath = componentRelativeStylePath;
+    externalStyle.absolutePath = normalizePath(externalStyle.originalComponentPath);
 
     // if this is an absolute path already, let's convert it to be relative
-    componentRelativeStylePath = config.sys.path.relative(componentDir, componentRelativeStylePath);
-
-    // add to our list of style relative paths
-    cmpRelativePath = componentRelativeStylePath;
+    externalStyle.relativePath = normalizePath(config.sys.path.relative(componentDir, externalStyle.originalComponentPath));
 
   } else {
     // this path is relative to the component
     // add to our list of style relative paths
-    cmpRelativePath = componentRelativeStylePath;
+    externalStyle.relativePath = normalizePath(externalStyle.originalComponentPath);
 
     // create the absolute path to the style file
-    const absoluteStylePath = normalizePath(config.sys.path.join(componentDir, componentRelativeStylePath));
-
-    // add to our list of style absolute paths
-    absolutePath = absoluteStylePath;
+    externalStyle.absolutePath = normalizePath(config.sys.path.join(componentDir, externalStyle.originalComponentPath));
   }
-
-  return {
-    cmpRelativePath,
-    absolutePath
-  };
 }

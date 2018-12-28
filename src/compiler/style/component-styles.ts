@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
@@ -27,8 +27,8 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   // format and set the styles for use later
   const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpCompilerMeta, modeName, styleMeta.externalStyles, compiledStyles);
 
-  styleMeta.compiledStyleText = compiledStyleMeta.compiledStyleText;
-  styleMeta.compiledStyleTextScoped = compiledStyleMeta.compiledStyleTextScoped;
+  styleMeta.compiledStyleText = compiledStyleMeta.styleText;
+  styleMeta.compiledStyleTextScoped = compiledStyleMeta.styleTextScoped;
 
   if (config.watch) {
     // since this is a watch and we'll be checking this again
@@ -173,13 +173,12 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
-  const styleMeta: d.StyleCompiler = {
-    modeName: modeName
-  };
-
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
   // join all the component's styles for this mode together into one line
-  styleMeta.compiledStyleText = compiledStyles.join('\n\n').trim();
+  const compiledStyle = {
+    styleText: compiledStyles.join('\n\n').trim(),
+    styleTextScoped: null as string
+  };
 
   let filePath: string = null;
   const externalStyle = externalStyles && externalStyles.length && externalStyles[0];
@@ -188,20 +187,19 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   // auto add css prefixes and minifies when configured
-  styleMeta.compiledStyleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath, true);
+  compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
 
-  if (requiresScopedStyles(cmpMeta.encapsulationMeta, config)) {
+  if (requiresScopedStyles(cmpMeta.encapsulation, config)) {
     // only create scoped styles if we need to
-    const compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
-    styleMeta.compiledStyleTextScoped = compiledStyleTextScoped;
-    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
-      styleMeta.compiledStyleText = compiledStyleTextScoped;
+    compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, compiledStyle.styleText);
+    if (cmpMeta.encapsulation === 'scoped') {
+      compiledStyle.styleText = compiledStyle.styleTextScoped;
     }
   }
 
   // by default the compiledTextScoped === compiledStyleText
-  if (!styleMeta.compiledStyleTextScoped) {
-    styleMeta.compiledStyleTextScoped = styleMeta.compiledStyleText;
+  if (!compiledStyle.styleTextScoped) {
+    compiledStyle.styleTextScoped = compiledStyle.styleText;
   }
 
   let addStylesUpdate = false;
@@ -209,8 +207,8 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   // test to see if the last styles are different
   const styleId = getStyleId(cmpMeta, modeName, false);
-  if (compilerCtx.lastBuildStyles.get(styleId) !== styleMeta.compiledStyleText) {
-    compilerCtx.lastBuildStyles.set(styleId, styleMeta.compiledStyleText);
+  if (compilerCtx.lastBuildStyles.get(styleId) !== compiledStyle.styleText) {
+    compilerCtx.lastBuildStyles.set(styleId, compiledStyle.styleText);
 
     if (buildCtx.isRebuild) {
       addStylesUpdate = true;
@@ -218,8 +216,8 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   const scopedStyleId = getStyleId(cmpMeta, modeName, true);
-  if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== styleMeta.compiledStyleTextScoped) {
-    compilerCtx.lastBuildStyles.set(scopedStyleId, styleMeta.compiledStyleTextScoped);
+  if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== compiledStyle.styleTextScoped) {
+    compilerCtx.lastBuildStyles.set(scopedStyleId, compiledStyle.styleTextScoped);
 
     if (buildCtx.isRebuild) {
       addScopedStylesUpdate = true;
@@ -232,31 +230,31 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesUpdated = buildCtx.stylesUpdated || [];
 
     buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagNameMeta,
+      styleTag: cmpMeta.tagName,
       styleMode: styleMode,
-      styleText: styleMeta.compiledStyleText,
+      styleText: compiledStyle.styleText,
       isScoped: false
     });
   }
 
   if (addScopedStylesUpdate) {
     buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagNameMeta,
+      styleTag: cmpMeta.tagName,
       styleMode: styleMode,
-      styleText: styleMeta.compiledStyleTextScoped,
+      styleText: compiledStyle.styleTextScoped,
       isScoped: true
     });
   }
 
-  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
-  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
+  compiledStyle.styleText = escapeCssForJs(compiledStyle.styleText);
+  compiledStyle.styleTextScoped = escapeCssForJs(compiledStyle.styleTextScoped);
 
-  return styleMeta;
+  return compiledStyle;
 }
 
 
-function getStyleId(cmpMeta: d.ComponentMeta, modeName: string, isScopedStyles: boolean) {
-  return `${cmpMeta.tagNameMeta}${modeName}${isScopedStyles ? '.sc' : ''}`;
+function getStyleId(cmpMeta: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
+  return `${cmpMeta.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 
 
@@ -272,10 +270,10 @@ export function escapeCssForJs(style: string) {
 }
 
 
-export function requiresScopedStyles(encapsulation: ENCAPSULATION, config: d.Config) {
+export function requiresScopedStyles(encapsulation: d.Encapsulation, config: d.Config) {
   return (
-    (encapsulation === ENCAPSULATION.ShadowDom && config.buildScoped) ||
-    (encapsulation === ENCAPSULATION.ScopedCss)
+    (encapsulation === 'shadow' && config.buildScoped) ||
+    (encapsulation === 'scoped')
   );
 }
 

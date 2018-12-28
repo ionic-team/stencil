@@ -3,6 +3,8 @@ import { generateAppCore } from '../app-core/generate-app-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { pathJoin } from '../util';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
+import { replaceStylePlaceholders } from 'app-core/register-styles';
 
 
 export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, stylesPromise: Promise<void>) {
@@ -75,10 +77,7 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
   const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, buildCtx.moduleFiles, appModuleFiles);
 
   if (!buildCtx.hasError && typeof outputText === 'string') {
-    const promises = outputTargets.map(async outputTarget => {
-      await writeBundledWebComponentOutput(config, compilerCtx, outputTarget, outputText);
-    });
-    await Promise.all(promises);
+    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, appModuleFiles, outputText);
   }
 
   timespan.finish(`generate self-contained web components finished`);
@@ -117,9 +116,42 @@ async function writeSelfContainedWebComponentOutput(config: d.Config, compilerCt
 }
 
 
-async function writeBundledWebComponentOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, outputText: string) {
-  const fileName = `${config.fsNamespace}.js`;
+async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], appModuleFiles: d.Module[], outputText: string) {
+  const allModes: string[] = [DEFAULT_STYLE_MODE];
+  appModuleFiles.forEach(m => {
+    if (m.cmpCompilerMeta && m.cmpCompilerMeta.styles) {
+      m.cmpCompilerMeta.styles.forEach(style => {
+        if (!allModes.includes(style.modeName)) {
+          allModes.push(style.modeName);
+        }
+      });
+    }
+  });
+
+  const promises: Promise<any>[] = [];
+
+  allModes.forEach(modeName => {
+    const modeOutputText = replaceStylePlaceholders(appModuleFiles, modeName, outputText);
+
+    outputTargets.map(async outputTarget => {
+      promises.push(
+        writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, modeOutputText, modeName)
+      );
+    });
+  });
+
+  await Promise.all(promises);
+}
+
+
+async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, modeOutputText: string, modeName: string) {
+  let fileName = `${config.fsNamespace}.`;
+  if (modeName !== DEFAULT_STYLE_MODE) {
+    fileName += `.${modeName.toLowerCase()}`;
+  }
+  fileName += `.js`;
+
   const filePath = pathJoin(config, outputTarget.buildDir, fileName);
 
-  await compilerCtx.fs.writeFile(filePath, outputText);
+  await compilerCtx.fs.writeFile(filePath, modeOutputText);
 }

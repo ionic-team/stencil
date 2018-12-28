@@ -8,10 +8,11 @@ import { parseStaticListeners } from './listeners';
 import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
+import { parseStaticStyles } from './styles';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(_config: d.Config, _compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
+export function parseStaticComponentMeta(config: d.Config, _compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
   const cmpMeta: d.ComponentCompilerMeta = {
     bundleIds: null,
     tagName: tagName,
@@ -23,8 +24,8 @@ export function parseStaticComponentMeta(_config: d.Config, _compilerCtx: d.Comp
     methods: parseStaticMethods(staticMembers),
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
+    styles: parseStaticStyles(config, moduleFile.sourceFilePath, staticMembers),
     styleDocs: [],
-    styles: null,
     dependencies: [],
     jsdoc: null, // serializeSymbol(checker, symbol),
 

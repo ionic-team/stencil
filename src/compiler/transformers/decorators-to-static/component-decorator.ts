@@ -11,11 +11,11 @@ export function componentDecoratorToStatic(cmpNode: ts.ClassDeclaration, newMemb
     return;
   }
 
-  if (typeof componentOptions.tag !== 'string') {
+  if (typeof componentOptions.tag !== 'string' || componentOptions.tag.trim().length === 0) {
     return;
   }
 
-  newMembers.push(createStaticGetter('is', convertValueToLiteral(componentOptions.tag)));
+  newMembers.push(createStaticGetter('is', convertValueToLiteral(componentOptions.tag.trim())));
 
   if (componentOptions.shadow) {
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('shadow')));
@@ -24,13 +24,15 @@ export function componentDecoratorToStatic(cmpNode: ts.ClassDeclaration, newMemb
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }
 
-  if (componentOptions.styleUrl) {
+  if (typeof componentOptions.styleUrl === 'string' && componentOptions.styleUrl.length > 0) {
     newMembers.push(createStaticGetter('styleUrl', convertValueToLiteral(componentOptions.styleUrl)));
+  }
 
-  } else if (componentOptions.styleUrls) {
+  if (componentOptions.styleUrls) {
     newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(componentOptions.styleUrls)));
+  }
 
-  } else if (componentOptions.styles) {
+  if (typeof componentOptions.styles === 'string' && componentOptions.styleUrl.length > 0) {
     newMembers.push(createStaticGetter('styles', convertValueToLiteral(componentOptions.styles)));
   }
 }

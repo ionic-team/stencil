@@ -4,7 +4,6 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
-const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-server');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
@@ -15,12 +14,6 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const success = transpile(path.join('..', 'src', 'server', 'tsconfig.json'));
 
 if (success) {
-
-  const buildConditionals = getDefaultBuildConditionals();
-  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`_BUILD_.${key}`] = buildConditionals[key];
-    return all;
-  }, {});
 
   function bundleServer() {
     rollup.rollup({
@@ -37,10 +30,7 @@ if (success) {
       ],
       plugins: [
         rollupResolve(),
-        rollupCommonjs(),
-        rollupPluginReplace({
-          values: replaceObj
-        })
+        rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
