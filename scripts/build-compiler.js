@@ -4,7 +4,6 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
-const { getDefaultBuildConditionals, rollupPluginReplace } = require('../dist/transpiled-build-conditionals/build-conditionals');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
@@ -21,12 +20,6 @@ buildId = buildId.replace('--build-id=', '');
 const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
 
 if (success) {
-
-  const buildConditionals = getDefaultBuildConditionals();
-  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`_BUILD_.${key}`] = buildConditionals[key];
-    return all;
-  }, {});
 
   function bundleCompiler() {
     rollup.rollup({
@@ -51,10 +44,7 @@ if (success) {
         rollupResolve({
           preferBuiltins: true
         }),
-        rollupCommonjs(),
-        rollupPluginReplace({
-          values: replaceObj
-        })
+        rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
@@ -110,7 +100,7 @@ if (success) {
   bundleCompiler();
 
 
-  process.on('exit', (code) => {
+  process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
   });
 

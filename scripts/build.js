@@ -9,8 +9,6 @@ const BUILD_ID = getBuildId();
 
 fs.removeSync(DIST_DIR);
 
-transpile(path.join('..', 'src', 'build-conditionals', 'tsconfig.json'));
-
 execSync('node build-mock-doc.js', {
   cwd: path.join(SCRIPTS_DIR)
 });
