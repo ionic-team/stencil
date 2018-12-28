@@ -2,8 +2,8 @@ import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
 
 
-export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, modeName);
+export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(moduleFile, styleMeta.modeName);
 
   const cachedStyleMeta = compilerCtx.cachedStyleMeta.get(cacheKey);
   if (!cachedStyleMeta) {
@@ -40,12 +40,12 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
 }
 
 
-function isChangedTsFile(moduleFile: d.ModuleFile, buildCtx: d.BuildCtx) {
+function isChangedTsFile(moduleFile: d.Module, buildCtx: d.BuildCtx) {
   return (buildCtx.filesChanged.includes(moduleFile.sourceFilePath));
 }
 
 
-function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, cacheKey: string) {
+function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, moduleFile: d.Module, cacheKey: string) {
   const lastStyleInput = compilerCtx.lastComponentStyleInput.get(cacheKey);
   if (!lastStyleInput) {
     return true;
@@ -55,7 +55,7 @@ function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, moduleFile: d.Modu
 }
 
 
-export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.StyleMeta) {
+export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.StyleCompiler) {
   if (!styleMeta.externalStyles) {
     return false;
   }
@@ -66,7 +66,7 @@ export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.Style
 }
 
 
-async function isChangedStyleEntryImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, styleMeta: d.StyleMeta) {
+async function isChangedStyleEntryImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, styleMeta: d.StyleCompiler) {
   if (!styleMeta.externalStyles) {
     return false;
   }
@@ -134,17 +134,17 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-function getComponentStyleInputKey(moduleFile: d.ModuleFile) {
+function getComponentStyleInputKey(moduleFile: d.Module) {
   const input: string[] = [];
 
-  if (moduleFile.cmpMeta.stylesMeta) {
-    Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(modeName => {
-      input.push(modeName);
+  if (moduleFile.cmpCompilerMeta.styles) {
+    moduleFile.cmpCompilerMeta.styles.forEach(styleMeta => {
+      input.push(styleMeta.modeName);
 
-      const styleMeta = moduleFile.cmpMeta.stylesMeta[modeName];
       if (styleMeta.styleStr) {
         input.push(styleMeta.styleStr);
       }
+
       if (styleMeta.externalStyles) {
         styleMeta.externalStyles.forEach(s => {
           input.push(s.absolutePath);
@@ -157,8 +157,8 @@ function getComponentStyleInputKey(moduleFile: d.ModuleFile) {
 }
 
 
-export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, modeName: string, styleMeta: d.StyleMeta) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, modeName);
+export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(moduleFile, styleMeta.modeName);
 
   compilerCtx.cachedStyleMeta.set(cacheKey, styleMeta);
 
@@ -167,6 +167,6 @@ export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: 
 }
 
 
-function getComponentStylesCacheKey(moduleFile: d.ModuleFile, modeName: string) {
+function getComponentStylesCacheKey(moduleFile: d.Module, modeName: string) {
   return `${moduleFile.sourceFilePath}#${modeName}`;
 }

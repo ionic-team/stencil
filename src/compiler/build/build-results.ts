@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { generateHmr } from './build-hmr';
 import { hasError, normalizePath } from '../util';
 
@@ -73,7 +73,7 @@ function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModul
   }
 
   en.moduleFiles.forEach(m => {
-    const encap = m.cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss ? 'scoped' : m.cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom ? 'shadow' : 'none';
+    const encap = m.cmpCompilerMeta.encapsulation;
     if (!buildEntry.encapsulations.includes(encap)) {
       buildEntry.encapsulations.push(encap);
     }
@@ -90,13 +90,13 @@ function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.En
 
     components: en.moduleFiles.map(m => {
       const entryCmp = entryCmps.find(ec => {
-        return ec.tag === m.cmpMeta.tagNameMeta;
+        return ec.tag === m.cmpCompilerMeta.tagName;
       });
       const dependencyOf = ((entryCmp && entryCmp.dependencyOf) || []).slice().sort();
 
       const buildCmp: d.BuildComponent = {
-        tag: m.cmpMeta.tagNameMeta,
-        dependencies: m.cmpMeta.dependencies.slice(),
+        tag: m.cmpCompilerMeta.tagName,
+        dependencies: m.cmpCompilerMeta.dependencies.slice(),
         dependencyOf: dependencyOf
       };
       return buildCmp;

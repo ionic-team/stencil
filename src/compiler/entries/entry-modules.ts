@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { buildError, buildWarn, catchError } from '../util';
 import { calcComponentDependencies } from './component-dependencies';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
 import { validateComponentTag } from '../config/validate-component';
 
@@ -44,32 +44,32 @@ export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-export function getEntryEncapsulations(moduleFiles: d.ModuleFile[]) {
-  const encapsulations: ENCAPSULATION[] = [];
+export function getEntryEncapsulations(moduleFiles: d.Module[]) {
+  const encapsulations: d.Encapsulation[] = [];
 
   moduleFiles.forEach(m => {
-    const encapsulation = m.cmpMeta.encapsulationMeta || ENCAPSULATION.NoEncapsulation;
+    const encapsulation = m.cmpCompilerMeta.encapsulation || 'none';
     if (!encapsulations.includes(encapsulation)) {
       encapsulations.push(encapsulation);
     }
   });
 
   if (encapsulations.length === 0) {
-    encapsulations.push(ENCAPSULATION.NoEncapsulation);
+    encapsulations.push('none');
 
-  } else if (encapsulations.includes(ENCAPSULATION.ShadowDom) && !encapsulations.includes(ENCAPSULATION.ScopedCss)) {
-    encapsulations.push(ENCAPSULATION.ScopedCss);
+  } else if (encapsulations.includes('shadow') && !encapsulations.includes('scoped')) {
+    encapsulations.push('scoped');
   }
 
   return encapsulations.sort();
 }
 
 
-export function getEntryModes(moduleFiles: d.ModuleFile[]) {
+export function getEntryModes(moduleFiles: d.Module[]) {
   const styleModeNames: string[] = [];
 
   moduleFiles.forEach(m => {
-    const cmpStyleModes = getComponentStyleModes(m.cmpMeta);
+    const cmpStyleModes = getComponentStyleModes(m.cmpCompilerMeta);
     cmpStyleModes.forEach(modeName => {
       if (!styleModeNames.includes(modeName)) {
         styleModeNames.push(modeName);
@@ -91,24 +91,27 @@ export function getEntryModes(moduleFiles: d.ModuleFile[]) {
 }
 
 
-export function getComponentStyleModes(cmpMeta: d.ComponentMeta) {
-  return (cmpMeta && cmpMeta.stylesMeta) ? Object.keys(cmpMeta.stylesMeta) : [];
+export function getComponentStyleModes(cmpMeta: d.ComponentCompilerMeta) {
+  if (cmpMeta && cmpMeta.styles) {
+    return cmpMeta.styles.map(style => style.modeName);
+  }
+  return [];
 }
 
 
-export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.EntryPoint[]) {
+export function regroupEntryModules(allModules: d.Module[], entryPoints: d.EntryPoint[]) {
 
   const cleanedEntryModules = entryPoints.map(entryPoint => {
     return allModules.filter(m => {
-      return entryPoint.some(ep => m.cmpMeta && ep.tag === m.cmpMeta.tagNameMeta);
+      return entryPoint.some(ep => m.cmpCompilerMeta && ep.tag === m.cmpCompilerMeta.tagName);
     });
   });
 
   return cleanedEntryModules
     .filter(m => m.length > 0)
     .sort((a, b) => {
-      if (a[0].cmpMeta.tagNameMeta < b[0].cmpMeta.tagNameMeta) return -1;
-      if (a[0].cmpMeta.tagNameMeta > b[0].cmpMeta.tagNameMeta) return 1;
+      if (a[0].cmpCompilerMeta.tagName < b[0].cmpCompilerMeta.tagName) return -1;
+      if (a[0].cmpCompilerMeta.tagName > b[0].cmpCompilerMeta.tagName) return 1;
       if (a.length < b.length) return -1;
       if (a.length > b.length) return 1;
       return 0;
@@ -117,11 +120,11 @@ export function regroupEntryModules(allModules: d.ModuleFile[], entryPoints: d.E
 
 
 export function createEntryModule(config: d.Config) {
-  return (moduleFiles: d.ModuleFile[]): d.EntryModule => {
+  return (moduleFiles: d.Module[]): d.EntryModule => {
     // generate a unique entry key based on the components within this entry module
     const entryKey = ENTRY_KEY_PREFIX + moduleFiles
       .sort(sortModuleFiles)
-      .map(m => m.cmpMeta.tagNameMeta)
+      .map(m => m.cmpCompilerMeta.tagName)
       .join('.');
 
     return {
@@ -144,10 +147,10 @@ export function createEntryModule(config: d.Config) {
 export const ENTRY_KEY_PREFIX = 'entry.';
 
 
-export function getAppEntryTags(allModules: d.ModuleFile[]) {
+export function getAppEntryTags(allModules: d.Module[]) {
   return allModules
-    .filter(m => m.cmpMeta && !m.isCollectionDependency)
-    .map(m => m.cmpMeta.tagNameMeta)
+    .filter(m => m.cmpCompilerMeta && !m.isCollectionDependency)
+    .map(m => m.cmpCompilerMeta.tagName)
     .sort((a, b) => {
       if (a.length < b.length) return 1;
       if (a.length > b.length) return -1;
@@ -158,7 +161,7 @@ export function getAppEntryTags(allModules: d.ModuleFile[]) {
 }
 
 
-export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.ConfigBundle[], allModules: d.ModuleFile[]) {
+export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.ConfigBundle[], allModules: d.Module[]) {
   configBundles = (configBundles || [])
     .filter(b => b.components && b.components.length > 0)
     .sort((a, b) => {
@@ -174,7 +177,7 @@ export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.Co
       .map(tag => {
         tag = validateComponentTag(tag);
 
-        const moduleFile = allModules.find(m => m.cmpMeta && m.cmpMeta.tagNameMeta === tag);
+        const moduleFile = allModules.find(m => m.cmpCompilerMeta && m.cmpCompilerMeta.tagName === tag);
         if (!moduleFile) {
           const warn = buildWarn(buildCtx.diagnostics);
           warn.header = `Stencil Config`;
@@ -215,7 +218,7 @@ export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx)
   });
 }
 
-function sortModuleFiles(a: d.ModuleFile, b: d.ModuleFile) {
+function sortModuleFiles(a: d.Module, b: d.Module) {
   if (a.isCollectionDependency && !b.isCollectionDependency) {
     return 1;
   }
@@ -223,7 +226,7 @@ function sortModuleFiles(a: d.ModuleFile, b: d.ModuleFile) {
     return -1;
   }
 
-  if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-  if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+  if (a.cmpCompilerMeta.tagName < b.cmpCompilerMeta.tagName) return -1;
+  if (a.cmpCompilerMeta.tagName > b.cmpCompilerMeta.tagName) return 1;
   return 0;
 }

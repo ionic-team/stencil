@@ -22,7 +22,7 @@ export class BuildContext implements d.BuildCtx {
   filesDeleted: string[] = [];
   filesUpdated: string[] = [];
   filesWritten: string[] = [];
-  global: d.ModuleFile = null;
+  global: d.Module = null;
   graphData: d.GraphData = null;
   hasConfigChanges = false;
   hasCopyChanges = false;
@@ -42,7 +42,7 @@ export class BuildContext implements d.BuildCtx {
   scriptsDeleted: string[] = [];
   startTime = Date.now();
   styleBuildCount = 0;
-  stylesUpdated = [] as d.BuildStyleUpdate[];
+  stylesUpdated: d.BuildStyleUpdate[] = [];
   timeSpan: d.LoggerTimeSpan = null;
   timestamp: string;
   transpileBuildCount = 0;
@@ -56,7 +56,7 @@ export class BuildContext implements d.BuildCtx {
     // get the build id from the incremented activeBuildId
     ++this.compilerCtx.activeBuildId;
 
-    if (this.compilerCtx.activeBuildId >= 100) {
+    if (this.compilerCtx.activeBuildId > 99) {
       // reset the build id back to 0
       this.compilerCtx.activeBuildId = 0;
     }

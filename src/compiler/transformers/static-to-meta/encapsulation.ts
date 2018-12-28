@@ -3,11 +3,14 @@ import ts from 'typescript';
 
 
 export function parseStaticEncapsulation(staticMembers: ts.ClassElement[]) {
-  const encapsulation: string = getStaticValue(staticMembers, 'encapsulation');
+  let encapsulation: string = getStaticValue(staticMembers, 'encapsulation');
 
-  if (encapsulation === 'shadow' || encapsulation === 'scoped') {
-    return encapsulation;
+  if (typeof encapsulation === 'string') {
+    encapsulation = encapsulation.toLowerCase().trim();
+    if (encapsulation === 'shadow' || encapsulation === 'scoped') {
+      return encapsulation;
+    }
   }
 
-  return null;
+  return 'none';
 }

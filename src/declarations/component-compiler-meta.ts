@@ -1,3 +1,4 @@
+import * as d from '.';
 
 
 export interface ComponentCompilerFeatures {
@@ -34,7 +35,8 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   bundleIds: ComponentBundleId;
   componentClassName: string;
   elementRef: string;
-  encapsulation: string;
+  encapsulation: Encapsulation;
+  dependencies: string[];
   jsdoc: CompilerJsDoc;
   events: ComponentCompilerEvent[];
   listeners: ComponentCompilerListener[];
@@ -42,31 +44,12 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   properties: ComponentCompilerProperty[];
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
-  styles: StylesCompiler;
+  styles: d.StyleCompiler[];
   tagName: string;
 }
 
 
-export interface StylesCompiler {
-  [modeName: string]: StyleCompiler;
-}
-
-
-export interface StyleCompiler {
-  styleId?: string;
-  styleStr?: string;
-  externalStyles?: ExternalStyleCompiler[];
-  compiledStyleText?: string;
-  compiledStyleTextScoped?: string;
-}
-
-
-export interface ExternalStyleCompiler {
-  absolutePath?: string;
-  cmpRelativePath?: string;
-  originalComponentPath?: string;
-  originalCollectionPath?: string;
-}
+export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
 
 export type ComponentBundleId = string | ComponentBundleModeIds;

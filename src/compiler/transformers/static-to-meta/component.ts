@@ -25,6 +25,7 @@ export function parseStaticComponentMeta(_config: d.Config, _compilerCtx: d.Comp
     events: parseStaticEvents(staticMembers),
     styleDocs: [],
     styles: null,
+    dependencies: [],
     jsdoc: null, // serializeSymbol(checker, symbol),
 
     hasAsyncLifecycle: false,

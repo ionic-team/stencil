@@ -8,7 +8,7 @@ export interface ComponentConstructor {
   host?: ComponentConstructorHost;
   style?: string;
   styleMode?: string;
-  encapsulation?: Encapsulation;
+  encapsulation?: d.Encapsulation;
   cmpMeta?: d.ComponentRuntimeMeta;
   observedAttributes?: string[];
 }
@@ -24,7 +24,7 @@ export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
   bundleIds?: string | BundleIds | GetModuleFn;
-  stylesMeta?: d.StylesMeta;
+  stylesMeta?: any;
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
@@ -33,7 +33,7 @@ export interface ComponentMeta {
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;
-  dependencies?: ComponentDependencies;
+  dependencies?: string[];
   jsdoc?: JsDoc;
   styleDocs?: StyleDoc[];
   hmrLoad?: () => void;
@@ -99,9 +99,6 @@ export interface AssetsMeta {
 export interface HostMeta {
   [key: string]: any;
 }
-
-
-export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
 
 export interface ComponentConstructorProperties {
@@ -188,9 +185,6 @@ export interface StyleDoc {
   docs: string;
   annotation: 'prop';
 }
-
-
-export type ComponentDependencies = string[];
 
 
 export abstract class ComponentModule {

@@ -99,13 +99,15 @@ function parseComponentClass(cmpData: d.ComponentDataDeprecated, cmpMeta: d.Comp
 function parseStyles(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
   const stylesData = cmpData.styles;
 
-  cmpMeta.styles = {};
-
   if (stylesData) {
-    Object.keys(stylesData).forEach(modeName => {
-      modeName = modeName.toLowerCase();
-      cmpMeta.styles[modeName] = parseStyle(config, collectionDir, cmpData, stylesData[modeName]);
+    const modeNames = Object.keys(stylesData);
+
+    cmpMeta.styles = modeNames.map(modeName => {
+      return parseStyle(config, collectionDir, cmpData, stylesData[modeName], modeName.toLowerCase());
     });
+
+  } else {
+    cmpMeta.styles = [];
   }
 }
 
@@ -137,14 +139,15 @@ function parseAssetsDir(config: d.Config, collectionDir: string, cmpData: d.Comp
 }
 
 
-function parseStyle(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated) {
-  const modeStyle: d.StyleMeta = {
+function parseStyle(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
+  const modeStyle: d.StyleCompiler = {
+    modeName: modeName,
     styleStr: modeStyleData.style
   };
 
   if (modeStyleData.stylePaths) {
     modeStyle.externalStyles = modeStyleData.stylePaths.map(stylePath => {
-      const externalStyle: d.ExternalStyleMeta = {};
+      const externalStyle: d.ExternalStyleCompiler = {};
 
       externalStyle.absolutePath = normalizePath(config.sys.path.join(
         collectionDir,
@@ -326,6 +329,9 @@ function parseEncapsulation(cmpData: d.ComponentDataDeprecated, cmpMeta: d.Compo
 
   } else if (cmpData.scoped === true) {
     cmpMeta.encapsulation = 'scoped';
+
+  } else {
+    cmpMeta.encapsulation = 'none';
   }
 }
 

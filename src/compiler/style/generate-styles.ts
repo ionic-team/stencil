@@ -31,10 +31,10 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 
 
 export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module) {
-  const styles = moduleFile.cmpCompilerMeta.styles = moduleFile.cmpCompilerMeta.styles || {};
+  const styles = moduleFile.cmpCompilerMeta.styles = moduleFile.cmpCompilerMeta.styles || [];
 
-  await Promise.all(Object.keys(styles).map(async modeName => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, styles[modeName], modeName);
+  await Promise.all(styles.map(async style => {
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, style, style.modeName);
   }));
 }
 

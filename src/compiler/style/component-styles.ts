@@ -7,13 +7,13 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleMeta, modeName: string) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler, modeName: string) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
   if (buildCtx.isRebuild) {
-    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, styleMeta, modeName);
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, styleMeta);
     if (cachedCompiledStyles) {
       styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
       styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
@@ -33,12 +33,12 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   if (config.watch) {
     // since this is a watch and we'll be checking this again
     // let's cache what we've learned today
-    setComponentStylesCache(compilerCtx, moduleFile, modeName, styleMeta);
+    setComponentStylesCache(compilerCtx, moduleFile, styleMeta);
   }
 }
 
 
-async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleMeta) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
   // get all the absolute paths for each style
   const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
@@ -173,8 +173,10 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, externalStyles: d.ExternalStyleMeta[], compiledStyles: string[]) {
-  const styleMeta: d.StyleMeta = {};
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
+  const styleMeta: d.StyleCompiler = {
+    modeName: modeName
+  };
 
   // join all the component's styles for this mode together into one line
   styleMeta.compiledStyleText = compiledStyles.join('\n\n').trim();

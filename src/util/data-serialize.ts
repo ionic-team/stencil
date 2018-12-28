@@ -60,8 +60,8 @@ export function formatBrowserLoaderBundleIds(bundleIds: string | d.BundleIds): a
 }
 
 
-export function formatHasStyles(stylesMeta: d.StylesMeta) {
-  if (stylesMeta && Object.keys(stylesMeta).length > 0) {
+export function formatHasStyles(stylesMeta: d.StyleCompiler[]) {
+  if (stylesMeta && stylesMeta.length > 0) {
     return 1;
   }
   return 0;

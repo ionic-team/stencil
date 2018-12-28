@@ -26,11 +26,11 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
 
   entryModules.forEach(entryModule => {
     const moduleFiles = entryModule.moduleFiles.filter(m => {
-      return m.cmpMeta.assetsDirsMeta && m.cmpMeta.assetsDirsMeta.length;
+      return m.cmpCompilerMeta.assetsDirs && m.cmpCompilerMeta.assetsDirs.length;
     });
 
     moduleFiles.forEach(moduleFile => {
-      moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
+      moduleFile.cmpCompilerMeta.assetsDirs.forEach(assetsMeta => {
         copyToBuildDir.push(assetsMeta);
 
         if (!moduleFile.excludeFromCollection && !moduleFile.isCollectionDependency) {
@@ -96,10 +96,10 @@ export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, 
     // loop through all the possible asset directories
     entryModules.forEach(entryModule => {
       entryModule.moduleFiles.forEach(moduleFile => {
-        if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
+        if (moduleFile.cmpCompilerMeta && moduleFile.cmpCompilerMeta.assetsDirs) {
 
           // loop through each of the asset directories of each component
-          moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsDir => {
+          moduleFile.cmpCompilerMeta.assetsDirs.forEach(assetsDir => {
             // get the absolute of the asset directory
             const assetDirPath = normalizePath(assetsDir.absolutePath);
 

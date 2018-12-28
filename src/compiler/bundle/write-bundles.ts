@@ -13,8 +13,8 @@ export async function writeEntryModules(config: d.Config, compilerCtx: d.Compile
     entryModules.map(async (entryModule) => {
       const fileContents = entryModule.moduleFiles
         .map(moduleFile => {
-          const originalClassName = moduleFile.cmpMeta.componentClass;
-          const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
+          const originalClassName = moduleFile.cmpCompilerMeta.componentClassName;
+          const pascalCasedClassName = dashToPascalCase(moduleFile.cmpCompilerMeta.tagName);
 
           const filePath = normalizePath(path.relative(path.dirname(entryModule.filePath), moduleFile.jsFilePath));
           return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;

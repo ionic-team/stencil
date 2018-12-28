@@ -6,7 +6,7 @@ import { processAppGraph } from './app-graph';
 export function generateComponentEntries(
   _config: d.Config,
   buildCtx: d.BuildCtx,
-  allModules: d.ModuleFile[],
+  allModules: d.Module[],
   userConfigEntryTags: string[][],
   appEntryTags: string[]
 ): d.EntryPoint[] {
@@ -27,7 +27,7 @@ export function generateComponentEntries(
 }
 
 
-export function processAppComponentEntryTags(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryPoints: d.EntryPoint[], appEntryTags: string[]) {
+export function processAppComponentEntryTags(buildCtx: d.BuildCtx, allModules: d.Module[], entryPoints: d.EntryPoint[], appEntryTags: string[]) {
   // remove any tags already found in user config
   appEntryTags = appEntryTags.filter(tag => !entryPoints.some(ep => ep.some(em => em.tag === tag)));
   if (entryPoints.length > 0 && appEntryTags.length > 0) {

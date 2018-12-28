@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildError } from '../util';
 
 
-export function processAppGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryTags: string[]) {
+export function processAppGraph(buildCtx: d.BuildCtx, allModules: d.Module[], entryTags: string[]) {
   const graph = getGraph(buildCtx, allModules, entryTags);
 
   const entryPoints: d.EntryPoint[] = [];
@@ -128,7 +128,7 @@ export function processAppGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[]
 }
 
 
-function getGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryTags: string[]) {
+function getGraph(buildCtx: d.BuildCtx, allModules: d.Module[], entryTags: string[]) {
   const graph: { tag: string; dependencies: string[]; }[] = [];
 
   function addDeps(tag: string) {
@@ -136,15 +136,15 @@ function getGraph(buildCtx: d.BuildCtx, allModules: d.ModuleFile[], entryTags: s
       return;
     }
 
-    const m = allModules.find(m => m.cmpMeta && m.cmpMeta.tagNameMeta === tag);
+    const m = allModules.find(m => m.cmpCompilerMeta && m.cmpCompilerMeta.tagName === tag);
     if (!m) {
       const diagnostic = buildError(buildCtx.diagnostics);
       diagnostic.messageText = `unable to find tag "${tag}" while generating component graph`;
       return;
     }
-    m.cmpMeta.dependencies = (m.cmpMeta.dependencies || []);
+    m.cmpCompilerMeta.dependencies = (m.cmpCompilerMeta.dependencies || []);
 
-    const dependencies = m.cmpMeta.dependencies.filter(t => t !== tag).sort();
+    const dependencies = m.cmpCompilerMeta.dependencies.filter(t => t !== tag).sort();
 
     graph.push({
       tag: tag,

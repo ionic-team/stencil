@@ -88,19 +88,19 @@ export function getBundleIds(entryModules: d.EntryModule[], components: d.Hydrat
 
   components.forEach(cmp => {
     entryModules.forEach(mb => {
-      const moduleFile = mb.moduleFiles.find(mf => mf.cmpMeta && mf.cmpMeta.tagNameMeta === cmp.tag);
+      const moduleFile = mb.moduleFiles.find(mf => mf.cmpCompilerMeta && mf.cmpCompilerMeta.tagName === cmp.tag);
       if (!moduleFile) {
         return;
       }
 
       let bundleId: string;
-      if (typeof moduleFile.cmpMeta.bundleIds === 'string') {
-        bundleId = moduleFile.cmpMeta.bundleIds;
+      if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'string') {
+        bundleId = moduleFile.cmpCompilerMeta.bundleIds;
       } else {
 
-        bundleId = (moduleFile.cmpMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
+        bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
         if (!bundleId) {
-          bundleId = (moduleFile.cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
+          bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
         }
       }
 

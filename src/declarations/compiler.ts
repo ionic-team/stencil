@@ -13,7 +13,7 @@ export interface Compiler {
 export interface CompilerCtx {
   activeBuildId: number;
   cache: d.Cache;
-  cachedStyleMeta: Map<string, d.StyleMeta>;
+  cachedStyleMeta: Map<string, d.StyleCompiler>;
   collections: d.CollectionCompilerMeta[];
   compilerOptions: any;
   events: d.BuildEvents;

@@ -30,7 +30,7 @@ export interface BuildCtx {
   filesUpdated: string[];
   filesWritten: string[];
   finish(): Promise<BuildResults>;
-  global: d.ModuleFile;
+  global: d.Module;
   graphData: GraphData;
   hasConfigChanges: boolean;
   hasCopyChanges: boolean;
@@ -171,7 +171,7 @@ export interface BuildEntry {
   bundles: BuildBundle[];
   inputs: string[];
   modes?: string[];
-  encapsulations: string[];
+  encapsulations: d.Encapsulation[];
 }
 
 

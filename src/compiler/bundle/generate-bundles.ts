@@ -115,9 +115,9 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
       // assign the bundle id build from the
       // mode, no scoped styles and esm to each of the components
       entryModule.moduleFiles.forEach(moduleFile => {
-        moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
-        if (typeof moduleFile.cmpMeta.bundleIds === 'object') {
-          moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+        moduleFile.cmpCompilerMeta.bundleIds = moduleFile.cmpCompilerMeta.bundleIds || {};
+        if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'object') {
+          moduleFile.cmpCompilerMeta.bundleIds[modeName] = bundleId;
         }
       });
     }
@@ -310,11 +310,11 @@ export function getBundleIdDev(entryModule: d.EntryModule, modeName: string) {
         return -1;
       }
 
-      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+      if (a.cmpCompilerMeta.tagName < b.cmpCompilerMeta.tagName) return -1;
+      if (a.cmpCompilerMeta.tagName > b.cmpCompilerMeta.tagName) return 1;
       return 0;
     })
-    .map(m => m.cmpMeta.tagNameMeta);
+    .map(m => m.cmpCompilerMeta.tagName);
 
   if (modeName === DEFAULT_STYLE_MODE || !modeName) {
     return tags[0];

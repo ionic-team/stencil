@@ -8,7 +8,7 @@ import { normalizePath } from '../util';
 export class CompilerContext implements d.CompilerCtx {
   activeBuildId = -1;
   cache: d.Cache;
-  cachedStyleMeta = new Map<string, d.StyleMeta>();
+  cachedStyleMeta = new Map<string, d.StyleCompiler>();
   collections: d.CollectionCompilerMeta[] = [];
   compilerOptions: any = null;
   events = new BuildEvents();
