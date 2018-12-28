@@ -15,7 +15,9 @@ export function setStylePlaceholders(cmpsWithStyles: d.ComponentCompilerMeta[], 
   c.push(`import { registerStyle } from '${coreImportPath}';`);
 
   cmpsWithStyles.forEach(cmpWithStyles => {
-    c.push(`registerStyle('${cmpWithStyles.tagName}${STYLE_ID_PLACEHOLDER}', '${cmpWithStyles.tagName}${STYLE_TEXT_PLACEHOLDER}');`);
+    const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);
+    const styleTextPlaceholder = getStyleTextPlaceholder(cmpWithStyles);
+    c.push(`registerStyle('${styleIdPlaceholder}', '${styleTextPlaceholder}');`);
   });
 
   return c.join('\n');
@@ -28,15 +30,19 @@ export function replaceStylePlaceholders(appModuleFiles: d.Module[], modeName: s
     .map(m => m.cmpCompilerMeta);
 
   cmpsWithStyles.forEach(cmpWithStyles => {
-    const style = cmpWithStyles.styles.find(s => s.modeName === modeName);
-    if (!style || style.compiledStyleText) {
-      return;
+    let style = cmpWithStyles.styles.find(s => s.modeName === modeName);
+    if (!style || typeof style.compiledStyleText !== 'string') {
+      modeName = DEFAULT_STYLE_MODE;
+      style = cmpWithStyles.styles.find(s => s.modeName === modeName);
+      if (!style || typeof style.compiledStyleText !== 'string') {
+        return;
+      }
     }
 
-    const styleIdPlaceholder = `${cmpWithStyles.tagName}${STYLE_ID_PLACEHOLDER}`;
-    const styleTextPlaceholder = `${cmpWithStyles.tagName}${STYLE_TEXT_PLACEHOLDER}`;
+    const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);
+    const styleTextPlaceholder = getStyleTextPlaceholder(cmpWithStyles);
 
-    const styleId = `${cmpWithStyles.tagName}${modeName === DEFAULT_STYLE_MODE ? '' : modeName}`;
+    const styleId = getStyleId(cmpWithStyles, modeName);
 
     bundleInput = bundleInput.replace(styleIdPlaceholder, styleId);
     bundleInput = bundleInput.replace(styleTextPlaceholder, style.compiledStyleText);
@@ -46,5 +52,31 @@ export function replaceStylePlaceholders(appModuleFiles: d.Module[], modeName: s
 }
 
 
-const STYLE_ID_PLACEHOLDER = `$STYLE-ID-PLACEHOLDER`;
-const STYLE_TEXT_PLACEHOLDER = `$STYLE-TEXT-PLACEHOLDER`;
+function getStyleId(cmpMeta: d.ComponentCompilerMeta, modeName: string) {
+  return `${cmpMeta.tagName.toUpperCase()}${modeName === DEFAULT_STYLE_MODE ? '' : modeName}`;
+}
+
+function getStyleIdPlaceholder(cmpMeta: d.ComponentCompilerMeta) {
+  return `${cmpMeta.tagName.toUpperCase()}$STYLE-ID-PLACEHOLDER`;
+}
+
+function getStyleTextPlaceholder(cmpMeta: d.ComponentCompilerMeta) {
+  return `${cmpMeta.tagName.toUpperCase()}$STYLE-TEXT-PLACEHOLDER`;
+}
+
+
+export function getAllModes(moduleFiles: d.Module[]) {
+  const allModes: string[] = [DEFAULT_STYLE_MODE];
+
+  moduleFiles.forEach(m => {
+    if (m.cmpCompilerMeta && m.cmpCompilerMeta.styles) {
+      m.cmpCompilerMeta.styles.forEach(style => {
+        if (!allModes.includes(style.modeName)) {
+          allModes.push(style.modeName);
+        }
+      });
+    }
+  });
+
+  return allModes;
+}

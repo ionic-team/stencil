@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-// import { DEFAULT_STYLE_MODE } from '../../util/constants';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 
 
 export function gatherComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) {
@@ -23,11 +23,8 @@ export function gatherComponentBuildConditionals(cmpMeta: d.ComponentCompilerMet
 
   cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);
 
-  // if (cmpMeta.stylesMeta) {
-  //   const modeNames = Object.keys(cmpMeta.stylesMeta);
-  //   if (modeNames.length > 0) {
-  //     cmpMeta.hasStyle = true;
-  //     cmpMeta.hasMode = modeNames.filter(m => m !== DEFAULT_STYLE_MODE).length > 0;
-  //   }
-  // }
+  if (cmpMeta.styles.length > 0) {
+    cmpMeta.hasStyle = true;
+    cmpMeta.hasMode = cmpMeta.styles.some(s => s.modeName !== DEFAULT_STYLE_MODE);
+  }
 }

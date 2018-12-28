@@ -9,6 +9,8 @@ export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HT
     if (!styles.has(styleId)) {
       styleId = elm.tagName;
     }
+  } else {
+    styleId = elm.tagName;
   }
 
   if (styles.has(styleId)) {

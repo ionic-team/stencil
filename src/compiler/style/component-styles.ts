@@ -264,6 +264,7 @@ export function escapeCssForJs(style: string) {
       .replace(/\\[\D0-7]/g, (v) => '\\' + v)
       .replace(/\r\n|\r|\n/g, `\\n`)
       .replace(/\"/g, `\\"`)
+      .replace(/\'/g, `\\'`)
       .replace(/\@/g, `\\@`);
   }
   return style;

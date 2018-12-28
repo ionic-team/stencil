@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { generateAppCore } from '../app-core/generate-app-core';
+import { getAllModes, replaceStylePlaceholders } from '../app-core/register-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { pathJoin } from '../util';
-import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { replaceStylePlaceholders } from 'app-core/register-styles';
 
 
 export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, stylesPromise: Promise<void>) {
@@ -52,10 +52,7 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
     const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, buildCtx.moduleFiles, appModuleFiles);
 
     if (!buildCtx.hasError && typeof outputText === 'string') {
-      const promises = outputTargets.map(async outputTarget => {
-        await writeSelfContainedWebComponentOutput(config, compilerCtx, outputTarget, appModuleFiles, outputText);
-      });
-      await Promise.all(promises);
+      await writeSelfContainedWebComponentModes(config, compilerCtx, outputTargets, appModuleFiles, outputText);
     }
   });
 
@@ -108,25 +105,42 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 }
 
 
-async function writeSelfContainedWebComponentOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, appModuleFiles: d.Module[], outputText: string) {
-  const fileName = `${appModuleFiles[0].cmpCompilerMeta.tagName}.js`;
+async function writeSelfContainedWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], appModuleFiles: d.Module[], outputText: string) {
+  const cmpMeta = appModuleFiles[0].cmpCompilerMeta;
+
+  const promises: Promise<any>[] = [];
+
+  const allModes = getAllModes(appModuleFiles);
+
+  allModes.forEach(modeName => {
+    const modeOutputText = replaceStylePlaceholders(appModuleFiles, modeName, outputText);
+
+    outputTargets.forEach(async outputTarget => {
+      promises.push(
+        writeSelfContainedWebComponentModeOutput(config, compilerCtx, outputTarget, cmpMeta, modeOutputText, modeName)
+      );
+    });
+  });
+
+  await Promise.all(promises);
+}
+
+
+async function writeSelfContainedWebComponentModeOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
+  let fileName = `${cmpMeta.tagName}`;
+  if (modeName !== DEFAULT_STYLE_MODE) {
+    fileName += `.${modeName}`;
+  }
+  fileName += `.js`;
+
   const filePath = pathJoin(config, outputTarget.dir, fileName);
 
-  await compilerCtx.fs.writeFile(filePath, outputText);
+  await compilerCtx.fs.writeFile(filePath, modeOutputText);
 }
 
 
 async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], appModuleFiles: d.Module[], outputText: string) {
-  const allModes: string[] = [DEFAULT_STYLE_MODE];
-  appModuleFiles.forEach(m => {
-    if (m.cmpCompilerMeta && m.cmpCompilerMeta.styles) {
-      m.cmpCompilerMeta.styles.forEach(style => {
-        if (!allModes.includes(style.modeName)) {
-          allModes.push(style.modeName);
-        }
-      });
-    }
-  });
+  const allModes = getAllModes(appModuleFiles);
 
   const promises: Promise<any>[] = [];
 
@@ -145,7 +159,7 @@ async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.Co
 
 
 async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, modeOutputText: string, modeName: string) {
-  let fileName = `${config.fsNamespace}.`;
+  let fileName = `${config.fsNamespace}`;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName.toLowerCase()}`;
   }
