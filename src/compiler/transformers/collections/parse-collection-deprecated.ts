@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { ModuleFile } from '../../build/compiler-ctx';
 import { normalizePath } from '../../util';
 
 
@@ -12,17 +13,14 @@ export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.Compi
 
 
 function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
-  const moduleFile: d.Module = {
-    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath)),
-    cmpCompilerMeta: {} as any,
-    isCollectionDependency: true,
-    collectionName: collection.collectionName,
-    excludeFromCollection: excludeFromCollection(config, cmpData),
-    localImports: [],
-    externalImports: [],
-    potentialCmpRefs: [],
-  };
-  const cmpMeta = moduleFile.cmpCompilerMeta;
+  const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
+  const moduleFile = new ModuleFile(sourceFilePath);
+
+  const cmpMeta: d.ComponentCompilerMeta = {} as any;
+  moduleFile.cmpCompilerMeta = cmpMeta;
+  moduleFile.isCollectionDependency = true;
+  moduleFile.collectionName = collection.collectionName;
+  moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);
 
   parseTag(cmpData, cmpMeta);
   // parseComponentDependencies(cmpData, cmpMeta);

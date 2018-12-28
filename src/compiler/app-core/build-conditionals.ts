@@ -37,10 +37,10 @@ export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.
     reflectToAttr: cmps.some(c => c.hasReflectToAttr),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
     shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
-    slot: moduleFileTree.some(m => m.hasSlot),
+    slot: moduleFileTree.some(m => m.htmlTagNames.has('slot')),
     state: cmps.some(c => c.hasState),
     style: cmps.some(c => c.hasStyle),
-    svg: moduleFileTree.some(m => m.hasSvg),
+    svg: moduleFileTree.some(m => m.htmlTagNames.has('svg')),
     updatable: cmps.some(c => c.isUpdateable),
     vdomAttribute: moduleFileTree.some(m => m.hasVdomAttribute),
     vdomClass: moduleFileTree.some(m => m.hasVdomClass),
@@ -69,7 +69,8 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.taskQueue = (b.updatable || b.mode || b.lifecycle || b.lazyLoad);
   b.refs = (b.updatable || b.member || b.lifecycle || b.listener);
 
-  b.exposeTaskQueue = (b.taskQueue && !!config.exposeTaskQueue);
+  b.exposeReadQueue = !!config.exposeReadQueue;
+  b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
 }
@@ -157,7 +158,8 @@ export function getDefaultBuildConditionals() {
     lazyLoad: false,
     es5: false,
     taskQueue: true,
-    exposeTaskQueue: true,
+    exposeReadQueue: true,
+    exposeWriteQueue: true,
     exposeEventListener: true,
     exposeRequestAnimationFrame: true,
     syncQueue: false

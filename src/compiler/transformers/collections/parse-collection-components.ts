@@ -1,12 +1,12 @@
 import * as d from '../../../declarations';
-import { gatherMeta } from '../static-to-meta/gather-meta';
 import { noop } from '../../../util/helpers';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { pathJoin } from '../../util';
+import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
 
 
-export function parseCollectionComponents(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
+export function parseCollectionComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
   collection.moduleFiles = collection.moduleFiles || [];
 
   parseComponentsDeprecated(config, compilerCtx, collection, collectionDir, collectionManifest);
@@ -15,13 +15,13 @@ export function parseCollectionComponents(config: d.Config, compilerCtx: d.Compi
     collectionManifest.entries.forEach(entryPath => {
       const componentPath = pathJoin(config, collectionDir, entryPath);
       const sourceText = compilerCtx.fs.readFileSync(componentPath);
-      transpileCollectionEntry(config, compilerCtx, collection, componentPath, sourceText);
+      transpileCollectionEntry(config, compilerCtx, buildCtx, collection, componentPath, sourceText);
     });
   }
 }
 
 
-function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, inputFileName: string, sourceText: string) {
+function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.CollectionCompilerMeta, inputFileName: string, sourceText: string) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
   options.suppressOutputPathCheck = true;
@@ -62,11 +62,10 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   const program = ts.createProgram([inputFileName], options, compilerHost);
 
   const typeChecker = program.getTypeChecker();
-  const diagnostics: d.Diagnostic[] = [];
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      gatherMeta(config, compilerCtx, diagnostics, typeChecker, collection)
+      visitSource(config, compilerCtx, buildCtx, typeChecker, collection)
     ]
   });
 }

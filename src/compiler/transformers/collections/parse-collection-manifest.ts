@@ -1,9 +1,10 @@
 import * as d from '../../../declarations';
+import { ModuleFile } from '../../build/compiler-ctx';
 import { normalizePath } from '../../util';
 import { parseCollectionComponents } from './parse-collection-components';
 
 
-export function parseCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) {
+export function parseCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
   const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || {} as any;
@@ -19,7 +20,7 @@ export function parseCollectionManifest(config: d.Config, compilerCtx: d.Compile
     bundles: []
   };
 
-  parseCollectionComponents(config, compilerCtx, collectionDir, collectionManifest, collection);
+  parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
   parseGlobal(config, collectionDir, collectionManifest, collection);
   parseBundles(collectionManifest, collection);
 
@@ -43,13 +44,10 @@ export function parseCollectionDependencies(collectionManifest: d.CollectionMani
 export function parseGlobal(config: d.Config, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
   if (typeof collectionManifest.global !== 'string') return;
 
-  collection.global = {
-    sourceFilePath: normalizePath(config.sys.path.join(collectionDir, collectionManifest.global)),
-    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionManifest.global)),
-    localImports: [],
-    externalImports: [],
-    potentialCmpRefs: []
-  };
+  const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+
+  collection.global = new ModuleFile(sourceFilePath);
+  collection.global.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
 }
 
 

@@ -1,23 +1,17 @@
 import * as d from '../../../declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
-import { gatherMeta } from '../static-to-meta/gather-meta';
-import { gatherModuleImports } from '../module-imports';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
 
 
 export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
-  // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts between input and output paths.
   options.suppressOutputPathCheck = true;
-  // Filename can be non-ts file.
   options.allowNonTsExtensions = true;
   options.removeComments = false;
-  // We are not returning a sourceFile for lib file when asked by the program,
-  // so pass --noLib to avoid reporting a file not found error.
   options.noLib = true;
-  // Clear out other settings that would not be used in transpiling this module
   options.lib = undefined;
   options.types = undefined;
   options.noEmit = undefined;
@@ -29,45 +23,37 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   options.declarationDir = undefined;
   options.out = undefined;
   options.outFile = undefined;
-  // We are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
   options.noResolve = true;
 
   options.module = ts.ModuleKind.ESNext;
   options.target = ts.ScriptTarget.ES2017;
   options.experimentalDecorators = true;
 
+  options.jsx = ts.JsxEmit.React;
+  options.jsxFactory = 'h';
 
-  // if jsx is specified then treat file as .tsx
-  const inputFileName = (options.jsx ? 'module.tsx' : 'module.ts');
+  const inputFileName = 'module.tsx';
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target); // TODO: GH#18217
 
-  const newLine = '';
-
-  // Output
   let outputText: string;
 
-  // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: function (fileName) { return fileName === inputFileName ? sourceFile : undefined; },
-    writeFile: function (_name, text) {
-      outputText = text;
-    },
-    getDefaultLibFileName: function () { return 'lib.d.ts'; },
-    useCaseSensitiveFileNames: function () { return false; },
-    getCanonicalFileName: function (fileName) { return fileName; },
-    getCurrentDirectory: function () { return ''; },
-    getNewLine: function () { return newLine; },
-    fileExists: function (fileName) { return fileName === inputFileName; },
-    readFile: function () { return ''; },
-    directoryExists: function () { return true; },
-    getDirectories: function () { return []; }
+    getSourceFile: fileName => fileName === inputFileName ? sourceFile : undefined,
+    writeFile: (_, text) => outputText = text,
+    getDefaultLibFileName: () => 'lib.d.ts',
+    useCaseSensitiveFileNames: () => false,
+    getCanonicalFileName: fileName => fileName,
+    getCurrentDirectory: () => '',
+    getNewLine: () => '',
+    fileExists: fileName => fileName === inputFileName,
+    readFile: () => '',
+    directoryExists: () => true,
+    getDirectories: () => []
   };
 
   const program = ts.createProgram([inputFileName], options, compilerHost);
 
   const typeChecker = program.getTypeChecker();
-  const diagnostics: d.Diagnostic[] = [];
 
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx();
@@ -77,11 +63,10 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
 
   program.emit(undefined, undefined, undefined, undefined, {
     before: [
-      convertDecoratorsToStatic(diagnostics, typeChecker)
+      convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      gatherMeta(config, compilerCtx, diagnostics, typeChecker, null),
-      gatherModuleImports(config, compilerCtx, buildCtx)
+      visitSource(config, compilerCtx, buildCtx, typeChecker, null)
     ]
   });
 
@@ -109,6 +94,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     outputText,
     compilerCtx,
     buildCtx,
+    diagnostics: buildCtx.diagnostics,
     moduleFile,
     cmpCompilerMeta,
     componentClassName,

@@ -1,14 +1,13 @@
 import * as d from '../../declarations';
-import { addCollection } from './datacollection/discover-collections';
+import { addCollection } from '../transformers/collections/add-collection';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { gatherMeta } from '../transformers/static-to-meta/gather-meta';
-import { gatherModuleImports } from '../transformers/module-imports';
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import minimatch from 'minimatch';
 import { normalizePath } from '../util';
+import { visitSource } from '../transformers/visitors/visit-source';
 import ts from 'typescript';
 
 
@@ -120,8 +119,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
           convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          gatherMeta(config, compilerCtx, transpileCtx.buildCtx.diagnostics, typeChecker, null),
-          gatherModuleImports(config, compilerCtx, buildCtx)
+          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null)
         ]
       };
     }
@@ -213,7 +211,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
-        addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+        addCollection(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
       });
 
       // write the cached js output too
@@ -266,7 +264,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
-          addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, moduleFile, config.rootDir, moduleId);
+          addCollection(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
         });
       }
 

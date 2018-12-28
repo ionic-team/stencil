@@ -5,26 +5,28 @@ export type ModuleMap = Map<string, Module>;
 
 
 export interface Module {
+  cmpCompilerMeta: d.ComponentCompilerMeta;
+  collectionName: string;
+  dtsFilePath: string;
+  excludeFromCollection: boolean;
+  externalImports: string[];
+  hasVdomAttribute: boolean;
+  hasVdomClass: boolean;
+  hasVdomFunctional: boolean;
+  hasVdomKey: boolean;
+  hasVdomListener: boolean;
+  hasVdomRef: boolean;
+  hasVdomRender: boolean;
+  hasVdomStyle: boolean;
+  hasVdomText: boolean;
+  htmlAttrNames: Set<string>;
+  htmlTagNames: Set<string>;
+  isCollectionDependency: boolean;
+  jsFilePath: string;
+  localImports: string[];
+  originalCollectionComponentPath: string;
+  potentialCmpRefs: d.PotentialComponentRef[];
   sourceFilePath: string;
-  jsFilePath?: string;
-  dtsFilePath?: string;
-  cmpCompilerMeta?: d.ComponentCompilerMeta;
-  isCollectionDependency?: boolean;
-  collectionName?: string;
-  excludeFromCollection?: boolean;
-  originalCollectionComponentPath?: string;
-  externalImports?: string[];
-  localImports?: string[];
-  potentialCmpRefs?: d.PotentialComponentRef[];
-  hasSlot?: boolean;
-  hasSvg?: boolean;
-  hasVdomRender?: boolean;
-  hasVdomAttribute?: boolean;
-  hasVdomClass?: boolean;
-  hasVdomFunctional?: boolean;
-  hasVdomKey?: boolean;
-  hasVdomListener?: boolean;
-  hasVdomRef?: boolean;
-  hasVdomStyle?: boolean;
-  hasVdomText?: boolean;
+
+  reset(): void;
 }

@@ -59,16 +59,62 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
     return module;
 
   } else {
-    const module: d.Module = {
-      cmpCompilerMeta: null,
-      collectionName: null,
-      externalImports: [],
-      isCollectionDependency: false,
-      localImports: [],
-      potentialCmpRefs: [],
-      sourceFilePath: sourceFilePath
-    };
+    const module = new ModuleFile(sourceFilePath);
     compilerCtx.moduleMap.set(sourceFilePath, module);
     return module;
+  }
+}
+
+
+export class ModuleFile implements d.Module {
+  cmpCompilerMeta: d.ComponentCompilerMeta = null;
+  collectionName: string = null;
+  dtsFilePath: string = null;
+  excludeFromCollection = false;
+  externalImports: string[] = [];
+  hasVdomAttribute = false;
+  hasVdomClass = false;
+  hasVdomFunctional = false;
+  hasVdomKey = false;
+  hasVdomListener = false;
+  hasVdomRef = false;
+  hasVdomRender = false;
+  hasVdomStyle = false;
+  hasVdomText = false;
+  htmlAttrNames = new Set<string>();
+  htmlTagNames = new Set<string>();
+  isCollectionDependency = false;
+  jsFilePath: string = null;
+  localImports: string[] = [];
+  originalCollectionComponentPath: string = null;
+  potentialCmpRefs: d.PotentialComponentRef[] = [];
+  sourceFilePath: string;
+
+  constructor(sourceFilePath: string) {
+    this.sourceFilePath = sourceFilePath;
+  }
+
+  reset() {
+    this.cmpCompilerMeta = null;
+    this.collectionName = null;
+    this.dtsFilePath = null;
+    this.excludeFromCollection = false;
+    this.externalImports.length = 0;
+    this.hasVdomAttribute = false;
+    this.hasVdomClass = false;
+    this.hasVdomFunctional = false;
+    this.hasVdomKey = false;
+    this.hasVdomListener = false;
+    this.hasVdomRef = false;
+    this.hasVdomRender = false;
+    this.hasVdomStyle = false;
+    this.hasVdomText = false;
+    this.htmlAttrNames.clear();
+    this.htmlTagNames.clear();
+    this.isCollectionDependency = false;
+    this.jsFilePath = null;
+    this.localImports.length = 0;
+    this.originalCollectionComponentPath = null;
+    this.potentialCmpRefs.length = 0;
   }
 }

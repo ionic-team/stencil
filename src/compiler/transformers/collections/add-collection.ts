@@ -3,7 +3,7 @@ import { normalizePath } from '../../util';
 import { parseCollection } from './parse-collection-module';
 
 
-export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.CollectionCompilerMeta[], moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
+export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
   moduleFile.externalImports = moduleFile.externalImports || [];
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -52,10 +52,10 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(config, compilerCtx, pkgJsonFilePath, pkgData);
+  const collection = parseCollection(config, compilerCtx, buildCtx, pkgJsonFilePath, pkgData);
 
   // check if we already added this collection to the build context
-  const alreadyHasCollection = collections.some(c => {
+  const alreadyHasCollection = buildCtx.collections.some(c => {
     return c.collectionName === collection.collectionName;
   });
 
@@ -65,14 +65,14 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
   }
 
   // let's add the collection to the build context
-  collections.push(collection);
+  buildCtx.collections.push(collection);
 
   if (Array.isArray(collection.dependencies)) {
     // this collection has more collections
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
-      addCollection(config, compilerCtx, collections, moduleFile, resolveFromDir, dependencyModuleId);
+      addCollection(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }
 }

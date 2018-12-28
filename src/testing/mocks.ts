@@ -99,8 +99,25 @@ export function mockCompilerCtx() {
     activeBuildId: 0,
     fs: new InMemoryFileSystem(mockFs(), { path: require('path') } as any),
     collections: [],
-    appFiles: {},
-    cache: mockCache()
+    compilerOptions: null,
+    cache: mockCache(),
+    cachedStyleMeta: new Map(),
+    events: null,
+    hasLoggedServerUrl: false,
+    hasSuccessfulBuild: false,
+    hasWatch: false,
+    isActivelyBuilding: false,
+    lastComponentStyleInput: new Map(),
+    lastBuildHadError: false,
+    lastBuildResults: null,
+    lastBuildStyles: null,
+    lastRawModules: null,
+    localPrerenderServer: null,
+    moduleMap: new Map(),
+    resolvedCollections: new Set(),
+    rootTsFiles: [],
+    tsService: null,
+    reset: noop
   };
 
   return compilerCtx;
