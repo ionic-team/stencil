@@ -17,14 +17,14 @@ export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
   table.addHeader([
     'Event',
     'Description',
-    'Detail'
+    'Type'
   ]);
 
   events.forEach(ev => {
     table.addRow([
       `\`${ev.event}\``,
       ev.docs,
-      ev.detail,
+      `\`CustomEvent<${ev.detail}>\``,
     ]);
   });
 
