@@ -63,51 +63,70 @@ export function h(nodeName: any, vnodeData: any) {
     }
   }
 
-  if (vnodeData != null) {
-    // normalize class / classname attributes
-    if (vnodeData['className']) {
-      vnodeData['class'] = vnodeData['className'];
-    }
-
-    if (typeof vnodeData['class'] === 'object') {
-      for ((i as any) in vnodeData['class']) {
-        if (vnodeData['class'][i]) {
-          stack.push(i);
-        }
+  if (BUILD.vdomAttribute) {
+    if (vnodeData != null) {
+      // normalize class / classname attributes
+      if (BUILD.vdomClass && vnodeData['className']) {
+        vnodeData['class'] = vnodeData['className'];
       }
 
-      vnodeData['class'] = stack.join(' ');
-      stack.length = 0;
-    }
+      if (BUILD.vdomClass && typeof vnodeData['class'] === 'object') {
+        for ((i as any) in vnodeData['class']) {
+          if (vnodeData['class'][i]) {
+            stack.push(i);
+          }
+        }
 
-    if (vnodeData.key != null) {
-      vkey = vnodeData.key;
-    }
+        vnodeData['class'] = stack.join(' ');
+        stack.length = 0;
+      }
 
-    if (vnodeData.name != null) {
-      vname = vnodeData.name;
+      if (BUILD.vdomKey && vnodeData.key != null) {
+        vkey = vnodeData.key;
+      }
+
+      if (BUILD.slotPolyfill && vnodeData.name != null) {
+        vname = vnodeData.name;
+      }
     }
   }
 
-  if (typeof nodeName === 'function') {
+  if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children || [], utils);
+    return (nodeName as d.FunctionalComponent<any>)(vnodeData, children || [], vdomFnUtils);
   }
 
-  return {
+  const vnode: d.VNode = {
     vtag: nodeName,
     vchildren: children,
-    vtext: undefined,
-    vattrs: vnodeData,
-    vkey: vkey,
-    vname: vname,
-    elm: undefined,
-    ishost: false
-  } as d.VNode;
+    elm: undefined
+  };
+
+  if (BUILD.vdomAttribute) {
+    vnode.vattrs = vnodeData;
+  }
+
+  if (BUILD.vdomText) {
+    vnode.vtext = undefined;
+  }
+
+  if (BUILD.vdomKey) {
+    vnode.vkey = vkey;
+  }
+
+  if (BUILD.slotPolyfill) {
+    vnode.vname = vname;
+  }
+
+  if (BUILD.reflectToAttr) {
+    vnode.ishost = false;
+  }
+
+  return vnode;
 }
 
 
-const utils: FunctionalUtilities = {
+const vdomFnUtils: FunctionalUtilities = {
   'forEach': (children, cb) => children.forEach(cb),
   'map': (children, cb) => children.map(cb)
 };

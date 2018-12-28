@@ -79,7 +79,8 @@ export interface Build extends BuildFeatures {
   es5: boolean;
   exposeEventListener: boolean;
   exposeRequestAnimationFrame: boolean;
-  exposeTaskQueue: boolean;
+  exposeReadQueue: boolean;
+  exposeWriteQueue: boolean;
   externalModuleLoader: boolean;
   hotModuleReplacement: boolean;
   isDebug: boolean;

@@ -14,8 +14,9 @@ export const initHostComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Compo
         .filter(m => m[3])
         .map(m => (attrNameToPropName.set(m[0], m[3]), m[3]));
 
-      (Cstr as any).prototype.attributeChangedCallback = (attrName: string, _oldValue: string, newValue: string) =>
+      (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
         this[attrNameToPropName.get(attrName.toLowerCase())] = newValue;
+      };
     }
 
     proxyComponent((Cstr as any).prototype, cmpMeta);

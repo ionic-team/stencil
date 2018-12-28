@@ -192,15 +192,15 @@ const addVnodes = (
   containerElm?: d.RenderNode,
   childNode?: Node
 ) => {
-  const contentRef = parentElm['s-cr'];
-  containerElm = ((contentRef && contentRef.parentNode) || parentElm) as any;
-  if ((containerElm as any).shadowRoot && toLowerCase(containerElm.nodeName) === hostTagName) {
+  containerElm = ((BUILD.slotPolyfill && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
+
+  if (BUILD.shadowDom && (containerElm as any).shadowRoot && toLowerCase(containerElm.nodeName) === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      childNode = isDef(vnodes[startIdx].vtext) ?
+      childNode = (BUILD.vdomText && isDef(vnodes[startIdx].vtext)) ?
                   document.createTextNode(vnodes[startIdx].vtext) :
                   createElm(null, parentVNode, startIdx, parentElm);
 
@@ -305,7 +305,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
         }
       }
 
-      if (isDef(idxInOld)) {
+      if (BUILD.vdomKey && isDef(idxInOld)) {
         elmToMove = oldCh[idxInOld];
 
         if (elmToMove.vtag !== newStartVnode.vtag) {
@@ -352,11 +352,12 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
-  if (vnode1.vtag === vnode2.vtag && (BUILD.vdomKey && vnode1.vkey === vnode2.vkey)) {
-    if (BUILD.slotPolyfill) {
-      if (vnode1.vtag === 'slot') {
-        return vnode1.vname === vnode2.vname;
-      }
+  if (vnode1.vtag === vnode2.vtag) {
+    if (BUILD.slotPolyfill && vnode1.vtag === 'slot') {
+      return vnode1.vname === vnode2.vname;
+    }
+    if (BUILD.vdomKey) {
+      return vnode1.vkey === vnode2.vkey;
     }
     return true;
   }
@@ -384,14 +385,14 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
   if (BUILD.svg) {
     // test if we're rendering an svg element, or still rendering nodes inside of one
     // only add this to the when the compiler sees we're using an svg somewhere
-    isSvgMode = newVNode.elm &&
-                isDef(newVNode.elm.parentNode) &&
-                ((newVNode.elm as any) as SVGElement).ownerSVGElement !== undefined;
+    isSvgMode = elm &&
+                isDef(elm.parentNode) &&
+                ((elm as any) as SVGElement).ownerSVGElement !== undefined;
 
     isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
   }
 
-  if (!isDef(newVNode.vtext)) {
+  if (!BUILD.vdomText || !isDef(newVNode.vtext)) {
     // element node
 
     if (BUILD.vdomAttribute && newVNode.vtag !== 'slot') {
@@ -407,7 +408,7 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
 
     } else if (isDef(newChildren)) {
       // no old child vnodes, but there are new child vnodes to add
-      if (BUILD.updatable && isDef(oldVNode.vtext)) {
+      if (BUILD.updatable && BUILD.vdomText && isDef(oldVNode.vtext)) {
         // the old vnode was text, so be sure to clear it out
         elm.textContent = '';
       }
@@ -423,7 +424,7 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
     // this element has slotted content
     defaultHolder.parentNode.textContent = newVNode.vtext;
 
-  } else if (oldVNode.vtext !== newVNode.vtext) {
+  } else if (BUILD.vdomText && oldVNode.vtext !== newVNode.vtext) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
     elm.textContent = newVNode.vtext;
@@ -593,7 +594,7 @@ interface RelocateNode {
 
 export const vdomRender = (hostElement: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, oldVNode: d.VNode, renderFnResults: any, hostDataFnResults?: any) => {
   const newVNode = h(null, hostDataFnResults, renderFnResults);
-  newVNode.elm = (BUILD.shadowDom ? hostElement.shadowRoot || hostElement : hostElement) as any;
+  newVNode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElement.shadowRoot || hostElement : hostElement) as any;
 
   if (BUILD.reflectToAttr) {
     // only care if we're reflecting values to the host element

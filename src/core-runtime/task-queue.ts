@@ -69,8 +69,10 @@ const flush = () => {
   // always force a bunch of medium callbacks to run, but still have
   // a throttle on how many can run in a certain time
 
-  // DOM READS!!!
-  consume(domReads);
+  if (BUILD.exposeReadQueue) {
+    // DOM READS!!!
+    consume(domReads);
+  }
 
   const timeout = performance.now() + (7 * Math.ceil(state.congestion * (1.0 / 22.0)));
 
@@ -83,7 +85,7 @@ const flush = () => {
     domWrites.length = 0;
   }
 
-  if (state.rafPending = ((domReads.length + domWrites.length + domWritesLow.length) > 0)) {
+  if (state.rafPending = ((BUILD.exposeReadQueue ? (domReads.length + domWrites.length + domWritesLow.length) : (domWrites.length + domWritesLow.length)) > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
     if (BUILD.exposeRequestAnimationFrame) {
@@ -102,5 +104,5 @@ const flush = () => {
 };
 
 
-export const readTask = BUILD.taskQueue ? queueTask(domReads) : undefined;
-export const writeTask = BUILD.taskQueue ? queueTask(domWrites) : undefined;
+export const readTask = BUILD.exposeReadQueue ? queueTask(domReads) : undefined;
+export const writeTask = (BUILD.exposeWriteQueue || BUILD.taskQueue) ? queueTask(domWrites) : undefined;
