@@ -1,9 +1,10 @@
-<a name="0.16.2-0"></a>
-## 🌐 [Prerelease] [0.16.2-0](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-0) (2018-12-28)
+<a name="0.16.2-1"></a>
+## 🐇 [Prerelease] [0.16.2-1](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-1) (2018-12-28)
 
 
 ### Bug Fixes
 
+* **docs:** markdown event docs emit the type, not detail ([5878850](https://github.com/ionic-team/stencil/commit/5878850))
 * **rollup:** update rollup ([4ce1008](https://github.com/ionic-team/stencil/commit/4ce1008))
 * **ts:** update ts 3.2
 
