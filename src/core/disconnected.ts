@@ -1,4 +1,4 @@
-import { callNodeRefs } from '../renderer/vdom/patch';
+// import { callNodeRefs } from '../renderer/vdom/patch';
 import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { NODE_TYPE } from '../util/constants';
 import { propagateComponentReady } from './init-component-instance';
@@ -23,7 +23,7 @@ export const disconnectedCallback = (plt: PlatformApi, elm: HostElement, perf: P
     propagateComponentReady(plt, elm);
 
     // since we're disconnecting, call all of the JSX ref's with null
-    callNodeRefs(plt.vnodeMap.get(elm), true);
+    // callNodeRefs(plt.vnodeMap.get(elm), true);
 
     // detatch any event listeners that may have been added
     // because we're not passing an exact event name it'll

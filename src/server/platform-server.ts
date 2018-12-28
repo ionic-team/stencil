@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
-import { createRendererPatch } from '../renderer/vdom/patch';
+// import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
 import { enableEventListener } from '../core/listeners';
 import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
@@ -121,7 +121,7 @@ export function createPlatformServer(
   patchDomApi(config, plt, domApi, perf);
 
   // create the renderer which will be used to patch the vdom
-  plt.render = createRendererPatch(plt, domApi);
+  // plt.render = createRendererPatch(plt, domApi);
 
   // patch the componentOnReady fn
   initCoreComponentOnReady(plt, App);

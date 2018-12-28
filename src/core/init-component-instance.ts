@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { callNodeRefs } from '../renderer/vdom/patch';
+// import { callNodeRefs } from '../renderer/vdom/patch';
 import { initEventEmitters } from './init-event-emitters';
 import { NODE_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
@@ -79,7 +79,7 @@ export const initComponentInstance = (
   }
 
   return instance;
-}
+};
 
 
 export const initComponentLoaded = (plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, perf: Performance, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[], hasCmpLoaded?: boolean): any => {
@@ -124,7 +124,7 @@ export const initComponentLoaded = (plt: d.PlatformApi, elm: d.HostElement, hydr
 
     try {
       // fire off the ref if it exists
-      callNodeRefs(plt.vnodeMap.get(elm));
+      // callNodeRefs(plt.vnodeMap.get(elm));
 
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
