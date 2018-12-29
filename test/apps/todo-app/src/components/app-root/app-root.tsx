@@ -2,10 +2,9 @@ import { Component, State, Listen, h } from '@stencil/core';
 
 
 @Component({
-  tag: 'my-todo',
-  styleUrl: 'my-todo.css'
+  tag: 'app-root'
 })
-export class MyTodo {
+export class AppRoot {
   @State() list: TodoItem[] = [
     { text: 'my initial todo', checked: false },
     { text: 'Learn about Web Components', checked: true }
@@ -32,10 +31,14 @@ export class MyTodo {
   render() {
     return (
       <div>
-        <h1>Todos Stencil</h1>
-        <section>
+        <header class="header">
+          <h1>Todos Stencil</h1>
           <todo-input></todo-input>
-          <ul id="list-container">
+        </header>
+        <section class="main">
+          <input id="toggle-all" class="toggle-all" type="checkbox"/>
+          <label htmlFor="toggle-all"/>
+          <ul class="todo-list">
             {this.list.map((item, index) => (
               <todo-item
                 checked={item.checked}

@@ -234,8 +234,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('requestLatestCompilerVersion');
   }
 
-  resolveModule(fromDir: string, moduleId: string) {
-    return this.nodeResolveModule.resolveModule(fromDir, moduleId);
+  resolveModule(fromDir: string, moduleId: string, opts?: d.ResolveModuleOptions) {
+    return this.nodeResolveModule.resolveModule(fromDir, moduleId, opts);
   }
 
   get rollup() {

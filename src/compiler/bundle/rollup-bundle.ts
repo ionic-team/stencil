@@ -17,15 +17,12 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     buildCtx.debug(`createBundle aborted, not active build`);
   }
 
-  const replaceObj = {
-    'Build.isDev': !!config.devMode,
-    'process.env.NODE_ENV': config.devMode ? 'development' : 'production'
-  };
-
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
-  let rollupBundle: RollupBuild;
-
+  const replaceObj = {
+    'Build.isDev': !!config.devMode,
+    'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
+  };
   const commonjsConfig = {
     include: 'node_modules/**',
     sourceMap: false,
@@ -49,9 +46,6 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     cache: config.enableCache ? compilerCtx.rollupCache : undefined,
     plugins: [
       abortPlugin(buildCtx),
-      rollupPluginReplace({
-        values: replaceObj
-      }),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
       config.sys.rollup.plugins.emptyJsResolver(),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
@@ -59,6 +53,9 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
+      rollupPluginReplace({
+        values: replaceObj
+      }),
       ...config.plugins,
       statsPlugin(buildCtx),
       pluginHelper(config, compilerCtx, buildCtx),
@@ -67,9 +64,11 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
+  let rollupBundle: RollupBuild;
   try {
     rollupBundle = await config.sys.rollup.rollup(rollupConfig);
-    compilerCtx.rollupCache = rollupBundle.cache;
+    compilerCtx.rollupCache = rollupBundle ? rollupBundle.cache : undefined;
+
   } catch (err) {
     // clean rollup cache if error
     compilerCtx.rollupCache = undefined;

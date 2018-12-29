@@ -1,3 +1,4 @@
+import * as d from '../../declarations';
 import fs from 'graceful-fs';
 import path from 'path';
 import { normalizePath } from '../../compiler/util';
@@ -6,12 +7,16 @@ import { normalizePath } from '../../compiler/util';
 export class NodeResolveModule {
   private resolveModuleCache = new Map<string, string>();
 
-  resolveModule(fromDir: string, moduleId: string) {
+  resolveModule(fromDir: string, moduleId: string, opts?: d.ResolveModuleOptions) {
     const cacheKey = `${fromDir}:${moduleId}`;
 
     const cachedPath = this.resolveModuleCache.get(cacheKey);
     if (cachedPath) {
       return cachedPath;
+    }
+
+    if (opts && opts.manuallyResolve) {
+      return this.resolveModuleManually(fromDir, moduleId, cacheKey);
     }
 
     if (moduleId.startsWith('@types/')) {
@@ -67,6 +72,28 @@ export class NodeResolveModule {
       this.resolveModuleCache.set(cacheKey, typesPackageJsonFilePath);
 
       return typesPackageJsonFilePath;
+    }
+
+    throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
+  }
+
+  resolveModuleManually(fromDir: string, moduleId: string, cacheKey: string) {
+    const root = normalizePath(path.parse(fromDir).root);
+
+    let dir = normalizePath(path.join(fromDir, 'noop.js'));
+    let packageJsonFilePath: string;
+
+    while (dir !== root) {
+      dir = normalizePath(path.dirname(dir));
+      packageJsonFilePath = path.join(dir, 'node_modules', moduleId, 'package.json');
+
+      if (!hasAccess(packageJsonFilePath)) {
+        continue;
+      }
+
+      this.resolveModuleCache.set(cacheKey, packageJsonFilePath);
+
+      return packageJsonFilePath;
     }
 
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);

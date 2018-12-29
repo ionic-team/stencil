@@ -65,7 +65,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     collections: collectionNames.map(n => {
       return { collectionName: n };
     })
-  };
+  } as any;
 
   program.emit(undefined, undefined, undefined, true, {
     before: [

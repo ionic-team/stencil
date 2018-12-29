@@ -12,8 +12,8 @@ import { JSXElements } from '@stencil/core';
 
 export namespace Components {
 
-  interface MyTodo {}
-  interface MyTodoAttributes extends JSXElements.HTMLAttributes {}
+  interface AppRoot {}
+  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface TodoInput {}
   interface TodoInputAttributes extends JSXElements.HTMLAttributes {}
@@ -24,22 +24,22 @@ export namespace Components {
 
 declare global {
   interface StencilElementInterfaces {
-    'MyTodo': Components.MyTodo;
+    'AppRoot': Components.AppRoot;
     'TodoInput': Components.TodoInput;
     'TodoItem': Components.TodoItem;
   }
 
   interface StencilIntrinsicElements {
-    'my-todo': Components.MyTodoAttributes;
+    'app-root': Components.AppRootAttributes;
     'todo-input': Components.TodoInputAttributes;
     'todo-item': Components.TodoItemAttributes;
   }
 
 
-  interface HTMLMyTodoElement extends Components.MyTodo, HTMLElement {}
-  var HTMLMyTodoElement: {
-    prototype: HTMLMyTodoElement;
-    new (): HTMLMyTodoElement;
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
+  var HTMLAppRootElement: {
+    prototype: HTMLAppRootElement;
+    new (): HTMLAppRootElement;
   };
 
   interface HTMLTodoInputElement extends Components.TodoInput, HTMLElement {}
@@ -55,13 +55,13 @@ declare global {
   };
 
   interface HTMLElementTagNameMap {
-    'my-todo': HTMLMyTodoElement
+    'app-root': HTMLAppRootElement
     'todo-input': HTMLTodoInputElement
     'todo-item': HTMLTodoItemElement
   }
 
   interface ElementTagNameMap {
-    'my-todo': HTMLMyTodoElement;
+    'app-root': HTMLAppRootElement;
     'todo-input': HTMLTodoInputElement;
     'todo-item': HTMLTodoItemElement;
   }

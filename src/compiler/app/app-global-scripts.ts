@@ -2,10 +2,10 @@ import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble } from '../util';
 import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';
+import rollupPluginReplace from '../bundle/rollup-plugins/rollup-plugin-replace';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import { minifyJs } from '../minifier';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
-import rollupPluginReplace from '../bundle/rollup-plugins/rollup-plugin-replace';
 
 
 export async function generateBrowserAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget: SourceTarget) {
@@ -86,12 +86,11 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
   // start the bundler on our temporary file
   try {
     const replaceObj = {
-      'process.env.NODE_ENV': config.devMode ? 'development' : 'production'
+      'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
     };
     const rollup = await config.sys.rollup.rollup({
       input: entry,
       plugins: [
-        inMemoryFsRead(config, compilerCtx, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -104,6 +103,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
         rollupPluginReplace({
           values: replaceObj
         }),
+        inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
