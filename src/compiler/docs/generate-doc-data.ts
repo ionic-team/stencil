@@ -83,8 +83,8 @@ function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
         docs: getMemberDocumentation(member.jsdoc),
         default: member.jsdoc.default,
 
-        optional: true,
-        required: false,
+        optional: member.attribType ? member.attribType.optional : true,
+        required: member.attribType ? member.attribType.required : false,
       };
     });
 }
