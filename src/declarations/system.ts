@@ -36,7 +36,7 @@ export interface StencilSystem {
   optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
   path?: Path;
   requestLatestCompilerVersion?(): Promise<string>;
-  resolveModule?(fromDir: string, moduleId: string): string;
+  resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
   semver?: Semver;
@@ -52,6 +52,11 @@ export interface StencilSystem {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
+}
+
+
+export interface ResolveModuleOptions {
+  manuallyResolve?: boolean;
 }
 
 
