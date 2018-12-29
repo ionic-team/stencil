@@ -38,29 +38,43 @@ function analysis(appName, filePaths) {
 
 
 function getBuildFileSize(filePath) {
-  const content = fs.readFileSync(filePath);
-  let fileName = path.basename(filePath);
-  let brotliSize = getFileSize(brotli.compress(content).length);
-  let gzipSize = getFileSize(zlib.gzipSync(content, { level: 9 }).length);
-  let minifiedSize = getFileSize(fs.statSync(filePath).size);
+  try {
+    const content = fs.readFileSync(filePath);
+    let fileName = path.basename(filePath);
 
-  while (fileName.length < 26) {
-    fileName += ' ';
+    let brotliSize;
+    let gzipSize;
+    let minifiedSize;
+
+    if (content.length > 0) {
+      brotliSize = getFileSize(brotli.compress(content).length);
+      gzipSize = getFileSize(zlib.gzipSync(content, { level: 9 }).length);
+      minifiedSize = getFileSize(fs.statSync(filePath).size);
+    } else {
+      brotliSize = gzipSize = minifiedSize = getFileSize(0);
+    }
+
+    while (fileName.length < 26) {
+      fileName += ' ';
+    }
+
+    while (brotliSize.length < 8) {
+      brotliSize += ' ';
+    }
+
+    while (gzipSize.length < 8) {
+      gzipSize += ' ';
+    }
+
+    while (minifiedSize.length < 8) {
+      minifiedSize += ' ';
+    }
+
+    return `| ${fileName} | ${brotliSize} | ${gzipSize} | ${minifiedSize} |`;
+
+  } catch (e) {
+    return e;
   }
-
-  while (brotliSize.length < 8) {
-    brotliSize += ' ';
-  }
-
-  while (gzipSize.length < 8) {
-    gzipSize += ' ';
-  }
-
-  while (minifiedSize.length < 8) {
-    minifiedSize += ' ';
-  }
-
-  return `| ${fileName} | ${brotliSize} | ${gzipSize} | ${minifiedSize} |`;
 }
 
 function getFileSize(bytes) {
