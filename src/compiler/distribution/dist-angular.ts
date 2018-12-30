@@ -206,18 +206,20 @@ export class ${tagNameAsPascal} {`];
 function getInputs(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable;
+    return isPublic(m.jsdoc) && (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable);
   });
 }
 
 function getOutputs(cmpMeta: d.ComponentMeta) {
-  return (cmpMeta.eventsMeta || []).map(eventMeta => eventMeta.eventName);
+  return (cmpMeta.eventsMeta || [])
+    .filter(e => isPublic(e.jsdoc))
+    .map(eventMeta => eventMeta.eventName);
 }
 
 function getMethods(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return m.memberType === MEMBER_TYPE.Method;
+    return isPublic(m.jsdoc) && m.memberType === MEMBER_TYPE.Method;
   });
 }
 
@@ -241,4 +243,8 @@ export const DIRECTIVES = [
   ${directives}
 ];
 `;
+}
+
+function isPublic(jsDocs: d.JsDoc | undefined) {
+  return !!(jsDocs && !jsDocs.tags.some((s) => s.name === 'internal'));
 }
