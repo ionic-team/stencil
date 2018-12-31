@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
 import { MEMBER_TYPE } from '../../util/constants';
+import { isDocsPublic } from '../util';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
@@ -16,7 +17,7 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
 function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegistry): d.ComponentMeta[] {
   return Object.keys(cmpRegistry)
     .map(key => cmpRegistry[key])
-    .filter(c => !excludeComponents.includes(c.tagNameMeta))
+    .filter(c => !excludeComponents.includes(c.tagNameMeta) && isDocsPublic(c.jsdoc))
     .sort((a, b) => {
       if (a.tagNameMeta < b.tagNameMeta) return -1;
       if (a.tagNameMeta > b.tagNameMeta) return 1;
@@ -206,18 +207,20 @@ export class ${tagNameAsPascal} {`];
 function getInputs(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable;
+    return isDocsPublic(m.jsdoc) && (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable);
   });
 }
 
 function getOutputs(cmpMeta: d.ComponentMeta) {
-  return (cmpMeta.eventsMeta || []).map(eventMeta => eventMeta.eventName);
+  return (cmpMeta.eventsMeta || [])
+    .filter(e => isDocsPublic(e.jsdoc))
+    .map(eventMeta => eventMeta.eventName);
 }
 
 function getMethods(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return m.memberType === MEMBER_TYPE.Method;
+    return isDocsPublic(m.jsdoc) && m.memberType === MEMBER_TYPE.Method;
   });
 }
 
