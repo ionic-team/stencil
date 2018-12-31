@@ -1,5 +1,5 @@
-<a name="0.16.2-1"></a>
-## 🐇 [Prerelease] [0.16.2-1](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-1) (2018-12-28)
+<a name="0.16.2-2"></a>
+## 🌃 [Prerelease] [0.16.2-2](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-2) (2018-12-31)
 
 
 ### Bug Fixes
@@ -7,6 +7,11 @@
 * **docs:** markdown event docs emit the type, not detail ([5878850](https://github.com/ionic-team/stencil/commit/5878850))
 * **rollup:** update rollup ([4ce1008](https://github.com/ionic-team/stencil/commit/4ce1008))
 * **ts:** update ts 3.2
+* **angular:** do not emit internal components ([37e63e0](https://github.com/ionic-team/stencil/commit/37e63e0))
+* **angular:** do not emit proxies for internal APIs ([7612fa0](https://github.com/ionic-team/stencil/commit/7612fa0))
+* **docs:** emit required metadata for props ([789e973](https://github.com/ionic-team/stencil/commit/789e973))
+* **docs:** filter internal components ([040cacc](https://github.com/ionic-team/stencil/commit/040cacc))
+* **sys:** fix node resolving module w/out package.json main ([39b5d71](https://github.com/ionic-team/stencil/commit/39b5d71))
 
 ### Performance Improvements
 
