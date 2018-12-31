@@ -292,6 +292,8 @@ export interface HostElement extends HTMLElement {
    */
   ['s-hmr-load']?: () => void;
 
+  _listeners?: {[type: string]: (opts?: any) => void};
+
   componentOnReady?: () => Promise<this>;
   color?: string;
   mode?: string;

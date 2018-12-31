@@ -11,7 +11,7 @@ import { h } from './h';
 import { isDef, toLowerCase } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
 import { plt, supportsShadowDom } from '../../core-runtime/data';
-// import { updateElement } from './update-dom-node';
+import { updateElement } from './update-dom-node';
 
 
 let useNativeShadowDom = false;
@@ -74,7 +74,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
     // add css classes, attrs, props, listeners, etc.
     if (BUILD.vdomAttribute) {
-      // updateElement(plt, null, newVNode, isSvgMode);
+      updateElement(null, newVNode, isSvgMode);
     }
 
     if ((BUILD.slotPolyfill || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
@@ -392,14 +392,20 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
     isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
   }
 
-  if (!BUILD.vdomText || !isDef(newVNode.vtext)) {
+
+  if (!isDef(newVNode.vtext)) {
     // element node
 
-    if (BUILD.vdomAttribute && newVNode.vtag !== 'slot') {
-      // either this is the first render of an element OR it's an update
-      // AND we already know it's possible it could have changed
-      // this updates the element's css classes, attrs, props, listeners, etc.
-      // updateElement(plt, oldVNode, newVNode, isSvgMode);
+    if (BUILD.vdomAttribute) {
+      if (BUILD.slot && newVNode.vtag !== 'slot') {
+        // minifier will clean this up
+
+      } else {
+        // either this is the first render of an element OR it's an update
+        // AND we already know it's possible it could have changed
+        // this updates the element's css classes, attrs, props, listeners, etc.
+        updateElement(oldVNode, newVNode, isSvgMode);
+      }
     }
 
     if (BUILD.updatable && isDef(oldChildren) && isDef(newChildren)) {
@@ -420,7 +426,7 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
       removeVnodes(oldChildren, 0, oldChildren.length - 1);
     }
 
-  } else if (BUILD.slotPolyfill && (defaultHolder = (elm['s-cr'] as any))) {
+  } else if (BUILD.vdomText && BUILD.slotPolyfill && (defaultHolder = (elm['s-cr'] as any))) {
     // this element has slotted content
     defaultHolder.parentNode.textContent = newVNode.vtext;
 

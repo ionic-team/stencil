@@ -1,14 +1,26 @@
+/**
+ * Production setAccessor() function based on Preact by
+ * Jason Miller (@developit)
+ * Licensed under the MIT License
+ * https://github.com/developit/preact/blob/master/LICENSE
+ *
+ * Modified for Stencil's compiler and vdom
+ */
+
 import * as d from '../../declarations';
-import { elementHasProperty } from '../../core/element-has-property';
-import { PROP_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
-import { updateAttribute } from './update-attribute';
 
 
-export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean) => {
-  if (memberName === 'class' && !isSvg) {
+export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean) => {
+  if (BUILD.vdomKey && memberName === 'key') {
+    // minifier will clean this up
+
+  } else if (BUILD.vdomRef && memberName === 'ref') {
+    // minifier will clean this up
+
+  } else if (BUILD.vdomClass && memberName === 'class' && (!isSvg)) {
     // Class
-    if (_BUILD_.updatable) {
+    if (BUILD.updatable) {
       if (oldValue !== newValue) {
         const oldList = parseClassList(oldValue);
         const newList = parseClassList(newValue);
@@ -29,9 +41,9 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
       elm.className = newValue;
     }
 
-  } else if (memberName === 'style') {
+  } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
-    if (_BUILD_.updatable) {
+    if (BUILD.updatable) {
       for (const prop in oldValue) {
         if (!newValue || newValue[prop] == null) {
           if (/-/.test(prop)) {
@@ -53,7 +65,7 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
       }
     }
 
-  } else if ((memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) && (!(memberName in elm))) {
+  } else if (BUILD.vdomListener && (memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) && (!(memberName in elm))) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
@@ -76,61 +88,59 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
     }
 
     if (newValue) {
-      if (newValue !== oldValue) {
-        // add listener
-        plt.domApi.$addEventListener(elm, memberName, newValue);
+      if (!oldValue) {
+        elm.addEventListener(name, eventProxy);
       }
 
-    } else if (_BUILD_.updatable) {
-      // remove listener
-      plt.domApi.$removeEventListener(elm, memberName);
+    } else if (BUILD.updatable) {
+      elm.removeEventListener(name, eventProxy);
     }
 
-  } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
-    (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
-    || (!_BUILD_.clientSide && elementHasProperty(plt, elm, memberName))) {
+    (elm._listeners || (elm._listeners = {}))[memberName] = newValue;
+
+  } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
+      (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
-    const cmpMeta = plt.getComponentMeta(elm);
-    if (_BUILD_.hasMembers && cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
-      // we know for a fact that this element is a known component
-      // and this component has this member name as a property,
-      // let's set the known @Prop on this element
-      // set it directly as property on the element
+    if (elm.tagName.includes('-')) {
+      // this member name is a property on a custom element
       setProperty(elm, memberName, newValue);
 
-      if (_BUILD_.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttrib) {
-        // we also want to set this data to the attribute
-        updateAttribute(
-          elm,
-          cmpMeta.membersMeta[memberName].attribName,
-          newValue,
-          cmpMeta.membersMeta[memberName].propType === PROP_TYPE.Boolean,
-        );
-      }
-
-    } else if (memberName !== 'ref') {
-      // this member name is a property on this element, but it's not a component
-      // this is a native property like "value" or something
-      // also we can ignore the "ref" member name at this point
+    } else {
+      // this member name is a property on this element, but it's not a custom element
+      // this is a native property like "value" or something\
       setProperty(elm, memberName, newValue == null ? '' : newValue);
-      if (newValue == null || newValue === false) {
-        plt.domApi.$removeAttribute(elm, memberName);
+      if ((newValue == null || newValue === false) && name !== 'spellcheck') {
+        elm.removeAttribute(name);
       }
     }
 
-  } else if (newValue != null && memberName !== 'key') {
-    if (_BUILD_.isDev && memberName === 'htmlfor') {
+  } else {
+    if (BUILD.isDev && memberName === 'htmlfor') {
       console.error(`Attribute "htmlfor" set on ${elm.tagName.toLowerCase()}, with the lower case "f" must be replaced with a "htmlFor" (capital "F")`);
     }
-    // Element Attributes
-    updateAttribute(elm, memberName, newValue);
 
-  } else if (isSvg || plt.domApi.$hasAttribute(elm, memberName) && (newValue == null || newValue === false)) {
-    // remove svg attribute
-    plt.domApi.$removeAttribute(elm, memberName);
+    let ns: boolean;
+    if (BUILD.svg) {
+      ns = isSvg && (memberName !== (memberName = memberName.replace(/^xlink:?/, '')));
+    }
+
+    if (newValue == null || newValue === false) {
+      if (BUILD.svg && ns) {
+        elm.removeAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName));
+      } else {
+        elm.removeAttribute(memberName);
+      }
+
+    } else if (typeof newValue !== 'function') {
+      if (BUILD.svg && ns) {
+        elm.setAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName), newValue);
+      } else {
+        elm.setAttribute(memberName, newValue);
+      }
+    }
   }
 };
 
@@ -148,3 +158,8 @@ const setProperty = (elm: any, name: string, value: any) => {
     elm[name] = value;
   } catch (e) { }
 };
+
+
+function eventProxy(this: d.HostElement, e: any) {
+  return this._listeners[e.type](e);
+}
