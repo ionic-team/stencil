@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, normalizePath } from '../util';
+import { buildWarn, isDocsPublic, normalizePath } from '../util';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { AUTO_GENERATE_COMMENT } from './constants';
@@ -27,6 +27,9 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       if (!moduleFile.cmpMeta || moduleFile.isCollectionDependency) {
         return false;
       }
+      if (!isDocsPublic(moduleFile.cmpMeta.jsdoc)) {
+        return false;
+      }
       const dirPath = normalizePath(config.sys.path.dirname(filePath));
       if (cmpDirectories.has(dirPath)) {
         const warn = buildWarn(diagnostics);
@@ -46,7 +49,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       const membersMeta = Object.keys(moduleFile.cmpMeta.membersMeta)
         .sort()
         .map(memberName => [memberName, moduleFile.cmpMeta.membersMeta[memberName]] as [string, d.MemberMeta])
-        .filter(([_, member]) => isPublic(member.jsdoc));
+        .filter(([_, member]) => isDocsPublic(member.jsdoc));
 
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
 
@@ -113,7 +116,7 @@ function getEvents(cmpMeta: d.ComponentMeta): d.JsonDocsEvent[] {
     if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
     return 0;
   })
-  .filter(eventMeta => isPublic(eventMeta.jsdoc))
+  .filter(eventMeta => isDocsPublic(eventMeta.jsdoc))
   .map(eventMeta => {
     return {
       event: eventMeta.eventName,
@@ -232,8 +235,4 @@ async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usag
   } catch (e) {}
 
   return rtn;
-}
-
-function isPublic(jsDocs: d.JsDoc | undefined) {
-  return !!(jsDocs && !jsDocs.tags.some((s) => s.name === 'internal'));
 }

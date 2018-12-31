@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
 import { MEMBER_TYPE } from '../../util/constants';
+import { isDocsPublic } from '../util';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
@@ -206,20 +207,20 @@ export class ${tagNameAsPascal} {`];
 function getInputs(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return isPublic(m.jsdoc) && (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable);
+    return isDocsPublic(m.jsdoc) && (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable);
   });
 }
 
 function getOutputs(cmpMeta: d.ComponentMeta) {
   return (cmpMeta.eventsMeta || [])
-    .filter(e => isPublic(e.jsdoc))
+    .filter(e => isDocsPublic(e.jsdoc))
     .map(eventMeta => eventMeta.eventName);
 }
 
 function getMethods(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return isPublic(m.jsdoc) && m.memberType === MEMBER_TYPE.Method;
+    return isDocsPublic(m.jsdoc) && m.memberType === MEMBER_TYPE.Method;
   });
 }
 
@@ -243,8 +244,4 @@ export const DIRECTIVES = [
   ${directives}
 ];
 `;
-}
-
-function isPublic(jsDocs: d.JsDoc | undefined) {
-  return !!(jsDocs && !jsDocs.tags.some((s) => s.name === 'internal'));
 }
