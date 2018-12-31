@@ -17,7 +17,7 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
 function getComponents(excludeComponents: string[], cmpRegistry: d.ComponentRegistry): d.ComponentMeta[] {
   return Object.keys(cmpRegistry)
     .map(key => cmpRegistry[key])
-    .filter(c => !excludeComponents.includes(c.tagNameMeta))
+    .filter(c => !excludeComponents.includes(c.tagNameMeta) && isDocsPublic(c.jsdoc))
     .sort((a, b) => {
       if (a.tagNameMeta < b.tagNameMeta) return -1;
       if (a.tagNameMeta > b.tagNameMeta) return 1;

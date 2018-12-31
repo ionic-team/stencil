@@ -3,7 +3,7 @@ import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { MEMBER_TYPE } from '../../util/constants';
-import { normalizePath, isDocsPublic } from '../util';
+import { isDocsPublic, normalizePath } from '../util';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 
