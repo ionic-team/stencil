@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { proxyComponent } from './proxy-component';
 
 
-export const initHostComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, attrNameToPropName?: Map<string, string>) => {
+export const initHostComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, proxyState?: boolean, attrNameToPropName?: Map<string, string>) => {
   // initHostComponent
   Cstr.cmpMeta = cmpMeta;
 
@@ -19,7 +19,7 @@ export const initHostComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Compo
       };
     }
 
-    proxyComponent((Cstr as any).prototype, cmpMeta);
+    proxyComponent((Cstr as any).prototype, cmpMeta, proxyState);
   }
 
   return Cstr;

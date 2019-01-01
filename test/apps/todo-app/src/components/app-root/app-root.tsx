@@ -38,8 +38,8 @@ export class AppRoot {
           <ul class="todo-list">
             {this.list.map((item, index) => (
               <todo-item
+                onItemCheck={this.itemCheckedHandler}
                 onItemRemove={this.itemRemoveHandler}
-                onItemChecked={this.itemCheckedHandler}
                 checked={item.checked}
                 text={item.text}
                 index={index}

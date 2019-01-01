@@ -7,16 +7,16 @@ export class TodoItem {
   @Prop() checked: boolean;
   @Prop() text: string;
   @Prop() index: number;
-  @Event() itemChecked: EventEmitter;
+  @Event() itemCheck: EventEmitter;
   @Event() itemRemove: EventEmitter;
 
-  handleOnRemove = () => this.itemChecked.emit(this.index);
-  handleOnChecked = () => this.itemRemove.emit(this.index);
+  handleOnCheck = () => this.itemCheck.emit(this.index);
+  handleOnRemove = () => this.itemRemove.emit(this.index);
 
   render() {
     return (
       <li class={this.checked ? 'completed' : ''}>
-        <input class="toggle" type="checkbox" checked={this.checked} onChange={this.handleOnChecked} />
+        <input class="toggle" type="checkbox" checked={this.checked} onChange={this.handleOnCheck} />
         <label>{this.text}</label>
         <button class="destroy" onClick={this.handleOnRemove}></button>
       </li>

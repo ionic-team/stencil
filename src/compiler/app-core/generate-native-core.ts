@@ -32,13 +32,14 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
     c.push(`customElements.define('${cmp.tagName}', initHostComponent(
       ${cmp.componentClassName},
-      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta))}
+      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta))},
+      1
     ));`);
 
   } else {
     // numerous components, so make it easy on minifying
     c.push(formatComponentRuntimeArrays(build, cmps));
-    c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2])));`);
+    c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2], 1)));`);
   }
 
   return c.join('\n');
