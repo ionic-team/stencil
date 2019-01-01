@@ -32,8 +32,11 @@ export function componentDecoratorToStatic(cmpNode: ts.ClassDeclaration, newMemb
     newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(componentOptions.styleUrls)));
   }
 
-  if (typeof componentOptions.styles === 'string' && componentOptions.styleUrl.length > 0) {
-    newMembers.push(createStaticGetter('styles', convertValueToLiteral(componentOptions.styles)));
+  if (typeof componentOptions.styles === 'string') {
+    const styles = componentOptions.styles.trim();
+    if (styles.length > 0) {
+      newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
+    }
   }
 }
 
