@@ -232,6 +232,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'text',
   'textContent',
   'timeRemaining',
+  'type',
   'value',
   'warn',
   'webkitMatchesSelector',

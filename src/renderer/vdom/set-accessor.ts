@@ -89,11 +89,11 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
     if (newValue) {
       if (!oldValue) {
-        elm.addEventListener(name, eventProxy);
+        elm.addEventListener(memberName, eventProxy);
       }
 
     } else if (BUILD.updatable) {
-      elm.removeEventListener(name, eventProxy);
+      elm.removeEventListener(memberName, eventProxy);
     }
 
     (elm._listeners || (elm._listeners = {}))[memberName] = newValue;
@@ -112,8 +112,8 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       // this member name is a property on this element, but it's not a custom element
       // this is a native property like "value" or something\
       setProperty(elm, memberName, newValue == null ? '' : newValue);
-      if ((newValue == null || newValue === false) && name !== 'spellcheck') {
-        elm.removeAttribute(name);
+      if ((newValue == null || newValue === false) && memberName !== 'spellcheck') {
+        elm.removeAttribute(memberName);
       }
     }
 
