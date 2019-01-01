@@ -1,4 +1,4 @@
-import { Component, State, Listen, h } from '@stencil/core';
+import { Component, State, h } from '@stencil/core';
 
 
 @Component({
@@ -10,21 +10,18 @@ export class AppRoot {
     { text: 'Learn about Web Components', checked: true }
   ];
 
-  @Listen('onTodoInputSubmit')
-  todoInputSubmiHandler(e: CustomEvent) {
+  inputSubmiHandler = (e: CustomEvent) => {
     this.list = [...this.list, { text: e.detail, checked: false, }];
   }
 
-  @Listen('onTodoItemChecked')
-  todoItemCheckedHandler(e: CustomEvent) {
+  itemCheckedHandler = (e: CustomEvent) => {
     const list = [...this.list];
     const item = list[e.detail];
     list[e.detail] = Object.assign({}, item, { checked: !item.checked });
     this.list = list;
   }
 
-  @Listen('onTodoItemRemove')
-  todoItemRemoveHandler(e: CustomEvent) {
+  itemRemoveHandler = (e: CustomEvent) => {
     this.list = [...this.list.slice(0, e.detail), ...this.list.slice(e.detail + 1)];
   }
 
@@ -33,7 +30,7 @@ export class AppRoot {
       <div>
         <header class="header">
           <h1>Todos Stencil</h1>
-          <todo-input></todo-input>
+          <todo-input onInputSubmit={this.inputSubmiHandler}></todo-input>
         </header>
         <section class="main">
           <input id="toggle-all" class="toggle-all" type="checkbox"/>
@@ -41,6 +38,8 @@ export class AppRoot {
           <ul class="todo-list">
             {this.list.map((item, index) => (
               <todo-item
+                onItemRemove={this.itemRemoveHandler}
+                onItemChecked={this.itemCheckedHandler}
                 checked={item.checked}
                 text={item.text}
                 index={index}

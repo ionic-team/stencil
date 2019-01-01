@@ -28,8 +28,24 @@ export const proxyComponent = (CstrPrototype: any, cmpMeta: d.ComponentRuntimeMe
     } else if (BUILD.method && (cmpMember[1] === MEMBER_TYPE.Method)) {
       // proxyComponent - method
       Object.defineProperty(CstrPrototype, cmpMember[0], {
-        value: noop,
-        configurable: true
+        value: noop
+      });
+
+    } else if (BUILD.event && (cmpMember[1] === MEMBER_TYPE.Event)) {
+      // proxyComponent - event
+      Object.defineProperty(CstrPrototype, cmpMember[0], {
+        get(this: d.HostElement) {
+          const elm = getElmRef(this).elm;
+          return {
+            emit: (data: any) => elm.dispatchEvent(new CustomEvent(
+              cmpMember[0],
+              {
+                detail: data,
+                // bubbles
+              }
+            ))
+          };
+        }
       });
     }
   });

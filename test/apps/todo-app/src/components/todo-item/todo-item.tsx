@@ -7,11 +7,11 @@ export class TodoItem {
   @Prop() checked: boolean;
   @Prop() text: string;
   @Prop() index: number;
-  @Event() onTodoItemChecked: EventEmitter;
-  @Event() onTodoItemRemove: EventEmitter;
+  @Event() itemChecked: EventEmitter;
+  @Event() itemRemove: EventEmitter;
 
-  handleOnRemove = () => this.onTodoItemRemove.emit(this.index);
-  handleOnChecked = () => this.onTodoItemChecked.emit(this.index);
+  handleOnRemove = () => this.itemChecked.emit(this.index);
+  handleOnChecked = () => this.itemRemove.emit(this.index);
 
   render() {
     return (

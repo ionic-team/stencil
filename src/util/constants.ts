@@ -10,6 +10,7 @@ export const enum MEMBER_TYPE {
   State = 1 << 4,
   Method = 1 << 5,
   Element = 1 << 6,
+  Event = 1 << 7,
 }
 
 

@@ -19,6 +19,14 @@ export function gatherComponentBuildConditionals(cmpMeta: d.ComponentCompilerMet
     }
   }
 
+  if (cmpMeta.events.length > 0) {
+    cmpMeta.hasEvent = true;
+  }
+
+  if (cmpMeta.listeners.length > 0) {
+    cmpMeta.hasListener = true;
+  }
+
   cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);
 
   cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);

@@ -43,6 +43,12 @@ function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta) {
     );
   }
 
+  if (compilerMeta.events) {
+    runtimeMembers.push(
+      ...compilerMeta.events.map(formatEventRuntimeMember)
+    );
+  }
+
   return runtimeMembers;
 }
 
@@ -143,6 +149,23 @@ function formatMethodRuntimeMember(compilerState: d.ComponentCompilerState): d.C
      * [1] member type
      */
     MEMBER_TYPE.Method
+  ];
+
+  return runtimeMethod as any;
+}
+
+
+function formatEventRuntimeMember(compilerState: d.ComponentCompilerState): d.ComponentRuntimeMember {
+  const runtimeMethod: d.ComponentRuntimeMember = [
+    /**
+     * [0] member name
+     */
+    compilerState.name,
+
+    /**
+     * [1] member type
+     */
+    MEMBER_TYPE.Event
   ];
 
   return runtimeMethod as any;

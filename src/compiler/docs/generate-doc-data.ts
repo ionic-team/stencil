@@ -48,7 +48,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
       const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
 
-      const membersMeta: any = null;
+      const membersMeta: any = [];
       //  = Object.keys(moduleFile.cmpCompilerMeta.membersMeta)
       //   .sort()
       //   .map(memberName => [memberName, moduleFile.cmpCompilerMeta.membersMeta[memberName]] as [string, d.MemberMeta])
