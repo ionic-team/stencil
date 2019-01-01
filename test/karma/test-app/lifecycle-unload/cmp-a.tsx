@@ -1,4 +1,4 @@
-import { Component, Element } from '../../../../dist';
+import { Component, Element, h } from '@stencil/core';
 
 @Component({
   tag: 'lifecycle-unload-a',

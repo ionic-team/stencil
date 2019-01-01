@@ -1,4 +1,4 @@
-import { Component, Element, State } from '../../../../dist';
+import { Component, Element, State, h } from '@stencil/core';
 
 @Component({
   tag: 'custom-event'

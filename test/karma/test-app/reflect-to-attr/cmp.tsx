@@ -1,4 +1,4 @@
-import { Component, Prop, Element } from '../../../../dist';
+import { Component, Prop, Element } from '@stencil/core';
 
 @Component({
   tag: 'reflect-to-attr'

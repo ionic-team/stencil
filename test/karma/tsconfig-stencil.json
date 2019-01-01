@@ -23,7 +23,7 @@
     "outDir": "www",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../"]
+      "@stencil/core": ["../../dist"]
     }
   },
   "include": [

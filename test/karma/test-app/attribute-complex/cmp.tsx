@@ -1,4 +1,4 @@
-import { Component, Prop, Method } from '../../../../dist';
+import { Component, Prop, Method } from '@stencil/core';
 
 @Component({
   tag: 'attribute-complex'

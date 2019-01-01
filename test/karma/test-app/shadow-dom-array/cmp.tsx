@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'shadow-dom-array',

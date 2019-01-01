@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
   tag: 'attribute-boolean'
