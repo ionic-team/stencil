@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { bundleAppCore } from './bundle-app-core';
 import { generateLazyLoadedAppCore } from './generate-lazy-core';
 import { generateNativeAppCore } from './generate-native-core';
-import { getComponentsWithStyles, setStylePlaceholders } from './register-styles';
 import { optimizeAppCoreBundle } from './optimize-app-core';
 import { pathJoin } from '../util';
 
@@ -18,12 +17,6 @@ export async function generateAppCore(config: d.Config, compilerCtx: d.CompilerC
 
   } else {
     bundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, coreImportPath, build, files);
-  }
-
-  const cmpsWithStyles = getComponentsWithStyles(build);
-  if (cmpsWithStyles.length > 0) {
-    const styles = await setStylePlaceholders(cmpsWithStyles, coreImportPath);
-    bundleInput += styles;
   }
 
   // bundle up the input into a nice pretty file

@@ -214,26 +214,26 @@ async function generateBundleEsmBuild(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-function injectStyleMode(moduleFiles: d.ModuleFile[], jsText: string, modeName: string, isScopedStyles: boolean) {
+function injectStyleMode(moduleFiles: d.Module[], jsText: string, modeName: string, isScopedStyles: boolean) {
   moduleFiles.forEach(moduleFile => {
-    jsText = injectComponentStyleMode(moduleFile.cmpMeta, modeName, jsText, isScopedStyles);
+    jsText = injectComponentStyleMode(moduleFile.cmpCompilerMeta, modeName, jsText, isScopedStyles);
   });
 
   return jsText;
 }
 
-export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: string, jsText: string, isScopedStyles: boolean) {
+export function injectComponentStyleMode(cmpMeta: d.ComponentCompilerMeta, modeName: string, jsText: string, isScopedStyles: boolean) {
   if (typeof jsText !== 'string') {
     return '';
   }
 
-  const stylePlaceholder = getStylePlaceholder(cmpMeta.tagNameMeta);
-  const stylePlaceholderId = getStyleIdPlaceholder(cmpMeta.tagNameMeta);
+  const stylePlaceholder = getStylePlaceholder(cmpMeta.tagName);
+  const stylePlaceholderId = getStyleIdPlaceholder(cmpMeta.tagName);
 
   let styleText = '';
 
-  if (cmpMeta.stylesMeta) {
-    let modeStyles = cmpMeta.stylesMeta[modeName];
+  if (cmpMeta.styles.length > 0) {
+    let modeStyles = cmpMeta.styles.find(s => s.modeName === modeName);
     if (modeStyles) {
       if (isScopedStyles) {
         // we specifically want scoped css
@@ -247,7 +247,7 @@ export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: str
       }
 
     } else {
-      modeStyles = cmpMeta.stylesMeta[DEFAULT_STYLE_MODE];
+      modeStyles = cmpMeta.styles.find(s => s.modeName === DEFAULT_STYLE_MODE);
       if (modeStyles) {
         if (isScopedStyles) {
           // we specifically want scoped css
@@ -273,13 +273,13 @@ export function injectComponentStyleMode(cmpMeta: d.ComponentMeta, modeName: str
   return jsText;
 }
 
-export function setBundleModeIds(moduleFiles: d.ModuleFile[], modeName: string, bundleId: string) {
+export function setBundleModeIds(moduleFiles: d.Module[], modeName: string, bundleId: string) {
   // assign the bundle id build from the
   // mode, no scoped styles and esm to each of the components
   moduleFiles.forEach(moduleFile => {
-    moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
-    if (typeof moduleFile.cmpMeta.bundleIds === 'object') {
-      moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+    moduleFile.cmpCompilerMeta.bundleIds = moduleFile.cmpCompilerMeta.bundleIds || {};
+    if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'object') {
+      moduleFile.cmpCompilerMeta.bundleIds[modeName] = bundleId;
     }
   });
 }

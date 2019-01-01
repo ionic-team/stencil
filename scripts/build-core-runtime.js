@@ -26,19 +26,14 @@ async function bundleRuntimeCore() {
     format: 'es',
   });
 
-  let code = results.code.trim();
-  // typescript is all tripped all by import()
-  // nothing a good ol' string replace can't fix ;)
-  code = code.replace(/ __import\(/g, ' import(');
-
-  fs.writeFileSync(outputFile, code);
+  fs.writeFileSync(outputFile, results.code);
 }
 
 
 function createPublicJavaScriptExports() {
   const entryPath = path.join(DST_DIR, 'index.js');
   fs.writeFileSync(entryPath,
-    `export { h } from './runtime/index.js';`
+    `export function h() {}`
   );
 }
 

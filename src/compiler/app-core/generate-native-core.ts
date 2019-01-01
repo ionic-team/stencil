@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { updateComponentSource } from './generate-component';
+import { getComponentsWithStyles, setStylePlaceholders } from './register-styles';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
@@ -40,6 +41,12 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
     // numerous components, so make it easy on minifying
     c.push(formatComponentRuntimeArrays(build, cmps));
     c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2], 1)));`);
+  }
+
+  const cmpsWithStyles = getComponentsWithStyles(build);
+  if (cmpsWithStyles.length > 0) {
+    const styles = await setStylePlaceholders(cmpsWithStyles, coreImportPath);
+    c.push(styles);
   }
 
   return c.join('\n');
