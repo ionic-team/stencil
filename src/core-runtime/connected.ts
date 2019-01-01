@@ -1,6 +1,6 @@
 import * as d from '../declarations';
+import { getElmRef } from './data';
 import { initialLoad } from './initial-load';
-import { refs } from './data';
 import { resolved } from './task-queue';
 
 
@@ -8,15 +8,7 @@ export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData) =
   // connectedCallback
 
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.listener) {
-    elmData = refs.get(elm);
-
-    if (!elmData) {
-      refs.set(elm, elmData = {
-        elm: elm,
-        instanceValues: new Map(),
-        instance: BUILD.lazyLoad ? null : elm
-      });
-    }
+    elmData = getElmRef(elm);
 
     if (BUILD.listener) {
       // initialize our event listeners on the host element

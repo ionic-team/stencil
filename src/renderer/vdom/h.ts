@@ -66,8 +66,8 @@ export function h(nodeName: any, vnodeData: any) {
   if (BUILD.vdomAttribute) {
     if (vnodeData != null) {
       // normalize class / classname attributes
-      if (BUILD.vdomClass && vnodeData['className']) {
-        vnodeData['class'] = vnodeData['className'];
+      if (BUILD.vdomClass && vnodeData.className) {
+        vnodeData['class'] = vnodeData.className;
       }
 
       if (BUILD.vdomClass && typeof vnodeData['class'] === 'object') {

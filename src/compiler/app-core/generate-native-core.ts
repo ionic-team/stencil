@@ -32,7 +32,7 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
     c.push(`customElements.define('${cmp.tagName}', initHostComponent(
       ${cmp.componentClassName},
-      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpMeta))}
+      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta))}
     ));`);
 
   } else {
@@ -55,7 +55,7 @@ async function updateToNativeComponent(config: d.Config, compilerCtx: d.Compiler
     outputText: outputText,
     tagName: moduleFile.cmpCompilerMeta.tagName,
     componentClassName: moduleFile.cmpCompilerMeta.componentClassName,
-    cmpMeta: moduleFile.cmpCompilerMeta
+    cmpCompilerMeta: moduleFile.cmpCompilerMeta
   };
 
   return cmpData;
@@ -81,7 +81,7 @@ function formatComponentRuntimeArray(build: d.Build, cmp: ComponentSourceData) {
   c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`,\n${formatComponentRuntimeMeta(build, cmp.cmpMeta)}`);
+  c.push(`,\n${formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta)}`);
 
   c.push(`]\n`);
 
@@ -94,5 +94,5 @@ interface ComponentSourceData {
   outputText: string;
   tagName: string;
   componentClassName: string;
-  cmpMeta: d.ComponentCompilerMeta;
+  cmpCompilerMeta: d.ComponentCompilerMeta;
 }

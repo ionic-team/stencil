@@ -13,7 +13,7 @@ export const config: Config = {
     }
   ],
 
-  devServer: null,
+  // devServer: null,
 
   enableCache: false
 

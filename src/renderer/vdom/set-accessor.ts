@@ -18,7 +18,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
   } else if (BUILD.vdomRef && memberName === 'ref') {
     // minifier will clean this up
 
-  } else if (BUILD.vdomClass && memberName === 'class' && (!isSvg)) {
+  } else if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
       if (oldValue !== newValue) {
@@ -122,20 +122,20 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       console.error(`Attribute "htmlfor" set on ${elm.tagName.toLowerCase()}, with the lower case "f" must be replaced with a "htmlFor" (capital "F")`);
     }
 
-    let ns: boolean;
+    let isXLink: boolean;
     if (BUILD.svg) {
-      ns = isSvg && (memberName !== (memberName = memberName.replace(/^xlink:?/, '')));
+      isXLink = isSvg && (memberName !== (memberName = memberName.replace(/^xlink:?/, '')));
     }
 
     if (newValue == null || newValue === false) {
-      if (BUILD.svg && ns) {
+      if (BUILD.svg && isXLink) {
         elm.removeAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName));
       } else {
         elm.removeAttribute(memberName);
       }
 
     } else if (typeof newValue !== 'function') {
-      if (BUILD.svg && ns) {
+      if (BUILD.svg && isXLink) {
         elm.setAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName), newValue);
       } else {
         elm.setAttribute(memberName, newValue);
@@ -149,14 +149,10 @@ const parseClassList = (value: string | undefined | null): string[] =>
   (value == null || value === '') ? [] : value.trim().split(/\s+/);
 
 
-/**
- * Attempt to set a DOM property to the given value.
- * IE & FF throw for certain property-value combinations.
- */
-const setProperty = (elm: any, name: string, value: any) => {
+const setProperty = (elm: any, propName: string, newValue: any) => {
   try {
-    elm[name] = value;
-  } catch (e) { }
+    elm[propName] = newValue;
+  } catch (e) {}
 };
 
 

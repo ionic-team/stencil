@@ -26,19 +26,20 @@ export interface ComponentRuntimeMember {
   [1]: number;
 
   /**
-   * reflect to attribute
-   */
-  [2]: boolean;
-
-  /**
-   * is attribute name to observe
-   */
-  [3]: string;
-
-  /**
    * prop type
    */
-  [4]: number;
+  [2]?: number;
+
+  /**
+   * attribute name to observe
+   */
+  [3]?: string | 1 | 0;
+
+  /**
+   * reflect to attribute
+   */
+  [4]?: boolean;
+
 }
 
 

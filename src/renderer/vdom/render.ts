@@ -377,10 +377,10 @@ const referenceNode = (node: d.RenderNode) => {
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
 
-const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Comment) => {
-  const elm = newVNode.elm = oldVNode.elm;
-  const oldChildren = oldVNode.vchildren;
-  const newChildren = newVNode.vchildren;
+const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement, oldChildren?: d.FVNode[], newChildren?: d.FVNode[], defaultHolder?: Comment) => {
+  elm = newVNode.elm = oldVNode.elm;
+  oldChildren = oldVNode.vchildren;
+  newChildren = newVNode.vchildren;
 
   if (BUILD.svg) {
     // test if we're rendering an svg element, or still rendering nodes inside of one
@@ -391,7 +391,6 @@ const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Commen
 
     isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
   }
-
 
   if (!isDef(newVNode.vtext)) {
     // element node
