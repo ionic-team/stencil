@@ -4,9 +4,9 @@
   "scripts": {
     "analysis": "node ./.scripts/analysis.js",
     "build": "npm run build.hello-world && npm run build.hello-vdom && npm run build.todo && npm run analysis",
-    "build.hello-world": "cd ./apps/hello-world && npm run build",
-    "build.hello-vdom": "cd ./apps/hello-vdom && npm run build",
-    "build.todo": "cd ./apps/todo-app && npm run build"
+    "build.hello-world": "cd ./hello-world && npm run build",
+    "build.hello-vdom": "cd ./hello-vdom && npm run build",
+    "build.todo": "cd ./todo-app && npm run build"
   },
   "devDependencies": {
     "brotli": "^1.3.2"

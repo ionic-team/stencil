@@ -2,7 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const fileSizeProfile = require('./file-size-profile')
 
-const output = [];
+const output = [
+  `# Test Apps`,
+  '',
+  '`npm run build`',
+  ''
+];
 const rootDir = path.join(__dirname, '..');
 
 

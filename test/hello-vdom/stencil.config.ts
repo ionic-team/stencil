@@ -1,4 +1,4 @@
-import { Config } from '../../../dist';
+import { Config } from '../../dist';
 
 export const config: Config = {
 

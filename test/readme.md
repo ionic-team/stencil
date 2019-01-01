@@ -1,3 +1,7 @@
+# Test Apps
+
+`npm run build`
+
 
 ## Hello World
 
