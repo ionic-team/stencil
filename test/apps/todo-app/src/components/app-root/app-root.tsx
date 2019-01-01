@@ -26,9 +26,8 @@ export class AppRoot {
   }
 
   toggleAllHandler = (e: CustomEvent) => {
-    const isChecked = (e.target as HTMLInputElement).checked;
     this.list = this.list.map(item => {
-      item.checked = !!isChecked;
+      item.checked = !!(e.target as HTMLInputElement).checked;
       return item;
     });
   }

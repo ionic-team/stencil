@@ -7,9 +7,17 @@
 
 
 
+## Hello VDOM
+
+| File                       | Brotli   | Gzipped  | Minified |
+|----------------------------|----------|----------|----------|
+| app.js                     | 646B     | 735B     | 1.25KB   |
+
+
+
 ## Todo App
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.js                     | 2.46KB   | 2.77KB   | 5.97KB   |
+| app.js                     | 2.51KB   | 2.83KB   | 6.14KB   |
 

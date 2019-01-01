@@ -13,6 +13,13 @@ fileSizeProfile('Hello World',
   output
 );
 
+fileSizeProfile('Hello VDOM',
+  [
+    path.join(rootDir, 'hello-vdom', 'www', 'build', 'app.js'),
+  ],
+  output
+);
+
 fileSizeProfile('Todo App',
   [
     path.join(rootDir, 'todo-app', 'www', 'build', 'app.js'),
