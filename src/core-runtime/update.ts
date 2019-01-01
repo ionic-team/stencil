@@ -90,8 +90,8 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
         if (BUILD.vdomRender) {
           vdomRender(
             elm,
+            elmData,
             cmpMeta,
-            elmData.vnode || {},
             (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
             instance.hostData && instance.hostData()
           );
