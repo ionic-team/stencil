@@ -1,11 +1,11 @@
-import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from '../../declarations';
+import * as d from '../../declarations';
 import { buildWarn, normalizePath } from '../../compiler/util';
 import { splitLineBreaks } from './logger-util';
 import { toTitleCase } from '../helpers';
 
 
-export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, rollupError: any) {
-  const d: Diagnostic = {
+export function loadRollupDiagnostics(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
+  const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'bundling',
     language: 'javascript',
@@ -18,16 +18,16 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
   };
 
   if (rollupError.loc && rollupError.loc.file) {
-    d.absFilePath = normalizePath(rollupError.loc.file);
+    diagnostic.absFilePath = normalizePath(rollupError.loc.file);
     if (config) {
-      d.relFilePath = normalizePath(config.sys.path.relative(config.cwd, d.absFilePath));
+      diagnostic.relFilePath = normalizePath(config.sys.path.relative(config.cwd, diagnostic.absFilePath));
     }
 
     try {
-      const sourceText = compilerCtx.fs.readFileSync(d.absFilePath);
+      const sourceText = compilerCtx.fs.readFileSync(diagnostic.absFilePath);
       const srcLines = splitLineBreaks(sourceText);
 
-      const errorLine: PrintLine = {
+      const errorLine: d.PrintLine = {
         lineIndex: rollupError.loc.line - 1,
         lineNumber: rollupError.loc.line,
         text: srcLines[rollupError.loc.line - 1],
@@ -35,8 +35,8 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLength: 0
       };
 
-      d.lineNumber = errorLine.lineNumber;
-      d.columnNumber = errorLine.errorCharStart;
+      diagnostic.lineNumber = errorLine.lineNumber;
+      diagnostic.columnNumber = errorLine.errorCharStart;
 
       const highlightLine = errorLine.text.substr(rollupError.loc.column);
       for (var i = 0; i < highlightLine.length; i++) {
@@ -46,7 +46,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLine.errorLength++;
       }
 
-      d.lines.push(errorLine);
+      diagnostic.lines.push(errorLine);
 
       if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
         errorLine.errorLength = 1;
@@ -54,7 +54,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
       }
 
       if (errorLine.lineIndex > 0) {
-        const previousLine: PrintLine = {
+        const previousLine: d.PrintLine = {
           lineIndex: errorLine.lineIndex - 1,
           lineNumber: errorLine.lineNumber - 1,
           text: srcLines[errorLine.lineIndex - 1],
@@ -62,11 +62,11 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
           errorLength: -1
         };
 
-        d.lines.unshift(previousLine);
+        diagnostic.lines.unshift(previousLine);
       }
 
       if (errorLine.lineIndex + 1 < srcLines.length) {
-        const nextLine: PrintLine = {
+        const nextLine: d.PrintLine = {
           lineIndex: errorLine.lineIndex + 1,
           lineNumber: errorLine.lineNumber + 1,
           text: srcLines[errorLine.lineIndex + 1],
@@ -74,20 +74,20 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
           errorLength: -1
         };
 
-        d.lines.push(nextLine);
+        diagnostic.lines.push(nextLine);
       }
     } catch (e) {
-      d.messageText = `Error parsing: ${rollupError.loc.file}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
+      diagnostic.messageText = `Error parsing: ${rollupError.loc.file}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
     }
   }
 
-  buildCtx.diagnostics.push(d);
+  buildCtx.diagnostics.push(diagnostic);
 }
 
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
 
-export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
+export function createOnWarnFn(config: d.Config, diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
@@ -109,7 +109,7 @@ export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundle
 
     let label = '';
     if (bundleModulesFiles) {
-      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpMeta.tagNameMeta).join(', ').trim();
+      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpCompilerMeta.tagName).join(', ').trim();
       if (label.length) {
         label += ': ';
       }
