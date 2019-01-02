@@ -3,7 +3,10 @@ import * as d from '.';
 
 export type ModuleMap = Map<string, Module>;
 
-
+/**
+ * Module gets serialized/parsed as JSON
+ * cannot use Map or Set
+ */
 export interface Module {
   cmpCompilerMeta: d.ComponentCompilerMeta;
   collectionName: string;
@@ -19,8 +22,8 @@ export interface Module {
   hasVdomRender: boolean;
   hasVdomStyle: boolean;
   hasVdomText: boolean;
-  htmlAttrNames: Set<string>;
-  htmlTagNames: Set<string>;
+  htmlAttrNames: string[];
+  htmlTagNames: string[];
   isCollectionDependency: boolean;
   jsFilePath: string;
   localImports: string[];

@@ -11,12 +11,12 @@ export function visitStringLiteral(moduleFile: d.Module, node: ts.StringLiteral)
       });
     }
 
-    if (!moduleFile.htmlTagNames.has('slot') && node.text.includes('<slot')) {
-      moduleFile.htmlTagNames.add('slot');
+    if (!moduleFile.htmlTagNames.includes('slot') && node.text.includes('<slot')) {
+      moduleFile.htmlTagNames.push('slot');
     }
 
-    if (!moduleFile.htmlTagNames.has('svg') && node.text.includes('<svg')) {
-      moduleFile.htmlTagNames.add('svg');
+    if (!moduleFile.htmlTagNames.includes('svg') && node.text.includes('<svg')) {
+      moduleFile.htmlTagNames.push('svg');
     }
   }
 }

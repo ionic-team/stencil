@@ -116,7 +116,7 @@ function updateBuildIds(buildId, input) {
   let output = input;
 
   // increment this number to bust the cache entirely
-  const CACHE_BUSTER = 1;
+  const CACHE_BUSTER = 2;
 
   output = output.replace(/__BUILDID__/g, buildId);
 

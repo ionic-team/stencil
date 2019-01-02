@@ -48,7 +48,9 @@ export function gatherVdomMeta(moduleFile: d.Module, args: ts.NodeArray<ts.Expre
           }
 
           attrs.forEach(attrName => {
-            moduleFile.htmlAttrNames.add(attrName);
+            if (!moduleFile.htmlAttrNames.includes(attrName)) {
+              moduleFile.htmlAttrNames.push(attrName);
+            }
           });
         }
       }

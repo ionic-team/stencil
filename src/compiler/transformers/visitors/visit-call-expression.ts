@@ -42,7 +42,9 @@ function visitCallExpressionArg(moduleFile: d.Module, arg: ts.Expression) {
 
     if (typeof tag === 'string') {
       tag = tag.toLowerCase();
-      moduleFile.htmlTagNames.add(tag);
+      if (!moduleFile.htmlTagNames.includes(tag)) {
+        moduleFile.htmlTagNames.push(tag);
+      }
 
       if (tag.includes('-')) {
         if (!moduleFile.potentialCmpRefs.some(cr => cr.tag === tag)) {

@@ -81,8 +81,8 @@ export class ModuleFile implements d.Module {
   hasVdomRender = false;
   hasVdomStyle = false;
   hasVdomText = false;
-  htmlAttrNames = new Set<string>();
-  htmlTagNames = new Set<string>();
+  htmlAttrNames: string[] = [];
+  htmlTagNames: string[] = [];
   isCollectionDependency = false;
   jsFilePath: string = null;
   localImports: string[] = [];
@@ -109,8 +109,8 @@ export class ModuleFile implements d.Module {
     this.hasVdomRender = false;
     this.hasVdomStyle = false;
     this.hasVdomText = false;
-    this.htmlAttrNames.clear();
-    this.htmlTagNames.clear();
+    this.htmlAttrNames.length = 0;
+    this.htmlTagNames.length = 0;
     this.isCollectionDependency = false;
     this.jsFilePath = null;
     this.localImports.length = 0;
