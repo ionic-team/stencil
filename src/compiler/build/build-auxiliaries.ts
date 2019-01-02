@@ -4,14 +4,14 @@ import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { prerenderOutputTargets } from '../prerender/prerender-app';
 
 
-export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function buildAuxiliaries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
   // let's prerender this first
   // and run service workers on top of this when it's done
-  await prerenderOutputTargets(config, compilerCtx, buildCtx, entryModules);
+  await prerenderOutputTargets(config, compilerCtx, buildCtx);
 
   // generate component docs
   // and service workers can run in parallel

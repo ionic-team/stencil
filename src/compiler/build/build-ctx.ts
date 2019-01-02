@@ -42,6 +42,7 @@ export class BuildContext implements d.BuildCtx {
   scriptsDeleted: string[] = [];
   startTime = Date.now();
   styleBuildCount = 0;
+  stylesPromise: Promise<void> = null;
   stylesUpdated: d.BuildStyleUpdate[] = [];
   timeSpan: d.LoggerTimeSpan = null;
   timestamp: string;

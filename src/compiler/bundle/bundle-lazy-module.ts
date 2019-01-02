@@ -12,12 +12,12 @@ import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
 import statsPlugin from './rollup-plugins/rollup-stats-plugin';
 
 
-export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function bundleLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryInputPaths: string[]) {
   if (!buildCtx.isActiveBuild) {
-    buildCtx.debug(`createBundle aborted, not active build`);
+    buildCtx.debug(`bundleLazyModule aborted, not active build`);
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`bundleLazyModule started`, true);
 
   const replaceObj = {
     'Build.isDev': !!config.devMode,
@@ -39,7 +39,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
 
   const rollupConfig: RollupDirOptions = {
     ...config.rollupConfig.inputOptions,
-    input: entryModules.map(b => b.filePath),
+    input: entryInputPaths,
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
     treeshake: !config.devMode,
@@ -50,7 +50,7 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       config.sys.rollup.plugins.emptyJsResolver(),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
-      inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
+      inMemoryFsRead(config, compilerCtx, buildCtx),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
       rollupPluginReplace({
@@ -64,10 +64,10 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
-  let rollupBundle: RollupBuild;
+  let rollupBuild: RollupBuild = null;
   try {
-    rollupBundle = await config.sys.rollup.rollup(rollupConfig);
-    compilerCtx.rollupCache = rollupBundle ? rollupBundle.cache : undefined;
+    rollupBuild = await config.sys.rollup.rollup(rollupConfig);
+    compilerCtx.rollupCache = rollupBuild ? rollupBuild.cache : undefined;
 
   } catch (err) {
     // clean rollup cache if error
@@ -78,10 +78,11 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
       loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
 
     } else {
-      buildCtx.debug(`createBundle errors ignored, not active build`);
+      buildCtx.debug(`bundleLazyModule errors ignored, not active build`);
     }
   }
 
-  timeSpan.finish(`createBundle finished`);
-  return rollupBundle;
+  timeSpan.finish(`bundleLazyModule finished`);
+
+  return rollupBuild;
 }

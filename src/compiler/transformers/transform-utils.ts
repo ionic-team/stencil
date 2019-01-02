@@ -422,3 +422,13 @@ export function copyComments(src: ts.Node, dst: ts.Node) {
     ts.setSyntheticLeadingComments(dst, newComments as any);
   }
 }
+
+
+export function isComponentClassNode(node: ts.Node, moduleFile: d.Module): node is ts.ClassDeclaration {
+  if (ts.isClassDeclaration(node)) {
+    if (node.name.getText().trim() === moduleFile.cmpCompilerMeta.componentClassName) {
+      return true;
+    }
+  }
+  return false;
+}

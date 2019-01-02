@@ -1,10 +1,49 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
+import { isComponentClassNode } from '../transformers/transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 
 
-export function updateComponentForBuild(build: d.Build, coreImportPath: string, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
+export function generateNativeComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+  if (buildCtx.hasError) {
+    return '';
+  }
+
+  const c: string[] = [];
+
+  try {
+    const transpileOpts: ts.TranspileOptions = {
+      compilerOptions: {
+        module: ts.ModuleKind.ESNext,
+        removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
+        target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
+      },
+      fileName: moduleFile.jsFilePath,
+      transformers: {
+        after: [
+          transformToNativeComponent(build, coreImportPath, moduleFile)
+        ]
+      }
+    };
+
+    const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
+
+    loadTypeScriptDiagnostics(null, buildCtx.diagnostics, transpileOutput.diagnostics);
+
+    if (!buildCtx.hasError) {
+      c.push(transpileOutput.outputText);
+    }
+
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
+  }
+
+  return c.join('\n');
+}
+
+
+function transformToNativeComponent(build: d.Build, coreImportPath: string, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
   const cmp: ComponentData = {
     build: build,
     coreImportPath: coreImportPath,
@@ -29,6 +68,23 @@ export function updateComponentForBuild(build: d.Build, coreImportPath: string, 
       return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
     };
   };
+}
+
+
+function addImport(cmp: ComponentData, importFnName: string) {
+  const importDeclaration = ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports([
+      ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
+    ])),
+    ts.createLiteral(cmp.coreImportPath)
+  );
+
+  cmp.sourceFileNode = ts.updateSourceFileNode(cmp.sourceFileNode, [
+    importDeclaration,
+    ...cmp.sourceFileNode.statements
+  ]);
 }
 
 
@@ -123,71 +179,6 @@ function addComponentCallback(methodName: string) {
 const REMOVE_STATIC_GETTERS = new Set([
   'is', 'properties', 'encapsulation', 'events', 'listeners', 'states', 'style', 'styleMode', 'styleUrl'
 ]);
-
-
-function addImport(cmp: ComponentData, importFnName: string) {
-  const importDeclaration = ts.createImportDeclaration(
-    undefined,
-    undefined,
-    ts.createImportClause(undefined, ts.createNamedImports([
-      ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
-    ])),
-    ts.createLiteral(cmp.coreImportPath)
-  );
-
-  cmp.sourceFileNode = ts.updateSourceFileNode(cmp.sourceFileNode, [
-    importDeclaration,
-    ...cmp.sourceFileNode.statements
-  ]);
-}
-
-
-export function updateComponentSource(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
-  if (buildCtx.hasError) {
-    return '';
-  }
-
-  const c: string[] = [];
-
-  try {
-    const transpileOpts: ts.TranspileOptions = {
-      compilerOptions: {
-        module: ts.ModuleKind.ESNext,
-        removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
-        target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
-      },
-      fileName: moduleFile.jsFilePath,
-      transformers: {
-        after: [
-          updateComponentForBuild(build, coreImportPath, moduleFile)
-        ]
-      }
-    };
-
-    const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
-
-    loadTypeScriptDiagnostics(null, buildCtx.diagnostics, transpileOutput.diagnostics);
-
-    if (!buildCtx.hasError) {
-      c.push(transpileOutput.outputText);
-    }
-
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
-  }
-
-  return c.join('\n');
-}
-
-
-function isComponentClassNode(node: ts.Node, moduleFile: d.Module): node is ts.ClassDeclaration {
-  if (ts.isClassDeclaration(node)) {
-    if (node.name.getText().trim() === moduleFile.cmpCompilerMeta.componentClassName) {
-      return true;
-    }
-  }
-  return false;
-}
 
 
 interface ComponentData {

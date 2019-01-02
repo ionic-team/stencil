@@ -55,6 +55,7 @@ export interface BuildCtx {
   shouldAbort: boolean;
   startTime: number;
   styleBuildCount: number;
+  stylesPromise: Promise<void>;
   stylesUpdated: BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan;
   timestamp: string;

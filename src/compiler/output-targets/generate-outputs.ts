@@ -9,12 +9,12 @@ import { generateStyles } from '../style/generate-styles';
 import { generateWebComponents } from './output-webcomponent';
 
 
-export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
-  const stylesPromise = generateStyles(config, compilerCtx, buildCtx);
+  buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
 
   if (buildCtx.shouldAbort) {
     return;
@@ -28,9 +28,9 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     generateCommonJsIndexes(config, compilerCtx, buildCtx),
     generateEsmIndexes(config, compilerCtx, buildCtx),
     generateIndexHtmls(config, compilerCtx, buildCtx),
-    generateLazyLoads(config, compilerCtx, buildCtx, entryModules, stylesPromise),
-    generateWebComponents(config, compilerCtx, buildCtx, stylesPromise),
-    stylesPromise
+    generateLazyLoads(config, compilerCtx, buildCtx),
+    generateWebComponents(config, compilerCtx, buildCtx),
+    buildCtx.stylesPromise
   ];
 
   await Promise.all(generateOutputs);

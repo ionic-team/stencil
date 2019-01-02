@@ -1,9 +1,8 @@
 import * as d from '../../../declarations';
-import { ENTRY_KEY_PREFIX } from '../../entries/entry-modules';
 import { normalizePath } from '../../util';
 
 
-export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules?: d.EntryModule[]) {
+export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const path = config.sys.path;
   const assetsCache: d.FilesMap = {};
   let tsFileNames: string[];
@@ -25,17 +24,6 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
 
       const orgImportee = importee;
 
-      // Entry files live in inMemoryFs
-      if (path.basename(importee).startsWith(ENTRY_KEY_PREFIX) && entryModules) {
-        const bundle = entryModules.find(b => b.filePath === importee);
-        if (bundle) {
-          return bundle.filePath;
-        }
-
-        buildCtx.debug(`bundleEntryFilePlugin resolveId, unable to find entry key: ${importee}`);
-        buildCtx.debug(`entryModules entryKeys: ${entryModules.map(em => em.filePath).join(', ')}`);
-      }
-
       if (!path.isAbsolute(importee)) {
         importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);
 
@@ -48,11 +36,11 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
       // it's possible the importee is a file pointing directly to the source ts file
       // if it is a ts file path, then we're good to go
       let moduleFile = compilerCtx.moduleMap.get(importee);
-      if (moduleFile) {
+      if (moduleFile != null) {
         return moduleFile.jsFilePath;
       }
 
-      if (!tsFileNames) {
+      if (tsFileNames == null) {
         // get all the module files as filenames
         // caching the filenames so we don't have to keep doing this
         tsFileNames = Array.from(compilerCtx.moduleMap.keys());
@@ -144,6 +132,28 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
               }
             }
           }
+        }
+      }
+
+      if (typeof importer === 'string') {
+        let absImporteePath: string;
+        if (path.isAbsolute(importee)) {
+          absImporteePath = importee;
+
+        } else {
+          const importerDir = path.dirname(importee);
+          absImporteePath = normalizePath(path.join(importerDir, importee));
+        }
+
+        const hasAccess = await compilerCtx.fs.access(absImporteePath);
+        if (hasAccess) {
+          return absImporteePath;
+        }
+
+      } else if (path.isAbsolute(importee)) {
+        const hasAccess = await compilerCtx.fs.access(importee);
+        if (hasAccess) {
+          return importee;
         }
       }
 

@@ -1,25 +1,15 @@
 import * as d from '../../declarations';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
-import { updateComponentSource } from './generate-component';
+import { generateNativeComponent } from '../bundle/generate-native-component';
 import { getComponentsWithStyles, setStylePlaceholders } from './register-styles';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
 
-  const promises = build.appModuleFiles.map(moduleFile => {
-    return updateToNativeComponent(config, compilerCtx, buildCtx, coreImportPath, build, moduleFile);
-  });
-
-  const cmps = await Promise.all(promises);
-
-  cmps.sort((a, b) => {
-    if (a.componentClassName < b.componentClassName) return -1;
-    if (a.componentClassName > b.componentClassName) return 1;
-    return 0;
-  });
-
   c.push(`import { initHostComponent } from '${coreImportPath}';`);
+
+  const cmps = await updateToNativeComponents(config, compilerCtx, buildCtx, coreImportPath, build);
 
   cmps.forEach(cmpData => {
     c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
@@ -53,10 +43,27 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 }
 
 
+async function updateToNativeComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build) {
+  const promises = build.appModuleFiles.map(moduleFile => {
+    return updateToNativeComponent(config, compilerCtx, buildCtx, coreImportPath, build, moduleFile);
+  });
+
+  const cmps = await Promise.all(promises);
+
+  cmps.sort((a, b) => {
+    if (a.componentClassName < b.componentClassName) return -1;
+    if (a.componentClassName > b.componentClassName) return 1;
+    return 0;
+  });
+
+  return cmps;
+}
+
+
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
   const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
-  const outputText = updateComponentSource(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
+  const outputText = generateNativeComponent(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
 
   const cmpData: ComponentSourceData = {
     filePath: moduleFile.jsFilePath,

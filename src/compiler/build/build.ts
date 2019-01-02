@@ -33,16 +33,16 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
-    const entryModules = generateEntryModules(config, buildCtx);
+    generateEntryModules(config, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
-    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
+    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // generate the core app files
-    await generateOutputTargets(config, compilerCtx, buildCtx, entryModules);
+    await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // wait on some promises we kicked off earlier
@@ -64,7 +64,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // await on our other optional stuff like docs, service workers, etc.
-    await buildAuxiliaries(config, compilerCtx, buildCtx, entryModules);
+    await buildAuxiliaries(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
   } catch (e) {

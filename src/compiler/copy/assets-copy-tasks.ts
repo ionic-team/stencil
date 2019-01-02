@@ -3,10 +3,10 @@ import { getAppBuildDir } from '../app/app-file-naming';
 import { normalizePath, pathJoin } from '../util';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
+export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filesChanged: string[]) {
   const copyTasks: d.CopyTask[] = [];
 
-  if (canSkipAssetsCopy(config, compilerCtx, entryModules, filesChanged)) {
+  if (canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, filesChanged)) {
     // no need to recopy all assets again
     return copyTasks;
   }
@@ -24,7 +24,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
   const copyToBuildDir: d.AssetsMeta[] = [];
   const copyToCollectionDir: d.AssetsMeta[] = [];
 
-  entryModules.forEach(entryModule => {
+  buildCtx.entryModules.forEach(entryModule => {
     const moduleFiles = entryModule.moduleFiles.filter(m => {
       return m.cmpCompilerMeta.assetsDirs && m.cmpCompilerMeta.assetsDirs.length;
     });

@@ -7,7 +7,7 @@ import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { pathJoin } from '../util';
 
 
-export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, stylesPromise: Promise<void>) {
+export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
@@ -29,7 +29,7 @@ export async function generateWebComponents(config: d.Config, compilerCtx: d.Com
     return;
   }
 
-  await stylesPromise;
+  await buildCtx.stylesPromise;
 
   const promises = [
     generateSelfContainedWebComponents(config, compilerCtx, buildCtx, selfContainedOutputTargets),

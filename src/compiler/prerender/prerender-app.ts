@@ -6,7 +6,7 @@ import { optimizeIndexHtml } from '../html/optimize-html';
 import { prerenderPath } from './prerender-path';
 
 
-export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!config.srcIndexHtml) {
     return;
   }
@@ -18,7 +18,7 @@ export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.Co
   await Promise.all(outputTargets.map(async outputTarget => {
 
     if (outputTarget.hydrateComponents && outputTarget.prerenderLocations && outputTarget.prerenderLocations.length > 0) {
-      await prerenderOutputTarget(config, compilerCtx, buildCtx, outputTarget, entryModules);
+      await prerenderOutputTarget(config, compilerCtx, buildCtx, outputTarget);
 
     } else {
       const windowLocationPath = outputTarget.baseUrl;
@@ -48,7 +48,7 @@ export function shouldPrerenderExternal(config: d.Config) {
   return config.flags && config.flags.prerenderExternal;
 }
 
-async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[]) {
+async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
   // get the www index html content for the template for all prerendered pages
@@ -72,11 +72,11 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
     return [];
   }
 
-  return runPrerenderApp(config, compilerCtx, buildCtx, outputTarget, entryModules, prerenderQueue, indexHtml);
+  return runPrerenderApp(config, compilerCtx, buildCtx, outputTarget, prerenderQueue, indexHtml);
 }
 
 
-async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], prerenderQueue: d.PrerenderLocation[], indexHtml: string) {
+async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], indexHtml: string) {
   // keep track of how long the entire build process takes
   const timeSpan = buildCtx.createTimeSpan(`prerendering started`, !outputTarget.hydrateComponents);
 
@@ -87,7 +87,7 @@ async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, bui
       drainPrerenderQueue(config, compilerCtx, buildCtx, outputTarget, prerenderQueue, indexHtml, hydrateResults, resolve);
     });
 
-    await generateHostConfig(config, compilerCtx, outputTarget, entryModules, hydrateResults);
+    await generateHostConfig(config, compilerCtx, outputTarget, buildCtx.entryModules, hydrateResults);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

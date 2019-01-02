@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
+import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { normalizePath } from '../util';
 
 

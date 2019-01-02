@@ -1,12 +1,10 @@
 import * as d from '../../declarations';
 import { generateAppCore } from '../app-core/generate-app-core';
-import { generateBundles } from '../bundle/generate-bundles';
 import { getAppBuildCorePath } from './output-file-naming';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { generateModuleMap } from '../bundle/bundle';
 
 
-export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], stylesPromise: Promise<void>) {
+export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
@@ -19,13 +17,7 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  const rawModules = await generateModuleMap(config, compilerCtx, buildCtx, entryModules);
-
-  await stylesPromise;
-
   const timespan = buildCtx.createTimeSpan(`generate app lazy components started`, true);
-
-  await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
 
   const appModuleFiles = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta);
 

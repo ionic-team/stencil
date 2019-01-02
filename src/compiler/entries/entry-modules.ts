@@ -39,8 +39,6 @@ export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
   }
 
   buildCtx.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
-
-  return buildCtx.entryModules;
 }
 
 
