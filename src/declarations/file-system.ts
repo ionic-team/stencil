@@ -73,9 +73,9 @@ export interface FsWriteOptions {
 
 
 export interface FsWriteResults {
-  changedContent?: boolean;
-  queuedWrite?: boolean;
-  ignored?: boolean;
+  changedContent: boolean;
+  queuedWrite: boolean;
+  ignored: boolean;
 }
 
 
@@ -83,13 +83,13 @@ export type FsItems = Map<string, FsItem>;
 
 
 export interface FsItem {
-  fileText?: string;
-  isFile?: boolean;
-  isDirectory?: boolean;
-  size?: number;
-  mtimeMs?: number;
-  exists?: boolean;
-  queueWriteToDisk?: boolean;
+  fileText: string;
+  isFile: boolean;
+  isDirectory: boolean;
+  size: number;
+  mtimeMs: number;
+  exists: boolean;
+  queueWriteToDisk: boolean;
   queueDeleteFromDisk?: boolean;
-  useCache?: boolean;
+  useCache: boolean;
 }

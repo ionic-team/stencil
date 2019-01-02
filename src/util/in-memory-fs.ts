@@ -172,7 +172,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   async readFile(filePath: string, opts?: d.FsReadOptions) {
-    if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
+    if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
         return item.fileText;
@@ -198,7 +198,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
    * @param filePath
    */
   readFileSync(filePath: string, opts?: d.FsReadOptions) {
-    if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
+    if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
         return item.fileText;
@@ -297,8 +297,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   async writeFile(filePath: string, content: string, opts?: d.FsWriteOptions) {
-    const results: d.FsWriteResults = {};
-
     if (typeof filePath !== 'string') {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
     }
@@ -306,6 +304,12 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     if (typeof content !== 'string') {
       throw new Error(`writeFile, invalid content: ${filePath}`);
     }
+
+    const results: d.FsWriteResults = {
+      ignored: false,
+      changedContent: false,
+      queuedWrite: false
+    };
 
     if (shouldIgnore(filePath)) {
       results.ignored = true;
@@ -323,11 +327,11 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     item.fileText = content;
 
-    if (opts && opts.useCache === false) {
+    if (opts != null && opts.useCache === false) {
       item.useCache = false;
     }
 
-    if (opts && opts.inMemoryOnly) {
+    if (opts != null && opts.inMemoryOnly) {
       // we don't want to actually write this to disk
       // just keep it in memory
       if (item.queueWriteToDisk) {
@@ -340,11 +344,12 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         // it wasn't already queued to be written
         item.queueWriteToDisk = false;
       }
-    } else if (opts && opts.immediateWrite) {
+    } else if (opts != null && opts.immediateWrite) {
 
       // If this is an immediate write then write the file
       // and do not add it to the queue
       await this.disk.writeFile(filePath, item.fileText);
+
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
@@ -491,7 +496,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   clearFileCache(filePath: string) {
     filePath = normalizePath(filePath);
     const item = this.items.get(filePath);
-    if (item && !item.queueWriteToDisk) {
+    if (item != null && !item.queueWriteToDisk) {
       this.items.delete(filePath);
     }
   }
@@ -517,15 +522,26 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   getItem(itemPath: string): d.FsItem {
     itemPath = normalizePath(itemPath);
     let item = this.items.get(itemPath);
-    if (item) {
+    if (item != null) {
       return item;
     }
-    this.items.set(itemPath, item = {});
+
+    this.items.set(itemPath, item = {
+      exists: null,
+      fileText: null,
+      size: null,
+      mtimeMs: null,
+      isDirectory: null,
+      isFile: null,
+      queueDeleteFromDisk: null,
+      queueWriteToDisk: null,
+      useCache: null
+    });
     return item;
   }
 
   clearCache() {
-    this.items = new Map();
+    this.items.clear();
   }
 
   get keys() {
@@ -643,7 +659,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
 
   instructions.dirsToEnsure = instructions.dirsToEnsure.filter(dir => {
     const item = d.get(dir);
-    if (item && item.exists && item.isDirectory) {
+    if (item != null && item.exists && item.isDirectory) {
       return false;
     }
     if (dir === '/' || dir.endsWith(':/')) {
