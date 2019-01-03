@@ -57,7 +57,8 @@ function getComponentDepsFromImports(moduleFiles: d.ModuleFile[], componentRefs:
       return (moduleFile.sourceFilePath === localImport) ||
              (moduleFile.sourceFilePath === localImport + '.ts') ||
              (moduleFile.sourceFilePath === localImport + '.tsx') ||
-             (moduleFile.sourceFilePath === localImport + '.js');
+             (moduleFile.sourceFilePath === localImport + '.js') ||
+             (moduleFile.sourceFilePath === localImport + '.mjs');
     });
 
     if (subModuleFile) {

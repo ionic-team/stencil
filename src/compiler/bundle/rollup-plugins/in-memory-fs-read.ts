@@ -27,7 +27,7 @@ export default function inMemoryFsRead(config: d.Config, compilerCtx: d.Compiler
       if (!path.isAbsolute(importee)) {
         importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);
 
-        if (!importee.endsWith('.js')) {
+        if (!importee.endsWith('.js') && !importee.endsWith('.mjs')) {
           importee += '.js';
         }
       }

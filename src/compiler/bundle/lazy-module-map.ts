@@ -153,7 +153,7 @@ interface LazyModule {
 
 
 async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, moduleFile: d.Module) {
-  const lazyModuleFilePath = `${moduleFile.jsFilePath}.lazy.js`;
+  const lazyModuleFilePath = `${moduleFile.jsFilePath}.lazy.mjs`;
 
   const lazyModuleContent = `export class ${moduleFile.cmpCompilerMeta.componentClassName} {}`;
 

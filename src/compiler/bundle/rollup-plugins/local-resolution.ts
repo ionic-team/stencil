@@ -23,7 +23,7 @@ export default function localResolution(config: Config, compilerCtx: CompilerCtx
       }
       importer = normalizePath(importer);
 
-      if (importee.endsWith('.js')) {
+      if (importee.endsWith('.js') || importee.endsWith('.mjs')) {
         return null;
       }
 

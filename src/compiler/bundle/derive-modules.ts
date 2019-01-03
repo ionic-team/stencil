@@ -54,7 +54,7 @@ async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, isBrowser: boolean): d.DerivedModule {
 
   const list = Object.keys(moduleList).map(chunkKey => ({
-    entryKey: chunkKey.replace('.js', ''),
+    entryKey: chunkKey.replace('.js', '').replace('.mjs', ''),
     filename: chunkKey,
     code: moduleList[chunkKey].code
   }));
