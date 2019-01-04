@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE } from '../../util/constants';
+// import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
 import { pathJoin } from '../util';
 
@@ -93,20 +93,20 @@ export function getBundleIds(entryModules: d.EntryModule[], components: d.Hydrat
         return;
       }
 
-      let bundleId: string;
-      if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'string') {
-        bundleId = moduleFile.cmpCompilerMeta.bundleIds;
-      } else {
+      // let bundleId: string;
+      // if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'string') {
+      //   bundleId = moduleFile.cmpCompilerMeta.bundleIds;
+      // } else {
 
-        bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
-        if (!bundleId) {
-          bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
-        }
-      }
+      //   bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
+      //   if (!bundleId) {
+      //     bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
+      //   }
+      // }
 
-      if (bundleId && bundleIds.indexOf(bundleId) === -1) {
-        bundleIds.push(bundleId);
-      }
+      // if (bundleId && bundleIds.indexOf(bundleId) === -1) {
+      //   bundleIds.push(bundleId);
+      // }
     });
   });
 
@@ -283,7 +283,7 @@ export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.
 }
 
 
-const DEFAULT_MODE = 'md';
+// const DEFAULT_MODE = 'md';
 const MAX_LINK_REL_PRELOAD_COUNT = 6;
 export const HOST_CONFIG_FILENAME = 'host.config.json';
 

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { generateAppCore } from '../app-core/generate-app-core';
-import { getAppBuildCorePath } from './output-file-naming';
+import { generateLazyBundles } from '../bundle/generate-lazy-bundles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 
 
@@ -32,23 +32,16 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const outputText = await generateAppCore(config, compilerCtx, buildCtx, build);
+  const appCorePromise = generateAppCore(config, compilerCtx, buildCtx, build);
 
-  if (!buildCtx.hasError && typeof outputText === 'string') {
-    await writeLazyLoadCore(config, compilerCtx, outputTargets, outputText);
-  }
+  const lazyBundlesPromise = generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
+
+  await Promise.all([
+    appCorePromise,
+    lazyBundlesPromise
+  ]);
 
   timespan.finish(`generate app lazy components finished`);
-}
-
-
-async function writeLazyLoadCore(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetBuild[], outputText: string) {
-  const promises = outputTargets.map(async outputTarget => {
-    const filePath = getAppBuildCorePath(config, outputTarget);
-    await compilerCtx.fs.writeFile(filePath, outputText);
-  });
-
-  await Promise.all(promises);
 }
 
 

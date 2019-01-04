@@ -32,7 +32,6 @@ export interface ComponentCompilerFeatures {
 
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs?: CompilerAssetDir[];
-  bundleIds: ComponentBundleId;
   componentClassName: string;
   elementRef: string;
   encapsulation: Encapsulation;
@@ -51,8 +50,6 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
-
-export type ComponentBundleId = string | ComponentBundleModeIds;
 
 export interface ComponentBundleModeIds {
   [modeName: string]: string;

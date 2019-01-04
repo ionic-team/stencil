@@ -14,7 +14,6 @@ import ts from 'typescript';
 
 export function parseStaticComponentMeta(config: d.Config, _compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
   const cmpMeta: d.ComponentCompilerMeta = {
-    bundleIds: null,
     tagName: tagName,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
     elementRef: parseStaticElementRef(staticMembers),

@@ -113,7 +113,7 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
 }
 
 
-function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) {
+function addTsFileImporters(allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);

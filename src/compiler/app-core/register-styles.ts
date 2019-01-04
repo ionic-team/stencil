@@ -4,7 +4,7 @@ import { DEFAULT_STYLE_MODE } from '../../util/constants';
 
 export function getComponentsWithStyles(build: d.Build) {
   return build.appModuleFiles
-    .filter(m => m.cmpCompilerMeta && m.cmpCompilerMeta.styles && m.cmpCompilerMeta.styles.length > 0)
+    .filter(m => m.cmpCompilerMeta != null && m.cmpCompilerMeta.styles != null && m.cmpCompilerMeta.styles.length > 0)
     .map(m => m.cmpCompilerMeta);
 }
 

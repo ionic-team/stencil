@@ -235,9 +235,10 @@ export interface DerivedChunk {
 
 export interface DerivedModule {
   list: DerivedChunk[];
-  sourceTarget: d.SourceTarget;
-  isBrowser: boolean;
+  sourceTarget: SourceTarget;
+  moduleFormat: ModuleFormat;
 }
 
-
 export type SourceTarget = 'es5' | 'es2017';
+
+export type ModuleFormat = 'esm' | 'amd';

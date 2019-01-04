@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { isComponentClassNode } from '../transformers/transform-utils';
+import { isComponentClassNode } from './transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 
 
-export function generateLazyComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -95,35 +95,9 @@ function updateComponentClass(cmp: ComponentData, classNode: ts.ClassDeclaration
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
-    getClassHeritageClauses(classNode),
+    classNode.heritageClauses,
     getClassMembers(cmp, classNode)
   );
-}
-
-
-function getClassHeritageClauses(classNode: ts.ClassDeclaration) {
-  const heritageClause = ts.createHeritageClause(
-    ts.SyntaxKind.ExtendsKeyword, [
-      ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
-    ]
-  );
-
-  const cstrMethod = classNode.members.find(classMember => {
-    return (classMember.kind === ts.SyntaxKind.Constructor);
-  }) as ts.MethodDeclaration;
-
-  if (cstrMethod) {
-    const superCall = ts.createCall(
-      ts.createIdentifier('super'), undefined, undefined
-    );
-
-    cstrMethod.body = ts.updateBlock(cstrMethod.body, [
-      ts.createExpressionStatement(superCall),
-      ...cstrMethod.body.statements
-    ]);
-  }
-
-  return [heritageClause];
 }
 
 

@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { isComponentClassNode } from '../transformers/transform-utils';
+import { isComponentClassNode } from './transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 
 
-export function generateNativeComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+export function transformNativeComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }

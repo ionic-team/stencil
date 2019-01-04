@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 
 
-export function getComponentRefsFromSourceStrings(moduleFiles: d.ModuleFile[]) {
+export function getComponentRefsFromSourceStrings(moduleFiles: d.Module[]) {
   const componentRefs: d.ComponentRef[] = [];
 
   const tags = moduleFiles
-    .filter(moduleFile => !!moduleFile.cmpMeta)
-    .map(moduleFile => moduleFile.cmpMeta.tagNameMeta);
+    .filter(moduleFile => moduleFile.cmpCompilerMeta != null)
+    .map(moduleFile => moduleFile.cmpCompilerMeta.tagName);
 
   moduleFiles.forEach(moduleFile => {
     moduleFile.potentialCmpRefs.forEach(potentialCmpRef => {
@@ -18,7 +18,7 @@ export function getComponentRefsFromSourceStrings(moduleFiles: d.ModuleFile[]) {
 }
 
 
-function parsePotentialComponentRef(componentRefs: d.ComponentRef[], tags: string[], moduleFile: d.ModuleFile, potentialCmpRef: d.PotentialComponentRef) {
+function parsePotentialComponentRef(componentRefs: d.ComponentRef[], tags: string[], moduleFile: d.Module, potentialCmpRef: d.PotentialComponentRef) {
   if (typeof potentialCmpRef.tag === 'string') {
     potentialCmpRef.tag = potentialCmpRef.tag.toLowerCase();
 

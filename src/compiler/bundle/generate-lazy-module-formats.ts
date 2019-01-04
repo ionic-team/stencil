@@ -2,62 +2,17 @@ import * as d from '../../declarations';
 import { bundleLazyModule } from './bundle-lazy-module';
 import { catchError, normalizePath, pathJoin } from '../util';
 import { dashToPascalCase } from '../../util/helpers';
-import { deriveModules } from './derive-modules';
-import { writeAmdModules, writeEsmModules } from './write-bundles';
+import { RollupBuild } from 'rollup';
 
 
-export async function generateLazyModuleMap(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort) {
-    return null;
-  }
-
-  if (buildCtx.entryModules == null || buildCtx.entryModules.length === 0) {
-    // no entry modules, so don't bother
-    return null;
-  }
-
-  if (buildCtx.isRebuild && !buildCtx.requiresFullBuild && !buildCtx.hasScriptChanges && compilerCtx.lastRawModules) {
-    // this is a rebuild, it doesn't require a full build
-    // there were no script changes, and we've got a good cache of the last js modules
-    // let's skip this
-    buildCtx.debug(`generateLazyModuleMap, using lastRawModules cache`);
-    return compilerCtx.lastRawModules;
-  }
-
-  const moduleMapTimespan = buildCtx.createTimeSpan(`module map started`);
-
-  let derivedModules: d.DerivedModule[] = null;
-
-  try {
-    // generate the bundled modules, but without the styles added
-    const moduleFormats = await generateLazyBundleModules(config, compilerCtx, buildCtx);
-
-    if (moduleFormats != null) {
-      const moduleDeriveTimespan = buildCtx.createTimeSpan(`module derive started`, true);
-      derivedModules = await deriveModules(config, compilerCtx, buildCtx, moduleFormats);
-      moduleDeriveTimespan.finish(`module derive finished`);
-
-      // remember for next time incase we change just a css file or something
-      compilerCtx.lastRawModules = derivedModules;
-    }
-
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
-    compilerCtx.lastRawModules = null;
-  }
-
-  moduleMapTimespan.finish(`module map finished`);
-
-  return derivedModules;
-}
-
-
-async function generateLazyBundleModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
   const entryInputPaths = await createLazyEntryModules(config, compilerCtx, buildCtx);
   if (entryInputPaths == null || entryInputPaths.length === 0) {
     return null;
   }
+
+  const timespan = buildCtx.createTimeSpan(`module derive started`, true);
 
   // Check for index.js file. This file is used for stencil project exports
   // usually this contains utility exports.
@@ -87,16 +42,18 @@ async function generateLazyBundleModules(config: d.Config, compilerCtx: d.Compil
 
     const [esm, amd] = await Promise.all([
       // [0] bundle using only es modules and dynamic imports
-      await writeEsmModules(config, rollupBuild),
+      await createEsmModulesFromRollup(config, rollupBuild),
 
       // [1] bundle using commonjs using jsonp callback
-      await writeAmdModules(config, rollupBuild, buildCtx.entryModules),
+      await createAmdModulesFromRollup(config, rollupBuild, buildCtx.entryModules),
     ]);
 
     if (buildCtx.shouldAbort) {
       // someone could have errored
       return null;
     }
+
+    timespan.finish(`module derive finished`);
 
     return {
       esm,
@@ -108,6 +65,49 @@ async function generateLazyBundleModules(config: d.Config, compilerCtx: d.Compil
   }
 
   return null;
+}
+
+
+async function createEsmModulesFromRollup(config: d.Config, rollupBuild: RollupBuild) {
+  const { output } = await rollupBuild.generate({
+    ...config.rollupConfig.outputOptions,
+    format: 'es',
+    // banner: generatePreamble(config),
+    // intro: MODULE_INTRO_PLACEHOLDER,
+    strict: false,
+  });
+  return <any>output as d.JSModuleList;
+}
+
+
+async function createAmdModulesFromRollup(config: d.Config, rollupBuild: RollupBuild, entryModules: d.EntryModule[]) {
+  if (!config.buildEs5) {
+    // only create legacy modules when generating es5 fallbacks
+    return null;
+  }
+
+  rollupBuild.cache.modules.forEach(module => {
+    const key = module.id;
+    const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
+    if (entryModule) {
+      entryModule.dependencies = module.dependencies.slice();
+    }
+  });
+
+  const { output } = await rollupBuild.generate({
+    ...config.rollupConfig.outputOptions,
+    format: 'amd',
+    amd: {
+      id: MODULE_BUNDLEID_PLACEHOLDER,
+      define: `${config.namespace}.loadBundle`
+    },
+    // banner: generatePreamble(config),
+    // intro: MODULE_INTRO_PLACEHOLDER,
+    strict: false,
+  });
+
+
+  return <any>output as d.JSModuleList;
 }
 
 
@@ -182,3 +182,7 @@ function createComponentExport(config: d.Config, entryModule: d.EntryModule, mod
 
   return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;
 }
+
+export const MODULE_INTRO_PLACEHOLDER = `/**:module-intro-placeholder:**/`;
+
+export const MODULE_BUNDLEID_PLACEHOLDER = `/**:module-bundle-id:**/`;

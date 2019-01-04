@@ -76,7 +76,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
 }
 
 
-function loadModuleFileTree(allModulesFiles: d.ModuleFile[], moduleFileTree: d.ModuleFile[], moduleFile: d.ModuleFile) {
+function loadModuleFileTree(allModulesFiles: d.Module[], moduleFileTree: d.Module[], moduleFile: d.Module) {
   if (moduleFile) {
     if (!moduleFileTree.includes(moduleFile)) {
       moduleFileTree.push(moduleFile);

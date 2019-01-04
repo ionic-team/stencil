@@ -3,7 +3,7 @@ import { assetVersioning } from '../asset-versioning/asset-versioning';
 import { catchError } from '../util';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineExternalAssets } from './inline-external-assets';
-import { inlineLoaderScript } from './inline-loader-script';
+// import { inlineLoaderScript } from './inline-loader-script';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
@@ -54,11 +54,11 @@ export async function optimizeHtml(
     }
   }
 
-  if (hydrateTarget.inlineLoaderScript) {
-    // remove the script to the external loader script request
-    // inline the loader script at the bottom of the html
-    promises.push(inlineLoaderScript(config, compilerCtx, hydrateTarget, windowLocationPath, doc));
-  }
+  // if (hydrateTarget.inlineLoaderScript) {
+  //   // remove the script to the external loader script request
+  //   // inline the loader script at the bottom of the html
+  //   promises.push(inlineLoaderScript(config, compilerCtx, hydrateTarget, windowLocationPath, doc));
+  // }
 
   if (hydrateTarget.inlineAssetsMaxSize > 0) {
     promises.push(inlineExternalAssets(config, compilerCtx, hydrateTarget, windowLocationPath, doc));

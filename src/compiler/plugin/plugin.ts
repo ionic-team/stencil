@@ -64,7 +64,7 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
 }
 
 
-export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, moduleFile?: d.ModuleFile) {
+export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, moduleFile?: d.Module) {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -91,9 +91,9 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
       return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
-    if (shouldParseCssDocs && moduleFile.cmpMeta) {
-      moduleFile.cmpMeta.styleDocs = moduleFile.cmpMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, moduleFile.cmpMeta.styleDocs);
+    if (shouldParseCssDocs && moduleFile.cmpCompilerMeta != null) {
+      moduleFile.cmpCompilerMeta.styleDocs = moduleFile.cmpCompilerMeta.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, moduleFile.cmpCompilerMeta.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
@@ -148,9 +148,9 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
       return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
-    if (shouldParseCssDocs && moduleFile.cmpMeta) {
-      moduleFile.cmpMeta.styleDocs = moduleFile.cmpMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, moduleFile.cmpMeta.styleDocs);
+    if (shouldParseCssDocs && moduleFile.cmpCompilerMeta) {
+      moduleFile.cmpCompilerMeta.styleDocs = moduleFile.cmpCompilerMeta.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, moduleFile.cmpCompilerMeta.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);

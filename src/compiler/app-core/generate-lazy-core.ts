@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
 import { formatBrowserLoaderComponent } from '../../util/data-serialize';
-import { generateLazyBundles } from '../bundle/generate-lazy-bundles';
 
 
-export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build) {
+export async function generateLazyLoadedAppCore(_config: d.Config, _compilerCtx: d.CompilerCtx, build: d.Build, coreImportPath: string) {
   const c: string[] = [];
 
   const cmpHostData = build.appModuleFiles.map(m => formatBrowserLoaderComponent(m.cmpCompilerMeta));
@@ -15,8 +14,6 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
   if (build.vdomRender) {
     c.push(`export { h } from '${coreImportPath}';`);
   }
-
-  await generateLazyBundles(config, compilerCtx, buildCtx);
 
   return c.join('\n');
 }

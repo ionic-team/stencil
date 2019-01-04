@@ -2,14 +2,14 @@ import * as d from '../../declarations';
 import { getComponentRefsFromSourceStrings } from './component-references';
 
 
-export function calcComponentDependencies(moduleFiles: d.ModuleFile[]) {
+export function calcComponentDependencies(moduleFiles: d.Module[]) {
   // figure out all the component references seen in each file
   // these are all the the components found in the app, and which file it was found in
   const componentRefs = getComponentRefsFromSourceStrings(moduleFiles);
 
   // go through all the module files in the app
   moduleFiles.forEach(moduleFile => {
-    if (moduleFile.cmpMeta) {
+    if (moduleFile.cmpCompilerMeta != null) {
       // if this module file has component metadata
       // then let's figure out which dependencies it has
       getComponentDependencies(moduleFiles, componentRefs, moduleFile);
@@ -18,9 +18,9 @@ export function calcComponentDependencies(moduleFiles: d.ModuleFile[]) {
 }
 
 
-function getComponentDependencies(moduleFiles: d.ModuleFile[], componentRefs: d.ComponentRef[], moduleFile: d.ModuleFile) {
+function getComponentDependencies(moduleFiles: d.Module[], componentRefs: d.ComponentRef[], moduleFile: d.Module) {
   // build a list of all the component dependencies this has, using their tag as the key
-  moduleFile.cmpMeta.dependencies = moduleFile.cmpMeta.dependencies || [];
+  moduleFile.cmpCompilerMeta.dependencies = moduleFile.cmpCompilerMeta.dependencies || [];
 
   // figure out if this file has any components in it
   // get all the component references for this file path
@@ -32,20 +32,20 @@ function getComponentDependencies(moduleFiles: d.ModuleFile[], componentRefs: d.
   // for each component ref of this file
   // go ahead and add the tag to the cmp metadata dependencies
   refTags.forEach(tag => {
-    if (tag !== moduleFile.cmpMeta.tagNameMeta && !moduleFile.cmpMeta.dependencies.includes(tag)) {
-      moduleFile.cmpMeta.dependencies.push(tag);
+    if (tag !== moduleFile.cmpCompilerMeta.tagName && !moduleFile.cmpCompilerMeta.dependencies.includes(tag)) {
+      moduleFile.cmpCompilerMeta.dependencies.push(tag);
     }
   });
 
   const importsInspected: string[] = [];
 
-  getComponentDepsFromImports(moduleFiles, componentRefs, importsInspected, moduleFile, moduleFile.cmpMeta);
+  getComponentDepsFromImports(moduleFiles, componentRefs, importsInspected, moduleFile, moduleFile.cmpCompilerMeta);
 
-  moduleFile.cmpMeta.dependencies.sort();
+  moduleFile.cmpCompilerMeta.dependencies.sort();
 }
 
 
-function getComponentDepsFromImports(moduleFiles: d.ModuleFile[], componentRefs: d.ComponentRef[], importsInspected: string[], inspectModuleFile: d.ModuleFile, cmpMeta: d.ComponentMeta) {
+function getComponentDepsFromImports(moduleFiles: d.Module[], componentRefs: d.ComponentRef[], importsInspected: string[], inspectModuleFile: d.Module, cmpMeta: d.ComponentCompilerMeta) {
   inspectModuleFile.localImports.forEach(localImport => {
     if (importsInspected.includes(localImport)) {
       return;

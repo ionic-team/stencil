@@ -13,10 +13,10 @@ export async function generateAppCore(config: d.Config, compilerCtx: d.CompilerC
   let appCoreBundleInput: string;
 
   if (build.lazyLoad) {
-    appCoreBundleInput = await generateLazyLoadedAppCore(config, compilerCtx, buildCtx, coreImportPath, build);
+    appCoreBundleInput = await generateLazyLoadedAppCore(config, compilerCtx, build, coreImportPath);
 
   } else {
-    appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, coreImportPath, build, files);
+    appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, build, coreImportPath, files);
   }
 
   // bundle up the input into a nice pretty file

@@ -21,7 +21,7 @@ export class CompilerContext implements d.CompilerCtx {
   lastBuildHadError = false;
   lastBuildResults: d.BuildResults = null;
   lastBuildStyles = new Map<string, string>();
-  lastRawModules: d.DerivedModule[] = null;
+  lastDerivedModules: d.DerivedModule[] = null;
   localPrerenderServer: any = null;
   moduleMap: d.ModuleMap = new Map();
   resolvedCollections = new Set<string>();

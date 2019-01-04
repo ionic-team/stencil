@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
-import { generateNativeComponent } from '../bundle/generate-native-component';
 import { getComponentsWithStyles, setStylePlaceholders } from './register-styles';
+import { transformNativeComponent } from '../transformers/transform-native-component';
 
 
-export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, files: Map<string, string>) {
+export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, coreImportPath: string, files: Map<string, string>) {
   const c: string[] = [];
 
   c.push(`import { initHostComponent } from '${coreImportPath}';`);
@@ -63,7 +63,7 @@ async function updateToNativeComponents(config: d.Config, compilerCtx: d.Compile
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
   const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
-  const outputText = generateNativeComponent(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
+  const outputText = transformNativeComponent(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
 
   const cmpData: ComponentSourceData = {
     filePath: moduleFile.jsFilePath,

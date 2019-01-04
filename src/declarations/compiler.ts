@@ -26,7 +26,7 @@ export interface CompilerCtx {
   lastBuildHadError: boolean;
   lastBuildResults: d.BuildResults;
   lastBuildStyles: Map<string, string>;
-  lastRawModules: d.DerivedModule[];
+  lastDerivedModules: d.DerivedModule[];
   localPrerenderServer: any;
   moduleMap: d.ModuleMap;
   resolvedCollections: Set<string>;
