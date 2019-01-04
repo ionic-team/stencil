@@ -284,7 +284,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
 
     } else if (typeof dependentsList === 'function') {
       // 2nd arg is the importer fn, and there is no dependency list
-      execBundleCallback(bundleId, [], dependentsList);
+      checkQueue();
     }
   }
   App.loadBundle = loadBundle;
