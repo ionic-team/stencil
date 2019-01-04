@@ -114,6 +114,15 @@ export namespace Components {
     'propVal'?: number;
   }
 
+  interface ExternalImportA {}
+  interface ExternalImportAAttributes extends StencilHTMLAttributes {}
+
+  interface ExternalImportB {}
+  interface ExternalImportBAttributes extends StencilHTMLAttributes {}
+
+  interface ExternalImportC {}
+  interface ExternalImportCAttributes extends StencilHTMLAttributes {}
+
   interface InitCssRoot {}
   interface InitCssRootAttributes extends StencilHTMLAttributes {}
 
@@ -385,6 +394,9 @@ declare global {
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
     'EsmImport': Components.EsmImport;
+    'ExternalImportA': Components.ExternalImportA;
+    'ExternalImportB': Components.ExternalImportB;
+    'ExternalImportC': Components.ExternalImportC;
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorderRoot': Components.KeyReorderRoot;
     'KeyReorder': Components.KeyReorder;
@@ -460,6 +472,9 @@ declare global {
     'dynamic-import': Components.DynamicImportAttributes;
     'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
     'esm-import': Components.EsmImportAttributes;
+    'external-import-a': Components.ExternalImportAAttributes;
+    'external-import-b': Components.ExternalImportBAttributes;
+    'external-import-c': Components.ExternalImportCAttributes;
     'init-css-root': Components.InitCssRootAttributes;
     'key-reorder-root': Components.KeyReorderRootAttributes;
     'key-reorder': Components.KeyReorderAttributes;
@@ -618,6 +633,24 @@ declare global {
   var HTMLEsmImportElement: {
     prototype: HTMLEsmImportElement;
     new (): HTMLEsmImportElement;
+  };
+
+  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {}
+  var HTMLExternalImportAElement: {
+    prototype: HTMLExternalImportAElement;
+    new (): HTMLExternalImportAElement;
+  };
+
+  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {}
+  var HTMLExternalImportBElement: {
+    prototype: HTMLExternalImportBElement;
+    new (): HTMLExternalImportBElement;
+  };
+
+  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {}
+  var HTMLExternalImportCElement: {
+    prototype: HTMLExternalImportCElement;
+    new (): HTMLExternalImportCElement;
   };
 
   interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
@@ -968,6 +1001,9 @@ declare global {
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
     'esm-import': HTMLEsmImportElement
+    'external-import-a': HTMLExternalImportAElement
+    'external-import-b': HTMLExternalImportBElement
+    'external-import-c': HTMLExternalImportCElement
     'init-css-root': HTMLInitCssRootElement
     'key-reorder-root': HTMLKeyReorderRootElement
     'key-reorder': HTMLKeyReorderElement
@@ -1043,6 +1079,9 @@ declare global {
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
     'esm-import': HTMLEsmImportElement;
+    'external-import-a': HTMLExternalImportAElement;
+    'external-import-b': HTMLExternalImportBElement;
+    'external-import-c': HTMLExternalImportCElement;
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'key-reorder': HTMLKeyReorderElement;
