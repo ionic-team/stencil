@@ -204,6 +204,9 @@ export namespace Components {
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends StencilHTMLAttributes {}
 
+  interface ListenWindow {}
+  interface ListenWindowAttributes extends StencilHTMLAttributes {}
+
   interface NodeGlobals {}
   interface NodeGlobalsAttributes extends StencilHTMLAttributes {}
 
@@ -412,6 +415,7 @@ declare global {
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
     'ReflectToAttr': Components.ReflectToAttr;
     'ScopedBasicRoot': Components.ScopedBasicRoot;
@@ -490,6 +494,7 @@ declare global {
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'listen-window': Components.ListenWindowAttributes;
     'node-globals': Components.NodeGlobalsAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
     'scoped-basic-root': Components.ScopedBasicRootAttributes;
@@ -741,6 +746,12 @@ declare global {
   var HTMLLifecycleUnloadRootElement: {
     prototype: HTMLLifecycleUnloadRootElement;
     new (): HTMLLifecycleUnloadRootElement;
+  };
+
+  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
+  var HTMLListenWindowElement: {
+    prototype: HTMLListenWindowElement;
+    new (): HTMLListenWindowElement;
   };
 
   interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {}
@@ -1019,6 +1030,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
     'reflect-to-attr': HTMLReflectToAttrElement
     'scoped-basic-root': HTMLScopedBasicRootElement
@@ -1097,6 +1109,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
