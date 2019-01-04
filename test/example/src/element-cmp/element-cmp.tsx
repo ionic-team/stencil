@@ -1,4 +1,4 @@
-import { Component, Element } from '../../../../dist/index';
+import { Component, Element, h } from '@stencil/core';
 
 @Component({
   tag: 'element-cmp'

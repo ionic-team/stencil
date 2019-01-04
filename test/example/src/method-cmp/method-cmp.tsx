@@ -1,4 +1,4 @@
-import { Component, Method, Prop } from '../../../../dist/index';
+import { Component, Method, Prop } from '@stencil/core';
 
 @Component({
   tag: 'method-cmp'

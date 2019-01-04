@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Method } from '../../../../dist/index';
+import { Component, Event, EventEmitter, Method } from '@stencil/core';
 
 @Component({
   tag: 'event-cmp'
