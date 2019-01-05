@@ -1,5 +1,6 @@
-<a name="0.16.2-3"></a>
-## 🍷 [Prerelease] [0.16.2-3](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-3) (2019-01-04)
+<a name="0.16.2-4"></a>
+## 🏄 [Prerelease] [0.16.2-4](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-4) (2019-01-05)
+
 
 ### Bug Fixes
 
@@ -10,6 +11,7 @@
 * **ts:** update ts 3.2
 * **angular:** do not emit internal components ([37e63e0](https://github.com/ionic-team/stencil/commit/37e63e0))
 * **angular:** do not emit proxies for internal APIs ([7612fa0](https://github.com/ionic-team/stencil/commit/7612fa0))
+* **angular:** angular uses es2015 🤷‍♂️ ([d0d215c](https://github.com/ionic-team/stencil/commit/d0d215c))
 * **docs:** emit required metadata for props ([789e973](https://github.com/ionic-team/stencil/commit/789e973))
 * **docs:** filter internal components ([040cacc](https://github.com/ionic-team/stencil/commit/040cacc))
 * **listen:** ensure window events from Listen decorator are captured ([be49235](https://github.com/ionic-team/stencil/commit/be49235))
