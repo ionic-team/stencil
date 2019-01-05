@@ -55,7 +55,7 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
-  if (moduleFile) {
+  if (moduleFile != null) {
     return moduleFile;
 
   } else {
