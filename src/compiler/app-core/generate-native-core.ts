@@ -4,12 +4,12 @@ import { getComponentsWithStyles, setStylePlaceholders } from './register-app-st
 import { updateToNativeComponents } from '../component-native/update-to-native-component';
 
 
-export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, coreImportPath: string, files: Map<string, string>) {
+export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
 
-  c.push(`import { initHostComponent } from '${coreImportPath}';`);
+  c.push(`import { initHostComponent } from '${build.coreImportPath}';`);
 
-  const cmps = await updateToNativeComponents(config, compilerCtx, buildCtx, coreImportPath, build);
+  const cmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build);
 
   cmps.forEach(cmpData => {
     c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
@@ -35,7 +35,7 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
   const cmpsWithStyles = getComponentsWithStyles(build);
   if (cmpsWithStyles.length > 0) {
-    const styles = await setStylePlaceholders(cmpsWithStyles, coreImportPath);
+    const styles = await setStylePlaceholders(build, cmpsWithStyles);
     c.push(styles);
   }
 

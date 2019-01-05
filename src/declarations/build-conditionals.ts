@@ -75,6 +75,7 @@ export interface Build extends BuildFeatures {
   appNamespace: string;
   appNamespaceLower: string;
   clientSide: boolean;
+  coreImportPath: string;
   devInspector: boolean;
   es5: boolean;
   exposeEventListener: boolean;

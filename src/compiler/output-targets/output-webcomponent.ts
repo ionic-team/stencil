@@ -102,12 +102,11 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
   updateBuildConditionals(config, build);
 
   const files = new Map<string, string>();
-  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
 
-  const appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, build, coreImportPath, files);
+  const appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, build, files);
 
   // bundle up the input into a nice pretty file
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, coreImportPath, files, appCoreBundleInput);
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, appCoreBundleInput);
   if (buildCtx.hasError) {
     return null;
   }

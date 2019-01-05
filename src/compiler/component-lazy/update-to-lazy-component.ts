@@ -1,23 +1,25 @@
 import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
 import { normalizePath } from '../util';
+import { transformLazyComponent } from './transform-lazy-component';
 
 
-export async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, moduleFile: d.Module) {
+export async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule, moduleFile: d.Module) {
+  const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
+
+  const outputText = transformLazyComponent(config, buildCtx, build, moduleFile, inputJsText);
+
   const lazyModuleFilePath = `${moduleFile.jsFilePath}.lazy.mjs`;
 
-  const lazyModuleContent = `export class ${moduleFile.cmpCompilerMeta.componentClassName} {}`;
+  await compilerCtx.fs.writeFile(lazyModuleFilePath, outputText, { inMemoryOnly: true});
 
-  await compilerCtx.fs.writeFile(lazyModuleFilePath, lazyModuleContent, { inMemoryOnly: true});
-  // console.log('write', lazyModuleFilePath)
-
-  const lazyModule: d.ComponentCompilerLazyData = {
+  const cmpData: d.ComponentCompilerLazyData = {
     filePath: lazyModuleFilePath,
     exportLine: createComponentExport(config, entryModule, moduleFile, lazyModuleFilePath),
     tagName: moduleFile.cmpCompilerMeta.tagName
   };
 
-  return lazyModule;
+  return cmpData;
 }
 
 

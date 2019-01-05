@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { pathJoin } from '../util';
 
 
 export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.Module[]) {
@@ -73,6 +74,8 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
+
+  b.coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
 }
 
 
@@ -162,7 +165,8 @@ export function getDefaultBuildConditionals() {
     exposeWriteQueue: true,
     exposeEventListener: true,
     exposeRequestAnimationFrame: true,
-    syncQueue: false
+    syncQueue: false,
+    coreImportPath: '.'
   };
   return b;
 }

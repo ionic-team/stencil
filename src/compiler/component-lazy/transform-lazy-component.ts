@@ -5,7 +5,7 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 
 
-export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, moduleFile: d.Module, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -22,7 +22,7 @@ export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, c
       fileName: moduleFile.jsFilePath,
       transformers: {
         after: [
-          transformToLazyComponent(build, coreImportPath, moduleFile)
+          transformToLazyComponent(build, moduleFile)
         ]
       }
     };
@@ -43,10 +43,9 @@ export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, c
 }
 
 
-function transformToLazyComponent(build: d.Build, coreImportPath: string, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
+function transformToLazyComponent(build: d.Build, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
   const cmp: ComponentData = {
     build: build,
-    coreImportPath: coreImportPath,
     sourceFileNode: null,
     moduleFile: moduleFile
   };
@@ -63,7 +62,7 @@ function transformToLazyComponent(build: d.Build, coreImportPath: string, module
     return tsSourceFile => {
       cmp.sourceFileNode = tsSourceFile;
 
-      addImport(cmp, 'connectedCallback');
+      addImport(build, cmp, 'connectedCallback');
 
       return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
     };
@@ -71,14 +70,14 @@ function transformToLazyComponent(build: d.Build, coreImportPath: string, module
 }
 
 
-function addImport(cmp: ComponentData, importFnName: string) {
+function addImport(build: d.Build, cmp: ComponentData, importFnName: string) {
   const importDeclaration = ts.createImportDeclaration(
     undefined,
     undefined,
     ts.createImportClause(undefined, ts.createNamedImports([
       ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
     ])),
-    ts.createLiteral(cmp.coreImportPath)
+    ts.createLiteral(build.coreImportPath)
   );
 
   cmp.sourceFileNode = ts.updateSourceFileNode(cmp.sourceFileNode, [
@@ -157,7 +156,6 @@ const REMOVE_STATIC_GETTERS = new Set([
 
 interface ComponentData {
   build: d.Build;
-  coreImportPath: string;
   sourceFileNode: ts.SourceFile;
   moduleFile: d.Module;
 }

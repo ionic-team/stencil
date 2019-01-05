@@ -15,7 +15,7 @@ export async function generateLazyBundles(config: d.Config, compilerCtx: d.Compi
   const timeSpan = buildCtx.createTimeSpan(`generate lazy bundles started`);
 
   // generate the bundled modules, but without the styles added
-  const derivedModules = await generateDerivedModules(config, compilerCtx, buildCtx);
+  const derivedModules = await generateDerivedModules(config, compilerCtx, buildCtx, build);
 
   if (derivedModules != null) {
     // Generate chunk files, ie, not entry points for components: chunk-[hash].js
@@ -45,7 +45,7 @@ export async function generateLazyBundles(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateDerivedModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+async function generateDerivedModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   if (buildCtx.shouldAbort) {
     return null;
   }
@@ -69,7 +69,7 @@ async function generateDerivedModules(config: d.Config, compilerCtx: d.CompilerC
 
   try {
     // generate the bundled modules, but without the styles added
-    const lazyModuleFormats = await generateLazyModuleFormats(config, compilerCtx, buildCtx);
+    const lazyModuleFormats = await generateLazyModuleFormats(config, compilerCtx, buildCtx, build);
 
     if (lazyModuleFormats != null) {
       derivedModules = await deriveLazyModules(config, compilerCtx, buildCtx, lazyModuleFormats);

@@ -4,14 +4,14 @@ import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
 import { normalizePath } from '../util';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, files: Map<string, string>, bundleInput: string) {
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>, bundleInput: string) {
   let output = '';
 
   try {
     const rollup = await config.sys.rollup.rollup({
       input: INPUT_ENTRY,
       plugins: [
-        filePlugin(coreImportPath, files, bundleInput),
+        filePlugin(build, files, bundleInput),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -42,7 +42,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
 }
 
 
-function filePlugin(coreImportPath: string, files: Map<string, string>, bundleInput: string) {
+function filePlugin(build: d.Build, files: Map<string, string>, bundleInput: string) {
   return {
     resolveId(id: string) {
       id = normalizePath(id);
@@ -51,7 +51,7 @@ function filePlugin(coreImportPath: string, files: Map<string, string>, bundleIn
         return INPUT_ENTRY;
       }
       if (id === STENCIL_CORE) {
-        return coreImportPath;
+        return build.coreImportPath;
       }
       if (files.has(id)) {
         return id;

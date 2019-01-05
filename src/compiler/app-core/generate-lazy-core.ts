@@ -2,16 +2,14 @@ import * as d from '../../declarations';
 import { bundleAppCore } from './bundle-app-core';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { optimizeAppCoreBundle } from './optimize-app-core';
-import { pathJoin } from '../util';
 
 
 export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
-  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
   const c: string[] = [];
 
   const cmpRuntimeData = formatLazyComponentRuntimeData(buildCtx.entryModules, lazyModules);
 
-  c.push(`import { bootstrapLazy } from '${coreImportPath}';`);
+  c.push(`import { bootstrapLazy } from '${build.coreImportPath}';`);
 
   c.push(`bootstrapLazy(${cmpRuntimeData});`);
 
@@ -26,14 +24,14 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
   }
 
   if (exportFns.length > 0) {
-    c.push(`export { ${exportFns.join(', ')} } from '${coreImportPath}';`);
+    c.push(`export { ${exportFns.join(', ')} } from '${build.coreImportPath}';`);
   }
 
   const appCoreBundleInput = c.join('\n');
 
   // bundle up the input into a nice pretty file
   const files = new Map();
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, coreImportPath, files, appCoreBundleInput);
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, appCoreBundleInput);
   if (buildCtx.hasError) {
     return null;
   }

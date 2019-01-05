@@ -5,9 +5,9 @@ import { RollupBuild } from 'rollup';
 import { updateToLazyComponent } from './update-to-lazy-component';
 
 
-export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
 
-  const entryInputPaths = await createLazyEntryModules(config, compilerCtx, buildCtx);
+  const entryInputPaths = await createLazyEntryModules(config, compilerCtx, buildCtx, build);
   if (entryInputPaths == null || entryInputPaths.length === 0) {
     return null;
   }
@@ -111,9 +111,9 @@ async function createAmdModulesFromRollup(config: d.Config, rollupBuild: RollupB
 }
 
 
-async function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+async function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const promises = buildCtx.entryModules.map(async entryModule => {
-    return createLazyEntryModule(config, compilerCtx, entryModule);
+    return createLazyEntryModule(config, compilerCtx, buildCtx, build, entryModule);
   });
 
   const entryInputPaths = await Promise.all(promises);
@@ -122,11 +122,11 @@ async function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule) {
+async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule) {
   const entryInputPath = entryModule.filePath;
 
   const promises = entryModule.moduleFiles.map(async moduleFile => {
-    return updateToLazyComponent(config, compilerCtx, entryModule, moduleFile);
+    return updateToLazyComponent(config, compilerCtx, buildCtx, build, entryModule, moduleFile);
   });
 
   const lazyModules = (await Promise.all(promises)).sort((a, b) => {
@@ -144,6 +144,5 @@ async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCt
   return entryInputPath;
 }
 
-export const MODULE_INTRO_PLACEHOLDER = `/**:module-intro-placeholder:**/`;
 
 export const MODULE_BUNDLEID_PLACEHOLDER = `/**:module-bundle-id:**/`;

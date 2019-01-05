@@ -9,10 +9,10 @@ export function getComponentsWithStyles(build: d.Build) {
 }
 
 
-export function setStylePlaceholders(cmpsWithStyles: d.ComponentCompilerMeta[], coreImportPath: string) {
+export function setStylePlaceholders(build: d.Build, cmpsWithStyles: d.ComponentCompilerMeta[]) {
   const c: string[] = [];
 
-  c.push(`import { registerStyle } from '${coreImportPath}';`);
+  c.push(`import { registerStyle } from '${build.coreImportPath}';`);
 
   cmpsWithStyles.forEach(cmpWithStyles => {
     const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);
