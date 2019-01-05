@@ -2,18 +2,22 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const transpile = require('./transpile');
+const buildPolyfills = require('./build-polyfills');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
 const DST_DIR = path.join(ROOT_DIR, 'dist');
-const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-runtime');
-const DIST_RUNTIME_DIR = path.join(DST_DIR, 'runtime');
+const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-client');
+const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 
-const inputFile = path.join(TRANSPILED_DIR, 'core-runtime', 'index.js');
-const outputFile = path.join(DIST_RUNTIME_DIR, 'index.js');
+const inputFile = path.join(TRANSPILED_DIR, 'client', 'index.js');
+const outputFile = path.join(DIST_CLIENT_DIR, 'index.js');
+
+const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
+const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 
-async function bundleRuntimeCore() {
+async function bundleClientCore() {
   const build = await rollup.rollup({
     input: inputFile,
     onwarn: (message) => {
@@ -74,7 +78,7 @@ function createPublicTypeExports() {
 }
 
 
-function createRuntimeDts() {
+function createClientDts() {
   const declarationSrcFiles = [
     path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
     path.join(SRC_DIR, 'declarations', 'jsx.ts'),
@@ -85,7 +89,7 @@ function createRuntimeDts() {
     .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
     .join('\n');
 
-  const declarationsFilePath = path.join(DST_DIR, 'runtime', 'declarations', 'stencil.core.d.ts');
+  const declarationsFilePath = path.join(DIST_CLIENT_DIR, 'declarations', 'stencil.core.d.ts');
   fs.emptyDirSync(path.dirname(declarationsFilePath));
   fs.writeFileSync(declarationsFilePath, declarationsFileContents);
 }
@@ -93,17 +97,18 @@ function createRuntimeDts() {
 
 process.on('exit', () => {
   fs.removeSync(TRANSPILED_DIR);
-  console.log(`✅ runtime: ${outputFile}`);
+  console.log(`✅ client: ${outputFile}`);
 });
 
 
-const success = transpile(path.join('..', 'src', 'core-runtime', 'tsconfig.json'));
+const success = transpile(path.join('..', 'src', 'client', 'tsconfig.json'));
 
 if (success) {
-  fs.emptyDirSync(DIST_RUNTIME_DIR);
+  fs.emptyDirSync(DIST_CLIENT_DIR);
 
-  bundleRuntimeCore();
-  createRuntimeDts();
+  bundleClientCore();
+  createClientDts();
   createPublicTypeExports();
   createPublicJavaScriptExports();
+  buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
 }

@@ -18,12 +18,13 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../dist/transpiled-runtime",
+    "outDir": "../../dist/transpiled-client",
     "pretty": true,
     "target": "es2017",
   },
   "files": [
     "./index.ts",
-    "../index.ts"
+    "../index.ts",
+    "./polyfills/css-shim/index.ts"
   ]
 }

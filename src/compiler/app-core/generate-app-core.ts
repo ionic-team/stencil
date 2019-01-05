@@ -8,7 +8,7 @@ import { pathJoin } from '../util';
 
 export async function generateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const files = new Map<string, string>();
-  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'runtime', 'index.js');
+  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
 
   let appCoreBundleInput: string;
 

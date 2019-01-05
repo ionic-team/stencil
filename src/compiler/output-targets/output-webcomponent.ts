@@ -69,7 +69,7 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
 
   const timespan = buildCtx.createTimeSpan(`generate self-contained web components started`, true);
 
-  const appModuleFiles = buildCtx.moduleFiles;
+  const appModuleFiles = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta != null);
 
   const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, buildCtx.moduleFiles, appModuleFiles);
 

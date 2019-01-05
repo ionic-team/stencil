@@ -60,11 +60,13 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {
       // print out the time it took to build
       // and add the duration to the build results
-      buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-      buildCtx.hasPrintedResults = true;
+      if (!buildCtx.hasPrintedResults) {
+        buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+        buildCtx.hasPrintedResults = true;
 
-      // write the build stats
-      await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
+        // write the build stats
+        await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
+      }
 
       // emit a buildFinish event for anyone who cares
       compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
