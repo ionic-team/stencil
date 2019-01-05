@@ -4,9 +4,6 @@ import { Cache } from '../compiler/cache';
 import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createQueueServer } from '../server/queue-server';
-import { createRendererPatch } from '../renderer/vdom/patch';
-import { initComponentInstance } from '../core/init-component-instance';
-import { initHostElement } from '../core/init-host-element';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { TestingConfig } from './testing-config';
 import { TestingFs } from './testing-fs';
@@ -72,11 +69,11 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
     });
   };
 
-  const renderer = createRendererPatch(plt, domApi);
+  // const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation) {
-    return renderer(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation);
-  };
+  // plt.render = function(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation) {
+  //   return renderer(hostElm, oldVNode, newVNode, useNativeShadowDom, encapsulation);
+  // };
 
   return plt as MockedPlatform;
 }
@@ -111,7 +108,7 @@ export function mockCompilerCtx() {
     lastBuildHadError: false,
     lastBuildResults: null,
     lastBuildStyles: null,
-    lastRawModules: null,
+    lastDerivedModules: null,
     localPrerenderServer: null,
     moduleMap: new Map(),
     resolvedCollections: new Set(),
@@ -190,9 +187,9 @@ export function mockDomApi(win?: any, doc?: any) {
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: d.DomApi): d.RendererApi {
+export function mockRenderer(plt?: MockedPlatform, _domApi?: d.DomApi): d.RendererApi {
   plt = plt || mockPlatform();
-  return createRendererPatch(<d.PlatformApi>plt, domApi || mockDomApi());
+  return {} as any; // createRendererPatch(<d.PlatformApi>plt, domApi || mockDomApi());
 }
 
 
@@ -201,16 +198,16 @@ export function mockQueue() {
 }
 
 
-export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta = {}): d.ComponentInstance {
-  mockDefine(plt, cmpMeta);
+export function mockComponentInstance(_plt: d.PlatformApi, _domApi: d.DomApi, _cmpMeta: d.ComponentMeta = {}): d.ComponentInstance {
+  // mockDefine(plt, cmpMeta);
 
-  const elm = domApi.$createElement('ion-cmp') as d.HostElement;
+  // const elm = domApi.$createElement('ion-cmp') as d.HostElement;
 
-  const hostSnapshot: d.HostSnapshot = {
-    $attributes: {}
-  };
+  // const hostSnapshot: d.HostSnapshot = {
+  //   $attributes: {}
+  // };
 
-  return initComponentInstance(plt, elm, hostSnapshot, testingPerf);
+  return null; // initComponentInstance(plt, elm, hostSnapshot, testingPerf);
 }
 
 
@@ -256,7 +253,7 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
     if (!plt.hasConnectedMap.has(node)) {
       const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated', testingPerf);
+        // initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated', testingPerf);
         (node as d.HostElement).connectedCallback();
       }
     }

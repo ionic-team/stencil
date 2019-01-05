@@ -33,7 +33,7 @@ function getBuildId() {
   const d = new Date();
 
   let buildId = ('0' + d.getUTCFullYear()).slice(-2);
-  buildId += ('0' + d.getUTCMonth()).slice(-2);
+  buildId += ('0' + (d.getUTCMonth() + 1)).slice(-2);
   buildId += ('0' + d.getUTCDate()).slice(-2);
   buildId += ('0' + d.getUTCHours()).slice(-2);
   buildId += ('0' + d.getUTCMinutes()).slice(-2);

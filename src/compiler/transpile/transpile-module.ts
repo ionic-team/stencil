@@ -1,13 +1,12 @@
 import * as d from '../../declarations';
-import addComponentMetadata from './transformers/add-component-metadata';
+// import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildContext } from '../build/build-ctx';
-import { gatherMetadata } from './datacollection/gather-metadata';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { noop } from '../../util/helpers';
 import { normalizePath } from '../util';
-import { removeCollectionImports } from './transformers/remove-collection-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { removeStencilImports } from './transformers/remove-stencil-imports';
+// import { removeCollectionImports } from './transformers/remove-collection-imports';
+// import { removeDecorators } from './transformers/remove-decorators';
+// import { removeStencilImports } from './transformers/remove-stencil-imports';
 import { validateConfig } from '../config/validate-config';
 import ts from 'typescript';
 
@@ -32,9 +31,8 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     cmpMeta: null
   };
 
-  const compilerCtx: d.CompilerCtx = {
+  const compilerCtx: any = {
     collections: [],
-    moduleFiles: {},
     resolvedCollections: new Set(),
     events: {
       emit: noop,
@@ -75,18 +73,18 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
   };
 
   const program = ts.createProgram([sourceFilePath], opts, compilerHost);
-  const typeChecker = program.getTypeChecker();
+  // const typeChecker = program.getTypeChecker();
 
   // Emit
   program.emit(undefined, undefined, undefined, false, {
     before: [
-      gatherMetadata(config, compilerCtx, buildCtx, typeChecker),
-      removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles)
+      // gatherMetadata(config, compilerCtx, buildCtx, typeChecker),
+      // removeDecorators(),
+      // addComponentMetadata(compilerCtx.moduleFiles)
     ],
     after: [
-      removeStencilImports(),
-      removeCollectionImports(compilerCtx)
+      // removeStencilImports(),
+      // removeCollectionImports(compilerCtx)
     ]
   });
 
@@ -100,7 +98,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
-  const moduleFile = compilerCtx.moduleFiles[results.sourceFilePath];
+  const moduleFile: any = null; // compilerCtx.moduleFiles[results.sourceFilePath];
 
   results.cmpMeta = moduleFile ? moduleFile.cmpMeta : null;
 
