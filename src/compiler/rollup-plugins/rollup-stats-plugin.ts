@@ -1,5 +1,6 @@
+import * as d from '../../declarations';
 import { OutputChunk, Plugin } from 'rollup';
-import * as d from '../../../declarations';
+
 
 function sortBundles(a: OutputChunk, b: OutputChunk) {
   if (a.isEntry && !b.isEntry) {

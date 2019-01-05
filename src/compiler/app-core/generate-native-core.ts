@@ -1,7 +1,8 @@
 import * as d from '../../declarations';
+import { formatComponentRuntimeArrays } from '../component-native/format-native-runtime-meta';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
-import { getComponentsWithStyles, setStylePlaceholders } from './register-styles';
-import { transformNativeComponent } from '../transformers/transform-native-component';
+import { getComponentsWithStyles, setStylePlaceholders } from './register-app-styles';
+import { updateToNativeComponents } from '../component-native/update-to-native-component';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, coreImportPath: string, files: Map<string, string>) {
@@ -40,74 +41,4 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
   }
 
   return c.join('\n');
-}
-
-
-async function updateToNativeComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build) {
-  const promises = build.appModuleFiles.map(moduleFile => {
-    return updateToNativeComponent(config, compilerCtx, buildCtx, coreImportPath, build, moduleFile);
-  });
-
-  const cmps = await Promise.all(promises);
-
-  cmps.sort((a, b) => {
-    if (a.componentClassName < b.componentClassName) return -1;
-    if (a.componentClassName > b.componentClassName) return 1;
-    return 0;
-  });
-
-  return cmps;
-}
-
-
-async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreImportPath: string, build: d.Build, moduleFile: d.Module) {
-  const inputJsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
-
-  const outputText = transformNativeComponent(config, buildCtx, coreImportPath, build, moduleFile, inputJsText);
-
-  const cmpData: ComponentSourceData = {
-    filePath: moduleFile.jsFilePath,
-    outputText: outputText,
-    tagName: moduleFile.cmpCompilerMeta.tagName,
-    componentClassName: moduleFile.cmpCompilerMeta.componentClassName,
-    cmpCompilerMeta: moduleFile.cmpCompilerMeta
-  };
-
-  return cmpData;
-}
-
-
-function formatComponentRuntimeArrays(cmps: ComponentSourceData[]) {
-  return `[${cmps.map(cmp => {
-    return formatComponentRuntimeArray(cmp);
-  }).join(',\n')}]`;
-}
-
-
-function formatComponentRuntimeArray(cmp: ComponentSourceData) {
-  const c: string[] = [];
-
-  c.push(`[`);
-
-  // 0
-  c.push(`\n'${cmp.tagName}'`);
-
-  // 1
-  c.push(`,\n${cmp.componentClassName}`);
-
-  // 2
-  c.push(`,\n${formatComponentRuntimeMeta(cmp.cmpCompilerMeta, false)}`);
-
-  c.push(`]\n`);
-
-  return c.join('');
-}
-
-
-interface ComponentSourceData {
-  filePath: string;
-  outputText: string;
-  tagName: string;
-  componentClassName: string;
-  cmpCompilerMeta: d.ComponentCompilerMeta;
 }

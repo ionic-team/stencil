@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { normalizePath } from '../../util';
+import * as d from '../../declarations';
+import { normalizePath } from '../util';
 
 
 export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

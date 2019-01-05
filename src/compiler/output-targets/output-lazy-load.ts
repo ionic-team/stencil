@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateLazyBundles } from '../bundle/generate-lazy-bundles';
+import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
 import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { pathJoin } from '../util';

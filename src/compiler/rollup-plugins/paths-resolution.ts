@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { normalizePath } from '../../util';
+import * as d from '../../declarations';
+import { normalizePath } from '../util';
 import ts from 'typescript';
 
 

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
-import { isComponentClassNode } from './transform-utils';
+import { isComponentClassNode } from '../transformers/transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 

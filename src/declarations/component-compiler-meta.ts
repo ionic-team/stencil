@@ -141,3 +141,12 @@ export interface CompilerAssetDir {
   originalComponentPath?: string;
   originalCollectionPath?: string;
 }
+
+
+export interface ComponentCompilerNativeData {
+  filePath: string;
+  outputText: string;
+  tagName: string;
+  componentClassName: string;
+  cmpCompilerMeta: d.ComponentCompilerMeta;
+}

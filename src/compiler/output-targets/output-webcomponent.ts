@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
-import { bundleAppCore } from '../bundle/bundle-app-core';
+import { bundleAppCore } from '../app-core/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { generateNativeAppCore } from '../app-core/generate-native-core';
-import { getAllModes, replaceStylePlaceholders } from '../app-core/register-styles';
+import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';

@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { buildError } from '../../util';
+import * as d from '../../declarations';
+import { buildError } from '../util';
 
 
 export default function rollupPluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {

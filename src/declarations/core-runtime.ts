@@ -1,7 +1,6 @@
 import * as d from '.';
 
 
-
 export type LazyBundleRuntimeMeta = [
   /** bundleIds */
   d.BundleIds,
@@ -9,6 +8,7 @@ export type LazyBundleRuntimeMeta = [
   /** */
   ComponentLazyRuntimeMeta[]
 ];
+
 
 export interface ComponentRuntimeMeta {
   members?: d.ComponentRuntimeMember[];

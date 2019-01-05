@@ -1,10 +1,8 @@
-import { CompilerCtx, Config } from '../../../../declarations';
+import { CompilerCtx, Config } from '../../../declarations';
 import {
-  mockCache,
   mockConfig,
   mockStencilSystem
-} from '../../../../testing/mocks';
-import localResolution from '../local-resolution';
+} from '../../../testing/mocks';
 import pathsResolver from '../paths-resolution';
 
 

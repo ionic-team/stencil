@@ -1,8 +1,8 @@
-import { CompilerCtx, Config } from '../../../declarations';
-import { normalizePath } from '../../util';
+import * as d from '../../declarations';
+import { normalizePath } from '../util';
 
 
-export default function localResolution(config: Config, compilerCtx: CompilerCtx) {
+export default function localResolution(config: d.Config, compilerCtx: d.CompilerCtx) {
   return {
     name: 'localResolution',
 

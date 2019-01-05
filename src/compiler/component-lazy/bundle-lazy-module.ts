@@ -1,15 +1,15 @@
 import * as d from '../../declarations';
-import abortPlugin from './rollup-plugins/abort-plugin';
-import bundleJson from './rollup-plugins/json';
+import abortPlugin from '../rollup-plugins/abort-plugin';
+import bundleJson from '../rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { getUserCompilerOptions } from '../transpile/compiler-options';
-import localResolution from './rollup-plugins/local-resolution';
-import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
+import localResolution from '../rollup-plugins/local-resolution';
+import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
 import { RollupBuild, RollupDirOptions } from 'rollup'; // types only
-import pathsResolution from './rollup-plugins/paths-resolution';
-import pluginHelper from './rollup-plugins/plugin-helper';
-import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
-import statsPlugin from './rollup-plugins/rollup-stats-plugin';
+import pathsResolution from '../rollup-plugins/paths-resolution';
+import pluginHelper from '../rollup-plugins/plugin-helper';
+import rollupPluginReplace from '../rollup-plugins/rollup-plugin-replace';
+import statsPlugin from '../rollup-plugins/rollup-stats-plugin';
 
 
 export async function bundleLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryInputPaths: string[]) {

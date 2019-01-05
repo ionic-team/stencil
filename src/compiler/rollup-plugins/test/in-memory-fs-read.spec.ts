@@ -1,6 +1,6 @@
-import * as d from '../../../../declarations';
+import * as d from '../../../declarations';
 import inMemoryFsRead from '../in-memory-fs-read';
-import { mockCompilerCtx, mockConfig, mockPath, mockStencilSystem } from '../../../../testing/mocks';
+import { mockCompilerCtx, mockConfig, mockPath } from '../../../testing/mocks';
 
 
 describe('inMemoryFsRead', () => {

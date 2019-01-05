@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { bundleAppCore } from '../bundle/bundle-app-core';
+import { bundleAppCore } from './bundle-app-core';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { optimizeAppCoreBundle } from './optimize-app-core';
 import { pathJoin } from '../util';
