@@ -5,7 +5,7 @@
  */
 
 
-import '@stencil/core';
+import { JSXElements } from '@stencil/core';
 
 
 
@@ -13,7 +13,7 @@ import '@stencil/core';
 export namespace Components {
 
   interface SiblingRoot {}
-  interface SiblingRootAttributes extends StencilHTMLAttributes {}
+  interface SiblingRootAttributes extends JSXElements.HTMLAttributes {}
 }
 
 declare global {
@@ -26,7 +26,7 @@ declare global {
   }
 
 
-  interface HTMLSiblingRootElement extends Components.SiblingRoot, HTMLStencilElement {}
+  interface HTMLSiblingRootElement extends Components.SiblingRoot, HTMLElement {}
   var HTMLSiblingRootElement: {
     prototype: HTMLSiblingRootElement;
     new (): HTMLSiblingRootElement;
@@ -39,14 +39,5 @@ declare global {
   interface ElementTagNameMap {
     'sibling-root': HTMLSiblingRootElement;
   }
-
-
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
 
 }
