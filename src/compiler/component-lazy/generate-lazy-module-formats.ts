@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { bundleLazyModule } from './bundle-lazy-module';
-import { catchError, normalizePath, pathJoin } from '../util';
-import { dashToPascalCase } from '../../util/helpers';
+import { catchError, pathJoin } from '../util';
 import { RollupBuild } from 'rollup';
+import { updateToLazyComponent } from './update-to-lazy-component';
 
 
 export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -142,45 +142,6 @@ async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCt
   await compilerCtx.fs.writeFile(entryInputPath, lazyModuleContent, { inMemoryOnly: true});
 
   return entryInputPath;
-}
-
-
-interface LazyModule {
-  exportLine: string;
-  filePath: string;
-  tagName: string;
-}
-
-
-async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, entryModule: d.EntryModule, moduleFile: d.Module) {
-  const lazyModuleFilePath = `${moduleFile.jsFilePath}.lazy.mjs`;
-
-  const lazyModuleContent = `export class ${moduleFile.cmpCompilerMeta.componentClassName} {}`;
-
-  await compilerCtx.fs.writeFile(lazyModuleFilePath, lazyModuleContent, { inMemoryOnly: true});
-  // console.log('write', lazyModuleFilePath)
-
-  const lazyModule: LazyModule = {
-    filePath: lazyModuleFilePath,
-    exportLine: createComponentExport(config, entryModule, moduleFile, lazyModuleFilePath),
-    tagName: moduleFile.cmpCompilerMeta.tagName
-  };
-
-  return lazyModule;
-}
-
-
-function createComponentExport(config: d.Config, entryModule: d.EntryModule, moduleFile: d.Module, lazyModuleFilePath: string) {
-  const originalClassName = moduleFile.cmpCompilerMeta.componentClassName;
-  const pascalCasedClassName = dashToPascalCase(moduleFile.cmpCompilerMeta.tagName);
-  const relPath = config.sys.path.relative(config.sys.path.dirname(entryModule.filePath), lazyModuleFilePath);
-  const filePath = normalizePath(relPath);
-
-  if (originalClassName === pascalCasedClassName) {
-    return `export { ${originalClassName} } from './${filePath}';`;
-  }
-
-  return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;
 }
 
 export const MODULE_INTRO_PLACEHOLDER = `/**:module-intro-placeholder:**/`;

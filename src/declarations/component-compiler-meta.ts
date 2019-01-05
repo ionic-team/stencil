@@ -150,3 +150,10 @@ export interface ComponentCompilerNativeData {
   componentClassName: string;
   cmpCompilerMeta: d.ComponentCompilerMeta;
 }
+
+
+export interface ComponentCompilerLazyData {
+  exportLine: string;
+  filePath: string;
+  tagName: string;
+}
