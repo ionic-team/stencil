@@ -3,7 +3,7 @@
 `npm run build`
 
 
-## Hello World
+## Hello World App
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
@@ -11,11 +11,11 @@
 
 
 
-## Hello VDOM
+## Hello VDOM App
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.js                     | 646B     | 735B     | 1.25KB   |
+| app.js                     | 653B     | 739B     | 1.25KB   |
 
 
 
@@ -23,5 +23,13 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.js                     | 2.51KB   | 2.83KB   | 6.14KB   |
+| app.js                     | 2.51KB   | 2.81KB   | 6.14KB   |
+
+
+
+## End-to-end App
+
+| File                       | Brotli   | Gzipped  | Minified |
+|----------------------------|----------|----------|----------|
+| app.js                     | 2.65KB   | 2.96KB   | 6.27KB   |
 

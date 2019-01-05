@@ -1,5 +1,5 @@
 {
-  "name": "@stencil/test-testing",
+  "name": "@stencil/end-to-end",
   "private": true,
   "scripts": {
     "build": "node ../../bin/stencil build",
