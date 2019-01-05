@@ -1,8 +1,8 @@
 import * as d from '../declarations';
-import { connectedCallback } from '../core/connected';
-import { ENCAPSULATION } from '../util/constants';
-import { initHostElement } from '../core/init-host-element';
-import { initHostSnapshot } from '../core/host-snapshot';
+// import { connectedCallback } from '../core/connected';
+// import { ENCAPSULATION } from '../util/constants';
+// import { initHostElement } from '../core/init-host-element';
+// import { initHostSnapshot } from '../core/host-snapshot';
 
 
 export function connectChildElements(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, parentElm: Element, perf: Performance) {
@@ -38,19 +38,19 @@ export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppG
 }
 
 
-function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta, perf: Performance) {
-  const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
-  plt.hostSnapshotMap.set(elm, hostSnapshot);
+function connectHostElement(_config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta, _perf: Performance) {
+  // const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
+  // plt.hostSnapshotMap.set(elm, hostSnapshot);
 
   if (!cmpMeta.componentConstructor) {
     plt.requestBundle(cmpMeta, elm);
   }
 
-  if (cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom) {
-    initHostElement(plt, cmpMeta, elm, config.hydratedCssClass, perf);
+  // if (cmpMeta.encapsulationMeta !== ENCAPSULATION.ShadowDom) {
+  //   initHostElement(plt, cmpMeta, elm, config.hydratedCssClass, perf);
 
-    connectedCallback(plt, cmpMeta, elm, perf);
-  }
+  //   connectedCallback(plt, cmpMeta, elm, perf);
+  // }
 
   connectComponentOnReady(App, elm);
 

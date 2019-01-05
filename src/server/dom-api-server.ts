@@ -1,9 +1,9 @@
 import * as d from '../declarations';
-import { initHostElement } from '../core/init-host-element';
-import { initHostSnapshot } from '../core/host-snapshot';
+// import { initHostElement } from '../core/init-host-element';
+// import { initHostSnapshot } from '../core/host-snapshot';
 
 
-export function patchDomApi(config: d.Config, plt: d.PlatformApi, domApi: d.DomApi, perf: Performance) {
+export function patchDomApi(_config: d.Config, plt: d.PlatformApi, domApi: d.DomApi, _perf: Performance) {
 
   const orgCreateElement = domApi.$createElement;
   domApi.$createElement = (tagName: string) => {
@@ -11,9 +11,9 @@ export function patchDomApi(config: d.Config, plt: d.PlatformApi, domApi: d.DomA
 
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && !cmpMeta.componentConstructor) {
-      initHostElement(plt, cmpMeta, elm, config.namespace, perf);
-      const hostSnapshot = initHostSnapshot(domApi, cmpMeta, elm);
-      plt.hostSnapshotMap.set(elm, hostSnapshot);
+      // initHostElement(plt, cmpMeta, elm, config.namespace, perf);
+      // const hostSnapshot = initHostSnapshot(domApi, cmpMeta, elm);
+      // plt.hostSnapshotMap.set(elm, hostSnapshot);
       plt.requestBundle(cmpMeta, elm);
     }
 

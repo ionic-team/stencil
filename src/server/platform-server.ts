@@ -3,15 +3,15 @@ import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 // import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
-import { enableEventListener } from '../core/listeners';
+// import { enableEventListener } from '../core/listeners';
 import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
-import { initCoreComponentOnReady } from '../core/component-on-ready';
+// import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
-import { proxyController } from '../core/proxy-controller';
-import { queueUpdate } from '../core/update';
+// import { proxyController } from '../core/proxy-controller';
+// import { queueUpdate } from '../core/update';
 import { serverAttachStyles, serverInitStyle } from './server-styles';
 import { toDashCase } from '../util/helpers';
 
@@ -29,7 +29,7 @@ export function createPlatformServer(
 ): d.PlatformApi {
   const loadedBundles: {[bundleId: string]:  d.CjsExports} = {};
   const appliedStyleIds = new Set<string>();
-  const controllerComponents: {[tag: string]: d.HostElement} = {};
+  // const controllerComponents: {[tag: string]: d.HostElement} = {};
   const domApi = createDomApi(App, win, doc);
   const perf = { mark: noop, measure: noop } as any;
 
@@ -41,7 +41,7 @@ export function createPlatformServer(
 
   // initialize Core global object
   const Context: d.CoreContext = {};
-  Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
+  // Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   Context.isClient = false;
   Context.isServer = true;
@@ -87,7 +87,7 @@ export function createPlatformServer(
     activeRender: false,
     isAppLoaded: false,
     nextId: () => config.namespace + (ids++),
-    propConnect,
+    // propConnect,
     queue: (Context.queue = createQueueServer()),
     requestBundle: requestBundle,
     tmpDisconnected: false,
@@ -124,7 +124,7 @@ export function createPlatformServer(
   // plt.render = createRendererPatch(plt, domApi);
 
   // patch the componentOnReady fn
-  initCoreComponentOnReady(plt, App);
+  // initCoreComponentOnReady(plt, App);
 
   // setup the root node of all things
   // which is the mighty <html> tag
@@ -277,7 +277,7 @@ export function createPlatformServer(
     // It is possible the data was loaded from an outside source like tests
     if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
       serverInitStyle(domApi, appliedStyleIds, cmpRegistry[cmpMeta.tagNameMeta].componentConstructor);
-      queueUpdate(plt, elm, perf);
+      // queueUpdate(plt, elm, perf);
 
     } else {
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
@@ -286,7 +286,7 @@ export function createPlatformServer(
 
       if (isLoadedBundle(bundleId)) {
         // sweet, we've already loaded this bundle
-        queueUpdate(plt, elm, perf);
+        // queueUpdate(plt, elm, perf);
 
       } else {
         const fileName = getComponentBundleFilename(cmpMeta, elm.mode);
@@ -359,9 +359,9 @@ export function createPlatformServer(
     }
   }
 
-  function propConnect(ctrlTag: string) {
-    return proxyController(domApi, controllerComponents, ctrlTag);
-  }
+  // function propConnect(_ctrlTag: string) {
+  //   return proxyController(domApi, controllerComponents, ctrlTag);
+  // }
 
   function getContextItem(contextKey: string) {
     return Context[contextKey];

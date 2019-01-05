@@ -10,7 +10,7 @@ import * as d from '../../declarations';
 import { h } from './h';
 import { isDef, toLowerCase } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
-import { plt, supportsShadowDom } from '../../core-runtime/data';
+import { plt, supportsShadowDom } from '../../client/data';
 import { updateElement } from './update-dom-node';
 
 
