@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist';
+import { Component, h } from '@stencil/core';
 import { store } from './external-store'
 
 

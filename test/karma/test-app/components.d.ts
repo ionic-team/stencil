@@ -64,13 +64,13 @@ export namespace Components {
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {}
 
   interface ExternalImportA {}
-  interface ExternalImportAAttributes extends StencilHTMLAttributes {}
+  interface ExternalImportAAttributes extends JSXElements.HTMLAttributes {}
 
   interface ExternalImportB {}
-  interface ExternalImportBAttributes extends StencilHTMLAttributes {}
+  interface ExternalImportBAttributes extends JSXElements.HTMLAttributes {}
 
   interface ExternalImportC {}
-  interface ExternalImportCAttributes extends StencilHTMLAttributes {}
+  interface ExternalImportCAttributes extends JSXElements.HTMLAttributes {}
 
   interface InitCssRoot {}
   interface InitCssRootAttributes extends JSXElements.HTMLAttributes {}
@@ -118,7 +118,7 @@ export namespace Components {
   interface LifecycleUnloadRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenWindow {}
-  interface ListenWindowAttributes extends StencilHTMLAttributes {}
+  interface ListenWindowAttributes extends JSXElements.HTMLAttributes {}
 
   interface NodeGlobals {}
   interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
@@ -503,29 +503,25 @@ declare global {
     new (): HTMLEsmImportElement;
   };
 
-<<<<<<< HEAD
-  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLElement {}
-=======
-  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {}
+  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLElement {}
   var HTMLExternalImportAElement: {
     prototype: HTMLExternalImportAElement;
     new (): HTMLExternalImportAElement;
   };
 
-  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {}
+  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLElement {}
   var HTMLExternalImportBElement: {
     prototype: HTMLExternalImportBElement;
     new (): HTMLExternalImportBElement;
   };
 
-  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {}
+  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLElement {}
   var HTMLExternalImportCElement: {
     prototype: HTMLExternalImportCElement;
     new (): HTMLExternalImportCElement;
   };
 
-  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
->>>>>>> master
+  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLElement {}
   var HTMLInitCssRootElement: {
     prototype: HTMLInitCssRootElement;
     new (): HTMLInitCssRootElement;
@@ -615,17 +611,13 @@ declare global {
     new (): HTMLLifecycleUnloadRootElement;
   };
 
-<<<<<<< HEAD
-  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLElement {}
-=======
-  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
+  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLElement {}
   var HTMLListenWindowElement: {
     prototype: HTMLListenWindowElement;
     new (): HTMLListenWindowElement;
   };
 
-  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {}
->>>>>>> master
+  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLElement {}
   var HTMLNodeGlobalsElement: {
     prototype: HTMLNodeGlobalsElement;
     new (): HTMLNodeGlobalsElement;
