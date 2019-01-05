@@ -63,6 +63,15 @@ export namespace Components {
   interface EsmImport {}
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {}
 
+  interface ExternalImportA {}
+  interface ExternalImportAAttributes extends StencilHTMLAttributes {}
+
+  interface ExternalImportB {}
+  interface ExternalImportBAttributes extends StencilHTMLAttributes {}
+
+  interface ExternalImportC {}
+  interface ExternalImportCAttributes extends StencilHTMLAttributes {}
+
   interface InitCssRoot {}
   interface InitCssRootAttributes extends JSXElements.HTMLAttributes {}
 
@@ -107,6 +116,9 @@ export namespace Components {
 
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends JSXElements.HTMLAttributes {}
+
+  interface ListenWindow {}
+  interface ListenWindowAttributes extends StencilHTMLAttributes {}
 
   interface NodeGlobals {}
   interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
@@ -248,6 +260,9 @@ declare global {
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
     'EsmImport': Components.EsmImport;
+    'ExternalImportA': Components.ExternalImportA;
+    'ExternalImportB': Components.ExternalImportB;
+    'ExternalImportC': Components.ExternalImportC;
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorderRoot': Components.KeyReorderRoot;
     'KeyReorder': Components.KeyReorder;
@@ -263,6 +278,7 @@ declare global {
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
     'ReflectToAttr': Components.ReflectToAttr;
     'ScopedBasicRoot': Components.ScopedBasicRoot;
@@ -323,6 +339,9 @@ declare global {
     'dynamic-import': Components.DynamicImportAttributes;
     'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
     'esm-import': Components.EsmImportAttributes;
+    'external-import-a': Components.ExternalImportAAttributes;
+    'external-import-b': Components.ExternalImportBAttributes;
+    'external-import-c': Components.ExternalImportCAttributes;
     'init-css-root': Components.InitCssRootAttributes;
     'key-reorder-root': Components.KeyReorderRootAttributes;
     'key-reorder': Components.KeyReorderAttributes;
@@ -338,6 +357,7 @@ declare global {
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'listen-window': Components.ListenWindowAttributes;
     'node-globals': Components.NodeGlobalsAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
     'scoped-basic-root': Components.ScopedBasicRootAttributes;
@@ -483,7 +503,29 @@ declare global {
     new (): HTMLEsmImportElement;
   };
 
+<<<<<<< HEAD
   interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLElement {}
+=======
+  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {}
+  var HTMLExternalImportAElement: {
+    prototype: HTMLExternalImportAElement;
+    new (): HTMLExternalImportAElement;
+  };
+
+  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {}
+  var HTMLExternalImportBElement: {
+    prototype: HTMLExternalImportBElement;
+    new (): HTMLExternalImportBElement;
+  };
+
+  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {}
+  var HTMLExternalImportCElement: {
+    prototype: HTMLExternalImportCElement;
+    new (): HTMLExternalImportCElement;
+  };
+
+  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
+>>>>>>> master
   var HTMLInitCssRootElement: {
     prototype: HTMLInitCssRootElement;
     new (): HTMLInitCssRootElement;
@@ -573,7 +615,17 @@ declare global {
     new (): HTMLLifecycleUnloadRootElement;
   };
 
+<<<<<<< HEAD
   interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLElement {}
+=======
+  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
+  var HTMLListenWindowElement: {
+    prototype: HTMLListenWindowElement;
+    new (): HTMLListenWindowElement;
+  };
+
+  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {}
+>>>>>>> master
   var HTMLNodeGlobalsElement: {
     prototype: HTMLNodeGlobalsElement;
     new (): HTMLNodeGlobalsElement;
@@ -831,6 +883,9 @@ declare global {
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
     'esm-import': HTMLEsmImportElement
+    'external-import-a': HTMLExternalImportAElement
+    'external-import-b': HTMLExternalImportBElement
+    'external-import-c': HTMLExternalImportCElement
     'init-css-root': HTMLInitCssRootElement
     'key-reorder-root': HTMLKeyReorderRootElement
     'key-reorder': HTMLKeyReorderElement
@@ -846,6 +901,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
     'reflect-to-attr': HTMLReflectToAttrElement
     'scoped-basic-root': HTMLScopedBasicRootElement
@@ -906,6 +962,9 @@ declare global {
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
     'esm-import': HTMLEsmImportElement;
+    'external-import-a': HTMLExternalImportAElement;
+    'external-import-b': HTMLExternalImportBElement;
+    'external-import-c': HTMLExternalImportCElement;
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'key-reorder': HTMLKeyReorderElement;
@@ -921,6 +980,7 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;

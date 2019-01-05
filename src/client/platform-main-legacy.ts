@@ -268,14 +268,22 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
    * This function is called anytime a JS file is loaded
    */
   function loadBundle(bundleId: string | undefined, dependentsList: string[], importer: Function) {
-    const missingDependents = dependentsList.filter(d => !isLoadedBundle(d));
-    missingDependents.forEach(d => {
-      requestUrl(resourcesUrl + d.replace('.js', '.es5.js'));
-    });
-    bundleQueue.push([bundleId, dependentsList, importer]);
+    if (Array.isArray(dependentsList)) {
+      // 2nd arg is an array of dependency bundle ids
+      // 3rd arg is the importer fn
+      const missingDependents = dependentsList.filter(d => !isLoadedBundle(d));
+      missingDependents.forEach(d => {
+        requestUrl(resourcesUrl + d.replace('.js', '.es5.js'));
+      });
+      bundleQueue.push([bundleId, dependentsList, importer]);
 
-    // If any dependents are not yet met then queue the bundle execution
-    if (missingDependents.length === 0) {
+      // If any dependents are not yet met then queue the bundle execution
+      if (missingDependents.length === 0) {
+        checkQueue();
+      }
+
+    } else if (typeof dependentsList === 'function') {
+      // 2nd arg is the importer fn, and there is no dependency list
       checkQueue();
     }
   }
