@@ -54,67 +54,89 @@ export class CompilerContext implements d.CompilerCtx {
 export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
   sourceFilePath = normalizePath(sourceFilePath);
 
-  const module = compilerCtx.moduleMap.get(sourceFilePath);
-  if (module) {
-    return module;
+  const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
+  if (moduleFile) {
+    return moduleFile;
 
   } else {
-    const module = new ModuleFile(sourceFilePath);
-    compilerCtx.moduleMap.set(sourceFilePath, module);
-    return module;
+    const moduleFile: d.Module = {
+      sourceFilePath: sourceFilePath,
+      cmpCompilerMeta: null,
+      collectionName: null,
+      dtsFilePath: null,
+      excludeFromCollection: false,
+      externalImports: [],
+      hasVdomAttribute: false,
+      hasVdomClass: false,
+      hasVdomFunctional: false,
+      hasVdomKey: false,
+      hasVdomListener: false,
+      hasVdomRef: false,
+      hasVdomRender: false,
+      hasVdomStyle: false,
+      hasVdomText: false,
+      htmlAttrNames: [],
+      htmlTagNames: [],
+      isCollectionDependency: false,
+      jsFilePath: null,
+      localImports: [],
+      originalCollectionComponentPath: null,
+      potentialCmpRefs: []
+    };
+    compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
+    return moduleFile;
   }
 }
 
 
-export class ModuleFile implements d.Module {
-  cmpCompilerMeta: d.ComponentCompilerMeta = null;
-  collectionName: string = null;
-  dtsFilePath: string = null;
-  excludeFromCollection = false;
-  externalImports: string[] = [];
-  hasVdomAttribute = false;
-  hasVdomClass = false;
-  hasVdomFunctional = false;
-  hasVdomKey = false;
-  hasVdomListener = false;
-  hasVdomRef = false;
-  hasVdomRender = false;
-  hasVdomStyle = false;
-  hasVdomText = false;
-  htmlAttrNames: string[] = [];
-  htmlTagNames: string[] = [];
-  isCollectionDependency = false;
-  jsFilePath: string = null;
-  localImports: string[] = [];
-  originalCollectionComponentPath: string = null;
-  potentialCmpRefs: d.PotentialComponentRef[] = [];
-  sourceFilePath: string;
+export function resetModule(moduleFile: d.Module) {
+  moduleFile.cmpCompilerMeta = null;
+  moduleFile.collectionName = null;
+  moduleFile.dtsFilePath = null;
+  moduleFile.excludeFromCollection = false;
 
-  constructor(sourceFilePath: string) {
-    this.sourceFilePath = sourceFilePath;
+  if (Array.isArray(moduleFile.externalImports)) {
+    moduleFile.externalImports.length = 0;
+  } else {
+    moduleFile.externalImports = [];
   }
 
-  reset() {
-    this.cmpCompilerMeta = null;
-    this.collectionName = null;
-    this.dtsFilePath = null;
-    this.excludeFromCollection = false;
-    this.externalImports.length = 0;
-    this.hasVdomAttribute = false;
-    this.hasVdomClass = false;
-    this.hasVdomFunctional = false;
-    this.hasVdomKey = false;
-    this.hasVdomListener = false;
-    this.hasVdomRef = false;
-    this.hasVdomRender = false;
-    this.hasVdomStyle = false;
-    this.hasVdomText = false;
-    this.htmlAttrNames.length = 0;
-    this.htmlTagNames.length = 0;
-    this.isCollectionDependency = false;
-    this.jsFilePath = null;
-    this.localImports.length = 0;
-    this.originalCollectionComponentPath = null;
-    this.potentialCmpRefs.length = 0;
+  moduleFile.hasVdomAttribute = false;
+  moduleFile.hasVdomClass = false;
+  moduleFile.hasVdomFunctional = false;
+  moduleFile.hasVdomKey = false;
+  moduleFile.hasVdomListener = false;
+  moduleFile.hasVdomRef = false;
+  moduleFile.hasVdomRender = false;
+  moduleFile.hasVdomStyle = false;
+  moduleFile.hasVdomText = false;
+
+  if (Array.isArray(moduleFile.htmlAttrNames)) {
+    moduleFile.htmlAttrNames.length = 0;
+  } else {
+    moduleFile.htmlAttrNames = [];
+  }
+
+  if (Array.isArray(moduleFile.htmlTagNames)) {
+    moduleFile.htmlTagNames.length = 0;
+  } else {
+    moduleFile.htmlTagNames = [];
+  }
+
+  moduleFile.isCollectionDependency = false;
+  moduleFile.jsFilePath = null;
+
+  if (Array.isArray(moduleFile.localImports)) {
+    moduleFile.localImports.length = 0;
+  } else {
+    moduleFile.localImports = [];
+  }
+
+  moduleFile.originalCollectionComponentPath = null;
+
+  if (Array.isArray(moduleFile.potentialCmpRefs)) {
+    moduleFile.potentialCmpRefs.length = 0;
+  } else {
+    moduleFile.potentialCmpRefs = [];
   }
 }

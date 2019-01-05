@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { ModuleFile } from '../../build/compiler-ctx';
+import { getModule } from '../../build/compiler-ctx';
 import { normalizePath } from '../../util';
 
 
@@ -14,7 +14,7 @@ export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.Compi
 
 function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
-  const moduleFile = new ModuleFile(sourceFilePath);
+  const moduleFile = getModule(compilerCtx, sourceFilePath);
 
   const cmpMeta: d.ComponentCompilerMeta = {} as any;
   moduleFile.cmpCompilerMeta = cmpMeta;
@@ -39,8 +39,6 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   parseEncapsulation(cmpData, cmpMeta);
 
   collection.moduleFiles.push(moduleFile);
-
-  compilerCtx.moduleMap.set(moduleFile.sourceFilePath, moduleFile);
 }
 
 

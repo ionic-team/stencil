@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getModule } from '../../build/compiler-ctx';
+import { getModule, resetModule } from '../../build/compiler-ctx';
 import { visitCallExpression } from './visit-call-expression';
 import { visitClass } from './visit-class';
 import { visitImport } from './visit-import';
@@ -43,7 +43,7 @@ export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       moduleFile = getModule(compilerCtx, tsSourceFile.fileName);
 
       // reset since we're doing a full parse again
-      moduleFile.reset();
+      resetModule(moduleFile);
 
       if (collection != null) {
         moduleFile.isCollectionDependency = true;

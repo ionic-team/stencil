@@ -30,6 +30,4 @@ export interface Module {
   originalCollectionComponentPath: string;
   potentialCmpRefs: d.PotentialComponentRef[];
   sourceFilePath: string;
-
-  reset(): void;
 }
