@@ -8,7 +8,7 @@ export async function writeLazyEntryModule(config: d.Config, compilerCtx: d.Comp
   }
   fileName += `.entry.js`;
 
-  const filePath = config.sys.path.join(outputTarget.buildDir, fileName);
+  const filePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace, fileName);
 
   await compilerCtx.fs.writeFile(filePath, jsText);
 }

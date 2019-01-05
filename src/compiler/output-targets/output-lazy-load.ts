@@ -1,7 +1,8 @@
 import * as d from '../../declarations';
-import { generateAppCore } from '../app-core/generate-app-core';
 import { generateLazyBundles } from '../bundle/generate-lazy-bundles';
+import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { pathJoin } from '../util';
 
 
 export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -32,16 +33,32 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const appCorePromise = generateAppCore(config, compilerCtx, buildCtx, build);
+  await generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
 
-  const lazyBundlesPromise = generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
+  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
+  const outputText = await generateLazyLoadedAppCore(config, compilerCtx, buildCtx, build, coreImportPath);
 
-  await Promise.all([
-    appCorePromise,
-    lazyBundlesPromise
-  ]);
+  await writeLazyLoadCoreOutputs(config, compilerCtx, outputTargets, outputText);
 
   timespan.finish(`generate app lazy components finished`);
+}
+
+
+async function writeLazyLoadCoreOutputs(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetBuild[], outputText: string) {
+  const promises = outputTargets.map(async outputTarget => {
+    await writeLazyLoadCoreOutput(config, compilerCtx, outputTarget, outputText);
+  });
+
+  await Promise.all(promises);
+}
+
+
+async function writeLazyLoadCoreOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, outputText: string) {
+  const fileName = `${config.fsNamespace}.js`;
+
+  const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+
+  await compilerCtx.fs.writeFile(filePath, outputText);
 }
 
 

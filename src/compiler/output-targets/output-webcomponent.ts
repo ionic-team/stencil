@@ -1,9 +1,11 @@
 import * as d from '../../declarations';
+import { bundleAppCore } from '../bundle/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { generateAppCore } from '../app-core/generate-app-core';
+import { generateNativeAppCore } from '../app-core/generate-native-core';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/register-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
+import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { pathJoin } from '../util';
 
 
@@ -99,9 +101,21 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const outputText = await generateAppCore(config, compilerCtx, buildCtx, build);
+  const files = new Map<string, string>();
+  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
 
-  return outputText;
+  const appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, build, coreImportPath, files);
+
+  // bundle up the input into a nice pretty file
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, coreImportPath, files, appCoreBundleInput);
+  if (buildCtx.hasError) {
+    return null;
+  }
+
+  const results = await optimizeAppCoreBundle(config, compilerCtx, build, appCoreBundleOutput);
+  buildCtx.diagnostics.push(...results.diagnostics);
+
+  return results.output;
 }
 
 
