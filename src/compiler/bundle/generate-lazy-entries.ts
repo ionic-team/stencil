@@ -4,40 +4,44 @@ import { writeLazyEntryModule } from './write-lazy-module';
 
 
 export async function generateLazyEntries(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, derivedModules: d.DerivedModule[]) {
-  const promises = buildCtx.entryModules.map(async entryModule => {
+  const promises: Promise<d.LazyModuleOutput>[] = [];
+
+  buildCtx.entryModules.forEach(entryModule => {
     const mainModule = derivedModules[0];
     const entryKey = entryModule.entryKey;
     const chunkIndex = mainModule.list.findIndex(c => c.entryKey === entryKey);
 
     if (chunkIndex >= 0 && entryModule.modeNames != null) {
-      const promises = entryModule.modeNames.map(async modeName => {
-        await generateLazyEntryModuleMode(config, compilerCtx, buildCtx, outputTargets, build, derivedModules, entryModule, modeName, chunkIndex);
+      entryModule.modeNames.forEach(modeName => {
+        const p = generateLazyEntryModuleMode(config, compilerCtx, outputTargets, build, derivedModules, entryModule, modeName, chunkIndex);
+        promises.push(...p);
       });
-
-      await Promise.all(promises);
     }
   });
 
-  await Promise.all(promises);
+  return await Promise.all(promises);
 }
 
 
-async function generateLazyEntryModuleMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, derivedModules: d.DerivedModule[], entryModule: d.EntryModule, modeName: string, chunkIndex: number) {
-  const promises = derivedModules.map(async derivedModule => {
+function generateLazyEntryModuleMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, derivedModules: d.DerivedModule[], entryModule: d.EntryModule, modeName: string, chunkIndex: number) {
+  const promises: Promise<d.LazyModuleOutput>[] = [];
+
+  derivedModules.forEach(derivedModule => {
     const chunk = derivedModule.list[chunkIndex];
     if (chunk != null) {
-      const outputPromises = outputTargets.map(async outputTarget => {
-        await generateLazyEntryModuleModeChunkOutput(config, compilerCtx, buildCtx, outputTarget, build, derivedModule, entryModule, modeName, chunk);
+      outputTargets.forEach(outputTarget => {
+        promises.push(
+          generateLazyEntryModuleModeChunkOutput(config, compilerCtx, outputTarget, build, derivedModule, entryModule, modeName, chunk)
+        );
       });
-      await Promise.all(outputPromises);
     }
   });
 
-  await Promise.all(promises);
+  return promises;
 }
 
 
-async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, build: d.Build, derivedModule: d.DerivedModule, entryModule: d.EntryModule, modeName: string, chunk: d.DerivedChunk) {
+async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, build: d.Build, derivedModule: d.DerivedModule, entryModule: d.EntryModule, modeName: string, chunk: d.DerivedChunk) {
   const c: string[] = [];
 
   if (config.logLevel === 'debug') {
@@ -79,6 +83,14 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
   const bundleId = getBundleId(config, entryModule, modeName, jsText);
 
   await writeLazyEntryModule(config, compilerCtx, outputTarget, derivedModule, bundleId, jsText);
+
+  const lazyModule: d.LazyModuleOutput = {
+    bundleId: bundleId,
+    entryKey: entryModule.entryKey,
+    modeName: modeName
+  };
+
+  return lazyModule;
 }
 
 

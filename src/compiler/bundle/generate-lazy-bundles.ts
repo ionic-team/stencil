@@ -9,7 +9,7 @@ import { PLUGIN_HELPERS } from '../style/component-styles';
 
 export async function generateLazyBundles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build) {
   if (canSkipGenerateBundles(buildCtx)) {
-    return;
+    return null;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`generate lazy bundles started`);
@@ -29,13 +29,19 @@ export async function generateLazyBundles(config: d.Config, compilerCtx: d.Compi
     const entryPromises = generateLazyEntries(config, compilerCtx, buildCtx, outputTargets, build, derivedModules);
 
     // ensure all entries and chunks are finished
-    await Promise.all([
-      chunkPromises,
-      entryPromises
+    const results = await Promise.all([
+      entryPromises,
+      chunkPromises
     ]);
+
+    const lazyModules = results[0];
+
+    return lazyModules;
   }
 
   timeSpan.finish(`generate lazy bundles finished`);
+
+  return null;
 }
 
 

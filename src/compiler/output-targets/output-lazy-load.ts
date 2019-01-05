@@ -33,12 +33,12 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  await generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
+  const lazyModules = await generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
+  if (lazyModules != null) {
+    const outputText = await generateLazyLoadedAppCore(config, compilerCtx, buildCtx, build, lazyModules);
 
-  const coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
-  const outputText = await generateLazyLoadedAppCore(config, compilerCtx, buildCtx, build, coreImportPath);
-
-  await writeLazyLoadCoreOutputs(config, compilerCtx, outputTargets, outputText);
+    await writeLazyLoadCoreOutputs(config, compilerCtx, outputTargets, outputText);
+  }
 
   timespan.finish(`generate app lazy components finished`);
 }

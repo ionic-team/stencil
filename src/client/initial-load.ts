@@ -38,7 +38,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if (!elm['s-cr'] && (!supportsShadowDom || !cmpMeta.scopedDomEncapsulation)) {
+      if (!elm['s-cr'] && (!supportsShadowDom || !cmpMeta.scopedCssEncapsulation)) {
         // only required when we're NOT using native shadow dom (slot)
         // or this browser doesn't support native shadow dom
         // and this host element was NOT created with SSR
@@ -50,7 +50,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
         elm.insertBefore(elm['s-cr'], elm.firstChild);
       }
 
-      if ((BUILD.es5 || BUILD.scoped) && !supportsShadowDom && cmpMeta.scopedDomEncapsulation) {
+      if ((BUILD.es5 || BUILD.scoped) && !supportsShadowDom && cmpMeta.scopedCssEncapsulation) {
         // initUpdate, BUILD.es5 || scoped
         // this component should use shadow dom
         // but this browser doesn't support it

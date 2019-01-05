@@ -1,16 +1,25 @@
 import * as d from '.';
 
 
+
+export type LazyBundleRuntimeMeta = [
+  /** bundleIds */
+  d.BundleIds,
+
+  /** */
+  ComponentLazyRuntimeMeta[]
+];
+
 export interface ComponentRuntimeMeta {
   members?: d.ComponentRuntimeMember[];
-  scopedDomEncapsulation?: boolean;
+  scopedCssEncapsulation?: boolean;
   shadowDomEncapsulation?: boolean;
 }
 
 
 export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
-  tagNameMeta?: string;
-  lazyBundleIds?: ModeBundleId;
+  cmpTag: string;
+  lazyBundleIds?: d.BundleIds;
 }
 
 

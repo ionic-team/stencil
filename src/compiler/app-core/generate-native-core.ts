@@ -23,13 +23,13 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
     c.push(`customElements.define('${cmp.tagName}', initHostComponent(
       ${cmp.componentClassName},
-      ${JSON.stringify(formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta))},
+      ${formatComponentRuntimeMeta(cmp.cmpCompilerMeta, false)},
       1
     ));`);
 
   } else {
     // numerous components, so make it easy on minifying
-    c.push(formatComponentRuntimeArrays(build, cmps));
+    c.push(formatComponentRuntimeArrays(cmps));
     c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2], 1)));`);
   }
 
@@ -77,14 +77,14 @@ async function updateToNativeComponent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-function formatComponentRuntimeArrays(build: d.Build, cmps: ComponentSourceData[]) {
+function formatComponentRuntimeArrays(cmps: ComponentSourceData[]) {
   return `[${cmps.map(cmp => {
-    return formatComponentRuntimeArray(build, cmp);
+    return formatComponentRuntimeArray(cmp);
   }).join(',\n')}]`;
 }
 
 
-function formatComponentRuntimeArray(build: d.Build, cmp: ComponentSourceData) {
+function formatComponentRuntimeArray(cmp: ComponentSourceData) {
   const c: string[] = [];
 
   c.push(`[`);
@@ -96,7 +96,7 @@ function formatComponentRuntimeArray(build: d.Build, cmp: ComponentSourceData) {
   c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`,\n${formatComponentRuntimeMeta(build, cmp.cmpCompilerMeta)}`);
+  c.push(`,\n${formatComponentRuntimeMeta(cmp.cmpCompilerMeta, false)}`);
 
   c.push(`]\n`);
 

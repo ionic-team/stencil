@@ -22,5 +22,5 @@ export const initHostComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Compo
     proxyComponent((Cstr as any).prototype, cmpMeta, proxyState);
   }
 
-  return Cstr;
+  return Cstr as any;
 };

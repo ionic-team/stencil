@@ -242,3 +242,9 @@ export interface DerivedModule {
 export type SourceTarget = 'es5' | 'es2017';
 
 export type ModuleFormat = 'esm' | 'amd';
+
+export interface LazyModuleOutput {
+  bundleId: string;
+  entryKey: string;
+  modeName: string;
+}

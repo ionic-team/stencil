@@ -7,7 +7,11 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
   opts.compress.global_defs = {};
 
   Object.keys(build).forEach(key => {
-    opts.compress.global_defs[`BUILD.${key}`] = !!(build as any)[key];
+    let value = (build as any)[key];
+    if (typeof value !== 'string') {
+      value = !!value;
+    }
+    opts.compress.global_defs[`BUILD.${key}`] = value;
   });
 
   if (build.es5) {

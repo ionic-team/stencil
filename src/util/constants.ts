@@ -27,24 +27,6 @@ export const enum PROP_TYPE {
 
 
 /**
- * JS Property to Attribute Name Options
- */
-export const enum ATTR_CASE {
-  LowerCase = 1,
-}
-
-
-/**
- * Priority Levels
- */
-export const enum PRIORITY {
-  Low = 1,
-  Medium = 2,
-  High = 3,
-}
-
-
-/**
  * Encapsulation
  */
 export const enum ENCAPSULATION {

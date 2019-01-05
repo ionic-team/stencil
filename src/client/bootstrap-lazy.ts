@@ -6,51 +6,62 @@ import { refs } from './data';
 import { resolved } from './task-queue';
 
 
-export const bootstrapLazy = (cmpLazyMetaData: d.ComponentLazyRuntimeMeta[]) => {
+export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
   // bootstrapLazy
 
-  cmpLazyMetaData.forEach(cmpMeta => {
+  // [{ios: 'abc12345', md: 'dec65432'}, ['ion-icon', []], ['ion-button',[]]]
 
-    class StencilLayHost extends HTMLElement {
-      // StencilLazyHost
+  lazyBundles.forEach(lazyBundle =>
 
-      connectedCallback() {
-        connectedCallback(this);
-      }
+    lazyBundle[1].forEach(cmpLazyMeta => {
 
-      disconnectedCallback() {
-        if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.listener) {
-          disconnectedCallback(this);
+      cmpLazyMeta.lazyBundleIds = lazyBundle[0];
+
+      class StencilLayHost extends HTMLElement {
+        // StencilLazyHost
+
+        connectedCallback() {
+          connectedCallback(this);
         }
-      }
 
-      's-init'() {
-        if (BUILD.lazyLoad) {
-          // initComponentLoaded(plt, this);
-        }
-      }
-
-      forceUpdate() {
-        if (BUILD.updatable) {
-          // queueUpdate(plt, this, plt.getElmData(this));
-        }
-      }
-
-      componentOnReady(): any {
-        if (BUILD.lifecycle || BUILD.updatable) {
-          const elmData = refs.get(this);
-          if (!elmData.onReadyPromise) {
-            elmData.onReadyPromise = new Promise(resolve => elmData.firedDidLoad ? resolve() : (elmData.onReadyResolve = resolve));
+        disconnectedCallback() {
+          if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.listener) {
+            disconnectedCallback(this);
           }
-          return elmData.onReadyPromise;
-
-        } else if (BUILD.lazyLoad) {
-          return resolved;
         }
+
+        's-init'() {
+          if (BUILD.lazyLoad) {
+            // initComponentLoaded(plt, this);
+          }
+        }
+
+        forceUpdate() {
+          if (BUILD.updatable) {
+            // queueUpdate(plt, this, plt.getElmData(this));
+          }
+        }
+
+        componentOnReady(): any {
+          if (BUILD.lifecycle || BUILD.updatable) {
+            const elmData = refs.get(this);
+            if (!elmData.onReadyPromise) {
+              elmData.onReadyPromise = new Promise(resolve => elmData.firedDidLoad ? resolve() : (elmData.onReadyResolve = resolve));
+            }
+            return elmData.onReadyPromise;
+
+          } else if (BUILD.lazyLoad) {
+            return resolved;
+          }
+        }
+
       }
 
-    }
+      customElements.define(
+        cmpLazyMeta.cmpTag,
+        initHostComponent(StencilLayHost as any, cmpLazyMeta)
+      );
+    })
 
-    customElements.define(cmpMeta.tagNameMeta, initHostComponent(StencilLayHost as any, cmpMeta) as any);
-  });
+  );
 };

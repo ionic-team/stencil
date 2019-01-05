@@ -2,23 +2,26 @@ import * as d from '../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export function formatComponentRuntimeMeta(build: d.Build, compilerMeta: d.ComponentCompilerMeta) {
-  const runtimeMeta: d.ComponentRuntimeMeta = {};
+export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean) {
+  // NOT using JSON.stringify so that properties can get renamed/minified
+  const runtimeMeta: string[] = [];
 
-  if (build.member) {
-    const members = formatComponentRuntimeMembers(compilerMeta);
-    if (members.length > 0) {
-      runtimeMeta.members = members;
-    }
+  if (includeTagName) {
+    runtimeMeta.push(`cmpTag: "${compilerMeta.tagName}"`);
+  }
+
+  const membersStr = formatComponentRuntimeMembers(compilerMeta);
+  if (membersStr != null) {
+    runtimeMeta.push(`members: ${membersStr}`);
   }
 
   if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.shadowDomEncapsulation = true;
+    runtimeMeta.push(`shadowDomEncapsulation: 1`);
   } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.scopedDomEncapsulation = true;
+    runtimeMeta.push(`scopedCssEncapsulation: 1`);
   }
 
-  return JSON.stringify(runtimeMeta);
+  return `{` + runtimeMeta.join(', ') + `}`;
 }
 
 
@@ -49,7 +52,13 @@ function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta) {
     );
   }
 
-  return runtimeMembers;
+  if (runtimeMembers.length === 0) {
+    return null;
+  }
+
+  // using JSON.stringify so the properties are "quoted"
+  // so the minifier DOES NOT property rename each property
+  return JSON.stringify(runtimeMembers);
 }
 
 
