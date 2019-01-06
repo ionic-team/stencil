@@ -70,6 +70,10 @@ function transformToNativeComponent(build: d.Build, moduleFile: d.Module): ts.Tr
 
       addImport(build, cmp, 'connectedCallback');
 
+      if (build.vdomRender) {
+        addImport(build, cmp, 'h');
+      }
+
       return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
     };
   };
@@ -100,33 +104,18 @@ function updateComponentClass(classNode: ts.ClassDeclaration) {
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
-    updateHostComponentHeritageClauses(classNode),
+    updateHostComponentHeritageClauses(),
     updateHostComponentMembers(classNode)
   );
 }
 
 
-function updateHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
+function updateHostComponentHeritageClauses() {
   const heritageClause = ts.createHeritageClause(
     ts.SyntaxKind.ExtendsKeyword, [
       ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
     ]
   );
-
-  const cstrMethod = classNode.members.find(classMember => {
-    return (classMember.kind === ts.SyntaxKind.Constructor);
-  }) as ts.MethodDeclaration;
-
-  if (cstrMethod) {
-    const superCall = ts.createCall(
-      ts.createIdentifier('super'), undefined, undefined
-    );
-
-    cstrMethod.body = ts.updateBlock(cstrMethod.body, [
-      ts.createExpressionStatement(superCall),
-      ...cstrMethod.body.statements
-    ]);
-  }
 
   return [heritageClause];
 }
@@ -135,31 +124,37 @@ function updateHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
 function updateHostComponentMembers(classNode: ts.ClassDeclaration) {
   const classMembers = removeStaticMetaProperties(classNode);
 
+  addSuperToHostConstructor(classMembers);
+
   classMembers.push(
-    addComponentCallback('connectedCallback')
+    addHostComponentCallback('connectedCallback')
   );
-
-  classNode.members.forEach(classMember => {
-    if (classMember.modifiers) {
-      const memberName = (classMember.name as any).escapedText;
-
-      if (classMember.modifiers.some(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
-        if (REMOVE_STATIC_GETTERS.has(memberName)) {
-          return;
-        }
-      }
-    }
-
-    classMembers.push(
-      classMember
-    );
-  });
 
   return classMembers;
 }
 
 
-function addComponentCallback(methodName: string) {
+function addSuperToHostConstructor(classMembers: ts.ClassElement[]) {
+  const cstrMethod = classMembers.find(classMember => {
+    return (classMember.kind === ts.SyntaxKind.Constructor);
+  }) as ts.ConstructorDeclaration;
+
+  if (cstrMethod) {
+    const superCall = ts.createCall(
+      ts.createIdentifier('super'),
+      undefined,
+      undefined
+    );
+
+    cstrMethod.body = ts.updateBlock(cstrMethod.body, [
+      ts.createExpressionStatement(superCall),
+      ...cstrMethod.body.statements
+    ]);
+  }
+}
+
+
+function addHostComponentCallback(methodName: string) {
   const args: any = [
     ts.createThis()
   ];
@@ -179,11 +174,6 @@ function addComponentCallback(methodName: string) {
   );
   return callbackMethod;
 }
-
-
-const REMOVE_STATIC_GETTERS = new Set([
-  'is', 'properties', 'encapsulation', 'events', 'listeners', 'states', 'style', 'styleMode', 'styleUrl'
-]);
 
 
 interface ComponentData {
