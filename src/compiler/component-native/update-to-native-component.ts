@@ -3,7 +3,9 @@ import { transformNativeComponent } from './transform-native-component';
 
 
 export async function updateToNativeComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const promises = build.appModuleFiles.map(moduleFile => {
+  const cmpModules = build.appModuleFiles.filter(m => m.cmpCompilerMeta != null);
+
+  const promises = cmpModules.map(moduleFile => {
     return updateToNativeComponent(config, compilerCtx, buildCtx, build, moduleFile);
   });
 

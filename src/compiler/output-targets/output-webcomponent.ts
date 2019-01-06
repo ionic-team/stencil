@@ -49,7 +49,9 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
 
   const timespan = buildCtx.createTimeSpan(`generate self-contained web components started`, true);
 
-  const promises = buildCtx.moduleFiles.map(async moduleFile => {
+  const cmpModules = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta != null);
+
+  const promises = cmpModules.map(async moduleFile => {
     const appModuleFiles = [moduleFile];
     const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, buildCtx.moduleFiles, appModuleFiles);
 

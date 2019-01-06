@@ -41,7 +41,7 @@ function generateLazyEntryModuleMode(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, build: d.Build, derivedModule: d.DerivedModule, entryModule: d.EntryModule, modeName: string, chunk: d.DerivedChunk) {
+async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, _build: d.Build, derivedModule: d.DerivedModule, entryModule: d.EntryModule, modeName: string, chunk: d.DerivedChunk) {
   const c: string[] = [];
 
   if (config.logLevel === 'debug') {
@@ -60,7 +60,8 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
 
   const coreImports: string[] = [];
 
-  if (build.vdomRender) {
+  const includeVdom = entryModule.moduleFiles.some(m => m.hasVdomRender);
+  if (includeVdom) {
     coreImports.push(`h`);
   }
 
