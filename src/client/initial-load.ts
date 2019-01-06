@@ -85,7 +85,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
         BUILD.member && (elmData.isConstructingInstance = true);
-        elmData.instance = new (LazyCstr as any)(elm);
+        new (LazyCstr as any)(elmData);
         BUILD.member && (elmData.isConstructingInstance = false);
 
       } catch (e) {
