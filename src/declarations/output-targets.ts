@@ -207,8 +207,8 @@ export interface OutputTargetAngular extends OutputTargetBase {
   componentCorePackage?: string;
   directivesProxyFile?: string;
   directivesArrayFile?: string;
+  directivesUtilsFile?: string;
   excludeComponents?: string[];
-  useDirectives?: boolean;
 }
 
 
