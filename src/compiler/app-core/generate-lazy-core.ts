@@ -13,7 +13,7 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
 
   c.push(`bootstrapLazy(${cmpRuntimeData});`);
 
-  const exportFns: string[] = [];
+  const exportFns: string[] = ['registerLazyInstance'];
 
   if (build.vdomRender) {
     exportFns.push('h');
@@ -23,9 +23,7 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
     exportFns.push('registerStyle');
   }
 
-  if (exportFns.length > 0) {
-    c.push(`export { ${exportFns.join(', ')} } from '${build.coreImportPath}';`);
-  }
+  c.push(`export { ${exportFns.join(', ')} } from '${build.coreImportPath}';`);
 
   const appCoreBundleInput = c.join('\n');
 

@@ -64,14 +64,14 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
     coreImports.push(`h`);
   }
 
+  coreImports.push(`registerLazyInstance`);
+
   if (registeredStyles.length > 0) {
     coreImports.push(`registerStyle`);
   }
 
-  if (coreImports.length > 0) {
-    c.push(`import { ${coreImports.sort().join(', ')} } from '../${config.fsNamespace}.js';`);
-    c.push(``);
-  }
+  c.push(`import { ${coreImports.sort().join(', ')} } from '../${config.fsNamespace}.js';`);
+  c.push(``);
 
   c.push(
     chunk.code,

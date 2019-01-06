@@ -3,9 +3,7 @@ import * as d from '.';
 
 export type LazyBundleRuntimeMeta = [
   /** bundleIds */
-  d.BundleIds,
-
-  /** */
+  any,
   ComponentLazyRuntimeMeta[]
 ];
 

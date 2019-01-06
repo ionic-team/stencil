@@ -2,6 +2,8 @@ import * as d from '../../declarations';
 import { catchError } from '../util';
 import { isComponentClassNode } from '../transformers/transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { removeStaticMetaProperties } from '../transformers/remove-static-meta-properties';
+import { removeStencilImport } from '../transformers/remove-stencil-import';
 import ts from 'typescript';
 
 
@@ -54,8 +56,12 @@ function transformToNativeComponent(build: d.Build, moduleFile: d.Module): ts.Tr
 
     function visitNode(node: ts.Node) {
       if (isComponentClassNode(node, moduleFile)) {
-        return updateComponentClass(cmp, node);
+        return updateComponentClass(node);
+
+      } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+        return removeStencilImport(node as ts.ImportDeclaration);
       }
+
       return node;
     }
 
@@ -87,20 +93,20 @@ function addImport(build: d.Build, cmp: ComponentData, importFnName: string) {
 }
 
 
-function updateComponentClass(cmp: ComponentData, classNode: ts.ClassDeclaration) {
+function updateComponentClass(classNode: ts.ClassDeclaration) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
-    getClassHeritageClauses(classNode),
-    getClassMembers(cmp, classNode)
+    updateHostComponentHeritageClauses(classNode),
+    updateHostComponentMembers(classNode)
   );
 }
 
 
-function getClassHeritageClauses(classNode: ts.ClassDeclaration) {
+function updateHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
   const heritageClause = ts.createHeritageClause(
     ts.SyntaxKind.ExtendsKeyword, [
       ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
@@ -126,8 +132,8 @@ function getClassHeritageClauses(classNode: ts.ClassDeclaration) {
 }
 
 
-function getClassMembers(_cmp: ComponentData, classNode: ts.ClassDeclaration) {
-  const classMembers: ts.ClassElement[] = [];
+function updateHostComponentMembers(classNode: ts.ClassDeclaration) {
+  const classMembers = removeStaticMetaProperties(classNode);
 
   classMembers.push(
     addComponentCallback('connectedCallback')

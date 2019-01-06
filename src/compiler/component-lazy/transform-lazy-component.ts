@@ -2,6 +2,8 @@ import * as d from '../../declarations';
 import { catchError } from '../util';
 import { isComponentClassNode } from '../transformers/transform-utils';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { removeStaticMetaProperties } from '../transformers/remove-static-meta-properties';
+import { removeStencilImport } from '../transformers/remove-stencil-import';
 import ts from 'typescript';
 
 
@@ -54,15 +56,17 @@ function transformToLazyComponent(build: d.Build, moduleFile: d.Module): ts.Tran
 
     function visitNode(node: ts.Node) {
       if (isComponentClassNode(node, moduleFile)) {
-        return updateComponentClass(cmp, node);
+        return updateComponentClass(node);
+
+      } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+        return removeStencilImport(node as ts.ImportDeclaration);
       }
+
       return node;
     }
 
     return tsSourceFile => {
       cmp.sourceFileNode = tsSourceFile;
-
-      addImport(build, cmp, 'connectedCallback');
 
       return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
     };
@@ -70,24 +74,7 @@ function transformToLazyComponent(build: d.Build, moduleFile: d.Module): ts.Tran
 }
 
 
-function addImport(build: d.Build, cmp: ComponentData, importFnName: string) {
-  const importDeclaration = ts.createImportDeclaration(
-    undefined,
-    undefined,
-    ts.createImportClause(undefined, ts.createNamedImports([
-      ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
-    ])),
-    ts.createLiteral(build.coreImportPath)
-  );
-
-  cmp.sourceFileNode = ts.updateSourceFileNode(cmp.sourceFileNode, [
-    importDeclaration,
-    ...cmp.sourceFileNode.statements
-  ]);
-}
-
-
-function updateComponentClass(cmp: ComponentData, classNode: ts.ClassDeclaration) {
+function updateComponentClass(classNode: ts.ClassDeclaration) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -95,63 +82,69 @@ function updateComponentClass(cmp: ComponentData, classNode: ts.ClassDeclaration
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    getClassMembers(cmp, classNode)
+    updateLazyComponentMembers(classNode)
   );
 }
 
 
-function getClassMembers(_cmp: ComponentData, classNode: ts.ClassDeclaration) {
-  const classMembers: ts.ClassElement[] = [];
+function updateLazyComponentMembers(classNode: ts.ClassDeclaration) {
+  const classMembers = removeStaticMetaProperties(classNode);
 
-  classMembers.push(
-    addComponentCallback('connectedCallback')
-  );
-
-  classNode.members.forEach(classMember => {
-    if (classMember.modifiers) {
-      const memberName = (classMember.name as any).escapedText;
-
-      if (classMember.modifiers.some(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
-        if (REMOVE_STATIC_GETTERS.has(memberName)) {
-          return;
-        }
-      }
-    }
-
-    classMembers.push(
-      classMember
-    );
-  });
+  updateLazyComponentConstructorMethod(classMembers);
 
   return classMembers;
 }
 
 
-function addComponentCallback(methodName: string) {
-  const args: any = [
-    ts.createThis()
+function updateLazyComponentConstructorMethod(classMembers: ts.ClassElement[]) {
+  const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
+
+  const cstrMethodArgs: any = [
+    ts.createIdentifier('elmData')
   ];
 
-  const stencilCallbackFnCall = ts.createCall(
-    ts.createIdentifier(methodName), undefined, args
+  const registerLazyInstanceMethodArgs: any = [
+    ts.createThis(),
+    ts.createIdentifier('elmData')
+  ];
+
+  const registerLazyInstanceMethod = ts.createCall(
+    ts.createIdentifier(REGISTER_INSTANCE_METHOD),
+    undefined,
+    registerLazyInstanceMethodArgs
   );
 
-  const body = ts.createBlock([
-    ts.createExpressionStatement(stencilCallbackFnCall)
-  ], true);
+  if (cstrMethodIndex > -1) {
+    const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-  // function call to stencil's exported connectedCallback(elm, plt)
-  const callbackMethod = ts.createMethod(undefined, undefined, undefined,
-    methodName, undefined, undefined, undefined, undefined,
-    body
-  );
-  return callbackMethod;
+    classMembers[cstrMethodIndex] = ts.updateConstructor(
+      cstrMethod,
+      cstrMethod.decorators,
+      cstrMethod.modifiers,
+      cstrMethodArgs,
+      ts.updateBlock(cstrMethod.body, [
+        ts.createExpressionStatement(registerLazyInstanceMethod),
+        ...cstrMethod.body.statements
+      ])
+    );
+
+  } else {
+    const body = ts.createBlock([
+      ts.createExpressionStatement(registerLazyInstanceMethod)
+    ], true);
+
+    const cstrMethod = ts.createConstructor(
+      undefined,
+      undefined,
+      cstrMethodArgs,
+      body
+    );
+    classMembers.unshift(cstrMethod);
+  }
 }
 
 
-const REMOVE_STATIC_GETTERS = new Set([
-  'is', 'properties', 'encapsulation', 'events', 'listeners', 'states', 'style', 'styleMode', 'styleUrl'
-]);
+const REGISTER_INSTANCE_METHOD = `registerLazyInstance`;
 
 
 interface ComponentData {
