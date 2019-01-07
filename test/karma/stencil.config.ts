@@ -14,6 +14,11 @@ export const config: Config = {
       empty: false
     },
     {
+      type: 'webcomponent',
+      dir: 'www/webcomponent',
+      empty: false
+    },
+    {
       type: 'dist',
       dir: 'test-dist'
     }
