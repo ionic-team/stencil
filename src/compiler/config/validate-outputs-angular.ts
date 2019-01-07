@@ -9,14 +9,17 @@ export function validateOutputTargetAngular(config: d.Config) {
 
   distOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];
-    outputTarget.useDirectives = !!outputTarget.useDirectives;
 
     if (!path.isAbsolute(outputTarget.directivesProxyFile)) {
       outputTarget.directivesProxyFile = normalizePath(path.join(config.rootDir, outputTarget.directivesProxyFile));
     }
 
-    if (!path.isAbsolute(outputTarget.directivesArrayFile)) {
+    if (outputTarget.directivesArrayFile && !path.isAbsolute(outputTarget.directivesArrayFile)) {
       outputTarget.directivesArrayFile = normalizePath(path.join(config.rootDir, outputTarget.directivesArrayFile));
+    }
+
+    if (outputTarget.directivesUtilsFile && !path.isAbsolute(outputTarget.directivesUtilsFile)) {
+      outputTarget.directivesUtilsFile = normalizePath(path.join(config.rootDir, outputTarget.directivesUtilsFile));
     }
   });
 }
