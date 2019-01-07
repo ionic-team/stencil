@@ -1,6 +1,5 @@
-<a name="0.16.2-4"></a>
-## 🏄 [Prerelease] [0.16.2-4](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2-4) (2019-01-05)
-
+<a name="0.16.2"></a>
+## 🐣 [0.16.2](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2) (2019-01-07)
 
 ### Bug Fixes
 
@@ -20,6 +19,11 @@
 ### Performance Improvements
 
 * **angular:** emit fast proxies ([e48cf84](https://github.com/ionic-team/stencil/commit/e48cf84))
+* **loader:** mark as sideEffect free ([4321cf0](https://github.com/ionic-team/stencil/commit/4321cf0))
+
+### Features
+
+* **angular:** emit proxies utils in a different file ([3377bc8](https://github.com/ionic-team/stencil/commit/3377bc8))
 
 
 
