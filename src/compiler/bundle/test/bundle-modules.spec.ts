@@ -74,7 +74,7 @@ describe('bundle-module', () => {
         path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-a.sc.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-b.sc.entry.js'),
-        path.join(root, 'www', 'build', 'app', 'chunk-304ba7c3.js'),
+        path.join(root, 'www', 'build', 'app', 'chunk-696f2b54.js'),
       ]);
     });
 

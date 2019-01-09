@@ -1,8 +1,7 @@
-import { Component, Prop, Event, EventEmitter } from '../../../../../../dist/index';
+import { Component, Prop, Event, EventEmitter } from '@stencil/core';
 
 @Component({
-  tag: 'todo-item',
-  styleUrl: 'todo-item.css'
+  tag: 'todo-item'
 })
 export class TodoItem {
   @Prop() checked: boolean;
@@ -17,9 +16,9 @@ export class TodoItem {
   render() {
     return (
       <li class={this.checked ? 'completed' : ''}>
-        <input type="checkbox" checked={this.checked} onChange={this.handleOnChecked} />
+        <input class="toggle" type="checkbox" checked={this.checked} onChange={this.handleOnChecked} />
         <label>{this.text}</label>
-        <button onClick={this.handleOnRemove}>x</button>
+        <button class="destroy" onClick={this.handleOnRemove}></button>
       </li>
     );
   }

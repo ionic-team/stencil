@@ -131,7 +131,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         assignersUnregListeners[assignersEventName]();
       }
 
-      if (_BUILD_.event && typeof attachTo === 'string') {
+      if ((_BUILD_.event || _BUILD_.listener) && typeof attachTo === 'string') {
         // attachTo is a string, and is probably something like
         // "parent", "window", or "document"
         // and the eventName would be like "mouseover" or "mousemove"
@@ -141,7 +141,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         // we were passed in an actual element to attach to
         attachToElm = attachTo;
 
-      } else if (_BUILD_.event) {
+      } else if (_BUILD_.event || _BUILD_.listener) {
         // depending on the event name, we could actually be attaching
         // this element to something like the document or window
         splt = eventName.split(':');
@@ -159,7 +159,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
         // somehow we're referencing an element that doesn't exist
         // let's not continue
 
-        if (_BUILD_.event) {
+        if (_BUILD_.event || _BUILD_.listener) {
           // test to see if we're looking for an exact keycode
           splt = eventName.split('.');
 

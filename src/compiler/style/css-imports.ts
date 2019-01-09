@@ -136,7 +136,7 @@ export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic
   try {
     const dir = config.sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-    cssImportData.filePath = config.sys.resolveModule(dir, moduleId);
+    cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { manuallyResolve: true });
     cssImportData.filePath = config.sys.path.dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;

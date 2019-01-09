@@ -21,8 +21,9 @@ export function propsToMarkdown(props: d.JsonDocsProp[]) {
   ]);
 
   props.forEach(prop => {
+    const propName = `\`${prop.name}\`${prop.required ? ' _(required)_' : ''}`;
     table.addRow([
-      `\`${prop.name}\``,
+      propName,
       prop.attr ? `\`${prop.attr}\`` : '--',
       prop.docs,
       `\`${prop.type}\``,

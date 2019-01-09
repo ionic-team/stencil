@@ -247,6 +247,10 @@ export function normalizePath(str: string) {
   return str;
 }
 
+export function isDocsPublic(jsDocs: d.JsDoc | undefined) {
+  return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
+}
+
 const EXTENDED_PATH_REGEX = /^\\\\\?\\/;
 const NON_ASCII_REGEX = /[^\x00-\x80]+/;
 const SLASH_REGEX = /\\/g;

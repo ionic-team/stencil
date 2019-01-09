@@ -1,8 +1,7 @@
-import { Component, State, Event, EventEmitter } from '../../../../../../dist/index';
+import { Component, State, Event, EventEmitter } from '@stencil/core';
 
 @Component({
-  tag: 'todo-input',
-  styleUrl: 'todo-input.css'
+  tag: 'todo-input'
 })
 export class TodoInput {
   @Event() onTodoInputSubmit: EventEmitter;
@@ -21,6 +20,7 @@ export class TodoInput {
     return (
       <form onSubmit={this.handleOnSubmit}>
         <input
+          class="new-todo"
           value={this.value}
           type="text"
           placeholder="What needs to be done?"

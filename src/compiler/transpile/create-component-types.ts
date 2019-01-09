@@ -3,7 +3,7 @@ import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { MEMBER_TYPE } from '../../util/constants';
-import { normalizePath } from '../util';
+import { isDocsPublic, normalizePath } from '../util';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 
@@ -323,6 +323,7 @@ interface TypeInfo {
     type: string;
     optional: boolean;
     required: boolean;
+    public: boolean;
     jsdoc?: string;
   };
 }
@@ -336,17 +337,18 @@ function attributesToMultiLineString(attributes: TypeInfo, jsxAttributes: boolea
     .sort()
     .reduce((fullList, key) => {
       const type = attributes[key];
-      if (type.jsdoc) {
-        fullList.push(`/**`);
-        fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
-        fullList.push(` */`);
+      if (type.public || !jsxAttributes) {
+        if (type.jsdoc) {
+          fullList.push(`/**`);
+          fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+          fullList.push(` */`);
+        }
+        const optional = (jsxAttributes)
+          ? !type.required
+          : type.optional;
+
+        fullList.push(`'${key}'${ optional ? '?' : '' }: ${type.type};`);
       }
-      const optional = (jsxAttributes)
-        ? !type.required
-        : type.optional;
-
-      fullList.push(`'${key}'${ optional ? '?' : '' }: ${type.type};`);
-
       return fullList;
     }, <string[]>[])
     .map(item => `${paddingString}${item}`)
@@ -363,7 +365,8 @@ function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
       obj[memberName] = {
         type: member.attribType.text,
         optional: member.attribType.optional,
-        required: member.attribType.required
+        required: member.attribType.required,
+        public: isDocsPublic(member.jsdoc)
       };
 
       if (member.jsdoc) {
@@ -387,6 +390,7 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
         type: member.attribType.text,
         optional: false,
         required: false,
+        public: isDocsPublic(member.jsdoc)
       };
 
       if (member.jsdoc) {
@@ -408,7 +412,8 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
       obj[memberName] = {
         type: `(event: ${eventType}) => void`, // TODO this is not good enough
         optional: false,
-        required: false
+        required: false,
+        public: isDocsPublic(eventMetaObj.jsdoc)
       };
 
       if (eventMetaObj.jsdoc) {
