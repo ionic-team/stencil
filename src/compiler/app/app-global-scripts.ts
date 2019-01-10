@@ -115,7 +115,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
     buildCtx.global = compilerCtx.moduleFiles[config.globalScript];
 
     // wrap our globals code with our own iife
-    return await wrapGlobalJs(config, compilerCtx, buildCtx, sourceTarget, namespace, results.code);
+    return await wrapGlobalJs(config, compilerCtx, buildCtx, sourceTarget, namespace, results.output[0].code);
 
   } catch (e) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, e);

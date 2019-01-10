@@ -157,9 +157,9 @@ function bundleNodeSysMain() {
       format: 'cjs',
       file: outputPath
 
-    }).then(output => {
+    }).then(({ output }) => {
       try {
-        let outputText = output.code;
+        let outputText = output[0].code;
 
         const buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
         outputText = outputText.replace(/__BUILDID__/g, buildId);

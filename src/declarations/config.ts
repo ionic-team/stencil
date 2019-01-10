@@ -163,7 +163,7 @@ export interface RollupConfig {
 
 export interface RollupInputOptions {
   context?: string;
-  moduleContext?: string | ((id: string) => string) | { [id: string]: string };
+  moduleContext?: ((id: string) => string) | { [id: string]: string };
 }
 
 export interface RollupOutputOptions {
