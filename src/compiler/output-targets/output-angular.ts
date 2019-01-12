@@ -1,5 +1,8 @@
 import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
+import { MEMBER_TYPE } from '../../util/constants';
+import { isDocsPublic } from '../util';
+import { OutputTargetAngular } from '../../declarations';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -18,7 +21,7 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
   const promises = outputTargets.map(async outputTarget => {
-    await angularDirectiveProxyOutput(config, compilerCtx, buildCtx.moduleFiles, outputTarget);
+    await angularDirectiveProxyOutput(config, compilerCtx, outputTarget, buildCtx.moduleFiles);
   });
 
   await Promise.all(promises);
@@ -26,12 +29,23 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
   timespan.finish(`generate angular proxies finished`);
 }
 
+async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, allModuleFiles: d.Module[]) {
+  const components = getComponents(outputTarget.excludeComponents, allModuleFiles);
+
+  await Promise.all([
+    generateProxies(config, compilerCtx, components, outputTarget),
+    generateAngularArray(config, compilerCtx, components, outputTarget),
+    generateAngularUtils(compilerCtx, outputTarget)
+  ]);
+
+  config.logger.debug(`generated angular directives: ${outputTarget.directivesProxyFile}`);
+}
 
 function getComponents(excludeComponents: string[], allModuleFiles: d.Module[]) {
   const cmps = allModuleFiles.filter(m => m.cmpCompilerMeta).map(m => m.cmpCompilerMeta);
 
   return cmps
-    .filter(c => !excludeComponents.includes(c.tagName))
+    .filter(c => !excludeComponents.includes(c.tagName) && isDocsPublic(c.jsdoc))
     .sort((a, b) => {
       if (a.tagName < b.tagName) return -1;
       if (a.tagName > b.tagName) return 1;
@@ -39,148 +53,50 @@ function getComponents(excludeComponents: string[], allModuleFiles: d.Module[]) 
     });
 }
 
+async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular) {
+  const proxies = getProxies(components);
 
-async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, allModuleFiles: d.Module[], outputTarget: d.OutputTargetAngular) {
-  const components = getComponents(outputTarget.excludeComponents, allModuleFiles);
-  const useDirectives = outputTarget.useDirectives;
-  const { hasOutputs, proxies } = generateProxies(components, useDirectives);
-
-  const auxFunctions: string[] = [
-    inputsAuxFunction(),
-    outputsAuxFunction(),
-    methodsAuxFunction()
-  ];
-  const angularImports = [
-    'ElementRef'
-  ];
-
-  if (components.length > 0) {
-    if (useDirectives) {
-      angularImports.push('Directive');
-    } else {
-      angularImports.push('Component');
-      angularImports.push('ViewEncapsulation');
-      angularImports.push('ChangeDetectionStrategy');
-      angularImports.push('ChangeDetectorRef');
-    }
-  }
-
-  if (hasOutputs) {
-    angularImports.push('EventEmitter');
-  }
-
-  const imports = `
-${hasOutputs ? `import { fromEvent } from 'rxjs';` : '' }
-import { ${angularImports.sort().join(', ')} } from '@angular/core';
-`;
+  const imports = `/* tslint:disable */
+/* auto-generated angular directive proxies */
+import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ? ''
     : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
 
   const final: string[] = [
-    '/* tslint:disable */',
-    '/* auto-generated angular directive proxies */',
     imports,
+    getProxyUtils(config, outputTarget),
     sourceImports,
-    auxFunctions.join('\n'),
     proxies,
   ];
 
-  const outputText = (final.join('\n') + '\n');
-
-  writeAngularProxyOutput(config, compilerCtx, outputTarget, components, outputText);
-
-  config.logger.debug(`generated angular directives: ${outputTarget.directivesProxyFile}`);
+  const finalText = final.join('\n') + '\n';
+  await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
 }
 
-function inputsAuxFunction() {
-  return `
-export function proxyInputs(instance: any, el: any, props: string[]) {
-  props.forEach(propName => {
-    Object.defineProperty(instance, propName, {
-      get: () => el[propName], set: (val: any) => el[propName] = val
-    });
-  });
-}`;
+function getProxies(components: d.ComponentCompilerMeta[]) {
+  return components
+    .map(getProxy)
+    .join('\n');
 }
 
-
-function outputsAuxFunction() {
-  return `
-export function proxyOutputs(instance: any, el: any, events: string[]) {
-  events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
-}`;
-}
-
-
-function methodsAuxFunction() {
-  return `
-export function proxyMethods(instance: any, el: any, methods: string[]) {
-  methods.forEach(methodName => {
-    Object.defineProperty(instance, methodName, {
-      get: function() {
-        return function() {
-          const args = arguments;
-          return el.componentOnReady().then((el: any) => el[methodName].apply(el, args));
-        };
-      }
-    });
-  });
-}
-`;
-}
-
-function generateProxies(components: d.ComponentCompilerMeta[], useDirectives: boolean) {
-  let hasMethods = false;
-  let hasOutputs = false;
-  let hasInputs = false;
-
-  const lines = components.map(cmpMeta => {
-    const proxy = generateProxy(cmpMeta, useDirectives);
-    if (proxy.hasInputs) {
-      hasInputs = true;
-    }
-    if (proxy.hasMethods) {
-      hasMethods = true;
-    }
-    if (proxy.hasOutputs) {
-      hasOutputs = true;
-    }
-    return proxy.text;
-  });
-
-  return {
-    proxies: lines.join('\n'),
-    hasInputs,
-    hasMethods,
-    hasOutputs
-  };
-}
-
-function generateProxy(cmpMeta: d.ComponentCompilerMeta, useDirectives: boolean) {
+function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   // Collect component meta
-  const inputs = (cmpMeta.properties || []);
-  const outputs = (cmpMeta.events || []).map(eventMeta => eventMeta.name);
-  const methods = (cmpMeta.methods || []);
+  const inputs = getInputs(cmpMeta);
+  const outputs = getOutputs(cmpMeta);
+  const methods = getMethods(cmpMeta);
 
   // Process meta
   const hasInputs = inputs.length > 0;
   const hasOutputs = outputs.length > 0;
   const hasMethods = methods.length > 0;
-  const hasContructor = hasInputs || hasOutputs || hasMethods;
 
   // Generate Angular @Directive
-  const decorator = useDirectives ? 'Directive' : 'Component';
   const directiveOpts = [
     `selector: \'${cmpMeta.tagName}\'`,
+    `changeDetection: 0`,
+    `template: '<ng-content></ng-content>'`
   ];
-  if (!useDirectives) {
-    directiveOpts.push(
-      `changeDetection: ChangeDetectionStrategy.OnPush`,
-      `encapsulation: ViewEncapsulation.None`,
-      `template: '<ng-content></ng-content>'`
-    );
-  }
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
@@ -188,7 +104,7 @@ function generateProxy(cmpMeta: d.ComponentCompilerMeta, useDirectives: boolean)
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
   const lines = [`
 export declare interface ${tagNameAsPascal} extends StencilComponents<'${tagNameAsPascal}'> {}
-@${decorator}({ ${directiveOpts.join(', ')} })
+@Component({ ${directiveOpts.join(', ')} })
 export class ${tagNameAsPascal} {`];
 
   // Generate outputs
@@ -196,46 +112,85 @@ export class ${tagNameAsPascal} {`];
     lines.push(`  ${output}!: EventEmitter<CustomEvent>;`);
   });
 
-  // Generate component constructor
-  if (hasContructor) {
-    if (useDirectives) {
-      lines.push(`
-  constructor(r: ElementRef) {
-    const el = r.nativeElement;`);
-    } else {
-      lines.push(`
-  constructor(c: ChangeDetectorRef, r: ElementRef) {
+  lines.push('  el: HTMLElement;');
+  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef) {
     c.detach();
-    const el = r.nativeElement;`);
-    }
-  }
-
-  if (hasMethods) {
-    lines.push(`    proxyMethods(this, el, ['${methods.join(`', '`)}']);`);
-  }
-
-  if (hasInputs) {
-    lines.push(`    proxyInputs(this, el, ['${inputs.join(`', '`)}']);`);
-  }
-
+    this.el = r.nativeElement;`);
   if (hasOutputs) {
-    lines.push(`    proxyOutputs(this, el, ['${outputs.join(`', '`)}']);`);
+    lines.push(`    proxyOutputs(this, this.el, ['${outputs.join(`', '`)}']);`);
   }
-
-  if (hasContructor) {
-    lines.push(`  }`);
-  }
-
+  lines.push(`  }`);
   lines.push(`}`);
 
-  return {
-    text: lines.join('\n'),
-    hasInputs,
-    hasMethods,
-    hasOutputs
-  };
+  if (hasMethods) {
+    lines.push(`proxyMethods(${tagNameAsPascal}, ['${methods.join(`', '`)}']);`);
+  }
+  if (hasInputs) {
+    lines.push(`proxyInputs(${tagNameAsPascal}, ['${inputs.join(`', '`)}']);`);
+  }
+
+  return lines.join('\n');
 }
 
+function getInputs(cmpMeta: d.ComponentCompilerMeta) {
+  return cmpMeta.properties.filter(_prop => {
+    // TODO
+    // return isDocsPublic(prop.jsdoc);
+    return false;
+  });
+}
+
+function getOutputs(cmpMeta: d.ComponentCompilerMeta) {
+  return cmpMeta.events.filter(_event => {
+    // TODO
+    // return isDocsPublic(event.jsdoc);
+    return false;
+  }).map(eventMeta => eventMeta.name);
+}
+
+function getMethods(cmpMeta: d.ComponentCompilerMeta) {
+  return cmpMeta.methods.filter(_method => {
+    // TODO
+    // return isDocsPublic(method.jsdoc);
+    return false;
+  });
+}
+
+function getProxyUtils(config: d.Config, outputTarget: OutputTargetAngular) {
+  if (!outputTarget.directivesUtilsFile) {
+    return PROXY_UTILS.replace(/export function/g, 'function');
+  } else {
+    const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile);
+    return `import { proxyInputs, proxyMethods, proxyOutputs } from '${utilsPath}';\n`;
+  }
+}
+
+async function generateAngularArray(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular) {
+  if (!outputTarget.directivesArrayFile) {
+    return;
+  }
+
+  const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+  const directives = components
+    .map(cmpMeta => dashToPascalCase(cmpMeta.tagName))
+    .map(className => `d.${className}`)
+    .join(',\n  ');
+
+  const c = `
+import * as d from '${proxyPath}';
+
+export const DIRECTIVES = [
+${directives}
+];
+`;
+  await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, c);
+}
+
+async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: OutputTargetAngular) {
+  if (outputTarget.directivesUtilsFile) {
+    await compilerCtx.fs.writeFile(outputTarget.directivesUtilsFile, '/* tslint:disable */\n' + PROXY_UTILS);
+  }
+}
 
 function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
@@ -243,28 +198,29 @@ function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
   return `${relativePath}/${config.sys.path.basename(pathTo, '.ts')}`;
 }
 
-function angularArray(components: d.ComponentMeta[], proxyPath: string) {
-  const directives = components
-    .map(cmpMeta => dashToPascalCase(cmpMeta.tagNameMeta))
-    .map(className => `d.${className}`)
-    .join(',\n  ');
+const PROXY_UTILS = `import { fromEvent } from 'rxjs';
 
-  return `
-import * as d from '${proxyPath}';
+export function proxyInputs(Cmp: any, inputs: string[]) {
+  const Prototype = Cmp.prototype;
+  inputs.forEach(item => {
+    Object.defineProperty(Prototype, item, {
+      get() { return this.el[item]; },
+      set(val: any) { this.el[item] = val; },
+    });
+  });
+}
 
-export const DIRECTIVES = [
-  ${directives}
-];
+export function proxyMethods(Cmp: any, methods: string[]) {
+  const Prototype = Cmp.prototype;
+  methods.forEach(methodName => {
+    Prototype[methodName] = function() {
+      const args = arguments;
+      return this.el.componentOnReady().then((el: any) => el[methodName].apply(el, args));
+    };
+  });
+}
+
+export function proxyOutputs(instance: any, el: any, events: string[]) {
+  events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
+}
 `;
-}
-
-
-async function writeAngularProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, components: d.ComponentCompilerMeta[], outputText: string) {
-  await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, outputText);
-
-  if (outputTarget.directivesArrayFile) {
-    const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
-    const a = angularArray(components, proxyPath);
-    await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, a);
-  }
-}
