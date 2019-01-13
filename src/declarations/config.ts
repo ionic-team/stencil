@@ -186,8 +186,22 @@ export interface NodeResolveConfig {
   jail?: string;
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
+
+  /**
+   * @see https://github.com/browserify/resolve#resolveid-opts-cb
+   */
   customResolveOptions?: {
-    [key: string]: string | string[]
+    basedir?: string;
+    package?: string;
+    extensions?: string[];
+    readFile?: Function;
+    isFile?: Function;
+    isDirectory?: Function;
+    packageFilter?: Function;
+    pathFilter?: Function;
+    paths?: Function | string[];
+    moduleDirectory?: string | string[];
+    preserveSymlinks?: boolean;
   };
 }
 
