@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
-import { MEMBER_TYPE } from '../../util/constants';
 import { isDocsPublic } from '../util';
 import { OutputTargetAngular } from '../../declarations';
 

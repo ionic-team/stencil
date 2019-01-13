@@ -37,6 +37,8 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
     // if something works in dev, but a runtime error in prod
     // chances are we need to add a property to this list
     opts.mangle.properties.reserved = RESERVED_PROPERTIES.slice();
+    opts.mangle.properties.reserved.push(build.appNamespace);
+    opts.mangle.properties.reserved.push(build.appNamespaceLower);
 
     if (config.logLevel === 'debug') {
       // if in debug mode, still mangle the property names

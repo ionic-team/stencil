@@ -78,6 +78,8 @@ export interface Build extends BuildFeatures {
   coreImportPath: string;
   devInspector: boolean;
   es5: boolean;
+  exposeAppRegistry: boolean;
+  exposeAppOnReady: boolean;
   exposeEventListener: boolean;
   exposeRequestAnimationFrame: boolean;
   exposeReadQueue: boolean;

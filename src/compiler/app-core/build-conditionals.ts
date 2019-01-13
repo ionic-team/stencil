@@ -67,9 +67,11 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
   b.profile = !!(config.flags && config.flags.profile);
-  b.taskQueue = (b.updatable || b.mode || b.lifecycle || b.lazyLoad);
+  b.taskQueue = (b.updatable || b.mode || b.lifecycle || b.lazyLoad || !!config.exposeAppOnReady);
   b.refs = (b.updatable || b.member || b.lifecycle || b.listener);
 
+  b.exposeAppOnReady = (b.lazyLoad && !!config.exposeAppOnReady);
+  b.exposeAppRegistry = (b.lazyLoad && !!config.exposeAppRegistry);
   b.exposeReadQueue = !!config.exposeReadQueue;
   b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
@@ -161,6 +163,8 @@ export function getDefaultBuildConditionals() {
     lazyLoad: false,
     es5: false,
     taskQueue: true,
+    exposeAppOnReady: true,
+    exposeAppRegistry: true,
     exposeReadQueue: true,
     exposeWriteQueue: true,
     exposeEventListener: true,
