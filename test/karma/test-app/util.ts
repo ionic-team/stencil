@@ -1,7 +1,5 @@
 
 
-export type AddComponentFn = <T extends Element>(childHtml: string) => T;
-
 /**
  * Create setup methods for dom based tests.
  */
@@ -16,17 +14,18 @@ export function setupDomTests(document: Document) {
   /**
    * Run this before each test
    */
-  async function setupDom(url?: string) {
+  function setupDom(url?: string) {
     const app = document.createElement('div');
     app.className = 'test-spec';
     testBed.appendChild(app)
 
     if (url) {
       app.setAttribute('data-url', url);
-      await renderTest(url, app);
+      console.log('render1')
+      return renderTest(url, app);
     }
 
-    return app;
+    return Promise.resolve(app);
   };
 
   /**
@@ -41,10 +40,12 @@ export function setupDomTests(document: Document) {
    */
   function renderTest(url: string, app: HTMLElement) {
     url = '/base/www' + url;
+    console.log('url', url)
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
         const indexLoaded = function() {
+          console.log('indexLoaded', this.status)
           if (this.status !== 200) {
             reject(`404: ${url}`);
             return;
@@ -62,17 +63,25 @@ export function setupDomTests(document: Document) {
             if (tmpScripts[i].src) {
               script.src = tmpScripts[i].src;
             }
+            if (tmpScripts[i].hasAttribute('nomodule')) {
+              script.setAttribute('nomodule', '');
+            }
+            if (tmpScripts[i].hasAttribute('type')) {
+              script.setAttribute('type', tmpScripts[i].getAttribute('type'));
+            }
             script.innerHTML = tmpScripts[i].innerHTML;
             tmpScripts[i].parentNode.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
           }
 
+          console.log('app.innerHTML', app.innerHTML)
           elm.innerHTML = '';
 
           const promises: Promise<any>[] = [];
           loadPromises(promises, app);
 
           Promise.all(promises).then(() => {
+            console.log('app promises', app)
             resolve(app);
 
           }).catch(err => {
@@ -87,6 +96,7 @@ export function setupDomTests(document: Document) {
           console.error('error oReq.addEventListener', err);
           reject(err);
         });
+        console.log('GET', url)
         oReq.open('GET', url);
         oReq.send();
 
@@ -98,6 +108,7 @@ export function setupDomTests(document: Document) {
   }
 
   function loadPromises(promises: Promise<any>[], component: any) {
+    console.log('p', component.tagName, !!component.componentOnReady)
     if (component.componentOnReady) {
       promises.push(component.componentOnReady());
     }
@@ -118,22 +129,36 @@ export function waitForChanges() {
 
   return new Promise(resolve => {
 
+    function waitForAppReady() {
+      const promises = win['s-apps'].map((appNamespace: string) => {
+        return win[appNamespace].onReady();
+      });
+
+      Promise.all(promises).then(() => {
+        win.requestAnimationFrame(resolve);
+      });
+    }
+
     function pageLoaded() {
       setTimeout(() => {
-        const promises = win['s-apps'].map((appNamespace: string) => {
-          return win[appNamespace].onReady();
-        });
-
-        Promise.all(promises).then(() => {
-          window.requestAnimationFrame(resolve);
-        });
+        if (win['s-apps']) {
+          waitForAppReady();
+        } else {
+          setTimeout(() => {
+            if (win['s-apps']) {
+              waitForAppReady();
+            } else {
+              console.error(`window['s-apps'] never loaded`);
+            }
+          }, 100)
+        }
       }, 32);
     }
 
     if (document.readyState === 'complete') {
       pageLoaded();
     } else {
-      window.addEventListener('load', pageLoaded, false);
+      win.addEventListener('load', pageLoaded, false);
     }
   });
 }
