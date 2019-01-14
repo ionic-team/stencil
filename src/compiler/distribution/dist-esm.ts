@@ -132,8 +132,7 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
     'module': './index.js',
     'jsnext:main': './index.es2017.js',
     'es2015': './index.es2017.js',
-    'es2017': './index.es2017.js',
-    'sideEffects': false
+    'es2017': './index.es2017.js'
   }, null, 2);
 
   const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
