@@ -1,3 +1,18 @@
+<a name="0.16.3"></a>
+## ⚽️ [0.16.3](https://github.com/ionic-team/stencil/compare/v0.16.2...v0.16.3) (2019-01-14)
+
+
+### Bug Fixes
+
+* **angular:** this.el should not be exposed in types ([a82c8df](https://github.com/ionic-team/stencil/commit/a82c8df))
+
+
+### Features
+
+* **docs:** expose encapsulation ([e39268a](https://github.com/ionic-team/stencil/commit/e39268a))
+
+
+
 <a name="0.16.2"></a>
 ## 🐣 [0.16.2](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2) (2019-01-07)
 
