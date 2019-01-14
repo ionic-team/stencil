@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { buildWarn, isDocsPublic, normalizePath } from '../util';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE, ENCAPSULATION } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { getBuildTimestamp } from '../build/build-ctx';
@@ -63,6 +63,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         readme,
         docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
         usage: await generateUsages(config, compilerCtx, usagesDir),
+        encapsulation: getEncapsulation(moduleFile.cmpMeta),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
@@ -71,6 +72,17 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       };
     });
   return Promise.all(promises);
+}
+
+function getEncapsulation(cmpMeta: d.ComponentMeta): 'shadow' | 'scoped' | 'none' {
+  const encapsulation = cmpMeta.encapsulationMeta;
+  if (encapsulation === ENCAPSULATION.ShadowDom) {
+    return 'shadow';
+  } else if (encapsulation === ENCAPSULATION.ScopedCss) {
+    return 'scoped';
+  } else {
+    return 'none';
+  }
 }
 
 function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {

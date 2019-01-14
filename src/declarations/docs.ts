@@ -18,6 +18,7 @@ export interface JsonDocsComponent {
   readmePath?: string;
   usagesDir?: string;
 
+  encapsulation: 'shadow' | 'scoped' | 'none';
   tag: string;
   readme: string;
   docs: string;

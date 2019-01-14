@@ -5,6 +5,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, jsonOutputs: 
     ...docsData,
     components: docsData.components.map(cmp => ({
       tag: cmp.tag,
+      encapsulation: cmp.encapsulation,
       readme: cmp.readme,
       docs: cmp.docs,
       usage: cmp.usage,
