@@ -4,7 +4,6 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { getBuildTimestamp } from '../build/build-ctx';
-import { JsonDocsTags } from '../../declarations';
 
 
 export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocs> {
@@ -219,7 +218,7 @@ function generateDocs(readme: string, jsdoc: d.JsDoc) {
   return contentLines.join('\n').trim();
 }
 
-function generateDocsTags(jsdoc: d.JsDoc): JsonDocsTags[] {
+function generateDocsTags(jsdoc: d.JsDoc): d.JsonDocsTags[] {
   return jsdoc.tags || [];
 }
 
