@@ -1,5 +1,5 @@
-import { MockElement } from './node';
 import { MockDocumentFragment } from './document-fragment';
+import { MockElement } from './node';
 
 
 export function createElement(ownerDocument: any, tagName: string) {
@@ -32,6 +32,18 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'template':
       return new MockTemplateElement(ownerDocument);
+  }
+
+  if (ownerDocument != null && tagName.includes('-')) {
+    const win = ownerDocument.defaultView;
+    if (win != null) {
+      const CustomElementCstr = win.customElements.get(tagName);
+      if (CustomElementCstr != null) {
+        const cmp = new CustomElementCstr(ownerDocument);
+        cmp.nodeName = tagName.toUpperCase();
+        return cmp;
+      }
+    }
   }
 
   return new MockElement(ownerDocument, tagName);

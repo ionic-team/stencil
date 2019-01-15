@@ -3,16 +3,16 @@ import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
 import { NODE_TYPES } from './constants';
+import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
 import { selectAll, selectOne } from './selector';
-import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 
 
 export class MockNode {
   childNodes: MockNode[] = [];
-  nodeName: string;
-  nodeType: number;
-  nodeValue: string;
+  nodeName = '';
+  nodeType = 0;
+  nodeValue = '';
   ownerDocument: any;
   parentNode: MockNode = null;
 
@@ -24,6 +24,7 @@ export class MockNode {
     newNode.remove();
     newNode.parentNode = this;
     this.childNodes.push(newNode);
+    connectNode(this.ownerDocument, newNode);
     return newNode;
   }
 
@@ -45,6 +46,18 @@ export class MockNode {
     }
 
     return newNode;
+  }
+
+  get isConnected() {
+    let node = this as any;
+    while (node) {
+      if (node.nodeType === NODE_TYPES.DOCUMENT_NODE) {
+        return true;
+      }
+      node = node.parentNode;
+    }
+
+    return false;
   }
 
   get lastChild() {
@@ -78,7 +91,20 @@ export class MockNode {
     const index = this.childNodes.indexOf(childNode);
     if (index > -1) {
       this.childNodes.splice(index, 1);
-      childNode.parentNode = null;
+
+      if (this.nodeType === NODE_TYPES.ELEMENT_NODE) {
+        const wasConnected = this.isConnected;
+
+        childNode.parentNode = null;
+
+        if (wasConnected) {
+          disconnectNode(childNode);
+        }
+
+      } else {
+        childNode.parentNode = null;
+      }
+
     } else {
       throw new Error(`node not found within childNodes during removeChild`);
     }
@@ -86,7 +112,7 @@ export class MockNode {
   }
 
   remove() {
-    if (this.parentNode) {
+    if (this.parentNode != null) {
       this.parentNode.removeChild(this);
     }
   }
@@ -117,14 +143,20 @@ export class MockNode {
 }
 
 
+const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
+const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
+
 export class MockElement extends MockNode {
   namespaceURI: string;
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument);
     this.nodeType = NODE_TYPES.ELEMENT_NODE;
-    if (nodeName) {
+
+    if (typeof nodeName === 'string') {
       this.nodeName = nodeName.toUpperCase();
+    } else {
+      this.nodeName = 'DIV';
     }
   }
 
@@ -132,15 +164,16 @@ export class MockElement extends MockNode {
     addEventListener(this, type, handler);
   }
 
-  private _attributes: MockAttributeMap;
   get attributes() {
-    if (!this._attributes) {
-      this._attributes = new MockAttributeMap();
+    let attrs = attrsMap.get(this);
+    if (attrs == null) {
+      attrs = new MockAttributeMap();
+      attrsMap.set(this, attrs);
     }
-    return this._attributes;
+    return attrs;
   }
   set attributes(attrs: MockAttributeMap) {
-    this._attributes = attrs;
+    attrsMap.set(this, attrs);
   }
 
   get children() {
@@ -194,7 +227,8 @@ export class MockElement extends MockNode {
   getAttribute(name: string) {
     name = name.toLowerCase();
     if (name === 'style') {
-      if (this._style && this._style.length > 0) {
+      const style = stylesMap.get(this);
+      if (style != null && style.length > 0) {
         return this.style.cssText;
       }
       return null;
@@ -236,7 +270,7 @@ export class MockElement extends MockNode {
         this.removeChild(this.childNodes[i]);
       }
 
-      if (html) {
+      if (typeof html === 'string') {
         const frag = parseFragmentUtil(this.ownerDocument, html);
         for (let i = 0; i < frag.childNodes.length; i++) {
           this.appendChild(frag.childNodes[i]);
@@ -258,7 +292,8 @@ export class MockElement extends MockNode {
   hasAttribute(name: string) {
     name = name.toLowerCase();
     if (name === 'style') {
-      return (!!this._style && this._style.length > 0);
+      const style = stylesMap.get(this);
+      return (style != null && style.length > 0);
     }
     return this.getAttribute(name) !== null;
   }
@@ -324,19 +359,20 @@ export class MockElement extends MockNode {
     return selectAll(selector, this);
   }
 
-  removeAttribute(name: string) {
-    name = name.toLowerCase();
-    if (name === 'style') {
-      this._style = null;
+  removeAttribute(attrName: string) {
+    attrName = attrName.toLowerCase();
+    if (attrName === 'style') {
+      stylesMap.delete(this);
     } else {
-      this.removeAttributeNS(null, name);
+      this.removeAttributeNS(null, attrName);
     }
   }
 
-  removeAttributeNS(namespaceURI: string, name: string) {
-    const attr = this.attributes.getNamedItemNS(namespaceURI, name);
-    if (attr) {
+  removeAttributeNS(namespaceURI: string, attrName: string) {
+    const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
+    if (attr != null) {
       this.attributes.removeNamedItemNS(attr);
+      attributeChanged(this, attrName, attr.value, null);
     }
   }
 
@@ -344,46 +380,56 @@ export class MockElement extends MockNode {
     removeEventListener(this, type, handler);
   }
 
-  setAttribute(name: string, value: any) {
-    name = name.toLowerCase();
-    if (name === 'style') {
+  setAttribute(attrName: string, value: any) {
+    attrName = attrName.toLowerCase();
+    if (attrName === 'style') {
       this.style = value;
     } else {
-      this.setAttributeNS(null, name, value);
+      this.setAttributeNS(null, attrName, value);
     }
   }
 
-  setAttributeNS(namespaceURI: string, name: string, value: any) {
+  setAttributeNS(namespaceURI: string, attrName: string, value: any) {
     const attributes = this.attributes;
-    let attr = attributes.getNamedItemNS(namespaceURI, name);
-    if (attr) {
+    let attr = attributes.getNamedItemNS(namespaceURI, attrName);
+    if (attr != null) {
+      const oldValue = attr.value;
       attr.value = String(value);
+
+      if (oldValue !== attr.value) {
+        attributeChanged(this, attrName, oldValue, attr.value);
+      }
 
     } else {
       attr = new MockAttr();
       attr.namespaceURI = namespaceURI;
-      attr.name = name;
+      attr.name = attrName;
       attr.value = String(value);
       attributes.items.push(attr);
+
+      attributeChanged(this, attrName, null, attr.value);
     }
   }
 
-  private _style: CSSStyleDeclaration = null;
   get style() {
-    if (!this._style) {
-      this._style = createCSSStyleDeclaration();
+    let style = stylesMap.get(this);
+    if (style == null) {
+      style = createCSSStyleDeclaration();
+      stylesMap.set(this, style);
     }
-    return this._style;
+    return style;
   }
-  set style(style: any) {
-    if (typeof style === 'string') {
-      if (!this._style) {
-        this._style = createCSSStyleDeclaration();
+  set style(val: any) {
+    if (typeof val === 'string') {
+      let style = stylesMap.get(this);
+      if (style == null) {
+        style = createCSSStyleDeclaration();
+        stylesMap.set(this, style);
       }
-      this._style.cssText = style;
+      style.cssText = val;
 
     } else {
-      this._style = style;
+      stylesMap.set(this, val);
     }
   }
 
@@ -504,11 +550,13 @@ export class MockElement extends MockNode {
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
   newNode.remove();
   newNode.parentNode = parentNode;
+  newNode.ownerDocument = parentNode.ownerDocument;
 
   if (referenceNode) {
     const index = parentNode.childNodes.indexOf(referenceNode);
     if (index > -1) {
       parentNode.childNodes.splice(index, 0, newNode);
+
     } else {
       throw new Error(`referenceNode not found in parentNode.childNodes`);
     }
@@ -517,7 +565,49 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
     parentNode.childNodes.push(newNode);
   }
 
+  connectNode(parentNode.ownerDocument, newNode);
+
   return newNode;
+}
+
+function connectNode(ownerDocument: any, node: MockNode) {
+  node.ownerDocument = ownerDocument;
+
+  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
+    if (node.nodeName.includes('-') && typeof (node as any).connectedCallback === 'function') {
+      if (node.isConnected) {
+        (node as any).connectedCallback();
+      }
+    }
+    node.childNodes.forEach(childNode => {
+      connectNode(ownerDocument, childNode);
+    });
+
+  } else {
+    node.childNodes.forEach(childNode => {
+      childNode.ownerDocument = ownerDocument;
+    });
+  }
+}
+
+function disconnectNode(node: MockNode) {
+  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
+    if (node.nodeName.includes('-') && typeof (node as any).disconnectedCallback === 'function') {
+      (node as any).disconnectedCallback();
+    }
+    node.childNodes.forEach(disconnectNode);
+  }
+}
+
+function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
+  if (node.nodeName.includes('-') && typeof (node as any).attributeChangedCallback === 'function') {
+    attrName = attrName.toLowerCase();
+
+    const observedAttributes = (node as any).constructor.observedAttributes as string[];
+    if (observedAttributes != null && observedAttributes.some(obs => obs.toLowerCase() === attrName)) {
+      (node as any).attributeChangedCallback(attrName, oldValue, newValue);
+    }
+  }
 }
 
 const NOT_IMPL = `is not implemented for MockElement. For unit tests, instead try document.getElementById(), document.getElementsByTagName(), or document.getElementsByClassName()`;

@@ -9,19 +9,18 @@ import { parseDocumentUtil } from './parse-util';
 
 
 export class MockDocument extends MockElement {
-  body: MockElement;
   defaultView: any;
-  documentElement: MockElement;
-  head: MockElement;
-  _parser: any;
+  body: MockElement = null;
+  documentElement: MockElement = null;
+  head: MockElement = null;
 
-  constructor(html?: string) {
+  constructor(html: string = null, win: any = null) {
     super(null, null);
     this.nodeName = '#document';
     this.nodeType = NODE_TYPES.DOCUMENT_NODE;
+    this.defaultView = win;
 
-    const docTypeNode = this.createDocumentTypeNode();
-    this.appendChild(docTypeNode);
+    this.appendChild(this.createDocumentTypeNode());
 
     if (typeof html === 'string') {
       const parsedDoc: MockDocument = parseDocumentUtil(this, html);
@@ -45,6 +44,13 @@ export class MockDocument extends MockElement {
     }
   }
 
+  appendChild(newNode: MockElement) {
+    newNode.remove();
+    newNode.parentNode = this;
+    this.childNodes.push(newNode);
+    return newNode;
+  }
+
   createComment(data: string) {
     return new MockComment(this, data);
   }
@@ -56,6 +62,7 @@ export class MockDocument extends MockElement {
       doc.parentNode = null;
       return doc;
     }
+
     return createElement(this, tagName);
   }
 
@@ -102,18 +109,30 @@ export class MockDocument extends MockElement {
 
   get title() {
     const title = this.head.querySelector('title');
-    if (title) {
+    if (title != null) {
       return title.textContent;
     }
     return '';
   }
-  set title(value) {
+  set title(value: string) {
     let title = this.head.querySelector('title');
-    if (!title) {
+    if (title == null) {
       title = this.createElement('title');
       this.head.appendChild(title);
     }
     title.textContent = value;
+  }
+
+  $reset() {
+    if (this.documentElement != null) {
+      this.documentElement.childNodes.length = 0;
+    }
+    if (this.body != null) {
+      this.body.childNodes.length = 0;
+    }
+    if (this.head != null) {
+      this.head.childNodes.length = 0;
+    }
   }
 
 }
@@ -127,7 +146,7 @@ function getElementById(elm: MockElement, id: string): MockElement {
       return childElm;
     }
     const childElmFound = getElementById(childElm, id);
-    if (childElmFound) {
+    if (childElmFound != null) {
       return childElmFound;
     }
   }

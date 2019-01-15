@@ -1,29 +1,49 @@
 import { MockWindow } from './window';
 
 
-export function applyWindowToGlobal(global: any) {
-  global._window = null;
+export function setupGlobal(global: any) {
+  teardownGlobal(global);
 
   Object.defineProperty(global, 'window', {
-    get: function() {
-      if (!this._window) {
-        this._window = new MockWindow();
+    get() {
+      if (global._window == null) {
+        global._window = new MockWindow();
       }
-      return this._window;
-    }
+      return global._window;
+    },
+    set(win: any) {
+      global._window = win;
+    },
+    configurable: true
   });
 
   WINDOW_PROPERTIES.forEach(winProperty => {
     Object.defineProperty(global, winProperty, {
-      get: function() {
-        if (!this._window) {
-          this._window = new MockWindow();
+      get() {
+        if (global._window == null) {
+          global._window = new MockWindow();
         }
-        return this._window[winProperty];
-      }
+        return global._window[winProperty];
+      },
+      set(val: any) {
+        if (global._window == null) {
+          global._window = new MockWindow();
+        }
+        global._window[winProperty] = val;
+      },
+      configurable: true
     });
   });
 }
+
+
+export function teardownGlobal(global: any) {
+  const win = global._window as MockWindow;
+  if (win != null) {
+    win.$reset();
+  }
+}
+
 
 const WINDOW_PROPERTIES = [
   'customElements',
@@ -39,6 +59,8 @@ const WINDOW_PROPERTIES = [
   'removeEventListener',
   'requestAnimationFrame',
   'sessionStorage',
+  'CSS',
+  'CustomEvent',
   'Event',
-  'CustomEvent'
+  'HTMLElement'
 ];

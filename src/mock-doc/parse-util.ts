@@ -7,6 +7,9 @@ import { NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
 
 
+const docParser = new WeakMap<any, any>();
+
+
 export function parseDocumentUtil(ownerDocument: any, html: string) {
   const doc = parse(
     html.trim(),
@@ -30,9 +33,11 @@ export function parseFragmentUtil(ownerDocument: any, html: string) {
 }
 
 
-function getParser(ownerDocument: any) {
-  if (ownerDocument._parser) {
-    return ownerDocument._parser;
+function getParser(ownerDocument: MockDocument) {
+  let parseOptions: ParserOptions = docParser.get(ownerDocument);
+
+  if (parseOptions != null) {
+    return parseOptions;
   }
 
   const treeAdapter: TreeAdapter = {
@@ -87,7 +92,7 @@ function getParser(ownerDocument: any) {
     setDocumentType(doc: MockDocument, name: string, publicId: string, systemId: string) {
       let doctypeNode = doc.childNodes.find(n => n.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE);
 
-      if (!doctypeNode) {
+      if (doctypeNode == null) {
         doctypeNode = ownerDocument.createDocumentTypeNode();
         doc.insertBefore(doctypeNode, doc.firstChild);
       }
@@ -113,7 +118,7 @@ function getParser(ownerDocument: any) {
     insertText(parentNode: MockNode, text: string) {
       const lastChild = parentNode.lastChild;
 
-      if (lastChild && lastChild.nodeType === NODE_TYPES.TEXT_NODE) {
+      if (lastChild != null && lastChild.nodeType === NODE_TYPES.TEXT_NODE) {
         lastChild.nodeValue += text;
       } else {
 
@@ -124,7 +129,7 @@ function getParser(ownerDocument: any) {
     insertTextBefore(parentNode: MockNode, text: string, referenceNode: MockNode) {
       const prevNode = parentNode.childNodes[parentNode.childNodes.indexOf(referenceNode) - 1];
 
-      if (prevNode && prevNode.nodeType === NODE_TYPES.TEXT_NODE) {
+      if (prevNode != null && prevNode.nodeType === NODE_TYPES.TEXT_NODE) {
         prevNode.nodeValue += text;
       } else {
         parentNode.insertBefore(ownerDocument.createTextNode(text), referenceNode);
@@ -210,11 +215,11 @@ function getParser(ownerDocument: any) {
     }
   };
 
-  const parseOptions: ParserOptions = {
+  parseOptions = {
     treeAdapter: treeAdapter
   };
 
-  ownerDocument._parser = parseOptions;
+  docParser.set(ownerDocument, parseOptions);
 
   return parseOptions;
 }

@@ -1,6 +1,7 @@
 import { MockCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
 import { MockDocument } from './document';
+import { MockElement } from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
@@ -8,82 +9,96 @@ import { MockPerformance } from './performance';
 import { MockStorage } from './storage';
 
 
+const customElementMap = new WeakMap<MockWindow, MockCustomElementRegistry>();
+const historyMap = new WeakMap<MockWindow, MockHistory>();
+const htmlElementCstrMap = new WeakMap<MockWindow, any>();
+const localStorageMap = new WeakMap<MockWindow, MockStorage>();
+const locMap = new WeakMap<MockWindow, MockLocation>();
+const navMap = new WeakMap<MockWindow, MockNavigator>();
+const perfMap = new WeakMap<MockWindow, MockPerformance>();
+const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
+const eventClassMap = new WeakMap<MockWindow, any>();
+const customEventClassMap = new WeakMap<MockWindow, any>();
+
+
 export class MockWindow {
+  document: Document;
+
+  constructor(html: string = null) {
+    this.document = new MockDocument(html, this) as any;
+  }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
     addEventListener(this, type, handler);
   }
 
-  private _customElements: MockCustomElementRegistry;
+  close() {
+    this.$reset();
+  }
+
   get customElements() {
-    if (!this._customElements) {
-      this._customElements = new MockCustomElementRegistry();
+    let customElements = customElementMap.get(this);
+    if (customElements == null) {
+      customElements = new MockCustomElementRegistry(this as any);
+      customElementMap.set(this, customElements);
     }
-    return this._customElements;
+    return customElements;
   }
   set customElements(val: any) {
-    this._customElements = val;
+    customElementMap.set(this, val);
   }
 
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
 
-  private _document: Document;
-  get document() {
-    if (!this._document) {
-      (this._document as any) = new MockDocument();
-      (this._document as any).defaultView = this;
-    }
-    return this._document;
-  }
-  set document(value) {
-    this._document = value;
-    (this._document as any).defaultView = this;
-  }
-
   fetch() {
     return Promise.resolve();
   }
 
-  private _history: MockHistory;
   get history() {
-    if (!this._history) {
-      this._history = new MockHistory();
+    let hsty = historyMap.get(this);
+    if (hsty == null) {
+      hsty = new MockHistory();
+      historyMap.set(this, hsty);
     }
-    return this._history;
+    return hsty;
   }
-  set history(value) {
-    this._history = value;
+  set history(hsty: any) {
+    historyMap.set(this, hsty);
   }
 
-  private _localStorage: MockStorage;
   get localStorage() {
-    if (!this._localStorage) {
-      this._localStorage = new MockStorage();
+    let locStorage = localStorageMap.get(this);
+    if (locStorage == null) {
+      locStorage = new MockStorage();
+      localStorageMap.set(this, locStorage);
     }
-    return this._localStorage;
+    return locStorage;
   }
-  set localStorage(value) {
-    this._localStorage = value;
+  set localStorage(locStorage: any) {
+    localStorageMap.set(this, locStorage);
   }
 
-  private _location: MockLocation;
   get location() {
-    if (!this._location) {
-      this._location = new MockLocation();
+    let loc = locMap.get(this);
+    if (loc == null) {
+      loc = new MockLocation();
+      locMap.set(this, loc);
     }
-    return this._location;
+    return loc;
   }
-  set location(value) {
-    if (typeof value === 'string') {
-      if (!this._location) {
-        this._location = new MockLocation();
+  set location(val: any) {
+    if (typeof val === 'string') {
+      let loc = locMap.get(this);
+      if (loc == null) {
+        loc = new MockLocation();
+        locMap.set(this, loc);
       }
-      this._location.href = value;
+      loc.href = val;
 
     } else {
-      this._location = value;
+      locMap.set(this, val);
     }
   }
 
@@ -93,35 +108,31 @@ export class MockWindow {
     };
   }
 
-  private _navigator: MockNavigator;
   get navigator() {
-    if (!this._navigator) {
-      this._navigator = new MockNavigator();
+    let nav = navMap.get(this);
+    if (nav == null) {
+      nav = new MockNavigator();
+      navMap.set(this, nav);
     }
-    return this._navigator;
+    return nav;
   }
-  set navigator(value) {
-    this._navigator = value;
+  set navigator(nav: any) {
+    navMap.set(this, nav);
   }
 
-  private _performance: any = null;
   get performance() {
-    if (!this._performance) {
-      this._performance = new MockPerformance();
+    let perf = perfMap.get(this);
+    if (perf == null) {
+      perf = new MockPerformance();
+      perfMap.set(this, perf);
     }
-    return this._performance;
+    return perf;
   }
-  set performance(value) {
-    this._performance = value;
+  set performance(perf: any) {
+    perfMap.set(this, perf);
   }
 
-  private _parent: any = null;
-  get parent() {
-    return this._parent;
-  }
-  set parent(value) {
-    this._parent = value;
-  }
+  parent: any = null;
 
   removeEventListener(type: string, handler: any) {
     removeEventListener(this, type, handler);
@@ -135,15 +146,16 @@ export class MockWindow {
     return this;
   }
 
-  private _sessionStorage: MockStorage;
   get sessionStorage() {
-    if (!this._sessionStorage) {
-      this._sessionStorage = new MockStorage();
+    let sessStorage = sessionStorageMap.get(this);
+    if (sessStorage == null) {
+      sessStorage = new MockStorage();
+      sessionStorageMap.set(this, sessStorage);
     }
-    return this._sessionStorage;
+    return sessStorage;
   }
-  set sessionStorage(val: any) {
-    this._sessionStorage = val;
+  set sessionStorage(locStorage: any) {
+    sessionStorageMap.set(this, locStorage);
   }
 
   get top() {
@@ -154,33 +166,48 @@ export class MockWindow {
     return this;
   }
 
-  static get CSS() {
+  get CSS() {
     return {
       supports: () => true
     };
   }
 
-  private _MockEvent: MockEvent;
+  get HTMLElement() {
+    let HtmlElementCstr = htmlElementCstrMap.get(this);
+    if (HtmlElementCstr == null) {
+      const ownerDocument = this.document;
+      HtmlElementCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+        }
+      };
+      htmlElementCstrMap.set(this, HtmlElementCstr);
+    }
+    return HtmlElementCstr;
+  }
+
   get Event() {
-    if (this._MockEvent) {
-      return this._MockEvent;
+    const evClass = eventClassMap.get(this);
+    if (evClass != null) {
+      return evClass;
     }
     return MockEvent;
   }
-  set Event(value: any) {
-    this._MockEvent = value;
+  set Event(ev: any) {
+    eventClassMap.set(this, ev);
   }
 
-  private _MockCustomEvent: MockCustomEvent;
   get CustomEvent() {
-    if (this._MockCustomEvent) {
-      return this._MockCustomEvent;
+    const custEvClass = customEventClassMap.get(this);
+    if (custEvClass != null) {
+      return custEvClass;
     }
     return MockCustomEvent;
   }
-  set CustomEvent(value: any) {
-    this._MockCustomEvent = value;
+  set CustomEvent(custEvClass: any) {
+    customEventClassMap.set(this, custEvClass);
   }
+
   getComputedStyle(_: any) {
     return {
       cssText: '',
@@ -203,4 +230,27 @@ export class MockWindow {
       }
     } as any;
   }
+
+  $reset() {
+    if (this.document != null) {
+      ((this.document as any) as MockDocument).$reset();
+    }
+
+    const customElements = customElementMap.get(this);
+    if (customElements != null) {
+      customElements.$reset();
+      customElementMap.delete(this);
+    }
+
+    historyMap.delete(this);
+    htmlElementCstrMap.delete(this);
+    localStorageMap.delete(this);
+    locMap.delete(this);
+    navMap.delete(this);
+    perfMap.delete(this);
+    sessionStorageMap.delete(this);
+    eventClassMap.delete(this);
+    customEventClassMap.delete(this);
+  }
+
 }
