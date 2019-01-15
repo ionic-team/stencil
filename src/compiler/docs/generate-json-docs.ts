@@ -8,6 +8,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, jsonOutputs: 
       encapsulation: cmp.encapsulation,
       readme: cmp.readme,
       docs: cmp.docs,
+      docsTags: cmp.docsTags,
       usage: cmp.usage,
       props: cmp.props,
       methods: cmp.methods,

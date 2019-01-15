@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
 import { buildWarn, isDocsPublic, normalizePath } from '../util';
-import { MEMBER_TYPE, PROP_TYPE, ENCAPSULATION } from '../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { JsonDocsTags } from '../../declarations';
 
 
 export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocs> {
@@ -62,6 +63,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         tag: moduleFile.cmpMeta.tagNameMeta,
         readme,
         docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
+        docsTags: generateDocsTags(moduleFile.cmpMeta.jsdoc),
         usage: await generateUsages(config, compilerCtx, usagesDir),
         encapsulation: getEncapsulation(moduleFile.cmpMeta),
 
@@ -96,6 +98,7 @@ function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
         attr: getAttrName(member),
         reflectToAttr: !!member.reflectToAttrib,
         docs: getMemberDocumentation(member.jsdoc),
+        docsTags: generateDocsTags(member.jsdoc),
         default: member.jsdoc.default,
 
         optional: member.attribType ? member.attribType.optional : true,
@@ -113,7 +116,8 @@ function getMethods(members: [string, d.MemberMeta][]): d.JsonDocsMethod[] {
         returns: getMethodReturns(member.jsdoc),
         signature: getMethodSignature(memberName, member.jsdoc),
         parameters: getMethodParameters(member.jsdoc),
-        docs: getMemberDocumentation(member.jsdoc)
+        docs: getMemberDocumentation(member.jsdoc),
+        docsTags: generateDocsTags(member.jsdoc),
       };
     });
 }
@@ -137,6 +141,7 @@ function getEvents(cmpMeta: d.ComponentMeta): d.JsonDocsEvent[] {
       cancelable: !!eventMeta.eventCancelable,
       composed: !!eventMeta.eventComposed,
       docs: getMemberDocumentation(eventMeta.jsdoc),
+      docsTags: generateDocsTags(eventMeta.jsdoc),
     };
   });
 }
@@ -214,6 +219,9 @@ function generateDocs(readme: string, jsdoc: d.JsDoc) {
   return contentLines.join('\n').trim();
 }
 
+function generateDocsTags(jsdoc: d.JsDoc): JsonDocsTags[] {
+  return jsdoc.tags || [];
+}
 
 async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
   const rtn: d.JsonDocsUsage = {};
