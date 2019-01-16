@@ -1,3 +1,33 @@
+<a name="0.16.4"></a>
+## 🚘 [0.16.4](https://github.com/ionic-team/stencil/compare/v0.16.3...v0.16.4) (2019-01-15)
+
+
+### Features
+
+* **docs:** expose JSdocs tags ([#1319](https://github.com/ionic-team/stencil/issues/1319)) ([c726727](https://github.com/ionic-team/stencil/commit/c726727))
+
+
+### Performance Improvements
+
+* **css:** reenable MergeLonghand CSS optimization ([cbd3579](https://github.com/ionic-team/stencil/commit/cbd3579))
+
+
+
+<a name="0.16.3"></a>
+## ⚽️ [0.16.3](https://github.com/ionic-team/stencil/compare/v0.16.2...v0.16.3) (2019-01-14)
+
+
+### Bug Fixes
+
+* **angular:** this.el should not be exposed in types ([a82c8df](https://github.com/ionic-team/stencil/commit/a82c8df))
+
+
+### Features
+
+* **docs:** expose encapsulation ([e39268a](https://github.com/ionic-team/stencil/commit/e39268a))
+
+
+
 <a name="0.16.2"></a>
 ## 🐣 [0.16.2](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2) (2019-01-07)
 

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { buildWarn, isDocsPublic, normalizePath } from '../util';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { getBuildTimestamp } from '../build/build-ctx';
 
@@ -65,7 +65,9 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         tag: moduleFile.cmpCompilerMeta.tagName,
         readme,
         docs: generateDocs(readme, moduleFile.cmpCompilerMeta.jsdoc),
+        docsTags: generateDocsTags(moduleFile.cmpCompilerMeta.jsdoc),
         usage: await generateUsages(config, compilerCtx, usagesDir),
+        encapsulation: getEncapsulation(moduleFile.cmpCompilerMeta),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
@@ -75,6 +77,17 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
     });
 
   return Promise.all(promises);
+}
+
+function getEncapsulation(cmpMeta: d.ComponentMeta): 'shadow' | 'scoped' | 'none' {
+  const encapsulation = cmpMeta.encapsulationMeta;
+  if (encapsulation === ENCAPSULATION.ShadowDom) {
+    return 'shadow';
+  } else if (encapsulation === ENCAPSULATION.ScopedCss) {
+    return 'scoped';
+  } else {
+    return 'none';
+  }
 }
 
 function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
@@ -88,6 +101,7 @@ function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
         attr: getAttrName(member),
         reflectToAttr: !!member.reflectToAttrib,
         docs: getMemberDocumentation(member.jsdoc),
+        docsTags: generateDocsTags(member.jsdoc),
         default: member.jsdoc.default,
 
         optional: member.attribType ? member.attribType.optional : true,
@@ -105,7 +119,8 @@ function getMethods(members: [string, d.MemberMeta][]): d.JsonDocsMethod[] {
         returns: getMethodReturns(member.jsdoc),
         signature: getMethodSignature(memberName, member.jsdoc),
         parameters: getMethodParameters(member.jsdoc),
-        docs: getMemberDocumentation(member.jsdoc)
+        docs: getMemberDocumentation(member.jsdoc),
+        docsTags: generateDocsTags(member.jsdoc),
       };
     });
 }
@@ -129,6 +144,7 @@ function getEvents(cmpMeta: d.ComponentMeta): d.JsonDocsEvent[] {
       cancelable: !!eventMeta.eventCancelable,
       composed: !!eventMeta.eventComposed,
       docs: getMemberDocumentation(eventMeta.jsdoc),
+      docsTags: generateDocsTags(eventMeta.jsdoc),
     };
   });
 }
@@ -206,6 +222,9 @@ function generateDocs(readme: string, jsdoc: d.JsDoc) {
   return contentLines.join('\n').trim();
 }
 
+function generateDocsTags(jsdoc: d.JsDoc): d.JsonDocsTags[] {
+  return jsdoc.tags || [];
+}
 
 async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
   const rtn: d.JsonDocsUsage = {};

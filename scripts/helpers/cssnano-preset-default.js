@@ -27,7 +27,7 @@ const postcssMinifyParams = require('postcss-minify-params');
 // const postcssNormalizeCharset = require('postcss-normalize-charset');
 const postcssMinifyFontValues = require('postcss-minify-font-values');
 const postcssNormalizeUrl = require('postcss-normalize-url');
-// const postcssMergeLonghand = require('postcss-merge-longhand');
+const postcssMergeLonghand = require('postcss-merge-longhand');
 const postcssDiscardDuplicates = require('postcss-discard-duplicates');
 // const postcssDiscardOverridden = require('postcss-discard-overridden');
 const postcssNormalizeRepeatStyle = require('postcss-normalize-repeat-style');
@@ -80,7 +80,7 @@ module.exports = function defaultPreset (opts = {}) {
     [postcssNormalizeRepeatStyle, options.normalizeRepeatStyle],
     [postcssNormalizePositions, options.normalizePositions],
     [postcssNormalizeWhitespace, options.normalizeWhitespace],
-    // [postcssMergeLonghand, options.mergeLonghand],
+    [postcssMergeLonghand, options.mergeLonghand],
     [postcssDiscardDuplicates, options.discardDuplicates],
     [postcssMergeRules, options.mergeRules],
     [postcssDiscardEmpty, options.discardEmpty],
