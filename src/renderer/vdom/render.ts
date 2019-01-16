@@ -7,10 +7,11 @@
  * Modified for Stencil's renderer and slot projection
  */
 import * as d from '../../declarations';
+import { BUILD } from '@stencil/core/build-conditionals';
+import { doc, plt } from '@stencil/core/platform';
 import { h } from './h';
 import { isDef, toLowerCase } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
-import { plt, supportsShadowDom } from '../../client/data';
 import { updateElement } from './update-dom-node';
 
 
@@ -54,17 +55,17 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   if (isDef(newVNode.vtext)) {
     // create text node
-    newVNode.elm = document.createTextNode(newVNode.vtext) as any;
+    newVNode.elm = doc.createTextNode(newVNode.vtext) as any;
 
   } else if (BUILD.slotPolyfill && newVNode.isSlotReference) {
     // create a slot reference html text node
-    newVNode.elm = document.createTextNode('') as any;
+    newVNode.elm = doc.createTextNode('') as any;
 
   } else {
     // create element
     elm = newVNode.elm = ((BUILD.svg && (isSvgMode || newVNode.vtag === 'svg')) ?
-                      document.createElementNS('http://www.w3.org/2000/svg', newVNode.vtag as string) :
-                      document.createElement(
+                      doc.createElementNS('http://www.w3.org/2000/svg', newVNode.vtag as string) :
+                      doc.createElement(
                         (BUILD.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag as string)
                       ) as any;
 
@@ -103,7 +104,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
         if (childNode) {
           // if (BUILD.prerenderServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
           //   // SSR ONLY: add the text node's start comment
-          //   elm.appendChild(document.createComment('s.' + ssrId + '.' + i));
+          //   elm.appendChild(doc.createComment('s.' + ssrId + '.' + i));
           // }
 
           // append our new node
@@ -111,8 +112,8 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
           // if (BUILD.prerenderServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
           //   // SSR ONLY: add the text node's end comment
-          //   elm.appendChild(document.createComment('/'));
-          //   elm.appendChild(document.createTextNode(' '));
+          //   elm.appendChild(doc.createComment('/'));
+          //   elm.appendChild(doc.createTextNode(' '));
           // }
         }
       }
@@ -201,7 +202,7 @@ const addVnodes = (
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
       childNode = (BUILD.vdomText && isDef(vnodes[startIdx].vtext)) ?
-                  document.createTextNode(vnodes[startIdx].vtext) :
+                  doc.createTextNode(vnodes[startIdx].vtext) :
                   createElm(null, parentVNode, startIdx, parentElm);
 
       if (childNode) {
@@ -598,134 +599,136 @@ interface RelocateNode {
 
 
 export const vdomRender = (hostElement: d.HostElement, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: any, hostDataFnResults?: any) => {
-  const oldVNode = elmData.vnode || {};
-  const newVNode = elmData.vnode = h(null, hostDataFnResults, renderFnResults);
-  newVNode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElement.shadowRoot || hostElement : hostElement) as any;
+  if (renderFnResults) {
+    const oldVNode = elmData.vnode || {};
+    const newVNode = elmData.vnode = h(null, hostDataFnResults, renderFnResults);
+    newVNode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElement.shadowRoot || hostElement : hostElement) as any;
 
-  if (BUILD.reflectToAttr) {
-    // only care if we're reflecting values to the host element
-    (renderFnResults as d.VNode).ishost = true;
-  }
+    if (BUILD.reflectToAttr) {
+      // only care if we're reflecting values to the host element
+      (renderFnResults as d.VNode).ishost = true;
+    }
 
-  // so it is safe to set these variables and internally
-  // the same patch() call will reference the same data
-  hostElm = hostElement;
-  hostTagName = toLowerCase(hostElm.nodeName);
+    // so it is safe to set these variables and internally
+    // the same patch() call will reference the same data
+    hostElm = hostElement;
+    hostTagName = toLowerCase(hostElm.nodeName);
 
-  if (BUILD.slotPolyfill) {
-    contentRef = hostElm['s-cr'];
-  }
+    if (BUILD.slotPolyfill) {
+      contentRef = hostElm['s-cr'];
+    }
 
-  if (BUILD.slotPolyfill) {
-    useNativeShadowDom = supportsShadowDom && cmpMeta.shadowDomEncapsulation;
-  }
+    if (BUILD.slotPolyfill) {
+      useNativeShadowDom = plt.supportsShadowDom && cmpMeta.shadowDomEncapsulation;
+    }
 
-  // if (BUILD.prerenderServerSide) {
-  //   if (!isShadowDom) {
-  //     ssrId = ssrPatchId;
-  //   } else {
-  //     ssrId = null;
-  //   }
-  // }
+    // if (BUILD.prerenderServerSide) {
+    //   if (!isShadowDom) {
+    //     ssrId = ssrPatchId;
+    //   } else {
+    //     ssrId = null;
+    //   }
+    // }
 
-  if (BUILD.slotPolyfill) {
-    // get the scopeId
-    scopeId = hostElm['s-sc'];
+    if (BUILD.slotPolyfill) {
+      // get the scopeId
+      scopeId = hostElm['s-sc'];
 
-    // always reset
-    checkSlotRelocate = checkSlotFallbackVisibility = false;
-  }
+      // always reset
+      checkSlotRelocate = checkSlotFallbackVisibility = false;
+    }
 
-  // synchronous patch
-  patchVNode(oldVNode, newVNode);
+    // synchronous patch
+    patchVNode(oldVNode, newVNode);
 
-  // if (BUILD.prerenderServerSide && isDef(ssrId)) {
-  //   // SSR ONLY: we've been given an SSR id, so the host element
-  //   // should be given the ssr id attribute
-  //   oldVNode.elm.setAttribute(SSR_VNODE_ID, ssrId as any);
-  // }
+    // if (BUILD.prerenderServerSide && isDef(ssrId)) {
+    //   // SSR ONLY: we've been given an SSR id, so the host element
+    //   // should be given the ssr id attribute
+    //   oldVNode.elm.setAttribute(SSR_VNODE_ID, ssrId as any);
+    // }
 
-  if (BUILD.slotPolyfill) {
-    if (checkSlotRelocate) {
-      relocateSlotContent(newVNode.elm);
+    if (BUILD.slotPolyfill) {
+      if (checkSlotRelocate) {
+        relocateSlotContent(newVNode.elm);
 
-      for (let i = 0; i < relocateNodes.length; i++) {
-        const relocateNode = relocateNodes[i];
+        for (let i = 0; i < relocateNodes.length; i++) {
+          const relocateNode = relocateNodes[i];
 
-        if (!relocateNode.nodeToRelocate['s-ol']) {
-          // add a reference node marking this node's original location
-          // keep a reference to this node for later lookups
-          const orgLocationNode = document.createTextNode('') as any;
-          orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
+          if (!relocateNode.nodeToRelocate['s-ol']) {
+            // add a reference node marking this node's original location
+            // keep a reference to this node for later lookups
+            const orgLocationNode = doc.createTextNode('') as any;
+            orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 
-          relocateNode.nodeToRelocate.parentNode.insertBefore(
-            (relocateNode.nodeToRelocate['s-ol'] = orgLocationNode),
-            relocateNode.nodeToRelocate
-          );
+            relocateNode.nodeToRelocate.parentNode.insertBefore(
+              (relocateNode.nodeToRelocate['s-ol'] = orgLocationNode),
+              relocateNode.nodeToRelocate
+            );
+          }
         }
-      }
 
-      // while we're moving nodes around existing nodes, temporarily disable
-      // the disconnectCallback from working
-      plt.isTmpDisconnected = true;
+        // while we're moving nodes around existing nodes, temporarily disable
+        // the disconnectCallback from working
+        plt.isTmpDisconnected = true;
 
-      for (let i = 0; i < relocateNodes.length; i++) {
-        const relocateNode = relocateNodes[i];
+        for (let i = 0; i < relocateNodes.length; i++) {
+          const relocateNode = relocateNodes[i];
 
-        // by default we're just going to insert it directly
-        // after the slot reference node
-        const parentNodeRef = relocateNode.slotRefNode.parentNode;
-        let insertBeforeNode = relocateNode.slotRefNode.parentNode;
+          // by default we're just going to insert it directly
+          // after the slot reference node
+          const parentNodeRef = relocateNode.slotRefNode.parentNode;
+          let insertBeforeNode = relocateNode.slotRefNode.parentNode;
 
-        let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
+          let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
 
-        while (orgLocationNode = orgLocationNode.previousSibling as any) {
-          let refNode = orgLocationNode['s-nr'];
-          if (refNode && refNode) {
-            if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
-              if (parentNodeRef === refNode.parentNode) {
-                if ((refNode = refNode.nextSibling as any) && refNode && !refNode['s-nr']) {
-                  insertBeforeNode = refNode;
-                  break;
+          while (orgLocationNode = orgLocationNode.previousSibling as any) {
+            let refNode = orgLocationNode['s-nr'];
+            if (refNode && refNode) {
+              if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
+                if (parentNodeRef === refNode.parentNode) {
+                  if ((refNode = refNode.nextSibling as any) && refNode && !refNode['s-nr']) {
+                    insertBeforeNode = refNode;
+                    break;
+                  }
                 }
               }
             }
           }
-        }
 
-        if (
-          (!insertBeforeNode && parentNodeRef !== relocateNode.nodeToRelocate.parentNode) ||
-          (relocateNode.nodeToRelocate.nextSibling !== insertBeforeNode)
-        ) {
-          // we've checked that it's worth while to relocate
-          // since that the node to relocate
-          // has a different next sibling or parent relocated
+          if (
+            (!insertBeforeNode && parentNodeRef !== relocateNode.nodeToRelocate.parentNode) ||
+            (relocateNode.nodeToRelocate.nextSibling !== insertBeforeNode)
+          ) {
+            // we've checked that it's worth while to relocate
+            // since that the node to relocate
+            // has a different next sibling or parent relocated
 
-          if (relocateNode.nodeToRelocate !== insertBeforeNode) {
-            // remove the node from the dom
-            relocateNode.nodeToRelocate.remove();
+            if (relocateNode.nodeToRelocate !== insertBeforeNode) {
+              // remove the node from the dom
+              relocateNode.nodeToRelocate.remove();
 
-            // add it back to the dom but in its new home
-            parentNodeRef.insertBefore(relocateNode.nodeToRelocate, insertBeforeNode);
+              // add it back to the dom but in its new home
+              parentNodeRef.insertBefore(relocateNode.nodeToRelocate, insertBeforeNode);
+            }
           }
         }
+
+        // done moving nodes around
+        // allow the disconnect callback to work again
+        plt.isTmpDisconnected = false;
       }
 
-      // done moving nodes around
-      // allow the disconnect callback to work again
-      plt.isTmpDisconnected = false;
+      if (checkSlotFallbackVisibility) {
+        updateFallbackSlotVisibility(newVNode.elm);
+      }
+
+      // always reset
+      relocateNodes.length = 0;
     }
 
-    if (checkSlotFallbackVisibility) {
-      updateFallbackSlotVisibility(newVNode.elm);
+    // fire off the ref if it exists
+    if (BUILD.vdomRef) {
+      callNodeRefs(newVNode);
     }
-
-    // always reset
-    relocateNodes.length = 0;
-  }
-
-  // fire off the ref if it exists
-  if (BUILD.vdomRef) {
-    callNodeRefs(newVNode);
   }
 };

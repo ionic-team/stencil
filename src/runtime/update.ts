@@ -1,15 +1,18 @@
 import * as d from '../declarations';
+import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@stencil/core/platform';
 import { attachStyles } from './styles';
-import { consoleError } from './log';
-import { propagateComponentReady } from './propagate-cmp-ready';
-import { supportsShadowDom } from './data';
-import { vdomRender } from '../renderer/vdom/render';
+import { BUILD } from '@stencil/core/build-conditionals';
+import { vdomRender } from '@stencil/core/renderer/vdom';
 
 
-export const update = async (elm: d.HostElement, instance: any, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean) => {
+export const update = async (elm: d.HostElement, instance: any, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   // update
   if (BUILD.taskQueue) {
     elmData.isQueuedForUpdate = false;
+  }
+
+  if (BUILD.exposeAppOnReady) {
+    activelyProcessingCmps.add(elm);
   }
 
   try {
@@ -25,7 +28,8 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
     consoleError(e);
   }
 
-  if (BUILD.shadowDom && isInitialLoad && supportsShadowDom && cmpMeta.shadowDomEncapsulation) {
+  if (BUILD.shadowDom && isInitialLoad && plt.supportsShadowDom && cmpMeta.shadowDomEncapsulation) {
+    // DOM WRITE
     // this component is using shadow dom
     // and this browser supports shadow dom
     // add the read-only property "shadowRoot" to the host element
@@ -88,6 +92,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
         // or we need to update the css class/attrs on the host element
 
         if (BUILD.vdomRender) {
+          // DOM WRITE!
           vdomRender(
             elm,
             elmData,
@@ -97,6 +102,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
           );
 
         } else if (BUILD.noVdomRender) {
+          // DOM WRITE!
           (BUILD.shadowDom ? elm.shadowRoot || elm : elm).textContent =
             (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()) as string;
         }
@@ -114,6 +120,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
   }
 
   if (BUILD.style && isInitialLoad) {
+    // DOM WRITE!
     attachStyles(elm);
 
     // if (BUILD.scoped) {
@@ -130,8 +137,10 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
 
   if (BUILD.lifecycle || BUILD.style) {
     // it's official, this element has rendered
+    // DOM WRITE!
     elmData.hasRendered = elm['s-rn'] = true;
   } else if (BUILD.updatable) {
+    // DOM WRITE!
     elmData.hasRendered = true;
   }
 
@@ -166,10 +175,6 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
     consoleError(e);
   }
 
-  if (BUILD.updatable || BUILD.lifecycle) {
-    elmData.firedDidLoad = true;
-  }
-
   // if (BUILD.polyfills && !allChildrenHaveConnected(plt, elm)) {
   //   // this check needs to be done when using the customElements polyfill
   //   // since the polyfill uses MutationObserver which causes the
@@ -177,29 +182,59 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
   //   return;
   // }
 
-  // all is good, this component has been told it's time to finish loading
-  // it's possible that we've already decided to destroy this element
-  // check if this element has any actively loading child elements
-  if (BUILD.style && (BUILD.lifecycle && (!elm['s-ld'] || !elm['s-ld'].length))) {
-    // cool, so at this point this element isn't already being destroyed
-    // and it does not have any child elements that are still loading
+  // load events fire from bottom to top
+  // the deepest elements load first then bubbles up
+  // load events fire from bottom to top
+  // the deepest elements load first then bubbles up
+  if (BUILD.lifecycle && elmData.ancestorHostElement) {
+    // ok so this element already has a known ancestor host element
+    // let's make sure we remove this element from its ancestor's
+    // known list of child elements which are actively loading
+    ancestorsActivelyLoadingChildren = elmData.ancestorHostElement['s-al'];
 
-    if (!elmData.firedDidLoad) {
-      if (BUILD.lifecycle) {
-        // ensure we remove any child references cuz it doesn't matter at this point
-        elm['s-ld'] = undefined;
-      }
+    if (ancestorsActivelyLoadingChildren) {
+      // remove this element from the actively loading map
+      ancestorsActivelyLoadingChildren.delete(elm);
 
-      if (BUILD.style) {
-        // add the css class that this element has officially hydrated
-        elm.classList.add('hydrated');
+      // the ancestor's initLoad method will do the actual checks
+      // to see if the ancestor is actually loaded or not
+      // then let's call the ancestor's initLoad method if there's no length
+      // (which actually ends up as this method again but for the ancestor)
+      if (!ancestorsActivelyLoadingChildren.size) {
+        elmData.ancestorHostElement['s-init']();
       }
     }
 
-    if (BUILD.lifecycle) {
-      // load events fire from bottom to top
-      // the deepest elements load first then bubbles up
-      propagateComponentReady(elm, elmData);
+    elmData.ancestorHostElement = undefined;
+  }
+
+  // all is good, this component has been told it's time to finish loading
+  // it's possible that we've already decided to destroy this element
+  // check if this element has any actively loading child elements
+  if (BUILD.lifecycle && (!elm['s-al'] || !elm['s-al'].size)) {
+    // cool, so at this point this element isn't already being destroyed
+    // and it does not have any child elements that are still loading
+
+    // ensure we remove any child references cuz it doesn't matter at this point
+    elm['s-al'] = undefined;
+
+    if (BUILD.style) {
+      // DOM WRITE!
+      // add the css class that this element has officially hydrated
+      elm.classList.add('hydrated');
+    }
+
+    if (BUILD.exposeAppOnReady) {
+      activelyProcessingCmps.delete(elm);
+    }
+  }
+
+  if (BUILD.exposeAppOnReady && onAppReadyCallbacks.length && !activelyProcessingCmps.size) {
+    // we've got some promises waiting on the entire app to be done processing
+    // so it should have an empty queue and no longer rendering
+    let cb: any;
+    while ((cb = onAppReadyCallbacks.shift())) {
+      cb();
     }
   }
 
@@ -207,9 +242,9 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
     elm['s-hmr-load'] && elm['s-hmr-load']();
   }
 
-  if (BUILD.lazyLoad && isInitialLoad) {
+  if (BUILD.lazyLoad && isInitialLoad && elmData.onReadyResolve) {
     // fire off the user's elm.componentOnReady() resolve (if any)
-    elmData.onReadyResolve && elmData.onReadyResolve(elm);
+    elmData.onReadyResolve(elm);
   }
 
   // ( •_•)

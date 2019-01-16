@@ -1,3 +1,4 @@
+import { attributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
@@ -568,46 +569,6 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
   connectNode(parentNode.ownerDocument, newNode);
 
   return newNode;
-}
-
-function connectNode(ownerDocument: any, node: MockNode) {
-  node.ownerDocument = ownerDocument;
-
-  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    if (node.nodeName.includes('-') && typeof (node as any).connectedCallback === 'function') {
-      if (node.isConnected) {
-        (node as any).connectedCallback();
-      }
-    }
-    node.childNodes.forEach(childNode => {
-      connectNode(ownerDocument, childNode);
-    });
-
-  } else {
-    node.childNodes.forEach(childNode => {
-      childNode.ownerDocument = ownerDocument;
-    });
-  }
-}
-
-function disconnectNode(node: MockNode) {
-  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    if (node.nodeName.includes('-') && typeof (node as any).disconnectedCallback === 'function') {
-      (node as any).disconnectedCallback();
-    }
-    node.childNodes.forEach(disconnectNode);
-  }
-}
-
-function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
-  if (node.nodeName.includes('-') && typeof (node as any).attributeChangedCallback === 'function') {
-    attrName = attrName.toLowerCase();
-
-    const observedAttributes = (node as any).constructor.observedAttributes as string[];
-    if (observedAttributes != null && observedAttributes.some(obs => obs.toLowerCase() === attrName)) {
-      (node as any).attributeChangedCallback(attrName, oldValue, newValue);
-    }
-  }
 }
 
 const NOT_IMPL = `is not implemented for MockElement. For unit tests, instead try document.getElementById(), document.getElementsByTagName(), or document.getElementsByClassName()`;

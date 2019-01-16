@@ -59,7 +59,7 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
     const tagName = node.nodeName.toLowerCase();
 
-    const ignoreTag = (opts.excludeTags && opts.excludeTags.includes(tagName));
+    const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName));
 
     if (!ignoreTag) {
 

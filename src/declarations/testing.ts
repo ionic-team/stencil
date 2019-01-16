@@ -1,4 +1,4 @@
-
+import * as d from '.';
 
 declare global {
   namespace jest {
@@ -148,7 +148,6 @@ export interface EventInitDict {
 
 
 export interface JestEnvironmentGlobal {
-  BUILD: any;
   __NEW_TEST_PAGE__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
@@ -447,4 +446,13 @@ export interface EmulateViewport {
    */
   isLandscape?: boolean;
 
+}
+
+
+export interface NewSpecPageOptions {
+  components: any[];
+  html?: string;
+  url?: string;
+  flushQueue?: boolean;
+  build?: d.Build;
 }

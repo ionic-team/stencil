@@ -61,7 +61,6 @@ export interface ModeBundleIds {
 export interface ElementData {
   ancestorHostElement?: d.HostElement;
   elm?: d.HostElement;
-  firedDidLoad?: boolean;
   hasConnected?: boolean;
   hasRendered?: boolean;
   isActiveRender?: boolean;
@@ -80,7 +79,11 @@ export interface ElementData {
 }
 
 export interface PlatformRuntime {
+  appMode?: string;
   isTmpDisconnected: boolean;
+  queueCongestion?: number;
+  queuePending?: boolean;
+  supportsShadowDom?: boolean;
 }
 
 export type RefMap = WeakMap<any, ElementData>;
@@ -90,3 +93,5 @@ export type StyleMap = Map<string, string>;
 export type RootAppliedStyleMap = WeakMap<Element, Set<string>>;
 
 export type AppliedStyleMap = Set<string>;
+
+export type ActivelyProcessingCmpMap = Set<Element>;

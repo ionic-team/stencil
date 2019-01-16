@@ -2,7 +2,16 @@
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Performance
  */
-export class MockPerformance {
+export class MockPerformance implements Performance {
+  timeOrigin: number;
+
+  constructor() {
+    this.timeOrigin = Date.now();
+  }
+
+  addEventListener() {
+    //
+  }
 
   clearMarks() {
     //
@@ -16,16 +25,20 @@ export class MockPerformance {
     //
   }
 
+  dispatchEvent() {
+    return true;
+  }
+
   getEntries() {
-    //
+    return [] as any;
   }
 
   getEntriesByName() {
-    //
+    return [] as any;
   }
 
   getEntriesByType() {
-    //
+    return [] as any;
   }
 
   mark() {
@@ -36,16 +49,36 @@ export class MockPerformance {
     //
   }
 
+  get navigation() {
+    return {} as any;
+  }
+
   now() {
-    return Date.now();
+    return Date.now() - this.timeOrigin;
+  }
+
+  get onresourcetimingbufferfull() {
+    return null as any;
+  }
+
+  removeEventListener() {
+    //
   }
 
   setResourceTimingBufferSize() {
     //
   }
 
+  get timing() {
+    return {} as any;
+  }
+
   toJSON() {
     //
+  }
+
+  $reset() {
+    this.timeOrigin = Date.now();
   }
 
 }

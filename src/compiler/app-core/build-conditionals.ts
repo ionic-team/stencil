@@ -174,3 +174,9 @@ export function getDefaultBuildConditionals() {
   };
   return b;
 }
+
+export function resetBuildConditionals(b: d.Build) {
+  Object.assign(b, getDefaultBuildConditionals());
+}
+
+export const BUILD = getDefaultBuildConditionals();

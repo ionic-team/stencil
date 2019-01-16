@@ -129,7 +129,7 @@ export function createPlatformServer(
   // setup the root node of all things
   // which is the mighty <html> tag
   const rootElm = domApi.$doc.documentElement as d.HostElement;
-  rootElm['s-ld'] = [];
+  // rootElm['s-ld'] = [];
   rootElm['s-rn'] = true;
 
   rootElm['s-init'] = function appLoadedCallback() {

@@ -1,24 +1,26 @@
 import * as d from '../../declarations';
 import { expectExtend } from '../matchers';
-import { getDefaultBuildConditionals } from '../../compiler/app-core/build-conditionals';
-import { h } from '../../renderer/vdom/h';
-import { applyWindowToGlobal } from '@stencil/core/mock-doc';
+import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 
 
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global.BUILD = getDefaultBuildConditionals();
   global.Context = {};
-  global.h = h;
   global.resourcesUrl = '/build';
-
-  applyWindowToGlobal(global);
 
   expect.extend(expectExtend);
 
+  setupGlobal(global);
+
+  afterEach(() => {
+    teardownGlobal(global);
+    global.Context = {};
+    global.resourcesUrl = '/build';
+  });
+
   const jasmineEnv = (jasmine as any).getEnv();
-  if (jasmineEnv) {
+  if (jasmineEnv != null) {
     jasmineEnv.addReporter({
       specStarted: (spec: any) => {
         global.currentSpec = spec;

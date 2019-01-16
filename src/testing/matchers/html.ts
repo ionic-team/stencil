@@ -11,7 +11,8 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
     serializeA = serializeNodeToHtml((input as any), {
       pretty: true,
-      outerHTML: true
+      outerHTML: true,
+      excludeTags: ['body']
     });
 
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
@@ -34,7 +35,8 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
   const parseB = parseHtmlToFragment(shouldEqual);
 
   const serializeB = serializeNodeToHtml(parseB, {
-    pretty: true
+    pretty: true,
+    excludeTags: ['body']
   });
 
   if (serializeA !== serializeB) {

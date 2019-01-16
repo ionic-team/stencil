@@ -18,19 +18,28 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../dist/transpiled-client",
+    "outDir": "../../dist/transpiled-runtime",
     "pretty": true,
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@stencil/core/build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
+      ],
+      "@stencil/core/platform": [
+        "../client/index.ts"
+      ],
+      "@stencil/core/renderer/vdom": [
+        "../renderer/vdom/index.ts"
       ]
     }
   },
-  "files": [
+  "include": [
     "./index.ts",
     "../index.ts",
-    "./polyfills/css-shim/index.ts"
+    "../client/polyfills/"
+  ],
+  "exclude": [
+    "../client/polyfills/css-shim/test/"
   ]
 }

@@ -1,5 +1,6 @@
 import * as d from '../declarations';
-import { rootAppliedStyles, styles } from './data';
+import { BUILD } from '@stencil/core/build-conditionals';
+import { doc, rootAppliedStyles, styles } from '@stencil/core/platform';
 
 
 export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
@@ -33,7 +34,7 @@ export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HT
     if (!appliedStyles.has(styleId)) {
       dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
 
-      styleElm = document.createElement('style');
+      styleElm = doc.createElement('style');
       styleElm.innerHTML = styles.get(styleId);
 
       styleContainerNode.insertBefore(

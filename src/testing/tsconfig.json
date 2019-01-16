@@ -12,7 +12,7 @@
       "dom",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -23,8 +23,20 @@
     "rootDir": "../",
     "baseUrl": ".",
     "paths": {
+      "@stencil/core/build-conditionals": [
+        "../compiler/app-core/build-conditionals.ts"
+      ],
       "@stencil/core/mock-doc": [
-        "../../dist/mock-doc"
+        "../mock-doc/index.ts"
+      ],
+      "@stencil/core/platform": [
+        "./testing-platform.ts"
+      ],
+      "@stencil/core/renderer/vdom": [
+        "../renderer/vdom/index.ts"
+      ],
+      "@stencil/core/runtime": [
+        "../runtime/index.ts"
       ]
     },
     "target": "es2015"

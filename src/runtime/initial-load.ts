@@ -1,7 +1,6 @@
 import * as d from '../declarations';
-import { appMode, supportsShadowDom } from './data';
-import { consoleError } from './log';
-import { loadModuleImport } from './load-module-import';
+import { BUILD } from '@stencil/core/build-conditionals';
+import { consoleError, doc, loadModule, plt } from '@stencil/core/platform';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 import { writeTask } from './task-queue';
@@ -30,7 +29,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
-      elm.mode = elm.getAttribute('mode') || appMode;
+      elm.mode = elm.getAttribute('mode') || plt.appMode;
     }
 
     if (BUILD.slotPolyfill) {
@@ -38,19 +37,19 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if (!elm['s-cr'] && (!supportsShadowDom || !cmpMeta.scopedCssEncapsulation)) {
+      if (!elm['s-cr'] && (!plt.supportsShadowDom || !cmpMeta.scopedCssEncapsulation)) {
         // only required when we're NOT using native shadow dom (slot)
         // or this browser doesn't support native shadow dom
         // and this host element was NOT created with SSR
         // let's pick out the inner content for slot projection
         // create a node to represent where the original
         // content was first placed, which is useful later on
-        elm['s-cr'] = document.createTextNode('') as any;
+        elm['s-cr'] = doc.createTextNode('') as any;
         elm['s-cr']['s-cn'] = true;
         elm.insertBefore(elm['s-cr'], elm.firstChild);
       }
 
-      if ((BUILD.es5 || BUILD.scoped) && !supportsShadowDom && cmpMeta.scopedCssEncapsulation) {
+      if ((BUILD.es5 || BUILD.scoped) && !plt.supportsShadowDom && cmpMeta.scopedCssEncapsulation) {
         // initUpdate, BUILD.es5 || scoped
         // this component should use shadow dom
         // but this browser doesn't support it
@@ -72,7 +71,7 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
 
     if (BUILD.lazyLoad) {
       try {
-        const LazyCstr = await loadModuleImport(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
+        const LazyCstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
 
         if (BUILD.member && !LazyCstr.isProxied && cmpMeta.members) {
           // we'eve never proxied this Constructor before

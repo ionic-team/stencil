@@ -23,14 +23,20 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
+      "@stencil/core/build-conditionals": [
+        "./compiler/app-core/build-conditionals.ts"
+      ],
       "@stencil/core/mock-doc": [
         "../dist/mock-doc"
+      ],
+      "@stencil/core/testing": [
+        "./testing/index.ts"
       ]
     }
   },
   "include": [
     "index.ts",
     "../types/*.d.ts",
-    "client/**/*.ts"
+    "runtime/**/*.ts"
   ]
 }

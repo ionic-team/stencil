@@ -7,30 +7,40 @@ const buildPolyfills = require('./build-polyfills');
 const ROOT_DIR = path.join(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
 const DST_DIR = path.join(ROOT_DIR, 'dist');
-const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-client');
-const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
+const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-runtime');
+const DIST_RUNTIME_DIR = path.join(DST_DIR, 'runtime');
 
-const inputFile = path.join(TRANSPILED_DIR, 'client', 'index.js');
-const outputFile = path.join(DIST_CLIENT_DIR, 'index.js');
+const inputFile = path.join(TRANSPILED_DIR, 'runtime', 'index.js');
 
-const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
+const outputPolyfillsDir = path.join(DIST_RUNTIME_DIR, 'polyfills');
 const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 
-async function bundleClientCore() {
+async function bundleRuntime() {
   const build = await rollup.rollup({
     input: inputFile,
+    external: [
+      '@stencil/core/build-conditionals',
+      '@stencil/core/platform',
+      '@stencil/core/renderer/vdom'
+    ],
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
       console.error(message);
     }
   });
 
-  const results = await build.generate({
-    format: 'es',
-  });
+  await Promise.all([
+    build.write({
+      format: 'es',
+      file: path.join(DIST_RUNTIME_DIR, 'index.mjs')
+    }),
+    build.write({
+      format: 'cjs',
+      file: path.join(DIST_RUNTIME_DIR, 'index.js')
+    })
+  ]);
 
-  fs.writeFileSync(outputFile, results.code);
 }
 
 
@@ -78,7 +88,7 @@ function createPublicTypeExports() {
 }
 
 
-function createClientDts() {
+function createDts() {
   const declarationSrcFiles = [
     path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
     path.join(SRC_DIR, 'declarations', 'jsx.ts'),
@@ -89,7 +99,7 @@ function createClientDts() {
     .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
     .join('\n');
 
-  const declarationsFilePath = path.join(DIST_CLIENT_DIR, 'declarations', 'stencil.core.d.ts');
+  const declarationsFilePath = path.join(DIST_RUNTIME_DIR, 'declarations', 'stencil.core.d.ts');
   fs.emptyDirSync(path.dirname(declarationsFilePath));
   fs.writeFileSync(declarationsFilePath, declarationsFileContents);
 }
@@ -97,17 +107,17 @@ function createClientDts() {
 
 process.on('exit', () => {
   fs.removeSync(TRANSPILED_DIR);
-  console.log(`✅ client: ${outputFile}`);
+  console.log(`✅ runtime`);
 });
 
 
-const success = transpile(path.join('..', 'src', 'client', 'tsconfig.json'));
+const success = transpile(path.join('..', 'src', 'runtime', 'tsconfig.json'));
 
 if (success) {
-  fs.emptyDirSync(DIST_CLIENT_DIR);
+  fs.emptyDirSync(DIST_RUNTIME_DIR);
 
-  bundleClientCore();
-  createClientDts();
+  bundleRuntime();
+  createDts();
   createPublicTypeExports();
   createPublicJavaScriptExports();
   buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);

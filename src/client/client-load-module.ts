@@ -1,16 +1,17 @@
 import * as d from '../declarations';
-import { consoleError } from './log';
+import { BUILD } from '@stencil/core/build-conditionals';
+import { consoleError } from './client-log';
 import { dashToPascalCase } from '../util/helpers';
-import { supportsShadowDom } from './data';
+import { plt } from './client-data';
 
 
-export const loadModuleImport = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {
+export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {
   // loadModuleImport
   const bundleId = (BUILD.mode && typeof bundleIds !== 'string')
     ? (bundleIds as d.BundleIds)[elm.mode]
     : bundleIds;
 
-  const useScopedCss = (BUILD.shadowDom && !supportsShadowDom);
+  const useScopedCss = (BUILD.shadowDom && !plt.supportsShadowDom);
   const url = `./${BUILD.appNamespaceLower}/${bundleId + (useScopedCss ? '.sc' : '')}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
 
   return __import(

@@ -252,9 +252,9 @@ export interface HostElement extends HTMLElement {
 
   /**
    * Is Active Loading:
-   * Array of child host elements that are actively loading.
+   * Set of child host elements that are actively loading.
    */
-  ['s-ld']?: HostElement[];
+  ['s-al']?: Set<HostElement>;
 
   /**
    * Has Rendered:

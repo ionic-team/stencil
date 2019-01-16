@@ -2,43 +2,28 @@ import { MockWindow } from './window';
 
 
 export function setupGlobal(global: any) {
-  teardownGlobal(global);
+  if (global.window == null) {
+    global.window = new MockWindow();
 
-  Object.defineProperty(global, 'window', {
-    get() {
-      if (global._window == null) {
-        global._window = new MockWindow();
-      }
-      return global._window;
-    },
-    set(win: any) {
-      global._window = win;
-    },
-    configurable: true
-  });
-
-  WINDOW_PROPERTIES.forEach(winProperty => {
-    Object.defineProperty(global, winProperty, {
-      get() {
-        if (global._window == null) {
-          global._window = new MockWindow();
-        }
-        return global._window[winProperty];
-      },
-      set(val: any) {
-        if (global._window == null) {
-          global._window = new MockWindow();
-        }
-        global._window[winProperty] = val;
-      },
-      configurable: true
+    WINDOW_PROPERTIES.forEach(winProperty => {
+      Object.defineProperty(global, winProperty, {
+        get() {
+          return global.window[winProperty];
+        },
+        set(val: any) {
+          global.window[winProperty] = val;
+        },
+        configurable: true
+      });
     });
-  });
+  }
+
+  return global.window;
 }
 
 
 export function teardownGlobal(global: any) {
-  const win = global._window as MockWindow;
+  const win = global.window as MockWindow;
   if (win != null) {
     win.$reset();
   }

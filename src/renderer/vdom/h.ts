@@ -8,6 +8,7 @@
  */
 
 import * as d from '../../declarations';
+import { BUILD } from '@stencil/core/build-conditionals';
 import { FunctionalUtilities } from '../../declarations';
 
 const stack: any[] = [];

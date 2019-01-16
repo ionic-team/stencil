@@ -47,9 +47,9 @@ const localLaunchers = {
 			'--remote-debugging-port=9333'
 		]
   },
-  'Firefox': {
-    base: 'Firefox'
-  }
+  // 'Firefox': {
+  //   base: 'Firefox'
+  // }
 };
 
 module.exports = function(config) {
@@ -90,18 +90,20 @@ module.exports = function(config) {
     customLaunchers: browserStack ? browserStackLaunchers : {},
 
     files: [
-      'test-app/**/*.spec.ts',
+      'test-app/attribute-basic/karma.spec.ts',
+      // 'test-app/**/*.spec.ts',
       'test-app/util.ts',
-      'www/build/testapp.js',
-      'www/build/testsibling.js',
-      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true }
+      // 'www/build/testapp.js',
+      { pattern: 'www/build/testapp.js', nocache: true, type: 'module' },
+      // 'www/build/testsibling.js',
+      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
     ],
 
     proxies: {
       '/www/': '/base/www/',
-      '/build/testapp.js': '/base/www/noscript.js',
-      '/build/testsibling.js': '/base/www/noscript.js',
-      '/esm-webpack/main.js': '/base/www/noscript.js',
+      '/build/testapp.js': '/base/www/build/testapp.js',
+      // '/build/testsibling.js': '/base/www/noscript.js',
+      // '/esm-webpack/main.js': '/base/www/noscript.js',
       '/prerender/': '/base/www/prerender/'
     },
 

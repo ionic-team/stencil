@@ -9,23 +9,25 @@ import { MockPerformance } from './performance';
 import { MockStorage } from './storage';
 
 
-const customElementMap = new WeakMap<MockWindow, MockCustomElementRegistry>();
 const historyMap = new WeakMap<MockWindow, MockHistory>();
 const htmlElementCstrMap = new WeakMap<MockWindow, any>();
 const localStorageMap = new WeakMap<MockWindow, MockStorage>();
 const locMap = new WeakMap<MockWindow, MockLocation>();
 const navMap = new WeakMap<MockWindow, MockNavigator>();
-const perfMap = new WeakMap<MockWindow, MockPerformance>();
 const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
 const eventClassMap = new WeakMap<MockWindow, any>();
 const customEventClassMap = new WeakMap<MockWindow, any>();
 
 
 export class MockWindow {
+  customElements: CustomElementRegistry;
   document: Document;
+  performance: Performance;
 
   constructor(html: string = null) {
     this.document = new MockDocument(html, this) as any;
+    this.performance = new MockPerformance();
+    this.customElements = new MockCustomElementRegistry(this as any);
   }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
@@ -34,18 +36,6 @@ export class MockWindow {
 
   close() {
     this.$reset();
-  }
-
-  get customElements() {
-    let customElements = customElementMap.get(this);
-    if (customElements == null) {
-      customElements = new MockCustomElementRegistry(this as any);
-      customElementMap.set(this, customElements);
-    }
-    return customElements;
-  }
-  set customElements(val: any) {
-    customElementMap.set(this, val);
   }
 
   dispatchEvent(ev: MockEvent) {
@@ -118,18 +108,6 @@ export class MockWindow {
   }
   set navigator(nav: any) {
     navMap.set(this, nav);
-  }
-
-  get performance() {
-    let perf = perfMap.get(this);
-    if (perf == null) {
-      perf = new MockPerformance();
-      perfMap.set(this, perf);
-    }
-    return perf;
-  }
-  set performance(perf: any) {
-    perfMap.set(this, perf);
   }
 
   parent: any = null;
@@ -232,14 +210,16 @@ export class MockWindow {
   }
 
   $reset() {
+    if (this.customElements != null) {
+      (customElements as MockCustomElementRegistry).$reset();
+    }
+
     if (this.document != null) {
       ((this.document as any) as MockDocument).$reset();
     }
 
-    const customElements = customElementMap.get(this);
-    if (customElements != null) {
-      customElements.$reset();
-      customElementMap.delete(this);
+    if (this.performance != null) {
+      (this.performance as MockPerformance).$reset();
     }
 
     historyMap.delete(this);
@@ -247,7 +227,6 @@ export class MockWindow {
     localStorageMap.delete(this);
     locMap.delete(this);
     navMap.delete(this);
-    perfMap.delete(this);
     sessionStorageMap.delete(this);
     eventClassMap.delete(this);
     customEventClassMap.delete(this);

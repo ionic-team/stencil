@@ -10,7 +10,7 @@
       "dom",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -19,7 +19,16 @@
     "outDir": "../../../dist/transpiled-renderer-vdom",
     "pretty": true,
     "rootDir": "../../",
-    "target": "es2015"
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/build-conditionals": [
+        "../../compiler/app-core/build-conditionals.ts"
+      ],
+      "@stencil/core/platform": [
+        "../../client/index.ts"
+      ]
+    }
   },
   "include": [
     "../../../types/*.d.ts"

@@ -1,15 +1,15 @@
 import * as d from '../declarations';
+import { BUILD } from '@stencil/core/build-conditionals';
 import { connectedCallback } from './connected';
+import { refs, resolved } from '@stencil/core/platform';
 import { disconnectedCallback } from './disconnected';
 import { initHostComponent } from './init-host-component';
-import { refs } from './data';
-import { resolved } from './task-queue';
+import { initialLoad } from './initial-load';
+import { update } from './update';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
   // bootstrapLazy
-
-  // [{ios: 'abc12345', md: 'dec65432'}, ['ion-icon', []], ['ion-button',[]]]
 
   lazyBundles.forEach(lazyBundle =>
 
@@ -17,7 +17,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
 
       cmpLazyMeta.lazyBundleIds = lazyBundle[0];
 
-      class StencilLayHost extends HTMLElement {
+      class StencilLazyHost extends HTMLElement {
         // StencilLazyHost
 
         connectedCallback() {
@@ -31,14 +31,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
         }
 
         's-init'() {
-          if (BUILD.lazyLoad) {
-            // initComponentLoaded(plt, this);
-          }
+          initialLoad(this, refs.get(this), cmpLazyMeta);
         }
 
         forceUpdate() {
           if (BUILD.updatable) {
-            // queueUpdate(plt, this, plt.getElmData(this));
+            const elmData = refs.get(this);
+            update(this, elmData.instance, elmData, cmpLazyMeta);
           }
         }
 
@@ -57,10 +56,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
 
       }
 
-      customElements.define(
-        cmpLazyMeta.cmpTag,
-        initHostComponent(StencilLayHost as any, cmpLazyMeta)
-      );
+      if (!customElements.get(cmpLazyMeta.cmpTag)) {
+        customElements.define(
+          cmpLazyMeta.cmpTag,
+          initHostComponent(StencilLazyHost as any, cmpLazyMeta)
+        );
+      }
     })
 
   );

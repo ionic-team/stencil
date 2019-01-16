@@ -13,15 +13,15 @@ export const config: Config = {
       type: 'www',
       empty: false
     },
-    {
-      type: 'webcomponent',
-      dir: 'www/webcomponent',
-      empty: false
-    },
-    {
-      type: 'dist',
-      dir: 'test-dist'
-    }
+    // {
+    //   type: 'webcomponent',
+    //   dir: 'www/webcomponent',
+    //   empty: false
+    // },
+    // {
+    //   type: 'dist',
+    //   dir: 'test-dist'
+    // }
   ],
   copy: [
     { src: '**/*.html' },
@@ -40,5 +40,7 @@ export const config: Config = {
       disableDotRule: true,
       index: 'index.html'
     }
-  }
+  },
+  exposeAppOnReady: true,
+  exposeAppRegistry: true
 };

@@ -8,6 +8,7 @@
  */
 
 import * as d from '../../declarations';
+import { BUILD } from '@stencil/core/build-conditionals';
 import { toLowerCase } from '../../util/helpers';
 
 

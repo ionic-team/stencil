@@ -17,8 +17,8 @@ const success = transpile(path.join('..', 'src', 'testing', 'tsconfig.json'));
 
 if (success) {
 
-  function bundleTestingUtils() {
-    rollup.rollup({
+  async function bundleTesting() {
+    const build = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'assert',
@@ -43,14 +43,22 @@ if (success) {
         'vm',
         'yargs',
         'zlib',
-        '../mock-doc'
+        '../compiler',
+        '../mock-doc',
+        '../runtime',
       ],
       plugins: [
         (() => {
           return {
             resolveId(id) {
+              if (id === '@stencil/core/build-conditionals') {
+                return '../compiler';
+              }
               if (id === '@stencil/core/mock-doc') {
                 return '../mock-doc';
+              }
+              if (id === '@stencil/core/runtime') {
+                return '../runtime';
               }
             }
           }
@@ -67,33 +75,23 @@ if (success) {
         if (message.code === 'CIRCULAR_DEPENDENCY') return;
         console.error(message);
       }
+    });
 
-    }).then(bundle => {
+    // copy over all the .d.ts file too
+    fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
+      filter: (src) => {
+        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
+      }
+    });
 
-      // copy over all the .d.ts file too
-      fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
-        filter: (src) => {
-          return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-        }
-      });
-
-      // bundle up the testing utilities into one js file
-      bundle.write({
-        format: 'cjs',
-        file: DEST_FILE
-
-      }).catch(err => {
-        console.log(`build testing error: ${err}`);
-        process.exit(1);
-      });
-
-    }).catch(err => {
-      console.log(`build testing error: ${err}`);
-      process.exit(1);
+    // bundle up the testing utilities into one js file
+    await build.write({
+      format: 'cjs',
+      file: DEST_FILE
     });
   }
 
-  bundleTestingUtils();
+  bundleTesting();
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
@@ -101,4 +99,3 @@ if (success) {
   });
 
 }
-

@@ -9,6 +9,18 @@ describe('parseHtml', () => {
     doc = new MockDocument();
   });
 
+  it('body innerHTML/querySelector', () => {
+    doc = new MockDocument();
+
+    doc.body.innerHTML = '<cmp-a>text</cmp-a>';
+
+    expect(doc.body.innerHTML).toBe(`<cmp-a>text</cmp-a>`);
+    expect(doc.body.outerHTML).toBe(`<body><cmp-a>text</cmp-a></body>`);
+
+    const article = doc.querySelector('cmp-a');
+    expect(article.tagName).toBe('CMP-A');
+  });
+
   it('template', () => {
     doc = new MockDocument(`
       <template>text</template>

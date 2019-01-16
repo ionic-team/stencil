@@ -124,9 +124,6 @@ export class MockDocument extends MockElement {
   }
 
   $reset() {
-    if (this.documentElement != null) {
-      this.documentElement.childNodes.length = 0;
-    }
     if (this.body != null) {
       this.body.childNodes.length = 0;
     }

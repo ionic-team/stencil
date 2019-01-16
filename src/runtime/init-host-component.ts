@@ -1,4 +1,5 @@
 import * as d from '../declarations';
+import { BUILD } from '@stencil/core/build-conditionals';
 import { proxyComponent } from './proxy-component';
 
 

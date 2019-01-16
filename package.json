@@ -13,6 +13,7 @@
     "dist/",
     "mock-doc/",
     "polyfills/",
+    "runtime/",
     "screenshot/",
     "server/",
     "sys/",
@@ -22,12 +23,12 @@
     "build": "node scripts/build.js",
     "build.cli": "node scripts/build-cli.js",
     "build.compiler": "node scripts/build-compiler.js",
-    "build.client": "node scripts/build-client.js",
-    "build.polyfills": "node scripts/build-polyfills.js",
-    "build.renderer.vdom": "node scripts/build-renderer-vdom.js",
-    "build.server": "node scripts/build-server.js",
     "build.dev.server": "node scripts/build-dev-server.js",
     "build.dev.server.client": "node scripts/build-dev-server-client.js",
+    "build.polyfills": "node scripts/build-polyfills.js",
+    "build.renderer.vdom": "node scripts/build-renderer-vdom.js",
+    "build.runtime": "node scripts/build-runtime.js",
+    "build.server": "node scripts/build-server.js",
     "build.mock-doc": "node scripts/build-mock-doc.js",
     "build.prod": "node scripts/build-prod.js",
     "build.screenshot": "node scripts/build-screenshot.js",
@@ -35,6 +36,7 @@
     "build.sys.node": "node scripts/build-sys-node.js",
     "build.testing": "node scripts/build-testing.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "jest.clearCache": "jest --clearCache",
     "lint": "tslint --project src/tsconfig.json",
     "release": "node scripts/release.js",
     "release.prepare": "node scripts/release.js --prepare",
@@ -154,9 +156,6 @@
       "/scripts",
       "/www"
     ],
-    "moduleNameMapper": {
-      "@stencil/core/mock-doc": "<rootDir>/mock-doc/"
-    },
     "testPathIgnorePatterns": [
       "<rootDir>/.stencil/",
       "<rootDir>/bin/",
