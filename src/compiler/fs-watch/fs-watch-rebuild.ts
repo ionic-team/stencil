@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { isCopyTaskFile } from '../copy/config-copy-tasks';
-import { hasServiceWorkerChanges, normalizePath, pathJoin } from '../util';
+import { hasServiceWorkerChanges, normalizePath, pathJoin } from '@stencil/core/utils';
 
 
 export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {

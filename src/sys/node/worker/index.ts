@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '../../../compiler/util';
+import { TASK_CANCELED_MSG } from '@stencil/core/utils';
 import { WorkerMain } from './worker-main';
 
 

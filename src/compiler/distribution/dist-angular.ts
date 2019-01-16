@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { dashToPascalCase } from '../../util/helpers';
-import { MEMBER_TYPE } from '../../util/constants';
-import { isDocsPublic } from '../util';
+import { dashToPascalCase } from '@stencil/core/utils';
+import { MEMBER_TYPE } from '@stencil/core/utils';
+import { isDocsPublic } from '@stencil/core/utils';
 import { OutputTargetAngular } from '../../declarations';
 
 

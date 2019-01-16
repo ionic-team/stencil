@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from '../app/app-file-naming';
-import { formatBrowserLoaderComponent } from '../../util/data-serialize';
-import { normalizePath, pathJoin } from '../util';
-import { dashToPascalCase } from '../../util/helpers';
+// import { formatBrowserLoaderComponent } from '../../util/data-serialize';
+import { normalizePath, pathJoin } from '@stencil/core/utils';
+import { dashToPascalCase } from '@stencil/core/utils';
 
 
 export async function generateEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
@@ -64,8 +64,8 @@ export async function generateEsmHosts(config: d.Config, compilerCtx: d.Compiler
   }
 
   const esmImports: EsmImport[] = Object.keys(cmpRegistry).sort().map(tagName => {
-    const cmpMeta = cmpRegistry[tagName];
-    const data = formatBrowserLoaderComponent(cmpMeta);
+    // const cmpMeta = cmpRegistry[tagName];
+    const data = 'formatBrowserLoaderComponent(cmpMeta)';
     return {
       name: dashToPascalCase(tagName),
       data,

@@ -21,8 +21,8 @@ const success = transpile(path.join('..', 'src', 'dev-server', 'tsconfig.json'))
 
 if (success) {
 
-  function bundleDevServer() {
-    rollup.rollup({
+  async function bundleDevServer() {
+    const build = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'buffer',
@@ -38,7 +38,8 @@ if (success) {
         'querystring',
         'url',
         'zlib',
-        '../sys/node/graceful-fs.js'
+        '../sys/node/graceful-fs.js',
+        '../utils'
       ],
       plugins: [
         (() => {
@@ -47,27 +48,26 @@ if (success) {
               if (importee === 'graceful-fs') {
                 return '../sys/node/graceful-fs.js';
               }
+              if (importee === '@stencil/core/utils') {
+                return '../utils';
+              }
             }
           }
         })(),
-        rollupResolve(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
-        console.error( message );
+        console.error(message);
       }
+    });
 
-    }).then(bundle => {
-
-      bundle.write({
-        format: 'cjs',
-        file: DEST_FILE
-
-      }).catch(err => {
-        console.log(`build dev.server error: ${err}`);
-        process.exit(1);
-      });
+    build.write({
+      format: 'cjs',
+      file: DEST_FILE
     });
   }
 

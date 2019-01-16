@@ -9,7 +9,7 @@
 
 import * as d from '../../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
-import { toLowerCase } from '../../util/helpers';
+import { toLowerCase } from '@stencil/core/utils';
 
 
 export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean) => {

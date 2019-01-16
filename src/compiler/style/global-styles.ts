@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, catchError, normalizePath, pathJoin } from '../util';
+import { buildError, catchError, normalizePath, pathJoin } from '@stencil/core/utils';
 import { getCssImports } from './css-imports';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { optimizeCss } from './optimize-css';

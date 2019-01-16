@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { hasError, normalizePath } from '../util';
+import { hasError, normalizePath } from '@stencil/core/utils';
 
 
 export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string, legacyBuild: boolean) {

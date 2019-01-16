@@ -15,7 +15,8 @@ module.exports = {
     "@stencil/core/renderer/vdom": "<rootDir>/dist/renderer/vdom/",
     "@stencil/core/runtime": "<rootDir>/dist/runtime/",
     "@stencil/core/testing": "<rootDir>/dist/testing/",
-    "@stencil/core": "<rootDir>/dist/testing/",
+    "@stencil/core/utils": "<rootDir>/dist/utils/",
+    "@stencil/core": "<rootDir>/dist/testing/"
   },
   setupTestFrameworkScriptFile: path.join(__dirname, 'jest.setuptestframework.js'),
   testEnvironment: path.join(__dirname, 'jest.environment.js'),

@@ -1,6 +1,6 @@
 import { CompilerCtx, ComponentRegistry, Config, OutputTargetWww } from '../declarations';
 import { getAppRegistry } from '../compiler/app/app-registry';
-import { ENCAPSULATION } from '../util/constants';
+import { ENCAPSULATION } from '@stencil/core/utils';
 
 
 export function loadComponentRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetWww) {

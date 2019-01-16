@@ -2,18 +2,18 @@ import * as d from '../declarations';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 // import { createRendererPatch } from '../renderer/vdom/patch';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '@stencil/core/utils';
 // import { enableEventListener } from '../core/listeners';
-import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
+// import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '@stencil/core/renderer/vdom';
 // import { initCoreComponentOnReady } from '../core/component-on-ready';
-import { noop } from '../util/helpers';
+import { noop } from '@stencil/core/utils';
 import { patchDomApi } from './dom-api-server';
 // import { proxyController } from '../core/proxy-controller';
 // import { queueUpdate } from '../core/update';
 import { serverAttachStyles, serverInitStyle } from './server-styles';
-import { toDashCase } from '../util/helpers';
+import { toDashCase } from '@stencil/core/utils';
 
 
 export function createPlatformServer(
@@ -217,7 +217,7 @@ export function createPlatformServer(
               const componentConstructor = bundleExports[pascalCasedTagName];
 
               if (!cmpMeta.componentConstructor) {
-                fillCmpMetaFromConstructor(componentConstructor, cmpMeta);
+                // fillCmpMetaFromConstructor(componentConstructor, cmpMeta);
 
                 if (!cmpMeta.componentConstructor) {
                   cmpMeta.componentConstructor = componentConstructor;

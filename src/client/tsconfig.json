@@ -25,6 +25,9 @@
     "paths": {
       "@stencil/core/build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
+      ],
+      "@stencil/core/utils": [
+        "../util/index.ts"
       ]
     }
   },

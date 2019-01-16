@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
+import { catchError } from '@stencil/core/utils';
 import { generateDistributions } from '../distribution/distribution';
 import { writeAppCollections } from '../collections/collection-data';
 

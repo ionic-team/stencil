@@ -1,4 +1,4 @@
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 import { gatherMetadata } from './test-utils';
 import { visitClass } from '../gather-metadata';
 import * as path from 'path';

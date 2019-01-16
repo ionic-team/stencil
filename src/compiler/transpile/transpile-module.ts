@@ -1,9 +1,7 @@
 import * as d from '../../declarations';
 // import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildContext } from '../build/build-ctx';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import { noop } from '../../util/helpers';
-import { normalizePath } from '../util';
+import { loadTypeScriptDiagnostics, noop, normalizePath } from '@stencil/core/utils';
 // import { removeCollectionImports } from './transformers/remove-collection-imports';
 // import { removeDecorators } from './transformers/remove-decorators';
 // import { removeStencilImports } from './transformers/remove-stencil-imports';

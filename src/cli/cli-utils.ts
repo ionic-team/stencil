@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function getConfigFilePath(process: NodeJS.Process, sys: d.StencilSystem, configArg: string) {

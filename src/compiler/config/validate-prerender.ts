@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { normalizePath } from '../util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {

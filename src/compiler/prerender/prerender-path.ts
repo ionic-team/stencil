@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
+import { catchError } from '@stencil/core/utils';
 import { Renderer } from '../../server/index';
 
 

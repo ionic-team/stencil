@@ -32,6 +32,9 @@
       ],
       "@stencil/core/renderer/vdom": [
         "../renderer/vdom/index.ts"
+      ],
+      "@stencil/core/utils": [
+        "../utils/index.ts"
       ]
     }
   },

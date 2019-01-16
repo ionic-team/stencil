@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getAppBuildDir } from '../app/app-file-naming';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath, pathJoin } from '@stencil/core/utils';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filesChanged: string[]) {

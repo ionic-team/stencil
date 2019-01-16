@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
-import { catchError } from './util';
+import { catchError } from '@stencil/core/utils';
 import { CompilerContext } from './build/compiler-ctx';
 import { docs } from './docs/docs';
 import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';

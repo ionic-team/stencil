@@ -1,4 +1,4 @@
-import * as c from '../../util/constants';
+import * as c from '@stencil/core/utils';
 import * as d from '../../declarations';
 import { buildWarn } from '../util';
 

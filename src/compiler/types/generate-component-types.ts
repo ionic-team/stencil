@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
+import { captializeFirstLetter, dashToPascalCase } from '@stencil/core/utils';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-file-naming';
-import { isDocsPublic, normalizePath } from '../util';
-import { MEMBER_TYPE } from '../../util/constants';
+import { isDocsPublic, normalizePath } from '@stencil/core/utils';
+import { MEMBER_TYPE } from '@stencil/core/utils';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 

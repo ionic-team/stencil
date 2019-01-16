@@ -46,6 +46,7 @@ if (success) {
         '../compiler',
         '../mock-doc',
         '../runtime',
+        '../utils'
       ],
       plugins: [
         (() => {
@@ -54,11 +55,17 @@ if (success) {
               if (id === '@stencil/core/build-conditionals') {
                 return '../compiler';
               }
+              if (id === '@stencil/core/compiler') {
+                return '../compiler';
+              }
               if (id === '@stencil/core/mock-doc') {
                 return '../mock-doc';
               }
               if (id === '@stencil/core/runtime') {
                 return '../runtime';
+              }
+              if (id === '@stencil/core/utils') {
+                return '../utils';
               }
             }
           }

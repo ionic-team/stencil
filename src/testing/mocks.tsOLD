@@ -11,7 +11,7 @@ import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
 import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
-import { noop } from '../util/helpers';
+import { noop } from '@stencil/core/utils';
 
 
 export { mockDocument, mockWindow };

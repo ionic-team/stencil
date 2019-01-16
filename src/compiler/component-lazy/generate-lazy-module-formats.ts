@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { bundleLazyModule } from './bundle-lazy-module';
-import { catchError, pathJoin } from '../util';
+import { catchError, pathJoin } from '@stencil/core/utils';
 import { RollupBuild } from 'rollup';
 import { updateToLazyComponent } from './update-to-lazy-component';
 

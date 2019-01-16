@@ -1,7 +1,7 @@
 import { gatherMetadata } from './test-utils';
 import { getMethodDecoratorMeta } from '../method-decorator';
 import * as path from 'path';
-import { MEMBER_TYPE } from '../../../../util/constants';
+import { MEMBER_TYPE } from '@stencil/core/utils';
 import { Config } from '../../../../declarations';
 import { mockConfig } from '../../../../testing/mocks';
 

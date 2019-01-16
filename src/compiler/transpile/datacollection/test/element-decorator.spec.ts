@@ -1,4 +1,4 @@
-import { MEMBER_TYPE } from '../../../../util/constants';
+import { MEMBER_TYPE } from '@stencil/core/utils';
 import { getElementDecoratorMeta } from '../element-decorator';
 import { gatherMetadata } from './test-utils';
 import * as path from 'path';

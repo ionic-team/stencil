@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function validateOutputTargetDist(config: d.Config) {

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { fillCmpMetaFromConstructor } from '../cmp-meta';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 
 
 describe('fillCmpMetaFromConstructor', () => {

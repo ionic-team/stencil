@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '../../compiler/util';
+import { catchError } from '@stencil/core/utils';
 import cssnano, { CssNanoOptions } from 'cssnano';
 import autoprefixer, { Options } from 'autoprefixer';
 import postcss, { AcceptedPlugin } from 'postcss';

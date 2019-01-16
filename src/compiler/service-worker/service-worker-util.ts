@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww) {

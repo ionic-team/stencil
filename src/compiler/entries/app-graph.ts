@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError } from '../util';
+import { buildError } from '@stencil/core/utils';
 
 
 export function processAppGraph(buildCtx: d.BuildCtx, allModules: d.Module[], entryTags: string[]) {

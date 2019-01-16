@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { resetBuildConditionals } from './testing-build';
-import { TestingCmpCstr } from './testing-decorators';
 
 
 export async function newSpecPage(opts: d.NewSpecPageOptions) {
@@ -27,88 +26,34 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   // see comment at the bottom of the page
   const runtime = require('@stencil/core/runtime');
 
-  const testingCmps = opts.components.map((Cstr: TestingCmpCstr) => {
-    const bundleId = Cstr.ComponentOptions.tag;
+  const testingCmps = opts.components.map((_Cstr: d.DecoratoredRuntimeConstructor) => {
+    // if (!Cstr.ComponentOptions) {
+    //   throw new Error(`@Component() decorator required`);
+    // }
 
-    if (!Cstr.ComponentOptions) {
-      throw new Error(`@Component() decorator required`);
-    }
+    // runtime.updateRuntimeBuild(BUILD, Cstr);
 
-    if (Cstr.ComponentOptions.shadow) {
-      BUILD.shadowDom = true;
-    }
-    if (Cstr.ComponentOptions.scoped) {
-      BUILD.scoped = true;
-    }
+    // const bundleId = Cstr.ComponentOptions.tag;
 
-    if (Cstr.Element) {
-      BUILD.element = true;
-      BUILD.member = true;
-    }
-
-    if (Cstr.Method) {
-      BUILD.method = true;
-      BUILD.member = true;
-    }
-
-    if (Cstr.Listen) {
-      BUILD.listener = true;
-      BUILD.member = true;
-    }
-
-    if (Cstr.Prop) {
-      BUILD.prop = true;
-      BUILD.member = true;
-      BUILD.updatable = true;
-      BUILD.observeAttr = true;
-
-      if (Cstr.PropMutable) {
-        BUILD.propMutable = true;
-      }
-      if (Cstr.ReflectToAttr) {
-        BUILD.reflectToAttr = true;
-      }
-    }
-
-    if (Cstr.State) {
-      BUILD.state = true;
-      BUILD.member = true;
-      BUILD.updatable = true;
-    }
-
-    if (Cstr.Watch) {
-      BUILD.watchCallback = true;
-    }
-
-    if (Cstr.prototype.connectedCallback) BUILD.connectedCallback = true;
-    if (Cstr.prototype.disconnectedCallback) BUILD.disconnectedCallback = true;
-    if (Cstr.prototype.componentWillLoad) BUILD.cmpWillLoad = true;
-    if (Cstr.prototype.componentDidLoad) BUILD.cmpDidLoad = true;
-    if (Cstr.prototype.componentWillUpdate) BUILD.cmpWillUpdate = true;
-    if (Cstr.prototype.componentDidUpdate) BUILD.cmpDidUpdate = true;
-    if (Cstr.prototype.componentDidUnload) BUILD.cmpDidUnload = true;
-    if (Cstr.prototype.render) BUILD.hasRenderFn = true;
-    if (Cstr.prototype.hostData) BUILD.hostData = true;
-
-    const ProxiedCstr = new Proxy<any>(Cstr, {
-      construct(target, args: any[]) {
-        const instance = new target();
-        runtime.registerLazyInstance(instance, args[0]);
-        return instance;
-      }
-    });
+    // const ProxiedCstr = new Proxy<any>(Cstr, {
+    //   construct(target, args: any[]) {
+    //     const instance = new target();
+    //     runtime.registerLazyInstance(instance, args[0]);
+    //     return instance;
+    //   }
+    // });
 
     const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
-      bundleId,
+      'bundleId',
       [{
-        cmpTag: Cstr.ComponentOptions.tag,
+        cmpTag: 'Cstr.ComponentOptions.tag',
         members: [],
-        scopedCssEncapsulation: !!Cstr.ComponentOptions.scoped,
-        shadowDomEncapsulation: !!Cstr.ComponentOptions.shadow
+        scopedCssEncapsulation: false,
+        shadowDomEncapsulation: false
       }]
     ];
 
-    registerModule(bundleId, ProxiedCstr);
+    // registerModule(bundleId, ProxiedCstr);
 
     return lazyBundleRuntimeMeta;
   });

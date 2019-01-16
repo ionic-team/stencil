@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, normalizePath, pathJoin } from '../util';
+import { buildError, normalizePath, pathJoin } from '@stencil/core/utils';
 import { parseStyleDocs } from '../docs/style-docs';
 
 

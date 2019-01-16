@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import * as path from 'path';
 import ts from 'typescript';
-import { normalizePath } from '../../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function loadConfigFile(fs: d.FileSystem, configPath: string, process?: NodeJS.Process) {

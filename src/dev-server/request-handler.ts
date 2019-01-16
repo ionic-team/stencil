@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { isDevClient } from './util';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';
 import { serve404, serve404Content } from './serve-404';

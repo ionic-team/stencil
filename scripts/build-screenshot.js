@@ -28,7 +28,8 @@ if (success) {
         'os',
         'path',
         'url',
-        '../sys/node/graceful-fs.js'
+        '../sys/node/graceful-fs.js',
+        '../utils'
       ],
       plugins: [
         (() => {
@@ -36,6 +37,9 @@ if (success) {
             resolveId(importee) {
               if (importee === 'graceful-fs') {
                 return '../sys/node/graceful-fs.js';
+              }
+              if (importee === '@stencil/core/utils') {
+                return '../utils';
               }
             }
           }
@@ -77,7 +81,8 @@ if (success) {
         'stream',
         'util',
         'zlib',
-        '../dist/sys/node/graceful-fs.js'
+        '../dist/sys/node/graceful-fs.js',
+        '../utils'
       ],
       plugins: [
         (() => {
@@ -85,6 +90,9 @@ if (success) {
             resolveId(importee) {
               if (importee === 'graceful-fs') {
                 return '../dist/sys/node/graceful-fs.js';
+              }
+              if (importee === '@stencil/core/utils') {
+                return '../utils';
               }
             }
           }

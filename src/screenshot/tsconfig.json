@@ -11,7 +11,7 @@
       "dom",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -20,7 +20,13 @@
     "outDir": "../../dist/transpiled-screenshot",
     "pretty": true,
     "rootDir": "../",
-    "target": "es2015"
+    "target": "es2015",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/utils": [
+        "../utils/index.ts"
+      ]
+    }
   },
   "include": [
     "../../types/*.d.ts"

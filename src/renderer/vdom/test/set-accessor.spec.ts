@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { mockPlatform } from '../../../testing/mocks';
-import { PROP_TYPE } from '../../../util/constants';
+import { PROP_TYPE } from '@stencil/core/utils';
 import { setAccessor } from '../set-accessor';
 
 describe('setAccessor for custom elements', () => {

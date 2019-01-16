@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { pathJoin } from '../util';
+import { pathJoin } from '@stencil/core/utils';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validatePrerender } from './validate-prerender';
 

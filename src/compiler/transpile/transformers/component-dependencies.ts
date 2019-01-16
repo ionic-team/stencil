@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getModuleFile } from '../../build/compiler-ctx';
-import { MEMBER_TYPE } from '../../../util/constants';
+import { MEMBER_TYPE } from '@stencil/core/utils';
 import ts from 'typescript';
 
 

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE } from '../../util/constants';
+import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 
 
 export function getComponentsWithStyles(build: d.Build) {

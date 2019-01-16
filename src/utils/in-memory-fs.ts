@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from './path-utils';
 
 
 export class InMemoryFileSystem implements d.InMemoryFileSystem {

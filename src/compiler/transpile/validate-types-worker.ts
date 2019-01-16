@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { loadTypeScriptDiagnostics, normalizePath } from '@stencil/core/utils';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
@@ -7,7 +7,6 @@ import { updateStencilTypesImports } from '../distribution/stencil-types';
 
 import * as path from 'path';
 import ts from 'typescript';
-import { normalizePath } from '../util';
 
 
 export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {

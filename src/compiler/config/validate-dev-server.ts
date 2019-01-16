@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath, pathJoin } from '@stencil/core/utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 
 

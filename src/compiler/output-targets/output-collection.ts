@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { pathJoin } from '../util';
+import { pathJoin } from '@stencil/core/utils';
 
 
 export async function generateCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

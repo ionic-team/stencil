@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildWarn } from '../../util';
-import { ENCAPSULATION } from '../../../util/constants';
+import { ENCAPSULATION } from '@stencil/core/utils';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import { getStylesMeta } from '../../transformers/static-to-meta/styles';
 import ts from 'typescript';

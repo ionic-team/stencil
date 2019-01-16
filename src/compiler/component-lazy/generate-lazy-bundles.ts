@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
+import { catchError } from '@stencil/core/utils';
 import { deriveLazyModules } from './derive-lazy-modules';
 import { generateLazyChunks } from './generate-lazy-chunks';
 import { generateLazyEntries } from './generate-lazy-entries';

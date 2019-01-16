@@ -1,5 +1,5 @@
 import { Config } from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@stencil/core/utils';
 import { setStringConfig } from './config-utils';
 import ts from 'typescript';
 

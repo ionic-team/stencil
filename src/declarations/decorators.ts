@@ -73,3 +73,19 @@ export interface StateDecorator {
 export interface WatchDecorator {
   (propName: string): CustomMethodDecorator<any>;
 }
+
+
+export interface DecoratoredRuntimeConstructor {
+  cmpMeta: d.ComponentLazyRuntimeMeta;
+  prototype: {
+    connectedCallback: Function;
+    disconnectedCallback: Function;
+    componentWillLoad: Function;
+    componentDidLoad: Function;
+    componentWillUpdate: Function;
+    componentDidUpdate: Function;
+    componentDidUnload: Function;
+    render: Function;
+    hostData: Function;
+  };
+}

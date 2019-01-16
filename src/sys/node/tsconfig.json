@@ -22,7 +22,13 @@
     "outDir": "../../../dist/transpiled-sys-node",
     "pretty": true,
     "rootDir": "../../",
-    "target": "es2015"
+    "target": "es2015",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/utils": [
+        "../../utils/index.ts"
+      ]
+    }
   },
   "files": [
     "./index.ts",

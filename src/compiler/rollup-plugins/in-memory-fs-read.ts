@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

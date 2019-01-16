@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
-import { getElementScopeId, getScopeId } from '../../util/scope';
+import { catchError, getElementScopeId, getScopeId } from '@stencil/core/utils';
 
 
 export async function scopeComponentCss(config: d.Config, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, mode: string, cssText: string) {

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { WEB_COMPONENTS_JSON_FILE_NAME } from '../../util/constants';
-import { normalizePath } from '../util';
+import { WEB_COMPONENTS_JSON_FILE_NAME } from '@stencil/core/utils';
+import { normalizePath } from '@stencil/core/utils';
 
 export async function generateWebComponentsJson(config: d.Config, compilerCtx: d.CompilerCtx, distOutputs: d.OutputTargetDist[], docsData: d.JsonDocs) {
   const json = {

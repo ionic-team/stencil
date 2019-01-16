@@ -42,10 +42,13 @@ if (success) {
 
 
 function bundleExternal(entryFileName) {
+  const utilsPath = '../../utils/index.js'
+
   const whitelist = [
     'child_process',
     'os',
-    'typescript'
+    'typescript',
+    '@stencil/core/utils'
   ];
 
   webpack({
@@ -66,6 +69,10 @@ function bundleExternal(entryFileName) {
       if (request.match(/^(\.{0,2})\//)) {
         // absolute and relative paths are not externals
         return callback();
+      }
+
+      if (request === '@stencil/core/utils') {
+        return callback(null, '../../utils');
       }
 
       if (whitelist.indexOf(request) > -1) {
@@ -109,12 +116,12 @@ function bundleExternal(entryFileName) {
 }
 
 
-function bundleNodeSysMain() {
+async function bundleNodeSysMain() {
   const fileName = 'index.js';
   const inputPath = path.join(TRANSPILED_DIR, 'sys', 'node', fileName);
   const outputPath = path.join(ROOT_DIR, 'dist', 'sys', 'node', fileName);
 
-  rollup.rollup({
+  const build = await rollup.rollup({
     input: inputPath,
     external: [
       'assert',
@@ -128,7 +135,8 @@ function bundleNodeSysMain() {
       'typescript',
       'url',
       'util',
-      './graceful-fs.js'
+      './graceful-fs.js',
+      '../../utils/index.js'
     ],
     plugins: [
       (() => {
@@ -139,6 +147,9 @@ function bundleNodeSysMain() {
             }
             if (importee === 'graceful-fs') {
               return './graceful-fs.js';
+            }
+            if (importee === '@stencil/core/utils') {
+              return '../../utils/index.js';
             }
           }
         }
@@ -153,39 +164,27 @@ function bundleNodeSysMain() {
       if (/top level of an ES module/.test(message)) return;
       console.error( message );
     }
-
-  }).then(bundle => {
-
-    return bundle.generate({
-      format: 'cjs',
-      file: outputPath
-
-    }).then(output => {
-      try {
-        let outputText = output.code;
-
-        const buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
-        outputText = outputText.replace(/__BUILDID__/g, buildId);
-
-        fs.ensureDirSync(path.dirname(outputPath));
-        fs.writeFileSync(outputPath, outputText);
-
-      } catch (e) {
-        console.error(`build sys.node error: ${e}`);
-      }
-
-    }).then(() => {
-      console.log(`✅ sys.node: ${fileName}`);
-
-    }).catch(err => {
-      console.error(`build sys.node error: ${err}`);
-      process.exit(1);
-    });
-
-  }).catch(err => {
-    console.error(`build sys.node error: ${err.stack}`);
-    process.exit(1);
   });
+
+  const results = await build.generate({
+    format: 'cjs',
+    file: outputPath
+  });
+
+  try {
+    let outputText = results.code;
+
+    const buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
+    outputText = outputText.replace(/__BUILDID__/g, buildId);
+
+    fs.ensureDirSync(path.dirname(outputPath));
+    fs.writeFileSync(outputPath, outputText);
+
+    console.log(`✅ sys.node: ${fileName}`);
+
+  } catch (e) {
+    console.error(`build sys.node error: ${e}`);
+  }
 }
 
 

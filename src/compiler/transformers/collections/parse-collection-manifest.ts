@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getModule } from '../../build/compiler-ctx';
-import { normalizePath } from '../../util';
+import { normalizePath } from '@stencil/core/utils';
 import { parseCollectionComponents } from './parse-collection-components';
 
 

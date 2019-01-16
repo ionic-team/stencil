@@ -1,5 +1,5 @@
 import { BuildResults, InMemoryFileSystem } from '../declarations';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function expectFiles(fs: InMemoryFileSystem, filePaths: string[]) {

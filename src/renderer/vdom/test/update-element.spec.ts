@@ -1,5 +1,5 @@
 import { mockPlatform } from '../../../testing/mocks';
-import { NODE_TYPE } from '../../../util/constants';
+import { NODE_TYPE } from '@stencil/core/utils';
 import { updateElement } from '../update-dom-node';
 import { VNode } from '../../../declarations';
 import * as setAccessor from '../set-accessor';

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { MAX_ERRORS, splitLineBreaks } from './logger-util';
-import { normalizePath } from '../../compiler/util';
+import { MAX_ERRORS, splitLineBreaks } from './logger-utils';
+import { normalizePath } from '../path-utils';
 import ts from 'typescript';
 
 
@@ -32,7 +32,7 @@ export function loadTypeScriptDiagnostic(config: d.Config, tsDiagnostic: ts.Diag
     lines: []
   };
 
-  if (tsDiagnostic.category === ts.DiagnosticCategory.Error) {
+  if (tsDiagnostic.category === 1) {
     d.level = 'error';
   }
 

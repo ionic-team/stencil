@@ -10,8 +10,7 @@ import * as d from '../../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { doc, plt } from '@stencil/core/platform';
 import { h } from './h';
-import { isDef, toLowerCase } from '../../util/helpers';
-import { NODE_TYPE } from '../../util/constants';
+import { NODE_TYPE, isDef, toLowerCase } from '@stencil/core/utils';
 import { updateElement } from './update-dom-node';
 
 

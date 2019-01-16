@@ -1,6 +1,6 @@
 import { gatherMetadata } from './test-utils';
 import { getStateDecoratorMeta } from '../state-decorator';
-import { MEMBER_TYPE } from '../../../../util/constants';
+import { MEMBER_TYPE } from '@stencil/core/utils';
 import * as path from 'path';
 
 

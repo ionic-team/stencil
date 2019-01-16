@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { dashToPascalCase } from '../../util/helpers';
-import { isDocsPublic } from '../util';
+import { dashToPascalCase } from '@stencil/core/utils';
+import { isDocsPublic } from '@stencil/core/utils';
 import { OutputTargetAngular } from '../../declarations';
 
 

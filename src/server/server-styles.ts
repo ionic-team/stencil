@@ -1,6 +1,5 @@
 import * as d from '../declarations';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
-import { getScopeId } from '../util/scope';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, getScopeId } from '@stencil/core/utils';
 
 
 export function serverInitStyle(domApi: d.DomApi, appliedStyleIds: Set<string>, cmpCtr: d.ComponentConstructor) {

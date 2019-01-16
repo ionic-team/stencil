@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';

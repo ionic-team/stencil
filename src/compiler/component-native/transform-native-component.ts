@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
+import { catchError, loadTypeScriptDiagnostics } from '@stencil/core/utils';
 import { isComponentClassNode } from '../transformers/transform-utils';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeStaticMetaProperties } from '../transformers/remove-static-meta-properties';
 import { removeStencilImport } from '../transformers/remove-stencil-import';
 import ts from 'typescript';

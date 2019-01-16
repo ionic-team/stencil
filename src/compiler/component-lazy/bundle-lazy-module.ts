@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import abortPlugin from '../rollup-plugins/abort-plugin';
 import bundleJson from '../rollup-plugins/json';
-import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
+import { createOnWarnFn, loadRollupDiagnostics } from '@stencil/core/utils';
 import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from '../rollup-plugins/local-resolution';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';

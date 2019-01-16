@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { convertValueToLiteral } from './util';
-import { DEFAULT_STYLE_MODE } from '../../../util/constants';
+import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import { formatConstructorEncapsulation, getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
 import ts from 'typescript';

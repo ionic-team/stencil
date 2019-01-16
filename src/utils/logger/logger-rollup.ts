@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
-import { buildWarn, normalizePath } from '../../compiler/util';
-import { splitLineBreaks } from './logger-util';
+import { buildWarn } from '../message-utils';
+import { normalizePath } from '../path-utils';
+import { splitLineBreaks } from './logger-utils';
 import { toTitleCase } from '../helpers';
 
 

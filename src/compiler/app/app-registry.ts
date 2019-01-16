@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { ENCAPSULATION } from '../../util/constants';
+import { ENCAPSULATION } from '@stencil/core/utils';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 

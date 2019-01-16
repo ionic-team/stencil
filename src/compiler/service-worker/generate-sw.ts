@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '../util';
+import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '@stencil/core/utils';
 
 
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

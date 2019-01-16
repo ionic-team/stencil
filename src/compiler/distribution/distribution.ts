@@ -4,7 +4,7 @@ import { generateCommonJsIndex } from './dist-cjs';
 import { generateEsmIndexes } from './dist-esm';
 import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
-import { hasError } from '../util';
+import { hasError } from '@stencil/core/utils';
 import * as v from './validate-package-json';
 
 

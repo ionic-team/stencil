@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { loadTypeScriptDiagnostics } from '@stencil/core/utils';
 import * as path from 'path';
 import ts from 'typescript';
 

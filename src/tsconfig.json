@@ -27,10 +27,13 @@
         "./compiler/app-core/build-conditionals.ts"
       ],
       "@stencil/core/mock-doc": [
-        "../dist/mock-doc"
+        "./mock-doc/index.ts"
       ],
       "@stencil/core/testing": [
         "./testing/index.ts"
+      ],
+      "@stencil/core/utils": [
+        "./utils/index.ts"
       ]
     }
   },

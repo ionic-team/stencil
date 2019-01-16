@@ -1,8 +1,6 @@
 import * as d from '../../declarations';
-import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { DEFAULT_STYLE_MODE } from '../../util/constants';
+import { DEFAULT_STYLE_MODE, cleanDiagnostics, hasError, normalizePath } from '@stencil/core/utils';
 import { generateHmr } from './build-hmr';
-import { hasError, normalizePath } from '../util';
 
 
 export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

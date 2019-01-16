@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { APP_NAMESPACE_REGEX } from '../../util/constants';
+import { APP_NAMESPACE_REGEX, generatePreamble } from '@stencil/core/utils';
 import { formatBrowserLoaderComponentTagNames } from '../../util/data-serialize';
-import { generatePreamble } from '../util';
 import { getLoaderPath } from './app-file-naming';
 import { minifyJs } from '../minifier';
 

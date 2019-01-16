@@ -6,12 +6,14 @@ const rollupCommonjs = require('rollup-plugin-commonjs');
 const transpile = require('./transpile');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-compiler');
+const DIST_DIR = path.join(__dirname, '..', 'dist');
+const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-compiler');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'compiler', 'index.js');
-const DEST_DIR = path.join(__dirname, '..', 'dist', 'compiler');
-const DEST_FILE = path.join(DEST_DIR, 'index.js');
+const COMPILER_DIST_DIR = path.join(DIST_DIR, 'compiler');
+const COMPILER_DIST_FILE = path.join(COMPILER_DIST_DIR, 'index.js');
+const UTILS_DIST_DIR = path.join(DIST_DIR, 'utils');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
-const DECLARATIONS_DST_DIR = path.join(__dirname, '..', 'dist', 'declarations');
+const DECLARATIONS_DST_DIR = path.join(DIST_DIR, 'declarations');
 
 let buildId = process.argv.find(a => a.startsWith('--build-id=')) || '';
 buildId = buildId.replace('--build-id=', '');
@@ -29,8 +31,9 @@ if (success) {
         'fs',
         'path',
         'typescript',
-        '../mock-doc',
-        '../renderer/vdom'
+        '../mock-doc/index.js',
+        '../renderer/vdom/index.js',
+        '../util/index.js'
       ],
       plugins: [
         (() => {
@@ -40,10 +43,13 @@ if (success) {
                 return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
               }
               if (id === '@stencil/core/mock-doc') {
-                return '../mock-doc';
+                return '../mock-doc/index.js';
               }
               if (id === '@stencil/core/renderer/vdom') {
-                return '../renderer/vdom';
+                return '../renderer/vdom/index.js';
+              }
+              if (id === '@stencil/core/utils') {
+                return '../util/index.js';
               }
             }
           }
@@ -60,7 +66,7 @@ if (success) {
     });
 
     // copy over all the .d.ts file too
-    fs.copySync(path.dirname(ENTRY_FILE), DEST_DIR, {
+    fs.copySync(path.dirname(ENTRY_FILE), COMPILER_DIST_DIR, {
       filter: (src) => {
         return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
       }
@@ -74,14 +80,51 @@ if (success) {
 
     const results = await build.generate({
       format: 'cjs',
-      file: DEST_FILE
+      file: COMPILER_DIST_FILE
     });
 
     const outputText = updateBuildIds(buildId, results.code);
 
-    fs.ensureDirSync(path.dirname(DEST_FILE));
-    fs.writeFileSync(DEST_FILE, outputText);
+    fs.ensureDirSync(path.dirname(COMPILER_DIST_FILE));
+    fs.writeFileSync(COMPILER_DIST_FILE, outputText);
   }
+
+  async function buildUtils() {
+    const build = await rollup.rollup({
+      input: path.join(TRANSPILED_DIR, 'utils', 'index.js'),
+      external: [
+        'buffer',
+        'crypto',
+        'module',
+        'path',
+        'fs',
+        'os',
+        'typescript'
+      ],
+      plugins: [
+        rollupResolve({
+          preferBuiltins: true
+        }),
+        rollupCommonjs()
+      ],
+      onwarn: (message) => {
+        if (/top level of an ES module/.test(message)) return;
+        console.error(message);
+      }
+    });
+
+    build.write({
+      format: 'es',
+      file: path.join(UTILS_DIST_DIR, 'index.mjs')
+    });
+
+    build.write({
+      format: 'cjs',
+      file: path.join(UTILS_DIST_DIR, 'index.js')
+    });
+  }
+
+  buildUtils();
 
   bundleCompiler();
 

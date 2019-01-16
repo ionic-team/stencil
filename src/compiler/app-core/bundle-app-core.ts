@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
-import { normalizePath } from '../util';
+import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@stencil/core/utils';
 
 
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>, bundleInput: string) {

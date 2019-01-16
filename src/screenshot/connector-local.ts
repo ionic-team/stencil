@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { fileExists, readFile, writeFile } from './screenshot-fs';
 import { join, relative } from 'path';
-import { normalizePath } from '../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 import { ScreenshotConnector } from './connector-base';
 import { URL } from 'url';
 

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { captializeFirstLetter } from '../../util/helpers';
+import { captializeFirstLetter } from '@stencil/core/utils';
 
 export function usageToMarkdown(usages: d.JsonDocsUsage) {
   const content: string[] = [];

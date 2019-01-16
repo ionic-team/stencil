@@ -4,9 +4,8 @@ import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { loadTypeScriptDiagnostics, normalizePath } from '@stencil/core/utils';
 import minimatch from 'minimatch';
-import { normalizePath } from '../util';
 import { visitSource } from '../transformers/visitors/visit-source';
 import ts from 'typescript';
 

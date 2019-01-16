@@ -1,4 +1,4 @@
-import { normalizePath } from '../../../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { wroteFile } from '../../../testing/utils';
 import * as path from 'path';

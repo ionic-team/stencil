@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { addCollection } from '../collections/add-collection';
-import { normalizePath } from '../../util';
+import { normalizePath } from '@stencil/core/utils';
 import ts from 'typescript';
 
 

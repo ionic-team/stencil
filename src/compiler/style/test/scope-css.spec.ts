@@ -13,7 +13,7 @@
 
 import { ShadowCss } from '../shadow-css';
 import { getElementScopeId, getScopeId } from '../../../util/scope';
-import { DEFAULT_STYLE_MODE } from '../../../util/constants';
+import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 
 
 describe('ShadowCss', function() {

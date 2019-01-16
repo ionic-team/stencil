@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
-import { catchError, hasError } from '../util';
-import { cleanDiagnostics } from '../../util/logger/logger-util';
+import { catchError, cleanDiagnostics, hasError } from '@stencil/core/utils';
 import { generateDocData } from './generate-doc-data';
 import { generateWebComponentsJson } from './generate-web-components-json';
 import { generateJsonDocs } from './generate-json-docs';

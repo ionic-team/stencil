@@ -22,7 +22,8 @@ async function bundleRuntime() {
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/platform',
-      '@stencil/core/renderer/vdom'
+      '@stencil/core/renderer/vdom',
+      '@stencil/core/utils'
     ],
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;

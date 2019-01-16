@@ -23,10 +23,22 @@ if (success) {
         'fs',
         'https',
         'os',
-        'path'
+        'path',
+        '../utils'
       ],
       plugins: [
-        rollupResolve(),
+        (() => {
+          return {
+            resolveId(id) {
+              if (id === '@stencil/core/utils') {
+                return '../utils';
+              }
+            }
+          }
+        })(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs()
       ],
       onwarn: (message) => {

@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '../../../compiler/util';
+import { TASK_CANCELED_MSG } from '@stencil/core/utils';
 
 
 export class WorkerMain extends EventEmitter {

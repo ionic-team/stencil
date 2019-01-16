@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
-import { hasError } from '../compiler/util';
+import { hasError } from '@stencil/core/utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, hasError } from '../util';
+import { buildWarn, catchError, hasError } from '@stencil/core/utils';
 import { crawlAnchorsForNextUrls, getPrerenderQueue, getWritePathFromUrl } from './prerender-utils';
 import { generateHostConfig } from './host-config';
 import { optimizeIndexHtml } from '../html/optimize-html';

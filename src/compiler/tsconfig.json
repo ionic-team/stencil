@@ -21,6 +21,7 @@
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
     "rootDir": "../",
+    "target": "es2015",
     "baseUrl": ".",
     "paths": {
       "@stencil/core/build-conditionals": [
@@ -34,14 +35,17 @@
       ],
       "@stencil/core/renderer/vdom": [
         "../renderer/vdom/index.ts"
+      ],
+      "@stencil/core/utils": [
+        "../utils/index.ts"
       ]
-    },
-    "target": "es2015"
+    }
   },
   "include": [
     "../../types/*.d.ts"
   ],
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "../utils/index.ts"
   ]
 }

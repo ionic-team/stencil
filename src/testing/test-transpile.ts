@@ -1,19 +1,22 @@
 import * as d from '../declarations';
-import { loadTypeScriptDiagnostic } from '../util/logger/logger-typescript';
-import { mockStencilSystem } from './mocks';
-import { normalizePath } from '../compiler/util';
+import { loadTypeScriptDiagnostic, normalizePath } from '@stencil/core/utils';
 import { TestLogger } from './test-logger';
-import { transpileModule } from '../compiler/transpile/transpile-module';
+import { TestingSystem } from './testing-sys';
+import { transpileModule } from '@stencil/core/compiler';
 import ts from 'typescript';
 
 
-const sys = mockStencilSystem();
+let sys: d.StencilSystem;
 
 
 export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
   const logger = new TestLogger();
 
-  const config = {
+  if (sys == null) {
+    sys = new TestingSystem();
+  }
+
+  const config: d.Config = {
     sys: sys,
     logger: logger,
     cwd: process.cwd(),

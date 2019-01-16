@@ -3,7 +3,7 @@ import * as d from '../../../declarations';
 import { getFilePath } from '../node-http-server';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../../compiler/config/validate-config';
-import { normalizePath } from '../../../compiler/util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 describe('node-http-server', () => {

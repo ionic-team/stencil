@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getModule } from '../../build/compiler-ctx';
-import { normalizePath } from '../../util';
+import { normalizePath } from '@stencil/core/utils';
 
 
 export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, collectionManifest: d.CollectionManifest) {

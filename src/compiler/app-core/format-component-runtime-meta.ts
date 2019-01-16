@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 
 
 export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean) {

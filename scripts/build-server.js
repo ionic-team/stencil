@@ -27,26 +27,26 @@ if (success) {
         'os',
         'path',
         'child_process',
-        '../compiler',
-        '../mock-doc',
-        '../renderer/vdom',
-        '../runtime',
+        '../compiler/index.js',
+        '../mock-doc/index.js',
+        '../renderer/vdom/index.js',
+        '../runtime/index.js',
       ],
       plugins: [
         (() => {
           return {
             resolveId(id) {
               if (id === '@stencil/core/build-conditionals') {
-                return '../compiler';
+                return '../compiler/index.js';
               }
               if (id === '@stencil/core/mock-doc') {
-                return '../mock-doc';
+                return '../mock-doc/index.js';
               }
               if (id === '@stencil/core/renderer/vdom') {
-                return '../renderer/vdom';
+                return '../renderer/vdom/index.js';
               }
               if (id === '@stencil/core/runtime') {
-                return '../runtime';
+                return '../runtime/index.js';
               }
             }
           }

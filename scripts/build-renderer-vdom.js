@@ -17,15 +17,14 @@ if (success) {
     const build = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
-        'util',
         '@stencil/core/build-conditionals',
-        '@stencil/core/platform'
+        '@stencil/core/platform',
+        '@stencil/core/utils'
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
         console.error( message );
       }
-
     });
 
     // copy over all the .d.ts file too
