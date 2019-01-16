@@ -15,8 +15,8 @@ const success = transpile(path.join('..', 'src', 'server', 'tsconfig.json'));
 
 if (success) {
 
-  function bundleServer() {
-    rollup.rollup({
+  async function bundleServer() {
+    const build = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'assert',
@@ -26,49 +26,63 @@ if (success) {
         'module',
         'os',
         'path',
-        'child_process'
+        'child_process',
+        '../compiler',
+        '../mock-doc',
+        '../renderer/vdom',
+        '../runtime',
       ],
       plugins: [
-        rollupResolve(),
+        (() => {
+          return {
+            resolveId(id) {
+              if (id === '@stencil/core/build-conditionals') {
+                return '../compiler';
+              }
+              if (id === '@stencil/core/mock-doc') {
+                return '../mock-doc';
+              }
+              if (id === '@stencil/core/renderer/vdom') {
+                return '../renderer/vdom';
+              }
+              if (id === '@stencil/core/runtime') {
+                return '../runtime';
+              }
+            }
+          }
+        })(),
+        rollupResolve({
+          preferBuiltins: true
+        }),
         rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
-        console.error( message );
+        console.error(message);
       }
+    });
 
-    }).then(bundle => {
+    // copy over all the .d.ts file too
+    fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
+      filter: (src) => {
+        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
+      }
+    });
 
-      // copy over all the .d.ts file too
-      fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
-        filter: (src) => {
-          return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-        }
-      });
-
-      // bundle up the compiler into one js file
-      bundle.write({
-        format: 'cjs',
-        file: DEST_FILE
-
-      }).catch(err => {
-        console.log(`❌ build server error: ${err}`);
-        process.exit(1);
-      });
-
-    }).catch(err => {
-      console.log(`❌ build server error: ${err}`);
-      process.exit(1);
+    build.write({
+      format: 'cjs',
+      file: DEST_FILE
     });
   }
-
 
   bundleServer();
 
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ server: ${DEST_FILE}`);
+    console.log(`✅  server`);
   });
 
+} else {
+  console.log(`❌  server`);
 }

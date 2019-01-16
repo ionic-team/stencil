@@ -13,9 +13,9 @@ const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
 
 
 // transpile sys.node
-const transpileSuccess = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
+const success = transpile(path.join('..', 'src', 'sys', 'node', 'tsconfig.json'));
 
-if (transpileSuccess) {
+if (success) {
   // bundle external deps
   bundleExternal('graceful-fs.js');
   bundleExternal('node-fetch.js');
@@ -35,6 +35,9 @@ if (transpileSuccess) {
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
   });
+
+} else {
+  console.log(`❌  sys.node`);
 }
 
 
@@ -100,7 +103,7 @@ function bundleExternal(entryFileName) {
     if (stats.hasErrors()) {
       console.error(info.errors);
     } else {
-      console.log(`✅ sys.node: ${entryFileName}`);
+      console.log(`✅  sys.node: ${entryFileName}`);
     }
   });
 }

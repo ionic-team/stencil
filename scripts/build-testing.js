@@ -95,7 +95,9 @@ if (success) {
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ testing: ${DEST_FILE}`);
+    console.log(`✅  testing`);
   });
 
+} else {
+  console.log(`❌  testing`);
 }

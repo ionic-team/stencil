@@ -107,6 +107,9 @@ if (success) {
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ screenshot`);
+    console.log(`✅  screenshot`);
   });
+
+} else {
+  console.log(`❌  screenshot`);
 }

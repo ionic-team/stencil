@@ -61,7 +61,9 @@ if (success) {
 
   process.on('exit', (code) => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ mock-doc: ${DEST_FILE}`);
+    console.log(`✅  mock-doc`);
   });
 
+} else {
+  console.log(`❌  mock-doc`);
 }

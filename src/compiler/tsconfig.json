@@ -28,6 +28,12 @@
       ],
       "@stencil/core/mock-doc": [
         "../mock-doc/index.ts"
+      ],
+      "@stencil/core/platform": [
+        "../client/index.ts"
+      ],
+      "@stencil/core/renderer/vdom": [
+        "../renderer/vdom/index.ts"
       ]
     },
     "target": "es2015"

@@ -126,12 +126,12 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     plt.win.location.href = opts.url;
   }
 
-  if (typeof opts.html === 'string') {
-    plt.body.innerHTML = opts.html;
-  }
-
   if (opts.build == null || opts.build.lazyLoad !== false) {
     runtime.bootstrapLazy(testingCmps);
+  }
+
+  if (typeof opts.html === 'string') {
+    plt.body.innerHTML = opts.html;
   }
 
   if (opts.flushQueue !== false) {

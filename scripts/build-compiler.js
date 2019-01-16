@@ -29,7 +29,8 @@ if (success) {
         'fs',
         'path',
         'typescript',
-        '../mock-doc'
+        '../mock-doc',
+        '../renderer/vdom'
       ],
       plugins: [
         (() => {
@@ -41,6 +42,9 @@ if (success) {
               if (id === '@stencil/core/mock-doc') {
                 return '../mock-doc';
               }
+              if (id === '@stencil/core/renderer/vdom') {
+                return '../renderer/vdom';
+              }
             }
           }
         })(),
@@ -51,7 +55,7 @@ if (success) {
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;
-        console.error( message );
+        console.error(message);
       }
     });
 
@@ -81,11 +85,13 @@ if (success) {
 
   bundleCompiler();
 
-
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
+    console.log(`✅  compiler`);
   });
 
+} else {
+  console.log(`❌  compiler`);
 }
 
 

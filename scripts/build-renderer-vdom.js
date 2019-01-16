@@ -52,7 +52,9 @@ if (success) {
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ renderer.vdom`);
+    console.log(`✅  renderer.vdom`);
   });
 
+} else {
+  console.log(`❌  renderer.vdom`);
 }

@@ -107,7 +107,7 @@ function createDts() {
 
 process.on('exit', () => {
   fs.removeSync(TRANSPILED_DIR);
-  console.log(`✅ runtime`);
+  console.log(`✅  runtime`);
 });
 
 
@@ -121,4 +121,7 @@ if (success) {
   createPublicTypeExports();
   createPublicJavaScriptExports();
   buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
+
+} else {
+  console.log(`❌  runtime`);
 }

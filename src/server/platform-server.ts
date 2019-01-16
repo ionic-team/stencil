@@ -6,7 +6,7 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/consta
 // import { enableEventListener } from '../core/listeners';
 import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
-import { h } from '../renderer/vdom/h';
+import { h } from '@stencil/core/renderer/vdom';
 // import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';

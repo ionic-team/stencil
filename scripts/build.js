@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const transpile = require('./transpile');
-const { execSync, fork } = require('child_process');
+const { fork } = require('child_process');
 
 const SCRIPTS_DIR = __dirname;
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
@@ -9,19 +8,16 @@ const BUILD_ID = getBuildId();
 
 fs.removeSync(DIST_DIR);
 
-execSync('node build-mock-doc.js', {
-  cwd: path.join(SCRIPTS_DIR)
-});
-
 [
   'build-cli.js',
   'build-compiler.js',
-  'build-core.js',
   'build-dev-server.js',
   'build-dev-server-client.js',
+  'build-mock-doc.js',
   'build-renderer-vdom.js',
+  'build-runtime.js',
   'build-screenshot.js',
-  'build-server.js',
+  // 'build-server.js',
   'build-submodules.js',
   'build-sys-node.js',
   'build-testing.js'

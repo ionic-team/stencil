@@ -45,7 +45,9 @@ if (success) {
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ cli: ${DEST_FILE}`);
+    console.log(`✅  cli`);
   });
 
+} else {
+  console.log(`❌  cli`);
 }
