@@ -36,7 +36,14 @@ export async function startPuppeteerBrowser(config: d.Config) {
     launchOpts.executablePath = config.testing.browserExecutablePath;
   }
 
-  const browser = await puppeteer.launch(launchOpts);
+  let browser;
+  if (config.testing.browserWSEndpoint) {
+    let connectOpts: puppeteer.ConnectOptions = launchOpts;
+    connectOpts.browserWSEndpoint = config.testing.browserWSEndpoint;
+    browser = await puppeteer.connect(connectOpts);
+  } else {
+    browser = await puppeteer.launch(launchOpts);
+  }
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
