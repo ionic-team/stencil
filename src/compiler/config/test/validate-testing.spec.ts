@@ -9,19 +9,21 @@ describe('validateTesting', () => {
 
   let config: d.Config;
   const ROOT = path.resolve('/');
+  const sys = mockStencilSystem();
+  const logger = mockLogger();
 
   beforeEach(() => {
     config = {
-      sys: mockStencilSystem(),
-      logger: mockLogger(),
+      sys: sys,
+      logger: logger,
       rootDir: path.join(ROOT, 'User', 'some', 'path'),
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
-      outputTargets: [{
-        type: 'www',
-        dir: pathJoin(config, ROOT, 'www')
-      } as any as d.OutputTargetStats]
     };
+    config.outputTargets = [{
+      type: 'www',
+      dir: pathJoin(config, ROOT, 'www')
+    } as any as d.OutputTargetStats];
   });
 
 
