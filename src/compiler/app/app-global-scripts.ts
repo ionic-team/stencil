@@ -76,9 +76,15 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
   // prepend the output content on top of the core js
   // this way external collections can provide a shared global at runtime
 
-  if (!entry) {
+  if (typeof entry !== 'string') {
     // looks like they never provided an entry file, which is fine, so let's skip this
     return '';
+  }
+
+  if (entry.toLowerCase().endsWith('.ts')) {
+    entry = entry.substr(0, entry.length - 2) + 'js';
+  } else if (entry.toLowerCase().endsWith('.tsx')) {
+    entry = entry.substr(0, entry.length - 3) + 'js';
   }
 
   // ok, so the project also provided an entry file, so let's bundle it up and
