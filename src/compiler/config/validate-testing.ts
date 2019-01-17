@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { pathJoin } from '@stencil/core/utils';
 
 
 export function validateTesting(config: d.Config) {
@@ -58,7 +59,7 @@ export function validateTesting(config: d.Config) {
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return config.sys.path.join(testing.rootDir, ignorePattern);
+      return pathJoin(config, testing.rootDir, ignorePattern);
     });
 
     config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {

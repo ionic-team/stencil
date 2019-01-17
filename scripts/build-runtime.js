@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const transpile = require('./transpile');
+const run = require('./run');
 const buildPolyfills = require('./build-polyfills');
 
 const ROOT_DIR = path.join(__dirname, '..');
@@ -17,7 +18,7 @@ const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 
 async function bundleRuntime() {
-  const build = await rollup.rollup({
+  const rollupBuild = await rollup.rollup({
     input: inputFile,
     external: [
       '@stencil/core/build-conditionals',
@@ -26,38 +27,38 @@ async function bundleRuntime() {
       '@stencil/core/utils'
     ],
     onwarn: (message) => {
-      if (/top level of an ES module/.test(message)) return;
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
       console.error(message);
     }
   });
 
   await Promise.all([
-    build.write({
+    rollupBuild.write({
       format: 'es',
       file: path.join(DIST_RUNTIME_DIR, 'index.mjs')
     }),
-    build.write({
+    rollupBuild.write({
       format: 'cjs',
       file: path.join(DIST_RUNTIME_DIR, 'index.js')
     })
   ]);
-
 }
 
 
-function createPublicJavaScriptExports() {
+async function createPublicJavaScriptExports() {
   const entryPath = path.join(DST_DIR, 'index.js');
-  fs.writeFileSync(entryPath,
+
+  await fs.writeFile(entryPath,
     `export function h() {}`
   );
 }
 
 
-function createPublicTypeExports() {
+async function createPublicTypeExports() {
   const declarationsContent = [];
   const declarationsDir = path.join(TRANSPILED_DIR, 'declarations');
 
-  const declarationFileNames = fs.readdirSync(declarationsDir).filter(f => f !== 'index.d.ts');
+  const declarationFileNames = (await fs.readdir(declarationsDir)).filter(f => f !== 'index.d.ts');
 
   declarationFileNames.forEach(declarationsFile => {
     const declarationsPath = path.join(declarationsDir, declarationsFile);
@@ -80,16 +81,16 @@ function createPublicTypeExports() {
   let fileContent = declarationsContent.join('\n');
 
   const outputDeclarationsFile = path.join(DST_DIR, 'declarations', 'index.d.ts');
-  fs.emptyDirSync(path.dirname(outputDeclarationsFile));
-  fs.writeFileSync(outputDeclarationsFile, fileContent);
+  await fs.emptyDir(path.dirname(outputDeclarationsFile));
+  await fs.writeFile(outputDeclarationsFile, fileContent);
 
   const transpiledDeclarationsIndexPath = path.join(TRANSPILED_DIR, 'index.d.ts');
   const distDeclarationsIndexPath = path.join(DST_DIR, 'index.d.ts');
-  fs.copyFileSync(transpiledDeclarationsIndexPath, distDeclarationsIndexPath);
+  await fs.copyFile(transpiledDeclarationsIndexPath, distDeclarationsIndexPath);
 }
 
 
-function createDts() {
+async function createDts() {
   const declarationSrcFiles = [
     path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
     path.join(SRC_DIR, 'declarations', 'jsx.ts'),
@@ -101,28 +102,24 @@ function createDts() {
     .join('\n');
 
   const declarationsFilePath = path.join(DIST_RUNTIME_DIR, 'declarations', 'stencil.core.d.ts');
-  fs.emptyDirSync(path.dirname(declarationsFilePath));
-  fs.writeFileSync(declarationsFilePath, declarationsFileContents);
+
+  await fs.emptyDir(path.dirname(declarationsFilePath));
+  await fs.writeFile(declarationsFilePath, declarationsFileContents);
 }
 
 
-process.on('exit', () => {
-  fs.removeSync(TRANSPILED_DIR);
-  console.log(`✅  runtime`);
+run(async ()=> {
+  transpile(path.join('..', 'src', 'runtime', 'tsconfig.json'));
+
+  await fs.emptyDir(DIST_RUNTIME_DIR);
+
+  await Promise.all([
+    bundleRuntime(),
+    buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir),
+    createDts(),
+    createPublicTypeExports(),
+    createPublicJavaScriptExports()
+  ]);
+
+  await fs.remove(TRANSPILED_DIR);
 });
-
-
-const success = transpile(path.join('..', 'src', 'runtime', 'tsconfig.json'));
-
-if (success) {
-  fs.emptyDirSync(DIST_RUNTIME_DIR);
-
-  bundleRuntime();
-  createDts();
-  createPublicTypeExports();
-  createPublicJavaScriptExports();
-  buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
-
-} else {
-  console.log(`❌  runtime`);
-}

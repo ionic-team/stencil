@@ -35,7 +35,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
   });
 
 
-  const build = await rollup.rollup({
+  const rollupBuild = await rollup.rollup({
     input: path.join(transpiledPolyfillsDir, 'css-shim', 'index.js'),
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
@@ -43,11 +43,11 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     }
   });
 
-  const bundleResults = await build.generate({
+  const { output } = await rollupBuild.generate({
     format: 'es'
   });
 
-  const transpile = ts.transpileModule(bundleResults.code, {
+  const transpile = ts.transpileModule(output[0].code, {
     compilerOptions: {
       target: ts.ScriptTarget.ES5
     }

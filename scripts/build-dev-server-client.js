@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const run = require('./run');
 const transpile = require('./transpile');
 
 const ROOT_DIR = path.join(__dirname, '..');
@@ -13,73 +14,54 @@ const DEV_CLIENT_OUTPUT_DIR = path.join(DST_DIR, 'dev-server', 'static');
 const inputFile = path.join(DEV_CLIENT_INPUT_DIR, 'index.js');
 const outputFile = path.join(DEV_CLIENT_OUTPUT_DIR, 'dev-server-client.html');
 
-const success = transpile(path.join('..', 'src', 'dev-server', 'dev-client', 'tsconfig.json'));
 
-if (success) {
-
-  // empty out the dist/client directory
-  fs.ensureDirSync(DEV_CLIENT_OUTPUT_DIR);
-  copyStaticAssets();
-
-  bundleDevServerClient();
-
-  function bundleDevServerClient() {
-    return rollup.rollup({
-      input: inputFile,
-      onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error( message );
-      }
-    })
-    .then(bundle => {
-      bundle.generate({
-        format: 'es',
-
-        banner: [
-          '<meta charset="utf-8">',
-          '💎 Stencil Dev Server',
-          '<script>',
-          '/* Dev Server Client */'
-        ].join('\n'),
-
-        intro: '(function(iframeWindow, appWindow, appDoc, config) {\n' +
-              '"use strict";',
-
-        outro: '})(window, window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
-
-        footer: '</script>'
-
-      }).then(clientCore => {
-
-        let code = clientCore.code.trim();
-        code = code.replace('exports ', '');
-
-        fs.writeFile(outputFile, code, (err) => {
-          if (err) {
-            console.log(err);
-            process.exit(1);
-          }
-        });
-
-      })
-    })
-    .catch(err => {
-      console.log(err);
-      console.log(err.stack);
-      process.exit(1);
-    });
-  }
-
-  function copyStaticAssets() {
-    fs.copySync(DEV_CLIENT_SRC_STATIC_DIR, DEV_CLIENT_OUTPUT_DIR);
-  }
-
-
-  process.on('exit', (code) => {
-    fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅  dev.server.client`);
+async function bundleDevServerClient() {
+  const rollupBuild = await rollup.rollup({
+    input: inputFile,
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
   });
 
-} else {
-  console.log(`❌  dev.server.client`);
+  const { output } = await rollupBuild.generate({
+    format: 'es',
+
+    banner: [
+      '<meta charset="utf-8">',
+      '💎 Stencil Dev Server',
+      '<script>',
+      '/* Dev Server Client */'
+    ].join('\n'),
+
+    intro: '(function(iframeWindow, appWindow, appDoc, config) {\n' +
+          '"use strict";',
+
+    outro: '})(window, window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
+
+    footer: '</script>'
+
+  });
+
+  let code = output[0].code.trim();
+  code = code.replace('exports ', '');
+
+  fs.writeFileSync(outputFile, code);
 }
+
+
+async function copyStaticAssets() {
+  await fs.copy(DEV_CLIENT_SRC_STATIC_DIR, DEV_CLIENT_OUTPUT_DIR);
+}
+
+
+run(async () => {
+  fs.ensureDirSync(DEV_CLIENT_OUTPUT_DIR);
+
+  transpile(path.join('..', 'src', 'dev-server', 'dev-client', 'tsconfig.json'));
+
+  await bundleDevServerClient();
+  await copyStaticAssets();
+
+  await fs.remove(TRANSPILED_DIR);
+});

@@ -1,28 +1,56 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { fork } = require('child_process');
+const { execSync, fork } = require('child_process');
+const Listr = require('listr');
+const color = require('ansi-colors');
+const run = require('./run');
 
 const SCRIPTS_DIR = __dirname;
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
-const BUILD_ID = getBuildId();
+const buildId = getBuildId();
 
-fs.removeSync(DIST_DIR);
 
-[
-  'build-cli.js',
-  'build-compiler.js',
-  'build-dev-server.js',
-  'build-dev-server-client.js',
-  'build-mock-doc.js',
-  'build-renderer-vdom.js',
-  'build-runtime.js',
-  'build-screenshot.js',
-  // 'build-server.js',
-  'build-submodules.js',
-  'build-sys-node.js',
-  'build-testing.js'
+const start = Date.now();
 
-].forEach(script => fork(path.join(SCRIPTS_DIR, script), [`--build-id=${BUILD_ID}`]));
+run(async () => {
+  execSync('npm install resolve@1.8.1', {
+    cwd: path.join(__dirname, '..', 'node_modules', 'rollup-plugin-node-resolve')
+  });
+
+  await fs.remove(DIST_DIR);
+
+  const scripts = [
+    ['CLI', 'build-cli.js'],
+    ['Compiler', 'build-compiler.js'],
+    ['Dev Sever', 'build-dev-server.js'],
+    ['Dev Server Client', 'build-dev-server-client.js'],
+    ['Mock Doc', 'build-mock-doc.js'],
+    ['Renderer VDOM', 'build-renderer-vdom.js'],
+    ['Runtime', 'build-runtime.js'],
+    ['Screenshot', 'build-screenshot.js'],
+    ['Submodules', 'build-submodules.js'],
+    ['Sys Node', 'build-sys-node.js'],
+    ['Testing', 'build-testing.js']
+  ];
+
+  const tasks = scripts.map(script => {
+    return {
+      title: script[0],
+      task: () => {
+        return new Promise((resolve, reject) => {
+          const cp = fork(path.join(SCRIPTS_DIR, script[1]), [`--build-id=${buildId}`]);
+          cp.on('exit', resolve);
+          cp.on('error', reject);
+        });
+      }
+    };
+  });
+
+  const listr = new Listr(tasks, { concurrent: true, showSubtasks: false });
+  await listr.run();
+
+  console.log(color.dim(`\n  Build: ${Date.now() - start}ms\n`));
+});
 
 
 function getBuildId() {

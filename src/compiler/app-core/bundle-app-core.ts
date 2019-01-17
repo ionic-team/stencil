@@ -1,13 +1,14 @@
 import * as d from '../../declarations';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
 import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@stencil/core/utils';
+import { RollupBuild, RollupOptions } from 'rollup'; // types only
 
 
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>, bundleInput: string) {
-  let output = '';
+  let outputText = '';
 
   try {
-    const rollup = await config.sys.rollup.rollup({
+    const rollupOptions: RollupOptions = {
       input: INPUT_ENTRY,
       plugins: [
         filePlugin(build, files, bundleInput),
@@ -24,12 +25,14 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics),
-    });
+    };
 
-    const results = await rollup.generate({ format: 'es' });
+    const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
 
-    if (results && typeof results.code === 'string') {
-      output = results.code.replace(/__import\(/g, 'import(');
+    const { output } = await rollupBuild.generate({ format: 'es' });
+
+    if (typeof output[0].code === 'string') {
+      outputText = output[0].code.replace(/__import\(/g, 'import(');
     }
 
   } catch (e) {
@@ -37,7 +40,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     config.logger.debug(`bundleAppCore, bundleInput: ${bundleInput}`);
   }
 
-  return output;
+  return outputText;
 }
 
 

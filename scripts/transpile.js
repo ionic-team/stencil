@@ -3,15 +3,15 @@ const cp = require('child_process');
 
 
 module.exports = function transpile(tsConfigPath) {
-  tsConfigPath = path.resolve(__dirname, tsConfigPath);
-
   try {
-    var cmd = 'npx tsc -p ' + tsConfigPath;
-    cp.execSync(cmd, { cwd: __dirname }).toString();
-    return true;
+    tsConfigPath = path.resolve(__dirname, tsConfigPath);
+
+    const tscPath = path.join(__dirname, '..', 'node_modules', '.bin', 'tsc');
+
+    const cmd = `${tscPath} -p ${tsConfigPath}`;
+    cp.execSync(cmd, { cwd: path.join(__dirname, '..') }).toString();
 
   } catch (e) {
-    console.log(e.stdout.toString());
-    return false;
+    throw new Error(e.stdout.toString());
   }
 }

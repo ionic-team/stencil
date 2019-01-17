@@ -16,7 +16,7 @@ const success = transpile(path.join('..', 'src', 'server', 'tsconfig.json'));
 if (success) {
 
   async function bundleServer() {
-    const build = await rollup.rollup({
+    const rollupBuild = await rollup.rollup({
       input: ENTRY_FILE,
       external: [
         'assert',
@@ -63,22 +63,21 @@ if (success) {
     });
 
     // copy over all the .d.ts file too
-    fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
+    async fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
       filter: (src) => {
         return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
       }
     });
 
-    build.write({
+    await rollupBuild.write({
       format: 'cjs',
       file: DEST_FILE
     });
   }
 
-  bundleServer();
+  await bundleServer();
 
-
-  process.on('exit', (code) => {
+  process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
     console.log(`✅  server`);
   });

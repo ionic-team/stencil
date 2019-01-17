@@ -4,28 +4,23 @@ const rollup = require('rollup');
 
 
 async function buildCoreEsm(inputFile, outputFile) {
-  const build = await rollup.rollup({
+  const rollupBuild = await rollup.rollup({
     input: inputFile,
     onwarn: (message) => {
-      if (/top level of an ES module/.test(message)) return;
-      console.error( message );
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
     }
   });
 
-  const clientCore = await build.generate({
+  const { output } = await rollupBuild.generate({
     format: 'es'
   });
 
-  let code = clientCore.code.trim();
+  let code = output[0].code.trim();
   code = dynamicImportFnHack(code);
   code = polyfillsHack(code);
 
-  fs.writeFile(outputFile, code, (err) => {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    }
-  });
+  fs.writeFileSync(outputFile, code);
 }
 
 

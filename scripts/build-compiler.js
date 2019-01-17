@@ -3,6 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
+const run = require('./run');
 const transpile = require('./transpile');
 
 
@@ -19,123 +20,120 @@ let buildId = process.argv.find(a => a.startsWith('--build-id=')) || '';
 buildId = buildId.replace('--build-id=', '');
 
 
-const success = transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'));
-
-if (success) {
-
-  async function bundleCompiler() {
-    const build = await rollup.rollup({
-      input: ENTRY_FILE,
-      external: [
-        'crypto',
-        'fs',
-        'path',
-        'typescript',
-        '../mock-doc/index.js',
-        '../renderer/vdom/index.js',
-        '../util/index.js'
-      ],
-      plugins: [
-        (() => {
-          return {
-            resolveId(id) {
-              if (id === '@stencil/core/build-conditionals') {
-                return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
-              }
-              if (id === '@stencil/core/mock-doc') {
-                return '../mock-doc/index.js';
-              }
-              if (id === '@stencil/core/renderer/vdom') {
-                return '../renderer/vdom/index.js';
-              }
-              if (id === '@stencil/core/utils') {
-                return '../util/index.js';
-              }
+async function bundleCompiler() {
+  const rollupBuild = await rollup.rollup({
+    input: ENTRY_FILE,
+    external: [
+      'crypto',
+      'fs',
+      'path',
+      'typescript',
+      '../mock-doc/index.js',
+      '../renderer/vdom/index.js',
+      '../util/index.js'
+    ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(id) {
+            if (id === '@stencil/core/build-conditionals') {
+              return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
+            }
+            if (id === '@stencil/core/mock-doc') {
+              return '../mock-doc/index.js';
+            }
+            if (id === '@stencil/core/renderer/vdom') {
+              return '../renderer/vdom/index.js';
+            }
+            if (id === '@stencil/core/utils') {
+              return '../util/index.js';
             }
           }
-        })(),
-        rollupResolve({
-          preferBuiltins: true
-        }),
-        rollupCommonjs()
-      ],
-      onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error(message);
-      }
-    });
+        }
+      })(),
+      rollupResolve({
+        preferBuiltins: true
+      }),
+      rollupCommonjs()
+    ],
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
+  });
 
-    // copy over all the .d.ts file too
-    fs.copySync(path.dirname(ENTRY_FILE), COMPILER_DIST_DIR, {
-      filter: (src) => {
-        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-      }
-    });
+  // copy over all the .d.ts file too
+  await fs.copy(path.dirname(ENTRY_FILE), COMPILER_DIST_DIR, {
+    filter: (src) => {
+      return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
+    }
+  });
 
-    fs.copySync(DECLARATIONS_SRC_DIR, DECLARATIONS_DST_DIR, {
-      filter: (src) => {
-        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-      }
-    });
+  await fs.copy(DECLARATIONS_SRC_DIR, DECLARATIONS_DST_DIR, {
+    filter: (src) => {
+      return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
+    }
+  });
 
-    const results = await build.generate({
-      format: 'cjs',
-      file: COMPILER_DIST_FILE
-    });
+  const { output } = await rollupBuild.generate({
+    format: 'cjs',
+    file: COMPILER_DIST_FILE
+  });
 
-    const outputText = updateBuildIds(buildId, results.code);
+  const outputText = updateBuildIds(buildId, output[0].code);
 
-    fs.ensureDirSync(path.dirname(COMPILER_DIST_FILE));
-    fs.writeFileSync(COMPILER_DIST_FILE, outputText);
-  }
+  fs.ensureDirSync(path.dirname(COMPILER_DIST_FILE));
+  fs.writeFileSync(COMPILER_DIST_FILE, outputText);
+}
 
-  async function buildUtils() {
-    const build = await rollup.rollup({
-      input: path.join(TRANSPILED_DIR, 'utils', 'index.js'),
-      external: [
-        'buffer',
-        'crypto',
-        'module',
-        'path',
-        'fs',
-        'os',
-        'typescript'
-      ],
-      plugins: [
-        rollupResolve({
-          preferBuiltins: true
-        }),
-        rollupCommonjs()
-      ],
-      onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error(message);
-      }
-    });
 
+async function buildUtils() {
+  const build = await rollup.rollup({
+    input: path.join(TRANSPILED_DIR, 'utils', 'index.js'),
+    external: [
+      'buffer',
+      'crypto',
+      'module',
+      'path',
+      'fs',
+      'os',
+      'typescript'
+    ],
+    plugins: [
+      rollupResolve({
+        preferBuiltins: true
+      }),
+      rollupCommonjs()
+    ],
+    onwarn: ({code}) => {
+      if (code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
+  });
+
+  await Promise.all([
     build.write({
       format: 'es',
       file: path.join(UTILS_DIST_DIR, 'index.mjs')
-    });
-
+    }),
     build.write({
       format: 'cjs',
       file: path.join(UTILS_DIST_DIR, 'index.js')
-    });
-  }
-
-  buildUtils();
-
-  bundleCompiler();
-
-  process.on('exit', () => {
-    fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅  compiler`);
-  });
-
-} else {
-  console.log(`❌  compiler`);
+    })
+  ]);
 }
+
+
+run(async () => {
+  transpile(path.join('..', 'src', 'compiler', 'tsconfig.json'))
+
+  await Promise.all([
+    buildUtils(),
+    bundleCompiler()
+  ]);
+
+  await fs.remove(TRANSPILED_DIR);
+});
 
 
 function updateBuildIds(buildId, input) {

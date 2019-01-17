@@ -375,6 +375,11 @@ export interface TestingConfig extends JestConfig {
   browserExecutablePath?: string;
 
   /**
+   * Url of remote Chrome instance to use instead of local Chrome.
+   */
+  browserWSEndpoint?: string;
+
+  /**
    * Whether to run browser e2e tests in headless mode. Defaults to true.
    */
   browserHeadless?: boolean;

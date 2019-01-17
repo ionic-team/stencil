@@ -1,3 +1,22 @@
+<a name="0.17.0-0"></a>
+# 😄 [0.17.0-0](https://github.com/ionic-team/stencil/compare/v0.16.4...v0.17.0-0) (2019-01-17)
+
+
+### Bug Fixes
+
+* **bundle:** force resolve@1.8.1 dep for rollup-plugin-node-resolve ([640de93](https://github.com/ionic-team/stencil/commit/640de93))
+* **events:** remove event listeners after lifecycle hook call ([#1293](https://github.com/ionic-team/stencil/issues/1293)) ([49b75d8](https://github.com/ionic-team/stencil/commit/49b75d8))
+* **global:** ensure ts files are mapped to js ([b5ec9ea](https://github.com/ionic-team/stencil/commit/b5ec9ea))
+
+
+### Features
+
+* **rollup:** update to rollup 1.1.0 and rollup-plugin-node-resolve 4.0.0
+* **puppeteer:** update to puppeteer 1.11.0
+* **e2e:** add remote chrome support for puppeteer ([#1322](https://github.com/ionic-team/stencil/issues/1322)) ([18f6e9d](https://github.com/ionic-team/stencil/commit/18f6e9d))
+
+
+
 <a name="0.16.4"></a>
 ## 🚘 [0.16.4](https://github.com/ionic-team/stencil/compare/v0.16.3...v0.16.4) (2019-01-15)
 

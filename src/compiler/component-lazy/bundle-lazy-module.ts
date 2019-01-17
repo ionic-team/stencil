@@ -5,7 +5,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@stencil/core/utils';
 import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from '../rollup-plugins/local-resolution';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
-import { RollupBuild, RollupDirOptions } from 'rollup'; // types only
+import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import pathsResolution from '../rollup-plugins/paths-resolution';
 import pluginHelper from '../rollup-plugins/plugin-helper';
 import rollupPluginReplace from '../rollup-plugins/rollup-plugin-replace';
@@ -37,10 +37,9 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
 
   const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
 
-  const rollupConfig: RollupDirOptions = {
+  const rollupConfig: RollupOptions = {
     ...config.rollupConfig.inputOptions,
     input: entryInputPaths,
-    experimentalCodeSplitting: true,
     preserveSymlinks: false,
     treeshake: !config.devMode,
     cache: config.enableCache ? compilerCtx.rollupCache : undefined,

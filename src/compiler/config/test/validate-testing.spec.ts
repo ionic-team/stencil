@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { pathJoin } from '../../util';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
 
@@ -8,19 +9,21 @@ describe('validateTesting', () => {
 
   let config: d.Config;
   const ROOT = path.resolve('/');
+  const sys = mockStencilSystem();
+  const logger = mockLogger();
 
   beforeEach(() => {
     config = {
-      sys: mockStencilSystem(),
-      logger: mockLogger(),
+      sys: sys,
+      logger: logger,
       rootDir: path.join(ROOT, 'User', 'some', 'path'),
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
-      outputTargets: [{
-        type: 'www',
-        dir: path.join(ROOT, 'www')
-      } as any as d.OutputTargetStats]
     };
+    config.outputTargets = [{
+      type: 'www',
+      dir: pathJoin(config, ROOT, 'www')
+    } as any as d.OutputTargetStats];
   });
 
 
@@ -79,10 +82,10 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'www')
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
+      pathJoin(config, ROOT, 'www')
     ]);
   });
 
@@ -95,11 +98,11 @@ describe('validateTesting', () => {
     ];
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
-      path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'dist-folder'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'www-folder'),
     ]);
   });
 });
