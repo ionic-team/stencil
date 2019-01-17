@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { pathJoin } from '../../util';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
-import { pathJoin } from '../../util';
 
 
 describe('validateTesting', () => {
@@ -80,10 +80,10 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'www')
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
+      pathJoin(config, ROOT, 'www')
     ]);
   });
 
