@@ -19,7 +19,7 @@ describe('validateTesting', () => {
       flags: {},
       outputTargets: [{
         type: 'www',
-        dir: path.join(ROOT, 'www')
+        dir: pathJoin(config, ROOT, 'www')
       } as any as d.OutputTargetStats]
     };
   });
