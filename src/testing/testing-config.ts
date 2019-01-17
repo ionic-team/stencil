@@ -28,8 +28,6 @@ export class TestingConfig implements d.Config {
   testing: d.TestingConfig;
   validateTypes = false;
   nodeResolve: d.NodeResolveConfig = {
-    customResolveOptions: {
-      preserveSymlinks: true,
-    },
+    customResolveOptions: {},
   };
 }

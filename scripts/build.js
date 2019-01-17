@@ -7,6 +7,10 @@ const SCRIPTS_DIR = __dirname;
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const BUILD_ID = getBuildId();
 
+execSync('npm install resolve@1.8.1', {
+  cwd: path.join(__dirname, '..', 'node_modules', 'rollup-plugin-node-resolve')
+});
+
 fs.removeSync(DIST_DIR);
 
 transpile(path.join('..', 'src', 'build-conditionals', 'tsconfig.json'));
