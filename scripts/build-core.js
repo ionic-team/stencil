@@ -69,7 +69,7 @@ if (success) {
 
       }).then(clientCore => {
 
-        let code = clientCore.code.trim();
+        let code = clientCore.output[0].code.trim();
         code = dynamicImportFnHack(code);
 
         fs.writeFile(outputCoreFile, code, (err) => {

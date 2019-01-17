@@ -33,7 +33,10 @@ export async function writeEsmModules(config: d.Config, rollupBundle: RollupBuil
     intro: getIntroPlaceholder(),
     strict: false,
   });
-  return <any>output as d.JSModuleList;
+
+  return output
+    .map(({ fileName, code }) => ({ [fileName]: { code } }))
+    .reduce((acc, val) => ({ ...acc, ...val })) as d.JSModuleList;
 }
 
 
@@ -64,6 +67,8 @@ export async function writeAmdModules(config: d.Config, rollupBundle: RollupBuil
   });
 
 
-  return <any>output as d.JSModuleList;
+  return output
+    .map(({ fileName, code }) => ({ [fileName]: { code } }))
+    .reduce((acc, val) => ({ ...acc, ...val })) as d.JSModuleList;
 }
 

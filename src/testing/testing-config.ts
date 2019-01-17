@@ -27,4 +27,9 @@ export class TestingConfig implements d.Config {
   minifyJs: boolean;
   testing: d.TestingConfig;
   validateTypes = false;
+  nodeResolve: d.NodeResolveConfig = {
+    customResolveOptions: {
+      preserveSymlinks: true,
+    },
+  };
 }
