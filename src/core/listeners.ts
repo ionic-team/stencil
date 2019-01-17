@@ -20,6 +20,7 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
           elm,
           listenMeta.eventName,
           createListenerCallback(plt, elm, listenMeta.eventMethodName),
+          1,
           listenMeta.eventCapture,
           listenMeta.eventPassive
         );
@@ -70,6 +71,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
             elm,
             eventName,
             (ev: any) => instance[listenMeta.eventMethodName](ev),
+            1,
             listenMeta.eventCapture,
             (passive === undefined) ? listenMeta.eventPassive : !!passive,
             attachTo
@@ -79,7 +81,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
       } else {
         // we're disabling the event listener
         // so let's just remove it entirely
-        plt.domApi.$removeEventListener(elm, eventName);
+        plt.domApi.$removeEventListener(elm, eventName, 1);
       }
     }
   }

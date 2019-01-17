@@ -360,7 +360,7 @@ describe('instance listeners', () => {
       };
 
       // test if target-addEventListener is called properly
-      domApi.$addEventListener(el, eventName, f, capture, passive);
+      domApi.$addEventListener(el, eventName, f, 0, capture, passive);
       expect(target.addEventListener).toHaveBeenCalledWith(targetName, internalCallback, {
         passive: passive,
         capture: capture
@@ -376,7 +376,7 @@ describe('instance listeners', () => {
       expect(calledCallback).toBeTruthy();
 
       // test if the listener is removed
-      domApi.$removeEventListener(el, eventName);
+      domApi.$removeEventListener(el, eventName, 0);
       expect(target.removeEventListener).toHaveBeenCalledWith(targetName, internalCallback, {
         passive: passive,
         capture: capture
