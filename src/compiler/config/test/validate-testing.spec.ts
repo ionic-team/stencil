@@ -2,6 +2,7 @@ import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
+import { pathJoin } from '../../util';
 
 
 describe('validateTesting', () => {
@@ -95,11 +96,11 @@ describe('validateTesting', () => {
     ];
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
-      path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'dist-folder'),
+      pathJoin(config, ROOT, 'User', 'some', 'path', 'www-folder'),
     ]);
   });
 });
