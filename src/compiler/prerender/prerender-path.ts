@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { Renderer } from '../../server/index';
 
 
-export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string, prerenderLocation: d.PrerenderLocation) {
+export async function prerenderPath(_config: d.Config, _compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string, prerenderLocation: d.PrerenderLocation) {
   const msg = outputTarget.hydrateComponents ? 'prerender' : 'optimize html';
   const timeSpan = buildCtx.createTimeSpan(`${msg}, started: ${prerenderLocation.path}`);
 
@@ -13,7 +12,7 @@ export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx
 
   try {
     // create the renderer config
-    const rendererConfig = Object.assign({}, config);
+    // const rendererConfig = Object.assign({}, config);
 
     // create the hydrate options from the prerender config
     const hydrateOpts: d.HydrateOptions = {};
@@ -25,7 +24,8 @@ export async function prerenderPath(config: d.Config, compilerCtx: d.CompilerCtx
     hydrateOpts.html = indexSrcHtml;
 
     // create a server-side renderer
-    const renderer = new Renderer(rendererConfig, null, compilerCtx, outputTarget);
+    // import { Renderer } from '@server'; TODO
+    const renderer: any = null; // new Renderer(rendererConfig, null, compilerCtx, outputTarget);
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html

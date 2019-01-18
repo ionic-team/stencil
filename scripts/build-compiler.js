@@ -30,6 +30,7 @@ async function bundleCompiler() {
       'typescript',
       '../mock-doc',
       '../renderer/vdom',
+      '../server',
       '../sys/node',
       '../utils'
     ],
@@ -42,6 +43,9 @@ async function bundleCompiler() {
             }
             if (id === '@mock-doc') {
               return '../mock-doc';
+            }
+            if (id === '@server') {
+              return '../server';
             }
             if (id === '@sys') {
               return '../sys/node';

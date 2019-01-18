@@ -36,6 +36,9 @@
       "@platform": [
         "../client/index.ts"
       ],
+      "@server": [
+        "../server/index.ts"
+      ],
       "@sys": [
         "../sys/node/index.ts"
       ],
