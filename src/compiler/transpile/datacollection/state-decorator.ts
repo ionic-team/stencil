@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
 import { MEMBER_TYPE } from '@stencil/core/utils';
 import ts from 'typescript';

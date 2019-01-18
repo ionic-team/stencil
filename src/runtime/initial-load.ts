@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { consoleError, doc, loadModule, plt } from '@stencil/core/platform';
 import { proxyComponent } from './proxy-component';

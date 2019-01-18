@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { addCollection } from '../transformers/collections/add-collection';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';

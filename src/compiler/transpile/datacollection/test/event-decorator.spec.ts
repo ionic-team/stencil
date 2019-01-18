@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import * as d from '@declarations';
 import { convertOptionsToMeta, getEventDecoratorMeta, getEventName } from '../event-decorator';
 import { gatherMetadata } from './test-utils';
 import * as path from 'path';

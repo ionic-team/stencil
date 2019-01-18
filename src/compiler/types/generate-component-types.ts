@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { captializeFirstLetter, dashToPascalCase } from '@stencil/core/utils';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-file-naming';

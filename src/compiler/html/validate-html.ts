@@ -1,5 +1,5 @@
 import * as c from '@stencil/core/utils';
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildWarn } from '../util';
 
 

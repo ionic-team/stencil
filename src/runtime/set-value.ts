@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { consoleError } from '@stencil/core/platform';
 import { update } from './update';

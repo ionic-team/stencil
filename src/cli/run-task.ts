@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
 import { taskHelp } from './task-help';

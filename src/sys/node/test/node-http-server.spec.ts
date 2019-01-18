@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getFilePath } from '../node-http-server';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../../compiler/config/validate-config';

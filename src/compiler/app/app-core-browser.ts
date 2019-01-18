@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildCoreContent } from './build-core-content';
 import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
 import { generatePreamble, pathJoin } from '../util';

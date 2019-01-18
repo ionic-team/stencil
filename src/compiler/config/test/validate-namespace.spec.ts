@@ -1,4 +1,4 @@
-import { Config } from '../../../declarations';
+import { Config } from '@declarations';
 import { validateNamespace } from '../validate-namespace';
 
 

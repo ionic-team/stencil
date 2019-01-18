@@ -1,4 +1,4 @@
-import { Config, StencilSystem } from '../../declarations';
+import { Config, StencilSystem } from '@declarations';
 
 
 export function loadConfig(sys: StencilSystem, config: string | Config) {

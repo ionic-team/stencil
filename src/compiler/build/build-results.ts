@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE, cleanDiagnostics, hasError, normalizePath } from '@stencil/core/utils';
 import { generateHmr } from './build-hmr';
 

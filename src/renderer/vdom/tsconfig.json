@@ -25,6 +25,9 @@
       "@stencil/core/build-conditionals": [
         "../../compiler/app-core/build-conditionals.ts"
       ],
+      "@declarations": [
+        "../../declarations/index.ts"
+      ],
       "@stencil/core/platform": [
         "../../client/index.ts"
       ],

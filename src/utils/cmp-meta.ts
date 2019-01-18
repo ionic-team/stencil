@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { MEMBER_TYPE, PROP_TYPE } from './constants';
 
 

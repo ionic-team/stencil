@@ -1,4 +1,4 @@
-import { Collection, CompilerCtx, Config, PackageJsonData } from '../../declarations';
+import { Collection, CompilerCtx, Config, PackageJsonData } from '@declarations';
 import { normalizePath, pathJoin } from '../util';
 import { parseCollectionData } from './collection-data';
 

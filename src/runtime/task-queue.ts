@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt, queueDomReads, queueDomWrites, queueDomWritesLow, raf, win } from '@stencil/core/platform';
 

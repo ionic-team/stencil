@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import * as ws from 'ws';
 import * as http from 'http';
 import { noop } from '@stencil/core/utils';

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export async function writeLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, derivedModule: d.DerivedModule, bundleId: string, jsText: string) {

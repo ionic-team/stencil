@@ -1,4 +1,4 @@
-import { Config } from '../../../declarations';
+import { Config } from '@declarations';
 import { isFileIncludePath } from '../transpile-service';
 import { mockConfig } from '../../../testing/mocks';
 

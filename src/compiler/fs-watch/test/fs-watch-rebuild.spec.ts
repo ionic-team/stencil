@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { BuildEvents } from '../../events';
 import { generateBuildFromFsWatch, shouldRebuild } from '../fs-watch-rebuild';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';

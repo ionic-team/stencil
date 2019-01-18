@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { h } from '../h';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 import { render } from '../../../core/render';

@@ -1,4 +1,4 @@
-import { AppGlobal, DomApi, EventEmitterData } from '../declarations';
+import { AppGlobal, DomApi, EventEmitterData } from '@declarations';
 import { KEY_CODE_MAP, NODE_TYPE } from '@stencil/core/utils';
 import { toLowerCase } from '@stencil/core/utils';
 

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from '../distribution/stencil-types';
 import { isDtsFile, pathJoin } from '@stencil/core/utils';
 import { generateComponentTypes } from '../types/generate-component-types';

@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import * as d from '@declarations';
 import { gatherMetadata } from './test-utils';
 import { getWatchDecoratorMeta } from '../watch-decorator';
 import * as path from 'path';

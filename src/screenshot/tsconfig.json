@@ -23,6 +23,9 @@
     "target": "es2015",
     "baseUrl": ".",
     "paths": {
+      "@declarations": [
+        "../declarations/index.ts"
+      ],
       "@stencil/core/utils": [
         "../utils/index.ts"
       ]

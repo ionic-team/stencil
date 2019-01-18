@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { WEB_COMPONENTS_JSON_FILE_NAME } from '@stencil/core/utils';
 import { normalizePath } from '@stencil/core/utils';
 

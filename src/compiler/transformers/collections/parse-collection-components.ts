@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { noop } from '@stencil/core/utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { pathJoin } from '@stencil/core/utils';

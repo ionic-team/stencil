@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildWarn } from '../../util';
 import { getAttributeTypeInfo, serializeSymbol } from './utils';
 import { getDeclarationParameters, isDecoratorNamed, isPropertyWithDecorators } from './utils';

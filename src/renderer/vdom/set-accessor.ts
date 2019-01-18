@@ -7,7 +7,7 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { getElmRef } from '@stencil/core/platform';
 import { toLowerCase } from '@stencil/core/utils';

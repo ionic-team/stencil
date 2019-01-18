@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '@stencil/core/utils';
 
 

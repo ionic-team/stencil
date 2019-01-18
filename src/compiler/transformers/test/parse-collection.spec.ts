@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { mockConfig } from '../../../testing/mocks';
 import { TestingFs } from '../../../testing/testing-fs';
 import { transpileModule } from './transpile';

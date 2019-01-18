@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { createStaticGetter, isDecoratorNamed, removeDecorator } from '../transform-utils';
 import ts from 'typescript';
 

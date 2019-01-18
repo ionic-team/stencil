@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { resetBuildConditionals } from './testing-build';
 
 

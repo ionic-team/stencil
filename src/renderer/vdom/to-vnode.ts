@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export function toVNode(domApi: d.DomApi, node: Node): d.VNode {

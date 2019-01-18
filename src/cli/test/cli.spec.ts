@@ -1,4 +1,4 @@
-import { Config, ConfigFlags } from '../../declarations';
+import { Config, ConfigFlags } from '@declarations';
 import { getConfigFilePath } from '../cli-utils';
 import { mockStencilSystem } from '../../testing/mocks';
 import { parseFlags } from '../parse-flags';

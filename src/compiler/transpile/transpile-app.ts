@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { catchError } from '@stencil/core/utils';
 import { generateComponentTypes } from '../types/generate-component-types';
 import { transpileService } from './transpile-service';

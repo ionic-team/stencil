@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '@stencil/core/utils';
 
 

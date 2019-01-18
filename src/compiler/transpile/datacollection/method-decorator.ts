@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol, typeToString } from './utils';
 import { MEMBER_TYPE } from '@stencil/core/utils';
 import { validatePublicName } from './reserved-public-members';

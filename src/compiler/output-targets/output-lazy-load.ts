@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
 import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';

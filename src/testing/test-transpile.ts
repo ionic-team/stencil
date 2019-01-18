@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { loadTypeScriptDiagnostic, normalizePath } from '@stencil/core/utils';
 import { TestLogger } from './test-logger';
 import { TestingSystem } from './testing-sys';

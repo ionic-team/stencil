@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { normalizePath } from '../../util';
 import { parseCollectionModule } from '../../collections/parse-collection-module';
 import ts from 'typescript';

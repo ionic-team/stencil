@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import { Config } from '@declarations';
 
 
 export function validatePlugins(config: Config) {

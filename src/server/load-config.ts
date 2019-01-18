@@ -1,4 +1,4 @@
-import { Config, StencilSystem } from '../declarations';
+import { Config, StencilSystem } from '@declarations';
 import { loadConfig as utilLoadConfig } from '../compiler/config/load-config';
 
 

@@ -7,9 +7,8 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
-import { FunctionalUtilities } from '../../declarations';
 
 const stack: any[] = [];
 
@@ -127,7 +126,7 @@ export function h(nodeName: any, vnodeData: any) {
 }
 
 
-const vdomFnUtils: FunctionalUtilities = {
+const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.forEach(cb),
   'map': (children, cb) => children.map(cb)
 };

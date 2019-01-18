@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import ts from 'typescript';
 

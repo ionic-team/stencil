@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '@stencil/core/utils';
 import { runJest } from './jest/jest-runner';

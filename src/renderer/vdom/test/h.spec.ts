@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { h } from '../h';
-import { FunctionalComponent } from '../../../declarations';
+import { FunctionalComponent } from '@declarations';
 
 
 describe('h()', () => {

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { getElmRef } from '@stencil/core/platform';
 import { MEMBER_TYPE } from '../utils/constants';

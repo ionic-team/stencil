@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildError, buildWarn } from '../../util';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators } from './utils';
 import ts from 'typescript';

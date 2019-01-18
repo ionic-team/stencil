@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble } from '../util';
 import { getCoreEsmBuildPath, getGlobalEsmFileName } from './app-file-naming';

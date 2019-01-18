@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { getDistCjsIndexPath } from '../app/app-file-naming';
 
 

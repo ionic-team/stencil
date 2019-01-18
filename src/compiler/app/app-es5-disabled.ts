@@ -1,4 +1,4 @@
-import { CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
+import { CompilerCtx, Config, OutputTargetBuild } from '@declarations';
 import { getAppBuildDir } from './app-file-naming';
 import { pathJoin } from '../util';
 

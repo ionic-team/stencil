@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { normalizePath } from '@stencil/core/utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';

@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import * as d from '@declarations';
 import { getNextWorker } from '..';
 import { TestWorkerMain } from './test-worker-main';
 

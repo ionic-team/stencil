@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { getPolyfillsEsmBuildPath } from './app-file-naming';
 import { pathJoin } from '@stencil/core/utils';
 

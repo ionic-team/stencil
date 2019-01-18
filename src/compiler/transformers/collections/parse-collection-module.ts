@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { normalizePath, pathJoin } from '@stencil/core/utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 

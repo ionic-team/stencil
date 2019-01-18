@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { processAppGraph } from '../app-graph';
 import { mockBuildCtx } from '../../../testing/mocks';
 

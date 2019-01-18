@@ -1,5 +1,5 @@
 import { Compiler, validateConfig } from '@stencil/core/compiler';
-import { Config } from '../declarations';
+import { Config } from '@declarations';
 import { TestingConfig } from './testing-config';
 
 

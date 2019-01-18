@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { createHashedFileName, getFilePathFromUrl } from './util';
 import { hasFileExtension } from '@stencil/core/utils';
 

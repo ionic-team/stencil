@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTasks } from '../config-copy-tasks';
 import { mockConfig } from '../../../testing/mocks';
 import { normalizePath } from '../../util';

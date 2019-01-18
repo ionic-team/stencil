@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { appUpdate } from './app-update';
 import { logDisabled, logReload, logWarn } from './logger';
 import { updateBuildStatus } from './build-status';

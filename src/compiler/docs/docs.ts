@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { catchError, cleanDiagnostics, hasError } from '@stencil/core/utils';
 import { generateDocData } from './generate-doc-data';

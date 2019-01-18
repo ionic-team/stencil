@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 

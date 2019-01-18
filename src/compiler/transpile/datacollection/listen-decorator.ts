@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import ts from 'typescript';
 

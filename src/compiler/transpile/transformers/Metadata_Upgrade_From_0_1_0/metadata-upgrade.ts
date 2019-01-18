@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import * as d from '@declarations';
 import { addStaticMeta } from '../add-component-metadata';
 import { normalizePath } from '../../../util';
 import ts from 'typescript';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 // import { createRendererPatch } from '../renderer/vdom/patch';

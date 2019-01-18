@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@stencil/core/utils';
 import { normalizePath } from '@stencil/core/utils';
 

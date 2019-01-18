@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
 import { transpileCoreBuild } from '../transpile/core-es5-build';
 import { replaceBuildString } from '../../util/text-manipulation';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { connectElement } from '../../../server/connect-element';
 import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../ssr';

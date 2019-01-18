@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { createHttpServer } from './server-http';
 import { createWebSocket } from './server-web-socket';
 import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './util';

@@ -1,4 +1,4 @@
-import { HydrateResults } from '../../declarations';
+import { HydrateResults } from '@declarations';
 
 export async function insertModulePreload(results: HydrateResults, doc: Document) {
   console.log('results.bundleUrls',  results.bundleUrls);

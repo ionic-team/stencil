@@ -1,4 +1,4 @@
-import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../declarations';
+import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '@declarations';
 import { createOnWarnFn, loadRollupDiagnostics } from '@stencil/core/utils';
 import { generatePreamble } from '@stencil/core/utils';
 import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildWarn, catchError } from '../../util';
 import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils';
 import { MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';

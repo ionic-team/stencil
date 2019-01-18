@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { ENCAPSULATION } from '@stencil/core/utils';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 

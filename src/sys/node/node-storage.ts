@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { createHash } from 'crypto';
 import { tmpdir } from 'os';
 import { join } from 'path';

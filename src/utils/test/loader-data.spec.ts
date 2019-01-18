@@ -1,4 +1,4 @@
-import { ComponentMeta } from '../../declarations';
+import { ComponentMeta } from '@declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../constants';
 import { formatBrowserLoaderComponent } from '../data-serialize';
 import { parseComponentLoader, parsePropertyValue } from '../data-parse';

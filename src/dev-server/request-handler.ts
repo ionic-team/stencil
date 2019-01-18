@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { isDevClient } from './util';
 import { normalizePath } from '@stencil/core/utils';
 import { serveDevClient } from './serve-dev-client';

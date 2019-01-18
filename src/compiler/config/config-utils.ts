@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import { Config } from '@declarations';
 
 
 export function setBooleanConfig(config: any, configName: string, flagName: string, defaultValue: boolean) {

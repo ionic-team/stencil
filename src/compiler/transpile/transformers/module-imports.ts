@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getModuleFile } from '../../build/compiler-ctx';
 import { normalizePath } from '../../util';
 import ts from 'typescript';

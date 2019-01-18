@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { InMemoryFileSystem, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
 import { mockFs } from '../../testing/mocks';
 import { normalizePath } from '@stencil/core/utils';

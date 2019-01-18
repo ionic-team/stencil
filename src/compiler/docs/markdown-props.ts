@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { MarkdownTable } from './docs-util';
 
 export function propsToMarkdown(props: d.JsonDocsProp[]) {

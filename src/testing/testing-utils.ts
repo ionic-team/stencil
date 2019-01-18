@@ -1,4 +1,4 @@
-import { BuildResults, InMemoryFileSystem } from '../declarations';
+import { BuildResults, InMemoryFileSystem } from '@declarations';
 import { normalizePath } from '@stencil/core/utils';
 
 

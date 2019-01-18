@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import { visitSource } from '../visitors/visit-source';

@@ -6,7 +6,7 @@
  *
  * Modified for Stencil's renderer and slot projection
  */
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { doc, plt } from '@stencil/core/platform';
 import { h } from './h';

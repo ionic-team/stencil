@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { generateNativeAppCore } from '../app-core/generate-native-core';

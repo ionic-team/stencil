@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildError, catchError, normalizePath } from '@stencil/core/utils';
 import { NodeFs } from '../../sys/node/node-fs';
 import * as path from 'path';

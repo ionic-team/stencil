@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { BuildEvents } from '../../events';
 import { FsWatchNormalizer } from '../fs-watch-normalizer';
 import { mockConfig } from '../../../testing/mocks';

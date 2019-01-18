@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
 import { dashToPascalCase } from '@stencil/core/utils';
 // import { formatBrowserLoaderComponent } from '../../util/data-serialize';

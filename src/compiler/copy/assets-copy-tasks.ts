@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { getAppBuildDir } from '../app/app-file-naming';
 import { normalizePath, pathJoin } from '@stencil/core/utils';
 

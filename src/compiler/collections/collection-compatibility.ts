@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export function validateCollectionCompatibility(config: d.Config, collection: d.Collection): number[] {

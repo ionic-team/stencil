@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { loadConfig as compilerLoadConfig } from '../../compiler/config/load-config';
 import { loadConfig as serverLoadConfig } from '../load-config';
 import { Renderer } from '../renderer';

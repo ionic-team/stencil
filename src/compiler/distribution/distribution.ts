@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { copyComponentStyles } from '../copy/copy-styles';
 import { generateCommonJsIndex } from './dist-cjs';
 import { generateEsmIndexes } from './dist-esm';

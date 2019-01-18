@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { assetVersioning } from '../asset-versioning/asset-versioning';
 import { catchError } from '@stencil/core/utils';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';

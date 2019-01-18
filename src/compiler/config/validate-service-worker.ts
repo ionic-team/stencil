@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { getGlobalFileName, getRegistryFileName } from '../app/app-file-naming';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 

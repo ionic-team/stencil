@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildWarn } from '../../util';
 import { ENCAPSULATION } from '@stencil/core/utils';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';

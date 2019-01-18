@@ -21,7 +21,13 @@
     "outDir": "../../dist/transpiled-mock-doc",
     "pretty": true,
     "rootDir": "../",
-    "target": "es2015"
+    "target": "es2015",
+    "baseUrl": ".",
+    "paths": {
+      "@declarations": [
+        "../declarations/index.ts"
+      ]
+    }
   },
   "include": [
     "../../types/*.d.ts"

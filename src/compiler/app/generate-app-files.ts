@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { catchError } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateBrowserAppGlobalScript } from './app-global-scripts';

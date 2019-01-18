@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { isDef } from './helpers';
 import { PROP_TYPE } from './constants';
 

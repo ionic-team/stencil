@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildError, catchError, hasFileExtension, normalizePath } from '@stencil/core/utils';
 import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';

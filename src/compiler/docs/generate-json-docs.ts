@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 export async function generateJsonDocs(compilerCtx: d.CompilerCtx, jsonOutputs: d.OutputTargetDocsJson[], docsData: d.JsonDocs) {
   const json = {

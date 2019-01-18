@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
 import { getComponentsWithStyles, setStylePlaceholders } from './register-app-styles';
 import { updateToNativeComponents } from '../component-native/update-to-native-component';

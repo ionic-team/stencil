@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { APP_NAMESPACE_REGEX, generatePreamble } from '@stencil/core/utils';
 import { formatBrowserLoaderComponentTagNames } from '../../util/data-serialize';
 import { getLoaderPath } from './app-file-naming';

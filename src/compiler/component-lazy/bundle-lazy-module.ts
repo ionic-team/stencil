@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import abortPlugin from '../rollup-plugins/abort-plugin';
 import bundleJson from '../rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '@stencil/core/utils';

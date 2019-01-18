@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 export function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {

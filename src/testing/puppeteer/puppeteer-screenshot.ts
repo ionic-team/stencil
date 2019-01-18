@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { compareScreenshot } from '../../screenshot/screenshot-compare';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';

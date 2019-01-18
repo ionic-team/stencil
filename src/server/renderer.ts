@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { catchError } from '@stencil/core/utils';
 import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { hydrateHtml } from './hydrate-html';

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { printUpdateMessage, requestLatestCompilerVersion } from '../sys/node/check-version';
 import exit from 'exit';
 

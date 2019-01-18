@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 // import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildContext } from '../build/build-ctx';
 import { loadTypeScriptDiagnostics, noop, normalizePath } from '@stencil/core/utils';

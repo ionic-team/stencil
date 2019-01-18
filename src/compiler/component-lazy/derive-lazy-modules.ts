@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 
 

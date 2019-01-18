@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { getModule } from '../../build/compiler-ctx';
 import { normalizePath } from '@stencil/core/utils';
 

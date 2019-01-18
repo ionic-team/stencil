@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export async function transpileToEs5Main(config: d.Config, compilerCtx: d.CompilerCtx, input: string, inlineHelpers = true) {

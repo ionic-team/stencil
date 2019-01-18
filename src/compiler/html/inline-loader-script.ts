@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { getLoaderFileName, getLoaderPath } from '../app/app-file-naming';
 import { normalizePath } from '../util';
 

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../util';
 import { logDiagnostic } from './logger';
 import { updateBuildStatus } from './build-status';

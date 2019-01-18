@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
 import { initFsWatch } from '../fs-watch/fs-watch-init';

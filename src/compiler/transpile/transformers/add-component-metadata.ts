@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';

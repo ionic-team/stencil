@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@stencil/core/utils';
 import { isComponentClassNode } from '../transformers/transform-utils';
 import { removeStaticMetaProperties } from '../transformers/remove-static-meta-properties';

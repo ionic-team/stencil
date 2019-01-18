@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { writeLazyEntryModule } from './write-lazy-module';
 

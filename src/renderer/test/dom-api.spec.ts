@@ -1,4 +1,4 @@
-import { AppGlobal, DomApi } from '../../declarations';
+import { AppGlobal, DomApi } from '@declarations';
 import { mockWindow } from '../../testing/mocks';
 import { createDomApi } from '../dom-api';
 

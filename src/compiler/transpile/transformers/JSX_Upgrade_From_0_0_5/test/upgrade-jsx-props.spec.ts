@@ -1,4 +1,4 @@
-import * as d from '../../../../../declarations';
+import * as d from '@declarations';
 import * as util from 'util';
 import * as fs from 'fs';
 import * as path from 'path';

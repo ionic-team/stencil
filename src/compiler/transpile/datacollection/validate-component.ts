@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildWarn } from '../../util';
 import { isMethod } from './utils';
 import ts from 'typescript';

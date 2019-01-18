@@ -1,4 +1,4 @@
-import { CompilerCtx, Config } from '../../../declarations';
+import { CompilerCtx, Config } from '@declarations';
 import {
   mockConfig,
   mockStencilSystem

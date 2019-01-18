@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { buildJestArgv } from '../jest-config';
 import { parseFlags } from '../../../cli/parse-flags';
 import { TestingConfig } from '../../testing-config';

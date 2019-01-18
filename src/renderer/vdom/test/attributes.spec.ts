@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { h } from '../h';
 import { mockDocument, mockRenderer } from '../../../testing/mocks';
 

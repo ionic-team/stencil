@@ -1,5 +1,5 @@
 import { compareHtml, mockConfig } from '../../testing/mocks';
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '@declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 import { h } from '../../renderer/vdom/h';
 import { hydrateHtml } from '../hydrate-html';

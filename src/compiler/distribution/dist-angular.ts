@@ -1,8 +1,8 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { dashToPascalCase } from '@stencil/core/utils';
 import { MEMBER_TYPE } from '@stencil/core/utils';
 import { isDocsPublic } from '@stencil/core/utils';
-import { OutputTargetAngular } from '../../declarations';
+import { OutputTargetAngular } from '@declarations';
 
 
 export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {

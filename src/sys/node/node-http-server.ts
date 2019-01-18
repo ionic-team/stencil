@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export function createServer(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {

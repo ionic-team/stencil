@@ -1,4 +1,4 @@
-import { Config } from '../../../declarations';
+import { Config } from '@declarations';
 import { mockDocument } from '../../../testing/mocks';
 import { removeUnusedStyles } from '../remove-unused-styles';
 import { UsedSelectors } from '../../html/used-selectors';

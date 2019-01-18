@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
 

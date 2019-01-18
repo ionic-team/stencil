@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { updateCanonicalLink, updateCanonicalLinkHref } from '../canonical-link';
 import { mockConfig, mockDocument } from '../../../testing/mocks';
 

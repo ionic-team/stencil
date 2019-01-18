@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { formatComponentConstructorEvent, formatComponentConstructorEvents, formatComponentConstructorListener, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../data-serialize';
 import { MEMBER_TYPE, PROP_TYPE } from '../constants';
 

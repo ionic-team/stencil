@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { minifyJs } from '../minifier';
 import { optimizeCss } from '../style/optimize-css';
 

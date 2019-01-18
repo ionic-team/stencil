@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export async function emptyOutputTargetDirs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

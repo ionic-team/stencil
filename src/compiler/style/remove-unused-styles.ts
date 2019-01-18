@@ -1,4 +1,4 @@
-import { Config, Diagnostic } from '../../declarations';
+import { Config, Diagnostic } from '@declarations';
 import { parseCss } from './parse-css';
 import { StringifyCss } from './stringify-css';
 import { UsedSelectors } from '../html/used-selectors';

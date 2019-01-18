@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 

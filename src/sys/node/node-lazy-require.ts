@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { dirname } from 'path';
 import { NodeResolveModule } from './node-resolve-module';
 import { readFile } from 'graceful-fs';

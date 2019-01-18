@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { addBundles, formatLinkRelPreloadHeader, getBundleIds, getUrlFromFilePath, mergeUserHostConfig, sortComponents } from '../host-config';
 import { pathJoin } from '../../util';
 import { TestingConfig } from '../../../testing/testing-config';

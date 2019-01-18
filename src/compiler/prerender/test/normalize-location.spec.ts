@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { crawlAnchorsForNextUrls, normalizePrerenderLocation } from '../prerender-utils';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../../config/validate-config';

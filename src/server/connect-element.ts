@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 // import { connectedCallback } from '../core/connected';
 // import { ENCAPSULATION } from '@stencil/core/utils';
 // import { initHostElement } from '../core/init-host-element';

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 // import { initHostElement } from '../core/init-host-element';
 // import { initHostSnapshot } from '../core/host-snapshot';
 

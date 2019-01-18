@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { h } from '../h';
 import { mockDomApi, mockRenderer } from '../../../testing/mocks';
 import { SVG_NS } from '@stencil/core/utils';

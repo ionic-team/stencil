@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { fileExists, readFile, writeFile } from './screenshot-fs';
 import { join, relative } from 'path';
 import { normalizePath } from '@stencil/core/utils';

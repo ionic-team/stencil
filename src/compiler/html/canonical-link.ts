@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 
 
 export function updateCanonicalLink(config: d.Config, doc: Document, windowLocationPath: string) {

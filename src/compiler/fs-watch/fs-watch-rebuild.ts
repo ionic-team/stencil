@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { isCopyTaskFile } from '../copy/config-copy-tasks';

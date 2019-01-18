@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { FsWatchNormalizer } from './fs-watch-normalizer';
 import { normalizePath } from '@stencil/core/utils';
 

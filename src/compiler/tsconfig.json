@@ -27,6 +27,9 @@
       "@stencil/core/build-conditionals": [
         "./app-core/build-conditionals.ts"
       ],
+      "@declarations": [
+        "../declarations/index.ts"
+      ],
       "@stencil/core/mock-doc": [
         "../mock-doc/index.ts"
       ],

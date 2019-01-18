@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
 import { getStaticValue } from '../transform-utils';
 import { normalizeStyles } from '../../style/normalize-styles';

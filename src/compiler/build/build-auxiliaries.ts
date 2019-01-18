@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { generateDocs } from '../docs/docs';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { prerenderOutputTargets } from '../prerender/prerender-app';

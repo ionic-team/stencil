@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { catchError, toDashCase } from '@stencil/core/utils';
 import { copyComments, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, objectToObjectLiteral, removeDecorator, resolveType, typeToString } from '../transform-utils';
 import ts from 'typescript';

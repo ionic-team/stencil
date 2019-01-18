@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { generateAngularProxies } from './output-angular';
 import { generateCollections } from './output-collection';
 import { generateCommonJsIndexes } from './output-commonjs';

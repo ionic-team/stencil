@@ -1,4 +1,4 @@
-import  * as d from '../../declarations';
+import  * as d from '@declarations';
 
 
 export function hmrInlineStyles(elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate[]) {

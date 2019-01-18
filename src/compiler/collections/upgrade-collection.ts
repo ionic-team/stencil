@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { catchError } from '../util';
 import { CompilerUpgrade, validateCollectionCompatibility } from './collection-compatibility';
 import { componentDependencies } from '../transpile/transformers/component-dependencies';

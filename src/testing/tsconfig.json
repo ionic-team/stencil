@@ -29,6 +29,9 @@
       "@stencil/core/compiler": [
         "../compiler/index.ts"
       ],
+      "@declarations": [
+        "../declarations/index.ts"
+      ],
       "@stencil/core/mock-doc": [
         "../mock-doc/index.ts"
       ],

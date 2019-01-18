@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@declarations';
 import { validateOutputTargetDist } from '../validate-outputs-dist';
 import * as path from 'path';
 

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@stencil/core/platform';
 import { attachStyles } from './styles';
 import { BUILD } from '@stencil/core/build-conditionals';

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildAuxiliaries } from './build-auxiliaries';
 import { catchError } from '@stencil/core/utils';
 import { copyTasksMain } from '../copy/copy-tasks-main';

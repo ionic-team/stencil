@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@declarations';
 import fs from 'graceful-fs';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';

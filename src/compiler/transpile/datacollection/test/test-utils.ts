@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import * as d from '@declarations';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import * as path from 'path';
 import ts from 'typescript';

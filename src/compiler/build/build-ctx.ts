@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { buildFinish } from './build-finish';
 import { hasError, hasWarning } from '@stencil/core/utils';
 

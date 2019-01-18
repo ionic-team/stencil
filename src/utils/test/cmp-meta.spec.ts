@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@declarations';
 import { fillCmpMetaFromConstructor } from '../cmp-meta';
 import { MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
 
