@@ -51,11 +51,6 @@ exports.getBuildId = getBuildId;
 
 
 function updateBuildIds(input) {
-  // __BUILDID__
-  // __BUILDID:TRANSPILE__
-  // __BUILDID:OPTIMIZECSS__
-  // __BUILDID:MINIFYJS__
-
   let buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
   if (buildId === '') {
     buildId = getBuildId();
@@ -68,18 +63,18 @@ function updateBuildIds(input) {
 
   output = output.replace(/__BUILDID__/g, buildId);
 
-  let transpilePkg = require('../node_modules/typescript/package.json');
-  let transpileId = transpilePkg.name + transpilePkg.version + CACHE_BUSTER;
+  const transpilePkg = require('../node_modules/typescript/package.json');
+  const transpileId = transpilePkg.name + transpilePkg.version + '_' + CACHE_BUSTER;
   output = output.replace(/__BUILDID:TRANSPILE__/g, transpileId);
 
-  let minifyJsPkg = require('../node_modules/terser/package.json');
-  let minifyJsId = minifyJsPkg.name + minifyJsPkg.version + CACHE_BUSTER;
+  const minifyJsPkg = require('../node_modules/terser/package.json');
+  const minifyJsId = minifyJsPkg.name + minifyJsPkg.version + '_' + CACHE_BUSTER;
   output = output.replace(/__BUILDID:MINIFYJS__/g, minifyJsId);
 
-  let autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
-  let cssnanoPkg = require('../node_modules/cssnano/package.json');
-  let postcssPkg = require('../node_modules/postcss/package.json');
-  let id = autoprefixerPkg.name + autoprefixerPkg.version + '_' + cssnanoPkg.name + cssnanoPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+  const autoprefixerPkg = require('../node_modules/autoprefixer/package.json');
+  const cssnanoPkg = require('../node_modules/cssnano/package.json');
+  const postcssPkg = require('../node_modules/postcss/package.json');
+  const id = autoprefixerPkg.name + autoprefixerPkg.version + '_' + cssnanoPkg.name + cssnanoPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
   output = output.replace(/__BUILDID:OPTIMIZECSS__/g, id);
 
   return output;

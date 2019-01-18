@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
 import { transpileCoreBuild } from '../transpile/core-es5-build';
 import { replaceBuildString } from '../../util/text-manipulation';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
 
 
 export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
@@ -87,7 +88,7 @@ export async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, s
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyCore', '__BUILDID__', opts, input);
+    cacheKey = compilerCtx.cache.createKey('minifyCore', COMPILER_BUILD.id, opts, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return {

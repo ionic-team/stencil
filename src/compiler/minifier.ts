@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { COMPILER_BUILD } from './build/compiler-build-id';
 import { generatePreamble } from '@utils';
 import { sys } from '@sys';
 
@@ -53,7 +54,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
   let cacheKey: string;
 
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyJs', '__BUILDID:MINIFYJS__', opts, jsText);
+    cacheKey = compilerCtx.cache.createKey('minifyJs', COMPILER_BUILD.minfyJs, opts, jsText);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return cachedContent;

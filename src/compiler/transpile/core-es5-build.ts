@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { loadTypeScriptDiagnostics } from '@utils';
 import ts from 'typescript';
 
 
@@ -11,7 +11,7 @@ export async function transpileCoreBuild(config: d.Config, compilerCtx: d.Compil
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('transpileCoreBuild', '__BUILDID:TRANSPILE__', coreBuild, input);
+    cacheKey = compilerCtx.cache.createKey('transpileCoreBuild', COMPILER_BUILD.tranpiler, coreBuild, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       results.code = cachedContent;

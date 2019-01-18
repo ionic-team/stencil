@@ -3,6 +3,7 @@ import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
 import { catchError } from '@utils';
 import { CompilerContext } from './build/compiler-ctx';
+import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
 import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
@@ -45,7 +46,7 @@ export class Compiler implements d.Compiler {
       logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
       logger.debug(`compiler runtime: ${sys.compiler.runtime}`);
-      logger.debug(`compiler build: __BUILDID__`);
+      logger.debug(`compiler build: ${COMPILER_BUILD.id}`);
 
       const workerOpts = sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
       logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);

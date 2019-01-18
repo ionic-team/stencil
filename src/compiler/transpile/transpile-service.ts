@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { addCollection } from '../transformers/collections/add-collection';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getModule } from '../build/compiler-ctx';
@@ -88,7 +89,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.outDir = undefined;
 
   // create a config key that will be used as part of the file's cache key
-  transpileCtx.configKey = createConfiKey(config, compilerOptions);
+  transpileCtx.configKey = createConfigKey(config, compilerOptions);
 
   const servicesHost: ts.LanguageServiceHost = {
     getScriptFileNames: () => transpileCtx.compilerCtx.rootTsFiles,
@@ -409,7 +410,7 @@ export function isFileIncludePath(config: d.Config, readPath: string) {
 }
 
 
-function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
+function createConfigKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
   // create a unique config key with stuff that "might" matter for typescript builds
   // not using the entire config object
   // since not everything is a primitive and could have circular references
@@ -433,7 +434,7 @@ function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
       config.excludeSrc,
       config.includeSrc,
       compilerOptions,
-      '__BUILDID:TRANSPILE__'
+      COMPILER_BUILD.id
     ]
   ), 32);
 }

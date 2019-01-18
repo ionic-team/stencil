@@ -1,3 +1,4 @@
+import { COMPILER_BUILD } from '@compiler';
 import { formatDiagnostic, getCompilerOptions, transpile } from '../test-transpile';
 
 
@@ -43,7 +44,7 @@ export const jestPreprocessor = {
     }
 
     const key = [
-      '__BUILDID__',
+      COMPILER_BUILD.id,
       process.version,
       this._tsCompilerOptionsKey,
       code,

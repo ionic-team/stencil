@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { RESERVED_PROPERTIES } from './reserved-properties';
 import { sys } from '@sys';
 
@@ -60,7 +61,7 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyCore', '__BUILDID__', opts, input);
+    cacheKey = compilerCtx.cache.createKey('minifyCore', COMPILER_BUILD.id, opts, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return {
