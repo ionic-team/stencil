@@ -53,6 +53,8 @@ async function buildCli() {
 
 run(async () => {
   transpile(path.join('..', 'src', 'cli', 'tsconfig.json'));
+
   await buildCli();
+
   await fs.remove(TRANSPILED_DIR);
 });
