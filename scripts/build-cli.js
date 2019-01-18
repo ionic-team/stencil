@@ -21,12 +21,16 @@ async function buildCli() {
       'https',
       'os',
       'path',
-      '../utils'
+      '../utils',
+      '../sys/node'
     ],
     plugins: [
       (() => {
         return {
           resolveId(id) {
+            if (id === '@sys/node') {
+              return '../sys/node';
+            }
             if (id === '@utils') {
               return '../utils';
             }

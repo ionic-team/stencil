@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getLatestCompilerVersion, validateCompilerVersion } from '../sys/node/check-version';
+import { getLatestCompilerVersion, validateCompilerVersion } from '@sys/node';
 import { hasError } from './cli-utils';
 import exit from 'exit';
 

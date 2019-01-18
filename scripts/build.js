@@ -12,6 +12,8 @@ const buildId = getBuildId();
 
 const start = Date.now();
 
+console.log(color.dim(`\n  Build: ${buildId}\n`));
+
 run(async () => {
   execSync('npm install resolve@1.8.1', {
     cwd: path.join(__dirname, '..', 'node_modules', 'rollup-plugin-node-resolve')
@@ -47,22 +49,19 @@ run(async () => {
           };
           const cp = fork(cmd, args, opts);
 
-          let err = '';
-
-          cp.stderr.on('data', (data) => {
-            err += data;
+          cp.stderr.on('data', data => {
+            errors.push(data);
           });
 
-          cp.on('exit', (code) => {
+          cp.on('exit', code => {
             if (code != 0) {
-              reject(err);
+              reject();
             } else {
               resolve();
             }
           });
 
-        }).catch(err => {
-          errors.push(err);
+        }).catch(() => {
           throw new Error();
         });
       }
@@ -76,7 +75,7 @@ run(async () => {
   });
 
   listr.run().then(() => {
-    console.log(color.dim(`\n  Build: ${Date.now() - start}ms\n`));
+    console.log(color.dim(`\n  ${Date.now() - start}ms`) + '  🎉\n');
 
   }).catch(() => {
     console.error('\n' + errors.join('\n'));
@@ -88,7 +87,7 @@ run(async () => {
 function getBuildId() {
   const d = new Date();
 
-  let buildId = ('0' + d.getUTCFullYear()).slice(-2);
+  let buildId = d.getUTCFullYear();
   buildId += ('0' + (d.getUTCMonth() + 1)).slice(-2);
   buildId += ('0' + d.getUTCDate()).slice(-2);
   buildId += ('0' + d.getUTCHours()).slice(-2);

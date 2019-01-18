@@ -100,6 +100,7 @@ async function bundleNodeSysMain() {
       'crypto',
       'events',
       'fs',
+      'https',
       'module',
       'path',
       'os',
@@ -107,7 +108,8 @@ async function bundleNodeSysMain() {
       'url',
       'util',
       './graceful-fs.js',
-      '../../utils'
+      '../../utils',
+      '../../sys/node'
     ],
     plugins: [
       (() => {
@@ -118,6 +120,9 @@ async function bundleNodeSysMain() {
             }
             if (importee === 'graceful-fs') {
               return './graceful-fs.js';
+            }
+            if (importee === '@sys/node') {
+              return '../../sys/node';
             }
             if (importee === '@utils') {
               return '../../utils';

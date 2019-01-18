@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { printUpdateMessage, requestLatestCompilerVersion } from '../sys/node/check-version';
+import { printUpdateMessage, requestLatestCompilerVersion } from '@sys/node';
 import exit from 'exit';
 
 
