@@ -1,6 +1,7 @@
 import * as d from '@declarations';
-import { createHashedFileName, getFilePathFromUrl } from './util';
+import { createHashedFileName, getFilePathFromUrl } from './asset-versioning-utils';
 import { hasFileExtension } from '@utils';
+import { sys } from '@sys';
 
 
 export async function versionElementAssets(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document) {
@@ -47,20 +48,20 @@ async function versionElementAsset(config: d.Config, compilerCtx: d.CompilerCtx,
 
 async function versionAsset(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, url: string) {
   try {
-    const orgFilePath = getFilePathFromUrl(config, outputTarget, windowLocationHref, url);
+    const orgFilePath = getFilePathFromUrl(outputTarget, windowLocationHref, url);
     if (!orgFilePath) {
       return null;
     }
 
     if (hasFileExtension(orgFilePath, TXT_EXT)) {
       const content = await compilerCtx.fs.readFile(orgFilePath);
-      const hash = config.sys.generateContentHash(content, config.hashedFileNameLength);
+      const hash = sys.generateContentHash(content, config.hashedFileNameLength);
 
-      const dirName = config.sys.path.dirname(orgFilePath);
-      const fileName = config.sys.path.basename(orgFilePath);
+      const dirName = sys.path.dirname(orgFilePath);
+      const fileName = sys.path.basename(orgFilePath);
       const hashedFileName = createHashedFileName(fileName, hash);
 
-      const hashedFilePath = config.sys.path.join(dirName, hashedFileName);
+      const hashedFilePath = sys.path.join(dirName, hashedFileName);
       await compilerCtx.fs.writeFile(hashedFilePath, content);
 
       await compilerCtx.fs.remove(orgFilePath);

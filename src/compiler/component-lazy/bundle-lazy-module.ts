@@ -10,6 +10,7 @@ import pathsResolution from '../rollup-plugins/paths-resolution';
 import pluginHelper from '../rollup-plugins/plugin-helper';
 import rollupPluginReplace from '../rollup-plugins/rollup-plugin-replace';
 import statsPlugin from '../rollup-plugins/rollup-stats-plugin';
+import { sys } from '@sys';
 
 
 export async function bundleLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryInputPaths: string[]) {
@@ -45,13 +46,13 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
     cache: config.enableCache ? compilerCtx.rollupCache : undefined,
     plugins: [
       abortPlugin(buildCtx),
-      config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
-      config.sys.rollup.plugins.emptyJsResolver(),
-      config.sys.rollup.plugins.commonjs(commonjsConfig),
+      sys.rollup.plugins.nodeResolve(nodeResolveConfig),
+      sys.rollup.plugins.emptyJsResolver(),
+      sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
-      inMemoryFsRead(config, compilerCtx, buildCtx),
+      inMemoryFsRead(compilerCtx, buildCtx),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
-      localResolution(config, compilerCtx),
+      localResolution(compilerCtx),
       rollupPluginReplace({
         values: replaceObj
       }),
@@ -60,12 +61,12 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
       pluginHelper(config, compilerCtx, buildCtx),
       abortPlugin(buildCtx)
     ],
-    onwarn: createOnWarnFn(config, buildCtx.diagnostics)
+    onwarn: createOnWarnFn(buildCtx.diagnostics)
   };
 
   let rollupBuild: RollupBuild = null;
   try {
-    rollupBuild = await config.sys.rollup.rollup(rollupConfig);
+    rollupBuild = await sys.rollup.rollup(rollupConfig);
     compilerCtx.rollupCache = rollupBuild ? rollupBuild.cache : undefined;
 
   } catch (err) {

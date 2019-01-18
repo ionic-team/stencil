@@ -6,6 +6,7 @@ import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets/generate-outputs';
 import { initIndexHtmls } from '../html/init-index-html';
+import { sys } from '@sys';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
 
@@ -14,7 +15,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   try {
     // ensure any existing worker tasks are not running
     // and we've got a clean slate
-    config.sys.cancelWorkerTasks();
+    sys.cancelWorkerTasks();
 
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist

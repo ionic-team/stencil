@@ -1,13 +1,14 @@
 import * as d from '@declarations';
 import { getPolyfillsEsmBuildPath } from './app-file-naming';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
-export async function getAppBrowserCorePolyfills(config: d.Config) {
+export async function getAppBrowserCorePolyfills() {
   // first load up all of the polyfill content
   const readFilePromises = INLINE_POLYFILLS.map(polyfillFile => {
-    const staticName = config.sys.path.join('polyfills', 'es5', polyfillFile);
-    return config.sys.getClientCoreFile({ staticName: staticName });
+    const staticName = sys.path.join('polyfills', 'es5', polyfillFile);
+    return sys.getClientCoreFile({ staticName: staticName });
   });
 
   // read all the polyfill content, in this particular order
@@ -22,8 +23,8 @@ export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.Comp
   const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget, 'es5');
 
   await POLYFILLS.map(async polyfillFile => {
-    const staticName = config.sys.path.join('polyfills', 'esm', polyfillFile);
-    const polyfillsContent = await config.sys.getClientCoreFile({ staticName: staticName });
+    const staticName = sys.path.join('polyfills', 'esm', polyfillFile);
+    const polyfillsContent = await sys.getClientCoreFile({ staticName: staticName });
 
     const polyfillDst = pathJoin(config, polyfillsBuildDir, polyfillFile);
     await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);

@@ -1,7 +1,7 @@
+
 declare module "rollup-plugin-node-resolve" {
   namespace rollupPluginNodeResolve {}
-  function rollupPluginNodeResolve(): void;
+  function rollupPluginNodeResolve(opts?: any): any;
 
   export = rollupPluginNodeResolve;
 }
-

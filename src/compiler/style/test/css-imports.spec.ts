@@ -10,7 +10,7 @@ describe('css-imports', () => {
   const config = mockConfig();
   let buildCtx: d.BuildCtx;
 
-  config.sys.resolveModule = (_fromDir, moduleId) => {
+  sys.resolveModule = (_fromDir, moduleId) => {
     return normalizePath(path.join(root, 'mocked', 'node_modules', moduleId, 'package.json'));
   };
 

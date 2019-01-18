@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { BuildEvents } from '../events';
 import { Cache } from '../cache';
 import { InMemoryFileSystem, normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
 export class CompilerContext implements d.CompilerCtx {
@@ -29,10 +30,10 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
 
   constructor(config: d.Config) {
-    this.cache = new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys));
+    this.cache = new Cache(config, new InMemoryFileSystem(sys.fs, sys));
     this.cache.initCacheDir();
 
-    this.fs = new InMemoryFileSystem(config.sys.fs, config.sys);
+    this.fs = new InMemoryFileSystem(sys.fs, sys);
   }
 
   reset() {

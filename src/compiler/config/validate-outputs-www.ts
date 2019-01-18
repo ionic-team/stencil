@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
 import { setBooleanConfig, setStringConfig } from './config-utils';
+import { sys } from '@sys';
 import { validatePrerender } from './validate-prerender';
 
 
@@ -20,7 +21,7 @@ export function validateOutputTargetWww(config: d.Config) {
 
 
 function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww) {
-  const path = config.sys.path;
+  const path = sys.path;
 
   setStringConfig(outputTarget, 'dir', DEFAULT_DIR);
 

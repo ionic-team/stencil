@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { logger, sys } from '@sys';
 import { pathJoin } from '@utils';
 
 
@@ -27,7 +28,7 @@ async function inlineStyle(config: d.Config, compilerCtx: d.CompilerCtx, outputT
     return;
   }
 
-  config.logger.debug(`optimize ${windowLocationPath}, inline style: ${config.sys.url.parse(linkElm.href).pathname}`);
+  logger.debug(`optimize ${windowLocationPath}, inline style: ${sys.url.parse(linkElm.href).pathname}`);
 
   const styleElm = doc.createElement('style');
   styleElm.innerHTML = content;
@@ -43,7 +44,7 @@ async function inlineScript(config: d.Config, compilerCtx: d.CompilerCtx, output
     return;
   }
 
-  config.logger.debug(`optimize ${windowLocationPath}, inline script: ${scriptElm.src}`);
+  logger.debug(`optimize ${windowLocationPath}, inline script: ${scriptElm.src}`);
 
   scriptElm.innerHTML = content;
   scriptElm.removeAttribute('src');
@@ -56,8 +57,8 @@ async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarge
   }
 
   // figure out the url's so we can check the hostnames
-  const fromUrl = config.sys.url.parse(windowLocationPath);
-  const toUrl = config.sys.url.parse(assetUrl);
+  const fromUrl = sys.url.parse(windowLocationPath);
+  const toUrl = sys.url.parse(assetUrl);
 
   if (fromUrl.hostname !== toUrl.hostname) {
     // not the same hostname, so we wouldn't have the file content
@@ -90,6 +91,6 @@ async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarge
 
 
 export function getFilePathFromUrl(config: d.Config, outputTarget: d.OutputTargetHydrate, fromUrl: d.Url, toUrl: d.Url) {
-  const resolvedUrl = '.' + config.sys.url.resolve(fromUrl.pathname, toUrl.pathname);
+  const resolvedUrl = '.' + sys.url.resolve(fromUrl.pathname, toUrl.pathname);
   return pathJoin(config, outputTarget.dir, resolvedUrl);
 }

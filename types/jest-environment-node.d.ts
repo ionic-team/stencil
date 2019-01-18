@@ -1,3 +1,4 @@
+
 declare module "jest-environment-node" {
   class NodeEnvironment {
     constructor(config: any);
@@ -7,4 +8,3 @@ declare module "jest-environment-node" {
 
   export = NodeEnvironment;
 }
-

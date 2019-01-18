@@ -10,7 +10,7 @@ describe('parse collection', () => {
 
   beforeEach(async () => {
     config = mockConfig();
-    config.sys.resolveModule = (_from, moduleId) => {
+    sys.resolveModule = (_from, moduleId) => {
       if (moduleId === 'ionicons') {
         return '/node_modules/@ionic/core/node_modules/ionicons/package.json';
       }

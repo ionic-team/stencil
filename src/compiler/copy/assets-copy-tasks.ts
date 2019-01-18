@@ -1,12 +1,13 @@
 import * as d from '@declarations';
 import { getAppBuildDir } from '../app/app-file-naming';
 import { normalizePath, pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filesChanged: string[]) {
   const copyTasks: d.CopyTask[] = [];
 
-  if (canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, filesChanged)) {
+  if (canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, filesChanged)) {
     // no need to recopy all assets again
     return copyTasks;
   }
@@ -61,7 +62,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
         // figure out what the path is to the component directory
         const collectionDirDestination = pathJoin(config,
           outputTarget.collectionDir,
-          config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+          sys.path.relative(config.srcDir, assetsMeta.absolutePath)
         );
 
         copyTasks.push({
@@ -78,7 +79,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
 }
 
 
-export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
+export function canSkipAssetsCopy(compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
@@ -91,7 +92,7 @@ export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, 
   // loop through each of the changed files
   filesChanged.forEach(changedFile => {
     // get the directory of where the changed file is in
-    const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
+    const changedFileDirPath = normalizePath(sys.path.dirname(changedFile));
 
     // loop through all the possible asset directories
     entryModules.forEach(entryModule => {

@@ -4,6 +4,7 @@ import { getCssImports } from './css-imports';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
+import { sys } from '@sys';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild) {
@@ -20,7 +21,7 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
     const fileName = getGlobalStyleFilename(config);
 
     const filePath = pathJoin(config, outputTarget.buildDir, fileName);
-    buildCtx.debug(`global style: ${config.sys.path.relative(config.rootDir, filePath)}`);
+    buildCtx.debug(`global style: ${sys.path.relative(config.rootDir, filePath)}`);
     await compilerCtx.fs.writeFile(filePath, styleText);
 
   } catch (e) {
@@ -45,7 +46,7 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
     const d = buildError(buildCtx.diagnostics);
     d.messageText = e + '';
     d.absFilePath = normalizePath(filePath);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+    d.relFilePath = normalizePath(sys.path.relative(config.rootDir, filePath));
   }
 
   return styleText;

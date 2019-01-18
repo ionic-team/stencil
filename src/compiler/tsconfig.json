@@ -36,11 +36,14 @@
       "@platform": [
         "../client/index.ts"
       ],
-      "@vdom": [
-        "../renderer/vdom/index.ts"
+      "@sys": [
+        "../sys/node/index.ts"
       ],
       "@utils": [
         "../utils/index.ts"
+      ],
+      "@vdom": [
+        "../renderer/vdom/index.ts"
       ]
     }
   },
@@ -49,6 +52,9 @@
   ],
   "files": [
     "./index.ts",
-    "../utils/index.ts"
+    "../utils/index.ts",
+    "../../types/rollup-plugin-commonjs.d.ts",
+    "../../types/rollup-plugin-node-globals.d.ts",
+    "../../types/rollup-plugin-node-resolve.d.ts"
   ]
 }

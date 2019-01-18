@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -30,7 +31,7 @@ export async function generateCollections(config: d.Config, compilerCtx: d.Compi
 
 
 async function generateCollection(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDist[], cmpModuleFile: d.Module) {
-  const relPath = config.sys.path.relative(config.srcDir, cmpModuleFile.jsFilePath);
+  const relPath = sys.path.relative(config.srcDir, cmpModuleFile.jsFilePath);
   const jsText = await compilerCtx.fs.readFile(cmpModuleFile.jsFilePath);
 
   const promises = outputTargets.map(async outputTarget => {

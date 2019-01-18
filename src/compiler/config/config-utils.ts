@@ -1,4 +1,5 @@
-import { Config } from '@declarations';
+import * as d from '@declarations';
+import { logger } from '@sys';
 
 
 export function setBooleanConfig(config: any, configName: string, flagName: string, defaultValue: boolean) {
@@ -72,13 +73,13 @@ export function setArrayConfig(config: any, configName: string, defaultValue?: a
 }
 
 
-function getUserConfigName(config: Config, correctConfigName: string) {
+function getUserConfigName(config: d.Config, correctConfigName: string) {
   const userConfigNames = Object.keys(config);
 
   for (const userConfigName of userConfigNames) {
     if (userConfigName.toLowerCase() === correctConfigName.toLowerCase()) {
       if (userConfigName !== correctConfigName) {
-        config.logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
+        logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
         return userConfigName;
       }
       break;

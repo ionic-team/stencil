@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.Module[]) {
@@ -77,7 +78,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
 
-  b.coreImportPath = pathJoin(config, config.sys.compiler.distDir, 'client', 'index.js');
+  b.coreImportPath = pathJoin(config, sys.compiler.distDir, 'client', 'index.js');
 }
 
 

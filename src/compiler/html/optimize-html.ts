@@ -3,7 +3,7 @@ import { assetVersioning } from '../asset-versioning/asset-versioning';
 import { catchError } from '@utils';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineExternalAssets } from './inline-external-assets';
-// import { inlineLoaderScript } from './inline-loader-script';
+import { logger, sys } from '@sys';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
@@ -28,7 +28,7 @@ export async function optimizeHtml(
 
   if (hydrateTarget.canonicalLink) {
     try {
-      updateCanonicalLink(config, doc, windowLocationPath);
+      updateCanonicalLink(doc, windowLocationPath);
 
     } catch (e) {
       diagnostics.push({
@@ -67,7 +67,7 @@ export async function optimizeHtml(
   if (hydrateTarget.collapseWhitespace && !config.devMode && config.logLevel !== 'debug') {
     // collapseWhitespace is the default
     try {
-      config.logger.debug(`optimize ${windowLocationPath}, collapse html whitespace`);
+      logger.debug(`optimize ${windowLocationPath}, collapse html whitespace`);
       collapseHtmlWhitepace(doc.documentElement);
 
     } catch (e) {
@@ -113,7 +113,7 @@ export async function optimizeIndexHtml(
     hydrateTarget.html = await compilerCtx.fs.readFile(hydrateTarget.indexHtml);
 
     try {
-      const dom = config.sys.createDom();
+      const dom = sys.createDom();
       const win = dom.parse(hydrateTarget);
       const doc = win.document;
 

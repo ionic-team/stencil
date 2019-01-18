@@ -3,6 +3,7 @@ import { captializeFirstLetter, dashToPascalCase } from '@utils';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-file-naming';
 import { isDocsPublic, normalizePath } from '@utils';
+import { logger, sys } from '@sys';
 import { MEMBER_TYPE } from '@utils';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
@@ -23,12 +24,12 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
   if (destination !== 'src') {
-    componentsDtsFilePath = config.sys.path.resolve(destination, GENERATED_DTS);
-    componentTypesFileContent = updateStencilTypesImports(config, destination, componentsDtsFilePath, componentTypesFileContent);
+    componentsDtsFilePath = sys.path.resolve(destination, GENERATED_DTS);
+    componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
   await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
-  buildCtx.debug(`generated ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
+  buildCtx.debug(`generated ${sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
 }
 
 
@@ -42,15 +43,15 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   const allTypes: { [key: string]: number } = {};
   const defineGlobalIntrinsicElements = destination === 'src';
 
-  const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
-  const collectionTypesImportsString = collectionTypesImports.map((cti) => {
+  const collectionTypesImports = await getCollectionsTypeImports(compilerCtx, defineGlobalIntrinsicElements);
+  const collectionTypesImportsString = collectionTypesImports.map(cti => {
     return `import '${cti.pkgName}';`;
   })
   .join('\n');
 
   const modules = moduleFiles.map(moduleFile => {
     const cmpMeta = moduleFile.cmpCompilerMeta;
-    const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
+    const importPath = normalizePath(sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
         .replace(/\.(tsx|ts)$/, ''));
 
     typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmpMeta, moduleFile.sourceFilePath);
@@ -89,9 +90,9 @@ ${modules.map(m => m.ElementTagNameMap).join('\n')}
 
     const typeData = typeImportData[filePath];
     let importFilePath: string;
-    if (config.sys.path.isAbsolute(filePath)) {
+    if (sys.path.isAbsolute(filePath)) {
       importFilePath = normalizePath('./' +
-        config.sys.path.relative(config.srcDir, filePath)
+        sys.path.relative(config.srcDir, filePath)
       ).replace(/\.(tsx|ts)$/, '');
     } else {
       importFilePath = filePath;
@@ -202,7 +203,7 @@ function updateReferenceTypeImports(_config: d.Config, importDataObj: ImportData
   return importDataObj;
 }
 
-export function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string]: number }, filePath: string) {
+export function updateImportReferenceFactory(allTypes: { [key: string]: number }, filePath: string) {
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {
       allTypes[name] = 1;
@@ -234,8 +235,8 @@ export function updateImportReferenceFactory(config: d.Config, allTypes: { [key:
       // If this is a relative path make it absolute
       if (importFileLocation.startsWith('.')) {
         importFileLocation =
-          config.sys.path.resolve(
-            config.sys.path.dirname(filePath),
+          sys.path.resolve(
+            sys.path.dirname(filePath),
             importFileLocation
           );
       }
@@ -413,11 +414,11 @@ export function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo
 }
 
 
-async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
+async function getCollectionsTypeImports(compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
   const collections = compilerCtx.collections.map(collection => {
-    const upgrades = validateCollectionCompatibility(config, collection);
+    const upgrades = validateCollectionCompatibility(collection);
     const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.indexOf(CompilerUpgrade.Add_Local_Intrinsic_Elements) !== -1;
-    return getCollectionTypesImport(config, compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
+    return getCollectionTypesImport(compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
   });
 
   const collectionTypes = await Promise.all(collections);
@@ -425,12 +426,12 @@ async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.Compil
 }
 
 
-async function getCollectionTypesImport(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.Collection, includeIntrinsicElements = false) {
+async function getCollectionTypesImport(compilerCtx: d.CompilerCtx, collection: d.Collection, includeIntrinsicElements = false) {
   let typeImport = null;
 
   try {
     const collectionDir = collection.moduleDir;
-    const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
+    const collectionPkgJson = sys.path.join(collectionDir, 'package.json');
 
     const pkgJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
     const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
@@ -443,11 +444,11 @@ async function getCollectionTypesImport(config: d.Config, compilerCtx: d.Compile
     }
 
   } catch (e) {
-    config.logger.debug(`getCollectionTypesImport: ${e}`);
+    logger.debug(`getCollectionTypesImport: ${e}`);
   }
 
   if (typeImport == null) {
-    config.logger.debug(`unabled to find "${collection.collectionName}" collection types`);
+    logger.debug(`unabled to find "${collection.collectionName}" collection types`);
   }
 
   return typeImport;

@@ -1,7 +1,7 @@
+
 declare module "rollup-plugin-commonjs" {
   namespace rollupPluginCommonjs {}
-  function rollupPluginCommonjs(): void;
+  function rollupPluginCommonjs(opts?: any): any;
 
   export = rollupPluginCommonjs;
 }
-

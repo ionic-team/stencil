@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { buildWarn } from '../message-utils';
 import { normalizePath } from '../path-utils';
 import { splitLineBreaks } from './logger-utils';
+import { logger, sys } from '@sys';
 import { toTitleCase } from '../helpers';
 
 
@@ -21,7 +22,7 @@ export function loadRollupDiagnostics(config: d.Config, compilerCtx: d.CompilerC
   if (rollupError.loc && rollupError.loc.file) {
     diagnostic.absFilePath = normalizePath(rollupError.loc.file);
     if (config) {
-      diagnostic.relFilePath = normalizePath(config.sys.path.relative(config.cwd, diagnostic.absFilePath));
+      diagnostic.relFilePath = normalizePath(sys.path.relative(config.cwd, diagnostic.absFilePath));
     }
 
     try {
@@ -88,7 +89,7 @@ export function loadRollupDiagnostics(config: d.Config, compilerCtx: d.CompilerC
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
 
-export function createOnWarnFn(config: d.Config, diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
+export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
@@ -103,7 +104,7 @@ export function createOnWarnFn(config: d.Config, diagnostics: d.Diagnostic[], bu
         return;
       }
       if (suppressWarnCodes.has(warning.code)) {
-        config.logger.debug(warning.message);
+        logger.debug(warning.message);
         return;
       }
     }

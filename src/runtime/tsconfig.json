@@ -32,18 +32,24 @@
       "@platform": [
         "../client/index.ts"
       ],
-      "@vdom": [
-        "../renderer/vdom/index.ts"
+      "@sys": [
+        "../sys/node/index.ts"
       ],
       "@utils": [
         "../utils/index.ts"
+      ],
+      "@vdom": [
+        "../renderer/vdom/index.ts"
       ]
     }
   },
   "include": [
     "./index.ts",
     "../index.ts",
-    "../client/polyfills/"
+    "../client/polyfills/",
+    "../../types/rollup-plugin-commonjs.d.ts",
+    "../../types/rollup-plugin-node-globals.d.ts",
+    "../../types/rollup-plugin-node-resolve.d.ts"
   ],
   "exclude": [
     "../client/polyfills/css-shim/test/"

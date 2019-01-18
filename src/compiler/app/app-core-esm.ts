@@ -24,7 +24,7 @@ export async function generateEsmCores(config: d.Config, compilerCtx: d.Compiler
 }
 
 export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist, entryModules: d.EntryModule[], sourceTarget: d.SourceTarget, coreId: d.BuildCoreIds) {
-  let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.esm.js' });
+  let jsContent = await sys.getClientCoreFile({ staticName: 'core.esm.js' });
 
   // browser esm core build
   const globalJsContentsEsm = await generateEsmAppGlobalScript(config, compilerCtx, buildCtx, sourceTarget);
@@ -44,7 +44,7 @@ export async function generateEsmCore(config: d.Config, compilerCtx: d.CompilerC
 
 async function writeEsmCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist, buildConditionals: d.BuildConditionals, jsContent: string, sourceTarget: d.SourceTarget) {
   const coreEsm = getCoreEsmBuildPath(config, outputTarget, sourceTarget);
-  const relPath = config.sys.path.relative(config.rootDir, coreEsm);
+  const relPath = sys.path.relative(config.rootDir, coreEsm);
 
   const timespan = buildCtx.createTimeSpan(`generateEsmCoreEs5 started, ${relPath}`, true);
 

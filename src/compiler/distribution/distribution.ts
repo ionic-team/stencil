@@ -5,6 +5,7 @@ import { generateEsmIndexes } from './dist-esm';
 import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
 import { hasError } from '@utils';
+import { sys } from '@sys';
 import * as v from './validate-package-json';
 
 
@@ -66,7 +67,7 @@ async function generateDistribution(config: d.Config, compilerCtx: d.CompilerCtx
 
 
 async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
+  const pkgJsonPath = sys.path.join(config.rootDir, 'package.json');
 
   let pkgJson: string;
   try {

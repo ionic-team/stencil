@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE, cleanDiagnostics, hasError, normalizePath } from '@utils';
 import { generateHmr } from './build-hmr';
+import { sys } from '@sys';
 
 
 export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -105,7 +106,7 @@ function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.En
     }),
 
     inputs: en.moduleFiles.map(m => {
-      return normalizePath(config.sys.path.relative(config.rootDir, m.jsFilePath));
+      return normalizePath(sys.path.relative(config.rootDir, m.jsFilePath));
     }).sort(),
 
     encapsulations: []
@@ -119,7 +120,7 @@ function getBuildBundle(config: d.Config, entryBundle: d.EntryBundle) {
   const buildBundle: d.BuildBundle = {
     fileName: entryBundle.fileName,
     outputs: entryBundle.outputs.map(filePath => {
-      return normalizePath(config.sys.path.relative(config.rootDir, filePath));
+      return normalizePath(sys.path.relative(config.rootDir, filePath));
     }).sort()
   };
 

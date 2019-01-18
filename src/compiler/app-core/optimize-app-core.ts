@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
+import { sys } from '@sys';
 
 
 export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build, input: string) {
@@ -69,7 +70,7 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
     }
   }
 
-  const results = await config.sys.minifyJs(input, opts);
+  const results = await sys.minifyJs(input, opts);
   if (results && results.diagnostics.length === 0 && compilerCtx) {
 
     if (!build.asyncLifecycle) {

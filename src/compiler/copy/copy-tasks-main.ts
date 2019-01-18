@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { buildError } from '@utils';
 import { getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getConfigCopyTasks } from './config-copy-tasks';
+import { sys } from '@sys';
 
 
 export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -17,7 +18,7 @@ export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx
     if (copyTasks.length > 0) {
       const timeSpan = buildCtx.createTimeSpan(`copyTasks started`, true);
 
-      const copyResults = await config.sys.copy(copyTasks);
+      const copyResults = await sys.copy(copyTasks);
 
       buildCtx.diagnostics.push(...copyResults.diagnostics);
 

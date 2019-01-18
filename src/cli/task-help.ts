@@ -1,7 +1,7 @@
-import * as d from '@declarations';
+import { logger } from '@sys';
 
 
-export function taskHelp(process: NodeJS.Process, logger: d.Logger) {
+export function taskHelp(process: NodeJS.Process) {
   const p = logger.dim((process.platform === 'win32') ? '>' : '$');
 
   console.log(`

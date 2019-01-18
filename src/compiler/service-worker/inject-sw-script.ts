@@ -10,15 +10,15 @@ export async function updateIndexHtmlServiceWorker(config: d.Config, buildCtx: d
 
   } else if (outputTarget.serviceWorker) {
     // we have a valid sw config, so we'll need to inject the register sw script
-    indexHtml = await injectRegisterServiceWorker(config, buildCtx, outputTarget, indexHtml);
+    indexHtml = await injectRegisterServiceWorker(buildCtx, outputTarget, indexHtml);
   }
 
   return indexHtml;
 }
 
 
-export async function injectRegisterServiceWorker(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexHtml: string) {
-  const swUrl = generateServiceWorkerUrl(config, outputTarget);
+export async function injectRegisterServiceWorker(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, indexHtml: string) {
+  const swUrl = generateServiceWorkerUrl(outputTarget);
 
   const serviceWorker = getRegisterSwScript(swUrl);
   const swHtml = `<script data-build="${buildCtx.timestamp}">${serviceWorker}</script>`;

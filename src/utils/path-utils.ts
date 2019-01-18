@@ -1,8 +1,9 @@
 import * as d from '@declarations';
+import { sys } from '@sys';
 
 
-export function pathJoin(config: d.Config, ...paths: string[]) {
-  return normalizePath(config.sys.path.join.apply(config.sys.path, paths));
+export function pathJoin(_config: d.Config, ...paths: string[]) {
+  return normalizePath(sys.path.join.apply(sys.path, paths));
 }
 
 

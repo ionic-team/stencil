@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { generateComponentTypes } from './generate-component-types';
 import { isDtsFile, pathJoin } from '@utils';
+import { sys } from '@sys';
 import * as v from './validate-package-json';
 
 
@@ -48,12 +49,12 @@ async function generateTypesAndValidate(config: d.Config, compilerCtx: d.Compile
 async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
-  const distTypesDir = config.sys.path.dirname(pkgData.types);
+  const distTypesDir = sys.path.dirname(pkgData.types);
 
   // Copy .d.ts files from src to dist
   // In addition, all references to @stencil/core are replaced
   await Promise.all(srcDtsFiles.map(async srcDtsFile => {
-    const relPath = config.sys.path.relative(config.srcDir, srcDtsFile.absPath);
+    const relPath = sys.path.relative(config.srcDir, srcDtsFile.absPath);
     const distPath = pathJoin(config, config.rootDir, distTypesDir, relPath);
 
     const originalDtsContent = await compilerCtx.fs.readFile(srcDtsFile.absPath);
@@ -68,7 +69,7 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
+  const pkgJsonPath = sys.path.join(config.rootDir, 'package.json');
 
   let pkgJson: string;
   try {

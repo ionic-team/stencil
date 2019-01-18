@@ -1,12 +1,13 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
-export function updateStencilTypesImports(config: d.Config, typesDir: string, dtsFilePath: string, dtsContent: string) {
-  const dir = config.sys.path.dirname(dtsFilePath);
-  const relPath = config.sys.path.relative(dir, typesDir);
+export function updateStencilTypesImports(typesDir: string, dtsFilePath: string, dtsContent: string) {
+  const dir = sys.path.dirname(dtsFilePath);
+  const relPath = sys.path.relative(dir, typesDir);
 
-  let coreDtsPath = normalizePath(config.sys.path.join(relPath, CORE_FILENAME));
+  let coreDtsPath = normalizePath(sys.path.join(relPath, CORE_FILENAME));
   if (!coreDtsPath.startsWith('.')) {
     coreDtsPath = `./${coreDtsPath}`;
   }
@@ -27,17 +28,17 @@ export async function copyStencilCoreDts(config: d.Config, compilerCtx: d.Compil
   const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.typesDir);
 
   await Promise.all(typesOutputTargets.map(async typesOutputTarget => {
-    await copyStencilCoreDtsOutput(config, compilerCtx, typesOutputTarget);
+    await copyStencilCoreDtsOutput(compilerCtx, typesOutputTarget);
   }));
 }
 
 
-async function copyStencilCoreDtsOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const srcDts = await config.sys.getClientCoreFile({
+async function copyStencilCoreDtsOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+  const srcDts = await sys.getClientCoreFile({
    staticName: 'declarations/stencil.core.d.ts'
   });
 
-  const coreDtsFilePath = normalizePath(config.sys.path.join(outputTarget.typesDir, CORE_DTS));
+  const coreDtsFilePath = normalizePath(sys.path.join(outputTarget.typesDir, CORE_DTS));
   await compilerCtx.fs.writeFile(coreDtsFilePath, srcDts);
 }
 

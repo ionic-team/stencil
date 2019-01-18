@@ -3,6 +3,7 @@ import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, norm
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
+import { sys } from '@sys';
 import { SSR_VNODE_ID } from '@utils';
 
 
@@ -17,7 +18,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
 
     // create a emulated window
     // attach data the request to the window
-    const dom = config.sys.createDom();
+    const dom = sys.createDom();
     const win = dom.parse(hydrateTarget);
     const doc = win.document;
 

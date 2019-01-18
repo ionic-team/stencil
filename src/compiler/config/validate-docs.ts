@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 
 
@@ -50,7 +51,7 @@ function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTarg
     outputTarget.dir = config.srcDir;
   }
 
-  if (!config.sys.path.isAbsolute(outputTarget.dir)) {
+  if (!sys.path.isAbsolute(outputTarget.dir)) {
     outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
   }
   outputTarget.strict = !!outputTarget.strict;

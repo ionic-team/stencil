@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getUserCompilerOptions } from './compiler-options';
+import { sys } from '@sys';
 
 
 export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -85,7 +86,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const emitDtsFiles = (config.outputTargets as d.OutputTargetDist[]).some(o => !!o.typesDir);
 
   // kick off validating types by sending the data over to the worker process
-  buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);
+  buildCtx.validateTypesPromise = sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);
 
   // when the validate types build finishes
   // let's run the handler we put on the build context

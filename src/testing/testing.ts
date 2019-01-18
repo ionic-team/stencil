@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '@utils';
+import { logger, sys } from '@sys';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
@@ -24,7 +25,7 @@ export class Testing implements d.Testing {
 
     if (this.isValid) {
       if (!config.flags.spec && !config.flags.e2e) {
-        config.logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
+        logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
         this.isValid = false;
       }
     }
@@ -56,16 +57,16 @@ export class Testing implements d.Testing {
       env.__STENCIL_SPEC_TESTS__ = 'true';
     }
 
-    config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
+    logger.info(logger.magenta(`testing ${msg.join(' and ')} files`));
 
     const doScreenshots = !!(config.flags.e2e && config.flags.screenshot);
     if (doScreenshots) {
       env.__STENCIL_SCREENSHOT__ = 'true';
 
       if (config.flags.updateScreenshot) {
-        config.logger.info(config.logger.magenta(`updating master screenshots`));
+        logger.info(logger.magenta(`updating master screenshots`));
       } else {
-        config.logger.info(config.logger.magenta(`comparing against master screenshots`));
+        logger.info(logger.magenta(`comparing against master screenshots`));
       }
     }
 
@@ -103,10 +104,10 @@ export class Testing implements d.Testing {
 
       if (this.devServer) {
         env.__STENCIL_BROWSER_URL__ = this.devServer.browserUrl;
-        config.logger.debug(`dev server url: ${env.__STENCIL_BROWSER_URL__}`);
+        logger.debug(`dev server url: ${env.__STENCIL_BROWSER_URL__}`);
 
         env.__STENCIL_LOADER_URL__ = getLoaderScriptUrl(config, outputTarget, this.devServer.browserUrl);
-        config.logger.debug(`dev server loader: ${env.__STENCIL_LOADER_URL__}`);
+        logger.debug(`dev server loader: ${env.__STENCIL_LOADER_URL__}`);
       }
     }
 
@@ -118,10 +119,10 @@ export class Testing implements d.Testing {
       } else {
         passed = await runJest(config, env);
       }
-      config.logger.info('');
+      logger.info('');
 
     } catch (e) {
-      config.logger.error(e);
+      logger.error(e);
     }
 
     return passed;
@@ -129,7 +130,7 @@ export class Testing implements d.Testing {
 
   async destroy() {
     if (this.config) {
-      this.config.sys.destroy();
+      sys.destroy();
       this.config = null;
     }
 
@@ -169,7 +170,7 @@ function getOutputTarget(config: d.Config) {
   if (!outputTarget) {
     outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetWww;
     if (!outputTarget) {
-      config.logger.error(`Test missing config output target`);
+      logger.error(`Test missing config output target`);
       isValid = false;
     }
   }
@@ -187,9 +188,9 @@ function getLoaderScriptUrl(config: d.Config, outputTarget: d.OutputTargetWww, b
   let appLoadUrlPath: string;
 
   if (outputTarget.type === 'www') {
-    appLoadUrlPath = config.sys.path.relative(outputTarget.dir, appLoaderFilePath);
+    appLoadUrlPath = sys.path.relative(outputTarget.dir, appLoaderFilePath);
   } else {
-    appLoadUrlPath = config.sys.path.relative(config.rootDir, appLoaderFilePath);
+    appLoadUrlPath = sys.path.relative(config.rootDir, appLoaderFilePath);
   }
 
   return browserUrl + appLoadUrlPath;

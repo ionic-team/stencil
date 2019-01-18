@@ -77,9 +77,9 @@ describe('manifest-data serialize/parse', () => {
         }
       ],
       'compiler': {
-        name: config.sys.compiler.name,
-        version: config.sys.compiler.version,
-        typescriptVersion: config.sys.compiler.typescriptVersion
+        name: sys.compiler.name,
+        version: sys.compiler.version,
+        typescriptVersion: sys.compiler.typescriptVersion
       },
       'bundles': [
         {

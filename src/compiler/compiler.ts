@@ -6,6 +6,7 @@ import { CompilerContext } from './build/compiler-ctx';
 import { docs } from './docs/docs';
 import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
+import { logger, sys } from '@sys';
 import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
@@ -20,36 +21,36 @@ export class Compiler implements d.Compiler {
     const config = this.config;
 
     if (this.isValid) {
-      const details = config.sys.details;
+      const details = sys.details;
 
-      let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
+      let startupMsg = `${sys.compiler.name} v${sys.compiler.version} `;
       if (details.platform !== 'win32') {
         startupMsg += `💎`;
       }
 
-      config.logger.info(config.logger.cyan(startupMsg));
+      logger.info(logger.cyan(startupMsg));
 
-      if (config.sys.semver.prerelease(config.sys.compiler.version)) {
-        config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+      if (sys.semver.prerelease(sys.compiler.version)) {
+        logger.warn(sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
       }
       if (config.devMode && config.buildEs5) {
-        config.logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
+        logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
         If you need ESM output, use the '--esm' flag instead.`);
       }
       if (config.devMode && !config.enableCache) {
-        config.logger.warn(`Disabling cache during development will slow down incremental builds.`);
+        logger.warn(`Disabling cache during development will slow down incremental builds.`);
 
       }
-      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
-      config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
+      logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
+      logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
-      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
-      config.logger.debug(`compiler build: __BUILDID__`);
+      logger.debug(`compiler runtime: ${sys.compiler.runtime}`);
+      logger.debug(`compiler build: __BUILDID__`);
 
-      const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
-      config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
+      const workerOpts = sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
+      logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
 
-      config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
+      logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
 
       this.ctx = new CompilerContext(config);
 
@@ -68,7 +69,7 @@ export class Compiler implements d.Compiler {
   rebuild(fsWatchResults: d.FsWatchResults) {
     const buildCtx = generateBuildFromFsWatch(this.config, this.ctx, fsWatchResults);
     if (buildCtx) {
-      logFsWatchMessage(this.config, buildCtx);
+      logFsWatchMessage(buildCtx);
       buildCtx.start();
       updateCacheFromRebuild(this.ctx, buildCtx);
       build(this.config, this.ctx, buildCtx);
@@ -76,7 +77,7 @@ export class Compiler implements d.Compiler {
   }
 
   async startDevServer() {
-    if (this.config.sys.details.runtime !== 'node') {
+    if (sys.details.runtime !== 'node') {
       throw new Error(`Dev Server only availabe in node`);
     }
 
@@ -87,7 +88,7 @@ export class Compiler implements d.Compiler {
       // get the browser url to be logged out at the end of the build
       this.config.devServer.browserUrl = devServer.browserUrl;
 
-      this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
+      logger.debug(`dev server started: ${devServer.browserUrl}`);
     }
 
     return devServer;
@@ -135,11 +136,11 @@ export class Compiler implements d.Compiler {
   }
 
   get name() {
-    return this.config.sys.compiler.name;
+    return sys.compiler.name;
   }
 
   get version() {
-    return this.config.sys.compiler.version;
+    return sys.compiler.version;
   }
 
 }
@@ -151,10 +152,10 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
     return [ true, config ];
 
   } catch (e) {
-    if (config.logger) {
+    if (logger) {
       const diagnostics: d.Diagnostic[] = [];
       catchError(diagnostics, e);
-      config.logger.printDiagnostics(diagnostics);
+      logger.printDiagnostics(diagnostics);
 
     } else {
       console.error(e);

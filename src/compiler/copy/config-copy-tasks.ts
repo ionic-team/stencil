@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { buildError, normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
+import { sys } from '@sys';
 
 
 export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx) {
@@ -71,7 +72,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
 async function processCopyTaskDestDir(config: d.Config, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask, destAbsDir: string) {
   const processedCopyTask: d.CopyTask = {
     src: getSrcAbsPath(config, copyTask.src),
-    dest: getDestAbsPath(config, copyTask.src, destAbsDir, copyTask.dest)
+    dest: getDestAbsPath(copyTask.src, destAbsDir, copyTask.dest)
   };
   if (typeof copyTask.warn === 'boolean') {
     processedCopyTask.warn = copyTask.warn;
@@ -88,7 +89,7 @@ async function processGlob(config: d.Config, outputTargets: d.OutputTargetDist[]
     nodir: true
   };
 
-  const files = await config.sys.glob(copyTask.src, globOpts);
+  const files = await sys.glob(copyTask.src, globOpts);
 
   files.forEach(globRelPath => {
 
@@ -109,19 +110,19 @@ async function processGlob(config: d.Config, outputTargets: d.OutputTargetDist[]
 
 export function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destDir: string, globRelPath: string) {
   const processedCopyTask: d.CopyTask = {
-    src: config.sys.path.join(config.srcDir, globRelPath),
+    src: sys.path.join(config.srcDir, globRelPath),
   };
 
   if (copyTask.dest) {
-    if (config.sys.path.isAbsolute(copyTask.dest)) {
-      processedCopyTask.dest = config.sys.path.join(copyTask.dest, config.sys.path.basename(globRelPath));
+    if (sys.path.isAbsolute(copyTask.dest)) {
+      processedCopyTask.dest = sys.path.join(copyTask.dest, sys.path.basename(globRelPath));
 
     } else {
-      processedCopyTask.dest = config.sys.path.join(destDir, copyTask.dest, config.sys.path.basename(globRelPath));
+      processedCopyTask.dest = sys.path.join(destDir, copyTask.dest, sys.path.basename(globRelPath));
     }
 
   } else {
-    processedCopyTask.dest = config.sys.path.join(destDir, globRelPath);
+    processedCopyTask.dest = sys.path.join(destDir, globRelPath);
   }
 
   return processedCopyTask;
@@ -129,29 +130,29 @@ export function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destD
 
 
 export function getSrcAbsPath(config: d.Config, src: string) {
-  if (config.sys.path.isAbsolute(src)) {
+  if (sys.path.isAbsolute(src)) {
     return src;
   }
 
-  return config.sys.path.join(config.srcDir, src);
+  return sys.path.join(config.srcDir, src);
 }
 
 
-export function getDestAbsPath(config: d.Config, src: string, destAbsPath: string, destRelPath: string) {
+export function getDestAbsPath(src: string, destAbsPath: string, destRelPath: string) {
   if (destRelPath) {
-    if (config.sys.path.isAbsolute(destRelPath)) {
+    if (sys.path.isAbsolute(destRelPath)) {
       return destRelPath;
 
     } else {
-      return config.sys.path.join(destAbsPath, destRelPath);
+      return sys.path.join(destAbsPath, destRelPath);
     }
   }
 
-  if (config.sys.path.isAbsolute(src)) {
+  if (sys.path.isAbsolute(src)) {
     throw new Error(`copy task, "to" property must exist if "from" property is an absolute path: ${src}`);
   }
 
-  return config.sys.path.join(destAbsPath, src);
+  return sys.path.join(destAbsPath, src);
 }
 
 
@@ -169,7 +170,7 @@ export function isCopyTaskFile(config: d.Config, filePath: string) {
 
     if (isGlob(copySrc)) {
       // test the glob
-      copySrc = config.sys.path.join(config.srcDir, copySrc);
+      copySrc = sys.path.join(config.srcDir, copySrc);
       if (minimatch(filePath, copySrc)) {
         return true;
       }
@@ -177,7 +178,7 @@ export function isCopyTaskFile(config: d.Config, filePath: string) {
     } else {
       copySrc = normalizePath(getSrcAbsPath(config, copySrc));
 
-      if (!config.sys.path.relative(copySrc, filePath).startsWith('.')) {
+      if (!sys.path.relative(copySrc, filePath).startsWith('.')) {
         return true;
       }
     }

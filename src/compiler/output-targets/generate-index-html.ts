@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
+import { sys } from '@sys';
 import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script';
 
 
@@ -47,7 +48,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
       await writeIndexHtmlOutput(compilerCtx, outputTarget, indexSrcHtml);
 
-      buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
+      buildCtx.debug(`generateIndexHtml, write: ${sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
     } catch (e) {
       catchError(buildCtx.diagnostics, e);

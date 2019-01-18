@@ -1,9 +1,10 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
-export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww) {
-  let swUrl = normalizePath(config.sys.path.relative(
+export function generateServiceWorkerUrl(outputTarget: d.OutputTargetWww) {
+  let swUrl = normalizePath(sys.path.relative(
     outputTarget.dir,
     outputTarget.serviceWorker.swDest
   ));

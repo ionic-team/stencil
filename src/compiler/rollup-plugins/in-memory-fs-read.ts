@@ -1,9 +1,10 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
-export default function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const path = config.sys.path;
+export default function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const path = sys.path;
   const assetsCache: d.FilesMap = {};
   let tsFileNames: string[];
 

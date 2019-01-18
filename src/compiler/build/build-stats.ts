@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateBuildStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) {
@@ -23,8 +24,8 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
     } else {
       const stats: d.BuildStats = {
         compiler: {
-          name: config.sys.compiler.name,
-          version: config.sys.compiler.version
+          name: sys.compiler.name,
+          version: sys.compiler.version
         },
         app: {
           namespace: config.namespace,
@@ -50,7 +51,7 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         collections: buildCtx.collections.map(c => {
           return {
             name: c.collectionName,
-            source: normalizePath(config.sys.path.relative(config.rootDir, c.moduleDir)),
+            source: normalizePath(sys.path.relative(config.rootDir, c.moduleDir)),
             tags: c.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort()
           };
         }).sort((a, b) => {
@@ -67,9 +68,9 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
           return 0;
 
         }).forEach(moduleFile => {
-          const key = normalizePath(config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
+          const key = normalizePath(sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
           stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
-            return normalizePath(config.sys.path.relative(config.rootDir, localImport));
+            return normalizePath(sys.path.relative(config.rootDir, localImport));
           }).sort();
         });
 

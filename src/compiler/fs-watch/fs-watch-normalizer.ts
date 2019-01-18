@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { GENERATED_DTS } from '../app/app-file-naming';
+import { logger, sys } from '@sys';
 import { normalizePath } from '@utils';
 
 
@@ -114,8 +115,8 @@ export class FsWatchNormalizer {
   }
 
   private log(msg: string, filePath: string) {
-    const relPath = this.config.sys.path.relative(this.config.rootDir, filePath);
-    this.config.logger.debug(`watch, ${msg}: ${relPath}, ${Date.now().toString().substring(5)}`);
+    const relPath = sys.path.relative(this.config.rootDir, filePath);
+    logger.debug(`watch, ${msg}: ${relPath}, ${Date.now().toString().substring(5)}`);
   }
 
 }

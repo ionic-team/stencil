@@ -45,7 +45,7 @@ async function bundleDevServer() {
             if (importee === 'graceful-fs') {
               return '../sys/node/graceful-fs.js';
             }
-            if (importee === '@sys/node') {
+            if (importee === '@sys') {
               return '../sys/node';
             }
             if (importee === '@utils') {

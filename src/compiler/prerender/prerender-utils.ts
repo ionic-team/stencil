@@ -1,8 +1,9 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { logger, sys } from '@sys';
 
 
-export function normalizePrerenderLocation(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, url: string) {
+export function normalizePrerenderLocation(outputTarget: d.OutputTargetWww, windowLocationHref: string, url: string) {
   let prerenderLocation: d.PrerenderLocation = null;
 
   try {
@@ -14,7 +15,7 @@ export function normalizePrerenderLocation(config: d.Config, outputTarget: d.Out
     url = url.replace(/\'|\"/g, '');
 
     // parse the <a href> passed in
-    const hrefParseUrl = config.sys.url.parse(url);
+    const hrefParseUrl = sys.url.parse(url);
 
     // don't bother for basically empty <a> tags
     if (!hrefParseUrl.pathname) {
@@ -22,7 +23,7 @@ export function normalizePrerenderLocation(config: d.Config, outputTarget: d.Out
     }
 
     // parse the window.location
-    const windowLocationUrl = config.sys.url.parse(windowLocationHref);
+    const windowLocationUrl = sys.url.parse(windowLocationHref);
 
     // urls must be on the same host
     // but only check they're the same host when the href has a host
@@ -32,18 +33,18 @@ export function normalizePrerenderLocation(config: d.Config, outputTarget: d.Out
 
     // convert it back to a nice in pretty path
     prerenderLocation = {
-      url: config.sys.url.resolve(windowLocationHref, url)
+      url: sys.url.resolve(windowLocationHref, url)
     };
 
-    const normalizedUrl = config.sys.url.parse(prerenderLocation.url);
+    const normalizedUrl = sys.url.parse(prerenderLocation.url);
     normalizedUrl.hash = null;
 
     if (!outputTarget.prerenderPathQuery) {
       normalizedUrl.search = null;
     }
 
-    prerenderLocation.url = config.sys.url.format(normalizedUrl);
-    prerenderLocation.path = config.sys.url.parse(prerenderLocation.url).path;
+    prerenderLocation.url = sys.url.format(normalizedUrl);
+    prerenderLocation.path = sys.url.parse(prerenderLocation.url).path;
 
     if (!prerenderLocation.path.startsWith(outputTarget.baseUrl)) {
       if (prerenderLocation.path !== outputTarget.baseUrl.substr(0, outputTarget.baseUrl.length - 1)) {
@@ -63,7 +64,7 @@ export function normalizePrerenderLocation(config: d.Config, outputTarget: d.Out
     }
 
   } catch (e) {
-    config.logger.error(`normalizePrerenderLocation`, e);
+    logger.error(`normalizePrerenderLocation`, e);
     return null;
   }
 
@@ -78,10 +79,10 @@ function prerenderFilter(url: d.Url) {
 }
 
 
-export function crawlAnchorsForNextUrls(config: d.Config, outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], windowLocationHref: string, anchors: d.HydrateAnchor[]) {
+export function crawlAnchorsForNextUrls(outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], windowLocationHref: string, anchors: d.HydrateAnchor[]) {
   anchors && anchors.forEach(anchor => {
     if (isValidCrawlableAnchor(anchor)) {
-      addLocationToProcess(config, outputTarget, windowLocationHref, prerenderQueue, anchor.href);
+      addLocationToProcess(outputTarget, windowLocationHref, prerenderQueue, anchor.href);
     }
   });
 }
@@ -104,8 +105,8 @@ export function isValidCrawlableAnchor(anchor: d.HydrateAnchor) {
 }
 
 
-function addLocationToProcess(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, prerenderQueue: d.PrerenderLocation[], locationUrl: string) {
-  const prerenderLocation = normalizePrerenderLocation(config, outputTarget, windowLocationHref, locationUrl);
+function addLocationToProcess(outputTarget: d.OutputTargetWww, windowLocationHref: string, prerenderQueue: d.PrerenderLocation[], locationUrl: string) {
+  const prerenderLocation = normalizePrerenderLocation(outputTarget, windowLocationHref, locationUrl);
 
   if (!prerenderLocation || prerenderQueue.some(p => p.url === prerenderLocation.url)) {
     // either it's not a good location to prerender
@@ -121,14 +122,14 @@ function addLocationToProcess(config: d.Config, outputTarget: d.OutputTargetWww,
 }
 
 
-export function getPrerenderQueue(config: d.Config, outputTarget: d.OutputTargetWww) {
+export function getPrerenderQueue(outputTarget: d.OutputTargetWww) {
   const prerenderHost = `http://prerender.stenciljs.com`;
 
   const prerenderQueue: d.PrerenderLocation[] = [];
 
   if (Array.isArray(outputTarget.prerenderLocations)) {
     outputTarget.prerenderLocations.forEach(prerenderLocation => {
-      addLocationToProcess(config, outputTarget, prerenderHost, prerenderQueue, prerenderLocation.path);
+      addLocationToProcess(outputTarget, prerenderHost, prerenderQueue, prerenderLocation.path);
     });
   }
 
@@ -137,7 +138,7 @@ export function getPrerenderQueue(config: d.Config, outputTarget: d.OutputTarget
 
 
 export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTargetWww, url: string) {
-  const parsedUrl = config.sys.url.parse(url);
+  const parsedUrl = sys.url.parse(url);
 
   let pathName = parsedUrl.pathname;
   if (pathName.startsWith(outputTarget.baseUrl)) {

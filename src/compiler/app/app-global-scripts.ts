@@ -94,15 +94,15 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
     const replaceObj = {
       'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
     };
-    const rollup = await config.sys.rollup.rollup({
+    const rollup = await sys.rollup.rollup({
       input: entry,
       plugins: [
-        config.sys.rollup.plugins.nodeResolve({
+        sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
         }),
-        config.sys.rollup.plugins.emptyJsResolver(),
-        config.sys.rollup.plugins.commonjs({
+        sys.rollup.plugins.emptyJsResolver(),
+        sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
         }),

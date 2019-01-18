@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { buildError, normalizePath, pathJoin } from '@utils';
 import { parseStyleDocs } from '../docs/style-docs';
+import { logger, sys } from '@sys';
 
 
 export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
@@ -42,7 +43,7 @@ async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, bui
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
     err.absFilePath = normalizePath(srcFilePath);
-    err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, srcFilePath));
+    err.relFilePath = normalizePath(sys.path.relative(config.rootDir, srcFilePath));
   }
 }
 
@@ -76,7 +77,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
 
   styleText = stripComments(styleText);
 
-  const dir = config.sys.path.dirname(filePath);
+  const dir = sys.path.dirname(filePath);
   const importeeExt = filePath.split('.').pop().toLowerCase();
 
   let r: RegExpExecArray;
@@ -88,7 +89,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
 
     if (!isLocalCssImport(cssImportData.srcImport)) {
       // do nothing for @import url(http://external.css)
-      config.logger.debug(`did not resolve external css @import: ${cssImportData.srcImport}`);
+      logger.debug(`did not resolve external css @import: ${cssImportData.srcImport}`);
       continue;
     }
 
@@ -96,21 +97,21 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
       // node resolve this path cuz it starts with ~
       resolveCssNodeModule(config, buildCtx.diagnostics, filePath, cssImportData);
 
-    } else if (config.sys.path.isAbsolute(cssImportData.url)) {
+    } else if (sys.path.isAbsolute(cssImportData.url)) {
       // absolute path already
       cssImportData.filePath = normalizePath(cssImportData.url);
 
     } else {
       // relative path
-      cssImportData.filePath = normalizePath(config.sys.path.join(dir, cssImportData.url));
+      cssImportData.filePath = normalizePath(sys.path.join(dir, cssImportData.url));
     }
 
     if (importeeExt !== 'css' && !cssImportData.filePath.toLowerCase().endsWith('.css')) {
       cssImportData.filePath += `.${importeeExt}`;
 
       if (importeeExt === 'scss') {
-        const fileName = '_' + config.sys.path.basename(cssImportData.filePath);
-        const dirPath = config.sys.path.dirname(cssImportData.filePath);
+        const fileName = '_' + sys.path.basename(cssImportData.filePath);
+        const dirPath = sys.path.dirname(cssImportData.filePath);
 
         cssImportData.altFilePath = pathJoin(config, dirPath, fileName);
       }
@@ -134,10 +135,10 @@ export function isCssNodeModule(url: string) {
 
 export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
   try {
-    const dir = config.sys.path.dirname(filePath);
+    const dir = sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-    cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { manuallyResolve: true });
-    cssImportData.filePath = config.sys.path.dirname(cssImportData.filePath);
+    cssImportData.filePath = sys.resolveModule(dir, moduleId, { manuallyResolve: true });
+    cssImportData.filePath = sys.path.dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
 
@@ -145,7 +146,7 @@ export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic
     const d = buildError(diagnostics);
     d.messageText = `Unable to resolve node module for CSS @import: ${cssImportData.url}`;
     d.absFilePath = normalizePath(filePath);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+    d.relFilePath = normalizePath(sys.path.relative(config.rootDir, filePath));
   }
 }
 
@@ -166,15 +167,15 @@ export function isLocalCssImport(srcImport: string) {
 }
 
 
-export function replaceNodeModuleUrl(config: d.Config, baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
-  nodeModulePath = normalizePath(config.sys.path.dirname(nodeModulePath));
+export function replaceNodeModuleUrl(baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
+  nodeModulePath = normalizePath(sys.path.dirname(nodeModulePath));
   url = normalizePath(url);
 
   const absPathToNodeModuleCss = normalizePath(url.replace(`~${moduleId}`, nodeModulePath));
 
-  const baseCssDir = normalizePath(config.sys.path.dirname(baseCssFilePath));
+  const baseCssDir = normalizePath(sys.path.dirname(baseCssFilePath));
 
-  const relToRoot = normalizePath(config.sys.path.relative(baseCssDir, absPathToNodeModuleCss));
+  const relToRoot = normalizePath(sys.path.relative(baseCssDir, absPathToNodeModuleCss));
   return relToRoot;
 }
 

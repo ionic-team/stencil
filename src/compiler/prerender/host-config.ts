@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-// import { DEFAULT_STYLE_MODE } from '@utils';
 import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResultss: d.HydrateResults[]) {
@@ -51,11 +51,11 @@ export function generateHostRule(config: d.Config, outputTarget: d.OutputTargetW
 export function generateHostRuleHeaders(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
-  addStyles(config, hostRuleHeaders, hydrateResults);
+  addStyles(hostRuleHeaders, hydrateResults);
   addCoreJs(config, outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
-  addScripts(config, hostRuleHeaders, hydrateResults);
-  addImgs(config, hostRuleHeaders, hydrateResults);
+  addScripts(hostRuleHeaders, hydrateResults);
+  addImgs(hostRuleHeaders, hydrateResults);
 
   return hostRuleHeaders;
 }
@@ -122,7 +122,7 @@ function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, bundleI
 
 
 export function getUrlFromFilePath(config: d.Config, outputTarget: d.OutputTargetWww, filePath: string) {
-  let url = pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, filePath));
+  let url = pathJoin(config, '/', sys.path.relative(outputTarget.dir, filePath));
 
   url = outputTarget.baseUrl + url.substring(1);
 
@@ -143,13 +143,13 @@ export function sortComponents(components: d.HydrateComponent[]) {
 }
 
 
-function addStyles(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.styleUrls.forEach(styleUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(styleUrl);
+    const url = sys.url.parse(styleUrl);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -157,13 +157,13 @@ function addStyles(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrat
 }
 
 
-function addScripts(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.scriptUrls.forEach(scriptUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(scriptUrl);
+    const url = sys.url.parse(scriptUrl);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -171,13 +171,13 @@ function addScripts(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydra
 }
 
 
-function addImgs(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.imgUrls.forEach(imgUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(imgUrl);
+    const url = sys.url.parse(imgUrl);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }

@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export function getAppBuildDir(config: d.Config, outputTarget: d.OutputTargetBuild) {
@@ -51,7 +52,7 @@ export function getGlobalJsBuildPath(config: d.Config, outputTarget: d.OutputTar
 export function getCoreFilename(config: d.Config, coreId: string, jsContent: string) {
   if (config.hashFileNames) {
     // prod mode renames the core file with its hashed content
-    const contentHash = config.sys.generateContentHash(jsContent, config.hashedFileNameLength);
+    const contentHash = sys.generateContentHash(jsContent, config.hashedFileNameLength);
     return `${config.fsNamespace}.${contentHash}.js`;
   }
 

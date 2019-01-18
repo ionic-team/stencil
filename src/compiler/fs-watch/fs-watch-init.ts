@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { FsWatchNormalizer } from './fs-watch-normalizer';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
 export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -10,14 +11,14 @@ export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     return false;
   }
 
-  buildCtx.debug(`initFsWatch: ${config.sys.path.relative(config.rootDir, config.srcDir)}`);
+  buildCtx.debug(`initFsWatch: ${sys.path.relative(config.rootDir, config.srcDir)}`);
 
   const fsWatchNormalizer = new FsWatchNormalizer(config, compilerCtx.events);
   fsWatchNormalizer.subscribe();
   compilerCtx.hasWatch = true;
 
-  if (config.sys.createFsWatcher) {
-    const fsWatcher = config.sys.createFsWatcher(compilerCtx.events, config.srcDir, {
+  if (sys.createFsWatcher) {
+    const fsWatcher = sys.createFsWatcher(compilerCtx.events, config.srcDir, {
       ignored: config.watchIgnoredRegex,
       ignoreInitial: true
     });

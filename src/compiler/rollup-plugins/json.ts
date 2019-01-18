@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
+import { sys } from '@sys';
 
 
 export default function bundleJson(config: d.Config, options: Options = {}) {
-  const path = config.sys.path;
   const filter = createFilter(options.include, options.exclude);
 
   const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir).map(o => o.collectionDir);
@@ -16,8 +16,8 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
         const collectionDir = collectionDirs.find(cd => importer.startsWith(cd));
 
         if (collectionDir) {
-          return path.resolve(
-            path.dirname(importer).replace(collectionDir, config.srcDir),
+          return sys.path.resolve(
+            sys.path.dirname(importer).replace(collectionDir, config.srcDir),
             importee
           );
         }

@@ -30,6 +30,7 @@ async function bundleCompiler() {
       'typescript',
       '../mock-doc',
       '../renderer/vdom',
+      '../sys/node',
       '../utils'
     ],
     plugins: [
@@ -42,11 +43,14 @@ async function bundleCompiler() {
             if (id === '@mock-doc') {
               return '../mock-doc';
             }
-            if (id === '@vdom') {
-              return '../renderer/vdom';
+            if (id === '@sys') {
+              return '../sys/node';
             }
             if (id === '@utils') {
               return '../utils';
+            }
+            if (id === '@vdom') {
+              return '../renderer/vdom';
             }
           }
         }
@@ -64,13 +68,13 @@ async function bundleCompiler() {
 
   // copy over all the .d.ts file too
   await fs.copy(path.dirname(ENTRY_FILE), COMPILER_DIST_DIR, {
-    filter: (src) => {
+    filter: src => {
       return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
     }
   });
 
   await fs.copy(DECLARATIONS_SRC_DIR, DECLARATIONS_DST_DIR, {
-    filter: (src) => {
+    filter: src => {
       return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
     }
   });
@@ -97,16 +101,26 @@ async function buildUtils() {
       'path',
       'fs',
       'os',
-      'typescript'
+      'typescript',
+      '../sys/node'
     ],
     plugins: [
+      (() => {
+        return {
+          resolveId(id) {
+            if (id === '@sys') {
+              return '../sys/node';
+            }
+          }
+        }
+      })(),
       rollupResolve({
         preferBuiltins: true
       }),
       rollupCommonjs()
     ],
-    onwarn: ({code}) => {
-      if (code === 'CIRCULAR_DEPENDENCY') return;
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
       console.error(message);
     }
   });

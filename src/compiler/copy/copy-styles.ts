@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
+import { sys } from '@sys';
 
 
 export async function copyComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -33,8 +34,8 @@ export async function copyComponentStyles(config: d.Config, compilerCtx: d.Compi
 
     await Promise.all(absSrcStylePaths.map(async absSrcStylePath => {
       await Promise.all(outputTargets.map(async outputTarget => {
-        const relPath = config.sys.path.relative(config.srcDir, absSrcStylePath);
-        const absDestStylePath = config.sys.path.join(outputTarget.collectionDir, relPath);
+        const relPath = sys.path.relative(config.srcDir, absSrcStylePath);
+        const absDestStylePath = sys.path.join(outputTarget.collectionDir, relPath);
 
         const content = await compilerCtx.fs.readFile(absSrcStylePath);
         await compilerCtx.fs.writeFile(absDestStylePath, content);

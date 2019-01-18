@@ -1,9 +1,10 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
 export function validateOutputTargetDist(config: d.Config) {
-  const path = config.sys.path;
+  const path = sys.path;
 
   const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
 

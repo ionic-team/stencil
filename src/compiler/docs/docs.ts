@@ -6,6 +6,7 @@ import { generateWebComponentsJson } from './generate-web-components-json';
 import { generateJsonDocs } from './generate-json-docs';
 import { generateReadmeDocs } from './generate-readme-docs';
 import { generateCustomDocs } from './generate-custom-docs';
+import { logger, sys } from '@sys';
 import { strickCheckDocs } from './strict-check';
 import { transpileApp } from '../transpile/transpile-app';
 
@@ -13,10 +14,10 @@ import { transpileApp } from '../transpile/transpile-app';
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   const buildCtx = new BuildContext(config, compilerCtx);
 
-  config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
+  logger.info(logger.cyan(`${sys.compiler.name} v${sys.compiler.version}`));
 
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`generate docs, ${config.fsNamespace}, started`);
+  const timeSpan = logger.createTimeSpan(`generate docs, ${config.fsNamespace}, started`);
 
   try {
     // begin the build
@@ -34,7 +35,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 
   // finalize phase
   buildCtx.diagnostics = cleanDiagnostics(buildCtx.diagnostics);
-  config.logger.printDiagnostics(buildCtx.diagnostics);
+  logger.printDiagnostics(buildCtx.diagnostics);
 
   // create a nice pretty message stating what happend
   let buildStatus = 'finished';
@@ -58,15 +59,15 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
 
-  const docsData = await generateDocData(config, compilerCtx, buildCtx.diagnostics);
+  const docsData = await generateDocData(compilerCtx, buildCtx.diagnostics);
 
   const strictCheck = (docsOutputTargets as d.OutputTargetDocsReadme[]).some(o => !!o.strict);
   if (strictCheck) {
-    strickCheckDocs(config, docsData);
+    strickCheckDocs(docsData);
   }
 
   // generate web-components.json
-  await generateWebComponentsJson(config, compilerCtx, distOutputTargets, docsData);
+  await generateWebComponentsJson(compilerCtx, distOutputTargets, docsData);
 
   // generate READMEs docs
   const readmeTargets = docsOutputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
@@ -83,6 +84,6 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
   // generate custom docs
   const customTargets = docsOutputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
   if (customTargets.length > 0) {
-    await generateCustomDocs(config, customTargets, docsData);
+    await generateCustomDocs(customTargets, docsData);
   }
 }

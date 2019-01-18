@@ -1,15 +1,11 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostics } from '@utils';
-import * as path from 'path';
 import ts from 'typescript';
 
 
 export async function transpileToEs5Worker(cwd: string, input: string, inlineHelpers: boolean) {
   const config: d.Config = {
-    cwd: cwd,
-    sys: {
-      path: path
-    } as any
+    cwd: cwd
   };
 
   const results: d.TranspileResults = {

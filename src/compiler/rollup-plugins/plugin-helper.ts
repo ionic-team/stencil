@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { buildError } from '@utils';
+import { sys } from '@sys';
 
 
 export default function rollupPluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {
@@ -34,7 +35,7 @@ export default function rollupPluginHelper(config: d.Config, compilerCtx: d.Comp
               }
             }
 
-            fromMsg = ` from ${config.sys.path.relative(config.rootDir, importer)}`;
+            fromMsg = ` from ${sys.path.relative(config.rootDir, importer)}`;
           }
 
           const diagnostic = buildError(builtCtx.diagnostics);

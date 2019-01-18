@@ -1,10 +1,11 @@
 import * as d from '@declarations';
+import { logger, sys } from '@sys';
 import { validateConfig } from './validate-config';
 
 
 export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
   try {
-    const updatedConfig = config.sys.loadConfigFile(config.configPath);
+    const updatedConfig = sys.loadConfigFile(config.configPath);
 
     configReload(config, updatedConfig);
 
@@ -12,7 +13,7 @@ export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
     compilerCtx.reset();
 
   } catch (e) {
-    config.logger.error(e);
+    logger.error(e);
   }
 }
 
@@ -55,8 +56,6 @@ export function configReload(config: d.Config, updatedConfig: d.Config) {
 // using the correct keys, but the value doesn't matter here
 const CONFIG_RELOAD_KEEPERS: d.Config = {
   flags: null,
-  sys: null,
-  logger: null,
   cwd: null,
   rootDir: null,
   watch: null

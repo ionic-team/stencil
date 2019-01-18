@@ -17,7 +17,7 @@ describe('validate-workers', () => {
       logger: logger,
       rootDir: '/'
     };
-    config.sys.details = {
+    sys.details = {
       cpuModel: 'cpuModel',
       cpus: 8,
       platform: 'darwin',

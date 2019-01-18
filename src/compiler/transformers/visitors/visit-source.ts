@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { getModule, resetModule } from '../../build/compiler-ctx';
+import { sys } from '@sys';
 import { visitCallExpression } from './visit-call-expression';
 import { visitClass } from './visit-class';
 import { visitImport } from './visit-import';
@@ -19,7 +20,7 @@ export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          visitClass(config, compilerCtx, buildCtx, moduleFile, typeChecker, tsSourceFile, node as ts.ClassDeclaration);
+          visitClass(compilerCtx, buildCtx, moduleFile, typeChecker, tsSourceFile, node as ts.ClassDeclaration);
           break;
 
         case ts.SyntaxKind.CallExpression:
@@ -39,7 +40,7 @@ export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     return sourceFile => {
       tsSourceFile = sourceFile;
-      dirPath = config.sys.path.dirname(tsSourceFile.fileName);
+      dirPath = sys.path.dirname(tsSourceFile.fileName);
       moduleFile = getModule(compilerCtx, tsSourceFile.fileName);
 
       // reset since we're doing a full parse again

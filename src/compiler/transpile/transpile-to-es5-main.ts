@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { sys } from '@sys';
 
 
 export async function transpileToEs5Main(config: d.Config, compilerCtx: d.CompilerCtx, input: string, inlineHelpers = true) {
@@ -12,7 +13,7 @@ export async function transpileToEs5Main(config: d.Config, compilerCtx: d.Compil
     return results;
   }
 
-  const results = await config.sys.transpileToEs5(config.cwd, input, inlineHelpers);
+  const results = await sys.transpileToEs5(config.cwd, input, inlineHelpers);
 
   if (results.diagnostics.length === 0) {
     await compilerCtx.cache.put(cacheKey, results.code);

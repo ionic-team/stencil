@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { logger } from '@sys';
 
 
 export function buildJestArgv(config: d.Config) {
@@ -13,7 +14,7 @@ export function buildJestArgv(config: d.Config) {
     args.push('--maxWorkers=4');
   }
 
-  config.logger.debug(`jest args: ${args.join(' ')}`);
+  logger.debug(`jest args: ${args.join(' ')}`);
 
   const { options } = require('jest-cli/build/cli/args');
   const jestArgv = yargs(args).options(options).argv as d.JestArgv;

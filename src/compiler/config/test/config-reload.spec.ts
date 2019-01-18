@@ -27,7 +27,7 @@ describe('config-reload', () => {
     validateConfig(config);
 
     expect(config.devMode).toBe(true);
-    expect(config.logger.level).toBe('debug');
+    expect(logger.level).toBe('debug');
     expect(config.buildEs5).toBe(true);
     expect(config.autoprefixCss).toBe(undefined);
 
@@ -35,7 +35,7 @@ describe('config-reload', () => {
     configReload(config, updateConfig);
 
     expect(config.devMode).toBe(true);
-    expect(config.logger.level).toBe('debug');
+    expect(logger.level).toBe('debug');
     expect(config.buildEs5).toBe(true);
     expect(config.autoprefixCss).toBe(false);
   });

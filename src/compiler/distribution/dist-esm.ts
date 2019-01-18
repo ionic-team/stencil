@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from '../app/app-file-naming';
-// import { formatBrowserLoaderComponent } from '../../util/data-serialize';
-import { normalizePath, pathJoin } from '@utils';
-import { dashToPascalCase } from '@utils';
+import { dashToPascalCase, normalizePath, pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
@@ -47,7 +46,7 @@ async function generateEsmIndex(config: d.Config, compilerCtx: d.CompilerCtx, ou
 async function addExport(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget, esm: string[], filePath: string) {
   const fileExists = await compilerCtx.fs.access(filePath);
   if (fileExists) {
-    let relPath = normalizePath(config.sys.path.relative(getDistEsmDir(config, outputTarget, sourceTarget), filePath));
+    let relPath = normalizePath(sys.path.relative(getDistEsmDir(config, outputTarget, sourceTarget), filePath));
 
     if (!relPath.startsWith('.')) {
       relPath = './' + relPath;
@@ -137,8 +136,8 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
 
   const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
   const indexDtsContent = generateIndexDts();
-  const indexContent = `export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
-  const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
+  const indexContent = `export * from '${normalizePath(sys.path.relative(loaderPath, indexPath))}';`;
+  const indexES2017Content = `export * from '${normalizePath(sys.path.relative(loaderPath, es2017EntryPoint))}';`;
 
   await Promise.all([
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent),

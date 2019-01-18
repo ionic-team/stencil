@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { logger } from '@sys';
 import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
 import { taskHelp } from './task-help';
@@ -10,13 +11,13 @@ import exit from 'exit';
 
 export async function runTask(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
   if (flags.help || flags.task === `help`) {
-    taskHelp(process, config.logger);
+    taskHelp(process);
 
   } else if (flags.version) {
-    taskVersion(config);
+    taskVersion();
 
   } else if (flags.checkVersion) {
-    await taskCheckVersion(config);
+    await taskCheckVersion();
 
   } else {
     switch (flags.task) {
@@ -37,8 +38,8 @@ export async function runTask(process: NodeJS.Process, config: d.Config, flags: 
         break;
 
       default:
-        config.logger.error(`Invalid stencil command, please see the options below:`);
-        taskHelp(process, config.logger);
+        logger.error(`Invalid stencil command, please see the options below:`);
+        taskHelp(process);
         exit(1);
     }
   }

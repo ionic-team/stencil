@@ -6,7 +6,7 @@ import { mockCompilerCtx, mockConfig, mockPath } from '../../../testing/mocks';
 describe('inMemoryFsRead', () => {
 
   const config = mockConfig();
-  const path = config.sys.path;
+  const path = sys.path;
   let compierCtx: d.CompilerCtx;
   const buildCtx: d.BuildCtx = {} as any;
   buildCtx.isActiveBuild = true;

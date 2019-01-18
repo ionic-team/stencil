@@ -32,6 +32,9 @@
       "@mock-doc": [
         "./mock-doc/index.ts"
       ],
+      "@sys": [
+        "./sys/node/index.ts"
+      ],
       "@testing": [
         "./testing/index.ts"
       ],

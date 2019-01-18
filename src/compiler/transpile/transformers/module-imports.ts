@@ -12,12 +12,12 @@ export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): 
       if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
         let importPath = importNode.moduleSpecifier.text;
 
-        if (config.sys.path.isAbsolute(importPath)) {
+        if (sys.path.isAbsolute(importPath)) {
           importPath = normalizePath(importPath);
           moduleFile.localImports.push(importPath);
 
         } else if (importPath.startsWith('.')) {
-          importPath = normalizePath(config.sys.path.resolve(dirPath, importPath));
+          importPath = normalizePath(sys.path.resolve(dirPath, importPath));
           moduleFile.localImports.push(importPath);
 
         } else {
@@ -42,7 +42,7 @@ export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): 
     return (tsSourceFile) => {
       const moduleFile = getModuleFile(compilerCtx, tsSourceFile.fileName);
 
-      const dirPath = config.sys.path.dirname(tsSourceFile.fileName);
+      const dirPath = sys.path.dirname(tsSourceFile.fileName);
 
       return visit(moduleFile, dirPath, tsSourceFile) as ts.SourceFile;
     };

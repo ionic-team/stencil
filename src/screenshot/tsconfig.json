@@ -26,6 +26,9 @@
       "@declarations": [
         "../declarations/index.ts"
       ],
+      "@sys": [
+        "../sys/node/index.ts"
+      ],
       "@utils": [
         "../utils/index.ts"
       ]

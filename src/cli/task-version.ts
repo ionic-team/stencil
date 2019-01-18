@@ -1,27 +1,26 @@
-import * as d from '@declarations';
-import { printUpdateMessage, requestLatestCompilerVersion } from '@sys/node';
+import { logger, printUpdateMessage, requestLatestCompilerVersion, sys } from '@sys';
 import exit from 'exit';
 
 
-export function taskVersion(config: d.Config) {
-  console.log(config.sys.compiler.version);
+export function taskVersion() {
+  console.log(sys.compiler.version);
 }
 
 
-export async function taskCheckVersion(config: d.Config) {
+export async function taskCheckVersion() {
   try {
-    const currentVersion = config.sys.compiler.version;
+    const currentVersion = sys.compiler.version;
     const latestVersion = await requestLatestCompilerVersion();
 
-    if (config.sys.semver.lt(currentVersion, latestVersion)) {
-      printUpdateMessage(config.logger, currentVersion, latestVersion);
+    if (sys.semver.lt(currentVersion, latestVersion)) {
+      printUpdateMessage(logger, currentVersion, latestVersion);
 
     } else {
-      console.log(`${config.logger.cyan(config.sys.compiler.name)} version ${config.logger.green(config.sys.compiler.version)} is the latest version`);
+      console.log(`${logger.cyan(sys.compiler.name)} version ${logger.green(sys.compiler.version)} is the latest version`);
     }
 
   } catch (e) {
-    config.logger.error(`unable to load latest compiler version: ${e}`);
+    logger.error(`unable to load latest compiler version: ${e}`);
     exit(1);
   }
 }

@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
+import { logger } from '@sys';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 
 
@@ -31,7 +32,7 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     success = !!cliResults.results.success;
 
   } catch (e) {
-    config.logger.error(`runJest: ${e}`);
+    logger.error(`runJest: ${e}`);
   }
 
   return success;

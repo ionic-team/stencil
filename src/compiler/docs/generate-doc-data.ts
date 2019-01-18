@@ -4,21 +4,22 @@ import { buildWarn, isDocsPublic, normalizePath } from '@utils';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@utils';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { sys } from '@sys';
 
 
-export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocs> {
+export async function generateDocData(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocs> {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
-      name: config.sys.compiler.name,
-      version: config.sys.compiler.version,
-      typescriptVersion: config.sys.compiler.typescriptVersion
+      name: sys.compiler.name,
+      version: sys.compiler.version,
+      typescriptVersion: sys.compiler.typescriptVersion
     },
-    components: await getComponents(config, compilerCtx, diagnostics)
+    components: await getComponents(compilerCtx, diagnostics)
   };
 }
 
-async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocsComponent[]> {
+async function getComponents(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocsComponent[]> {
   const cmpDirectories: Set<string> = new Set();
 
   const fileNames = Array.from(compilerCtx.moduleMap.keys()).sort();
@@ -32,7 +33,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       if (!isDocsPublic(moduleFile.cmpCompilerMeta.jsdoc)) {
         return false;
       }
-      const dirPath = normalizePath(config.sys.path.dirname(filePath));
+      const dirPath = normalizePath(sys.path.dirname(filePath));
       if (cmpDirectories.has(dirPath)) {
         const warn = buildWarn(diagnostics);
         warn.relFilePath = dirPath;
@@ -44,9 +45,9 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
     })
     .map(async filePath => {
       const moduleFile = compilerCtx.moduleMap.get(filePath);
-      const dirPath = normalizePath(config.sys.path.dirname(filePath));
-      const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
-      const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
+      const dirPath = normalizePath(sys.path.dirname(filePath));
+      const readmePath = normalizePath(sys.path.join(dirPath, 'readme.md'));
+      const usagesDir = normalizePath(sys.path.join(dirPath, 'usage'));
 
       const membersMeta: any = [];
       //  = Object.keys(moduleFile.cmpCompilerMeta.membersMeta)
@@ -59,14 +60,14 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
       return {
         dirPath,
         filePath,
-        fileName: config.sys.path.basename(filePath),
+        fileName: sys.path.basename(filePath),
         readmePath,
         usagesDir,
         tag: moduleFile.cmpCompilerMeta.tagName,
         readme,
         docs: generateDocs(readme, moduleFile.cmpCompilerMeta.jsdoc),
         docsTags: generateDocsTags(moduleFile.cmpCompilerMeta.jsdoc),
-        usage: await generateUsages(config, compilerCtx, usagesDir),
+        usage: await generateUsages(compilerCtx, usagesDir),
         encapsulation: getEncapsulation(moduleFile.cmpCompilerMeta),
 
         props: getProperties(membersMeta),
@@ -226,7 +227,7 @@ function generateDocsTags(jsdoc: d.JsDoc): d.JsonDocsTags[] {
   return jsdoc.tags || [];
 }
 
-async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
+async function generateUsages(compilerCtx: d.CompilerCtx, usagesDir: string) {
   const rtn: d.JsonDocsUsage = {};
 
   try {
@@ -239,7 +240,7 @@ async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usag
         return;
       }
 
-      const fileName = config.sys.path.basename(f.relPath);
+      const fileName = sys.path.basename(f.relPath);
       if (!fileName.toLowerCase().endsWith('.md')) {
         return;
       }

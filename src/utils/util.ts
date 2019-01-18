@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { BANNER } from './constants';
+import { sys } from '@sys';
 
 
 export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) {
@@ -8,7 +9,7 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
   }
   const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
   return wwwServiceOutputs.some(outputTarget => {
-    return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
+    return buildCtx.filesChanged.some(fileChanged => sys.path.basename(fileChanged).toLowerCase() === sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });
 }
 

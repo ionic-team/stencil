@@ -35,7 +35,7 @@ export function getMethodDecoratorMeta(config: d.Config, diagnostics: d.Diagnost
         warn.header = '@Method requires async';
         warn.messageText = `External @Method() ${methodName}() should return a Promise or void.\n\n Consider prefixing the method with async, such as @Method async ${methodName}(). \n Next minor release will error.`;
         warn.absFilePath = normalizePath(filePath);
-        warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+        warn.relFilePath = normalizePath(sys.path.relative(config.rootDir, filePath));
       }
 
       let methodReturnTypes: d.AttributeTypeReferences = {};

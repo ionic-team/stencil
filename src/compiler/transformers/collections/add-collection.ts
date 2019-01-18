@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { parseCollection } from './parse-collection-module';
+import { sys } from '@sys';
 
 
 export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
@@ -22,7 +23,7 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buil
   let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
-    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId));
+    pkgJsonFilePath = normalizePath(sys.resolveModule(resolveFromDir, moduleId));
 
   } catch (e) {
     // it's someone else's job to handle unresolvable paths
@@ -71,7 +72,7 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buil
     // this collection has more collections
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
-      const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
+      const resolveFromDir = sys.path.dirname(pkgJsonFilePath);
       addCollection(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }

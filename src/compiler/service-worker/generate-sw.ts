@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '@utils';
+import { logger, sys } from '@sys';
 
 
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -11,10 +12,10 @@ export async function generateServiceWorkers(config: d.Config, compilerCtx: d.Co
   }
 
   // let's make sure they have what we need from workbox installed
-  await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
+  await sys.lazyRequire.ensure(logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
 
   // we've ensure workbox is installed, so let's require it now
-  const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
+  const workbox: d.Workbox = sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
 
   const promises = wwwServiceOutputs.map(async outputTarget => {
     await generateServiceWorker(config, buildCtx, outputTarget, workbox);

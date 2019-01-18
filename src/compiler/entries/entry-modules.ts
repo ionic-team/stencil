@@ -3,6 +3,7 @@ import { buildError, buildWarn, catchError } from '@utils';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentEntries } from './entry-components';
+import { sys } from '@sys';
 import { validateComponentTag } from '../config/validate-component';
 
 
@@ -130,7 +131,7 @@ export function createEntryModule(config: d.Config) {
       entryKey,
 
       // generate a unique entry key based on the components within this entry module
-      filePath: config.sys.path.join(config.srcDir, `${entryKey}.js`),
+      filePath: sys.path.join(config.srcDir, `${entryKey}.js`),
 
       // get the modes used in this bundle
       modeNames: getEntryModes(moduleFiles),
@@ -206,7 +207,7 @@ export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx)
       const tag = moduleFile.cmpCompilerMeta.tagName;
       if (definedTags.has(tag)) {
         const error = buildError(buildCtx.diagnostics);
-        error.messageText = `Component tag "${tag}" has been defined in multiple files: ${config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath)}`;
+        error.messageText = `Component tag "${tag}" has been defined in multiple files: ${sys.path.relative(config.rootDir, moduleFile.sourceFilePath)}`;
       } else {
         definedTags.add(tag);
       }

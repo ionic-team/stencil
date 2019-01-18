@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { getGlobalFileName, getRegistryFileName } from '../app/app-file-naming';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
+import { sys } from '@sys';
 
 
 export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
@@ -55,11 +56,11 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
 
   if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
+    outputTarget.serviceWorker.swDest = sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
   }
 
-  if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
+  if (!sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
+    outputTarget.serviceWorker.swDest = sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
   }
 }
 

@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { addCollection } from '../collections/add-collection';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 import ts from 'typescript';
 
 
@@ -8,14 +9,14 @@ export function visitImport(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
-    if (config.sys.path.isAbsolute(importPath)) {
+    if (sys.path.isAbsolute(importPath)) {
       // absolute import
       importPath = normalizePath(importPath);
       moduleFile.localImports.push(importPath);
 
     } else if (importPath.startsWith('.')) {
       // relative import
-      importPath = normalizePath(config.sys.path.resolve(dirPath, importPath));
+      importPath = normalizePath(sys.path.resolve(dirPath, importPath));
       moduleFile.localImports.push(importPath);
 
     } else {

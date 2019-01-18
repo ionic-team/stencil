@@ -109,7 +109,7 @@ describe('component-styles', () => {
     c.config.minifyJs = true;
     c.config.minifyCss = true;
     c.config.hashFileNames = true;
-    c.config.sys.generateContentHash = function() {
+    c.sys.generateContentHash = function() {
       return 'hashed';
     };
 

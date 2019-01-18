@@ -2,9 +2,11 @@ import * as d from '@declarations';
 import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
 import { propsToMarkdown } from './markdown-props';
 import { eventsToMarkdown } from './markdown-events';
+import { logger, sys } from '@sys';
 import { methodsToMarkdown } from './markdown-methods';
 import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
+
 
 export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
   await Promise.all(docs.components.map(async cmpData => {
@@ -20,14 +22,14 @@ async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, read
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (readmeOutput.dir) {
-      const relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
-      const absPath = config.sys.path.join(readmeOutput.dir, relPath);
+      const relPath = sys.path.relative(config.srcDir, docsData.readmePath);
+      const absPath = sys.path.join(readmeOutput.dir, relPath);
       const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
       if (results.changedContent) {
         if (isUpdate) {
-          config.logger.info(`updated readme docs: ${docsData.tag}`);
+          logger.info(`updated readme docs: ${docsData.tag}`);
         } else {
-          config.logger.info(`created readme docs: ${docsData.tag}`);
+          logger.info(`created readme docs: ${docsData.tag}`);
         }
       }
     }

@@ -5,6 +5,7 @@ import { getComponentStylesCache, setComponentStylesCache } from './cached-style
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
+import { sys } from '@sys';
 
 
 export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler, modeName: string) {
@@ -95,10 +96,10 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     if (!moduleFile.isCollectionDependency) {
       const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
-      const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
+      const relPath = sys.path.relative(config.srcDir, transformResults.id);
 
       await Promise.all(collectionDirs.map(async outputTarget => {
-        const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+        const collectionPath = sys.path.join(outputTarget.collectionDir, relPath);
         await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
       }));
     }
@@ -110,8 +111,8 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   } catch (e) {
     if (e.code === 'ENOENT') {
       const d = buildError(buildCtx.diagnostics);
-      const relExtStyle = config.sys.path.relative(config.cwd, extStylePath);
-      const relSrc = config.sys.path.relative(config.cwd, moduleFile.sourceFilePath);
+      const relExtStyle = sys.path.relative(config.cwd, extStylePath);
+      const relSrc = sys.path.relative(config.cwd, moduleFile.sourceFilePath);
       d.messageText = `Unable to load style ${relExtStyle} from ${relSrc}`;
     } else {
       catchError(buildCtx.diagnostics, e);
@@ -146,7 +147,7 @@ function checkPluginHelper(config: d.Config, buildCtx: d.BuildCtx, externalStyle
   }
   buildCtx.data[errorKey] = true;
 
-  const relPath = config.sys.path.relative(config.rootDir, externalStylePath);
+  const relPath = sys.path.relative(config.rootDir, externalStylePath);
 
   const msg = [
     `Style "${relPath}" is a ${pluginName} file, however the "${pluginId}" `,
@@ -191,7 +192,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   if (requiresScopedStyles(cmpMeta.encapsulation, config)) {
     // only create scoped styles if we need to
-    compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, compiledStyle.styleText);
+    compiledStyle.styleTextScoped = await scopeComponentCss(buildCtx, cmpMeta, modeName, compiledStyle.styleText);
     if (cmpMeta.encapsulation === 'scoped') {
       compiledStyle.styleText = compiledStyle.styleTextScoped;
     }

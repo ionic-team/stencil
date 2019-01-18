@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { sys } from '@sys';
 
 
 export async function writeLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, derivedModule: d.DerivedModule, bundleId: string, jsText: string) {
@@ -8,7 +9,7 @@ export async function writeLazyEntryModule(config: d.Config, compilerCtx: d.Comp
   }
   fileName += `.entry.js`;
 
-  const filePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace, fileName);
+  const filePath = sys.path.join(outputTarget.buildDir, config.fsNamespace, fileName);
 
   await compilerCtx.fs.writeFile(filePath, jsText);
 }

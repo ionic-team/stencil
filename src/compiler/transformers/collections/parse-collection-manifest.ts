@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { getModule } from '../../build/compiler-ctx';
 import { normalizePath } from '@utils';
 import { parseCollectionComponents } from './parse-collection-components';
+import { sys } from '@sys';
 
 
 export function parseCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) {
@@ -21,7 +22,7 @@ export function parseCollectionManifest(config: d.Config, compilerCtx: d.Compile
   };
 
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
-  parseGlobal(config, compilerCtx, collectionDir, collectionManifest, collection);
+  parseGlobal(compilerCtx, collectionDir, collectionManifest, collection);
   parseBundles(collectionManifest, collection);
 
   return collection;
@@ -41,13 +42,13 @@ export function parseCollectionDependencies(collectionManifest: d.CollectionMani
 }
 
 
-export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
+export function parseGlobal(compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
   if (typeof collectionManifest.global !== 'string') return;
 
-  const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+  const sourceFilePath = normalizePath(sys.path.join(collectionDir, collectionManifest.global));
 
   collection.global = getModule(compilerCtx, sourceFilePath);
-  collection.global.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+  collection.global.jsFilePath = normalizePath(sys.path.join(collectionDir, collectionManifest.global));
 }
 
 

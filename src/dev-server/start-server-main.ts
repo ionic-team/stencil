@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { logger, sys } from '@sys';
 import { sendMsg } from './dev-server-utils';
 
 
@@ -13,10 +14,10 @@ export async function startDevServerMain(config: d.Config, compilerCtx: d.Compil
 
   // using the path stuff below because after the the bundles are created
   // then these files are no longer relative to how they are in the src directory
-  config.devServer.devServerDir = config.sys.path.join(__dirname, '..', 'dev-server');
+  config.devServer.devServerDir = sys.path.join(__dirname, '..', 'dev-server');
 
   // get the path of the dev server module
-  const program = require.resolve(config.sys.path.join(config.devServer.devServerDir, 'index.js'));
+  const program = require.resolve(sys.path.join(config.devServer.devServerDir, 'index.js'));
 
   const args: string[] = [];
 
@@ -42,7 +43,7 @@ export async function startDevServerMain(config: d.Config, compilerCtx: d.Compil
     close: () => {
       try {
         serverProcess.kill('SIGINT');
-        config.logger.debug(`dev server closed`);
+        logger.debug(`dev server closed`);
       } catch (e) {}
       return Promise.resolve();
     }
@@ -56,7 +57,7 @@ function startServer(config: d.Config, compilerCtx: d.CompilerCtx, serverProcess
   return new Promise<d.DevServerConfig>((resolve, reject) => {
     serverProcess.stdout.on('data', (data: any) => {
       // the child server process has console logged data
-      config.logger.debug(`dev server: ${data}`);
+      logger.debug(`dev server: ${data}`);
     });
 
     serverProcess.stderr.on('data', (data: any) => {
@@ -104,7 +105,7 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
   if (msg.serverStated) {
     // received a message from the child process that the server has successfully started
     if (config.devServer.openBrowser && msg.serverStated.initialLoadUrl) {
-      config.sys.open(msg.serverStated.initialLoadUrl);
+      sys.open(msg.serverStated.initialLoadUrl);
     }
 
     // resolve that everything is good to go
@@ -138,8 +139,8 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
 
   if (msg.error) {
     // received a message from the child process that is an error
-    config.logger.error(msg.error.message);
-    config.logger.debug(msg.error);
+    logger.error(msg.error.message);
+    logger.debug(msg.error);
     return;
   }
 }

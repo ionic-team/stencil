@@ -5,7 +5,7 @@ import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
 
-import * as path from 'path';
+import path from 'path';
 import ts from 'typescript';
 
 
@@ -17,10 +17,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   };
 
   const config: d.Config = {
-    cwd: currentWorkingDir,
-    sys: {
-      path: path
-    } as any
+    cwd: currentWorkingDir
   };
 
   if (!workerCtx.tsHost) {
@@ -48,7 +45,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       }
 
       if (typeof compilerOptions.declarationDir === 'string') {
-        data = updateStencilTypesImports(config, compilerOptions.declarationDir, outputFileName, data);
+        data = updateStencilTypesImports(compilerOptions.declarationDir, outputFileName, data);
       }
 
       ts.sys.writeFile(outputFileName, data, writeByteOrderMark);

@@ -15,20 +15,20 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
   }
 
   // get the root directory of the dependency
-  const collectionPackageRootDir = config.sys.path.dirname(pkgJsonFilePath);
+  const collectionPackageRootDir = sys.path.dirname(pkgJsonFilePath);
 
   // figure out the full path to the collection collection file
   const collectionFilePath = pathJoin(config, collectionPackageRootDir, pkgData.collection);
 
-  const relPath = config.sys.path.relative(config.rootDir, collectionFilePath);
-  config.logger.debug(`load collection: ${collectionName}, ${relPath}`);
+  const relPath = sys.path.relative(config.rootDir, collectionFilePath);
+  logger.debug(`load collection: ${collectionName}, ${relPath}`);
 
   // we haven't cached the collection yet, let's read this file
   // sync on purpose :(
   const collectionJsonStr = compilerCtx.fs.readFileSync(collectionFilePath);
 
   // get the directory where the collection collection file is sitting
-  const collectionDir = normalizePath(config.sys.path.dirname(collectionFilePath));
+  const collectionDir = normalizePath(sys.path.dirname(collectionFilePath));
 
   // parse the json string into our collection data
   collection = parseCollectionData(

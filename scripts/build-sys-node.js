@@ -14,7 +14,7 @@ const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
 
 
 function bundleExternal(entryFileName) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
 
     const whitelist = [
       'child_process',
@@ -40,6 +40,10 @@ function bundleExternal(entryFileName) {
         if (request.match(/^(\.{0,2})\//)) {
           // absolute and relative paths are not externals
           return callback();
+        }
+
+        if (request === '@sys') {
+          return callback(null, '../../sys/node');
         }
 
         if (request === '@utils') {
@@ -71,14 +75,15 @@ function bundleExternal(entryFileName) {
     }, (err, stats) => {
       if (err) {
         if (err.details) {
-          reject(err.details);
+          throw err.details;
         }
-        return;
       }
 
-      const info = stats.toJson();
+      const info = stats.toJson({ errors: true });
       if (stats.hasErrors()) {
-        reject(info.errors);
+        const webpackError = info.errors.join('\n');
+        throw webpackError
+
       } else {
         resolve();
       }

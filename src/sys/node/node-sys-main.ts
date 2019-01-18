@@ -181,13 +181,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
-    const config = loadConfigFile(this.fs, configPath, process);
-
-    if (!config.sys) {
-      config.sys = this;
-    }
-
-    return config;
+    return loadConfigFile(this.fs, configPath, process);
   }
 
   get lazyRequire() {
@@ -198,14 +192,14 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   optimizeCss(inputOpts: d.OptimizeCssInput) {
-    return this.sysWorker.run('optimizeCss', [inputOpts]);
+    return this.sysWorker.run('optimizeCss', [inputOpts]) as Promise<d.OptimizeCssOutput>;
   }
 
   minifyJs(input: string, opts?: any) {
     return this.sysWorker.run('minifyJs', [input, opts]);
   }
 
-  open(target: string, opts: any) {
+  open(target: string, opts?: any) {
     return opn(target, opts) as Promise<any>;
   }
 

@@ -42,6 +42,7 @@ async function bundleTesting() {
       '../compiler',
       '../mock-doc',
       '../runtime',
+      '../sys/node',
       '../utils'
     ],
     plugins: [
@@ -59,6 +60,9 @@ async function bundleTesting() {
             }
             if (id === '@runtime') {
               return '../runtime';
+            }
+            if (id === '@sys') {
+              return '../sys/node';
             }
             if (id === '@utils') {
               return '../utils';

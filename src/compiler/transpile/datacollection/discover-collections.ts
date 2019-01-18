@@ -39,7 +39,7 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
   let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
-    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId));
+    pkgJsonFilePath = normalizePath(sys.resolveModule(resolveFromDir, moduleId));
 
   } catch (e) {
     // it's someone else's job to handle unresolvable paths
@@ -83,7 +83,7 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, coll
     // this collection has more collections
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
-      const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
+      const resolveFromDir = sys.path.dirname(pkgJsonFilePath);
       addCollection(config, compilerCtx, collections, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }

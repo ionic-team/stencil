@@ -1,24 +1,11 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
-import { TestLogger } from './test-logger';
-import { TestingSystem } from './testing-sys';
 import { transpileModule } from '@compiler';
 import ts from 'typescript';
 
 
-let sys: d.StencilSystem;
-
-
 export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  const logger = new TestLogger();
-
-  if (sys == null) {
-    sys = new TestingSystem();
-  }
-
   const config: d.Config = {
-    sys: sys,
-    logger: logger,
     cwd: process.cwd(),
     rootDir: '/',
     srcDir: '/',
@@ -28,8 +15,6 @@ export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFi
   };
 
   const results = transpileModule(config, input, opts, sourceFilePath);
-
-  logger.printLogs();
 
   return results;
 }

@@ -19,10 +19,10 @@ export async function generateLoader(
   }
 
   const appLoaderPath = getLoaderPath(config, outputTarget);
-  const relPath = config.sys.path.relative(config.rootDir, appLoaderPath);
+  const relPath = sys.path.relative(config.rootDir, appLoaderPath);
   const timeSpan = buildCtx.createTimeSpan(`generateLoader started, ${relPath}`, true);
 
-  let loaderContent = await config.sys.getClientCoreFile({ staticName: CLIENT_LOADER_SOURCE });
+  let loaderContent = await sys.getClientCoreFile({ staticName: CLIENT_LOADER_SOURCE });
 
   loaderContent = injectAppIntoLoader(
     config,

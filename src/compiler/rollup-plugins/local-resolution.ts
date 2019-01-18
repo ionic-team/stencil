@@ -1,8 +1,9 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
+import { sys } from '@sys';
 
 
-export default function localResolution(config: d.Config, compilerCtx: d.CompilerCtx) {
+export default function localResolution(compilerCtx: d.CompilerCtx) {
   return {
     name: 'localResolution',
 
@@ -27,10 +28,10 @@ export default function localResolution(config: d.Config, compilerCtx: d.Compile
         return null;
       }
 
-      const basename = config.sys.path.basename(importer);
+      const basename = sys.path.basename(importer);
       const directory = importer.split(basename)[0];
 
-      const dirIndexFile = config.sys.path.join(directory + importee, 'index.js');
+      const dirIndexFile = sys.path.join(directory + importee, 'index.js');
 
       let stats;
       try {

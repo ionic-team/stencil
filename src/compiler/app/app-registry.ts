@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { ENCAPSULATION } from '@utils';
 import { getLoaderFileName, getRegistryJson } from './app-file-naming';
+import { sys } from '@sys';
 
 
 export function createAppRegistry(config: d.Config) {
@@ -72,7 +73,7 @@ export async function writeAppRegistry(config: d.Config, compilerCtx: d.Compiler
 
     await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
 
-    const relPath = config.sys.path.relative(config.rootDir, appRegistryWWW);
+    const relPath = sys.path.relative(config.rootDir, appRegistryWWW);
     buildCtx.debug(`writeAppRegistry: ${relPath}`);
   }
 }

@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { MAX_ERRORS, splitLineBreaks } from './logger-utils';
 import { normalizePath } from '../path-utils';
+import { sys } from '@sys';
 import ts from 'typescript';
 
 
@@ -39,7 +40,7 @@ export function loadTypeScriptDiagnostic(config: d.Config, tsDiagnostic: ts.Diag
   if (tsDiagnostic.file) {
     d.absFilePath = normalizePath(tsDiagnostic.file.fileName);
     if (config) {
-      d.relFilePath = normalizePath(config.sys.path.relative(config.cwd, d.absFilePath));
+      d.relFilePath = normalizePath(sys.path.relative(config.cwd, d.absFilePath));
 
       if (!d.relFilePath.includes('/')) {
         d.relFilePath = './' + d.relFilePath;

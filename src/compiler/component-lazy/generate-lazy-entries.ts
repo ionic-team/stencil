@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { sys } from '@sys';
 import { writeLazyEntryModule } from './write-lazy-module';
 
 
@@ -131,7 +132,7 @@ function getBundleId(config: d.Config, entryModule: d.EntryModule, modeName: str
 
 
 function getBundleIdHashed(config: d.Config, jsText: string) {
-  return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
+  return sys.generateContentHash(jsText, config.hashedFileNameLength);
 }
 
 

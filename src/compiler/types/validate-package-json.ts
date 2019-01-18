@@ -2,11 +2,12 @@ import * as d from '@declarations';
 import { buildWarn, normalizePath, pathJoin } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
 import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../output-targets/output-file-naming';
+import { sys } from '@sys';
 
 
 export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (Array.isArray(pkgData.files)) {
-    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
+    const actualDistDir = normalizePath(sys.path.relative(config.rootDir, outputTarget.dir));
 
     const validPaths = [
       `${actualDistDir}`,
@@ -28,7 +29,7 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 
 export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const moduleAbs = getDistEsmIndexPath(config, outputTarget, 'es5');
-  const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
+  const moduleRel = normalizePath(sys.path.relative(config.rootDir, moduleAbs));
 
   if (typeof pkgData.module !== 'string') {
     const err = buildWarn(diagnostics);
@@ -55,7 +56,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 
 export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const mainAbs = getDistCjsIndexPath(config, outputTarget);
-  const mainRel = pathJoin(config, config.sys.path.relative(config.rootDir, mainAbs));
+  const mainRel = pathJoin(config, sys.path.relative(config.rootDir, mainAbs));
 
   if (typeof pkgData.main !== 'string' || pkgData.main === '') {
     const err = buildWarn(diagnostics);
@@ -72,7 +73,7 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   const loaderAbs = getLoaderPath(config, outputTarget);
-  const loaderRel = pathJoin(config, config.sys.path.relative(config.rootDir, loaderAbs));
+  const loaderRel = pathJoin(config, sys.path.relative(config.rootDir, loaderAbs));
   if (normalizePath(pkgData.main) === loaderRel) {
     const err = buildWarn(diagnostics);
     err.messageText = `package.json "main" property should not be set to "${pkgData.main}", which is the browser loader (this was a previous recommendation, but recently updated). Instead, please set the "main" property to: ${mainRel}`;
@@ -114,7 +115,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
 
 export function validateCollection(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (outputTarget.collectionDir) {
-    const collectionRel = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+    const collectionRel = pathJoin(config, sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
     if (!pkgData.collection || normalizePath(pkgData.collection) !== collectionRel) {
       const err = buildWarn(diagnostics);
       err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
@@ -141,5 +142,5 @@ export function validateNamespace(config: d.Config, diagnostics: d.Diagnostic[])
 
 export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDist) {
   const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
-  return pathJoin(config, config.sys.path.relative(config.rootDir, typesAbs));
+  return pathJoin(config, sys.path.relative(config.rootDir, typesAbs));
 }

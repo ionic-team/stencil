@@ -81,7 +81,7 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
     content = await compilerCtx.fs.readFile(appLoaderPath);
 
   } catch (e) {
-    config.logger.debug(`unable to inline loader: ${appLoaderPath}`, e);
+    logger.debug(`unable to inline loader: ${appLoaderPath}`, e);
   }
 
   if (!content) {
@@ -89,7 +89,7 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
     return;
   }
 
-  config.logger.debug(`optimize ${windowLocationPath}, inline loader`);
+  logger.debug(`optimize ${windowLocationPath}, inline loader`);
 
   // remove the external src
   scriptElm.removeAttribute('src');
@@ -120,8 +120,8 @@ export function setDataResourcesUrlAttr(config: d.Config, outputTarget: d.Output
   let resourcesUrl = outputTarget.resourcesUrl;
 
   if (!resourcesUrl) {
-    resourcesUrl = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
-    resourcesUrl = normalizePath(config.sys.path.relative(outputTarget.dir, resourcesUrl));
+    resourcesUrl = sys.path.join(outputTarget.buildDir, config.fsNamespace);
+    resourcesUrl = normalizePath(sys.path.relative(outputTarget.dir, resourcesUrl));
 
     if (!resourcesUrl.startsWith('/')) {
       resourcesUrl = '/' + resourcesUrl;

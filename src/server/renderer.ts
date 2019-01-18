@@ -4,6 +4,7 @@ import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { hydrateHtml } from './hydrate-html';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
+import { sys } from '@sys';
 import { noop } from '@utils';
 
 
@@ -17,7 +18,7 @@ export class Renderer {
     this.config = validateConfig(config);
 
     // do not allow more than one worker when prerendering
-    config.sys.initWorkers(1, 1);
+    sys.initWorkers(1, 1);
 
     // init the build context
     this.ctx = ctx || new CompilerContext(config);
@@ -68,8 +69,8 @@ export class Renderer {
   }
 
   destroy() {
-    if (this.config && this.config.sys && this.config.sys.destroy) {
-      this.config.sys.destroy();
+    if (this.config) {
+      // this.sys.destroy();
     }
   }
 
@@ -90,6 +91,6 @@ function loadAppGlobal(_config: d.Config, _compilerCtx: d.CompilerCtx, _outputTa
   //   compilerCtx.appFiles.global = compilerCtx.fs.readFileSync(appGlobalPath);
 
   // } catch (e) {
-  //   config.logger.debug(`missing app global: ${appGlobalPath}`);
+  //   logger.debug(`missing app global: ${appGlobalPath}`);
   // }
 }

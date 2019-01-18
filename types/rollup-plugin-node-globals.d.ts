@@ -1,7 +1,7 @@
+
 declare module "rollup-plugin-node-globals" {
   namespace rollupPluginNodeGlobals {}
-  function rollupPluginNodeGlobals(): void;
+  function rollupPluginNodeGlobals(opts?: any): any;
 
   export = rollupPluginNodeGlobals;
 }
-

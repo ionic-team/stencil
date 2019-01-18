@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { buildFinish } from './build-finish';
 import { hasError, hasWarning } from '@utils';
+import { logger } from '@sys';
 
 
 export class BuildContext implements d.BuildCtx {
@@ -81,10 +82,10 @@ export class BuildContext implements d.BuildCtx {
     if ((this.isActiveBuild && !this.hasFinished) || debug) {
       if (debug) {
         if (this.config.watch) {
-          msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
+          msg = `${logger.cyan('[' + this.buildId + ']')} ${msg}`;
         }
       }
-      const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
+      const timeSpan = logger.createTimeSpan(msg, debug, this.buildMessages);
 
       if (!debug && this.compilerCtx.events) {
         this.compilerCtx.events.emit('buildLog', {
@@ -97,7 +98,7 @@ export class BuildContext implements d.BuildCtx {
           if ((this.isActiveBuild && !this.hasFinished) || debug) {
             if (debug) {
               if (this.config.watch) {
-                finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
+                finishedMsg = `${logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
               }
             }
 
@@ -120,9 +121,9 @@ export class BuildContext implements d.BuildCtx {
 
   debug(msg: string) {
     if (this.config.watch) {
-      this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
+      logger.debug(`${logger.cyan('[' + this.buildId + ']')} ${msg}`);
     } else {
-      this.config.logger.debug(msg);
+      logger.debug(msg);
     }
   }
 

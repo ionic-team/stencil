@@ -28,7 +28,7 @@ async function buildCli() {
       (() => {
         return {
           resolveId(id) {
-            if (id === '@sys/node') {
+            if (id === '@sys') {
               return '../sys/node';
             }
             if (id === '@utils') {

@@ -32,16 +32,16 @@ export async function getLatestCompilerVersion(sys: d.StencilSystem, logger: d.L
 }
 
 
-export async function validateCompilerVersion(config: d.Config, latestVersionPromise: Promise<string>) {
+export async function validateCompilerVersion(sys: d.StencilSystem, logger: d.Logger, latestVersionPromise: Promise<string>) {
   const latestVersion = await latestVersionPromise;
   if (latestVersion == null) {
     return;
   }
 
-  const currentVersion = config.sys.compiler.version;
+  const currentVersion = sys.compiler.version;
 
-  if (config.sys.semver.lt(currentVersion, latestVersion)) {
-    printUpdateMessage(config.logger, currentVersion, latestVersion);
+  if (sys.semver.lt(currentVersion, latestVersion)) {
+    printUpdateMessage(logger, currentVersion, latestVersion);
   }
 }
 

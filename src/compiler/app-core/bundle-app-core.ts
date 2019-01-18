@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
 import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@utils';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
+import { logger, sys } from '@sys';
 
 
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>, bundleInput: string) {
@@ -12,22 +13,22 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
       input: INPUT_ENTRY,
       plugins: [
         filePlugin(build, files, bundleInput),
-        config.sys.rollup.plugins.nodeResolve({
+        sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
         }),
-        config.sys.rollup.plugins.emptyJsResolver(),
-        config.sys.rollup.plugins.commonjs({
+        sys.rollup.plugins.emptyJsResolver(),
+        sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(config, compilerCtx, buildCtx),
+        inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
       ],
-      onwarn: createOnWarnFn(config, buildCtx.diagnostics),
+      onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
 
-    const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
+    const rollupBuild: RollupBuild = await sys.rollup.rollup(rollupOptions);
 
     const { output } = await rollupBuild.generate({ format: 'es' });
 
@@ -37,7 +38,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
 
   } catch (e) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
-    config.logger.debug(`bundleAppCore, bundleInput: ${bundleInput}`);
+    logger.debug(`bundleAppCore, bundleInput: ${bundleInput}`);
   }
 
   return outputText;

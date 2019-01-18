@@ -4,7 +4,7 @@ import { parseStaticComponentMeta } from '../static-to-meta/component';
 import ts from 'typescript';
 
 
-export function visitClass(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, classNode: ts.ClassDeclaration) {
+export function visitClass(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, classNode: ts.ClassDeclaration) {
   if (!classNode.members) {
     return;
   }
@@ -16,7 +16,7 @@ export function visitClass(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
 
   const tagName: string = getStaticValue(staticMembers, 'is');
   if (typeof tagName === 'string' && tagName.includes('-')) {
-    parseStaticComponentMeta(config, compilerCtx, buildCtx, moduleFile, typeChecker, tsSourceFile, classNode, staticMembers, tagName);
+    parseStaticComponentMeta(compilerCtx, buildCtx, moduleFile, typeChecker, tsSourceFile, classNode, staticMembers, tagName);
   }
 }
 

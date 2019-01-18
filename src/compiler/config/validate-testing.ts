@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export function validateTesting(config: d.Config) {
@@ -27,7 +28,7 @@ export function validateTesting(config: d.Config) {
     testing.browserHeadless = true;
   }
 
-  const path = config.sys.path;
+  const path = sys.path;
 
   if (typeof testing.rootDir === 'string') {
     if (!path.isAbsolute(testing.rootDir)) {
@@ -48,8 +49,8 @@ export function validateTesting(config: d.Config) {
     }
 
   } else {
-    testing.screenshotConnector = config.sys.path.join(
-      config.sys.compiler.packageDir, 'screenshot', 'local-connector.js'
+    testing.screenshotConnector = sys.path.join(
+      sys.compiler.packageDir, 'screenshot', 'local-connector.js'
     );
   }
 
@@ -69,7 +70,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
+      sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
     );
 
   } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
@@ -81,7 +82,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.testEnvironment !== 'string') {
     testing.testEnvironment = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.environment.js'
+      sys.compiler.packageDir, 'testing', 'jest.environment.js'
     );
 
   } else if (!path.isAbsolute(testing.testEnvironment)) {
@@ -129,7 +130,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.runner !== 'string') {
     testing.runner = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.runner.js'
+      sys.compiler.packageDir, 'testing', 'jest.runner.js'
     );
   }
 
@@ -153,7 +154,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.transform[DEFAULT_TS_TRANSFORM] !== 'string') {
     testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.preprocessor.js'
+      sys.compiler.packageDir, 'testing', 'jest.preprocessor.js'
     );
 
   } else if (!path.isAbsolute(testing.transform[DEFAULT_TS_TRANSFORM])) {

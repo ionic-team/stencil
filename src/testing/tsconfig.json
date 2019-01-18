@@ -42,6 +42,9 @@
       "@runtime": [
         "../runtime/index.ts"
       ],
+      "@sys": [
+        "../sys/node/index.ts"
+      ],
       "@utils": [
         "../utils/index.ts"
       ],

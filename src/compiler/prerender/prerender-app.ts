@@ -64,7 +64,7 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
   }
 
   // get the prerender urls to queue up
-  const prerenderQueue = getPrerenderQueue(config, outputTarget);
+  const prerenderQueue = getPrerenderQueue(outputTarget);
 
   if (!prerenderQueue.length) {
     const d = buildWarn(buildCtx.diagnostics);
@@ -154,7 +154,7 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
     // awesome!!
 
     if (outputTarget.prerenderUrlCrawl) {
-      crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results.url, results.anchors);
+      crawlAnchorsForNextUrls(outputTarget, prerenderQueue, results.url, results.anchors);
     }
 
     hydrateResults.push(results);

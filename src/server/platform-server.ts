@@ -13,6 +13,7 @@ import { patchDomApi } from './dom-api-server';
 // import { proxyController } from '../core/proxy-controller';
 // import { queueUpdate } from '../core/update';
 import { serverAttachStyles, serverInitStyle } from './server-styles';
+import { sys } from '@sys';
 import { toDashCase } from '@utils';
 
 
@@ -66,7 +67,7 @@ export function createPlatformServer(
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
-  config.sys.vm.createContext(compilerCtx, outputTarget, win);
+  sys.vm.createContext(compilerCtx, outputTarget, win);
 
   // execute the global scripts (if there are any)
   runGlobalScripts();
@@ -296,10 +297,10 @@ export function createPlatformServer(
   }
 
   function loadFile(fileName: string) {
-    const jsFilePath = config.sys.path.join(appBuildDir, fileName);
+    const jsFilePath = sys.path.join(appBuildDir, fileName);
 
     const jsCode = compilerCtx.fs.readFileSync(jsFilePath);
-    config.sys.vm.runInContext(jsCode, win);
+    sys.vm.runInContext(jsCode, win);
   }
 
 
@@ -308,7 +309,7 @@ export function createPlatformServer(
     //   return;
     // }
 
-    // config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
+    // sys.vm.runInContext(compilerCtx.appFiles.global, win);
   }
 
   function onError(err: Error, type: RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {

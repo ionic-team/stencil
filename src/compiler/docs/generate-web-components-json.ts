@@ -1,8 +1,9 @@
 import * as d from '@declarations';
-import { WEB_COMPONENTS_JSON_FILE_NAME } from '@utils';
-import { normalizePath } from '@utils';
+import { WEB_COMPONENTS_JSON_FILE_NAME, normalizePath } from '@utils';
+import { sys } from '@sys';
 
-export async function generateWebComponentsJson(config: d.Config, compilerCtx: d.CompilerCtx, distOutputs: d.OutputTargetDist[], docsData: d.JsonDocs) {
+
+export async function generateWebComponentsJson(compilerCtx: d.CompilerCtx, distOutputs: d.OutputTargetDist[], docsData: d.JsonDocs) {
   const json = {
     'tags': docsData.components.map(cmp => ({
       'label': cmp.tag,
@@ -16,7 +17,7 @@ export async function generateWebComponentsJson(config: d.Config, compilerCtx: d
   };
   const jsonContent = JSON.stringify(json, null, 2);
   await Promise.all(distOutputs.map(async distOutput => {
-    const filePath = normalizePath(config.sys.path.join(distOutput.buildDir, WEB_COMPONENTS_JSON_FILE_NAME));
+    const filePath = normalizePath(sys.path.join(distOutput.buildDir, WEB_COMPONENTS_JSON_FILE_NAME));
     await compilerCtx.fs.writeFile(filePath, jsonContent);
   }));
 }

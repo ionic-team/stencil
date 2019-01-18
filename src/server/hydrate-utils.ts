@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { logger, sys } from '@sys';
 
 
 export function normalizeHydrateOptions(wwwTarget: d.OutputTargetWww, opts: d.HydrateOptions) {
@@ -29,7 +30,7 @@ export function generateHydrateResults(config: d.Config, hydrateTarget: d.Output
   }
 
   // https://nodejs.org/api/url.html
-  const urlParse =  config.sys.url.parse(hydrateTarget.url);
+  const urlParse =  sys.url.parse(hydrateTarget.url);
 
   const hydrateResults: d.HydrateResults = {
     diagnostics: [],
@@ -143,7 +144,7 @@ export function normalizeLanguage(doc: Document, hydrateTarget: d.OutputTargetHy
 }
 
 
-export function collectAnchors(config: d.Config, doc: Document, results: d.HydrateResults) {
+export function collectAnchors(_config: d.Config, doc: Document, results: d.HydrateResults) {
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {
@@ -157,7 +158,7 @@ export function collectAnchors(config: d.Config, doc: Document, results: d.Hydra
     results.anchors.push(attrs);
   }
 
-  config.logger.debug(`optimize ${results.pathname}, collected anchors: ${results.anchors.length}`);
+  logger.debug(`optimize ${results.pathname}, collected anchors: ${results.anchors.length}`);
 }
 
 

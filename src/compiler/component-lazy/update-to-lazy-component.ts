@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { dashToPascalCase, normalizePath } from '@utils';
+import { sys } from '@sys';
 import { transformLazyComponent } from './transform-lazy-component';
 
 
@@ -14,7 +15,7 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
 
   const cmpData: d.ComponentCompilerLazyData = {
     filePath: lazyModuleFilePath,
-    exportLine: createComponentExport(config, entryModule, moduleFile, lazyModuleFilePath),
+    exportLine: createComponentExport(entryModule, moduleFile, lazyModuleFilePath),
     tagName: moduleFile.cmpCompilerMeta.tagName
   };
 
@@ -22,10 +23,10 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
 }
 
 
-function createComponentExport(config: d.Config, entryModule: d.EntryModule, moduleFile: d.Module, lazyModuleFilePath: string) {
+function createComponentExport(entryModule: d.EntryModule, moduleFile: d.Module, lazyModuleFilePath: string) {
   const originalClassName = moduleFile.cmpCompilerMeta.componentClassName;
   const pascalCasedClassName = dashToPascalCase(moduleFile.cmpCompilerMeta.tagName);
-  const relPath = config.sys.path.relative(config.sys.path.dirname(entryModule.filePath), lazyModuleFilePath);
+  const relPath = sys.path.relative(sys.path.dirname(entryModule.filePath), lazyModuleFilePath);
   const filePath = normalizePath(relPath);
 
   if (originalClassName === pascalCasedClassName) {

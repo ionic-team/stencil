@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export function validateStats(config: d.Config) {
@@ -26,7 +27,7 @@ function validateStatsOutputTarget(config: d.Config, outputTarget: d.OutputTarge
     outputTarget.file = DEFAULT_JSON_FILE_NAME;
   }
 
-  if (!config.sys.path.isAbsolute(outputTarget.file)) {
+  if (!sys.path.isAbsolute(outputTarget.file)) {
     outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
   }
 }
