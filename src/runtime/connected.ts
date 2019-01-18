@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
-import { activelyProcessingCmps, resolved } from '@stencil/core/platform';
-import { getElmRef } from './platform';
+import { activelyProcessingCmps, getElmRef, resolved } from '@stencil/core/platform';
 import { initialLoad } from './initial-load';
 
 

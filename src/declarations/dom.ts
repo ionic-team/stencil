@@ -27,8 +27,8 @@ export interface DomApi {
   $hasAttribute(elm: any, key: string): boolean;
   $elementRef?(elm: any, referenceName: string): any;
   $parentElement?(node: Node): any;
-  $addEventListener?(elm: any, eventName: string, eventListener: any, useCapture?: boolean, usePassive?: boolean, attachTo?: string|Element): void;
-  $removeEventListener?(elm: any, eventName?: string): any;
+  $addEventListener?(elm: any, eventName: string, eventListener: any, assignerId: 0 | 1, useCapture?: boolean, usePassive?: boolean, attachTo?: string|Element): void;
+  $removeEventListener?(elm: any, eventName?: string, assignerId?: 0 | 1): any;
   $dispatchEvent?(elm: Element | Document | Window, eventName: string, data: any): CustomEvent;
   $supportsShadowDom?: boolean;
   $supportsEventOptions?: boolean;

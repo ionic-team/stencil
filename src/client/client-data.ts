@@ -38,3 +38,22 @@ if (BUILD.shadowDom) {
 if (BUILD.exposeAppRegistry) {
   (win['s-apps'] = win['s-apps'] || []).push(BUILD.appNamespace);
 }
+
+export const getElement = (ref: any) => refs.get(ref).elm;
+
+export const getElmRef = (elm: d.HostElement, elmData?: d.ElementData) => {
+  elmData = refs.get(elm);
+
+  if (!elmData) {
+    refs.set(elm, elmData = {
+      elm: elm,
+      instanceValues: new Map(),
+      instance: BUILD.lazyLoad ? null : elm
+    });
+  }
+
+  return elmData;
+};
+
+export const registerLazyInstance = (lazyInstance: any, elmData: d.ElementData) =>
+  refs.set(elmData.instance = lazyInstance, elmData);

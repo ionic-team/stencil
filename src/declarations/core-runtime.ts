@@ -70,6 +70,7 @@ export interface ElementData {
   isQueuedForUpdate?: boolean;
   isShadowDom?: boolean;
   isScoped?: boolean;
+  listernProxies?: {[key: string]: Function};
   queuedEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;

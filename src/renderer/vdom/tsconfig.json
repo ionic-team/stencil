@@ -28,6 +28,9 @@
       "@stencil/core/platform": [
         "../../client/index.ts"
       ],
+      "@stencil/core/runtime": [
+        "../../runtime/index.ts"
+      ],
       "@stencil/core/utils": [
         "../../utils/index.ts"
       ]

@@ -9,6 +9,7 @@
 
 import * as d from '../../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
+import { getElmRef } from '@stencil/core/platform';
 import { toLowerCase } from '@stencil/core/utils';
 
 
@@ -90,14 +91,15 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
     if (newValue) {
       if (!oldValue) {
-        elm.addEventListener(memberName, eventProxy);
+        elm.addEventListener(memberName, jsxEventProxy);
       }
 
     } else if (BUILD.updatable) {
-      elm.removeEventListener(memberName, eventProxy);
+      elm.removeEventListener(memberName, jsxEventProxy);
     }
 
-    (elm._listeners || (elm._listeners = {}))[memberName] = newValue;
+    const elmData = getElmRef(elm);
+    (elmData.listernProxies || (elmData.listernProxies = {}))[memberName + 0] = newValue;
 
   } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
       (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
@@ -157,6 +159,6 @@ const setProperty = (elm: any, propName: string, newValue: any) => {
 };
 
 
-function eventProxy(this: d.HostElement, e: any) {
-  return this._listeners[e.type](e);
+function jsxEventProxy(this: d.HostElement, e: any) {
+  return getElmRef(this).listernProxies[e.type + 0](e);
 }

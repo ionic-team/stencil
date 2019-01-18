@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
 import { connectedCallback } from './connected';
-import { refs, resolved } from '@stencil/core/platform';
+import { getElmRef, resolved } from '@stencil/core/platform';
 import { disconnectedCallback } from './disconnected';
 import { initHostComponent } from './init-host-component';
 import { initialLoad } from './initial-load';
@@ -31,21 +31,21 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
         }
 
         's-init'() {
-          initialLoad(this, refs.get(this), cmpLazyMeta);
+          initialLoad(this, getElmRef(this), cmpLazyMeta);
         }
 
         forceUpdate() {
           if (BUILD.updatable) {
-            const elmData = refs.get(this);
+            const elmData = getElmRef(this);
             update(this, elmData.instance, elmData, cmpLazyMeta);
           }
         }
 
         componentOnReady(): any {
           if (BUILD.lifecycle || BUILD.updatable) {
-            const elmData = refs.get(this);
+            const elmData = getElmRef(this);
             if (!elmData.onReadyPromise) {
-              elmData.onReadyPromise = new Promise(resolve => elmData.firedDidLoad ? resolve() : (elmData.onReadyResolve = resolve));
+              elmData.onReadyPromise = new Promise(resolve => elmData.hasRendered ? resolve() : (elmData.onReadyResolve = resolve));
             }
             return elmData.onReadyPromise;
 

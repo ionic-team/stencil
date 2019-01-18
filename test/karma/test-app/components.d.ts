@@ -117,6 +117,12 @@ export namespace Components {
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends JSXElements.HTMLAttributes {}
 
+  interface ListenJsxRoot {}
+  interface ListenJsxRootAttributes extends StencilHTMLAttributes {}
+
+  interface ListenJsx {}
+  interface ListenJsxAttributes extends StencilHTMLAttributes {}
+
   interface ListenWindow {}
   interface ListenWindowAttributes extends JSXElements.HTMLAttributes {}
 
@@ -278,6 +284,8 @@ declare global {
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'ListenJsxRoot': Components.ListenJsxRoot;
+    'ListenJsx': Components.ListenJsx;
     'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
     'ReflectToAttr': Components.ReflectToAttr;
@@ -357,6 +365,8 @@ declare global {
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'listen-jsx-root': Components.ListenJsxRootAttributes;
+    'listen-jsx': Components.ListenJsxAttributes;
     'listen-window': Components.ListenWindowAttributes;
     'node-globals': Components.NodeGlobalsAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;

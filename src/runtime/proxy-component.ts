@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@stencil/core/build-conditionals';
-import { getElmRef } from './platform';
+import { getElmRef } from '@stencil/core/platform';
 import { MEMBER_TYPE } from '../utils/constants';
 import { noop } from '../utils/helpers';
 import { setValue } from './set-value';
