@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import * as http  from 'http';
 import * as path  from 'path';
-import { responseHeaders } from './util';
+import { responseHeaders } from './dev-server-utils';
 import { serve500 } from './serve-500';
 
 

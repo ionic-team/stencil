@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../util';
+import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../dev-server-utils';
 import { logDiagnostic } from './logger';
 import { updateBuildStatus } from './build-status';
 

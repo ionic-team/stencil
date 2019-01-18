@@ -21,6 +21,7 @@
     "outDir": "../../dist/transpiled-testing",
     "pretty": true,
     "rootDir": "../",
+    "target": "es2015",
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [
@@ -47,8 +48,7 @@
       "@vdom": [
         "../renderer/vdom/index.ts"
       ]
-    },
-    "target": "es2015"
+    }
   },
   "include": [
     "../../types/*.d.ts"

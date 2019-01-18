@@ -32,7 +32,7 @@
       "@mock-doc": [
         "./mock-doc/index.ts"
       ],
-      "@stencil/core/testing": [
+      "@testing": [
         "./testing/index.ts"
       ],
       "@utils": [

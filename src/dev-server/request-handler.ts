@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { isDevClient } from './util';
+import { isDevClient } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';

@@ -1,5 +1,5 @@
 import * as http  from 'http';
-import { responseHeaders, sendError } from './util';
+import { responseHeaders, sendError } from './dev-server-utils';
 
 
 export function serve500(res: http.ServerResponse, error: any) {

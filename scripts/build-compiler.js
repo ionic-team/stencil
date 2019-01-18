@@ -30,7 +30,7 @@ async function bundleCompiler() {
       'typescript',
       '../mock-doc',
       '../renderer/vdom',
-      '../util'
+      '../utils'
     ],
     plugins: [
       (() => {
@@ -46,7 +46,7 @@ async function bundleCompiler() {
               return '../renderer/vdom';
             }
             if (id === '@utils') {
-              return '../util';
+              return '../utils';
             }
           }
         }

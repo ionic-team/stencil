@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { appReset } from './app-update';
-import { DEV_SERVER_INIT_URL } from '../util';
+import { DEV_SERVER_INIT_URL } from '../dev-server-utils';
 import { initClientWebSocket } from './client-web-socket';
 
 

@@ -35,6 +35,7 @@ async function bundleDevServer() {
       'url',
       'zlib',
       '../sys/node/graceful-fs.js',
+      '../sys/node',
       '../utils'
     ],
     plugins: [
@@ -43,6 +44,9 @@ async function bundleDevServer() {
           resolveId(importee) {
             if (importee === 'graceful-fs') {
               return '../sys/node/graceful-fs.js';
+            }
+            if (importee === '@sys/node') {
+              return '../sys/node';
             }
             if (importee === '@utils') {
               return '../utils';

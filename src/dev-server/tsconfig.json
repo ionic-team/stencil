@@ -12,7 +12,7 @@
       "dom",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -28,12 +28,18 @@
       "@declarations": [
         "../declarations/index.ts"
       ],
+      "@sys/node": [
+        "../sys/node/index.ts"
+      ],
       "@utils": [
         "../utils/index.ts"
       ]
     }
   },
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "../../types/rollup-plugin-commonjs.d.ts",
+    "../../types/rollup-plugin-node-globals.d.ts",
+    "../../types/rollup-plugin-node-resolve.d.ts"
   ]
 }

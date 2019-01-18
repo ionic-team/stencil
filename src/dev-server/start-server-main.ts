@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { sendMsg } from './util';
+import { sendMsg } from './dev-server-utils';
 
 
 /**

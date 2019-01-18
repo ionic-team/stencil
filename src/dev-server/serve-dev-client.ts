@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import * as util from './util';
+import * as util from './dev-server-utils';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';

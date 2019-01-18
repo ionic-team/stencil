@@ -1,3 +1,3 @@
-const { createTestRunner } = require('../dist/testing/index.js');
+const { createTestRunner } = require('../dist/testing');
 
 module.exports = createTestRunner();

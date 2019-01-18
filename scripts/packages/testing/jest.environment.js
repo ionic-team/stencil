@@ -1,3 +1,3 @@
-const { createJestPuppeteerEnvironment } = require('../dist/testing/index.js');
+const { createJestPuppeteerEnvironment } = require('../dist/testing');
 
 module.exports = createJestPuppeteerEnvironment();

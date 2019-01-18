@@ -1,2 +1,2 @@
 /*  @stencil/core/server  */
-module.exports = require('../dist/server/index.js');
+module.exports = require('../dist/server');

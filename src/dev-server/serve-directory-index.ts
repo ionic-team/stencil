@@ -5,7 +5,7 @@ import { serveFile } from './serve-file';
 import * as http from 'http';
 import * as path from 'path';
 import * as url from 'url';
-import { responseHeaders } from './util';
+import { responseHeaders } from './dev-server-utils';
 
 
 export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {

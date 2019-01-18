@@ -6,6 +6,7 @@ export interface TranspileResults {
   code?: string;
   map?: any;
   diagnostics?: d.Diagnostic[];
+  moduleFile?: d.Module;
   cmpMeta?: d.ComponentCompilerMeta;
 }
 

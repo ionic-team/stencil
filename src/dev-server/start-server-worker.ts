@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { createHttpServer } from './server-http';
 import { createWebSocket } from './server-web-socket';
-import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './util';
+import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './dev-server-utils';
 import { getEditors } from './open-in-editor';
 import exit from 'exit';
 

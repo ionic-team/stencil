@@ -9,14 +9,14 @@ module.exports = {
     'json'
   ],
   moduleNameMapper: {
-    "@build-conditionals": "<rootDir>/dist/testing/",
-    "@mock-doc": "<rootDir>/dist/mock-doc/",
-    "@platform": "<rootDir>/dist/testing/",
-    "@vdom": "<rootDir>/dist/renderer/vdom/",
-    "@runtime": "<rootDir>/dist/runtime/",
-    "@stencil/core/testing": "<rootDir>/dist/testing/",
-    "@utils": "<rootDir>/dist/utils/",
-    "@stencil/core": "<rootDir>/dist/testing/"
+    "@stencil/core/build-conditionals": "<rootDir>/dist/testing",
+    "@stencil/core/mock-doc": "<rootDir>/dist/mock-doc",
+    "@stencil/core/platform": "<rootDir>/dist/testing",
+    "@stencil/core/renderer/vdom": "<rootDir>/dist/renderer/vdom",
+    "@stencil/core/runtime": "<rootDir>/dist/runtime",
+    "@stencil/core/testing": "<rootDir>/dist/testing",
+    "@stencil/core/utils": "<rootDir>/dist/utils",
+    "@stencil/core": "<rootDir>/dist/testing"
   },
   setupTestFrameworkScriptFile: path.join(__dirname, 'jest.setuptestframework.js'),
   testEnvironment: path.join(__dirname, 'jest.environment.js'),

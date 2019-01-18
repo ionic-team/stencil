@@ -1,3 +1,3 @@
-const { jestSetupTestFramework } = require('../dist/testing/index.js');
+const { jestSetupTestFramework } = require('../dist/testing');
 
 jestSetupTestFramework();
