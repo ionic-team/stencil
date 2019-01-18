@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { createRequestHandler } from '../request-handler';
 import { mockConfig } from '../../testing/mocks';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 import { TestingFs } from '../../testing/testing-fs';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import * as nodeFs from 'fs';

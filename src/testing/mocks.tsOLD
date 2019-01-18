@@ -10,8 +10,8 @@ import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import { validateConfig } from '../compiler/config/validate-config';
-import { MockCustomEvent, mockDocument, mockWindow } from '@stencil/core/mock-doc';
-import { noop } from '@stencil/core/utils';
+import { MockCustomEvent, mockDocument, mockWindow } from '@mock-doc';
+import { noop } from '@utils';
 
 
 export { mockDocument, mockWindow };

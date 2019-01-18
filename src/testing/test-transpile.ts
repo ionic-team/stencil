@@ -1,8 +1,8 @@
 import * as d from '@declarations';
-import { loadTypeScriptDiagnostic, normalizePath } from '@stencil/core/utils';
+import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { TestLogger } from './test-logger';
 import { TestingSystem } from './testing-sys';
-import { transpileModule } from '@stencil/core/compiler';
+import { transpileModule } from '@compiler';
 import ts from 'typescript';
 
 

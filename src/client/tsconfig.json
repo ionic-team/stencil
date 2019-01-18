@@ -23,13 +23,13 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/build-conditionals": [
+      "@build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
       ],
       "@declarations": [
         "../declarations/index.ts"
       ],
-      "@stencil/core/utils": [
+      "@utils": [
         "../util/index.ts"
       ]
     }

@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { dashToPascalCase } from '@stencil/core/utils';
-import { normalizePath } from '@stencil/core/utils';
+import { dashToPascalCase } from '@utils';
+import { normalizePath } from '@utils';
 import { transformLazyComponent } from './transform-lazy-component';
 
 

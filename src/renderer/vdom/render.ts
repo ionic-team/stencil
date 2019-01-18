@@ -7,10 +7,10 @@
  * Modified for Stencil's renderer and slot projection
  */
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { doc, plt } from '@stencil/core/platform';
+import { BUILD } from '@build-conditionals';
+import { doc, plt } from '@platform';
 import { h } from './h';
-import { NODE_TYPE, isDef, toLowerCase } from '@stencil/core/utils';
+import { NODE_TYPE, isDef, toLowerCase } from '@utils';
 import { updateElement } from './update-dom-node';
 
 

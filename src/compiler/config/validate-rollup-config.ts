@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { isObject, pluck } from '@stencil/core/utils';
+import { isObject, pluck } from '@utils';
 
 export function validateRollupConfig(config: d.Config) {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);

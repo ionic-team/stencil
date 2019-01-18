@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 
 

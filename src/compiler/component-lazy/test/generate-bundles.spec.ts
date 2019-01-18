@@ -1,5 +1,5 @@
 import { CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '@declarations';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '@stencil/core/utils';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '@utils';
 import { getBundleIdDev, getBundleIdHashed, injectComponentStyleMode } from '../generate-bundles';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { getStylePlaceholder } from '../../../util/data-serialize';

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '@stencil/core/utils';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '@utils';
 
 
 export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {

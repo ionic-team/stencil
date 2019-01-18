@@ -8,7 +8,7 @@
  */
 
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
+import { BUILD } from '@build-conditionals';
 
 const stack: any[] = [];
 

@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { getAppEntryTags, getEntryEncapsulations, getEntryModes,
   getUserConfigEntryTags, regroupEntryModules } from '../entry-modules';
-import { ENCAPSULATION } from '@stencil/core/utils';
+import { ENCAPSULATION } from '@utils';
 
 
 describe('graph-dependencies', () => {

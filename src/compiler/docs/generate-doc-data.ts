@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { buildWarn, isDocsPublic, normalizePath } from '@stencil/core/utils';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
+import { buildWarn, isDocsPublic, normalizePath } from '@utils';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@utils';
 import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { getBuildTimestamp } from '../build/build-ctx';
 

@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
 import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

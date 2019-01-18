@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

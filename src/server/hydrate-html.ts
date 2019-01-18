@@ -3,7 +3,7 @@ import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, norm
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { SSR_VNODE_ID } from '@stencil/core/utils';
+import { SSR_VNODE_ID } from '@utils';
 
 
 export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentRegistry, opts: d.HydrateOptions, perf: Performance) {

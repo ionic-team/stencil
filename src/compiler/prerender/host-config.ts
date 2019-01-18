@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-// import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
+// import { DEFAULT_STYLE_MODE } from '@utils';
 import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export async function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResultss: d.HydrateResults[]) {

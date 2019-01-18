@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 
 
 export default function localResolution(config: d.Config, compilerCtx: d.CompilerCtx) {

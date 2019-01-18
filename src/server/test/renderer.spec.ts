@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
+import { MEMBER_TYPE, PROP_TYPE } from '@utils';
 import { mockConfig } from '../../testing/mocks';
 import { Renderer, h } from '../index';
 

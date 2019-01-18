@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { setupGlobal } from '@stencil/core/mock-doc';
+import { BUILD } from '@build-conditionals';
+import { setupGlobal } from '@mock-doc';
 
 
 export const resolved = Promise.resolve();

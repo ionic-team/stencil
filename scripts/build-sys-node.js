@@ -19,8 +19,7 @@ function bundleExternal(entryFileName) {
     const whitelist = [
       'child_process',
       'os',
-      'typescript',
-      '@stencil/core/utils'
+      'typescript'
     ];
 
     webpack({
@@ -43,7 +42,7 @@ function bundleExternal(entryFileName) {
           return callback();
         }
 
-        if (request === '@stencil/core/utils') {
+        if (request === '@utils') {
           return callback(null, '../../utils');
         }
 
@@ -108,7 +107,7 @@ async function bundleNodeSysMain() {
       'url',
       'util',
       './graceful-fs.js',
-      '../../utils/index.js'
+      '../../utils'
     ],
     plugins: [
       (() => {
@@ -120,8 +119,8 @@ async function bundleNodeSysMain() {
             if (importee === 'graceful-fs') {
               return './graceful-fs.js';
             }
-            if (importee === '@stencil/core/utils') {
-              return '../../utils/index.js';
+            if (importee === '@utils') {
+              return '../../utils';
             }
           }
         }

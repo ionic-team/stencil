@@ -17,6 +17,23 @@ async function bundleRenderer() {
       '@stencil/core/platform',
       '@stencil/core/utils'
     ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(importee) {
+            if (importee === '@build-conditionals') {
+              return '@stencil/core/build-conditionals';
+            }
+            if (importee === '@platform') {
+              return '@stencil/core/platform';
+            }
+            if (importee === '@utils') {
+              return '@stencil/core/utils';
+            }
+          }
+        }
+      })()
+    ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;
       console.error(message);

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildError } from '@stencil/core/utils';
+import { buildError } from '@utils';
 import { getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getConfigCopyTasks } from './config-copy-tasks';
 

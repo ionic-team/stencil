@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from '../distribution/stencil-types';
-import { isDtsFile, pathJoin } from '@stencil/core/utils';
+import { isDtsFile, pathJoin } from '@utils';
 import { generateComponentTypes } from '../types/generate-component-types';
 import { validateTypes, validateTypesExist } from '../distribution/validate-package-json';
 

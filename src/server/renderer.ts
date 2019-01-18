@@ -1,10 +1,10 @@
 import * as d from '@declarations';
-import { catchError } from '@stencil/core/utils';
+import { catchError } from '@utils';
 import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { hydrateHtml } from './hydrate-html';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
-import { noop } from '@stencil/core/utils';
+import { noop } from '@utils';
 
 
 export class Renderer {

@@ -34,7 +34,7 @@ async function bundleScreenshot() {
             if (importee === 'graceful-fs') {
               return '../sys/node/graceful-fs.js';
             }
-            if (importee === '@stencil/core/utils') {
+            if (importee === '@utils') {
               return '../utils';
             }
           }

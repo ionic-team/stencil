@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export function normalizePrerenderLocation(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, url: string) {

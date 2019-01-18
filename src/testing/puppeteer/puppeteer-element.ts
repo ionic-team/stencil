@@ -3,7 +3,7 @@ import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
-import { MockElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
+import { MockElement, parseHtmlToFragment } from '@mock-doc';
 
 
 export class E2EElement extends MockElement implements pd.E2EElementInternal {

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { generatePreamble } from '@stencil/core/utils';
+import { generatePreamble } from '@utils';
 
 
 /**

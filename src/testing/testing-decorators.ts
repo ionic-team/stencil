@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { MEMBER_TYPE } from '@stencil/core/utils';
+import { MEMBER_TYPE } from '@utils';
 
 
 export function Component(opts: d.ComponentOptions) {

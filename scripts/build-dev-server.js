@@ -44,7 +44,7 @@ async function bundleDevServer() {
             if (importee === 'graceful-fs') {
               return '../sys/node/graceful-fs.js';
             }
-            if (importee === '@stencil/core/utils') {
+            if (importee === '@utils') {
               return '../utils';
             }
           }
@@ -81,7 +81,7 @@ async function createContentTypeData() {
   }
   const contentTypeDestPath = path.join(DEST_DIR, 'content-type-db.json');
 
-  const mimeDbJson = fs.readJsonSync(mimeDbSrcPath[0]);
+  const mimeDbJson = await fs.readJson(mimeDbSrcPath[0]);
   const exts = {};
 
   Object.keys(mimeDbJson).forEach(mimeType => {
@@ -92,7 +92,8 @@ async function createContentTypeData() {
       });
     }
   });
-  fs.writeJsonSync(contentTypeDestPath, exts);
+
+  await fs.writeJson(contentTypeDestPath, exts);
 }
 
 
@@ -102,13 +103,15 @@ async function copyTemplates() {
 
 
 run(async () => {
-  fs.ensureDirSync(DEST_DIR);
+  await fs.ensureDir(DEST_DIR);
 
   transpile(path.join('..', 'src', 'dev-server', 'tsconfig.json'));
 
-  await bundleDevServer();
-  await createContentTypeData();
-  await copyTemplates();
+  await Promise.all([
+    bundleDevServer(),
+    createContentTypeData(),
+    copyTemplates()
+  ]);
 
   await fs.remove(TRANSPILED_DIR);
 });

@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
-import { dashToPascalCase } from '@stencil/core/utils';
+import { dashToPascalCase } from '@utils';
 // import { formatBrowserLoaderComponent } from '../../util/data-serialize';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from './output-file-naming';
-import { normalizePath, pathJoin } from '@stencil/core/utils';
+import { normalizePath, pathJoin } from '@utils';
 
 
 export async function generateEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

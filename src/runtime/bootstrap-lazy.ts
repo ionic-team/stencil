@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
+import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected';
-import { getElmRef, resolved } from '@stencil/core/platform';
+import { getElmRef, resolved } from '@platform';
 import { disconnectedCallback } from './disconnected';
 import { initHostComponent } from './init-host-component';
 import { initialLoad } from './initial-load';

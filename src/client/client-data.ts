@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
+import { BUILD } from '@build-conditionals';
 import { doc, win } from './client-window';
 
 export const refs = (BUILD.refs ? new Map() : undefined);

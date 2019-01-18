@@ -23,29 +23,29 @@
     "rootDir": "../",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/build-conditionals": [
+      "@build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
       ],
-      "@stencil/core/compiler": [
+      "@compiler": [
         "../compiler/index.ts"
       ],
       "@declarations": [
         "../declarations/index.ts"
       ],
-      "@stencil/core/mock-doc": [
+      "@mock-doc": [
         "../mock-doc/index.ts"
       ],
-      "@stencil/core/platform": [
+      "@platform": [
         "./testing-platform.ts"
       ],
-      "@stencil/core/renderer/vdom": [
-        "../renderer/vdom/index.ts"
-      ],
-      "@stencil/core/runtime": [
+      "@runtime": [
         "../runtime/index.ts"
       ],
-      "@stencil/core/utils": [
+      "@utils": [
         "../utils/index.ts"
+      ],
+      "@vdom": [
+        "../renderer/vdom/index.ts"
       ]
     },
     "target": "es2015"

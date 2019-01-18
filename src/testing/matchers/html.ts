@@ -1,4 +1,4 @@
-import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc';
 
 
 export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {

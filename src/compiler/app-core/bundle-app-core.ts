@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
-import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@stencil/core/utils';
+import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@utils';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
 
 

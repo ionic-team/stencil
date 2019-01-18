@@ -24,22 +24,22 @@
     "target": "es2015",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/build-conditionals": [
+      "@build-conditionals": [
         "./app-core/build-conditionals.ts"
       ],
       "@declarations": [
         "../declarations/index.ts"
       ],
-      "@stencil/core/mock-doc": [
+      "@mock-doc": [
         "../mock-doc/index.ts"
       ],
-      "@stencil/core/platform": [
+      "@platform": [
         "../client/index.ts"
       ],
-      "@stencil/core/renderer/vdom": [
+      "@vdom": [
         "../renderer/vdom/index.ts"
       ],
-      "@stencil/core/utils": [
+      "@utils": [
         "../utils/index.ts"
       ]
     }

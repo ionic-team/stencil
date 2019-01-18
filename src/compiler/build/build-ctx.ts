@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { buildFinish } from './build-finish';
-import { hasError, hasWarning } from '@stencil/core/utils';
+import { hasError, hasWarning } from '@utils';
 
 
 export class BuildContext implements d.BuildCtx {

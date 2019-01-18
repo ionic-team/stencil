@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { catchError } from '@stencil/core/utils';
+import { catchError } from '@utils';
 
 
 export async function copyComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

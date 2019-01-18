@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 
 
 export function validateOutputTargetAngular(config: d.Config) {

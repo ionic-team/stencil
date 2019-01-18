@@ -1,12 +1,12 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
-import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateNativeAppCore } from '../app-core/generate-native-core';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

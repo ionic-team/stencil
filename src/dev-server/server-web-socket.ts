@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import * as ws from 'ws';
 import * as http from 'http';
-import { noop } from '@stencil/core/utils';
+import { noop } from '@utils';
 
 const WebSocket: any = require('../sys/node/websocket').WebSocket;
 

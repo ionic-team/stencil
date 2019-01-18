@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { dashToPascalCase } from '@stencil/core/utils';
+import { dashToPascalCase } from '@utils';
 
 
 export function parseFlags(process: NodeJS.Process): d.ConfigFlags {

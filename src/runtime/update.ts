@@ -1,8 +1,8 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@stencil/core/platform';
+import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@platform';
 import { attachStyles } from './styles';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { vdomRender } from '@stencil/core/renderer/vdom';
+import { BUILD } from '@build-conditionals';
+import { vdomRender } from '@vdom';
 
 
 export const update = async (elm: d.HostElement, instance: any, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {

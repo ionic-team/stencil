@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildWarn } from '@stencil/core/utils';
+import { buildWarn } from '@utils';
 import { processAppGraph } from './app-graph';
 
 

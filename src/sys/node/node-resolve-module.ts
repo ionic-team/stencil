@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import fs from 'graceful-fs';
 import path from 'path';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 
 
 export class NodeResolveModule {

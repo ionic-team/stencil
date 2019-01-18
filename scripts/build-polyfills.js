@@ -9,15 +9,15 @@ const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 
 
 module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
-  fs.emptyDirSync(outputPolyfillsDir);
+  await fs.emptyDir(outputPolyfillsDir);
 
   const esmDir = path.join(outputPolyfillsDir, 'esm');
-  fs.emptyDirSync(esmDir);
+  await fs.emptyDir(esmDir);
 
   const es5Dir = path.join(outputPolyfillsDir, 'es5');
-  fs.emptyDirSync(es5Dir);
+  await fs.emptyDir(es5Dir);
 
-  const files = fs.readdirSync(SRC_DIR).filter(f => f.endsWith('.js'));
+  const files = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));
 
   files.forEach(fileName => {
     const srcFilePath = path.join(SRC_DIR, fileName);
@@ -58,15 +58,17 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
   const cssShimOutput = minify.code;
 
   const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
-  const mapPolyfill = fs.readFileSync(mapPolyfillFilePath, 'utf8');
+  const mapPolyfill = await fs.readFile(mapPolyfillFilePath, 'utf8');
 
   const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
 
   const esmFilePath = path.join(esmDir, 'css-shim.js');
   const es5FilePath = path.join(es5Dir, 'css-shim.js');
 
-  fs.writeFileSync(esmFilePath, esmWrap(cssShimMapPolyfill));
-  fs.writeFileSync(es5FilePath, cssShimMapPolyfill);
+  await Promise.all([
+    fs.writeFile(esmFilePath, esmWrap(cssShimMapPolyfill)),
+    fs.writeFile(es5FilePath, cssShimMapPolyfill)
+  ]);
 };
 
 

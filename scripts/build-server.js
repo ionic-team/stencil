@@ -39,7 +39,7 @@ if (success) {
               if (id === '@stencil/core/build-conditionals') {
                 return '../compiler/index.js';
               }
-              if (id === '@stencil/core/mock-doc') {
+              if (id === '@mock-doc') {
                 return '../mock-doc/index.js';
               }
               if (id === '@stencil/core/renderer/vdom') {

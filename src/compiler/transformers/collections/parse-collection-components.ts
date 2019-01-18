@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { noop } from '@stencil/core/utils';
+import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
 

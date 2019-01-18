@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { buildError, catchError, hasFileExtension, normalizePath } from '@stencil/core/utils';
-import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
+import { buildError, catchError, hasFileExtension, normalizePath } from '@utils';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';

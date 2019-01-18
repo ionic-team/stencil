@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { buildWarn, normalizePath, pathJoin } from '@stencil/core/utils';
-import { COLLECTION_MANIFEST_FILE_NAME } from '@stencil/core/utils';
+import { buildWarn, normalizePath, pathJoin } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
 import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
 
 

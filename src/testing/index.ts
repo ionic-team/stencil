@@ -6,7 +6,7 @@ export { createTestRunner } from './jest/jest-runner';
 export { E2EElement, E2EPage } from './puppeteer/puppeteer-declarations';
 export { jestPreprocessor } from './jest/jest-preprocessor';
 export { jestSetupTestFramework } from './jest/jest-setup-test-framework';
-export { mockDocument, mockWindow } from '@stencil/core/mock-doc';
+export { mockDocument, mockWindow } from '@mock-doc';
 export { newE2EPage } from './puppeteer/puppeteer-page';
 export { newSpecPage } from './testing-spec-page';
 export { Testing } from './testing';

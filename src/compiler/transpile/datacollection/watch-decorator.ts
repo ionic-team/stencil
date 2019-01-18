@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { buildError, buildWarn } from '../../util';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators } from './utils';
 import ts from 'typescript';
-import { MEMBER_TYPE } from '@stencil/core/utils';
+import { MEMBER_TYPE } from '@utils';
 
 
 export function getWatchDecoratorMeta(diagnostics: d.Diagnostic[], classNode: ts.ClassDeclaration, cmpMeta: d.ComponentMeta) {

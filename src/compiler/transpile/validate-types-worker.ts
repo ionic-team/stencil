@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { loadTypeScriptDiagnostics, normalizePath } from '@stencil/core/utils';
+import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';

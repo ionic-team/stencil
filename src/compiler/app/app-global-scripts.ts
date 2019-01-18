@@ -1,6 +1,6 @@
 import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '@declarations';
-import { createOnWarnFn, loadRollupDiagnostics } from '@stencil/core/utils';
-import { generatePreamble } from '@stencil/core/utils';
+import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { generatePreamble } from '@utils';
 import { getGlobalEsmBuildPath, getGlobalFileName, getGlobalJsBuildPath } from './app-file-naming';
 import rollupPluginReplace from '../bundle/rollup-plugins/rollup-plugin-replace';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';

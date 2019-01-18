@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { h } from '../h';
 import { mockDomApi, mockRenderer } from '../../../testing/mocks';
-import { SVG_NS } from '@stencil/core/utils';
+import { SVG_NS } from '@utils';
 import { toVNode } from '../to-vnode';
 import { getScopeId } from '../../../util/scope';
 import { shuffleArray } from '../../../testing/utils';

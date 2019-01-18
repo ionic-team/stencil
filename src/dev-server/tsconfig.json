@@ -28,7 +28,7 @@
       "@declarations": [
         "../declarations/index.ts"
       ],
-      "@stencil/core/utils": [
+      "@utils": [
         "../utils/index.ts"
       ]
     }

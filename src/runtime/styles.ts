@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { doc, rootAppliedStyles, styles } from '@stencil/core/platform';
+import { BUILD } from '@build-conditionals';
+import { doc, rootAppliedStyles, styles } from '@platform';
 
 
 export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {

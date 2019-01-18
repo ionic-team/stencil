@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { buildAuxiliaries } from './build-auxiliaries';
-import { catchError } from '@stencil/core/utils';
+import { catchError } from '@utils';
 import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';

@@ -29,7 +29,7 @@
     "build.renderer.vdom": "node scripts/build-renderer-vdom.js",
     "build.runtime": "node scripts/build-runtime.js",
     "build.server": "node scripts/build-server.js",
-    "build.mock-doc": "node scripts/build-mock-doc.js",
+    "build.mock.doc": "node scripts/build-mock-doc.js",
     "build.prod": "node scripts/build-prod.js",
     "build.screenshot": "node scripts/build-screenshot.js",
     "build.submodules": "node scripts/build-submodules.js",

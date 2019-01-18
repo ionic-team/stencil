@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@stencil/core/utils';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '@utils';
 import { mockConfig } from '../../../testing/mocks';
 import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeComponent } from '../collection-data';
 

@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { GENERATED_DTS } from '../app/app-file-naming';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 
 
 export class FsWatchNormalizer {

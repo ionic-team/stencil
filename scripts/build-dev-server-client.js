@@ -46,7 +46,7 @@ async function bundleDevServerClient() {
   let code = output[0].code.trim();
   code = code.replace('exports ', '');
 
-  fs.writeFileSync(outputFile, code);
+  await fs.writeFile(outputFile, code);
 }
 
 
@@ -56,12 +56,14 @@ async function copyStaticAssets() {
 
 
 run(async () => {
-  fs.ensureDirSync(DEV_CLIENT_OUTPUT_DIR);
+  await fs.ensureDir(DEV_CLIENT_OUTPUT_DIR);
 
   transpile(path.join('..', 'src', 'dev-server', 'dev-client', 'tsconfig.json'));
 
-  await bundleDevServerClient();
-  await copyStaticAssets();
+  await Promise.all([
+    bundleDevServerClient(),
+    copyStaticAssets()
+  ])
 
   await fs.remove(TRANSPILED_DIR);
 });

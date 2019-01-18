@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { getConfigFilePath } from './cli-utils';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
-import { shouldIgnoreError } from '@stencil/core/utils';
+import { shouldIgnoreError } from '@utils';
 import exit from 'exit';
 
 

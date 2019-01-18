@@ -1,6 +1,6 @@
 import { AppGlobal, DomApi, EventEmitterData } from '@declarations';
-import { KEY_CODE_MAP, NODE_TYPE } from '@stencil/core/utils';
-import { toLowerCase } from '@stencil/core/utils';
+import { KEY_CODE_MAP, NODE_TYPE } from '@utils';
+import { toLowerCase } from '@utils';
 
 
 export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi => {

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildError } from '@stencil/core/utils';
+import { buildError } from '@utils';
 
 
 export default function rollupPluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {

@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { buildError, buildWarn, catchError } from '@stencil/core/utils';
+import { buildError, buildWarn, catchError } from '@utils';
 import { calcComponentDependencies } from './component-dependencies';
-import { DEFAULT_STYLE_MODE } from '@stencil/core/utils';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentEntries } from './entry-components';
 import { validateComponentTag } from '../config/validate-component';
 

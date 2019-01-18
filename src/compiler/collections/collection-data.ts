@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { COLLECTION_MANIFEST_FILE_NAME } from '@stencil/core/utils';
-import { normalizePath } from '@stencil/core/utils';
+import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
+import { normalizePath } from '@utils';
 
 
 export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

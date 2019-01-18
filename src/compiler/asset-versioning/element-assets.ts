@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { createHashedFileName, getFilePathFromUrl } from './util';
-import { hasFileExtension } from '@stencil/core/utils';
+import { hasFileExtension } from '@utils';
 
 
 export async function versionElementAssets(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document) {

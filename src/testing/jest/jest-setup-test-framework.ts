@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { expectExtend } from '../matchers';
-import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
+import { setupGlobal, teardownGlobal } from '@mock-doc';
 
 
 declare const global: d.JestEnvironmentGlobal;

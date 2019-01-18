@@ -27,7 +27,7 @@ async function buildCli() {
       (() => {
         return {
           resolveId(id) {
-            if (id === '@stencil/core/utils') {
+            if (id === '@utils') {
               return '../utils';
             }
           }

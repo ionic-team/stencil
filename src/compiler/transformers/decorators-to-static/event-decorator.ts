@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildWarn } from '@stencil/core/utils';
+import { buildWarn } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator } from '../transform-utils';
 import ts from 'typescript';
 

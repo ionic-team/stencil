@@ -8,9 +8,9 @@
  */
 
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { getElmRef } from '@stencil/core/platform';
-import { toLowerCase } from '@stencil/core/utils';
+import { BUILD } from '@build-conditionals';
+import { getElmRef } from '@platform';
+import { toLowerCase } from '@utils';
 
 
 export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean) => {

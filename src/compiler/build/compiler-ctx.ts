@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { BuildEvents } from '../events';
 import { Cache } from '../cache';
-import { InMemoryFileSystem, normalizePath } from '@stencil/core/utils';
+import { InMemoryFileSystem, normalizePath } from '@utils';
 
 
 export class CompilerContext implements d.CompilerCtx {

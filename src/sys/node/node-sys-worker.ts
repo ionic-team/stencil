@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
-import { loadMinifyJsDiagnostics } from '@stencil/core/utils';
+import { loadMinifyJsDiagnostics } from '@utils';
 import { optimizeCssWorker } from './optimize-css-worker';
 import { requestLatestCompilerVersion } from './check-version';
 import { ShadowCss } from '../../compiler/style/shadow-css';

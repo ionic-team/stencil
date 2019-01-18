@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
+import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
-import { dashToPascalCase } from '@stencil/core/utils';
+import { dashToPascalCase } from '@utils';
 import { plt } from './client-data';
 
 

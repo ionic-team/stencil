@@ -10,7 +10,7 @@ import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 import opn from 'opn';
 import semver from 'semver';
 import { WorkerManager } from './worker/index';

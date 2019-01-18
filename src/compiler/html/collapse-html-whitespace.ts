@@ -1,4 +1,4 @@
-import { NODE_TYPE } from '@stencil/core/utils';
+import { NODE_TYPE } from '@utils';
 
 
 export function collapseHtmlWhitepace(node: Node) {

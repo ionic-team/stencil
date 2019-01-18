@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { consoleError } from '@stencil/core/platform';
+import { BUILD } from '@build-conditionals';
+import { consoleError } from '@platform';
 import { update } from './update';
 import { writeTask } from './task-queue';
 

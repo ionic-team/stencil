@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath, pathJoin } from '@stencil/core/utils';
+import { normalizePath, pathJoin } from '@utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
 

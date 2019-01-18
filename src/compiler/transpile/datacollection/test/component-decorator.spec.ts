@@ -1,4 +1,4 @@
-import { ENCAPSULATION } from '@stencil/core/utils';
+import { ENCAPSULATION } from '@utils';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import { gatherMetadata } from './test-utils';
 import * as path from 'path';

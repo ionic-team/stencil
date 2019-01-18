@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 
 
 export function normalizeStyles(config: d.Config, componentFilePath: string, styles: d.StyleCompiler[]) {

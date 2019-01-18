@@ -28,25 +28,25 @@ async function bundleCompiler() {
       'fs',
       'path',
       'typescript',
-      '../mock-doc/index.js',
-      '../renderer/vdom/index.js',
-      '../util/index.js'
+      '../mock-doc',
+      '../renderer/vdom',
+      '../util'
     ],
     plugins: [
       (() => {
         return {
           resolveId(id) {
-            if (id === '@stencil/core/build-conditionals') {
+            if (id === '@build-conditionals') {
               return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
             }
-            if (id === '@stencil/core/mock-doc') {
-              return '../mock-doc/index.js';
+            if (id === '@mock-doc') {
+              return '../mock-doc';
             }
-            if (id === '@stencil/core/renderer/vdom') {
-              return '../renderer/vdom/index.js';
+            if (id === '@vdom') {
+              return '../renderer/vdom';
             }
-            if (id === '@stencil/core/utils') {
-              return '../util/index.js';
+            if (id === '@utils') {
+              return '../util';
             }
           }
         }
@@ -82,8 +82,8 @@ async function bundleCompiler() {
 
   const outputText = updateBuildIds(buildId, output[0].code);
 
-  fs.ensureDirSync(path.dirname(COMPILER_DIST_FILE));
-  fs.writeFileSync(COMPILER_DIST_FILE, outputText);
+  await fs.ensureDir(path.dirname(COMPILER_DIST_FILE));
+  await fs.writeFile(COMPILER_DIST_FILE, outputText);
 }
 
 

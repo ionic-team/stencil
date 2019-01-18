@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { consoleError, doc, loadModule, plt } from '@stencil/core/platform';
+import { BUILD } from '@build-conditionals';
+import { consoleError, doc, loadModule, plt } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 import { writeTask } from './task-queue';

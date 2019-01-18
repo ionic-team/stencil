@@ -1,5 +1,5 @@
 import { Config } from '@declarations';
-import { dashToPascalCase } from '@stencil/core/utils';
+import { dashToPascalCase } from '@utils';
 import { setStringConfig } from './config-utils';
 
 

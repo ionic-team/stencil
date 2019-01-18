@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { catchError } from '@stencil/core/utils';
+import { catchError } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
 

@@ -48,19 +48,19 @@ async function bundleTesting() {
       (() => {
         return {
           resolveId(id) {
-            if (id === '@stencil/core/build-conditionals') {
+            if (id === '@build-conditionals') {
               return '../compiler';
             }
-            if (id === '@stencil/core/compiler') {
+            if (id === '@compiler') {
               return '../compiler';
             }
-            if (id === '@stencil/core/mock-doc') {
+            if (id === '@mock-doc') {
               return '../mock-doc';
             }
-            if (id === '@stencil/core/runtime') {
+            if (id === '@runtime') {
               return '../runtime';
             }
-            if (id === '@stencil/core/utils') {
+            if (id === '@utils') {
               return '../utils';
             }
           }

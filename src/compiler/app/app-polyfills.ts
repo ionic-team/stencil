@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { getPolyfillsEsmBuildPath } from './app-file-naming';
-import { pathJoin } from '@stencil/core/utils';
+import { pathJoin } from '@utils';
 
 
 export async function getAppBrowserCorePolyfills(config: d.Config) {

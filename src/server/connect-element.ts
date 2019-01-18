@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 // import { connectedCallback } from '../core/connected';
-// import { ENCAPSULATION } from '@stencil/core/utils';
+// import { ENCAPSULATION } from '@utils';
 // import { initHostElement } from '../core/init-host-element';
 // import { initHostSnapshot } from '../core/host-snapshot';
 

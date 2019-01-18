@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol, typeToString } from './utils';
-import { MEMBER_TYPE } from '@stencil/core/utils';
+import { MEMBER_TYPE } from '@utils';
 import { validatePublicName } from './reserved-public-members';
 import ts from 'typescript';
 import { buildWarn, normalizePath } from '../../util';

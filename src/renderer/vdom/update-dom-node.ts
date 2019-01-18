@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { BUILD } from '@stencil/core/build-conditionals';
-import { EMPTY_OBJ, NODE_TYPE } from '@stencil/core/utils';
+import { BUILD } from '@build-conditionals';
+import { EMPTY_OBJ, NODE_TYPE } from '@utils';
 import { setAccessor } from './set-accessor';
 
 

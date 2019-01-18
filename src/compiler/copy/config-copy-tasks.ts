@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildError, normalizePath } from '@stencil/core/utils';
+import { buildError, normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 
