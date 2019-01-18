@@ -6,8 +6,7 @@ const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const rollupJson = require('rollup-plugin-json');
 const glob = require('glob');
-const run = require('./run');
-const transpile = require('./transpile');
+const { run, transpile, updateBuildIds } = require('./script-utils');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
@@ -152,10 +151,7 @@ async function bundleNodeSysMain() {
     file: outputPath
   });
 
-  let outputText = output[0].code;
-
-  const buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
-  outputText = outputText.replace(/__BUILDID__/g, buildId);
+  const outputText = updateBuildIds(output[0].code);
 
   await fs.ensureDir(path.dirname(outputPath));
   await fs.writeFile(outputPath, outputText);

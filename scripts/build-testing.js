@@ -4,18 +4,17 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const rollupJson = require('rollup-plugin-json');
-const run = require('./run');
-const transpile = require('./transpile');
+const { run, transpile, updateBuildIds } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-testing');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'testing', 'index.js');
+const INPUT_FILE = path.join(TRANSPILED_DIR, 'testing', 'index.js');
 const DEST_DIR = path.join(__dirname, '..', 'dist', 'testing');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
 async function bundleTesting() {
   const rollupBuild = await rollup.rollup({
-    input: ENTRY_FILE,
+    input: INPUT_FILE,
     external: [
       'assert',
       'buffer',
@@ -85,17 +84,21 @@ async function bundleTesting() {
   });
 
   // copy over all the .d.ts file too
-  await fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
+  await fs.copy(path.dirname(INPUT_FILE), DEST_DIR, {
     filter: (src) => {
       return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
     }
   });
 
-  // bundle up the testing utilities into one js file
-  await rollupBuild.write({
+  const { output } = await rollupBuild.generate({
     format: 'cjs',
     file: DEST_FILE
   });
+
+  const outputText = updateBuildIds(output[0].code);
+
+  await fs.ensureDir(path.dirname(DEST_FILE));
+  await fs.writeFile(DEST_FILE, outputText);
 }
 
 run(async () => {

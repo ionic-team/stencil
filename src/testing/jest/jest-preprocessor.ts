@@ -43,8 +43,8 @@ export const jestPreprocessor = {
     }
 
     const key = [
+      '__BUILDID__',
       process.version,
-      CACHE_BUSTER,
       this._tsCompilerOptionsKey,
       code,
       filePath,
@@ -56,5 +56,3 @@ export const jestPreprocessor = {
   }
 
 };
-
-const CACHE_BUSTER = 1;

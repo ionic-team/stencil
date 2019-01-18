@@ -1,8 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const transpile = require('./transpile');
-const run = require('./run');
+const { run, transpile } = require('./script-utils');
 const buildPolyfills = require('./build-polyfills');
 
 const ROOT_DIR = path.join(__dirname, '..');

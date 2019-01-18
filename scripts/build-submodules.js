@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const run = require('./run');
+const { run } = require('./script-utils');
 
 const SRC_PACKAGES_DIR = path.join(__dirname, 'packages');
 const ROOT_DIR = path.join(__dirname, '..');

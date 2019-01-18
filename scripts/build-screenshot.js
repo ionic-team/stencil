@@ -3,8 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const run = require('./run');
-const transpile = require('./transpile');
+const { run, transpile } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-screenshot');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'screenshot', 'index.js');

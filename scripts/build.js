@@ -3,16 +3,16 @@ const path = require('path');
 const { execSync, fork } = require('child_process');
 const Listr = require('listr');
 const color = require('ansi-colors');
-const run = require('./run');
+const { getBuildId, run } = require('./script-utils');
 
-const SCRIPTS_DIR = __dirname;
+
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const buildId = getBuildId();
-
 
 const start = Date.now();
 
 console.log(color.dim(`\n  Build: ${buildId}\n`));
+
 
 run(async () => {
   execSync('npm install resolve@1.8.1', {
@@ -42,7 +42,7 @@ run(async () => {
       title: script[0],
       task: () => {
         return new Promise((resolve, reject) => {
-          const cmd = path.join(SCRIPTS_DIR, script[1]);
+          const cmd = path.join(__dirname, script[1]);
           const args = [`--build-id=${buildId}`];
           const opts = {
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
@@ -82,17 +82,3 @@ run(async () => {
   });
 
 });
-
-
-function getBuildId() {
-  const d = new Date();
-
-  let buildId = d.getUTCFullYear();
-  buildId += ('0' + (d.getUTCMonth() + 1)).slice(-2);
-  buildId += ('0' + d.getUTCDate()).slice(-2);
-  buildId += ('0' + d.getUTCHours()).slice(-2);
-  buildId += ('0' + d.getUTCMinutes()).slice(-2);
-  buildId += ('0' + d.getUTCSeconds()).slice(-2);
-
-  return buildId;
-}

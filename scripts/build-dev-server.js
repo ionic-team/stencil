@@ -4,8 +4,7 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const glob = require('glob');
-const run = require('./run');
-const transpile = require('./transpile');
+const { run, transpile } = require('./script-utils');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const DST_DIR = path.join(ROOT_DIR, 'dist');

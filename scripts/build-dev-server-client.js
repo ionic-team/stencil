@@ -1,8 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-const run = require('./run');
-const transpile = require('./transpile');
+const { run, transpile } = require('./script-utils');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const DST_DIR = path.join(ROOT_DIR, 'dist');

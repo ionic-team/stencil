@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const transpile = require('./transpile');
+const { transpile } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-server');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
@@ -63,7 +63,7 @@ if (success) {
     });
 
     // copy over all the .d.ts file too
-    async fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
+    await fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
       filter: (src) => {
         return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
       }
