@@ -174,7 +174,7 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
   // join all the component's styles for this mode together into one line
   const compiledStyle = {
     styleText: compiledStyles.join('\n\n').trim(),
@@ -190,10 +190,10 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   // auto add css prefixes and minifies when configured
   compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
 
-  if (requiresScopedStyles(cmpMeta.encapsulation, config)) {
+  if (requiresScopedStyles(cmp.encapsulation, config)) {
     // only create scoped styles if we need to
-    compiledStyle.styleTextScoped = await scopeComponentCss(buildCtx, cmpMeta, modeName, compiledStyle.styleText);
-    if (cmpMeta.encapsulation === 'scoped') {
+    compiledStyle.styleTextScoped = await scopeComponentCss(buildCtx, cmp, modeName, compiledStyle.styleText);
+    if (cmp.encapsulation === 'scoped') {
       compiledStyle.styleText = compiledStyle.styleTextScoped;
     }
   }
@@ -207,7 +207,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   let addScopedStylesUpdate = false;
 
   // test to see if the last styles are different
-  const styleId = getStyleId(cmpMeta, modeName, false);
+  const styleId = getStyleId(cmp, modeName, false);
   if (compilerCtx.lastBuildStyles.get(styleId) !== compiledStyle.styleText) {
     compilerCtx.lastBuildStyles.set(styleId, compiledStyle.styleText);
 
@@ -216,7 +216,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     }
   }
 
-  const scopedStyleId = getStyleId(cmpMeta, modeName, true);
+  const scopedStyleId = getStyleId(cmp, modeName, true);
   if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== compiledStyle.styleTextScoped) {
     compilerCtx.lastBuildStyles.set(scopedStyleId, compiledStyle.styleTextScoped);
 
@@ -231,7 +231,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesUpdated = buildCtx.stylesUpdated || [];
 
     buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagName,
+      styleTag: cmp.tagName,
       styleMode: styleMode,
       styleText: compiledStyle.styleText,
       isScoped: false
@@ -240,7 +240,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   if (addScopedStylesUpdate) {
     buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagName,
+      styleTag: cmp.tagName,
       styleMode: styleMode,
       styleText: compiledStyle.styleTextScoped,
       isScoped: true
@@ -254,8 +254,8 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 }
 
 
-function getStyleId(cmpMeta: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
-  return `${cmpMeta.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
+function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
+  return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 
 

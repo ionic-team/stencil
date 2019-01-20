@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { getBuildFeatures } from '../../app-core/build-conditionals';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
@@ -16,7 +15,7 @@ import { visitStringLiteral } from '../visitors/visit-string-literal';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, addStaticBuildConditionals: boolean) {
+export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, addStaticCmpMetaData: boolean) {
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -99,10 +98,9 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
 
   setComponentBuildConditionals(cmp);
 
-  if (addStaticBuildConditionals) {
-    const build = getBuildFeatures([cmp]);
+  if (addStaticCmpMetaData) {
+    const cmpMetaStaticProp = createStaticGetter('CMP_META', convertValueToLiteral(cmp));
 
-    const buildStaticProp = createStaticGetter('BUILD', convertValueToLiteral(build));
     cmpNode = ts.updateClassDeclaration(
       cmpNode,
       cmpNode.decorators,
@@ -110,7 +108,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
       cmpNode.name,
       cmpNode.typeParameters,
       cmpNode.heritageClauses,
-      [...cmpNode.members, buildStaticProp]
+      [...cmpNode.members, cmpMetaStaticProp]
     );
   }
 

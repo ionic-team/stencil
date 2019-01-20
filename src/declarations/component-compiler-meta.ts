@@ -1,6 +1,6 @@
 import * as d from '.';
 
-
+/** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
   hasAsyncLifecycle: boolean;
   hasAttr: boolean;
@@ -42,7 +42,7 @@ export interface ComponentCompilerFeatures {
   potentialCmpRefs: d.PotentialComponentRef[];
 }
 
-/** Must be serializable to JSON */
+/** Must be serializable to JSON!! */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs?: CompilerAssetDir[];
   componentClassName: string;
@@ -66,10 +66,6 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
-
-export interface ComponentBundleModeIds {
-  [modeName: string]: string;
-}
 
 export interface ComponentCompilerStaticProperty {
   mutable: boolean;

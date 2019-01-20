@@ -25,7 +25,7 @@ export interface DevInspectorComponentData {
 
 export interface DevInspectorComponentMeta {
   tag: string;
-  bundle: string | d.BundleIds;
+  bundle: string | d.ModeBundleIds;
   encapsulation: d.Encapsulation;
   props: DevInspectorPropMeta[];
   states: DevInspectorStateMeta[];

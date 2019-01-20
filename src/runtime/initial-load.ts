@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, doc, loadModule, plt } from '@platform';
+import { parsePropertyValue } from './parse-property-value';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 import { writeTask } from './task-queue';
@@ -92,11 +93,13 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       }
     }
 
-    if (BUILD.member && cmpMeta.members) {
-      // initUpdate BUILD.member
-      cmpMeta.members.forEach(member => {
-        if (member[3] && elm.hasAttribute(member[3] as any)) {
-          elmData.instanceValues.set(member[0], elm.getAttribute(member[3] as any));
+    if (BUILD.observeAttr && cmpMeta.attrNameToPropName) {
+      cmpMeta.attrNameToPropName.forEach((propName, attrName) => {
+        if (elm.hasAttribute(attrName)) {
+          elmData.instanceValues.set(
+            propName,
+            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.members[propName][1])
+          );
         }
       });
     }

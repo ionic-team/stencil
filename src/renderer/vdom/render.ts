@@ -618,7 +618,7 @@ export const vdomRender = (hostElement: d.HostElement, elmData: d.ElementData, c
     }
 
     if (BUILD.slotPolyfill) {
-      useNativeShadowDom = plt.supportsShadowDom && cmpMeta.shadowDomEncapsulation;
+      useNativeShadowDom = plt.supportsShadowDom && !!cmpMeta.shadowDomEncapsulation;
     }
 
     // if (BUILD.prerenderServerSide) {

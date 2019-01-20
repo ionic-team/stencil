@@ -37,7 +37,7 @@ export interface AppRegistry {
 
 export interface AppRegistryComponents {
   [tagName: string]: {
-    bundleIds: d.BundleIds,
+    bundleIds: d.ModeBundleIds,
     encapsulation?: 'shadow' | 'scoped';
   };
 }
@@ -53,7 +53,7 @@ export interface ModuleFile {
   sourceFilePath: string;
   jsFilePath?: string;
   dtsFilePath?: string;
-  cmpMeta?: d.ComponentMeta;
+  cmpMeta?: any;
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;

@@ -9,44 +9,44 @@ export type LazyBundleRuntimeMeta = [
 
 
 export interface ComponentRuntimeMeta {
-  members?: d.ComponentRuntimeMember[];
-  scopedCssEncapsulation?: boolean;
-  shadowDomEncapsulation?: boolean;
+  members?: d.ComponentRuntimeMembers;
+  scopedCssEncapsulation?: 1;
+  shadowDomEncapsulation?: 1;
+  attrNameToPropName?: Map<string, string>;
 }
 
 
 export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
-  cmpTag: string;
-  lazyBundleIds?: d.BundleIds;
+  cmpTag?: string;
+  lazyBundleIds?: d.ModeBundleIds;
+}
+
+
+export interface ComponentRuntimeMembers {
+  [memberName: string]: ComponentRuntimeMember;
 }
 
 
 export interface ComponentRuntimeMember {
   /**
-   * member name
-   */
-  [0]: string;
-
-  /**
    * member type
    */
-  [1]: number;
+  [0]: number;
 
   /**
    * prop type
    */
-  [2]?: number;
+  [1]?: number;
 
   /**
    * attribute name to observe
    */
-  [3]?: string | 1 | 0;
+  [2]?: string | 1 | 0;
 
   /**
    * reflect to attribute
    */
-  [4]?: boolean;
-
+  [3]?: boolean;
 }
 
 

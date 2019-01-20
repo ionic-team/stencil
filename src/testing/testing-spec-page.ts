@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { formatComponentRuntimeMeta, getBuildFeatures } from '@compiler';
 import { resetBuildConditionals } from './testing-build';
 
 
@@ -19,55 +20,56 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   const bc = require('@stencil/core/build-conditionals');
   const BUILD = resetBuildConditionals(bc.BUILD);
 
-  const testingCmps = opts.components.map((Cstr: d.ComponentConstructor) => {
+  const lazyLoad = (opts.lazyLoad !== false);
+
+  const testingCmps = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
     if (typeof Cstr.is !== 'string') {
       throw new Error(`Invalid component class. Requires the @Component() decorator with tag, or static "is" property.`);
     }
 
-    const bundleId = Cstr.is;
-
-    const cmpBuild = (Cstr as any).BUILD;
-    if (cmpBuild != null) {
-      Object.keys(cmpBuild).forEach(key => {
-        if (cmpBuild[key] === true) {
-          (BUILD as any)[key] = true;
-        }
-      });
+    if (Cstr.CMP_META == null) {
+      throw new Error(`Invalid component class: Missing static getter CMP_META`);
     }
 
-    const ProxiedCstr = new Proxy<any>(Cstr, {
-      construct(target, args: any[]) {
-        const instance = new target();
-        platform.registerLazyInstance(instance, args[0]);
-        return instance;
+    const cmpBuild = getBuildFeatures([Cstr.CMP_META]) as any;
+
+    Object.keys(cmpBuild).forEach(key => {
+      if (cmpBuild[key] === true) {
+        (BUILD as any)[key] = true;
       }
     });
 
-    const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
-      bundleId,
-      [{
-        cmpTag: Cstr.is,
-        members: [],
-        scopedCssEncapsulation: (Cstr.encapsulation === 'scoped'),
-        shadowDomEncapsulation: (Cstr.encapsulation === 'shadow')
-      }]
-    ];
+    if (lazyLoad) {
+      const bundleId = Cstr.is + Math.round(Math.random() * 99999);
 
-    registerModule(bundleId, ProxiedCstr);
+      const ProxiedCstr = new Proxy<any>(Cstr, {
+        construct(target, args: any[]) {
+          const instance = new target();
+          platform.registerLazyInstance(instance, args[0]);
+          return instance;
+        }
+      });
 
-    return lazyBundleRuntimeMeta;
+      const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
+        bundleId,
+        [formatComponentRuntimeMeta(Cstr.CMP_META, true)]
+      ];
+
+      registerModule(bundleId, ProxiedCstr);
+
+      return lazyBundleRuntimeMeta;
+
+    } else {
+      throw new Error('todo!');
+    }
   });
-
-  if (opts.build != null) {
-    Object.assign(BUILD, opts.build);
-  }
 
   const plt = {
     win: platform.win as Window,
     doc: platform.doc as Document,
     body: platform.doc.body as HTMLBodyElement,
     head: platform.doc.head as HTMLHeadElement,
-    opts: BUILD,
+    build: BUILD,
     flush: (): Promise<void> => platform.flushAll(),
     flushLoadModule: (): Promise<void> => platform.flushLoadModule(),
     flushQueue: (): Promise<void> => platform.flushQueue()
@@ -79,7 +81,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   const runtime = require('@stencil/core/runtime');
 
-  if (opts.build == null || opts.build.lazyLoad !== false) {
+  if (lazyLoad) {
     runtime.bootstrapLazy(testingCmps);
   }
 

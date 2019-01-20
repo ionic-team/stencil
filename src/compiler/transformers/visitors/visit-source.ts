@@ -6,7 +6,7 @@ import { visitImport } from './visit-import';
 import ts from 'typescript';
 
 
-export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, addStaticBuildConditionals: boolean): ts.TransformerFactory<ts.SourceFile> {
+export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, addStaticCmpMetaData: boolean): ts.TransformerFactory<ts.SourceFile> {
   let dirPath: string;
   let moduleFile: d.Module;
 
@@ -16,7 +16,7 @@ export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
       switch (node.kind) {
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(transformCtx, moduleFile, typeChecker, node as ts.ClassDeclaration, addStaticBuildConditionals);
+          return visitClass(transformCtx, moduleFile, typeChecker, node as ts.ClassDeclaration, addStaticCmpMetaData);
 
         case ts.SyntaxKind.ImportDeclaration:
           return visitImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node as ts.ImportDeclaration);

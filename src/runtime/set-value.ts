@@ -2,12 +2,14 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from '@platform';
 import { update } from './update';
+import { parsePropertyValue } from './parse-property-value';
 import { writeTask } from './task-queue';
 
 
 export const setValue = (elmData: d.ElementData, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, oldVal?: any) => {
   // check our new property value against our internal value
   oldVal = elmData.instanceValues.get(propName);
+  newVal = parsePropertyValue(newVal, cmpMeta.members[propName][1]);
 
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!

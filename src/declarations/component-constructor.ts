@@ -1,3 +1,4 @@
+import * as d from '.';
 
 
 export interface ComponentConstructor {
@@ -8,6 +9,13 @@ export interface ComponentConstructor {
   style?: string;
   styleMode?: string;
   encapsulation?: ComponentConstructorEncapsulation;
+  cmpMeta?: d.ComponentRuntimeMeta;
+  observedAttributes?: string[];
+}
+
+
+export interface ComponentConstructorStaticMeta extends ComponentConstructor {
+  CMP_META: d.ComponentCompilerMeta;
 }
 
 

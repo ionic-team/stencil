@@ -14,7 +14,6 @@ export interface ComponentOptions {
   styles?: string;
   scoped?: boolean;
   shadow?: boolean;
-  host?: d.HostMeta;
   assetsDir?: string;
   assetsDirs?: string[];
 }

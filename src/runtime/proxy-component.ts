@@ -8,38 +8,38 @@ import { setValue } from './set-value';
 
 export const proxyComponent = (CstrPrototype: any, cmpMeta: d.ComponentRuntimeMeta, proxyState?: boolean) =>
   // proxyComponent
-  cmpMeta.members.forEach(cmpMember => {
+  Object.entries(cmpMeta.members).forEach(([memberName, memberData]) => {
 
-    if ((BUILD.prop && ((cmpMember[1] === MEMBER_TYPE.Prop) || (cmpMember[1] === MEMBER_TYPE.PropMutable))) || (BUILD.state && (cmpMember[1] === MEMBER_TYPE.State) && proxyState)) {
+    if ((BUILD.prop && ((memberData[0] === MEMBER_TYPE.Prop) || (memberData[0] === MEMBER_TYPE.PropMutable))) || (BUILD.state && (memberData[0] === MEMBER_TYPE.State) && proxyState)) {
       // proxyComponent - prop
-      Object.defineProperty(CstrPrototype, cmpMember[0],
+      Object.defineProperty(CstrPrototype, memberName,
         {
           get(this: d.HostElement) {
             // proxyComponent, get value
-            return getElmRef(this).instanceValues.get(cmpMember[0]);
+            return getElmRef(this).instanceValues.get(memberName);
           },
           set(this: d.HostElement, newValue) {
             // proxyComponent, set value
-            setValue(getElmRef(this), cmpMember[0], newValue, cmpMeta);
+            setValue(getElmRef(this), memberName, newValue, cmpMeta);
           },
           configurable: true
         }
       );
 
-    } else if (BUILD.method && (cmpMember[1] === MEMBER_TYPE.Method)) {
+    } else if (BUILD.method && (memberData[0] === MEMBER_TYPE.Method)) {
       // proxyComponent - method
-      Object.defineProperty(CstrPrototype, cmpMember[0], {
+      Object.defineProperty(CstrPrototype, memberName, {
         value: noop
       });
 
-    } else if (BUILD.event && (cmpMember[1] === MEMBER_TYPE.Event)) {
+    } else if (BUILD.event && (memberData[0] === MEMBER_TYPE.Event)) {
       // proxyComponent - event
-      Object.defineProperty(CstrPrototype, cmpMember[0], {
+      Object.defineProperty(CstrPrototype, memberName, {
         get(this: d.HostElement) {
           const elm = getElmRef(this).elm;
           return {
             emit: (data: any) => elm.dispatchEvent(new CustomEvent(
-              cmpMember[0],
+              memberName,
               {
                 detail: data,
                 // bubbles

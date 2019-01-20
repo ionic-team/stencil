@@ -2,8 +2,8 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from './constants';
 
 
-export function getScopeId(cmpMeta: d.ComponentMeta, mode?: string) {
-  return ('sc-' + cmpMeta.tagNameMeta) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
+export function getScopeId(cmpMeta: d.ComponentCompilerMeta, mode?: string) {
+  return ('sc-' + cmpMeta.tagName) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
 }
 
 

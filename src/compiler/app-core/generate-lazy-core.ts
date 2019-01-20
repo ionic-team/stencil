@@ -7,11 +7,13 @@ import { optimizeAppCoreBundle } from './optimize-app-core';
 export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
   const c: string[] = [];
 
-  const cmpRuntimeData = formatLazyComponentRuntimeData(buildCtx.entryModules, lazyModules);
+  const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
+
+  const strData = JSON.stringify(cmpRuntimeData);
 
   c.push(`import { bootstrapLazy } from '${build.coreImportPath}';`);
 
-  c.push(`bootstrapLazy(${cmpRuntimeData});`);
+  c.push(`bootstrapLazy(${strData});`);
 
   const exportFns: string[] = ['registerLazyInstance'];
 
@@ -41,27 +43,28 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
 }
 
 
-function formatLazyComponentRuntimeData(entryModules: d.EntryModule[], lazyModules: d.LazyModuleOutput[]) {
+function formatLazyComponentRuntimeEntryModule(entryModules: d.EntryModule[], lazyModules: d.LazyModuleOutput[]) {
   // [[{ios: 'abc12345', md: 'dec65432'}, {tagName: 'ion-icon', members: []}]]
 
   const lazyBundles = entryModules.map(entryModule => {
     const bundleId = getBundleId(entryModule, lazyModules);
-    const cmps = entryModule.cmps;
-
-    // NOT using JSON.stringify so that properties can get renamed/minified
-    const str = `[${
-      bundleId
-    }, [${
-      cmps.map(cmp => {
-        return formatComponentRuntimeMeta(cmp, true);
-      }).join(', ')
-    }]]`;
-
-    return str;
+    return formatLazyCompnonentRuntimeBundle(bundleId, entryModule.cmps);
   });
 
-  return `[` + lazyBundles.join(', ') + `]`;
+  return lazyBundles;
 }
+
+
+function formatLazyCompnonentRuntimeBundle(bundleId: d.ModeBundleId, cmps: d.ComponentCompilerMeta[]) {
+  const lazyBundle: d.LazyBundleRuntimeMeta = [
+    bundleId,
+    cmps.map(cmp => {
+      return formatComponentRuntimeMeta(cmp, true);
+    })
+  ];
+  return lazyBundle;
+}
+
 
 function getBundleId(entryModule: d.EntryModule, lazyModules: d.LazyModuleOutput[]): d.ModeBundleId {
   if (entryModule.modeNames.length === 0) {

@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { BUILD } from '@build-conditionals';
 import { setupGlobal } from '@mock-doc';
 
 
@@ -144,7 +143,7 @@ export const getElmRef = (elm: d.HostElement, elmData?: d.ElementData) => {
     refs.set(elm, elmData = {
       elm: elm,
       instanceValues: new Map(),
-      instance: BUILD.lazyLoad ? null : elm
+      instance: elm
     });
   }
 

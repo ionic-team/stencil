@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from '../distribution/stencil-types';
 import { isDtsFile, pathJoin } from '@utils';
-import { generateComponentTypes } from '../types/generate-component-types';
+// import { generateComponentTypes } from '../types/generate-component-types';
 import { sys } from '@sys';
 import { validateTypes, validateTypesExist } from '../distribution/validate-package-json';
 
@@ -28,8 +28,9 @@ export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx
     await compilerCtx.fs.writeFile(distPath, distDtsContent);
   }));
 
-  const distPath = pathJoin(config, config.rootDir, distTypesDir);
-  await generateComponentTypes(config, compilerCtx, buildCtx, distPath);
+  // const distPath = pathJoin(config, config.rootDir, distTypesDir);
+  // TODO
+  // await generateComponentTypes(config, compilerCtx, buildCtx, distPath);
 
   // Final check, we make sure the generated types matches the path configured in the package.json
   const existsTypes = await validateTypesExist(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);

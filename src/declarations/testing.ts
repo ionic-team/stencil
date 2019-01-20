@@ -1,4 +1,3 @@
-import * as d from '.';
 
 declare global {
   namespace jest {
@@ -450,7 +449,6 @@ export interface EmulateViewport {
    * Specifies if viewport is in landscape mode. Defaults to false.
    */
   isLandscape?: boolean;
-
 }
 
 
@@ -459,5 +457,5 @@ export interface NewSpecPageOptions {
   html?: string;
   url?: string;
   flushQueue?: boolean;
-  build?: d.Build;
+  lazyLoad?: boolean;
 }

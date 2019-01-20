@@ -82,6 +82,6 @@ export interface CjsImporterFn {
 
 
 export interface CjsExports {
-  [moduleId: string]: d.ComponentConstructor;
+  [moduleId: string]: any;
 }
 

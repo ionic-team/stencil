@@ -57,7 +57,7 @@ export interface Now {
 
 
 export interface ImportedModule {
-  [pascalCaseTag: string]: d.ComponentConstructor;
+  [pascalCaseTag: string]: d.ComponentConstructorOLD;
 }
 
 
