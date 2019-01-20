@@ -4,13 +4,16 @@ import * as d from '@declarations';
 export function getComponentRefsFromSourceStrings(moduleFiles: d.Module[]) {
   const componentRefs: d.ComponentRef[] = [];
 
-  const tags = moduleFiles
-    .filter(moduleFile => moduleFile.cmpCompilerMeta != null)
-    .map(moduleFile => moduleFile.cmpCompilerMeta.tagName);
+  const tags = moduleFiles.reduce((tags, m) => {
+    m.cmps.forEach(cmp => tags.push(cmp.tagName));
+    return tags;
+  }, [] as string[]);
 
   moduleFiles.forEach(moduleFile => {
-    moduleFile.potentialCmpRefs.forEach(potentialCmpRef => {
-      parsePotentialComponentRef(componentRefs, tags, moduleFile, potentialCmpRef);
+    moduleFile.cmps.forEach(cmp => {
+      cmp.potentialCmpRefs.forEach(potentialCmpRef => {
+        parsePotentialComponentRef(componentRefs, tags, moduleFile, potentialCmpRef);
+      });
     });
   });
 

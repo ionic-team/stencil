@@ -5,7 +5,7 @@ import { sys } from '@sys';
 
 export default function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const path = sys.path;
-  const assetsCache: d.FilesMap = {};
+  const assetsCache = new Map<string, string>();
   let tsFileNames: string[];
 
   return {
@@ -114,22 +114,26 @@ export default function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.B
         if (moduleFile.jsFilePath === importer) {
           // awesome, there's a module file for this js file via importeR
           // now let's check if this module has an assets directory
-          if (moduleFile.cmpCompilerMeta && moduleFile.cmpCompilerMeta.assetsDirs) {
-            for (var j = 0; j < moduleFile.cmpCompilerMeta.assetsDirs.length; j++) {
-              const assetsAbsPath = moduleFile.cmpCompilerMeta.assetsDirs[j].absolutePath;
-              const importeeFileName = path.basename(importee);
-              const assetsFilePath = normalizePath(path.join(assetsAbsPath, importeeFileName));
+          for (let j = 0; j < moduleFile.cmps.length; j++) {
+            const cmp = moduleFile.cmps[j];
+            if (cmp.assetsDirs != null) {
+              for (let k = 0; k < cmp.assetsDirs.length; k++) {
+                const assetsAbsPath = cmp.assetsDirs[k].absolutePath;
+                const importeeFileName = path.basename(importee);
+                const assetsFilePath = normalizePath(path.join(assetsAbsPath, importeeFileName));
 
-              // ok, we've got a potential absolute path where the file "could" be
-              try {
-                // let's see if it actually exists, but with readFileSync :(
-                assetsCache[assetsFilePath] = compilerCtx.fs.readFileSync(assetsFilePath);
-                if (typeof assetsCache[assetsFilePath] === 'string') {
-                  return assetsFilePath;
+                // ok, we've got a potential absolute path where the file "could" be
+                try {
+                  // let's see if it actually exists, but with readFileSync :(
+                  const content = compilerCtx.fs.readFileSync(assetsFilePath);
+                  if (typeof content === 'string') {
+                    assetsCache.set(assetsFilePath, content);
+                    return assetsFilePath;
+                  }
+
+                } catch (e) {
+                  buildCtx.debug(`asset ${assetsFilePath} did not exist`);
                 }
-
-              } catch (e) {
-                buildCtx.debug(`asset ${assetsFilePath} did not exist`);
               }
             }
           }
@@ -168,9 +172,10 @@ export default function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.B
 
       sourcePath = normalizePath(sourcePath);
 
-      if (typeof assetsCache[sourcePath] === 'string') {
+      const assetContent = assetsCache.get(sourcePath);
+      if (typeof assetContent === 'string') {
         // awesome, this is one of the cached asset file we already read in resolveId
-        return assetsCache[sourcePath];
+        return assetContent;
       }
 
       return compilerCtx.fs.readFile(sourcePath);

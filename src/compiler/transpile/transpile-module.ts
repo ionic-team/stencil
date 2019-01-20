@@ -28,7 +28,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     map: null,
     diagnostics: [],
     moduleFile: null,
-    cmpMeta: null
+    build: {}
   };
 
   if (sourceFilePath.endsWith('.tsx')) {
@@ -68,7 +68,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, null)
+      visitSource(config, compilerCtx, buildCtx, typeChecker, null, true)
     ]
   });
 
@@ -83,8 +83,6 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
   results.diagnostics.push(...buildCtx.diagnostics);
 
   results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
-
-  results.cmpMeta = (results.moduleFile != null) ? results.moduleFile.cmpCompilerMeta : null;
 
   return results;
 }

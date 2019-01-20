@@ -83,32 +83,32 @@ export function addBundles(config: d.Config, outputTarget: d.OutputTargetWww, en
 }
 
 
-export function getBundleIds(entryModules: d.EntryModule[], components: d.HydrateComponent[]) {
+export function getBundleIds(_entryModules: d.EntryModule[], _components: d.HydrateComponent[]) {
   const bundleIds: string[] = [];
 
-  components.forEach(cmp => {
-    entryModules.forEach(mb => {
-      const moduleFile = mb.moduleFiles.find(mf => mf.cmpCompilerMeta && mf.cmpCompilerMeta.tagName === cmp.tag);
-      if (!moduleFile) {
-        return;
-      }
+  // components.forEach(cmp => {
+  //   entryModules.forEach(mb => {
+  //     const moduleFile = mb.moduleFiles.find(mf => mf.cmpCompilerMeta && mf.cmpCompilerMeta.tagName === cmp.tag);
+  //     if (!moduleFile) {
+  //       return;
+  //     }
 
-      // let bundleId: string;
-      // if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'string') {
-      //   bundleId = moduleFile.cmpCompilerMeta.bundleIds;
-      // } else {
+  //     let bundleId: string;
+  //     if (typeof moduleFile.cmpCompilerMeta.bundleIds === 'string') {
+  //       bundleId = moduleFile.cmpCompilerMeta.bundleIds;
+  //     } else {
 
-      //   bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
-      //   if (!bundleId) {
-      //     bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
-      //   }
-      // }
+  //       bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_MODE];
+  //       if (!bundleId) {
+  //         bundleId = (moduleFile.cmpCompilerMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE];
+  //       }
+  //     }
 
-      // if (bundleId && bundleIds.indexOf(bundleId) === -1) {
-      //   bundleIds.push(bundleId);
-      // }
-    });
-  });
+  //     if (bundleId && bundleIds.indexOf(bundleId) === -1) {
+  //       bundleIds.push(bundleId);
+  //     }
+  //   });
+  // });
 
   return bundleIds;
 }

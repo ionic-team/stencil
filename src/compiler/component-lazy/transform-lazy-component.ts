@@ -6,12 +6,12 @@ import { removeStencilImport } from '../transformers/remove-stencil-import';
 import ts from 'typescript';
 
 
-export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, moduleFile: d.Module, inputJsText: string) {
+export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
 
-  const c: string[] = [];
+  let outputText = '';
 
   try {
     const transpileOpts: ts.TranspileOptions = {
@@ -20,10 +20,10 @@ export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, b
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
       },
-      fileName: moduleFile.jsFilePath,
+      fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          transformToLazyComponent(build, moduleFile)
+          transformToLazyComponent(build, cmp)
         ]
       }
     };
@@ -33,28 +33,27 @@ export function transformLazyComponent(config: d.Config, buildCtx: d.BuildCtx, b
     loadTypeScriptDiagnostics(null, buildCtx.diagnostics, transpileOutput.diagnostics);
 
     if (!buildCtx.hasError) {
-      c.push(transpileOutput.outputText);
+      outputText = transpileOutput.outputText;
     }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
-  return c.join('\n');
+  return outputText;
 }
 
 
-function transformToLazyComponent(build: d.Build, moduleFile: d.Module): ts.TransformerFactory<ts.SourceFile> {
-  const cmp: ComponentData = {
+function transformToLazyComponent(build: d.Build, cmp: d.ComponentCompilerMeta): ts.TransformerFactory<ts.SourceFile> {
+  const cmpData: ComponentData = {
     build: build,
-    sourceFileNode: null,
-    moduleFile: moduleFile
+    sourceFileNode: null
   };
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitNode(node: ts.Node) {
-      if (isComponentClassNode(node, moduleFile)) {
+      if (isComponentClassNode(node, cmp)) {
         return updateComponentClass(node);
 
       } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -65,9 +64,9 @@ function transformToLazyComponent(build: d.Build, moduleFile: d.Module): ts.Tran
     }
 
     return tsSourceFile => {
-      cmp.sourceFileNode = tsSourceFile;
+      cmpData.sourceFileNode = tsSourceFile;
 
-      return ts.visitEachChild(cmp.sourceFileNode, visitNode, transformContext);
+      return ts.visitEachChild(cmpData.sourceFileNode, visitNode, transformCtx);
     };
   };
 }
@@ -149,5 +148,4 @@ const REGISTER_INSTANCE_METHOD = `registerLazyInstance`;
 interface ComponentData {
   build: d.Build;
   sourceFileNode: ts.SourceFile;
-  moduleFile: d.Module;
 }

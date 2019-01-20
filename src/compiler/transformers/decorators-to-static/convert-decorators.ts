@@ -12,7 +12,7 @@ import ts from 'typescript';
 
 export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
@@ -21,7 +21,7 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
 
       return ts.visitEachChild(node, node => {
         return visit(tsSourceFile, node);
-      }, transformContext);
+      }, transformCtx);
     }
 
     return tsSourceFile => visit(tsSourceFile, tsSourceFile) as ts.SourceFile;

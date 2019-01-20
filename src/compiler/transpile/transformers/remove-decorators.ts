@@ -22,7 +22,7 @@ const DECORATORS_TO_REMOVE = new Set([
  */
 export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
@@ -32,7 +32,7 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
           }
           return visitComponentClass(node as ts.ClassDeclaration);
         default:
-          return ts.visitEachChild(node, visit, transformContext);
+          return ts.visitEachChild(node, visit, transformCtx);
       }
     }
 

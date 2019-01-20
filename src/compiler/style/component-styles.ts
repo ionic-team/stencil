@@ -8,13 +8,13 @@ import { scopeComponentCss } from './scope-css';
 import { sys } from '@sys';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler, modeName: string) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
   if (buildCtx.isRebuild) {
-    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, styleMeta);
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta);
     if (cachedCompiledStyles) {
       styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
       styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
@@ -23,10 +23,10 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   }
 
   // compile each mode style
-  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, styleMeta);
+  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta);
 
   // format and set the styles for use later
-  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpCompilerMeta, modeName, styleMeta.externalStyles, compiledStyles);
+  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, cmp, modeName, styleMeta.externalStyles, compiledStyles);
 
   styleMeta.compiledStyleText = compiledStyleMeta.styleText;
   styleMeta.compiledStyleTextScoped = compiledStyleMeta.styleTextScoped;
@@ -34,12 +34,12 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   if (config.watch) {
     // since this is a watch and we'll be checking this again
     // let's cache what we've learned today
-    setComponentStylesCache(compilerCtx, moduleFile, styleMeta);
+    setComponentStylesCache(compilerCtx, moduleFile, cmp, styleMeta);
   }
 }
 
 
-async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
   // get all the absolute paths for each style
   const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
@@ -54,14 +54,14 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
   // build an array of style strings
   const compiledStyles = await Promise.all(extStylePaths.map(extStylePath => {
-    return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, extStylePath);
+    return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, cmp, extStylePath);
   }));
 
   return compiledStyles;
 }
 
 
-async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, extStylePath: string) {
+async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, extStylePath: string) {
   if (buildCtx.shouldAbort) {
     return '/* build aborted */';
   }
@@ -91,7 +91,7 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   try {
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, moduleFile);
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, cmp);
 
     if (!moduleFile.isCollectionDependency) {
       const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);

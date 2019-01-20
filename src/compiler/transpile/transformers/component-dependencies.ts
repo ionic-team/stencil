@@ -6,7 +6,7 @@ import ts from 'typescript';
 
 export function componentDependencies(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visit(node: ts.Node, moduleFile: d.ModuleFile): ts.VisitResult<ts.Node> {
       if (node.kind === ts.SyntaxKind.CallExpression) {
@@ -18,7 +18,7 @@ export function componentDependencies(compilerCtx: d.CompilerCtx): ts.Transforme
 
       return ts.visitEachChild(node, (node) => {
         return visit(node, moduleFile);
-      }, transformContext);
+      }, transformCtx);
     }
 
     return (tsSourceFile) => {

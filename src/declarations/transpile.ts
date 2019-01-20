@@ -2,12 +2,12 @@ import * as d from '.';
 
 
 export interface TranspileResults {
-  sourceFilePath?: string;
-  code?: string;
-  map?: any;
-  diagnostics?: d.Diagnostic[];
-  moduleFile?: d.Module;
-  cmpMeta?: d.ComponentCompilerMeta;
+  sourceFilePath: string;
+  code: string;
+  map: any;
+  diagnostics: d.Diagnostic[];
+  moduleFile: d.Module;
+  build: d.Build;
 }
 
 

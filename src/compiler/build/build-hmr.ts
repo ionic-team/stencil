@@ -98,10 +98,14 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
 
   const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
     const moduleFile = compilerCtx.moduleMap.get(changedTsFile);
-    if (moduleFile && moduleFile.cmpCompilerMeta && moduleFile.cmpCompilerMeta.tagName) {
-      if (!tags.includes(moduleFile.cmpCompilerMeta.tagName)) {
-        tags.push(moduleFile.cmpCompilerMeta.tagName);
-      }
+    if (moduleFile != null) {
+      moduleFile.cmps.forEach(cmp => {
+        if (typeof cmp.tagName === 'string') {
+          if (!tags.includes(cmp.tagName)) {
+            tags.push(cmp.tagName);
+          }
+        }
+      });
     }
     return tags;
   }, [] as string[]);

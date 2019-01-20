@@ -1,5 +1,7 @@
 import * as d from '@declarations';
-import { gatherComponentBuildConditionals } from '../component-build-conditionals';
+import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import { getBuildFeatures } from '../../app-core/build-conditionals';
+import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
@@ -9,12 +11,17 @@ import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
 import { parseStaticStyles } from './styles';
+import { visitCallExpression } from '../visitors/visit-call-expression';
+import { visitStringLiteral } from '../visitors/visit-string-literal';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(_compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, _tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string) {
-  const cmpMeta: d.ComponentCompilerMeta = {
+export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, addStaticBuildConditionals: boolean) {
+  const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
+    excludeFromCollection: moduleFile.excludeFromCollection,
+    isCollectionDependency: moduleFile.isCollectionDependency,
+    jsFilePath: moduleFile.jsFilePath,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation: parseStaticEncapsulation(staticMembers),
@@ -52,13 +59,60 @@ export function parseStaticComponentMeta(_compilerCtx: d.CompilerCtx, _buildCtx:
     hasRenderFn: false,
     hasState: false,
     hasStyle: false,
+    hasVdomAttribute: false,
+    hasVdomClass: false,
+    hasVdomFunctional: false,
+    hasVdomKey: false,
+    hasVdomListener: false,
+    hasVdomRef: false,
+    hasVdomRender: false,
+    hasVdomStyle: false,
+    hasVdomText: false,
     hasWatchCallback: false,
-    isUpdateable: false
+    htmlAttrNames: [],
+    htmlTagNames: [],
+    isUpdateable: false,
+    potentialCmpRefs: []
   };
 
-  moduleFile.cmpCompilerMeta = cmpMeta;
+  moduleFile.cmps.push(cmp);
 
-  gatherComponentBuildConditionals(cmpMeta);
+  parseClassMethods(typeChecker, cmpNode, cmp);
 
-  parseClassMethods(typeChecker, cmpNode, cmpMeta);
+
+  function visitComponentChildNode(node: ts.Node): ts.VisitResult<ts.Node> {
+
+    switch (node.kind) {
+      case ts.SyntaxKind.CallExpression:
+        visitCallExpression(cmp, node as ts.CallExpression);
+        break;
+
+      case ts.SyntaxKind.StringLiteral:
+        visitStringLiteral(cmp, node as ts.StringLiteral);
+        break;
+    }
+
+    return ts.visitEachChild(node, visitComponentChildNode, transformCtx);
+  }
+
+  cmpNode = ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
+
+  setComponentBuildConditionals(cmp);
+
+  if (addStaticBuildConditionals) {
+    const build = getBuildFeatures([cmp]);
+
+    const buildStaticProp = createStaticGetter('BUILD', convertValueToLiteral(build));
+    cmpNode = ts.updateClassDeclaration(
+      cmpNode,
+      cmpNode.decorators,
+      cmpNode.modifiers,
+      cmpNode.name,
+      cmpNode.typeParameters,
+      cmpNode.heritageClauses,
+      [...cmpNode.members, buildStaticProp]
+    );
+  }
+
+  return cmpNode;
 }

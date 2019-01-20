@@ -46,9 +46,7 @@ function formatLazyComponentRuntimeData(entryModules: d.EntryModule[], lazyModul
 
   const lazyBundles = entryModules.map(entryModule => {
     const bundleId = getBundleId(entryModule, lazyModules);
-    const cmps = entryModule.moduleFiles.filter(m => m.cmpCompilerMeta != null).map(m => {
-      return m.cmpCompilerMeta;
-    });
+    const cmps = entryModule.cmps;
 
     // NOT using JSON.stringify so that properties can get renamed/minified
     const str = `[${

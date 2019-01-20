@@ -1,5 +1,5 @@
+import * as d from './declarations';
 
-import * as d from './declarations/index';
 export {
   ComponentDidLoad,
   ComponentDidUnload,
@@ -13,7 +13,7 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXElements,
-} from './declarations/index';
+} from './declarations';
 
 /**
  * Build

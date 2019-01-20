@@ -4,20 +4,20 @@ import { parseStaticComponentMeta } from '../static-to-meta/component';
 import ts from 'typescript';
 
 
-export function visitClass(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, classNode: ts.ClassDeclaration) {
-  if (!classNode.members) {
-    return;
+export function visitClass(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration, addStaticBuildConditionals: boolean) {
+  if (classNode.members != null) {
+    const staticMembers = classNode.members.filter(isStaticGetter);
+
+    if (staticMembers.length > 0) {
+      const tagName = getStaticValue(staticMembers, 'is') as string;
+
+      if (typeof tagName === 'string' && tagName.includes('-')) {
+        return parseStaticComponentMeta(transformCtx, moduleFile, typeChecker, classNode, staticMembers, tagName, addStaticBuildConditionals);
+      }
+    }
   }
 
-  const staticMembers = classNode.members.filter(isStaticGetter);
-  if (staticMembers.length === 0) {
-    return;
-  }
-
-  const tagName: string = getStaticValue(staticMembers, 'is');
-  if (typeof tagName === 'string' && tagName.includes('-')) {
-    parseStaticComponentMeta(compilerCtx, buildCtx, moduleFile, typeChecker, tsSourceFile, classNode, staticMembers, tagName);
-  }
+  return classNode;
 }
 
 

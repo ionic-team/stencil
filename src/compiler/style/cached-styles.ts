@@ -2,8 +2,8 @@ import * as d from '@declarations';
 import { getCssImports } from './css-imports';
 
 
-export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, styleMeta.modeName);
+export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(moduleFile, cmp, styleMeta.modeName);
 
   const cachedStyleMeta = compilerCtx.cachedStyleMeta.get(cacheKey);
   if (!cachedStyleMeta) {
@@ -11,7 +11,7 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
     return null;
   }
 
-  if (isChangedTsFile(moduleFile, buildCtx) && hasDecoratorStyleChanges(compilerCtx, moduleFile, cacheKey)) {
+  if (isChangedTsFile(moduleFile, buildCtx) && hasDecoratorStyleChanges(compilerCtx, cmp, cacheKey)) {
     // this module is one of the changed ts files
     // and the changed ts file has different
     // styleUrls or styleStr in the component decorator
@@ -45,13 +45,13 @@ function isChangedTsFile(moduleFile: d.Module, buildCtx: d.BuildCtx) {
 }
 
 
-function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, moduleFile: d.Module, cacheKey: string) {
+function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta, cacheKey: string) {
   const lastStyleInput = compilerCtx.lastComponentStyleInput.get(cacheKey);
   if (!lastStyleInput) {
     return true;
   }
 
-  return (lastStyleInput !== getComponentStyleInputKey(moduleFile));
+  return (lastStyleInput !== getComponentStyleInputKey(cmp));
 }
 
 
@@ -134,39 +134,37 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-function getComponentStyleInputKey(moduleFile: d.Module) {
+function getComponentStyleInputKey(cmp: d.ComponentCompilerMeta) {
   const input: string[] = [];
 
-  if (moduleFile.cmpCompilerMeta.styles) {
-    moduleFile.cmpCompilerMeta.styles.forEach(styleMeta => {
-      input.push(styleMeta.modeName);
+  cmp.styles.forEach(styleMeta => {
+    input.push(styleMeta.modeName);
 
-      if (styleMeta.styleStr) {
-        input.push(styleMeta.styleStr);
-      }
+    if (styleMeta.styleStr) {
+      input.push(styleMeta.styleStr);
+    }
 
-      if (styleMeta.externalStyles) {
-        styleMeta.externalStyles.forEach(s => {
-          input.push(s.absolutePath);
-        });
-      }
-    });
-  }
+    if (styleMeta.externalStyles) {
+      styleMeta.externalStyles.forEach(s => {
+        input.push(s.absolutePath);
+      });
+    }
+  });
 
   return input.join(',');
 }
 
 
-export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.Module, styleMeta: d.StyleCompiler) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, styleMeta.modeName);
+export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(moduleFile, cmp, styleMeta.modeName);
 
   compilerCtx.cachedStyleMeta.set(cacheKey, styleMeta);
 
-  const styleInput = getComponentStyleInputKey(moduleFile);
+  const styleInput = getComponentStyleInputKey(cmp);
   compilerCtx.lastComponentStyleInput.set(cacheKey, styleInput);
 }
 
 
-function getComponentStylesCacheKey(moduleFile: d.Module, modeName: string) {
-  return `${moduleFile.sourceFilePath}#${modeName}`;
+function getComponentStylesCacheKey(moduleFile: d.Module, cmp: d.ComponentCompilerMeta, modeName: string) {
+  return `${moduleFile.sourceFilePath}#${cmp.tagName}#${modeName}`;
 }

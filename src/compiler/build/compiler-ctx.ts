@@ -61,27 +61,15 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
   } else {
     const moduleFile: d.Module = {
       sourceFilePath: sourceFilePath,
-      cmpCompilerMeta: null,
+      cmps: [],
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,
       externalImports: [],
-      hasVdomAttribute: false,
-      hasVdomClass: false,
-      hasVdomFunctional: false,
-      hasVdomKey: false,
-      hasVdomListener: false,
-      hasVdomRef: false,
-      hasVdomRender: false,
-      hasVdomStyle: false,
-      hasVdomText: false,
-      htmlAttrNames: [],
-      htmlTagNames: [],
       isCollectionDependency: false,
       jsFilePath: null,
       localImports: [],
-      originalCollectionComponentPath: null,
-      potentialCmpRefs: []
+      originalCollectionComponentPath: null
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
@@ -90,53 +78,13 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
 
 
 export function resetModule(moduleFile: d.Module) {
-  moduleFile.cmpCompilerMeta = null;
+  moduleFile.cmps.length = 0;
   moduleFile.collectionName = null;
   moduleFile.dtsFilePath = null;
   moduleFile.excludeFromCollection = false;
-
-  if (Array.isArray(moduleFile.externalImports)) {
-    moduleFile.externalImports.length = 0;
-  } else {
-    moduleFile.externalImports = [];
-  }
-
-  moduleFile.hasVdomAttribute = false;
-  moduleFile.hasVdomClass = false;
-  moduleFile.hasVdomFunctional = false;
-  moduleFile.hasVdomKey = false;
-  moduleFile.hasVdomListener = false;
-  moduleFile.hasVdomRef = false;
-  moduleFile.hasVdomRender = false;
-  moduleFile.hasVdomStyle = false;
-  moduleFile.hasVdomText = false;
-
-  if (Array.isArray(moduleFile.htmlAttrNames)) {
-    moduleFile.htmlAttrNames.length = 0;
-  } else {
-    moduleFile.htmlAttrNames = [];
-  }
-
-  if (Array.isArray(moduleFile.htmlTagNames)) {
-    moduleFile.htmlTagNames.length = 0;
-  } else {
-    moduleFile.htmlTagNames = [];
-  }
-
+  moduleFile.externalImports.length = 0;
   moduleFile.isCollectionDependency = false;
   moduleFile.jsFilePath = null;
-
-  if (Array.isArray(moduleFile.localImports)) {
-    moduleFile.localImports.length = 0;
-  } else {
-    moduleFile.localImports = [];
-  }
-
+  moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
-
-  if (Array.isArray(moduleFile.potentialCmpRefs)) {
-    moduleFile.potentialCmpRefs.length = 0;
-  } else {
-    moduleFile.potentialCmpRefs = [];
-  }
 }

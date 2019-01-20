@@ -65,7 +65,7 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
 }
 
 
-export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, moduleFile?: d.Module) {
+export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: sys,
@@ -88,13 +88,13 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // concat all css @imports into one file
     // when the entry file is a .css file (not .scss)
     // do this BEFORE transformations on css files
-    const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
+    const shouldParseCssDocs = (cmp != null && config.outputTargets.some(o => {
       return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
-    if (shouldParseCssDocs && moduleFile.cmpCompilerMeta != null) {
-      moduleFile.cmpCompilerMeta.styleDocs = moduleFile.cmpCompilerMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, moduleFile.cmpCompilerMeta.styleDocs);
+    if (shouldParseCssDocs && cmp != null) {
+      cmp.styleDocs = cmp.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
@@ -145,13 +145,13 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // but only updated it to use url() instead. Let's go ahead and concat the url() css
     // files into one file like we did for raw .css files.
     // do this AFTER transformations on non-css files
-    const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
+    const shouldParseCssDocs = (cmp != null && config.outputTargets.some(o => {
       return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
     }));
 
-    if (shouldParseCssDocs && moduleFile.cmpCompilerMeta) {
-      moduleFile.cmpCompilerMeta.styleDocs = moduleFile.cmpCompilerMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, moduleFile.cmpCompilerMeta.styleDocs);
+    if (shouldParseCssDocs && cmp != null) {
+      cmp.styleDocs = cmp.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);

@@ -3,7 +3,7 @@ import * as d from '@declarations';
 
 export function createCustomElements(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitComponentClass(classNode: ts.ClassDeclaration) {
       return ts.updateClassDeclaration(
@@ -38,7 +38,7 @@ export function createCustomElements(compilerCtx: d.CompilerCtx): ts.Transformer
       function visit(node: ts.Node): ts.VisitResult<ts.Node> {
         if (!ts.isClassDeclaration(node) ||
            (<ts.ClassDeclaration>node).name.escapedText !== compilerCtx.moduleFiles[fileName].cmpMeta.componentClass) {
-          return ts.visitEachChild(node, visit, transformContext);
+          return ts.visitEachChild(node, visit, transformCtx);
         }
 
         return visitComponentClass(node as ts.ClassDeclaration);

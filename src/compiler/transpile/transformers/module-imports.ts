@@ -6,7 +6,7 @@ import ts from 'typescript';
 
 export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitImport(moduleFile: d.ModuleFile, dirPath: string, importNode: ts.ImportDeclaration) {
       if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
@@ -35,7 +35,7 @@ export function getModuleImports(config: d.Config, compilerCtx: d.CompilerCtx): 
         default:
           return ts.visitEachChild(node, (node) => {
             return visit(moduleFile, dirPath, node);
-          }, transformContext);
+          }, transformCtx);
       }
     }
 

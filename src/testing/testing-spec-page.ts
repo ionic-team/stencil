@@ -19,44 +19,48 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   const bc = require('@stencil/core/build-conditionals');
   const BUILD = resetBuildConditionals(bc.BUILD);
 
-  if (opts.build != null) {
-    Object.assign(BUILD, opts.build);
-  }
+  const testingCmps = opts.components.map((Cstr: d.ComponentConstructor) => {
+    if (typeof Cstr.is !== 'string') {
+      throw new Error(`Invalid component class. Requires the @Component() decorator with tag, or static "is" property.`);
+    }
 
-  // see comment at the bottom of the page
-  const runtime = require('@stencil/core/runtime');
+    const bundleId = Cstr.is;
 
-  const testingCmps = opts.components.map((_Cstr: d.DecoratoredRuntimeConstructor) => {
-    // if (!Cstr.ComponentOptions) {
-    //   throw new Error(`@Component() decorator required`);
-    // }
+    const cmpBuild = (Cstr as any).BUILD;
+    if (cmpBuild != null) {
+      Object.keys(cmpBuild).forEach(key => {
+        if (cmpBuild[key] === true) {
+          (BUILD as any)[key] = true;
+        }
+      });
+    }
 
-    // runtime.updateRuntimeBuild(BUILD, Cstr);
-
-    // const bundleId = Cstr.ComponentOptions.tag;
-
-    // const ProxiedCstr = new Proxy<any>(Cstr, {
-    //   construct(target, args: any[]) {
-    //     const instance = new target();
-    //     runtime.registerLazyInstance(instance, args[0]);
-    //     return instance;
-    //   }
-    // });
+    const ProxiedCstr = new Proxy<any>(Cstr, {
+      construct(target, args: any[]) {
+        const instance = new target();
+        platform.registerLazyInstance(instance, args[0]);
+        return instance;
+      }
+    });
 
     const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
-      'bundleId',
+      bundleId,
       [{
-        cmpTag: 'Cstr.ComponentOptions.tag',
+        cmpTag: Cstr.is,
         members: [],
-        scopedCssEncapsulation: false,
-        shadowDomEncapsulation: false
+        scopedCssEncapsulation: (Cstr.encapsulation === 'scoped'),
+        shadowDomEncapsulation: (Cstr.encapsulation === 'shadow')
       }]
     ];
 
-    // registerModule(bundleId, ProxiedCstr);
+    registerModule(bundleId, ProxiedCstr);
 
     return lazyBundleRuntimeMeta;
   });
+
+  if (opts.build != null) {
+    Object.assign(BUILD, opts.build);
+  }
 
   const plt = {
     win: platform.win as Window,
@@ -64,12 +68,16 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     body: platform.doc.body as HTMLBodyElement,
     head: platform.doc.head as HTMLHeadElement,
     opts: BUILD,
-    flush: async () => await platform.flushAll()
+    flush: (): Promise<void> => platform.flushAll(),
+    flushLoadModule: (): Promise<void> => platform.flushLoadModule(),
+    flushQueue: (): Promise<void> => platform.flushQueue()
   };
 
   if (typeof opts.url === 'string') {
     plt.win.location.href = opts.url;
   }
+
+  const runtime = require('@stencil/core/runtime');
 
   if (opts.build == null || opts.build.lazyLoad !== false) {
     runtime.bootstrapLazy(testingCmps);

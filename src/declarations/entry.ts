@@ -5,7 +5,7 @@ export interface EntryModule {
   entryKey?: string;
   filePath?: string;
   dependencies?: string[];
-  moduleFiles: d.Module[];
+  cmps: d.ComponentCompilerMeta[];
   requiresScopedStyles?: boolean;
   modeNames?: string[];
   entryBundles?: EntryBundle[];

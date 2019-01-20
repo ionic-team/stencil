@@ -48,7 +48,7 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
   if (config.logLevel === 'debug') {
     c.push(`/*!`);
     c.push(`  ${chunk.entryKey}`);
-    c.push(`  ${entryModule.moduleFiles.map(m => m.cmpCompilerMeta.tagName).join(', ')}`);
+    c.push(`  ${entryModule.cmps.map(cmp => cmp.tagName).join(', ')}`);
     c.push(`  ${derivedModule.sourceTarget} ${derivedModule.moduleFormat}`);
     if (modeName !== DEFAULT_STYLE_MODE) {
       c.push(`  mode: ${modeName}`);
@@ -61,7 +61,7 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
 
   const coreImports: string[] = [];
 
-  const includeVdom = entryModule.moduleFiles.some(m => m.hasVdomRender);
+  const includeVdom = entryModule.cmps.some(cmp => cmp.hasVdomRender);
   if (includeVdom) {
     coreImports.push(`h`);
   }
@@ -97,11 +97,9 @@ async function generateLazyEntryModuleModeChunkOutput(config: d.Config, compiler
 
 
 function registerStyles(entryModule: d.EntryModule, modeName: string) {
-  const cmpsWithStyles = entryModule.moduleFiles
-    .filter(m => m.cmpCompilerMeta != null)
-    .filter(m => m.cmpCompilerMeta.styles != null && m.cmpCompilerMeta.styles.length > 0)
-    .filter(m => m.cmpCompilerMeta.styles.some(s => s.modeName === modeName))
-    .map(m => m.cmpCompilerMeta);
+  const cmpsWithStyles = entryModule.cmps
+    .filter(cmp => cmp.styles.length > 0)
+    .filter(cmp => cmp.styles.some(s => s.modeName === modeName));
 
   return cmpsWithStyles.map(cmp => {
     return registerStyle(cmp, modeName);
@@ -137,7 +135,7 @@ function getBundleIdHashed(config: d.Config, jsText: string) {
 
 
 function getBundleIdDev(entryModule: d.EntryModule, modeName: string) {
-  const tags = entryModule.moduleFiles
+  const tags = entryModule.cmps
     .sort((a, b) => {
       if (a.isCollectionDependency && !b.isCollectionDependency) {
         return 1;
@@ -146,11 +144,11 @@ function getBundleIdDev(entryModule: d.EntryModule, modeName: string) {
         return -1;
       }
 
-      if (a.cmpCompilerMeta.tagName < b.cmpCompilerMeta.tagName) return -1;
-      if (a.cmpCompilerMeta.tagName > b.cmpCompilerMeta.tagName) return 1;
+      if (a.tagName < b.tagName) return -1;
+      if (a.tagName > b.tagName) return 1;
       return 0;
     })
-    .map(m => m.cmpCompilerMeta.tagName);
+    .map(m => m.tagName);
 
   if (modeName === DEFAULT_STYLE_MODE || !modeName) {
     return tags[0];

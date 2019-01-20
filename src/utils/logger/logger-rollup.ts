@@ -111,7 +111,11 @@ export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?:
 
     let label = '';
     if (bundleModulesFiles) {
-      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpCompilerMeta.tagName).join(', ').trim();
+      label = bundleModulesFiles.reduce((cmps, m) => {
+        cmps.push(...m.cmps);
+        return cmps;
+      }, [] as d.ComponentCompilerMeta[]).join(', ').trim();
+
       if (label.length) {
         label += ': ';
       }

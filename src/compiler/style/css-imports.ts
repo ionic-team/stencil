@@ -16,7 +16,7 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   }
   noLoop.push(resolvedFilePath);
 
-  if (styleDocs) {
+  if (styleDocs != null) {
     parseStyleDocs(styleDocs, styleText);
   }
 

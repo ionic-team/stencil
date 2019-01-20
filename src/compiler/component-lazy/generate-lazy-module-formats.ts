@@ -23,7 +23,7 @@ export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d
     buildCtx.entryModules.push({
       entryKey: 'exportedFile',
       filePath: exportedFile,
-      moduleFiles: []
+      cmps: []
     });
   }
 
@@ -125,8 +125,8 @@ async function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerC
 async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule) {
   const entryInputPath = entryModule.filePath;
 
-  const promises = entryModule.moduleFiles.map(async moduleFile => {
-    return updateToLazyComponent(config, compilerCtx, buildCtx, build, entryModule, moduleFile);
+  const promises = entryModule.cmps.map(async cmp => {
+    return updateToLazyComponent(config, compilerCtx, buildCtx, build, entryModule, cmp);
   });
 
   const lazyModules = (await Promise.all(promises)).sort((a, b) => {

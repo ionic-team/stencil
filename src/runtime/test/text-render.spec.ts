@@ -15,9 +15,6 @@ describe('text-render', () => {
     const { body } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      build: {
-        noVdomRender: true
-      }
     });
 
     expect(body).toEqualHtml(`
@@ -34,10 +31,7 @@ describe('text-render', () => {
     }
 
     const { body, flush } = await newSpecPage({
-      components: [CmpA],
-      build: {
-        noVdomRender: true
-      }
+      components: [CmpA]
     });
 
     body.innerHTML = `<cmp-a></cmp-a>`;

@@ -120,7 +120,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
           convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null)
+          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, false)
         ]
       };
     }

@@ -1,9 +1,5 @@
-import * as d from '.';
-
 
 export interface BuildFeatures {
-  appModuleFiles?: d.Module[];
-
   // encapsulation
   style?: boolean;
   mode?: boolean;

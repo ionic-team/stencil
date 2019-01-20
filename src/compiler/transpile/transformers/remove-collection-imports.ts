@@ -14,7 +14,7 @@ export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.Transfor
 
   */
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitImport(importNode: ts.ImportDeclaration) {
       if (!importNode.importClause && importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
@@ -45,7 +45,7 @@ export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.Transfor
         case ts.SyntaxKind.ImportDeclaration:
           return visitImport(node as ts.ImportDeclaration);
         default:
-          return ts.visitEachChild(node, visit, transformContext);
+          return ts.visitEachChild(node, visit, transformCtx);
       }
     }
 

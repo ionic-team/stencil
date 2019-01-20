@@ -2,11 +2,11 @@ import * as d from '@declarations';
 import ts from 'typescript';
 
 
-export function gatherVdomMeta(moduleFile: d.Module, args: ts.NodeArray<ts.Expression>) {
-  moduleFile.hasVdomRender = true;
+export function gatherVdomMeta(cmpMeta: d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) {
+  cmpMeta.hasVdomRender = true;
 
   if (args[0].kind === ts.SyntaxKind.Identifier) {
-    moduleFile.hasVdomFunctional = true;
+    cmpMeta.hasVdomFunctional = true;
   }
 
   if (args.length > 1) {
@@ -21,45 +21,45 @@ export function gatherVdomMeta(moduleFile: d.Module, args: ts.NodeArray<ts.Expre
         const attrs = new Set(Array.from(propsWithText));
 
         if (attrs.has('key')) {
-          moduleFile.hasVdomKey = true;
+          cmpMeta.hasVdomKey = true;
           attrs.delete('key');
         }
 
         if (attrs.has('ref')) {
-          moduleFile.hasVdomRef = true;
+          cmpMeta.hasVdomRef = true;
           attrs.delete('ref');
         }
 
         attrs.forEach(attr => {
           if (attr.startsWith('on') && attr.length > 2 && /[A-Z]/.test(attr.charAt(2))) {
-            moduleFile.hasVdomListener = true;
+            cmpMeta.hasVdomListener = true;
             attrs.delete(attr);
           }
         });
 
         if (attrs.size > 0) {
-          moduleFile.hasVdomAttribute = true;
+          cmpMeta.hasVdomAttribute = true;
 
           if (attrs.has('class') || attrs.has('className')) {
-            moduleFile.hasVdomClass = true;
+            cmpMeta.hasVdomClass = true;
           }
           if (attrs.has('style')) {
-            moduleFile.hasVdomStyle = true;
+            cmpMeta.hasVdomStyle = true;
           }
 
           attrs.forEach(attrName => {
-            if (!moduleFile.htmlAttrNames.includes(attrName)) {
-              moduleFile.htmlAttrNames.push(attrName);
+            if (!cmpMeta.htmlAttrNames.includes(attrName)) {
+              cmpMeta.htmlAttrNames.push(attrName);
             }
           });
         }
       }
     }
 
-    if (!moduleFile.hasVdomText) {
+    if (!cmpMeta.hasVdomText) {
       for (let i = 2; i < args.length; i++) {
         if (ts.isStringLiteral(args[i])) {
-          moduleFile.hasVdomText = true;
+          cmpMeta.hasVdomText = true;
           break;
         }
       }

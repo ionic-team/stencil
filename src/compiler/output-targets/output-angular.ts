@@ -28,8 +28,8 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
   timespan.finish(`generate angular proxies finished`);
 }
 
-async function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, allModuleFiles: d.Module[]) {
-  const components = getComponents(outputTarget.excludeComponents, allModuleFiles);
+async function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
+  const components = getComponents(outputTarget.excludeComponents, moduleFiles);
 
   await Promise.all([
     generateProxies(compilerCtx, components, outputTarget),
@@ -40,8 +40,11 @@ async function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTar
   logger.debug(`generated angular directives: ${outputTarget.directivesProxyFile}`);
 }
 
-function getComponents(excludeComponents: string[], allModuleFiles: d.Module[]) {
-  const cmps = allModuleFiles.filter(m => m.cmpCompilerMeta).map(m => m.cmpCompilerMeta);
+function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
+  const cmps = moduleFiles.reduce((cmps, m) => {
+    cmps.push(...m.cmps);
+    return cmps;
+  }, [] as d.ComponentCompilerMeta[]);
 
   return cmps
     .filter(c => !excludeComponents.includes(c.tagName) && isDocsPublic(c.jsdoc))

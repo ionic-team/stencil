@@ -3,17 +3,21 @@ import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
-export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.Module[]) {
-  const cmps = appModuleFiles.filter(m => m.cmpCompilerMeta != null).map(m => m.cmpCompilerMeta);
+export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
+  // const cmps: d.ComponentCompilerMeta[] = [];
+  // const moduleFileTree: d.Module[] = [];
 
-  const moduleFileTree: d.Module[] = [];
-  appModuleFiles.forEach(moduleFile => {
-    loadModuleFileTree(allModulesFiles, moduleFileTree, moduleFile);
-  });
+  // moduleFiles.forEach(moduleFile => {
+  //   loadModuleFileTree(moduleFiles, moduleFileTree, moduleFile);
+  // });
+
+  // const cmps = moduleFiles.reduce((cmps, m) => {
+  //   cmps.push(...m.cmps);
+  //   return cmps;
+  // }, [] as d.ComponentCompilerMeta[]);
 
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
-    appModuleFiles: appModuleFiles,
     asyncLifecycle: cmps.some(c => c.hasAsyncLifecycle),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
     cmpDidUnload: cmps.some(c => c.hasComponentWillUnloadFn),
@@ -31,28 +35,28 @@ export function getBuildFeatures(allModulesFiles: d.Module[], appModuleFiles: d.
     member: cmps.some(c => c.hasMember),
     method: cmps.some(c => c.hasMethod),
     mode: cmps.some(c => c.hasMode),
-    noRenderFn: cmps.every(cmpMeta => !cmpMeta.hasRenderFn),
-    noVdomRender: moduleFileTree.every(m => !m.hasVdomRender),
+    noRenderFn: cmps.every(c => !c.hasRenderFn),
+    noVdomRender: cmps.every(c => !c.hasVdomRender),
     observeAttr: cmps.some(c => c.hasAttr),
     prop: cmps.some(c => c.hasProp),
     propMutable: cmps.some(c => c.hasPropMutable),
     reflectToAttr: cmps.some(c => c.hasReflectToAttr),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
     shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
-    slot: moduleFileTree.some(m => m.htmlTagNames.includes('slot')),
+    slot: cmps.some(c => c.htmlTagNames.includes('slot')),
     state: cmps.some(c => c.hasState),
     style: cmps.some(c => c.hasStyle),
-    svg: moduleFileTree.some(m => m.htmlTagNames.includes('svg')),
+    svg: cmps.some(c => c.htmlTagNames.includes('svg')),
     updatable: cmps.some(c => c.isUpdateable),
-    vdomAttribute: moduleFileTree.some(m => m.hasVdomAttribute),
-    vdomClass: moduleFileTree.some(m => m.hasVdomClass),
-    vdomFunctional: moduleFileTree.some(m => m.hasVdomFunctional),
-    vdomKey: moduleFileTree.some(m => m.hasVdomKey),
-    vdomListener: moduleFileTree.some(m => m.hasVdomListener),
-    vdomRef: moduleFileTree.some(m => m.hasVdomRef),
-    vdomRender: moduleFileTree.some(m => m.hasVdomRender),
-    vdomStyle: moduleFileTree.some(m => m.hasVdomStyle),
-    vdomText: moduleFileTree.some(m => m.hasVdomText),
+    vdomAttribute: cmps.some(c => c.hasVdomAttribute),
+    vdomClass: cmps.some(c => c.hasVdomClass),
+    vdomFunctional: cmps.some(c => c.hasVdomFunctional),
+    vdomKey: cmps.some(c => c.hasVdomKey),
+    vdomListener: cmps.some(c => c.hasVdomListener),
+    vdomRef: cmps.some(c => c.hasVdomRef),
+    vdomRender: cmps.some(c => c.hasVdomRender),
+    vdomStyle: cmps.some(c => c.hasVdomStyle),
+    vdomText: cmps.some(c => c.hasVdomText),
     watchCallback: cmps.some(c => c.hasWatchCallback),
   };
 
@@ -82,24 +86,24 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
 }
 
 
-function loadModuleFileTree(allModulesFiles: d.Module[], moduleFileTree: d.Module[], moduleFile: d.Module) {
-  if (moduleFile) {
-    if (!moduleFileTree.includes(moduleFile)) {
-      moduleFileTree.push(moduleFile);
-    }
+// function loadModuleFileTree(allModulesFiles: d.Module[], moduleFileTree: d.Module[], moduleFile: d.Module) {
+//   if (moduleFile) {
+//     if (!moduleFileTree.includes(moduleFile)) {
+//       moduleFileTree.push(moduleFile);
+//     }
 
-    moduleFile.localImports && moduleFile.localImports.forEach(localImport => {
-      const subModuleFile = allModulesFiles.find(moduleFile => {
-        return (moduleFile.sourceFilePath === localImport) ||
-               (moduleFile.sourceFilePath === localImport + '.ts') ||
-               (moduleFile.sourceFilePath === localImport + '.tsx') ||
-               (moduleFile.sourceFilePath === localImport + '.js');
-      });
+//     moduleFile.localImports && moduleFile.localImports.forEach(localImport => {
+//       const subModuleFile = allModulesFiles.find(moduleFile => {
+//         return (moduleFile.sourceFilePath === localImport) ||
+//                (moduleFile.sourceFilePath === localImport + '.ts') ||
+//                (moduleFile.sourceFilePath === localImport + '.tsx') ||
+//                (moduleFile.sourceFilePath === localImport + '.js');
+//       });
 
-      loadModuleFileTree(allModulesFiles, moduleFileTree, subModuleFile);
-    });
-  }
-}
+//       loadModuleFileTree(allModulesFiles, moduleFileTree, subModuleFile);
+//     });
+//   }
+// }
 
 
 export function getDefaultBuildConditionals() {
@@ -107,7 +111,7 @@ export function getDefaultBuildConditionals() {
     allRenderFn: false,
     appNamespace: 'App',
     appNamespaceLower: 'app',
-    appModuleFiles: [],
+    // cmps: [],
     asyncLifecycle: true,
     connectedCallback: true,
     disconnectedCallback: true,

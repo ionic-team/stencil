@@ -27,10 +27,11 @@ async function getComponents(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnost
   const promises = fileNames
     .filter(filePath => {
       const moduleFile = compilerCtx.moduleMap.get(filePath);
-      if (!moduleFile.cmpCompilerMeta || moduleFile.isCollectionDependency) {
+      if (moduleFile.cmps.length === 0 || moduleFile.isCollectionDependency) {
         return false;
       }
-      if (!isDocsPublic(moduleFile.cmpCompilerMeta.jsdoc)) {
+      const hasJsDoc = moduleFile.cmps.some(c => isDocsPublic(c.jsdoc));
+      if (!hasJsDoc) {
         return false;
       }
       const dirPath = normalizePath(sys.path.dirname(filePath));
@@ -50,6 +51,7 @@ async function getComponents(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnost
       const usagesDir = normalizePath(sys.path.join(dirPath, 'usage'));
 
       const membersMeta: any = [];
+      // TODO!!!!
       //  = Object.keys(moduleFile.cmpCompilerMeta.membersMeta)
       //   .sort()
       //   .map(memberName => [memberName, moduleFile.cmpCompilerMeta.membersMeta[memberName]] as [string, d.MemberMeta])
@@ -57,23 +59,26 @@ async function getComponents(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnost
 
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
 
+      // TODO!
+      const cmp = moduleFile.cmps[0];
+
       return {
         dirPath,
         filePath,
         fileName: sys.path.basename(filePath),
         readmePath,
         usagesDir,
-        tag: moduleFile.cmpCompilerMeta.tagName,
+        tag: cmp.tagName,
         readme,
-        docs: generateDocs(readme, moduleFile.cmpCompilerMeta.jsdoc),
-        docsTags: generateDocsTags(moduleFile.cmpCompilerMeta.jsdoc),
+        docs: generateDocs(readme, cmp.jsdoc),
+        docsTags: generateDocsTags(cmp.jsdoc),
         usage: await generateUsages(compilerCtx, usagesDir),
-        encapsulation: getEncapsulation(moduleFile.cmpCompilerMeta),
+        encapsulation: getEncapsulation(cmp),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
-        events: getEvents(moduleFile.cmpCompilerMeta),
-        styles: getStyles(moduleFile.cmpCompilerMeta)
+        events: getEvents(cmp),
+        styles: getStyles(cmp)
       };
     });
 

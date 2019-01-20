@@ -15,19 +15,8 @@ export function resetBuildConditionals(b: d.Build) {
   b.appNamespace = 'TestApp';
   b.appNamespaceLower = 'testapp';
 
-  b.vdomAttribute = true;
-  b.vdomClass = true;
-  b.vdomStyle = true;
-  b.vdomFunctional = true;
-  b.vdomKey = true;
-  b.vdomListener = true;
-  b.vdomRef = true;
-  b.vdomText = true;
-  b.slot = true;
-  b.svg = true;
   b.isDev = true;
   b.clientSide = true;
-
   b.lazyLoad = true;
 
   return b;

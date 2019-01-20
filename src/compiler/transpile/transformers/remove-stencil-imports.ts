@@ -3,7 +3,7 @@ import ts from 'typescript';
 
 export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitImport(importNode: ts.ImportDeclaration) {
       if (importNode.moduleSpecifier &&
@@ -21,7 +21,7 @@ export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
         case ts.SyntaxKind.ImportDeclaration:
           return visitImport(node as ts.ImportDeclaration);
         default:
-          return ts.visitEachChild(node, visit, transformContext);
+          return ts.visitEachChild(node, visit, transformCtx);
       }
     }
 

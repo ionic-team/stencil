@@ -9,8 +9,12 @@ export async function transpileToEs5Worker(cwd: string, input: string, inlineHel
   };
 
   const results: d.TranspileResults = {
+    sourceFilePath: null,
     code: input,
-    diagnostics: []
+    map: null,
+    diagnostics: [],
+    moduleFile: null,
+    build: {}
   };
 
   const transpileOpts: ts.TranspileOptions = {

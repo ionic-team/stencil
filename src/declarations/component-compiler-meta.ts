@@ -26,18 +26,34 @@ export interface ComponentCompilerFeatures {
   hasRenderFn: boolean;
   hasState: boolean;
   hasStyle: boolean;
+  hasVdomAttribute: boolean;
+  hasVdomClass: boolean;
+  hasVdomFunctional: boolean;
+  hasVdomKey: boolean;
+  hasVdomListener: boolean;
+  hasVdomRef: boolean;
+  hasVdomRender: boolean;
+  hasVdomStyle: boolean;
+  hasVdomText: boolean;
   hasWatchCallback: boolean;
+  htmlAttrNames: string[];
+  htmlTagNames: string[];
   isUpdateable: boolean;
+  potentialCmpRefs: d.PotentialComponentRef[];
 }
 
+/** Must be serializable to JSON */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs?: CompilerAssetDir[];
   componentClassName: string;
+  dependencies: string[];
   elementRef: string;
   encapsulation: Encapsulation;
-  dependencies: string[];
-  jsdoc: CompilerJsDoc;
   events: ComponentCompilerEvent[];
+  excludeFromCollection: boolean;
+  isCollectionDependency: boolean;
+  jsFilePath: string;
+  jsdoc: CompilerJsDoc;
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
   properties: ComponentCompilerProperty[];
@@ -148,7 +164,7 @@ export interface ComponentCompilerNativeData {
   outputText: string;
   tagName: string;
   componentClassName: string;
-  cmpCompilerMeta: d.ComponentCompilerMeta;
+  cmp: d.ComponentCompilerMeta;
 }
 
 

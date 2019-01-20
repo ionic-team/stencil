@@ -40,6 +40,7 @@ async function bundleTesting() {
       'zlib',
       '../compiler',
       '../mock-doc',
+      '../renderer/vdom',
       '../runtime',
       '../sys/node',
       '../utils'
@@ -65,6 +66,9 @@ async function bundleTesting() {
             }
             if (id === '@utils') {
               return '../utils';
+            }
+            if (id === '@vdom') {
+              return '../renderer/vdom';
             }
           }
         }

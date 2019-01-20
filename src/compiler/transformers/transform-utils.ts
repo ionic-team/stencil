@@ -424,11 +424,37 @@ export function copyComments(src: ts.Node, dst: ts.Node) {
 }
 
 
-export function isComponentClassNode(node: ts.Node, moduleFile: d.Module): node is ts.ClassDeclaration {
+export function isComponentClassNode(node: ts.Node, cmp: d.ComponentCompilerMeta): node is ts.ClassDeclaration {
   if (ts.isClassDeclaration(node)) {
-    if (node.name.getText().trim() === moduleFile.cmpCompilerMeta.componentClassName) {
+    if (cmp.componentClassName === node.name.getText().trim()) {
       return true;
     }
   }
   return false;
+}
+
+
+export function createImportDeclaration(importPath: string, importFnName: string) {
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports([
+      ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
+    ])),
+    ts.createLiteral(importPath)
+  );
+}
+
+
+export function addVariable(varName: string, expression: ts.Expression) {
+  const left = ts.createUniqueName(varName);
+  return ts.createBinary(left, ts.SyntaxKind.EqualsToken, expression);
+}
+
+
+export function addImportDeclaration(tsSourceFile: ts.SourceFile, importPath: string, importFnName: string) {
+  return ts.updateSourceFileNode(tsSourceFile, [
+    createImportDeclaration(importPath, importFnName),
+    ...tsSourceFile.statements
+  ]);
 }

@@ -15,15 +15,13 @@ export async function copyComponentStyles(config: d.Config, compilerCtx: d.Compi
     const absSrcStylePaths: string[] = [];
 
     buildCtx.entryModules.forEach(entryModule => {
-      const cmps = entryModule.moduleFiles.filter(m => m.cmpCompilerMeta.styles);
-
-      cmps.forEach(c => {
+      entryModule.cmps.forEach(c => {
         if (c.isCollectionDependency) {
           return;
         }
 
-        c.cmpCompilerMeta.styles.forEach(styleMeta => {
-          if (styleMeta.externalStyles) {
+        c.styles.forEach(styleMeta => {
+          if (styleMeta.externalStyles != null) {
             styleMeta.externalStyles.forEach(externalStyle => {
               absSrcStylePaths.push(externalStyle.absolutePath);
             });

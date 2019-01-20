@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { catchError } from '../util';
+import { catchError } from '@util';
 import { CompilerUpgrade, validateCollectionCompatibility } from './collection-compatibility';
 import { componentDependencies } from '../transpile/transformers/component-dependencies';
 import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
@@ -11,7 +11,7 @@ import ts from 'typescript';
 
 export async function upgradeCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {
   try {
-    const upgradeTransforms = validateCollectionCompatibility(config, collection);
+    const upgradeTransforms = validateCollectionCompatibility(collection);
 
     if (upgradeTransforms.length === 0) {
       return;
@@ -48,8 +48,8 @@ function createDoUpgrade(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
         case CompilerUpgrade.Remove_Stencil_Imports:
         buildCtx.debug(`Remove_Stencil_Imports, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
-          return (transformContext: ts.TransformationContext) => {
-            return removeStencilImports()(transformContext);
+          return (transformCtx: ts.TransformationContext) => {
+            return removeStencilImports()(transformCtx);
           };
 
         case CompilerUpgrade.Add_Component_Dependencies:

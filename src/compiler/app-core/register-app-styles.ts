@@ -2,13 +2,6 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function getComponentsWithStyles(build: d.Build) {
-  return build.appModuleFiles
-    .filter(m => m.cmpCompilerMeta != null && m.cmpCompilerMeta.styles != null && m.cmpCompilerMeta.styles.length > 0)
-    .map(m => m.cmpCompilerMeta);
-}
-
-
 export function setStylePlaceholders(build: d.Build, cmpsWithStyles: d.ComponentCompilerMeta[]) {
   const c: string[] = [];
 
@@ -24,25 +17,21 @@ export function setStylePlaceholders(build: d.Build, cmpsWithStyles: d.Component
 }
 
 
-export function replaceStylePlaceholders(appModuleFiles: d.Module[], modeName: string, bundleInput: string) {
-  const cmpsWithStyles = appModuleFiles
-    .filter(m => m.cmpCompilerMeta && m.cmpCompilerMeta.styles && m.cmpCompilerMeta.styles.length > 0)
-    .map(m => m.cmpCompilerMeta);
+export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeName: string, bundleInput: string) {
+  cmps.forEach(cmp => {
+    let style = cmp.styles.find(s => s.modeName === modeName);
 
-  cmpsWithStyles.forEach(cmpWithStyles => {
-    let style = cmpWithStyles.styles.find(s => s.modeName === modeName);
-    if (!style || typeof style.compiledStyleText !== 'string') {
+    if (style == null || typeof style.compiledStyleText !== 'string') {
       modeName = DEFAULT_STYLE_MODE;
-      style = cmpWithStyles.styles.find(s => s.modeName === modeName);
-      if (!style || typeof style.compiledStyleText !== 'string') {
+      style = cmp.styles.find(s => s.modeName === modeName);
+      if (style == null || typeof style.compiledStyleText !== 'string') {
         return;
       }
     }
 
-    const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);
-    const styleTextPlaceholder = getStyleTextPlaceholder(cmpWithStyles);
-
-    const styleId = getStyleId(cmpWithStyles, modeName);
+    const styleIdPlaceholder = getStyleIdPlaceholder(cmp);
+    const styleTextPlaceholder = getStyleTextPlaceholder(cmp);
+    const styleId = getStyleId(cmp, modeName);
 
     bundleInput = bundleInput.replace(styleIdPlaceholder, styleId);
     bundleInput = bundleInput.replace(styleTextPlaceholder, style.compiledStyleText);
@@ -65,12 +54,12 @@ function getStyleTextPlaceholder(cmpMeta: d.ComponentCompilerMeta) {
 }
 
 
-export function getAllModes(moduleFiles: d.Module[]) {
+export function getAllModes(cmps: d.ComponentCompilerMeta[]) {
   const allModes: string[] = [DEFAULT_STYLE_MODE];
 
-  moduleFiles.forEach(m => {
-    if (m.cmpCompilerMeta && m.cmpCompilerMeta.styles) {
-      m.cmpCompilerMeta.styles.forEach(style => {
+  cmps.forEach(cmp => {
+    if (cmp.styles != null) {
+      cmp.styles.forEach(style => {
         if (!allModes.includes(style.modeName)) {
           allModes.push(style.modeName);
         }

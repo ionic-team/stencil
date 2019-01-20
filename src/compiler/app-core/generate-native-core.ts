@@ -1,39 +1,39 @@
 import * as d from '@declarations';
 import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
-import { getComponentsWithStyles, setStylePlaceholders } from './register-app-styles';
+import { setStylePlaceholders } from './register-app-styles';
 import { updateToNativeComponents } from '../component-native/update-to-native-component';
 
 
-export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>) {
+export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
 
   c.push(`import { initHostComponent } from '${build.coreImportPath}';`);
 
-  const cmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build);
+  const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
-  cmps.forEach(cmpData => {
+  cmpData.forEach(cmpData => {
     c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
 
     files.set(cmpData.filePath, cmpData.outputText);
   });
 
-  if (cmps.length === 1) {
+  if (cmpData.length === 1) {
     // only one component, so get straight to the point
-    const cmp = cmps[0];
+    const cmp = cmpData[0];
 
     c.push(`customElements.define('${cmp.tagName}', initHostComponent(
       ${cmp.componentClassName},
-      ${formatComponentRuntimeMeta(cmp.cmpCompilerMeta, false)},
+      ${formatComponentRuntimeMeta(cmp.cmp, false)},
       1
     ));`);
 
   } else {
     // numerous components, so make it easy on minifying
-    c.push(formatNativeComponentRuntimeData(cmps));
+    c.push(formatNativeComponentRuntimeData(cmpData));
     c.push(`.forEach(cmp => customElements.define(cmp[0], initHostComponent(cmp[1], cmp[2], 1)));`);
   }
 
-  const cmpsWithStyles = getComponentsWithStyles(build);
+  const cmpsWithStyles = cmps.filter(cmp => cmp.styles.length > 0);
   if (cmpsWithStyles.length > 0) {
     const styles = await setStylePlaceholders(build, cmpsWithStyles);
     c.push(styles);
@@ -62,7 +62,7 @@ function formatNativeComponentRuntime(cmp: d.ComponentCompilerNativeData) {
   c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`,\n${formatComponentRuntimeMeta(cmp.cmpCompilerMeta, false)}`);
+  c.push(`,\n${formatComponentRuntimeMeta(cmp.cmp, false)}`);
 
   c.push(`]\n`);
 

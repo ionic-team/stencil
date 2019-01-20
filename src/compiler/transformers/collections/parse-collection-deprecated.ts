@@ -18,7 +18,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   const moduleFile = getModule(compilerCtx, sourceFilePath);
 
   const cmpMeta: d.ComponentCompilerMeta = {} as any;
-  moduleFile.cmpCompilerMeta = cmpMeta;
+  moduleFile.cmps = [cmpMeta];
   moduleFile.isCollectionDependency = true;
   moduleFile.collectionName = collection.collectionName;
   moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);

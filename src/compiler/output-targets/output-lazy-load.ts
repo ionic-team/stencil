@@ -20,9 +20,12 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
   const timespan = buildCtx.createTimeSpan(`generate app lazy components started`, true);
 
-  const appModuleFiles = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta);
+  const cmps = buildCtx.moduleFiles.reduce((cmps, m) => {
+    cmps.push(...m.cmps);
+    return cmps;
+  }, [] as d.ComponentCompilerMeta[]);
 
-  const build = getBuildFeatures(buildCtx.moduleFiles, appModuleFiles) as d.Build;
+  const build = getBuildFeatures(cmps) as d.Build;
 
   build.lazyLoad = true;
   build.es5 = false;

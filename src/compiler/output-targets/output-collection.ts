@@ -18,10 +18,14 @@ export async function generateCollections(config: d.Config, compilerCtx: d.Compi
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
 
-  const cmpModuleFiles = buildCtx.moduleFiles.filter(m => m.cmpCompilerMeta);
+  const promises: Promise<any>[] = [];
 
-  const promises = cmpModuleFiles.map(async cmpModuleFile => {
-    await generateCollection(config, compilerCtx, outputTargets, cmpModuleFile);
+  buildCtx.moduleFiles.forEach(moduleFile => {
+    moduleFile.cmps.forEach(cmp => {
+      promises.push(
+        generateCollection(config, compilerCtx, outputTargets, moduleFile, cmp)
+      );
+    });
   });
 
   await Promise.all(promises);
@@ -30,19 +34,19 @@ export async function generateCollections(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateCollection(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDist[], cmpModuleFile: d.Module) {
-  const relPath = sys.path.relative(config.srcDir, cmpModuleFile.jsFilePath);
-  const jsText = await compilerCtx.fs.readFile(cmpModuleFile.jsFilePath);
+async function generateCollection(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDist[], moduleFile: d.Module, cmp: d.ComponentCompilerMeta) {
+  const relPath = sys.path.relative(config.srcDir, moduleFile.jsFilePath);
+  const jsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
   const promises = outputTargets.map(async outputTarget => {
-    await writeCollectionOutput(config, compilerCtx, outputTarget, relPath, jsText);
+    await writeCollectionOutput(config, compilerCtx, outputTarget, cmp, relPath, jsText);
   });
 
   await Promise.all(promises);
 }
 
 
-async function writeCollectionOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, relPath: string, outputText: string) {
+async function writeCollectionOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, _cmp: d.ComponentCompilerMeta, relPath: string, outputText: string) {
   const outputFilePath = pathJoin(config, outputTarget.collectionDir, relPath);
 
   await compilerCtx.fs.writeFile(outputFilePath, outputText);

@@ -8,7 +8,7 @@ import ts from 'typescript';
 
 export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
-  return (transformContext) => {
+  return transformCtx => {
 
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentMeta) {
       const staticMembers = addStaticMeta(cmpMeta);
@@ -35,7 +35,7 @@ export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.Tra
         default:
           return ts.visitEachChild(node, (node) => {
             return visit(node, cmpMeta);
-          }, transformContext);
+          }, transformCtx);
       }
     }
 

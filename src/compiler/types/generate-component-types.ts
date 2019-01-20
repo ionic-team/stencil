@@ -15,7 +15,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
     .slice()
     .sort()
     .map(tsFilePath => compilerCtx.moduleMap.get(tsFilePath))
-    .filter(m => m && m.cmpCompilerMeta);
+    .filter(m => m && m.cmps.length > 0);
 
   // Generate d.ts files for component types
   let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, moduleFiles, destination);
@@ -49,14 +49,16 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   })
   .join('\n');
 
-  const modules = moduleFiles.map(moduleFile => {
-    const cmpMeta = moduleFile.cmpCompilerMeta;
-    const importPath = normalizePath(sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
-        .replace(/\.(tsx|ts)$/, ''));
+  const modules = moduleFiles.reduce((modules, moduleFile) => {
+    moduleFile.cmps.forEach(cmp => {
+      const importPath = normalizePath(sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
+          .replace(/\.(tsx|ts)$/, ''));
 
-    typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmpMeta, moduleFile.sourceFilePath);
-    return createTypesAsString(cmpMeta, importPath);
-  });
+      typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, moduleFile.sourceFilePath);
+      return createTypesAsString(cmp, importPath);
+    });
+    return modules;
+  }, [] as StencilModule[]);
 
   const componentsFileString = `
 export namespace Components {
@@ -266,7 +268,7 @@ export function updateImportReferenceFactory(allTypes: { [key: string]: number }
  * @param cmpMeta the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function createTypesAsString(cmpMeta: d.ComponentCompilerMeta, _importPath: string) {
+export function createTypesAsString(cmpMeta: d.ComponentCompilerMeta, _importPath: string): StencilModule {
   const tagName = cmpMeta.tagName;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
@@ -303,6 +305,16 @@ var ${interfaceName}: {
     ElementTagNameMap: `'${tagName}': ${interfaceName};`,
     IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
   };
+}
+
+interface StencilModule {
+  tagNameAsPascal: string;
+  StencilComponents: string;
+  JSXElements: string;
+  global: string;
+  HTMLElementTagNameMap: string;
+  ElementTagNameMap: string;
+  IntrinsicElements: string;
 }
 
 interface TypeInfo {

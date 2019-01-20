@@ -11,7 +11,9 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
   const componentStyles = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
-    await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
+    await Promise.all(moduleFile.cmps.map(async cmps => {
+      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile, cmps);
+    }));
   }));
 
   // create the global styles
@@ -30,15 +32,9 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module) {
-  if (moduleFile.cmpCompilerMeta == null) {
-    return;
-  }
-
-  const styles = moduleFile.cmpCompilerMeta.styles;
-
-  await Promise.all(styles.map(async style => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, style, style.modeName);
+export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) {
+  await Promise.all(cmp.styles.map(async style => {
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, cmp, style, style.modeName);
   }));
 }
 

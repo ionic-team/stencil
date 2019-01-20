@@ -48,8 +48,8 @@ export function serializeAppCollection(config: d.Config, compilerCtx: d.Compiler
 
   // add component data for each of the collection files
   entryModules.forEach(entryModule => {
-    entryModule.moduleFiles.forEach(moduleFile => {
-      const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    entryModule.cmps.forEach(cmp => {
+      const cmpData = serializeComponent(config, collectionDir, cmp);
       if (cmpData) {
         collectionData.components.push(cmpData);
       }
@@ -77,9 +77,14 @@ export function serializeCollectionDependencies(compilerCtx: d.CompilerCtx) {
   const collectionDeps = compilerCtx.collections.map(c => {
     const collectionDeps: d.CollectionDependencyData = {
       name: c.collectionName,
-      tags: c.moduleFiles.filter(m => {
-        return !!m.cmpCompilerMeta;
-      }).map(m => m.cmpCompilerMeta.tagName).sort()
+      tags: c.moduleFiles.reduce((tags, m) => {
+        m.cmps.forEach(cmp => {
+          if (!tags.includes(cmp.tagName)) {
+            tags.push(cmp.tagName);
+          }
+        });
+        return tags;
+      }, [] as string[]).sort()
     };
     return collectionDeps;
   });
@@ -125,17 +130,16 @@ export function excludeFromCollection(config: d.Config, cmpData: d.ComponentData
 }
 
 
-export function serializeComponent(config: d.Config, collectionDir: string, moduleFile: d.Module) {
-  if (!moduleFile || !moduleFile.cmpCompilerMeta || moduleFile.isCollectionDependency || moduleFile.excludeFromCollection) {
+export function serializeComponent(config: d.Config, collectionDir: string, cmp: d.ComponentCompilerMeta) {
+  if (cmp.isCollectionDependency || cmp.excludeFromCollection) {
     return null;
   }
 
   const cmpData: d.ComponentData = {};
-  const cmpMeta = moduleFile.cmpCompilerMeta;
 
   // get the current absolute path to our built js file
   // and figure out the relative path from the src dir
-  const relToSrc = normalizePath(sys.path.relative(config.srcDir, moduleFile.jsFilePath));
+  const relToSrc = normalizePath(sys.path.relative(config.srcDir, cmp.jsFilePath));
 
   // figure out the absolute path when it's in the collection dir
   const compiledComponentAbsoluteFilePath = normalizePath(sys.path.join(collectionDir, relToSrc));
@@ -146,12 +150,12 @@ export function serializeComponent(config: d.Config, collectionDir: string, modu
   // create a relative path to the directory where the compiled component's output javascript is sitting in
   const compiledComponentRelativeDirPath = normalizePath(sys.path.dirname(compiledComponentRelativeFilePath));
 
-  serializeTag(cmpData, cmpMeta);
-  serializeComponentDependencies(cmpData, cmpMeta);
-  serializeComponentClass(cmpData, cmpMeta);
+  serializeTag(cmpData, cmp);
+  serializeComponentDependencies(cmpData, cmp);
+  serializeComponentClass(cmpData, cmp);
   serializeComponentPath(collectionDir, compiledComponentAbsoluteFilePath, cmpData);
-  serializeStyles(compiledComponentRelativeDirPath, cmpData, cmpMeta);
-  serializeAssetsDir(compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeStyles(compiledComponentRelativeDirPath, cmpData, cmp);
+  serializeAssetsDir(compiledComponentRelativeDirPath, cmpData, cmp);
   // serializeProps(cmpData, cmpMeta);
   // serializeStates(cmpData, cmpMeta);
   // serializeListeners(cmpData, cmpMeta);

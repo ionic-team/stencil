@@ -56,7 +56,7 @@ function generateBuildResultsEntries(config: d.Config, buildCtx: d.BuildCtx) {
 function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModule) {
   en.modeNames = en.modeNames || [];
   en.entryBundles = en.entryBundles || [];
-  en.moduleFiles = en.moduleFiles || [];
+  en.cmps = en.cmps || [];
 
   const entryCmps: d.EntryComponent[] = [];
 
@@ -71,8 +71,8 @@ function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModul
     buildEntry.modes = modes.sort();
   }
 
-  en.moduleFiles.forEach(m => {
-    const encap = m.cmpCompilerMeta.encapsulation;
+  en.cmps.forEach(cmp => {
+    const encap = cmp.encapsulation;
     if (!buildEntry.encapsulations.includes(encap)) {
       buildEntry.encapsulations.push(encap);
     }
@@ -87,15 +87,15 @@ function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.En
   const buildEntry: d.BuildEntry = {
     entryId: en.entryKey,
 
-    components: en.moduleFiles.map(m => {
+    components: en.cmps.map(cmp => {
       const entryCmp = entryCmps.find(ec => {
-        return ec.tag === m.cmpCompilerMeta.tagName;
+        return ec.tag === cmp.tagName;
       });
       const dependencyOf = ((entryCmp && entryCmp.dependencyOf) || []).slice().sort();
 
       const buildCmp: d.BuildComponent = {
-        tag: m.cmpCompilerMeta.tagName,
-        dependencies: m.cmpCompilerMeta.dependencies.slice(),
+        tag: cmp.tagName,
+        dependencies: cmp.dependencies.slice(),
         dependencyOf: dependencyOf
       };
       return buildCmp;
@@ -105,9 +105,13 @@ function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.En
       return getBuildBundle(config, entryBundle);
     }),
 
-    inputs: en.moduleFiles.map(m => {
-      return normalizePath(sys.path.relative(config.rootDir, m.jsFilePath));
-    }).sort(),
+    inputs: en.cmps.reduce((cmps, cmp) => {
+      const cmpPath = normalizePath(sys.path.relative(config.rootDir, cmp.jsFilePath));
+      if (!cmps.includes(cmpPath)) {
+        cmps.push(cmpPath);
+      }
+      return cmps;
+    }, [] as string[]).sort(),
 
     encapsulations: []
   };
