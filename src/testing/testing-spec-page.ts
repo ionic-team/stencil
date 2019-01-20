@@ -24,11 +24,11 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   const testingCmps = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
     if (typeof Cstr.is !== 'string') {
-      throw new Error(`Invalid component class. Requires the @Component() decorator with tag, or static "is" property.`);
+      throw new Error(`Invalid component class: Requires the @Component() decorator with "tag", or static "is" property.`);
     }
 
     if (Cstr.CMP_META == null) {
-      throw new Error(`Invalid component class: Missing static getter CMP_META`);
+      throw new Error(`Invalid component class: Missing static "CMP_META" property.`);
     }
 
     const cmpBuild = getBuildFeatures([Cstr.CMP_META]) as any;

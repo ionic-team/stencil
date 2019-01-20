@@ -159,23 +159,28 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
         }
 
         if (childNodes.length > 0) {
-          if (opts.indentSpaces > 0 && !ignoreTag) {
-            output.indent = output.indent + opts.indentSpaces;
-          }
+          if (childNodes.length === 1 && childNodes[0].nodeType === 3 && typeof node.nodeValue === 'string' && childNodes[0].nodeValue.trim() === '') {
+            // skip over empty text nodes
 
-          for (let i = 0; i < childNodes.length; i++) {
-            serializeToHtml(childNodes[i], opts, output);
-          }
+          } else {
+            if (opts.indentSpaces > 0 && !ignoreTag) {
+              output.indent = output.indent + opts.indentSpaces;
+            }
 
-          if (opts.newLines && !ignoreTag) {
-            output.text.push('\n');
-          }
+            for (let i = 0; i < childNodes.length; i++) {
+              serializeToHtml(childNodes[i], opts, output);
+            }
 
-          if (opts.indentSpaces > 0 && !ignoreTag) {
-            output.indent = output.indent - opts.indentSpaces;
+            if (opts.newLines && !ignoreTag) {
+              output.text.push('\n');
+            }
 
-            for (let i = 0; i < output.indent; i++) {
-              output.text.push(' ');
+            if (opts.indentSpaces > 0 && !ignoreTag) {
+              output.indent = output.indent - opts.indentSpaces;
+
+              for (let i = 0; i < output.indent; i++) {
+                output.text.push(' ');
+              }
             }
           }
         }
