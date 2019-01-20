@@ -6,26 +6,7 @@ describe('attr', () => {
 
   describe('already set', () => {
 
-    it('set "true"', async () => {
-      @Component({ tag: 'cmp-a'})
-      class CmpA {
-        @Prop() bool: boolean;
-        render() {
-          return `${this.bool}`;
-        }
-      }
-
-      const { body } = await newSpecPage({
-        components: [CmpA],
-        html: `<cmp-a bool="true"></cmp-a>`,
-      });
-
-      expect(body).toEqualHtml(`
-        <cmp-a bool="true">true</cmp-a>
-      `);
-    });
-
-    it('set "false"', async () => {
+    it('set boolean, "false"', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         @Prop() bool: boolean;
@@ -42,6 +23,102 @@ describe('attr', () => {
       expect(body).toEqualHtml(`
         <cmp-a bool="false">false</cmp-a>
       `);
+
+      const elm = body.querySelector('cmp-a') as any;
+      expect(elm.textContent).toBe('false');
+      expect(elm.bool).toBe(false);
+    });
+
+    it('set boolean, undefined when missing attribute', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @Prop() bool: boolean;
+        render() {
+          return `${this.bool}`;
+        }
+      }
+
+      const { body } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      expect(body).toEqualHtml(`
+        <cmp-a>undefined</cmp-a>
+      `);
+
+      const elm = body.querySelector('cmp-a') as any;
+      expect(elm.textContent).toBe('undefined');
+      expect(elm.bool).toBe(undefined);
+    });
+
+    it('set boolean, "true"', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @Prop() bool: boolean;
+        render() {
+          return `${this.bool}`;
+        }
+      }
+
+      const { body } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a bool="true"></cmp-a>`,
+      });
+
+      expect(body).toEqualHtml(`
+        <cmp-a bool="true">true</cmp-a>
+      `);
+
+      const elm = body.querySelector('cmp-a') as any;
+      expect(elm.textContent).toBe('true');
+      expect(elm.bool).toBe(true);
+    });
+
+    it('set boolean true from no attribute value', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @Prop() bool: boolean;
+        render() {
+          return `${this.bool}`;
+        }
+      }
+
+      const { body } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a bool></cmp-a>`,
+      });
+
+      expect(body).toEqualHtml(`
+        <cmp-a bool>true</cmp-a>
+      `);
+
+      const elm = body.querySelector('cmp-a') as any;
+      expect(elm.textContent).toBe('true');
+      expect(elm.bool).toBe(true);
+    });
+
+    it('set boolean true from empty string', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @Prop() bool: boolean;
+        render() {
+          return `${this.bool}`;
+        }
+      }
+
+      const { body } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a bool=""></cmp-a>`,
+      });
+
+      expect(body).toEqualHtml(`
+        <cmp-a bool="">true</cmp-a>
+      `);
+
+      const elm = body.querySelector('cmp-a') as any;
+      expect(elm.textContent).toBe('true');
+      expect(elm.bool).toBe(true);
     });
 
     it('set zero', async () => {
