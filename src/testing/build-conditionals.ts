@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 
 
-export const BUILD = {};
+export const BUILD: d.Build = {};
 
 
 export function resetBuildConditionals(b: d.Build) {

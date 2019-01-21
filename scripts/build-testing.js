@@ -7,14 +7,22 @@ const rollupJson = require('rollup-plugin-json');
 const { run, transpile, updateBuildIds } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-testing');
-const INPUT_FILE = path.join(TRANSPILED_DIR, 'testing', 'index.js');
+const TRANSPILED_TESTING_DIR = path.join(TRANSPILED_DIR, 'testing');
 const DEST_DIR = path.join(__dirname, '..', 'dist', 'testing');
-const DEST_FILE = path.join(DEST_DIR, 'index.js');
+
+const INPUTS = [
+  'index.js',
+  'build-conditionals.js',
+  'core.js',
+  'platform.js'
+];
 
 
 async function bundleTesting() {
   const rollupBuild = await rollup.rollup({
-    input: INPUT_FILE,
+    input: INPUTS.map(fileName => {
+      return path.join(TRANSPILED_TESTING_DIR, fileName);
+    }),
     external: [
       'assert',
       'buffer',
@@ -42,14 +50,15 @@ async function bundleTesting() {
       '../mock-doc',
       '../runtime',
       '../sys/node',
-      '../utils'
+      '../utils',
+      '@stencil/core/build-conditionals'
     ],
     plugins: [
       (() => {
         return {
           resolveId(id) {
             if (id === '@build-conditionals') {
-              return '../compiler';
+              return '@stencil/core/build-conditionals';
             }
             if (id === '@compiler') {
               return '../compiler';
@@ -84,7 +93,7 @@ async function bundleTesting() {
   });
 
   // copy over all the .d.ts file too
-  await fs.copy(path.dirname(INPUT_FILE), DEST_DIR, {
+  await fs.copy(path.dirname(TRANSPILED_TESTING_DIR), DEST_DIR, {
     filter: (src) => {
       return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
     }
@@ -92,13 +101,16 @@ async function bundleTesting() {
 
   const { output } = await rollupBuild.generate({
     format: 'cjs',
-    file: DEST_FILE
+    dir: DEST_DIR
   });
 
-  const outputText = updateBuildIds(output[0].code);
+  await fs.ensureDir(DEST_DIR);
 
-  await fs.ensureDir(path.dirname(DEST_FILE));
-  await fs.writeFile(DEST_FILE, outputText);
+  await Promise.all(output.map(async chunk => {
+    const outputText = updateBuildIds(chunk.code);
+    const outputFile = path.join(DEST_DIR, chunk.fileName);
+    await fs.writeFile(outputFile, outputText);
+  }));
 }
 
 run(async () => {

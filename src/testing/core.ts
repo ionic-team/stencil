@@ -62,13 +62,4 @@ export declare const State: d.StateDecorator;
 export declare const Watch: d.WatchDecorator;
 
 
-let _h: Function = null;
-export function h() {
-  // proxied to ensure test suites can map
-  // to the correct module
-  if (_h == null) {
-    _h = require('@stencil/core/runtime').h;
-  }
-
-  return _h.apply(this, arguments);
-}
+export { h } from '@runtime';

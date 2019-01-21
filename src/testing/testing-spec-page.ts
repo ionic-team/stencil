@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '@compiler';
-import { resetBuildConditionals } from './testing-build-conditionals';
 
 
 export async function newSpecPage(opts: d.NewSpecPageOptions) {
@@ -22,7 +21,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   // reset the platform for this new test
   platform.resetPlatform();
-  resetBuildConditionals(bc.BUILD);
+  bc.resetBuildConditionals(bc.BUILD);
 
   const cmpTags = new Set<string>();
 

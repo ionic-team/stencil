@@ -25,7 +25,7 @@
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [
-        "./testing-build-conditionals.ts"
+        "./build-conditionals.ts"
       ],
       "@compiler": [
         "../compiler/index.ts"
@@ -37,7 +37,7 @@
         "../mock-doc/index.ts"
       ],
       "@platform": [
-        "./testing-platform.ts"
+        "./platform.ts"
       ],
       "@runtime": [
         "../runtime/index.ts"
@@ -54,6 +54,9 @@
     "../../types/*.d.ts"
   ],
   "files": [
-    "./index.ts"
+    "./index.ts",
+    "./build-conditionals.ts",
+    "./core.ts",
+    "./platform.ts"
   ]
 }
