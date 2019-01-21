@@ -15,7 +15,7 @@ export interface ComponentConstructor {
 
 
 export interface ComponentConstructorStaticMeta extends ComponentConstructor {
-  CMP_META: d.ComponentCompilerMeta;
+  COMPILER_META: d.ComponentCompilerMeta;
 }
 
 

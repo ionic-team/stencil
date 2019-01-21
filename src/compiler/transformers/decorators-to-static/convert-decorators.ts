@@ -1,8 +1,8 @@
 import * as d from '@declarations';
+import { isDecoratorNamed } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
-import { isDecoratorNamed } from '../transform-utils';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { methodDecoratorsToStatic } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
@@ -24,7 +24,9 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
       }, transformCtx);
     }
 
-    return tsSourceFile => visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
+    return tsSourceFile => {
+      return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
+    };
   };
 }
 
@@ -44,7 +46,7 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
 
 
 function visitComponentClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Decorator) {
-  const newMembers: ts.ClassElement[] = [];
+  const newMembers: ts.ClassElement[] = [...cmpNode.members];
 
   componentDecoratorToStatic(cmpNode, newMembers, componentDecorator);
 
@@ -65,7 +67,7 @@ function visitComponentClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeCh
     cmpNode.name,
     cmpNode.typeParameters,
     cmpNode.heritageClauses,
-    [ ...cmpNode.members, ...newMembers]
+    newMembers
   );
 }
 

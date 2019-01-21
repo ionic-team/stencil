@@ -15,7 +15,7 @@ import { visitStringLiteral } from '../visitors/visit-string-literal';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, addStaticCmpMetaData: boolean) {
+export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, transformOpts: d.TransformOptions) {
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -98,8 +98,10 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
 
   setComponentBuildConditionals(cmp);
 
-  if (addStaticCmpMetaData) {
-    const cmpMetaStaticProp = createStaticGetter('CMP_META', convertValueToLiteral(cmp));
+  if (transformOpts.addCompilerMeta) {
+    const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(cmp));
+
+    const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
     cmpNode = ts.updateClassDeclaration(
       cmpNode,
@@ -108,7 +110,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
       cmpNode.name,
       cmpNode.typeParameters,
       cmpNode.heritageClauses,
-      [...cmpNode.members, cmpMetaStaticProp]
+      classMembers
     );
   }
 

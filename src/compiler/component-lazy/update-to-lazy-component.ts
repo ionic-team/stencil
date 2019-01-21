@@ -1,13 +1,13 @@
 import * as d from '@declarations';
 import { dashToPascalCase, normalizePath } from '@utils';
 import { sys } from '@sys';
-import { transformLazyComponent } from './transform-lazy-component';
+import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';
 
 
 export async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule, cmp: d.ComponentCompilerMeta) {
   const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
-  const outputText = transformLazyComponent(config, buildCtx, build, cmp, inputJsText);
+  const outputText = transformToLazyComponentText(config, buildCtx, build, cmp, inputJsText);
 
   const lazyModuleFilePath = `${cmp.jsFilePath}.${cmp.tagName}.lazy.mjs`;
 

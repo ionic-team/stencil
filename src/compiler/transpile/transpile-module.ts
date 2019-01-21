@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { validateConfig } from '../config/validate-config';
 import { visitSource } from '../transformers/visitors/visit-source';
@@ -63,12 +64,17 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
   const program = ts.createProgram([sourceFilePath], opts, compilerHost);
   const typeChecker = program.getTypeChecker();
 
+  const transformOpts: d.TransformOptions = {
+    addCompilerMeta: true
+  };
+
   program.emit(undefined, undefined, undefined, false, {
     before: [
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, null, true)
+      visitSource(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+      lazyComponentTransform()
     ]
   });
 

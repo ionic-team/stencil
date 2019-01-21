@@ -65,7 +65,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, collection, false)
+      visitSource(config, compilerCtx, buildCtx, typeChecker, collection, {})
     ]
   });
 }

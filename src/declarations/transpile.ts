@@ -16,3 +16,8 @@ export interface ValidateTypesResults {
   dirPaths: string[];
   filePaths: string[];
 }
+
+
+export interface TransformOptions {
+  addCompilerMeta?: boolean;
+}

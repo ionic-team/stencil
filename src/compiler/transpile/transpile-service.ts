@@ -115,12 +115,16 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     getCustomTransformers: () => {
       const typeChecker = services.getProgram().getTypeChecker();
 
+      const transformOpts: d.TransformOptions = {
+        addCompilerMeta: false
+      };
+
       return {
         before: [
           convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, false)
+          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
         ]
       };
     }

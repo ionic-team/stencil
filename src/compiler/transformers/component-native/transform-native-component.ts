@@ -1,12 +1,12 @@
 import * as d from '@declarations';
-import { addImportDeclaration, isComponentClassNode } from '../transformers/transform-utils';
+import { addImports, isComponentClassNode } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { removeStaticMetaProperties } from '../transformers/remove-static-meta-properties';
-import { removeStencilImport } from '../transformers/remove-stencil-import';
+import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
-export function transformNativeComponent(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToNativeComponentText(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -23,7 +23,7 @@ export function transformNativeComponent(config: d.Config, buildCtx: d.BuildCtx,
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          transformToNativeComponent(build, cmp)
+          nativeComponentTransform()
         ]
       }
     };
@@ -44,16 +44,11 @@ export function transformNativeComponent(config: d.Config, buildCtx: d.BuildCtx,
 }
 
 
-function transformToNativeComponent(build: d.Build, cmp: d.ComponentCompilerMeta): ts.TransformerFactory<ts.SourceFile> {
-  const cmpData: ComponentData = {
-    build: build,
-    sourceFileNode: null
-  };
-
-  return transformContext => {
+function nativeComponentTransform(): ts.TransformerFactory<ts.SourceFile> {
+  return transformCtx => {
 
     function visitNode(node: ts.Node) {
-      if (isComponentClassNode(node, cmp)) {
+      if (isComponentClassNode(node)) {
         return updateComponentClass(node);
 
       } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -64,15 +59,12 @@ function transformToNativeComponent(build: d.Build, cmp: d.ComponentCompilerMeta
     }
 
     return tsSourceFile => {
-      cmpData.sourceFileNode = tsSourceFile;
+      tsSourceFile = addImports(transformCtx, tsSourceFile,
+        ['connectedCallback', 'h'],
+        '@stencil/core/runtime'
+      );
 
-      cmpData.sourceFileNode = addImportDeclaration(cmpData.sourceFileNode, build.coreImportPath, 'connectedCallback');
-
-      if (build.vdomRender) {
-        cmpData.sourceFileNode = addImportDeclaration(cmpData.sourceFileNode, build.coreImportPath, 'h');
-      }
-
-      return ts.visitEachChild(cmpData.sourceFileNode, visitNode, transformContext);
+      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
 }
@@ -154,10 +146,4 @@ function addHostComponentCallback(methodName: string) {
     body
   );
   return callbackMethod;
-}
-
-
-interface ComponentData {
-  build: d.Build;
-  sourceFileNode: ts.SourceFile;
 }

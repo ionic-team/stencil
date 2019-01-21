@@ -1,5 +1,6 @@
-import ts from 'typescript';
 import * as d from '@declarations';
+import ts from 'typescript';
+
 
 export function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
@@ -424,13 +425,35 @@ export function copyComments(src: ts.Node, dst: ts.Node) {
 }
 
 
-export function isComponentClassNode(node: ts.Node, cmp: d.ComponentCompilerMeta): node is ts.ClassDeclaration {
-  if (ts.isClassDeclaration(node)) {
-    if (cmp.componentClassName === node.name.getText().trim()) {
-      return true;
-    }
+export function isComponentClassNode(node: ts.Node): node is ts.ClassDeclaration {
+  if (ts.isClassDeclaration(node) && node.members != null) {
+    const staticMembers = node.members.filter(isStaticGetter);
+
+    const tagName = getComponentTagName(staticMembers);
+    return (tagName != null);
   }
   return false;
+}
+
+
+export function getComponentTagName(staticMembers: ts.ClassElement[]) {
+  if (staticMembers.length > 0) {
+    const tagName = getStaticValue(staticMembers, 'is') as string;
+
+    if (typeof tagName === 'string' && tagName.includes('-')) {
+      return tagName;
+    }
+  }
+
+  return null;
+}
+
+
+export function isStaticGetter(member: ts.ClassElement) {
+  return (
+    member.kind === ts.SyntaxKind.GetAccessor &&
+    member.modifiers && member.modifiers.some(({kind}) => kind === ts.SyntaxKind.StaticKeyword)
+  );
 }
 
 
@@ -452,9 +475,44 @@ export function addVariable(varName: string, expression: ts.Expression) {
 }
 
 
-export function addImportDeclaration(tsSourceFile: ts.SourceFile, importPath: string, importFnName: string) {
+export function addImports(transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) {
+  const { module } = transformCtx.getCompilerOptions();
+
+  if (module === ts.ModuleKind.CommonJS) {
+    // CommonJS
+    // const importName = require(importPath).importName;
+    const requires = importFnNames.map(importName => {
+      return ts.createVariableStatement(
+        undefined,
+        ts.createVariableDeclarationList([
+          ts.createVariableDeclaration(
+            importName,
+            undefined,
+            ts.createPropertyAccess(
+              ts.createCall(
+                ts.createIdentifier('require'),
+                [],
+                [ts.createLiteral(importPath)]
+              ),
+              ts.createIdentifier(importName)
+            )
+          )
+        ])
+      );
+    });
+
+    return ts.updateSourceFileNode(tsSourceFile, [
+      ...requires,
+      ...tsSourceFile.statements
+    ]);
+  }
+
+  // ESM
+  // import { importNames } from 'importPath';
   return ts.updateSourceFileNode(tsSourceFile, [
-    createImportDeclaration(importPath, importFnName),
+    ...importFnNames.map(importFnName => {
+      return createImportDeclaration(importPath, importFnName);
+    }),
     ...tsSourceFile.statements
   ]);
 }

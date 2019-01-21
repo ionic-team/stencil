@@ -21,17 +21,16 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   const BUILD = resetBuildConditionals(bc.BUILD);
 
   const lazyLoad = (opts.lazyLoad !== false);
+  const cmpTags = new Set<string>();
 
   const testingCmps = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
-    if (typeof Cstr.is !== 'string') {
-      throw new Error(`Invalid component class: Requires the @Component() decorator with "tag", or static "is" property.`);
-    }
-
-    if (Cstr.CMP_META == null) {
+    if (Cstr.COMPILER_META == null) {
       throw new Error(`Invalid component class: Missing static "CMP_META" property.`);
     }
 
-    const cmpBuild = getBuildFeatures([Cstr.CMP_META]) as any;
+    cmpTags.add(Cstr.COMPILER_META.tagName);
+
+    const cmpBuild = getBuildFeatures([Cstr.COMPILER_META]) as any;
 
     Object.keys(cmpBuild).forEach(key => {
       if (cmpBuild[key] === true) {
@@ -40,22 +39,14 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     });
 
     if (lazyLoad) {
-      const bundleId = Cstr.is + Math.round(Math.random() * 99999);
-
-      const ProxiedCstr = new Proxy<any>(Cstr, {
-        construct(target, args: any[]) {
-          const instance = new target();
-          platform.registerLazyInstance(instance, args[0]);
-          return instance;
-        }
-      });
+      const bundleId = Cstr.COMPILER_META.tagName + Math.round(Math.random() * 9999999);
 
       const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
         bundleId,
-        [formatComponentRuntimeMeta(Cstr.CMP_META, true)]
+        [formatComponentRuntimeMeta(Cstr.COMPILER_META, true)]
       ];
 
-      registerModule(bundleId, ProxiedCstr);
+      registerTestingModule(bundleId, Cstr);
 
       return lazyBundleRuntimeMeta;
 
@@ -67,8 +58,9 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   const plt = {
     win: platform.win as Window,
     doc: platform.doc as Document,
-    body: platform.doc.body as HTMLBodyElement,
     head: platform.doc.head as HTMLHeadElement,
+    body: platform.doc.body as HTMLBodyElement,
+    root: null as any,
     build: BUILD,
     flush: (): Promise<void> => platform.flushAll(),
     flushLoadModule: (): Promise<void> => platform.flushLoadModule(),
@@ -93,7 +85,31 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     await plt.flush();
   }
 
+  plt.root = findRoot(cmpTags, plt.body);
+
   return plt;
+}
+
+
+function findRoot(cmpTags: Set<string>, node: Element): any {
+  if (node != null) {
+    const children = node.children;
+
+    for (let i = 0; i < children.length; i++) {
+      const elm = children[i];
+      if (cmpTags.has(elm.nodeName.toLowerCase())) {
+        return elm;
+      }
+    }
+
+    for (let i = 0; i < children.length; i++) {
+      const r = findRoot(cmpTags, children[i]);
+      if (r != null) {
+        return r;
+      }
+    }
+  }
+  return null;
 }
 
 
@@ -118,7 +134,7 @@ export function flushLoadModule() {
 }
 
 
-export function registerModule(bundleId: string, Cstr: any) {
+function registerTestingModule(bundleId: string, Cstr: any) {
   // see comment at the bottom of the page
   const platform = require('@stencil/core/platform');
   return platform.registerModule(bundleId, Cstr);

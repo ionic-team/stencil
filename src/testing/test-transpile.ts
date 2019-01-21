@@ -14,7 +14,9 @@ export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFi
     validateTypes: false
   };
 
-  return transpileModule(config, input, opts, sourceFilePath);
+  const results = transpileModule(config, input, opts, sourceFilePath);
+
+  return results;
 }
 
 

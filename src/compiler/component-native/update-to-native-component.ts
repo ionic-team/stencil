@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { transformNativeComponent } from './transform-native-component';
+import { transformToNativeComponentText } from '../transformers/component-native/transform-native-component';
 
 
 export async function updateToNativeComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
@@ -20,7 +20,7 @@ export async function updateToNativeComponents(config: d.Config, compilerCtx: d.
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
   const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
-  const outputText = transformNativeComponent(config, buildCtx, build, cmp, inputJsText);
+  const outputText = transformToNativeComponentText(config, buildCtx, build, cmp, inputJsText);
 
   const cmpData: d.ComponentCompilerNativeData = {
     filePath: cmp.jsFilePath,
