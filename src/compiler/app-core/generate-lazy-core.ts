@@ -5,33 +5,11 @@ import { optimizeAppCoreBundle } from './optimize-app-core';
 
 
 export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
-  const c: string[] = [];
-
   const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
-
-  const strData = JSON.stringify(cmpRuntimeData);
-
-  c.push(`import { bootstrapLazy } from '${build.coreImportPath}';`);
-
-  c.push(`bootstrapLazy(${strData});`);
-
-  const exportFns: string[] = ['registerLazyInstance'];
-
-  if (build.vdomRender) {
-    exportFns.push('h');
-  }
-
-  if (build.style) {
-    exportFns.push('registerStyle');
-  }
-
-  c.push(`export { ${exportFns.join(', ')} } from '${build.coreImportPath}';`);
-
-  const appCoreBundleInput = c.join('\n');
 
   // bundle up the input into a nice pretty file
   const files = new Map();
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, appCoreBundleInput);
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, cmpRuntimeData);
   if (buildCtx.hasError) {
     return null;
   }
@@ -46,7 +24,7 @@ export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d
 function formatLazyComponentRuntimeEntryModule(entryModules: d.EntryModule[], lazyModules: d.LazyModuleOutput[]) {
   // [[{ios: 'abc12345', md: 'dec65432'}, {tagName: 'ion-icon', members: []}]]
 
-  const lazyBundles = entryModules.map(entryModule => {
+  const lazyBundles: d.LazyBundlesRuntimeMeta = entryModules.map(entryModule => {
     const bundleId = getBundleId(entryModule, lazyModules);
     return formatLazyCompnonentRuntimeBundle(bundleId, entryModule.cmps);
   });
@@ -58,9 +36,7 @@ function formatLazyComponentRuntimeEntryModule(entryModules: d.EntryModule[], la
 function formatLazyCompnonentRuntimeBundle(bundleId: d.ModeBundleId, cmps: d.ComponentCompilerMeta[]) {
   const lazyBundle: d.LazyBundleRuntimeMeta = [
     bundleId,
-    cmps.map(cmp => {
-      return formatComponentRuntimeMeta(cmp, true);
-    })
+    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
   return lazyBundle;
 }

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { formatComponentRuntimeMeta, getBuildFeatures } from '@compiler';
+import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '@compiler';
 import { resetBuildConditionals } from './testing-build-conditionals';
 
 
@@ -12,20 +12,23 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     throw new Error(`opts.components required`);
   }
 
-  // see comment at the bottom of the page
-  const platform = require('@stencil/core/platform');
-  platform.resetPlatform();
-
-  // see comment at the bottom of the page
+  // * WHY THE REQUIRES?!
+  // using require() in a closure so jest has a moment
+  // to jest.mock w/ moduleNameMapper in the jest config
+  // otherwise the require() happens at the top of the file before jest is setup
   const bc = require('@stencil/core/build-conditionals');
-  const BUILD = resetBuildConditionals(bc.BUILD);
+  const runtime = require('@stencil/core/runtime');
+  const platform = require('@stencil/core/platform');
 
-  const lazyLoad = (opts.lazyLoad !== false);
+  // reset the platform for this new test
+  platform.resetPlatform();
+  resetBuildConditionals(bc.BUILD);
+
   const cmpTags = new Set<string>();
 
-  const testingCmps = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
+  const lazyBundles: d.LazyBundlesRuntimeMeta = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
     if (Cstr.COMPILER_META == null) {
-      throw new Error(`Invalid component class: Missing static "CMP_META" property.`);
+      throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
     }
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
@@ -34,25 +37,17 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
     Object.keys(cmpBuild).forEach(key => {
       if (cmpBuild[key] === true) {
-        (BUILD as any)[key] = true;
+        (bc.BUILD as any)[key] = true;
       }
     });
 
-    if (lazyLoad) {
-      const bundleId = Cstr.COMPILER_META.tagName + Math.round(Math.random() * 9999999);
+    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 89999) + 10000)}`;
 
-      const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
-        bundleId,
-        [formatComponentRuntimeMeta(Cstr.COMPILER_META, true)]
-      ];
+    const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
 
-      registerTestingModule(bundleId, Cstr);
+    platform.registerModule(bundleId, Cstr);
 
-      return lazyBundleRuntimeMeta;
-
-    } else {
-      throw new Error('todo!');
-    }
+    return lazyBundleRuntimeMeta;
   });
 
   const plt = {
@@ -61,7 +56,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     head: platform.doc.head as HTMLHeadElement,
     body: platform.doc.body as HTMLBodyElement,
     root: null as any,
-    build: BUILD,
+    build: bc.BUILD,
     flush: (): Promise<void> => platform.flushAll(),
     flushLoadModule: (): Promise<void> => platform.flushLoadModule(),
     flushQueue: (): Promise<void> => platform.flushQueue()
@@ -71,11 +66,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     plt.win.location.href = opts.url;
   }
 
-  const runtime = require('@stencil/core/runtime');
-
-  if (lazyLoad) {
-    runtime.bootstrapLazy(testingCmps);
-  }
+  runtime.bootstrapLazy(lazyBundles);
 
   if (typeof opts.html === 'string') {
     plt.body.innerHTML = opts.html;
@@ -132,16 +123,3 @@ export function flushLoadModule() {
   const platform = require('@stencil/core/platform');
   return platform.flushLoadModule();
 }
-
-
-function registerTestingModule(bundleId: string, Cstr: any) {
-  // see comment at the bottom of the page
-  const platform = require('@stencil/core/platform');
-  return platform.registerModule(bundleId, Cstr);
-}
-
-
-// * WHY THE REQUIRES?!
-// using require() in a closure so jest has a moment
-// to jest.mock w/ moduleNameMapper in the jest config
-// otherwise the require() happens at the top of the file before jest is setup

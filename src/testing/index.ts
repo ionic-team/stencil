@@ -13,3 +13,4 @@ export { transpile } from './test-transpile';
 export * from './testing-build-conditionals';
 export * from './testing-core';
 export * from './testing-platform';
+export * from './testing-task-queue';

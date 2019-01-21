@@ -23,13 +23,6 @@ describe('render-text', () => {
   });
 
   it('Hello World, innerHTML, await flush', async () => {
-    @Component({ tag: 'cmp-a'})
-    class CmpA {
-      render() {
-        return 'Hello World';
-      }
-    }
-
     const { body, flush } = await newSpecPage({
       components: [CmpA]
     });

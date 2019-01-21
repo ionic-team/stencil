@@ -65,13 +65,15 @@ export interface BuildFeatures {
   // attr
   observeAttr?: boolean;
   reflectToAttr?: boolean;
+
+  taskQueue?: boolean;
+  refs?: boolean;
 }
 
 export interface Build extends BuildFeatures {
   appNamespace?: string;
   appNamespaceLower?: string;
   clientSide?: boolean;
-  coreImportPath?: string;
   devInspector?: boolean;
   es5?: boolean;
   exposeAppRegistry?: boolean;
@@ -90,11 +92,8 @@ export interface Build extends BuildFeatures {
   prerenderClientSide?: boolean;
   polyfills?: boolean;
   profile?: boolean;
-  refs?: boolean;
   slotPolyfill?: boolean;
   syncQueue?: boolean;
-  taskQueue?: boolean;
-  updatable?: boolean;
 }
 
 export interface UserBuildConditionals {

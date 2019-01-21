@@ -30,7 +30,7 @@
         "../declarations/index.ts"
       ],
       "@utils": [
-        "../util/index.ts"
+        "../utils/index.ts"
       ]
     }
   },

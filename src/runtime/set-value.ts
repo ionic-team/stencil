@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError } from '@platform';
-import { update } from './update';
+import { consoleError, writeTask } from '@platform';
 import { parsePropertyValue } from './parse-property-value';
-import { writeTask } from './task-queue';
+import { update } from './update';
 
 
 export const setValue = (elmData: d.ElementData, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, oldVal?: any) => {

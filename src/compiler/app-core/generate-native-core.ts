@@ -7,7 +7,7 @@ import { updateToNativeComponents } from '../component-native/update-to-native-c
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build, files: Map<string, string>) {
   const c: string[] = [];
 
-  c.push(`import { initHostComponent } from '${build.coreImportPath}';`);
+  c.push(`import { initHostComponent } from 'TODO';`);
 
   const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 

@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { activelyProcessingCmps, getElmRef, resolved } from '@platform';
+import { activelyProcessingCmps, getElmRef, tick } from '@platform';
 import { initialLoad } from './initial-load';
 
 
@@ -59,7 +59,7 @@ export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData, a
 
       if (BUILD.taskQueue) {
         // connectedCallback, initUpdate BUILD.taskQueue
-        resolved.then(() => initialLoad(elm, elmData));
+        tick.then(() => initialLoad(elm, elmData));
 
       } else {
         // connectedCallback, initUpdate

@@ -1,6 +1,9 @@
 import * as d from '.';
 
 
+export type LazyBundlesRuntimeMeta = LazyBundleRuntimeMeta[];
+
+
 export type LazyBundleRuntimeMeta = [
   /** bundleIds */
   any,

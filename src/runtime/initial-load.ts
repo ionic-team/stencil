@@ -1,10 +1,9 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, loadModule, plt } from '@platform';
+import { consoleError, doc, loadModule, plt, writeTask } from '@platform';
 import { parsePropertyValue } from './parse-property-value';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
-import { writeTask } from './task-queue';
 
 
 export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cmpMeta?: d.ComponentRuntimeMeta) => {

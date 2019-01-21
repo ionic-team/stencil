@@ -1,6 +1,13 @@
 import * as d from '@declarations';
+import { activelyProcessingCmps, onAppReadyCallbacks, plt } from './client-data';
 import { BUILD } from '@build-conditionals';
-import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt, queueDomReads, queueDomWrites, queueDomWritesLow, raf, win } from '@platform';
+import { consoleError } from './client-log';
+import { win } from './client-window';
+
+
+const queueDomReads: d.RafCallback[] = [];
+const queueDomWrites: d.RafCallback[] = [];
+const queueDomWritesLow: d.RafCallback[] = [];
 
 
 const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
@@ -14,10 +21,10 @@ const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
       if (win[BUILD.appNamespace] && win[BUILD.appNamespace].raf) {
         win[BUILD.appNamespace].raf(flush);
       } else {
-        raf(flush);
+        requestAnimationFrame(flush);
       }
     } else {
-      raf(flush);
+      requestAnimationFrame(flush);
     }
   }
 };
@@ -82,10 +89,10 @@ const flush = () => {
       if (win[BUILD.appNamespace] && win[BUILD.appNamespace].raf) {
         win[BUILD.appNamespace].raf(flush);
       } else {
-        raf(flush);
+        requestAnimationFrame(flush);
       }
     } else {
-      raf(flush);
+      requestAnimationFrame(flush);
     }
 
   } else {
@@ -98,5 +105,9 @@ if (BUILD.exposeAppOnReady) {
     .onReady = () => new Promise(resolve => writeTask(() => activelyProcessingCmps.size ? onAppReadyCallbacks.push(resolve) : resolve()));
 }
 
+
+export const tick = (BUILD.taskQueue ? Promise.resolve() : undefined);
+
 export const readTask = BUILD.exposeReadQueue ? queueTask(queueDomReads) : undefined;
-export const writeTask = (BUILD.exposeWriteQueue || BUILD.taskQueue) ? queueTask(queueDomWrites) : undefined;
+
+export const writeTask = (BUILD.taskQueue) ? queueTask(queueDomWrites) : undefined;

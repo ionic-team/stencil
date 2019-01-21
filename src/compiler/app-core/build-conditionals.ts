@@ -1,6 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
-import { sys } from '@sys';
 
 
 export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
@@ -60,6 +58,12 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     watchCallback: cmps.some(c => c.hasWatchCallback),
   };
 
+  f.member = (f.updatable || f.mode || f.lifecycle);
+
+  f.taskQueue = (f.updatable || f.mode || f.lifecycle);
+
+  f.refs = (f.updatable || f.member || f.lifecycle || f.listener);
+
   return f;
 }
 
@@ -72,8 +76,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
   b.profile = !!(config.flags && config.flags.profile);
-  b.taskQueue = (b.updatable || b.mode || b.lifecycle || b.lazyLoad || !!config.exposeAppOnReady);
-  b.refs = (b.updatable || b.member || b.lifecycle || b.listener);
 
   b.exposeAppOnReady = (b.lazyLoad && !!config.exposeAppOnReady);
   b.exposeAppRegistry = (b.lazyLoad && !!config.exposeAppRegistry);
@@ -81,8 +83,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
   b.exposeEventListener = (b.listener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
-
-  b.coreImportPath = pathJoin(config, sys.compiler.distDir, 'client', 'index.js');
 }
 
 
@@ -106,82 +106,4 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
 // }
 
 
-export function getDefaultBuildConditionals() {
-  const b: d.Build = {
-    allRenderFn: false,
-    appNamespace: 'App',
-    appNamespaceLower: 'app',
-    // cmps: [],
-    asyncLifecycle: true,
-    connectedCallback: true,
-    disconnectedCallback: true,
-    polyfills: false,
-    shadowDom: true,
-    scoped: true,
-    slotPolyfill: true,
-    prerenderServerSide: true,
-    prerenderClientSide: true,
-    devInspector: true,
-    hotModuleReplacement: true,
-    style: true,
-    refs: true,
-    hasRenderFn: true,
-    noRenderFn: false,
-    hostData: true,
-    vdomRender: true,
-    noVdomRender: false,
-    vdomAttribute: true,
-    vdomClass: true,
-    vdomStyle: true,
-    vdomFunctional: true,
-    vdomKey: true,
-    vdomListener: true,
-    vdomRef: true,
-    vdomText: true,
-    reflectToAttr: true,
-    slot: true,
-    svg: true,
-    mode: true,
-    observeAttr: true,
-    isDebug: false,
-    isDev: true,
-    isProd: false,
-    profile: false,
-    element: true,
-    event: true,
-    listener: true,
-    method: true,
-    prop: true,
-    propMutable: true,
-    state: true,
-    member: true,
-    updatable: true,
-    watchCallback: true,
-    lifecycle: true,
-    cmpDidLoad: true,
-    cmpWillLoad: true,
-    cmpDidUpdate: true,
-    cmpWillUpdate: true,
-    cmpDidUnload: true,
-    clientSide: false,
-    externalModuleLoader: false,
-    lazyLoad: false,
-    es5: false,
-    taskQueue: true,
-    exposeAppOnReady: true,
-    exposeAppRegistry: true,
-    exposeReadQueue: true,
-    exposeWriteQueue: true,
-    exposeEventListener: true,
-    exposeRequestAnimationFrame: true,
-    syncQueue: false,
-    coreImportPath: '.'
-  };
-  return b;
-}
-
-export function resetBuildConditionals(b: d.Build) {
-  Object.assign(b, getDefaultBuildConditionals());
-}
-
-export const BUILD = getDefaultBuildConditionals();
+export const BUILD: d.Build = {};

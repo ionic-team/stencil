@@ -2,6 +2,17 @@ import * as d from '@declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
+export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]) {
+  const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
+    bundleId,
+    cmps.map(cmp => {
+      return formatComponentRuntimeMeta(cmp, true);
+    })
+  ];
+  return lazyBundleRuntimeMeta;
+}
+
+
 export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean) {
   const runtimeMeta: d.ComponentLazyRuntimeMeta = {};
 

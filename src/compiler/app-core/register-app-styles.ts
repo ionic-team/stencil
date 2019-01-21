@@ -2,10 +2,8 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function setStylePlaceholders(build: d.Build, cmpsWithStyles: d.ComponentCompilerMeta[]) {
+export function setStylePlaceholders(_build: d.Build, cmpsWithStyles: d.ComponentCompilerMeta[]) {
   const c: string[] = [];
-
-  c.push(`import { registerStyle } from '${build.coreImportPath}';`);
 
   cmpsWithStyles.forEach(cmpWithStyles => {
     const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);

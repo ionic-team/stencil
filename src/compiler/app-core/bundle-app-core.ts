@@ -1,18 +1,18 @@
 import * as d from '@declarations';
 import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
-import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
-import { logger, sys } from '@sys';
+import { sys } from '@sys';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, files: Map<string, string>, bundleInput: string) {
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _build: d.Build, _files: Map<string, string>, _cmpRuntimeData: d.LazyBundlesRuntimeMeta) {
   let outputText = '';
 
   try {
     const rollupOptions: RollupOptions = {
       input: INPUT_ENTRY,
       plugins: [
-        filePlugin(build, files, bundleInput),
+        // filePlugin(files, bundleInput),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -38,37 +38,32 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
 
   } catch (e) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
-    logger.debug(`bundleAppCore, bundleInput: ${bundleInput}`);
   }
 
   return outputText;
 }
 
 
-function filePlugin(build: d.Build, files: Map<string, string>, bundleInput: string) {
-  return {
-    resolveId(id: string) {
-      id = normalizePath(id);
+// function filePlugin(files: Map<string, string>, bundleInput: string) {
+//   return {
+//     resolveId(id: string) {
+//       id = normalizePath(id);
 
-      if (id === INPUT_ENTRY) {
-        return INPUT_ENTRY;
-      }
-      if (id === STENCIL_CORE) {
-        return build.coreImportPath;
-      }
-      if (files.has(id)) {
-        return id;
-      }
-      return null;
-    },
-    load(id: string) {
-      if (id === INPUT_ENTRY) {
-        return bundleInput;
-      }
-      return files.get(id);
-    }
-  };
-}
+//       if (id === INPUT_ENTRY) {
+//         return INPUT_ENTRY;
+//       }
+//       if (files.has(id)) {
+//         return id;
+//       }
+//       return null;
+//     },
+//     load(id: string) {
+//       if (id === INPUT_ENTRY) {
+//         return bundleInput;
+//       }
+//       return files.get(id);
+//     }
+//   };
+// }
 
 const INPUT_ENTRY = ':INPUTENTRY:';
-export const STENCIL_CORE = '@stencil/core';

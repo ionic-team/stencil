@@ -1,14 +1,14 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected';
-import { getElmRef, resolved } from '@platform';
+import { getElmRef, tick } from '@platform';
 import { disconnectedCallback } from './disconnected';
 import { initHostComponent } from './init-host-component';
 import { initialLoad } from './initial-load';
 import { update } from './update';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) => {
   // bootstrapLazy
 
   lazyBundles.forEach(lazyBundle =>
@@ -50,7 +50,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundleRuntimeMeta[]) => {
             return elmData.onReadyPromise;
 
           } else if (BUILD.lazyLoad) {
-            return resolved;
+            return tick;
           }
         }
 
