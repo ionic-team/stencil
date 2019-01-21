@@ -57,3 +57,6 @@ export const getElmRef = (elm: d.HostElement, elmData?: d.ElementData) => {
 
 export const registerLazyInstance = (lazyInstance: any, elmData: d.ElementData) =>
   refs.set(elmData.instance = lazyInstance, elmData);
+
+
+export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

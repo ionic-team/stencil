@@ -46,6 +46,3 @@ export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HT
     }
   }
 };
-
-
-export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);
