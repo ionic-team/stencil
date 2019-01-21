@@ -21,7 +21,6 @@ export interface CompilerCtx {
   fsWatcher?: d.FsWatcher;
   hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
-  hasWatch: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
   lastBuildHadError: boolean;

@@ -18,6 +18,3 @@ export interface FsWatcher {
 export interface FsWatcherItem {
   close(): void;
 }
-
-
-export type BuildHashes = Map<string, string>;

@@ -13,7 +13,7 @@ export interface StencilSystem {
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   color?: any;
-  createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents, rootDir: string): Promise<d.FsWatcher>;
+  createFsWatcher?(fs: d.FileSystem, events: d.BuildEvents, rootDir: string): Promise<d.FsWatcher>;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;

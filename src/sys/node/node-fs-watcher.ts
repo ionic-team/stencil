@@ -16,7 +16,7 @@ export class FsWatcher implements d.FsWatcher {
   private dirWatchers = new Map<string, d.FsWatcherItem>();
   private fileWatchers = new Map<string, d.FsWatcherItem>();
 
-  constructor(private config: d.Config, private fs: d.FileSystem, private events: d.BuildEvents) {
+  constructor(private fs: d.FileSystem, private events: d.BuildEvents, private rootDir: string) {
     events.subscribe('buildFinish', this.reset.bind(this));
   }
 
@@ -232,8 +232,8 @@ export class FsWatcher implements d.FsWatcher {
   }
 
   private log(msg: string, filePath: string) {
-    const relPath = path.relative(this.config.rootDir, filePath);
-    logger.debug(`fs-watch, ${msg}: ${relPath}, ${Date.now().toString().substring(6)}`);
+    const relPath = path.relative(this.rootDir, filePath);
+    logger.debug(`fs-watcher, ${msg}: ${relPath}, ${Date.now().toString().substring(6)}`);
   }
 
 }

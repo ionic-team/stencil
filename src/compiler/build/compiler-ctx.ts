@@ -13,14 +13,14 @@ export class CompilerContext implements d.CompilerCtx {
   compilerOptions: any = null;
   events = new BuildEvents();
   fs: d.InMemoryFileSystem;
+  fsWatcher: d.FsWatcher = null;
   hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
-  hasWatch = false;
   isActivelyBuilding = false;
-  lastComponentStyleInput = new Map<string, string>();
   lastBuildHadError = false;
   lastBuildResults: d.BuildResults = null;
   lastBuildStyles = new Map<string, string>();
+  lastComponentStyleInput = new Map<string, string>();
   lastDerivedModules: d.DerivedModule[] = null;
   localPrerenderServer: any = null;
   moduleMap: d.ModuleMap = new Map();

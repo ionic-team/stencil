@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
-import { initFsWatch } from '../fs-watch/fs-watch-init';
+import { initFsWatcher } from '../fs-watch/fs-watch-init';
 import { logger, sys } from '@sys';
 import { writeCacheStats } from './cache-stats';
 
@@ -80,7 +80,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     if (config.watch) {
       // this is a watch build
       // setup watch if we haven't done so already
-      initFsWatch(config, compilerCtx, buildCtx);
+      await initFsWatcher(config, compilerCtx, buildCtx);
 
     } else {
       // not a watch build, so lets destroy anything left open
