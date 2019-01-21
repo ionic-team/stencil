@@ -1,8 +1,8 @@
 import * as d from '@declarations';
-import { resetTaskQueue } from './testing-task-queue';
+import { resetTaskQueue } from './task-queue';
 import { setupGlobal } from '@mock-doc';
 
-export * from './testing-task-queue';
+export * from './task-queue';
 
 
 export const consoleError = (e: any) => console.error(e);

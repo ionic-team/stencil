@@ -1,4 +1,4 @@
-import { Component, State, h } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -7,7 +7,7 @@ describe('render-vdom', () => {
   it('Hello VDOM, re-render, flush', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      @State() excitement = '';
+      @Prop() excitement = '';
       render() {
         return <div>Hello VDOM{this.excitement}</div>;
       }
@@ -22,12 +22,19 @@ describe('render-vdom', () => {
       <cmp-a><div>Hello VDOM</div></cmp-a>
     `);
 
-    // root.excitement = `!`;
-    // await flush();
+    root.excitement = `!`;
+    await flush();
 
-    // expect(root).toEqualHtml(`
-    //   <cmp-a><div>Hello VDOM</div></cmp-a>
-    // `);
+    expect(root).toEqualHtml(`
+      <cmp-a><div>Hello VDOM!</div></cmp-a>
+    `);
+
+    root.excitement = `!!`;
+    await flush();
+
+    expect(root).toEqualHtml(`
+      <cmp-a><div>Hello VDOM!!</div></cmp-a>
+    `);
   });
 
   it('Hello VDOM, html option', async () => {

@@ -13,18 +13,17 @@ describe('attr', () => {
       }
     }
 
-    const { body } = await newSpecPage({
+    const { root } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a multi-word="multi-word"></cmp-a>`,
     });
 
-    expect(body).toEqualHtml(`
+    expect(root).toEqualHtml(`
       <cmp-a multi-word="multi-word">multi-word</cmp-a>
     `);
 
-    const elm = body.querySelector('cmp-a') as any;
-    expect(elm.textContent).toBe('multi-word');
-    expect(elm.multiWord).toBe('multi-word');
+    expect(root.textContent).toBe('multi-word');
+    expect(root.multiWord).toBe('multi-word');
   });
 
   it('custom attribute name', async () => {
@@ -36,18 +35,17 @@ describe('attr', () => {
       }
     }
 
-    const { body } = await newSpecPage({
+    const { root } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a some-customName="some-customName"></cmp-a>`,
     });
 
-    expect(body).toEqualHtml(`
+    expect(root).toEqualHtml(`
       <cmp-a some-customName="some-customName">some-customName</cmp-a>
     `);
 
-    const elm = body.querySelector('cmp-a') as any;
-    expect(elm.textContent).toBe('some-customName');
-    expect(elm.customAttr).toBe('some-customName');
+    expect(root.textContent).toBe('some-customName');
+    expect(root.customAttr).toBe('some-customName');
   });
 
   describe('already set', () => {
@@ -61,18 +59,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a bool="false"></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a bool="false">false</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('false');
-      expect(elm.bool).toBe(false);
+      expect(root.textContent).toBe('false');
+      expect(root.bool).toBe(false);
     });
 
     it('set boolean, undefined when missing attribute', async () => {
@@ -84,18 +81,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a>undefined</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('undefined');
-      expect(elm.bool).toBe(undefined);
+      expect(root.textContent).toBe('undefined');
+      expect(root.bool).toBe(undefined);
     });
 
     it('set boolean, "true"', async () => {
@@ -107,18 +103,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a bool="true"></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a bool="true">true</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('true');
-      expect(elm.bool).toBe(true);
+      expect(root.textContent).toBe('true');
+      expect(root.bool).toBe(true);
     });
 
     it('set boolean true from no attribute value', async () => {
@@ -130,18 +125,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a bool></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a bool>true</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('true');
-      expect(elm.bool).toBe(true);
+      expect(root.textContent).toBe('true');
+      expect(root.bool).toBe(true);
     });
 
     it('set boolean true from empty string', async () => {
@@ -153,18 +147,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a bool=""></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a bool="">true</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('true');
-      expect(elm.bool).toBe(true);
+      expect(root.textContent).toBe('true');
+      expect(root.bool).toBe(true);
     });
 
     it('set zero', async () => {
@@ -176,18 +169,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a num="0"></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a num="0">0</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('0');
-      expect(elm.num).toBe(0);
+      expect(root.textContent).toBe('0');
+      expect(root.num).toBe(0);
     });
 
     it('set number', async () => {
@@ -199,18 +191,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a num="88"></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a num="88">88</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('88');
-      expect(elm.num).toBe(88);
+      expect(root.textContent).toBe('88');
+      expect(root.num).toBe(88);
     });
 
     it('set string', async () => {
@@ -222,18 +213,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a str="string"></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a str="string">string</cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('string');
-      expect(elm.str).toBe('string');
+      expect(root.textContent).toBe('string');
+      expect(root.str).toBe('string');
     });
 
     it('set empty string', async () => {
@@ -245,18 +235,17 @@ describe('attr', () => {
         }
       }
 
-      const { body } = await newSpecPage({
+      const { root } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a str=""></cmp-a>`,
       });
 
-      expect(body).toEqualHtml(`
+      expect(root).toEqualHtml(`
         <cmp-a str=""></cmp-a>
       `);
 
-      const elm = body.querySelector('cmp-a') as any;
-      expect(elm.textContent).toBe('');
-      expect(elm.str).toBe('');
+      expect(root.textContent).toBe('');
+      expect(root.str).toBe('');
     });
 
   });
