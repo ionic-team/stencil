@@ -1,12 +1,12 @@
 import * as d from '@declarations';
-import { createDomApi } from '../renderer/dom-api';
+// import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 // import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '@utils';
 // import { enableEventListener } from '../core/listeners';
 // import { fillCmpMetaFromConstructor } from '../util/cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
-import { h } from '@vdom';
+import { h } from '@runtime';
 // import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { noop } from '@utils';
 import { patchDomApi } from './dom-api-server';

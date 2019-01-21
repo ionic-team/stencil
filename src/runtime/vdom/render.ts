@@ -597,7 +597,7 @@ interface RelocateNode {
 }
 
 
-export const vdomRender = (hostElement: d.HostElement, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: any, hostDataFnResults?: any) => {
+export const renderVdom = (hostElement: d.HostElement, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: any, hostDataFnResults?: any) => {
   if (renderFnResults) {
     const oldVNode = elmData.vnode || {};
     const newVNode = elmData.vnode = h(null, hostDataFnResults, renderFnResults);

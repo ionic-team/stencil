@@ -27,7 +27,6 @@ run(async () => {
     ['Dev Sever', 'build-dev-server.js'],
     ['Dev Server Client', 'build-dev-server-client.js'],
     ['Mock Doc', 'build-mock-doc.js'],
-    ['Renderer VDOM', 'build-renderer-vdom.js'],
     ['Runtime', 'build-runtime.js'],
     ['Screenshot', 'build-screenshot.js'],
     ['Submodules', 'build-submodules.js'],

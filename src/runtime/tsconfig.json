@@ -37,9 +37,6 @@
       ],
       "@utils": [
         "../utils/index.ts"
-      ],
-      "@vdom": [
-        "../renderer/vdom/index.ts"
       ]
     }
   },

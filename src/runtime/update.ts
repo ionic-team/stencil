@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@platform';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { vdomRender } from '@vdom';
+import { renderVdom } from './vdom/render';
 
 
 export const update = async (elm: d.HostElement, instance: any, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
@@ -93,7 +93,7 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
 
         if (BUILD.vdomRender) {
           // DOM WRITE!
-          vdomRender(
+          renderVdom(
             elm,
             elmData,
             cmpMeta,

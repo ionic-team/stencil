@@ -22,7 +22,6 @@ async function bundleRuntime() {
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/platform',
-      '@stencil/core/renderer/vdom',
       '@stencil/core/utils'
     ],
     plugins: [
@@ -34,9 +33,6 @@ async function bundleRuntime() {
             }
             if (id === '@platform') {
               return '@stencil/core/platform';
-            }
-            if (id === '@vdom') {
-              return '@stencil/core/renderer/vdom';
             }
             if (id === '@utils') {
               return '@stencil/core/utils';
