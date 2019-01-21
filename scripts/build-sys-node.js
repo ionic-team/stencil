@@ -125,7 +125,7 @@ async function bundleNodeSysMain() {
             if (importee === 'graceful-fs') {
               return './graceful-fs.js';
             }
-            if (importee === '@sys/node') {
+            if (importee === '@sys') {
               return '../../sys/node';
             }
             if (importee === '@utils') {
