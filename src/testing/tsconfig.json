@@ -25,7 +25,7 @@
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [
-        "./testing-build.ts"
+        "./testing-build-conditionals.ts"
       ],
       "@compiler": [
         "../compiler/index.ts"

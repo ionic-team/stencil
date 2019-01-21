@@ -23,10 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core": [
-        "../../testing/index.ts"
-      ],
-      "@stencil/core/runtime": [
-        "../index.ts"
+        "../../index.ts"
       ],
       "@stencil/core/testing": [
         "../../testing/index.ts"

@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { formatComponentRuntimeMeta, getBuildFeatures } from '@compiler';
-import { resetBuildConditionals } from './testing-build';
+import { resetBuildConditionals } from './testing-build-conditionals';
 
 
 export async function newSpecPage(opts: d.NewSpecPageOptions) {

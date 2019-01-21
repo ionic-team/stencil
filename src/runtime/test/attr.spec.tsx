@@ -4,6 +4,52 @@ import { newSpecPage } from '@stencil/core/testing';
 
 describe('attr', () => {
 
+  it('multi-word attribute', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Prop() multiWord: string;
+      render() {
+        return `${this.multiWord}`;
+      }
+    }
+
+    const { body } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a multi-word="multi-word"></cmp-a>`,
+    });
+
+    expect(body).toEqualHtml(`
+      <cmp-a multi-word="multi-word">multi-word</cmp-a>
+    `);
+
+    const elm = body.querySelector('cmp-a') as any;
+    expect(elm.textContent).toBe('multi-word');
+    expect(elm.multiWord).toBe('multi-word');
+  });
+
+  it('custom attribute name', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Prop({ attr: 'some-customName' }) customAttr: string;
+      render() {
+        return `${this.customAttr}`;
+      }
+    }
+
+    const { body } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a some-customName="some-customName"></cmp-a>`,
+    });
+
+    expect(body).toEqualHtml(`
+      <cmp-a some-customName="some-customName">some-customName</cmp-a>
+    `);
+
+    const elm = body.querySelector('cmp-a') as any;
+    expect(elm.textContent).toBe('some-customName');
+    expect(elm.customAttr).toBe('some-customName');
+  });
+
   describe('already set', () => {
 
     it('set boolean, "false"', async () => {

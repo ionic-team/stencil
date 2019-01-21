@@ -1,5 +1,4 @@
 
-export { BUILD, resetBuildConditionals } from './testing-build';
 export { createJestPuppeteerEnvironment } from './jest/jest-environment';
 export { createTestRunner } from './jest/jest-runner';
 export { E2EElement, E2EPage } from './puppeteer/puppeteer-declarations';
@@ -10,88 +9,7 @@ export { newE2EPage } from './puppeteer/puppeteer-page';
 export { newSpecPage } from './testing-spec-page';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
+
+export * from './testing-build-conditionals';
+export * from './testing-core';
 export * from './testing-platform';
-
-
-import * as d from '../declarations';
-
-export {
-  ComponentDidLoad,
-  ComponentDidUnload,
-  ComponentDidUpdate,
-  ComponentWillLoad,
-  ComponentWillUpdate,
-  ComponentInstance as ComponentInterface,
-  StencilConfig as Config,
-  EventEmitter,
-  EventListenerEnable,
-  FunctionalComponent,
-  QueueApi,
-  JSXElements,
-} from '../declarations';
-
-/**
- * Build
- */
-export declare const Build: d.UserBuildConditionals;
-
-/**
- * Component
- */
-export declare const Component: d.ComponentDecorator;
-
-/**
- * Element
- */
-export declare const Element: d.ElementDecorator;
-
-/**
- * Event
- */
-export declare const Event: d.EventDecorator;
-
-/**
- * Listen
- */
-export declare const Listen: d.ListenDecorator;
-
-/**
- * Method
- */
-export declare const Method: d.MethodDecorator;
-
-/**
- * Prop
- */
-export declare const Prop: d.PropDecorator;
-
-/**
- * State
- */
-export declare const State: d.StateDecorator;
-
-/**
- * Watch
- */
-export declare const Watch: d.WatchDecorator;
-
-
-export interface HostElement extends HTMLElement {}
-
-export declare namespace h {
-  export function h(sel: any): d.VNode;
-  export function h(sel: Node, data: d.VNodeData): d.VNode;
-  export function h(sel: any, data: d.VNodeData): d.VNode;
-  export function h(sel: any, text: string): d.VNode;
-  export function h(sel: any, children: Array<d.VNode | undefined | null>): d.VNode;
-  export function h(sel: any, data: d.VNodeData, text: string): d.VNode;
-  export function h(sel: any, data: d.VNodeData, children: Array<d.VNode | undefined | null>): d.VNode;
-  export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
-
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends d.JSXElements.DefaultIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-}
