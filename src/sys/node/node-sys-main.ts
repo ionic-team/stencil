@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import color from 'ansi-colors';
 import { createContext, runInContext } from './node-context';
 import { createFsWatcher } from './node-fs-watcher';
-import { createDom } from './node-dom';
 import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
@@ -124,19 +123,6 @@ export class NodeSystem implements d.StencilSystem {
 
   async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
     return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
-  }
-
-  private _existingDom: () => d.CreateDom;
-
-  get createDom() {
-    if (this._existingDom) {
-      return this._existingDom;
-    }
-    return createDom;
-  }
-
-  set createDom(val) {
-    this._existingDom = val;
   }
 
   createFsWatcher(events: d.BuildEvents, paths: string, opts: any) {

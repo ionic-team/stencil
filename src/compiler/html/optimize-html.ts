@@ -3,7 +3,7 @@ import { assetVersioning } from '../asset-versioning/asset-versioning';
 import { catchError } from '@utils';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineExternalAssets } from './inline-external-assets';
-import { logger, sys } from '@sys';
+import { logger } from '@sys';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
@@ -113,7 +113,7 @@ export async function optimizeIndexHtml(
     hydrateTarget.html = await compilerCtx.fs.readFile(hydrateTarget.indexHtml);
 
     try {
-      const dom = sys.createDom();
+      const dom = null as any; // TODO! mock-doc
       const win = dom.parse(hydrateTarget);
       const doc = win.document;
 

@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "chokidar": "2.0.4",
-    "jsdom": "11.11.0",
     "typescript": "3.2.4"
   },
   "devDependencies": {
