@@ -1,20 +1,19 @@
 import * as d from '@declarations';
 import { BuildEvents } from '../../events';
 import { generateBuildFromFsWatch, shouldRebuild } from '../fs-watch-rebuild';
+import { generateBuildFromFsWatch } from '../fs-watch-rebuild';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import * as path from 'path';
-import { normalizePath } from '../../util';
+import { normalizePath } from '@utils';
 
 
 describe('watch-rebuild', () => {
   const config = mockConfig();
   let compilerCtx: d.CompilerCtx;
   let fsWatchResults: d.FsWatchResults;
-  let events: BuildEvents;
 
   beforeEach(() => {
     compilerCtx = mockCompilerCtx();
-    events = new BuildEvents();
     fsWatchResults = {
       dirsAdded: [],
       dirsDeleted: [],

@@ -54,12 +54,10 @@
     "vermoji": "node scripts/vermoji.js"
   },
   "dependencies": {
-    "chokidar": "2.0.4",
     "typescript": "3.2.4"
   },
   "devDependencies": {
     "@types/autoprefixer": "^9.1.1",
-    "@types/chokidar": "^1.7.5",
     "@types/cssnano": "^4.0.0",
     "@types/exit": "^0.1.30",
     "@types/fs-extra": "^5.0.4",

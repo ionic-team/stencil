@@ -9,6 +9,19 @@ export class TestingFs implements d.FileSystem {
   diskWrites = 0;
   diskReads = 0;
 
+  access(itemPath: string) {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          this.statSync(itemPath);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      }, this.resolveTime);
+    });
+  }
+
   copyFile(srcPath: string, destPath: string) {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {

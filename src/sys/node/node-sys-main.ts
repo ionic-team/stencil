@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import color from 'ansi-colors';
 import { createContext, runInContext } from './node-context';
-import { createFsWatcher } from './node-fs-watcher';
+import { FsWatcher } from './node-fs-watcher';
 import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
@@ -125,8 +125,9 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
   }
 
-  createFsWatcher(events: d.BuildEvents, paths: string, opts: any) {
-    const fsWatcher = createFsWatcher(events, paths, opts);
+  async createFsWatcher(config: d.Config, fs: d.FileSystem, events: d.BuildEvents) {
+    const fsWatcher = new FsWatcher(config, fs, events);
+    await fsWatcher.addDirectory(config.srcDir);
 
     this.addDestroy(() => {
       fsWatcher.close();

@@ -4,10 +4,10 @@ import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
-export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // only create the watcher if this is a watch build
   // and we haven't created a watch listener already
-  if (compilerCtx.hasWatch || !config.watch) {
+  if (compilerCtx.fsWatcher != null || !config.watch) {
     return false;
   }
 
@@ -17,15 +17,12 @@ export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   fsWatchNormalizer.subscribe();
   compilerCtx.hasWatch = true;
 
-  if (sys.createFsWatcher) {
-    const fsWatcher = sys.createFsWatcher(compilerCtx.events, config.srcDir, {
-      ignored: config.watchIgnoredRegex,
-      ignoreInitial: true
-    });
+  if (sys.createFsWatcher != null) {
+    compilerCtx.fsWatcher = await sys.createFsWatcher(config, sys.fs, compilerCtx.events);
 
-    if (fsWatcher && config.configPath) {
+    if (compilerCtx.fsWatcher && config.configPath) {
       config.configPath = normalizePath(config.configPath);
-      fsWatcher.add(config.configPath);
+      compilerCtx.fsWatcher.addFile(config.configPath);
     }
   }
 

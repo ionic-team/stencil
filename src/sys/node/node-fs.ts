@@ -4,6 +4,18 @@ import fs from 'graceful-fs';
 
 export class NodeFs implements d.FileSystem {
 
+  access(path: string) {
+    return new Promise<void>((resolve, reject) => {
+      fs.access(path, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
       const readStream = fs.createReadStream(src);

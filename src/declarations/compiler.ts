@@ -18,6 +18,7 @@ export interface CompilerCtx {
   compilerOptions: any;
   events: d.BuildEvents;
   fs: d.InMemoryFileSystem;
+  fsWatcher?: d.FsWatcher;
   hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
   hasWatch: boolean;
