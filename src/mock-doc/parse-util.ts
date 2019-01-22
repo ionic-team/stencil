@@ -3,7 +3,7 @@ import { MockDocument } from './document';
 import { MockElement, MockNode } from './node';
 import { MockTemplateElement } from './element';
 import { MockTextNode } from './text-node';
-import { NODE_TYPES } from './constants';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
 
 
@@ -43,7 +43,7 @@ function getParser(ownerDocument: MockDocument) {
   const treeAdapter: TreeAdapter = {
 
     createDocument() {
-      const doc = ownerDocument.createElement('#document');
+      const doc = ownerDocument.createElement(NODE_NAMES.DOCUMENT_NODE);
       (doc as any)['x-mode'] = 'no-quirks';
       return doc;
     },

@@ -1,5 +1,6 @@
 import { MockDocument } from './document';
 import { MockElement } from './node';
+import { NODE_NAMES } from './constants';
 
 
 export class MockEvent {
@@ -14,7 +15,7 @@ export class MockEvent {
   timeStamp: number;
   type: string;
 
-  constructor(type: string, eventInitDict?: any) {
+  constructor(type: string, eventInitDict?: EventInit) {
     if (typeof type !== 'string') {
       throw new Error(`Event type required`);
     }
@@ -44,11 +45,11 @@ export class MockEvent {
 export class MockCustomEvent extends MockEvent {
   detail: any = null;
 
-  constructor(type: string, eventInitDict?: any) {
+  constructor(type: string, customEventInitDic?: CustomEventInit) {
     super(type);
 
-    if (eventInitDict != null) {
-      Object.assign(this, eventInitDict);
+    if (customEventInitDic != null) {
+      Object.assign(this, customEventInitDic);
     }
   }
 
@@ -99,7 +100,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   const target: EventTarget = elm;
   ev.currentTarget = elm;
 
-  if (target._listeners) {
+  if (Array.isArray(target._listeners)) {
     const listeners = target._listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
       listener.handler(ev);
@@ -110,7 +111,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
     return;
   }
 
-  if (elm.nodeName === '#document') {
+  if (elm.nodeName === NODE_NAMES.DOCUMENT_NODE) {
     triggerEventListener((elm as MockDocument).defaultView, ev);
   } else {
     triggerEventListener(elm.parentElement, ev);

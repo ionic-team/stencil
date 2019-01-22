@@ -8,3 +8,10 @@ export const enum NODE_TYPES {
   DOCUMENT_TYPE_NODE = 10,
   DOCUMENT_FRAGMENT_NODE = 11,
 }
+
+export const enum NODE_NAMES {
+  COMMENT_NODE = '#comment',
+  DOCUMENT_NODE = '#document',
+  DOCUMENT_FRAGMENT_NODE = '#document-fragment',
+  TEXT_NODE = '#text',
+}

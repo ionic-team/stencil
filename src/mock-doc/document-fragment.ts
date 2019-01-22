@@ -1,12 +1,12 @@
 import { MockElement } from './node';
-import { NODE_TYPES } from './constants';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 
 
 export class MockDocumentFragment extends MockElement {
 
   constructor(ownerDocument: any) {
     super(ownerDocument, null);
-    this.nodeName = '#document-fragment';
+    this.nodeName = NODE_NAMES.DOCUMENT_FRAGMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_FRAGMENT_NODE;
   }
 

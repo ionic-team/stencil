@@ -4,7 +4,7 @@ import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement } from './node';
 import { MockTextNode } from './text-node';
-import { NODE_TYPES } from './constants';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
 
 
@@ -16,7 +16,7 @@ export class MockDocument extends MockElement {
 
   constructor(html: string = null, win: any = null) {
     super(null, null);
-    this.nodeName = '#document';
+    this.nodeName = NODE_NAMES.DOCUMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_NODE;
     this.defaultView = win;
 
@@ -56,7 +56,7 @@ export class MockDocument extends MockElement {
   }
 
   createElement(tagName: string) {
-    if (tagName === '#document') {
+    if (tagName === NODE_NAMES.DOCUMENT_NODE) {
       const doc = new MockDocument(false as any);
       doc.nodeName = tagName;
       doc.parentNode = null;
