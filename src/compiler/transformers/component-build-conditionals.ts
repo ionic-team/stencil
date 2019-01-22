@@ -21,6 +21,10 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
     }
   }
 
+  if (cmpMeta.methods.length > 0) {
+    cmpMeta.hasMethod = true;
+  }
+
   if (cmpMeta.events.length > 0) {
     cmpMeta.hasEvent = true;
   }

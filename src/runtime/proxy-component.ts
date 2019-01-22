@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { getElmRef } from '@platform';
 import { MEMBER_TYPE } from '../utils/constants';
-import { noop } from '../utils/helpers';
 import { setValue } from './set-value';
 
 
@@ -26,10 +25,17 @@ export const proxyComponent = (CstrPrototype: any, cmpMeta: d.ComponentRuntimeMe
         }
       );
 
-    } else if (BUILD.method && (memberData[0] === MEMBER_TYPE.Method)) {
+    } else if (BUILD.lazyLoad && BUILD.method && !proxyState && (memberData[0] === MEMBER_TYPE.Method)) {
       // proxyComponent - method
+      // lazy host method proxy
       Object.defineProperty(CstrPrototype, memberName, {
-        value: noop
+        value: function() {
+          const instance = getElmRef(this).instance;
+
+          if (instance) {
+            return instance[memberName].apply(instance, arguments);
+          }
+        }
       });
 
     } else if (BUILD.event && (memberData[0] === MEMBER_TYPE.Event)) {

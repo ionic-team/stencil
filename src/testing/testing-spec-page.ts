@@ -55,9 +55,9 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     head: platform.doc.head as HTMLHeadElement,
     body: platform.doc.body as HTMLBodyElement,
     root: null as any,
-    build: bc.BUILD,
+    build: bc.BUILD as d.Build,
     flush: (): Promise<void> => platform.flushAll(),
-    flushLoadModule: (): Promise<void> => platform.flushLoadModule(),
+    flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
     flushQueue: (): Promise<void> => platform.flushQueue()
   };
 
