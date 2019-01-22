@@ -87,6 +87,20 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
         new (LazyCstr as any)(elmData);
         BUILD.member && (elmData.isConstructingInstance = false);
 
+        if (BUILD.hostListener && elmData.queuedReceivedHostEvents) {
+          // events may have already fired before the instance was even ready
+          // now that the instance is ready, let's replay all of the events that
+          // we queued up earlier that were originally meant for the instance
+          for (let i = 0; i < elmData.queuedReceivedHostEvents.length; i += 2) {
+            // data was added in sets of two
+            // first item the eventMethodName
+            // second item is the event data
+            // take a look at hostEventListenerProxy()
+            elmData.instance[elmData.queuedReceivedHostEvents[i]](elmData.queuedReceivedHostEvents[i + 1]);
+          }
+          elmData.queuedReceivedHostEvents = null;
+        }
+
       } catch (e) {
         consoleError(e);
       }

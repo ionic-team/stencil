@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
 import { dashToPascalCase } from '@utils';
-import { plt } from './client-data';
+import { plt } from './client-window';
 
 
 export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {

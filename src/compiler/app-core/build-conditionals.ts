@@ -29,7 +29,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     hasRenderFn: cmps.some(c => (c.hasRenderFn || c.hasHostDataFn)),
     hostData: cmps.some(c => c.hasHostDataFn),
     lifecycle: cmps.some(c => c.hasLifecycle),
-    listener: cmps.some(c => c.hasListener),
+    hostListener: cmps.some(c => c.hasListener),
     member: cmps.some(c => c.hasMember),
     method: cmps.some(c => c.hasMethod),
     mode: cmps.some(c => c.hasMode),
@@ -62,7 +62,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 
   f.taskQueue = (f.updatable || f.mode || f.lifecycle);
 
-  f.refs = (f.updatable || f.member || f.lifecycle || f.listener);
+  f.refs = (f.updatable || f.member || f.lifecycle || f.hostListener);
 
   return f;
 }
@@ -81,7 +81,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.exposeAppRegistry = (b.lazyLoad && !!config.exposeAppRegistry);
   b.exposeReadQueue = !!config.exposeReadQueue;
   b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
-  b.exposeEventListener = (b.listener && !!config.exposeEventListener);
+  b.exposeEventListener = (b.hostListener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
 }
 

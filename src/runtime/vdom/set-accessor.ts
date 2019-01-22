@@ -89,17 +89,22 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       memberName = toLowerCase(memberName[2]) + memberName.substring(3);
     }
 
+    const elmData = getElmRef(elm);
+
     if (newValue) {
+      (elmData.vdomListeners || (elmData.vdomListeners = new Map()))
+        .set(memberName, newValue);
+
       if (!oldValue) {
-        elm.addEventListener(memberName, jsxEventProxy);
+        elm.addEventListener(memberName, vdomListenerProxy);
       }
 
-    } else if (BUILD.updatable) {
-      elm.removeEventListener(memberName, jsxEventProxy);
+    } else if (BUILD.updatable && elmData.vdomListeners) {
+      elmData.vdomListeners.delete(memberName);
+      if (!elmData.vdomListeners.size) {
+        elm.removeEventListener(memberName, vdomListenerProxy);
+      }
     }
-
-    const elmData = getElmRef(elm);
-    (elmData.listernProxies || (elmData.listernProxies = {}))[memberName + 0] = newValue;
 
   } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
       (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
@@ -159,6 +164,6 @@ const setProperty = (elm: any, propName: string, newValue: any) => {
 };
 
 
-function jsxEventProxy(this: d.HostElement, e: any) {
-  return getElmRef(this).listernProxies[e.type + 0](e);
+function vdomListenerProxy(this: d.HostElement, ev: Event) {
+  return getElmRef(this).vdomListeners.get(ev.type)(ev);
 }

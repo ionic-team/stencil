@@ -1,8 +1,8 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, onAppReadyCallbacks, plt } from './client-data';
+import { activelyProcessingCmps, onAppReadyCallbacks } from './client-data';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
-import { win } from './client-window';
+import { plt, win } from './client-window';
 
 
 const queueDomReads: d.RafCallback[] = [];

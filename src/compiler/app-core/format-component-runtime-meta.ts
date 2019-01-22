@@ -25,10 +25,16 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
     runtimeMeta.members = members;
   }
 
+  const hostListeners = formatHostListeners(compilerMeta);
+  if (hostListeners.length > 0) {
+    runtimeMeta.hostListeners = hostListeners;
+  }
+
   if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.shadowDomEncapsulation = 1;
+    runtimeMeta.shadowDomEncapsulation = shortBoolean(true);
+
   } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.scopedCssEncapsulation = 1;
+    runtimeMeta.scopedCssEncapsulation = shortBoolean(true);
   }
 
   return runtimeMeta;
@@ -157,7 +163,21 @@ function formatEventRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, com
 }
 
 
-function shortBoolean(val: boolean): boolean {
+function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
+  return compilerMeta.listeners.map(compilerListener => {
+    const hostListener: d.ComponentRuntimeHostListener = [
+      compilerListener.name,
+      compilerListener.method,
+      shortBoolean(compilerListener.disabled),
+      shortBoolean(compilerListener.capture),
+      shortBoolean(compilerListener.passive)
+    ];
+    return trimFalsy(hostListener);
+  });
+}
+
+
+function shortBoolean(val: boolean) {
   return (val ? 1 : 0) as any;
 }
 

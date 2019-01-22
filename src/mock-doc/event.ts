@@ -70,7 +70,7 @@ export class MockEventListener {
 export function addEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
-  if (!target._listeners) {
+  if (target._listeners == null) {
     target._listeners = [];
   }
 
@@ -103,7 +103,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   if (Array.isArray(target._listeners)) {
     const listeners = target._listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
-      listener.handler(ev);
+      listener.handler.call(target, ev);
     });
   }
 

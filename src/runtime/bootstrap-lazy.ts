@@ -8,7 +8,7 @@ import { initialLoad } from './initial-load';
 import { update } from './update';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) => {
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
   // bootstrapLazy
 
   lazyBundles.forEach(lazyBundle =>
@@ -21,11 +21,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) => {
         // StencilLazyHost
 
         connectedCallback() {
-          connectedCallback(this);
+          connectedCallback(this, cmpLazyMeta);
         }
 
         disconnectedCallback() {
-          if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.listener) {
+          if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.hostListener) {
             disconnectedCallback(this);
           }
         }
@@ -65,4 +65,3 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) => {
     })
 
   );
-};

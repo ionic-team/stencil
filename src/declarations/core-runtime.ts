@@ -12,10 +12,11 @@ export type LazyBundleRuntimeMeta = [
 
 
 export interface ComponentRuntimeMeta {
+  attrNameToPropName?: Map<string, string>;
+  hostListeners?: d.ComponentRuntimeHostListener[];
   members?: d.ComponentRuntimeMembers;
   scopedCssEncapsulation?: 1;
   shadowDomEncapsulation?: 1;
-  attrNameToPropName?: Map<string, string>;
 }
 
 
@@ -53,6 +54,34 @@ export interface ComponentRuntimeMember {
 }
 
 
+export interface ComponentRuntimeHostListener {
+  /**
+   * event name (event type)
+   */
+  [0]: string;
+
+  /**
+   * class method to handle event
+   */
+  [1]: string;
+
+  /**
+   * disabled event
+   */
+  [2]?: boolean;
+
+  /**
+   * passive event option
+   */
+  [3]?: boolean;
+
+  /**
+   * capture event option
+   */
+  [4]?: boolean;
+}
+
+
 export type ModeBundleId = ModeBundleIds | string;
 
 
@@ -66,6 +95,7 @@ export interface ElementData {
   elm?: d.HostElement;
   hasConnected?: boolean;
   hasRendered?: boolean;
+  hostListenerEventToMethodMap?: Map<string, string>;
   isActiveRender?: boolean;
   isConstructingInstance?: boolean;
   instance?: d.ComponentInstance;
@@ -73,11 +103,11 @@ export interface ElementData {
   isQueuedForUpdate?: boolean;
   isShadowDom?: boolean;
   isScoped?: boolean;
-  listernProxies?: {[key: string]: Function};
-  queuedEvents?: any[];
+  queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;
   useNativeShadowDom?: boolean;
+  vdomListeners?: Map<string, Function>;
   vnode?: d.VNode;
   watchCallbacks?: Map<string, string[]>;
 }
@@ -87,6 +117,7 @@ export interface PlatformRuntime {
   isTmpDisconnected: boolean;
   queueCongestion?: number;
   queuePending?: boolean;
+  supportsListenerOptions?: boolean;
   supportsShadowDom?: boolean;
 }
 

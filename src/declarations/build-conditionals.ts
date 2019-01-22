@@ -42,7 +42,7 @@ export interface BuildFeatures {
   // decorators
   element?: boolean;
   event?: boolean;
-  listener?: boolean;
+  hostListener?: boolean;
   method?: boolean;
   prop?: boolean;
   propMutable?: boolean;

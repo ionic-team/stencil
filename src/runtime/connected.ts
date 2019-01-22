@@ -1,26 +1,27 @@
 import * as d from '@declarations';
+import { activelyProcessingCmps, getElmRef, plt, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
-import { activelyProcessingCmps, getElmRef, tick } from '@platform';
 import { initialLoad } from './initial-load';
 
 
-export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData, ancestorHostElement?: d.HostElement) => {
+export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, elmData?: d.ElementData, ancestorHostElement?: d.HostElement) => {
   // connectedCallback
 
-  if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.listener) {
+  if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.hostListener) {
     elmData = getElmRef(elm);
 
-    if (BUILD.listener) {
+    if (BUILD.hostListener && cmpMeta.hostListeners) {
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
       // have fired even before the instance is ready
-      // if (!elmData.hasListeners) {
-        // it's possible we've already connected
-        // then disconnected
-        // and the same element is reconnected again
-        // elmData.hasListeners = true;
-        // initHostListeners(plt, elm, elmData, cmpCstr);
-      // }
+      cmpMeta.hostListeners.forEach(hostListener => {
+        if (!hostListener[2]) {
+          (elmData.hostListenerEventToMethodMap || (elmData.hostListenerEventToMethodMap = new Map()))
+            .set(hostListener[0], hostListener[1]);
+
+          elm.addEventListener(hostListener[0], hostListenerProxy, listenerOpts(hostListener));
+        }
+      });
     }
 
     if (!elmData.hasConnected) {
@@ -72,3 +73,26 @@ export const connectedCallback = (elm: d.HostElement, elmData?: d.ElementData, a
     initialLoad(elm, { instance: elm });
   }
 };
+
+
+function hostListenerProxy(this: d.HostElement, ev: Event) {
+  const elmData = getElmRef(this);
+  const hostListenerMethodName = elmData.hostListenerEventToMethodMap.get(ev.type);
+
+  if (elmData.instance) {
+    // instance is ready, let's call it's member method for this event
+    return elmData.instance[hostListenerMethodName](ev);
+  }
+
+  (elmData.queuedReceivedHostEvents || (elmData.queuedReceivedHostEvents = []))
+    .push(hostListenerMethodName, ev);
+}
+
+
+const listenerOpts = (hostListener: d.ComponentRuntimeHostListener) =>
+  plt.supportsListenerOptions ?
+    {
+      'passive': !!hostListener[3],
+      'capture': !!hostListener[4],
+    }
+  : !!hostListener[4];
