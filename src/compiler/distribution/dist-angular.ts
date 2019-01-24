@@ -96,7 +96,7 @@ export class ${tagNameAsPascal} {`];
     lines.push(`  ${output}!: EventEmitter<CustomEvent>;`);
   });
 
-  lines.push('  el: HTMLElement;');
+  lines.push('  protected el: HTMLElement;');
   lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef) {
     c.detach();
     this.el = r.nativeElement;`);

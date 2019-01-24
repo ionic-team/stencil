@@ -1,3 +1,54 @@
+<a name="0.17.0"></a>
+# 🔑 [0.17.0](https://github.com/ionic-team/stencil/compare/v0.16.4...v0.17.0) (2019-01-18)
+
+
+### Bug Fixes
+
+* **bundle:** force resolve@1.8.1 dep for rollup-plugin-node-resolve ([640de93](https://github.com/ionic-team/stencil/commit/640de93))
+* **css:** disable MergeLonghand ([c208c60](https://github.com/ionic-team/stencil/commit/c208c60))
+* **events:** ensure both listen decorator and jsx can assign same event ([42fa73a](https://github.com/ionic-team/stencil/commit/42fa73a))
+* **events:** remove event listeners after lifecycle hook call ([#1293](https://github.com/ionic-team/stencil/issues/1293)) ([49b75d8](https://github.com/ionic-team/stencil/commit/49b75d8))
+* **global:** ensure ts files are mapped to js ([b5ec9ea](https://github.com/ionic-team/stencil/commit/b5ec9ea))
+
+
+### Features
+
+* **rollup:** update to rollup 1.1.0 and rollup-plugin-node-resolve 4.0.0
+* **puppeteer:** update to puppeteer 1.11.0
+* **e2e:** add remote chrome support for puppeteer ([#1322](https://github.com/ionic-team/stencil/issues/1322)) ([18f6e9d](https://github.com/ionic-team/stencil/commit/18f6e9d))
+
+
+
+<a name="0.16.4"></a>
+## 🚘 [0.16.4](https://github.com/ionic-team/stencil/compare/v0.16.3...v0.16.4) (2019-01-15)
+
+
+### Features
+
+* **docs:** expose JSdocs tags ([#1319](https://github.com/ionic-team/stencil/issues/1319)) ([c726727](https://github.com/ionic-team/stencil/commit/c726727))
+
+
+### Performance Improvements
+
+* **css:** reenable MergeLonghand CSS optimization ([cbd3579](https://github.com/ionic-team/stencil/commit/cbd3579))
+
+
+
+<a name="0.16.3"></a>
+## ⚽️ [0.16.3](https://github.com/ionic-team/stencil/compare/v0.16.2...v0.16.3) (2019-01-14)
+
+
+### Bug Fixes
+
+* **angular:** this.el should not be exposed in types ([a82c8df](https://github.com/ionic-team/stencil/commit/a82c8df))
+
+
+### Features
+
+* **docs:** expose encapsulation ([e39268a](https://github.com/ionic-team/stencil/commit/e39268a))
+
+
+
 <a name="0.16.2"></a>
 ## 🐣 [0.16.2](https://github.com/ionic-team/stencil/compare/v0.16.1...v0.16.2) (2019-01-07)
 
@@ -1087,408 +1138,3 @@ Next, the `stencil.config.js` file can also remove the entire `exports.devServer
 * **slot:** move slot content to original location before removing ([7ef8afe](https://github.com/ionic-team/stencil/commit/7ef8afe))
 * **slot:** fix slot reordering on async update ([39d1afe](https://github.com/ionic-team/stencil/commit/39d1afe))
 * **slot:** relocate slot content at component root ([f1598fd](https://github.com/ionic-team/stencil/commit/f1598fd))
-
-
-<a name="0.7.26"></a>
-## 👻 [0.7.26](https://github.com/ionic-team/stencil/compare/v0.7.25...v0.7.26) (2018-04-23)
-
-
-### Bug Fixes
-
-* **angular:** methods proxy ([d014206](https://github.com/ionic-team/stencil/commit/d014206))
-* **style:** Support multiple base64 variables ([5458790](https://github.com/ionic-team/stencil/commit/5458790))
-* **styles:** prevent stackoverflow when shimming base64 css vars ([089636b](https://github.com/ionic-team/stencil/commit/089636b)), closes [#749](https://github.com/ionic-team/stencil/issues/749)
-* **windows:** use npx for build scripts ([d67dcdb](https://github.com/ionic-team/stencil/commit/d67dcdb))
-
-
-### Features
-
-* **test:** adds auxiliar test utils ([093c425](https://github.com/ionic-team/stencil/commit/093c425))
-
-
-
-<a name="0.7.25"></a>
-## 🎬 [0.7.25](https://github.com/ionic-team/stencil/compare/v0.7.24...v0.7.25) (2018-04-18)
-
-
-### Bug Fixes
-
-* **ssr:** ensure ssr includes inlined styles ([e83c6be](https://github.com/ionic-team/stencil/commit/e83c6be)), closes [#734](https://github.com/ionic-team/stencil/issues/734)
-
-
-### Features
-
-* **ssr:** add server initApp() for express middleware ([89485c8](https://github.com/ionic-team/stencil/commit/89485c8))
-* **watch:** emit error when watching to invalid prop ([18f03a0](https://github.com/ionic-team/stencil/commit/18f03a0))
-
-
-### Performance Improvements
-
-* **queue:** multi-stage scheduler queue ([#746](https://github.com/ionic-team/stencil/issues/746)) ([0c9e6ee](https://github.com/ionic-team/stencil/commit/0c9e6ee))
-
-
-
-<a name="0.7.24"></a>
-## 🍣 [0.7.24](https://github.com/ionic-team/stencil/compare/v0.7.23...v0.7.24) (2018-04-13)
-
-
-### Bug Fixes
-
-* **queue:** ensure all queued callbacks run ([e251802](https://github.com/ionic-team/stencil/commit/e251802))
-
-
-
-<a name="0.7.23"></a>
-## ☀️ [0.7.23](https://github.com/ionic-team/stencil/compare/v0.7.22...v0.7.23) (2018-04-13)
-
-
-### Bug Fixes
-
-* **css-shim:** fix relative paths ([67edcbd](https://github.com/ionic-team/stencil/commit/67edcbd))
-* allow collection packages to use package.json 'module' to export esmodules. ([8aee1f0](https://github.com/ionic-team/stencil/commit/8aee1f0))
-
-
-
-<a name="0.7.22"></a>
-## ⛷ [0.7.22](https://github.com/ionic-team/stencil/compare/v0.7.21...v0.7.22) (2018-04-12)
-
-
-### Bug Fixes
-
-* **angular:** output decorator ([494fb18](https://github.com/ionic-team/stencil/commit/494fb18))
-* **prerender:** pass property data down to child components ([35c0911](https://github.com/ionic-team/stencil/commit/35c0911))
-
-
-
-<a name="0.7.21"></a>
-## ⚾️ [0.7.21](https://github.com/ionic-team/stencil/compare/v0.7.20...v0.7.21) (2018-04-12)
-
-
-### Bug Fixes
-
-* **angular:** emit exact types ([2164ad3](https://github.com/ionic-team/stencil/commit/2164ad3))
-* **css-shim:** Fix css-shim when base64 uri value is used ([84a1348](https://github.com/ionic-team/stencil/commit/84a1348)), closes [#393](https://github.com/ionic-team/stencil/issues/393)
-* **svg:** remove svg attribute when undefined ([5a3c632](https://github.com/ionic-team/stencil/commit/5a3c632)), closes [#720](https://github.com/ionic-team/stencil/issues/720)
-* **test:** correct tsconfig for karma tests. ([568c82d](https://github.com/ionic-team/stencil/commit/568c82d))
-
-
-### Features
-
-* **queue:** organize dom read/writes within queue ([0d865b8](https://github.com/ionic-team/stencil/commit/0d865b8))
-* export component types ([41e4089](https://github.com/ionic-team/stencil/commit/41e4089))
-
-
-
-<a name="0.7.20"></a>
-## 🍭 [0.7.20](https://github.com/ionic-team/stencil/compare/v0.7.19...v0.7.20) (2018-04-10)
-
-
-### Bug Fixes
-
-* **declarations:** fix dialog type interface ([9e7da78](https://github.com/ionic-team/stencil/commit/9e7da78))
-* **test:** fix accessing TestWindow properties ([1dabe1f](https://github.com/ionic-team/stencil/commit/1dabe1f))
-* **test:** update to TestWindow ([aa41953](https://github.com/ionic-team/stencil/commit/aa41953))
-* **test:** TestWindow types subclass Window ([a7feecc](https://github.com/ionic-team/stencil/commit/a7feecc))
-
-
-### Features
-
-* **autoprefix:** built-in css autoprefixing ([e141e8a](https://github.com/ionic-team/stencil/commit/e141e8a))
-
-
-
-<a name="0.7.19"></a>
-## 💾 [0.7.19](https://github.com/ionic-team/stencil/compare/v0.7.18...v0.7.19) (2018-04-09)
-
-
-### Bug Fixes
-
-* **props:** dash-case attributes to props ([0bf1796](https://github.com/ionic-team/stencil/commit/0bf1796)), closes [#697](https://github.com/ionic-team/stencil/issues/697)
-* **props:** static type analysis for props ([b6e7863](https://github.com/ionic-team/stencil/commit/b6e7863))
-* **test:** use TestWindow for Listen testing ([3279676](https://github.com/ionic-team/stencil/commit/3279676)), closes [#572](https://github.com/ionic-team/stencil/issues/572)
-* **testing:** fix event emitter for test suite ([d388430](https://github.com/ionic-team/stencil/commit/d388430)), closes [#601](https://github.com/ionic-team/stencil/issues/601)
-* **tests:** path is not correct on windows ([#701](https://github.com/ionic-team/stencil/issues/701)) ([f7acae4](https://github.com/ionic-team/stencil/commit/f7acae4))
-
-
-### Refactor
-
-The test suite now comes with a `TestWindow` class, with the ultimate goal of better simulating a standardized browser environment built on top of `window` and `document`. Using a `TestWindow` instance allows tests to stay compartmentalized, and not require global objects which get reused (which is not ideal for testing). Instead, each test creates a new instance of `window`, and by doing so lets each test to not affect others.
-
-The test suite has been refactored to now use `TestWindow` instead of `render` and `flush`. Existing tests will continue to work, but warnings will be printed to use `TestWindow` instead. Here are [a few examples](https://github.com/ionic-team/stencil/commit/77dd1c79b4d8926995d9a48773c8516fff63e410).
-
-##### Old test:
-
-```
-import { render, flush } from '@stencil/core/testing';
-import { MyComponent } from './my-component';
-
-it('should be the old way', async () => {
-  const element = await render({
-    components: [MyComponent],
-    html: '<my-cmp first="Marty" last-name="McFly"></my-cmp>'
-  });
-  expect(element.textContent).toEqual('Hello, my name is Marty McFly');
-
-  element.first = 'George';
-  await flush(element);
-
-  expect(element.textContent).toEqual('Hello, my name is George McFly');
-});
-```
-
-##### New test:
-
-```
-import { TestWindow } from '@stencil/core/testing';
-import { MyComponent } from './my-component';
-
-it('should be the new way', async () => {
-  const window = new TestWindow();
-  const element = await window.load({
-    components: [MyComponent],
-    html: '<my-cmp first="Marty" last-name="McFly"></my-cmp>'
-  });
-  expect(element.textContent).toEqual('Hello, my name is Marty McFly');
-
-  element.first = 'George';
-  await window.flush();
-
-  expect(element.textContent).toEqual('Hello, my name is George McFly');
-});
-```
-
-
-<a name="0.7.18"></a>
-## 🍹 [0.7.18](https://github.com/ionic-team/stencil/compare/v0.7.17...v0.7.18) (2018-04-06)
-
-
-### Bug Fixes
-
-* **angular:** outputs must be proxied ([e5647ac](https://github.com/ionic-team/stencil/commit/e5647ac))
-
-
-
-<a name="0.7.17"></a>
-## 🍸 [0.7.17](https://github.com/ionic-team/stencil/compare/v0.7.16...v0.7.17) (2018-04-06)
-
-
-### Bug Fixes
-
-* **angular:** method proxy ([e06a37d](https://github.com/ionic-team/stencil/commit/e06a37d))
-* **angular:** proxy methods ([5e93ecb](https://github.com/ionic-team/stencil/commit/5e93ecb))
-* **bundle:** also resolve paths of relative source files not in memory ([9991d1e](https://github.com/ionic-team/stencil/commit/9991d1e))
-
-
-
-<a name="0.7.16"></a>
-## 🏌 [0.7.16](https://github.com/ionic-team/stencil/compare/v0.7.15...v0.7.16) (2018-04-05)
-
-
-### Bug Fixes
-
-* **tests:** fix test suite API ([dcac32f](https://github.com/ionic-team/stencil/commit/dcac32f)), closes [#697](https://github.com/ionic-team/stencil/issues/697)
-
-
-
-<a name="0.7.15"></a>
-## 🚢 [0.7.15](https://github.com/ionic-team/stencil/compare/v0.7.14...v0.7.15) (2018-04-05)
-
-
-### Bug Fixes
-
-* **slot:** load host content on every render ([79fbf50](https://github.com/ionic-team/stencil/commit/79fbf50))
-* **theme:** ensure elm.mode is always set ([33dd711](https://github.com/ionic-team/stencil/commit/33dd711))
-* **types:** property possibly undefined ([18bac2a](https://github.com/ionic-team/stencil/commit/18bac2a))
-
-
-
-<a name="0.7.14"></a>
-## 😛 [0.7.14](https://github.com/ionic-team/stencil/compare/v0.7.13...v0.7.14) (2018-04-04)
-
-
-### Bug Fixes
-
-* **slot:** alway include slot ([803cfa3](https://github.com/ionic-team/stencil/commit/803cfa3))
-
-
-
-<a name="0.7.13"></a>
-## ⛱ [0.7.13](https://github.com/ionic-team/stencil/compare/v0.7.12...v0.7.13) (2018-04-04)
-
-
-### Bug Fixes
-
-* **docs:** only output readme docs w/ --docs flag ([0aad8e7](https://github.com/ionic-team/stencil/commit/0aad8e7)), closes [#690](https://github.com/ionic-team/stencil/issues/690)
-* **svg:** update css class on svg element ([260b538](https://github.com/ionic-team/stencil/commit/260b538))
-* **test:** add esModuleInterop so that tests will have proper interop with commonjs modules. ([8520059](https://github.com/ionic-team/stencil/commit/8520059))
-
-
-### Features
-
-* **docs:** add usage markdown to docs json output ([7d811f1](https://github.com/ionic-team/stencil/commit/7d811f1))
-* **host:** apply static Component host data to host element ([00b6af6](https://github.com/ionic-team/stencil/commit/00b6af6)), closes [#562](https://github.com/ionic-team/stencil/issues/562)
-* add commonjs config option that will allow additonal configuration of rollup like namedExports. ([d807ea1](https://github.com/ionic-team/stencil/commit/d807ea1))
-
-
-
-<a name="0.7.12"></a>
-## 😋 [0.7.12](https://github.com/ionic-team/stencil/compare/v0.7.11...v0.7.12) (2018-04-02)
-
-
-### Bug Fixes
-
-* **angular:** emit all props ([dc5ac70](https://github.com/ionic-team/stencil/commit/dc5ac70))
-
-
-
-<a name="0.7.11"></a>
-## 🔦 [0.7.11](https://github.com/ionic-team/stencil/compare/v0.7.10...v0.7.11) (2018-04-02)
-
-
-### Bug Fixes
-
-* **build:** separate cached build conditionals ([bc7873e](https://github.com/ionic-team/stencil/commit/bc7873e)), closes [#676](https://github.com/ionic-team/stencil/issues/676)
-* **cli:** override previous flags in cli args ([da14e81](https://github.com/ionic-team/stencil/commit/da14e81))
-* **render:** fix vnode key comparison ([6f380da](https://github.com/ionic-team/stencil/commit/6f380da))
-* **render:** update parent host content from child changed element render ([6fe6a6e](https://github.com/ionic-team/stencil/commit/6fe6a6e)), closes [#679](https://github.com/ionic-team/stencil/issues/679)
-
-
-### Features
-* **angular:** directivesArrayFile ([ca11e0a](https://github.com/ionic-team/stencil/commit/ca11e0a))
-* **build:** exclude slot polyfill for shadow-only, or not slot components ([191d90a](https://github.com/ionic-team/stencil/commit/191d90a))
-* **docs:** cli flag for json docs ([7b9cedd](https://github.com/ionic-team/stencil/commit/7b9cedd))
-* **props:** warn when using standardized props/methods ([e6ff67c](https://github.com/ionic-team/stencil/commit/e6ff67c)), closes [#309](https://github.com/ionic-team/stencil/issues/309)
-* **typescript:** update to TypeScript 2.8.1 ([c98c7ce](https://github.com/ionic-team/stencil/commit/c98c7ce))
-
-
-
-<a name="0.7.10"></a>
-## 🐚 [0.7.10](https://github.com/ionic-team/stencil/compare/v0.7.9...v0.7.10) (2018-03-28)
-
-
-### Bug Fixes
-
-* **componentOnReady:** set host element as resolve value ([dcfdf06](https://github.com/ionic-team/stencil/commit/dcfdf06))
-
-
-
-<a name="0.7.9"></a>
-## 🎷 [0.7.9](https://github.com/ionic-team/stencil/compare/v0.7.8...v0.7.9) (2018-03-28)
-
-### Features
-
-* **refactor:** add `componentOnReady()` to prototype immediately ([57d14c7](https://github.com/ionic-team/stencil/commit/57d14c7))
-
-
-<a name="0.7.8"></a>
-## 👽 [0.7.8](https://github.com/ionic-team/stencil/compare/v0.7.7...v0.7.8) (2018-03-26)
-
-
-### Features
-
-* **config:** enable ng output target ([c2eb430](https://github.com/ionic-team/stencil/commit/c2eb430))
-* **docs:** generate component docs in json format ([34bd335](https://github.com/ionic-team/stencil/commit/34bd335))
-
-
-<a name="0.7.7"></a>
-## 🍒 [0.7.7](https://github.com/ionic-team/stencil/compare/v0.7.6...v0.7.7) (2018-03-23)
-
-### Features
-
-* **events:** reduce restrictions on public member names that are similar to event names ([ef1b2e7](https://github.com/ionic-team/stencil/commit/ef1b2e7))
-* **types:** add methods to components.d.ts file and remove localized dependency on components ([#654](https://github.com/ionic-team/stencil/issues/654)) ([ef304ea](https://github.com/ionic-team/stencil/commit/ef304ea))
-
-
-### Bug Fixes
-
-* **events:** fix adding listeners from JSX attributes ([527f2ac](https://github.com/ionic-team/stencil/commit/527f2ac)), closes [#662](https://github.com/ionic-team/stencil/issues/662)
-
-
-<a name="0.7.6"></a>
-## 🎺 [0.7.6](https://github.com/ionic-team/stencil/compare/v0.7.5...v0.7.6) (2018-03-22)
-
-### Features
-
-Listeners can now be added to specific elements within JSX. [#323](https://github.com/ionic-team/stencil/issues/323#issuecomment-375349412)
-
-For example, if a component emits the event `ionChange`, then the JSX attribute `onIonChange` can be added, such as:
-
-```
-<ion-input onIonChange={(ev) => this.someMethod(ev)}/>
-```
-
-This matches how listeners are added for standard events. For example, to listen to a button's `click` event, the JSX attribute would be `onClick`.
-
-
-### Bug Fixes
-
-* **build:** avoid Object.entries (breaks Node 6) ([b39b2b9](https://github.com/ionic-team/stencil/commit/b39b2b9))
-* **events:** keep event names case-sensitive ([bb09964](https://github.com/ionic-team/stencil/commit/bb09964))
-* **loader:** more-specific "customElements" polyfill check ([f4823f7](https://github.com/ionic-team/stencil/commit/f4823f7)), closes [#648](https://github.com/ionic-team/stencil/issues/648)
-* **render:** fix functional components patch when children aren't rendered ([3747dcd](https://github.com/ionic-team/stencil/commit/3747dcd)), closes [#649](https://github.com/ionic-team/stencil/issues/649)
-* **styles:** escape unicode chars & octal literals in css ([f1af0bc](https://github.com/ionic-team/stencil/commit/f1af0bc)), closes [#656](https://github.com/ionic-team/stencil/issues/656)
-* **types:** dash based event names should appear within quotes in the components.d.ts file. ([dafd02d](https://github.com/ionic-team/stencil/commit/dafd02d))
-
-
-
-<a name="0.7.5"></a>
-## 🐬 [0.7.5](https://github.com/ionic-team/stencil/compare/v0.7.4...v0.7.5) (2018-03-20)
-
-
-### Bug Fixes
-
-* **css:** update the CSS variable regexp for pseudo-classes ([97c35ce](https://github.com/ionic-team/stencil/commit/97c35ce)), closes [#603](https://github.com/ionic-team/stencil/issues/603)
-* add event listeners and custom events types to components.d.ts ([#644](https://github.com/ionic-team/stencil/issues/644)) ([4644d91](https://github.com/ionic-team/stencil/commit/4644d91))
-
-
-
-<a name="0.7.4"></a>
-## 🏵 [0.7.4](https://github.com/ionic-team/stencil/compare/v0.7.3...v0.7.4) (2018-03-20)
-
-
-### Bug Fixes
-
-* **build:** reuse build conditionals from last build for non-typescript changes ([8127829](https://github.com/ionic-team/stencil/commit/8127829)), closes [#636](https://github.com/ionic-team/stencil/issues/636)
-* **prop:** fix prop decorator parsing ([857d81c](https://github.com/ionic-team/stencil/commit/857d81c))
-
-
-
-<a name="0.7.3"></a>
-## 🏆 [0.7.3](https://github.com/ionic-team/stencil/compare/v0.7.2...v0.7.3) (2018-03-20)
-
-
-### Features
-
-* **reflectToAttr:** add Prop option to reflect property values to attribute ([741d97f](https://github.com/ionic-team/stencil/commit/741d97f)), closes [#588](https://github.com/ionic-team/stencil/issues/588)
-
-
-
-<a name="0.7.2"></a>
-## 🚔 [0.7.2](https://github.com/ionic-team/stencil/compare/v0.7.1...v0.7.2) (2018-03-19)
-
-
-### Bug Fixes
-
-* **canonical-link:** update `<link rel="canonical">` using existing href value ([0abcfbe](https://github.com/ionic-team/stencil/commit/0abcfbe))
-* **prerender:** merge prerender diagnostics with build output ([bc6c638](https://github.com/ionic-team/stencil/commit/bc6c638))
-* **render:** check if functional component on update element ([007b188](https://github.com/ionic-team/stencil/commit/007b188))
-* **render:** fix functional components returning null ([10a3777](https://github.com/ionic-team/stencil/commit/10a3777)), closes [#610](https://github.com/ionic-team/stencil/issues/610)
-* **whenDefined:** customElements.whenDefined() polyfill before the full polyfill ([8d92cc1](https://github.com/ionic-team/stencil/commit/8d92cc1))
-
-
-
-<a name="0.7.1"></a>
-## 🏐 [0.7.1](https://github.com/ionic-team/stencil/compare/v0.7.0...v0.7.1) (2018-03-17)
-
-
-### Bug Fixes
-
-* **crossorigin:** support crossorigin for dynamic import ([037839f](https://github.com/ionic-team/stencil/commit/037839f))
-* **es5:** fix observedAttributes in es5 build ([7c93e85](https://github.com/ionic-team/stencil/commit/7c93e85)), closes [#623](https://github.com/ionic-team/stencil/issues/623)
-* **prerender:** fix custom indexHtml build ([7768864](https://github.com/ionic-team/stencil/commit/7768864)), closes [#563](https://github.com/ionic-team/stencil/issues/563)
-* **styles:** escape unicode characters in css ([b32d9da](https://github.com/ionic-team/stencil/commit/b32d9da)), closes [#545](https://github.com/ionic-team/stencil/issues/545)
-
-
-
-<a name="0.7.0"></a>
-# 🍬 [0.7.0](https://github.com/ionic-team/stencil/compare/v0.6.18...v0.7.0) (2018-03-16)

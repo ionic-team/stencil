@@ -18,14 +18,21 @@ export interface JsonDocsComponent {
   readmePath?: string;
   usagesDir?: string;
 
+  encapsulation: 'shadow' | 'scoped' | 'none';
   tag: string;
   readme: string;
   docs: string;
+  docsTags: JsonDocsTags[];
   usage: JsonDocsUsage;
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
+}
+
+export interface JsonDocsTags {
+  name: string;
+  text?: string;
 }
 
 export interface JsonDocsUsage {
@@ -40,6 +47,7 @@ export interface JsonDocsProp {
   attr: string | undefined;
   reflectToAttr: boolean;
   docs: string;
+  docsTags: JsonDocsTags[];
   default: string;
 
   optional: boolean;
@@ -50,6 +58,7 @@ export interface JsonDocsProp {
 export interface JsonDocsMethod {
   name: string;
   docs: string;
+  docsTags: JsonDocsTags[];
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
@@ -72,6 +81,7 @@ export interface JsonDocsEvent {
   cancelable: boolean;
   composed: boolean;
   docs: string;
+  docsTags: JsonDocsTags[];
   detail: string;
 }
 

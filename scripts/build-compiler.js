@@ -81,9 +81,9 @@ if (success) {
         format: 'cjs',
         file: DEST_FILE
 
-      }).then(output => {
+      }).then(({ output }) => {
         try {
-          let outputText = updateBuildIds(buildId, output.code);
+          let outputText = updateBuildIds(buildId, output[0].code);
 
           fs.ensureDirSync(path.dirname(DEST_FILE));
           fs.writeFileSync(DEST_FILE, outputText);

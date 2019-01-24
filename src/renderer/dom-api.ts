@@ -114,7 +114,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
       return elm;
     },
 
-    $addEventListener: (assignerElm, eventName, listenerCallback, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[], assignersEventName?: string) => {
+    $addEventListener: (assignerElm, eventName, listenerCallback, assignerId, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[], assignersEventName?: string) => {
       // remember the original name before we possibly change it
       let attachToElm = assignerElm;
       let eventListener = listenerCallback;
@@ -123,7 +123,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
       // this element from the unregister listeners weakmap
       let assignersUnregListeners = unregisterListenerFns.get(assignerElm);
 
-      assignersEventName = eventName;
+      assignersEventName = eventName + assignerId;
 
       if (assignersUnregListeners && assignersUnregListeners[assignersEventName]) {
         // removed any existing listeners for this event for the assigner element
@@ -202,13 +202,13 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
       }
     },
 
-    $removeEventListener: (elm, eventName, assignersUnregListeners?: any) => {
+    $removeEventListener: (elm, eventName, assignerId, assignersUnregListeners?: any) => {
       // get the unregister listener functions for this element
       if ((assignersUnregListeners = unregisterListenerFns.get(elm))) {
         // this element has unregister listeners
         if (eventName) {
           // passed in one specific event name to remove
-          assignersUnregListeners[eventName] && assignersUnregListeners[eventName]();
+          assignersUnregListeners[eventName + assignerId] && assignersUnregListeners[eventName + assignerId]();
 
         } else {
           // remove all event listeners

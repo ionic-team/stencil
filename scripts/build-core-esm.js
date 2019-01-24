@@ -16,7 +16,7 @@ async function buildCoreEsm(inputFile, outputFile) {
     format: 'es'
   });
 
-  let code = clientCore.code.trim();
+  let code = clientCore.output[0].code.trim();
   code = dynamicImportFnHack(code);
   code = polyfillsHack(code);
 

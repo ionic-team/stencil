@@ -78,12 +78,12 @@ export const setAccessor = (plt: d.PlatformApi, elm: HTMLElement, memberName: st
     if (newValue) {
       if (newValue !== oldValue) {
         // add listener
-        plt.domApi.$addEventListener(elm, memberName, newValue);
+        plt.domApi.$addEventListener(elm, memberName, newValue, 0);
       }
 
     } else if (_BUILD_.updatable) {
       // remove listener
-      plt.domApi.$removeEventListener(elm, memberName);
+      plt.domApi.$removeEventListener(elm, memberName, 0);
     }
 
   } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&

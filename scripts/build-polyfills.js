@@ -47,7 +47,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     format: 'es'
   });
 
-  const transpile = ts.transpileModule(bundleResults.code, {
+  const transpile = ts.transpileModule(bundleResults.output[0].code, {
     compilerOptions: {
       target: ts.ScriptTarget.ES5
     }

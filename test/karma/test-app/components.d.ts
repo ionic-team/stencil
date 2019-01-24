@@ -204,6 +204,12 @@ export namespace Components {
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends StencilHTMLAttributes {}
 
+  interface ListenJsxRoot {}
+  interface ListenJsxRootAttributes extends StencilHTMLAttributes {}
+
+  interface ListenJsx {}
+  interface ListenJsxAttributes extends StencilHTMLAttributes {}
+
   interface ListenWindow {}
   interface ListenWindowAttributes extends StencilHTMLAttributes {}
 
@@ -415,6 +421,8 @@ declare global {
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'ListenJsxRoot': Components.ListenJsxRoot;
+    'ListenJsx': Components.ListenJsx;
     'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
     'ReflectToAttr': Components.ReflectToAttr;
@@ -494,6 +502,8 @@ declare global {
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'listen-jsx-root': Components.ListenJsxRootAttributes;
+    'listen-jsx': Components.ListenJsxAttributes;
     'listen-window': Components.ListenWindowAttributes;
     'node-globals': Components.NodeGlobalsAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
@@ -746,6 +756,18 @@ declare global {
   var HTMLLifecycleUnloadRootElement: {
     prototype: HTMLLifecycleUnloadRootElement;
     new (): HTMLLifecycleUnloadRootElement;
+  };
+
+  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {}
+  var HTMLListenJsxRootElement: {
+    prototype: HTMLListenJsxRootElement;
+    new (): HTMLListenJsxRootElement;
+  };
+
+  interface HTMLListenJsxElement extends Components.ListenJsx, HTMLStencilElement {}
+  var HTMLListenJsxElement: {
+    prototype: HTMLListenJsxElement;
+    new (): HTMLListenJsxElement;
   };
 
   interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
@@ -1030,6 +1052,8 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'listen-jsx-root': HTMLListenJsxRootElement
+    'listen-jsx': HTMLListenJsxElement
     'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
     'reflect-to-attr': HTMLReflectToAttrElement
@@ -1109,6 +1133,8 @@ declare global {
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'listen-jsx-root': HTMLListenJsxRootElement;
+    'listen-jsx': HTMLListenJsxElement;
     'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
     'reflect-to-attr': HTMLReflectToAttrElement;

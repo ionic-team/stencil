@@ -51,7 +51,7 @@ if (success) {
 
       }).then(clientCore => {
 
-        let code = clientCore.code.trim();
+        let code = clientCore.output[0].code.trim();
         code = code.replace('exports ', '');
 
         fs.writeFile(outputFile, code, (err) => {
