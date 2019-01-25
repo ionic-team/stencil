@@ -218,6 +218,7 @@ export namespace Components {
 
   interface ReflectToAttr {
     'bool': boolean;
+    'disabled': boolean;
     'dynamicNu': number;
     'dynamicStr': string;
     'nu': number;
@@ -228,6 +229,7 @@ export namespace Components {
   }
   interface ReflectToAttrAttributes extends StencilHTMLAttributes {
     'bool'?: boolean;
+    'disabled'?: boolean;
     'dynamicNu'?: number;
     'dynamicStr'?: string;
     'nu'?: number;

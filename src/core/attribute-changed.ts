@@ -8,6 +8,8 @@ export function attributeChangedCallback(attrPropsMap: {[attr: string]: string},
   if (propName) {
     // there is not need to cast the value since, it's already casted when
     // the prop is setted
-    (elm as any)[propName] = newVal;
+    (elm as any)[propName] = newVal === null && typeof (elm as any)[propName] === 'boolean'
+      ? false
+      : newVal;
   }
 }
