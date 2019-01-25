@@ -1,3 +1,13 @@
+<a name="0.17.1-0"></a>
+## 🚛 [0.17.1-0](https://github.com/ionic-team/stencil/compare/v0.17.0...v0.17.1-0) (2019-01-25)
+
+
+### Bug Fixes
+
+* **prerender:** ensure meta charset is first element in document.head ([590ddbf](https://github.com/ionic-team/stencil/commit/590ddbf))
+
+
+
 <a name="0.17.0"></a>
 # 🔑 [0.17.0](https://github.com/ionic-team/stencil/compare/v0.16.4...v0.17.0) (2019-01-18)
 
