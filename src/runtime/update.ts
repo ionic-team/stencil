@@ -5,10 +5,10 @@ import { BUILD } from '@build-conditionals';
 import { renderVdom } from './vdom/render';
 
 
-export const update = async (elm: d.HostElement, instance: any, elmData: d.ElementData, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   // update
-  if (BUILD.taskQueue) {
-    elmData.isQueuedForUpdate = false;
+  if (BUILD.updatable) {
+    hostRef.isQueuedForUpdate = false;
   }
 
   if (BUILD.exposeAppOnReady) {
@@ -37,26 +37,20 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
   }
 
   if (BUILD.hasRenderFn) {
-    // tell the platform we're actively rendering
-    // if a value is changed within a render() then
-    // this tells the platform not to queue the change
-    if (BUILD.updatable) {
-      elmData.isActiveRender = true;
-    }
 
     try {
       // let reflectHostAttr: d.VNodeData;
-      if (BUILD.reflectToAttr) {
+      if (BUILD.reflect) {
         // reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpCstr.properties, elmData.instance);
       }
 
-      if ((BUILD.hasRenderFn || BUILD.hostData || BUILD.reflectToAttr)) {
+      if (BUILD.hasRenderFn || BUILD.hostData || BUILD.reflect) {
         // tell the platform we're actively rendering
         // if a value is changed within a render() then
         // this tells the platform not to queue the change
-        // if (BUILD.updatable) {
-        //   plt.isActiveRender = true;
-        // }
+        if (BUILD.updatable) {
+          hostRef.isActiveRender = true;
+        }
 
         if (BUILD.hostData) {
 
@@ -95,10 +89,10 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
           // DOM WRITE!
           renderVdom(
             elm,
-            elmData,
+            hostRef,
             cmpMeta,
             (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
-            instance.hostData && instance.hostData()
+            (BUILD.hostData) ? instance.hostData && instance.hostData() : 0
           );
 
         } else if (BUILD.noVdomRender) {
@@ -108,14 +102,14 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
         }
       }
 
+      if (BUILD.updatable) {
+        // tell the platform we're done rendering
+        // now any changes will again queue
+        hostRef.isActiveRender = false;
+      }
+
     } catch (e) {
       consoleError(e);
-    }
-
-    if (BUILD.updatable) {
-      // tell the platform we're done rendering
-      // now any changes will again queue
-      elmData.isActiveRender = false;
     }
   }
 
@@ -138,10 +132,10 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
   if (BUILD.lifecycle || BUILD.style) {
     // it's official, this element has rendered
     // DOM WRITE!
-    elmData.hasRendered = elm['s-rn'] = true;
+    hostRef.hasRendered = elm['s-rn'] = true;
   } else if (BUILD.updatable) {
     // DOM WRITE!
-    elmData.hasRendered = true;
+    hostRef.hasRendered = true;
   }
 
   if (BUILD.lifecycle && elm['s-rc']) {
@@ -186,11 +180,11 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
   // the deepest elements load first then bubbles up
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
-  if (BUILD.lifecycle && elmData.ancestorHostElement) {
+  if (BUILD.lifecycle && hostRef.ancestorHostElement) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = elmData.ancestorHostElement['s-al'];
+    ancestorsActivelyLoadingChildren = hostRef.ancestorHostElement['s-al'];
 
     if (ancestorsActivelyLoadingChildren) {
       // remove this element from the actively loading map
@@ -201,11 +195,11 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
       // then let's call the ancestor's initLoad method if there's no length
       // (which actually ends up as this method again but for the ancestor)
       if (!ancestorsActivelyLoadingChildren.size) {
-        elmData.ancestorHostElement['s-init']();
+        hostRef.ancestorHostElement['s-init']();
       }
     }
 
-    elmData.ancestorHostElement = undefined;
+    hostRef.ancestorHostElement = undefined;
   }
 
   // all is good, this component has been told it's time to finish loading
@@ -242,9 +236,9 @@ export const update = async (elm: d.HostElement, instance: any, elmData: d.Eleme
     elm['s-hmr-load'] && elm['s-hmr-load']();
   }
 
-  if (BUILD.lazyLoad && isInitialLoad && elmData.onReadyResolve) {
+  if (BUILD.lazyLoad && isInitialLoad && hostRef.onReadyResolve) {
     // fire off the user's elm.componentOnReady() resolve (if any)
-    elmData.onReadyResolve(elm);
+    hostRef.onReadyResolve(elm);
   }
 
   // ( •_•)

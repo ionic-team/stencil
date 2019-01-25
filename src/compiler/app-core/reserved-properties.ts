@@ -5,7 +5,7 @@
 export const RESERVED_PROPERTIES: string[] = [
   'addListener',
   'applyPolyfill',
-  'attr',
+  'attribute',
   'color',
   'Context',
   'dom',
@@ -72,6 +72,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'mutable',
   'passive',
   'properties',
+  'reflect',
   'reflectToAttr',
   'scoped',
   'state',

@@ -23,10 +23,18 @@ export interface PropDecorator {
   (opts?: PropOptions): PropertyDecorator;
 }
 export interface PropOptions {
-  attr?: string;
+  attribute?: string;
+
+  /** DEPRECATED: "attr" has been deprecated, please use "attribute" instead. */
+  attr2?: string;
+
   context?: string;
   connect?: string;
   mutable?: boolean;
+
+  reflect?: boolean;
+
+  /** DEPRECATED: "reflectToAttr" has been deprecated, please use "reflect" instead. */
   reflectToAttr?: boolean;
 }
 

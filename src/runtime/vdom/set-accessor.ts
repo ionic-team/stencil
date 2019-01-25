@@ -9,7 +9,7 @@
 
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { getElmRef } from '@platform';
+import { getHostRef } from '@platform';
 import { toLowerCase } from '@utils';
 
 
@@ -89,7 +89,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       memberName = toLowerCase(memberName[2]) + memberName.substring(3);
     }
 
-    const elmData = getElmRef(elm);
+    const elmData = getHostRef(elm);
 
     if (newValue) {
       (elmData.vdomListeners || (elmData.vdomListeners = new Map()))
@@ -165,5 +165,5 @@ const setProperty = (elm: any, propName: string, newValue: any) => {
 
 
 function vdomListenerProxy(this: d.HostElement, ev: Event) {
-  return getElmRef(this).vdomListeners.get(ev.type)(ev);
+  return getHostRef(this).vdomListeners.get(ev.type)(ev);
 }

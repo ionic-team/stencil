@@ -63,11 +63,11 @@ export interface BuildFeatures {
   disconnectedCallback?: boolean;
 
   // attr
-  observeAttr?: boolean;
-  reflectToAttr?: boolean;
+  observeAttribute?: boolean;
+  reflect?: boolean;
 
   taskQueue?: boolean;
-  refs?: boolean;
+  hostRefs?: boolean;
 }
 
 export interface Build extends BuildFeatures {

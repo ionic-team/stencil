@@ -9,7 +9,6 @@ export interface ComponentConstructor {
   style?: string;
   styleMode?: string;
   encapsulation?: ComponentConstructorEncapsulation;
-  cmpMeta?: d.ComponentRuntimeMeta;
   observedAttributes?: string[];
 }
 
@@ -28,17 +27,17 @@ export interface ComponentConstructorProperties {
 
 
 export interface ComponentConstructorProperty {
-  attr?: string;
+  attribute?: string;
   elementRef?: boolean;
   method?: boolean;
   mutable?: boolean;
-  reflectToAttr?: boolean;
+  reflect?: boolean;
   state?: boolean;
   type?: ComponentConstructorPropertyType;
   watchCallbacks?: string[];
 }
 
-export type ComponentConstructorPropertyType = 'string' | 'boolean' | 'number';
+export type ComponentConstructorPropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'string' | 'boolean' | 'number';
 
 
 export interface ComponentConstructorEvent {

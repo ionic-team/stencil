@@ -262,7 +262,7 @@ function formatComponentConstructorProperty(memberMeta: d.MemberMeta, stringify?
     }
 
     if (typeof memberMeta.attribName === 'string') {
-      property.attr = memberMeta.attribName;
+      property.attribute = memberMeta.attribName;
 
       if (memberMeta.reflectToAttrib) {
         property.reflectToAttr = true;

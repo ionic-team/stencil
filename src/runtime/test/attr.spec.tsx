@@ -2,7 +2,7 @@ import { Component, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
-describe('attr', () => {
+describe('attribute', () => {
 
   it('multi-word attribute', async () => {
     @Component({ tag: 'cmp-a'})
@@ -29,7 +29,7 @@ describe('attr', () => {
   it('custom attribute name', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      @Prop({ attr: 'some-customName' }) customAttr: string;
+      @Prop({ attribute: 'some-customName' }) customAttr: string;
       render() {
         return `${this.customAttr}`;
       }

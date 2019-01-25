@@ -3,7 +3,7 @@ import * as d from '.';
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
   hasAsyncLifecycle: boolean;
-  hasAttr: boolean;
+  hasAttribute: boolean;
   hasAttributeChangedCallbackFn: boolean;
   hasComponentWillLoadFn: boolean;
   hasComponentDidLoadFn: boolean;
@@ -22,7 +22,7 @@ export interface ComponentCompilerFeatures {
   hasMode: boolean;
   hasProp: boolean;
   hasPropMutable: boolean;
-  hasReflectToAttr: boolean;
+  hasReflect: boolean;
   hasRenderFn: boolean;
   hasState: boolean;
   hasStyle: boolean;
@@ -73,8 +73,8 @@ export interface ComponentCompilerStaticProperty {
   required: boolean;
   type: ComponentCompilerPropertyType;
   complexType?: ComponentCompilerPropertyComplexType;
-  attr?: string;
-  reflectToAttr?: boolean;
+  attribute?: string;
+  reflect?: boolean;
   defaultValue?: string;
 }
 

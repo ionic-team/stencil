@@ -84,7 +84,7 @@ function formatPropertyRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, 
     /**
      * [3] reflect to attribute
      */
-    shortBoolean(compilerProperty.reflectToAttr),
+    shortBoolean(compilerProperty.reflect),
 
   ];
 
@@ -93,18 +93,20 @@ function formatPropertyRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, 
 
 
 function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
-  if (typeof compilerProperty.attr === 'string') {
+  if (typeof compilerProperty.attribute === 'string') {
     // string attr name means we should observe this attribute
-    if (compilerProperty.name === compilerProperty.attr) {
+    if (compilerProperty.name === compilerProperty.attribute) {
       // property name and attribute name are the exact same
       // true value means to use the property name for the attribute name
       return 1;
     }
+
     // property name and attribute name are not the same
     // so we need to return the actual string value
     // example: "multiWord" !== "multi-word"
-    return compilerProperty.attr;
+    return compilerProperty.attribute;
   }
+
   // we shouldn't even observe an attribute for this property
   return 0;
 }

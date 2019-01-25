@@ -2,7 +2,9 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 
 
-export const refs = (BUILD.refs ? new Map() : undefined);
+export const cmpMetaRefs: WeakMap<any, d.ComponentRuntimeMeta> = (BUILD.hostRefs ? new WeakMap() : undefined);
+
+export const hostRefs: WeakMap<any, d.HostRef> = (BUILD.hostRefs ? new WeakMap() : undefined);
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = (BUILD.style ? new WeakMap() : undefined);
 
@@ -12,24 +14,24 @@ export const onAppReadyCallbacks: any[] = [];
 
 export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = (BUILD.exposeAppOnReady ? new Set() : undefined);
 
-export const getElement = (ref: any) => refs.get(ref).elm;
+// export const getElement = (ref: any) => hostDataMap.get(ref).elm;
 
-export const getElmRef = (elm: d.HostElement, elmData?: d.ElementData) => {
-  elmData = refs.get(elm);
+export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
+  hostRef = hostRefs.get(elm);
 
-  if (!elmData) {
-    refs.set(elm, elmData = {
+  if (!hostRef) {
+    hostRefs.set(elm, hostRef = {
       elm: elm,
       instanceValues: new Map(),
       instance: BUILD.lazyLoad ? null : elm
     });
   }
 
-  return elmData;
+  return hostRef;
 };
 
-export const registerLazyInstance = (lazyInstance: any, elmData: d.ElementData) =>
-  refs.set(elmData.instance = lazyInstance, elmData);
+export const registerLazyInstance = (lazyInstance: any, elmData: d.HostRef) =>
+  hostRefs.set(elmData.instance = lazyInstance, elmData);
 
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

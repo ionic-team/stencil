@@ -35,10 +35,10 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     mode: cmps.some(c => c.hasMode),
     noRenderFn: cmps.every(c => !c.hasRenderFn),
     noVdomRender: cmps.every(c => !c.hasVdomRender),
-    observeAttr: cmps.some(c => c.hasAttr),
+    observeAttribute: cmps.some(c => c.hasAttribute),
     prop: cmps.some(c => c.hasProp),
     propMutable: cmps.some(c => c.hasPropMutable),
-    reflectToAttr: cmps.some(c => c.hasReflectToAttr),
+    reflect: cmps.some(c => c.hasReflect),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
     shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
     slot: cmps.some(c => c.htmlTagNames.includes('slot')),
@@ -62,7 +62,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 
   f.taskQueue = (f.updatable || f.mode || f.lifecycle);
 
-  f.refs = (f.updatable || f.member || f.lifecycle || f.hostListener);
+  f.hostRefs = (f.updatable || f.member || f.lifecycle || f.hostListener);
 
   return f;
 }

@@ -72,6 +72,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'mutable',
   'passive',
   'properties',
+  'reflect',
   'reflectToAttr',
   'scoped',
   'state',

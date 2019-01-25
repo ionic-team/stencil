@@ -1,14 +1,15 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, getElmRef, plt, tick } from '@platform';
+import { activelyProcessingCmps, cmpMetaRefs, getHostRef, plt, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { initialLoad } from './initial-load';
 
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, elmData?: d.ElementData, ancestorHostElement?: d.HostElement) => {
+export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
   // connectedCallback
 
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.hostListener) {
-    elmData = getElmRef(elm);
+    hostRef = getHostRef(elm);
+    cmpMeta = cmpMetaRefs.get(elm.constructor);
 
     if (BUILD.hostListener && cmpMeta.hostListeners) {
       // initialize our event listeners on the host element
@@ -16,7 +17,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       // have fired even before the instance is ready
       cmpMeta.hostListeners.forEach(hostListener => {
         if (!hostListener[2]) {
-          (elmData.hostListenerEventToMethodMap || (elmData.hostListenerEventToMethodMap = new Map()))
+          (hostRef.hostListenerEventToMethodMap || (hostRef.hostListenerEventToMethodMap = new Map()))
             .set(hostListener[0], hostListener[1]);
 
           elm.addEventListener(hostListener[0], hostListenerProxy, listenerOpts(hostListener));
@@ -24,9 +25,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       });
     }
 
-    if (!elmData.hasConnected) {
+    if (!hostRef.hasConnected) {
       // first time this element has connected
-      elmData.hasConnected = true;
+      hostRef.hasConnected = true;
 
       if (BUILD.exposeAppOnReady) {
         activelyProcessingCmps.add(elm);
@@ -47,7 +48,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
             if (!ancestorHostElement['s-rn']) {
 
               // keep a reference to this element's ancestor host element
-              elmData.ancestorHostElement = ancestorHostElement;
+              hostRef.ancestorHostElement = ancestorHostElement;
 
               // ensure there is an array to contain a reference to each of the child elements
               // and set this element as one of the ancestor's child elements it should wait on
@@ -59,32 +60,31 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
 
       if (BUILD.taskQueue) {
-        // connectedCallback, initUpdate BUILD.taskQueue
-        tick.then(() => initialLoad(elm, elmData));
+        // connectedCallback, taskQueue, initialLoad
+        tick.then(() => initialLoad(elm, hostRef, cmpMeta));
 
       } else {
-        // connectedCallback, initUpdate
-        initialLoad(elm, elmData);
+        initialLoad(elm, hostRef, cmpMeta);
       }
     }
 
   } else {
-    // connectedCallback, initUpdate
-    initialLoad(elm, { instance: elm });
+    // connectedCallback, initialLoad
+    initialLoad(elm, getHostRef(elm), cmpMetaRefs.get(elm.constructor));
   }
 };
 
 
 function hostListenerProxy(this: d.HostElement, ev: Event) {
-  const elmData = getElmRef(this);
-  const hostListenerMethodName = elmData.hostListenerEventToMethodMap.get(ev.type);
+  const hostRef = getHostRef(this);
+  const hostListenerMethodName = hostRef.hostListenerEventToMethodMap.get(ev.type);
 
-  if (elmData.instance) {
+  if (hostRef.instance) {
     // instance is ready, let's call it's member method for this event
-    return elmData.instance[hostListenerMethodName](ev);
+    return hostRef.instance[hostListenerMethodName](ev);
   }
 
-  (elmData.queuedReceivedHostEvents || (elmData.queuedReceivedHostEvents = []))
+  (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []))
     .push(hostListenerMethodName, ev);
 }
 

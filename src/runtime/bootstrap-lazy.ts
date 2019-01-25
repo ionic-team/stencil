@@ -1,10 +1,10 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected';
-import { getElmRef, tick } from '@platform';
+import { hostRefs, tick } from '@platform';
 import { disconnectedCallback } from './disconnected';
-import { initHostComponent } from './init-host-component';
 import { initialLoad } from './initial-load';
+import { proxyComponent } from './proxy-component';
 import { update } from './update';
 
 
@@ -21,7 +21,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
         // StencilLazyHost
 
         connectedCallback() {
-          connectedCallback(this, cmpLazyMeta);
+          connectedCallback(this);
         }
 
         disconnectedCallback() {
@@ -31,23 +31,23 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
         }
 
         's-init'() {
-          initialLoad(this, getElmRef(this), cmpLazyMeta);
+          initialLoad(this, hostRefs.get(this), cmpLazyMeta);
         }
 
         forceUpdate() {
           if (BUILD.updatable) {
-            const elmData = getElmRef(this);
-            update(this, elmData.instance, elmData, cmpLazyMeta);
+            const hostRef = hostRefs.get(this);
+            update(this, hostRef.instance, hostRef, cmpLazyMeta);
           }
         }
 
         componentOnReady(): any {
           if (BUILD.lifecycle || BUILD.updatable) {
-            const elmData = getElmRef(this);
-            if (!elmData.onReadyPromise) {
-              elmData.onReadyPromise = new Promise(resolve => elmData.hasRendered ? resolve() : (elmData.onReadyResolve = resolve));
+            const hostRef = hostRefs.get(this);
+            if (!hostRef.onReadyPromise) {
+              hostRef.onReadyPromise = new Promise(resolve => hostRef.hasRendered ? resolve() : (hostRef.onReadyResolve = resolve));
             }
-            return elmData.onReadyPromise;
+            return hostRef.onReadyPromise;
 
           } else if (BUILD.lazyLoad) {
             return tick;
@@ -59,7 +59,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
         customElements.define(
           cmpLazyMeta.cmpTag,
-          initHostComponent(StencilLazyHost as any, cmpLazyMeta)
+          proxyComponent(StencilLazyHost as any, cmpLazyMeta, true) as any
         );
       }
     })

@@ -2,7 +2,6 @@ import * as d from '@declarations';
 
 
 const queuedTicks: Function[] = [];
-const queuedReadTasks: d.RafCallback[] = [];
 const queuedWriteTasks: d.RafCallback[] = [];
 const moduleLoaded = new Map();
 const queuedLoadModules: QueuedLoadModule[] = [];
@@ -10,7 +9,6 @@ const queuedLoadModules: QueuedLoadModule[] = [];
 
 export function resetTaskQueue() {
   queuedTicks.length = 0;
-  queuedReadTasks.length = 0;
   queuedWriteTasks.length = 0;
   moduleLoaded.clear();
   queuedLoadModules.length = 0;
@@ -26,26 +24,36 @@ export const tick = {
 
 export function flushTicks() {
   return new Promise((resolve, reject) => {
-    try {
-      process.nextTick(() => {
-        let cb: Function;
-        while ((cb = queuedTicks.shift())) {
-          cb();
+
+    function drain() {
+      try {
+        if (queuedTicks.length > 0) {
+          const writeTasks = queuedTicks.slice();
+
+          queuedTicks.length = 0;
+
+          let cb: Function;
+          while ((cb = writeTasks.shift())) {
+            cb(Date.now());
+          }
         }
-      });
 
-      resolve();
+        if (queuedTicks.length > 0) {
+          process.nextTick(drain);
 
-    } catch (e) {
-      reject(`flushTicks: ${e}`);
+        } else {
+          resolve();
+        }
+
+      } catch (e) {
+        reject(`flushTicks: ${e}`);
+      }
     }
+
+    process.nextTick(drain);
   });
 }
 
-
-export function readTask(cb: d.RafCallback) {
-  queuedReadTasks.push(cb);
-}
 
 export function writeTask(cb: d.RafCallback) {
   queuedWriteTasks.push(cb);
@@ -54,28 +62,39 @@ export function writeTask(cb: d.RafCallback) {
 
 export function flushQueue() {
   return new Promise((resolve, reject) => {
-    try {
-      process.nextTick(() => {
-        let cb: Function;
-        while ((cb = queuedReadTasks.shift())) {
-          cb(Date.now());
-        }
-        while ((cb = queuedWriteTasks.shift())) {
-          cb(Date.now());
-        }
-      });
 
-      resolve();
+    function drain() {
+      try {
+        if (queuedWriteTasks.length > 0) {
+          const writeTasks = queuedWriteTasks.slice();
 
-    } catch (e) {
-      reject(`flushQueue: ${e}`);
+          queuedWriteTasks.length = 0;
+
+          let cb: Function;
+          while ((cb = writeTasks.shift())) {
+            cb(Date.now());
+          }
+        }
+
+        if (queuedWriteTasks.length > 0) {
+          process.nextTick(drain);
+
+        } else {
+          resolve();
+        }
+
+      } catch (e) {
+        reject(`flushQueue: ${e}`);
+      }
     }
+
+    process.nextTick(drain);
   });
 }
 
 
 export async function flushAll() {
-  while (queuedTicks.length > 0 || queuedLoadModules.length > 0 || queuedReadTasks.length > 0 || queuedWriteTasks.length > 0) {
+  while (queuedTicks.length > 0 || queuedLoadModules.length > 0 || queuedWriteTasks.length > 0) {
     await flushTicks();
     await flushLoadModule();
     await flushQueue();

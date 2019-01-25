@@ -35,7 +35,7 @@ describe('render-text', () => {
     `);
   });
 
-  fit('Hello World, re-render, flush', async () => {
+  it('Hello World, re-render, flush', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
       @Prop() excitement = '';

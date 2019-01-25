@@ -6,20 +6,18 @@ import { proxyComponent } from './proxy-component';
 import { update } from './update';
 
 
-export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cmpMeta?: d.ComponentRuntimeMeta) => {
+export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
   // initialConnect
-  cmpMeta = (elm as any).constructor.cmpMeta;
-
-  if (BUILD.lifecycle && elmData.ancestorHostElement && !elmData.ancestorHostElement['s-rn']) {
+  if (BUILD.lifecycle && hostRef.ancestorHostElement && !hostRef.ancestorHostElement['s-rn']) {
     // initUpdate, BUILD.lifecycle
     // this is the intial load
     // this element has an ancestor host element
     // but the ancestor host element has NOT rendered yet
     // so let's just cool our jets and wait for the ancestor to render
-    (elmData.ancestorHostElement['s-rc'] = elmData.ancestorHostElement['s-rc'] || []).push(() =>
+    (hostRef.ancestorHostElement['s-rc'] = hostRef.ancestorHostElement['s-rc'] || []).push(() =>
       // this will get fired off when the ancestor host element
       // finally gets around to rendering its lazy self
-      initialLoad(elm, elmData)
+      initialLoad(elm, hostRef, cmpMeta)
     );
 
   } else {
@@ -76,29 +74,29 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
         if (BUILD.member && !LazyCstr.isProxied && cmpMeta.members) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
-          proxyComponent(LazyCstr.prototype, cmpMeta, true);
+          proxyComponent(LazyCstr, cmpMeta, false, true);
           LazyCstr.isProxied = true;
         }
 
         // ok, time to construct the instance
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
-        BUILD.member && (elmData.isConstructingInstance = true);
-        new (LazyCstr as any)(elmData);
-        BUILD.member && (elmData.isConstructingInstance = false);
+        BUILD.member && (hostRef.isConstructingInstance = true);
+        new (LazyCstr as any)(hostRef);
+        BUILD.member && (hostRef.isConstructingInstance = false);
 
-        if (BUILD.hostListener && elmData.queuedReceivedHostEvents) {
+        if (BUILD.hostListener && hostRef.queuedReceivedHostEvents) {
           // events may have already fired before the instance was even ready
           // now that the instance is ready, let's replay all of the events that
           // we queued up earlier that were originally meant for the instance
-          for (let i = 0; i < elmData.queuedReceivedHostEvents.length; i += 2) {
+          for (let i = 0; i < hostRef.queuedReceivedHostEvents.length; i += 2) {
             // data was added in sets of two
             // first item the eventMethodName
             // second item is the event data
             // take a look at hostEventListenerProxy()
-            elmData.instance[elmData.queuedReceivedHostEvents[i]](elmData.queuedReceivedHostEvents[i + 1]);
+            hostRef.instance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
           }
-          elmData.queuedReceivedHostEvents = null;
+          hostRef.queuedReceivedHostEvents = null;
         }
 
       } catch (e) {
@@ -106,10 +104,10 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
       }
     }
 
-    if (BUILD.observeAttr && cmpMeta.attrNameToPropName) {
+    if (BUILD.observeAttribute && cmpMeta.attrNameToPropName) {
       cmpMeta.attrNameToPropName.forEach((propName, attrName) => {
         if (elm.hasAttribute(attrName)) {
-          elmData.instanceValues.set(
+          hostRef.instanceValues.set(
             propName,
             parsePropertyValue(elm.getAttribute(attrName), cmpMeta.members[propName][1])
           );
@@ -118,9 +116,9 @@ export const initialLoad = async (elm: d.HostElement, elmData: d.ElementData, cm
     }
 
     if (BUILD.taskQueue) {
-      writeTask(() => update(elm, elmData.instance, elmData, cmpMeta, true));
+      writeTask(() => update(elm, hostRef.instance, hostRef, cmpMeta, true));
     } else {
-      update(elm, elmData.instance, elmData, cmpMeta, true);
+      update(elm, hostRef.instance, hostRef, cmpMeta, true);
     }
   }
 };

@@ -13,10 +13,12 @@ export type LazyBundleRuntimeMeta = [
 
 export interface ComponentRuntimeMeta {
   attrNameToPropName?: Map<string, string>;
+  propNameToAttrName?: Map<string, string>;
   hostListeners?: d.ComponentRuntimeHostListener[];
+  isReflectingAttribute?: boolean;
   members?: d.ComponentRuntimeMembers;
-  scopedCssEncapsulation?: 1;
-  shadowDomEncapsulation?: 1;
+  scopedCssEncapsulation?: boolean;
+  shadowDomEncapsulation?: boolean;
 }
 
 
@@ -90,9 +92,10 @@ export interface ModeBundleIds {
 }
 
 
-export interface ElementData {
+export interface HostRef {
   ancestorHostElement?: d.HostElement;
   elm?: d.HostElement;
+  cmpMeta?: d.ComponentRuntimeMeta;
   hasConnected?: boolean;
   hasRendered?: boolean;
   hostListenerEventToMethodMap?: Map<string, string>;
@@ -121,7 +124,7 @@ export interface PlatformRuntime {
   supportsShadowDom?: boolean;
 }
 
-export type RefMap = WeakMap<any, ElementData>;
+export type RefMap = WeakMap<any, HostRef>;
 
 export type StyleMap = Map<string, string>;
 

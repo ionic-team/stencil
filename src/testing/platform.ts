@@ -11,7 +11,7 @@ export const win = setupGlobal(global);
 
 export const doc = win.document;
 
-export const refs = new Map();
+export const hostRefs = new Map();
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
 
@@ -31,7 +31,7 @@ export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = new Set();
 
 export function resetPlatform() {
   win.$reset();
-  refs.clear();
+  hostRefs.clear();
   styles.clear();
   plt.appMode = null;
   plt.isTmpDisconnected = false;
@@ -43,24 +43,26 @@ export function resetPlatform() {
   resetTaskQueue();
 }
 
-export const getElement = (ref: any) => refs.get(ref).elm;
+export const cmpMetaRefs = new Map();
 
-export const getElmRef = (elm: d.HostElement, elmData?: d.ElementData) => {
-  elmData = refs.get(elm);
+export const getElement = (ref: any) => hostRefs.get(ref).elm;
 
-  if (!elmData) {
-    refs.set(elm, elmData = {
+export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
+  hostRef = hostRefs.get(elm);
+
+  if (!hostRef) {
+    hostRefs.set(elm, hostRef = {
       elm: elm,
       instanceValues: new Map(),
       instance: elm
     });
   }
 
-  return elmData;
+  return hostRef;
 };
 
-export const registerLazyInstance = (lazyInstance: any, elmData: d.ElementData) =>
-  refs.set(elmData.instance = lazyInstance, elmData);
+export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
+  hostRefs.set(hostRef.instance = lazyInstance, hostRef);
 
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

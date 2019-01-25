@@ -118,7 +118,7 @@ export function h(nodeName: any, vnodeData: any) {
     vnode.vname = vname;
   }
 
-  if (BUILD.reflectToAttr) {
+  if (BUILD.reflect) {
     vnode.ishost = false;
   }
 
