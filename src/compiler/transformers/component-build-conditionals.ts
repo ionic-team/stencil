@@ -6,8 +6,8 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
   if (cmpMeta.properties.length > 0) {
     cmpMeta.hasProp = true;
     cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
-    cmpMeta.hasReflectToAttr = cmpMeta.properties.some(p => p.reflectToAttr);
-    cmpMeta.hasAttr = cmpMeta.properties.some(p => typeof p.attr === 'string');
+    cmpMeta.hasReflect = cmpMeta.properties.some(p => p.reflect);
+    cmpMeta.hasAttribute = cmpMeta.properties.some(p => typeof p.attribute === 'string');
     // TODO
     // cmpMeta.hasWatchCallback = cmpMeta.properties.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
   }

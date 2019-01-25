@@ -4,6 +4,7 @@ import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { sys } from '@sys';
 import { validateConfig } from '../config/validate-config';
 import { visitSource } from '../transformers/visitors/visit-source';
 import ts from 'typescript';
@@ -73,7 +74,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
       lazyComponentTransform()
     ]
   });

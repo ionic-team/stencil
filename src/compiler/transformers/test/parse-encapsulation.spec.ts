@@ -13,7 +13,7 @@ describe('parse encapsulation', () => {
     `);
 
     expect(getStaticGetter(t.outputText, 'encapsulation')).toEqual('shadow');
-    expect(t.cmpCompilerMeta.encapsulation).toBe('shadow');
+    expect(t.cmp.encapsulation).toBe('shadow');
   });
 
   it('scoped', () => {
@@ -26,7 +26,7 @@ describe('parse encapsulation', () => {
     `);
 
     expect(getStaticGetter(t.outputText, 'encapsulation')).toEqual('scoped');
-    expect(t.cmpCompilerMeta.encapsulation).toBe('scoped');
+    expect(t.cmp.encapsulation).toBe('scoped');
   });
 
   it('no encapsulation', () => {
@@ -38,7 +38,7 @@ describe('parse encapsulation', () => {
     `);
 
     expect(t.outputText).not.toContain(`static get encapsulation()`);
-    expect(t.cmpCompilerMeta.encapsulation).toBe(null);
+    expect(t.cmp.encapsulation).toBe('none');
   });
 
 });

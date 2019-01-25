@@ -13,6 +13,7 @@ module.exports = {
     "@stencil/core/mock-doc": "<rootDir>/dist/mock-doc",
     "@stencil/core/platform": "<rootDir>/dist/testing/platform",
     "@stencil/core/runtime": "<rootDir>/dist/runtime",
+    "@stencil/core/sys": "<rootDir>/dist/sys/node",
     "@stencil/core/testing": "<rootDir>/dist/testing",
     "@stencil/core/utils": "<rootDir>/dist/utils",
     "@stencil/core": "<rootDir>/dist/testing/core"

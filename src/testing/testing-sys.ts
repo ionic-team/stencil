@@ -1,7 +1,7 @@
 import { TestingFs } from './testing-fs';
 import { StencilSystem } from '@declarations';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 
 const relDistPath = path.join(__dirname, '..', '..', 'dist');
@@ -18,6 +18,7 @@ export class TestingSystem extends NodeSystem {
   constructor() {
     const fs = new TestingFs();
     super(fs);
+    this.path = path;
     this.createFsWatcher = null;
     this.initWorkers(1, 1);
   }

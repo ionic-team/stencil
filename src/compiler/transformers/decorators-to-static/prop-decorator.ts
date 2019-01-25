@@ -30,6 +30,8 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
   const propMeta: d.ComponentCompilerStaticProperty = {
     type: typeStr,
+    attribute: null,
+    reflect: false,
     mutable: !!propOptions.mutable,
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
@@ -38,8 +40,8 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
-    propMeta.attr = getAttributeName(propName, propOptions);
-    propMeta.reflectToAttr = !!propOptions.reflectToAttr;
+    propMeta.attribute = getAttributeName(diagnostics, propName, propOptions);
+    propMeta.reflect = getReflect(diagnostics, propOptions);
   }
 
   // extract default value
@@ -59,12 +61,32 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
   return staticProp;
 }
 
-function getAttributeName(propName: string, propOptions: d.PropOptions) {
-  if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
-    return propOptions.attr.trim();
-  } else {
-    return toDashCase(propName);
+function getAttributeName(_diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions) {
+  if (typeof propOptions.attribute === 'string' && propOptions.attribute.trim().length > 0) {
+    return propOptions.attribute.trim();
   }
+
+  if (typeof (propOptions as any).attr === 'string' && (propOptions as any).attr.trim().length > 0) {
+    // const diagnostic = buildWarn(diagnostics);
+    // diagnostic.messageText = `@Prop option "attr" has been depreciated. Please use "attribute" instead.`;
+    return (propOptions as any).attr.trim();
+  }
+
+  return toDashCase(propName);
+}
+
+function getReflect(_diagnostics: d.Diagnostic[], propOptions: d.PropOptions) {
+  if (typeof propOptions.reflect === 'boolean') {
+    return propOptions.reflect;
+  }
+
+  if (typeof (propOptions as any).reflectToAttr === 'boolean') {
+    // const diagnostic = buildWarn(diagnostics);
+    // diagnostic.messageText = `@Prop option "reflectToAttr" has been depreciated. Please use "reflect" instead.`;
+    return (propOptions as any).reflectToAttr;
+  }
+
+  return false;
 }
 
 function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]) {

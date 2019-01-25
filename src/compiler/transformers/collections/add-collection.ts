@@ -1,10 +1,9 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { parseCollection } from './parse-collection-module';
-import { sys } from '@sys';
 
 
-export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
+export function addCollection(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
   moduleFile.externalImports = moduleFile.externalImports || [];
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -73,7 +72,7 @@ export function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, buil
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = sys.path.dirname(pkgJsonFilePath);
-      addCollection(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
+      addCollection(sys, config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }
 }

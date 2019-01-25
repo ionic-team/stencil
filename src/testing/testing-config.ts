@@ -1,12 +1,9 @@
-import * as path from 'path';
 import * as d from '@declarations';
-import { TestingLogger } from './testing-logger';
-import { TestingSystem } from './testing-sys';
+import * as path from 'path';
+
 
 export class TestingConfig implements d.Config {
   _isTesting = true;
-  logger = new TestingLogger();
-  sys = new TestingSystem();
 
   namespace: string;
   rootDir = path.resolve('/');

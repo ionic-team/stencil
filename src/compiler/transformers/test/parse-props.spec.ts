@@ -12,7 +12,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -20,16 +20,16 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': true,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'string'
       }
     });
 
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
     expect(t.property.type).toBe('string');
     expect(t.property.optional).toBe(true);
-    expect(t.cmpCompilerMeta.hasProp).toBe(true);
+    expect(t.cmp.hasProp).toBe(true);
   });
 
   it('prop required', () => {
@@ -41,7 +41,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -49,7 +49,7 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': true,
         'type': 'string'
       }
@@ -66,7 +66,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -75,7 +75,7 @@ describe('parse props', () => {
         'defaultValue': undefined,
         'mutable': true,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'string'
       }
@@ -87,12 +87,12 @@ describe('parse props', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
-        @Prop({ reflectToAttr: true }) val: string;
+        @Prop({ reflect: true }) val: string;
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -100,13 +100,13 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': true,
+        'reflect': true,
         'required': false,
         'type': 'string'
       }
     });
-    expect(t.property.reflectToAttr).toBe(true);
-    expect(t.cmpCompilerMeta.hasReflectToAttr).toBe(true);
+    expect(t.property.reflect).toBe(true);
+    expect(t.cmp.hasReflect).toBe(true);
   });
 
   it('prop array', () => {
@@ -118,6 +118,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
+        'attribute': null,
         'complexType': {
           'references': {},
           'resolved': '{}', // TODO, needs to be string[]
@@ -125,13 +126,14 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
+        'reflect': false,
         'required': false,
         'type': 'unknown'
       }
     });
     expect(t.property.type).toBe('unknown');
-    expect(t.property.attr).toBe(null);
-    expect(t.property.reflectToAttr).toBe(false);
+    expect(t.property.attribute).toBe(null);
+    expect(t.property.reflect).toBe(false);
   });
 
   it('prop object', () => {
@@ -143,7 +145,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {
             'Object': {
@@ -155,14 +157,14 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'any'
       }
     });
     expect(t.property.type).toBe('any');
-    expect(t.property.attr).toBe('val');
-    expect(t.property.reflectToAttr).toBe(false);
+    expect(t.property.attribute).toBe('val');
+    expect(t.property.reflect).toBe(false);
   });
 
   it('prop multiword', () => {
@@ -174,7 +176,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'multiWord': {
-        'attr': 'multi-word',
+        'attribute': 'multi-word',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -183,13 +185,13 @@ describe('parse props', () => {
         'defaultValue': undefined,
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'string'
       }
     });
     expect(t.property.name).toBe('multiWord');
-    expect(t.property.attr).toBe('multi-word');
+    expect(t.property.attribute).toBe('multi-word');
   });
 
   it('prop w/ string type', () => {
@@ -201,7 +203,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -209,13 +211,13 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'string'
       }
     });
     expect(t.property.type).toBe('string');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ number type', () => {
@@ -227,7 +229,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'number',
@@ -235,13 +237,13 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'number'
       }
     });
     expect(t.property.type).toBe('number');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ boolean type', () => {
@@ -253,7 +255,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'boolean',
@@ -261,13 +263,13 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'boolean'
       }
     });
     expect(t.property.type).toBe('boolean');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ any type', () => {
@@ -279,7 +281,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'any',
@@ -287,13 +289,13 @@ describe('parse props', () => {
         },
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'any'
       }
     });
     expect(t.property.type).toBe('any');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ inferred string type', () => {
@@ -305,7 +307,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'string',
@@ -314,13 +316,13 @@ describe('parse props', () => {
         'defaultValue': `'mph'`,
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'string'
       }
     });
     expect(t.property.type).toBe('string');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ inferred number type', () => {
@@ -332,7 +334,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'number',
@@ -341,13 +343,13 @@ describe('parse props', () => {
         'defaultValue': '88',
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'number'
       }
     });
     expect(t.property.type).toBe('number');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ inferred boolean type', () => {
@@ -359,7 +361,7 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'boolean',
@@ -368,13 +370,13 @@ describe('parse props', () => {
         'defaultValue': 'false',
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'boolean'
       }
     });
     expect(t.property.type).toBe('boolean');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
   it('prop w/ inferred any type from null', () => {
@@ -387,7 +389,7 @@ describe('parse props', () => {
 
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attr': 'val',
+        'attribute': 'val',
         'complexType': {
           'references': {},
           'resolved': 'any',
@@ -396,13 +398,13 @@ describe('parse props', () => {
         'defaultValue': 'null',
         'mutable': false,
         'optional': false,
-        'reflectToAttr': false,
+        'reflect': false,
         'required': false,
         'type': 'any'
       }
     });
     expect(t.property.type).toBe('any');
-    expect(t.property.attr).toBe('val');
+    expect(t.property.attribute).toBe('val');
   });
 
 });

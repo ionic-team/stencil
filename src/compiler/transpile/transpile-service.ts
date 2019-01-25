@@ -124,7 +124,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
           convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          visitSource(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
+          visitSource(sys, config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
         ]
       };
     }
@@ -216,7 +216,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
-        addCollection(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+        addCollection(sys, config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
       });
 
       // write the cached js output too
@@ -269,7 +269,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
-          addCollection(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
+          addCollection(sys, config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
         });
       }
 

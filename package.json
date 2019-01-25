@@ -148,6 +148,17 @@
   ],
   "jest": {
     "preset": "./testing/jest.preset.js",
+    "moduleNameMapper": {
+      "@build-conditionals": "<rootDir>/dist/testing/build-conditionals",
+      "@compiler": "<rootDir>/dist/mock-doc",
+      "@core": "<rootDir>/dist/testing/core",
+      "@mock-doc": "<rootDir>/dist/mock-doc",
+      "@platform": "<rootDir>/dist/testing/platform",
+      "@runtime": "<rootDir>/dist/runtime",
+      "@sys": "<rootDir>/dist/sys/node",
+      "@testing": "<rootDir>/dist/testing",
+      "@utils": "<rootDir>/dist/utils"
+    },
     "modulePathIgnorePatterns": [
       "/bin",
       "/scripts",

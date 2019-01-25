@@ -1,12 +1,11 @@
 import * as d from '@declarations';
 import { getModule, resetModule } from '../../build/compiler-ctx';
-import { sys } from '@sys';
 import { visitClass } from './visit-class';
 import { visitImport } from './visit-import';
 import ts from 'typescript';
 
 
-export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
+export function visitSource(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
   let dirPath: string;
   let moduleFile: d.Module;
 
@@ -19,7 +18,7 @@ export function visitSource(config: d.Config, compilerCtx: d.CompilerCtx, buildC
           return visitClass(transformCtx, moduleFile, typeChecker, node as ts.ClassDeclaration, transformOpts);
 
         case ts.SyntaxKind.ImportDeclaration:
-          return visitImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node as ts.ImportDeclaration);
+          return visitImport(sys, config, compilerCtx, buildCtx, moduleFile, dirPath, node as ts.ImportDeclaration);
       }
 
       return ts.visitEachChild(node, visitNode, transformCtx);

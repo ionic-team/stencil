@@ -1,25 +1,24 @@
 import * as d from '@declarations';
-import { mockConfig } from '../../../testing/mocks';
-import { TestingFs } from '../../../testing/testing-fs';
+import { mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
 import { transpileModule } from './transpile';
 
 
 describe('parse collection', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
+  let sys: d.StencilSystem;
 
   beforeEach(async () => {
     config = mockConfig();
+    compilerCtx = mockCompilerCtx();
+    sys = mockStencilSystem();
     sys.resolveModule = (_from, moduleId) => {
       if (moduleId === 'ionicons') {
         return '/node_modules/@ionic/core/node_modules/ionicons/package.json';
       }
       return '/node_modules/@ionic/core/package.json';
     };
-    compilerCtx = {
-      fs: new TestingFs() as any,
-      moduleMap: new Map()
-    };
+
     await compilerCtx.fs.writeFiles({
       '/node_modules/@ionic/core/package.json': `
       {
@@ -92,7 +91,7 @@ describe('parse collection', () => {
       import '@ionic/core';
       @Component({tag: 'cmp-a'})
       export class CmpA {}
-    `, config, compilerCtx);
+    `, config, compilerCtx, sys);
 
     expect(t.outputText).not.toContain(`@ionic/core`);
 
@@ -107,13 +106,13 @@ describe('parse collection', () => {
     expect(ionicCollection.compiler.version).toBe(`9.9.9`);
     expect(ionicCollection.compiler.typescriptVersion).toBe(`8.8.8`);
 
-    expect(ionicCollection.moduleFiles[0].cmpCompilerMeta.tagName).toBe(`ion-action-sheet`);
-    expect(ionicCollection.moduleFiles[0].cmpCompilerMeta.encapsulation).toBe(`shadow`);
+    expect(ionicCollection.moduleFiles[0].cmps[0].tagName).toBe(`ion-action-sheet`);
+    expect(ionicCollection.moduleFiles[0].cmps[0].encapsulation).toBe(`shadow`);
     expect(ionicCollection.moduleFiles[0].collectionName).toBe(`@ionic/core`);
     expect(ionicCollection.moduleFiles[0].isCollectionDependency).toBe(true);
 
-    expect(ioniconsCollection.moduleFiles[0].cmpCompilerMeta.tagName).toBe(`ion-icon`);
-    expect(ioniconsCollection.moduleFiles[0].cmpCompilerMeta.encapsulation).toBe(`scoped`);
+    expect(ioniconsCollection.moduleFiles[0].cmps[0].tagName).toBe(`ion-icon`);
+    expect(ioniconsCollection.moduleFiles[0].cmps[0].encapsulation).toBe(`scoped`);
     expect(ioniconsCollection.moduleFiles[0].collectionName).toBe(`ionicons`);
     expect(ioniconsCollection.moduleFiles[0].isCollectionDependency).toBe(true);
 

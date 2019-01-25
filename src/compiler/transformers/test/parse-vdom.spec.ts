@@ -13,7 +13,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomAttribute).toBe(true);
+    expect(t.cmp.hasVdomAttribute).toBe(true);
   });
 
   it('hasVdomClass', () => {
@@ -26,7 +26,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomClass).toBe(true);
+    expect(t.cmp.hasVdomClass).toBe(true);
   });
 
   it('hasVdomFunctional', () => {
@@ -40,7 +40,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomFunctional).toBe(true);
+    expect(t.cmp.hasVdomFunctional).toBe(true);
   });
 
   it('hasVdomKey', () => {
@@ -53,7 +53,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomKey).toBe(true);
+    expect(t.cmp.hasVdomKey).toBe(true);
   });
 
   it('hasVdomListener', () => {
@@ -66,7 +66,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomListener).toBe(true);
+    expect(t.cmp.hasVdomListener).toBe(true);
   });
 
   it('hasVdomRef', () => {
@@ -79,7 +79,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomRef).toBe(true);
+    expect(t.cmp.hasVdomRef).toBe(true);
   });
 
   it('hasVdomRender', () => {
@@ -92,7 +92,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomRender).toBe(true);
+    expect(t.cmp.hasVdomRender).toBe(true);
   });
 
   it('hasVdomStyle', () => {
@@ -105,7 +105,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomStyle).toBe(true);
+    expect(t.cmp.hasVdomStyle).toBe(true);
   });
 
   it('hasVdomText', () => {
@@ -118,7 +118,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasVdomText).toBe(true);
+    expect(t.cmp.hasVdomText).toBe(true);
   });
 
   it('hasSlot', () => {
@@ -131,7 +131,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasSlot).toBe(true);
+    expect(t.cmp.htmlTagNames).toContain('slot');
   });
 
   it('hasSvg', () => {
@@ -144,7 +144,7 @@ describe('parse vdom', () => {
       }
     `);
 
-    expect(t.moduleFile.hasSvg).toBe(true);
+    expect(t.cmp.htmlTagNames).toContain('svg');
   });
 
 });

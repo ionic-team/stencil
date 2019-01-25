@@ -16,19 +16,22 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
 
   return propNames.map(propName => {
     const val = parsedProps[propName];
-    return {
+
+    const prop: d.ComponentCompilerProperty = {
       name: propName,
       type: val.type,
-      attr: (typeof val.attr === 'string' ? val.attr : null),
-      reflectToAttr: !!val.reflectToAttr,
+      attribute: (typeof val.attribute === 'string' ? val.attribute.trim() : (typeof val.attr === 'string' ? val.attr.trim() : null)),
+      reflect: (typeof val.reflect === 'boolean' ? val.reflect : (typeof val.reflectToAttr === 'boolean' ? val.reflectToAttr : false)),
       mutable: !!val.mutable,
       required: !!val.required,
       optional: !!val.optional,
       defaultValue: val.defaultValue,
       complexType: undefined,
     };
+    return prop;
   });
 }
+
 
 export function parseWatchCallbacks(val: any) {
   if (Array.isArray(val.watchCallbacks)) {

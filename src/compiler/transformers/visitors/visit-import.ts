@@ -1,11 +1,10 @@
 import * as d from '@declarations';
 import { addCollection } from '../collections/add-collection';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import ts from 'typescript';
 
 
-export function visitImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) {
+export function visitImport(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
@@ -23,7 +22,7 @@ export function visitImport(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       // node resolve import
       if (!importNode.importClause) {
         // node resolve side effect import
-        addCollection(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
+        addCollection(sys, config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 
         // test if this side effect import is a collection
         compilerCtx.collections = compilerCtx.collections || [];

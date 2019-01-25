@@ -181,11 +181,11 @@ function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentComp
   cmpMeta.properties = propsData.map(propData => {
     const prop: d.ComponentCompilerProperty = {
       name: propData.name,
-      attr: (typeof propData.attr === 'string' ? propData.attr : null),
+      attribute: (typeof propData.attr === 'string' ? propData.attr : null),
       mutable: !!propData.mutable,
       optional: false, // TODO
       required: false, // TODO
-      reflectToAttr: !!propData.reflectToAttr,
+      reflect: !!propData.reflectToAttr,
       type: 'unknown'
     };
 

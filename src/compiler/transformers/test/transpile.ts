@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
 import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
 
 
-export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx) {
+export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx, sys?: d.StencilSystem) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
   options.suppressOutputPathCheck = true;
@@ -33,7 +33,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   options.jsxFactory = 'h';
 
   const inputFileName = 'module.tsx';
-  const sourceFile = ts.createSourceFile(inputFileName, input, options.target); // TODO: GH#18217
+  const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
 
@@ -57,16 +57,20 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
 
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx();
-  compilerCtx.moduleMap = compilerCtx.moduleMap || new Map();
+  sys = sys || mockStencilSystem();
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
+
+  const transformOpts: d.TransformOptions = {
+    addCompilerMeta: false
+  };
 
   program.emit(undefined, undefined, undefined, undefined, {
     before: [
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, null)
+      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
     ]
   });
 
@@ -75,20 +79,21 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   }
 
   const moduleFile = compilerCtx.moduleMap.values().next().value;
-  const cmpCompilerMeta: d.ComponentCompilerMeta = moduleFile ? moduleFile.cmpCompilerMeta : null;
-  const tagName = cmpCompilerMeta ? cmpCompilerMeta.tagName : null;
-  const componentClassName = cmpCompilerMeta ? cmpCompilerMeta.componentClassName : null;
-  const properties = cmpCompilerMeta ? cmpCompilerMeta.properties : null;
+  const cmps = moduleFile ? moduleFile.cmps : null;
+  const cmp = Array.isArray(cmps) && cmps.length > 0 ? cmps[0] : null;
+  const tagName = cmp ? cmp.tagName : null;
+  const componentClassName = cmp ? cmp.componentClassName : null;
+  const properties = cmp ? cmp.properties : null;
   const property = properties ? properties[0] : null;
-  const states = cmpCompilerMeta ? cmpCompilerMeta.states : null;
+  const states = cmp ? cmp.states : null;
   const state = states ? states[0] : null;
-  const listeners = cmpCompilerMeta ? cmpCompilerMeta.listeners : null;
+  const listeners = cmp ? cmp.listeners : null;
   const listener = listeners ? listeners[0] : null;
-  const events = cmpCompilerMeta ? cmpCompilerMeta.events : null;
+  const events = cmp ? cmp.events : null;
   const event = events ? events[0] : null;
-  const methods = cmpCompilerMeta ? cmpCompilerMeta.methods : null;
+  const methods = cmp ? cmp.methods : null;
   const method = methods ? methods[0] : null;
-  const elementRef = cmpCompilerMeta ? cmpCompilerMeta.elementRef : null;
+  const elementRef = cmp ? cmp.elementRef : null;
 
   return {
     outputText,
@@ -96,7 +101,8 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     buildCtx,
     diagnostics: buildCtx.diagnostics,
     moduleFile,
-    cmpCompilerMeta,
+    cmps,
+    cmp,
     componentClassName,
     tagName,
     properties,

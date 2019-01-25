@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { pathJoin } from '@utils';
+import { sys } from '@sys';
 import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
 
@@ -65,7 +66,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      visitSource(config, compilerCtx, buildCtx, typeChecker, collection, {})
+      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, collection, {})
     ]
   });
 }
