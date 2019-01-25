@@ -10,4 +10,4 @@ try {
   }
 } catch (e) {}
 
-cli.run(process);
+require('../dist/cli').run(process);

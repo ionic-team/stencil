@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { logger, sys } from '@sys';
-import { normalizePath, pathJoin } from '@utils';
+import { normalizePath } from '@utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
 
@@ -20,7 +20,7 @@ export function parseCollection(config: d.Config, compilerCtx: d.CompilerCtx, bu
   const collectionPackageRootDir = sys.path.dirname(pkgJsonFilePath);
 
   // figure out the full path to the collection collection file
-  const collectionFilePath = pathJoin(config, collectionPackageRootDir, pkgData.collection);
+  const collectionFilePath = sys.path.join(collectionPackageRootDir, pkgData.collection);
 
   const relPath = sys.path.relative(config.rootDir, collectionFilePath);
   logger.debug(`load collection: ${collectionName}, ${relPath}`);

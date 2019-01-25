@@ -47,7 +47,7 @@ describe('host-config', () => {
       config = new TestingConfig();
       validateConfig(config);
       outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-      const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
+      const filePath = sys.path.join(outputTarget.dir, 'build/app/1234.js');
       const url = getUrlFromFilePath(config, outputTarget, filePath);
       expect(url).toBe('/build/app/1234.js');
     });

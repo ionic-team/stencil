@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { logger, sys } from '@sys';
 
 
@@ -137,7 +136,7 @@ export function getPrerenderQueue(outputTarget: d.OutputTargetWww) {
 }
 
 
-export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTargetWww, url: string) {
+export function getWritePathFromUrl(outputTarget: d.OutputTargetWww, url: string) {
   const parsedUrl = sys.url.parse(url);
 
   let pathName = parsedUrl.pathname;
@@ -149,8 +148,7 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
   }
 
   // figure out the directory where this file will be saved
-  const dir = pathJoin(
-    config,
+  const dir = sys.path.join(
     outputTarget.dir,
     pathName
   );
@@ -162,10 +160,10 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
     // this is the root of the output target directory
     // use the configured index.html
     const basename = outputTarget.indexHtml.substr(dir.length + 1);
-    filePath = pathJoin(config, dir, basename);
+    filePath = sys.path.join(dir, basename);
 
   } else {
-    filePath = pathJoin(config, dir, `index.html`);
+    filePath = sys.path.join(dir, `index.html`);
   }
 
   return filePath;

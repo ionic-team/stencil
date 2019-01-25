@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
 import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -59,7 +59,7 @@ async function writeLazyLoadCoreOutputs(config: d.Config, compilerCtx: d.Compile
 async function writeLazyLoadCoreOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, outputText: string) {
   const fileName = `${config.fsNamespace}.js`;
 
-  const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+  const filePath = sys.path.join(outputTarget.buildDir, fileName);
 
   await compilerCtx.fs.writeFile(filePath, outputText);
 }

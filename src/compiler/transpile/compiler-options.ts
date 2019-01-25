@@ -18,13 +18,13 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
 
     if (tsconfigResults.error) {
       if (!config._isTesting) {
-        buildCtx.diagnostics.push(loadTypeScriptDiagnostic(config, tsconfigResults.error));
+        buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsconfigResults.error));
       }
 
     } else {
       const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, '.');
       if (parseResult.errors && parseResult.errors.length > 0) {
-        loadTypeScriptDiagnostics(config, buildCtx.diagnostics, parseResult.errors);
+        loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
 
       } else {
         compilerOptions = {

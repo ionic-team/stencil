@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { getPolyfillsEsmBuildPath } from './app-file-naming';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
@@ -19,14 +18,14 @@ export async function getAppBrowserCorePolyfills() {
 }
 
 
-export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const polyfillsBuildDir = getPolyfillsEsmBuildPath(config, outputTarget, 'es5');
+export async function copyEsmCorePolyfills(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+  const polyfillsBuildDir = getPolyfillsEsmBuildPath(outputTarget, 'es5');
 
   await POLYFILLS.map(async polyfillFile => {
     const staticName = sys.path.join('polyfills', 'esm', polyfillFile);
     const polyfillsContent = await sys.getClientCoreFile({ staticName: staticName });
 
-    const polyfillDst = pathJoin(config, polyfillsBuildDir, polyfillFile);
+    const polyfillDst = sys.path.join(polyfillsBuildDir, polyfillFile);
     await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);
   });
 }

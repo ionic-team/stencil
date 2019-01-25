@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
@@ -26,7 +25,7 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
 
   addDefaults(config, outputTarget, hostConfig);
 
-  const hostConfigFilePath = pathJoin(config, outputTarget.dir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = sys.path.join(outputTarget.dir, HOST_CONFIG_FILENAME);
 
   await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
 
@@ -52,7 +51,7 @@ export function generateHostRuleHeaders(config: d.Config, outputTarget: d.Output
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
   addStyles(hostRuleHeaders, hydrateResults);
-  addCoreJs(config, outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
+  addCoreJs(outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
   addScripts(hostRuleHeaders, hydrateResults);
   addImgs(hostRuleHeaders, hydrateResults);
@@ -61,8 +60,8 @@ export function generateHostRuleHeaders(config: d.Config, outputTarget: d.Output
 }
 
 
-function addCoreJs(config: d.Config, outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
-  const url = getUrlFromFilePath(config, outputTarget, appCoreWWWPath);
+function addCoreJs(outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
+  const url = getUrlFromFilePath(outputTarget, appCoreWWWPath);
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
 }
@@ -116,13 +115,13 @@ export function getBundleIds(_entryModules: d.EntryModule[], _components: d.Hydr
 
 function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, bundleId: string) {
   const unscopedFileName = getBrowserFilename(bundleId, false);
-  const unscopedWwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), unscopedFileName);
-  return getUrlFromFilePath(config, outputTarget, unscopedWwwBuildPath);
+  const unscopedWwwBuildPath = sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName);
+  return getUrlFromFilePath(outputTarget, unscopedWwwBuildPath);
 }
 
 
-export function getUrlFromFilePath(config: d.Config, outputTarget: d.OutputTargetWww, filePath: string) {
-  let url = pathJoin(config, '/', sys.path.relative(outputTarget.dir, filePath));
+export function getUrlFromFilePath(outputTarget: d.OutputTargetWww, filePath: string) {
+  let url = sys.path.join('/', sys.path.relative(outputTarget.dir, filePath));
 
   url = outputTarget.baseUrl + url.substring(1);
 
@@ -217,15 +216,15 @@ function formatLinkRelPreloadValue(url: string) {
 
 function addDefaults(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   addBuildDirCacheControl(config, outputTarget, hostConfig);
-  addServiceWorkerNoCacheControl(config, outputTarget, hostConfig);
+  addServiceWorkerNoCacheControl(outputTarget, hostConfig);
 }
 
 
 function addBuildDirCacheControl(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
-  const url = getUrlFromFilePath(config, outputTarget, getAppBuildDir(config, outputTarget));
+  const url = getUrlFromFilePath(outputTarget, getAppBuildDir(config, outputTarget));
 
   hostConfig.hosting.rules.push({
-    include: pathJoin(config, url, '**'),
+    include: sys.path.join(url, '**'),
     headers: [
       {
         name: `Cache-Control`,
@@ -236,12 +235,12 @@ function addBuildDirCacheControl(config: d.Config, outputTarget: d.OutputTargetW
 }
 
 
-function addServiceWorkerNoCacheControl(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   if (!outputTarget.serviceWorker) {
     return;
   }
 
-  const url = getUrlFromFilePath(config, outputTarget, outputTarget.serviceWorker.swDest);
+  const url = getUrlFromFilePath(outputTarget, outputTarget.serviceWorker.swDest);
 
   hostConfig.hosting.rules.push({
     include: url,
@@ -256,7 +255,7 @@ function addServiceWorkerNoCacheControl(config: d.Config, outputTarget: d.Output
 
 
 async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) {
-  const hostConfigFilePath = pathJoin(config, config.srcDir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = sys.path.join(config.srcDir, HOST_CONFIG_FILENAME);
   try {
     const userHostConfigStr = await compilerCtx.fs.readFile(hostConfigFilePath);
 

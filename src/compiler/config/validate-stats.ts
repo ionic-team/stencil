@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
@@ -28,7 +27,7 @@ function validateStatsOutputTarget(config: d.Config, outputTarget: d.OutputTarge
   }
 
   if (!sys.path.isAbsolute(outputTarget.file)) {
-    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
+    outputTarget.file = sys.path.join(config.rootDir, outputTarget.file);
   }
 }
 

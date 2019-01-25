@@ -57,11 +57,11 @@ export async function optimizeHtml(
   // if (hydrateTarget.inlineLoaderScript) {
   //   // remove the script to the external loader script request
   //   // inline the loader script at the bottom of the html
-  //   promises.push(inlineLoaderScript(config, compilerCtx, hydrateTarget, windowLocationPath, doc));
+  //   promises.push(inlineLoaderScript(compilerCtx, hydrateTarget, windowLocationPath, doc));
   // }
 
   if (hydrateTarget.inlineAssetsMaxSize > 0) {
-    promises.push(inlineExternalAssets(config, compilerCtx, hydrateTarget, windowLocationPath, doc));
+    promises.push(inlineExternalAssets(compilerCtx, hydrateTarget, windowLocationPath, doc));
   }
 
   if (hydrateTarget.collapseWhitespace && !config.devMode && config.logLevel !== 'debug') {

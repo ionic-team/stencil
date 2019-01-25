@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
@@ -60,7 +59,7 @@ export function validateTesting(config: d.Config) {
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return pathJoin(config, testing.rootDir, ignorePattern);
+      return sys.path.join(testing.rootDir, ignorePattern);
     });
 
     config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {

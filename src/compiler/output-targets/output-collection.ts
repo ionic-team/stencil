@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 
 
@@ -39,15 +38,15 @@ async function generateCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
   const jsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
   const promises = outputTargets.map(async outputTarget => {
-    await writeCollectionOutput(config, compilerCtx, outputTarget, cmp, relPath, jsText);
+    await writeCollectionOutput(compilerCtx, outputTarget, cmp, relPath, jsText);
   });
 
   await Promise.all(promises);
 }
 
 
-async function writeCollectionOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, _cmp: d.ComponentCompilerMeta, relPath: string, outputText: string) {
-  const outputFilePath = pathJoin(config, outputTarget.collectionDir, relPath);
+async function writeCollectionOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, _cmp: d.ComponentCompilerMeta, relPath: string, outputText: string) {
+  const outputFilePath = sys.path.join(outputTarget.collectionDir, relPath);
 
   await compilerCtx.fs.writeFile(outputFilePath, outputText);
 }

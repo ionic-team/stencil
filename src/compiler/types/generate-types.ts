@@ -55,7 +55,7 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
   // In addition, all references to @stencil/core are replaced
   await Promise.all(srcDtsFiles.map(async srcDtsFile => {
     const relPath = sys.path.relative(config.srcDir, srcDtsFile.absPath);
-    const distPath = pathJoin(config, config.rootDir, distTypesDir, relPath);
+    const distPath = sys.path.join(config.rootDir, distTypesDir, relPath);
 
     const originalDtsContent = await compilerCtx.fs.readFile(srcDtsFile.absPath);
     const distDtsContent = updateStencilTypesImports(config, outputTarget.typesDir, distPath, originalDtsContent);
@@ -63,7 +63,7 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
     await compilerCtx.fs.writeFile(distPath, distDtsContent);
   }));
 
-  const distPath = pathJoin(config, config.rootDir, distTypesDir);
+  const distPath = sys.path.join(config.rootDir, distTypesDir);
   await generateComponentTypes(config, compilerCtx, buildCtx, distPath);
 }
 

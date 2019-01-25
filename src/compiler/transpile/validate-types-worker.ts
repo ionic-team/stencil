@@ -4,7 +4,6 @@ import { removeCollectionImports } from './transformers/remove-collection-import
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
 import { updateStencilTypesImports } from '../distribution/stencil-types';
-
 import path from 'path';
 import ts from 'typescript';
 
@@ -78,7 +77,16 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
   program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
-  loadTypeScriptDiagnostics(config, results.diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(results.diagnostics, tsDiagnostics);
+
+  results.diagnostics.forEach(diagnostic => {
+    if (diagnostic.absFilePath) {
+      diagnostic.relFilePath = path.relative(config.cwd, diagnostic.absFilePath);
+      if (!diagnostic.relFilePath.includes('/')) {
+        diagnostic.relFilePath = './' + diagnostic.relFilePath;
+      }
+    }
+  });
 
   return results;
 }

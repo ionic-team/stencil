@@ -52,9 +52,9 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   events: ComponentCompilerEvent[];
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
-  jsFilePath: string;
   jsdoc: CompilerJsDoc;
   listeners: ComponentCompilerListener[];
+  moduleFile: d.Module;
   methods: ComponentCompilerMethod[];
   properties: ComponentCompilerProperty[];
   states: ComponentCompilerState[];

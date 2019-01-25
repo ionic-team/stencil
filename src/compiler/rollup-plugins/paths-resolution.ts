@@ -4,7 +4,7 @@ import { sys } from '@sys';
 import ts from 'typescript';
 
 
-export default function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, tsCompilerOptions: ts.CompilerOptions) {
+export function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, tsCompilerOptions: ts.CompilerOptions) {
   const extensions = [
     'ts',
     'tsx'

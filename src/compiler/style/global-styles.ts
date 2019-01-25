@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildError, catchError, normalizePath, pathJoin } from '@utils';
+import { buildError, catchError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { optimizeCss } from './optimize-css';
@@ -20,7 +20,7 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
 
     const fileName = getGlobalStyleFilename(config);
 
-    const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+    const filePath = sys.path.join(outputTarget.buildDir, fileName);
     buildCtx.debug(`global style: ${sys.path.relative(config.rootDir, filePath)}`);
     await compilerCtx.fs.writeFile(filePath, styleText);
 

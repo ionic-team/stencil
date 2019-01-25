@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { sys } from '@sys';
 import { validatePrerender } from './validate-prerender';
@@ -26,19 +25,19 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   setStringConfig(outputTarget, 'dir', DEFAULT_DIR);
 
   if (!path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
+    outputTarget.dir = sys.path.join(config.rootDir, outputTarget.dir);
   }
 
   setStringConfig(outputTarget, 'buildDir', DEFAULT_BUILD_DIR);
 
   if (!path.isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = pathJoin(config, outputTarget.dir, outputTarget.buildDir);
+    outputTarget.buildDir = sys.path.join(outputTarget.dir, outputTarget.buildDir);
   }
 
   setStringConfig(outputTarget, 'indexHtml', DEFAULT_INDEX_HTML);
 
   if (!path.isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = pathJoin(config, outputTarget.dir, outputTarget.indexHtml);
+    outputTarget.indexHtml = sys.path.join(outputTarget.dir, outputTarget.indexHtml);
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);

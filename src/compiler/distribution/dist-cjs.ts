@@ -7,7 +7,7 @@ export async function generateCommonJsIndex(config: d.Config, compilerCtx: d.Com
     `// ${config.namespace}: CommonJS Main`
   ];
 
-  const distIndexCjsPath = getDistCjsIndexPath(config, outputTarget);
+  const distIndexCjsPath = getDistCjsIndexPath(outputTarget);
 
   await compilerCtx.fs.writeFile(distIndexCjsPath, cjs.join('\n'));
 }

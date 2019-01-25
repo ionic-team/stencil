@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 import { visitSource } from '../visitors/visit-source';
 import ts from 'typescript';
@@ -14,7 +13,7 @@ export function parseCollectionComponents(config: d.Config, compilerCtx: d.Compi
 
   if (collectionManifest.entries) {
     collectionManifest.entries.forEach(entryPath => {
-      const componentPath = pathJoin(config, collectionDir, entryPath);
+      const componentPath = sys.path.join(collectionDir, entryPath);
       const sourceText = compilerCtx.fs.readFileSync(componentPath);
       transpileCollectionEntry(config, compilerCtx, buildCtx, collection, componentPath, sourceText);
     });

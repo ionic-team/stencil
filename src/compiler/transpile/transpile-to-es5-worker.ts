@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostics } from '@utils';
+import path from 'path';
 import ts from 'typescript';
 
 
@@ -34,7 +35,16 @@ export async function transpileToEs5Worker(cwd: string, input: string, inlineHel
 
   const tsResults = ts.transpileModule(input, transpileOpts);
 
-  loadTypeScriptDiagnostics(config, results.diagnostics, tsResults.diagnostics);
+  loadTypeScriptDiagnostics(results.diagnostics, tsResults.diagnostics);
+
+  results.diagnostics.forEach(diagnostic => {
+    if (diagnostic.absFilePath) {
+      diagnostic.relFilePath = path.relative(config.cwd, diagnostic.absFilePath);
+      if (!diagnostic.relFilePath.includes('/')) {
+        diagnostic.relFilePath = './' + diagnostic.relFilePath;
+      }
+    }
+  });
 
   if (results.diagnostics.length === 0) {
     results.code = tsResults.outputText;

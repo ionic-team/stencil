@@ -3,7 +3,7 @@ import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
 import { sys } from '@sys';
 
 
-export default function bundleJson(config: d.Config, options: Options = {}) {
+export function bundleJson(config: d.Config, options: Options = {}) {
   const filter = createFilter(options.include, options.exclude);
 
   const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir).map(o => o.collectionDir);

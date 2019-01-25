@@ -98,7 +98,7 @@ function getUserCompilerOptions(rootDir: string) {
   const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
   if (tsconfigResults.error) {
-    throw new Error(formatDiagnostic(loadTypeScriptDiagnostic(null, tsconfigResults.error)));
+    throw new Error(formatDiagnostic(loadTypeScriptDiagnostic(tsconfigResults.error)));
   }
 
   const parseResult = ts.parseJsonConfigFileContent(tsconfigResults.config, ts.sys, rootDir, undefined, tsconfigFilePath);

@@ -139,7 +139,7 @@ export function serializeComponent(config: d.Config, collectionDir: string, cmp:
 
   // get the current absolute path to our built js file
   // and figure out the relative path from the src dir
-  const relToSrc = normalizePath(sys.path.relative(config.srcDir, cmp.jsFilePath));
+  const relToSrc = normalizePath(sys.path.relative(config.srcDir, cmp.moduleFile.jsFilePath));
 
   // figure out the absolute path when it's in the collection dir
   const compiledComponentAbsoluteFilePath = normalizePath(sys.path.join(collectionDir, relToSrc));

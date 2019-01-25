@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateCommonJsIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -30,12 +30,12 @@ export async function generateCommonJsIndexes(config: d.Config, compilerCtx: d.C
 async function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const outputText = `// ${config.namespace}: CommonJS Main`;
 
-  await writeCommonJsOutput(config, compilerCtx, outputTarget, outputText);
+  await writeCommonJsOutput(compilerCtx, outputTarget, outputText);
 }
 
 
-async function writeCommonJsOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
-  const distIndexCjsPath = pathJoin(config, outputTarget.buildDir, 'index.js');
+async function writeCommonJsOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
+  const distIndexCjsPath = sys.path.join(outputTarget.buildDir, 'index.js');
 
   await compilerCtx.fs.writeFile(distIndexCjsPath, outputText);
 }

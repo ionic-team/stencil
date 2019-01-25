@@ -1,10 +1,8 @@
 import * as d from '@declarations';
 import { logger, sys } from '@sys';
-import { pathJoin } from '@utils';
 
 
 export async function inlineExternalAssets(
-  config: d.Config,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetHydrate,
   windowLocationPath: string,
@@ -12,18 +10,18 @@ export async function inlineExternalAssets(
 ) {
   const linkElements = doc.querySelectorAll('link[href][rel="stylesheet"]') as any;
   for (var i = 0; i < linkElements.length; i++) {
-    inlineStyle(config, compilerCtx, outputTarget, windowLocationPath, doc, linkElements[i] as any);
+    inlineStyle(compilerCtx, outputTarget, windowLocationPath, doc, linkElements[i] as any);
   }
 
   const scriptElements = doc.querySelectorAll('script[src]') as any;
   for (i = 0; i < scriptElements.length; i++) {
-    await inlineScript(config, compilerCtx, outputTarget, windowLocationPath, scriptElements[i] as any);
+    await inlineScript(compilerCtx, outputTarget, windowLocationPath, scriptElements[i] as any);
   }
 }
 
 
-async function inlineStyle(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, doc: Document, linkElm: HTMLLinkElement) {
-  const content = await getAssetContent(config, compilerCtx, outputTarget, windowLocationPath, linkElm.href);
+async function inlineStyle(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, doc: Document, linkElm: HTMLLinkElement) {
+  const content = await getAssetContent(compilerCtx, outputTarget, windowLocationPath, linkElm.href);
   if (!content) {
     return;
   }
@@ -38,8 +36,8 @@ async function inlineStyle(config: d.Config, compilerCtx: d.CompilerCtx, outputT
 }
 
 
-async function inlineScript(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, scriptElm: HTMLScriptElement) {
-  const content = await getAssetContent(config, compilerCtx, outputTarget, windowLocationPath, scriptElm.src);
+async function inlineScript(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, scriptElm: HTMLScriptElement) {
+  const content = await getAssetContent(compilerCtx, outputTarget, windowLocationPath, scriptElm.src);
   if (!content) {
     return;
   }
@@ -51,7 +49,7 @@ async function inlineScript(config: d.Config, compilerCtx: d.CompilerCtx, output
 }
 
 
-async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, assetUrl: string) {
+async function getAssetContent(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, assetUrl: string) {
   if (typeof assetUrl !== 'string' || assetUrl.trim() === '') {
     return null;
   }
@@ -66,12 +64,12 @@ async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarge
   }
 
   // figure out the local file path
-  const filePath = getFilePathFromUrl(config, outputTarget, fromUrl, toUrl);
+  const filePath = getFilePathFromUrl(outputTarget, fromUrl, toUrl);
 
   // doesn't look like we've got it cached in app files
   try {
     // try looking it up directly
-    const content = await ctx.fs.readFile(filePath);
+    const content = await compilerCtx.fs.readFile(filePath);
 
     // rough estimate of size
     const fileSize = content.length;
@@ -90,7 +88,7 @@ async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarge
 }
 
 
-export function getFilePathFromUrl(config: d.Config, outputTarget: d.OutputTargetHydrate, fromUrl: d.Url, toUrl: d.Url) {
+export function getFilePathFromUrl(outputTarget: d.OutputTargetHydrate, fromUrl: d.Url, toUrl: d.Url) {
   const resolvedUrl = '.' + sys.url.resolve(fromUrl.pathname, toUrl.pathname);
-  return pathJoin(config, outputTarget.dir, resolvedUrl);
+  return sys.path.join(outputTarget.dir, resolvedUrl);
 }

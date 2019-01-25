@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { buildError, normalizePath, pathJoin } from '@utils';
-import { parseStyleDocs } from '../docs/style-docs';
+import { buildError, normalizePath } from '@utils';
 import { logger, sys } from '@sys';
+import { parseStyleDocs } from '../docs/style-docs';
 
 
 export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
@@ -113,7 +113,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
         const fileName = '_' + sys.path.basename(cssImportData.filePath);
         const dirPath = sys.path.dirname(cssImportData.filePath);
 
-        cssImportData.altFilePath = pathJoin(config, dirPath, fileName);
+        cssImportData.altFilePath = sys.path.join(dirPath, fileName);
       }
     }
 

@@ -47,7 +47,7 @@ export async function run(process: NodeJS.Process) {
 
   } catch (e) {
     if (!shouldIgnoreError(e)) {
-      logger.error(`uncaught cli error: ${e}`);
+      logger.error(`uncaught cli error: ${e}${logger.level === 'debug' ? e.stack : ''}`);
       exit(1);
     }
   }

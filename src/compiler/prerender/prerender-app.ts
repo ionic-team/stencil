@@ -159,7 +159,7 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
 
     hydrateResults.push(results);
 
-    await writePrerenderDest(config, compilerCtx, outputTarget, results);
+    await writePrerenderDest(compilerCtx, outputTarget, results);
 
   } catch (e) {
     // darn, idk, bad news
@@ -175,9 +175,9 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 
-async function writePrerenderDest(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, results: d.HydrateResults) {
+async function writePrerenderDest(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, results: d.HydrateResults) {
   // create the full path where this will be saved
-  const filePath = getWritePathFromUrl(config, outputTarget, results.url);
+  const filePath = getWritePathFromUrl(outputTarget, results.url);
 
   // add the prerender html content it to our collection of
   // files that need to be saved when we're all ready

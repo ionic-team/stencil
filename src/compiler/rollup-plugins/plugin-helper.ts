@@ -3,7 +3,7 @@ import { buildError } from '@utils';
 import { sys } from '@sys';
 
 
-export default function rollupPluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {
+export function pluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {
   return {
     name: 'pluginHelper',
 

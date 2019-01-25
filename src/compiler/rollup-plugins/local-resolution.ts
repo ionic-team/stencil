@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
-export default function localResolution(compilerCtx: d.CompilerCtx) {
+export function localResolution(compilerCtx: d.CompilerCtx) {
   return {
     name: 'localResolution',
 

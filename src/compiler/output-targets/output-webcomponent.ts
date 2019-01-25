@@ -1,12 +1,11 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '@utils';
-// import { generateNativeAppCore } from '../app-core/generate-native-core';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
-import { pathJoin } from '@utils';
+import { sys } from '@sys';
 
 
 export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -57,7 +56,7 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
       const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, appCmps);
 
       if (!buildCtx.hasError && typeof outputText === 'string') {
-        await writeSelfContainedWebComponentModes(config, compilerCtx, outputTargets, appCmps, outputText);
+        await writeSelfContainedWebComponentModes(compilerCtx, outputTargets, appCmps, outputText);
       }
     });
     promises.push(...p);
@@ -121,7 +120,7 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 }
 
 
-async function writeSelfContainedWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
+async function writeSelfContainedWebComponentModes(compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
   const promises: Promise<any>[] = [];
 
   const allModes = getAllModes(cmps);
@@ -132,7 +131,7 @@ async function writeSelfContainedWebComponentModes(config: d.Config, compilerCtx
     cmps.forEach(cmp => {
       outputTargets.forEach(async outputTarget => {
         promises.push(
-          writeSelfContainedWebComponentModeOutput(config, compilerCtx, outputTarget, cmp, modeOutputText, modeName)
+          writeSelfContainedWebComponentModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName)
         );
       });
     });
@@ -142,14 +141,14 @@ async function writeSelfContainedWebComponentModes(config: d.Config, compilerCtx
 }
 
 
-async function writeSelfContainedWebComponentModeOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
+async function writeSelfContainedWebComponentModeOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
   let fileName = `${cmpMeta.tagName}`;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName}`;
   }
   fileName += `.js`;
 
-  const filePath = pathJoin(config, outputTarget.dir, fileName);
+  const filePath = sys.path.join(outputTarget.dir, fileName);
 
   await compilerCtx.fs.writeFile(filePath, modeOutputText);
 }
@@ -181,7 +180,7 @@ async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx:
   }
   fileName += `.js`;
 
-  const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+  const filePath = sys.path.join(outputTarget.buildDir, fileName);
 
   await compilerCtx.fs.writeFile(filePath, modeOutputText);
 }

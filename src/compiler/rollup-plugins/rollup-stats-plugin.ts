@@ -21,7 +21,7 @@ function sortBundles(a: OutputChunk, b: OutputChunk) {
   return 0;
 }
 
-export default function statsPlugin(buildCtx: d.BuildCtx) {
+export function statsPlugin(buildCtx: d.BuildCtx) {
   const plugin: Plugin = {
     name: 'stats-plugin',
     generateBundle(options, bundle) {

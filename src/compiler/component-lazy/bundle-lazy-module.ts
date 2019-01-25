@@ -1,16 +1,16 @@
 import * as d from '@declarations';
-import abortPlugin from '../rollup-plugins/abort-plugin';
-import bundleJson from '../rollup-plugins/json';
+import { abortPlugin } from '../rollup-plugins/abort-plugin';
+import { bundleJson } from '../rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { getUserCompilerOptions } from '../transpile/compiler-options';
-import localResolution from '../rollup-plugins/local-resolution';
-import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
+import { localResolution } from '../rollup-plugins/local-resolution';
+import { logger, sys } from '@sys';
+import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
-import pathsResolution from '../rollup-plugins/paths-resolution';
-import pluginHelper from '../rollup-plugins/plugin-helper';
-import rollupPluginReplace from '../rollup-plugins/rollup-plugin-replace';
-import statsPlugin from '../rollup-plugins/rollup-stats-plugin';
-import { sys } from '@sys';
+import { pathsResolver } from '../rollup-plugins/paths-resolution';
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
+import { replacePlugin } from '../rollup-plugins/rollup-plugin-replace';
+import { statsPlugin } from '../rollup-plugins/rollup-stats-plugin';
 
 
 export async function bundleLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryInputPaths: string[]) {
@@ -51,9 +51,9 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
       sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       inMemoryFsRead(compilerCtx, buildCtx),
-      pathsResolution(config, compilerCtx, tsCompilerOptions),
+      pathsResolver(config, compilerCtx, tsCompilerOptions),
       localResolution(compilerCtx),
-      rollupPluginReplace({
+      replacePlugin({
         values: replaceObj
       }),
       ...config.plugins,
@@ -61,7 +61,7 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
       pluginHelper(config, compilerCtx, buildCtx),
       abortPlugin(buildCtx)
     ],
-    onwarn: createOnWarnFn(buildCtx.diagnostics)
+    onwarn: createOnWarnFn(logger, buildCtx.diagnostics)
   };
 
   let rollupBuild: RollupBuild = null;
@@ -75,7 +75,7 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
 
     // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
+      loadRollupDiagnostics(sys, config, compilerCtx, buildCtx, err);
 
     } else {
       buildCtx.debug(`bundleLazyModule errors ignored, not active build`);

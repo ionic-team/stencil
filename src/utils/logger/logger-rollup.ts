@@ -1,12 +1,11 @@
 import * as d from '@declarations';
 import { buildWarn } from '../message-utils';
-import { normalizePath } from '../path-utils';
+import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
-import { logger, sys } from '@sys';
 import { toTitleCase } from '../helpers';
 
 
-export function loadRollupDiagnostics(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
+export function loadRollupDiagnostics(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'bundling',
@@ -89,7 +88,7 @@ export function loadRollupDiagnostics(config: d.Config, compilerCtx: d.CompilerC
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
 
-export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
+export function createOnWarnFn(logger: d.Logger, diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {

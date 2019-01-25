@@ -1,7 +1,5 @@
 import * as d from '@declarations';
 import { MAX_ERRORS, splitLineBreaks } from './logger-utils';
-import { normalizePath } from '../path-utils';
-import { sys } from '@sys';
 import ts from 'typescript';
 
 
@@ -10,16 +8,16 @@ import ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(config: d.Config, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (let i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadTypeScriptDiagnostic(config, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
   }
 }
 
 
-export function loadTypeScriptDiagnostic(config: d.Config, tsDiagnostic: ts.Diagnostic) {
+export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
 
   const d: d.Diagnostic = {
     level: 'warn',
@@ -38,14 +36,7 @@ export function loadTypeScriptDiagnostic(config: d.Config, tsDiagnostic: ts.Diag
   }
 
   if (tsDiagnostic.file) {
-    d.absFilePath = normalizePath(tsDiagnostic.file.fileName);
-    if (config) {
-      d.relFilePath = normalizePath(sys.path.relative(config.cwd, d.absFilePath));
-
-      if (!d.relFilePath.includes('/')) {
-        d.relFilePath = './' + d.relFilePath;
-      }
-    }
+    d.absFilePath = tsDiagnostic.file.fileName;
 
     const sourceText = tsDiagnostic.file.text;
     const srcLines = splitLineBreaks(sourceText);

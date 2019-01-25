@@ -1,8 +1,9 @@
 import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
+import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
 import { isCopyTaskFile } from '../copy/config-copy-tasks';
-import { hasServiceWorkerChanges, normalizePath, pathJoin } from '@utils';
+import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
@@ -18,7 +19,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 
   // recursively drill down through any directories added and fill up more data
   buildCtx.dirsAdded.forEach(dirAdded => {
-    addDir(config, compilerCtx, buildCtx, dirAdded);
+    addDir(compilerCtx, buildCtx, dirAdded);
   });
 
   // files changed include updated, added and deleted
@@ -63,7 +64,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 }
 
 
-function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
+function addDir(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   dir = normalizePath(dir);
 
   if (!buildCtx.dirsAdded.includes(dir)) {
@@ -73,11 +74,11 @@ function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildC
   const items = compilerCtx.fs.disk.readdirSync(dir);
 
   items.forEach(dirItem => {
-    const itemPath = pathJoin(config, dir, dirItem);
+    const itemPath = sys.path.join(dir, dirItem);
     const stat = compilerCtx.fs.disk.statSync(itemPath);
 
     if (stat.isDirectory()) {
-      addDir(config, compilerCtx, buildCtx, itemPath);
+      addDir(compilerCtx, buildCtx, itemPath);
 
     } else if (stat.isFile()) {
       if (!buildCtx.filesAdded.includes(itemPath)) {

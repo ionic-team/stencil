@@ -1,8 +1,8 @@
 import * as d from '@declarations';
-import inMemoryFsRead from '../rollup-plugins/in-memory-fs-read';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
+import { logger, sys } from '@sys';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
-import { sys } from '@sys';
 
 
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _build: d.Build, _files: Map<string, string>, _cmpRuntimeData: d.LazyBundlesRuntimeMeta) {
@@ -25,7 +25,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
         inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
       ],
-      onwarn: createOnWarnFn(buildCtx.diagnostics),
+      onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
     };
 
     const rollupBuild: RollupBuild = await sys.rollup.rollup(rollupOptions);
@@ -37,7 +37,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     }
 
   } catch (e) {
-    loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+    loadRollupDiagnostics(sys, config, compilerCtx, buildCtx, e);
   }
 
   return outputText;

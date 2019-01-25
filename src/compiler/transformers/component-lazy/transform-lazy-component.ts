@@ -21,7 +21,7 @@ export function transformToLazyComponentText(config: d.Config, buildCtx: d.Build
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
       },
-      fileName: cmp.jsFilePath,
+      fileName: cmp.moduleFile.jsFilePath,
       transformers: {
         after: [
           lazyComponentTransform()
@@ -31,7 +31,7 @@ export function transformToLazyComponentText(config: d.Config, buildCtx: d.Build
 
     const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
 
-    loadTypeScriptDiagnostics(null, buildCtx.diagnostics, transpileOutput.diagnostics);
+    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
 
     if (!buildCtx.hasError) {
       outputText = transpileOutput.outputText;

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath, pathJoin } from '@utils';
+import { normalizePath } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { logger, sys } from '@sys';
 
@@ -79,7 +79,7 @@ export function validateDevServer(config: d.Config) {
   setStringConfig(config.devServer, 'baseUrl', baseUrl);
 
   if (!sys.path.isAbsolute(config.devServer.root)) {
-    config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
+    config.devServer.root = sys.path.join(config.rootDir, config.devServer.root);
   }
 
   if (config.devServer.excludeHmr) {

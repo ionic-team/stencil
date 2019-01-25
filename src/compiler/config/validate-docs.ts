@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { pathJoin } from '@utils';
 import { sys } from '@sys';
 import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 
@@ -52,7 +51,7 @@ function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTarg
   }
 
   if (!sys.path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
+    outputTarget.dir = sys.path.join(config.rootDir, outputTarget.dir);
   }
   outputTarget.strict = !!outputTarget.strict;
 }
@@ -63,7 +62,7 @@ function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTa
     throw new Error(`docs-json outputTarget missing the "file" option`);
   }
 
-  outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
+  outputTarget.file = sys.path.join(config.rootDir, outputTarget.file);
   outputTarget.strict = !!outputTarget.strict;
 }
 

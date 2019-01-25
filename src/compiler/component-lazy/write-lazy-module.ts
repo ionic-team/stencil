@@ -33,7 +33,7 @@ export async function writeLazyChunkModule(_config: d.Config, _compilerCtx: d.Co
 
 //   await Promise.all(outputTargets.map(async outputTarget => {
 //     // get the absolute path to where it'll be saved in www
-//     const buildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
+//     const buildPath = sys.path.join(getAppBuildDir(config, outputTarget), fileName);
 
 //     // write to the build dir
 //     await compilerCtx.fs.writeFile(buildPath, jsText);
@@ -46,7 +46,7 @@ export async function writeLazyChunkModule(_config: d.Config, _compilerCtx: d.Co
 
 //   const promises = outputTargets.map(async outputTarget => {
 //     // get the absolute path to where it'll be saved in www
-//     const buildPath = pathJoin(config, getDistEsmComponentsDir(config, outputTarget, sourceTarget), fileName);
+//     const buildPath = sys.path.join(getDistEsmComponentsDir(config, outputTarget, sourceTarget), fileName);
 
 //     // write to the build dir
 //     await compilerCtx.fs.writeFile(buildPath, jsText);

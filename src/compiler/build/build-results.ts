@@ -106,7 +106,7 @@ function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.En
     }),
 
     inputs: en.cmps.reduce((cmps, cmp) => {
-      const cmpPath = normalizePath(sys.path.relative(config.rootDir, cmp.jsFilePath));
+      const cmpPath = normalizePath(sys.path.relative(config.rootDir, cmp.moduleFile.jsFilePath));
       if (!cmps.includes(cmpPath)) {
         cmps.push(cmpPath);
       }

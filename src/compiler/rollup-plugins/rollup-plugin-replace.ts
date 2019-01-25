@@ -36,7 +36,7 @@ function mapToFunctions(object: {[key: string]: any}) {
   return functions;
 }
 
-export default function replace(options: Options) {
+export function replacePlugin(options: Options) {
   const { delimiters } = options;
   const functionValues = mapToFunctions(getReplacements(options));
   const keys = Object.keys(functionValues)

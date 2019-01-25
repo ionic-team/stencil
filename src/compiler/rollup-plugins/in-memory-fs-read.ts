@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
-export default function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const path = sys.path;
   const assetsCache = new Map<string, string>();
   let tsFileNames: string[];

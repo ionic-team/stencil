@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { getAppBuildDir } from '../app/app-file-naming';
-import { normalizePath, pathJoin } from '@utils';
+import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
@@ -46,7 +46,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     // figure out what the path is to the component directory
 
     outputTargets.forEach(outputTarget => {
-      const buildDirDestination = pathJoin(config, getAppBuildDir(config, outputTarget), assetsMeta.cmpRelativePath);
+      const buildDirDestination = sys.path.join(getAppBuildDir(config, outputTarget), assetsMeta.cmpRelativePath);
 
       copyTasks.push({
         src: assetsMeta.absolutePath,
@@ -60,7 +60,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
       // copy all of the files in asset directories to the app's collection directory
       copyToCollectionDir.forEach(assetsMeta => {
         // figure out what the path is to the component directory
-        const collectionDirDestination = pathJoin(config,
+        const collectionDirDestination = sys.path.join(
           outputTarget.collectionDir,
           sys.path.relative(config.srcDir, assetsMeta.absolutePath)
         );

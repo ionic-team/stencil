@@ -1,11 +1,3 @@
-import * as d from '@declarations';
-import { sys } from '@sys';
-
-
-export function pathJoin(_config: d.Config, ...paths: string[]) {
-  return normalizePath(sys.path.join.apply(sys.path, paths));
-}
-
 
 export function normalizePath(str: string) {
   // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar

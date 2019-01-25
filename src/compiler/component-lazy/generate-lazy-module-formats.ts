@@ -1,7 +1,8 @@
 import * as d from '@declarations';
 import { bundleLazyModule } from './bundle-lazy-module';
-import { catchError, pathJoin } from '@utils';
+import { catchError } from '@utils';
 import { RollupBuild } from 'rollup';
+import { sys } from '@sys';
 import { updateToLazyComponent } from './update-to-lazy-component';
 
 
@@ -17,7 +18,7 @@ export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d
   // Check for index.js file. This file is used for stencil project exports
   // usually this contains utility exports.
   // If it exists then add it as an entry point.
-  const exportedFile = pathJoin(config, config.srcDir, 'index.js');
+  const exportedFile = sys.path.join(config.srcDir, 'index.js');
   const fileExists = await compilerCtx.fs.access(exportedFile);
   if (fileExists) {
     buildCtx.entryModules.push({

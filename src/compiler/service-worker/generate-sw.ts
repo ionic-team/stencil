@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildWarn, catchError, hasError, hasServiceWorkerChanges } from '@utils';
+import { buildWarn, catchError, hasError } from '@utils';
 import { logger, sys } from '@sys';
 
 
@@ -142,5 +142,18 @@ async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, b
   // let's build us some service workerz
   return false;
 }
+
+
+export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) {
+  if (config.devMode && !config.flags.serviceWorker) {
+    return false;
+  }
+
+  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
+  return wwwServiceOutputs.some(outputTarget => {
+    return buildCtx.filesChanged.some(fileChanged => sys.path.basename(fileChanged).toLowerCase() === sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
+  });
+}
+
 
 const WORKBOX_BUILD_MODULE_ID = 'workbox-build';
