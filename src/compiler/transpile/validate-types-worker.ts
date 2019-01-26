@@ -8,15 +8,11 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, _currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
   const results: d.ValidateTypesResults = {
     diagnostics: [],
     dirPaths: [],
     filePaths: []
-  };
-
-  const config: d.Config = {
-    cwd: currentWorkingDir
   };
 
   if (!workerCtx.tsHost) {
@@ -78,15 +74,6 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
   loadTypeScriptDiagnostics(results.diagnostics, tsDiagnostics);
-
-  results.diagnostics.forEach(diagnostic => {
-    if (diagnostic.absFilePath) {
-      diagnostic.relFilePath = path.relative(config.cwd, diagnostic.absFilePath);
-      if (!diagnostic.relFilePath.includes('/')) {
-        diagnostic.relFilePath = './' + diagnostic.relFilePath;
-      }
-    }
-  });
 
   return results;
 }

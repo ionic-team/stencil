@@ -89,15 +89,6 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
-  results.diagnostics.forEach(diagnostic => {
-    if (diagnostic.absFilePath) {
-      diagnostic.relFilePath = sys.path.relative(config.cwd, diagnostic.absFilePath);
-      if (!diagnostic.relFilePath.includes('/')) {
-        diagnostic.relFilePath = './' + diagnostic.relFilePath;
-      }
-    }
-  });
-
   results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
 
   return results;

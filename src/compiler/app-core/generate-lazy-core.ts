@@ -6,10 +6,15 @@ import { optimizeAppCoreBundle } from './optimize-app-core';
 
 export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
   const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
+  cmpRuntimeData;
 
-  // bundle up the input into a nice pretty file
-  const files = new Map();
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, cmpRuntimeData);
+  const appCoreInputFiles = new Map();
+
+  const appCoreInputEntryFile = '';
+
+  appCoreInputFiles.set(appCoreInputEntryFile, '');
+
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
   if (buildCtx.hasError) {
     return null;
   }

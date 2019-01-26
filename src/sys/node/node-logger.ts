@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import color from 'ansi-colors';
 import fs from 'graceful-fs';
+import path from 'path';
 
 
 export class NodeLogger implements d.Logger {
@@ -262,41 +263,48 @@ export class NodeLogger implements d.Logger {
     return new CmdTimeSpan(this, startMsg, debug, appendTo);
   }
 
-  printDiagnostics(diagnostics: d.Diagnostic[]) {
-    if (!diagnostics || !diagnostics.length) return;
+  printDiagnostics(diagnostics: d.Diagnostic[], cwd?: string) {
+    if (!diagnostics || diagnostics.length === 0) return;
 
     let outputLines: string[] = [''];
 
     diagnostics.forEach(d => {
-      outputLines = outputLines.concat(this.printDiagnostic(d));
+      outputLines = outputLines.concat(this.printDiagnostic(d, cwd));
     });
 
     console.log(outputLines.join('\n'));
   }
 
-  printDiagnostic(d: d.Diagnostic) {
-    const outputLines = wordWrap([d.messageText], getColumns());
+  printDiagnostic(diagnostic: d.Diagnostic, cwd: string) {
+    const outputLines = wordWrap([diagnostic.messageText], getColumns());
 
     let header = '';
 
-    if (d.header && d.header !== 'Build Error') {
-      header += d.header;
+    if (diagnostic.header && diagnostic.header !== 'Build Error') {
+      header += diagnostic.header;
     }
 
-    if (d.relFilePath) {
+    if (typeof cwd === 'string' && typeof diagnostic.absFilePath === 'string' && typeof diagnostic.relFilePath !== 'string') {
+      diagnostic.relFilePath = path.relative(cwd, diagnostic.absFilePath);
+      if (!diagnostic.relFilePath.includes('/')) {
+        diagnostic.relFilePath = './' + diagnostic.relFilePath;
+      }
+    }
+
+    if (typeof diagnostic.relFilePath !== 'string') {
       if (header.length > 0) {
         header += ': ';
       }
 
-      header += color.cyan(d.relFilePath);
+      header += color.cyan(diagnostic.relFilePath);
 
-      if (typeof d.lineNumber === 'number' && d.lineNumber > -1) {
+      if (typeof diagnostic.lineNumber === 'number' && diagnostic.lineNumber > -1) {
         header += color.dim(`:`);
-        header += color.yellow(`${d.lineNumber}`);
+        header += color.yellow(`${diagnostic.lineNumber}`);
 
-        if (typeof d.columnNumber === 'number' && d.columnNumber > -1) {
+        if (typeof diagnostic.columnNumber === 'number' && diagnostic.columnNumber > -1) {
           header += color.dim(`:`);
-          header += color.yellow(`${d.columnNumber}`);
+          header += color.yellow(`${diagnostic.columnNumber}`);
         }
       }
     }
@@ -307,8 +315,8 @@ export class NodeLogger implements d.Logger {
 
     outputLines.push('');
 
-    if (d.lines && d.lines.length) {
-      const lines = prepareLines(d.lines);
+    if (diagnostic.lines && diagnostic.lines.length) {
+      const lines = prepareLines(diagnostic.lines);
 
       lines.forEach(l => {
         if (!isMeaningfulLine(l.text)) {
@@ -327,9 +335,9 @@ export class NodeLogger implements d.Logger {
 
         msg = this.dim(msg);
 
-        if (d.language === 'typescript' || d.language === 'javascript') {
+        if (diagnostic.language === 'typescript' || diagnostic.language === 'javascript') {
           msg += this.javaScriptSyntaxHighlight(text);
-        } else if (d.language === 'scss' || d.language === 'css') {
+        } else if (diagnostic.language === 'scss' || diagnostic.language === 'css') {
           msg += this.cssSyntaxHighlight(text);
         } else {
           msg += text;
@@ -341,13 +349,13 @@ export class NodeLogger implements d.Logger {
       outputLines.push('');
     }
 
-    if (d.level === 'error') {
+    if (diagnostic.level === 'error') {
       this.errorPrefix(outputLines);
 
-    } else if (d.level === 'warn') {
+    } else if (diagnostic.level === 'warn') {
       this.warnPrefix(outputLines);
 
-    } else if (d.level === 'debug') {
+    } else if (diagnostic.level === 'debug') {
       this.debugPrefix(outputLines);
 
     } else {

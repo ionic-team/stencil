@@ -14,8 +14,8 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
     header: 'Minify JS',
     code: '',
     messageText: result.error.message,
-    relFilePath: null,
     absFilePath: null,
+    relFilePath: null,
     lines: []
   };
 

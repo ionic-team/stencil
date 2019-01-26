@@ -20,7 +20,7 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
     parseStyleDocs(styleDocs, styleText);
   }
 
-  const cssImports = getCssImports(config, buildCtx, resolvedFilePath, styleText);
+  const cssImports = getCssImports(buildCtx, resolvedFilePath, styleText);
   if (cssImports.length === 0) {
     return styleText;
   }
@@ -42,8 +42,7 @@ async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, bui
   } else {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
-    err.absFilePath = normalizePath(srcFilePath);
-    err.relFilePath = normalizePath(sys.path.relative(config.rootDir, srcFilePath));
+    err.absFilePath = srcFilePath;
   }
 }
 
@@ -67,7 +66,7 @@ async function loadStyleText(compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
 }
 
 
-export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: string, styleText: string) {
+export function getCssImports(buildCtx: d.BuildCtx, filePath: string, styleText: string) {
   const imports: d.CssImportData[] = [];
 
   if (!styleText.includes('@import')) {
@@ -95,7 +94,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
 
     if (isCssNodeModule(cssImportData.url)) {
       // node resolve this path cuz it starts with ~
-      resolveCssNodeModule(config, buildCtx.diagnostics, filePath, cssImportData);
+      resolveCssNodeModule(buildCtx.diagnostics, filePath, cssImportData);
 
     } else if (sys.path.isAbsolute(cssImportData.url)) {
       // absolute path already
@@ -133,7 +132,7 @@ export function isCssNodeModule(url: string) {
 }
 
 
-export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
+export function resolveCssNodeModule(diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
   try {
     const dir = sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
@@ -145,8 +144,7 @@ export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic
   } catch (e) {
     const d = buildError(diagnostics);
     d.messageText = `Unable to resolve node module for CSS @import: ${cssImportData.url}`;
-    d.absFilePath = normalizePath(filePath);
-    d.relFilePath = normalizePath(sys.path.relative(config.rootDir, filePath));
+    d.absFilePath = filePath;
   }
 }
 

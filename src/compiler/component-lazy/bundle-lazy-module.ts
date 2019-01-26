@@ -75,7 +75,7 @@ export async function bundleLazyModule(config: d.Config, compilerCtx: d.Compiler
 
     // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
-      loadRollupDiagnostics(sys, config, compilerCtx, buildCtx, err);
+      loadRollupDiagnostics(compilerCtx, buildCtx, err);
 
     } else {
       buildCtx.debug(`bundleLazyModule errors ignored, not active build`);

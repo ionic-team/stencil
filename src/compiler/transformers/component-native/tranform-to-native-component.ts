@@ -20,7 +20,7 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
       },
-      fileName: cmp.jsFilePath,
+      fileName: cmp.moduleFile.jsFilePath,
       transformers: {
         after: [
           nativeComponentTransform()
@@ -30,7 +30,7 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
 
     const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
 
-    loadTypeScriptDiagnostics(null, buildCtx.diagnostics, transpileOutput.diagnostics);
+    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
 
     if (!buildCtx.hasError) {
       c.push(transpileOutput.outputText);

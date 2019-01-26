@@ -102,7 +102,7 @@ async function hasChangedImportFile(config: d.Config, compilerCtx: d.CompilerCtx
 
 
 async function hasChangedImportContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, content: string, checkedFiles: string[]): Promise<boolean> {
-  const cssImports = getCssImports(config, buildCtx, filePath, content);
+  const cssImports = getCssImports(buildCtx, filePath, content);
   if (cssImports.length === 0) {
     // don't bother
     return false;

@@ -37,7 +37,7 @@ export function createElement(ownerDocument: any, tagName: string) {
 
   if (ownerDocument != null && tagName.includes('-')) {
     const win = ownerDocument.defaultView;
-    if (win != null) {
+    if (win != null && win.customElements != null) {
       return creatCustomElement(win.customElements, ownerDocument, tagName);
     }
   }

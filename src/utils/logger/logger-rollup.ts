@@ -1,11 +1,10 @@
 import * as d from '@declarations';
 import { buildWarn } from '../message-utils';
-import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
 import { toTitleCase } from '../helpers';
 
 
-export function loadRollupDiagnostics(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
+export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'bundling',
@@ -19,10 +18,7 @@ export function loadRollupDiagnostics(sys: d.StencilSystem, config: d.Config, co
   };
 
   if (rollupError.loc && rollupError.loc.file) {
-    diagnostic.absFilePath = normalizePath(rollupError.loc.file);
-    if (config) {
-      diagnostic.relFilePath = normalizePath(sys.path.relative(config.cwd, diagnostic.absFilePath));
-    }
+    diagnostic.absFilePath = rollupError.loc.file;
 
     try {
       const sourceText = compilerCtx.fs.readFileSync(diagnostic.absFilePath);

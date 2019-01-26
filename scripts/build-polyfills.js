@@ -39,7 +39,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     input: path.join(transpiledPolyfillsDir, 'css-shim', 'index.js'),
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
-      console.error( message );
+      console.error(message);
     }
   });
 

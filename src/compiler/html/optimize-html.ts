@@ -5,6 +5,7 @@ import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineExternalAssets } from './inline-external-assets';
 import { logger } from '@sys';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
+import { mockDocument } from '@mock-doc';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
 import { updateCanonicalLink } from './canonical-link';
 
@@ -113,14 +114,12 @@ export async function optimizeIndexHtml(
     hydrateTarget.html = await compilerCtx.fs.readFile(hydrateTarget.indexHtml);
 
     try {
-      const dom = null as any; // TODO! mock-doc
-      const win = dom.parse(hydrateTarget);
-      const doc = win.document;
+      const doc = mockDocument(hydrateTarget.html);
 
       await optimizeHtml(config, compilerCtx, hydrateTarget, windowLocationPath, doc, diagnostics);
 
       // serialize this dom back into a string
-      await compilerCtx.fs.writeFile(hydrateTarget.indexHtml, dom.serialize());
+      await compilerCtx.fs.writeFile(hydrateTarget.indexHtml, doc.documentElement.outerHTML);
 
     } catch (e) {
       catchError(diagnostics, e);

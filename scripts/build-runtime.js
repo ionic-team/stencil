@@ -9,16 +9,18 @@ const SRC_DIR = path.join(ROOT_DIR, 'src');
 const DST_DIR = path.join(ROOT_DIR, 'dist');
 const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-runtime');
 const DIST_RUNTIME_DIR = path.join(DST_DIR, 'runtime');
+const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 
-const inputFile = path.join(TRANSPILED_DIR, 'runtime', 'index.js');
+const runtimeInputFile = path.join(TRANSPILED_DIR, 'runtime', 'index.js');
+const clientInputFile = path.join(TRANSPILED_DIR, 'client', 'index.js');
 
-const outputPolyfillsDir = path.join(DIST_RUNTIME_DIR, 'polyfills');
+const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
 const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 
 async function bundleRuntime() {
   const rollupBuild = await rollup.rollup({
-    input: inputFile,
+    input: runtimeInputFile,
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/platform',
@@ -57,6 +59,40 @@ async function bundleRuntime() {
       file: path.join(DIST_RUNTIME_DIR, 'index.js')
     })
   ]);
+}
+
+
+async function bundleClient() {
+  const rollupBuild = await rollup.rollup({
+    input: clientInputFile,
+    external: [
+      '@stencil/core/build-conditionals',
+      '@stencil/core/utils'
+    ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(id) {
+            if (id === '@build-conditionals') {
+              return '@stencil/core/build-conditionals';
+            }
+            if (id === '@utils') {
+              return '@stencil/core/utils';
+            }
+          }
+        }
+      })()
+    ],
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
+  });
+
+  await rollupBuild.write({
+    format: 'es',
+    file: path.join(DIST_CLIENT_DIR, 'index.mjs')
+  });
 }
 
 
@@ -130,11 +166,12 @@ run(async ()=> {
 
   await Promise.all([
     bundleRuntime(),
+    bundleClient(),
     buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir),
     createDts(),
     createPublicTypeExports(),
     createPublicJavaScriptExports()
   ]);
 
-  await fs.remove(TRANSPILED_DIR);
+  // await fs.remove(TRANSPILED_DIR);
 });

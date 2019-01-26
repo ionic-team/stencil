@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { generateNativeAppCore } from '../component-native/generate-native-core';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
@@ -103,12 +104,12 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const files = new Map<string, string>();
+  const appCoreInputFiles = new Map<string, string>();
 
-  // const appCoreBundleInput = await generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build, files);
+  const appCoreInputEntryFile = await generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build, appCoreInputFiles);
 
   // bundle up the input into a nice pretty file
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, files, null);
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
   if (buildCtx.hasError) {
     return null;
   }

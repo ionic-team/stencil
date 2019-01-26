@@ -37,7 +37,7 @@ export function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
       // it's possible the importee is a file pointing directly to the source ts file
       // if it is a ts file path, then we're good to go
       let moduleFile = compilerCtx.moduleMap.get(importee);
-      if (moduleFile != null) {
+      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
         return moduleFile.jsFilePath;
       }
 
