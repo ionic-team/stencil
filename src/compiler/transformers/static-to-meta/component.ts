@@ -20,7 +20,6 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency: moduleFile.isCollectionDependency,
-    moduleFile: moduleFile,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation: parseStaticEncapsulation(staticMembers),
@@ -33,6 +32,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     styleDocs: [],
     dependencies: [],
     jsdoc: null, // serializeSymbol(checker, symbol),
+    jsFilePath: null,
 
     hasAsyncLifecycle: false,
     hasAttributeChangedCallbackFn: false,
@@ -106,7 +106,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.excludeFromCollection;
     delete copyCmp.isCollectionDependency;
     delete copyCmp.jsdoc;
-    delete copyCmp.moduleFile;
+    delete copyCmp.jsFilePath;
     delete copyCmp.potentialCmpRefs;
     delete copyCmp.styleDocs;
 

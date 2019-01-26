@@ -21,7 +21,7 @@ export function transformToLazyComponentText(config: d.Config, buildCtx: d.Build
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: getBuildScriptTarget(build)
       },
-      fileName: cmp.moduleFile.jsFilePath,
+      fileName: cmp.jsFilePath,
       transformers: {
         after: [
           lazyComponentTransform()

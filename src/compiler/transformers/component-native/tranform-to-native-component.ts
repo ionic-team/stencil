@@ -20,7 +20,7 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: getBuildScriptTarget(build)
       },
-      fileName: cmp.moduleFile.jsFilePath,
+      fileName: cmp.jsFilePath,
       transformers: {
         after: [
           nativeComponentTransform(build)

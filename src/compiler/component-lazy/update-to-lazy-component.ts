@@ -5,11 +5,11 @@ import { transformToLazyComponentText } from '../transformers/component-lazy/tra
 
 
 export async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule, cmp: d.ComponentCompilerMeta) {
-  const inputJsText = await compilerCtx.fs.readFile(cmp.moduleFile.jsFilePath);
+  const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
   const outputText = transformToLazyComponentText(config, buildCtx, build, cmp, inputJsText);
 
-  const lazyModuleFilePath = `${cmp.moduleFile.jsFilePath}.${cmp.tagName}.lazy.mjs`;
+  const lazyModuleFilePath = `${cmp.jsFilePath}.${cmp.tagName}.lazy.mjs`;
 
   await compilerCtx.fs.writeFile(lazyModuleFilePath, outputText, { inMemoryOnly: true});
 

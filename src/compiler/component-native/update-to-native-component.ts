@@ -18,12 +18,12 @@ export async function updateToNativeComponents(config: d.Config, compilerCtx: d.
 
 
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
-  const inputJsText = await compilerCtx.fs.readFile(cmp.moduleFile.jsFilePath);
+  const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
   const outputText = transformToNativeComponentText(config, buildCtx, build, cmp, inputJsText);
 
   const cmpData: d.ComponentCompilerNativeData = {
-    filePath: cmp.moduleFile.jsFilePath,
+    filePath: cmp.jsFilePath,
     outputText: outputText,
     tagName: cmp.tagName,
     componentClassName: cmp.componentClassName,
