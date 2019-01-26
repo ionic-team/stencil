@@ -7,6 +7,7 @@ import { logger } from '@sys';
 import { minifyInlineScripts, minifyInlineStyles } from './minify-inline-content';
 import { mockDocument } from '@mock-doc';
 import { optimizeSsrStyles } from '../style/optimize-ssr-styles';
+import { relocateMetaCharset } from './relocate-meta-charset';
 import { updateCanonicalLink } from './canonical-link';
 
 
@@ -98,6 +99,8 @@ export async function optimizeHtml(
   if (config.assetVersioning) {
     promises.push(assetVersioning(config, compilerCtx, hydrateTarget, windowLocationPath, doc));
   }
+
+  relocateMetaCharset(doc);
 
   await Promise.all(promises);
 }
