@@ -11,8 +11,6 @@ export const config: Config = {
     }
   ],
 
-  devServer: null,
-
   enableCache: false
 
 };

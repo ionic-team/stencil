@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { cmpMetaRefs, getHostRef } from '@platform';
+import { getHostRef } from '@platform';
 import { MEMBER_TYPE } from '../utils/constants';
 import { setValue } from './set-value';
 
@@ -8,6 +8,10 @@ import { setValue } from './set-value';
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.ComponentRuntimeMeta, isElementConstructor?: boolean, proxyState?: boolean) => {
 
   if (BUILD.member && cmpMeta.members) {
+
+    if (!BUILD.lazyLoad) {
+      Cstr.cmpMeta = cmpMeta;
+    }
 
     if (BUILD.observeAttribute && isElementConstructor) {
       cmpMeta.attrNameToPropName = new Map();
@@ -54,7 +58,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
             },
             set(this: d.HostElement, newValue) {
               // proxyComponent, set value
-              setValue(getHostRef(this), memberName, newValue, cmpMeta);
+              setValue(this, memberName, newValue, cmpMeta);
             },
             configurable: true,
             enumerable: true
@@ -65,9 +69,14 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
           value(instance?: any) {
-            if ((instance = getHostRef(this).instance)) {
-              // lazy host method proxy
-              return instance[memberName].apply(instance, arguments);
+            if (BUILD.lazyLoad) {
+              if ((instance = getHostRef(this).lazyInstance)) {
+                // lazy host method proxy
+                return instance[memberName].apply(instance, arguments);
+              }
+
+            } else {
+              return this[memberName].apply(this, arguments);
             }
           }
         });
@@ -76,7 +85,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
         // proxyComponent - event
         Object.defineProperty((Cstr as any).prototype, memberName, {
           get(this: d.HostElement) {
-            const elm = getHostRef(this).elm;
+            const elm = this;
             return {
               emit: (data: any) => elm.dispatchEvent(new CustomEvent(
                 memberName,
@@ -91,8 +100,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
       }
     });
   }
-
-  cmpMetaRefs.set(Cstr, cmpMeta);
 
   return Cstr;
 };

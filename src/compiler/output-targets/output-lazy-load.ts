@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
-import { generateLazyLoadedAppCore } from '../app-core/generate-lazy-core';
+import { generateLazyLoadedAppCore } from '../component-lazy/generate-lazy-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { sys } from '@sys';
 

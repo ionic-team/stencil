@@ -2,18 +2,6 @@ import * as d from '@declarations';
 
 
 export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
-  // const cmps: d.ComponentCompilerMeta[] = [];
-  // const moduleFileTree: d.Module[] = [];
-
-  // moduleFiles.forEach(moduleFile => {
-  //   loadModuleFileTree(moduleFiles, moduleFileTree, moduleFile);
-  // });
-
-  // const cmps = moduleFiles.reduce((cmps, m) => {
-  //   cmps.push(...m.cmps);
-  //   return cmps;
-  // }, [] as d.ComponentCompilerMeta[]);
-
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     asyncLifecycle: cmps.some(c => c.hasAsyncLifecycle),
@@ -62,8 +50,6 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 
   f.taskQueue = (f.updatable || f.mode || f.lifecycle);
 
-  f.hostRefs = (f.updatable || f.member || f.lifecycle || f.hostListener);
-
   return f;
 }
 
@@ -84,26 +70,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.exposeEventListener = (b.hostListener && !!config.exposeEventListener);
   b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
 }
-
-
-// function loadModuleFileTree(allModulesFiles: d.Module[], moduleFileTree: d.Module[], moduleFile: d.Module) {
-//   if (moduleFile) {
-//     if (!moduleFileTree.includes(moduleFile)) {
-//       moduleFileTree.push(moduleFile);
-//     }
-
-//     moduleFile.localImports && moduleFile.localImports.forEach(localImport => {
-//       const subModuleFile = allModulesFiles.find(moduleFile => {
-//         return (moduleFile.sourceFilePath === localImport) ||
-//                (moduleFile.sourceFilePath === localImport + '.ts') ||
-//                (moduleFile.sourceFilePath === localImport + '.tsx') ||
-//                (moduleFile.sourceFilePath === localImport + '.js');
-//       });
-
-//       loadModuleFileTree(allModulesFiles, moduleFileTree, subModuleFile);
-//     });
-//   }
-// }
 
 
 export const BUILD: d.Build = {};

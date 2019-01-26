@@ -229,7 +229,7 @@ function generateDocs(readme: string, jsdoc: d.JsDoc) {
 }
 
 function generateDocsTags(jsdoc: d.JsDoc): d.JsonDocsTags[] {
-  return jsdoc.tags || [];
+  return (jsdoc && jsdoc.tags) || [];
 }
 
 async function generateUsages(compilerCtx: d.CompilerCtx, usagesDir: string) {

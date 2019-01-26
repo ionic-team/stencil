@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { addImports, isComponentClassNode } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, isComponentClassNode } from '../transform-utils';
 import { REGISTER_INSTANCE_METHOD, registerLazyComponentInConstructor } from './register-lazy-constructor';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
@@ -17,9 +17,9 @@ export function transformToLazyComponentText(config: d.Config, buildCtx: d.Build
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ts.ModuleKind.ESNext,
+        module: ModuleKind,
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
-        target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
+        target: getBuildScriptTarget(build)
       },
       fileName: cmp.moduleFile.jsFilePath,
       transformers: {

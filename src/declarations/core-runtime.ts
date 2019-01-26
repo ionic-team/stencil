@@ -94,14 +94,12 @@ export interface ModeBundleIds {
 
 export interface HostRef {
   ancestorHostElement?: d.HostElement;
-  elm?: d.HostElement;
-  cmpMeta?: d.ComponentRuntimeMeta;
   hasConnected?: boolean;
   hasRendered?: boolean;
   hostListenerEventToMethodMap?: Map<string, string>;
   isActiveRender?: boolean;
   isConstructingInstance?: boolean;
-  instance?: d.ComponentInstance;
+  lazyInstance?: d.ComponentInstance;
   instanceValues?: Map<string, any>;
   isQueuedForUpdate?: boolean;
   isShadowDom?: boolean;

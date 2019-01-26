@@ -67,7 +67,6 @@ export interface BuildFeatures {
   reflect?: boolean;
 
   taskQueue?: boolean;
-  hostRefs?: boolean;
 }
 
 export interface Build extends BuildFeatures {

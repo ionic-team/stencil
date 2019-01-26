@@ -1,12 +1,13 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, writeTask } from '@platform';
+import { consoleError, getHostRef, writeTask } from '@platform';
 import { parsePropertyValue } from './parse-property-value';
 import { update } from './update';
 
 
-export const setValue = (hostRef: d.HostRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, oldVal?: any) => {
+export const setValue = (elm: d.HostElement, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, oldVal?: any) => {
   // check our new property value against our internal value
+  hostRef = getHostRef(elm);
   oldVal = hostRef.instanceValues.get(propName);
   newVal = parsePropertyValue(newVal, cmpMeta.members[propName][1]);
 
@@ -17,7 +18,7 @@ export const setValue = (hostRef: d.HostRef, propName: string, newVal: any, cmpM
       // set our new value!
       hostRef.instanceValues.set(propName, newVal);
 
-      if (hostRef.instance) {
+      if (!BUILD.lazyLoad || hostRef.lazyInstance) {
         // get an array of method names of watch functions to call
         if (BUILD.watchCallback) {
           const watchMethods = hostRef.watchCallbacks.get(propName);
@@ -27,7 +28,13 @@ export const setValue = (hostRef: d.HostRef, propName: string, newVal: any, cmpM
             watchMethods.forEach(watchMethodName => {
               try {
                 // fire off each of the watch methods that are watching this property
-                hostRef.instance[watchMethodName].call(hostRef.instance, newVal, oldVal, propName);
+                (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any)[watchMethodName].call(
+                  (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any),
+                  newVal,
+                  oldVal,
+                  propName
+                );
+
               } catch (e) {
                 consoleError(e);
               }
@@ -42,7 +49,15 @@ export const setValue = (hostRef: d.HostRef, propName: string, newVal: any, cmpM
           // up millions cuz this function ensures it only runs once
           hostRef.isQueuedForUpdate = true;
 
-          writeTask(() => update(hostRef.elm, hostRef.instance, hostRef, cmpMeta));
+          writeTask(() =>
+            update(
+              elm,
+              (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
+              hostRef,
+              cmpMeta
+            )
+          );
+
         }
       }
     }

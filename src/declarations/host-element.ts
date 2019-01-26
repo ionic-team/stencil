@@ -71,4 +71,7 @@ export interface HostElement extends HTMLElement {
   componentOnReady?: () => Promise<this>;
   color?: string;
   mode?: string;
+
+  _lazyInstance?: any;
+  _instanceValues?: any;
 }

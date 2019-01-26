@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { logger } from '@sys';
+import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
 
 
@@ -130,10 +131,10 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   experimentalDecorators: true,
 
   // transpile down to es2017
-  target: ts.ScriptTarget.ES2017,
+  target: ScriptTarget,
 
   // create esNext modules
-  module: ts.ModuleKind.ESNext,
+  module: ModuleKind,
 
   // resolve using NodeJs style
   moduleResolution: ts.ModuleResolutionKind.NodeJs,

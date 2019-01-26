@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, cmpMetaRefs, getHostRef, plt, tick } from '@platform';
+import { activelyProcessingCmps, getHostRef, plt, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { initialLoad } from './initial-load';
 
@@ -7,9 +7,12 @@ import { initialLoad } from './initial-load';
 export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
   // connectedCallback
 
+  if (!BUILD.lazyLoad) {
+    cmpMeta = (elm.constructor as d.ComponentConstructor).cmpMeta;
+  }
+
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.hostListener) {
     hostRef = getHostRef(elm);
-    cmpMeta = cmpMetaRefs.get(elm.constructor);
 
     if (BUILD.hostListener && cmpMeta.hostListeners) {
       // initialize our event listeners on the host element
@@ -70,7 +73,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
 
   } else {
     // connectedCallback, initialLoad
-    initialLoad(elm, getHostRef(elm), cmpMetaRefs.get(elm.constructor));
+    initialLoad(elm, getHostRef(elm), cmpMeta);
   }
 };
 
@@ -79,9 +82,14 @@ function hostListenerProxy(this: d.HostElement, ev: Event) {
   const hostRef = getHostRef(this);
   const hostListenerMethodName = hostRef.hostListenerEventToMethodMap.get(ev.type);
 
-  if (hostRef.instance) {
-    // instance is ready, let's call it's member method for this event
-    return hostRef.instance[hostListenerMethodName](ev);
+  if (BUILD.lazyLoad) {
+    if (hostRef.lazyInstance) {
+      // instance is ready, let's call it's member method for this event
+      return hostRef.lazyInstance[hostListenerMethodName](ev);
+    }
+
+  } else {
+    return (this as any)[hostListenerMethodName](ev);
   }
 
   (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []))

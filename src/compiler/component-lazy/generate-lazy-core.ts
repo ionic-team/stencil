@@ -1,18 +1,23 @@
 import * as d from '@declarations';
-import { bundleAppCore } from './bundle-app-core';
-import { formatComponentRuntimeMeta } from './format-component-runtime-meta';
-import { optimizeAppCoreBundle } from './optimize-app-core';
+import { bundleAppCore } from '../app-core/bundle-app-core';
+import { formatComponentRuntimeMeta } from '../app-core/format-component-runtime-meta';
+import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 
 
 export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
-  const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
-  cmpRuntimeData;
-
+  const appCoreInputEntryFile = `${config.fsNamespace}-lazy.mjs`;
   const appCoreInputFiles = new Map();
 
-  const appCoreInputEntryFile = '';
+  const coreText: string[] = [];
 
-  appCoreInputFiles.set(appCoreInputEntryFile, '');
+  coreText.push(`// ${appCoreInputEntryFile}`);
+  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
+
+  const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
+
+  coreText.push(`bootstrapLazy(${cmpRuntimeData});`);
+
+  appCoreInputFiles.set(appCoreInputEntryFile, coreText.join('\n'));
 
   const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
   if (buildCtx.hasError) {

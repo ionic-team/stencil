@@ -94,7 +94,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
             // first item the eventMethodName
             // second item is the event data
             // take a look at hostEventListenerProxy()
-            hostRef.instance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
+            (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any)[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
           }
           hostRef.queuedReceivedHostEvents = null;
         }
@@ -116,9 +116,9 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
     }
 
     if (BUILD.taskQueue) {
-      writeTask(() => update(elm, hostRef.instance, hostRef, cmpMeta, true));
+      writeTask(() => update(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
     } else {
-      update(elm, hostRef.instance, hostRef, cmpMeta, true);
+      update(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
     }
   }
 };

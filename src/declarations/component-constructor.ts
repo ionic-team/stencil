@@ -10,6 +10,7 @@ export interface ComponentConstructor {
   styleMode?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
+  cmpMeta?: d.ComponentRuntimeMeta;
 }
 
 

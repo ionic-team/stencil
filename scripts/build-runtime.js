@@ -89,10 +89,16 @@ async function bundleClient() {
     }
   });
 
-  await rollupBuild.write({
-    format: 'es',
-    file: path.join(DIST_CLIENT_DIR, 'index.mjs')
-  });
+  await Promise.all([
+    rollupBuild.write({
+      format: 'es',
+      file: path.join(DIST_CLIENT_DIR, 'index.mjs')
+    }),
+    rollupBuild.write({
+      format: 'cjs',
+      file: path.join(DIST_CLIENT_DIR, 'index.js')
+    })
+  ]);
 }
 
 

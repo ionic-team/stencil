@@ -1,11 +1,9 @@
 import * as d from '@declarations';
-import { bundleAppCore } from '../app-core/bundle-app-core';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateNativeAppCore } from '../component-native/generate-native-core';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
-import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { sys } from '@sys';
 
 
@@ -84,7 +82,6 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
   const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
 
   if (!buildCtx.hasError && typeof outputText === 'string') {
-
     await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, outputText);
   }
 
@@ -104,20 +101,7 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const appCoreInputFiles = new Map<string, string>();
-
-  const appCoreInputEntryFile = await generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build, appCoreInputFiles);
-
-  // bundle up the input into a nice pretty file
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
-  if (buildCtx.hasError) {
-    return null;
-  }
-
-  const results = await optimizeAppCoreBundle(config, compilerCtx, build, appCoreBundleOutput);
-  buildCtx.diagnostics.push(...results.diagnostics);
-
-  return results.output;
+  return await generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build);
 }
 
 

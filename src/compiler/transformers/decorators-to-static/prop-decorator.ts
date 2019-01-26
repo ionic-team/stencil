@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { catchError, toDashCase } from '@utils';
-import { copyComments, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, objectToObjectLiteral, removeDecorator, resolveType, typeToString } from '../transform-utils';
+import { convertValueToLiteral, copyComments, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, removeDecorator, resolveType, typeToString } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -52,7 +52,7 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
   const staticProp = ts.createPropertyAssignment(
     ts.createLiteral(propName),
-    objectToObjectLiteral(propMeta)
+    convertValueToLiteral(propMeta)
   );
 
   // copy comments from prop to static object

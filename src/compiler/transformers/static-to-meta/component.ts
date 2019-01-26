@@ -99,7 +99,18 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
   setComponentBuildConditionals(cmp);
 
   if (transformOpts.addCompilerMeta) {
-    const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(cmp));
+    // no need to copy all compiler meta data to the static getter
+    const copyCmp = Object.assign({}, cmp);
+    delete copyCmp.assetsDirs;
+    delete copyCmp.dependencies;
+    delete copyCmp.excludeFromCollection;
+    delete copyCmp.isCollectionDependency;
+    delete copyCmp.jsdoc;
+    delete copyCmp.moduleFile;
+    delete copyCmp.potentialCmpRefs;
+    delete copyCmp.styleDocs;
+
+    const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
 
     const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 

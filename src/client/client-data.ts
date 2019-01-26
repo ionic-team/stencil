@@ -2,9 +2,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 
 
-export const cmpMetaRefs: WeakMap<any, d.ComponentRuntimeMeta> = (BUILD.hostRefs ? new WeakMap() : undefined);
-
-export const hostRefs: WeakMap<any, d.HostRef> = (BUILD.hostRefs ? new WeakMap() : undefined);
+export const hostRefs: WeakMap<any, d.HostRef> = new WeakMap();
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = (BUILD.style ? new WeakMap() : undefined);
 
@@ -21,9 +19,7 @@ export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
 
   if (!hostRef) {
     hostRefs.set(elm, hostRef = {
-      elm: elm,
-      instanceValues: new Map(),
-      instance: BUILD.lazyLoad ? null : elm
+      instanceValues: new Map()
     });
   }
 
@@ -31,7 +27,7 @@ export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
 };
 
 export const registerLazyInstance = (lazyInstance: any, elmData: d.HostRef) =>
-  hostRefs.set(elmData.instance = lazyInstance, elmData);
+  hostRefs.set(elmData.lazyInstance = lazyInstance, elmData);
 
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

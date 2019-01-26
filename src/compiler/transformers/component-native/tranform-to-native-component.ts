@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { addImports, isComponentClassNode } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
+import { ModuleKind, addImports, getBuildScriptTarget, isComponentClassNode } from '../transform-utils';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
@@ -16,14 +16,14 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ts.ModuleKind.ESNext,
+        module: ModuleKind,
         removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
-        target: build.es5 ? ts.ScriptTarget.ES5 : ts.ScriptTarget.ES2017
+        target: getBuildScriptTarget(build)
       },
       fileName: cmp.moduleFile.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform()
+          nativeComponentTransform(build)
         ]
       }
     };
@@ -44,7 +44,7 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
 }
 
 
-function nativeComponentTransform(): ts.TransformerFactory<ts.SourceFile> {
+function nativeComponentTransform(build: d.Build): ts.TransformerFactory<ts.SourceFile> {
   return transformCtx => {
 
     function visitNode(node: ts.Node) {
@@ -59,10 +59,13 @@ function nativeComponentTransform(): ts.TransformerFactory<ts.SourceFile> {
     }
 
     return tsSourceFile => {
-      tsSourceFile = addImports(transformCtx, tsSourceFile,
-        ['connectedCallback', 'h'],
-        '@stencil/core/runtime'
-      );
+      const importFns = ['connectedCallback'];
+
+      if (build.vdomRender) {
+        importFns.push('h');
+      }
+
+      tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/runtime');
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
@@ -97,17 +100,14 @@ function updateHostComponentHeritageClauses() {
 function updateHostComponentMembers(classNode: ts.ClassDeclaration) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  addSuperToHostConstructor(classMembers);
-
-  classMembers.push(
-    addHostComponentCallback('connectedCallback')
-  );
+  addSuperToConstructor(classMembers);
+  addConnectedCallback(classMembers);
 
   return classMembers;
 }
 
 
-function addSuperToHostConstructor(classMembers: ts.ClassElement[]) {
+function addSuperToConstructor(classMembers: ts.ClassElement[]) {
   const cstrMethod = classMembers.find(classMember => {
     return (classMember.kind === ts.SyntaxKind.Constructor);
   }) as ts.ConstructorDeclaration;
@@ -127,23 +127,39 @@ function addSuperToHostConstructor(classMembers: ts.ClassElement[]) {
 }
 
 
-function addHostComponentCallback(methodName: string) {
+function addConnectedCallback(classMembers: ts.ClassElement[]) {
+  // function call to stencil's exported connectedCallback(elm, plt)
+  const methodName = 'connectedCallback';
+
   const args: any = [
     ts.createThis()
   ];
 
-  const stencilCallbackFnCall = ts.createCall(
+  const fnCall = ts.createCall(
     ts.createIdentifier(methodName), undefined, args
   );
 
-  const body = ts.createBlock([
-    ts.createExpressionStatement(stencilCallbackFnCall)
-  ], true);
+  const connectedCallback = classMembers.find(classMember => {
+    return (classMember.kind === ts.SyntaxKind.MethodDeclaration && (classMember.name as any).escapedText === methodName);
+  }) as ts.MethodDeclaration;
 
-  // function call to stencil's exported connectedCallback(elm, plt)
-  const callbackMethod = ts.createMethod(undefined, undefined, undefined,
-    methodName, undefined, undefined, undefined, undefined,
-    body
-  );
-  return callbackMethod;
+  if (connectedCallback != null) {
+    // class already has a connectedCallback(), so update it
+    connectedCallback.body = ts.updateBlock(connectedCallback.body, [
+      ts.createExpressionStatement(fnCall),
+      ...connectedCallback.body.statements
+    ]);
+
+  } else {
+    // class doesn't have a connectedCallback(), so add it
+    const body = ts.createBlock([
+      ts.createExpressionStatement(fnCall)
+    ], true);
+
+    const callbackMethod = ts.createMethod(undefined, undefined, undefined,
+      methodName, undefined, undefined, undefined, undefined,
+      body
+    );
+    classMembers.push(callbackMethod);
+  }
 }

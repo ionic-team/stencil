@@ -21,7 +21,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
         // StencilLazyHost
 
         connectedCallback() {
-          connectedCallback(this);
+          connectedCallback(this, cmpLazyMeta);
         }
 
         disconnectedCallback() {
@@ -37,7 +37,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
         forceUpdate() {
           if (BUILD.updatable) {
             const hostRef = hostRefs.get(this);
-            update(this, hostRef.instance, hostRef, cmpLazyMeta);
+            update(this,
+              BUILD.lazyLoad ? hostRef.lazyInstance : this,
+              hostRef,
+              cmpLazyMeta
+            );
           }
         }
 
@@ -59,7 +63,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
         customElements.define(
           cmpLazyMeta.cmpTag,
-          proxyComponent(StencilLazyHost as any, cmpLazyMeta, true) as any
+          proxyComponent(StencilLazyHost as any, cmpLazyMeta, 1 as any) as any
         );
       }
     })

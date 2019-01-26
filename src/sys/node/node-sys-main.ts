@@ -187,7 +187,7 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('optimizeCss', [inputOpts]) as Promise<d.OptimizeCssOutput>;
   }
 
-  minifyJs(input: string, opts?: any) {
+  minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: d.Diagnostic[]}> {
     return this.sysWorker.run('minifyJs', [input, opts]);
   }
 

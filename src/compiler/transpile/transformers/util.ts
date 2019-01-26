@@ -1,4 +1,5 @@
 import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
+import { ScriptTarget } from '../../transformers/transform-utils';
 import ts from 'typescript';
 
 
@@ -145,7 +146,7 @@ function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
  * @returns a string
  */
 export async function transformSourceString(fileName: string, sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
-  const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.ES2017), transformers);
+  const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ScriptTarget), transformers);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
       onEmitNode: transformed.emitNodeWithNotification,
       substituteNode: transformed.substituteNode
@@ -166,7 +167,7 @@ export function transformSourceFile(sourceText: string, transformers: ts.CustomT
   return ts.transpileModule(sourceText, {
     transformers,
     compilerOptions: Object.assign({}, DEFAULT_COMPILER_OPTIONS, {
-      target: ts.ScriptTarget.ES2017
+      target: ScriptTarget
     })
   }).outputText;
 }

@@ -5,7 +5,9 @@ import { setupGlobal } from '@mock-doc';
 export * from './task-queue';
 
 
-export const consoleError = (e: any) => console.error(e);
+export const consoleError = (e: any) => {
+  throw e;
+};
 
 export const win = setupGlobal(global);
 
@@ -43,8 +45,6 @@ export function resetPlatform() {
   resetTaskQueue();
 }
 
-export const cmpMetaRefs = new Map();
-
 export const getElement = (ref: any) => hostRefs.get(ref).elm;
 
 export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
@@ -52,9 +52,8 @@ export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
 
   if (!hostRef) {
     hostRefs.set(elm, hostRef = {
-      elm: elm,
       instanceValues: new Map(),
-      instance: elm
+      lazyInstance: elm
     });
   }
 
@@ -62,7 +61,7 @@ export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
 };
 
 export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set(hostRef.instance = lazyInstance, hostRef);
+  hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
 
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

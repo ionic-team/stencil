@@ -1,30 +1,33 @@
 import * as d from '@declarations';
 import { formatComponentRuntimeMeta } from '../app-core/format-component-runtime-meta';
 import { setStylePlaceholders } from '../app-core/register-app-styles';
-import { sys } from '@sys';
 import { updateToNativeComponents } from './update-to-native-component';
+import { bundleAppCore } from '../app-core/bundle-app-core';
+import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 
 
-export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build, inputFiles: Map<string, string>) {
-  const appCoreInput = sys.path.join(config.srcDir, 'core', 'native', `${config.fsNamespace}.js`);
+export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
+  const appCoreInputEntryFile = `${config.fsNamespace}-native.mjs`;
+  const appCoreInputFiles = new Map();
 
-  const c: string[] = [];
+  const coreText: string[] = [];
 
-  c.push(`import { proxyComponent } from '@stencil/core/runtime';`);
+  coreText.push(`// ${appCoreInputEntryFile}`);
+  coreText.push(`import { proxyComponent } from '@stencil/core/runtime';`);
 
   const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
   cmpData.forEach(cmpData => {
-    c.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
+    coreText.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
 
-    inputFiles.set(cmpData.filePath, cmpData.outputText);
+    appCoreInputFiles.set(cmpData.filePath, cmpData.outputText);
   });
 
   if (cmpData.length === 1) {
     // only one component, so get straight to the point
     const cmp = cmpData[0];
 
-    c.push(`customElements.define('${cmp.tagName}', proxyComponent(
+    coreText.push(`customElements.define('${cmp.tagName}', proxyComponent(
       ${cmp.componentClassName},
       ${JSON.stringify(formatComponentRuntimeMeta(cmp.cmp, false))},
       1 /* is element constructor */,
@@ -33,19 +36,32 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
   } else {
     // numerous components, so make it easy on minifying
-    c.push(formatNativeComponentRuntimeData(cmpData));
-    c.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
+    coreText.push(formatNativeComponentRuntimeData(cmpData));
+    coreText.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
   }
 
   const cmpsWithStyles = cmps.filter(cmp => cmp.styles.length > 0);
   if (cmpsWithStyles.length > 0) {
     const styles = await setStylePlaceholders(build, cmpsWithStyles);
-    c.push(styles);
+    coreText.push(styles);
   }
 
-  inputFiles.set(appCoreInput, c.join('\n'));
+  appCoreInputFiles.set(appCoreInputEntryFile, coreText.join('\n'));
 
-  return appCoreInput;
+  // bundle up the input into a nice pretty file
+  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
+  if (buildCtx.hasError) {
+    return null;
+  }
+
+  const results = await optimizeAppCoreBundle(config, compilerCtx, build, appCoreBundleOutput);
+  buildCtx.diagnostics.push(...results.diagnostics);
+
+  if (buildCtx.hasError) {
+    return null;
+  }
+
+  return results.output;
 }
 
 
@@ -68,7 +84,7 @@ function formatNativeComponentRuntime(cmp: d.ComponentCompilerNativeData) {
   c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`,\n${formatComponentRuntimeMeta(cmp.cmp, false)}`);
+  c.push(`,\n${JSON.stringify(formatComponentRuntimeMeta(cmp.cmp, false))}`);
 
   c.push(`]\n`);
 

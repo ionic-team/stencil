@@ -2,16 +2,23 @@ import * as d from '@declarations';
 import ts from 'typescript';
 
 
-export function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
-  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
-    const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
-    return prop;
-  });
-  return ts.createObjectLiteral(newProperties, true);
+export const LegacyScriptTarget = ts.ScriptTarget.ES5;
+export const ScriptTarget = ts.ScriptTarget.ES2017;
+export const ModuleKind = ts.ModuleKind.ESNext;
+
+
+export function getBuildScriptTarget(build: d.Build) {
+  if (build.es5) {
+    return LegacyScriptTarget;
+  }
+  return ScriptTarget;
 }
 
 
-export function convertValueToLiteral(val: any) {
+export function convertValueToLiteral(val: any, refs: WeakSet<any> = null) {
+  if (refs == null) {
+    refs = new WeakSet();
+  }
   if (val === String) {
     return ts.createIdentifier('String');
   }
@@ -28,18 +35,36 @@ export function convertValueToLiteral(val: any) {
     return ts.createIdentifier('null');
   }
   if (Array.isArray(val)) {
-    return arrayToArrayLiteral(val);
+    return arrayToArrayLiteral(val, refs);
   }
   if (typeof val === 'object') {
-    return objectToObjectLiteral(val);
+    return objectToObjectLiteral(val, refs);
   }
   return ts.createLiteral(val);
 }
 
 
-function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
-  const newList: any[] = list.map(convertValueToLiteral);
+function arrayToArrayLiteral(list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression {
+  const newList: any[] = list.map(l => {
+    return convertValueToLiteral(l, refs);
+  });
   return ts.createArrayLiteral(newList);
+}
+
+
+function objectToObjectLiteral(obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression {
+  if (refs.has(obj)) {
+    return ts.createIdentifier('undefined') as any;
+  }
+
+  refs.add(obj);
+
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
+    const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key], refs) as ts.Expression);
+    return prop;
+  });
+
+  return ts.createObjectLiteral(newProperties, true);
 }
 
 

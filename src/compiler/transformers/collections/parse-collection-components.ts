@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { ModuleKind, ScriptTarget } from '../transform-utils';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { sys } from '@sys';
@@ -40,8 +41,8 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   options.outFile = undefined;
   options.noResolve = true;
 
-  options.module = ts.ModuleKind.ESNext;
-  options.target = ts.ScriptTarget.ES2017;
+  options.module = ModuleKind;
+  options.target = ScriptTarget;
 
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, options.target);
 
