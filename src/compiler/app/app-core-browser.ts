@@ -73,16 +73,8 @@ export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.C
 
   return [
     generatePreamble(config, {defaultBanner: true}) + '\n',
-    `
-let w = window;
-let d = document;
-let x = {};
-let n = "${config.namespace}";
-let h = "${config.hydratedCssClass}";
-let c = ${cmpLoaderRegistryStr};
-let r;
-(function(s){s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n
-`,
+    `let w=window,d=document, x={},n="${config.namespace}",h="${config.hydratedCssClass}",c=${cmpLoaderRegistryStr},r;`,
+    `(function(s){s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
     jsContent.trim()
   ].join('');
   }

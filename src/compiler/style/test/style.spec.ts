@@ -96,11 +96,11 @@ describe('component-styles', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'u.entry.js'));
+    const iosContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', '3.entry.js'));
     expect(iosContent).toContain(`body{font-family:Helvetica}`);
     expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'h.entry.js'));
+    const mdContent = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'z.entry.js'));
     expect(mdContent).toContain(`body{font-family:Roboto}`);
     expect(mdContent).toContain(`static get styleMode(){return"md"}`);
   });

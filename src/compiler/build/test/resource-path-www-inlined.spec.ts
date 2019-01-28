@@ -156,6 +156,7 @@ describe('www loader/core resourcesUrl', () => {
 
   function execScript(win: any, doc: any, jsContent: string) {
     jsContent = jsContent.replace(/import\(/g, 'mockImport(');
+    jsContent = jsContent.replace(/export[^}]*\}/g, '');
     const winFn = new Function('window', 'document', jsContent);
     winFn(win, doc, jsContent);
   }

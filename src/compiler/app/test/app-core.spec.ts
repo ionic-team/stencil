@@ -35,9 +35,8 @@ describe('app-core', () => {
 
     it('wraps the JS content in an IFEE, arrow function', () => {
       const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is', cmpRegistry, {} as any).split('\n');
-      expect(lines[1].toString().startsWith(`((w,d,x,n,h,c,r)=>{`)).toBe(true);
+      expect(lines[1].toString().startsWith(`let w=window,d=document`)).toBe(true);
       expect(lines[2]).toEqual('this is JavaScript code, really it is');
-      expect(lines[3]).toEqual(`})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",[]);`);
     });
 
     it('wraps the JS content in an IFEE, es5', () => {

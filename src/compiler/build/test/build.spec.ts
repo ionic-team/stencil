@@ -77,7 +77,7 @@ describe('build', () => {
     expect(r.hasSvg).toBe(false);
 
     const output = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
-    expect(output).toEqual('class t{static get is(){return"cmp-a"}}export{t as CmpA};');
+    expect(output).toEqual('import{h as r}from"./app.core.js";class t{static get is(){return"cmp-a"}}export{t as CmpA};');
   });
 
   it('should build app files, app global and component', async () => {
