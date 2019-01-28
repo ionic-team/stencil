@@ -20,6 +20,60 @@ describe('dom api', () => {
   });
 
 
+  describe('$nodeIs', () => {
+
+    it('is not case sensitive', () => {
+
+      const r = domApi.$nodeIs('dIv', elm);
+      expect(r).toBe(true);
+    })
+
+    it('is not', () => {
+
+      const r = domApi.$nodeIs('span', elm);
+      expect(r).toBe(false);
+    });
+  });
+
+  describe('$insertBefore', () => {
+
+    it('when inserting child on a template, goes in content fragment', () => {
+
+      const parentElm = doc.createElement('template');
+      const referenceElm = doc.createElement('div');
+      parentElm.content.appendChild(referenceElm);
+
+      domApi.$insertBefore(parentElm, elm, referenceElm);
+      const r = parentElm.content.childNodes[0];
+      expect(r).toBe(elm);
+    });
+  });
+
+  describe('$appendChild', () => {
+
+    it('when appending child on a template, goes in content fragment', () => {
+
+      const parentElm = doc.createElement('template');
+      parentElm.content.appendChild(doc.createElement('div'));
+
+      domApi.$appendChild(parentElm, elm);
+      const r = parentElm.content.childNodes[1];
+      expect(r).toBe(elm);
+    });
+  });
+
+  describe('$childNodes', () => {
+
+    it('returning childNodes from a template', () => {
+
+      const parentElm = doc.createElement('template');
+      parentElm.content.appendChild(elm);
+
+      const r = domApi.$childNodes(parentElm)[0];
+      expect(r).toBe(elm);
+    });
+  });
+
   describe('$parentElement', () => {
 
     it('element w/ parentNode thats is a shadow root should return host', () => {

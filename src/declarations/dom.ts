@@ -3,6 +3,7 @@
 export interface DomApi {
   $doc: HTMLDocument;
   $nodeType(node: any): number;
+  $nodeIs<T extends Node>(nodeName: string, node: Node): node is T;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
   $createElement(tagName: any): HTMLElement;
   $createElementNS(namespace: string, tagName: any): any;

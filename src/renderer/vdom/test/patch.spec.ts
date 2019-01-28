@@ -891,7 +891,24 @@ describe('renderer', () => {
 
   });
 
-  function prop(name: any) {
+  describe('template elements', () => {
+
+    it('adds children to the content fragment', ()=>{
+      hostElm = domApi.$createElement('my-tag');
+      vnode0 = {};
+      vnode0.elm = hostElm;
+      hostElm = patch(hostElm, vnode0,
+        h('my-tag', null,
+            h('template', null, 'Test Child')
+        )
+      ).elm;
+
+      expect(hostElm.childNodes[0].tagName).toBe('TEMPLATE');
+      expect(hostElm.childNodes[0].content.childNodes[0].textContent).toBe('Test Child');
+    });
+  });
+
+function prop(name: any) {
     return function(obj: any) {
       return obj[name];
     };

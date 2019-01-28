@@ -18,6 +18,8 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     $nodeType: (node: any) =>
       node.nodeType,
 
+    $nodeIs: (nodeName: string, node: Node): node is any => node.nodeName && node.nodeName === nodeName.toUpperCase(),
+
     $createElement: (tagName: any) =>
       doc.createElement(tagName),
 
@@ -29,14 +31,14 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     $createComment: (data: string) => doc.createComment(data),
 
     $insertBefore: (parentNode: Node, childNode: Node, referenceNode: Node) =>
-      parentNode.insertBefore(childNode, referenceNode),
+      domApi.$nodeIs<HTMLTemplateElement>('TEMPLATE', parentNode) ? parentNode.content.insertBefore(childNode, referenceNode) : parentNode.insertBefore(childNode, referenceNode),
 
     // https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
     // and it's polyfilled in es5 builds
     $remove: (node: Node) => (node as any).remove(),
 
     $appendChild: (parentNode: Node, childNode: Node) =>
-      parentNode.appendChild(childNode),
+      domApi.$nodeIs<HTMLTemplateElement>('TEMPLATE', parentNode) ? parentNode.content.appendChild(childNode) : parentNode.appendChild(childNode),
 
     $addClass: (elm: Element, cssClass: string) => {
       if (_BUILD_.hasSvg && _BUILD_.es5) {
@@ -60,7 +62,7 @@ export const createDomApi = (App: AppGlobal, win: any, doc: Document): DomApi =>
     },
 
     $childNodes: (node: Node) =>
-      node.childNodes,
+      domApi.$nodeIs<HTMLTemplateElement>('TEMPLATE', node) ? node.content.childNodes : node.childNodes,
 
     $parentNode: (node: Node) =>
       node.parentNode,
