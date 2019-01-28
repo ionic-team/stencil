@@ -233,7 +233,7 @@ export interface DerivedChunk {
 export interface DerivedModule {
   list: DerivedChunk[];
   sourceTarget: d.SourceTarget;
-  isBrowser: boolean;
+  browserBuild: boolean;
 }
 
 

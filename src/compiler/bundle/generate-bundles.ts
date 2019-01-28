@@ -51,7 +51,7 @@ async function generateChunkFiles(config: d.Config, compilerCtx: d.CompilerCtx, 
     .filter(chunk => !entryModulesMap.has(chunk.entryKey))
     .map(async chunk => {
       // chunk asset, not a entry point, just write to the final destination
-      if (module.isBrowser) {
+      if (module.browserBuild) {
         const fileName = `${chunk.entryKey}${module.sourceTarget === 'es5' ? '.es5' : ''}.js`;
         const jsText = replaceBundleIdPlaceholder(chunk.code, chunk.filename);
         await writeBrowserJSFile(config, compilerCtx, fileName, jsText);
@@ -128,7 +128,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
     }
 
     // generate the bundle build for mode, no scoped styles, and esm
-    if (module.isBrowser) {
+    if (module.browserBuild) {
       await generateBundleBrowserBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, module.sourceTarget);
     } else {
       await generateBundleEsmBuild(config, compilerCtx, entryModule, jsText, bundleId, modeName, false, module.sourceTarget);
@@ -139,7 +139,7 @@ async function generateBundleMode(config: d.Config, compilerCtx: d.CompilerCtx, 
       const scopedJsText = await injectStyleMode(entryModule.moduleFiles, chunk.code, modeName, true);
 
       // generate the bundle build for: mode, esm and scoped styles
-      if (module.isBrowser) {
+      if (module.browserBuild) {
         await generateBundleBrowserBuild(config, compilerCtx, entryModule, scopedJsText, bundleId, modeName, true, module.sourceTarget);
       } else {
         await generateBundleEsmBuild(config, compilerCtx, entryModule, scopedJsText, bundleId, modeName, true, module.sourceTarget);

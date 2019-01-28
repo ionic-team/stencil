@@ -60,16 +60,32 @@ export function wrapCoreJs(config: d.Config, jsContent: string, cmpRegistry: d.C
 
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
-  const output = [
-    generatePreamble(config, {defaultBanner: true}) + '\n',
-    `(${buildConditionals.es5 ? 'function' : ''}(w,d,x,n,h,c,r)${buildConditionals.es5 ? '' : '=>'}{`,
-    buildConditionals.es5 ? `"use strict";\n` : ``,
-    `(${buildConditionals.es5 ? 'function' : ''}(s)${buildConditionals.es5 ? '' : '=>'}{s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
-    jsContent.trim(),
-    `\n})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",${cmpLoaderRegistryStr});`
-  ].join('');
+  if (buildConditionals.es5) {
+    return [
+      generatePreamble(config, {defaultBanner: true}) + '\n',
+      '(function(w,d,x,n,h,c,r){',
+      `"use strict";\n`,
+      `(function(s){s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n`,
+      jsContent.trim(),
+      `\n})(window,document,{},"${config.namespace}","${config.hydratedCssClass}",${cmpLoaderRegistryStr});`
+    ].join('');
+  } else {
 
-  return output;
+  return [
+    generatePreamble(config, {defaultBanner: true}) + '\n',
+    `
+let w = window;
+let d = document;
+let x = {};
+let n = "${config.namespace}";
+let h = "${config.hydratedCssClass}";
+let c = ${cmpLoaderRegistryStr};
+let r;
+(function(s){s&&(r=s.getAttribute('data-resources-url'))})(d.querySelector("script[data-namespace='${config.fsNamespace}']"));\n
+`,
+    jsContent.trim()
+  ].join('');
+  }
 }
 
 

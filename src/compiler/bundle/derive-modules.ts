@@ -25,7 +25,7 @@ export async function deriveModules(config: d.Config, compilerCtx: d.CompilerCtx
   return rawModules;
 }
 
-async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, mightMinify: boolean,  moduleList: d.JSModuleList) {
+async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, browserBuild: boolean, mightMinify: boolean,  moduleList: d.JSModuleList) {
   // skip if moduleList is not defined
   if (!moduleList) {
     return undefined;
@@ -37,21 +37,21 @@ async function deriveModule(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   // skip non-browser builds if ESM is disabled
-  if (!isBrowser && !config.buildEsm) {
+  if (!browserBuild && !config.buildEsm) {
     return undefined;
   }
 
-  const module = createModule(moduleList, sourceTarget, isBrowser);
+  const module = createModule(moduleList, sourceTarget, browserBuild);
 
   await Promise.all(
     module.list.map(chunk =>
-      deriveChunk(config, compilerCtx, buildCtx, sourceTarget, isBrowser, mightMinify, chunk)
+      deriveChunk(config, compilerCtx, buildCtx, sourceTarget, browserBuild, mightMinify, chunk)
     )
   );
   return module;
 }
 
-function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, isBrowser: boolean): d.DerivedModule {
+function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, browserBuild: boolean): d.DerivedModule {
 
   const list = Object.keys(moduleList).map(chunkKey => ({
     entryKey: chunkKey.replace('.js', ''),
@@ -62,18 +62,18 @@ function createModule(moduleList: d.JSModuleList, sourceTarget: d.SourceTarget, 
   return {
     list,
     sourceTarget,
-    isBrowser
+    browserBuild
   };
 }
 
-async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, isBrowser: boolean, mightMinify: boolean, chunk: d.DerivedChunk) {
+async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, browserBuild: boolean, mightMinify: boolean, chunk: d.DerivedChunk) {
   // replace intro placeholder with an actual intro statement
-  chunk.code = chunk.code.replace(getIntroPlaceholder(), generateIntro(config, isBrowser));
+  chunk.code = chunk.code.replace(getIntroPlaceholder(), generateIntro(config, browserBuild, sourceTarget));
 
   // transpile
   if (sourceTarget === 'es5') {
-    chunk.code = await transpileEs5Bundle(config, compilerCtx, buildCtx, isBrowser, chunk.code);
-    if (!isBrowser) {
+    chunk.code = await transpileEs5Bundle(config, compilerCtx, buildCtx, browserBuild, chunk.code);
+    if (!browserBuild) {
       chunk.code = chunk.code.replace(`from "tslib";`, `from '../polyfills/tslib.js';`);
     }
   }
@@ -85,9 +85,9 @@ async function deriveChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
 }
 
 
-async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isBrowser: boolean, jsText: string, ) {
+async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, browserBuild: boolean, jsText: string, ) {
   // use typescript to convert this js text into es5
-  const transpileResults = await transpileToEs5Main(config, compilerCtx, jsText, isBrowser);
+  const transpileResults = await transpileToEs5Main(config, compilerCtx, jsText, browserBuild);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
 
@@ -98,8 +98,13 @@ async function transpileEs5Bundle(config: d.Config, compilerCtx: d.CompilerCtx, 
   return transpileResults.code;
 }
 
-function generateIntro(config: d.Config, isBrowser: boolean) {
-  return isBrowser
-    ? `const h = window.${config.namespace}.h;`
-    : `import { h } from '../${getCoreEsmFileName(config)}';`;
+function generateIntro(config: d.Config, browserBuild: boolean, sourceTarget: d.SourceTarget) {
+  if (browserBuild && sourceTarget === 'es5') {
+    return `const h = window.${config.namespace}.h;`;
+  }
+  if (browserBuild) {
+    return `import { h } from './${getCoreEsmFileName(config)}';`;
+  } else {
+    return `import { h } from '../${getCoreEsmFileName(config)}';`;
+  }
 }
