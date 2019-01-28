@@ -87,30 +87,23 @@ const CONFIG_FILENAMES = [
 
 
 function requireConfigFile(fs: d.FileSystem, configFilePath: string) {
-  // load up the source code
-  let sourceText = fs.readFileSync(configFilePath);
-
-  sourceText = convertSourceConfig(sourceText, configFilePath);
-
   // ensure we cleared out node's internal require() cache for this file
   delete require.cache[path.resolve(configFilePath)];
 
   // let's override node's require for a second
   // don't worry, we'll revert this when we're done
-  const defaultLoader = require.extensions['.js'];
-  require.extensions['.js'] = (module: NodeModuleWithCompile, filename: string) => {
-    if (filename === configFilePath) {
-      module._compile(sourceText, filename);
-    } else {
-      defaultLoader(module, filename);
-    }
+  require.extensions['.ts'] = (module: NodeModuleWithCompile, filename: string) => {
+    let sourceText = fs.readFileSync(filename);
+    sourceText = convertSourceConfig(sourceText, filename);
+    console.log(sourceText);
+    module._compile(sourceText, filename);
   };
 
   // let's do this!
   const config = require(configFilePath);
 
   // all set, let's go ahead and reset the require back to the default
-  require.extensions['.js'] = defaultLoader;
+  require.extensions['.ts'] = undefined;
 
   // good work team
   return config;
