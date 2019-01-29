@@ -44,7 +44,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
     Object.entries(cmpMeta.cmpMembers).forEach(([memberName, memberData]) => {
 
-      if ((BUILD.prop || BUILD.state) && ((memberData[0] & MEMBER_FLAGS.PropLike) || proxyState)) {
+      if ((BUILD.prop && (memberData[0] & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberData[0] & MEMBER_FLAGS.State))) {
         // proxyComponent - prop
         Object.defineProperty((Cstr as any).prototype, memberName,
           {
