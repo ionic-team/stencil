@@ -33,27 +33,17 @@ export interface ComponentRuntimeMembers {
 }
 
 
-export interface ComponentRuntimeMember {
+export type ComponentRuntimeMember = [
   /**
-   * member type
+   * flags data
    */
-  [0]: number;
-
-  /**
-   * prop type
-   */
-  [1]?: number;
+  number,
 
   /**
    * attribute name to observe
    */
-  [2]?: string | 1 | 0;
-
-  /**
-   * reflect to attribute
-   */
-  [3]?: boolean;
-}
+  string?
+];
 
 
 export interface ComponentRuntimeHostListener {

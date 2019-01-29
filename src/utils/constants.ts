@@ -1,16 +1,36 @@
 
+export const enum MEMBER_FLAGS {
+  String = 1 << 0,
+  Number = 1 << 1,
+  Boolean = 1 << 2,
+  Any = 1 << 3,
+  Unknown = 1 << 4,
+  State = 1 << 5,
+  Method = 1 << 6,
+  Event = 1 << 7,
+  Element = 1 << 8,
+  ReflectAttr = 1 << 9,
+  PropMutable = 1 << 10,
+  PropContext = 1 << 11,
+  PropConnect = 1 << 12,
+
+  Prop = String | Number | Boolean | Any | Unknown,
+  HasAttribute = String | Number | Boolean | Any,
+  PropLike = Prop | PropMutable | State,
+}
+
 /**
  * Member Types
  */
 export const enum MEMBER_TYPE {
-  Prop = 1 << 0,
-  PropMutable = 1 << 1,
-  PropContext = 1 << 2,
-  PropConnect = 1 << 3,
-  State = 1 << 4,
-  Method = 1 << 5,
-  Element = 1 << 6,
-  Event = 1 << 7,
+  Prop = MEMBER_FLAGS.Prop,
+  PropMutable = MEMBER_FLAGS.PropMutable,
+  PropContext = MEMBER_FLAGS.PropContext,
+  PropConnect = MEMBER_FLAGS.PropConnect,
+  State = MEMBER_FLAGS.State,
+  Method = MEMBER_FLAGS.Method,
+  Element = MEMBER_FLAGS.Element,
+  Event = MEMBER_FLAGS.Event,
 }
 
 
@@ -18,11 +38,11 @@ export const enum MEMBER_TYPE {
  * Property Types
  */
 export const enum PROP_TYPE {
-  Unknown = 0,
-  Any = 1 << 0,
-  String = 1 << 1,
-  Boolean = 1 << 2,
-  Number = 1 << 3,
+  Unknown = MEMBER_FLAGS.Unknown,
+  Any = MEMBER_FLAGS.Any,
+  String = MEMBER_FLAGS.String,
+  Boolean = MEMBER_FLAGS.Boolean,
+  Number = MEMBER_FLAGS.Number,
 }
 
 

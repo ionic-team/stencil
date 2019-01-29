@@ -63,7 +63,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
         customElements.define(
           cmpLazyMeta.cmpTag,
-          proxyComponent(StencilLazyHost as any, cmpLazyMeta, 1 as any) as any
+          proxyComponent(StencilLazyHost as any, cmpLazyMeta, 1, 0) as any
         );
       }
     })

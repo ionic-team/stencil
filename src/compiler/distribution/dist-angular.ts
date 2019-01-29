@@ -119,7 +119,7 @@ export class ${tagNameAsPascal} {`];
 function getInputs(cmpMeta: d.ComponentMeta) {
   return Object.keys(cmpMeta.membersMeta || {}).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-    return isDocsPublic(m.jsdoc) && (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable);
+    return isDocsPublic(m.jsdoc) && (m.memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable));
   });
 }
 

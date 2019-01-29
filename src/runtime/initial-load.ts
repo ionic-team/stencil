@@ -74,7 +74,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         if (BUILD.member && !LazyCstr.isProxied && cmpMeta.members) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
-          proxyComponent(LazyCstr, cmpMeta, false, true);
+          proxyComponent(LazyCstr, cmpMeta, 0, 1);
           LazyCstr.isProxied = true;
         }
 
@@ -109,7 +109,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         if (elm.hasAttribute(attrName)) {
           hostRef.instanceValues.set(
             propName,
-            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.members[propName][1])
+            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.members[propName][0])
           );
         }
       });

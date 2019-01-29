@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '@utils';
+import { MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]) {
@@ -41,54 +41,41 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 }
 
 
-function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta) {
+function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta): d.ComponentRuntimeMembers {
+  return {
+    ...formatPropertiesRuntimeMember(compilerMeta.properties),
+    ...formatStatesRuntimeMember(compilerMeta.states),
+    ...formatMethodsRuntimeMember(compilerMeta.methods),
+    ...formatEventsRuntimeMember(compilerMeta.events),
+  };
+}
+
+
+function formatPropertiesRuntimeMember(properties: d.ComponentCompilerProperty[]) {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  compilerMeta.properties.forEach(compilerProperty => {
-    formatPropertyRuntimeMember(runtimeMembers, compilerProperty);
+  properties.forEach(member => {
+    runtimeMembers[member.name] = trimFalsy([
+      /**
+       * [0] member type
+       */
+      formatFlags(member),
+      formatAttrName(member)
+    ]);
   });
-
-  compilerMeta.states.forEach(compilerState => {
-    formatStateRuntimeMember(runtimeMembers, compilerState);
-  });
-
-  compilerMeta.methods.forEach(compilerMethod => {
-    formatMethodRuntimeMember(runtimeMembers, compilerMethod);
-  });
-
-  compilerMeta.events.forEach(compilerEvent => {
-    formatEventRuntimeMember(runtimeMembers, compilerEvent);
-  });
-
   return runtimeMembers;
 }
 
 
-function formatPropertyRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, compilerProperty: d.ComponentCompilerProperty) {
-  const runtimeMember: d.ComponentRuntimeMember = [
-    /**
-     * [0] member type
-     */
-    compilerProperty.mutable ? MEMBER_TYPE.PropMutable : MEMBER_TYPE.Prop,
-
-    /**
-     * [1] prop type
-     */
-    formatPropType(compilerProperty.type),
-
-    /**
-     * [2] attribute name to observe
-     */
-    formatAttrName(compilerProperty),
-
-    /**
-     * [3] reflect to attribute
-     */
-    shortBoolean(compilerProperty.reflect),
-
-  ];
-
-  runtimeMembers[compilerProperty.name] = trimFalsy(runtimeMember);
+function formatFlags(compilerProperty: d.ComponentCompilerProperty) {
+  let type = formatPropType(compilerProperty.type);
+  if (compilerProperty.mutable) {
+    type |= MEMBER_FLAGS.PropMutable;
+  }
+  if (compilerProperty.reflect) {
+    type |= MEMBER_FLAGS.ReflectAttr;
+  }
+  return type;
 }
 
 
@@ -98,7 +85,7 @@ function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
     if (compilerProperty.name === compilerProperty.attribute) {
       // property name and attribute name are the exact same
       // true value means to use the property name for the attribute name
-      return 1;
+      return undefined;
     }
 
     // property name and attribute name are not the same
@@ -108,7 +95,7 @@ function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
   }
 
   // we shouldn't even observe an attribute for this property
-  return 0;
+  return undefined;
 }
 
 
@@ -129,39 +116,48 @@ function formatPropType(type: d.ComponentCompilerPropertyType) {
 }
 
 
-function formatStateRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, compilerState: d.ComponentCompilerState) {
-  const runtimeState: d.ComponentRuntimeMember = [
-    /**
-     * [0] member type
-     */
-    MEMBER_TYPE.State
-  ];
+function formatStatesRuntimeMember(states: d.ComponentCompilerState[]) {
+  const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  runtimeMembers[compilerState.name] = runtimeState;
+  states.forEach(member => {
+    runtimeMembers[member.name] = [
+      /**
+       * [0] member flags
+       */
+      MEMBER_TYPE.State
+    ];
+  });
+  return runtimeMembers;
 }
 
 
-function formatMethodRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, compilerMethod: d.ComponentCompilerMethod) {
-  const runtimeMethod: d.ComponentRuntimeMember = [
-    /**
-     * [0] member type
-     */
-    MEMBER_TYPE.Method
-  ];
+function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
+  const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  runtimeMembers[compilerMethod.name] = runtimeMethod;
+  methods.forEach(member => {
+    runtimeMembers[member.name] = [
+      /**
+       * [0] member flags
+       */
+      MEMBER_TYPE.Method
+    ];
+  });
+  return runtimeMembers;
 }
 
 
-function formatEventRuntimeMember(runtimeMembers: d.ComponentRuntimeMembers, compilerEvent: d.ComponentCompilerEvent) {
-  const runtimeMethod: d.ComponentRuntimeMember = [
-    /**
-     * [0] member type
-     */
-    MEMBER_TYPE.Event
-  ];
+function formatEventsRuntimeMember(events: d.ComponentCompilerEvent[]) {
+  const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  runtimeMembers[compilerEvent.name] = runtimeMethod;
+  events.forEach(member => {
+    runtimeMembers[member.name] = [
+      /**
+       * [0] member flags
+       */
+      MEMBER_TYPE.Event
+    ];
+  });
+  return runtimeMembers;
 }
 
 

@@ -9,7 +9,7 @@ export const setValue = (elm: d.HostElement, propName: string, newVal: any, cmpM
   // check our new property value against our internal value
   hostRef = getHostRef(elm);
   oldVal = hostRef.instanceValues.get(propName);
-  newVal = parsePropertyValue(newVal, cmpMeta.members[propName][1]);
+  newVal = parsePropertyValue(newVal, cmpMeta.members[propName][0]);
 
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!

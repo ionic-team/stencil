@@ -98,7 +98,7 @@ function getEncapsulation(cmpMeta: d.ComponentMeta): 'shadow' | 'scoped' | 'none
 
 function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
   return members
-    .filter(([_, member]) => member.memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable))
+    .filter(([_, member]) => member.memberType & (MEMBER_TYPE.Prop))
     .map(([memberName, member]) => {
       return {
         name: memberName,

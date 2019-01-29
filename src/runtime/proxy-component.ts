@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
-import { MEMBER_TYPE } from '../utils/constants';
+import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
 import { setValue } from './set-value';
 
 
-export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.ComponentRuntimeMeta, isElementConstructor?: boolean, proxyState?: boolean) => {
+export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
 
   if (BUILD.member && cmpMeta.members) {
 
@@ -23,32 +23,31 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
       // create an array of attributes to observe
       // and also create a map of html attribute name to js property name
       Cstr.observedAttributes = Object.entries(cmpMeta.members)
-        .filter(([_, m]) => m[2]) // filter to only keep props that should match attributes
+        .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
+          const attribute = m[1] || propName;
             // if > 0, then we already know attr name the same as the prop name
             // if not > 0, then let's use the attr name given (probably has a dash in it)
-            cmpMeta.attrNameToPropName.set(
-              m[2] = (m[2] > 0 ? propName : m[2]
-            ) as string, propName);
+            cmpMeta.attrNameToPropName.set(attribute, propName);
 
             if (BUILD.reflect) {
-              cmpMeta.propNameToAttrName.set(propName, m[2]);
+              cmpMeta.propNameToAttrName.set(propName, attribute);
             }
 
-            return m[2];
+            return attribute;
           }
         );
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
         if (!cmpMeta.isReflectingAttribute) {
-          this[cmpMeta.attrNameToPropName.get(attrName.toLowerCase())] = newValue;
+          this[cmpMeta.attrNameToPropName.get(attrName)] = newValue;
         }
       };
     }
 
     Object.entries(cmpMeta.members).forEach(([memberName, memberData]) => {
 
-      if ((BUILD.prop && ((memberData[0] === MEMBER_TYPE.Prop) || (memberData[0] === MEMBER_TYPE.PropMutable))) || (BUILD.state && (memberData[0] === MEMBER_TYPE.State) && proxyState)) {
+      if ((BUILD.prop || BUILD.state) && ((memberData[0] & MEMBER_FLAGS.PropLike) || proxyState)) {
         // proxyComponent - prop
         Object.defineProperty((Cstr as any).prototype, memberName,
           {
@@ -65,7 +64,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
           }
         );
 
-      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberData[0] === MEMBER_TYPE.Method)) {
+      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberData[0] & MEMBER_TYPE.Method)) {
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
           value(instance?: any) {
@@ -81,7 +80,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta?: d.Compone
           }
         });
 
-      } else if (BUILD.event && (memberData[0] === MEMBER_TYPE.Event)) {
+      } else if (BUILD.event && (memberData[0] & MEMBER_TYPE.Event)) {
         // proxyComponent - event
         Object.defineProperty((Cstr as any).prototype, memberName, {
           get(this: d.HostElement) {
