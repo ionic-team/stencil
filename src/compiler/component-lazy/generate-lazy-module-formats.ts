@@ -9,7 +9,7 @@ import { updateToLazyComponent } from './update-to-lazy-component';
 export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
 
   const entryInputPaths = await createLazyEntryModules(config, compilerCtx, buildCtx, build);
-  if (entryInputPaths == null || entryInputPaths.length === 0) {
+  if (entryInputPaths.length === 0 || buildCtx.shouldAbort) {
     return null;
   }
 
@@ -31,22 +31,17 @@ export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d
   try {
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
-    const rollupBuild = await bundleLazyModule(config, compilerCtx, buildCtx, entryInputPaths);
-    if (rollupBuild == null) {
-      return null;
-    }
-
-    if (buildCtx.shouldAbort) {
-      // rollup errored, so let's not continue
+    const rollupBuild = await bundleLazyModule(config, compilerCtx, buildCtx, build, entryInputPaths);
+    if (rollupBuild == null || buildCtx.shouldAbort) {
       return null;
     }
 
     const [esm, amd] = await Promise.all([
       // [0] bundle using only es modules and dynamic imports
-      await createEsmModulesFromRollup(config, rollupBuild),
+      await createEsmModulesFromRollupBuild(config, rollupBuild),
 
       // [1] bundle using commonjs using jsonp callback
-      await createAmdModulesFromRollup(config, rollupBuild, buildCtx.entryModules),
+      await createAmdModulesFromRollupBuild(config, rollupBuild, buildCtx.entryModules),
     ]);
 
     if (buildCtx.shouldAbort) {
@@ -59,7 +54,7 @@ export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d
     return {
       esm,
       amd
-    } as d.JSModuleFormats;
+    };
 
   } catch (err) {
     catchError(buildCtx.diagnostics, err);
@@ -69,19 +64,17 @@ export async function generateLazyModuleFormats(config: d.Config, compilerCtx: d
 }
 
 
-async function createEsmModulesFromRollup(config: d.Config, rollupBuild: RollupBuild) {
+async function createEsmModulesFromRollupBuild(config: d.Config, rollupBuild: RollupBuild) {
   const { output } = await rollupBuild.generate({
     ...config.rollupConfig.outputOptions,
     format: 'es',
-    // banner: generatePreamble(config),
-    // intro: MODULE_INTRO_PLACEHOLDER,
     strict: false,
   });
-  return <any>output as d.JSModuleList;
+  return output as d.BundleOutputChunk[];
 }
 
 
-async function createAmdModulesFromRollup(config: d.Config, rollupBuild: RollupBuild, entryModules: d.EntryModule[]) {
+async function createAmdModulesFromRollupBuild(config: d.Config, rollupBuild: RollupBuild, entryModules: d.EntryModule[]) {
   if (!config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
     return null;
@@ -102,32 +95,28 @@ async function createAmdModulesFromRollup(config: d.Config, rollupBuild: RollupB
       id: MODULE_BUNDLEID_PLACEHOLDER,
       define: `${config.namespace}.loadBundle`
     },
-    // banner: generatePreamble(config),
-    // intro: MODULE_INTRO_PLACEHOLDER,
     strict: false,
   });
 
 
-  return <any>output as d.JSModuleList;
+  return output as d.BundleOutputChunk[];
 }
 
 
-async function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const promises = buildCtx.entryModules.map(async entryModule => {
+function createLazyEntryModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+  const promises = buildCtx.entryModules.map(entryModule => {
     return createLazyEntryModule(config, compilerCtx, buildCtx, build, entryModule);
   });
 
-  const entryInputPaths = await Promise.all(promises);
-
-  return entryInputPaths.sort();
+  return Promise.all(promises);
 }
 
 
 async function createLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModule: d.EntryModule) {
   const entryInputPath = entryModule.filePath;
 
-  const promises = entryModule.cmps.map(async cmp => {
-    return updateToLazyComponent(config, compilerCtx, buildCtx, build, entryModule, cmp);
+  const promises = entryModule.cmps.map(cmp => {
+    return updateToLazyComponent(config, compilerCtx, buildCtx, build, cmp);
   });
 
   const lazyModules = (await Promise.all(promises)).sort((a, b) => {

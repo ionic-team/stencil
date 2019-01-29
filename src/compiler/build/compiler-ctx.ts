@@ -5,6 +5,12 @@ import { InMemoryFileSystem, normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
+/**
+ * The CompilerCtx is a persistent object that's reused throughout
+ * all builds and rebuilds. The data within this object is used
+ * for in-memory caching, and can be reset, but the object itself
+ * is always the same.
+ */
 export class CompilerContext implements d.CompilerCtx {
   activeBuildId = -1;
   cache: d.Cache;
@@ -21,11 +27,10 @@ export class CompilerContext implements d.CompilerCtx {
   lastBuildResults: d.BuildResults = null;
   lastBuildStyles = new Map<string, string>();
   lastComponentStyleInput = new Map<string, string>();
-  lastDerivedModules: d.DerivedModule[] = null;
+  lazyModuleRollupCache: any = null;
   localPrerenderServer: any = null;
   moduleMap: d.ModuleMap = new Map();
   resolvedCollections = new Set<string>();
-  rollupCache: any = null;
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
 
@@ -43,6 +48,7 @@ export class CompilerContext implements d.CompilerCtx {
     this.compilerOptions = null;
     this.fs.clearCache();
     this.lastComponentStyleInput.clear();
+    this.lazyModuleRollupCache = null;
     this.moduleMap.clear();
     this.resolvedCollections.clear();
     this.rootTsFiles.length = 0;

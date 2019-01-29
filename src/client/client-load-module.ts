@@ -12,13 +12,11 @@ export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVer
     : bundleIds;
 
   const useScopedCss = (BUILD.shadowDom && !plt.supportsShadowDom);
-  const url = `./${BUILD.appNamespaceLower}/${bundleId + (useScopedCss ? '.sc' : '')}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
+  const url = `./${bundleId + (useScopedCss ? '.sc' : '')}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
 
-  return __import(
+  return import(
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackMode: "lazy" */
     url
   ).then(importedModule => importedModule[dashToPascalCase(elm.nodeName)], consoleError);
 };
-
-declare var __import: (url: string) => Promise<any>;

@@ -6,7 +6,7 @@ import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
-export function transformToNativeComponentText(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToNativeComponentText(buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -17,7 +17,6 @@ export function transformToNativeComponentText(config: d.Config, buildCtx: d.Bui
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: getBuildScriptTarget(build)
       },
       fileName: cmp.jsFilePath,

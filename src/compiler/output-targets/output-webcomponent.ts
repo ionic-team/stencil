@@ -79,10 +79,10 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
     return cmps;
   }, [] as d.ComponentCompilerMeta[]);
 
-  const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
+  const bundleOutputs = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
 
-  if (!buildCtx.hasError && typeof outputText === 'string') {
-    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, outputText);
+  if (Array.isArray(bundleOutputs) && !buildCtx.shouldAbort) {
+    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, bundleOutputs);
   }
 
   timespan.finish(`generate self-contained web components finished`);
@@ -139,17 +139,15 @@ async function writeSelfContainedWebComponentModeOutput(compilerCtx: d.CompilerC
 }
 
 
-async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
+async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], _bundleOutputs: d.RollupResult[]) {
   const allModes = getAllModes(cmps);
 
   const promises: Promise<any>[] = [];
 
   allModes.forEach(modeName => {
-    const modeOutputText = replaceStylePlaceholders(cmps, modeName, outputText);
-
     outputTargets.map(async outputTarget => {
       promises.push(
-        writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, modeOutputText, modeName)
+        writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, modeName, modeName)
       );
     });
   });

@@ -18,7 +18,7 @@ export interface CompilerCtx {
   compilerOptions: any;
   events: d.BuildEvents;
   fs: d.InMemoryFileSystem;
-  fsWatcher?: d.FsWatcher;
+  fsWatcher: d.FsWatcher;
   hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
@@ -26,11 +26,10 @@ export interface CompilerCtx {
   lastBuildHadError: boolean;
   lastBuildResults: d.BuildResults;
   lastBuildStyles: Map<string, string>;
-  lastDerivedModules: d.DerivedModule[];
+  lazyModuleRollupCache: any;
   localPrerenderServer: any;
   moduleMap: d.ModuleMap;
   resolvedCollections: Set<string>;
-  rollupCache?: any;
   rootTsFiles: string[];
   tsService: TsService;
 

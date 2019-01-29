@@ -2,84 +2,93 @@ import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { formatComponentRuntimeMeta } from '../app-core/format-component-runtime-meta';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
+import { sys } from '@sys';
 
 
-export async function generateLazyLoadedAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, lazyModules: d.LazyModuleOutput[]) {
-  const appCoreInputEntryFile = `${config.fsNamespace}-lazy.mjs`;
-  const appCoreInputFiles = new Map();
+export async function generateLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+  const appCoreEntryFilePath = await generateLazyAppCoreEntry(config, compilerCtx, build);
+
+  const bundleEntryInputs: d.BundleEntryInputs = {};
+
+  bundleEntryInputs[config.fsNamespace] = appCoreEntryFilePath;
+
+  buildCtx.entryModules.forEach(entryModule => {
+    bundleEntryInputs[entryModule.entryKey] = entryModule.entryKey;
+  });
+
+  return await bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, appCoreEntryFilePath, bundleEntryInputs);
+}
+
+
+async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build) {
+  const appCoreEntryFileName = `${config.fsNamespace}-lazy.mjs`;
+  const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
 
-  coreText.push(`// ${appCoreInputEntryFile}`);
   coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
 
-  const cmpRuntimeData = formatLazyComponentRuntimeEntryModule(buildCtx.entryModules, lazyModules);
+  coreText.push(`bootstrapLazy([]);`);
 
-  coreText.push(`bootstrapLazy(${cmpRuntimeData});`);
+  coreText.push(`export { registerLazyInstance } from '@stencil/core/platform';`);
 
-  appCoreInputFiles.set(appCoreInputEntryFile, coreText.join('\n'));
-
-  const appCoreBundleOutput = await bundleAppCore(config, compilerCtx, buildCtx, build, appCoreInputEntryFile, appCoreInputFiles);
-  if (buildCtx.hasError) {
-    return null;
+  if (build.vdomRender) {
+    coreText.push(`export { h } from '@stencil/core/runtime';`);
   }
 
-  const results = await optimizeAppCoreBundle(config, compilerCtx, build, appCoreBundleOutput);
-  buildCtx.diagnostics.push(...results.diagnostics);
+  await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 
-  return results.output;
+  return appCoreEntryFilePath;
 }
 
 
-function formatLazyComponentRuntimeEntryModule(entryModules: d.EntryModule[], lazyModules: d.LazyModuleOutput[]) {
-  // [[{ios: 'abc12345', md: 'dec65432'}, {tagName: 'ion-icon', members: []}]]
+export async function writeLazyAppCoreOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
+  const appCoreRollupResults = rollupResults.filter(r => r.isAppCore);
 
-  const lazyBundles: d.LazyBundlesRuntimeMeta = entryModules.map(entryModule => {
-    const bundleId = getBundleId(entryModule, lazyModules);
-    return formatLazyCompnonentRuntimeBundle(bundleId, entryModule.cmps);
+  const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
+
+  await Promise.all(appCoreRollupResults.map(async rollupResult => {
+    const results = await optimizeAppCoreBundle(config, compilerCtx, build, rollupResult.code);
+
+    buildCtx.diagnostics.push(...results.diagnostics);
+
+    if (buildCtx.shouldAbort) {
+      return;
+    }
+
+    const code = results.output
+                        .replace(`[].forEach(lazyBundle`, `${lazyRuntimeData}.forEach(lazyBundle`);
+
+    await Promise.all(outputTargets.map(async outputTarget => {
+      const filePath = sys.path.join(outputTarget.buildDir, rollupResult.fileName);
+      await compilerCtx.fs.writeFile(filePath, code);
+    }));
+  }));
+}
+
+
+function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
+  // [[{ios: 'abc12345', md: 'dec65432'}, {cmpTag: 'ion-icon', cmpMembers: []}]]
+
+  const lazyBundles = bundleModules.map(bundleModule => {
+    return formatLazyRuntimeBundle(bundleModule);
   });
 
-  return lazyBundles;
+  // stringify the data, then remove property double-quotes so they can be property renamed
+  return JSON.stringify(lazyBundles)
+             .replace(/"cmpTag"/g, 'cmpTag')
+             .replace(/"cmpMeta"/g, 'cmpMeta')
+             .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
+             .replace(/"cmpShadowDomEncapsulation"/g, 'cmpShadowDomEncapsulation')
+             .replace(/"cmpScopedCssEncapsulation"/g, 'cmpScopedCssEncapsulation')
+             .replace(/"cmpMembers"/g, 'cmpMembers');
 }
 
 
-function formatLazyCompnonentRuntimeBundle(bundleId: d.ModeBundleId, cmps: d.ComponentCompilerMeta[]) {
-  const lazyBundle: d.LazyBundleRuntimeMeta = [
-    bundleId,
-    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
+function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
+  const lazyBundle: d.LazyBundleRuntimeData = [
+    bundleModule.entryKey,
+    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
   return lazyBundle;
-}
-
-
-function getBundleId(entryModule: d.EntryModule, lazyModules: d.LazyModuleOutput[]): d.ModeBundleId {
-  if (entryModule.modeNames.length === 0) {
-    throw new Error(`entry module does not have any modes`);
-  }
-
-  entryModule.modeNames.sort();
-
-  if (entryModule.modeNames.length === 1) {
-    const modeName = entryModule.modeNames[0];
-    return getModeBundleId(lazyModules, modeName, entryModule.entryKey);
-  }
-
-  const bundleIds: d.ModeBundleIds = {};
-  entryModule.modeNames.forEach(modeName => {
-    bundleIds[modeName] = getModeBundleId(lazyModules, modeName, entryModule.entryKey);
-  });
-  return JSON.stringify(bundleIds);
-}
-
-function getModeBundleId(lazyModules: d.LazyModuleOutput[], modeName: string, entryKey: string) {
-  const lazyModule = lazyModules.find(lazyModule => {
-    return lazyModule.entryKey === entryKey && lazyModule.modeName === modeName;
-  });
-  if (lazyModule == null) {
-    throw new Error(`unable to find lazy module, entry key: ${entryKey}, mode: ${modeName}`);
-  }
-  if (typeof lazyModule.bundleId !== 'string') {
-    throw new Error(`invalid bundle id`);
-  }
-  return `"` + lazyModule.bundleId + `"`;
 }

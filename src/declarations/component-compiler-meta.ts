@@ -165,7 +165,6 @@ export interface CompilerAssetDir {
 
 export interface ComponentCompilerNativeData {
   filePath: string;
-  outputText: string;
   tagName: string;
   componentClassName: string;
   cmp: d.ComponentCompilerMeta;

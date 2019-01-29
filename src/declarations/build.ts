@@ -198,53 +198,67 @@ export interface BuildComponent {
 }
 
 
-export interface FilesMap {
-  [filePath: string]: string;
-}
-
-
 export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'fsChange' | 'buildFinish' | 'buildNoChange' | 'buildLog';
 
 
-export interface JSModuleList {
-  [key: string]: {
-    code: string,
-    imports?: string[],
-    exports?: string[],
-    modules?: {
-      [modulePath: string]: {
-        renderedExports: string[],
-        removedExports: string[],
-        renderedLength: number,
-        originalLength: number
-      }
+export interface BundleOutputChunk {
+  code: string;
+  fileName: string;
+  isDynamicEntry: boolean;
+  isEntry: boolean;
+  map: any;
+  dynamicImports: string[];
+  imports: string[];
+  exports: string[];
+  modules: {
+    [modulePath: string]: {
+      renderedExports: string[];
+      removedExports: string[];
+      renderedLength: number;
+      originalLength: number;
     }
   };
+  name: string;
 }
 
-export interface JSModuleFormats {
-  esm?: JSModuleList;
-  amd?: JSModuleList;
-}
+// export interface DerivedChunk {
+//   entryKey: string;
+//   fileName: string;
+//   code: string;
+// }
 
-export interface DerivedChunk {
-  entryKey: string;
-  filename: string;
-  code: string;
-}
-
-export interface DerivedModule {
-  list: DerivedChunk[];
-  sourceTarget: SourceTarget;
-  moduleFormat: ModuleFormat;
-}
+// export interface DerivedModule {
+//   chunks: DerivedChunk[];
+//   sourceTarget: SourceTarget;
+//   moduleFormat: ModuleFormat;
+// }
 
 export type SourceTarget = 'es5' | 'es2017';
 
 export type ModuleFormat = 'esm' | 'amd';
 
-export interface LazyModuleOutput {
-  bundleId: string;
+export interface BundleEntryInputs {
+  [entryKey: string]: string;
+}
+
+export interface RollupResult {
   entryKey: string;
+  fileName: string;
+  code: string;
+  isEntry: boolean;
+  isAppCore: boolean;
+  moduleFormat: ModuleFormat;
+}
+
+export interface BundleModule {
+  entryKey: string;
+  cmps: d.ComponentCompilerMeta[];
+  outputs: BundleModuleOutput[];
+}
+
+export interface BundleModuleOutput {
+  bundleId: string;
+  fileName: string;
+  code: string;
   modeName: string;
 }

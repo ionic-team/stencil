@@ -3,7 +3,7 @@ import { MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]) {
-  const lazyBundleRuntimeMeta: d.LazyBundleRuntimeMeta = [
+  const lazyBundleRuntimeMeta: d.LazyBundleRuntimeData = [
     bundleId,
     cmps.map(cmp => {
       return formatComponentRuntimeMeta(cmp, true);
@@ -22,19 +22,19 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 
   const members = formatComponentRuntimeMembers(compilerMeta);
   if (Object.keys(members).length > 0) {
-    runtimeMeta.members = members;
+    runtimeMeta.cmpMembers = members;
   }
 
   const hostListeners = formatHostListeners(compilerMeta);
   if (hostListeners.length > 0) {
-    runtimeMeta.hostListeners = hostListeners;
+    runtimeMeta.cmpHostListeners = hostListeners;
   }
 
   if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.shadowDomEncapsulation = shortBoolean(true);
+    runtimeMeta.cmpShadowDomEncapsulation = shortBoolean(true);
 
   } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.scopedCssEncapsulation = shortBoolean(true);
+    runtimeMeta.cmpScopedCssEncapsulation = shortBoolean(true);
   }
 
   return runtimeMeta;

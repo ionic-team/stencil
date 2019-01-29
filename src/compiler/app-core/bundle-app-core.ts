@@ -1,20 +1,25 @@
 import * as d from '@declarations';
-import { createOnWarnFn, loadRollupDiagnostics, normalizePath } from '@utils';
+import { buildConditionalsPlugin } from '../rollup-plugins/build-conditionals';
+import { componentEntryPlugin } from '../rollup-plugins/component-entry';
+import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { logger, sys } from '@sys';
-import { RollupBuild, RollupOptions } from 'rollup'; // types only
+import { OutputAsset, OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
+import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencies';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appCoreInputEntryFile: string, appInputFiles: Map<string, string>) {
-  let outputText: string = null;
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
+  const rollupResults: d.RollupResult[] = [];
+
+  bundleEntryInputs[`${config.fsNamespace}`] = appCoreEntryFilePath;
 
   try {
     const rollupOptions: RollupOptions = {
-      input: appCoreInputEntryFile,
+      input: bundleEntryInputs,
       plugins: [
-        appCoreStencilDependenciesPlugin(),
-        appCoreBuildDataPlugin(build),
-        appCoreInputFilesPlugin(appInputFiles),
+        stencilDependenciesPlugin(appCoreEntryFilePath),
+        buildConditionalsPlugin(build),
+        componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -32,87 +37,61 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
 
     const rollupBuild: RollupBuild = await sys.rollup.rollup(rollupOptions);
 
-    const { output } = await rollupBuild.generate({ format: 'es' });
+    const outputOptions: OutputOptions[] = [];
 
-    if (Array.isArray(output) && output.length > 0 && typeof output[0].code === 'string') {
-      outputText = output[0].code.replace(/__import\(/g, 'import(');
+    outputOptions.push({
+      format: 'esm'
+    });
+
+    if (build.es5) {
+      outputOptions.push({
+        format: 'amd'
+      });
     }
+
+    const generatePromises = outputOptions.map(async outputOption => {
+      const { output } = await rollupBuild.generate(outputOption);
+
+      if (!buildCtx.shouldAbort) {
+        const outputPromises = output.map(rollupOutput => {
+          return createRollupResult(config, outputOption.format as any, rollupOutput);
+        });
+        rollupResults.push(...(await Promise.all(outputPromises)));
+      }
+    });
+
+    await Promise.all(generatePromises);
 
   } catch (e) {
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
 
     if (logger.level === 'debug') {
-      logger.error(`bundleAppCore, inputEntryText: ${appInputFiles.get(appCoreInputEntryFile)}`);
+      logger.error(`bundleAppCore, bundleEntryInputs: ${bundleEntryInputs}`);
     }
   }
 
-  return outputText;
+  return rollupResults;
 }
 
 
-function appCoreInputFilesPlugin(appInputFiles: Map<string, string>) {
-  return {
-
-    resolveId(id: string) {
-      id = normalizePath(id);
-      if (appInputFiles.has(id)) {
-        return id;
-      }
-      return null;
-    },
-
-    load(id: string) {
-      const inputFileText = appInputFiles.get(normalizePath(id));
-      if (typeof inputFileText === 'string') {
-        return inputFileText;
-      }
-      return null;
-    },
-
-    name: 'appCoreInputFilesPlugin'
+async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat, rollupOutput: OutputAsset | OutputChunk) {
+  const rollupResult: d.RollupResult = {
+    fileName: rollupOutput.fileName,
+    code: rollupOutput.code,
+    moduleFormat: moduleFormat,
+    entryKey: null,
+    isEntry: !!(rollupOutput as OutputChunk).isEntry,
+    isAppCore: false
   };
-}
 
+  if (!rollupResult.isEntry) {
+    return rollupResult;
+  }
 
-function appCoreBuildDataPlugin(build: d.Build) {
-  const buildData = `export const BUILD = ${JSON.stringify(build)}`;
+  const rollupChunk = rollupOutput as OutputChunk;
 
-  return {
-    resolveId(id: string) {
-      if (id === '@stencil/core/build-conditionals') {
-        return '@stencil/core/build-conditionals';
-      }
-      return null;
-    },
+  rollupResult.isAppCore = (rollupChunk.name === config.fsNamespace);
+  rollupResult.entryKey = rollupChunk.name;
 
-    load(id: string) {
-      if (id === '@stencil/core/build-conditionals') {
-        return buildData;
-      }
-      return null;
-    },
-
-    name: 'appCoreBuildDataPlugin'
-  };
-}
-
-
-function appCoreStencilDependenciesPlugin() {
-
-  return {
-    resolveId(id: string) {
-      if (id === '@stencil/core/platform') {
-        return sys.path.join(sys.compiler.distDir, 'client', 'index.mjs');
-      }
-      if (id === '@stencil/core/runtime') {
-        return sys.path.join(sys.compiler.distDir, 'runtime', 'index.mjs');
-      }
-      if (id === '@stencil/core/utils') {
-        return sys.path.join(sys.compiler.distDir, 'utils', 'index.mjs');
-      }
-      return null;
-    },
-
-    name: 'appCoreStencilDependenciesPlugin'
-  };
+  return rollupResult;
 }

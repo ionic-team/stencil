@@ -3,7 +3,6 @@ import * as d from '.';
 
 export interface EntryModule {
   entryKey?: string;
-  filePath?: string;
   dependencies?: string[];
   cmps: d.ComponentCompilerMeta[];
   requiresScopedStyles?: boolean;

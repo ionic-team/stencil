@@ -28,7 +28,7 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     consoleError(e);
   }
 
-  if (BUILD.shadowDom && isInitialLoad && plt.supportsShadowDom && cmpMeta.shadowDomEncapsulation) {
+  if (BUILD.shadowDom && isInitialLoad && plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) {
     // DOM WRITE
     // this component is using shadow dom
     // and this browser supports shadow dom

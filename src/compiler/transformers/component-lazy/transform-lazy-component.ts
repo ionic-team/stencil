@@ -7,7 +7,7 @@ import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
-export function transformToLazyComponentText(config: d.Config, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToLazyComponentText(buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -18,7 +18,6 @@ export function transformToLazyComponentText(config: d.Config, buildCtx: d.Build
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        removeComments: (build.isDev || config.logLevel === 'debug') ? false : true,
         target: getBuildScriptTarget(build)
       },
       fileName: cmp.jsFilePath,
@@ -61,9 +60,11 @@ export function lazyComponentTransform(): ts.TransformerFactory<ts.SourceFile> {
     }
 
     return tsSourceFile => {
+      const importFnNames = [REGISTER_INSTANCE_METHOD, 'h'];
+
       tsSourceFile = addImports(transformCtx, tsSourceFile,
-        [REGISTER_INSTANCE_METHOD],
-        '@stencil/core/platform',
+        importFnNames,
+        '@stencil/core/app',
       );
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);

@@ -1,10 +1,10 @@
 import * as d from '.';
 
 
-export type LazyBundlesRuntimeMeta = LazyBundleRuntimeMeta[];
+export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 
 
-export type LazyBundleRuntimeMeta = [
+export type LazyBundleRuntimeData = [
   /** bundleIds */
   any,
   ComponentLazyRuntimeMeta[]
@@ -13,12 +13,12 @@ export type LazyBundleRuntimeMeta = [
 
 export interface ComponentRuntimeMeta {
   attrNameToPropName?: Map<string, string>;
+  cmpMembers?: d.ComponentRuntimeMembers;
   propNameToAttrName?: Map<string, string>;
-  hostListeners?: d.ComponentRuntimeHostListener[];
+  cmpHostListeners?: d.ComponentRuntimeHostListener[];
   isReflectingAttribute?: boolean;
-  members?: d.ComponentRuntimeMembers;
-  scopedCssEncapsulation?: boolean;
-  shadowDomEncapsulation?: boolean;
+  cmpScopedCssEncapsulation?: boolean;
+  cmpShadowDomEncapsulation?: boolean;
 }
 
 

@@ -240,9 +240,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     try {
       const dirItems = await this.readdir(dirPath, { recursive: true });
 
-      await Promise.all(dirItems.map(async item => {
-        await this.removeItem(item.absPath);
-      }));
+      await Promise.all(dirItems.map(item => this.removeItem(item.absPath)));
 
     } catch (e) {
       // do not throw error if the directory never existed
@@ -366,12 +364,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return results;
   }
 
-  async writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
-    const writtenFiles = await Promise.all(Object.keys(files).map(async filePath => {
-      const writtenFile = await this.writeFile(filePath, files[filePath], opts);
-      return writtenFile;
+  writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
+    return Promise.all(Object.keys(files).map(filePath => {
+      return this.writeFile(filePath, files[filePath], opts);
     }));
-    return writtenFiles;
   }
 
   async commit() {

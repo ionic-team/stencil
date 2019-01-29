@@ -3,7 +3,7 @@ import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
 import { sys } from '@sys';
 
 
-export function bundleJson(config: d.Config, options: Options = {}) {
+export function bundleJson(config: d.Config, options: BundleJsonOptions = {}) {
   const filter = createFilter(options.include, options.exclude);
 
   const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir).map(o => o.collectionDir);
@@ -190,14 +190,14 @@ export function bundleJson(config: d.Config, options: Options = {}) {
   };
 }
 
-export interface Options {
+export interface BundleJsonOptions {
   indent?: string;
   preferConst?: boolean;
   include?: any;
   exclude?: any;
 }
 
-export interface ASTNode {
+interface ASTNode {
   type: string;
   sourceType?: string;
   start: number | null;

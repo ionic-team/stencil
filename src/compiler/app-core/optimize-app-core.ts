@@ -72,7 +72,7 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
   }
 
   const results = await sys.minifyJs(input, opts);
-  if (results && results.diagnostics.length === 0 && compilerCtx) {
+  if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
 
     if (!build.asyncLifecycle) {
       results.output = results.output.replace(/async/g, '')
@@ -107,7 +107,7 @@ export const DEV_MINIFY_OPTS = JSON.stringify({
     drop_debugger: false,
     evaluate: true,
     expression: false,
-    hoist_funs: false,
+    hoist_funs: true,
     hoist_vars: false,
     ie8: false,
     if_return: false,

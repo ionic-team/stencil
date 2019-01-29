@@ -1,8 +1,7 @@
 import * as d from '@declarations';
-import { generateLazyBundles } from '../component-lazy/generate-lazy-bundles';
-import { generateLazyLoadedAppCore } from '../component-lazy/generate-lazy-core';
+import { generateLazyAppCore, writeLazyAppCoreOutput } from '../component-lazy/generate-lazy-core';
+import { generateLazyBundleModules } from '../component-lazy/generate-lazy-output-files';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { sys } from '@sys';
 
 
 export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -36,32 +35,17 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  const lazyModules = await generateLazyBundles(config, compilerCtx, buildCtx, outputTargets, build);
-  if (lazyModules != null) {
-    const outputText = await generateLazyLoadedAppCore(config, compilerCtx, buildCtx, build, lazyModules);
+  const rollupResults = await generateLazyAppCore(config, compilerCtx, buildCtx, build);
 
-    await writeLazyLoadCoreOutputs(config, compilerCtx, outputTargets, outputText);
+  if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
+    await buildCtx.stylesPromise;
+
+    const bundleModules = await generateLazyBundleModules(config, compilerCtx, buildCtx, outputTargets, rollupResults);
+
+    await writeLazyAppCoreOutput(config, compilerCtx, buildCtx, outputTargets, build, rollupResults, bundleModules);
   }
 
   timespan.finish(`generate app lazy components finished`);
-}
-
-
-async function writeLazyLoadCoreOutputs(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetBuild[], outputText: string) {
-  const promises = outputTargets.map(async outputTarget => {
-    await writeLazyLoadCoreOutput(config, compilerCtx, outputTarget, outputText);
-  });
-
-  await Promise.all(promises);
-}
-
-
-async function writeLazyLoadCoreOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetBuild, outputText: string) {
-  const fileName = `${config.fsNamespace}.js`;
-
-  const filePath = sys.path.join(outputTarget.buildDir, fileName);
-
-  await compilerCtx.fs.writeFile(filePath, outputText);
 }
 
 

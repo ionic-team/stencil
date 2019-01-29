@@ -6,6 +6,7 @@ export interface Diagnostic {
   header?: string;
   language?: string;
   messageText: string;
+  debugText?: string;
   code?: string;
   absFilePath?: string;
   relFilePath?: string;

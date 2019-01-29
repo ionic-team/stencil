@@ -22,59 +22,67 @@ export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
 
     try {
       const sourceText = compilerCtx.fs.readFileSync(diagnostic.absFilePath);
-      const srcLines = splitLineBreaks(sourceText);
 
-      const errorLine: d.PrintLine = {
-        lineIndex: rollupError.loc.line - 1,
-        lineNumber: rollupError.loc.line,
-        text: srcLines[rollupError.loc.line - 1],
-        errorCharStart: rollupError.loc.column,
-        errorLength: 0
-      };
+      try {
+        const srcLines = splitLineBreaks(sourceText);
 
-      diagnostic.lineNumber = errorLine.lineNumber;
-      diagnostic.columnNumber = errorLine.errorCharStart;
+        const errorLine: d.PrintLine = {
+          lineIndex: rollupError.loc.line - 1,
+          lineNumber: rollupError.loc.line,
+          text: srcLines[rollupError.loc.line - 1],
+          errorCharStart: rollupError.loc.column,
+          errorLength: 0
+        };
 
-      const highlightLine = errorLine.text.substr(rollupError.loc.column);
-      for (var i = 0; i < highlightLine.length; i++) {
-        if (charBreak.has(highlightLine.charAt(i))) {
-          break;
+        diagnostic.lineNumber = errorLine.lineNumber;
+        diagnostic.columnNumber = errorLine.errorCharStart;
+
+        const highlightLine = errorLine.text.substr(rollupError.loc.column);
+        for (var i = 0; i < highlightLine.length; i++) {
+          if (charBreak.has(highlightLine.charAt(i))) {
+            break;
+          }
+          errorLine.errorLength++;
         }
-        errorLine.errorLength++;
+
+        diagnostic.lines.push(errorLine);
+
+        if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
+          errorLine.errorLength = 1;
+          errorLine.errorCharStart--;
+        }
+
+        if (errorLine.lineIndex > 0) {
+          const previousLine: d.PrintLine = {
+            lineIndex: errorLine.lineIndex - 1,
+            lineNumber: errorLine.lineNumber - 1,
+            text: srcLines[errorLine.lineIndex - 1],
+            errorCharStart: -1,
+            errorLength: -1
+          };
+
+          diagnostic.lines.unshift(previousLine);
+        }
+
+        if (errorLine.lineIndex + 1 < srcLines.length) {
+          const nextLine: d.PrintLine = {
+            lineIndex: errorLine.lineIndex + 1,
+            lineNumber: errorLine.lineNumber + 1,
+            text: srcLines[errorLine.lineIndex + 1],
+            errorCharStart: -1,
+            errorLength: -1
+          };
+
+          diagnostic.lines.push(nextLine);
+        }
+
+      } catch (e) {
+        diagnostic.messageText = `Error parsing: ${diagnostic.absFilePath}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
+        diagnostic.debugText = sourceText;
       }
 
-      diagnostic.lines.push(errorLine);
-
-      if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
-        errorLine.errorLength = 1;
-        errorLine.errorCharStart--;
-      }
-
-      if (errorLine.lineIndex > 0) {
-        const previousLine: d.PrintLine = {
-          lineIndex: errorLine.lineIndex - 1,
-          lineNumber: errorLine.lineNumber - 1,
-          text: srcLines[errorLine.lineIndex - 1],
-          errorCharStart: -1,
-          errorLength: -1
-        };
-
-        diagnostic.lines.unshift(previousLine);
-      }
-
-      if (errorLine.lineIndex + 1 < srcLines.length) {
-        const nextLine: d.PrintLine = {
-          lineIndex: errorLine.lineIndex + 1,
-          lineNumber: errorLine.lineNumber + 1,
-          text: srcLines[errorLine.lineIndex + 1],
-          errorCharStart: -1,
-          errorLength: -1
-        };
-
-        diagnostic.lines.push(nextLine);
-      }
     } catch (e) {
-      diagnostic.messageText = `Error parsing: ${rollupError.loc.file}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
+      diagnostic.messageText = `Error loading: ${diagnostic.absFilePath}`;
     }
   }
 

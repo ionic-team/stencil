@@ -49,12 +49,12 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string
   if (typeof msg === 'string') {
     diagnostic.messageText = msg;
 
-  } else if (err) {
-    if (err.stack) {
+  } else if (err != null) {
+    if (err.stack != null) {
       diagnostic.messageText = err.stack.toString();
 
     } else {
-      if (err.message) {
+      if (err.message != null) {
         diagnostic.messageText = err.message.toString();
 
       } else {
@@ -63,13 +63,13 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string
     }
   }
 
-  if (diagnostics && !shouldIgnoreError(diagnostic.messageText)) {
+  if (diagnostics != null && !shouldIgnoreError(diagnostic.messageText)) {
     diagnostics.push(diagnostic);
   }
 }
 
 export function hasError(diagnostics: d.Diagnostic[]): boolean {
-  if (!diagnostics) {
+  if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
@@ -77,7 +77,7 @@ export function hasError(diagnostics: d.Diagnostic[]): boolean {
 
 
 export function hasWarning(diagnostics: d.Diagnostic[]): boolean {
-  if (!diagnostics) {
+  if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
   return diagnostics.some(d => d.level === 'warn');

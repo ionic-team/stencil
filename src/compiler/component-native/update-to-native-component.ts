@@ -1,4 +1,6 @@
 import * as d from '@declarations';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
+import { sys } from '@sys';
 import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';
 
 
@@ -18,17 +20,28 @@ export async function updateToNativeComponents(config: d.Config, compilerCtx: d.
 
 
 async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
+  const inputFileName = sys.path.basename(cmp.jsFilePath);
   const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
-  const outputText = transformToNativeComponentText(config, buildCtx, build, cmp, inputJsText);
+  const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputFileName, inputJsText);
+  const outputFileName = `${cacheKey}-${inputFileName}`;
+  const outputFilePath = sys.path.join(config.cacheDir, outputFileName);
 
   const cmpData: d.ComponentCompilerNativeData = {
-    filePath: cmp.jsFilePath,
-    outputText: outputText,
+    filePath: outputFilePath,
     tagName: cmp.tagName,
     componentClassName: cmp.componentClassName,
     cmp: cmp
   };
+
+  let outputJsText = await compilerCtx.cache.get(cacheKey);
+  if (outputJsText == null) {
+    outputJsText = transformToNativeComponentText(buildCtx, build, cmp, inputJsText);
+
+    await compilerCtx.cache.put(cacheKey, outputJsText);
+  }
+
+  await compilerCtx.fs.writeFile(outputFilePath, outputJsText, { inMemoryOnly: true });
 
   return cmpData;
 }

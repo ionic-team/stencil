@@ -28,7 +28,7 @@ export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
     const cleanedEntryModules = regroupEntryModules(cmps, buildCtx.entryPoints);
 
     buildCtx.entryModules = cleanedEntryModules
-      .map(createEntryModule(config))
+      .map(createEntryModule())
       .filter((entryModule, index, array) => {
         const firstIndex = array.findIndex(e => e.entryKey === entryModule.entryKey);
         return firstIndex === index;
@@ -119,10 +119,10 @@ export function regroupEntryModules(cmps: d.ComponentCompilerMeta[], entryPoints
 }
 
 
-export function createEntryModule(config: d.Config) {
+export function createEntryModule() {
   return (cmps: d.ComponentCompilerMeta[]): d.EntryModule => {
     // generate a unique entry key based on the components within this entry module
-    const entryKey = ENTRY_KEY_PREFIX + cmps
+    const entryKey = cmps
       .sort(sortComponents)
       .map(c => c.tagName)
       .join('.');
@@ -130,9 +130,6 @@ export function createEntryModule(config: d.Config) {
     return {
       cmps,
       entryKey,
-
-      // generate a unique entry key based on the components within this entry module
-      filePath: sys.path.join(config.srcDir, `${entryKey}.js`),
 
       // get the modes used in this bundle
       modeNames: getEntryModes(cmps),
@@ -142,9 +139,6 @@ export function createEntryModule(config: d.Config) {
     };
   };
 }
-
-
-export const ENTRY_KEY_PREFIX = 'entry.';
 
 
 export function getAppEntryTags(cmps: d.ComponentCompilerMeta[]) {

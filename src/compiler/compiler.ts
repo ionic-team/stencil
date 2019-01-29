@@ -146,10 +146,11 @@ export class Compiler implements d.Compiler {
 
 }
 
+
 function isValid(config: d.Config): [ boolean, d.Config | null] {
   try {
     // validate the build config
-    validateConfig(config, true);
+    config = validateConfig(config, true);
     return [ true, config ];
 
   } catch (e) {

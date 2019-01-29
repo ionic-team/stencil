@@ -76,6 +76,11 @@ export class Cache implements d.Cache {
     return result;
   }
 
+  async has(key: string) {
+    const val = await this.get(key);
+    return (typeof val === 'string');
+  }
+
   createKey(domain: string, ...args: any[]) {
     if (!this.config.enableCache) {
       return '';
@@ -107,7 +112,7 @@ export class Cache implements d.Cache {
       }
 
       const fs = this.cacheFs.disk;
-      const cachedFileNames = await fs.readdirSync(this.config.cacheDir);
+      const cachedFileNames = await fs.readdir(this.config.cacheDir);
       const cachedFilePaths = cachedFileNames.map(f => sys.path.join(this.config.cacheDir, f));
 
       let totalCleared = 0;

@@ -362,6 +362,11 @@ export class NodeLogger implements d.Logger {
       this.infoPrefix(outputLines);
     }
 
+    if (diagnostic.debugText != null && this.level === 'debug') {
+      outputLines.push(diagnostic.debugText);
+      this.debugPrefix(wordWrap([diagnostic.debugText], getColumns()));
+    }
+
     return outputLines;
   }
 

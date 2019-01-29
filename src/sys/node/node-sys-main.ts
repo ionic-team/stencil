@@ -141,7 +141,7 @@ export class NodeSystem implements d.StencilSystem {
     return fsWatcher;
   }
 
-  generateContentHash(content: any, length: number) {
+  generateContentHash(content: any, length?: number) {
     let hash = createHash('md5')
                .update(content)
                .digest('base64');

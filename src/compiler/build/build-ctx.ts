@@ -4,6 +4,10 @@ import { hasError, hasWarning } from '@utils';
 import { logger } from '@sys';
 
 
+/**
+ * A new BuildCtx object is created for every build
+ * and rebuild.
+ */
 export class BuildContext implements d.BuildCtx {
   appFileBuildCount = 0;
   buildId = -1;

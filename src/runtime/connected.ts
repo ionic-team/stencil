@@ -14,11 +14,11 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
   if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.hostListener) {
     hostRef = getHostRef(elm);
 
-    if (BUILD.hostListener && cmpMeta.hostListeners) {
+    if (BUILD.hostListener && cmpMeta.cmpHostListeners) {
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
       // have fired even before the instance is ready
-      cmpMeta.hostListeners.forEach(hostListener => {
+      cmpMeta.cmpHostListeners.forEach(hostListener => {
         if (!hostListener[2]) {
           (hostRef.hostListenerEventToMethodMap || (hostRef.hostListenerEventToMethodMap = new Map()))
             .set(hostListener[0], hostListener[1]);

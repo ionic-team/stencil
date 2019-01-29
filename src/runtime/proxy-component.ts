@@ -7,7 +7,7 @@ import { setValue } from './set-value';
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
 
-  if (BUILD.member && cmpMeta.members) {
+  if (BUILD.member && cmpMeta.cmpMembers) {
 
     if (!BUILD.lazyLoad) {
       Cstr.cmpMeta = cmpMeta;
@@ -22,7 +22,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
       // create an array of attributes to observe
       // and also create a map of html attribute name to js property name
-      Cstr.observedAttributes = Object.entries(cmpMeta.members)
+      Cstr.observedAttributes = Object.entries(cmpMeta.cmpMembers)
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
           const attribute = m[1] || propName;
@@ -42,7 +42,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       };
     }
 
-    Object.entries(cmpMeta.members).forEach(([memberName, memberData]) => {
+    Object.entries(cmpMeta.cmpMembers).forEach(([memberName, memberData]) => {
 
       if ((BUILD.prop || BUILD.state) && ((memberData[0] & MEMBER_FLAGS.PropLike) || proxyState)) {
         // proxyComponent - prop

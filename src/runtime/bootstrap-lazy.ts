@@ -8,7 +8,7 @@ import { proxyComponent } from './proxy-component';
 import { update } from './update';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeMeta) =>
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
   // bootstrapLazy
 
   lazyBundles.forEach(lazyBundle =>

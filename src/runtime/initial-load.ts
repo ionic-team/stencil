@@ -35,7 +35,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if (!elm['s-cr'] && (!plt.supportsShadowDom || !cmpMeta.scopedCssEncapsulation)) {
+      if (!elm['s-cr'] && (!plt.supportsShadowDom || !cmpMeta.cmpScopedCssEncapsulation)) {
         // only required when we're NOT using native shadow dom (slot)
         // or this browser doesn't support native shadow dom
         // and this host element was NOT created with SSR
@@ -47,7 +47,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         elm.insertBefore(elm['s-cr'], elm.firstChild);
       }
 
-      if ((BUILD.es5 || BUILD.scoped) && !plt.supportsShadowDom && cmpMeta.scopedCssEncapsulation) {
+      if ((BUILD.es5 || BUILD.scoped) && !plt.supportsShadowDom && cmpMeta.cmpScopedCssEncapsulation) {
         // initUpdate, BUILD.es5 || scoped
         // this component should use shadow dom
         // but this browser doesn't support it
@@ -71,7 +71,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
       try {
         const LazyCstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
 
-        if (BUILD.member && !LazyCstr.isProxied && cmpMeta.members) {
+        if (BUILD.member && !LazyCstr.isProxied && cmpMeta.cmpMembers) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
           proxyComponent(LazyCstr, cmpMeta, 0, 1);
@@ -109,7 +109,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         if (elm.hasAttribute(attrName)) {
           hostRef.instanceValues.set(
             propName,
-            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.members[propName][0])
+            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.cmpMembers[propName][0])
           );
         }
       });
