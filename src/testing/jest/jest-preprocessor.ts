@@ -18,7 +18,7 @@ export const jestPreprocessor = {
         const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
         throw new Error(msg);
       }
-console.log(results.code);
+
       return {
         code: results.code,
         map: results.map

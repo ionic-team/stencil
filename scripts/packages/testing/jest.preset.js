@@ -9,6 +9,7 @@ module.exports = {
     'json'
   ],
   moduleNameMapper: {
+    "@stencil/core/app": "<rootDir>/dist/testing/platform",
     "@stencil/core/build-conditionals": "<rootDir>/dist/testing/build-conditionals",
     "@stencil/core/mock-doc": "<rootDir>/dist/mock-doc",
     "@stencil/core/platform": "<rootDir>/dist/testing/platform",
