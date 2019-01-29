@@ -127,10 +127,30 @@ export namespace Components {
   interface ListenWindowAttributes extends JSXElements.HTMLAttributes {}
 
   interface NodeGlobals {}
-  interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
+  interface NodeGlobalsAttributes extends StencilHTMLAttributes {}
 
-  interface ReflectToAttr {}
-  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {}
+  interface ReflectToAttr {
+    'bool': boolean;
+    'disabled': boolean;
+    'dynamicNu': number;
+    'dynamicStr': string;
+    'nu': number;
+    'null': string;
+    'otherBool': boolean;
+    'str': string;
+    'undef': string;
+  }
+  interface ReflectToAttrAttributes extends StencilHTMLAttributes {
+    'bool'?: boolean;
+    'disabled'?: boolean;
+    'dynamicNu'?: number;
+    'dynamicStr'?: string;
+    'nu'?: number;
+    'null'?: string;
+    'otherBool'?: boolean;
+    'str'?: string;
+    'undef'?: string;
+  }
 
   interface ScopedBasicRoot {}
   interface ScopedBasicRootAttributes extends JSXElements.HTMLAttributes {}

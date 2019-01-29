@@ -41,4 +41,18 @@ describe('reflect-to-attr', function() {
     expect(cmp.getAttribute('dynamic-nu')).toEqual('123');
   });
 
+  it('should reflect booleans property', async () => {
+    const cmp = app.querySelector('reflect-to-attr') as any;
+    expect(cmp.disabled).toBe(false);
+
+    const toggle = app.querySelector('#toggle') as any;
+    toggle.click();
+    await waitForChanges();
+    expect(cmp.disabled).toBe(true);
+
+    toggle.click();
+    await waitForChanges();
+    expect(cmp.disabled).toBe(false);
+  });
+
 });

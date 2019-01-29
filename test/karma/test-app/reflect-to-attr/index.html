@@ -3,3 +3,12 @@
 <script src="/build/testapp.js" type="module"></script>
 
 <reflect-to-attr></reflect-to-attr>
+
+<button id="toggle" onclick="toggleDisabled()">Toggle disabled</button>
+
+<script>
+  function toggleDisabled() {
+    const item = document.querySelector('reflect-to-attr');
+    item.disabled = !item.disabled;
+  }
+</script>
