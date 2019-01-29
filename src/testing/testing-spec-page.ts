@@ -25,7 +25,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   const cmpTags = new Set<string>();
 
-  const lazyBundles: d.LazyBundlesRuntimeMeta = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
+  const lazyBundles: d.LazyBundlesRuntimeData = opts.components.map((Cstr: d.ComponentConstructorStaticMeta) => {
     if (Cstr.COMPILER_META == null) {
       throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
     }
