@@ -14,7 +14,20 @@ describe('parse methods', () => {
       }
     `);
 
-    expect(getStaticGetter(t.outputText, 'methods')).toEqual({ 'someMethod': {} });
+    expect(getStaticGetter(t.outputText, 'methods')).toEqual({ 'someMethod': {
+      'complexType': {
+        'parameters': [],
+        'returns': {
+          'docs': '',
+          'type': 'void',
+        },
+        'signature': '() => void',
+      },
+      'docs': {
+        'text': '',
+        'tags': []
+      }
+    } });
     expect(t.method.name).toBe('someMethod');
   });
 

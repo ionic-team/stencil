@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator, serializeSymbol } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -15,7 +15,7 @@ export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile:
 }
 
 
-function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
+function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
   const eventDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
@@ -26,17 +26,19 @@ function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.Sou
 
   const [ opts ] = getDeclarationParameters<d.EventOptions>(eventDecorator);
 
-  const memberName = (prop.name as ts.Identifier).text;
+  const memberName = prop.name.getText();
   if (!memberName) {
     return null;
   }
 
+  const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const eventMeta: d.ComponentCompilerEvent = {
     method: memberName,
     name: getEventName(diagnostics, opts, memberName),
     bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
     cancelable: opts && typeof opts.cancelable === 'boolean' ? opts.cancelable : true,
-    composed: opts && typeof opts.composed === 'boolean' ? opts.composed : true
+    composed: opts && typeof opts.composed === 'boolean' ? opts.composed : true,
+    docs: serializeSymbol(typeChecker, symbol)
   };
   return convertValueToLiteral(eventMeta);
 }

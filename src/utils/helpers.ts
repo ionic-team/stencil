@@ -13,6 +13,16 @@ export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase(
 
 export const noop = (): any => { /* noop*/ };
 
+export function sortBy<T>(array: T[], prop: ((item: T) => string)) {
+  return array.slice().sort((a, b) => {
+    const nameA = prop(a);
+    const nameB = prop(b);
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+}
+
 export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
   return keys.reduce((final, key) => {
     if (obj[key]) {

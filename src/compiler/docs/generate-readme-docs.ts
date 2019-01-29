@@ -9,8 +9,8 @@ import { stylesToMarkdown } from './markdown-css-props';
 
 
 export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
-  await Promise.all(docs.components.map(async cmpData => {
-    await generateReadme(config, compilerCtx, readmeOutputs, cmpData);
+  await Promise.all(docs.components.map(cmpData => {
+    return generateReadme(config, compilerCtx, readmeOutputs, cmpData);
   }));
 }
 

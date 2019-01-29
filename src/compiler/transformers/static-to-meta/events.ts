@@ -3,7 +3,7 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.ComponentConstructorEvent[] {
+export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] {
   const parsedEvents: d.ComponentCompilerEvent[] = getStaticValue(staticMembers, 'events');
   if (!parsedEvents || parsedEvents.length === 0) {
     return [];
@@ -15,7 +15,8 @@ export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.Component
       method: parsedEvent.method,
       bubbles: parsedEvent.bubbles,
       cancelable: parsedEvent.cancelable,
-      composed: parsedEvent.composed
+      composed: parsedEvent.composed,
+      docs: parsedEvent.docs
     };
   });
 }

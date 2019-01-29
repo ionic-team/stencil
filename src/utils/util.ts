@@ -110,6 +110,6 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
 }
 
 
-export function isDocsPublic(jsDocs: d.JsDoc | undefined) {
+export function isDocsPublic(jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) {
   return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
 }

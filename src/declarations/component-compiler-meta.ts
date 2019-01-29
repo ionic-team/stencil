@@ -52,7 +52,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   events: ComponentCompilerEvent[];
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
-  jsdoc: CompilerJsDoc;
+  docs: CompilerJsDoc;
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
@@ -75,6 +75,7 @@ export interface ComponentCompilerStaticProperty {
   complexType?: ComponentCompilerPropertyComplexType;
   attribute?: string;
   reflect?: boolean;
+  docs: CompilerJsDoc;
   defaultValue?: string;
 }
 
@@ -105,6 +106,7 @@ export interface ComponentCompilerEvent {
   bubbles: boolean;
   cancelable: boolean;
   composed: boolean;
+  docs: CompilerJsDoc;
 }
 
 export interface ComponentCompilerListener {
@@ -115,7 +117,21 @@ export interface ComponentCompilerListener {
   passive?: boolean;
 }
 
-export interface ComponentCompilerMethod {
+export interface ComponentCompilerStaticMethod {
+  docs: CompilerJsDoc;
+  complexType: ComponentCompilerMethodComplexType;
+}
+
+export interface ComponentCompilerMethodComplexType {
+  signature: string;
+  parameters: CompilerJsDoc[];
+  returns: {
+    type: string;
+    docs: string;
+  };
+}
+
+export interface ComponentCompilerMethod extends ComponentCompilerStaticMethod {
   name: string;
 }
 
@@ -124,16 +140,8 @@ export interface ComponentCompilerState {
 }
 
 export interface CompilerJsDoc {
-  name: string;
-  documentation: string;
-  type: string;
+  text: string;
   tags: CompilerJsDocTagInfo[];
-  default?: string;
-  parameters?: CompilerJsDoc[];
-  returns?: {
-    type: string;
-    documentation: string;
-  };
 }
 
 export interface CompilerJsDocTagInfo {

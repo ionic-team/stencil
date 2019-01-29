@@ -216,6 +216,10 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
     let val: any;
 
     switch (attr.initializer.kind) {
+      case ts.SyntaxKind.ArrayLiteralExpression:
+        val = arrayLiteralToArray(attr.initializer as ts.ArrayLiteralExpression);
+        break;
+
       case ts.SyntaxKind.ObjectLiteralExpression:
         val = objectLiteralToObjectMap(attr.initializer as ts.ObjectLiteralExpression);
         break;
@@ -540,4 +544,36 @@ export function addImports(transformCtx: ts.TransformationContext, tsSourceFile:
     }),
     ...tsSourceFile.statements
   ]);
+}
+
+export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc {
+  return {
+    tags: symbol.getJsDocTags().map(tag => {
+      return {text: tag.text, name: tag.name};
+    }),
+    text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+  };
+}
+
+export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): string {
+  const type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+  const set = new Set<string>();
+  parseDocsType(checker, type, set);
+
+  // normalize booleans
+  const hasTrue = set.delete('true');
+  const hasFalse = set.delete('false');
+  if (hasTrue || hasFalse) {
+    set.add('boolean');
+  }
+
+  let parts = Array.from(set.keys()).sort();
+  if (parts.length > 1) {
+    parts = parts.map(p => (p.indexOf('=>') >= 0) ? `(${p})` : p);
+  }
+  if (parts.length > 20) {
+    return typeToString(checker, type);
+  } else {
+    return parts.join(' | ');
+  }
 }

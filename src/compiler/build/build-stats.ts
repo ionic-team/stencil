@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { normalizePath } from '@utils';
+import { normalizePath, sortBy } from '@utils';
 import { sys } from '@sys';
 
 
@@ -61,18 +61,12 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         })
       };
 
-      buildCtx.moduleFiles
-        .sort((a, b) => {
-          if (a.sourceFilePath < b.sourceFilePath) return -1;
-          if (a.sourceFilePath > b.sourceFilePath) return 1;
-          return 0;
-
-        }).forEach(moduleFile => {
-          const key = normalizePath(sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
-          stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
-            return normalizePath(sys.path.relative(config.rootDir, localImport));
-          }).sort();
-        });
+      sortBy(buildCtx.moduleFiles, m => m.sourceFilePath).forEach(moduleFile => {
+        const key = normalizePath(sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
+        stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
+          return normalizePath(sys.path.relative(config.rootDir, localImport));
+        }).sort();
+      });
 
       jsonData = stats;
     }

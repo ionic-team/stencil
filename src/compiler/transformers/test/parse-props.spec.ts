@@ -18,6 +18,10 @@ describe('parse props', () => {
           'resolved': 'string',
           'text': 'string'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': true,
         'reflect': false,
@@ -47,6 +51,10 @@ describe('parse props', () => {
           'resolved': 'string',
           'text': 'string'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
         'reflect': false,
@@ -73,6 +81,10 @@ describe('parse props', () => {
           'text': 'string'
         },
         'defaultValue': undefined,
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': true,
         'optional': false,
         'reflect': false,
@@ -98,6 +110,10 @@ describe('parse props', () => {
           'resolved': 'string',
           'text': 'string'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
         'reflect': true,
@@ -118,21 +134,23 @@ describe('parse props', () => {
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
       'val': {
-        'attribute': null,
         'complexType': {
           'references': {},
           'resolved': '{}', // TODO, needs to be string[]
           'text': 'string[]'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
-        'reflect': false,
         'required': false,
         'type': 'unknown'
       }
     });
     expect(t.property.type).toBe('unknown');
-    expect(t.property.attribute).toBe(null);
+    expect(t.property.attribute).toBe(undefined);
     expect(t.property.reflect).toBe(false);
   });
 
@@ -154,6 +172,10 @@ describe('parse props', () => {
           },
           'resolved': 'any',
           'text': 'Object'
+        },
+        'docs': {
+          'text': '',
+          'tags': []
         },
         'mutable': false,
         'optional': false,
@@ -182,6 +204,10 @@ describe('parse props', () => {
           'resolved': 'string',
           'text': 'string'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'defaultValue': undefined,
         'mutable': false,
         'optional': false,
@@ -209,6 +235,10 @@ describe('parse props', () => {
           'resolved': 'string',
           'text': 'string'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
         'reflect': false,
@@ -234,6 +264,10 @@ describe('parse props', () => {
           'references': {},
           'resolved': 'number',
           'text': 'number'
+        },
+        'docs': {
+          'text': '',
+          'tags': []
         },
         'mutable': false,
         'optional': false,
@@ -261,6 +295,10 @@ describe('parse props', () => {
           'resolved': 'boolean',
           'text': 'boolean'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
         'reflect': false,
@@ -287,6 +325,10 @@ describe('parse props', () => {
           'resolved': 'any',
           'text': 'any'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'mutable': false,
         'optional': false,
         'reflect': false,
@@ -312,6 +354,10 @@ describe('parse props', () => {
           'references': {},
           'resolved': 'string',
           'text': 'string'
+        },
+        'docs': {
+          'text': '',
+          'tags': []
         },
         'defaultValue': `'mph'`,
         'mutable': false,
@@ -340,6 +386,10 @@ describe('parse props', () => {
           'resolved': 'number',
           'text': 'number'
         },
+        'docs': {
+          'text': '',
+          'tags': []
+        },
         'defaultValue': '88',
         'mutable': false,
         'optional': false,
@@ -366,6 +416,10 @@ describe('parse props', () => {
           'references': {},
           'resolved': 'boolean',
           'text': 'boolean'
+        },
+        'docs': {
+          'text': '',
+          'tags': []
         },
         'defaultValue': 'false',
         'mutable': false,
@@ -394,6 +448,10 @@ describe('parse props', () => {
           'references': {},
           'resolved': 'any',
           'text': 'any'
+        },
+        'docs': {
+          'text': '',
+          'tags': []
         },
         'defaultValue': 'null',
         'mutable': false,

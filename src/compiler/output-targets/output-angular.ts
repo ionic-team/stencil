@@ -47,7 +47,7 @@ function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
   }, [] as d.ComponentCompilerMeta[]);
 
   return cmps
-    .filter(c => !excludeComponents.includes(c.tagName) && isDocsPublic(c.jsdoc))
+    .filter(c => !excludeComponents.includes(c.tagName) && isDocsPublic(c.docs))
     .sort((a, b) => {
       if (a.tagName < b.tagName) return -1;
       if (a.tagName > b.tagName) return 1;

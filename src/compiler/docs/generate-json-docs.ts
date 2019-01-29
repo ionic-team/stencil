@@ -17,7 +17,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, jsonOutputs: 
     }))
   };
   const jsonContent = JSON.stringify(json, null, 2);
-  await Promise.all(jsonOutputs.map(async jsonOutput => {
-    await compilerCtx.fs.writeFile(jsonOutput.file, jsonContent);
+  await Promise.all(jsonOutputs.map(jsonOutput => {
+    return compilerCtx.fs.writeFile(jsonOutput.file, jsonContent);
   }));
 }

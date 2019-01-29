@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, serializeSymbol } from '../transform-utils';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
@@ -16,6 +16,7 @@ import ts from 'typescript';
 
 
 export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, transformOpts: d.TransformOptions) {
+  const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -31,7 +32,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     styles: parseStaticStyles(moduleFile.sourceFilePath, staticMembers),
     styleDocs: [],
     dependencies: [],
-    jsdoc: null, // serializeSymbol(checker, symbol),
+    docs: serializeSymbol(typeChecker, symbol),
     jsFilePath: null,
 
     hasAsyncLifecycle: false,
@@ -105,7 +106,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.dependencies;
     delete copyCmp.excludeFromCollection;
     delete copyCmp.isCollectionDependency;
-    delete copyCmp.jsdoc;
+    delete copyCmp.docs;
     delete copyCmp.jsFilePath;
     delete copyCmp.potentialCmpRefs;
     delete copyCmp.styleDocs;

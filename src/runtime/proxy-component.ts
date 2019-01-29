@@ -26,17 +26,14 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
           const attribute = m[1] || propName;
-            // if > 0, then we already know attr name the same as the prop name
-            // if not > 0, then let's use the attr name given (probably has a dash in it)
-            cmpMeta.attrNameToPropName.set(attribute, propName);
+          cmpMeta.attrNameToPropName.set(attribute, propName);
 
-            if (BUILD.reflect) {
-              cmpMeta.propNameToAttrName.set(propName, attribute);
-            }
-
-            return attribute;
+          if (BUILD.reflect) {
+            cmpMeta.propNameToAttrName.set(propName, attribute);
           }
-        );
+
+          return attribute;
+        });
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
         if (!cmpMeta.isReflectingAttribute) {

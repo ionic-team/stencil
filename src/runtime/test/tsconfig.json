@@ -10,7 +10,8 @@
     "jsxFactory": "h",
     "lib": [
       "dom",
-      "es2017"
+      "es2017",
+      "esnext.array"
     ],
     "module": "esnext",
     "moduleResolution": "node",

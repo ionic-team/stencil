@@ -4,7 +4,7 @@ import ts from 'typescript';
 
 
 export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentCompilerProperty[] {
-  const parsedProps = getStaticValue(staticMembers, 'properties');
+  const parsedProps: {[key: string]: d.ComponentCompilerStaticProperty} = getStaticValue(staticMembers, 'properties');
   if (!parsedProps) {
     return [];
   }
@@ -16,19 +16,18 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
 
   return propNames.map(propName => {
     const val = parsedProps[propName];
-
-    const prop: d.ComponentCompilerProperty = {
+    return {
       name: propName,
       type: val.type,
-      attribute: (typeof val.attribute === 'string' ? val.attribute.trim() : (typeof val.attr === 'string' ? val.attr.trim() : null)),
-      reflect: (typeof val.reflect === 'boolean' ? val.reflect : (typeof val.reflectToAttr === 'boolean' ? val.reflectToAttr : false)),
+      attribute: val.attribute,
+      reflect: (typeof val.reflect === 'boolean' ? val.reflect : (typeof val.reflect === 'boolean' ? val.reflect : false)),
       mutable: !!val.mutable,
       required: !!val.required,
       optional: !!val.optional,
       defaultValue: val.defaultValue,
-      complexType: undefined,
+      complexType: val.complexType,
+      docs: val.docs
     };
-    return prop;
   });
 }
 

@@ -1,10 +1,10 @@
 import * as d from '@declarations';
-import { createStaticGetter, isDecoratorNamed, removeDecorator } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, isDecoratorNamed, removeDecorator, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';
 
 
 export function methodDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const methods: ts.ObjectLiteralElementLike[] = decoratedProps.map((prop: ts.PropertyDeclaration) => {
+  const methods: ts.ObjectLiteralElementLike[] = decoratedProps.filter(ts.isMethodDeclaration).map((prop: ts.MethodDeclaration) => {
     return methodDecoratorToStatic(diagnostics, typeChecker, prop);
   }).filter(method => !!method);
 
@@ -14,18 +14,45 @@ export function methodDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFil
 }
 
 
-function methodDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
-  const methodDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Method'));
+function methodDecoratorToStatic(_diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) {
+  const methodDecorator = method.decorators && method.decorators.find(isDecoratorNamed('Method'));
 
   if (methodDecorator == null) {
     return null;
   }
 
-  removeDecorator(prop, 'Method');
+  removeDecorator(method, 'Method');
 
-  const methodName = (prop.name as ts.Identifier).text;
+  const methodName = method.name.getText();
+  const flags = ts.TypeFormatFlags.WriteArrowStyleSignature | ts.TypeFormatFlags.NoTruncation;
+  const signature = typeChecker.getSignatureFromDeclaration(method);
+  const returnType = typeChecker.getReturnTypeOfSignature(signature);
+  const jsDocReturnTag = ts.getJSDocReturnTag(method);
+  const typeString = typeChecker.signatureToString(
+    signature,
+    method,
+    flags,
+    ts.SignatureKind.Call
+  );
+  const methodMeta: d.ComponentCompilerStaticMethod = {
+    complexType: {
+      signature: typeString,
+      parameters: signature.parameters.map(symbol => serializeSymbol(typeChecker, symbol)),
+      returns: {
+        type: typeToString(typeChecker, returnType),
+        docs: jsDocReturnTag ? jsDocReturnTag.comment : ''
+      }
+    },
+    docs: {
+      text: ts.displayPartsToString(signature.getDocumentationComment(typeChecker)),
+      tags: signature.getJsDocTags()
+    }
+  };
 
-  const propertyAssignment = ts.createPropertyAssignment(ts.createLiteral(methodName), ts.createObjectLiteral([], true));
+  const staticProp = ts.createPropertyAssignment(
+    ts.createLiteral(methodName),
+    convertValueToLiteral(methodMeta)
+  );
 
-  return propertyAssignment;
+  return staticProp;
 }

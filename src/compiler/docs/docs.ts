@@ -59,7 +59,7 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
 
-  const docsData = await generateDocData(compilerCtx, buildCtx.diagnostics);
+  const docsData = await generateDocData(compilerCtx, buildCtx);
 
   const strictCheck = (docsOutputTargets as d.OutputTargetDocsReadme[]).some(o => !!o.strict);
   if (strictCheck) {

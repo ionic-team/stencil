@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { catchError, toDashCase } from '@utils';
-import { convertValueToLiteral, copyComments, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, removeDecorator, resolveType, typeToString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, removeDecorator, resolveType, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';
 
 
 export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const properties = decoratedProps.map((prop: ts.PropertyDeclaration) => {
+  const properties = decoratedProps.filter(ts.isPropertyDeclaration).map((prop: ts.PropertyDeclaration) => {
     return propDecoratorToStatic(diagnostics, typeChecker, prop);
   }).filter(prop => prop != null);
 
@@ -23,19 +23,19 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
   removeDecorator(prop, 'Prop');
 
-  const propName = (prop.name as ts.Identifier).text;
+  const propName = prop.name.getText();
   const propOptions = getPropOptions(propDecorator, diagnostics);
+  const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);
   const typeStr = propTypeFromTSType(type);
 
   const propMeta: d.ComponentCompilerStaticProperty = {
     type: typeStr,
-    attribute: null,
-    reflect: false,
     mutable: !!propOptions.mutable,
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
+    docs: serializeSymbol(typeChecker, symbol)
   };
 
   // prop can have an attribute if type is NOT "unknown"
@@ -54,9 +54,6 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
     ts.createLiteral(propName),
     convertValueToLiteral(propMeta)
   );
-
-  // copy comments from prop to static object
-  copyComments(prop, staticProp);
 
   return staticProp;
 }

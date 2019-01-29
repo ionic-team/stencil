@@ -186,7 +186,11 @@ function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentComp
       optional: false, // TODO
       required: false, // TODO
       reflect: !!propData.reflectToAttr,
-      type: 'unknown'
+      type: 'unknown',
+      docs: {
+        text: 'TODO',
+        tags: []
+      }
     };
 
     // the standard is the first character of the type is capitalized
@@ -252,7 +256,19 @@ function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCo
 
   cmpMeta.methods = cmpData.methods.map(methodData => {
     const method: d.ComponentCompilerMethod = {
-      name: methodData.name
+      name: methodData.name,
+      complexType: {
+        signature: '',
+        parameters: [],
+        returns: {
+          docs: 'TODO',
+          type: 'TODO'
+        }
+      },
+      docs: {
+        text: 'TODO',
+        tags: []
+      }
     };
     return method;
   });
@@ -317,7 +333,11 @@ function parseEvents(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCom
       method: (eventData.method) ? eventData.method : eventData.event,
       bubbles: (eventData.bubbles !== false),
       cancelable: (eventData.cancelable !== false),
-      composed: (eventData.composed !== false)
+      composed: (eventData.composed !== false),
+      docs: {
+        text: 'TODO',
+        tags: []
+      }
     };
     return event;
   });

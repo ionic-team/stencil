@@ -58,8 +58,8 @@ function isAsyncFn(typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDecl
   }
 
   const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
-  const returnType = typeChecker.getReturnTypeOfSignature(methodSignature);
+  const returnType = methodSignature.getReturnType();
   const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
 
-  return typeStr.includes('Promise');
+  return typeStr.includes('Promise<');
 }

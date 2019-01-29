@@ -4,7 +4,7 @@ import ts from 'typescript';
 
 
 export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] {
-  const parsedMethods = getStaticValue(staticMembers, 'methods');
+  const parsedMethods: {[key: string]: d.ComponentCompilerStaticMethod} = getStaticValue(staticMembers, 'methods');
   if (!parsedMethods) {
     return [];
   }
@@ -16,7 +16,9 @@ export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.Componen
 
   return methodNames.map(methodName => {
     return {
-      name: methodName
+      name: methodName,
+      docs: parsedMethods[methodName].docs,
+      complexType: parsedMethods[methodName].complexType,
     };
   });
 }
