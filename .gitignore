@@ -33,3 +33,4 @@ dist/
 /screenshot/pixel-match.js
 
 test/**/www/*
+.stencil

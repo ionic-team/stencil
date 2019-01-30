@@ -4,7 +4,10 @@ import { sys } from '@sys';
 
 
 export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
-  const opts: any = {};
+  const opts: any = {
+    output: {},
+    compress: {}
+  };
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;

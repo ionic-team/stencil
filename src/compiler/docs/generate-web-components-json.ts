@@ -8,7 +8,7 @@ export async function generateWebComponentsJson(compilerCtx: d.CompilerCtx, dist
     'tags': docsData.components.map(cmp => ({
       'label': cmp.tag,
       'description': cmp.docs,
-      'attributes': cmp.props.filter(p => p.attr).map(p => ({
+      'attributes': (cmp.props || []).filter(p => p.attr).map(p => ({
         'label': p.attr,
         'description': p.docs,
         'required': p.required
