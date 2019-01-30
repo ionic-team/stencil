@@ -1,12 +1,13 @@
 import * as d from '@declarations';
 import { catchError, toDashCase } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, removeDecorator, resolveType, serializeSymbol, typeToString } from '../transform-utils';
+import { transformConnectProp, transformContextProp } from './deprecated-prop';
 import ts from 'typescript';
 
 
 export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
   const properties = decoratedProps.filter(ts.isPropertyDeclaration).map((prop: ts.PropertyDeclaration) => {
-    return propDecoratorToStatic(diagnostics, typeChecker, prop);
+    return propDecoratorToStatic(diagnostics, typeChecker, prop, newMembers);
   }).filter(prop => prop != null);
 
   if (properties.length > 0) {
@@ -15,7 +16,7 @@ export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile:
 }
 
 
-function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
+function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, newMembers: ts.ClassElement[]) {
   const propDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -25,6 +26,18 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
   const propName = prop.name.getText();
   const propOptions = getPropOptions(propDecorator, diagnostics);
+
+  if (propOptions.context) {
+    // TODO: add deprecation warning
+    transformContextProp(prop, propOptions.context, newMembers);
+    return null;
+  }
+  if (propOptions.connect) {
+    // TODO: add deprecation warning
+    transformConnectProp(prop, propOptions.connect, newMembers);
+    return null;
+  }
+
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);
   const typeStr = propTypeFromTSType(type);

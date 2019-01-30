@@ -1,7 +1,10 @@
 import * as d from '@declarations';
 import { resetTaskQueue } from './task-queue';
 import { setupGlobal } from '@mock-doc';
-export { createEvent, getElement } from '@runtime';
+export {
+  createEvent as __stencil_createEvent,
+  getElement as __stencil_getElement
+} from '@runtime';
 
 export * from './task-queue';
 
@@ -54,3 +57,19 @@ export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);
+
+const Context = {
+  window: win,
+  document: doc,
+  isServer: false,
+  enableListener: () => console.log('TODO'),
+  queue: {}
+};
+
+export function getContext(context: string): any {
+  return (Context as any)[context];
+}
+
+export {
+  getContext as __stencil_getContext
+};

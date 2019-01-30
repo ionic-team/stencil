@@ -95,7 +95,6 @@ function requireConfigFile(fs: d.FileSystem, configFilePath: string) {
   require.extensions['.ts'] = (module: NodeModuleWithCompile, filename: string) => {
     let sourceText = fs.readFileSync(filename);
     sourceText = convertSourceConfig(sourceText, filename);
-    console.log(sourceText);
     module._compile(sourceText, filename);
   };
 

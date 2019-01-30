@@ -2,27 +2,15 @@ import ts from 'typescript';
 import * as d from '@declarations';
 import { EVENT_FLAGS } from '@utils';
 
-export function registerEventEmitters(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
-  if (cmpMeta.events.length === 0) {
+export function registerConstructor(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
+
+  const statements = [
+    ...getEventStatements(cmpMeta),
+  ];
+
+  if (statements.length === 0) {
     return;
   }
-  const statements = cmpMeta.events.map(ev => {
-    return ts.createStatement(ts.createAssignment(
-      ts.createPropertyAccess(
-        ts.createThis(),
-        ts.createIdentifier(ev.method)
-      ),
-      ts.createCall(
-        ts.createIdentifier('createEvent'),
-        undefined,
-        [
-          ts.createThis(),
-          ts.createLiteral(ev.name),
-          ts.createLiteral(computeFlags(ev))
-        ]
-      )
-    ));
-  });
 
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
   if (cstrMethodIndex >= 0) {
@@ -39,6 +27,26 @@ export function registerEventEmitters(classMembers: ts.ClassElement[], cmpMeta: 
     );
   }
 
+}
+
+export function getEventStatements(cmpMeta: d.ComponentCompilerMeta) {
+  return cmpMeta.events.map(ev => {
+    return ts.createStatement(ts.createAssignment(
+      ts.createPropertyAccess(
+        ts.createThis(),
+        ts.createIdentifier(ev.method)
+      ),
+      ts.createCall(
+        ts.createIdentifier('__stencil_createEvent'),
+        undefined,
+        [
+          ts.createThis(),
+          ts.createLiteral(ev.name),
+          ts.createLiteral(computeFlags(ev))
+        ]
+      )
+    ));
+  });
 }
 
 function computeFlags(eventMeta: d.ComponentCompilerEvent) {

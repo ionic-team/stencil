@@ -5,7 +5,7 @@ import { REGISTER_INSTANCE_METHOD, registerLazyComponentInConstructor } from './
 import { registerLazyElementGetter } from './register-lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
-import { registerEventEmitters } from './register-event-emitters';
+import { registerConstructor } from '../register-constructor';
 import ts from 'typescript';
 
 
@@ -63,7 +63,14 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
 
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
-      const importFnNames = [REGISTER_INSTANCE_METHOD, 'h', 'getElement', 'createEvent'];
+      const importFnNames = [
+        REGISTER_INSTANCE_METHOD,
+        'h',
+        '__stencil_getElement',
+        '__stencil_getConnect',
+        '__stencil_getContext',
+        '__stencil_createEvent'
+      ];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile,
         importFnNames,
@@ -94,8 +101,7 @@ function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmpMeta: d.C
 
   registerLazyComponentInConstructor(classMembers);
   registerLazyElementGetter(classMembers, cmpMeta);
-  registerEventEmitters(classMembers, cmpMeta);
-
+  registerConstructor(classMembers, cmpMeta);
 
   return classMembers;
 }

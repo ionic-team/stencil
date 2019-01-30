@@ -7,3 +7,4 @@ export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/render';
 export { createEvent } from './event-emitter';
 export { getElement } from './element';
+export { getConnect } from './connect';

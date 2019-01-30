@@ -4,6 +4,7 @@ import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
+import { registerConstructor } from '../register-constructor';
 
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
@@ -103,9 +104,9 @@ function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmpMeta: d.C
 
   addSuperToConstructor(classMembers);
   addConnectedCallback(classMembers);
-  if (cmpMeta.elementRef) {
-    registerElementGetter(classMembers, cmpMeta.elementRef);
-  }
+  registerConstructor(classMembers, cmpMeta);
+  registerElementGetter(classMembers, cmpMeta);
+
   return classMembers;
 }
 
@@ -167,22 +168,24 @@ function addConnectedCallback(classMembers: ts.ClassElement[]) {
   }
 }
 
-function registerElementGetter(classMembers: ts.ClassElement[], elementRef: string) {
+function registerElementGetter(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
   // @Element() element;
   // is transformed into:
   // get element() { return this; }
-  classMembers.push(
-    ts.createGetAccessor(
-      undefined,
-      undefined,
-      elementRef,
-      [],
-      undefined,
-      ts.createBlock([
-        ts.createReturn(
-          ts.createThis()
-        )
-      ])
-    )
-  );
+  if (cmpMeta.elementRef) {
+    classMembers.push(
+      ts.createGetAccessor(
+        undefined,
+        undefined,
+        cmpMeta.elementRef,
+        [],
+        undefined,
+        ts.createBlock([
+          ts.createReturn(
+            ts.createThis()
+          )
+        ])
+      )
+    );
+  }
 }

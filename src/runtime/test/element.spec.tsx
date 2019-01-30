@@ -16,10 +16,6 @@ describe('element', () => {
       }
     }
     // @ts-ignore
-    console.log(require('@stencil/core/app'));
-    // @ts-ignore
-    console.log(createEvent);
-
     const { root, flush } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,

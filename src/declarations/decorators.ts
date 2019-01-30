@@ -24,17 +24,16 @@ export interface PropDecorator {
 }
 export interface PropOptions {
   attribute?: string;
-
-  /** DEPRECATED: "attr" has been deprecated, please use "attribute" instead. */
-  attr2?: string;
-
-  context?: string;
-  connect?: string;
   mutable?: boolean;
-
   reflect?: boolean;
 
-  /** DEPRECATED: "reflectToAttr" has been deprecated, please use "reflect" instead. */
+  /** @deprecated: "attr" has been deprecated, please use "attribute" instead. */
+  attr2?: string;
+  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
+  context?: string;
+  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
+  connect?: string;
+  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
   reflectToAttr?: boolean;
 }
 

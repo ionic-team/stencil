@@ -30,8 +30,14 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
 
   coreText.push(`bootstrapLazy([]);`);
 
-  coreText.push(`export { registerLazyInstance } from '@stencil/core/platform';`);
-  coreText.push(`export { h, getElement, createEvent } from '@stencil/core/runtime';`);
+  coreText.push(`export { registerLazyInstance, getContext as __stencil_getContext } from '@stencil/core/platform';`);
+  coreText.push(`
+export {
+  h,
+  createEvent as __stencil_createEvent,
+  getElement as __stencil_getElement,
+  getConnect as __stencil_getConnect
+} from '@stencil/core/runtime';`);
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 
