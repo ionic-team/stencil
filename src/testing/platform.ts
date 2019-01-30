@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { resetTaskQueue } from './task-queue';
 import { setupGlobal } from '@mock-doc';
+export { createEvent, getElement } from '@runtime';
 
 export * from './task-queue';
 
@@ -51,8 +52,5 @@ export const getHostRef = (elm: d.RuntimeRef) =>
 
 export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
-
-export const getElement = (ref: any) =>
-  getHostRef(ref).hostElement;
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

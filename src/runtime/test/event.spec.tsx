@@ -9,6 +9,7 @@ describe('event', () => {
     class CmpA {
 
       @Event() ionChange: EventEmitter;
+
       @State() counter = 0;
 
       @Listen('ionChange')

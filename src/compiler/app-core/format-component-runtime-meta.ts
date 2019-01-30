@@ -46,7 +46,6 @@ function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta): d
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
     ...formatStatesRuntimeMember(compilerMeta.states),
     ...formatMethodsRuntimeMember(compilerMeta.methods),
-    ...formatEventsRuntimeMember(compilerMeta.events),
   };
 }
 
@@ -144,32 +143,6 @@ function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
   });
   return runtimeMembers;
 }
-
-
-function formatEventsRuntimeMember(events: d.ComponentCompilerEvent[]) {
-  const runtimeMembers: d.ComponentRuntimeMembers = {};
-
-  events.forEach(member => {
-    let flags = MEMBER_FLAGS.Event;
-    if (member.bubbles) {
-      flags |= MEMBER_FLAGS.EventBubbles;
-    }
-    if (member.composed) {
-      flags |= MEMBER_FLAGS.EventComposed;
-    }
-    if (member.cancelable) {
-      flags |= MEMBER_FLAGS.EventCancellable;
-    }
-    runtimeMembers[member.name] = [
-      /**
-       * [0] member flags
-       */
-      flags
-    ];
-  });
-  return runtimeMembers;
-}
-
 
 function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
   return compilerMeta.listeners.map(compilerListener => {

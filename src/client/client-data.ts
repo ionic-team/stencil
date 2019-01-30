@@ -12,16 +12,13 @@ export const onAppReadyCallbacks: any[] = [];
 
 export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = (BUILD.exposeAppOnReady ? new Set() : undefined);
 
-// export const getElement = (ref: any) => hostDataMap.get(ref).elm;
+export const getHostRef = (elm: d.RuntimeRef) =>
+  hostRefs.get(elm);
 
-export const getHostRef = (elm: d.RuntimeRef) => {
-  return hostRefs.get(elm);
-};
+export const getElement = (ref: any) =>
+  getHostRef(ref).hostElement;
 
 export const registerLazyInstance = (lazyInstance: any, elmData: d.HostRef) =>
   hostRefs.set(elmData.lazyInstance = lazyInstance, elmData);
-
-export const getElement = (ref: any) =>
-  hostRefs.get(ref).hostElement;
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

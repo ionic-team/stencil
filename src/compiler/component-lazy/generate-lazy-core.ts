@@ -20,21 +20,18 @@ export async function generateLazyAppCore(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build) {
+async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, _build: d.Build) {
   const appCoreEntryFileName = `${config.fsNamespace}-lazy.mjs`;
   const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
 
-  coreText.push(`import { bootstrapLazy, getElement } from '@stencil/core/runtime';`);
+  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
 
   coreText.push(`bootstrapLazy([]);`);
 
-  coreText.push(`export { registerLazyInstance, getElement } from '@stencil/core/platform';`);
-
-  if (build.vdomRender) {
-    coreText.push(`export { h } from '@stencil/core/runtime';`);
-  }
+  coreText.push(`export { registerLazyInstance } from '@stencil/core/platform';`);
+  coreText.push(`export { h, getElement, createEvent } from '@stencil/core/runtime';`);
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 

@@ -76,27 +76,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
             }
           }
         });
-
-      } else if (BUILD.event && (memberFlags & MEMBER_TYPE.Event)) {
-        // proxyComponent - event
-        const eventMeta = {
-          bubbles: !!(memberFlags & MEMBER_FLAGS.EventBubbles),
-          composed: !!(memberFlags & MEMBER_FLAGS.EventComposed),
-          cancelable: !!(memberFlags & MEMBER_FLAGS.EventCancellable)
-        };
-        Object.defineProperty((Cstr as any).prototype, memberName, {
-          get(this: d.RuntimeRef) {
-            const el = (BUILD.lazyLoad && !isElementConstructor)
-              ? getHostRef(this).hostElement
-              : this as d.HostElement;
-
-            return {
-              emit: (detail: any) => el.dispatchEvent(
-                new CustomEvent(memberName, { ...eventMeta, detail })
-              )
-            };
-          }
-        });
       }
     });
   }

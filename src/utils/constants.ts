@@ -14,14 +14,17 @@ export const enum MEMBER_FLAGS {
   ReflectAttr = 1 << 9,
   Mutable = 1 << 10,
 
-  EventBubbles = 1 << 9,
-  EventComposed = 1 << 10,
-  EventCancellable = 1 << 11,
-
   Prop = String | Number | Boolean | Any | Unknown,
   HasAttribute = String | Number | Boolean | Any,
   PropLike = Prop | State,
 }
+
+export const enum EVENT_FLAGS {
+  Bubbles = 1 << 1,
+  Composed = 1 << 2,
+  Cancellable = 1 << 3,
+}
+
 
 /**
  * Member Types
