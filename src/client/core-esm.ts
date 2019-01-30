@@ -120,6 +120,7 @@ function loadBundle(bundleId: string, useScopedCss: boolean, className: string) 
   return import(
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackMode: "lazy" */
+    /* webpackChunkName: "stencil-[request]" */ 
     `./build/${bundleId}${(useScopedCss ? '.sc' : '')}.entry.js`
   ).then(m => m[className]);
 }

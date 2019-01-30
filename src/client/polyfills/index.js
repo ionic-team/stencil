@@ -14,27 +14,27 @@ export function applyPolyfills(window) {
     const promises = [];
 
     if (!window.customElements || (window.Element && (!window.Element.prototype.closest || !window.Element.prototype.matches || !window.Element.prototype.remove))) {
-      promises.push(import('./polyfills/dom.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-dom" */ './polyfills/dom.js'));
     }
 
     if ('function' !== typeof Object.assign || !Object.entries) {
-      promises.push(import('./polyfills/object.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-object" */ './polyfills/object.js'));
     }
 
     if (!Array.prototype.find || !Array.prototype.includes) {
-      promises.push(import('./polyfills/array.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-array" */ './polyfills/array.js'));
     }
 
     if (!String.prototype.startsWith || !String.prototype.endsWith) {
-      promises.push(import('./polyfills/string.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-string" */ './polyfills/string.js'));
     }
 
     if (!window.fetch) {
-      promises.push(import('./polyfills/fetch.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-fetch" */ './polyfills/fetch.js'));
     }
 
     if (typeof WeakMap == 'undefined' || !(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'))) {
-      promises.push(import('./polyfills/css-shim.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-css-shim" */ './polyfills/css-shim.js'));
     }
 
     function checkIfURLIsSupported() {
