@@ -1,12 +1,12 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, isComponentClassNode } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
-export function transformToNativeComponentText(buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.hasError) {
     return '';
   }
@@ -22,7 +22,7 @@ export function transformToNativeComponentText(buildCtx: d.BuildCtx, build: d.Bu
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform(build)
+          nativeComponentTransform(build, compilerCtx)
         ]
       }
     };
@@ -43,21 +43,23 @@ export function transformToNativeComponentText(buildCtx: d.BuildCtx, build: d.Bu
 }
 
 
-function nativeComponentTransform(build: d.Build): ts.TransformerFactory<ts.SourceFile> {
+function nativeComponentTransform(build: d.Build, compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
   return transformCtx => {
 
-    function visitNode(node: ts.Node) {
-      if (isComponentClassNode(node)) {
-        return updateComponentClass(node);
-
-      } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-        return removeStencilImport(node as ts.ImportDeclaration);
-      }
-
-      return node;
-    }
-
     return tsSourceFile => {
+
+      function visitNode(node: ts.Node) {
+        if (ts.isClassDeclaration(node)) {
+          const cmpMeta = getComponentMeta(compilerCtx, tsSourceFile, node);
+          if (cmpMeta) {
+            return updateComponentClass(node, cmpMeta);
+          }
+        } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+          return removeStencilImport(node as ts.ImportDeclaration);
+        }
+
+        return node;
+      }
       const importFns = ['connectedCallback'];
 
       if (build.vdomRender) {
@@ -72,7 +74,7 @@ function nativeComponentTransform(build: d.Build): ts.TransformerFactory<ts.Sour
 }
 
 
-function updateComponentClass(classNode: ts.ClassDeclaration) {
+function updateComponentClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -80,7 +82,7 @@ function updateComponentClass(classNode: ts.ClassDeclaration) {
     classNode.name,
     classNode.typeParameters,
     updateHostComponentHeritageClauses(),
-    updateHostComponentMembers(classNode)
+    updateHostComponentMembers(classNode, cmpMeta)
   );
 }
 
@@ -96,12 +98,14 @@ function updateHostComponentHeritageClauses() {
 }
 
 
-function updateHostComponentMembers(classNode: ts.ClassDeclaration) {
+function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
   addSuperToConstructor(classMembers);
   addConnectedCallback(classMembers);
-
+  if (cmpMeta.elementRef) {
+    registerElementGetter(classMembers, cmpMeta.elementRef);
+  }
   return classMembers;
 }
 
@@ -161,4 +165,24 @@ function addConnectedCallback(classMembers: ts.ClassElement[]) {
     );
     classMembers.push(callbackMethod);
   }
+}
+
+function registerElementGetter(classMembers: ts.ClassElement[], elementRef: string) {
+  // @Element() element;
+  // is transformed into:
+  // get element() { return this; }
+  classMembers.push(
+    ts.createGetAccessor(
+      undefined,
+      undefined,
+      elementRef,
+      [],
+      undefined,
+      ts.createBlock([
+        ts.createReturn(
+          ts.createThis()
+        )
+      ])
+    )
+  );
 }

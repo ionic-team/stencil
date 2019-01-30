@@ -61,7 +61,7 @@ export class MockEventListener {
   handler: (ev?: any) => void;
 
   constructor(type: string, handler: any) {
-    this.type = type.toLowerCase();
+    this.type = type;
     this.handler = handler;
   }
 }
@@ -80,7 +80,6 @@ export function addEventListener(elm: any, type: string, handler: any) {
 
 export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
-  type = type.toLowerCase();
 
   if (target._listeners) {
     const elmListener = target._listeners.find(e => e.type === type && e.handler === handler);
@@ -103,7 +102,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   if (Array.isArray(target._listeners)) {
     const listeners = target._listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
-      listener.handler.call(target, ev);
+      listener.handler(ev);
     });
   }
 
@@ -120,11 +119,6 @@ function triggerEventListener(elm: any, ev: MockEvent) {
 
 export function dispatchEvent(currentTarget: any, ev: MockEvent) {
   ev.target = currentTarget;
-  ev.currentTarget = currentTarget;
-  ev.bubbles = true;
-  ev.cancelable = true;
-  ev.composed = true;
-  ev.defaultPrevented = false;
   triggerEventListener(currentTarget, ev);
   return true;
 }

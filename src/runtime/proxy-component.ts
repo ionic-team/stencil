@@ -86,14 +86,14 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         };
         Object.defineProperty((Cstr as any).prototype, memberName, {
           get(this: d.RuntimeRef) {
-            const el = (BUILD.lazyLoad
-              ? (isElementConstructor ? this : getHostRef(this).hostElement)
-              : this) as d.HostElement;
+            const el = (BUILD.lazyLoad && !isElementConstructor)
+              ? getHostRef(this).hostElement
+              : this as d.HostElement;
 
             return {
               emit: (detail: any) => el.dispatchEvent(
-                new CustomEvent(memberName, { ...eventMeta, detail}
-              ))
+                new CustomEvent(memberName, { ...eventMeta, detail })
+              )
             };
           }
         });

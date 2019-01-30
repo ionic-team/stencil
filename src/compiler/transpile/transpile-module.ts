@@ -43,7 +43,9 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: fileName => normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined,
+    getSourceFile: fileName => {
+      return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
+    },
     writeFile: (name, text) => {
       if (name.endsWith('.map')) {
         results.map = text;
@@ -75,7 +77,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     ],
     after: [
       visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-      lazyComponentTransform()
+      lazyComponentTransform(compilerCtx)
     ]
   });
 

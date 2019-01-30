@@ -13,14 +13,11 @@ describe('event', () => {
 
       @Listen('ionChange')
       onIonChange() {
-        console.log('HELLO');
         this.counter++;
       }
 
       @Method()
       emitEvent() {
-        console.log('here');
-
         this.ionChange.emit();
       }
 

@@ -23,7 +23,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
           (hostRef.hostListenerEventToMethodMap || (hostRef.hostListenerEventToMethodMap = new Map()))
             .set(hostListener[0], hostListener[1]);
 
-          elm.addEventListener(hostListener[0], hostListenerProxy, listenerOpts(hostListener));
+          elm.addEventListener(hostListener[0], ev => hostListenerProxy(elm, ev), listenerOpts(hostListener));
         }
       });
     }
@@ -78,8 +78,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
 };
 
 
-function hostListenerProxy(this: d.HostElement, ev: Event) {
-  const hostRef = getHostRef(this);
+function hostListenerProxy(elm: d.HostElement, ev: Event) {
+  const hostRef = getHostRef(elm);
   const hostListenerMethodName = hostRef.hostListenerEventToMethodMap.get(ev.type);
 
   if (BUILD.lazyLoad) {

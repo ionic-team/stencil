@@ -453,17 +453,19 @@ export function copyComments(src: ts.Node, dst: ts.Node) {
   }
 }
 
-
-export function isComponentClassNode(node: ts.Node): node is ts.ClassDeclaration {
-  if (ts.isClassDeclaration(node) && node.members != null) {
+export function getComponentMeta(compilerCtx: d.CompilerCtx, sourceFile: ts.SourceFile, node: ts.ClassDeclaration) {
+  if (node.members != null) {
     const staticMembers = node.members.filter(isStaticGetter);
-
     const tagName = getComponentTagName(staticMembers);
-    return (tagName != null);
+    if (tagName) {
+      const mod = compilerCtx.moduleMap.get(sourceFile.fileName);
+      if (mod) {
+        return mod.cmps.find(cmp => cmp.tagName === tagName);
+      }
+    }
   }
-  return false;
+  return undefined;
 }
-
 
 export function getComponentTagName(staticMembers: ts.ClassElement[]) {
   if (staticMembers.length > 0) {
