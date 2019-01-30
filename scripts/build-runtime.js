@@ -179,5 +179,5 @@ run(async ()=> {
     createPublicJavaScriptExports()
   ]);
 
-  // await fs.remove(TRANSPILED_DIR);
+  await fs.remove(TRANSPILED_DIR);
 });

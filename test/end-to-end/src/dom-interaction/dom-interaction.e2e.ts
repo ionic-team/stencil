@@ -1,4 +1,4 @@
-import { newE2EPage } from '../../../../dist/testing';
+import { newE2EPage } from '@stencil/core/testing';
 
 
 describe('dom interaction e2e tests', () => {

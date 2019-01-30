@@ -23,7 +23,8 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../"]
+      "@stencil/core/testing": ["../../src/testing/index.ts"],
+      "@stencil/core": ["../../src/index.ts"]
     }
   }
 }

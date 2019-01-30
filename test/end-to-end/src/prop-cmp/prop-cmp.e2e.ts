@@ -1,4 +1,4 @@
-import { newE2EPage, E2EPage } from '../../../../dist/testing';
+import { newE2EPage, E2EPage } from '@stencil/core/testing';
 
 
 describe('@Prop', () => {
