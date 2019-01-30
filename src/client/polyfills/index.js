@@ -47,7 +47,7 @@ export function applyPolyfills(window) {
       }
     }
     if (!checkIfURLIsSupported) {
-      promises.push(import('./polyfills/url.js'));
+      promises.push(import(/* webpackChunkName: "stencil-polyfills-url" */ './polyfills/url.js'));
     }
 
     return Promise.all(promises).then(function(results) {
