@@ -41,18 +41,17 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         }
       };
     }
+    Object.entries(cmpMeta.cmpMembers).forEach(([memberName, [memberFlags]]) => {
 
-    Object.entries(cmpMeta.cmpMembers).forEach(([memberName, memberData]) => {
-
-      if ((BUILD.prop && (memberData[0] & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberData[0] & MEMBER_FLAGS.State))) {
+      if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberFlags & MEMBER_FLAGS.State))) {
         // proxyComponent - prop
         Object.defineProperty((Cstr as any).prototype, memberName,
           {
-            get(this: d.HostElement) {
+            get(this: d.RuntimeRef) {
               // proxyComponent, get value
               return getHostRef(this).instanceValues.get(memberName);
             },
-            set(this: d.HostElement, newValue) {
+            set(this: d.RuntimeRef, newValue) {
               // proxyComponent, set value
               setValue(this, memberName, newValue, cmpMeta);
             },
@@ -61,12 +60,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           }
         );
 
-      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberData[0] & MEMBER_TYPE.Method)) {
+      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberFlags & MEMBER_TYPE.Method)) {
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
-          value(instance?: any) {
+          value() {
             if (BUILD.lazyLoad) {
-              if ((instance = getHostRef(this).lazyInstance)) {
+              const instance = getHostRef(this).lazyInstance;
+              if (instance) {
                 // lazy host method proxy
                 return instance[memberName].apply(instance, arguments);
               }
@@ -77,18 +77,22 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           }
         });
 
-      } else if (BUILD.event && (memberData[0] & MEMBER_TYPE.Event)) {
+      } else if (BUILD.event && (memberFlags & MEMBER_TYPE.Event)) {
         // proxyComponent - event
+        const eventMeta = {
+          bubbles: !!(memberFlags & MEMBER_FLAGS.EventBubbles),
+          composed: !!(memberFlags & MEMBER_FLAGS.EventComposed),
+          cancelable: !!(memberFlags & MEMBER_FLAGS.EventCancellable)
+        };
         Object.defineProperty((Cstr as any).prototype, memberName, {
-          get(this: d.HostElement) {
-            const elm = this;
+          get(this: d.RuntimeRef) {
+            const el = (BUILD.lazyLoad
+              ? (isElementConstructor ? this : getHostRef(this).hostElement)
+              : this) as d.HostElement;
+
             return {
-              emit: (data: any) => elm.dispatchEvent(new CustomEvent(
-                memberName,
-                {
-                  detail: data,
-                  // bubbles
-                }
+              emit: (detail: any) => el.dispatchEvent(
+                new CustomEvent(memberName, { ...eventMeta, detail}
               ))
             };
           }

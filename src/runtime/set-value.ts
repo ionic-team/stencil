@@ -5,10 +5,11 @@ import { parsePropertyValue } from './parse-property-value';
 import { update } from './update';
 
 
-export const setValue = (elm: d.HostElement, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, oldVal?: any) => {
+export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
   // check our new property value against our internal value
-  hostRef = getHostRef(elm);
-  oldVal = hostRef.instanceValues.get(propName);
+  const hostRef = getHostRef(ref);
+  const elm = BUILD.lazyLoad ? hostRef.hostElement : ref as d.HostElement;
+  const oldVal = hostRef.instanceValues.get(propName);
   newVal = parsePropertyValue(newVal, cmpMeta.cmpMembers[propName][0]);
 
   if (newVal !== oldVal) {

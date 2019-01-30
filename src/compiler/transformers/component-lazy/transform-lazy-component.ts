@@ -1,7 +1,8 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, isComponentClassNode } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, getStaticValue, isComponentClassNode, isStaticGetter } from '../transform-utils';
 import { REGISTER_INSTANCE_METHOD, registerLazyComponentInConstructor } from './register-lazy-constructor';
+import { registerLazyElementGetter } from './register-lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
@@ -60,7 +61,7 @@ export function lazyComponentTransform(): ts.TransformerFactory<ts.SourceFile> {
     }
 
     return tsSourceFile => {
-      const importFnNames = [REGISTER_INSTANCE_METHOD, 'h'];
+      const importFnNames = [REGISTER_INSTANCE_METHOD, 'h', 'getElement'];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile,
         importFnNames,
@@ -87,9 +88,13 @@ function updateComponentClass(classNode: ts.ClassDeclaration) {
 
 
 function updateLazyComponentMembers(classNode: ts.ClassDeclaration) {
+  const elementRef = getStaticValue(classNode.members.filter(isStaticGetter), 'elementRef');
   const classMembers = removeStaticMetaProperties(classNode);
 
   registerLazyComponentInConstructor(classMembers);
+  if (elementRef) {
+    registerLazyElementGetter(classMembers, elementRef);
+  }
 
   return classMembers;
 }

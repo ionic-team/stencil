@@ -70,7 +70,7 @@ function formatPropertiesRuntimeMember(properties: d.ComponentCompilerProperty[]
 function formatFlags(compilerProperty: d.ComponentCompilerProperty) {
   let type = formatPropType(compilerProperty.type);
   if (compilerProperty.mutable) {
-    type |= MEMBER_FLAGS.PropMutable;
+    type |= MEMBER_FLAGS.Mutable;
   }
   if (compilerProperty.reflect) {
     type |= MEMBER_FLAGS.ReflectAttr;
@@ -150,11 +150,21 @@ function formatEventsRuntimeMember(events: d.ComponentCompilerEvent[]) {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
   events.forEach(member => {
+    let flags = MEMBER_FLAGS.Event;
+    if (member.bubbles) {
+      flags |= MEMBER_FLAGS.EventBubbles;
+    }
+    if (member.composed) {
+      flags |= MEMBER_FLAGS.EventComposed;
+    }
+    if (member.cancelable) {
+      flags |= MEMBER_FLAGS.EventCancellable;
+    }
     runtimeMembers[member.name] = [
       /**
        * [0] member flags
        */
-      MEMBER_TYPE.Event
+      flags
     ];
   });
   return runtimeMembers;

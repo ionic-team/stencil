@@ -44,10 +44,10 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     vdomStyle: cmps.some(c => c.hasVdomStyle),
     vdomText: cmps.some(c => c.hasVdomText),
     watchCallback: cmps.some(c => c.hasWatchCallback),
+    taskQueue: true,
   };
 
-  f.member = (f.updatable || f.mode || f.lifecycle);
-
+  f.member = (f.member || f.updatable || f.mode || f.lifecycle);
   f.taskQueue = (f.updatable || f.mode || f.lifecycle);
 
   return f;

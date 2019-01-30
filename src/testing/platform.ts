@@ -13,7 +13,7 @@ export const win = setupGlobal(global);
 
 export const doc = win.document;
 
-export const hostRefs = new Map();
+export const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
 
@@ -45,23 +45,15 @@ export function resetPlatform() {
   resetTaskQueue();
 }
 
-export const getElement = (ref: any) => hostRefs.get(ref).elm;
 
-export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
-  hostRef = hostRefs.get(elm);
-
-  if (!hostRef) {
-    hostRefs.set(elm, hostRef = {
-      instanceValues: new Map(),
-      lazyInstance: elm
-    });
-  }
-
-  return hostRef;
+export const getHostRef = (elm: d.RuntimeRef) => {
+  return hostRefs.get(elm);
 };
 
 export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
 
+export const getElement = (ref: any) =>
+  hostRefs.get(ref).hostElement;
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

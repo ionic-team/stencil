@@ -5,18 +5,22 @@ export const enum MEMBER_FLAGS {
   Boolean = 1 << 2,
   Any = 1 << 3,
   Unknown = 1 << 4,
+
   State = 1 << 5,
   Method = 1 << 6,
   Event = 1 << 7,
   Element = 1 << 8,
+
   ReflectAttr = 1 << 9,
-  PropMutable = 1 << 10,
-  PropContext = 1 << 11,
-  PropConnect = 1 << 12,
+  Mutable = 1 << 10,
+
+  EventBubbles = 1 << 9,
+  EventComposed = 1 << 10,
+  EventCancellable = 1 << 11,
 
   Prop = String | Number | Boolean | Any | Unknown,
   HasAttribute = String | Number | Boolean | Any,
-  PropLike = Prop | PropMutable | State,
+  PropLike = Prop | State,
 }
 
 /**
@@ -24,9 +28,6 @@ export const enum MEMBER_FLAGS {
  */
 export const enum MEMBER_TYPE {
   Prop = MEMBER_FLAGS.Prop,
-  PropMutable = MEMBER_FLAGS.PropMutable,
-  PropContext = MEMBER_FLAGS.PropContext,
-  PropConnect = MEMBER_FLAGS.PropConnect,
   State = MEMBER_FLAGS.State,
   Method = MEMBER_FLAGS.Method,
   Element = MEMBER_FLAGS.Element,

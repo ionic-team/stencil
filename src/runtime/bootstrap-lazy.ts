@@ -19,6 +19,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
 
       class StencilLazyHost extends HTMLElement {
         // StencilLazyHost
+        constructor() {
+          super();
+          hostRefs.set(this, {
+            hostElement: this,
+            instanceValues: new Map(),
+          });
+        }
 
         connectedCallback() {
           connectedCallback(this, cmpLazyMeta);

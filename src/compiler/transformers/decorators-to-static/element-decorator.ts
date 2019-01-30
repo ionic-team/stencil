@@ -1,15 +1,20 @@
 import * as d from '@declarations';
 import { createStaticGetter, isDecoratorNamed, removeDecorator } from '../transform-utils';
 import ts from 'typescript';
+import { buildError } from '@utils';
 
 
 export function elementDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const elementRef: string = decoratedProps.map((prop: ts.PropertyDeclaration) => {
+  const elementRefs = decoratedProps.map((prop: ts.PropertyDeclaration) => {
     return elementDecoratorToStatic(diagnostics, typeChecker, prop);
-  }).filter(element => typeof element === 'string')[0];
+  }).filter(element => typeof element === 'string');
 
-  if (elementRef) {
-    newMembers.push(createStaticGetter('elementRef', ts.createLiteral(elementRef)));
+  if (elementRefs.length > 0) {
+    newMembers.push(createStaticGetter('elementRef', ts.createLiteral(elementRefs[0])));
+    if (elementRefs.length > 1) {
+      const error = buildError(diagnostics);
+      error.messageText = `It's not valid to add more than one Element() decorator`;
+    }
   }
 }
 
@@ -22,8 +27,5 @@ function elementDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts
   }
 
   removeDecorator(prop, 'Element');
-
-  const elementRef = (prop.name as ts.Identifier).text;
-
-  return elementRef;
+  return prop.name.getText();
 }

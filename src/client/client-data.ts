@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 
 
-export const hostRefs: WeakMap<any, d.HostRef> = new WeakMap();
+export const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = (BUILD.style ? new WeakMap() : undefined);
 
@@ -14,20 +14,14 @@ export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = (BUILD.exposeA
 
 // export const getElement = (ref: any) => hostDataMap.get(ref).elm;
 
-export const getHostRef = (elm: d.HostElement, hostRef?: d.HostRef) => {
-  hostRef = hostRefs.get(elm);
-
-  if (!hostRef) {
-    hostRefs.set(elm, hostRef = {
-      instanceValues: new Map()
-    });
-  }
-
-  return hostRef;
+export const getHostRef = (elm: d.RuntimeRef) => {
+  return hostRefs.get(elm);
 };
 
 export const registerLazyInstance = (lazyInstance: any, elmData: d.HostRef) =>
   hostRefs.set(elmData.lazyInstance = lazyInstance, elmData);
 
+export const getElement = (ref: any) =>
+  hostRefs.get(ref).hostElement;
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);

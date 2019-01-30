@@ -26,11 +26,11 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
 
   const coreText: string[] = [];
 
-  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
+  coreText.push(`import { bootstrapLazy, getElement } from '@stencil/core/runtime';`);
 
   coreText.push(`bootstrapLazy([]);`);
 
-  coreText.push(`export { registerLazyInstance } from '@stencil/core/platform';`);
+  coreText.push(`export { registerLazyInstance, getElement } from '@stencil/core/platform';`);
 
   if (build.vdomRender) {
     coreText.push(`export { h } from '@stencil/core/runtime';`);

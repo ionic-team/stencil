@@ -81,6 +81,7 @@ export interface ModeBundleIds {
   [modeName: string]: string;
 }
 
+export type RuntimeRef = d.HostElement | {};
 
 export interface HostRef {
   ancestorHostElement?: d.HostElement;
@@ -89,6 +90,7 @@ export interface HostRef {
   hostListenerEventToMethodMap?: Map<string, string>;
   isActiveRender?: boolean;
   isConstructingInstance?: boolean;
+  hostElement?: d.HostElement;
   lazyInstance?: d.ComponentInstance;
   instanceValues?: Map<string, any>;
   isQueuedForUpdate?: boolean;
