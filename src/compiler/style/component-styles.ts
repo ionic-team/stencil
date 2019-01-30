@@ -151,7 +151,7 @@ function checkPluginHelper(config: d.Config, buildCtx: d.BuildCtx, externalStyle
   const msg = [
     `Style "${relPath}" is a ${pluginName} file, however the "${pluginId}" `,
     `plugin has not been installed. Please install the "@stencil/${pluginId}" `,
-    `plugin and add it to "config.plugins" within the project's stencil.config.js `,
+    `plugin and add it to "config.plugins" within the project's stencil config `,
     `file. For more info please see: https://www.npmjs.com/package/@stencil/${pluginId}`
   ].join('');
 
