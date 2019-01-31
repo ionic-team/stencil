@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getGlobalFileName, getRegistryFileName } from '../app/app-file-naming';
+import { getGlobalFileName, getRegistryFileName } from '../app-core/app-file-naming';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { sys } from '@sys';
 

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getAppBuildDir } from '../app/app-file-naming';
+import { getAppBuildDir } from '../app-core/app-file-naming';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
 

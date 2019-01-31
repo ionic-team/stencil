@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { GENERATED_DTS } from '../app/app-file-naming';
+import { GENERATED_DTS } from '../app-core/app-file-naming';
 import { logger, sys } from '@sys';
 import { normalizePath } from '@utils';
 

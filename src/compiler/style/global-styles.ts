@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { buildError, catchError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
-import { getGlobalStyleFilename } from '../app/app-file-naming';
+import { getGlobalStyleFilename } from '../app-core/app-file-naming';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { sys } from '@sys';

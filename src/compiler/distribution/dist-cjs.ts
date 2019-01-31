@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getDistCjsIndexPath } from '../app/app-file-naming';
+import { getDistCjsIndexPath } from '../app-core/app-file-naming';
 
 
 export async function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {

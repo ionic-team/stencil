@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { copyEsmCorePolyfills } from '../app/app-polyfills';
+import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
 // import { formatBrowserLoaderComponent } from '../../util/data-serialize';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from './output-file-naming';

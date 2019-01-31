@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
-import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
+import { getComponentsDtsSrcFilePath } from '../app-core/app-file-naming';
 import { getUserCompilerOptions } from './compiler-options';
 import { sys } from '@sys';
 

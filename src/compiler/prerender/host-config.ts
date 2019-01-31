@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getAppBuildDir, getBrowserFilename } from '../app/app-file-naming';
+import { getAppBuildDir, getBrowserFilename } from '../app-core/app-file-naming';
 import { sys } from '@sys';
 
 

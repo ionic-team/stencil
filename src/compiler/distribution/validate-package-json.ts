@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
-import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
+import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app-core/app-file-naming';
 import { sys } from '@sys';
 
 
