@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { activelyProcessingCmps, getHostRef, plt, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { initialLoad } from './initial-load';
+import { LISTENER_FLAGS } from '@utils';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
@@ -18,12 +19,12 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
       // have fired even before the instance is ready
-      cmpMeta.cmpHostListeners.forEach(hostListener => {
-        if (!hostListener[2]) {
-          (hostRef.hostListenerEventToMethodMap || (hostRef.hostListenerEventToMethodMap = new Map()))
-            .set(hostListener[0], hostListener[1]);
-
-          elm.addEventListener(hostListener[0], ev => hostListenerProxy(elm, ev), listenerOpts(hostListener));
+      cmpMeta.cmpHostListeners.forEach(([flags, name, method]) => {
+        if ((flags & LISTENER_FLAGS.Disabled) === 0) {
+          if (BUILD.lazyLoad) {
+            (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []));
+          }
+          getListenerTarget(elm, flags).addEventListener(name, hostListenerProxy(hostRef, method), listenerOpts(flags));
         }
       });
     }
@@ -78,29 +79,34 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
 };
 
 
-function hostListenerProxy(elm: d.HostElement, ev: Event) {
-  const hostRef = getHostRef(elm);
-  const hostListenerMethodName = hostRef.hostListenerEventToMethodMap.get(ev.type);
-
-  if (BUILD.lazyLoad) {
-    if (hostRef.lazyInstance) {
-      // instance is ready, let's call it's member method for this event
-      return hostRef.lazyInstance[hostListenerMethodName](ev);
+const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
+  return (ev: Event) => {
+    if (BUILD.lazyLoad) {
+      if (hostRef.lazyInstance) {
+        // instance is ready, let's call it's member method for this event
+        return hostRef.lazyInstance[methodName](ev);
+      } else {
+        hostRef.queuedReceivedHostEvents.push(methodName, ev);
+      }
+    } else {
+      return (hostRef.hostElement as any)[methodName](ev);
     }
+  };
+};
 
-  } else {
-    return (this as any)[hostListenerMethodName](ev);
-  }
+const getListenerTarget = (elm: Element, flags: number): EventTarget => {
+  if (flags & LISTENER_FLAGS.TargetDocument) return document;
+  if (flags & LISTENER_FLAGS.TargetWindow) return window;
+  if (flags & LISTENER_FLAGS.TargetBody) return document.body;
+  if (flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
+  if (flags & LISTENER_FLAGS.TargetChild) return elm.firstElementChild;
+  return elm;
+};
 
-  (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []))
-    .push(hostListenerMethodName, ev);
-}
-
-
-const listenerOpts = (hostListener: d.ComponentRuntimeHostListener) =>
+const listenerOpts = (flags: number) =>
   plt.supportsListenerOptions ?
     {
-      'passive': !!hostListener[3],
-      'capture': !!hostListener[4],
+      'passive': (flags & LISTENER_FLAGS.Passive) !== 0,
+      'capture': (flags & LISTENER_FLAGS.Capture) !== 0,
     }
-  : !!hostListener[4];
+  : (flags & LISTENER_FLAGS.Capture) !== 0;

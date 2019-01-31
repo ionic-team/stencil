@@ -240,6 +240,7 @@ function parseListeners(cmpData: d.ComponentDataDeprecated, cmpMeta: d.Component
     const listener: d.ComponentCompilerListener = {
       name: listenerData.event,
       method: listenerData.method,
+      target: undefined, // TODO
       passive: (listenerData.passive !== false),
       disabled: (listenerData.enabled === false),
       capture: (listenerData.capture !== false)

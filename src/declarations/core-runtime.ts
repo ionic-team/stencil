@@ -46,32 +46,22 @@ export type ComponentRuntimeMember = [
 ];
 
 
-export interface ComponentRuntimeHostListener {
+export type ComponentRuntimeHostListener = [
   /**
-   * event name (event type)
+   * event flags
    */
-  [0]: string;
+  number,
 
   /**
-   * class method to handle event
+   * event name,
    */
-  [1]: string;
+  string,
 
   /**
-   * disabled event
+   * event method,
    */
-  [2]?: boolean;
-
-  /**
-   * passive event option
-   */
-  [3]?: boolean;
-
-  /**
-   * capture event option
-   */
-  [4]?: boolean;
-}
+  string
+];
 
 
 export type ModeBundleId = ModeBundleIds | string;
@@ -87,7 +77,6 @@ export interface HostRef {
   ancestorHostElement?: d.HostElement;
   hasConnected?: boolean;
   hasRendered?: boolean;
-  hostListenerEventToMethodMap?: Map<string, string>;
   isActiveRender?: boolean;
   isConstructingInstance?: boolean;
   hostElement?: d.HostElement;

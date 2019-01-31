@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator } from '../transform-utils';
 import ts from 'typescript';
+import { buildError, buildWarn } from '@utils';
 
 
 export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
@@ -16,7 +17,7 @@ export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFil
 }
 
 
-function listenDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, listeners: any[], prop: ts.PropertyDeclaration) {
+function listenDecoratorToStatic(diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, listeners: any[], prop: ts.PropertyDeclaration) {
   const listenDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Listen'));
 
   if (listenDecorator == null) {
@@ -27,46 +28,48 @@ function listenDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts.
 
   const [ listenText, listenOptions ] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
 
-  listenText.split(',').forEach(eventName => {
+  const eventNames = listenText.split(',');
+  if (eventNames.length > 1) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = 'Deprecated @Listen() feature. Use multiple @Listen() decorators instead of comma-separated names.';
+  }
+
+  eventNames.forEach(eventName => {
     listeners.push(
-      validateListener(eventName.trim(), listenOptions, prop.name.getText())
+      validateListener(diagnostics, eventName.trim(), listenOptions, prop.name.getText())
     );
   });
 }
 
 
-export function validateListener(eventName: string, opts: d.ListenOptions = {}, methodName: string) {
+export function validateListener(diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string) {
   let rawEventName = eventName;
+  let target = opts.target;
 
-  let splt = eventName.split(':');
-
-  if (splt.length > 2) {
-    throw new Error(`@Listen can only contain one colon: ${eventName}`);
-  }
-
-  if (splt.length > 1) {
+  // DEPRECATED: handle old syntax (`TARGET:event`)
+  if (!target) {
+    const splt = eventName.split(':');
     const prefix = splt[0].toLowerCase().trim();
-    if (!isValidElementRefPrefix(prefix)) {
-      throw new Error(`invalid @Listen prefix "${prefix}" for "${eventName}"`);
+    if (splt.length > 1 && isValidTargetValue(prefix)) {
+      rawEventName = splt[1].trim();
+      target = prefix;
+      const warn = buildWarn(diagnostics);
+      warn.messageText = `Deprecated @Listen() feature. Use @Listen('${rawEventName}', { target: '${prefix}' }) instead.`;
     }
-    rawEventName = splt[1].toLowerCase().trim();
   }
 
-  splt = rawEventName.split('.');
-  if (splt.length > 2) {
-    throw new Error(`@Listen can only contain one period: ${eventName}`);
-  }
-  if (splt.length > 1) {
-    const suffix = splt[1].toLowerCase().trim();
-    if (!isValidKeycodeSuffix(suffix)) {
-      throw new Error(`invalid @Listen suffix "${suffix}" for "${eventName}"`);
-    }
-    rawEventName = splt[0].toLowerCase().trim();
+  // DEPRECATED: handle keycode syntax (`event:KEY`)
+  const [finalEvent, keycode, rest] = rawEventName.split('.');
+  if (rest === undefined && isValidKeycodeSuffix(keycode)) {
+    rawEventName = finalEvent;
+    const warn = buildError(diagnostics);
+    warn.messageText = `Deprecated @Listen() feature. Using key is not longer supported, use "event.key" instead.`;
   }
 
   const listenerMeta: d.ComponentCompilerListener = {
-    name: eventName,
+    name: rawEventName,
     method: methodName,
+    target,
     capture: (typeof opts.capture === 'boolean') ? opts.capture : false,
     passive: (typeof opts.passive === 'boolean') ? opts.passive :
       // if the event name is kown to be a passive event then set it to true
@@ -77,7 +80,7 @@ export function validateListener(eventName: string, opts: d.ListenOptions = {}, 
   return convertValueToLiteral(listenerMeta);
 }
 
-export function isValidElementRefPrefix(prefix: string) {
+export function isValidTargetValue(prefix: string): prefix is d.ListenTargetOptions  {
   return (VALID_ELEMENT_REF_PREFIXES.indexOf(prefix) > -1);
 }
 

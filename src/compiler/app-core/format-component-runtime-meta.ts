@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
+import { LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]) {
@@ -147,16 +147,34 @@ function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
 function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
   return compilerMeta.listeners.map(compilerListener => {
     const hostListener: d.ComponentRuntimeHostListener = [
+      computeListenerFlags(compilerListener),
       compilerListener.name,
       compilerListener.method,
-      shortBoolean(compilerListener.disabled),
-      shortBoolean(compilerListener.capture),
-      shortBoolean(compilerListener.passive)
     ];
-    return trimFalsy(hostListener);
+    return hostListener;
   });
 }
 
+function computeListenerFlags(listener: d.ComponentCompilerListener) {
+  let flags = 0;
+  if (listener.disabled) {
+    flags |= LISTENER_FLAGS.Disabled;
+  }
+  if (listener.capture) {
+    flags |= LISTENER_FLAGS.Capture;
+  }
+  if (listener.passive) {
+    flags |= LISTENER_FLAGS.Passive;
+  }
+  switch (listener.target) {
+    case 'document': flags |= LISTENER_FLAGS.TargetDocument; break;
+    case 'window': flags |= LISTENER_FLAGS.TargetWindow; break;
+    case 'parent': flags |= LISTENER_FLAGS.TargetParent; break;
+    case 'body': flags |= LISTENER_FLAGS.TargetBody; break;
+    case 'child': flags |= LISTENER_FLAGS.TargetChild; break;
+  }
+  return flags;
+}
 
 function shortBoolean(val: boolean) {
   return (val ? 1 : 0) as any;

@@ -94,9 +94,9 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
             // first item the eventMethodName
             // second item is the event data
             // take a look at hostEventListenerProxy()
-            (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any)[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
+            hostRef.lazyInstance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
           }
-          hostRef.queuedReceivedHostEvents = null;
+          hostRef.queuedReceivedHostEvents = undefined;
         }
 
       } catch (e) {

@@ -113,9 +113,10 @@ export interface ComponentCompilerEvent {
 export interface ComponentCompilerListener {
   name: string;
   method: string;
-  capture?: boolean;
-  disabled?: boolean;
-  passive?: boolean;
+  capture: boolean;
+  disabled: boolean;
+  passive: boolean;
+  target: d.ListenTargetOptions | undefined;
 }
 
 export interface ComponentCompilerStaticMethod {

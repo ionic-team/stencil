@@ -193,7 +193,7 @@ export class MockElement extends MockNode {
   }
 
   click() {
-    dispatchEvent(this, new MockEvent('click'));
+    dispatchEvent(this, new MockEvent('click', { bubbles: true, cancelable: true, composed: true }));
   }
 
   cloneNode(deep?: boolean) {

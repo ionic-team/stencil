@@ -64,11 +64,14 @@ export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
 export interface ListenOptions {
+  target?: ListenTargetOptions;
   eventName?: string;
   capture?: boolean;
   passive?: boolean;
   enabled?: boolean;
 }
+
+export type ListenTargetOptions = 'child' | 'parent' | 'body' | 'document' | 'window';
 
 
 export interface StateDecorator {

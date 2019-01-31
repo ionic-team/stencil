@@ -20,9 +20,22 @@ export const enum MEMBER_FLAGS {
 }
 
 export const enum EVENT_FLAGS {
-  Bubbles = 1 << 1,
-  Composed = 1 << 2,
-  Cancellable = 1 << 3,
+  Cancellable = 1 << 0,
+  Composed = 1 << 1,
+  Bubbles = 1 << 2,
+}
+
+
+export const enum LISTENER_FLAGS {
+  Passive = 1 << 0,
+  Disabled = 1 << 1,
+  Capture = 1 << 2,
+
+  TargetDocument = 1 << 3,
+  TargetWindow = 1 << 4,
+  TargetParent = 1 << 5,
+  TargetBody = 1 << 6,
+  TargetChild = 1 << 7,
 }
 
 
