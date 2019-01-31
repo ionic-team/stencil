@@ -24,7 +24,7 @@ async function bundleDevServerClient() {
   });
 
   const { output } = await rollupBuild.generate({
-    format: 'es',
+    format: 'esm',
 
     banner: [
       '<meta charset="utf-8">',

@@ -94,16 +94,6 @@ async function bundleCompiler() {
 async function buildUtils() {
   const build = await rollup.rollup({
     input: path.join(TRANSPILED_DIR, 'utils', 'index.js'),
-    external: [
-      'buffer',
-      'crypto',
-      'module',
-      'path',
-      'fs',
-      'os',
-      'typescript',
-      '../sys/node'
-    ],
     plugins: [
       (() => {
         return {
@@ -127,7 +117,7 @@ async function buildUtils() {
 
   await Promise.all([
     build.write({
-      format: 'es',
+      format: 'esm',
       file: path.join(UTILS_DIST_DIR, 'index.mjs')
     }),
     build.write({

@@ -44,7 +44,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
   });
 
   const { output } = await rollupBuild.generate({
-    format: 'es'
+    format: 'esm'
   });
 
   const transpile = ts.transpileModule(output[0].code, {

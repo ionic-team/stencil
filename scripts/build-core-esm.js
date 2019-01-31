@@ -13,7 +13,7 @@ async function buildCoreEsm(inputFile, outputFile) {
   });
 
   const { output } = await rollupBuild.generate({
-    format: 'es'
+    format: 'esm'
   });
 
   let code = output[0].code.trim();
