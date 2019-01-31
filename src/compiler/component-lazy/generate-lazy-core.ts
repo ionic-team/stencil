@@ -20,7 +20,7 @@ export async function generateLazyAppCore(config: d.Config, compilerCtx: d.Compi
 
 async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, _build: d.Build) {
   const appCoreEntryFileName = `${config.fsNamespace}-lazy.mjs`;
-  const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
+  const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
 

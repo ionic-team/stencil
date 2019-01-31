@@ -15,20 +15,36 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 
 async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const appCoreEntryFileName = `${config.fsNamespace}-native.mjs`;
-  const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
+  const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
-  const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
+  const nativeCmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
-  coreText.push(`import { proxyComponent, registerHost } from '@stencil/core/runtime';`);
+  const runtimeImports: string[] = [];
+  const platformImports: string[] = [];
 
-  cmpData.forEach(cmpData => {
+  runtimeImports.push('createEvent');
+  runtimeImports.push('getConnect');
+  runtimeImports.push('getElement');
+  runtimeImports.push('h');
+  runtimeImports.push('proxyComponent');
+  runtimeImports.push('registerHost');
+
+  platformImports.push('getContext');
+  platformImports.push('registerInstance');
+  platformImports.push('registerStyle');
+
+  coreText.push(`import { ${runtimeImports.join(', ')} } from '@stencil/core/runtime';`);
+
+  coreText.push(`import { ${platformImports.join(', ')} } from '@stencil/core/platform';`);
+
+  nativeCmps.forEach(cmpData => {
     coreText.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
   });
 
-  if (cmpData.length === 1) {
+  if (nativeCmps.length === 1) {
     // only one component, so get straight to the point
-    const cmp = cmpData[0];
+    const cmp = nativeCmps[0];
     const runtimeData = formatComponentRuntimeMeta(cmp.cmp, false);
 
     coreText.push(`customElements.define('${cmp.tagName}', proxyComponent(
@@ -40,25 +56,9 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
 
   } else {
     // numerous components, so make it easy on minifying
-    coreText.push(formatNativeComponentRuntimeData(cmpData));
+    coreText.push(formatNativeComponentRuntimeData(nativeCmps));
     coreText.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
   }
-
-  const runtimeExports: string[] = [];
-  const platformExports: string[] = [];
-
-  runtimeExports.push('createEvent');
-  runtimeExports.push('getConnect');
-  runtimeExports.push('getElement');
-  runtimeExports.push('h');
-
-  platformExports.push('getContext');
-  platformExports.push('registerInstance');
-  platformExports.push('registerStyle');
-
-  coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
-
-  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   const cmpsWithStyles = cmps.filter(cmp => cmp.styles.length > 0);
   if (cmpsWithStyles.length > 0) {
