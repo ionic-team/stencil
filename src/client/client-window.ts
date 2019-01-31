@@ -40,3 +40,7 @@ if (BUILD.hostListener) {
     );
   } catch (e) {}
 }
+
+export const onAppReadyCallbacks: any[] = [];
+
+export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = (BUILD.exposeAppOnReady ? new Set() : undefined);

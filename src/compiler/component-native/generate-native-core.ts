@@ -20,7 +20,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   const coreText: string[] = [];
   const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
-  coreText.push(`import { proxyComponent } from '@stencil/core/runtime';`);
+  coreText.push(`import { proxyComponent, registerHost } from '@stencil/core/runtime';`);
 
   cmpData.forEach(cmpData => {
     coreText.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
@@ -52,7 +52,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   runtimeExports.push('h');
 
   platformExports.push('getContext');
-  platformExports.push('registerLazyInstance');
+  platformExports.push('registerInstance');
   platformExports.push('registerStyle');
 
   coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);

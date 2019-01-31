@@ -50,8 +50,14 @@ export function resetPlatform() {
 export const getHostRef = (elm: d.RuntimeRef) =>
   hostRefs.get(elm);
 
-export const registerLazyInstance = (lazyInstance: any, hostRef: d.HostRef) =>
+export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
+
+export const registerHost = (elm: d.HostElement) =>
+  hostRefs.set(elm, {
+    hostElement: elm,
+    instanceValues: new Map(),
+  });
 
 export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);
 

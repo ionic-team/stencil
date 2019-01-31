@@ -1,5 +1,6 @@
-import { readTask, tick, writeTask } from './client-task-queue';
 import { doc, win } from './client-window';
+import { readTask, tick, writeTask } from './client-task-queue';
+
 
 const Context = {
   window: win,

@@ -1,6 +1,6 @@
 
 export * from './client-context';
-export * from './client-data';
+export * from './client-host-ref';
 export * from './client-load-module';
 export * from './client-log';
 export * from './client-style';

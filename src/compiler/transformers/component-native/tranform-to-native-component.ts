@@ -69,7 +69,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
       const importFns = [
         'connectedCallback',
         'h',
-        'registerLazyInstance',
+        'registerInstance',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',

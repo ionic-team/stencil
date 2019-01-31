@@ -8,15 +8,15 @@ export function registerLazyComponentInConstructor(classMembers: ts.ClassElement
     ts.createIdentifier('elmData')
   ];
 
-  const registerLazyInstanceMethodArgs: any = [
+  const registerInstanceMethodArgs: any = [
     ts.createThis(),
     ts.createIdentifier('elmData')
   ];
 
-  const registerLazyInstanceMethod = ts.createCall(
-    ts.createIdentifier('registerLazyInstance'),
+  const registerInstanceMethod = ts.createCall(
+    ts.createIdentifier('registerInstance'),
     undefined,
-    registerLazyInstanceMethodArgs
+    registerInstanceMethodArgs
   );
 
   if (cstrMethodIndex > -1) {
@@ -28,14 +28,14 @@ export function registerLazyComponentInConstructor(classMembers: ts.ClassElement
       cstrMethod.modifiers,
       cstrMethodArgs,
       ts.updateBlock(cstrMethod.body, [
-        ts.createExpressionStatement(registerLazyInstanceMethod),
+        ts.createExpressionStatement(registerInstanceMethod),
         ...cstrMethod.body.statements
       ])
     );
 
   } else {
     const body = ts.createBlock([
-      ts.createExpressionStatement(registerLazyInstanceMethod)
+      ts.createExpressionStatement(registerInstanceMethod)
     ], true);
 
     const cstrMethod = ts.createConstructor(

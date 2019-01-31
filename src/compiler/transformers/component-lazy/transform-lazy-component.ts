@@ -70,7 +70,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
 
       const importFns = [
         'h',
-        'registerLazyInstance',
+        'registerInstance',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',

@@ -1,8 +1,8 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected';
-import { hostRefs, tick } from '@platform';
 import { disconnectedCallback } from './disconnected';
+import { hostRefs, registerHost, tick } from '@platform';
 import { initialLoad } from './initial-load';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
@@ -21,10 +21,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
         // StencilLazyHost
         constructor() {
           super();
-          hostRefs.set(this, {
-            hostElement: this,
-            instanceValues: new Map(),
-          });
+          registerHost(this);
         }
 
         connectedCallback() {

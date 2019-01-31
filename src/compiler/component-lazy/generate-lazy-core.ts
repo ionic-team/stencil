@@ -36,7 +36,7 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   runtimeExports.push('h');
 
   platformExports.push('getContext');
-  platformExports.push('registerLazyInstance');
+  platformExports.push('registerInstance');
   platformExports.push('registerStyle');
 
 
