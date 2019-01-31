@@ -37,16 +37,16 @@ async function generateCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
   const relPath = sys.path.relative(config.srcDir, moduleFile.jsFilePath);
   const jsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
 
-  const promises = outputTargets.map(async outputTarget => {
-    await writeCollectionOutput(compilerCtx, outputTarget, cmp, relPath, jsText);
+  const promises = outputTargets.map(outputTarget => {
+    return writeCollectionOutput(compilerCtx, outputTarget, cmp, relPath, jsText);
   });
 
-  await Promise.all(promises);
+  return Promise.all(promises);
 }
 
 
-async function writeCollectionOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, _cmp: d.ComponentCompilerMeta, relPath: string, outputText: string) {
+function writeCollectionOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, _cmp: d.ComponentCompilerMeta, relPath: string, outputText: string) {
   const outputFilePath = sys.path.join(outputTarget.collectionDir, relPath);
 
-  await compilerCtx.fs.writeFile(outputFilePath, outputText);
+  return compilerCtx.fs.writeFile(outputFilePath, outputText);
 }

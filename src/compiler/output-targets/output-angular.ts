@@ -19,8 +19,8 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
 
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
-  const promises = outputTargets.map(async outputTarget => {
-    await angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles);
+  const promises = outputTargets.map(outputTarget => {
+    return angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles);
   });
 
   await Promise.all(promises);

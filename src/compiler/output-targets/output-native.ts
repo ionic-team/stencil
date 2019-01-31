@@ -1,13 +1,12 @@
 import * as d from '@declarations';
-import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateNativeAppCore } from '../component-native/generate-native-core';
-import { getAllModes, replaceStylePlaceholders } from '../app-core/register-app-styles';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { MIN_FOR_LAZY_LOAD } from './output-lazy-load';
-import { sys } from '@sys';
+import { writeNativeBundled } from '../component-native/write-native-bundled';
+import { writeNativeSelfContained } from '../component-native/write-native-self-contained';
 
 
-export async function generateWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function generateNative(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
@@ -55,7 +54,7 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
       const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, appCmps);
 
       if (!buildCtx.shouldAbort && typeof outputText === 'string') {
-        await writeSelfContainedWebComponentModes(compilerCtx, outputTargets, appCmps, outputText);
+        await writeNativeSelfContained(compilerCtx, outputTargets, appCmps, outputText);
       }
     });
     promises.push(...p);
@@ -84,14 +83,14 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
     await buildCtx.stylesPromise;
 
-    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, rollupResults);
+    await writeNativeBundled(config, compilerCtx, outputTargets, cmps, rollupResults);
   }
 
   timespan.finish(`generate self-contained web components finished`);
 }
 
 
-async function generateWebComponentCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
+function generateWebComponentCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
   const build = getBuildFeatures(cmps) as d.Build;
 
   build.lazyLoad = false;
@@ -103,71 +102,5 @@ async function generateWebComponentCore(config: d.Config, compilerCtx: d.Compile
 
   updateBuildConditionals(config, build);
 
-  return await generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build);
-}
-
-
-async function writeSelfContainedWebComponentModes(compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
-  const promises: Promise<any>[] = [];
-
-  const allModes = getAllModes(cmps);
-
-  allModes.forEach(modeName => {
-    const modeOutputText = replaceStylePlaceholders(cmps, modeName, outputText);
-
-    cmps.forEach(cmp => {
-      outputTargets.forEach(outputTarget => {
-        promises.push(
-          writeSelfContainedWebComponentModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName)
-        );
-      });
-    });
-  });
-
-  await Promise.all(promises);
-}
-
-
-async function writeSelfContainedWebComponentModeOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
-  let fileName = `${cmpMeta.tagName}`;
-  if (modeName !== DEFAULT_STYLE_MODE) {
-    fileName += `.${modeName}`;
-  }
-  fileName += `.js`;
-
-  const filePath = sys.path.join(outputTarget.dir, fileName);
-
-  await compilerCtx.fs.writeFile(filePath, modeOutputText);
-}
-
-
-async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], rollupResults: d.RollupResult[]) {
-  const allModes = getAllModes(cmps);
-
-  const promises: Promise<any>[] = [];
-
-  allModes.forEach(modeName => {
-    rollupResults.forEach(rollupResult => {
-      outputTargets.map(outputTarget => {
-        promises.push(
-          writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, rollupResult, modeName)
-        );
-      });
-    });
-  });
-
-  await Promise.all(promises);
-}
-
-
-async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, rollupResult: d.RollupResult, modeName: string) {
-  let fileName = config.fsNamespace;
-  if (modeName !== DEFAULT_STYLE_MODE) {
-    fileName += `.${modeName.toLowerCase()}`;
-  }
-  fileName += `.js`;
-
-  const filePath = sys.path.join(outputTarget.buildDir, fileName);
-
-  await compilerCtx.fs.writeFile(filePath, rollupResult.code);
+  return generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build);
 }

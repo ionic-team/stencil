@@ -17,8 +17,8 @@ export async function generateCommonJsIndexes(config: d.Config, compilerCtx: d.C
 
   const timespan = buildCtx.createTimeSpan(`generate commonjs started`, true);
 
-  const promises = outputsTargets.map(async outputsTarget => {
-    await generateCommonJsIndex(config, compilerCtx, outputsTarget);
+  const promises = outputsTargets.map(outputsTarget => {
+    return generateCommonJsIndex(config, compilerCtx, outputsTarget);
   });
 
   await Promise.all(promises);
@@ -27,15 +27,15 @@ export async function generateCommonJsIndexes(config: d.Config, compilerCtx: d.C
 }
 
 
-async function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const outputText = `// ${config.namespace}: CommonJS Main`;
 
-  await writeCommonJsOutput(compilerCtx, outputTarget, outputText);
+  return writeCommonJsOutput(compilerCtx, outputTarget, outputText);
 }
 
 
-async function writeCommonJsOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
+function writeCommonJsOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
   const distIndexCjsPath = sys.path.join(outputTarget.buildDir, 'index.js');
 
-  await compilerCtx.fs.writeFile(distIndexCjsPath, outputText);
+  return compilerCtx.fs.writeFile(distIndexCjsPath, outputText);
 }

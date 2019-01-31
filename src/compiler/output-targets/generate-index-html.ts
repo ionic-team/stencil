@@ -19,8 +19,8 @@ export async function generateIndexHtmls(config: d.Config, compilerCtx: d.Compil
 
   const timespan = buildCtx.createTimeSpan(`generate index.html started`, true);
 
-  const promises = outputTargets.map(async outputTarget => {
-    await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+  const promises = outputTargets.map(outputTarget => {
+    return generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   });
 
   await Promise.all(promises);
@@ -46,7 +46,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     try {
       indexSrcHtml = await updateIndexHtmlServiceWorker(config, buildCtx, outputTarget, indexSrcHtml);
 
-      await writeIndexHtmlOutput(compilerCtx, outputTarget, indexSrcHtml);
+      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
 
       buildCtx.debug(`generateIndexHtml, write: ${sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
@@ -58,9 +58,4 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // it's ok if there's no index file
     buildCtx.debug(`no index html: ${config.srcIndexHtml}`);
   }
-}
-
-
-async function writeIndexHtmlOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string) {
-  await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
 }

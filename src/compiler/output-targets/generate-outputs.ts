@@ -6,7 +6,7 @@ import { generateEsmIndexes } from './output-esm';
 import { generateIndexHtmls } from './generate-index-html';
 import { generateLazyLoads } from './output-lazy-load';
 import { generateStyles } from '../style/generate-styles';
-import { generateWebComponents } from './output-webcomponent';
+import { generateNative } from './output-native';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -29,7 +29,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     generateEsmIndexes(config, compilerCtx, buildCtx),
     generateIndexHtmls(config, compilerCtx, buildCtx),
     generateLazyLoads(config, compilerCtx, buildCtx),
-    generateWebComponents(config, compilerCtx, buildCtx),
+    generateNative(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];
 

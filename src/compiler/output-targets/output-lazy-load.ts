@@ -1,7 +1,8 @@
 import * as d from '@declarations';
-import { generateLazyAppCore, writeLazyAppCoreOutput } from '../component-lazy/generate-lazy-core';
-import { generateLazyBundleModules } from '../component-lazy/generate-lazy-output-files';
+import { generateLazyAppCore } from '../component-lazy/generate-lazy-core';
+import { generateLazyBundleModules } from '../component-lazy/generate-lazy-output';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
 
 
 export async function generateLazyLoads(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -42,7 +43,7 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
 
     const bundleModules = await generateLazyBundleModules(config, compilerCtx, buildCtx, outputTargets, rollupResults);
 
-    await writeLazyAppCoreOutput(config, compilerCtx, buildCtx, outputTargets, build, rollupResults, bundleModules);
+    await writeLazyAppCore(config, compilerCtx, buildCtx, outputTargets, build, rollupResults, bundleModules);
   }
 
   timespan.finish(`generate app lazy components finished`);

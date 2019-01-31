@@ -55,9 +55,9 @@ async function generateLazyBundleModuleOutput(config: d.Config, compilerCtx: d.C
     modeName: modeName,
   };
 
-  const promises = outputTargets.map(async outputTarget => {
+  const promises = outputTargets.map(outputTarget => {
     const filePath = sys.path.join(outputTarget.buildDir, output.fileName);
-    await compilerCtx.fs.writeFile(filePath, output.code);
+    return compilerCtx.fs.writeFile(filePath, output.code);
   });
 
   await Promise.all(promises);
