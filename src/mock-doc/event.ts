@@ -103,7 +103,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
     const listeners = target._listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
       try {
-        listener.handler(ev);
+        listener.handler.call(target, ev);
       } catch (err) {
         console.error(err);
       }

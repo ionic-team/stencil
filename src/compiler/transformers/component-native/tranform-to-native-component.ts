@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerConstructor } from '../register-constructor';
 import { registerStyle } from '../register-style';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
+import { getEventStatements, updateConstructor } from '../register-constructor';
 
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
@@ -66,17 +66,20 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      const importFns = [
-        'connectedCallback',
+      const runtimeImports = [
         'h',
-        'registerInstance',
+        'connectedCallback',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
         'createEvent as __stencil_createEvent'
       ];
+      const platformImports = [
+        'registerHost as __stencil_registerHost',
+      ];
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/runtime');
+      tsSourceFile = addImports(transformCtx, tsSourceFile, runtimeImports, '@stencil/core/runtime');
+      tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');
 
       if (moduleFile != null) {
         tsSourceFile = registerStyle(transformCtx, tsSourceFile, moduleFile.cmps);
@@ -117,10 +120,22 @@ function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.Compo
 
   addSuperToConstructor(classMembers);
   addConnectedCallback(classMembers);
-  registerConstructor(classMembers, cmp);
   registerElementGetter(classMembers, cmp);
 
+  // TODO, before needs to be added AFTEr super()
+  updateConstructor(classMembers, [], [
+    ...getEventStatements(cmp)
+  ]);
+
   return classMembers;
+}
+
+function registerHostStatement() {
+  return ts.createStatement(ts.createCall(
+    ts.createIdentifier('__stencil_registerHost'),
+    undefined,
+    [ ts.createThis() ]
+  ));
 }
 
 
@@ -138,6 +153,7 @@ function addSuperToConstructor(classMembers: ts.ClassElement[]) {
 
     cstrMethod.body = ts.updateBlock(cstrMethod.body, [
       ts.createExpressionStatement(superCall),
+      registerHostStatement(),
       ...cstrMethod.body.statements
     ]);
   }

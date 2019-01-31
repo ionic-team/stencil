@@ -1,8 +1,8 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerLazyComponentInConstructor } from './register-lazy-constructor';
-import { registerConstructor } from '../register-constructor';
+import { registerInstanceStatement, updateLazyComponentConstructor } from './register-lazy-constructor';
+import { getEventStatements, updateConstructor } from '../register-constructor';
 import { registerLazyElementGetter } from './register-lazy-element-getter';
 import { registerStyle } from '../register-style';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
@@ -70,7 +70,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
 
       const importFns = [
         'h',
-        'registerInstance',
+        'registerInstance as __stencil_registerInstance',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
@@ -105,9 +105,13 @@ function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCo
 function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  registerLazyComponentInConstructor(classMembers);
+  updateLazyComponentConstructor(classMembers);
   registerLazyElementGetter(classMembers, cmp);
-  registerConstructor(classMembers, cmp);
+  updateConstructor(classMembers, [
+    registerInstanceStatement()
+  ], [
+    ...getEventStatements(cmp)
+  ]);
 
   return classMembers;
 }

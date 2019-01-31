@@ -89,7 +89,6 @@ export interface HostRef {
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;
   useNativeShadowDom?: boolean;
-  vdomListeners?: Map<string, Function>;
   vnode?: d.VNode;
   watchCallbacks?: Map<string, string[]>;
 }

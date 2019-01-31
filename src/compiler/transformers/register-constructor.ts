@@ -2,13 +2,8 @@ import ts from 'typescript';
 import * as d from '@declarations';
 import { EVENT_FLAGS } from '@utils';
 
-export function registerConstructor(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
-
-  const statements = [
-    ...getEventStatements(cmpMeta),
-  ];
-
-  if (statements.length === 0) {
+export function updateConstructor(classMembers: ts.ClassElement[], before: ts.Statement[], after: ts.Statement[]) {
+  if (before.length + after.length === 0) {
     return;
   }
 
@@ -21,12 +16,23 @@ export function registerConstructor(classMembers: ts.ClassElement[], cmpMeta: d.
       cstrMethod.modifiers,
       cstrMethod.parameters,
       ts.updateBlock(cstrMethod.body, [
+        ...before,
         ...cstrMethod.body.statements,
-        ...statements
+        ...after
       ])
     );
+  } else {
+    const cstrMethod = ts.createConstructor(
+      undefined,
+      undefined,
+      undefined,
+      ts.createBlock([
+        ...before,
+        ...after
+      ], true)
+    );
+    classMembers.unshift(cstrMethod);
   }
-
 }
 
 export function getEventStatements(cmpMeta: d.ComponentCompilerMeta) {

@@ -1,49 +1,45 @@
 import ts from 'typescript';
 
+const HOST_REF_ARG = 'hostRef';
 
-export function registerLazyComponentInConstructor(classMembers: ts.ClassElement[]) {
+export function updateLazyComponentConstructor(classMembers: ts.ClassElement[]) {
+  const cstrMethodArgs = [
+    ts.createParameter(
+      undefined,
+      undefined,
+      undefined,
+      ts.createIdentifier(HOST_REF_ARG)
+    )
+  ];
+
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
-
-  const cstrMethodArgs: any = [
-    ts.createIdentifier('elmData')
-  ];
-
-  const registerInstanceMethodArgs: any = [
-    ts.createThis(),
-    ts.createIdentifier('elmData')
-  ];
-
-  const registerInstanceMethod = ts.createCall(
-    ts.createIdentifier('registerInstance'),
-    undefined,
-    registerInstanceMethodArgs
-  );
-
-  if (cstrMethodIndex > -1) {
+  if (cstrMethodIndex >= 0) {
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
-
     classMembers[cstrMethodIndex] = ts.updateConstructor(
       cstrMethod,
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethodArgs,
-      ts.updateBlock(cstrMethod.body, [
-        ts.createExpressionStatement(registerInstanceMethod),
-        ...cstrMethod.body.statements
-      ])
+      cstrMethod.body,
     );
-
   } else {
-    const body = ts.createBlock([
-      ts.createExpressionStatement(registerInstanceMethod)
-    ], true);
-
     const cstrMethod = ts.createConstructor(
       undefined,
       undefined,
       cstrMethodArgs,
-      body
+      ts.createBlock([], true),
     );
     classMembers.unshift(cstrMethod);
   }
+}
+
+export function registerInstanceStatement() {
+  return ts.createStatement(ts.createCall(
+    ts.createIdentifier('__stencil_registerInstance'),
+    undefined,
+    [
+      ts.createThis(),
+      ts.createIdentifier(HOST_REF_ARG)
+    ]
+  ));
 }

@@ -28,10 +28,9 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   runtimeImports.push('getElement');
   runtimeImports.push('h');
   runtimeImports.push('proxyComponent');
-  runtimeImports.push('registerHost');
 
   platformImports.push('getContext');
-  platformImports.push('registerInstance');
+  platformImports.push('registerHost');
   platformImports.push('registerStyle');
 
   coreText.push(`import { ${runtimeImports.join(', ')} } from '@stencil/core/runtime';`);

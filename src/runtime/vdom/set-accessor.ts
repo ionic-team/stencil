@@ -9,9 +9,9 @@
 
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { getHostRef } from '@platform';
 import { toLowerCase } from '@utils';
 
+const vdomListenersMap = new WeakMap<HTMLElement, Map<string, Function>>();
 
 export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean) => {
   if (BUILD.vdomKey && memberName === 'key') {
@@ -89,19 +89,20 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       memberName = toLowerCase(memberName[2]) + memberName.substring(3);
     }
 
-    const elmData = getHostRef(elm);
-
+    let vdomListeners = vdomListenersMap.get(elm);
     if (newValue) {
-      (elmData.vdomListeners || (elmData.vdomListeners = new Map()))
-        .set(memberName, newValue);
+      if (!vdomListeners) {
+        vdomListenersMap.set(elm, vdomListeners = new Map());
+      }
+      vdomListeners.set(memberName, newValue);
 
       if (!oldValue) {
         elm.addEventListener(memberName, vdomListenerProxy);
       }
 
-    } else if (BUILD.updatable && elmData.vdomListeners) {
-      elmData.vdomListeners.delete(memberName);
-      if (!elmData.vdomListeners.size) {
+    } else if (BUILD.updatable && vdomListeners) {
+      vdomListeners.delete(memberName);
+      if (vdomListeners.size === 0) {
         elm.removeEventListener(memberName, vdomListenerProxy);
       }
     }
@@ -165,5 +166,5 @@ const setProperty = (elm: any, propName: string, newValue: any) => {
 
 
 function vdomListenerProxy(this: d.HostElement, ev: Event) {
-  return getHostRef(this).vdomListeners.get(ev.type)(ev);
+  return vdomListenersMap.get(this).get(ev.type)(ev);
 }
