@@ -217,6 +217,7 @@ export namespace JSXElements {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onClose?: (event: Event) => string | void;
     open?: boolean;
     returnValue?: string;
   }
