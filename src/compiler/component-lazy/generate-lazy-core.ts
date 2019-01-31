@@ -10,8 +10,6 @@ export async function generateLazyAppCore(config: d.Config, compilerCtx: d.Compi
 
   const bundleEntryInputs: d.BundleEntryInputs = {};
 
-  bundleEntryInputs[config.fsNamespace] = appCoreEntryFilePath;
-
   buildCtx.entryModules.forEach(entryModule => {
     bundleEntryInputs[entryModule.entryKey] = entryModule.entryKey;
   });
@@ -28,10 +26,6 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   const runtimeExports: string[] = [];
   const platformExports: string[] = [];
 
-  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
-
-  coreText.push(`bootstrapLazy([]);`);
-
   runtimeExports.push('createEvent');
   runtimeExports.push('getConnect');
   runtimeExports.push('getElement');
@@ -40,6 +34,9 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   platformExports.push('getContext');
   platformExports.push('registerLazyInstance');
   platformExports.push('registerStyle');
+
+  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
+  coreText.push(`bootstrapLazy([]);`);
 
   if (platformExports.length > 0) {
     coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);

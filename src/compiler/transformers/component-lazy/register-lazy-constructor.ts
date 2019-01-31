@@ -14,7 +14,7 @@ export function registerLazyComponentInConstructor(classMembers: ts.ClassElement
   ];
 
   const registerLazyInstanceMethod = ts.createCall(
-    ts.createIdentifier(REGISTER_INSTANCE_METHOD),
+    ts.createIdentifier('registerLazyInstance'),
     undefined,
     registerLazyInstanceMethodArgs
   );
@@ -47,6 +47,3 @@ export function registerLazyComponentInConstructor(classMembers: ts.ClassElement
     classMembers.unshift(cstrMethod);
   }
 }
-
-
-export const REGISTER_INSTANCE_METHOD = `registerLazyInstance`;

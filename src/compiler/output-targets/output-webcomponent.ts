@@ -79,10 +79,12 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
     return cmps;
   }, [] as d.ComponentCompilerMeta[]);
 
-  const bundleOutputs = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
+  const rollupResults = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
 
-  if (Array.isArray(bundleOutputs) && !buildCtx.shouldAbort) {
-    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, bundleOutputs);
+  if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
+    await buildCtx.stylesPromise;
+
+    await writeBundledWebComponentModes(config, compilerCtx, outputTargets, cmps, rollupResults);
   }
 
   timespan.finish(`generate self-contained web components finished`);
@@ -114,7 +116,7 @@ async function writeSelfContainedWebComponentModes(compilerCtx: d.CompilerCtx, o
     const modeOutputText = replaceStylePlaceholders(cmps, modeName, outputText);
 
     cmps.forEach(cmp => {
-      outputTargets.forEach(async outputTarget => {
+      outputTargets.forEach(outputTarget => {
         promises.push(
           writeSelfContainedWebComponentModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName)
         );
@@ -139,16 +141,18 @@ async function writeSelfContainedWebComponentModeOutput(compilerCtx: d.CompilerC
 }
 
 
-async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], _bundleOutputs: d.RollupResult[]) {
+async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], rollupResults: d.RollupResult[]) {
   const allModes = getAllModes(cmps);
 
   const promises: Promise<any>[] = [];
 
   allModes.forEach(modeName => {
-    outputTargets.map(async outputTarget => {
-      promises.push(
-        writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, modeName, modeName)
-      );
+    rollupResults.forEach(rollupResult => {
+      outputTargets.map(outputTarget => {
+        promises.push(
+          writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, rollupResult, modeName)
+        );
+      });
     });
   });
 
@@ -156,8 +160,8 @@ async function writeBundledWebComponentModes(config: d.Config, compilerCtx: d.Co
 }
 
 
-async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, modeOutputText: string, modeName: string) {
-  let fileName = `${config.fsNamespace}`;
+async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, rollupResult: d.RollupResult, modeName: string) {
+  let fileName = config.fsNamespace;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName.toLowerCase()}`;
   }
@@ -165,5 +169,5 @@ async function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx:
 
   const filePath = sys.path.join(outputTarget.buildDir, fileName);
 
-  await compilerCtx.fs.writeFile(filePath, modeOutputText);
+  await compilerCtx.fs.writeFile(filePath, rollupResult.code);
 }

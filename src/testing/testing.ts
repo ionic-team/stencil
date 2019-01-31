@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { getLoaderPath } from '../compiler/app/app-file-naming';
 import { hasError } from '@utils';
 import { logger, sys } from '@sys';
 import { runJest } from './jest/jest-runner';
@@ -183,7 +182,7 @@ function getOutputTarget(config: d.Config) {
 
 
 function getLoaderScriptUrl(config: d.Config, outputTarget: d.OutputTargetWww, browserUrl: string) {
-  const appLoaderFilePath = getLoaderPath(config, outputTarget);
+  const appLoaderFilePath = 'getLoaderPath(config, outputTarget)';
 
   let appLoadUrlPath: string;
 

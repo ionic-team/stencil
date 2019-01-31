@@ -11,7 +11,7 @@ import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencie
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
   const rollupResults: d.RollupResult[] = [];
 
-  bundleEntryInputs[`${config.fsNamespace}`] = appCoreEntryFilePath;
+  bundleEntryInputs[config.fsNamespace] = appCoreEntryFilePath;
 
   try {
     const rollupOptions: RollupOptions = {

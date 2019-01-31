@@ -13,14 +13,27 @@ export async function generateNativeAppCore(config: d.Config, compilerCtx: d.Com
 }
 
 
-export async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
+async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const appCoreEntryFileName = `${config.fsNamespace}-native.mjs`;
   const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
+  const runtimeExports: string[] = [];
+  const platformExports: string[] = [];
 
-  coreText.push(`// ${appCoreEntryFileName}`);
-  coreText.push(`import { proxyComponent } from '@stencil/core/runtime';`);
+  runtimeExports.push('createEvent');
+  runtimeExports.push('getConnect');
+  runtimeExports.push('getElement');
+  runtimeExports.push('h');
+  runtimeExports.push('proxyComponent');
+
+  platformExports.push('getContext');
+  platformExports.push('registerLazyInstance');
+  platformExports.push('registerStyle');
+
+  coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
+
+  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
@@ -53,7 +66,7 @@ export async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: 
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 
-  return appCoreEntryFileName;
+  return appCoreEntryFilePath;
 }
 
 

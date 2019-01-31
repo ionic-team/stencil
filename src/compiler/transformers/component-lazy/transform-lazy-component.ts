@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { REGISTER_INSTANCE_METHOD, registerLazyComponentInConstructor } from './register-lazy-constructor';
+import { registerLazyComponentInConstructor } from './register-lazy-constructor';
 import { registerConstructor } from '../register-constructor';
 import { registerLazyElementGetter } from './register-lazy-element-getter';
 import { registerStyle } from '../register-styles';
@@ -68,16 +68,16 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      const importFnNames = [
-        REGISTER_INSTANCE_METHOD,
+      const importFns = [
         'h',
+        'registerLazyInstance',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
         'createEvent as __stencil_createEvent'
       ];
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, importFnNames, '@stencil/core/app');
+      tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');
 
       if (moduleFile != null) {
         tsSourceFile = registerStyle(transformCtx, tsSourceFile, moduleFile.cmps);

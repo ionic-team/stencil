@@ -66,7 +66,15 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      const importFns = ['connectedCallback', 'h'];
+      const importFns = [
+        'connectedCallback',
+        'h',
+        'registerLazyInstance',
+        'getElement as __stencil_getElement',
+        'getConnect as __stencil_getConnect',
+        'getContext as __stencil_getContext',
+        'createEvent as __stencil_createEvent'
+      ];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/runtime');
 
