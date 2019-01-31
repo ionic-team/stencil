@@ -18,24 +18,9 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
-  const runtimeExports: string[] = [];
-  const platformExports: string[] = [];
-
-  runtimeExports.push('createEvent');
-  runtimeExports.push('getConnect');
-  runtimeExports.push('getElement');
-  runtimeExports.push('h');
-  runtimeExports.push('proxyComponent');
-
-  platformExports.push('getContext');
-  platformExports.push('registerLazyInstance');
-  platformExports.push('registerStyle');
-
-  coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
-
-  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
-
   const cmpData = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
+
+  coreText.push(`import { proxyComponent } from '@stencil/core/runtime';`);
 
   cmpData.forEach(cmpData => {
     coreText.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
@@ -57,6 +42,22 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
     coreText.push(formatNativeComponentRuntimeData(cmpData));
     coreText.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
   }
+
+  const runtimeExports: string[] = [];
+  const platformExports: string[] = [];
+
+  runtimeExports.push('createEvent');
+  runtimeExports.push('getConnect');
+  runtimeExports.push('getElement');
+  runtimeExports.push('h');
+
+  platformExports.push('getContext');
+  platformExports.push('registerLazyInstance');
+  platformExports.push('registerStyle');
+
+  coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
+
+  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   const cmpsWithStyles = cmps.filter(cmp => cmp.styles.length > 0);
   if (cmpsWithStyles.length > 0) {

@@ -54,7 +54,7 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
       const appCmps = [cmp];
       const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, appCmps);
 
-      if (!buildCtx.hasError && typeof outputText === 'string') {
+      if (!buildCtx.shouldAbort && typeof outputText === 'string') {
         await writeSelfContainedWebComponentModes(compilerCtx, outputTargets, appCmps, outputText);
       }
     });

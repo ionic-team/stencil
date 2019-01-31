@@ -23,6 +23,10 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
+
+  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
+  coreText.push(`bootstrapLazy([]);`);
+
   const runtimeExports: string[] = [];
   const platformExports: string[] = [];
 
@@ -35,8 +39,6 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   platformExports.push('registerLazyInstance');
   platformExports.push('registerStyle');
 
-  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
-  coreText.push(`bootstrapLazy([]);`);
 
   if (platformExports.length > 0) {
     coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);

@@ -141,7 +141,7 @@ function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecate
 function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
   const modeStyle: d.StyleCompiler = {
     modeName: modeName,
-    styleId: null,
+    styleId: cmpData.tag,
     styleStr: modeStyleData.style,
     externalStyles: [],
     compiledStyleText: null,

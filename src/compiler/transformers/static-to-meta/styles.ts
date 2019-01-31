@@ -5,7 +5,7 @@ import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
 
-export function parseStaticStyles(componentFilePath: string, staticMembers: ts.ClassElement[]) {
+export function parseStaticStyles(tagName: string, componentFilePath: string, staticMembers: ts.ClassElement[]) {
   const styles: d.StyleCompiler[] = [];
 
   let parsedStyleStr: string = getStaticValue(staticMembers, 'styles');
@@ -113,7 +113,7 @@ export function parseStaticStyles(componentFilePath: string, staticMembers: ts.C
 
   }
 
-  normalizeStyles(componentFilePath, styles);
+  normalizeStyles(tagName, componentFilePath, styles);
 
   return styles;
 }

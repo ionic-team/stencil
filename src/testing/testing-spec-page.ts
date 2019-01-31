@@ -46,6 +46,12 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
     platform.registerModule(bundleId, Cstr);
 
+    if (Array.isArray(Cstr.COMPILER_META.styles)) {
+      Cstr.COMPILER_META.styles.forEach(style => {
+        platform.registerStyle(style.styleId, style.styleStr);
+      });
+    }
+
     return lazyBundleRuntimeMeta;
   });
 
@@ -56,6 +62,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     body: platform.doc.body as HTMLBodyElement,
     root: null as any,
     build: bc.BUILD as d.Build,
+    styles: platform.styles as Map<string, string>,
     flush: (): Promise<void> => platform.flushAll(),
     flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
     flushQueue: (): Promise<void> => platform.flushQueue()

@@ -4,7 +4,7 @@ import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModu
 import { registerLazyComponentInConstructor } from './register-lazy-constructor';
 import { registerConstructor } from '../register-constructor';
 import { registerLazyElementGetter } from './register-lazy-element-getter';
-import { registerStyle } from '../register-styles';
+import { registerStyle } from '../register-style';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
@@ -56,9 +56,9 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
 
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = getComponentMeta(moduleFile, node);
-          if (cmpMeta != null) {
-            return updateComponentClass(node, cmpMeta);
+          const cmp = getComponentMeta(moduleFile, node);
+          if (cmp != null) {
+            return updateComponentClass(node, cmp);
           }
 
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -89,7 +89,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
 }
 
 
-function updateComponentClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
+function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -97,17 +97,17 @@ function updateComponentClass(classNode: ts.ClassDeclaration, cmpMeta: d.Compone
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateLazyComponentMembers(classNode, cmpMeta)
+    updateLazyComponentMembers(classNode, cmp)
   );
 }
 
 
-function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
+function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
   registerLazyComponentInConstructor(classMembers);
-  registerLazyElementGetter(classMembers, cmpMeta);
-  registerConstructor(classMembers, cmpMeta);
+  registerLazyElementGetter(classMembers, cmp);
+  registerConstructor(classMembers, cmp);
 
   return classMembers;
 }

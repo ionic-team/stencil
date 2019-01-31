@@ -1,10 +1,17 @@
 import * as d from '@declarations';
-import { normalizePath } from '@utils';
+import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
-export function normalizeStyles(componentFilePath: string, styles: d.StyleCompiler[]) {
+export function normalizeStyles(tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) {
   styles.forEach(style => {
+
+    if (style.modeName === DEFAULT_STYLE_MODE) {
+      style.styleId = tagName;
+    } else {
+      style.styleId = `${tagName}.${style.modeName}`;
+    }
+
     if (Array.isArray(style.externalStyles)) {
       style.externalStyles.forEach(externalStyle => {
         normalizeExternalStyle(componentFilePath, externalStyle);

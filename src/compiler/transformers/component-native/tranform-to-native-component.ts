@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerStyle } from '../register-styles';
+import { registerConstructor } from '../register-constructor';
+import { registerStyle } from '../register-style';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
-import { registerConstructor } from '../register-constructor';
 
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
@@ -54,9 +54,9 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
 
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = getComponentMeta(moduleFile, node);
-          if (cmpMeta != null) {
-            return updateComponentClass(node, cmpMeta);
+          const cmp = getComponentMeta(moduleFile, node);
+          if (cmp != null) {
+            return updateComponentClass(node, cmp);
           }
 
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -88,7 +88,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
 }
 
 
-function updateComponentClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
+function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -96,7 +96,7 @@ function updateComponentClass(classNode: ts.ClassDeclaration, cmpMeta: d.Compone
     classNode.name,
     classNode.typeParameters,
     updateHostComponentHeritageClauses(),
-    updateHostComponentMembers(classNode, cmpMeta)
+    updateHostComponentMembers(classNode, cmp)
   );
 }
 
@@ -112,13 +112,13 @@ function updateHostComponentHeritageClauses() {
 }
 
 
-function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) {
+function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
   addSuperToConstructor(classMembers);
   addConnectedCallback(classMembers);
-  registerConstructor(classMembers, cmpMeta);
-  registerElementGetter(classMembers, cmpMeta);
+  registerConstructor(classMembers, cmp);
+  registerElementGetter(classMembers, cmp);
 
   return classMembers;
 }
