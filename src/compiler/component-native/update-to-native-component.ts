@@ -23,7 +23,7 @@ async function updateToNativeComponent(config: d.Config, compilerCtx: d.Compiler
   const inputFileName = sys.path.basename(cmp.jsFilePath);
   const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputFileName, inputJsText);
+  const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputJsText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = sys.path.join(config.cacheDir, outputFileName);
 

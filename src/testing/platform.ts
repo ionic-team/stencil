@@ -1,10 +1,7 @@
 import * as d from '@declarations';
+export { createEvent, getElement } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { setupGlobal } from '@mock-doc';
-export {
-  createEvent as __stencil_createEvent,
-  getElement as __stencil_getElement
-} from '@runtime';
 
 export * from './task-queue';
 
@@ -69,7 +66,3 @@ const Context = {
 export function getContext(context: string): any {
   return (Context as any)[context];
 }
-
-export {
-  getContext as __stencil_getContext
-};

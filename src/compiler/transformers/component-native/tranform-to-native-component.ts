@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
+import { registerStyle } from '../register-styles';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
@@ -8,11 +9,11 @@ import { registerConstructor } from '../register-constructor';
 
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
-  if (buildCtx.hasError) {
-    return '';
+  if (buildCtx.shouldAbort) {
+    return null;
   }
 
-  const c: string[] = [];
+  let outputText: string = null;
 
   try {
     const transpileOpts: ts.TranspileOptions = {
@@ -23,7 +24,7 @@ export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, build
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform(build, compilerCtx)
+          nativeComponentTransform(compilerCtx)
         ]
       }
     };
@@ -32,42 +33,46 @@ export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, build
 
     loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
 
-    if (!buildCtx.hasError) {
-      c.push(transpileOutput.outputText);
+    if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
+      outputText = transpileOutput.outputText;
     }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
-  return c.join('\n');
+  return outputText;
 }
 
 
-function nativeComponentTransform(build: d.Build, compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+
   return transformCtx => {
 
     return tsSourceFile => {
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      function visitNode(node: ts.Node) {
+      function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = getComponentMeta(compilerCtx, tsSourceFile, node);
-          if (cmpMeta) {
+          const cmpMeta = getComponentMeta(moduleFile, node);
+          if (cmpMeta != null) {
             return updateComponentClass(node, cmpMeta);
           }
+
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
           return removeStencilImport(node as ts.ImportDeclaration);
         }
 
-        return node;
+        return ts.visitEachChild(node, visitNode, transformCtx);
       }
-      const importFns = ['connectedCallback'];
 
-      if (build.vdomRender) {
-        importFns.push('h');
-      }
+      const importFns = ['connectedCallback', 'h'];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/runtime');
+
+      if (moduleFile != null) {
+        tsSourceFile = registerStyle(transformCtx, tsSourceFile, moduleFile.cmps);
+      }
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };

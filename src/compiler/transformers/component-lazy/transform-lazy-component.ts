@@ -1,20 +1,21 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { REGISTER_INSTANCE_METHOD, registerLazyComponentInConstructor } from './register-lazy-constructor';
+import { registerConstructor } from '../register-constructor';
 import { registerLazyElementGetter } from './register-lazy-element-getter';
+import { registerStyle } from '../register-styles';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
-import { registerConstructor } from '../register-constructor';
 import ts from 'typescript';
 
 
-export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
-  if (buildCtx.hasError) {
-    return '';
+export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputText: string) {
+  if (buildCtx.shouldAbort) {
+    return null;
   }
 
-  let outputText = '';
+  let outputText: string = null;
 
   try {
     const transpileOpts: ts.TranspileOptions = {
@@ -30,11 +31,11 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
       }
     };
 
-    const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
+    const transpileOutput = ts.transpileModule(inputText, transpileOpts);
 
     loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
 
-    if (!buildCtx.hasError) {
+    if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
       outputText = transpileOutput.outputText;
     }
 
@@ -49,33 +50,38 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
 export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
+
     return tsSourceFile => {
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = getComponentMeta(compilerCtx, tsSourceFile, node);
-          if (cmpMeta) {
+          const cmpMeta = getComponentMeta(moduleFile, node);
+          if (cmpMeta != null) {
             return updateComponentClass(node, cmpMeta);
           }
+
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
           return removeStencilImport(node as ts.ImportDeclaration);
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
+
       const importFnNames = [
         REGISTER_INSTANCE_METHOD,
         'h',
-        '__stencil_getElement',
-        '__stencil_getConnect',
-        '__stencil_getContext',
-        '__stencil_createEvent'
+        'getElement as __stencil_getElement',
+        'getConnect as __stencil_getConnect',
+        'getContext as __stencil_getContext',
+        'createEvent as __stencil_createEvent'
       ];
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile,
-        importFnNames,
-        '@stencil/core/app',
-      );
+      tsSourceFile = addImports(transformCtx, tsSourceFile, importFnNames, '@stencil/core/app');
+
+      if (moduleFile != null) {
+        tsSourceFile = registerStyle(transformCtx, tsSourceFile, moduleFile.cmps);
+      }
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };

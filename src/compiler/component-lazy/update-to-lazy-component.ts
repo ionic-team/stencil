@@ -6,11 +6,12 @@ import { transformToLazyComponentText } from '../transformers/component-lazy/tra
 
 
 export async function updateToLazyComponent(_config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
-  const inputFileDir = sys.path.dirname(cmp.jsFilePath);
-  const inputFileName = sys.path.basename(cmp.jsFilePath);
-  const inputJsText = await compilerCtx.fs.readFile(cmp.jsFilePath);
+  const inputFilePath = cmp.jsFilePath;
+  const inputFileDir = sys.path.dirname(inputFilePath);
+  const inputFileName = sys.path.basename(inputFilePath);
+  const inputText = await compilerCtx.fs.readFile(inputFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('lazy', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputFileName, inputJsText);
+  const cacheKey = compilerCtx.cache.createKey('lazy', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = sys.path.join(inputFileDir, outputFileName);
 
@@ -22,7 +23,7 @@ export async function updateToLazyComponent(_config: d.Config, compilerCtx: d.Co
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
-    outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, build, cmp, inputJsText);
+    outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, build, cmp, inputText);
 
     await compilerCtx.cache.put(cacheKey, outputJsText);
   }

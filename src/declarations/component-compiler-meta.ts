@@ -57,6 +57,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
   properties: ComponentCompilerProperty[];
+  sourceFilePath: string;
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
   styles: d.StyleCompiler[];

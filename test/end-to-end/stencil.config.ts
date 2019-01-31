@@ -8,6 +8,8 @@ export const config: Config = {
   ],
 
   testing: {
-  }
+  },
+
+  enableCache: false
 
 };

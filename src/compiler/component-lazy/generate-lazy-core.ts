@@ -25,19 +25,29 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   const appCoreEntryFilePath = sys.path.join(config.srcDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
+  const runtimeExports: string[] = [];
+  const platformExports: string[] = [];
 
   coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
 
   coreText.push(`bootstrapLazy([]);`);
 
-  coreText.push(`export { registerLazyInstance, getContext as __stencil_getContext } from '@stencil/core/platform';`);
-  coreText.push(`
-export {
-  h,
-  createEvent as __stencil_createEvent,
-  getElement as __stencil_getElement,
-  getConnect as __stencil_getConnect
-} from '@stencil/core/runtime';`);
+  runtimeExports.push('createEvent');
+  runtimeExports.push('getConnect');
+  runtimeExports.push('getElement');
+  runtimeExports.push('h');
+
+  platformExports.push('getContext');
+  platformExports.push('registerLazyInstance');
+  platformExports.push('registerStyle');
+
+  if (platformExports.length > 0) {
+    coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
+  }
+
+  if (runtimeExports.length > 0) {
+    coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
+  }
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 

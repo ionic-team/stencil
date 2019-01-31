@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 
@@ -453,15 +454,23 @@ export function copyComments(src: ts.Node, dst: ts.Node) {
   }
 }
 
-export function getComponentMeta(compilerCtx: d.CompilerCtx, sourceFile: ts.SourceFile, node: ts.ClassDeclaration) {
-  if (node.members != null) {
+export function getModuleFromSourceFile(compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
+  const sourceFilePath = normalizePath(tsSourceFile.fileName);
+  const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
+  if (moduleFile != null) {
+    return moduleFile;
+  }
+
+  const moduleFiles = Array.from(compilerCtx.moduleMap.values());
+  return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
+}
+
+export function getComponentMeta(moduleFile: d.Module, node: ts.ClassDeclaration) {
+  if (moduleFile != null && node.members != null) {
     const staticMembers = node.members.filter(isStaticGetter);
     const tagName = getComponentTagName(staticMembers);
-    if (tagName) {
-      const mod = compilerCtx.moduleMap.get(sourceFile.fileName);
-      if (mod) {
-        return mod.cmps.find(cmp => cmp.tagName === tagName);
-      }
+    if (typeof tagName === 'string') {
+      return moduleFile.cmps.find(cmp => cmp.tagName === tagName);
     }
   }
   return undefined;
@@ -488,12 +497,15 @@ export function isStaticGetter(member: ts.ClassElement) {
 }
 
 
-export function createImportDeclaration(importPath: string, importFnName: string) {
+export function createImportDeclaration(importPath: string, importFnName: string, importAs: string = null) {
   return ts.createImportDeclaration(
     undefined,
     undefined,
     ts.createImportClause(undefined, ts.createNamedImports([
-      ts.createImportSpecifier(undefined, ts.createIdentifier(importFnName))
+      ts.createImportSpecifier(
+        typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
+        ts.createIdentifier(importAs)
+      )
     ])),
     ts.createLiteral(importPath)
   );
@@ -511,13 +523,22 @@ export function addImports(transformCtx: ts.TransformationContext, tsSourceFile:
 
   if (module === ts.ModuleKind.CommonJS) {
     // CommonJS
-    // const importName = require(importPath).importName;
-    const requires = importFnNames.map(importName => {
+    // const varName = require(importPath).importName;
+    const requires = importFnNames.map(importKey => {
+      const splt = importKey.split(' as ');
+      let varName = importKey;
+      let importName = importKey;
+
+      if (splt.length > 1) {
+        varName = splt[1];
+        importName = splt[0];
+      }
+
       return ts.createVariableStatement(
         undefined,
         ts.createVariableDeclarationList([
           ts.createVariableDeclaration(
-            importName,
+            varName,
             undefined,
             ts.createPropertyAccess(
               ts.createCall(
@@ -541,8 +562,17 @@ export function addImports(transformCtx: ts.TransformationContext, tsSourceFile:
   // ESM
   // import { importNames } from 'importPath';
   return ts.updateSourceFileNode(tsSourceFile, [
-    ...importFnNames.map(importFnName => {
-      return createImportDeclaration(importPath, importFnName);
+    ...importFnNames.map(importKey => {
+      const splt = importKey.split(' as ');
+      let varName = importKey;
+      let importName = importKey;
+
+      if (splt.length > 1) {
+        varName = splt[1];
+        importName = splt[0];
+      }
+
+      return createImportDeclaration(importPath, importName, varName);
     }),
     ...tsSourceFile.statements
   ]);

@@ -13,7 +13,5 @@ const Context = {
   }
 };
 
-export function getContext(context: string): any {
-  return (Context as any)[context];
-}
-
+export const getContext = (context: string) =>
+  (Context as any)[context];

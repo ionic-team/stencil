@@ -34,6 +34,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     dependencies: [],
     docs: serializeSymbol(typeChecker, symbol),
     jsFilePath: null,
+    sourceFilePath: null,
 
     hasAsyncLifecycle: false,
     hasAttributeChangedCallbackFn: false,
@@ -110,6 +111,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.jsFilePath;
     delete copyCmp.potentialCmpRefs;
     delete copyCmp.styleDocs;
+    delete copyCmp.sourceFilePath;
 
     const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
 
