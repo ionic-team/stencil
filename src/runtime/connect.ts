@@ -1,10 +1,12 @@
+import { doc } from '@platform';
+
 
 export function getConnect(tagName: string) {
   return {
     create() {
-      let element = document.querySelector(tagName) as any;
+      let element = doc.querySelector(tagName) as any;
       if (!element) {
-        element = document.createElement(tagName);
+        element = doc.createElement(tagName);
       }
       if (element.componentOnReady) {
         return element.componentOnReady().then(() =>
