@@ -41,6 +41,18 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 }
 
 
+export function stringifyRuntimeData(data: any) {
+  // stringify the data, then remove property double-quotes so they can be property renamed
+  return JSON.stringify(data)
+             .replace(/"cmpTag"/g, 'cmpTag')
+             .replace(/"cmpMeta"/g, 'cmpMeta')
+             .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
+             .replace(/"cmpShadowDomEncapsulation"/g, 'cmpShadowDomEncapsulation')
+             .replace(/"cmpScopedCssEncapsulation"/g, 'cmpScopedCssEncapsulation')
+             .replace(/"cmpMembers"/g, 'cmpMembers');
+}
+
+
 function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta): d.ComponentRuntimeMembers {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),

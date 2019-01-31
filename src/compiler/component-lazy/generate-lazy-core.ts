@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
-import { formatComponentRuntimeMeta } from '../app-core/format-component-runtime-meta';
+import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { sys } from '@sys';
 
@@ -86,14 +86,7 @@ function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
     return formatLazyRuntimeBundle(bundleModule);
   });
 
-  // stringify the data, then remove property double-quotes so they can be property renamed
-  return JSON.stringify(lazyBundles)
-             .replace(/"cmpTag"/g, 'cmpTag')
-             .replace(/"cmpMeta"/g, 'cmpMeta')
-             .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
-             .replace(/"cmpShadowDomEncapsulation"/g, 'cmpShadowDomEncapsulation')
-             .replace(/"cmpScopedCssEncapsulation"/g, 'cmpScopedCssEncapsulation')
-             .replace(/"cmpMembers"/g, 'cmpMembers');
+  return stringifyRuntimeData(lazyBundles);
 }
 
 

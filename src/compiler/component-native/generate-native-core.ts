@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
-import { formatComponentRuntimeMeta } from '../app-core/format-component-runtime-meta';
+import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { setStylePlaceholders } from '../app-core/register-app-styles';
 import { updateToNativeComponents } from './update-to-native-component';
 import { sys } from '@sys';
@@ -29,10 +29,11 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   if (cmpData.length === 1) {
     // only one component, so get straight to the point
     const cmp = cmpData[0];
+    const runtimeData = formatComponentRuntimeMeta(cmp.cmp, false);
 
     coreText.push(`customElements.define('${cmp.tagName}', proxyComponent(
       ${cmp.componentClassName},
-      ${JSON.stringify(formatComponentRuntimeMeta(cmp.cmp, false))},
+      ${stringifyRuntimeData(runtimeData)},
       1 /* is element constructor */,
       1 /* proxy state */
     ));`);
@@ -90,7 +91,7 @@ function formatNativeComponentRuntime(cmp: d.ComponentCompilerNativeData) {
   c.push(`,\n${cmp.componentClassName}`);
 
   // 2
-  c.push(`,\n${JSON.stringify(formatComponentRuntimeMeta(cmp.cmp, false))}`);
+  c.push(`,\n${stringifyRuntimeData(formatComponentRuntimeMeta(cmp.cmp, false))}`);
 
   c.push(`]\n`);
 
