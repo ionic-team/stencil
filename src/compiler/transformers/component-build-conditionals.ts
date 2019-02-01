@@ -31,6 +31,11 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
 
   if (cmpMeta.listeners.length > 0) {
     cmpMeta.hasListener = true;
+    cmpMeta.hasListenerTargetWindow = cmpMeta.listeners.some(l => l.target === 'window');
+    cmpMeta.hasListenerTargetDocument = cmpMeta.listeners.some(l => l.target === 'document');
+    cmpMeta.hasListenerTargetBody = cmpMeta.listeners.some(l => l.target === 'body');
+    cmpMeta.hasListenerTargetParent = cmpMeta.listeners.some(l => l.target === 'parent');
+    cmpMeta.hasListenerTarget = cmpMeta.listeners.some(l => !!l.target);
   }
 
   cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);

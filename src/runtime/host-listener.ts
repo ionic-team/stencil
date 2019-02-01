@@ -21,11 +21,10 @@ export const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
 
 
 export const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
-  if (flags & LISTENER_FLAGS.TargetDocument) return doc;
-  if (flags & LISTENER_FLAGS.TargetWindow) return win;
-  if (flags & LISTENER_FLAGS.TargetBody) return doc.body;
-  if (flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
-  if (flags & LISTENER_FLAGS.TargetChild) return elm.firstElementChild;
+  if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
+  if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
+  if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
+  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
   return elm;
 };
 

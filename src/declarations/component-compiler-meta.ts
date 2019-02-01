@@ -17,6 +17,11 @@ export interface ComponentCompilerFeatures {
   hasHostDataFn: boolean;
   hasLifecycle: boolean;
   hasListener: boolean;
+  hasListenerTarget: boolean;
+  hasListenerTargetWindow: boolean;
+  hasListenerTargetDocument: boolean;
+  hasListenerTargetBody: boolean;
+  hasListenerTargetParent: boolean;
   hasMember: boolean;
   hasMethod: boolean;
   hasMode: boolean;

@@ -183,7 +183,6 @@ function computeListenerFlags(listener: d.ComponentCompilerListener) {
     case 'window': flags |= LISTENER_FLAGS.TargetWindow; break;
     case 'parent': flags |= LISTENER_FLAGS.TargetParent; break;
     case 'body': flags |= LISTENER_FLAGS.TargetBody; break;
-    case 'child': flags |= LISTENER_FLAGS.TargetChild; break;
   }
   return flags;
 }

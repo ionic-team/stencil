@@ -71,7 +71,7 @@ export interface ListenOptions {
   enabled?: boolean;
 }
 
-export type ListenTargetOptions = 'child' | 'parent' | 'body' | 'document' | 'window';
+export type ListenTargetOptions = 'parent' | 'body' | 'document' | 'window';
 
 
 export interface StateDecorator {

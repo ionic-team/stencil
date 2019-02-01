@@ -99,7 +99,7 @@ const PASSIVE_TRUE_DEFAULTS = [
 ];
 
 const VALID_ELEMENT_REF_PREFIXES = [
-  'child', 'parent', 'body', 'document', 'window'
+  'parent', 'body', 'document', 'window'
 ];
 
 const VALID_KEYCODE_SUFFIX = [

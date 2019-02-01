@@ -43,6 +43,11 @@ export interface BuildFeatures {
   element?: boolean;
   event?: boolean;
   hostListener?: boolean;
+  hostListenerTargetWindow?: boolean;
+  hostListenerTargetDocument?: boolean;
+  hostListenerTargetBody?: boolean;
+  hostListenerTargetParent?: boolean;
+  hostListenerTarget?: boolean;
   method?: boolean;
   prop?: boolean;
   propMutable?: boolean;

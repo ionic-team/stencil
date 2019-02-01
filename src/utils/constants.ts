@@ -35,7 +35,6 @@ export const enum LISTENER_FLAGS {
   TargetWindow = 1 << 4,
   TargetParent = 1 << 5,
   TargetBody = 1 << 6,
-  TargetChild = 1 << 7,
 }
 
 

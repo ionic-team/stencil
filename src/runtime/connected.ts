@@ -25,7 +25,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
           if (BUILD.lazyLoad) {
             (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []));
           }
-          getHostListenerTarget(elm, flags).addEventListener(name, hostListenerProxy(hostRef, method), hostListenerOpts(flags));
+          (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm).addEventListener(name, hostListenerProxy(hostRef, method), hostListenerOpts(flags));
         }
       });
     }
