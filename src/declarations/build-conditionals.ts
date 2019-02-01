@@ -75,8 +75,6 @@ export interface BuildFeatures {
 }
 
 export interface Build extends BuildFeatures {
-  appNamespace?: string;
-  appNamespaceLower?: string;
   clientSide?: boolean;
   devInspector?: boolean;
   es5?: boolean;

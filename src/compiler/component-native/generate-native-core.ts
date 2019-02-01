@@ -2,8 +2,8 @@ import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { setStylePlaceholders } from '../app-core/register-app-styles';
-import { updateToNativeComponents } from './update-to-native-component';
 import { sys } from '@sys';
+import { updateToNativeComponents } from './update-to-native-component';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {

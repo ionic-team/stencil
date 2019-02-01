@@ -5,23 +5,26 @@ import { sys } from '@sys';
 
 
 export function writeNativeSelfContained(compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
-  const promises: Promise<any>[] = [];
-
   const allModes = getAllModes(cmps);
 
-  allModes.forEach(modeName => {
-    const modeOutputText = replaceStylePlaceholders(cmps, modeName, outputText);
+  return Promise.all(allModes.map(async modeName => {
+    const modeOutputText = await writeNativeSelfContainedMode(cmps, modeName, outputText);
 
-    cmps.forEach(cmp => {
-      outputTargets.forEach(outputTarget => {
-        promises.push(
-          writeNativeSelfContainedModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName)
-        );
-      });
-    });
-  });
+    return Promise.all(cmps.map(cmp => {
+      return Promise.all(outputTargets.map(outputTarget => {
+        return writeNativeSelfContainedModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName);
+      }));
+    }));
+  }));
+}
 
-  return Promise.all(promises);
+
+async function writeNativeSelfContainedMode(cmps: d.ComponentCompilerMeta[], modeName: string, inputText: string) {
+  const outputText = replaceStylePlaceholders(cmps, modeName, inputText);
+
+  // TODO MINIFY
+
+  return outputText;
 }
 
 

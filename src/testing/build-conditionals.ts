@@ -13,9 +13,6 @@ export function resetBuildConditionals(b: d.Build) {
     }
   });
 
-  b.appNamespace = 'TestApp';
-  b.appNamespaceLower = 'testapp';
-
   b.isDev = true;
   b.clientSide = true;
   b.lazyLoad = true;

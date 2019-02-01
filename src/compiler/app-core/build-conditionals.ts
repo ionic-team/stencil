@@ -60,8 +60,6 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 
 
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
-  b.appNamespace = config.namespace;
-  b.appNamespaceLower = config.fsNamespace;
   b.isDebug = config.logLevel === 'debug';
   b.isDev = !!config.devMode;
   b.isProd = !config.devMode;

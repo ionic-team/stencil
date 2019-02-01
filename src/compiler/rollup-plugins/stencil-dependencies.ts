@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { sys } from '@sys';
 
 
-export function stencilDependenciesPlugin(config: d.Config, appCoreEntryFilePath: string) {
+export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePath: string) {
 
   return {
     resolveId(id: string) {
@@ -11,7 +11,7 @@ export function stencilDependenciesPlugin(config: d.Config, appCoreEntryFilePath
       }
 
       if (id === '@stencil/core/platform') {
-        const clientPlatform = config.minifyJs ? 'index.min.mjs' : 'index.mjs';
+        const clientPlatform = 'index.mjs';
         return sys.path.join(sys.compiler.distDir, 'client', clientPlatform);
       }
 
