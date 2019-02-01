@@ -17,20 +17,22 @@ export function connectChildElements(config: d.Config, plt: d.PlatformApi, App: 
 
 export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: Element, perf: Performance) {
   if (!plt.hasConnectedMap.has(elm as d.HostElement)) {
-    const tagName = elm.tagName.toLowerCase();
-    const cmpMeta = plt.getComponentMeta(elm);
+    if (!elm.hasAttribute('no-prerender')) {
+      const tagName = elm.tagName.toLowerCase();
+      const cmpMeta = plt.getComponentMeta(elm);
 
-    if (cmpMeta) {
-      connectHostElement(config, plt, App, hydrateResults, elm as d.HostElement, cmpMeta, perf);
+      if (cmpMeta) {
+        connectHostElement(config, plt, App, hydrateResults, elm as d.HostElement, cmpMeta, perf);
 
-    } else if (tagName === 'script') {
-      connectScriptElement(hydrateResults, elm as HTMLScriptElement);
+      } else if (tagName === 'script') {
+        connectScriptElement(hydrateResults, elm as HTMLScriptElement);
 
-    } else if (tagName === 'link') {
-      connectLinkElement(hydrateResults, elm as HTMLLinkElement);
+      } else if (tagName === 'link') {
+        connectLinkElement(hydrateResults, elm as HTMLLinkElement);
 
-    } else if (tagName === 'img') {
-      connectImgElement(hydrateResults, elm as HTMLImageElement);
+      } else if (tagName === 'img') {
+        connectImgElement(hydrateResults, elm as HTMLImageElement);
+      }
     }
 
     plt.hasConnectedMap.set(elm as d.HostElement, true);

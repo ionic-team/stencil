@@ -1,5 +1,6 @@
-import * as d from '@declarations';
-// import { createDomApi } from '../renderer/dom-api';
+import * as d from '../declarations';
+import { catchError } from '../compiler/util';
+import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 // import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '@utils';
@@ -69,8 +70,12 @@ export function createPlatformServer(
   // V8 Context provides an isolated global environment
   sys.vm.createContext(compilerCtx, outputTarget, win);
 
-  // execute the global scripts (if there are any)
-  runGlobalScripts();
+  try {
+    // execute the global scripts (if there are any)
+    runGlobalScripts();
+  } catch (e) {
+    catchError(diagnostics, e);
+  }
 
   // internal id increment for unique ids
   let ids = 0;
@@ -309,7 +314,18 @@ export function createPlatformServer(
     //   return;
     // }
 
-    // sys.vm.runInContext(compilerCtx.appFiles.global, win);
+    // if (!win.matchMedia) {
+    //   win.matchMedia = () => {
+    //     return { matches: true };
+    //   };
+    // }
+
+    // const globalContext = Object.assign(win, {
+    //   x: compilerCtx,
+    //   r: Context.resourcesUrl
+    // });
+
+    // sys.vm.runInContext(compilerCtx.appFiles.global, globalContext);
   }
 
   function onError(err: Error, type: RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {

@@ -1,10 +1,18 @@
-<a name="0.17.1-0"></a>
-## 🚛 [0.17.1-0](https://github.com/ionic-team/stencil/compare/v0.17.0...v0.17.1-0) (2019-01-25)
+<a name="0.17.1"></a>
+## 🚛 [0.17.1](https://github.com/ionic-team/stencil/compare/v0.17.0...v0.17.1) (2019-02-01)
 
 
 ### Bug Fixes
 
+* **attribute:** don't null boolean properties ([647a47d](https://github.com/ionic-team/stencil/commit/647a47d))
+* **config:** load .ts dependencies ([#1339](https://github.com/ionic-team/stencil/issues/1339)) ([e7de19f](https://github.com/ionic-team/stencil/commit/e7de19f))
+* **prerender:** fix prerender error handling ([918e9ed](https://github.com/ionic-team/stencil/commit/918e9ed))
 * **prerender:** ensure meta charset is first element in document.head ([590ddbf](https://github.com/ionic-team/stencil/commit/590ddbf))
+
+
+### Features
+
+* **prerender:** add "no-prerender" attribute to skip prerendering elements ([9c11415](https://github.com/ionic-team/stencil/commit/9c11415))
 
 
 
