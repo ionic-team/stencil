@@ -4,12 +4,12 @@ import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { sys } from '@sys';
 
 
-export async function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
+export function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
   const appCoreRollupResults = rollupResults.filter(r => r.isAppCore);
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
 
-  await Promise.all(appCoreRollupResults.map(rollupResult => {
+  return Promise.all(appCoreRollupResults.map(rollupResult => {
     return writeLazyAppCoreResults(config, compilerCtx, buildCtx, outputTargets, build, lazyRuntimeData, rollupResult);
   }));
 }
@@ -35,7 +35,6 @@ async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.Compiler
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }
-
 
 
 function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {

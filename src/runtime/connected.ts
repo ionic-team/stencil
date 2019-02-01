@@ -34,9 +34,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
       // first time this element has connected
       hostRef.hasConnected = true;
 
-      if (BUILD.exposeAppOnReady) {
-        activelyProcessingCmps.add(elm);
-      }
+      activelyProcessingCmps.add(elm);
 
       if (BUILD.lifecycle) {
         // register this component as an actively

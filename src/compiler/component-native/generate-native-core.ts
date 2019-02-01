@@ -20,20 +20,16 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   const coreText: string[] = [];
   const nativeCmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
-  const runtimeImports: string[] = [];
   const platformImports: string[] = [];
 
-  runtimeImports.push('createEvent');
-  runtimeImports.push('getConnect');
-  runtimeImports.push('getElement');
-  runtimeImports.push('h');
-  runtimeImports.push('proxyComponent');
-
+  platformImports.push('createEvent');
+  platformImports.push('getConnect');
   platformImports.push('getContext');
+  platformImports.push('getElement');
+  platformImports.push('h');
+  platformImports.push('proxyComponent');
   platformImports.push('registerHost');
   platformImports.push('registerStyle');
-
-  coreText.push(`import { ${runtimeImports.join(', ')} } from '@stencil/core/runtime';`);
 
   coreText.push(`import { ${platformImports.join(', ')} } from '@stencil/core/platform';`);
 

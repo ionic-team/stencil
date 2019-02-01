@@ -6,9 +6,7 @@ export const win = window as any;
 
 export const doc = document;
 
-export const plt: d.PlatformRuntime = {
-  isTmpDisconnected: false
-};
+export const plt: d.PlatformRuntime = {};
 
 if (BUILD.mode) {
   plt.appMode = doc.documentElement.getAttribute('mode');
@@ -23,24 +21,14 @@ if (BUILD.shadowDom) {
   plt.supportsShadowDom = !!doc.documentElement.attachShadow;
 }
 
-if (BUILD.exposeAppRegistry) {
-  (win['s-apps'] = win['s-apps'] || []).push(BUILD.appNamespace);
-}
-
 if (BUILD.hostListener) {
   plt.supportsListenerOptions = false;
 }
 
-if (BUILD.hostListener) {
-  try {
-    (win as Window).addEventListener('e', null,
-      Object.defineProperty({}, 'passive', {
-        get() { plt.supportsListenerOptions = true; }
-      })
-    );
-  } catch (e) {}
-}
+// if (BUILD.exposeAppRegistry) {
+//   (win['s-apps'] = win['s-apps'] || []).push(BUILD.appNamespace);
+// }
+
+export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = new Set();
 
 export const onAppReadyCallbacks: any[] = [];
-
-export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = (BUILD.exposeAppOnReady ? new Set() : undefined);

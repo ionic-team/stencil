@@ -13,7 +13,7 @@ export function writeNativeBundled(config: d.Config, compilerCtx: d.CompilerCtx,
     rollupResults.forEach(rollupResult => {
       outputTargets.map(outputTarget => {
         promises.push(
-          writeBundledWebComponentOutputMode(config, compilerCtx, outputTarget, rollupResult, modeName)
+          writeNativeBundledOutput(config, compilerCtx, outputTarget, rollupResult, modeName)
         );
       });
     });
@@ -23,7 +23,7 @@ export function writeNativeBundled(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 
-function writeBundledWebComponentOutputMode(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, rollupResult: d.RollupResult, modeName: string) {
+function writeNativeBundledOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, rollupResult: d.RollupResult, modeName: string) {
   let fileName = config.fsNamespace;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName.toLowerCase()}`;

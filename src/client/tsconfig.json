@@ -30,6 +30,9 @@
       "@declarations": [
         "../declarations/index.ts"
       ],
+      "@runtime": [
+        "../runtime/index.ts"
+      ],
       "@utils": [
         "../utils/index.ts"
       ]

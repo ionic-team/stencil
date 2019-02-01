@@ -80,12 +80,6 @@ export interface Build extends BuildFeatures {
   clientSide?: boolean;
   devInspector?: boolean;
   es5?: boolean;
-  exposeAppRegistry?: boolean;
-  exposeAppOnReady?: boolean;
-  exposeEventListener?: boolean;
-  exposeRequestAnimationFrame?: boolean;
-  exposeReadQueue?: boolean;
-  exposeWriteQueue?: boolean;
   externalModuleLoader?: boolean;
   hotModuleReplacement?: boolean;
   isDebug?: boolean;

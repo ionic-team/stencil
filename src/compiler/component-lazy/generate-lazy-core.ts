@@ -20,31 +20,23 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   const appCoreEntryFileName = `${config.fsNamespace}-lazy.mjs`;
   const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
 
-  const coreText: string[] = [];
-
-  coreText.push(`import { bootstrapLazy } from '@stencil/core/runtime';`);
-  coreText.push(`bootstrapLazy([]);`);
-
-  const runtimeExports: string[] = [];
   const platformExports: string[] = [];
 
-  runtimeExports.push('createEvent');
-  runtimeExports.push('getConnect');
-  runtimeExports.push('getElement');
-  runtimeExports.push('h');
-
+  platformExports.push('createEvent');
+  platformExports.push('getConnect');
+  platformExports.push('getElement');
+  platformExports.push('h');
   platformExports.push('getContext');
   platformExports.push('registerInstance');
   platformExports.push('registerStyle');
 
+  const coreText: string[] = [];
 
-  if (platformExports.length > 0) {
-    coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
-  }
+  coreText.push(`import { bootstrapLazy } from '@stencil/core/platform';`);
 
-  if (runtimeExports.length > 0) {
-    coreText.push(`export { ${runtimeExports.join(', ')} } from '@stencil/core/runtime';`);
-  }
+  coreText.push(`bootstrapLazy([]);`);
+
+  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 

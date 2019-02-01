@@ -67,13 +67,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
   b.profile = !!(config.flags && config.flags.profile);
-
-  b.exposeAppOnReady = (b.lazyLoad && !!config.exposeAppOnReady);
-  b.exposeAppRegistry = (b.lazyLoad && !!config.exposeAppRegistry);
-  b.exposeReadQueue = !!config.exposeReadQueue;
-  b.exposeWriteQueue = (b.taskQueue && !!config.exposeWriteQueue);
-  b.exposeEventListener = (b.hostListener && !!config.exposeEventListener);
-  b.exposeRequestAnimationFrame = (b.taskQueue && !!config.exposeRequestAnimationFrame);
 }
 
 

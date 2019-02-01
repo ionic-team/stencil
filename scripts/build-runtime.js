@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const { run, transpile } = require('./script-utils');
+const { minifyClientCore } = require('./minify-client-core');
 const buildPolyfills = require('./build-polyfills');
 
 const ROOT_DIR = path.join(__dirname, '..');
@@ -13,6 +14,7 @@ const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 
 const runtimeInputFile = path.join(TRANSPILED_DIR, 'runtime', 'index.js');
 const clientInputFile = path.join(TRANSPILED_DIR, 'client', 'index.js');
+const utilsInputFile = path.join(TRANSPILED_DIR, 'utils', 'index.js');
 
 const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
 const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
@@ -51,7 +53,7 @@ async function bundleRuntime() {
 
   await Promise.all([
     rollupBuild.write({
-      format: 'es',
+      format: 'esm',
       file: path.join(DIST_RUNTIME_DIR, 'index.mjs')
     }),
     rollupBuild.write({
@@ -66,8 +68,7 @@ async function bundleClient() {
   const rollupBuild = await rollup.rollup({
     input: clientInputFile,
     external: [
-      '@stencil/core/build-conditionals',
-      '@stencil/core/utils'
+      '@stencil/core/build-conditionals'
     ],
     plugins: [
       (() => {
@@ -76,8 +77,14 @@ async function bundleClient() {
             if (id === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
             }
+            if (id === '@platform') {
+              return clientInputFile;
+            }
+            if (id === '@runtime') {
+              return runtimeInputFile;
+            }
             if (id === '@utils') {
-              return '@stencil/core/utils';
+              return utilsInputFile;
             }
           }
         }
@@ -89,9 +96,9 @@ async function bundleClient() {
     }
   });
 
-  await Promise.all([
+  const results = await Promise.all([
     rollupBuild.write({
-      format: 'es',
+      format: 'esm',
       file: path.join(DIST_CLIENT_DIR, 'index.mjs')
     }),
     rollupBuild.write({
@@ -99,6 +106,12 @@ async function bundleClient() {
       file: path.join(DIST_CLIENT_DIR, 'index.js')
     })
   ]);
+
+  const minifyOutput = minifyClientCore(results[0].output[0].code);
+
+  const minifiedClientMjsPath = path.join(DIST_CLIENT_DIR, 'index.min.mjs');
+
+  await fs.writeFile(minifiedClientMjsPath, minifyOutput.code);
 }
 
 
@@ -170,8 +183,9 @@ run(async ()=> {
 
   await fs.emptyDir(DIST_RUNTIME_DIR);
 
+  await bundleRuntime();
+
   await Promise.all([
-    bundleRuntime(),
     bundleClient(),
     buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir),
     createDts(),

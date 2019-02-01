@@ -16,7 +16,6 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   // to jest.mock w/ moduleNameMapper in the jest config
   // otherwise the require() happens at the top of the file before jest is setup
   const bc = require('@stencil/core/build-conditionals');
-  const runtime = require('@stencil/core/runtime');
   const platform = require('@stencil/core/platform');
 
   // reset the platform for this new test
@@ -72,7 +71,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     plt.win.location.href = opts.url;
   }
 
-  runtime.bootstrapLazy(lazyBundles);
+  platform.bootstrapLazy(lazyBundles);
 
   if (typeof opts.html === 'string') {
     plt.body.innerHTML = opts.html;

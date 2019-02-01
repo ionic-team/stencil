@@ -11,9 +11,7 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     hostRef.isQueuedForUpdate = false;
   }
 
-  if (BUILD.exposeAppOnReady) {
-    activelyProcessingCmps.add(elm);
-  }
+  activelyProcessingCmps.add(elm);
 
   try {
     if (isInitialLoad) {
@@ -218,12 +216,10 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
       elm.classList.add('hydrated');
     }
 
-    if (BUILD.exposeAppOnReady) {
-      activelyProcessingCmps.delete(elm);
-    }
+    activelyProcessingCmps.delete(elm);
   }
 
-  if (BUILD.exposeAppOnReady && onAppReadyCallbacks.length && !activelyProcessingCmps.size) {
+  if (onAppReadyCallbacks.length && !activelyProcessingCmps.size) {
     // we've got some promises waiting on the entire app to be done processing
     // so it should have an empty queue and no longer rendering
     let cb: any;

@@ -95,7 +95,7 @@ export interface HostRef {
 
 export interface PlatformRuntime {
   appMode?: string;
-  isTmpDisconnected: boolean;
+  isTmpDisconnected?: boolean;
   queueCongestion?: number;
   queuePending?: boolean;
   supportsListenerOptions?: boolean;

@@ -66,19 +66,16 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      const runtimeImports = [
+      const platformImports = [
         'h',
         'connectedCallback',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
-        'createEvent as __stencil_createEvent'
-      ];
-      const platformImports = [
-        'registerHost as __stencil_registerHost',
+        'createEvent as __stencil_createEvent',
+        'registerHost as __stencil_registerHost'
       ];
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, runtimeImports, '@stencil/core/runtime');
       tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');
 
       if (moduleFile != null) {

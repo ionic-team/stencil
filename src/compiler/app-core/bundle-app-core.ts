@@ -17,7 +17,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     const rollupOptions: RollupOptions = {
       input: bundleEntryInputs,
       plugins: [
-        stencilDependenciesPlugin(appCoreEntryFilePath),
+        stencilDependenciesPlugin(config, appCoreEntryFilePath),
         buildConditionalsPlugin(build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
