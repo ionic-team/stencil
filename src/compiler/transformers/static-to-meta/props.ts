@@ -19,7 +19,7 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
     return {
       name: propName,
       type: val.type,
-      attribute: val.attribute,
+      attribute: val.attribute ? val.attribute.toLowerCase() : undefined,
       reflect: (typeof val.reflect === 'boolean' ? val.reflect : (typeof val.reflect === 'boolean' ? val.reflect : false)),
       mutable: !!val.mutable,
       required: !!val.required,

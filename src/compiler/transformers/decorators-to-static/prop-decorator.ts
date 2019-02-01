@@ -73,13 +73,13 @@ function propDecoratorToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.Type
 
 function getAttributeName(_diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions) {
   if (typeof propOptions.attribute === 'string' && propOptions.attribute.trim().length > 0) {
-    return propOptions.attribute.trim();
+    return propOptions.attribute.trim().toLowerCase();
   }
 
-  if (typeof (propOptions as any).attr === 'string' && (propOptions as any).attr.trim().length > 0) {
+  if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
     // const diagnostic = buildWarn(diagnostics);
     // diagnostic.messageText = `@Prop option "attr" has been depreciated. Please use "attribute" instead.`;
-    return (propOptions as any).attr.trim();
+    return propOptions.attr.trim().toLowerCase();
   }
 
   return toDashCase(propName);

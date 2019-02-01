@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, doc, loadModule, plt, writeTask } from '@platform';
-import { parsePropertyValue } from './parse-property-value';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 
@@ -71,7 +70,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
       try {
         const LazyCstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
 
-        if (BUILD.member && !LazyCstr.isProxied && cmpMeta.cmpMembers) {
+        if (BUILD.member && !LazyCstr.isProxied) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
           proxyComponent(LazyCstr, cmpMeta, 0, 1);
@@ -82,7 +81,11 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
         BUILD.member && (hostRef.isConstructingInstance = true);
-        new (LazyCstr as any)(hostRef);
+        try {
+          new (LazyCstr as any)(hostRef);
+        } catch (err) {
+          consoleError(err);
+        }
         BUILD.member && (hostRef.isConstructingInstance = false);
 
         if (BUILD.hostListener && hostRef.queuedReceivedHostEvents) {
@@ -94,7 +97,11 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
             // first item the eventMethodName
             // second item is the event data
             // take a look at hostEventListenerProxy()
-            hostRef.lazyInstance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
+            try {
+              hostRef.lazyInstance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
+            } catch (err) {
+              consoleError(err);
+            }
           }
           hostRef.queuedReceivedHostEvents = undefined;
         }
@@ -102,17 +109,6 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
       } catch (e) {
         consoleError(e);
       }
-    }
-
-    if (BUILD.observeAttribute && cmpMeta.attrNameToPropName) {
-      cmpMeta.attrNameToPropName.forEach((propName, attrName) => {
-        if (elm.hasAttribute(attrName)) {
-          hostRef.instanceValues.set(
-            propName,
-            parsePropertyValue(elm.getAttribute(attrName), cmpMeta.cmpMembers[propName][0])
-          );
-        }
-      });
     }
 
     if (BUILD.taskQueue) {

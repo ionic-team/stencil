@@ -28,7 +28,7 @@ export interface PropOptions {
   reflect?: boolean;
 
   /** @deprecated: "attr" has been deprecated, please use "attribute" instead. */
-  attr2?: string;
+  attr?: string;
   /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
   context?: string;
   /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */

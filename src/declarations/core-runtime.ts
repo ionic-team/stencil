@@ -12,7 +12,6 @@ export type LazyBundleRuntimeData = [
 
 
 export interface ComponentRuntimeMeta {
-  attrNameToPropName?: Map<string, string>;
   cmpMembers?: d.ComponentRuntimeMembers;
   propNameToAttrName?: Map<string, string>;
   cmpHostListeners?: d.ComponentRuntimeHostListener[];

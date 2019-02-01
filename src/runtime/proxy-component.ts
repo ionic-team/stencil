@@ -13,8 +13,11 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       Cstr.cmpMeta = cmpMeta;
     }
 
+    // It's better to have a const than two Object.entries()
+    const members = Object.entries(cmpMeta.cmpMembers);
+
     if (BUILD.observeAttribute && isElementConstructor) {
-      cmpMeta.attrNameToPropName = new Map();
+      const attrNameToPropName = new Map();
 
       if (BUILD.reflect) {
         cmpMeta.propNameToAttrName = new Map();
@@ -26,8 +29,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
           const attribute = m[1] || propName;
-          cmpMeta.attrNameToPropName.set(attribute, propName);
-
+          attrNameToPropName.set(attribute, propName);
           if (BUILD.reflect) {
             cmpMeta.propNameToAttrName.set(propName, attribute);
           }
@@ -37,12 +39,11 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
         if (!cmpMeta.isReflectingAttribute) {
-          this[cmpMeta.attrNameToPropName.get(attrName)] = newValue;
+          this[attrNameToPropName.get(attrName)] = newValue;
         }
       };
     }
-    Object.entries(cmpMeta.cmpMembers).forEach(([memberName, [memberFlags]]) => {
-
+    members.forEach(([memberName, [memberFlags]]) => {
       if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberFlags & MEMBER_FLAGS.State))) {
         // proxyComponent - prop
         Object.defineProperty((Cstr as any).prototype, memberName,

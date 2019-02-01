@@ -26,7 +26,7 @@ describe('attribute', () => {
     expect(root.multiWord).toBe('multi-word');
   });
 
-  it('custom attribute name', async () => {
+  fit('custom attribute name', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
       @Prop({ attribute: 'some-customName' }) customAttr: string;
