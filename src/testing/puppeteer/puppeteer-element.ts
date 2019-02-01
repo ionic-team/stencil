@@ -446,7 +446,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
         return rtn;
       });
 
-    }, this._elmHandle, this._queuedActions);
+    }, this._elmHandle, this._queuedActions as any);
 
     this._queuedActions.length = 0;
 

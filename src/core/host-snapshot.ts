@@ -36,9 +36,11 @@ export const initHostSnapshot = (domApi: d.DomApi, cmpMeta: d.ComponentMeta, hos
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
 
-      if ((window as any).HTMLElement && !('shadowRoot' in (window as any).HTMLElement.prototype)) {
-        (hostElm as any).shadowRoot = hostElm;
-      }
+      try {
+        if ((window as any).HTMLElement && !('shadowRoot' in (window as any).HTMLElement.prototype)) {
+          (hostElm as any).shadowRoot = hostElm;
+        }
+      } catch (e) {}
     }
   }
 
