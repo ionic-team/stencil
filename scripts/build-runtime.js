@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const { run, transpile } = require('./script-utils');
-const { minifyClientCore } = require('./minify-client-core');
 const buildPolyfills = require('./build-polyfills');
 
 const ROOT_DIR = path.join(__dirname, '..');
@@ -106,12 +105,6 @@ async function bundleClient() {
       file: path.join(DIST_CLIENT_DIR, 'index.js')
     })
   ]);
-
-  const minifyOutput = minifyClientCore(results[0].output[0].code);
-
-  const minifiedClientMjsPath = path.join(DIST_CLIENT_DIR, 'index.min.mjs');
-
-  await fs.writeFile(minifiedClientMjsPath, minifyOutput.code);
 }
 
 
