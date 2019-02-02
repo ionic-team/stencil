@@ -1,0 +1,39 @@
+import * as d from '@declarations';
+import { EVENT_FLAGS } from '@utils';
+import ts from 'typescript';
+
+
+export function createEvents(cmpMeta: d.ComponentCompilerMeta) {
+  return cmpMeta.events.map(ev => {
+    return ts.createStatement(ts.createAssignment(
+      ts.createPropertyAccess(
+        ts.createThis(),
+        ts.createIdentifier(ev.method)
+      ),
+      ts.createCall(
+        ts.createIdentifier('__stencil_createEvent'),
+        undefined,
+        [
+          ts.createThis(),
+          ts.createLiteral(ev.name),
+          ts.createLiteral(computeFlags(ev))
+        ]
+      )
+    ));
+  });
+}
+
+
+function computeFlags(eventMeta: d.ComponentCompilerEvent) {
+  let flags = 0;
+  if (eventMeta.bubbles) {
+    flags |= EVENT_FLAGS.Bubbles;
+  }
+  if (eventMeta.composed) {
+    flags |= EVENT_FLAGS.Composed;
+  }
+  if (eventMeta.cancelable) {
+    flags |= EVENT_FLAGS.Cancellable;
+  }
+  return flags;
+}

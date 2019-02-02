@@ -2,10 +2,9 @@ import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { registerStyle } from '../register-style';
-import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
+import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
-import { getEventStatements, updateConstructor } from '../register-constructor';
 
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
@@ -56,7 +55,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(moduleFile, node);
           if (cmp != null) {
-            return updateComponentClass(node, cmp);
+            return updateNativeComponentClass(node, cmp);
           }
 
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -85,116 +84,4 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
-}
-
-
-function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
-  return ts.updateClassDeclaration(
-    classNode,
-    classNode.decorators,
-    classNode.modifiers,
-    classNode.name,
-    classNode.typeParameters,
-    updateHostComponentHeritageClauses(classNode),
-    updateHostComponentMembers(classNode, cmp)
-  );
-}
-
-
-function updateHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
-  if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
-    return classNode.heritageClauses;
-  }
-
-  const heritageClause = ts.createHeritageClause(
-    ts.SyntaxKind.ExtendsKeyword, [
-      ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
-    ]
-  );
-
-  return [heritageClause];
-}
-
-
-function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
-  const classMembers = removeStaticMetaProperties(classNode);
-
-  updateConstructor(classMembers, [], [
-    getRegisterHostStatement(),
-    ...getEventStatements(cmp)
-  ]);
-
-  addConnectedCallback(classMembers);
-  addElementGetter(classMembers, cmp);
-
-  return classMembers;
-}
-
-function getRegisterHostStatement() {
-  return ts.createStatement(ts.createCall(
-    ts.createIdentifier('__stencil_registerHost'),
-    undefined,
-    [ ts.createThis() ]
-  ));
-}
-
-
-function addConnectedCallback(classMembers: ts.ClassElement[]) {
-  // function call to stencil's exported connectedCallback(elm, plt)
-  const methodName = 'connectedCallback';
-
-  const args: any = [
-    ts.createThis()
-  ];
-
-  const fnCall = ts.createCall(
-    ts.createIdentifier(methodName), undefined, args
-  );
-
-  const connectedCallback = classMembers.find(classMember => {
-    return (classMember.kind === ts.SyntaxKind.MethodDeclaration && (classMember.name as any).escapedText === methodName);
-  }) as ts.MethodDeclaration;
-
-  if (connectedCallback != null) {
-    // class already has a connectedCallback(), so update it
-    connectedCallback.body = ts.updateBlock(connectedCallback.body, [
-      ts.createExpressionStatement(fnCall),
-      ...connectedCallback.body.statements
-    ]);
-
-  } else {
-    // class doesn't have a connectedCallback(), so add it
-    const body = ts.createBlock([
-      ts.createExpressionStatement(fnCall)
-    ], true);
-
-    const callbackMethod = ts.createMethod(undefined, undefined, undefined,
-      methodName, undefined, undefined, undefined, undefined,
-      body
-    );
-    classMembers.push(callbackMethod);
-  }
-}
-
-
-function addElementGetter(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
-  // @Element() element;
-  // is transformed into:
-  // get element() { return this; }
-  if (cmpMeta.elementRef) {
-    classMembers.push(
-      ts.createGetAccessor(
-        undefined,
-        undefined,
-        cmpMeta.elementRef,
-        [],
-        undefined,
-        ts.createBlock([
-          ts.createReturn(
-            ts.createThis()
-          )
-        ])
-      )
-    );
-  }
 }

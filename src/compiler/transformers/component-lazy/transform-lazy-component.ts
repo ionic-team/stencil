@@ -1,12 +1,9 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerInstanceStatement, updateLazyComponentConstructor } from './register-lazy-constructor';
-import { getEventStatements, updateConstructor } from '../register-constructor';
-import { registerLazyElementGetter } from './register-lazy-element-getter';
 import { registerStyle } from '../register-style';
-import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { removeStencilImport } from '../remove-stencil-import';
+import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
 
@@ -58,7 +55,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(moduleFile, node);
           if (cmp != null) {
-            return updateComponentClass(node, cmp);
+            return updateLazyComponentClass(node, cmp);
           }
 
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -86,32 +83,4 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
-}
-
-
-function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
-  return ts.updateClassDeclaration(
-    classNode,
-    classNode.decorators,
-    classNode.modifiers,
-    classNode.name,
-    classNode.typeParameters,
-    classNode.heritageClauses,
-    updateLazyComponentMembers(classNode, cmp)
-  );
-}
-
-
-function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
-  const classMembers = removeStaticMetaProperties(classNode);
-
-  updateLazyComponentConstructor(classMembers);
-  registerLazyElementGetter(classMembers, cmp);
-  updateConstructor(classMembers, [
-    registerInstanceStatement()
-  ], [
-    ...getEventStatements(cmp)
-  ]);
-
-  return classMembers;
 }

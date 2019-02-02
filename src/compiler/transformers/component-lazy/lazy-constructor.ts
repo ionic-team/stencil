@@ -1,6 +1,5 @@
 import ts from 'typescript';
 
-const HOST_REF_ARG = 'hostRef';
 
 export function updateLazyComponentConstructor(classMembers: ts.ClassElement[]) {
   const cstrMethodArgs = [
@@ -22,18 +21,22 @@ export function updateLazyComponentConstructor(classMembers: ts.ClassElement[]) 
       cstrMethodArgs,
       cstrMethod.body,
     );
+
   } else {
     const cstrMethod = ts.createConstructor(
       undefined,
       undefined,
       cstrMethodArgs,
-      ts.createBlock([], true),
+      ts.createBlock([
+        registerInstanceStatement()
+      ], true),
     );
     classMembers.unshift(cstrMethod);
   }
 }
 
-export function registerInstanceStatement() {
+
+function registerInstanceStatement() {
   return ts.createStatement(ts.createCall(
     ts.createIdentifier('__stencil_registerInstance'),
     undefined,
@@ -43,3 +46,6 @@ export function registerInstanceStatement() {
     ]
   ));
 }
+
+
+const HOST_REF_ARG = 'hostRef';

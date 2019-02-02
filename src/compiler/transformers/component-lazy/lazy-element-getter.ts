@@ -1,16 +1,17 @@
-import ts from 'typescript';
 import * as d from '@declarations';
+import ts from 'typescript';
 
-export function registerLazyElementGetter(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
+
+export function addLazyElementGetter(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
   // @Element() element;
   // is transformed into:
   // get element() { return __stencil_getElement(this); }
-  if (cmpMeta.elementRef) {
+  if (cmp.elementRef) {
     classMembers.push(
       ts.createGetAccessor(
         undefined,
         undefined,
-        cmpMeta.elementRef,
+        cmp.elementRef,
         [],
         undefined,
         ts.createBlock([
