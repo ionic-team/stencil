@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { bundleAppCore } from '../app-core/bundle-app-core';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
-import { setStylePlaceholders } from '../app-core/register-app-styles';
 import { sys } from '@sys';
 import { updateToNativeComponents } from './update-to-native-component';
 
@@ -53,12 +52,6 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
     // numerous components, so make it easy on minifying
     coreText.push(formatNativeComponentRuntimeData(nativeCmps));
     coreText.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
-  }
-
-  const cmpsWithStyles = cmps.filter(cmp => cmp.styles.length > 0);
-  if (cmpsWithStyles.length > 0) {
-    const styles = await setStylePlaceholders(build, cmpsWithStyles);
-    coreText.push(styles);
   }
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });

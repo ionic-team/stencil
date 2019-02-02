@@ -2,19 +2,6 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function setStylePlaceholders(_build: d.Build, cmpsWithStyles: d.ComponentCompilerMeta[]) {
-  const c: string[] = [];
-
-  cmpsWithStyles.forEach(cmpWithStyles => {
-    const styleIdPlaceholder = getStyleIdPlaceholder(cmpWithStyles);
-    const styleTextPlaceholder = getStyleTextPlaceholder(cmpWithStyles);
-    c.push(`registerStyle('${styleIdPlaceholder}', '${styleTextPlaceholder}');`);
-  });
-
-  return c.join('\n');
-}
-
-
 export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeName: string, bundleInput: string) {
   cmps.forEach(cmp => {
     let style = cmp.styles.find(s => s.modeName === modeName);

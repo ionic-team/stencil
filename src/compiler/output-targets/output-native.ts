@@ -51,10 +51,13 @@ async function generateSelfContainedWebComponents(config: d.Config, compilerCtx:
   moduleFiles.forEach(moduleFile => {
     const p = moduleFile.cmps.map(async cmp => {
       const appCmps = [cmp];
-      const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, appCmps);
+
+      const build = getBuildFeatures(appCmps) as d.Build;
+
+      const outputText = await generateWebComponentCore(config, compilerCtx, buildCtx, build, appCmps);
 
       if (!buildCtx.shouldAbort && typeof outputText === 'string') {
-        await writeNativeSelfContained(compilerCtx, outputTargets, appCmps, outputText);
+        await writeNativeSelfContained(config, compilerCtx, buildCtx, build, outputTargets, appCmps, outputText);
       }
     });
     promises.push(...p);
@@ -78,21 +81,21 @@ async function generateBundledWebComponents(config: d.Config, compilerCtx: d.Com
     return cmps;
   }, [] as d.ComponentCompilerMeta[]);
 
-  const rollupResults = await generateWebComponentCore(config, compilerCtx, buildCtx, cmps);
+  const build = getBuildFeatures(cmps) as d.Build;
+
+  const rollupResults = await generateWebComponentCore(config, compilerCtx, buildCtx, build, cmps);
 
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
     await buildCtx.stylesPromise;
 
-    await writeNativeBundled(config, compilerCtx, outputTargets, cmps, rollupResults);
+    await writeNativeBundled(config, compilerCtx, buildCtx, build, outputTargets, cmps, rollupResults);
   }
 
   timespan.finish(`generate self-contained web components finished`);
 }
 
 
-function generateWebComponentCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
-
+function generateWebComponentCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
   build.lazyLoad = false;
   build.es5 = false;
   build.slotPolyfill = false;
