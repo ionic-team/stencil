@@ -5,6 +5,12 @@ const queuedTicks: Function[] = [];
 const queuedWriteTasks: d.RafCallback[] = [];
 const moduleLoaded = new Map();
 const queuedLoadModules: QueuedLoadModule[] = [];
+const caughtErrors: Error[] = [];
+
+
+export const consoleError = (e: any) => {
+  caughtErrors.push(e);
+};
 
 
 export function resetTaskQueue() {
@@ -12,6 +18,7 @@ export function resetTaskQueue() {
   queuedWriteTasks.length = 0;
   moduleLoaded.clear();
   queuedLoadModules.length = 0;
+  caughtErrors.length = 0;
 }
 
 
@@ -98,6 +105,9 @@ export async function flushAll() {
     await flushTicks();
     await flushLoadModule();
     await flushQueue();
+  }
+  if (caughtErrors.length > 0) {
+      throw caughtErrors[0];
   }
 }
 

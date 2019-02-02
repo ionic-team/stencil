@@ -5,11 +5,6 @@ import { setupGlobal } from '@mock-doc';
 
 export * from './task-queue';
 
-
-export const consoleError = (e: any) => {
-  throw e;
-};
-
 export const win = setupGlobal(global);
 
 export const doc = win.document;
