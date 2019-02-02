@@ -21,7 +21,7 @@ export function updateLazyComponentClass(classNode: ts.ClassDeclaration, cmp: d.
 function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateLazyComponentConstructor(classMembers);
+  updateLazyComponentConstructor(classMembers, cmp);
 
   addLazyElementGetter(classMembers, cmp);
 

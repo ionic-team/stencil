@@ -1,7 +1,9 @@
+import * as d from '@declarations';
+import { addCreateEvents } from '../create-event';
 import ts from 'typescript';
 
 
-export function updateLazyComponentConstructor(classMembers: ts.ClassElement[]) {
+export function updateLazyComponentConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
   const cstrMethodArgs = [
     ts.createParameter(
       undefined,
@@ -13,22 +15,32 @@ export function updateLazyComponentConstructor(classMembers: ts.ClassElement[]) 
 
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
   if (cstrMethodIndex >= 0) {
+    // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+
+    const body = ts.updateBlock(cstrMethod.body, [
+      registerInstanceStatement(),
+      ...cstrMethod.body.statements,
+      ...addCreateEvents(cmp)
+    ]);
+
     classMembers[cstrMethodIndex] = ts.updateConstructor(
       cstrMethod,
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethodArgs,
-      cstrMethod.body,
+      body,
     );
 
   } else {
+    // create a constructor()
     const cstrMethod = ts.createConstructor(
       undefined,
       undefined,
       cstrMethodArgs,
       ts.createBlock([
-        registerInstanceStatement()
+        registerInstanceStatement(),
+        ...addCreateEvents(cmp)
       ], true),
     );
     classMembers.unshift(cstrMethod);

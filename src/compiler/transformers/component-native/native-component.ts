@@ -37,7 +37,7 @@ function updateNativeHostComponentHeritageClauses(classNode: ts.ClassDeclaration
 function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateNativeConstructor(classMembers);
+  updateNativeConstructor(classMembers, cmp);
 
   addNativeConnectedCallback(classMembers);
 

@@ -3,8 +3,8 @@ import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
 
 
-export function createEvents(cmpMeta: d.ComponentCompilerMeta) {
-  return cmpMeta.events.map(ev => {
+export function addCreateEvents(cmp: d.ComponentCompilerMeta) {
+  return cmp.events.map(ev => {
     return ts.createStatement(ts.createAssignment(
       ts.createPropertyAccess(
         ts.createThis(),
