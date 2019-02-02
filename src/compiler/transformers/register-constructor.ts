@@ -1,6 +1,7 @@
-import ts from 'typescript';
 import * as d from '@declarations';
 import { EVENT_FLAGS } from '@utils';
+import ts from 'typescript';
+
 
 export function updateConstructor(classMembers: ts.ClassElement[], before: ts.Statement[], after: ts.Statement[]) {
   if (before.length + after.length === 0) {
@@ -10,29 +11,47 @@ export function updateConstructor(classMembers: ts.ClassElement[], before: ts.St
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
   if (cstrMethodIndex >= 0) {
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+
+    const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
+    if (!hasSuper) {
+      before.unshift(createSuper());
+    }
+
+    const body = ts.updateBlock(cstrMethod.body, [
+      ...before,
+      ...cstrMethod.body.statements,
+      ...after
+    ]);
+
     classMembers[cstrMethodIndex] = ts.updateConstructor(
       cstrMethod,
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethod.parameters,
-      ts.updateBlock(cstrMethod.body, [
-        ...before,
-        ...cstrMethod.body.statements,
-        ...after
-      ])
+      body
     );
+
   } else {
     const cstrMethod = ts.createConstructor(
       undefined,
       undefined,
       undefined,
       ts.createBlock([
+        createSuper(),
         ...before,
         ...after
       ], true)
     );
     classMembers.unshift(cstrMethod);
   }
+}
+
+function createSuper() {
+  return ts.createExpressionStatement(ts.createCall(
+    ts.createIdentifier('super'),
+    undefined,
+    undefined
+  ));
 }
 
 export function getEventStatements(cmpMeta: d.ComponentCompilerMeta) {

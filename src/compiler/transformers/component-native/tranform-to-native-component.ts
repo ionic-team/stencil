@@ -95,13 +95,17 @@ function updateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCo
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
-    updateHostComponentHeritageClauses(),
+    updateHostComponentHeritageClauses(classNode),
     updateHostComponentMembers(classNode, cmp)
   );
 }
 
 
-function updateHostComponentHeritageClauses() {
+function updateHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
+  if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
+    return classNode.heritageClauses;
+  }
+
   const heritageClause = ts.createHeritageClause(
     ts.SyntaxKind.ExtendsKeyword, [
       ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
@@ -115,45 +119,23 @@ function updateHostComponentHeritageClauses() {
 function updateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  addSuperToConstructor(classMembers);
-  addConnectedCallback(classMembers);
-  registerElementGetter(classMembers, cmp);
-
-  // TODO, before needs to be added AFTEr super()
   updateConstructor(classMembers, [], [
+    getRegisterHostStatement(),
     ...getEventStatements(cmp)
   ]);
+
+  addConnectedCallback(classMembers);
+  addElementGetter(classMembers, cmp);
 
   return classMembers;
 }
 
-function registerHostStatement() {
+function getRegisterHostStatement() {
   return ts.createStatement(ts.createCall(
     ts.createIdentifier('__stencil_registerHost'),
     undefined,
     [ ts.createThis() ]
   ));
-}
-
-
-function addSuperToConstructor(classMembers: ts.ClassElement[]) {
-  const cstrMethod = classMembers.find(classMember => {
-    return (classMember.kind === ts.SyntaxKind.Constructor);
-  }) as ts.ConstructorDeclaration;
-
-  if (cstrMethod) {
-    const superCall = ts.createCall(
-      ts.createIdentifier('super'),
-      undefined,
-      undefined
-    );
-
-    cstrMethod.body = ts.updateBlock(cstrMethod.body, [
-      ts.createExpressionStatement(superCall),
-      registerHostStatement(),
-      ...cstrMethod.body.statements
-    ]);
-  }
 }
 
 
@@ -194,7 +176,8 @@ function addConnectedCallback(classMembers: ts.ClassElement[]) {
   }
 }
 
-function registerElementGetter(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
+
+function addElementGetter(classMembers: ts.ClassElement[], cmpMeta: d.ComponentCompilerMeta) {
   // @Element() element;
   // is transformed into:
   // get element() { return this; }
