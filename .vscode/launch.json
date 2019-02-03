@@ -7,7 +7,20 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Test End-To-End",
+      "name": "Test Style Modes",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--config",
+        "${workspaceFolder}/test/style-modes/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test End-To-End",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
