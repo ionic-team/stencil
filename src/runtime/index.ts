@@ -1,8 +1,8 @@
 
 export { bootstrapLazy } from './bootstrap-lazy';
-export { connectedCallback } from './connected';
+export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';
-export { disconnectedCallback } from './disconnected';
+export { disconnectedCallback } from './disconnected-callback';
 export { getConnect } from './connect';
 export { getElement } from './element';
 export { h } from './vdom/h';

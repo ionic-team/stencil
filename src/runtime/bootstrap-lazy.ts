@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { connectedCallback } from './connected';
-import { disconnectedCallback } from './disconnected';
+import { connectedCallback } from './connected-callback';
+import { disconnectedCallback } from './disconnected-callback';
 import { hostRefs, registerHost, tick } from '@platform';
 import { initialLoad } from './initial-load';
 import { proxyComponent } from './proxy-component';
