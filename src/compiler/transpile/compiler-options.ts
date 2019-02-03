@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { logger } from '@sys';
+import { logger, sys } from '@sys';
 import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
 
@@ -17,13 +17,14 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
 
     const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
-    if (tsconfigResults.error) {
+    if (tsconfigResults.error != null) {
       if (!config._isTesting) {
         buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsconfigResults.error));
       }
 
     } else {
-      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, '.');
+      const configBasePath = sys.path.dirname(config.configPath);
+      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, configBasePath);
       if (parseResult.errors && parseResult.errors.length > 0) {
         loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
 
