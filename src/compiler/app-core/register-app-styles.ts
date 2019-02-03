@@ -2,13 +2,14 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeName: string, bundleInput: string) {
+export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeName: string, code: string) {
   cmps.forEach(cmp => {
-    let style = cmp.styles.find(s => s.modeName === modeName);
+    let styleModeName = modeName;
+    let style = cmp.styles.find(s => s.modeName === styleModeName);
 
     if (style == null || typeof style.compiledStyleText !== 'string') {
-      modeName = DEFAULT_STYLE_MODE;
-      style = cmp.styles.find(s => s.modeName === modeName);
+      styleModeName = DEFAULT_STYLE_MODE;
+      style = cmp.styles.find(s => s.modeName === styleModeName);
       if (style == null || typeof style.compiledStyleText !== 'string') {
         return;
       }
@@ -16,13 +17,13 @@ export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeNa
 
     const styleIdPlaceholder = getStyleIdPlaceholder(cmp);
     const styleTextPlaceholder = getStyleTextPlaceholder(cmp);
-    const styleId = getStyleId(cmp, modeName);
+    const styleId = getStyleId(cmp, styleModeName);
 
-    bundleInput = bundleInput.replace(styleIdPlaceholder, styleId);
-    bundleInput = bundleInput.replace(styleTextPlaceholder, style.compiledStyleText);
+    code = code.replace(styleIdPlaceholder, styleId);
+    code = code.replace(styleTextPlaceholder, style.compiledStyleText);
   });
 
-  return bundleInput;
+  return code;
 }
 
 

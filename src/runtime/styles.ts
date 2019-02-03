@@ -6,7 +6,7 @@ import { doc, rootAppliedStyles, styles } from '@platform';
 export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
 
   if (BUILD.mode) {
-    styleId = elm.tagName + '.' +  elm.mode;
+    styleId = elm.tagName + elm.mode;
     if (!styles.has(styleId)) {
       styleId = elm.tagName;
     }

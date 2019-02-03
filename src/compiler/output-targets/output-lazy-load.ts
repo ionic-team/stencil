@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { generateLazyAppCore } from '../component-lazy/generate-lazy-core';
-import { generateLazyBundleModules } from '../component-lazy/generate-lazy-output';
+import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
 
@@ -41,7 +41,7 @@ export async function generateLazyLoads(config: d.Config, compilerCtx: d.Compile
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
     await buildCtx.stylesPromise;
 
-    const bundleModules = await generateLazyBundleModules(config, compilerCtx, buildCtx, outputTargets, rollupResults);
+    const bundleModules = await generateLazyModules(config, compilerCtx, buildCtx, outputTargets, rollupResults);
 
     await writeLazyAppCore(config, compilerCtx, buildCtx, outputTargets, build, rollupResults, bundleModules);
   }

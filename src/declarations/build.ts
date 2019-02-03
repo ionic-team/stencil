@@ -221,18 +221,6 @@ export interface BundleOutputChunk {
   name: string;
 }
 
-// export interface DerivedChunk {
-//   entryKey: string;
-//   fileName: string;
-//   code: string;
-// }
-
-// export interface DerivedModule {
-//   chunks: DerivedChunk[];
-//   sourceTarget: SourceTarget;
-//   moduleFormat: ModuleFormat;
-// }
-
 export type SourceTarget = 'es5' | 'es2017';
 
 export type ModuleFormat = 'esm' | 'amd';

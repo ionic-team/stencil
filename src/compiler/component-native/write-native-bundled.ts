@@ -21,14 +21,14 @@ export function writeNativeBundled(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function writeNativeBundledMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[], modeName: string, code: string) {
-  code = replaceStylePlaceholders(cmps, modeName, code);
-
   const results = await optimizeAppCoreBundle(config, compilerCtx, build, code);
   buildCtx.diagnostics.push(...results.diagnostics);
 
   if (results.diagnostics.length === 0 && typeof results.output === 'string') {
     code = results.output;
   }
+
+  code = replaceStylePlaceholders(cmps, modeName, code);
 
   return code;
 }
