@@ -72,11 +72,6 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
   const results = await sys.minifyJs(input, opts);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
 
-    if (!build.asyncLifecycle) {
-      results.output = results.output.replace(/async/g, '')
-                                     .replace(/await/g, '');
-    }
-
     if (!build.lazyLoad) {
       results.output = results.output.replace(/export(.*);/, '');
 

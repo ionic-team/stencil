@@ -2,13 +2,13 @@ import * as d from '@declarations';
 import { sys } from '@sys';
 
 
-export async function generateCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
 
   const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return o.type === 'dist' && o.collectionDir;
+    return (o.type === 'dist' && o.collectionDir);
   });
 
   if (outputTargets.length === 0) {
@@ -17,17 +17,11 @@ export async function generateCollections(config: d.Config, compilerCtx: d.Compi
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
 
-  const promises: Promise<any>[] = [];
-
-  buildCtx.moduleFiles.forEach(moduleFile => {
-    moduleFile.cmps.forEach(cmp => {
-      promises.push(
-        generateCollection(config, compilerCtx, outputTargets, moduleFile, cmp)
-      );
-    });
-  });
-
-  await Promise.all(promises);
+  await Promise.all(buildCtx.moduleFiles.map(moduleFile => {
+    return Promise.all(moduleFile.cmps.map(cmp => {
+      return generateCollection(config, compilerCtx, outputTargets, moduleFile, cmp);
+    }));
+  }));
 
   timespan.finish(`generate collections finished`);
 }

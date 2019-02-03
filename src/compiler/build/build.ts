@@ -4,7 +4,7 @@ import { catchError } from '@utils';
 import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
-import { generateOutputTargets } from '../output-targets/generate-outputs';
+import { generateOutputTargets } from '../output-targets';
 import { initIndexHtmls } from '../html/init-index-html';
 import { sys } from '@sys';
 import { transpileApp } from '../transpile/transpile-app';

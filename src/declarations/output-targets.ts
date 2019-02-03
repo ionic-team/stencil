@@ -180,6 +180,16 @@ export interface OutputTargetWebComponent extends OutputTargetBase {
 }
 
 
+export interface OutputTargetSelfContained extends OutputTargetBase {
+  type: 'selfcontained';
+
+  dir?: string;
+  buildDir?: string;
+  resourcesUrl?: string;
+  empty?: boolean;
+}
+
+
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs';
 
@@ -244,4 +254,5 @@ export type OutputTarget =
  | OutputTargetHydrate
  | OutputTargetDist
  | OutputTargetWebComponent
+ | OutputTargetSelfContained
  | OutputTargetWww;

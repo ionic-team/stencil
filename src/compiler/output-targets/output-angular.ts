@@ -1,10 +1,10 @@
 import * as d from '@declarations';
 import { dashToPascalCase } from '@utils';
 import { isDocsPublic } from '@utils';
-import { logger, sys } from '@sys';
+import { sys } from '@sys';
 
 
-export async function generateAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
@@ -28,16 +28,14 @@ export async function generateAngularProxies(config: d.Config, compilerCtx: d.Co
   timespan.finish(`generate angular proxies finished`);
 }
 
-async function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
+function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
   const components = getComponents(outputTarget.excludeComponents, moduleFiles);
 
-  await Promise.all([
+  return Promise.all([
     generateProxies(compilerCtx, components, outputTarget),
     generateAngularArray(compilerCtx, components, outputTarget),
     generateAngularUtils(compilerCtx, outputTarget)
   ]);
-
-  logger.debug(`generated angular directives: ${outputTarget.directivesProxyFile}`);
 }
 
 function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
@@ -55,7 +53,7 @@ function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
     });
 }
 
-async function generateProxies(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
+function generateProxies(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
   const proxies = getProxies(components);
 
   const imports = `/* tslint:disable */
@@ -73,7 +71,8 @@ import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular
   ];
 
   const finalText = final.join('\n') + '\n';
-  await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
+
+  return compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
 }
 
 function getProxies(components: d.ComponentCompilerMeta[]) {
@@ -167,9 +166,9 @@ function getProxyUtils(outputTarget: d.OutputTargetAngular) {
   }
 }
 
-async function generateAngularArray(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
+function generateAngularArray(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular): Promise<any> {
   if (!outputTarget.directivesArrayFile) {
-    return;
+    return Promise.resolve();
   }
 
   const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
@@ -185,7 +184,7 @@ export const DIRECTIVES = [
 ${directives}
 ];
 `;
-  await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, c);
+  return compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, c);
 }
 
 async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular) {

@@ -1,13 +1,12 @@
 import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
-// import { formatBrowserLoaderComponent } from '../../util/data-serialize';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from './output-file-naming';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from './output-utils';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
 
-export async function generateEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }

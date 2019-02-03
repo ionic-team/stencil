@@ -4,7 +4,7 @@ import { sys } from '@sys';
 import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script';
 
 
-export async function generateIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!config.srcIndexHtml) {
     return;
   }

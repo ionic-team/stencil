@@ -5,7 +5,7 @@ import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { sys } from '@sys';
 
 
-export function writeNativeSelfContained(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], outputText: string) {
+export function writeNativeSelfContained(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, outputTargets: d.OutputTargetSelfContained[], cmps: d.ComponentCompilerMeta[], outputText: string) {
   const allModes = getAllModes(cmps);
 
   return Promise.all(allModes.map(async modeName => {
@@ -34,7 +34,7 @@ async function writeNativeSelfContainedMode(config: d.Config, compilerCtx: d.Com
 }
 
 
-function writeNativeSelfContainedModeOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWebComponent, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
+function writeNativeSelfContainedModeOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetSelfContained, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
   let fileName = `${cmpMeta.tagName}`;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName}`;
