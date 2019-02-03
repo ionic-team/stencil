@@ -72,13 +72,14 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
         'createEvent as __stencil_createEvent',
-        'registerHost as __stencil_registerHost'
+        'registerHost as __stencil_registerHost',
+        'registerStyle as __stencil_registerStyle'
       ];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');
 
       if (moduleFile != null) {
-        tsSourceFile = registerStyle(transformCtx, tsSourceFile, moduleFile.cmps);
+        tsSourceFile = registerStyle(tsSourceFile, moduleFile.cmps);
       }
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);

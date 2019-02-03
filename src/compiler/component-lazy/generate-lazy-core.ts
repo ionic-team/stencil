@@ -4,7 +4,7 @@ import { sys } from '@sys';
 
 
 export async function generateLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const appCoreEntryFilePath = await generateLazyAppCoreEntry(config, compilerCtx, build);
+  const appCoreEntryFilePath = await generateLazyAppCoreEntry(config, compilerCtx);
 
   const bundleEntryInputs: d.BundleEntryInputs = {};
 
@@ -16,19 +16,9 @@ export async function generateLazyAppCore(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, _build: d.Build) {
+async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx) {
   const appCoreEntryFileName = `${config.fsNamespace}-lazy.mjs`;
   const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
-
-  const platformExports: string[] = [];
-
-  platformExports.push('createEvent');
-  platformExports.push('getConnect');
-  platformExports.push('getElement');
-  platformExports.push('h');
-  platformExports.push('getContext');
-  platformExports.push('registerInstance');
-  platformExports.push('registerStyle');
 
   const coreText: string[] = [];
 
@@ -36,6 +26,15 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
 
   coreText.push(`bootstrapLazy([]);`);
 
+  const platformExports: string[] = [
+    'createEvent',
+    'getConnect',
+    'getContext',
+    'getElement',
+    'h',
+    'registerInstance',
+    'registerStyle'
+  ];
   coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });

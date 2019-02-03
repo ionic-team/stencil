@@ -26,16 +26,16 @@ export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeNa
 }
 
 
-function getStyleId(cmpMeta: d.ComponentCompilerMeta, modeName: string) {
-  return `${cmpMeta.tagName.toUpperCase()}${modeName === DEFAULT_STYLE_MODE ? '' : modeName}`;
+function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string) {
+  return `${cmp.tagName.toUpperCase()}${modeName === DEFAULT_STYLE_MODE ? '' : modeName}`;
 }
 
-function getStyleIdPlaceholder(cmpMeta: d.ComponentCompilerMeta) {
-  return `${cmpMeta.tagName.toUpperCase()}$STYLE-ID-PLACEHOLDER`;
+export function getStyleIdPlaceholder(cmp: d.ComponentCompilerMeta) {
+  return `STYLE_ID_PLACEHOLDER:${cmp.tagName}`;
 }
 
-function getStyleTextPlaceholder(cmpMeta: d.ComponentCompilerMeta) {
-  return `${cmpMeta.tagName.toUpperCase()}$STYLE-TEXT-PLACEHOLDER`;
+export function getStyleTextPlaceholder(cmp: d.ComponentCompilerMeta) {
+  return `STYLE_TEXT_PLACEHOLDER:${cmp.tagName}`;
 }
 
 

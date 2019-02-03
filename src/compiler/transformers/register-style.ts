@@ -1,17 +1,12 @@
 import * as d from '@declarations';
-import { addImports } from './transform-utils';
+import { getStyleIdPlaceholder, getStyleTextPlaceholder } from '../app-core/register-app-styles';
 import ts from 'typescript';
 
 
-export function registerStyle(transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, cmps: d.ComponentCompilerMeta[]) {
+export function registerStyle(tsSourceFile: ts.SourceFile, cmps: d.ComponentCompilerMeta[]) {
   if (!cmps.some(cmp => cmp.hasStyle)) {
     return tsSourceFile;
   }
-
-  tsSourceFile = addImports(transformCtx, tsSourceFile,
-    ['registerStyle'],
-    '@stencil/core/app',
-  );
 
   const registerStyleCalls = cmps.map(createRegisterStyleCall);
 
@@ -23,13 +18,13 @@ export function registerStyle(transformCtx: ts.TransformationContext, tsSourceFi
 
 
 function createRegisterStyleCall(cmp: d.ComponentCompilerMeta) {
-  const registerStyleMethodArgs: any = [
-    ts.createStringLiteral(`STYLE_ID_PLACEHOLDER:${cmp.tagName}`),
-    ts.createStringLiteral(`STYLE_TEXT_PLACEHOLDER:${cmp.tagName}`)
+  const registerStyleMethodArgs = [
+    ts.createStringLiteral(getStyleIdPlaceholder(cmp)),
+    ts.createStringLiteral(getStyleTextPlaceholder(cmp))
   ];
 
   const registerStyleMethod = ts.createCall(
-    ts.createIdentifier('registerStyle'),
+    ts.createIdentifier('__stencil_registerStyle'),
     undefined,
     registerStyleMethodArgs
   );

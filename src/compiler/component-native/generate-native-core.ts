@@ -6,13 +6,13 @@ import { updateToNativeComponents } from './update-to-native-component';
 
 
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
-  const appCoreEntryFilePath = await generateNativeAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
+  const appCoreEntryFilePath = await generateNativeAppCoreEntry(config, compilerCtx, buildCtx, build, cmps);
 
   return bundleAppCore(config, compilerCtx, buildCtx, build, [], appCoreEntryFilePath, {});
 }
 
 
-async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
+async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
   const appCoreEntryFileName = `${config.fsNamespace}-native.mjs`;
   const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
 
@@ -20,15 +20,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   const nativeCmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
 
   const platformImports: string[] = [];
-
-  platformImports.push('createEvent');
-  platformImports.push('getConnect');
-  platformImports.push('getContext');
-  platformImports.push('getElement');
-  platformImports.push('h');
   platformImports.push('proxyComponent');
-  platformImports.push('registerHost');
-  platformImports.push('registerStyle');
 
   coreText.push(`import { ${platformImports.join(', ')} } from '@stencil/core/platform';`);
 
@@ -53,6 +45,17 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
     coreText.push(formatNativeComponentRuntimeData(nativeCmps));
     coreText.push(`.forEach(cmp => customElements.define(cmp[0], proxyComponent(cmp[1], cmp[2], 1, 1)));`);
   }
+
+  const platformExports: string[] = [
+    'createEvent',
+    'getConnect',
+    'getContext',
+    'getElement',
+    'h',
+    'registerHost',
+    'registerStyle'
+  ];
+  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 
   await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
 
