@@ -38,7 +38,7 @@ Stencil is able to generate components into various formats so they can be best 
 - Generates ES Modules to be imported by other bundlers, such as `dist/es2017/` and `dist/es5`.
 
 
-### selfcontained
+### `selfcontained`
 
 - Generates a directory of each component as its own stand-alone web component.
 - Does not import any functions and works as is within the browser.
@@ -48,3 +48,27 @@ Stencil is able to generate components into various formats so they can be best 
 
 - Generates a wrapper Angular component proxy.
 - Web componets themselves work fine within Angular, but you loose out on many of Angular's features, such as types or `@ViewChild`. In order for a Stencil project to fit right into the Angular ecosystem, this output target generates thin wrapper that can be imported by Angular.
+
+
+## Output Folder Structure
+
+```
+- dist/
+  - collection/
+  - selfcontained/
+  - esm/ (modules to be imported)
+    - es5/ (es5 target)
+      - index.mjs
+    - es2017/
+      - index.mjs
+  - loader
+    - index.mjs (points to the esm/es2017/ directory)
+  - types/
+  - app.js (legacy es5 script)
+  - app.mjs (modern esm script)
+- www/
+  - build/
+    - app.js (legacy es5 script)
+    - app.mjs (modern esm script)
+  - index.html
+```
