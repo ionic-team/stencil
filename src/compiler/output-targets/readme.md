@@ -5,7 +5,7 @@ Stencil is able to generate components into various formats so they can be best 
 
 ## Output Target Terms
 
-`app`: A prebuilt, stand-alone webapp built from the components. These are already built to be loaded by just a script tag, no additional builds or bundling required. Both the `www` and `dist` output target types save an "app" into their directories. When saving the webapp into the `dist/` directory, it can be easily packaged up and used with a service like `unpkg.com`. See https://www.npmjs.com/package/@ionic/core
+`script`: A prebuilt, stand-alone webapp already built from the components. These are already built to be loaded by just a script tag, no additional builds or bundling required. Both the `www` and `dist` output target types save an "app" into their directories. When saving the webapp into the `dist/` directory, it can be easily packaged up and used with a service like `unpkg.com`. See https://www.npmjs.com/package/@ionic/core
 
 `collection`: Source files transpiled down to simple JavaScript, and all component metadata placed on the component class as static getters. When one Stencil distribution imports another, it will use these files when generating its own distribution. What's important is that the source code of a `collection` is future proof, meaning no matter what version of Stencil it can import and understand the component metadata.
 
@@ -33,9 +33,9 @@ Stencil is able to generate components into various formats so they can be best 
 
 ### `dist`
 
+- Generates `modules` to be imported by other bundlers, such as `dist/es2017/` and `dist/es5`.
 - Generates an `app` at the root of the `dist/` directory. It's the same stand-alone webapp as the `www` type, but located in dist so it's easy to package up and shared.
 - Generates a `collection` into the `dist/collection/` directory to be used by other projects.
-- Generates ES Modules to be imported by other bundlers, such as `dist/es2017/` and `dist/es5`.
 
 
 ### `selfcontained`
@@ -55,20 +55,91 @@ Stencil is able to generate components into various formats so they can be best 
 ```
 - dist/
   - collection/
-  - selfcontained/
-  - esm/ (modules to be imported)
-    - es5/ (es5 target)
+    - components
+      - cmp-a
+        - cmp-a.css
+        - cmp-a.mjs
+      - cmp-b
+        - cmp-b.css
+        - cmp-b.mjs
+      - collection-manifest.json
+
+  - modules/ (modules to be imported)
+    - es5/
       - index.mjs
+
     - es2017/
       - index.mjs
+
+    - package.json
+        {
+          "module": "es5/",
+          "main": "es5/",
+          "es2015": "es2017/"
+        }
+
   - loader
     - index.mjs (points to the esm/es2017/ directory)
+
+  - selfcontained/
+    - cmp-a.mjs
+    - cmp-b.mjs
+    - app.mjs (self-contained of all native components)
+
   - types/
+    - index.d.ts
+
   - app.js (legacy es5 script)
   - app.mjs (modern esm script)
+
 - www/
   - build/
     - app.js (legacy es5 script)
     - app.mjs (modern esm script)
+
   - index.html
+
+- package.json
+- stencil.config.ts
+```
+
+
+### Module Format
+
+```
+dist/module/index.mjs
+---------
+
+class IonButton extends HTMLElement {
+
+  static get observedAttributes() {
+    return proxyComponent(IonButton, meta);
+  }
+
+  render() {
+    // implementation
+    return (
+      'Hello World'
+    );
+  }
+}
+
+
+export class IonButton_ios extends IonButton {
+  static get mode() {
+    return 'ios';
+  }
+  static get styles() {
+    return 'ios';
+  }
+}
+
+export class IonButton_md extends IonButton {
+  static get mode() {
+    return 'md';
+  }
+  static get styles() {
+    return 'md';
+  }
+}
 ```
