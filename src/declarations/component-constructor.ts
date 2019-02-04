@@ -7,10 +7,12 @@ export interface ComponentConstructor {
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
   style?: string;
-  styleMode?: string;
+  mode?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
   cmpMeta?: d.ComponentRuntimeMeta;
+  isProxied?: boolean;
+  isStyleRegistered?: boolean;
 }
 
 

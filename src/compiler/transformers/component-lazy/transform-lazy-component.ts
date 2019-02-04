@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerStyle } from '../register-style';
 import { removeStencilImport } from '../remove-stencil-import';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
@@ -67,10 +66,6 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
       }
 
       tsSourceFile = addLazyImports(transformCtx, tsSourceFile);
-
-      if (moduleFile != null) {
-        tsSourceFile = registerStyle(tsSourceFile, moduleFile.cmps);
-      }
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };

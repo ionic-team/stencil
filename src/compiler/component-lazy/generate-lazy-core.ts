@@ -32,8 +32,7 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
     'getContext',
     'getElement',
     'h',
-    'registerInstance',
-    'registerStyle'
+    'registerInstance'
   ];
   coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 

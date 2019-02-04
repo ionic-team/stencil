@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, loadModule, plt, writeTask } from '@platform';
+import { consoleError, doc, loadModule, plt, styles, writeTask } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 
 
-export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
   // initialConnect
   if (BUILD.lifecycle && hostRef.ancestorHostElement && !hostRef.ancestorHostElement['s-rn']) {
     // initUpdate, BUILD.lifecycle
@@ -67,14 +67,24 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
     }
 
     if (BUILD.lazyLoad) {
+      // lazy loaded components
       try {
-        const LazyCstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
+        Cstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
 
-        if (BUILD.member && !LazyCstr.isProxied) {
+        if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype
-          proxyComponent(LazyCstr, cmpMeta, 0, 1);
-          LazyCstr.isProxied = true;
+          proxyComponent(Cstr, cmpMeta, 0, 1);
+          Cstr.isProxied = true;
+        }
+
+        if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
+          if (BUILD.mode && Cstr.mode) {
+            styles.set(Cstr.mode, Cstr.style);
+          } else {
+            styles.set(elm.tagName, Cstr.style);
+          }
+          Cstr.isStyleRegistered = true;
         }
 
         // ok, time to construct the instance
@@ -82,7 +92,7 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         // so that the getters/setters don't incorrectly step on data
         BUILD.member && (hostRef.isConstructingInstance = true);
         try {
-          new (LazyCstr as any)(hostRef);
+          new (Cstr as any)(hostRef);
         } catch (err) {
           consoleError(err);
         }
@@ -108,6 +118,20 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
 
       } catch (e) {
         consoleError(e);
+      }
+
+    } else {
+      // native components
+      if (BUILD.style) {
+        Cstr = elm.constructor as any;
+        if (!Cstr.isStyleRegistered && Cstr.style) {
+          if (BUILD.mode && Cstr.mode) {
+            styles.set(Cstr.mode, Cstr.style);
+          } else {
+            styles.set(elm.tagName, Cstr.style);
+          }
+          Cstr.isStyleRegistered = true;
+        }
       }
     }
 

@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { addComponentStyle } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateLazyComponentConstructor } from './lazy-constructor';
@@ -22,8 +23,8 @@ function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.Compo
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateLazyComponentConstructor(classMembers, cmp);
-
   addLazyElementGetter(classMembers, cmp);
+  addComponentStyle(classMembers, cmp);
 
   return classMembers;
 }

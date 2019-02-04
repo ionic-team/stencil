@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { optimizeModule } from '../app-core/optimize-module';
-import { replaceStylePlaceholders } from '../app-core/register-app-styles';
+import { replaceStylePlaceholders } from '../app-core/component-styles';
 import { sys } from '@sys';
 
 

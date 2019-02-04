@@ -52,8 +52,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
     'getContext',
     'getElement',
     'h',
-    'registerHost',
-    'registerStyle'
+    'registerHost'
   ];
   coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 

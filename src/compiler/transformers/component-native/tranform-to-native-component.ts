@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
-import { registerStyle } from '../register-style';
 import { removeStencilImport } from '../remove-stencil-import';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
@@ -72,15 +71,10 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
         'createEvent as __stencil_createEvent',
-        'registerHost as __stencil_registerHost',
-        'registerStyle as __stencil_registerStyle'
+        'registerHost as __stencil_registerHost'
       ];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');
-
-      if (moduleFile != null) {
-        tsSourceFile = registerStyle(tsSourceFile, moduleFile.cmps);
-      }
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };

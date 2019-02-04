@@ -5,7 +5,7 @@ import { dashToPascalCase } from '@utils';
 import { plt } from './client-window';
 
 
-export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string) => {
+export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
   // loadModuleImport
   const bundleId = (BUILD.mode && typeof bundleIds !== 'string')
     ? (bundleIds as d.BundleIds)[elm.mode]

@@ -240,6 +240,7 @@ export interface RollupResult {
 
 export interface BundleModule {
   entryKey: string;
+  modeNames: string[];
   cmps: d.ComponentCompilerMeta[];
   outputs: BundleModuleOutput[];
 }

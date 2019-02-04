@@ -49,8 +49,22 @@ function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
 
 
 function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
+  let bundleId: any;
+
+  if (bundleModule.modeNames.length > 1) {
+    // more than one mode, object of bundleIds with the mode as a key
+    bundleId = {};
+    bundleModule.outputs.forEach(output => {
+      bundleId[output.modeName] = output.bundleId;
+    });
+
+  } else {
+    // only one default mode, bundleId is a string
+    bundleId = bundleModule.entryKey;
+  }
+
   const lazyBundle: d.LazyBundleRuntimeData = [
-    bundleModule.entryKey,
+    bundleId,
     bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
   return lazyBundle;

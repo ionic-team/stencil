@@ -7,9 +7,9 @@ export function normalizeStyles(tagName: string, componentFilePath: string, styl
   styles.forEach(style => {
 
     if (style.modeName === DEFAULT_STYLE_MODE) {
-      style.styleId = tagName;
+      style.styleId = tagName.toUpperCase();
     } else {
-      style.styleId = `${tagName}.${style.modeName}`;
+      style.styleId = `${tagName.toUpperCase()}#${style.modeName}`;
     }
 
     if (Array.isArray(style.externalStyles)) {

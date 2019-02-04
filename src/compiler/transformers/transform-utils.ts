@@ -69,18 +69,18 @@ function objectToObjectLiteral(obj: { [key: string]: any }, refs: WeakSet<any>):
 }
 
 
-export function isDecoratorNamed(name: string) {
+export function isDecoratorNamed(propName: string) {
   return (dec: ts.Decorator): boolean => {
-    return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === name);
+    return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === propName);
   };
 }
 
 
-export function createStaticGetter(name: string, returnExpression: ts.Expression) {
+export function createStaticGetter(propName: string, returnExpression: ts.Expression) {
   return ts.createGetAccessor(
     undefined,
     [ts.createToken(ts.SyntaxKind.StaticKeyword)],
-    name,
+    propName,
     undefined,
     undefined,
     ts.createBlock([
@@ -213,7 +213,7 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
   const attrs: ts.ObjectLiteralElementLike[] = (objectLiteral.properties as any);
 
   return attrs.reduce((final: ObjectMap, attr: ts.PropertyAssignment) => {
-    const name = getTextOfPropertyName(attr.name);
+    const attrName = getTextOfPropertyName(attr.name);
     let val: any;
 
     switch (attr.initializer.kind) {
@@ -253,23 +253,23 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
         val = attr.initializer;
     }
 
-    final[name] = val;
+    final[attrName] = val;
     return final;
 
   }, <ObjectMap>{});
 }
 
-function getTextOfPropertyName(name: ts.PropertyName): string {
-  switch (name.kind) {
+function getTextOfPropertyName(propName: ts.PropertyName): string {
+  switch (propName.kind) {
   case ts.SyntaxKind.Identifier:
-    return (<ts.Identifier>name).text;
+    return (<ts.Identifier>propName).text;
   case ts.SyntaxKind.StringLiteral:
   case ts.SyntaxKind.NumericLiteral:
-    return (<ts.LiteralExpression>name).text;
+    return (<ts.LiteralExpression>propName).text;
   case ts.SyntaxKind.ComputedPropertyName:
-    const expression = (<ts.ComputedPropertyName>name).expression;
+    const expression = (<ts.ComputedPropertyName>propName).expression;
     if (ts.isStringLiteral(expression) || ts.isNumericLiteral(expression)) {
-      return (<ts.LiteralExpression>(<ts.ComputedPropertyName>name).expression).text;
+      return (<ts.LiteralExpression>(<ts.ComputedPropertyName>propName).expression).text;
     }
   }
   return undefined;
@@ -296,15 +296,15 @@ function getAllTypeReferences(node: ts.Node): string[] {
       const typeNode = node as ts.TypeReferenceNode;
 
       if (ts.isIdentifier(typeNode.typeName)) {
-        const name = typeNode.typeName as ts.Identifier;
-        referencedTypes.push(name.escapedText.toString());
+        const typeName = typeNode.typeName as ts.Identifier;
+        referencedTypes.push(typeName.escapedText.toString());
       }
       if (typeNode.typeArguments) {
         typeNode.typeArguments
           .filter(ta => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
-            const name = tr.typeName as ts.Identifier;
-            referencedTypes.push(name.escapedText.toString());
+            const typeName = tr.typeName as ts.Identifier;
+            referencedTypes.push(typeName.escapedText.toString());
           });
       }
     /* tslint:disable */

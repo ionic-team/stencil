@@ -54,8 +54,6 @@ export const registerHost = (elm: d.HostElement) =>
     instanceValues: new Map(),
   });
 
-export const registerStyle = (styleId: string, styleText: string) => styles.set(styleId, styleText);
-
 const Context = {
   window: win,
   document: doc,

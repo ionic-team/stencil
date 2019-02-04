@@ -47,7 +47,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
     if (Array.isArray(Cstr.COMPILER_META.styles)) {
       Cstr.COMPILER_META.styles.forEach(style => {
-        platform.registerStyle(style.styleId, style.styleStr);
+        platform.styles.set(style.styleId, style.styleStr);
       });
     }
 
