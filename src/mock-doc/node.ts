@@ -249,6 +249,22 @@ export class MockElement extends MockNode {
     return { bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0 };
   }
 
+  getRootNode(opts?: { composed?: boolean; [key: string]: any; }) {
+    const isComposed = !!(opts != null && opts.composed);
+
+    let node: Node = this as any;
+
+    while (node.parentNode != null) {
+      node = node.parentNode;
+
+      if (isComposed && node.parentNode == null && (node as any).host) {
+        node = (node as any).host;
+      }
+    }
+
+    return node;
+  }
+
   get id() { return this.getAttribute('id') || ''; }
   set id(value: string) { this.setAttribute('id', value); }
 
