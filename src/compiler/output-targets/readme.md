@@ -38,6 +38,12 @@ Stencil is able to generate components into various formats so they can be best 
 - Generates ES Modules to be imported by other bundlers, such as `dist/es2017/` and `dist/es5`.
 
 
+### selfcontained
+
+- Generates a directory of each component as its own stand-alone web component.
+- Does not import any functions and works as is within the browser.
+
+
 ### `angular`
 
 - Generates a wrapper Angular component proxy.
