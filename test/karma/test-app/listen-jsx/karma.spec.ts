@@ -11,7 +11,7 @@ describe('listen-jsx', function() {
   afterEach(tearDownDom);
 
   it('button click trigger both listeners', async () => {
-    app.querySelector('listen-jsx').click();
+    (app.querySelector('listen-jsx') as HTMLElement).click();
 
     await waitForChanges();
 

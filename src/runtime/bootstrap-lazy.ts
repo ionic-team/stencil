@@ -56,10 +56,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
               hostRef.onReadyPromise = new Promise(resolve => hostRef.hasRendered ? resolve() : (hostRef.onReadyResolve = resolve));
             }
             return hostRef.onReadyPromise;
-
-          } else if (BUILD.lazyLoad) {
-            return tick;
           }
+          return tick;
         }
 
       }

@@ -24,7 +24,7 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
 
   coreText.push(`import { bootstrapLazy } from '@stencil/core/platform';`);
 
-  coreText.push(`bootstrapLazy([]);`);
+  coreText.push(`bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);`);
 
   const platformExports: string[] = [
     'createEvent',

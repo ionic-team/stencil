@@ -8,8 +8,11 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
     cmpDidUnload: cmps.some(c => c.hasComponentWillUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),
+    cmpDidRender: cmps.some(c => c.hasComponentDidRenderFn),
     cmpWillLoad: cmps.some(c => c.hasComponentWillLoadFn),
     cmpWillUpdate: cmps.some(c => c.hasComponentWillUpdateFn),
+    cmpWillRender: cmps.some(c => c.hasComponentWillRenderFn),
+
     connectedCallback: cmps.some(c => c.hasConnectedCallbackFn),
     disconnectedCallback: cmps.some(c => c.hasDisonnectedCallbackFn),
     element: cmps.some(c => c.hasElement),
@@ -65,6 +68,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
   b.profile = !!(config.flags && config.flags.profile);
+  b.lifecycleDOMEvents = !!(config.devMode || config._isTesting || true);
 }
 
 

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, getHostRef, tick } from '@platform';
+import { getHostRef, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
 import { initialLoad } from './initial-load';
@@ -33,8 +33,6 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
     if (!hostRef.hasConnected) {
       // first time this element has connected
       hostRef.hasConnected = true;
-
-      activelyProcessingCmps.add(elm);
 
       if (BUILD.lifecycle) {
         // register this component as an actively

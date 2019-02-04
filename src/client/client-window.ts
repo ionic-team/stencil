@@ -29,6 +29,3 @@ if (BUILD.hostListener) {
 //   (win['s-apps'] = win['s-apps'] || []).push(BUILD.appNamespace);
 // }
 
-export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = new Set();
-
-export const onAppReadyCallbacks: any[] = [];

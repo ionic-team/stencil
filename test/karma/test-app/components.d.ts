@@ -118,16 +118,16 @@ export namespace Components {
   interface LifecycleUnloadRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenJsxRoot {}
-  interface ListenJsxRootAttributes extends StencilHTMLAttributes {}
+  interface ListenJsxRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenJsx {}
-  interface ListenJsxAttributes extends StencilHTMLAttributes {}
+  interface ListenJsxAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenWindow {}
   interface ListenWindowAttributes extends JSXElements.HTMLAttributes {}
 
   interface NodeGlobals {}
-  interface NodeGlobalsAttributes extends StencilHTMLAttributes {}
+  interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
 
   interface ReflectToAttr {
     'bool': boolean;
@@ -140,7 +140,7 @@ export namespace Components {
     'str': string;
     'undef': string;
   }
-  interface ReflectToAttrAttributes extends StencilHTMLAttributes {
+  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {
     'bool'?: boolean;
     'disabled'?: boolean;
     'dynamicNu'?: number;

@@ -1,5 +1,32 @@
 
 
+const activeRendering = new Set();
+const onAppReadyCallbacks: Function[] = [];
+
+function willRender(elm: any) {
+  activeRendering.add(elm);
+}
+
+function didRender(elm: any) {
+  activeRendering.delete(elm);
+  if (onAppReadyCallbacks.length > 0 && activeRendering.size === 0) {
+    // we've got some promises waiting on the entire app to be done processing
+    // so it should have an empty queue and no longer rendering
+    let cb: any;
+    while ((cb = onAppReadyCallbacks.shift())) {
+      cb();
+    }
+  }
+}
+
+function onReady(callback: Function) {
+  if (activeRendering.size === 0) {
+    callback();
+  } else {
+    onAppReadyCallbacks.push(callback);
+  }
+}
+
 /**
  * Create setup methods for dom based tests.
  */
@@ -16,6 +43,11 @@ export function setupDomTests(document: Document) {
    */
   function setupDom(url?: string) {
     const app = document.createElement('div');
+    activeRendering.clear();
+    onAppReadyCallbacks.length = 0;
+    app.addEventListener('stencil_componentWillRender', (ev) => willRender(ev.target));
+    app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target))
+
     app.className = 'test-spec';
     testBed.appendChild(app)
 
@@ -128,31 +160,10 @@ export function waitForChanges() {
   const win = window as any;
 
   return new Promise(resolve => {
-
-    function waitForAppReady() {
-      const promises = win['s-apps'].map((appNamespace: string) => {
-        return win[appNamespace].onReady();
-      });
-
-      Promise.all(promises).then(() => {
-        win.requestAnimationFrame(resolve);
-      });
-    }
-
     function pageLoaded() {
       setTimeout(() => {
-        if (win['s-apps']) {
-          waitForAppReady();
-        } else {
-          setTimeout(() => {
-            if (win['s-apps']) {
-              waitForAppReady();
-            } else {
-              console.error(`window['s-apps'] never loaded`);
-            }
-          }, 100)
-        }
-      }, 32);
+        onReady(resolve);
+      }, 100);
     }
 
     if (document.readyState === 'complete') {

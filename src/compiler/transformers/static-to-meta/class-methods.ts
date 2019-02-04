@@ -35,6 +35,16 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
     }
   }
 
+  const cmpWillRenderMethod = classMethods.find(m => isMethod(m, 'componentWillRender')) as ts.MethodDeclaration;
+  if (cmpWillRenderMethod) {
+    cmpMeta.hasComponentWillRenderFn = true;
+
+    if (!cmpMeta.hasAsyncLifecycle && isAsyncFn(typeChecker, cmpWillRenderMethod)) {
+      cmpMeta.hasAsyncLifecycle = true;
+    }
+  }
+
+  cmpMeta.hasComponentDidRenderFn = classMethods.some(m => isMethod(m, 'componentDidRender'));
   cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
   cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
   cmpMeta.hasComponentWillUnloadFn = classMethods.some(m => isMethod(m, 'componentWillUnload'));

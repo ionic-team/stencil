@@ -1,9 +1,14 @@
 import * as d from '@declarations';
-import { activelyProcessingCmps, consoleError, onAppReadyCallbacks, plt } from '@platform';
+import { consoleError, plt } from '@platform';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { renderVdom } from './vdom/render';
 
+export const emitLifecycleEvent = (elm: d.HostElement, name: string) => {
+  if (BUILD.lifecycleDOMEvents) {
+    elm.dispatchEvent(new CustomEvent(`stencil_${name}`, {bubbles: true, composed: true}));
+  }
+};
 
 export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   // update
@@ -11,16 +16,24 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     hostRef.isQueuedForUpdate = false;
   }
 
-  activelyProcessingCmps.add(elm);
 
   try {
     if (isInitialLoad) {
+      emitLifecycleEvent(elm, 'componentWillLoad');
       if (BUILD.cmpWillLoad && instance.componentWillLoad) {
         await instance.componentWillLoad();
       }
 
-    } else if (BUILD.cmpWillUpdate && instance.componentWillUpdate) {
-      await instance.componentWillUpdate();
+    } else {
+      emitLifecycleEvent(elm, 'componentWillUpdate');
+
+      if (BUILD.cmpWillUpdate && instance.componentWillUpdate) {
+        await instance.componentWillUpdate();
+      }
+    }
+    emitLifecycleEvent(elm, 'componentWillRender');
+    if (BUILD.cmpWillRender && instance.componentWillRender) {
+      await instance.componentWillRender();
     }
   } catch (e) {
     consoleError(e);
@@ -154,14 +167,22 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
       if (BUILD.cmpDidLoad && instance.componentDidLoad) {
         instance.componentDidLoad();
       }
+      emitLifecycleEvent(elm, 'componentDidLoad');
 
-    } else if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
-      // we've already loaded this component
-      // fire off the user's componentDidUpdate method (if one was provided)
-      // componentDidUpdate runs AFTER render() has been called
-      // and all child components have finished updating
-      instance.componentDidUpdate();
+    } else {
+      if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
+        // we've already loaded this component
+        // fire off the user's componentDidUpdate method (if one was provided)
+        // componentDidUpdate runs AFTER render() has been called
+        // and all child components have finished updating
+        instance.componentDidUpdate();
+      }
+      emitLifecycleEvent(elm, 'componentDidUpdate');
     }
+    if (BUILD.cmpDidRender && instance.componentDidRender) {
+      instance.componentDidRender();
+    }
+    emitLifecycleEvent(elm, 'componentDidRender');
 
   } catch (e) {
     consoleError(e);
@@ -214,17 +235,6 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
       // DOM WRITE!
       // add the css class that this element has officially hydrated
       elm.classList.add('hydrated');
-    }
-
-    activelyProcessingCmps.delete(elm);
-  }
-
-  if (onAppReadyCallbacks.length && !activelyProcessingCmps.size) {
-    // we've got some promises waiting on the entire app to be done processing
-    // so it should have an empty queue and no longer rendering
-    let cb: any;
-    while ((cb = onAppReadyCallbacks.shift())) {
-      cb();
     }
   }
 

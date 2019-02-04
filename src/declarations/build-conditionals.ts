@@ -63,6 +63,8 @@ export interface BuildFeatures {
   cmpWillLoad?: boolean;
   cmpDidUpdate?: boolean;
   cmpWillUpdate?: boolean;
+  cmpWillRender?: boolean;
+  cmpDidRender?: boolean;
   cmpDidUnload?: boolean;
   connectedCallback?: boolean;
   disconnectedCallback?: boolean;
@@ -83,6 +85,7 @@ export interface Build extends BuildFeatures {
   isDebug?: boolean;
   isDev?: boolean;
   isProd?: boolean;
+  lifecycleDOMEvents?: boolean;
   lazyLoad?: boolean;
   prerenderServerSide?: boolean;
   prerenderClientSide?: boolean;

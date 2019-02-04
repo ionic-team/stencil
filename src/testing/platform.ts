@@ -23,10 +23,6 @@ export const plt: d.PlatformRuntime = {
   supportsShadowDom: true
 };
 
-export const onAppReadyCallbacks: any[] = [];
-
-export const activelyProcessingCmps: d.ActivelyProcessingCmpMap = new Set();
-
 export function resetPlatform() {
   win.$reset();
   hostRefs.clear();
@@ -34,9 +30,6 @@ export function resetPlatform() {
   plt.appMode = null;
   plt.isTmpDisconnected = false;
   plt.supportsShadowDom = true;
-
-  onAppReadyCallbacks.length = 0;
-  activelyProcessingCmps.clear();
 
   resetTaskQueue();
 }
