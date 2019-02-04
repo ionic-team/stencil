@@ -349,7 +349,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   }
 };
 
-const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
+export const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
   if (vnode1.vtag === vnode2.vtag) {

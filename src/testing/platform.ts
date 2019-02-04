@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-export { bootstrapLazy, createEvent, getElement } from '@runtime';
+export { bootstrapLazy, createEvent, getElement, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { setupGlobal } from '@mock-doc';
 

@@ -1,9 +1,22 @@
 import * as d from '@declarations';
+import { BUILD } from '@build-conditionals';
 import { h } from '../h';
-import { FunctionalComponent } from '@declarations';
 
 
 describe('h()', () => {
+
+  beforeEach(() => {
+    BUILD.vdomAttribute = true;
+    BUILD.vdomClass = true;
+    BUILD.vdomStyle = true;
+    BUILD.vdomKey = true;
+    BUILD.vdomRef = true;
+    BUILD.vdomListener = true;
+    BUILD.vdomFunctional = true;
+    BUILD.vdomText = true;
+    BUILD.slotPolyfill = true;
+    BUILD.reflect = true;
+  });
 
   it('should render nested functional components', () => {
     const FunctionalCmp1 = () => h('fn-cmp', null);
@@ -263,76 +276,6 @@ describe('h()', () => {
     expect(vnode.vchildren[0].vtext).toEqual('I am a string');
   });
 
-  describe('isSameVnode', () => {
-
-    it('should not be same vnode with slot and no vnode2 name', () => {
-      const vnode1 = h('slot', { name: 'start' }, '1');
-      const vnode2 = h('slot', {}, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should not be same vnode with slot and no vnode1 name', () => {
-      const vnode1 = h('slot', {}, '1');
-      const vnode2 = h('slot', { name: 'end' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should not be same vnode with slot and different vname', () => {
-      const vnode1 = h('slot', { name: 'start' }, '1');
-      const vnode2 = h('slot', { name: 'end' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should be same vnode with slot and same vname', () => {
-      const vnode1 = h('slot', { name: 'start' }, '1');
-      const vnode2 = h('slot', { name: 'start' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(true);
-    });
-
-    it('should be same vnode with slot and no vname', () => {
-      const vnode1 = h('slot', {}, '1');
-      const vnode2 = h('slot', {}, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(true);
-    });
-
-    it('should not be same vnode with same tag and different key', () => {
-      const vnode1 = h('a', { attr: '1', key: 'mykey1' }, '1');
-      const vnode2 = h('a', { attr: '2', key: 'mykey2' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should not be same vnode with different tag and same key', () => {
-      const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
-      const vnode2 = h('b', { attr: '2', key: 'mykey' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should not be same vnode with different tag and no key', () => {
-      const vnode1 = h('a', null, '1');
-      const vnode2 = h('b', null, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(false);
-    });
-
-    it('should be same vnode with same tag and same key', () => {
-      const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
-      const vnode2 = h('a', { attr: '2', key: 'mykey' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(true);
-    });
-
-    it('should be same vnode with same tag and defined data, but no key', () => {
-      const vnode1 = h('a', { attr: '1' }, '1');
-      const vnode2 = h('a', { attr: '2' }, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(true);
-    });
-
-    it('should be same vnode with same tag and undefined data', () => {
-      const vnode1 = h('a', null, '1');
-      const vnode2 = h('a', null, '2');
-      expect(isSameVnode(vnode1, vnode2)).toBe(true);
-    });
-
-  });
-
   describe('functional components', () => {
 
     it('should receive props, array, and utils as props', async () => {
@@ -398,8 +341,8 @@ describe('h()', () => {
 
   describe('VDom Util methods', () => {
     it('utils.forEach should loop over items and get the ChildNode data', () => {
-      const output = [];
-      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
+      const output: any = [];
+      const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
         util.forEach(children, element => {
           output.push(element);
           util.forEach(element.vchildren, el => {
@@ -447,7 +390,7 @@ describe('h()', () => {
     });
 
     it('replaceAttributes should return the attributes for the node', () => {
-      const FunctionalCmp: FunctionalComponent = (nodeData, children, util) => {
+      const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
         return util.map(children, child => {
           return {
             ...child,
@@ -493,16 +436,3 @@ describe('h()', () => {
     });
   });
 });
-
-
-function isSameVnode(vnode1: d.VNode, vnode2: d.VNode) {
-  // compare if two vnode to see if they're "technically" the same
-  // need to have the same element tag, and same key to be the same
-  if (vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey) {
-    if (vnode1.vtag === 'slot') {
-      return vnode1.vname === vnode2.vname;
-    }
-    return true;
-  }
-  return false;
-}
