@@ -86,7 +86,6 @@ export function setupDomTests(document: Document) {
           const elm = document.createElement('div');
           elm.innerHTML = this.responseText;
           frag.appendChild(elm);
-
           app.innerHTML = elm.innerHTML;
 
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
@@ -109,7 +108,9 @@ export function setupDomTests(document: Document) {
           console.log('app.innerHTML', app.innerHTML)
           elm.innerHTML = '';
 
-          const promises: Promise<any>[] = [];
+          const promises: Promise<any>[] = [
+            new Promise(resolve => setTimeout(resolve, 1000))
+          ];
           loadPromises(promises, app);
 
           Promise.all(promises).then(() => {

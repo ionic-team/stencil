@@ -94,14 +94,12 @@ module.exports = function(config) {
       // 'test-app/**/*.spec.ts',
       'test-app/util.ts',
       // 'www/build/testapp.js',
-      { pattern: 'www/build/testapp.js', nocache: true, type: 'module' },
       // 'www/build/testsibling.js',
       { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
     ],
 
     proxies: {
-      '/www/': '/base/www/',
-      '/build/testapp.js': '/base/www/build/testapp.js',
+      '/build/': '/base/www/build/',
       // '/build/testsibling.js': '/base/www/noscript.js',
       // '/esm-webpack/main.js': '/base/www/noscript.js',
       '/prerender/': '/base/www/prerender/'
