@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { h } from '../h';
 import { patch } from '../render';
+import { SVG_NS, XLINK_NS } from '@utils';
 
 
 describe('attributes', () => {
@@ -33,7 +34,7 @@ describe('attributes', () => {
   it('are set correctly when namespaced', () => {
     const vnode1 = h('svg', { 'xlink:href': '#foo' });
     patch(vnode0, vnode1);
-    expect(hostElm.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).toEqual('#foo');
+    expect(hostElm.getAttributeNS(XLINK_NS, 'href')).toEqual('#foo');
   });
 
   it('should not touch class nor id fields', () => {
@@ -74,7 +75,6 @@ describe('attributes', () => {
   describe('svg', function () {
 
     it('adds correctly xlink namespaced attribute', () => {
-      const xlinkNS = 'http://www.w3.org/1999/xlink';
       const testUrl = '/test';
       const vnode1 = h('svg', {},
         h('div', {
@@ -82,12 +82,12 @@ describe('attributes', () => {
         })
       );
 
-      hostElm = document.createElementNS('http://www.w3.org/2000/svg', 'svg') as any;
+      hostElm = document.createElementNS(SVG_NS, 'svg') as any;
       vnode0.elm = hostElm;
       patch(vnode0, vnode1);
       expect(hostElm.childNodes.length).toEqual(1);
       expect(hostElm.children[0].getAttribute('href')).toEqual(testUrl);
-      expect(hostElm.children[0].getAttributeNS(xlinkNS, 'href')).toEqual(testUrl);
+      expect(hostElm.children[0].getAttributeNS(XLINK_NS, 'href')).toEqual(testUrl);
     });
   });
 

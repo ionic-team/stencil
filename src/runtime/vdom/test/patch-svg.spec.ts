@@ -1,14 +1,13 @@
 import * as d from '@declarations';
 import { h } from '../h';
 import { patch } from '../render';
+import { SVG_NS } from '@utils';
 import { toVNode } from '../to-vnode';
 
 
 describe('renderer', () => {
   let hostElm: d.HostElement;
   let vnode0: d.VNode;
-
-  const SVGNamespace = 'http://www.w3.org/2000/svg';
 
   beforeEach(() => {
     hostElm = document.createElement('div');
@@ -24,7 +23,7 @@ describe('renderer', () => {
     });
 
     it('should automatically get svg namespace', () => {
-      const svgElm = document.createElementNS(SVGNamespace, 'svg');
+      const svgElm = document.createElementNS(SVG_NS, 'svg');
       const vnode1 = toVNode(svgElm);
       patch(vnode1, h('svg', null,
         h('foreignObject', null,
@@ -32,8 +31,8 @@ describe('renderer', () => {
         )
       ));
 
-      expect(svgElm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVGNamespace);
+      expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
+      expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVG_NS);
     });
 
     it('should not affect subsequence element', () => {
@@ -46,12 +45,12 @@ describe('renderer', () => {
       ] as any));
 
       expect(hostElm.tagName).toEqual('DIV');
-      expect(hostElm.namespaceURI).not.toEqual(SVGNamespace);
+      expect(hostElm.namespaceURI).not.toEqual(SVG_NS);
       expect(hostElm.firstElementChild.tagName).toEqual('SVG');
-      expect(hostElm.firstElementChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstElementChild.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstElementChild.lastChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.lastElementChild.namespaceURI).not.toEqual(SVGNamespace);
+      expect(hostElm.firstElementChild.namespaceURI).toEqual(SVG_NS);
+      expect(hostElm.firstElementChild.firstChild.namespaceURI).toEqual(SVG_NS);
+      expect(hostElm.firstElementChild.lastChild.namespaceURI).toEqual(SVG_NS);
+      expect(hostElm.lastElementChild.namespaceURI).not.toEqual(SVG_NS);
     });
   });
 

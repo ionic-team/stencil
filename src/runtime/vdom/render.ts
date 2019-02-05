@@ -9,7 +9,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
-import { NODE_TYPE, isDef, toLowerCase } from '@utils';
+import { NODE_TYPE, isDef, toLowerCase, SVG_NS } from '@utils';
 import { updateElement } from './update-element';
 
 
@@ -60,7 +60,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
   } else {
     // create element
     elm = newVNode.elm = ((BUILD.svg && (isSvgMode || newVNode.vtag === 'svg')) ?
-                      doc.createElementNS('http://www.w3.org/2000/svg', newVNode.vtag as string) :
+                      doc.createElementNS(SVG_NS, newVNode.vtag as string) :
                       doc.createElement(
                         (BUILD.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag as string)
                       ) as any;
