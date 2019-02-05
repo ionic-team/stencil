@@ -261,12 +261,12 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newEndVnode = newCh[--newEndIdx];
 
     } else if (isSameVnode(oldStartVnode, newStartVnode)) {
-      patchVNode(oldStartVnode, newStartVnode);
+      patch(oldStartVnode, newStartVnode);
       oldStartVnode = oldCh[++oldStartIdx];
       newStartVnode = newCh[++newStartIdx];
 
     } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-      patchVNode(oldEndVnode, newEndVnode);
+      patch(oldEndVnode, newEndVnode);
       oldEndVnode = oldCh[--oldEndIdx];
       newEndVnode = newCh[--newEndIdx];
 
@@ -275,7 +275,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
         putBackInOriginalLocation(oldStartVnode.elm.parentNode);
       }
-      patchVNode(oldStartVnode, newEndVnode);
+      patch(oldStartVnode, newEndVnode);
       parentElm.insertBefore(oldStartVnode.elm, oldEndVnode.elm.nextSibling as any);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
@@ -285,7 +285,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
         putBackInOriginalLocation(oldEndVnode.elm.parentNode);
       }
-      patchVNode(oldEndVnode, newStartVnode);
+      patch(oldEndVnode, newStartVnode);
       parentElm.insertBefore(oldEndVnode.elm, oldStartVnode.elm);
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
@@ -309,7 +309,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
           node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
 
         } else {
-          patchVNode(elmToMove, newStartVnode);
+          patch(elmToMove, newStartVnode);
           oldCh[idxInOld] = undefined;
           node = elmToMove.elm;
         }
@@ -374,7 +374,7 @@ const referenceNode = (node: d.RenderNode) => {
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
 
-const patchVNode = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement, oldChildren?: d.FVNode[], newChildren?: d.FVNode[], defaultHolder?: Comment) => {
+export const patch = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement, oldChildren?: d.FVNode[], newChildren?: d.FVNode[], defaultHolder?: Comment) => {
   elm = newVNode.elm = oldVNode.elm;
   oldChildren = oldVNode.vchildren;
   newChildren = newVNode.vchildren;
@@ -635,7 +635,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     }
 
     // synchronous patch
-    patchVNode(oldVNode, hostRef.vnode);
+    patch(oldVNode, hostRef.vnode);
 
     // if (BUILD.prerenderServerSide && isDef(ssrId)) {
     //   // SSR ONLY: we've been given an SSR id, so the host element
