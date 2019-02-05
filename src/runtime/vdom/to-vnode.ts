@@ -1,23 +1,22 @@
 import * as d from '@declarations';
+import { NODE_TYPE } from '@utils';
 
 
-export function toVNode(domApi: d.DomApi, node: Node): d.VNode {
-  const nodeType = domApi.$nodeType(node);
-
-  if (nodeType === 1 || nodeType === 3) {
+export function toVNode(node: Node): d.VNode {
+  if (node.nodeType === NODE_TYPE.TextNode || node.nodeType === NODE_TYPE.ElementNode) {
 
     const vnode: d.VNode = {};
-    vnode.elm = node;
+    vnode.elm = node as any;
 
-    if (nodeType === 1) {
+    if (node.nodeType === NODE_TYPE.ElementNode) {
       // element node
-      vnode.vtag = domApi.$tagName(node);
+      vnode.vtag = node.nodeName.toLowerCase();
 
-      const childNodes = domApi.$childNodes(node);
+      const childNodes = node.childNodes;
       let childVnode: d.VNode;
 
       for (let i = 0, l = childNodes.length; i < l; i++) {
-        childVnode = toVNode(domApi, childNodes[i]);
+        childVnode = toVNode(childNodes[i]);
         if (childVnode) {
           (vnode.vchildren = vnode.vchildren || []).push(childVnode);
         }
@@ -25,7 +24,7 @@ export function toVNode(domApi: d.DomApi, node: Node): d.VNode {
 
     } else {
       // text node
-      vnode.vtext = domApi.$getTextContent(node);
+      vnode.vtext = node.textContent;
     }
 
     return vnode;

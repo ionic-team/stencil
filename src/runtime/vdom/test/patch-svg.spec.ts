@@ -1,21 +1,17 @@
 import * as d from '@declarations';
 import { h } from '../h';
-import { mockDocument, mockDomApi, mockRenderer } from '../../../testing/mocks';
+import { patch } from '../render';
 import { toVNode } from '../to-vnode';
 
 
 describe('renderer', () => {
-  const patch = mockRenderer();
-  const domApi = mockDomApi();
-  let doc: Document;
-  let hostElm: any;
+  let hostElm: d.HostElement;
   let vnode0: d.VNode;
 
   const SVGNamespace = 'http://www.w3.org/2000/svg';
 
   beforeEach(() => {
-    doc = mockDocument();
-    hostElm = doc.createElement('div');
+    hostElm = document.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -23,39 +19,39 @@ describe('renderer', () => {
   describe('created element', () => {
 
     it('has tag', () => {
-      hostElm = patch(hostElm, vnode0, h('div', null)).elm;
+      patch(vnode0, h('div', null));
       expect(hostElm.tagName).toEqual('DIV');
     });
 
     it('should automatically get svg namespace', () => {
-      const svgElm = doc.createElementNS(SVGNamespace, 'svg');
-      const vnode1 = toVNode(domApi, svgElm);
-      hostElm = patch(hostElm, vnode1, h('svg', null,
+      const svgElm = document.createElementNS(SVGNamespace, 'svg');
+      const vnode1 = toVNode(svgElm);
+      patch(vnode1, h('svg', null,
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
         )
-      )).elm;
+      ));
 
-      expect(hostElm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstChild.firstChild.namespaceURI).not.toEqual(SVGNamespace);
+      expect(svgElm.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVGNamespace);
     });
 
     it('should not affect subsequence element', () => {
-      hostElm = patch(hostElm, vnode0, h('div', null, [
+      patch(vnode0, h('div', null, [
         h('svg', null, [
           h('title', null, 'Title'),
           h('circle', null)
         ] as any),
         h('div', null)
-      ] as any)).elm;
+      ] as any));
 
       expect(hostElm.tagName).toEqual('DIV');
       expect(hostElm.namespaceURI).not.toEqual(SVGNamespace);
-      expect(hostElm.firstChild.tagName).toEqual('SVG');
-      expect(hostElm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstChild.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.firstChild.lastChild.namespaceURI).toEqual(SVGNamespace);
-      expect(hostElm.lastChild.namespaceURI).not.toEqual(SVGNamespace);
+      expect(hostElm.firstElementChild.tagName).toEqual('SVG');
+      expect(hostElm.firstElementChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.firstElementChild.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.firstElementChild.lastChild.namespaceURI).toEqual(SVGNamespace);
+      expect(hostElm.lastElementChild.namespaceURI).not.toEqual(SVGNamespace);
     });
   });
 
@@ -63,19 +59,26 @@ describe('renderer', () => {
 
     it('should not affect subsequent created element', () => {
 
-      const divWithSVGChild = patch(hostElm, vnode0,  h('div', null,
+      patch(vnode0,  h('div', null,
         h('div', null,
           h('svg', null)
         )
       ));
-      const oneMoreChildAdded = patch(hostElm, divWithSVGChild, h('div', null, [
+
+      const vnode1 = toVNode(vnode0.elm);
+
+      patch(vnode1, h('div', null, [
           h('div', null,
             h('svg', null)
           ),
           h('div', null)
         ] as any
       ));
-      expect(oneMoreChildAdded.vchildren[1].elm.tagName).toEqual('DIV');
+
+      const vnode2 = toVNode(vnode1.elm) as any;
+      expect(vnode2.vchildren[0].elm.tagName).toEqual('DIV');
+      expect(vnode2.vchildren[0].vchildren[0].elm.tagName).toEqual('SVG');
+      expect(vnode2.vchildren[1].elm.tagName).toEqual('DIV');
     });
   });
 
