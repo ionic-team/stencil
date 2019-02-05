@@ -10,7 +10,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
 import { NODE_TYPE, isDef, toLowerCase } from '@utils';
-import { updateElement } from './update-dom-node';
+import { updateElement } from './update-element';
 
 
 let useNativeShadowDom = false;

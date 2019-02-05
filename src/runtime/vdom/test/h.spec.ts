@@ -1,22 +1,8 @@
 import * as d from '@declarations';
-import { BUILD } from '@build-conditionals';
 import { h } from '../h';
 
 
 describe('h()', () => {
-
-  beforeEach(() => {
-    BUILD.vdomAttribute = true;
-    BUILD.vdomClass = true;
-    BUILD.vdomStyle = true;
-    BUILD.vdomKey = true;
-    BUILD.vdomRef = true;
-    BUILD.vdomListener = true;
-    BUILD.vdomFunctional = true;
-    BUILD.vdomText = true;
-    BUILD.slotPolyfill = true;
-    BUILD.reflect = true;
-  });
 
   it('should render nested functional components', () => {
     const FunctionalCmp1 = () => h('fn-cmp', null);

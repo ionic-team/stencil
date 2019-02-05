@@ -1,23 +1,9 @@
 // import * as d from '@declarations';
-import { BUILD } from '@build-conditionals';
 import { h } from '../h';
 import { isSameVnode } from '../render';
 
 
 describe('isSameVnode', () => {
-
-  beforeEach(() => {
-    BUILD.vdomAttribute = true;
-    BUILD.vdomClass = true;
-    BUILD.vdomStyle = true;
-    BUILD.vdomKey = true;
-    BUILD.vdomRef = true;
-    BUILD.vdomListener = true;
-    BUILD.vdomFunctional = true;
-    BUILD.vdomText = true;
-    BUILD.slotPolyfill = true;
-    BUILD.reflect = true;
-  });
 
   it('should not be same vnode with slot and no vnode2 name', () => {
     const vnode1 = h('slot', { name: 'start' }, '1');

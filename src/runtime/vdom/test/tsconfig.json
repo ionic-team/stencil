@@ -34,6 +34,9 @@
       ],
       "@declarations": [
         "../../../declarations/index.ts"
+      ],
+      "@utils": [
+        "../../../utils/index.ts"
       ]
     }
   }
