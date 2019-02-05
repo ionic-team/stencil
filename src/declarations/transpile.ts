@@ -19,5 +19,6 @@ export interface ValidateTypesResults {
 
 
 export interface TransformOptions {
-  addCompilerMeta?: boolean;
+  addCompilerMeta: boolean;
+  addStyle: boolean;
 }

@@ -68,7 +68,8 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
   const typeChecker = program.getTypeChecker();
 
   const transformOpts: d.TransformOptions = {
-    addCompilerMeta: true
+    addCompilerMeta: true,
+    addStyle: false
   };
 
   program.emit(undefined, undefined, undefined, false, {
@@ -77,7 +78,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     ],
     after: [
       visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-      lazyComponentTransform(compilerCtx)
+      lazyComponentTransform(compilerCtx, transformOpts)
     ]
   });
 

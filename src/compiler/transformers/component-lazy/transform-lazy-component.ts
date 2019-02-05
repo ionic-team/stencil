@@ -7,7 +7,7 @@ import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
 
-export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputText: string) {
+export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
   if (buildCtx.shouldAbort) {
     return null;
   }
@@ -23,7 +23,7 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          lazyComponentTransform(compilerCtx)
+          lazyComponentTransform(compilerCtx, opts)
         ]
       }
     };
@@ -44,7 +44,7 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
 }
 
 
-export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
@@ -55,7 +55,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx): ts.Transform
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(moduleFile, node);
           if (cmp != null) {
-            return updateLazyComponentClass(node, cmp);
+            return updateLazyComponentClass(opts, node, cmp);
           }
 
         } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {

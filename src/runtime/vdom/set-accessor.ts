@@ -132,11 +132,12 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
     }
 
     let isXLink: boolean;
+    const isBooleanAttr = typeof newValue === 'boolean';
     if (BUILD.svg) {
       isXLink = isSvg && (memberName !== (memberName = memberName.replace(/^xlink:?/, '')));
     }
 
-    if (newValue == null || newValue === false) {
+    if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
       if (BUILD.svg && isXLink) {
         elm.removeAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName));
       } else {
@@ -144,6 +145,8 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       }
 
     } else if (typeof newValue !== 'function') {
+      newValue = isBooleanAttr ? '' : newValue + '';
+
       if (BUILD.svg && isXLink) {
         elm.setAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName), newValue);
       } else {

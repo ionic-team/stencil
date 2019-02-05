@@ -13,6 +13,15 @@ export function jestSetupTestFramework() {
 
   setupGlobal(global);
 
+  beforeEach(() => {
+    const bc = require('@stencil/core/build-conditionals');
+    const platform = require('@stencil/core/platform');
+
+    // reset the platform for this new test
+    platform.resetPlatform();
+    bc.resetBuildConditionals(bc.BUILD);
+  });
+
   afterEach(() => {
     teardownGlobal(global);
     global.Context = {};

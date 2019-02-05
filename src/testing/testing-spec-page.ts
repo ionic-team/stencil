@@ -34,8 +34,8 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     const cmpBuild = getBuildFeatures([Cstr.COMPILER_META]) as any;
 
     Object.keys(cmpBuild).forEach(key => {
-      if (cmpBuild[key] === true) {
-        (bc.BUILD as any)[key] = true;
+      if (typeof cmpBuild[key] === 'boolean') {
+        (bc.BUILD as any)[key] = cmpBuild[key];
       }
     });
 

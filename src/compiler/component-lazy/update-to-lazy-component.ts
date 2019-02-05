@@ -23,7 +23,11 @@ export async function updateToLazyComponent(_config: d.Config, compilerCtx: d.Co
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
-    outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, build, cmp, inputText);
+    const transformOpts: d.TransformOptions = {
+      addCompilerMeta: false,
+      addStyle: true
+    };
+    outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, build, transformOpts, cmp, inputText);
 
     await compilerCtx.cache.put(cacheKey, outputJsText);
   }

@@ -6,7 +6,7 @@ import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
 
 
-export function updateLazyComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+export function updateLazyComponentClass(opts: d.TransformOptions, classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -14,17 +14,20 @@ export function updateLazyComponentClass(classNode: ts.ClassDeclaration, cmp: d.
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateLazyComponentMembers(classNode, cmp)
+    updateLazyComponentMembers(opts, classNode, cmp)
   );
 }
 
 
-function updateLazyComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateLazyComponentConstructor(classMembers, cmp);
   addLazyElementGetter(classMembers, cmp);
-  addComponentStyle(classMembers, cmp);
+
+  if (opts.addStyle) {
+    addComponentStyle(classMembers, cmp);
+  }
 
   return classMembers;
 }

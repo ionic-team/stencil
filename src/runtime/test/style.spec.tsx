@@ -20,7 +20,7 @@ describe('style', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(styles.get('cmp-a')).toBe(`div { color: red; }`);
+    expect(styles.get('CMP-A')).toBe(`div { color: red; }`);
   });
 
 });

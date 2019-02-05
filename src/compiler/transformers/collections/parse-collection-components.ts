@@ -66,7 +66,10 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, collection, {})
+      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, collection, {
+        addCompilerMeta: false,
+        addStyle: true
+      })
     ]
   });
 }

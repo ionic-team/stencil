@@ -15,13 +15,11 @@ import { updateElement } from './update-dom-node';
 
 
 let useNativeShadowDom = false;
-// let ssrId: number;
 let scopeId: string;
 let checkSlotFallbackVisibility: boolean;
 let checkSlotRelocate: boolean;
 let contentRef: d.RenderNode;
 let hostTagName: string;
-let hostElm: d.HostElement;
 let isSvgMode = false;
 
 
@@ -597,21 +595,25 @@ interface RelocateNode {
 }
 
 
-export const renderVdom = (hostElement: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: any, hostDataFnResults?: any) => {
+export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode, hostDataFnResults?: any) => {
   if (renderFnResults) {
     const oldVNode = hostRef.vnode || {};
-    const newVNode = hostRef.vnode = h(null, hostDataFnResults, renderFnResults);
-    newVNode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElement.shadowRoot || hostElement : hostElement) as any;
+    hostTagName = toLowerCase(hostElm.nodeName);
+
+    if (renderFnResults.vtag === 'host') {
+      renderFnResults.vtag = hostTagName;
+      hostRef.vnode = renderFnResults;
+
+    } else {
+      hostRef.vnode = h(null, hostDataFnResults, renderFnResults);
+    }
+
+    hostRef.vnode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
     if (BUILD.reflect) {
       // only care if we're reflecting values to the host element
       (renderFnResults as d.VNode).ishost = true;
     }
-
-    // so it is safe to set these variables and internally
-    // the same patch() call will reference the same data
-    hostElm = hostElement;
-    hostTagName = toLowerCase(hostElm.nodeName);
 
     if (BUILD.slotPolyfill) {
       contentRef = hostElm['s-cr'];
@@ -638,7 +640,7 @@ export const renderVdom = (hostElement: d.HostElement, hostRef: d.HostRef, cmpMe
     }
 
     // synchronous patch
-    patchVNode(oldVNode, newVNode);
+    patchVNode(oldVNode, hostRef.vnode);
 
     // if (BUILD.prerenderServerSide && isDef(ssrId)) {
     //   // SSR ONLY: we've been given an SSR id, so the host element
@@ -648,7 +650,7 @@ export const renderVdom = (hostElement: d.HostElement, hostRef: d.HostRef, cmpMe
 
     if (BUILD.slotPolyfill) {
       if (checkSlotRelocate) {
-        relocateSlotContent(newVNode.elm);
+        relocateSlotContent(hostRef.vnode.elm);
 
         for (let i = 0; i < relocateNodes.length; i++) {
           const relocateNode = relocateNodes[i];
@@ -718,7 +720,7 @@ export const renderVdom = (hostElement: d.HostElement, hostRef: d.HostRef, cmpMe
       }
 
       if (checkSlotFallbackVisibility) {
-        updateFallbackSlotVisibility(newVNode.elm);
+        updateFallbackSlotVisibility(hostRef.vnode.elm);
       }
 
       // always reset
@@ -727,7 +729,7 @@ export const renderVdom = (hostElement: d.HostElement, hostRef: d.HostRef, cmpMe
 
     // fire off the ref if it exists
     if (BUILD.vdomRef) {
-      callNodeRefs(newVNode);
+      callNodeRefs(hostRef.vnode);
     }
   }
 };

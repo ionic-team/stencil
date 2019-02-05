@@ -116,7 +116,8 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
       const typeChecker = services.getProgram().getTypeChecker();
 
       const transformOpts: d.TransformOptions = {
-        addCompilerMeta: false
+        addCompilerMeta: false,
+        addStyle: true
       };
 
       return {
