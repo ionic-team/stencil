@@ -1,15 +1,13 @@
-import { mockDomApi } from '../../../testing/mocks';
 import { toVNode } from '../to-vnode';
 
 
 describe('toVNode()', () => {
-  const domApi = mockDomApi();
 
   it('should create element w/ child elements and text nodes', () => {
-    const elm = domApi.$createElement('h1');
+    const elm = document.createElement('h1');
     elm.innerHTML = '<div> 1 <span> 2 </span><!--comment-->   </div>';
 
-    const vnode = toVNode(domApi, elm);
+    const vnode = toVNode(elm);
 
     expect(vnode.elm).toBe(elm);
     expect(vnode.vtag).toBe('h1');
@@ -31,9 +29,9 @@ describe('toVNode()', () => {
   });
 
   it('should create element w/ child text node', () => {
-    const elm = domApi.$createElement('h1');
+    const elm = document.createElement('h1');
     elm.textContent = '88mph';
-    const vnode = toVNode(domApi, elm);
+    const vnode = toVNode(elm);
     expect(vnode.elm).toBe(elm);
     expect(vnode.vtag).toBe('h1');
     expect(vnode.vchildren).toBeDefined();
@@ -42,8 +40,8 @@ describe('toVNode()', () => {
   });
 
   it('should create element', () => {
-    const elm = domApi.$createElement('h1');
-    const vnode = toVNode(domApi, elm);
+    const elm = document.createElement('h1');
+    const vnode = toVNode(elm);
     expect(vnode.elm).toBe(elm);
     expect(vnode.vtag).toBe('h1');
     expect(vnode.vchildren).toBeUndefined();
