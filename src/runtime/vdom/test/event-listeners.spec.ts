@@ -1,16 +1,14 @@
 import * as d from '@declarations';
 import { h } from '../h';
-import { mockDocument, mockRenderer } from '../../../testing/mocks';
+import { patch } from '../render';
 
 
 describe('event listeners', () => {
-  const patch = mockRenderer();
-  let hostElm: any;
+  let hostElm: d.HostElement;
   let vnode0: d.VNode;
 
   beforeEach(() => {
-    const doc = mockDocument();
-    hostElm = doc.createElement('div');
+    hostElm = document.createElement('div');
     vnode0 = {};
     vnode0.elm = hostElm;
   });
@@ -24,7 +22,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent')
     );
 
-    hostElm = patch(hostElm, vnode0, vnode).elm;
+    patch(vnode0, vnode);
     hostElm.click();
 
     expect(result.length).toBe(1);
@@ -41,10 +39,10 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    patch(vnode0, vnode1);
     hostElm.click();
 
-    hostElm = patch(hostElm, vnode1, vnode2).elm;
+    patch(vnode1, vnode2);
     hostElm.click();
 
     expect(result[0]).toBe(1);
@@ -60,7 +58,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    patch(vnode0, vnode1);
     hostElm.click();
     hostElm.click();
 
@@ -70,7 +68,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    hostElm = patch(hostElm, vnode1, vnode2).elm;
+    patch(vnode1, vnode2);
     hostElm.click();
     hostElm.click();
 
@@ -88,11 +86,11 @@ describe('event listeners', () => {
       h('a', { onClick: click }, 'Click my parent'),
     );
 
-    hostElm = patch(hostElm, vnode0, vnode1).elm;
+    patch(vnode0, vnode1);
     hostElm.click();
 
     expect(result.length).toBe(1);
-    hostElm.firstChild.click();
+    (hostElm.firstChild as HTMLElement).click();
     expect(result.length).toBe(3);
   });
 });
