@@ -16,7 +16,6 @@ export interface ComponentCompilerFeatures {
   hasDisonnectedCallbackFn: boolean;
   hasElement: boolean;
   hasEvent: boolean;
-  hasHostDataFn: boolean;
   hasLifecycle: boolean;
   hasListener: boolean;
   hasListenerTarget: boolean;

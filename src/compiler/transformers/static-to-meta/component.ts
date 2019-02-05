@@ -49,7 +49,6 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     hasDisonnectedCallbackFn: false,
     hasElement: false,
     hasEvent: false,
-    hasHostDataFn: false,
     hasLifecycle: false,
     hasListener: false,
     hasListenerTarget: false,
@@ -121,7 +120,6 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.sourceFilePath;
 
     const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
-
     const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
     cmpNode = ts.updateClassDeclaration(

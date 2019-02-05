@@ -55,38 +55,12 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
         // reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpCstr.properties, elmData.instance);
       }
 
-      if (BUILD.hasRenderFn || BUILD.hostData || BUILD.reflect) {
+      if (BUILD.hasRenderFn || BUILD.reflect) {
         // tell the platform we're actively rendering
         // if a value is changed within a render() then
         // this tells the platform not to queue the change
         if (BUILD.updatable) {
           hostRef.isActiveRender = true;
-        }
-
-        if (BUILD.hostData) {
-
-          if (BUILD.isDev) {
-            // if (vnodeHostData && cmpMeta.membersMeta) {
-            //   const foundHostKeys = Object.keys(vnodeHostData).reduce((err, k) => {
-            //     if (cmpMeta.membersMeta[k]) {
-            //       return err.concat(k);
-            //     }
-            //     if (cmpMeta.membersMeta[dashToPascalCase(k)]) {
-            //       return err.concat(dashToPascalCase(k));
-            //     }
-            //     return err;
-            //   }, <string[]>[]);
-
-            //   if (foundHostKeys.length > 0) {
-            //     throw new Error(
-            //     `The following keys were attempted to be set with hostData() from the ` +
-            //     `${elm.nodeName} component: ${foundHostKeys.join(', ')}. ` +
-            //     `If you would like to modify these please set @Prop({ mutable: true, reflectToAttr: true}) ` +
-            //     `on the @Prop() decorator.`
-            //     );
-            //   }
-            // }
-          }
         }
 
         // if (BUILD.reflectToAttr && reflectHostAttr) {
@@ -103,7 +77,6 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
             hostRef,
             cmpMeta,
             (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
-            (BUILD.hostData) ? instance.hostData && instance.hostData() : 0
           );
 
         } else if (BUILD.noVdomRender) {

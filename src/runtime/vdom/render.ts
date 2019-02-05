@@ -9,7 +9,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
-import { h } from './h';
 import { NODE_TYPE, isDef, toLowerCase } from '@utils';
 import { updateElement } from './update-dom-node';
 
@@ -595,7 +594,7 @@ interface RelocateNode {
 }
 
 
-export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode, hostDataFnResults?: any) => {
+export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode) => {
   if (renderFnResults) {
     const oldVNode = hostRef.vnode || {};
     hostTagName = toLowerCase(hostElm.nodeName);
@@ -603,11 +602,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     if (renderFnResults.vtag === 'host') {
       renderFnResults.vtag = hostTagName;
       hostRef.vnode = renderFnResults;
-
-    } else {
-      hostRef.vnode = h(null, hostDataFnResults, renderFnResults);
     }
-
     hostRef.vnode.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
     if (BUILD.reflect) {

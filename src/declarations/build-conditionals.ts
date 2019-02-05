@@ -21,7 +21,6 @@ export interface BuildFeatures {
    * No components have a render function
    */
   noRenderFn?: boolean;
-  hostData?: boolean;
 
   // vdom
   vdomRender?: boolean;
