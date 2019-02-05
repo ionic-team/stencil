@@ -609,6 +609,11 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     } else {
       renderFnResults = h(null, null, renderFnResults as any);
     }
+    console.log('BUILD.reflect', BUILD.reflect);
+    if (BUILD.reflect) {
+      console.log(getReflectedAttr(cmpMeta, hostElm));
+      renderFnResults.vattrs = {...getReflectedAttr(cmpMeta, hostElm), ...renderFnResults.vattrs};
+    }
     renderFnResults.ishost = true;
     hostRef.vnode = renderFnResults;
     renderFnResults.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
@@ -730,4 +735,12 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
       callNodeRefs(renderFnResults);
     }
   }
+};
+
+const getReflectedAttr = (cmpMeta: d.ComponentRuntimeMeta, elm: any) => {
+  const hostData: any = {};
+  cmpMeta.attrsToReflect.forEach(([propName, attribute]) => {
+    hostData[attribute] = elm[propName];
+  });
+  return hostData;
 };

@@ -1,4 +1,4 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Element, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -248,6 +248,53 @@ describe('attribute', () => {
       expect(root.str).toBe('');
     });
 
+  });
+
+  describe('reflect', () => {
+    it('should reflect properties as attributes', async () => {
+      @Component({ tag: 'cmp-b'})
+      class CmpB {
+        @Element() el: any;
+
+        @Prop({reflectToAttr: true}) str = 'single';
+        @Prop({reflectToAttr: true}) nu = 2;
+        @Prop({reflectToAttr: true}) undef: string;
+        @Prop({reflectToAttr: true}) null: string = null;
+        @Prop({reflectToAttr: true}) bool = false;
+        @Prop({reflectToAttr: true}) otherBool = true;
+        @Prop({reflectToAttr: true}) disabled = false;
+
+        @Prop({reflectToAttr: true, mutable: true}) dynamicStr: string;
+        @Prop({reflectToAttr: true}) dynamicNu: number;
+
+        componentDidLoad() {
+          this.dynamicStr = 'value';
+          this.el.dynamicNu = 123;
+        }
+      }
+
+      const { root, flush } = await newSpecPage({
+        components: [CmpB],
+        html: `<cmp-b></cmp-b>`,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-b str="single" nu="2" other-bool></cmp-b>
+      `);
+
+      root.str = 'second';
+      root.nu = -12.2;
+      root.undef = 'no undef';
+      root.null = 'no null';
+      root.bool = true;
+      root.otherBool = false;
+
+      await flush();
+
+      expect(root).toEqualHtml(`
+        <cmp-b str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-b>
+      `);
+    });
   });
 
 });

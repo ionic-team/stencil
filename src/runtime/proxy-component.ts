@@ -20,7 +20,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       const attrNameToPropName = new Map();
 
       if (BUILD.reflect) {
-        cmpMeta.propNameToAttrName = new Map();
+        cmpMeta.attrsToReflect = [];
       }
 
       // create an array of attributes to observe
@@ -30,10 +30,9 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         .map(([propName, m]) => {
           const attribute = m[1] || propName;
           attrNameToPropName.set(attribute, propName);
-          if (BUILD.reflect) {
-            cmpMeta.propNameToAttrName.set(propName, attribute);
+          if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
+            cmpMeta.attrsToReflect.push([propName, attribute]);
           }
-
           return attribute;
         });
 

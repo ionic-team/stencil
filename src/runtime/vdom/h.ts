@@ -99,7 +99,8 @@ export function h(nodeName: any, vnodeData: any) {
   const vnode: d.VNode = {
     vtag: nodeName,
     vchildren: children,
-    elm: undefined
+    elm: undefined,
+    ishost: false,
   };
 
   if (BUILD.vdomAttribute) {
@@ -116,10 +117,6 @@ export function h(nodeName: any, vnodeData: any) {
 
   if (BUILD.slotPolyfill) {
     vnode.vname = vname;
-  }
-
-  if (BUILD.reflect) {
-    vnode.ishost = false;
   }
 
   return vnode;
