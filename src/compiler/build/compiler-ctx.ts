@@ -30,6 +30,7 @@ export class CompilerContext implements d.CompilerCtx {
   lazyModuleRollupCache: any = null;
   localPrerenderServer: any = null;
   moduleMap: d.ModuleMap = new Map();
+  nodeMap = new WeakMap();
   resolvedCollections = new Set<string>();
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;

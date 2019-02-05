@@ -29,7 +29,7 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
         }
 
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = visitClass(config, buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
+          const cmpMeta = visitClass(config, buildCtx.diagnostics, typeChecker, node, tsSourceFile);
           if (cmpMeta) {
             if (moduleFile.cmpMeta) {
               throw new Error(`More than one @Component() class in a single file is not valid`);

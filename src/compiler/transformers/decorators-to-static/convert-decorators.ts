@@ -17,12 +17,10 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
 
     function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
-        node = visitClass(diagnostics, typeChecker, tsSourceFile, node as ts.ClassDeclaration);
+        node = visitClass(diagnostics, typeChecker, tsSourceFile, node);
       }
 
-      return ts.visitEachChild(node, node => {
-        return visit(tsSourceFile, node);
-      }, transformCtx);
+      return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
     }
 
     return tsSourceFile => {
@@ -32,21 +30,16 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
 }
 
 
-function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, classNode: ts.ClassDeclaration) {
-  if (!classNode.decorators) {
-    return classNode;
+function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) {
+  if (!cmpNode.decorators) {
+    return cmpNode;
   }
 
-  const componentDecorator = classNode.decorators.find(isDecoratorNamed('Component'));
+  const componentDecorator = cmpNode.decorators.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
-    return classNode;
+    return cmpNode;
   }
 
-  return visitComponentClass(diagnostics, typeChecker, tsSourceFile, classNode, componentDecorator);
-}
-
-
-function visitComponentClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Decorator) {
   const newMembers: ts.ClassElement[] = [...cmpNode.members];
 
   transformHostData(newMembers);

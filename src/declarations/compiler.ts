@@ -1,5 +1,5 @@
 import * as d from '.';
-
+import ts from 'typescript';
 
 export interface Compiler {
   build(): Promise<d.BuildResults>;
@@ -29,11 +29,14 @@ export interface CompilerCtx {
   lazyModuleRollupCache: any;
   localPrerenderServer: any;
   moduleMap: d.ModuleMap;
+  nodeMap: NodeMap;
   resolvedCollections: Set<string>;
   rootTsFiles: string[];
   tsService: TsService;
 
   reset(): void;
 }
+
+export type NodeMap = WeakMap<ts.ClassDeclaration, d.ComponentCompilerMeta>;
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<any>;

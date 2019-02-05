@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
+import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { removeStencilImport } from '../remove-stencil-import';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
@@ -49,11 +49,10 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.Trans
   return transformCtx => {
 
     return tsSourceFile => {
-      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(moduleFile, node);
+          const cmp = getComponentMeta(compilerCtx, node);
           if (cmp != null) {
             return updateLazyComponentClass(opts, node, cmp);
           }

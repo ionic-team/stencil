@@ -29,14 +29,12 @@ export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.Tra
     }
 
     function visit(node: ts.Node, cmpMeta: d.ComponentMeta): ts.VisitResult<ts.Node> {
-      switch (node.kind) {
-        case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(node as ts.ClassDeclaration, cmpMeta);
-        default:
-          return ts.visitEachChild(node, (node) => {
-            return visit(node, cmpMeta);
-          }, transformCtx);
+      if (ts.isClassDeclaration(node)) {
+        return visitClass(node, cmpMeta);
       }
+      return ts.visitEachChild(node, (node) => {
+        return visit(node, cmpMeta);
+      }, transformCtx);
     }
 
     return (tsSourceFile) => {

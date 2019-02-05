@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 import { getModule, resetModule } from '../../build/compiler-ctx';
-import { visitClass } from './visit-class';
-import { visitImport } from './visit-import';
 import ts from 'typescript';
+import { parseStaticComponentMeta } from './component';
+import { parseImport } from './import';
 
 
-export function visitSource(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
+export function convertStaticToMeta(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
   let dirPath: string;
   let moduleFile: d.Module;
 
@@ -13,14 +13,11 @@ export function visitSource(sys: d.StencilSystem, config: d.Config, compilerCtx:
 
     function visitNode(node: ts.Node): ts.VisitResult<ts.Node> {
 
-      switch (node.kind) {
-        case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(transformCtx, moduleFile, typeChecker, node as ts.ClassDeclaration, transformOpts);
-
-        case ts.SyntaxKind.ImportDeclaration:
-          return visitImport(sys, config, compilerCtx, buildCtx, moduleFile, dirPath, node as ts.ImportDeclaration);
+      if (ts.isClassDeclaration(node)) {
+        return parseStaticComponentMeta(transformCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
+      } else if (ts.isImportDeclaration(node)) {
+        return parseImport(sys, config, compilerCtx, buildCtx, moduleFile, dirPath, node);
       }
-
       return ts.visitEachChild(node, visitNode, transformCtx);
     }
 

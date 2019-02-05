@@ -8,7 +8,7 @@ import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import minimatch from 'minimatch';
 import { logger, sys } from '@sys';
-import { visitSource } from '../transformers/visitors/visit-source';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -125,7 +125,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
           convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          visitSource(sys, config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
+          convertStaticToMeta(sys, config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
         ]
       };
     }

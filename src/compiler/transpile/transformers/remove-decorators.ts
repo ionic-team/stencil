@@ -25,17 +25,14 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
   return transformCtx => {
 
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
-      switch (node.kind) {
-        case ts.SyntaxKind.ClassDeclaration:
-          if (!isComponentClass(node as ts.ClassDeclaration)) {
-            return node;
-          }
-          return visitComponentClass(node as ts.ClassDeclaration);
-        default:
-          return ts.visitEachChild(node, visit, transformCtx);
+      if (ts.isClassDeclaration(node)) {
+        if (isComponentClass(node)) {
+          return visitComponentClass(node);
+        }
+        return node;
       }
+      return ts.visitEachChild(node, visit, transformCtx);
     }
-
     return (tsSourceFile) => visit(tsSourceFile) as ts.SourceFile;
   };
 }

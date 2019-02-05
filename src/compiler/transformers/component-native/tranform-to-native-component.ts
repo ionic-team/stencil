@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
+import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { removeStencilImport } from '../remove-stencil-import';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
@@ -48,11 +48,9 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
   return transformCtx => {
 
     return tsSourceFile => {
-      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
-
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(moduleFile, node);
+          const cmp = getComponentMeta(compilerCtx, node);
           if (cmp != null) {
             return updateNativeComponentClass(node, cmp);
           }

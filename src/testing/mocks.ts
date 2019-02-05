@@ -35,6 +35,7 @@ export function mockCompilerCtx() {
     lazyModuleRollupCache: new Map(),
     localPrerenderServer: null,
     moduleMap: new Map(),
+    nodeMap: new WeakMap(),
     resolvedCollections: new Set(),
     rootTsFiles: [],
     tsService: null,

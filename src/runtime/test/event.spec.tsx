@@ -61,8 +61,8 @@ describe('event', () => {
   });
 
   it('should have custom name', async () => {
-    @Component({ tag: 'cmp-b'})
-    class CmpB {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
 
       @Event({eventName: 'ionStyle'}) style: EventEmitter;
       @State() counter = 0;
@@ -83,12 +83,12 @@ describe('event', () => {
     }
 
     const { root, flush } = await newSpecPage({
-      components: [CmpB],
-      html: `<cmp-b></cmp-b>`,
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-b>0</cmp-b>
+      <cmp-a>0</cmp-a>
     `);
 
     let called = false;
@@ -103,13 +103,13 @@ describe('event', () => {
 
     expect(called).toBe(true);
     expect(root).toEqualHtml(`
-      <cmp-b>1</cmp-b>
+      <cmp-a>1</cmp-a>
     `);
   });
 
   it('should have different default settings', async () => {
-    @Component({ tag: 'cmp-c'})
-    class CmpC {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
 
       @Event({
         eventName: 'ionStyle',
@@ -136,12 +136,12 @@ describe('event', () => {
     }
 
     const { root, flush } = await newSpecPage({
-      components: [CmpC],
-      html: `<cmp-c></cmp-c>`,
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-c>0</cmp-c>
+      <cmp-a>0</cmp-a>
     `);
 
     let called = false;
@@ -157,7 +157,7 @@ describe('event', () => {
     expect(called).toBe(true);
 
     expect(root).toEqualHtml(`
-      <cmp-c>1</cmp-c>
+      <cmp-a>1</cmp-a>
     `);
   });
 });

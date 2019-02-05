@@ -6,7 +6,7 @@ import { lazyComponentTransform } from '../transformers/component-lazy/transform
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { sys } from '@sys';
 import { validateConfig } from '../config/validate-config';
-import { visitSource } from '../transformers/visitors/visit-source';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -77,7 +77,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
       lazyComponentTransform(compilerCtx, transformOpts)
     ]
   });

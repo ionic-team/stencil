@@ -3,7 +3,7 @@ import { ModuleKind, ScriptTarget } from '../transform-utils';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { sys } from '@sys';
-import { visitSource } from '../visitors/visit-source';
+import { convertStaticToMeta } from '../static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -66,7 +66,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, collection, {
+      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, collection, {
         addCompilerMeta: false,
         addStyle: true
       })

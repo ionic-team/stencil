@@ -36,12 +36,10 @@ export function createCustomElements(compilerCtx: d.CompilerCtx): ts.Transformer
         );
 
       function visit(node: ts.Node): ts.VisitResult<ts.Node> {
-        if (!ts.isClassDeclaration(node) ||
-           (<ts.ClassDeclaration>node).name.escapedText !== compilerCtx.moduleFiles[fileName].cmpMeta.componentClass) {
-          return ts.visitEachChild(node, visit, transformCtx);
+        if (ts.isClassDeclaration(node) && node.name.escapedText !== compilerCtx.moduleFiles[fileName].cmpMeta.componentClass) {
+          return visitComponentClass(node);
         }
-
-        return visitComponentClass(node as ts.ClassDeclaration);
+        return ts.visitEachChild(node, visit, transformCtx);
       }
 
       const sourceFile = visit(tsSourceFile) as ts.SourceFile;

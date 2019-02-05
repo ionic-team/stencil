@@ -1,21 +1,30 @@
+import { parseStaticListeners } from './listeners';
 import * as d from '@declarations';
-import { convertValueToLiteral, createStaticGetter, serializeSymbol } from '../transform-utils';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { parseStaticListeners } from './listeners';
+import { convertValueToLiteral, createStaticGetter, getComponentTagName, isStaticGetter, serializeSymbol } from '../transform-utils';
 import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
 import { parseStaticStyles } from './styles';
-import { visitCallExpression } from '../visitors/visit-call-expression';
-import { visitStringLiteral } from '../visitors/visit-string-literal';
+import { parseCallExpression } from './call-expression';
+import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, moduleFile: d.Module, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, staticMembers: ts.ClassElement[], tagName: string, transformOpts: d.TransformOptions) {
+export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
+  if (cmpNode.members == null) {
+    return cmpNode;
+  }
+  const staticMembers = cmpNode.members.filter(isStaticGetter);
+  const tagName = getComponentTagName(staticMembers);
+  if (tagName == null) {
+    return cmpNode;
+  }
+
   const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
@@ -82,27 +91,17 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     potentialCmpRefs: []
   };
 
-  moduleFile.cmps.push(cmp);
-
   parseClassMethods(typeChecker, cmpNode, cmp);
 
-
   function visitComponentChildNode(node: ts.Node): ts.VisitResult<ts.Node> {
-
-    switch (node.kind) {
-      case ts.SyntaxKind.CallExpression:
-        visitCallExpression(cmp, node as ts.CallExpression);
-        break;
-
-      case ts.SyntaxKind.StringLiteral:
-        visitStringLiteral(cmp, node as ts.StringLiteral);
-        break;
+    if (ts.isCallExpression(node)) {
+      parseCallExpression(cmp, node);
+    } else if (ts.isStringLiteral(node)) {
+      parseStringLiteral(cmp, node);
     }
-
     return ts.visitEachChild(node, visitComponentChildNode, transformCtx);
   }
-
-  cmpNode = ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
+  ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
 
   setComponentBuildConditionals(cmp);
 
@@ -132,6 +131,12 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
       classMembers
     );
   }
+
+  // add to module map
+  moduleFile.cmps.push(cmp);
+
+  // add to node map
+  nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
 }

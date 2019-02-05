@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import ts from 'typescript';
 
 
-export function visitStringLiteral(cmpMeta: d.ComponentCompilerMeta, node: ts.StringLiteral) {
+export function parseStringLiteral(cmpMeta: d.ComponentCompilerMeta, node: ts.StringLiteral) {
   if (typeof node.text === 'string' && node.text.includes('</')) {
 
     if (node.text.includes('-')) {

@@ -252,8 +252,8 @@ describe('attribute', () => {
 
   describe('reflect', () => {
     it('should reflect properties as attributes', async () => {
-      @Component({ tag: 'cmp-b'})
-      class CmpB {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
         @Element() el: any;
 
         @Prop({reflect: true}) str = 'single';
@@ -274,12 +274,12 @@ describe('attribute', () => {
       }
 
       const { root, flush } = await newSpecPage({
-        components: [CmpB],
-        html: `<cmp-b></cmp-b>`,
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
       });
 
       expect(root).toEqualHtml(`
-        <cmp-b str="single" nu="2" other-bool dynamic-str="value" dynamic-nu="123"></cmp-b>
+        <cmp-a str="single" nu="2" other-bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
 
       root.str = 'second';
@@ -292,7 +292,7 @@ describe('attribute', () => {
       await flush();
 
       expect(root).toEqualHtml(`
-        <cmp-b str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-b>
+        <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
     });
   });

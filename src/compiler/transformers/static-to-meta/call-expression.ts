@@ -3,7 +3,7 @@ import { gatherVdomMeta } from '../static-to-meta/vdom';
 import ts from 'typescript';
 
 
-export function visitCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.CallExpression) {
+export function parseCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.CallExpression) {
   if (node.arguments != null && node.arguments.length > 0) {
 
     if (node.expression.kind === ts.SyntaxKind.Identifier) {
