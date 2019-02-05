@@ -13,14 +13,8 @@ import { toLowerCase } from '@utils';
 
 const vdomListenersMap = new WeakMap<HTMLElement, Map<string, Function>>();
 
-export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean) => {
-  if (BUILD.vdomKey && memberName === 'key') {
-    // minifier will clean this up
-
-  } else if (BUILD.vdomRef && memberName === 'ref') {
-    // minifier will clean this up
-
-  } else if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
+export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHost: boolean) => {
+  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
       if (oldValue !== newValue) {
@@ -66,8 +60,13 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
         }
       }
     }
+  } else if (BUILD.vdomKey && memberName === 'key') {
+    // minifier will clean this up
 
-  } else if (BUILD.vdomListener && (memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) && (!(memberName in elm))) {
+  } else if (BUILD.vdomRef && memberName === 'ref') {
+    // minifier will clean this up
+
+  } else if (BUILD.vdomListener && /^on[A-Z]/.test(memberName) && !(memberName in elm)) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
@@ -107,51 +106,18 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       }
     }
 
-  } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
-      (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
-    // Properties
-    // - list and type are attributes that get applied as values on the element
-    // - all svgs get values as attributes not props
-    // - check if elm contains name or if the value is array, object, or function
-    if (elm.tagName.includes('-')) {
-      // this member name is a property on a custom element
-      setProperty(elm, memberName, newValue);
-
-    } else {
-      // this member name is a property on this element, but it's not a custom element
-      // this is a native property like "value" or something\
-      setProperty(elm, memberName, newValue == null ? '' : newValue);
-      if ((newValue == null || newValue === false) && memberName !== 'spellcheck') {
-        elm.removeAttribute(memberName);
-      }
-    }
-
   } else {
-    if (BUILD.isDev && memberName === 'htmlfor') {
-      console.error(`Attribute "htmlfor" set on ${elm.tagName.toLowerCase()}, with the lower case "f" must be replaced with a "htmlFor" (capital "F")`);
+    // TODO
+    // handle special cases
+    // } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
+    // (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
+
+    const isProp = memberName in elm;
+    if (isProp) {
+      setProperty(elm, memberName, newValue);
     }
-
-    let isXLink: boolean;
-    const isBooleanAttr = typeof newValue === 'boolean';
-    if (BUILD.svg) {
-      isXLink = isSvg && (memberName !== (memberName = memberName.replace(/^xlink:?/, '')));
-    }
-
-    if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
-      if (BUILD.svg && isXLink) {
-        elm.removeAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName));
-      } else {
-        elm.removeAttribute(memberName);
-      }
-
-    } else if (typeof newValue !== 'function') {
-      newValue = isBooleanAttr ? '' : newValue + '';
-
-      if (BUILD.svg && isXLink) {
-        elm.setAttributeNS('http://www.w3.org/1999/xlink', toLowerCase(memberName), newValue);
-      } else {
-        elm.setAttribute(memberName, newValue);
-      }
+    if (!isProp || isHost) {
+      updateAttribute(elm, memberName, newValue);
     }
   }
 };
@@ -167,7 +133,42 @@ const setProperty = (elm: any, propName: string, newValue: any) => {
   } catch (e) {}
 };
 
+export const updateAttribute = (
+  elm: HTMLElement,
+  memberName: string,
+  newValue: any,
+  isBooleanAttr = typeof newValue === 'boolean',
+  isXlinkNs?: boolean
+) => {
+  if (BUILD.svg) {
+    isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+  }
+
+  if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
+    if (BUILD.svg && isXlinkNs) {
+      elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
+
+    } else {
+      elm.removeAttribute(memberName);
+    }
+
+  } else if (typeof newValue !== 'function') {
+    if (isBooleanAttr) {
+      newValue = '';
+    } else {
+      newValue = newValue.toString();
+    }
+    if (BUILD.svg && isXlinkNs) {
+      elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
+
+    } else {
+      elm.setAttribute(memberName, newValue);
+    }
+  }
+};
 
 function vdomListenerProxy(this: d.HostElement, ev: Event) {
   return vdomListenersMap.get(this).get(ev.type)(ev);
 }
+
+const XLINK_NS = 'http://www.w3.org/1999/xlink';

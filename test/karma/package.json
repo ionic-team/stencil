@@ -14,7 +14,7 @@
     "karma.firefox": "karma start karma.config.js --browsers=Firefox --single-run=false",
     "karma.prod": "npm run tsc && npm run build.app && npm run karma.webpack && karma start karma.config.js --browsers=Chrome",
     "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
-    "start": "node ../../bin/stencil build --debug --profile --watch --es5 --serve",
+    "start": "node ../../bin/stencil build --dev --watch --serve",
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "devDependencies": {
