@@ -47,53 +47,40 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     elm.attachShadow({ mode: 'open' });
   }
 
-  if (BUILD.hasRenderFn) {
+  if (BUILD.hasRenderFn || BUILD.reflect) {
 
     try {
-      // let reflectHostAttr: d.VNodeData;
-      if (BUILD.reflect) {
-        // reflectHostAttr = reflectInstanceValuesToHostAttributes(cmpCstr.properties, elmData.instance);
-      }
-
-      if (BUILD.hasRenderFn || BUILD.reflect) {
-        // tell the platform we're actively rendering
-        // if a value is changed within a render() then
-        // this tells the platform not to queue the change
-        if (BUILD.updatable) {
-          hostRef.isActiveRender = true;
-        }
-
-        // if (BUILD.reflectToAttr && reflectHostAttr) {
-        //   vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
-        // }
-
-        // looks like we've got child nodes to render into this host element
-        // or we need to update the css class/attrs on the host element
-
-        if (BUILD.vdomRender) {
-          // DOM WRITE!
-          renderVdom(
-            elm,
-            hostRef,
-            cmpMeta,
-            (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
-          );
-
-        } else if (BUILD.noVdomRender) {
-          // DOM WRITE!
-          (BUILD.shadowDom ? elm.shadowRoot || elm : elm).textContent =
-            (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()) as string;
-        }
-      }
-
+      // tell the platform we're actively rendering
+      // if a value is changed within a render() then
+      // this tells the platform not to queue the change
       if (BUILD.updatable) {
-        // tell the platform we're done rendering
-        // now any changes will again queue
-        hostRef.isActiveRender = false;
+        hostRef.isActiveRender = true;
+      }
+
+      // if (BUILD.reflectToAttr && reflectHostAttr) {
+      //   vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
+      // }
+
+      // looks like we've got child nodes to render into this host element
+      // or we need to update the css class/attrs on the host element
+
+      if (BUILD.vdomRender || BUILD.reflect) {
+        // DOM WRITE!
+        renderVdom(
+          elm,
+          hostRef,
+          cmpMeta,
+          (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
+        );
       }
 
     } catch (e) {
       consoleError(e);
+    }
+    if (BUILD.updatable) {
+      // tell the platform we're done rendering
+      // now any changes will again queue
+      hostRef.isActiveRender = false;
     }
   }
 

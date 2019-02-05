@@ -256,18 +256,18 @@ describe('attribute', () => {
       class CmpB {
         @Element() el: any;
 
-        @Prop({reflectToAttr: true}) str = 'single';
-        @Prop({reflectToAttr: true}) nu = 2;
-        @Prop({reflectToAttr: true}) undef: string;
-        @Prop({reflectToAttr: true}) null: string = null;
-        @Prop({reflectToAttr: true}) bool = false;
-        @Prop({reflectToAttr: true}) otherBool = true;
-        @Prop({reflectToAttr: true}) disabled = false;
+        @Prop({reflect: true}) str = 'single';
+        @Prop({reflect: true}) nu = 2;
+        @Prop({reflect: true}) undef: string;
+        @Prop({reflect: true}) null: string = null;
+        @Prop({reflect: true}) bool = false;
+        @Prop({reflect: true}) otherBool = true;
+        @Prop({reflect: true}) disabled = false;
 
-        @Prop({reflectToAttr: true, mutable: true}) dynamicStr: string;
-        @Prop({reflectToAttr: true}) dynamicNu: number;
+        @Prop({reflect: true, mutable: true}) dynamicStr: string;
+        @Prop({reflect: true}) dynamicNu: number;
 
-        componentDidLoad() {
+        componentWillLoad() {
           this.dynamicStr = 'value';
           this.el.dynamicNu = 123;
         }
@@ -279,7 +279,7 @@ describe('attribute', () => {
       });
 
       expect(root).toEqualHtml(`
-        <cmp-b str="single" nu="2" other-bool></cmp-b>
+        <cmp-b str="single" nu="2" other-bool dynamic-str="value" dynamic-nu="123"></cmp-b>
       `);
 
       root.str = 'second';
