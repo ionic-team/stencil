@@ -90,11 +90,11 @@ module.exports = function(config) {
     customLaunchers: browserStack ? browserStackLaunchers : {},
 
     files: [
-      'test-app/attribute-basic/karma.spec.ts',
-      'test-app/attribute-complex/karma.spec.ts',
-      'test-app/reflect-to-attr/karma.spec.ts',
+      // 'test-app/attribute-basic/karma.spec.ts',
+      // 'test-app/attribute-complex/karma.spec.ts',
+      // 'test-app/reflect-to-attr/karma.spec.ts',
 
-      // 'test-app/**/*.spec.ts',
+      'test-app/**/*.spec.ts',
       'test-app/util.ts',
       // 'www/build/testapp.js',
       // 'www/build/testsibling.js',
