@@ -3,6 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { consoleError, getHostRef, writeTask } from '@platform';
 import { parsePropertyValue } from './parse-property-value';
 import { update } from './update';
+import { HOST_STATE } from '@utils';
 
 
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -10,18 +11,20 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   const hostRef = getHostRef(ref);
   const elm = BUILD.lazyLoad ? hostRef.hostElement : ref as d.HostElement;
   const oldVal = hostRef.instanceValues.get(propName);
+  const flags = hostRef.flags;
   newVal = parsePropertyValue(newVal, cmpMeta.cmpMembers[propName][0]);
 
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
 
-    if (!hostRef.isConstructingInstance || (hostRef.isConstructingInstance && oldVal === undefined)) {
+    if ((flags & HOST_STATE.isConstructingInstance) === 0 || oldVal === undefined) {
       // set our new value!
       hostRef.instanceValues.set(propName, newVal);
 
       if (!BUILD.lazyLoad || hostRef.lazyInstance) {
         // get an array of method names of watch functions to call
-        if (BUILD.watchCallback && cmpMeta.watchers && hostRef.hasConnected && !hostRef.isConstructingInstance) {
+        if (BUILD.watchCallback && cmpMeta.watchers &&
+          (flags & (HOST_STATE.hasConnected | HOST_STATE.isConstructingInstance)) === HOST_STATE.hasConnected) {
           const watchMethods = cmpMeta.watchers[propName];
 
           if (watchMethods) {
@@ -43,12 +46,12 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           }
         }
 
-        if (BUILD.updatable && !hostRef.isActiveRender && hostRef.hasRendered && !hostRef.isQueuedForUpdate) {
+        if (BUILD.updatable && (flags & (HOST_STATE.isActiveRender | HOST_STATE.hasRendered | HOST_STATE.isQueuedForUpdate)) === HOST_STATE.hasRendered) {
           // looks like this value actually changed, so we've got work to do!
           // but only if we've already rendered, otherwise just chill out
           // queue that we need to do an update, but don't worry about queuing
           // up millions cuz this function ensures it only runs once
-          hostRef.isQueuedForUpdate = true;
+          hostRef.flags |= HOST_STATE.isQueuedForUpdate;
 
           writeTask(() =>
             update(

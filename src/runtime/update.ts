@@ -3,6 +3,7 @@ import { consoleError, plt } from '@platform';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { renderVdom } from './vdom/render';
+import { HOST_STATE } from '@utils';
 
 export const emitLifecycleEvent = (elm: d.HostElement, name: string) => {
   if (BUILD.lifecycleDOMEvents) {
@@ -13,7 +14,7 @@ export const emitLifecycleEvent = (elm: d.HostElement, name: string) => {
 export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   // update
   if (BUILD.updatable) {
-    hostRef.isQueuedForUpdate = false;
+    hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
   }
 
 
@@ -54,7 +55,7 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
       if (BUILD.updatable) {
-        hostRef.isActiveRender = true;
+        hostRef.flags |= HOST_STATE.isActiveRender;
       }
 
       // looks like we've got child nodes to render into this host element
@@ -75,7 +76,7 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     if (BUILD.updatable) {
       // tell the platform we're done rendering
       // now any changes will again queue
-      hostRef.isActiveRender = false;
+      hostRef.flags &= ~HOST_STATE.isActiveRender;
     }
   }
 
@@ -98,11 +99,10 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
   if (BUILD.lifecycle || BUILD.style) {
     // it's official, this element has rendered
     // DOM WRITE!
-    hostRef.hasRendered = elm['s-rn'] = true;
-  } else if (BUILD.updatable) {
-    // DOM WRITE!
-    hostRef.hasRendered = true;
+    elm['s-rn'] = true;
   }
+  hostRef.flags |= HOST_STATE.hasRendered;
+
 
   if (BUILD.lifecycle && elm['s-rc']) {
     // ok, so turns out there are some child host elements

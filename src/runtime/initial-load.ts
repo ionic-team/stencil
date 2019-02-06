@@ -3,6 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { consoleError, doc, loadModule, plt, styles, writeTask } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
+import { HOST_STATE } from '@utils';
 
 
 export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
@@ -90,13 +91,13 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
         // ok, time to construct the instance
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
-        BUILD.member && (hostRef.isConstructingInstance = true);
+        BUILD.member && (hostRef.flags |= HOST_STATE.isConstructingInstance);
         try {
           new (Cstr as any)(hostRef);
         } catch (err) {
           consoleError(err);
         }
-        BUILD.member && (hostRef.isConstructingInstance = false);
+        BUILD.member && (hostRef.flags &= ~HOST_STATE.isConstructingInstance);
 
         if (BUILD.hostListener && hostRef.queuedReceivedHostEvents) {
           // events may have already fired before the instance was even ready

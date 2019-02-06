@@ -43,6 +43,7 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
 
 export const registerHost = (elm: d.HostElement) =>
   hostRefs.set(elm, {
+    flags: 0,
     hostElement: elm,
     instanceValues: new Map(),
   });

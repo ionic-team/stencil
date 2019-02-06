@@ -76,21 +76,14 @@ export interface ModeBundleIds {
 export type RuntimeRef = d.HostElement | {};
 
 export interface HostRef {
+  flags: number;
   ancestorHostElement?: d.HostElement;
-  hasConnected?: boolean;
-  hasRendered?: boolean;
-  isActiveRender?: boolean;
-  isConstructingInstance?: boolean;
   hostElement?: d.HostElement;
   lazyInstance?: d.ComponentInstance;
   instanceValues?: Map<string, any>;
-  isQueuedForUpdate?: boolean;
-  isShadowDom?: boolean;
-  isScoped?: boolean;
   queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;
-  useNativeShadowDom?: boolean;
   vnode?: d.VNode;
   watchCallbacks?: Map<string, string[]>;
 }

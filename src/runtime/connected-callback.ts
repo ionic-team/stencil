@@ -3,7 +3,7 @@ import { getHostRef, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
 import { initialLoad } from './initial-load';
-import { LISTENER_FLAGS } from '@utils';
+import { LISTENER_FLAGS, HOST_STATE } from '@utils';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
@@ -30,9 +30,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
       });
     }
 
-    if (!hostRef.hasConnected) {
+    if ((hostRef.flags & HOST_STATE.hasConnected) === 0) {
       // first time this element has connected
-      hostRef.hasConnected = true;
+      hostRef.flags |= HOST_STATE.hasConnected;
 
       if (BUILD.lifecycle) {
         // register this component as an actively

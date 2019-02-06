@@ -14,19 +14,15 @@ describe('event', () => {
 
       @Listen('ionChange')
       onIonChange() {
-        console.log(this, 'HEYYYY', this.counter);
         this.counter++;
-        console.log(this.counter);
       }
 
       @Method()
       emitEvent() {
-        console.log('METHOD');
         this.ionChange.emit();
       }
 
       render() {
-        console.log('render()');
         return `${this.counter}`;
       }
     }

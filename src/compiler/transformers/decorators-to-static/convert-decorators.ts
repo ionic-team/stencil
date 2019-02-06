@@ -80,12 +80,13 @@ function removeStencilDecorators(classMembers: ts.ClassElement[]) {
 }
 
 const STENCIL_MEMBER_DECORATORS = [
-  'Prop',
-  'State',
-  'Listen',
+  'Element',
   'Event',
+  'Listen',
   'Method',
-  'Watch',
+  'Prop',
+  'PropDidChange',
   'PropWillChange',
-  'PropDidChange'
+  'State',
+  'Watch',
 ];

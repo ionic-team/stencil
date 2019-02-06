@@ -37,6 +37,16 @@ export const enum LISTENER_FLAGS {
   TargetBody = 1 << 6,
 }
 
+export enum HOST_STATE {
+  hasConnected = 1 << 0,
+  hasRendered = 1 << 1,
+  isActiveRender = 1 << 2,
+  isConstructingInstance = 1 << 3,
+  isQueuedForUpdate = 1 << 4,
+  isShadowDom = 1 << 5,
+  isScoped = 1 << 6,
+  useNativeShadowDom = 1 << 7,
+}
 
 /**
  * Member Types
