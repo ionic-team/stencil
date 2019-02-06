@@ -25,7 +25,7 @@ describe('element', () => {
       <cmp-a></cmp-a>
     `);
 
-    root.setClassNow();
+    await root.setClassNow();
     await flush();
 
     expect(root).toEqualHtml(`

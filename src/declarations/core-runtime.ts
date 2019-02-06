@@ -15,7 +15,6 @@ export interface ComponentRuntimeMeta {
   cmpMembers?: d.ComponentRuntimeMembers;
   attrsToReflect?: [string, string][];
   cmpHostListeners?: d.ComponentRuntimeHostListener[];
-  isReflectingAttribute?: boolean;
   cmpScopedCssEncapsulation?: boolean;
   cmpShadowDomEncapsulation?: boolean;
 }

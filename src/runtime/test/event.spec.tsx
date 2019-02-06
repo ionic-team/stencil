@@ -14,15 +14,19 @@ describe('event', () => {
 
       @Listen('ionChange')
       onIonChange() {
+        console.log(this, 'HEYYYY', this.counter);
         this.counter++;
+        console.log(this.counter);
       }
 
       @Method()
       emitEvent() {
+        console.log('METHOD');
         this.ionChange.emit();
       }
 
       render() {
+        console.log('render()');
         return `${this.counter}`;
       }
     }
@@ -36,7 +40,7 @@ describe('event', () => {
       <cmp-a>0</cmp-a>
     `);
 
-    root.emitEvent();
+    await root.emitEvent();
     await flush();
 
     expect(root).toEqualHtml(`
@@ -51,7 +55,7 @@ describe('event', () => {
       called = true;
     });
 
-    root.emitEvent();
+    await root.emitEvent();
     await flush();
 
     expect(called).toBe(true);
@@ -98,7 +102,7 @@ describe('event', () => {
       expect(ev.composed).toBe(true);
       called = true;
     });
-    root.emitEvent();
+    await root.emitEvent();
     await flush();
 
     expect(called).toBe(true);
@@ -151,7 +155,7 @@ describe('event', () => {
       expect(ev.composed).toBe(false);
       called = true;
     });
-    root.emitEvent();
+    await root.emitEvent();
     await flush();
 
     expect(called).toBe(true);

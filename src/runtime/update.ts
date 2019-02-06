@@ -57,13 +57,8 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
         hostRef.isActiveRender = true;
       }
 
-      // if (BUILD.reflectToAttr && reflectHostAttr) {
-      //   vnodeHostData = vnodeHostData ? Object.assign(vnodeHostData, reflectHostAttr) : reflectHostAttr;
-      // }
-
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
-
       if (BUILD.vdomRender || BUILD.reflect) {
         // DOM WRITE!
         renderVdom(

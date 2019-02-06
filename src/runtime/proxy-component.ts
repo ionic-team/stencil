@@ -3,6 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
 import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
 import { setValue } from './set-value';
+import { componentOnReady } from './component-on-ready';
 
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
@@ -37,9 +38,10 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
-        if (!cmpMeta.isReflectingAttribute) {
-          this[attrNameToPropName.get(attrName)] = newValue;
-        }
+        const propName = attrNameToPropName.get(attrName);
+        this[propName] = newValue === null && typeof this[propName] === 'boolean'
+          ? false
+          : newValue;
       };
     }
     members.forEach(([memberName, [memberFlags]]) => {
@@ -63,17 +65,10 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberFlags & MEMBER_TYPE.Method)) {
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
-          value() {
-            if (BUILD.lazyLoad) {
-              const instance = getHostRef(this).lazyInstance;
-              if (instance) {
-                // lazy host method proxy
-                return instance[memberName].apply(instance, arguments);
-              }
-
-            } else {
-              return this[memberName].apply(this, arguments);
-            }
+          value(this: d.HostElement) {
+            const ref = getHostRef(this);
+            const args = arguments;
+            return componentOnReady(ref).then(() => ref.lazyInstance[memberName].apply(ref.lazyInstance, args));
           }
         });
       }

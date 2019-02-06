@@ -465,8 +465,21 @@ export function getModuleFromSourceFile(compilerCtx: d.CompilerCtx, tsSourceFile
   return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
 }
 
-export function getComponentMeta(compilerCtx: d.CompilerCtx, node: ts.ClassDeclaration) {
-  return compilerCtx.nodeMap.get(node);
+export function getComponentMeta(compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) {
+  const meta = compilerCtx.nodeMap.get(node);
+  if (meta) {
+    return meta;
+  }
+
+  const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
+   if (moduleFile != null && node.members != null) {
+    const staticMembers = node.members.filter(isStaticGetter);
+    const tagName = getComponentTagName(staticMembers);
+    if (typeof tagName === 'string') {
+      return moduleFile.cmps.find(cmp => cmp.tagName === tagName);
+    }
+  }
+  return undefined;
 }
 
 export function getComponentTagName(staticMembers: ts.ClassElement[]) {

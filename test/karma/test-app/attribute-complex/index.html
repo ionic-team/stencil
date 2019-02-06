@@ -5,8 +5,8 @@
 <attribute-complex></attribute-complex>
 
 <script>
-  var el = document.querySelector('attribute-complex');
-  el.componentOnReady().then(function(el) {
+  customElements.whenDefined('attribute-complex').then(() => {
+    var el = document.querySelector('attribute-complex');
     el.getInstance();
   });
 </script>

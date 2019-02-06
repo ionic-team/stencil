@@ -394,7 +394,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement,
     // element node
 
     if (BUILD.vdomAttribute) {
-      if (BUILD.slot && newVNode.vtag !== 'slot') {
+      if (BUILD.slot && newVNode.vtag === 'slot') {
         // minifier will clean this up
 
       } else {
@@ -734,7 +734,8 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
 const getReflectedAttr = (cmpMeta: d.ComponentRuntimeMeta, elm: any) => {
   const hostData: any = {};
-  cmpMeta.attrsToReflect.forEach(([propName, attribute]) => {
+
+  cmpMeta.attrsToReflect && cmpMeta.attrsToReflect.forEach(([propName, attribute]) => {
     hostData[attribute] = elm[propName];
   });
   return hostData;

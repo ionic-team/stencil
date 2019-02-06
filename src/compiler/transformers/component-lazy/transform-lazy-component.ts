@@ -52,7 +52,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.Trans
 
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(compilerCtx, node);
+          const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
             return updateLazyComponentClass(opts, node, cmp);
           }

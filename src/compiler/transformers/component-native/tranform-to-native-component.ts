@@ -50,7 +50,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
     return tsSourceFile => {
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(compilerCtx, node);
+          const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
             return updateNativeComponentClass(node, cmp);
           }

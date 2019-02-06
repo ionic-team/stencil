@@ -2,10 +2,11 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { hostRefs, registerHost, tick } from '@platform';
+import { hostRefs, registerHost } from '@platform';
 import { initialLoad } from './initial-load';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
+import { componentOnReady } from './component-on-ready';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
@@ -50,16 +51,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
         }
 
         componentOnReady(): any {
-          if (BUILD.lifecycle || BUILD.updatable) {
-            const hostRef = hostRefs.get(this);
-            if (!hostRef.onReadyPromise) {
-              hostRef.onReadyPromise = new Promise(resolve => hostRef.hasRendered ? resolve() : (hostRef.onReadyResolve = resolve));
-            }
-            return hostRef.onReadyPromise;
-          }
-          return tick;
+          return componentOnReady(hostRefs.get(this));
         }
-
       }
 
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
