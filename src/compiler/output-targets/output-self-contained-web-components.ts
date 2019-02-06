@@ -52,7 +52,6 @@ async function generateSelfContainedWebComponent(config: d.Config, compilerCtx: 
 function generateSelfContainedCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
   build.lazyLoad = false;
   build.es5 = false;
-  build.slotPolyfill = false;
   build.polyfills = false;
   build.prerenderClientSide = false;
   build.prerenderServerSide = false;

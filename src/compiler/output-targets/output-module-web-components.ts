@@ -48,7 +48,6 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
 function generateModuleWebComponentCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
   build.lazyLoad = false;
   build.es5 = false;
-  build.slotPolyfill = false;
   build.polyfills = false;
   build.prerenderClientSide = false;
   build.prerenderServerSide = false;

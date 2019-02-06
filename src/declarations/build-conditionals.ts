@@ -97,8 +97,3 @@ export interface Build extends BuildFeatures {
 export interface UserBuildConditionals {
   isDev?: boolean;
 }
-
-declare global {
-  /** OLD WAY */
-  var _BUILD_: any;
-}

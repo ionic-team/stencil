@@ -27,7 +27,6 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
 function generateLazyLoadedCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   build.lazyLoad = true;
   build.es5 = false;
-  build.slotPolyfill = false;
   build.polyfills = false;
   build.prerenderClientSide = false;
   build.prerenderServerSide = false;

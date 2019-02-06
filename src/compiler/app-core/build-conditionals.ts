@@ -62,12 +62,13 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 
 
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
-  b.isDebug = config.logLevel === 'debug';
+  b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
   b.isProd = !config.devMode;
   b.hotModuleReplacement = b.isDev;
-  b.profile = !!(config.flags && config.flags.profile);
   b.lifecycleDOMEvents = !!(config.devMode || config._isTesting || true);
+  b.profile = !!(config.flags && config.flags.profile);
+  b.slotPolyfill = !!(b.scoped || (b.es5 && b.shadowDom));
 }
 
 
