@@ -1,10 +1,10 @@
 import * as d from '@declarations';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorator } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
 import ts from 'typescript';
 
 
 export function componentDecoratorToStatic(cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
-  removeDecorator(cmpNode, 'Component');
+  removeDecorators(cmpNode, ['Component']);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {

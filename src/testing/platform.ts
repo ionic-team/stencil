@@ -9,7 +9,7 @@ export const win = setupGlobal(global);
 
 export const doc = win.document;
 
-export const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
+const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
 

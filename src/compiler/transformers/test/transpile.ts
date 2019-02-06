@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
-import { visitSource } from '../visitors/visit-source';
+import { convertStaticToMeta } from '../static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -71,7 +71,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
       convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      visitSource(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
+      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
     ]
   });
 

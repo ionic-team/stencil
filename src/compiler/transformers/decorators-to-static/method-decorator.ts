@@ -1,12 +1,13 @@
 import * as d from '@declarations';
-import { convertValueToLiteral, createStaticGetter, isDecoratorNamed, removeDecorator, serializeSymbol, typeToString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, isDecoratorNamed, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';
 
 
 export function methodDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const methods: ts.ObjectLiteralElementLike[] = decoratedProps.filter(ts.isMethodDeclaration).map((prop: ts.MethodDeclaration) => {
-    return methodDecoratorToStatic(diagnostics, typeChecker, prop);
-  }).filter(method => !!method);
+  const methods = decoratedProps
+    .filter(ts.isMethodDeclaration)
+    .map(method => parseMethodDecorator(diagnostics, typeChecker, method))
+    .filter(method => !!method);
 
   if (methods.length > 0) {
     newMembers.push(createStaticGetter('methods', ts.createObjectLiteral(methods, true)));
@@ -14,14 +15,11 @@ export function methodDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFil
 }
 
 
-function methodDecoratorToStatic(_diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) {
-  const methodDecorator = method.decorators && method.decorators.find(isDecoratorNamed('Method'));
-
+function parseMethodDecorator(_diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) {
+  const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
     return null;
   }
-
-  removeDecorator(method, 'Method');
 
   const methodName = method.name.getText();
   const flags = ts.TypeFormatFlags.WriteArrowStyleSignature | ts.TypeFormatFlags.NoTruncation;

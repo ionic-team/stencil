@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { isDecoratorNamed } from '../transform-utils';
+import { isDecoratorNamed, removeDecorators } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
@@ -7,6 +7,8 @@ import { listenDecoratorsToStatic } from './listen-decorator';
 import { methodDecoratorsToStatic } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
+import { watchDecoratorsToStatic } from './watch-decorator';
+
 import { transformHostData } from '../transforms/host-data-transform';
 import ts from 'typescript';
 
@@ -42,17 +44,24 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
 
   const newMembers: ts.ClassElement[] = [...cmpNode.members];
 
+  // transform hostData() into synthetic render()
   transformHostData(newMembers);
+
+  // parser component decorator (Component)
   componentDecoratorToStatic(cmpNode, newMembers, componentDecorator);
 
-  const decoratedProps = cmpNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
-  if (decoratedProps.length > 0) {
-    propDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
-    stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
-    listenDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
-    eventDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
-    methodDecoratorsToStatic(diagnostics, tsSourceFile, decoratedProps, typeChecker, newMembers);
-    elementDecoratorsToStatic(diagnostics, decoratedProps, typeChecker, newMembers);
+  // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
+  const decoratedMembers = newMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
+  if (decoratedMembers.length > 0) {
+    propDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    eventDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    methodDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
+    watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
+    listenDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
+
+    removeStencilDecorators(decoratedMembers);
   }
 
   return ts.updateClassDeclaration(
@@ -66,3 +75,17 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
   );
 }
 
+function removeStencilDecorators(classMembers: ts.ClassElement[]) {
+  classMembers.forEach(member => removeDecorators(member, STENCIL_MEMBER_DECORATORS));
+}
+
+const STENCIL_MEMBER_DECORATORS = [
+  'Prop',
+  'State',
+  'Listen',
+  'Event',
+  'Method',
+  'Watch',
+  'PropWillChange',
+  'PropDidChange'
+];

@@ -31,5 +31,6 @@ const REMOVE_STATIC_GETTERS = new Set([
   'styleMode',
   'styles',
   'styleUrl',
+  'watchers',
   'styleUrls'
 ]);

@@ -1,30 +1,26 @@
 import * as d from '@declarations';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
 import { buildError, buildWarn } from '@utils';
 
 
-export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const listeners: ts.ArrayLiteralExpression[] = [];
-
-  decoratedProps.forEach((prop: ts.PropertyDeclaration) => {
-    listenDecoratorToStatic(diagnostics, typeChecker, listeners, prop);
-  });
+export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) {
+  const listeners = decoratedMembers
+    .filter(ts.isMethodDeclaration)
+    .flatMap(method => parseListenDecorator(diagnostics, method))
+    .filter(listener => !!listener);
 
   if (listeners.length > 0) {
-    newMembers.push(createStaticGetter('listeners', ts.createArrayLiteral(listeners, true)));
+    newMembers.push(createStaticGetter('listeners', convertValueToLiteral(listeners)));
   }
 }
 
 
-function listenDecoratorToStatic(diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, listeners: any[], prop: ts.PropertyDeclaration) {
-  const listenDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Listen'));
-
+function parseListenDecorator(diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) {
+  const listenDecorator = method.decorators.find(isDecoratorNamed('Listen'));
   if (listenDecorator == null) {
-    return;
+    return [];
   }
-
-  removeDecorator(prop, 'Listen');
 
   const [ listenText, listenOptions ] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
 
@@ -34,15 +30,11 @@ function listenDecoratorToStatic(diagnostics: d.Diagnostic[], _typeChecker: ts.T
     warn.messageText = 'Deprecated @Listen() feature. Use multiple @Listen() decorators instead of comma-separated names.';
   }
 
-  eventNames.forEach(eventName => {
-    listeners.push(
-      validateListener(diagnostics, eventName.trim(), listenOptions, prop.name.getText())
-    );
-  });
+  return eventNames.map(eventName => validateListener(diagnostics, eventName.trim(), listenOptions, method.name.getText()));
 }
 
 
-export function validateListener(diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string) {
+export function validateListener(diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string): d.ComponentCompilerListener {
   let rawEventName = eventName;
   let target = opts.target;
 
@@ -66,7 +58,7 @@ export function validateListener(diagnostics: d.Diagnostic[], eventName: string,
     warn.messageText = `Deprecated @Listen() feature. Using key is not longer supported, use "event.key" instead.`;
   }
 
-  const listenerMeta: d.ComponentCompilerListener = {
+  return {
     name: rawEventName,
     method: methodName,
     target,
@@ -76,8 +68,6 @@ export function validateListener(diagnostics: d.Diagnostic[], eventName: string,
       (PASSIVE_TRUE_DEFAULTS.indexOf(rawEventName.toLowerCase()) > -1),
     disabled: (opts.enabled === false)
   };
-
-  return convertValueToLiteral(listenerMeta);
 }
 
 export function isValidTargetValue(prefix: string): prefix is d.ListenTargetOptions  {

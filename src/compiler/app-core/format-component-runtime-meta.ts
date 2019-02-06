@@ -2,14 +2,11 @@ import * as d from '@declarations';
 import { LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
-export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]) {
-  const lazyBundleRuntimeMeta: d.LazyBundleRuntimeData = [
+export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
+  return [
     bundleId,
-    cmps.map(cmp => {
-      return formatComponentRuntimeMeta(cmp, true);
-    })
+    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
-  return lazyBundleRuntimeMeta;
 }
 
 

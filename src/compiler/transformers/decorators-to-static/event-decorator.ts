@@ -1,28 +1,27 @@
 import * as d from '@declarations';
 import { buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, removeDecorator, serializeSymbol } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, serializeSymbol } from '../transform-utils';
 import ts from 'typescript';
 
 
 export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
-  const events = decoratedProps.map((prop: ts.PropertyDeclaration) => {
-    return eventDecoratorToStatic(diagnostics, sourceFile, typeChecker, prop);
-  }).filter(event => !!event);
+  const events = decoratedProps
+    .filter(ts.isPropertyDeclaration)
+    .map(prop => parseEventDecorator(diagnostics, sourceFile, typeChecker, prop))
+    .filter(ev => !!ev);
 
   if (events.length > 0) {
-    newMembers.push(createStaticGetter('events', ts.createArrayLiteral(events, true)));
+    newMembers.push(createStaticGetter('events', convertValueToLiteral(events)));
   }
 }
 
 
-function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
-  const eventDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Event'));
+function parseEventDecorator(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerEvent {
+  const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
     return null;
   }
-
-  removeDecorator(prop, 'Event');
 
   const [ opts ] = getDeclarationParameters<d.EventOptions>(eventDecorator);
 
@@ -32,7 +31,7 @@ function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.Sou
   }
 
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
-  const eventMeta: d.ComponentCompilerEvent = {
+  return {
     method: memberName,
     name: getEventName(diagnostics, opts, memberName),
     bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
@@ -40,7 +39,6 @@ function eventDecoratorToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.Sou
     composed: opts && typeof opts.composed === 'boolean' ? opts.composed : true,
     docs: serializeSymbol(typeChecker, symbol)
   };
-  return convertValueToLiteral(eventMeta);
 }
 
 

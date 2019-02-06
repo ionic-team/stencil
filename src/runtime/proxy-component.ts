@@ -7,13 +7,13 @@ import { componentOnReady } from './component-on-ready';
 
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
-
   if (BUILD.member && cmpMeta.cmpMembers) {
-
+    if (BUILD.watchCallback && Cstr.watchers) {
+      cmpMeta.watchers = Cstr.watchers;
+    }
     if (!BUILD.lazyLoad) {
       Cstr.cmpMeta = cmpMeta;
     }
-
     // It's better to have a const than two Object.entries()
     const members = Object.entries(cmpMeta.cmpMembers);
 
@@ -26,7 +26,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
       // create an array of attributes to observe
       // and also create a map of html attribute name to js property name
-      Cstr.observedAttributes = Object.entries(cmpMeta.cmpMembers)
+      Cstr.observedAttributes = members
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
           const attribute = m[1] || propName;

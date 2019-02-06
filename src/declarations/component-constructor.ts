@@ -4,6 +4,7 @@ import * as d from '.';
 export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
+  watchers?: ComponentConstructorWatchers;
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
   style?: string;
@@ -15,6 +16,9 @@ export interface ComponentConstructor {
   isStyleRegistered?: boolean;
 }
 
+export interface ComponentConstructorWatchers {
+  [propName: string]: string[];
+}
 
 export interface ComponentConstructorStaticMeta extends ComponentConstructor {
   COMPILER_META: d.ComponentCompilerMeta;

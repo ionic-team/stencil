@@ -60,6 +60,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     head: platform.doc.head as HTMLHeadElement,
     body: platform.doc.body as HTMLBodyElement,
     root: null as any,
+    rootInstance: null as any,
     build: bc.BUILD as d.Build,
     styles: platform.styles as Map<string, string>,
     flush: (): Promise<void> => platform.flushAll(),
@@ -82,7 +83,9 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   }
 
   plt.root = findRoot(cmpTags, plt.body);
-
+  if (plt.root) {
+    plt.rootInstance = platform.getHostRef(plt.root).lazyInstance;
+  }
   return plt;
 }
 

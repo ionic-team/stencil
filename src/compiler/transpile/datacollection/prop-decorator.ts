@@ -18,7 +18,7 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
         return allMembers;
       }
       const propOptions = getPropOptions(propDecorator, diagnostics);
-      const memberName = (prop.name as ts.Identifier).text;
+      const memberName = prop.name.getText();
       const symbol = checker.getSymbolAtLocation(prop.name);
 
       if (propOptions && typeof propOptions.connect === 'string') {

@@ -9,6 +9,7 @@ import { convertValueToLiteral, createStaticGetter, getComponentTagName, isStati
 import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
+import { parseStaticWatchers } from './watchers';
 import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
@@ -38,6 +39,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     methods: parseStaticMethods(staticMembers),
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
+    watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(tagName, moduleFile.sourceFilePath, staticMembers),
     styleDocs: [],
     dependencies: [],

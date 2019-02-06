@@ -4,6 +4,8 @@ import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateNativeConstructor } from './native-constructor';
+import { addWatchers } from '../transforms/watcher-meta-transform';
+
 import ts from 'typescript';
 
 
@@ -41,6 +43,7 @@ function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.
   updateNativeConstructor(classMembers, cmp);
   addNativeConnectedCallback(classMembers);
   addNativeElementGetter(classMembers, cmp);
+  addWatchers(classMembers, cmp);
   addComponentStyle(classMembers, cmp);
 
   return classMembers;

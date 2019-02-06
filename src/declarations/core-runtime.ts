@@ -13,10 +13,14 @@ export type LazyBundleRuntimeData = [
 
 export interface ComponentRuntimeMeta {
   cmpMembers?: d.ComponentRuntimeMembers;
-  attrsToReflect?: [string, string][];
   cmpHostListeners?: d.ComponentRuntimeHostListener[];
   cmpScopedCssEncapsulation?: boolean;
   cmpShadowDomEncapsulation?: boolean;
+
+
+  // added later
+  attrsToReflect?: [string, string][];
+  watchers?: d.ComponentConstructorWatchers;
 }
 
 

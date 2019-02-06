@@ -4,6 +4,7 @@ import { addLazyElementGetter } from './lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
+import { addWatchers } from '../transforms/watcher-meta-transform';
 
 
 export function updateLazyComponentClass(opts: d.TransformOptions, classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
@@ -24,6 +25,7 @@ function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.Clas
 
   updateLazyComponentConstructor(classMembers, cmp);
   addLazyElementGetter(classMembers, cmp);
+  addWatchers(classMembers, cmp);
 
   if (opts.addStyle) {
     addComponentStyle(classMembers, cmp);

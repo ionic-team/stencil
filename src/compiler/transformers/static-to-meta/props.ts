@@ -31,10 +31,3 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
   });
 }
 
-
-export function parseWatchCallbacks(val: any) {
-  if (Array.isArray(val.watchCallbacks)) {
-    return val.watchCallbacks.slice();
-  }
-  return null;
-}

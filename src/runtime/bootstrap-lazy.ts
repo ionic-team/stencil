@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { hostRefs, registerHost } from '@platform';
+import { getHostRef, registerHost } from '@platform';
 import { initialLoad } from './initial-load';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
@@ -36,13 +36,14 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
         }
 
         's-init'() {
-          initialLoad(this, hostRefs.get(this), cmpLazyMeta);
+          initialLoad(this, getHostRef(this), cmpLazyMeta);
         }
 
         forceUpdate() {
           if (BUILD.updatable) {
-            const hostRef = hostRefs.get(this);
-            update(this,
+            const hostRef = getHostRef(this);
+            update(
+              this,
               BUILD.lazyLoad ? hostRef.lazyInstance : this,
               hostRef,
               cmpLazyMeta
@@ -51,7 +52,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
         }
 
         componentOnReady(): any {
-          return componentOnReady(hostRefs.get(this));
+          return componentOnReady(getHostRef(this));
         }
       }
 

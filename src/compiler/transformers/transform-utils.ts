@@ -113,13 +113,15 @@ export function evalText(text: string) {
 }
 
 
-export function removeDecorator(node: ts.Node, decoratorName: string) {
+export function removeDecorators(node: ts.Node, decoratorNames: string[]) {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter(dec => {
-      const toRemove = ts.isCallExpression(dec.expression) &&
+      const name = (
+        ts.isCallExpression(dec.expression) &&
         ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text === decoratorName;
-      return !toRemove;
+        dec.expression.expression.text
+      );
+      return !decoratorNames.includes(name);
     });
 
     if (updatedDecoratorList.length !== node.decorators.length) {

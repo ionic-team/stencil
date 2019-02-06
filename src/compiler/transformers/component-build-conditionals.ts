@@ -8,17 +8,14 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
     cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
     cmpMeta.hasReflect = cmpMeta.properties.some(p => p.reflect);
     cmpMeta.hasAttribute = cmpMeta.properties.some(p => typeof p.attribute === 'string');
-    // TODO
-    // cmpMeta.hasWatchCallback = cmpMeta.properties.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
   }
 
   if (cmpMeta.states.length > 0) {
     cmpMeta.hasState = true;
+  }
 
-    if (!cmpMeta.hasWatchCallback) {
-      // TODO
-      // cmpMeta.hasWatchCallback = cmpMeta.states.some(p => Array.isArray(p.watchCallbacks) && p.watchCallbacks.length > 0);
-    }
+  if (cmpMeta.watchers.length > 0) {
+    cmpMeta.hasWatchCallback = true;
   }
 
   if (cmpMeta.methods.length > 0) {

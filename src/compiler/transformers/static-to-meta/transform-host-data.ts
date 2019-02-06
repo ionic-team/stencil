@@ -8,7 +8,7 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
     return;
   }
 
-  const classMethods = classMembers.filter(m => ts.isMethodDeclaration(m));
+  const classMethods = classMembers.filter(ts.isMethodDeclaration);
   if (classMethods.length === 0) {
     return;
   }

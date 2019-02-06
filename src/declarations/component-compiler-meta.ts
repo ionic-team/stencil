@@ -63,6 +63,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
   properties: ComponentCompilerProperty[];
+  watchers: ComponentCompilerWatch[];
   sourceFilePath: string;
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
@@ -137,6 +138,11 @@ export interface ComponentCompilerMethodComplexType {
     type: string;
     docs: string;
   };
+}
+
+export interface ComponentCompilerWatch {
+  propName: string;
+  methodName: string;
 }
 
 export interface ComponentCompilerMethod extends ComponentCompilerStaticMethod {
