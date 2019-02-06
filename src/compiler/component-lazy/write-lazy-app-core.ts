@@ -16,23 +16,28 @@ export function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, b
 
 
 async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, lazyRuntimeData: string, rollupResult: d.RollupResult) {
-  const code = rollupResult.code.replace(
+  let code = rollupResult.code.replace(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`
   );
-  const results = await optimizeAppCoreBundle(config, compilerCtx, build, code);
 
-  buildCtx.diagnostics.push(...results.diagnostics);
+  if (config.minifyJs) {
+    const results = await optimizeAppCoreBundle(compilerCtx, build, code);
 
-  if (buildCtx.shouldAbort) {
-    return;
+    buildCtx.diagnostics.push(...results.diagnostics);
+
+    if (buildCtx.shouldAbort) {
+      return;
+    }
+
+    code = results.output;
   }
 
   // inject the component metadata
 
   await Promise.all(outputTargets.map(outputTarget => {
     const filePath = sys.path.join(outputTarget.buildDir, rollupResult.fileName);
-    return compilerCtx.fs.writeFile(filePath, results.output);
+    return compilerCtx.fs.writeFile(filePath, code);
   }));
 }
 

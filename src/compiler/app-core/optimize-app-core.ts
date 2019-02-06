@@ -4,17 +4,8 @@ import { RESERVED_PROPERTIES } from './reserved-properties';
 import { sys } from '@sys';
 
 
-export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build, input: string) {
-  const opts = JSON.parse(config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
-  opts.compress.global_defs = {};
-
-  Object.keys(build).forEach(key => {
-    let value = (build as any)[key];
-    if (typeof value !== 'string') {
-      value = !!value;
-    }
-    opts.compress.global_defs[`BUILD.${key}`] = value;
-  });
+export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d.Build, input: string) {
+  const opts = JSON.parse(PROD_MINIFY_OPTS);
 
   if (build.es5) {
     opts.ecma = 5;
@@ -27,34 +18,24 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
     opts.ecma = 7;
     opts.output.ecma = 7;
     opts.compress.ecma = 7;
+    opts.compress.arrows = true;
     opts.compress.module = true;
   }
 
-  if (config.minifyJs) {
-    if (!build.es5) {
-      opts.compress.arrows = true;
-    }
+  if (build.isDebug) {
+    // if in debug mode, still mangle the property names
+    // but at least make them readable of what the
+    // properties originally were named
+    opts.mangle.properties.debug = true;
+    opts.mangle.keep_fnames = true;
+    opts.compress.drop_console = false;
+    opts.compress.drop_debugger = false;
+    opts.output.beautify = true;
+    opts.output.indent_level = 2;
+    opts.output.comments = 'all';
 
-    // reserved properties is a list of properties to NOT rename
-    // if something works in dev, but a runtime error in prod
-    // chances are we need to add a property to this list
-    opts.mangle.properties.reserved = RESERVED_PROPERTIES.slice();
-
-    if (config.logLevel === 'debug') {
-      // if in debug mode, still mangle the property names
-      // but at least make them readable of what the
-      // properties originally were named
-      opts.mangle.properties.debug = true;
-      opts.mangle.keep_fnames = true;
-      opts.compress.drop_console = false;
-      opts.compress.drop_debugger = false;
-      opts.output.beautify = true;
-      opts.output.indent_level = 2;
-      opts.output.comments = 'all';
-
-    } else {
-      opts.output.comments = '/webpack/';
-    }
+  } else {
+    opts.output.comments = '/webpack/';
   }
 
   let cacheKey: string;
@@ -83,78 +64,6 @@ export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.Com
 
   return results;
 }
-
-
-// https://www.npmjs.com/package/terser
-export const DEV_MINIFY_OPTS = JSON.stringify({
-  compress: {
-    arguments: false,
-    arrows: false,
-    booleans: false,
-    booleans_as_integers: false,
-    collapse_vars: false,
-    comparisons: false,
-    conditionals: true, // must set for dead_code removal
-    dead_code: true,
-    drop_console: false,
-    drop_debugger: false,
-    evaluate: true,
-    expression: false,
-    hoist_funs: true,
-    hoist_vars: false,
-    ie8: false,
-    if_return: false,
-    inline: false,
-    join_vars: false,
-    keep_fargs: false,
-    keep_fnames: true,
-    keep_infinity: true,
-    loops: false,
-    negate_iife: false,
-    passes: 2,
-    properties: true,
-    pure_funcs: null,
-    pure_getters: false,
-    reduce_funcs: false,
-    reduce_vars: true,
-    sequences: true,
-    side_effects: true,
-    switches: false,
-    toplevel: true,
-    top_retain: false,
-    typeofs: false,
-    unsafe: false,
-    unsafe_arrows: false,
-    unsafe_comps: false,
-    unsafe_Function: false,
-    unsafe_math: false,
-    unsafe_proto: false,
-    unsafe_regexp: false,
-    unused: true,
-    warnings: false
-  },
-  mangle: false,
-  output: {
-    ascii_only: false,
-    beautify: true,
-    comments: 'all',
-    ie8: false,
-    indent_level: 2,
-    indent_start: 0,
-    inline_script: true,
-    keep_quoted_props: true,
-    max_line_len: false,
-    preamble: null,
-    quote_keys: false,
-    quote_style: 1,
-    semicolons: true,
-    shebang: true,
-    source_map: null,
-    webkit: false,
-    width: 80,
-    wrap_iife: false
-  }
-});
 
 
 export const PROD_MINIFY_OPTS = JSON.stringify({
@@ -201,7 +110,8 @@ export const PROD_MINIFY_OPTS = JSON.stringify({
     properties: {
       builtins: false,
       debug: false,
-      keep_quoted: true
+      keep_quoted: true,
+      reserved: RESERVED_PROPERTIES
     },
     toplevel: true,
     reserved: ['h']
