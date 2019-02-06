@@ -17,7 +17,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
 
-    if ((flags & HOST_STATE.isConstructingInstance) === 0 || oldVal === undefined) {
+    if (!(flags & HOST_STATE.isConstructingInstance) || oldVal === undefined) {
       // set our new value!
       hostRef.instanceValues.set(propName, newVal);
 

@@ -37,7 +37,7 @@ export const enum LISTENER_FLAGS {
   TargetBody = 1 << 6,
 }
 
-export enum HOST_STATE {
+export const enum HOST_STATE {
   hasConnected = 1 << 0,
   hasRendered = 1 << 1,
   isActiveRender = 1 << 2,
@@ -86,14 +86,14 @@ export const enum ENCAPSULATION {
  * Node Types
  * https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
  */
-export const NODE_TYPE = {
-  ElementNode: 1,
-  TextNode: 3,
-  CommentNode: 8,
-  DocumentNode: 9,
-  DocumentTypeNode: 10,
-  DocumentFragment: 11
-};
+export const enum NODE_TYPE {
+  ElementNode = 1,
+  TextNode = 3,
+  CommentNode = 8,
+  DocumentNode = 9,
+  DocumentTypeNode = 10,
+  DocumentFragment = 11
+}
 
 
 /**
@@ -115,21 +115,6 @@ export const DEFAULT_STYLE_MODE = '$';
  */
 export const EMPTY_OBJ: any = {};
 export const EMPTY_ARR: any[] = [];
-
-
-/**
- * Key Name to Key Code Map
- */
-export const KEY_CODE_MAP: {[key: string]: number} = {
-  'enter': 13,
-  'escape': 27,
-  'space': 32,
-  'tab': 9,
-  'left' : 37,
-  'up' : 38,
-  'right' : 39,
-  'down' : 40
-};
 
 
 /**
