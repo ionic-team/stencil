@@ -6,6 +6,7 @@ import { logger, sys } from '@sys';
 import { methodsToMarkdown } from './markdown-methods';
 import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
+import { slotsToMarkdown } from './markdown-slots';
 
 
 export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
@@ -46,6 +47,7 @@ export function generateMarkdown(userContent: string, cmp: d.JsonDocsComponent) 
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),
     ...methodsToMarkdown(cmp.methods),
+    ...slotsToMarkdown(cmp.slots),
     ...stylesToMarkdown(cmp.styles),
     `----------------------------------------------`,
     '',

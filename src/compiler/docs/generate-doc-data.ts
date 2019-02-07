@@ -44,7 +44,8 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): 
         props: getProperties(cmp.properties),
         methods: getMethods(cmp.methods),
         events: getEvents(cmp.events),
-        styles: getStyles(cmp)
+        styles: getStyles(cmp),
+        slots: getSlots(cmp.docs.tags)
       }));
     }));
 
@@ -121,6 +122,23 @@ function getStyles(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] {
       docs: styleDoc.docs || ''
     };
   });
+}
+
+function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
+  return tags
+    .filter(tag => tag.name === 'slot' && tag.text)
+    .map(({text}) => {
+      const [namePart, ...rest] = (' ' + text).split(' - ');
+      return {
+        name: namePart.trim(),
+        docs: rest.join(' - ').trim()
+      };
+    })
+    .sort((a, b) => {
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      return 0;
+    });
 }
 
 async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: string) {

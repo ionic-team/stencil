@@ -14,6 +14,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, jsonOutputs: 
       methods: cmp.methods,
       events: cmp.events,
       styles: cmp.styles,
+      slots: cmp.slots
     }))
   };
   const jsonContent = JSON.stringify(json, null, 2);

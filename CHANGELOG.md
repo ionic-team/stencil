@@ -1,3 +1,13 @@
+<a name="0.17.2"></a>
+## 🐋 [0.17.2](https://github.com/ionic-team/stencil/compare/v0.17.1...v0.17.2) (2019-02-05)
+
+
+### Bug Fixes
+
+* **log:** remove config console.log ([29c9e8b](https://github.com/ionic-team/stencil/commit/29c9e8b))
+
+
+
 <a name="0.17.1"></a>
 ## 🚛 [0.17.1](https://github.com/ionic-team/stencil/compare/v0.17.0...v0.17.1) (2019-02-01)
 
