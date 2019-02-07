@@ -31,4 +31,5 @@ export function resetBuildConditionals(b: d.Build) {
   b.vdomListener = true;
   b.vdomFunctional = true;
   b.vdomText = true;
+  b.allRenderFn = false;
 }
