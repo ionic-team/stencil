@@ -28,6 +28,7 @@ export interface JsonDocsComponent {
   methods: JsonDocsMethod[];
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
+  slots: JsonDocsSlot[];
 }
 
 export interface JsonDocsTags {
@@ -90,4 +91,9 @@ export interface JsonDocsStyle {
   name: string;
   docs: string;
   annotation: string;
+}
+
+export interface JsonDocsSlot {
+  name: string;
+  docs: string;
 }
