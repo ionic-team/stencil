@@ -52,7 +52,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         .filter(([_, member]) => isDocsPublic(member.jsdoc));
 
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
-
+      const docsTags = generateDocsTags(moduleFile.cmpMeta.jsdoc);
       return {
         dirPath,
         filePath,
@@ -61,15 +61,16 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
         usagesDir,
         tag: moduleFile.cmpMeta.tagNameMeta,
         readme,
+        docsTags,
         docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
-        docsTags: generateDocsTags(moduleFile.cmpMeta.jsdoc),
         usage: await generateUsages(config, compilerCtx, usagesDir),
         encapsulation: getEncapsulation(moduleFile.cmpMeta),
 
         props: getProperties(membersMeta),
         methods: getMethods(membersMeta),
         events: getEvents(moduleFile.cmpMeta),
-        styles: getStyles(moduleFile.cmpMeta)
+        styles: getStyles(moduleFile.cmpMeta),
+        slots: getSlots(docsTags)
       };
     });
   return Promise.all(promises);
@@ -170,6 +171,17 @@ function getStyles(cmpMeta: d.ComponentMeta): d.JsonDocsStyle[] {
   });
 }
 
+function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
+  return tags
+    .filter(tag => tag.name === 'slot' && tag.text)
+    .map(({text}) => {
+      const [name, ...rest] = text.trim().split(' ');
+      return {
+        name,
+        docs: rest.join(' ')
+      };
+    });
+}
 
 function getAttrName(memberMeta: d.MemberMeta) {
   if (memberMeta.attribName) {
