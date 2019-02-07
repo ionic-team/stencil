@@ -6,10 +6,17 @@ import ts from 'typescript';
 export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) {
   const watchers = decoratedProps
     .filter(ts.isMethodDeclaration)
-    .flatMap(method => parseWatchDecorator(diagnostics, method));
+    .map(method => parseWatchDecorator(diagnostics, method));
 
-  if (watchers.length > 0) {
-    newMembers.push(createStaticGetter('watchers', convertValueToLiteral(watchers)));
+  const flatWatchers = watchers.reduce((arr, listener) => {
+    if (listener) {
+      arr.push(...listener);
+    }
+    return arr;
+  }, []);
+
+  if (flatWatchers.length > 0) {
+    newMembers.push(createStaticGetter('watchers', convertValueToLiteral(flatWatchers)));
   }
 }
 
