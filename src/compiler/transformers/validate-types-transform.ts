@@ -1,9 +1,8 @@
-import { isComponentClass } from './util';
+import { removeStencilImport } from './remove-stencil-import';
+import { } from './transform-utils';
 import ts from 'typescript';
 
 const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
-
-// same as the "declare" variables in the root index.ts file
 const DECORATORS_TO_REMOVE = new Set([
   'Element',
   'Event',
@@ -17,19 +16,13 @@ const DECORATORS_TO_REMOVE = new Set([
 ]);
 
 
-/**
- * Remove all decorators that are for metadata purposes
- */
-export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
+export function removeStencilDecorators(): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
-        if (isComponentClass(node)) {
-          return visitComponentClass(node);
-        }
-        return node;
+        return visitComponentClass(node);
       }
       return ts.visitEachChild(node, visit, transformCtx);
     }
@@ -38,10 +31,6 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
 }
 
 
-/**
- * Visit the component class and remove decorators
- * @param classNode
- */
 function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
   classNode.decorators = removeDecoratorsByName(classNode.decorators, CLASS_DECORATORS_TO_REMOVE);
 
@@ -54,11 +43,7 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
   return classNode;
 }
 
-/**
- * Remove a decorator from the an array by name
- * @param decorators array of decorators
- * @param name name to remove
- */
+
 function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names: Set<string>): ts.NodeArray<ts.Decorator> {
   const updatedDecoratorList = decoratorList.filter(dec => {
     const toRemove = ts.isCallExpression(dec.expression) &&
@@ -76,4 +61,23 @@ function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names
   }
 
   return decoratorList;
+}
+
+
+export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
+
+  return transformCtx => {
+
+    return tsSourceFile => {
+      function visitNode(node: ts.Node): any {
+        if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+          return removeStencilImport(node as ts.ImportDeclaration);
+        }
+
+        return ts.visitEachChild(node, visitNode, transformCtx);
+      }
+
+      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+    };
+  };
 }

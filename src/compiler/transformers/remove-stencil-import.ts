@@ -2,9 +2,8 @@ import ts from 'typescript';
 
 
 export function removeStencilImport(importNode: ts.ImportDeclaration) {
-  if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
-    const importPath = importNode.moduleSpecifier.text;
-    if (importPath === '@stencil/core') {
+  if (importNode.moduleSpecifier != null && ts.isStringLiteral(importNode.moduleSpecifier)) {
+    if (importNode.moduleSpecifier.text === '@stencil/core') {
       return null;
     }
   }
