@@ -55,7 +55,7 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
 
 
 function isMethod(member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration {
-  return ts.isMethodDeclaration(member) && member.name.getText() === methodName;
+  return ts.isMethodDeclaration(member) && member.name && (member.name as any).escapedText === methodName;
 }
 
 
