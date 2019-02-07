@@ -54,4 +54,23 @@ describe('parse listeners', () => {
     expect(t.listeners[1].method).toBe('onMouseDown');
   });
 
+  it('multiple listener decorators on same method', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Listen('touchend')
+        @Listen('mouseup')
+        onUp(ev: UIEvent) {
+          console.log('up!');
+        }
+      }
+    `);
+
+    expect(t.listeners[0].name).toBe('touchend');
+    expect(t.listeners[0].method).toBe('onUp');
+
+    expect(t.listeners[1].name).toBe('mouseup');
+    expect(t.listeners[1].method).toBe('onUp');
+  });
+
 });

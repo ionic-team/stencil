@@ -1,41 +1,50 @@
 import * as d from '@declarations';
+import { buildError, buildWarn } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
-import { buildError, buildWarn } from '@utils';
 
 
 export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
-    .flatMap(method => parseListenDecorator(diagnostics, method))
-    .filter(listener => !!listener);
+    .map(method => parseListenDecorators(diagnostics, method));
 
-  if (listeners.length > 0) {
-    newMembers.push(createStaticGetter('listeners', convertValueToLiteral(listeners)));
+  const flatListeners = listeners.reduce((arr, listener) => {
+    if (listener) {
+      arr.push(...listener);
+    }
+    return arr;
+  }, []);
+
+  if (flatListeners.length > 0) {
+    newMembers.push(createStaticGetter('listeners', convertValueToLiteral(flatListeners)));
   }
 }
 
 
-function parseListenDecorator(diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) {
-  const listenDecorator = method.decorators.find(isDecoratorNamed('Listen'));
-  if (listenDecorator == null) {
-    return [];
+function parseListenDecorators(diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) {
+  const listenDecorators = method.decorators.filter(isDecoratorNamed('Listen'));
+  if (listenDecorators.length === 0) {
+    return null;
   }
 
-  const [ listenText, listenOptions ] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
+  return listenDecorators.map(listenDecorator => {
+    const methodName = method.name.getText();
+    const [ listenText, listenOptions ] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
 
-  const eventNames = listenText.split(',');
-  if (eventNames.length > 1) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = 'Deprecated @Listen() feature. Use multiple @Listen() decorators instead of comma-separated names.';
-  }
+    const eventNames = listenText.split(',');
+    if (eventNames.length > 1) {
+      const err = buildError(diagnostics);
+      err.messageText = 'Please use multiple @Listen() decorators instead of comma-separated names.';
+    }
 
-  return eventNames.map(eventName => validateListener(diagnostics, eventName.trim(), listenOptions, method.name.getText()));
+    return parseListener(diagnostics, eventNames[0], listenOptions, methodName);
+  });
 }
 
 
-export function validateListener(diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string): d.ComponentCompilerListener {
-  let rawEventName = eventName;
+export function parseListener(diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string) {
+  let rawEventName = eventName.trim();
   let target = opts.target;
 
   // DEPRECATED: handle old syntax (`TARGET:event`)
@@ -58,27 +67,28 @@ export function validateListener(diagnostics: d.Diagnostic[], eventName: string,
     warn.messageText = `Deprecated @Listen() feature. Using key is not longer supported, use "event.key" instead.`;
   }
 
-  return {
+  const listener: d.ComponentCompilerListener = {
     name: rawEventName,
     method: methodName,
     target,
     capture: (typeof opts.capture === 'boolean') ? opts.capture : false,
     passive: (typeof opts.passive === 'boolean') ? opts.passive :
       // if the event name is kown to be a passive event then set it to true
-      (PASSIVE_TRUE_DEFAULTS.indexOf(rawEventName.toLowerCase()) > -1),
+      (PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase())),
     disabled: (opts.enabled === false)
   };
+  return listener;
 }
 
 export function isValidTargetValue(prefix: string): prefix is d.ListenTargetOptions  {
-  return (VALID_ELEMENT_REF_PREFIXES.indexOf(prefix) > -1);
+  return (VALID_ELEMENT_REF_PREFIXES.has(prefix));
 }
 
 export function isValidKeycodeSuffix(prefix: string) {
-  return (VALID_KEYCODE_SUFFIX.indexOf(prefix) > -1);
+  return (VALID_KEYCODE_SUFFIX.has(prefix));
 }
 
-const PASSIVE_TRUE_DEFAULTS = [
+const PASSIVE_TRUE_DEFAULTS = new Set([
   'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
   'mouseenter', 'mouseover', 'mousemove', 'mousedown', 'mouseup', 'mouseleave', 'mouseout', 'mousewheel',
   'pointerover', 'pointerenter', 'pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'pointerout', 'pointerleave',
@@ -86,12 +96,12 @@ const PASSIVE_TRUE_DEFAULTS = [
   'scroll',
   'touchstart', 'touchmove', 'touchend', 'touchenter', 'touchleave', 'touchcancel',
   'wheel',
-];
+]);
 
-const VALID_ELEMENT_REF_PREFIXES = [
+const VALID_ELEMENT_REF_PREFIXES = new Set([
   'parent', 'body', 'document', 'window'
-];
+]);
 
-const VALID_KEYCODE_SUFFIX = [
+const VALID_KEYCODE_SUFFIX = new Set([
   'enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left'
-];
+]);
