@@ -38,6 +38,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
         (bc.BUILD as any)[key] = true;
       }
     });
+    console.log(bc.BUILD.allRenderFn);
 
     const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 89999) + 10000)}`;
 

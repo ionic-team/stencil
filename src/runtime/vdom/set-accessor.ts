@@ -107,65 +107,41 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
     }
 
   } else {
-    // TODO
-    // handle special cases
-    // } else if (BUILD.member && (memberName !== 'list' && memberName !== 'type' && !isSvg &&
-    // (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null))) {
-
+    // Set property if it exists and it's not a SVG
     const isProp = memberName in elm;
-    if (isProp) {
-      setProperty(elm, memberName, newValue);
+    if (isProp && !isSvg) {
+      try {
+        (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;
+      } catch (e) {}
     }
-    if (!isProp || isHost) {
-      updateAttribute(elm, memberName, newValue);
+
+    /**
+     * Need to manually update attribute if:
+     * - memberName is not an attribute
+     * - if we are rendering the host element in order to reflect attribute
+     * - if it's a SVG, since properties might not work in <svg>
+     * - if the newValue is null/undefined or 'false'.
+     */
+    const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+    if (newValue == null || newValue === false) {
+      if (isXlinkNs) {
+        elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
+      } else {
+        elm.removeAttribute(memberName);
+      }
+    } else if ((!isProp || isHost || isSvg) && typeof newValue !== 'function') {
+      newValue = newValue === true ? '' : newValue.toString();
+      if (isXlinkNs) {
+        elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
+      } else {
+        elm.setAttribute(memberName, newValue);
+      }
     }
   }
 };
-
 
 const parseClassList = (value: string | undefined | null): string[] =>
   (value == null || value === '') ? [] : value.trim().split(/\s+/);
-
-
-const setProperty = (elm: any, propName: string, newValue: any) => {
-  try {
-    elm[propName] = newValue;
-  } catch (e) {}
-};
-
-export const updateAttribute = (
-  elm: HTMLElement,
-  memberName: string,
-  newValue: any,
-  isBooleanAttr = typeof newValue === 'boolean',
-  isXlinkNs?: boolean
-) => {
-  if (BUILD.svg) {
-    isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
-  }
-
-  if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
-    if (BUILD.svg && isXlinkNs) {
-      elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
-
-    } else {
-      elm.removeAttribute(memberName);
-    }
-
-  } else if (typeof newValue !== 'function') {
-    if (isBooleanAttr) {
-      newValue = '';
-    } else {
-      newValue = newValue.toString();
-    }
-    if (BUILD.svg && isXlinkNs) {
-      elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
-
-    } else {
-      elm.setAttribute(memberName, newValue);
-    }
-  }
-};
 
 function vdomListenerProxy(this: d.HostElement, ev: Event) {
   return vdomListenersMap.get(this).get(ev.type)(ev);
