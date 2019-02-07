@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { EMPTY_OBJ, NODE_TYPE } from '@utils';
+import { EMPTY_OBJ } from '@utils';
+import { NODE_TYPE } from '../runtime-constants';
 import { setAccessor } from './set-accessor';
 
 

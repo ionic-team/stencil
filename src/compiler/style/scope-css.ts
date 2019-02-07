@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { catchError, getElementScopeId, getScopeId } from '@utils';
+import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { sys } from '@sys';
 
 
@@ -18,3 +18,12 @@ export async function scopeComponentCss(buildCtx: d.BuildCtx, cmp: d.ComponentCo
 
   return cssText;
 }
+
+export const getScopeId = (cmpMeta: d.ComponentMeta, mode?: string) => {
+  return ('sc-' + cmpMeta.tagNameMeta) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
+};
+
+
+export const getElementScopeId = (scopeId: string, isHostElement?: boolean) => {
+  return scopeId + (isHostElement ? '-h' : '-s');
+};

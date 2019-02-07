@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, loadModule, plt, styles, writeTask } from '@platform';
+import { consoleError, loadModule, plt, styles, writeTask } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
 import { HOST_STATE } from '@utils';
@@ -28,43 +28,6 @@ export const initialLoad = async (elm: d.HostElement, hostRef: d.HostRef, cmpMet
       // first check if there's an attribute
       // next check the app's global
       elm.mode = elm.getAttribute('mode') || plt.appMode;
-    }
-
-    if (BUILD.slotPolyfill) {
-      // initUpdate, BUILD.slotPolyfill
-      // if the slot polyfill is required we'll need to put some nodes
-      // in here to act as original content anchors as we move nodes around
-      // host element has been connected to the DOM
-      if (!elm['s-cr'] && (!plt.supportsShadowDom || !cmpMeta.cmpScopedCssEncapsulation)) {
-        // only required when we're NOT using native shadow dom (slot)
-        // or this browser doesn't support native shadow dom
-        // and this host element was NOT created with SSR
-        // let's pick out the inner content for slot projection
-        // create a node to represent where the original
-        // content was first placed, which is useful later on
-        elm['s-cr'] = doc.createTextNode('') as any;
-        elm['s-cr']['s-cn'] = true;
-        elm.insertBefore(elm['s-cr'], elm.firstChild);
-      }
-
-      if ((BUILD.es5 || BUILD.scoped) && !plt.supportsShadowDom && cmpMeta.cmpScopedCssEncapsulation) {
-        // initUpdate, BUILD.es5 || scoped
-        // this component should use shadow dom
-        // but this browser doesn't support it
-        // so let's polyfill a few things for the user
-
-        if (BUILD.isDev) {
-          // it's possible we're manually forcing the slot polyfill
-          // but this browser may already support the read-only shadowRoot
-          // do an extra check here, but only for dev mode on the client
-          if (!('shadowRoot' in HTMLElement.prototype)) {
-            (elm as any).shadowRoot = elm;
-          }
-
-        } else {
-          (elm as any).shadowRoot = elm;
-        }
-      }
     }
 
     if (BUILD.lazyLoad) {

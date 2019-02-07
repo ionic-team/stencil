@@ -8,5 +8,4 @@ export * from './logger/logger-typescript';
 export * from './logger/logger-utils';
 export * from './message-utils';
 export * from './normalize-path';
-export * from './scope';
 export * from './util';

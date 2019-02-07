@@ -83,20 +83,6 @@ export const enum ENCAPSULATION {
 
 
 /**
- * Node Types
- * https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
- */
-export const enum NODE_TYPE {
-  ElementNode = 1,
-  TextNode = 3,
-  CommentNode = 8,
-  DocumentNode = 9,
-  DocumentTypeNode = 10,
-  DocumentFragment = 11
-}
-
-
-/**
  * SSR Attribute Names
  */
 export const SSR_VNODE_ID = 'ssrv';

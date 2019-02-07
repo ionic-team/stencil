@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { NODE_TYPE } from '@utils';
+import { NODE_TYPE } from '../runtime-constants';
 
 
 export function toVNode(node: Node): d.VNode {

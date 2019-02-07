@@ -1,22 +1,16 @@
 import * as d from '@declarations';
-import { consoleError, plt } from '@platform';
-import { attachStyles } from './styles';
+import { attachStyles, getElementScopeId } from './styles';
 import { BUILD } from '@build-conditionals';
+import { DEFAULT_STYLE_MODE, HOST_STATE, toLowerCase } from '@utils';
+import { consoleError, plt } from '@platform';
 import { renderVdom } from './vdom/render';
-import { HOST_STATE } from '@utils';
 
-export const emitLifecycleEvent = (elm: d.HostElement, name: string) => {
-  if (BUILD.lifecycleDOMEvents) {
-    elm.dispatchEvent(new CustomEvent(`stencil_${name}`, {bubbles: true, composed: true}));
-  }
-};
 
 export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   // update
   if (BUILD.updatable) {
     hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
   }
-
 
   try {
     if (isInitialLoad) {
@@ -40,16 +34,50 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     consoleError(e);
   }
 
-  if (BUILD.shadowDom && isInitialLoad && plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) {
-    // DOM WRITE
-    // this component is using shadow dom
-    // and this browser supports shadow dom
-    // add the read-only property "shadowRoot" to the host element
-    elm.attachShadow({ mode: 'open' });
+  if (isInitialLoad) {
+    if (BUILD.slotPolyfill) {
+      // initUpdate, BUILD.slotPolyfill
+      // if the slot polyfill is required we'll need to put some nodes
+      // in here to act as original content anchors as we move nodes around
+      // host element has been connected to the DOM
+      if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpScopedCssEncapsulation)) {
+        // only required when we're NOT using native shadow dom (slot)
+        // or this browser doesn't support native shadow dom
+        // and this host element was NOT created with SSR
+        // let's pick out the inner content for slot projection
+        // create a node to represent where the original
+        // content was first placed, which is useful later on
+        // DOM WRITE!!
+
+        if (BUILD.mode) {
+          elm['s-sc'] = ('sc-' + toLowerCase(elm.tagName)) + ((elm.mode !== DEFAULT_STYLE_MODE) ? '-' + elm.mode : '');
+        } else {
+          elm['s-sc'] = 'sc-' + toLowerCase(elm.tagName);
+        }
+
+        elm.classList.add(getElementScopeId(elm['s-sc'], true));
+
+        if (cmpMeta.cmpScopedCssEncapsulation) {
+          elm.classList.add(getElementScopeId(elm['s-sc']));
+        }
+      }
+    }
+
+    if (BUILD.shadowDom && plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) {
+      // DOM WRITE
+      // this component is using shadow dom
+      // and this browser supports shadow dom
+      // add the read-only property "shadowRoot" to the host element
+      elm.attachShadow({ 'mode': 'open' });
+    }
+
+    if (BUILD.style) {
+      // DOM WRITE!
+      attachStyles(elm);
+    }
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
-
     try {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
@@ -78,22 +106,6 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
       // now any changes will again queue
       hostRef.flags &= ~HOST_STATE.isActiveRender;
     }
-  }
-
-  if (BUILD.style && isInitialLoad) {
-    // DOM WRITE!
-    attachStyles(elm);
-
-    // if (BUILD.scoped) {
-    //   const scopeId = elm['s-sc'];
-    //   if (scopeId) {
-    //     elm.classList.add(getElementScopeId(scopeId, true));
-
-    //     if (encapsulation === 'scoped') {
-    //       elm.classList.add(getElementScopeId(scopeId));
-    //     }
-    //   }
-    // }
   }
 
   if (BUILD.lifecycle || BUILD.style) {
@@ -205,4 +217,11 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
   // ( •_•)
   // ( •_•)>⌐■-■
   // (⌐■_■)
+};
+
+
+const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {
+  if (BUILD.lifecycleDOMEvents) {
+    elm.dispatchEvent(new CustomEvent('stencil_' + lifecycleName, { 'bubbles': true, 'composed': true }));
+  }
 };

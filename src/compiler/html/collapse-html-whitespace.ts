@@ -1,4 +1,3 @@
-import { NODE_TYPE } from '@utils';
 
 
 export function collapseHtmlWhitepace(node: Node) {
@@ -6,7 +5,7 @@ export function collapseHtmlWhitepace(node: Node) {
   // this is more about having many less nodes for the client side to
   // have to climb through while it's creating vnodes from this HTML
 
-  if (node.nodeType === NODE_TYPE.ElementNode) {
+  if (node.nodeType === 3) {
     const attributes = (node as HTMLElement).attributes;
 
     for (let j = attributes.length - 1; j >= 0; j--) {
@@ -28,7 +27,7 @@ export function collapseHtmlWhitepace(node: Node) {
   for (let i = node.childNodes.length - 1; i >= 0; i--) {
     const childNode = node.childNodes[i];
 
-    if (childNode.nodeType === NODE_TYPE.TextNode || childNode.nodeType === NODE_TYPE.CommentNode) {
+    if (childNode.nodeType === 3 || childNode.nodeType === 8) {
 
       childNode.nodeValue = childNode.nodeValue.replace(REDUCE_WHITESPACE_REGEX, ' ');
 

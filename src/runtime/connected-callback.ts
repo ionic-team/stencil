@@ -1,9 +1,9 @@
 import * as d from '@declarations';
-import { getHostRef, tick } from '@platform';
 import { BUILD } from '@build-conditionals';
+import { doc, getHostRef, plt, tick } from '@platform';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
+import { HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initialLoad } from './initial-load';
-import { LISTENER_FLAGS, HOST_STATE } from '@utils';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
@@ -33,6 +33,30 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
     if ((hostRef.flags & HOST_STATE.hasConnected) === 0) {
       // first time this element has connected
       hostRef.flags |= HOST_STATE.hasConnected;
+
+      if (BUILD.slotPolyfill) {
+        // initUpdate, BUILD.slotPolyfill
+        // if the slot polyfill is required we'll need to put some nodes
+        // in here to act as original content anchors as we move nodes around
+        // host element has been connected to the DOM
+        if ((BUILD.scoped && cmpMeta.cmpScopedCssEncapsulation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation)) {
+          // only required when we're NOT using native shadow dom (slot)
+          // or this browser doesn't support native shadow dom
+          // and this host element was NOT created with SSR
+          // let's pick out the inner content for slot projection
+          // create a node to represent where the original
+          // content was first placed, which is useful later on
+          elm['s-cr'] = doc.createComment(BUILD.isDebug ? elm.tagName : '') as any;
+          elm['s-cr']['s-cn'] = true;
+          elm.insertBefore(elm['s-cr'], elm.firstChild);
+        }
+
+        if (BUILD.es5 && !plt.supportsShadowDom && cmpMeta.cmpScopedCssEncapsulation) {
+          try {
+            (elm as any).shadowRoot = elm;
+          } catch (e) {}
+        }
+      }
 
       if (BUILD.lifecycle) {
         // register this component as an actively

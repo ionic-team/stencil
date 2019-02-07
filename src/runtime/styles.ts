@@ -45,3 +45,8 @@ export const attachStyles = (elm: d.HostElement, styleId?: string, styleElm?: HT
     }
   }
 };
+
+
+export const getElementScopeId = (scopeId: string, isHostElement?: boolean) => {
+  return scopeId + (isHostElement ? '-h' : '-s');
+};

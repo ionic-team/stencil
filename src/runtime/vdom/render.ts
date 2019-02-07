@@ -9,9 +9,10 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
-import { NODE_TYPE, SVG_NS, isDef, toLowerCase } from '@utils';
-import { updateElement } from './update-element';
 import { h } from './h';
+import { NODE_TYPE } from '../runtime-constants';
+import { SVG_NS, isDef, toLowerCase } from '@utils';
+import { updateElement } from './update-element';
 
 
 let useNativeShadowDom = false;
@@ -56,7 +57,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   } else if (BUILD.slotPolyfill && newVNode.isSlotReference) {
     // create a slot reference html text node
-    newVNode.elm = doc.createTextNode('') as any;
+    newVNode.elm = BUILD.isDebug ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('') as any;
 
   } else {
     // create element
@@ -192,7 +193,7 @@ const addVnodes = (
 ) => {
   containerElm = ((BUILD.slotPolyfill && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
 
-  if (BUILD.shadowDom && (containerElm as any).shadowRoot && toLowerCase(containerElm.nodeName) === hostTagName) {
+  if (BUILD.shadowDom && (containerElm as any).shadowRoot && toLowerCase(containerElm.tagName) === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
@@ -600,7 +601,7 @@ const isHost = (node: any): node is d.VNode => {
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
   const oldVNode = hostRef.vnode || {};
-  hostTagName = toLowerCase(hostElm.nodeName);
+  hostTagName = toLowerCase(hostElm.tagName);
 
   if (isHost(renderFnResults)) {
     renderFnResults.vtag = null;
@@ -657,7 +658,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
         if (!relocateNode.nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          const orgLocationNode = doc.createTextNode('') as any;
+          const orgLocationNode = BUILD.isDebug ? doc.createComment(`node-reference:${relocateNode.nodeToRelocate.textContent}`) as any : doc.createTextNode('') as any;
           orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 
           relocateNode.nodeToRelocate.parentNode.insertBefore(
@@ -677,7 +678,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
         // by default we're just going to insert it directly
         // after the slot reference node
         const parentNodeRef = relocateNode.slotRefNode.parentNode;
-        let insertBeforeNode = relocateNode.slotRefNode.parentNode;
+        let insertBeforeNode = relocateNode.slotRefNode.nextSibling;
 
         let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
 
