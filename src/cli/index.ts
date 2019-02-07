@@ -5,11 +5,9 @@ import { runTask } from './run-task';
 import { logger, sys } from '@sys';
 import { shouldIgnoreError } from '@utils';
 import exit from 'exit';
-import { applyPolyfills } from './polyfills';
 
 
 export async function run(process: NodeJS.Process) {
-  applyPolyfills();
 
   process.on(`unhandledRejection`, (r: any) => {
     if (!shouldIgnoreError(r)) {

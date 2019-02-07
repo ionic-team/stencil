@@ -10,6 +10,3 @@ export { shuffleArray } from './shuffle-array';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
 export * from './mocks';
-
-import { applyPolyfills } from '../cli/polyfills';
-applyPolyfills();

@@ -1,4 +1,8 @@
 
+import { applyPolyfills } from './polyfills';
+
+applyPolyfills();
+
 export { BuildContext } from './build/build-ctx';
 export { Cache } from './cache';
 export { Compiler } from './compiler';
