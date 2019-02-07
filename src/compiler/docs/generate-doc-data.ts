@@ -53,6 +53,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagn
 
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
       const docsTags = generateDocsTags(moduleFile.cmpMeta.jsdoc);
+
       return {
         dirPath,
         filePath,
