@@ -72,12 +72,10 @@ export function setupDomTests(document: Document) {
    */
   function renderTest(url: string, app: HTMLElement) {
     url = '/base/www' + url;
-    console.log('url', url)
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
         const indexLoaded = function() {
-          console.log('indexLoaded', this.status)
           if (this.status !== 200) {
             reject(`404: ${url}`);
             return;
@@ -105,20 +103,15 @@ export function setupDomTests(document: Document) {
             tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
           }
 
-          console.log('app.innerHTML', app.innerHTML)
           elm.innerHTML = '';
 
-          const promises: Promise<any>[] = [
-            new Promise(resolve => setTimeout(resolve, 1000))
-          ];
+          const promises: Promise<any>[] = [];
           loadPromises(promises, app);
 
           Promise.all(promises).then(() => {
-            console.log('app promises', app)
             resolve(app);
 
           }).catch(err => {
-            console.error('Promise.all error', err);
             reject(err);
           });
         }
@@ -141,7 +134,6 @@ export function setupDomTests(document: Document) {
   }
 
   function loadPromises(promises: Promise<any>[], component: any) {
-    console.log('p', component.tagName, !!component.componentOnReady)
     if (component.componentOnReady) {
       promises.push(component.componentOnReady());
     }

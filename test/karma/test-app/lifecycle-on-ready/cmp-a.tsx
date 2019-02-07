@@ -1,7 +1,5 @@
 import { Component, State, h } from '@stencil/core';
 
-declare const window: any;
-
 @Component({
   tag: 'lifecycle-on-ready-a'
 })
@@ -17,11 +15,6 @@ export class LifecycleOnReadyA {
     li.innerHTML = `<span style="color:gray">async add child components to lifecycle-on-ready-a</span> ${this.values[this.values.length - 1]}`;
     document.getElementById('output').appendChild(li);
 
-    window.TestApp.onReady().then(() => {
-      const li = document.createElement('li');
-      li.innerHTML = `<span style="font-weight:bold">TestApp.onReady() resolved</span> ${this.values[this.values.length - 1]}`;
-      document.getElementById('output').appendChild(li);
-    });
   }
 
   componentWillLoad() {

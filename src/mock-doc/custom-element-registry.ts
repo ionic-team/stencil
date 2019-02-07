@@ -96,6 +96,15 @@ export function creatCustomElement(customElements: MockCustomElementRegistry, ow
       }
       return obj[prop];
     },
+    has(obj: any, prop: string) {
+      if (prop in obj) {
+        return true;
+      }
+      if (prop in instance) {
+        return true;
+      }
+      return false;
+    },
     set(obj: any, prop: string, val: any) {
       const instance = proxyElements.get(host);
       if (instance != null) {

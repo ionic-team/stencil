@@ -31,7 +31,6 @@ describe('lifecycle-on-ready', function() {
     expect(loads[6].textContent).toBe('lifecycle-on-ready-c componentDidLoad 1');
     expect(loads[7].textContent).toBe('lifecycle-on-ready-b componentDidLoad 1');
     expect(loads[8].textContent).toBe('lifecycle-on-ready-a componentDidUpdate 1');
-    expect(loads[9].textContent).toBe('TestApp.onReady() resolved 1');
 
     button.click();
     await waitForChanges();
@@ -47,7 +46,6 @@ describe('lifecycle-on-ready', function() {
     expect(loads[6].textContent).toBe('lifecycle-on-ready-c componentDidLoad 1');
     expect(loads[7].textContent).toBe('lifecycle-on-ready-b componentDidLoad 1');
     expect(loads[8].textContent).toBe('lifecycle-on-ready-a componentDidUpdate 1');
-    expect(loads[9].textContent).toBe('TestApp.onReady() resolved 1');
     expect(loads[10].textContent).toBe('async add child components to lifecycle-on-ready-a 2');
     expect(loads[11].textContent).toBe('lifecycle-on-ready-a componentWillUpdate 2');
     expect(loads[12].textContent).toBe('lifecycle-on-ready-b componentWillLoad 2');
@@ -55,7 +53,6 @@ describe('lifecycle-on-ready', function() {
     expect(loads[14].textContent).toBe('lifecycle-on-ready-c componentDidLoad 2');
     expect(loads[15].textContent).toBe('lifecycle-on-ready-b componentDidLoad 2');
     expect(loads[16].textContent).toBe('lifecycle-on-ready-a componentDidUpdate 2');
-    expect(loads[17].textContent).toBe('TestApp.onReady() resolved 2');
   });
 
 });

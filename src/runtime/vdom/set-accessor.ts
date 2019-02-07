@@ -99,7 +99,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
         elm.addEventListener(memberName, vdomListenerProxy);
       }
 
-    } else if (BUILD.updatable && vdomListeners) {
+    } else if (vdomListeners) {
       vdomListeners.delete(memberName);
       if (vdomListeners.size === 0) {
         elm.removeEventListener(memberName, vdomListenerProxy);
@@ -109,7 +109,8 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
   } else {
     // Set property if it exists and it's not a SVG
     const isProp = memberName in elm;
-    if (isProp && !isSvg) {
+    const isComplex = ['object', 'function'].includes(typeof newValue);
+    if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;
       } catch (e) {}
@@ -129,7 +130,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       } else {
         elm.removeAttribute(memberName);
       }
-    } else if ((!isProp || isHost || isSvg) && typeof newValue !== 'function') {
+    } else if ((!isProp || isHost || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue.toString();
       if (isXlinkNs) {
         elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
@@ -143,7 +144,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 const parseClassList = (value: string | undefined | null): string[] =>
   (value == null || value === '') ? [] : value.trim().split(/\s+/);
 
-function vdomListenerProxy(this: d.HostElement, ev: Event) {
+export function vdomListenerProxy(this: d.HostElement, ev: Event) {
   return vdomListenersMap.get(this).get(ev.type)(ev);
 }
 
