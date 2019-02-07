@@ -197,21 +197,19 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
 
     // ensure we remove any child references cuz it doesn't matter at this point
     elm['s-al'] = undefined;
-
-    if (BUILD.style) {
-      // DOM WRITE!
-      // add the css class that this element has officially hydrated
-      elm.classList.add('hydrated');
-    }
   }
 
   if (BUILD.hotModuleReplacement) {
     elm['s-hmr-load'] && elm['s-hmr-load']();
   }
 
-  if (BUILD.lazyLoad && isInitialLoad && hostRef.onReadyResolve) {
+  if (BUILD.lazyLoad && isInitialLoad) {
+    // DOM WRITE!
+    // add the css class that this element has officially hydrated
+    elm.classList.add('hydrated');
+
     // fire off the user's elm.componentOnReady() resolve (if any)
-    hostRef.onReadyResolve(elm);
+    hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
   }
 
   // ( •_•)

@@ -1,16 +1,18 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
+import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { getHostRef, registerHost } from '@platform';
+import { doc, getHostRef, registerHost } from '@platform';
 import { initialLoad } from './initial-load';
 import { proxyComponent } from './proxy-component';
 import { update } from './update';
-import { componentOnReady } from './component-on-ready';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
   // bootstrapLazy
+
+  const cmpTags: string[] = [];
 
   lazyBundles.forEach(lazyBundle =>
 
@@ -57,6 +59,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
       }
 
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
+
+        cmpTags.push(cmpLazyMeta.cmpTag);
+
         customElements.define(
           cmpLazyMeta.cmpTag,
           proxyComponent(StencilLazyHost as any, cmpLazyMeta, 1, 0) as any
@@ -65,3 +70,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) =>
     })
 
   );
+
+  const visibilityStyle = doc.createElement('style');
+  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+  visibilityStyle.setAttribute('data-styles', '');
+
+  const y = doc.head.querySelector('meta[charset]');
+  doc.head.insertBefore(visibilityStyle, y ? y.nextSibling : doc.head.firstChild);
+};
