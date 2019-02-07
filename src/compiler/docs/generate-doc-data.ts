@@ -175,11 +175,16 @@ function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
   return tags
     .filter(tag => tag.name === 'slot' && tag.text)
     .map(({text}) => {
-      const [name, ...rest] = text.trim().split(' ');
+      const [namePart, ...rest] = (' ' + text).split(' - ');
       return {
-        name,
-        docs: rest.join(' ')
+        name: namePart.trim(),
+        docs: rest.join(' - ').trim()
       };
+    })
+    .sort((a, b) => {
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      return 0;
     });
 }
 

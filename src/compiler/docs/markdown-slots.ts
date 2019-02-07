@@ -12,11 +12,11 @@ export function slotsToMarkdown(slots: d.JsonDocsSlot[]) {
   content.push(``);
 
   const table = new MarkdownTable();
-  table.addHeader(['Name', 'Description']);
+  table.addHeader(['Slot', 'Description']);
 
   slots.forEach(style => {
     table.addRow([
-      `\`${style.name}\``,
+      style.name === '' ? '' : `\`"${style.name}"\``,
       style.docs
     ]);
   });
