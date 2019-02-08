@@ -27,18 +27,43 @@ async function bundle() {
     }
   });
 
-  // copy over all the .d.ts file too
-  await fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
-    filter: (src) => {
-      return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-    }
-  });
-
   // bundle up the compiler into one js file
   await rollupBuild.write({
     format: 'cjs',
     file: DEST_FILE
   });
+
+  await mergeDts(path.dirname(ENTRY_FILE), DEST_DIR);
+}
+
+
+async function mergeDts(srcDir, destDir) {
+  const declarationsContent = [];
+
+  const declarationFileNames = (await fs.readdir(srcDir)).filter(f => f !== 'index.d.ts');
+
+  declarationFileNames.forEach(declarationsFile => {
+    const declarationsPath = path.join(srcDir, declarationsFile);
+    if (declarationsPath.endsWith('.d.ts')) {
+
+      let fileContent = fs.readFileSync(declarationsPath, 'utf8');
+      fileContent = fileContent.replace(/import (.*);/g, '');
+      fileContent = fileContent.replace(/\: d\./g, ': ');
+      fileContent = fileContent.replace(/<d\./g, '<');
+      fileContent = fileContent.replace(/\, d\./g, ', ');
+      fileContent = fileContent.replace(/=> d\./g, '=> ');
+      fileContent = fileContent.replace(/\| d\./g, '| ');
+      fileContent = fileContent.replace(/extends d\./g, 'extends ');
+      fileContent = fileContent.trim();
+
+      declarationsContent.push(fileContent);
+    }
+  });
+
+  let fileContent = declarationsContent.join('\n');
+
+  const outputDeclarationsFile = path.join(destDir, 'index.d.ts');
+  await fs.writeFile(outputDeclarationsFile, fileContent);
 }
 
 
