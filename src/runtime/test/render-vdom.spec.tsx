@@ -19,21 +19,21 @@ describe('render-vdom', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a><div>Hello VDOM</div></cmp-a>
+      <cmp-a class="hydrated"><div>Hello VDOM</div></cmp-a>
     `);
 
     root.excitement = `!`;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a><div>Hello VDOM!</div></cmp-a>
+      <cmp-a class="hydrated"><div>Hello VDOM!</div></cmp-a>
     `);
 
     root.excitement = `!!`;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a><div>Hello VDOM!!</div></cmp-a>
+      <cmp-a class="hydrated"><div>Hello VDOM!!</div></cmp-a>
     `);
   });
 
@@ -51,7 +51,7 @@ describe('render-vdom', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a><div>Hello VDOM</div></cmp-a>
+      <cmp-a class="hydrated"><div>Hello VDOM</div></cmp-a>
     `);
   });
 
@@ -71,7 +71,7 @@ describe('render-vdom', () => {
     await flush();
 
     expect(body).toEqualHtml(`
-      <cmp-a><div>Hello VDOM</div></cmp-a>
+      <cmp-a class="hydrated"><div>Hello VDOM</div></cmp-a>
     `);
   });
 

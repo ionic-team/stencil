@@ -25,21 +25,21 @@ describe('listen', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>0</cmp-a>
+      <cmp-a class="hydrated">0</cmp-a>
     `);
 
     root.click();
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a>1</cmp-a>
+      <cmp-a class="hydrated">1</cmp-a>
     `);
 
     root.click();
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a>2</cmp-a>
+      <cmp-a class="hydrated">2</cmp-a>
     `);
   });
 
@@ -92,46 +92,46 @@ describe('listen', () => {
     const other = doc.querySelector('other') as any;
 
     expect(root).toEqualHtml(`
-      <cmp-a>0,0,0,0,0</cmp-a>
+      <cmp-a class="hydrated">0,0,0,0,0</cmp-a>
     `);
 
 
     root.click();
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,1,1,1,1</cmp-a>
+      <cmp-a class="hydrated">1,1,1,1,1</cmp-a>
     `);
 
 
     parent.click();
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,2,2,2</cmp-a>
+      <cmp-a class="hydrated">1,2,2,2,2</cmp-a>
     `);
 
 
     other.click();
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,3,3,3</cmp-a>
+      <cmp-a class="hydrated">1,2,3,3,3</cmp-a>
     `);
 
     body.click();
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,4,4</cmp-a>
+      <cmp-a class="hydrated">1,2,4,4,4</cmp-a>
     `);
 
     doc.dispatchEvent(new CustomEvent('click', {bubbles: true}));
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,5,5</cmp-a>
+      <cmp-a class="hydrated">1,2,4,5,5</cmp-a>
     `);
 
     win.dispatchEvent(new CustomEvent('click', {bubbles: true}));
     await flush();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,5,6</cmp-a>
+      <cmp-a class="hydrated">1,2,4,5,6</cmp-a>
     `);
 
   });

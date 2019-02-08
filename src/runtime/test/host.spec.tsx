@@ -24,14 +24,14 @@ describe('hostData', () => {
       html: `<cmp-a></cmp-a>`,
     });
     expect(root).toEqualHtml(`
-      <cmp-a role="alert"></cmp-a>
+      <cmp-a class="hydrated" role="alert"></cmp-a>
     `);
 
     root.hidden = true;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
+      <cmp-a class="hydrated" role="alert" aria-hidden="true" hidden></cmp-a>
     `);
   });
 
@@ -57,14 +57,14 @@ describe('hostData', () => {
       html: `<cmp-a></cmp-a>`,
     });
     expect(root).toEqualHtml(`
-      <cmp-a role="alert"></cmp-a>
+      <cmp-a class="hydrated" role="alert"></cmp-a>
     `);
 
     root.hidden = true;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
+      <cmp-a class="hydrated" role="alert" aria-hidden="true" hidden></cmp-a>
     `);
   });
 

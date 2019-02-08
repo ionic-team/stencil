@@ -64,7 +64,7 @@ export function parseListener(diagnostics: d.Diagnostic[], tsSourceFile: ts.Sour
   if (rest === undefined && isValidKeycodeSuffix(keycode)) {
     rawEventName = finalEvent;
     const warn = buildError(diagnostics);
-    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using key is not longer supported, use "event.key" instead. ${tsSourceFile.fileName}`;
+    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using "${rawEventName}" is no longer supported, use "event.key" within the function itself instead. ${tsSourceFile.fileName}`;
   }
 
   const listener: d.ComponentCompilerListener = {

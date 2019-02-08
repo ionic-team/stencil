@@ -22,7 +22,7 @@ describe('prop', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a bool-false="true" bool-true="false" str="attr" num="99">
+      <cmp-a class="hydrated" bool-false="true" bool-true="false" str="attr" num="99">
         true-false-attr-99
       </cmp-a>
     `);
@@ -52,7 +52,7 @@ describe('prop', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>false-true-string-88</cmp-a>
+      <cmp-a class="hydrated">false-true-string-88</cmp-a>
     `);
 
     expect(root.textContent).toBe('false-true-string-88');

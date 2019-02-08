@@ -31,7 +31,7 @@ describe('state', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>false-true-string-88</cmp-a>
+      <cmp-a class="hydrated">false-true-string-88</cmp-a>
     `);
 
     expect(root.textContent).toBe('false-true-string-88');

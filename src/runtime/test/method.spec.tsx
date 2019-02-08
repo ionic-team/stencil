@@ -33,7 +33,7 @@ describe('method', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>default</cmp-a>
+      <cmp-a class="hydrated">default</cmp-a>
     `);
 
     await root.asyncMethod('async');
