@@ -15,6 +15,7 @@ import { proxyController } from '../core/proxy-controller';
 import { queueUpdate } from '../core/update';
 import { serverAttachStyles, serverInitStyle } from './server-styles';
 import { toDashCase } from '../util/helpers';
+import {DEFAULT_MODE} from "../compiler/prerender/host-config";
 
 
 export function createPlatformServer(
@@ -390,7 +391,7 @@ export function createPlatformServer(
 export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: string) {
   let bundleId: string = (typeof cmpMeta.bundleIds === 'string') ?
     cmpMeta.bundleIds :
-    ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE]);
+    ((cmpMeta.bundleIds as d.BundleIds)[modeName] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_MODE] || (cmpMeta.bundleIds as d.BundleIds)[DEFAULT_STYLE_MODE]);
 
   if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';
