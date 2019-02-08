@@ -10,6 +10,8 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { toLowerCase } from '@utils';
+import { XLINK_NS } from '../runtime-constants';
+
 
 const vdomListenersMap = new WeakMap<HTMLElement, Map<string, Function>>();
 
@@ -147,5 +149,3 @@ const parseClassList = (value: string | undefined | null): string[] =>
 export function vdomListenerProxy(this: d.HostElement, ev: Event) {
   return vdomListenersMap.get(this).get(ev.type)(ev);
 }
-
-const XLINK_NS = 'http://www.w3.org/1999/xlink';
