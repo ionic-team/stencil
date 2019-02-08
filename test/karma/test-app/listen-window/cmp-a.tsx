@@ -8,12 +8,12 @@ export class ListenWindow {
   @State() clicked = 0;
   @State() scrolled = 0;
 
-  @Listen('window:click')
+  @Listen('click', { target: 'window' })
   winClick() {
     this.clicked++;
   }
 
-  @Listen('window:scroll')
+  @Listen('scroll', { target: 'window' })
   winScroll() {
     this.scrolled++;
   }

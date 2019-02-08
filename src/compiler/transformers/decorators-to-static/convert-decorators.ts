@@ -59,7 +59,7 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
     methodDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
-    listenDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
+    listenDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, newMembers);
 
     removeStencilDecorators(decoratedMembers);
   }
