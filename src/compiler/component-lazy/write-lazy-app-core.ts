@@ -56,7 +56,7 @@ function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
 function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
   let bundleId: any;
 
-  if (bundleModule.modeNames.length > 1) {
+  if (bundleModule.outputs.length > 1) {
     // more than one mode, object of bundleIds with the mode as a key
     bundleId = {};
     bundleModule.outputs.forEach(output => {
@@ -65,7 +65,7 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
 
   } else {
     // only one default mode, bundleId is a string
-    bundleId = bundleModule.entryKey;
+    bundleId = bundleModule.outputs[0].bundleId;
   }
 
   const lazyBundle: d.LazyBundleRuntimeData = [

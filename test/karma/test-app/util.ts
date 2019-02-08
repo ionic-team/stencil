@@ -53,7 +53,6 @@ export function setupDomTests(document: Document) {
 
     if (url) {
       app.setAttribute('data-url', url);
-      console.log('render1')
       return renderTest(url, app);
     }
 
