@@ -31,6 +31,19 @@
       "protocol": "inspector"
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Test Karma",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--config",
+        "${workspaceFolder}/test/karma/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
       "name": "Test",
       "type": "node",
       "request": "launch",

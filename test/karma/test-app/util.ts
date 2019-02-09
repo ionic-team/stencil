@@ -85,6 +85,17 @@ export function setupDomTests(document: Document) {
           frag.appendChild(elm);
           app.innerHTML = elm.innerHTML;
 
+          function appLoad() {
+            window.removeEventListener('stencil_appload', appLoad);
+            resolve(app);
+          }
+
+          window.addEventListener('stencil_appload', appLoad);
+
+          function scriptErrored(ev: any) {
+            console.error('script error', ev);
+          }
+
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
             const script = document.createElement('script') as HTMLScriptElement;
@@ -98,21 +109,14 @@ export function setupDomTests(document: Document) {
               script.setAttribute('type', tmpScripts[i].getAttribute('type'));
             }
             script.innerHTML = tmpScripts[i].innerHTML;
+
+            script.addEventListener('error', scriptErrored);
+
             tmpScripts[i].parentNode.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
           }
 
           elm.innerHTML = '';
-
-          const promises: Promise<any>[] = [];
-          loadPromises(promises, app);
-
-          Promise.all(promises).then(() => {
-            resolve(app);
-
-          }).catch(err => {
-            reject(err);
-          });
         }
 
         var oReq = new XMLHttpRequest();
@@ -121,7 +125,6 @@ export function setupDomTests(document: Document) {
           console.error('error oReq.addEventListener', err);
           reject(err);
         });
-        console.log('GET', url)
         oReq.open('GET', url);
         oReq.send();
 
@@ -130,16 +133,6 @@ export function setupDomTests(document: Document) {
         reject(e);
       }
     });
-  }
-
-  function loadPromises(promises: Promise<any>[], component: any) {
-    if (component.componentOnReady) {
-      promises.push(component.componentOnReady());
-    }
-
-    for (let i = 0; i < component.childNodes.length; i++) {
-      loadPromises(promises, component.childNodes[i]);
-    }
   }
 
   return { setupDom, tearDownDom };

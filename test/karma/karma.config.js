@@ -1,4 +1,3 @@
-var path = require('path');
 const browserStack = !!process.env.CI;
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
@@ -96,8 +95,6 @@ module.exports = function(config) {
 
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
-      // 'www/build/testapp.js',
-      // 'www/build/testsibling.js',
       { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
     ],
 
