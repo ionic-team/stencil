@@ -65,7 +65,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
         // this element as one of the actively loading child elements for its ancestor
         ancestorHostElement = elm;
 
-        while ((ancestorHostElement = ancestorHostElement.parentNode as any)) {
+        while ((ancestorHostElement = (ancestorHostElement.parentNode as any || ancestorHostElement.host as any))) {
           // climb up the ancestors looking for the first connected
           // component that hasn't finished loading yet
           if (ancestorHostElement['s-init']) {
