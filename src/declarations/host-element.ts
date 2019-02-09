@@ -13,12 +13,6 @@ export interface HostElement extends HTMLElement {
   // and should be common between all versions of stencil
 
   /**
-   * Host Element Id:
-   * A unique id assigned to this host element.
-   */
-  ['s-id']?: string;
-
-  /**
    * Content Reference:
    * Reference to the HTML Comment that's placed inside of the
    * host element's original content. This comment is used to
@@ -31,6 +25,12 @@ export interface HostElement extends HTMLElement {
    * Set of child host elements that are actively loading.
    */
   ['s-al']?: Set<HostElement>;
+
+  /**
+   * Has Finished loading:
+   * Set to true if this component has finished loading.
+   */
+  ['s-ld']?: boolean;
 
   /**
    * Has Rendered:

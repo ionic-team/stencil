@@ -3,7 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, tick } from '@platform';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
 import { HOST_STATE, LISTENER_FLAGS } from '@utils';
-import { initialLoad } from './initial-load';
+import { initializeComponent } from './initialize-component';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
@@ -66,12 +66,12 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
         ancestorHostElement = elm;
 
         while ((ancestorHostElement = ancestorHostElement.parentNode as any)) {
-          // climb up the ancestors looking for the first registered component
+          // climb up the ancestors looking for the first connected
+          // component that hasn't finished loading yet
           if (ancestorHostElement['s-init']) {
-            // we found this elements the first ancestor host element
-            // if the ancestor already loaded then do nothing, it's too late
             if (!ancestorHostElement['s-rn']) {
-
+              // we found this elements the first ancestor host element
+              // if the ancestor already rendered then do nothing, it's too late
               // keep a reference to this element's ancestor host element
               hostRef.ancestorHostElement = ancestorHostElement;
 
@@ -86,15 +86,15 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
 
       if (BUILD.taskQueue) {
         // connectedCallback, taskQueue, initialLoad
-        tick.then(() => initialLoad(elm, hostRef, cmpMeta));
+        tick.then(() => initializeComponent(elm, hostRef, cmpMeta));
 
       } else {
-        initialLoad(elm, hostRef, cmpMeta);
+        initializeComponent(elm, hostRef, cmpMeta);
       }
     }
 
   } else {
     // connectedCallback, initialLoad
-    initialLoad(elm, getHostRef(elm), cmpMeta);
+    initializeComponent(elm, getHostRef(elm), cmpMeta);
   }
 };

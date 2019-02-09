@@ -80,6 +80,8 @@ export interface HostRef {
   ancestorHostElement?: d.HostElement;
   hostElement?: d.HostElement;
   lazyInstance?: d.ComponentInstance;
+  hasInitializedComponent?: boolean;
+  hasPostUpdatedComponent?: boolean;
   instanceValues?: Map<string, any>;
   queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;

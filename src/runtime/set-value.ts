@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, getHostRef, writeTask } from '@platform';
-import { parsePropertyValue } from './parse-property-value';
-import { update } from './update';
 import { HOST_STATE } from '@utils';
+import { parsePropertyValue } from './parse-property-value';
+import { updateComponent } from './update-component';
 
 
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -54,7 +54,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           hostRef.flags |= HOST_STATE.isQueuedForUpdate;
 
           writeTask(() =>
-            update(
+            updateComponent(
               elm,
               (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
               hostRef,

@@ -4,9 +4,8 @@ import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 import { doc, getHostRef, registerHost } from '@platform';
-import { initialLoad } from './initial-load';
+import { postUpdateComponent, updateComponent } from './update-component';
 import { proxyComponent } from './proxy-component';
-import { update } from './update';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
@@ -38,13 +37,16 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         }
 
         's-init'() {
-          initialLoad(this, getHostRef(this), cmpLazyMeta);
+          const hostRef = getHostRef(this);
+          if (!hostRef.hasPostUpdatedComponent && hostRef.lazyInstance) {
+            postUpdateComponent(this, hostRef.lazyInstance, hostRef, true);
+          }
         }
 
         forceUpdate() {
           if (BUILD.updatable) {
             const hostRef = getHostRef(this);
-            update(
+            updateComponent(
               this,
               BUILD.lazyLoad ? hostRef.lazyInstance : this,
               hostRef,

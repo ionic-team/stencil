@@ -6,14 +6,14 @@ import { consoleError, plt } from '@platform';
 import { renderVdom } from './vdom/render';
 
 
-export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad?: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialUpdate?: boolean) => {
   // update
   if (BUILD.updatable) {
     hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
   }
 
   try {
-    if (isInitialLoad) {
+    if (isInitialUpdate) {
       emitLifecycleEvent(elm, 'componentWillLoad');
       if (BUILD.cmpWillLoad && instance.componentWillLoad) {
         await instance.componentWillLoad();
@@ -26,15 +26,17 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
         await instance.componentWillUpdate();
       }
     }
+
     emitLifecycleEvent(elm, 'componentWillRender');
     if (BUILD.cmpWillRender && instance.componentWillRender) {
       await instance.componentWillRender();
     }
+
   } catch (e) {
     consoleError(e);
   }
 
-  if (isInitialLoad) {
+  if (isInitialUpdate) {
     if (BUILD.slotPolyfill) {
       // initUpdate, BUILD.slotPolyfill
       // if the slot polyfill is required we'll need to put some nodes
@@ -101,6 +103,7 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     } catch (e) {
       consoleError(e);
     }
+
     if (BUILD.updatable) {
       // tell the platform we're done rendering
       // now any changes will again queue
@@ -108,13 +111,8 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     }
   }
 
-  if (BUILD.lifecycle || BUILD.style) {
-    // it's official, this element has rendered
-    // DOM WRITE!
-    elm['s-rn'] = true;
-  }
+  elm['s-rn'] = true;
   hostRef.flags |= HOST_STATE.hasRendered;
-
 
   if (BUILD.lifecycle && elm['s-rc']) {
     // ok, so turns out there are some child host elements
@@ -124,98 +122,87 @@ export const update = async (elm: d.HostElement, instance: any, hostRef: d.HostR
     elm['s-rc'] = undefined;
   }
 
-  // update styles!
-  // if (BUILD.polyfills && plt.customStyle) {
-  //   plt.customStyle.updateHost(elm);
-  // }
-
-  try {
-    if (isInitialLoad) {
-      if (BUILD.cmpDidLoad && instance.componentDidLoad) {
-        instance.componentDidLoad();
-      }
-      emitLifecycleEvent(elm, 'componentDidLoad');
-
-    } else {
-      if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
-        // we've already loaded this component
-        // fire off the user's componentDidUpdate method (if one was provided)
-        // componentDidUpdate runs AFTER render() has been called
-        // and all child components have finished updating
-        instance.componentDidUpdate();
-      }
-      emitLifecycleEvent(elm, 'componentDidUpdate');
-    }
-    if (BUILD.cmpDidRender && instance.componentDidRender) {
-      instance.componentDidRender();
-    }
-    emitLifecycleEvent(elm, 'componentDidRender');
-
-  } catch (e) {
-    consoleError(e);
-  }
-
-  // if (BUILD.polyfills && !allChildrenHaveConnected(plt, elm)) {
-  //   // this check needs to be done when using the customElements polyfill
-  //   // since the polyfill uses MutationObserver which causes the
-  //   // connectedCallbacks to fire async, which isn't ideal for the code below
-  //   return;
-  // }
-
-  // load events fire from bottom to top
-  // the deepest elements load first then bubbles up
-  // load events fire from bottom to top
-  // the deepest elements load first then bubbles up
-  if (BUILD.lifecycle && hostRef.ancestorHostElement) {
-    // ok so this element already has a known ancestor host element
-    // let's make sure we remove this element from its ancestor's
-    // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = hostRef.ancestorHostElement['s-al'];
-
-    if (ancestorsActivelyLoadingChildren) {
-      // remove this element from the actively loading map
-      ancestorsActivelyLoadingChildren.delete(elm);
-
-      // the ancestor's initLoad method will do the actual checks
-      // to see if the ancestor is actually loaded or not
-      // then let's call the ancestor's initLoad method if there's no length
-      // (which actually ends up as this method again but for the ancestor)
-      if (!ancestorsActivelyLoadingChildren.size) {
-        hostRef.ancestorHostElement['s-init']();
-      }
-    }
-
-    hostRef.ancestorHostElement = undefined;
-  }
-
-  // all is good, this component has been told it's time to finish loading
-  // it's possible that we've already decided to destroy this element
-  // check if this element has any actively loading child elements
-  if (BUILD.lifecycle && (!elm['s-al'] || !elm['s-al'].size)) {
-    // cool, so at this point this element isn't already being destroyed
-    // and it does not have any child elements that are still loading
-
-    // ensure we remove any child references cuz it doesn't matter at this point
-    elm['s-al'] = undefined;
-  }
-
-  if (BUILD.hotModuleReplacement) {
-    elm['s-hmr-load'] && elm['s-hmr-load']();
-  }
-
-  if (BUILD.lazyLoad && isInitialLoad) {
-    // DOM WRITE!
-    // add the css class that this element has officially hydrated
-    elm.classList.add('hydrated');
-
-    // fire off the user's elm.componentOnReady() resolve (if any)
-    hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
-  }
-
-  // ( •_•)
-  // ( •_•)>⌐■-■
-  // (⌐■_■)
+  postUpdateComponent(elm, instance, hostRef, isInitialUpdate);
 };
+
+
+export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, isInitialUpdate: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+  if (!elm[ACTIVELY_LOADING]) {
+    hostRef.hasPostUpdatedComponent = true;
+
+    try {
+      if (isInitialUpdate) {
+        if (BUILD.cmpDidLoad && instance.componentDidLoad) {
+          instance.componentDidLoad();
+        }
+        emitLifecycleEvent(elm, 'componentDidLoad');
+
+      } else {
+        if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
+          // we've already loaded this component
+          // fire off the user's componentDidUpdate method (if one was provided)
+          // componentDidUpdate runs AFTER render() has been called
+          // and all child components have finished updating
+          instance.componentDidUpdate();
+        }
+        emitLifecycleEvent(elm, 'componentDidUpdate');
+      }
+
+      if (BUILD.cmpDidRender && instance.componentDidRender) {
+        instance.componentDidRender();
+      }
+      emitLifecycleEvent(elm, 'componentDidRender');
+
+    } catch (e) {
+      consoleError(e);
+    }
+
+    // load events fire from bottom to top
+    // the deepest elements load first then bubbles up
+    if (BUILD.lifecycle && hostRef.ancestorHostElement) {
+      // ok so this element already has a known ancestor host element
+      // let's make sure we remove this element from its ancestor's
+      // known list of child elements which are actively loading
+      ancestorsActivelyLoadingChildren = hostRef.ancestorHostElement[ACTIVELY_LOADING];
+
+      if (ancestorsActivelyLoadingChildren) {
+        // remove this element from the actively loading map
+        ancestorsActivelyLoadingChildren.delete(elm);
+
+        // the ancestor's initializeComponent method will do the actual checks
+        // to see if the ancestor is actually loaded or not
+        // then let's call the ancestor's initializeComponent method if there's no length
+        // (which actually ends up as this method again but for the ancestor)
+        if (!ancestorsActivelyLoadingChildren.size) {
+          hostRef.ancestorHostElement[ACTIVELY_LOADING] = undefined;
+          hostRef.ancestorHostElement['s-init']();
+        }
+      }
+
+      hostRef.ancestorHostElement = undefined;
+    }
+
+    if (BUILD.hotModuleReplacement) {
+      elm['s-hmr-load'] && elm['s-hmr-load']();
+    }
+
+    if (BUILD.lazyLoad && isInitialUpdate) {
+      // DOM WRITE!
+      // add the css class that this element has officially hydrated
+      elm.classList.add('hydrated');
+
+      // fire off the user's elm.componentOnReady() resolve (if any)
+      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+    }
+
+    // ( •_•)
+    // ( •_•)>⌐■-■
+    // (⌐■_■)
+  }
+};
+
+
+const ACTIVELY_LOADING = 's-al';
 
 
 const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {
