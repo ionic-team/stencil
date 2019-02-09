@@ -90,7 +90,7 @@ export interface Build extends BuildFeatures {
   prerenderClientSide?: boolean;
   polyfills?: boolean;
   profile?: boolean;
-  slotPolyfill?: boolean;
+  slotRelocation?: boolean;
   syncQueue?: boolean;
 }
 

@@ -34,6 +34,10 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
     runtimeMeta.cmpScopedCssEncapsulation = shortBoolean(true);
   }
 
+  if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
+    runtimeMeta.cmpHasSlotRelocation = shortBoolean(true);
+  }
+
   return runtimeMeta;
 }
 
@@ -46,6 +50,7 @@ export function stringifyRuntimeData(data: any) {
              .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
              .replace(/"cmpShadowDomEncapsulation"/g, 'cmpShadowDomEncapsulation')
              .replace(/"cmpScopedCssEncapsulation"/g, 'cmpScopedCssEncapsulation')
+             .replace(/"cmpHasSlotRelocation"/g, 'cmpHasSlotRelocation')
              .replace(/"cmpMembers"/g, 'cmpMembers');
 }
 

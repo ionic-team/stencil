@@ -68,7 +68,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.hotModuleReplacement = b.isDev;
   b.lifecycleDOMEvents = !!(config.devMode || config._isTesting || true);
   b.profile = !!(config.flags && config.flags.profile);
-  b.slotPolyfill = !!(b.scoped || (b.es5 && b.shadowDom));
+  b.slotRelocation = !!(b.scoped || (b.es5 && b.shadowDom));
 }
 
 

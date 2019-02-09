@@ -27,7 +27,7 @@ let isSvgMode = false;
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) => {
   newVNode = newParentVNode.vchildren[childIndex];
 
-  if (BUILD.slotPolyfill && !useNativeShadowDom) {
+  if (BUILD.slotRelocation && !useNativeShadowDom) {
     // remember for later we need to check to relocate nodes
     checkSlotRelocate = true;
 
@@ -55,7 +55,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     // create text node
     newVNode.elm = doc.createTextNode(newVNode.vtext) as any;
 
-  } else if (BUILD.slotPolyfill && newVNode.isSlotReference) {
+  } else if (BUILD.slotRelocation && newVNode.isSlotReference) {
     // create a slot reference html text node
     newVNode.elm = BUILD.isDebug ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('') as any;
 
@@ -64,7 +64,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     elm = newVNode.elm = ((BUILD.svg && (isSvgMode || newVNode.vtag === 'svg')) ?
                       doc.createElementNS(SVG_NS, newVNode.vtag as string) :
                       doc.createElement(
-                        (BUILD.slotPolyfill && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag as string)
+                        (BUILD.slotRelocation && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag as string)
                       ) as any;
 
     if (BUILD.svg) {
@@ -76,7 +76,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       updateElement(null, newVNode, isSvgMode);
     }
 
-    if ((BUILD.slotPolyfill || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
+    if ((BUILD.slotRelocation || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
       // if there is a scopeId and this is the initial render
       // then let's add the scopeId as an attribute
       elm.classList.add((elm['s-si'] = scopeId));
@@ -123,7 +123,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     }
   }
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     newVNode.elm['s-hn'] = hostTagName;
 
     if (newVNode.isSlotFallback || newVNode.isSlotReference) {
@@ -191,7 +191,7 @@ const addVnodes = (
   containerElm?: d.RenderNode,
   childNode?: Node
 ) => {
-  containerElm = ((BUILD.slotPolyfill && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
+  containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
 
   if (BUILD.shadowDom && (containerElm as any).shadowRoot && toLowerCase(containerElm.tagName) === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
@@ -205,7 +205,7 @@ const addVnodes = (
 
       if (childNode) {
         vnodes[startIdx].elm = childNode as any;
-        containerElm.insertBefore(childNode, BUILD.slotPolyfill ? referenceNode(before) : before);
+        containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
       }
     }
   }
@@ -217,7 +217,7 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, node?
 
       node = vnodes[startIdx].elm;
 
-      if (BUILD.slotPolyfill) {
+      if (BUILD.slotRelocation) {
         // we're removing this element
         // so it's possible we need to show slot fallback content now
         checkSlotFallbackVisibility = true;
@@ -274,7 +274,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 
     } else if (isSameVnode(oldStartVnode, newEndVnode)) {
       // Vnode moved right
-      if (BUILD.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
+      if (BUILD.slotRelocation && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
         putBackInOriginalLocation(oldStartVnode.elm.parentNode);
       }
       patch(oldStartVnode, newEndVnode);
@@ -284,7 +284,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 
     } else if (isSameVnode(oldEndVnode, newStartVnode)) {
       // Vnode moved left
-      if (BUILD.slotPolyfill && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
+      if (BUILD.slotRelocation && (oldStartVnode.vtag === 'slot' || newEndVnode.vtag === 'slot')) {
         putBackInOriginalLocation(oldEndVnode.elm.parentNode);
       }
       patch(oldEndVnode, newStartVnode);
@@ -325,7 +325,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       }
 
       if (node) {
-        if (BUILD.slotPolyfill) {
+        if (BUILD.slotRelocation) {
           parentReferenceNode(oldStartVnode.elm).insertBefore(node, referenceNode(oldStartVnode.elm));
         } else {
           oldStartVnode.elm.parentNode.insertBefore(node, oldStartVnode.elm);
@@ -352,7 +352,7 @@ export const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
   if (vnode1.vtag === vnode2.vtag) {
-    if (BUILD.slotPolyfill && vnode1.vtag === 'slot') {
+    if (BUILD.slotRelocation && vnode1.vtag === 'slot') {
       return vnode1.vname === vnode2.vname;
     }
     if (BUILD.vdomKey) {
@@ -424,7 +424,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement,
       removeVnodes(oldChildren, 0, oldChildren.length - 1);
     }
 
-  } else if (BUILD.vdomText && BUILD.slotPolyfill && (defaultHolder = (elm['s-cr'] as any))) {
+  } else if (BUILD.vdomText && BUILD.slotRelocation && (defaultHolder = (elm['s-cr'] as any))) {
     // this element has slotted content
     defaultHolder.parentNode.textContent = newVNode.vtext;
 
@@ -619,11 +619,11 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   hostRef.vnode = renderFnResults;
   renderFnResults.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
   }
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     useNativeShadowDom = plt.supportsShadowDom && !!cmpMeta.cmpShadowDomEncapsulation;
   }
 
@@ -635,7 +635,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   //   }
   // }
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     // get the scopeId
     scopeId = hostElm['s-sc'];
 
@@ -652,7 +652,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   //   oldVNode.elm.setAttribute(SSR_VNODE_ID, ssrId as any);
   // }
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {
       relocateSlotContent(renderFnResults.elm);
 

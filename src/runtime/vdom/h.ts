@@ -85,7 +85,7 @@ export function h(nodeName: any, vnodeData: any) {
         vkey = vnodeData.key;
       }
 
-      if (BUILD.slotPolyfill && vnodeData.name != null) {
+      if (BUILD.slotRelocation && vnodeData.name != null) {
         vname = vnodeData.name;
       }
     }
@@ -115,7 +115,7 @@ export function h(nodeName: any, vnodeData: any) {
     vnode.vkey = vkey;
   }
 
-  if (BUILD.slotPolyfill) {
+  if (BUILD.slotRelocation) {
     vnode.vname = vname;
   }
 

@@ -16,6 +16,7 @@ export interface ComponentRuntimeMeta {
   cmpHostListeners?: d.ComponentRuntimeHostListener[];
   cmpScopedCssEncapsulation?: boolean;
   cmpShadowDomEncapsulation?: boolean;
+  cmpHasSlotRelocation?: boolean;
 
 
   // added later

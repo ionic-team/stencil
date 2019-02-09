@@ -37,7 +37,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
   }
 
   if (isInitialUpdate) {
-    if (BUILD.slotPolyfill) {
+    if (BUILD.slotRelocation) {
       // initUpdate, BUILD.slotPolyfill
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around

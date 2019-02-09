@@ -34,19 +34,19 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
       // first time this element has connected
       hostRef.flags |= HOST_STATE.hasConnected;
 
-      if (BUILD.slotPolyfill) {
-        // initUpdate, BUILD.slotPolyfill
+      if (BUILD.slotRelocation) {
+        // initUpdate, BUILD.slotRelocation
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if ((BUILD.scoped && cmpMeta.cmpScopedCssEncapsulation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation)) {
+        if ((BUILD.slot && cmpMeta.cmpHasSlotRelocation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation)) {
           // only required when we're NOT using native shadow dom (slot)
           // or this browser doesn't support native shadow dom
           // and this host element was NOT created with SSR
           // let's pick out the inner content for slot projection
           // create a node to represent where the original
           // content was first placed, which is useful later on
-          elm['s-cr'] = doc.createComment(BUILD.isDebug ? elm.tagName : '') as any;
+          elm['s-cr'] = doc.createComment(BUILD.isDebug ? `content-reference:${elm.tagName.toLowerCase()}` : '') as any;
           elm['s-cr']['s-cn'] = true;
           elm.insertBefore(elm['s-cr'], elm.firstChild);
         }

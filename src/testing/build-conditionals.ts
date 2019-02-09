@@ -20,7 +20,7 @@ export function resetBuildConditionals(b: d.Build) {
   b.reflect = true;
   b.scoped = true;
   b.shadowDom = true;
-  b.slotPolyfill = true;
+  b.slotRelocation = true;
   b.svg = true;
   b.updatable = true;
   b.vdomAttribute = true;
