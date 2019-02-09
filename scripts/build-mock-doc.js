@@ -53,6 +53,7 @@ async function mergeDts(srcDir, destDir) {
       fileContent = fileContent.replace(/\, d\./g, ', ');
       fileContent = fileContent.replace(/=> d\./g, '=> ');
       fileContent = fileContent.replace(/\| d\./g, '| ');
+      fileContent = fileContent.replace(/= d\./g, '= ');
       fileContent = fileContent.replace(/extends d\./g, 'extends ');
       fileContent = fileContent.trim();
 
