@@ -83,6 +83,7 @@ export interface HostRef {
   hasInitializedComponent?: boolean;
   hasPostUpdatedComponent?: boolean;
   instanceValues?: Map<string, any>;
+  isRootComponent?: boolean;
   queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;

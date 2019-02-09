@@ -157,6 +157,23 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
       consoleError(e);
     }
 
+    if (BUILD.hotModuleReplacement) {
+      elm['s-hmr-load'] && elm['s-hmr-load']();
+    }
+
+    if (BUILD.lazyLoad && isInitialUpdate) {
+      // DOM WRITE!
+      // add the css class that this element has officially hydrated
+      elm.classList.add('hydrated');
+
+      // fire off the user's elm.componentOnReady() resolve (if any)
+      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+
+      if (BUILD.lifecycleDOMEvents && hostRef.isRootComponent) {
+        emitLifecycleEvent(elm, 'appload');
+      }
+    }
+
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
     if (BUILD.lifecycle && hostRef.ancestorHostElement) {
@@ -180,19 +197,6 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
       }
 
       hostRef.ancestorHostElement = undefined;
-    }
-
-    if (BUILD.hotModuleReplacement) {
-      elm['s-hmr-load'] && elm['s-hmr-load']();
-    }
-
-    if (BUILD.lazyLoad && isInitialUpdate) {
-      // DOM WRITE!
-      // add the css class that this element has officially hydrated
-      elm.classList.add('hydrated');
-
-      // fire off the user's elm.componentOnReady() resolve (if any)
-      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
     }
 
     // ( •_•)

@@ -84,6 +84,10 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRunti
         }
       }
 
+      if (BUILD.lifecycleDOMEvents) {
+        hostRef.isRootComponent = !hostRef.ancestorHostElement;
+      }
+
       if (BUILD.taskQueue) {
         // connectedCallback, taskQueue, initialLoad
         tick.then(() => initializeComponent(elm, hostRef, cmpMeta));
