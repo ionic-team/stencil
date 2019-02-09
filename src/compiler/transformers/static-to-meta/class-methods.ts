@@ -47,7 +47,7 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
   cmpMeta.hasComponentDidRenderFn = classMethods.some(m => isMethod(m, 'componentDidRender'));
   cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
   cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
-  cmpMeta.hasComponentWillUnloadFn = classMethods.some(m => isMethod(m, 'componentWillUnload'));
+  cmpMeta.hasComponentDidUnloadFn = classMethods.some(m => isMethod(m, 'componentDidUnload'));
   cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn);
 
   cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render'));

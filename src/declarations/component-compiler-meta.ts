@@ -11,7 +11,7 @@ export interface ComponentCompilerFeatures {
   hasComponentDidUpdateFn: boolean;
   hasComponentWillRenderFn: boolean;
   hasComponentDidRenderFn: boolean;
-  hasComponentWillUnloadFn: boolean;
+  hasComponentDidUnloadFn: boolean;
   hasConnectedCallbackFn: boolean;
   hasDisonnectedCallbackFn: boolean;
   hasElement: boolean;

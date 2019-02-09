@@ -31,7 +31,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         }
 
         disconnectedCallback() {
-          if (BUILD.lazyLoad || BUILD.vdomListener || BUILD.hostListener) {
+          if (BUILD.cmpDidUnload) {
             disconnectedCallback(this);
           }
         }

@@ -6,7 +6,7 @@ import { HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta?: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
+export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
   // connectedCallback
 
   if (!BUILD.lazyLoad) {
