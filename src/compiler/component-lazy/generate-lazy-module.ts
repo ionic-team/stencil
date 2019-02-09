@@ -1,19 +1,32 @@
 import * as d from '@declarations';
-import { writeLazyModule } from './write-lazy-module';
+import { writeLazyChunk } from './write-lazy-chunk';
+import { writeLazyModule } from './write-lazy-entry-module';
 
 
-export function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], rollupResults: d.RollupResult[]) {
-  const componentRollupResults = rollupResults.filter(rollupResult => {
+export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], rollupResults: d.RollupResult[]) {
+  const entryCompononetResults = rollupResults.filter(rollupResult => {
     return rollupResult.isEntry && !rollupResult.isAppCore;
   });
 
-  return Promise.all(componentRollupResults.map(rollupResult => {
-    return generateLazyModule(config, compilerCtx, buildCtx, outputTargets, buildCtx.entryModules, rollupResult);
-  }));
+  const chunkResults = rollupResults.filter(rollupResult => {
+    return !rollupResult.isEntry && !rollupResult.isAppCore;
+  });
+
+  const outputResults = await Promise.all([
+    Promise.all(entryCompononetResults.map(rollupResult => {
+      return generateLazyEntryModule(config, compilerCtx, buildCtx, outputTargets, buildCtx.entryModules, rollupResult);
+    })),
+    Promise.all(chunkResults.map(rollupResult => {
+      return writeLazyChunk(config, compilerCtx, buildCtx, outputTargets, rollupResult);
+    }))
+  ]);
+
+  const bundleModules = outputResults[0];
+  return bundleModules;
 }
 
 
-async function generateLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], entryModules: d.EntryModule[], rollupResult: d.RollupResult) {
+async function generateLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], entryModules: d.EntryModule[], rollupResult: d.RollupResult) {
   const entryModule = entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
 
   const bundleModule: d.BundleModule = {
