@@ -27,16 +27,9 @@ export interface HostElement extends HTMLElement {
   ['s-al']?: Set<HostElement>;
 
   /**
-   * Has Finished loading:
-   * Set to true if this component has finished loading.
+   * Lifecycle ready
    */
-  ['s-ld']?: boolean;
-
-  /**
-   * Has Rendered:
-   * Set to true if this component has rendered
-   */
-  ['s-rn']?: boolean;
+  ['s-lr']?: boolean;
 
   /**
    * On Render Callbacks:

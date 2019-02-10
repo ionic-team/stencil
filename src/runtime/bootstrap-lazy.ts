@@ -38,8 +38,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
         's-init'() {
           const hostRef = getHostRef(this);
-          if (!hostRef.hasPostUpdatedComponent && hostRef.lazyInstance) {
-            postUpdateComponent(this, hostRef.lazyInstance, hostRef, true);
+          if (hostRef.lazyInstance) {
+            postUpdateComponent(this, hostRef.lazyInstance, hostRef);
           }
         }
 
@@ -62,7 +62,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
 
-        cmpTags.push(cmpLazyMeta.cmpTag);
+        if (BUILD.style) {
+          cmpTags.push(cmpLazyMeta.cmpTag);
+        }
 
         customElements.define(
           cmpLazyMeta.cmpTag,
@@ -73,10 +75,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
   );
 
-  const visibilityStyle = doc.createElement('style');
-  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
-  visibilityStyle.setAttribute('data-styles', '');
+  if (BUILD.style) {
+    const visibilityStyle = doc.createElement('style');
+    visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+    visibilityStyle.setAttribute('data-styles', '');
 
-  const y = doc.head.querySelector('meta[charset]');
-  doc.head.insertBefore(visibilityStyle, y ? y.nextSibling : doc.head.firstChild);
+    const y = doc.head.querySelector('meta[charset]');
+    doc.head.insertBefore(visibilityStyle, y ? y.nextSibling : doc.head.firstChild);
+  }
 };

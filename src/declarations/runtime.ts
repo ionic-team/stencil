@@ -77,14 +77,14 @@ export interface ModeBundleIds {
 export type RuntimeRef = d.HostElement | {};
 
 export interface HostRef {
+  ancestorComponent?: d.HostElement;
   flags: number;
-  ancestorHostElement?: d.HostElement;
-  hostElement?: d.HostElement;
-  lazyInstance?: d.ComponentInstance;
   hasInitializedComponent?: boolean;
-  hasPostUpdatedComponent?: boolean;
+  hasLoadedComponent?: boolean;
+  hostElement?: d.HostElement;
   instanceValues?: Map<string, any>;
   isRootComponent?: boolean;
+  lazyInstance?: d.ComponentInstance;
   queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;

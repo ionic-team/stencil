@@ -6,7 +6,7 @@ import { HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorHostElement?: d.HostElement) => {
+export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorComponent?: d.HostElement) => {
   // connectedCallback
 
   if (!BUILD.lazyLoad) {
@@ -31,7 +31,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
     }
 
     if ((hostRef.flags & HOST_STATE.hasConnected) === 0) {
-      // first time this element has connected
+      // first time this component has connected
       hostRef.flags |= HOST_STATE.hasConnected;
 
       if (BUILD.slotRelocation) {
@@ -59,33 +59,28 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
 
       if (BUILD.lifecycle) {
-        // register this component as an actively
-        // loading child to its parent component
-        // find the first ancestor host element (if there is one) and register
-        // this element as one of the actively loading child elements for its ancestor
-        ancestorHostElement = elm;
+        // find the first ancestor component (if there is one) and register
+        // this component as one of the actively loading child components for its ancestor
+        ancestorComponent = elm;
 
-        while ((ancestorHostElement = (ancestorHostElement.parentNode as any || ancestorHostElement.host as any))) {
-          // climb up the ancestors looking for the first connected
-          // component that hasn't finished loading yet
-          if (ancestorHostElement['s-init']) {
-            if (!ancestorHostElement['s-rn']) {
-              // we found this elements the first ancestor host element
-              // if the ancestor already rendered then do nothing, it's too late
-              // keep a reference to this element's ancestor host element
-              hostRef.ancestorHostElement = ancestorHostElement;
+        while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
+          // climb up the ancestors looking for the first
+          // component that hasn't finished its lifecycle update yet
+          if (ancestorComponent['s-init'] && !ancestorComponent['s-lr']) {
+            // we found this components first ancestor component
+            // keep a reference to this component's ancestor component
+            hostRef.ancestorComponent = ancestorComponent;
 
-              // ensure there is an array to contain a reference to each of the child elements
-              // and set this element as one of the ancestor's child elements it should wait on
-              (ancestorHostElement['s-al'] = ancestorHostElement['s-al'] || new Set()).add(elm);
-            }
+            // ensure there is an array to contain a reference to each of the child components
+            // and set this component as one of the ancestor's child components it should wait on
+            (ancestorComponent['s-al'] = ancestorComponent['s-al'] || new Set()).add(elm);
             break;
           }
         }
       }
 
       if (BUILD.lifecycleDOMEvents) {
-        hostRef.isRootComponent = !hostRef.ancestorHostElement;
+        hostRef.isRootComponent = !hostRef.ancestorComponent;
       }
 
       if (BUILD.taskQueue) {

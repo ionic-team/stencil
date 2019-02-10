@@ -7,14 +7,14 @@ import { updateComponent } from './update-component';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
-  // initialLoad
+  // initializeComponent
 
   if (!hostRef.hasInitializedComponent) {
     // we haven't initialized this element yet
     hostRef.hasInitializedComponent = true;
 
     if (BUILD.mode && !elm.mode) {
-      // initialLoad, BUILD.mode
+      // initializeComponent, BUILD.mode
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global mode
@@ -108,24 +108,25 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   if (!BUILD.lazyLoad || hostRef.lazyInstance) {
     // we've successfully created a lazy instance
 
-    if (BUILD.lifecycle && hostRef.ancestorHostElement && !hostRef.ancestorHostElement['s-rn']) {
-      // this is the intial load and this element has an ancestor host element
-      // but the ancestor host element has NOT rendered yet
-      // so let's just cool our jets and wait for the ancestor to render
-      (hostRef.ancestorHostElement['s-rc'] = hostRef.ancestorHostElement['s-rc'] || []).push(() =>
-        // this will get fired off when the ancestor host element
+    if (BUILD.lifecycle && hostRef.ancestorComponent && !hostRef.ancestorComponent['s-lr']) {
+      // this is the intial load and this component it has an ancestor component
+      // but the ancestor component has NOT fired its will update lifecycle yet
+      // so let's just cool our jets and wait for the ancestor to continue first
+      (hostRef.ancestorComponent['s-rc'] = hostRef.ancestorComponent['s-rc'] || []).push(() =>
+        // this will get fired off when the ancestor component
         // finally gets around to rendering its lazy self
         // fire off the initial update
         initializeComponent(elm, hostRef, cmpMeta)
       );
 
     } else {
-      // there is no ancestorHostElement or the ancestorHostElement has rendered
+      // there is no ancestorc omponent or the ancestor component
+      // has already fired off its lifecycle update then
       // fire off the initial update
       if (BUILD.taskQueue) {
-        writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
+        writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta));
       } else {
-        updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+        updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta);
       }
     }
   }

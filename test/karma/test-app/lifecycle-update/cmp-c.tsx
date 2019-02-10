@@ -1,9 +1,9 @@
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-on-ready-c'
+  tag: 'lifecycle-update-c'
 })
-export class LifecycleOnReadyC {
+export class LifecycleUpdateC {
 
   @Prop() value = 0;
   start: number;
@@ -12,7 +12,7 @@ export class LifecycleOnReadyC {
     this.start = Date.now();
 
     const li = document.createElement('li');
-    li.innerHTML = `<span style="color:orange">lifecycle-on-ready-c</span> <span style="color:blue">componentWillLoad</span> ${this.value}`;
+    li.innerHTML = `<span style="color:orange">lifecycle-update-c</span> <span style="color:blue">componentWillLoad</span> ${this.value}`;
     document.getElementById('output').appendChild(li);
 
     return new Promise(resolve => {
@@ -22,13 +22,13 @@ export class LifecycleOnReadyC {
 
   componentDidLoad() {
     const li = document.createElement('li');
-    li.innerHTML = `<span style="color:orange">lifecycle-on-ready-c</span> <span style="color:green">componentDidLoad</span> ${this.value}`;
+    li.innerHTML = `<span style="color:orange">lifecycle-update-c</span> <span style="color:green">componentDidLoad</span> ${this.value}`;
     document.getElementById('output').appendChild(li);
   }
 
   render() {
     return (
-      <span> - lifecycle-on-ready-c: {this.value}</span>
+      <span> - lifecycle-update-c: {this.value}</span>
     );
   }
 }

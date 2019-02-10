@@ -1,19 +1,21 @@
 import * as d from '@declarations';
 import { attachStyles, getElementScopeId } from './styles';
 import { BUILD } from '@build-conditionals';
-import { DEFAULT_STYLE_MODE, HOST_STATE, toLowerCase } from '@utils';
 import { consoleError, plt } from '@platform';
+import { DEFAULT_STYLE_MODE, HOST_STATE, toLowerCase } from '@utils';
 import { renderVdom } from './vdom/render';
 
 
-export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialUpdate?: boolean) => {
-  // update
+export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+  // updateComponent
   if (BUILD.updatable) {
     hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
   }
 
+  elm['s-lr'] = false;
+
   try {
-    if (isInitialUpdate) {
+    if (!hostRef.hasLoadedComponent) {
       emitLifecycleEvent(elm, 'componentWillLoad');
       if (BUILD.cmpWillLoad && instance.componentWillLoad) {
         await instance.componentWillLoad();
@@ -36,7 +38,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
     consoleError(e);
   }
 
-  if (isInitialUpdate) {
+  if (!hostRef.hasLoadedComponent) {
     if (BUILD.slotRelocation) {
       // initUpdate, BUILD.slotPolyfill
       // if the slot polyfill is required we'll need to put some nodes
@@ -111,7 +113,8 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
     }
   }
 
-  elm['s-rn'] = true;
+  // set that this component lifecycle rendering has completed
+  elm['s-lr'] = true;
   hostRef.flags |= HOST_STATE.hasRendered;
 
   if (BUILD.lifecycle && elm['s-rc']) {
@@ -122,16 +125,15 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
     elm['s-rc'] = undefined;
   }
 
-  postUpdateComponent(elm, instance, hostRef, isInitialUpdate);
+  postUpdateComponent(elm, instance, hostRef);
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, isInitialUpdate: boolean, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if (!elm[ACTIVELY_LOADING]) {
-    hostRef.hasPostUpdatedComponent = true;
+export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+  if (!elm['s-al']) {
 
     try {
-      if (isInitialUpdate) {
+      if (!hostRef.hasLoadedComponent) {
         if (BUILD.cmpDidLoad && instance.componentDidLoad) {
           instance.componentDidLoad();
         }
@@ -161,10 +163,12 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
 
-    if (BUILD.lazyLoad && isInitialUpdate) {
-      // DOM WRITE!
-      // add the css class that this element has officially hydrated
-      elm.classList.add('hydrated');
+    if (BUILD.lazyLoad && !hostRef.hasLoadedComponent) {
+      if (BUILD.style) {
+        // DOM WRITE!
+        // add the css class that this element has officially hydrated
+        elm.classList.add('hydrated');
+      }
 
       // fire off the user's elm.componentOnReady() resolve (if any)
       hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
@@ -173,14 +177,15 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
         emitLifecycleEvent(elm, 'appload');
       }
     }
+    hostRef.hasLoadedComponent = true;
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && hostRef.ancestorHostElement) {
-      // ok so this element already has a known ancestor host element
+    if (BUILD.lifecycle && hostRef.ancestorComponent) {
+      // ok so this element already has a known ancestor component
       // let's make sure we remove this element from its ancestor's
       // known list of child elements which are actively loading
-      ancestorsActivelyLoadingChildren = hostRef.ancestorHostElement[ACTIVELY_LOADING];
+      ancestorsActivelyLoadingChildren = hostRef.ancestorComponent['s-al'];
 
       if (ancestorsActivelyLoadingChildren) {
         // remove this element from the actively loading map
@@ -191,12 +196,12 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
         // then let's call the ancestor's initializeComponent method if there's no length
         // (which actually ends up as this method again but for the ancestor)
         if (!ancestorsActivelyLoadingChildren.size) {
-          hostRef.ancestorHostElement[ACTIVELY_LOADING] = undefined;
-          hostRef.ancestorHostElement['s-init']();
+          hostRef.ancestorComponent['s-al'] = undefined;
+          hostRef.ancestorComponent['s-init']();
         }
       }
 
-      hostRef.ancestorHostElement = undefined;
+      hostRef.ancestorComponent = undefined;
     }
 
     // ( •_•)
@@ -204,9 +209,6 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
     // (⌐■_■)
   }
 };
-
-
-const ACTIVELY_LOADING = 's-al';
 
 
 const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {

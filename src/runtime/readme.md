@@ -28,15 +28,15 @@ The `hydrated` css class that's added to the component assigns `visibility: inhe
 
 ## Lifecycle Process
 
-- **Connect***: Synchronously within `connectedCallback`, each component looks for an ancestor component and adds itself as a child component if an ancestor is found.
+- **Connect**: Synchronously within `connectedCallback`, each component looks for an ancestor component and adds itself as a child component if an ancestor is found.
 
   - Climb up the parent elements with a while loop.
 
   - Stop at the first element that has an `s-init` function.
 
-  - If the ancestor component we found hasn't rendered yet, add this component to the ancestor's `s-al` set. The `s-al` is a set of child components that are actively loading.
+  - If the ancestor component we found hasn't ran its lifecycle update yet, then add this component to the ancestor's `s-al` set. The `s-al` is a set of child components that are actively loading.
 
-  - If no ancestor component is found then continue without the component setting a ancestor component.
+  - If no ancestor component is found then continue without the component setting an ancestor component.
 
 
 - **Initialize Component**: Initialize the component for the first time within `initializeComponent`.
@@ -49,12 +49,16 @@ The `hydrated` css class that's added to the component assigns `visibility: inhe
 
   - The constructor will directly wire the host element and lazy-loaded component instance together with the host ref data.
 
-  - If the component has an ancestor component, but the ancestor hasn't rendered yet, then this component should not be initialized yet and shouldn't fire its `componentWillLoad` yet. Instead, this component should be added to the ancestor component's array of render callbacks `s-rc`, which would call `initializeComponent` again when its ready. Once the ancestor component has rendered, it'll then call all of its child render callbacks so that the `componentWillLoad` lifecycle events are in the correct order.
+  - If the component has an ancestor component, but the ancestor hasn't ran its lifecycle update yet, then this component should not be initialized at this moment and shouldn't fire its `componentWillLoad` yet. Instead, this component should be added to the ancestor component's array of render callbacks `s-rc`, which would call `initializeComponent` again after its ready. Once the ancestor component has ran its lifecycle update, it'll then call all of its child render callbacks so that the `componentWillLoad` lifecycle events are in the correct order.
 
   - If there is no ancestor component, or the ancestor component has already rendered, then fire off the first update.
 
+  - When ready, `updateComponent` will be added as an async write task and ran asynchronously.
+
 
 - **First Update**: The first component update and render from within `updateComponent`.
+
+  - Set the lifecycle ready value `s-lr` to `false` signifying that the lifecycle update is not ready for this component.
 
   - Fire off `componentWillLoad` lifecycle.
 
@@ -68,7 +72,7 @@ The `hydrated` css class that's added to the component assigns `visibility: inhe
 
   - First render.
 
-  - Mark that the component has rendered with `s-rn` true.
+  - Set the lifecycle ready value `s-lr` to `true` signifying that the lifecycle update has happened and the component is now ready for child component lifecyles.
 
   - Fire off all of this component's child render callbacks within `s-rc`. Each of the child render callbacks will fire off their own initialize component process.
 
@@ -80,13 +84,13 @@ The `hydrated` css class that's added to the component assigns `visibility: inhe
 
   - Fire off `componentDidRender` lifecycle.
 
+  - Add `hydrated` css class signifying the component has finished loading. At this point this component has finished updating.
+
   - If the component has an ancestor component, then remove this component from its set of actively loading children in `s-al`.
 
-  - After removing this component from the ancestor component's `s-al` set, if the set is now empty then fire the ancestor component's `s-init`. If the component has already set `hasPostUpdatedComponent` to true then then do nothing. Knowing if the component has already done a post update is in the host ref data, which ensures it never tries to fully initialize more than once.
+  - After removing this component from the ancestor component's `s-al` set, if the set is now empty then fire the ancestor component's `s-init`.
 
   - Firing `s-init` on the ancestor component allows the ancestor to complete its first update and fire its own `componentDidLoad` lifecycle event, allowing for `componentDidLoad` lifecycles to fire bottom to top.
-
-  - Add `hydrated` css class signifying the component has finished loading.
 
   - Fire all `componentOnReady` resolves.
 
@@ -117,8 +121,6 @@ The `hydrated` css class that's added to the component assigns `visibility: inhe
 
 `s-init`: A function to be called by child components to finish initializing the component.
 
-`s-ld`: The component's loaded status. `true` if the component has fully loaded, falsey if not.
+`s-lr`: The component's lifecycle ready status. `true` if the component has finished its lifecycle update, falsey if it is actively updating and has not fired off either `componentWillLoad` or `componentWillUpdate`.
 
 `s-rc`: A component's array of child component render callbacks. After a component renders, it should then fire off all of its child component render callbacks.
-
-`s-rn`: The component's rendered status. `true` if the component has rendered, falsey if not.
