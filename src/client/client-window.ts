@@ -8,10 +8,6 @@ export const doc = document;
 
 export const plt: d.PlatformRuntime = {};
 
-if (BUILD.mode) {
-  plt.appMode = doc.documentElement.getAttribute('mode');
-}
-
 if (BUILD.taskQueue) {
   plt.queueCongestion = 0;
   plt.queuePending = false;

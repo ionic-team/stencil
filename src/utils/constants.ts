@@ -46,6 +46,8 @@ export const enum HOST_STATE {
   isShadowDom = 1 << 5,
   isScoped = 1 << 6,
   useNativeShadowDom = 1 << 7,
+  hasInitializedComponent = 1 << 8,
+  hasLoadedComponent = 1 << 9,
 }
 
 /**

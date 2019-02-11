@@ -79,11 +79,8 @@ export type RuntimeRef = d.HostElement | {};
 export interface HostRef {
   ancestorComponent?: d.HostElement;
   flags: number;
-  hasInitializedComponent?: boolean;
-  hasLoadedComponent?: boolean;
   hostElement?: d.HostElement;
   instanceValues?: Map<string, any>;
-  isRootComponent?: boolean;
   lazyInstance?: d.ComponentInstance;
   queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
@@ -93,7 +90,6 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  appMode?: string;
   isTmpDisconnected?: boolean;
   queueCongestion?: number;
   queuePending?: boolean;

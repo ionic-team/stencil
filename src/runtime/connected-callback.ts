@@ -30,7 +30,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       });
     }
 
-    if ((hostRef.flags & HOST_STATE.hasConnected) === 0) {
+    if (!(hostRef.flags & HOST_STATE.hasConnected)) {
       // first time this component has connected
       hostRef.flags |= HOST_STATE.hasConnected;
 
@@ -77,10 +77,6 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
             break;
           }
         }
-      }
-
-      if (BUILD.lifecycleDOMEvents) {
-        hostRef.isRootComponent = !hostRef.ancestorComponent;
       }
 
       if (BUILD.taskQueue) {

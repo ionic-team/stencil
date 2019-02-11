@@ -15,7 +15,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
   elm['s-lr'] = false;
 
   try {
-    if (!hostRef.hasLoadedComponent) {
+    if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
       emitLifecycleEvent(elm, 'componentWillLoad');
       if (BUILD.cmpWillLoad && instance.componentWillLoad) {
         await instance.componentWillLoad();
@@ -38,7 +38,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
     consoleError(e);
   }
 
-  if (!hostRef.hasLoadedComponent) {
+  if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
     if (BUILD.slotRelocation) {
       // initUpdate, BUILD.slotPolyfill
       // if the slot polyfill is required we'll need to put some nodes
@@ -133,7 +133,7 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
   if (!elm['s-al']) {
 
     try {
-      if (!hostRef.hasLoadedComponent) {
+      if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
         if (BUILD.cmpDidLoad && instance.componentDidLoad) {
           instance.componentDidLoad();
         }
@@ -163,7 +163,7 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
 
-    if (BUILD.lazyLoad && !hostRef.hasLoadedComponent) {
+    if (BUILD.lazyLoad && !(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
       if (BUILD.style) {
         // DOM WRITE!
         // add the css class that this element has officially hydrated
@@ -173,11 +173,11 @@ export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: 
       // fire off the user's elm.componentOnReady() resolve (if any)
       hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
 
-      if (BUILD.lifecycleDOMEvents && hostRef.isRootComponent) {
+      if (BUILD.lifecycleDOMEvents && !hostRef.ancestorComponent) {
         emitLifecycleEvent(elm, 'appload');
       }
     }
-    hostRef.hasLoadedComponent = true;
+    hostRef.flags |= HOST_STATE.hasLoadedComponent;
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up

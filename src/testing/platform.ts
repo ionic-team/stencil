@@ -16,7 +16,6 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
 export const styles: d.StyleMap = new Map();
 
 export const plt: d.PlatformRuntime = {
-  appMode: null,
   isTmpDisconnected: false,
   queueCongestion: 0,
   queuePending: false,
@@ -27,7 +26,6 @@ export function resetPlatform() {
   win.$reset();
   hostRefs.clear();
   styles.clear();
-  plt.appMode = null;
   plt.isTmpDisconnected = false;
   plt.supportsShadowDom = true;
 
