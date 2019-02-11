@@ -125,9 +125,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       // has already fired off its lifecycle update then
       // fire off the initial update
       if (BUILD.taskQueue) {
-        writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta));
+        writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
       } else {
-        updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta);
+        updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
       }
     }
   }

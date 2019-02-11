@@ -50,7 +50,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
               this,
               BUILD.lazyLoad ? hostRef.lazyInstance : this,
               hostRef,
-              cmpLazyMeta
+              cmpLazyMeta,
+              false
             );
           }
         }

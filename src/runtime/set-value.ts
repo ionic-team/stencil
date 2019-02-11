@@ -58,7 +58,8 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
               elm,
               (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
               hostRef,
-              cmpMeta
+              cmpMeta,
+              false
             )
           );
 

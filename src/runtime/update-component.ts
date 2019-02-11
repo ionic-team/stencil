@@ -6,7 +6,7 @@ import { DEFAULT_STYLE_MODE, HOST_STATE, toLowerCase } from '@utils';
 import { renderVdom } from './vdom/render';
 
 
-export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable) {
     hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
@@ -15,7 +15,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
   elm['s-lr'] = false;
 
   try {
-    if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
+    if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
       if (BUILD.cmpWillLoad && instance.componentWillLoad) {
         await instance.componentWillLoad();
@@ -38,7 +38,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
     consoleError(e);
   }
 
-  if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
+  if (isInitialLoad) {
     if (BUILD.slotRelocation) {
       // initUpdate, BUILD.slotPolyfill
       // if the slot polyfill is required we'll need to put some nodes
@@ -86,9 +86,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
-      if (BUILD.updatable) {
-        hostRef.flags |= HOST_STATE.isActiveRender;
-      }
+      hostRef.flags |= HOST_STATE.isActiveRender;
 
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
