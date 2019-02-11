@@ -33,14 +33,14 @@ describe('event', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">0</cmp-a>
+      <cmp-a>0</cmp-a>
     `);
 
     await root.emitEvent();
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">1</cmp-a>
+      <cmp-a>1</cmp-a>
     `);
 
     let called = false;
@@ -56,7 +56,7 @@ describe('event', () => {
 
     expect(called).toBe(true);
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">2</cmp-a>
+      <cmp-a>2</cmp-a>
     `);
   });
 
@@ -88,7 +88,7 @@ describe('event', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">0</cmp-a>
+      <cmp-a>0</cmp-a>
     `);
 
     let called = false;
@@ -103,7 +103,7 @@ describe('event', () => {
 
     expect(called).toBe(true);
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">1</cmp-a>
+      <cmp-a>1</cmp-a>
     `);
   });
 
@@ -141,7 +141,7 @@ describe('event', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">0</cmp-a>
+      <cmp-a>0</cmp-a>
     `);
 
     let called = false;
@@ -157,7 +157,7 @@ describe('event', () => {
     expect(called).toBe(true);
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">1</cmp-a>
+      <cmp-a>1</cmp-a>
     `);
   });
 });

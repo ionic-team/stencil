@@ -241,7 +241,7 @@ describe('attribute', () => {
       });
 
       expect(root).toEqualHtml(`
-        <cmp-a class="hydrated" str=""></cmp-a>
+        <cmp-a str=""></cmp-a>
       `);
 
       expect(root.textContent).toBe('');
@@ -251,7 +251,7 @@ describe('attribute', () => {
   });
 
   describe('reflect', () => {
-    fit('should reflect properties as attributes', async () => {
+    it('should reflect properties as attributes', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         @Element() el: any;
@@ -279,7 +279,7 @@ describe('attribute', () => {
       });
 
       expect(root).toEqualHtml(`
-        <cmp-a class="hydrated" str="single" nu="2" other-bool dynamic-str="value" dynamic-nu="123"></cmp-a>
+        <cmp-a str="single" nu="2" other-bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
 
       root.str = 'second';
@@ -292,7 +292,7 @@ describe('attribute', () => {
       await flush();
 
       expect(root).toEqualHtml(`
-        <cmp-a class="hydrated" str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
+        <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
     });
   });

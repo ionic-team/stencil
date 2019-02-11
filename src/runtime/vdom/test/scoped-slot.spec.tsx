@@ -731,7 +731,7 @@ describe('scoped slot', () => {
 
     expect(root.firstElementChild.nodeName).toBe('TEST-1');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
+    // expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
     // expect(root.firstElementChild.firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
     // expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('TEST-2');
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.nodeName).toBe('GOOSE');

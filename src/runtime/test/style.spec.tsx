@@ -11,15 +11,16 @@ describe('style', () => {
     })
     class CmpA {
       render() {
-        return `style`;
+        return `innertext`;
       }
     }
 
-    const { styles } = await newSpecPage({
+    const { root, styles } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
 
+    expect(root).toHaveClass('hydrated');
     expect(styles.get('CMP-A')).toBe(`div { color: red; }`);
   });
 

@@ -22,14 +22,14 @@ describe('element', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated"></cmp-a>
+      <cmp-a></cmp-a>
     `);
 
     await root.setClassNow();
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a class="new-class hydrated"></cmp-a>
+      <cmp-a class="new-class"></cmp-a>
     `);
   });
 

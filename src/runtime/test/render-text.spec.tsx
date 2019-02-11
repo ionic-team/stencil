@@ -18,7 +18,7 @@ describe('render-text', () => {
     });
 
     expect(body).toEqualHtml(`
-      <cmp-a class="hydrated">Hello World</cmp-a>
+      <cmp-a>Hello World</cmp-a>
     `);
   });
 
@@ -31,7 +31,7 @@ describe('render-text', () => {
     await flush();
 
     expect(body).toEqualHtml(`
-      <cmp-a class="hydrated">Hello World</cmp-a>
+      <cmp-a>Hello World</cmp-a>
     `);
   });
 
@@ -50,21 +50,21 @@ describe('render-text', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">Hello World</cmp-a>
+      <cmp-a>Hello World</cmp-a>
     `);
 
     root.excitement = `!`;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">Hello World!</cmp-a>
+      <cmp-a>Hello World!</cmp-a>
     `);
 
     root.excitement = `!!`;
     await flush();
 
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">Hello World!!</cmp-a>
+      <cmp-a>Hello World!!</cmp-a>
     `);
   });
 });
