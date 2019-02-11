@@ -141,14 +141,14 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function waitForChanges() {
+export function waitForChanges(timeout = 100) {
   const win = window as any;
 
   return new Promise(resolve => {
     function pageLoaded() {
       setTimeout(() => {
         onReady(resolve);
-      }, 100);
+      }, timeout);
     }
 
     if (document.readyState === 'complete') {
