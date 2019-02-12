@@ -15,23 +15,66 @@ export namespace Components {
   interface AttributeBasicRoot {}
   interface AttributeBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface AttributeBasic {}
-  interface AttributeBasicAttributes extends JSXElements.HTMLAttributes {}
+  interface AttributeBasic {
+    'customAttr': string;
+    'multiWord': string;
+    'single': string;
+  }
+  interface AttributeBasicAttributes extends JSXElements.HTMLAttributes {
+    'customAttr'?: string;
+    'multiWord'?: string;
+    'single'?: string;
+  }
 
-  interface AttributeBooleanRoot {}
+  interface AttributeBooleanRoot {
+    'toggleState': () => void;
+  }
   interface AttributeBooleanRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface AttributeBoolean {}
-  interface AttributeBooleanAttributes extends JSXElements.HTMLAttributes {}
+  interface AttributeBoolean {
+    'boolState': boolean;
+    'noreflect': boolean;
+    'strState': string;
+  }
+  interface AttributeBooleanAttributes extends JSXElements.HTMLAttributes {
+    'boolState'?: boolean;
+    'noreflect'?: boolean;
+    'strState'?: string;
+  }
 
-  interface AttributeComplex {}
-  interface AttributeComplexAttributes extends JSXElements.HTMLAttributes {}
+  interface AttributeComplex {
+    'bool0': boolean;
+    'bool1': boolean;
+    'bool2': boolean;
+    'getInstance': () => Promise<this>;
+    'nu0': number;
+    'nu1': number;
+    'str0': string;
+    'str1': string;
+  }
+  interface AttributeComplexAttributes extends JSXElements.HTMLAttributes {
+    'bool0'?: boolean;
+    'bool1'?: boolean;
+    'bool2'?: boolean;
+    'nu0'?: number;
+    'nu1'?: number;
+    'str0'?: string;
+    'str1'?: string;
+  }
 
   interface AttributeHost {}
   interface AttributeHostAttributes extends JSXElements.HTMLAttributes {}
 
-  interface AttributeHtmlRoot {}
-  interface AttributeHtmlRootAttributes extends JSXElements.HTMLAttributes {}
+  interface AttributeHtmlRoot {
+    'anyAttr': any;
+    'nuAttr': number;
+    'strAttr': string;
+  }
+  interface AttributeHtmlRootAttributes extends JSXElements.HTMLAttributes {
+    'anyAttr'?: any;
+    'nuAttr'?: number;
+    'strAttr'?: string;
+  }
 
   interface ConditionalBasic {}
   interface ConditionalBasicAttributes extends JSXElements.HTMLAttributes {}
@@ -54,14 +97,22 @@ export namespace Components {
   interface DynamicCssVariable {}
   interface DynamicCssVariableAttributes extends JSXElements.HTMLAttributes {}
 
-  interface DynamicImport {}
+  interface DynamicImport {
+    'update': () => Promise<void>;
+  }
   interface DynamicImportAttributes extends JSXElements.HTMLAttributes {}
 
   interface Es5AddclassSvg {}
   interface Es5AddclassSvgAttributes extends JSXElements.HTMLAttributes {}
 
-  interface EsmImport {}
-  interface EsmImportAttributes extends JSXElements.HTMLAttributes {}
+  interface EsmImport {
+    'propVal': number;
+    'someMethod': () => void;
+  }
+  interface EsmImportAttributes extends JSXElements.HTMLAttributes {
+    'onSomeEvent'?: (event: any /**TODO**/) => void;
+    'propVal'?: number;
+  }
 
   interface ExternalImportA {}
   interface ExternalImportAAttributes extends JSXElements.HTMLAttributes {}
@@ -78,26 +129,54 @@ export namespace Components {
   interface KeyReorderRoot {}
   interface KeyReorderRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface KeyReorder {}
-  interface KeyReorderAttributes extends JSXElements.HTMLAttributes {}
+  interface KeyReorder {
+    'num': number;
+  }
+  interface KeyReorderAttributes extends JSXElements.HTMLAttributes {
+    'num'?: number;
+  }
 
   interface LifecycleAsyncA {}
   interface LifecycleAsyncAAttributes extends JSXElements.HTMLAttributes {}
 
-  interface LifecycleAsyncB {}
-  interface LifecycleAsyncBAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleAsyncB {
+    'value': string;
+  }
+  interface LifecycleAsyncBAttributes extends JSXElements.HTMLAttributes {
+    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
+    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'value'?: string;
+  }
 
-  interface LifecycleAsyncC {}
-  interface LifecycleAsyncCAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleAsyncC {
+    'value': string;
+  }
+  interface LifecycleAsyncCAttributes extends JSXElements.HTMLAttributes {
+    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
+    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'value'?: string;
+  }
 
   interface LifecycleBasicA {}
   interface LifecycleBasicAAttributes extends JSXElements.HTMLAttributes {}
 
-  interface LifecycleBasicB {}
-  interface LifecycleBasicBAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleBasicB {
+    'value': string;
+  }
+  interface LifecycleBasicBAttributes extends JSXElements.HTMLAttributes {
+    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
+    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'value'?: string;
+  }
 
-  interface LifecycleBasicC {}
-  interface LifecycleBasicCAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleBasicC {
+    'value': string;
+  }
+  interface LifecycleBasicCAttributes extends JSXElements.HTMLAttributes {
+    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
+    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'value'?: string;
+  }
 
   interface LifecycleUnloadA {}
   interface LifecycleUnloadAAttributes extends JSXElements.HTMLAttributes {}
@@ -111,11 +190,19 @@ export namespace Components {
   interface LifecycleUpdateA {}
   interface LifecycleUpdateAAttributes extends JSXElements.HTMLAttributes {}
 
-  interface LifecycleUpdateB {}
-  interface LifecycleUpdateBAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleUpdateB {
+    'value': number;
+  }
+  interface LifecycleUpdateBAttributes extends JSXElements.HTMLAttributes {
+    'value'?: number;
+  }
 
-  interface LifecycleUpdateC {}
-  interface LifecycleUpdateCAttributes extends JSXElements.HTMLAttributes {}
+  interface LifecycleUpdateC {
+    'value': number;
+  }
+  interface LifecycleUpdateCAttributes extends JSXElements.HTMLAttributes {
+    'value'?: number;
+  }
 
   interface ListenJsxRoot {}
   interface ListenJsxRootAttributes extends JSXElements.HTMLAttributes {}
@@ -129,8 +216,28 @@ export namespace Components {
   interface NodeGlobals {}
   interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ReflectToAttr {}
-  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {}
+  interface ReflectToAttr {
+    'bool': boolean;
+    'disabled': boolean;
+    'dynamicNu': number;
+    'dynamicStr': string;
+    'nu': number;
+    'null': string;
+    'otherBool': boolean;
+    'str': string;
+    'undef': string;
+  }
+  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {
+    'bool'?: boolean;
+    'disabled'?: boolean;
+    'dynamicNu'?: number;
+    'dynamicStr'?: string;
+    'nu'?: number;
+    'null'?: string;
+    'otherBool'?: boolean;
+    'str'?: string;
+    'undef'?: string;
+  }
 
   interface ScopedBasicRoot {}
   interface ScopedBasicRootAttributes extends JSXElements.HTMLAttributes {}
@@ -141,8 +248,12 @@ export namespace Components {
   interface ShadowDomArrayRoot {}
   interface ShadowDomArrayRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ShadowDomArray {}
-  interface ShadowDomArrayAttributes extends JSXElements.HTMLAttributes {}
+  interface ShadowDomArray {
+    'values': unknown;
+  }
+  interface ShadowDomArrayAttributes extends JSXElements.HTMLAttributes {
+    'values'?: unknown;
+  }
 
   interface ShadowDomBasicRoot {}
   interface ShadowDomBasicRootAttributes extends JSXElements.HTMLAttributes {}
@@ -162,8 +273,12 @@ export namespace Components {
   interface ShadowDomSlotNestedRoot {}
   interface ShadowDomSlotNestedRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ShadowDomSlotNested {}
-  interface ShadowDomSlotNestedAttributes extends JSXElements.HTMLAttributes {}
+  interface ShadowDomSlotNested {
+    'i': number;
+  }
+  interface ShadowDomSlotNestedAttributes extends JSXElements.HTMLAttributes {
+    'i'?: number;
+  }
 
   interface SlotArrayBasic {}
   interface SlotArrayBasicAttributes extends JSXElements.HTMLAttributes {}
@@ -192,17 +307,29 @@ export namespace Components {
   interface SlotDynamicWrapperRoot {}
   interface SlotDynamicWrapperRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotDynamicWrapper {}
-  interface SlotDynamicWrapperAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotDynamicWrapper {
+    'tag': string;
+  }
+  interface SlotDynamicWrapperAttributes extends JSXElements.HTMLAttributes {
+    'tag'?: string;
+  }
 
   interface SlotFallbackRoot {}
   interface SlotFallbackRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotFallback {}
-  interface SlotFallbackAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotFallback {
+    'inc': number;
+  }
+  interface SlotFallbackAttributes extends JSXElements.HTMLAttributes {
+    'inc'?: number;
+  }
 
-  interface SlotHtml {}
-  interface SlotHtmlAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotHtml {
+    'inc': number;
+  }
+  interface SlotHtmlAttributes extends JSXElements.HTMLAttributes {
+    'inc'?: number;
+  }
 
   interface SlotLightDomRoot {}
   interface SlotLightDomRootAttributes extends JSXElements.HTMLAttributes {}
@@ -219,14 +346,22 @@ export namespace Components {
   interface SlotReorderRoot {}
   interface SlotReorderRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotReorder {}
-  interface SlotReorderAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotReorder {
+    'reordered': boolean;
+  }
+  interface SlotReorderAttributes extends JSXElements.HTMLAttributes {
+    'reordered'?: boolean;
+  }
 
   interface SlotReplaceWrapperRoot {}
   interface SlotReplaceWrapperRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotReplaceWrapper {}
-  interface SlotReplaceWrapperAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotReplaceWrapper {
+    'href': string;
+  }
+  interface SlotReplaceWrapperAttributes extends JSXElements.HTMLAttributes {
+    'href'?: string;
+  }
 
   interface CssCmp {}
   interface CssCmpAttributes extends JSXElements.HTMLAttributes {}

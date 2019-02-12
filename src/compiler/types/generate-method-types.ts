@@ -8,7 +8,7 @@ export function generateMethodTypes(cmpMethods: d.ComponentCompilerMethod[]) {
   cmpMethods.forEach(cmpMethod => {
 
     interfaceData[cmpMethod.name] = {
-      type: 'TODOcmpMethod.complexType.returns',
+      type: cmpMethod.complexType.signature,
       optional: false,
       required: false,
       public: isDocsPublic(cmpMethod.docs)
