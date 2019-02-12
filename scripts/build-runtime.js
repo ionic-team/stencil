@@ -165,7 +165,7 @@ async function createDts() {
     .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
     .join('\n');
 
-  const declarationsFilePath = path.join(DIST_RUNTIME_DIR, 'declarations', 'stencil.core.d.ts');
+  const declarationsFilePath = path.join(DIST_CLIENT_DIR, 'declarations', 'stencil.core.d.ts');
 
   await fs.emptyDir(path.dirname(declarationsFilePath));
   await fs.writeFile(declarationsFilePath, declarationsFileContents);

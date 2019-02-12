@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
-import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../output-targets/output-file-naming';
+import { getComponentsDtsTypesFilePath } from '../output-targets/output-utils';
 import { sys } from '@sys';
 
 
@@ -28,7 +28,7 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 
 
 export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const moduleAbs = getDistEsmIndexPath(config, outputTarget, 'es5');
+  const moduleAbs = sys.path.join(outputTarget.buildDir, 'esm', 'es5', 'index.js');
   const moduleRel = normalizePath(sys.path.relative(config.rootDir, moduleAbs));
 
   if (typeof pkgData.module !== 'string') {
@@ -44,7 +44,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
-  const pkgFile = normalizePath(config.rootDir, pkgData.module);
+  const pkgFile = sys.path.join(config.rootDir, pkgData.module);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
@@ -55,7 +55,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 
 
 export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const mainAbs = getDistCjsIndexPath(config, outputTarget);
+  const mainAbs = sys.path.join(outputTarget.buildDir, 'index.js');
   const mainRel = normalizePath(sys.path.relative(config.rootDir, mainAbs));
 
   if (typeof pkgData.main !== 'string' || pkgData.main === '') {
@@ -64,7 +64,7 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const pkgFile = normalizePath(config.rootDir, pkgData.main);
+  const pkgFile = sys.path.join(config.rootDir, pkgData.main);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
@@ -72,7 +72,7 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const loaderAbs = getLoaderPath(config, outputTarget);
+  const loaderAbs = sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`);
   const loaderRel = normalizePath(sys.path.relative(config.rootDir, loaderAbs));
   if (normalizePath(pkgData.main) === loaderRel) {
     const err = buildWarn(diagnostics);
@@ -100,6 +100,10 @@ export function validateTypes(config: d.Config, outputTarget: d.OutputTargetDist
 
 
 export async function validateTypesExist(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+  if (typeof pkgData.types !== 'string') {
+    return false;
+  }
+
   const pkgFile = sys.path.join(config.rootDir, pkgData.types);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
@@ -115,7 +119,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
 
 export function validateCollection(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (outputTarget.collectionDir) {
-    const collectionRel = normalizePath(sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+    const collectionRel = sys.path.join(sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
     if (!pkgData.collection || normalizePath(pkgData.collection) !== collectionRel) {
       const err = buildWarn(diagnostics);
       err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
@@ -141,6 +145,6 @@ export function validateNamespace(config: d.Config, diagnostics: d.Diagnostic[])
 
 
 export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDist) {
-  const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
+  const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
   return normalizePath(sys.path.relative(config.rootDir, typesAbs));
 }

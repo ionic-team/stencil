@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { generateDistributions } from '../distribution/distribution';
 import { writeAppCollections } from '../collections/collection-data';
 
 
@@ -16,20 +15,7 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
   let totalFilesWrote = 0;
 
-  let distributionPromise: Promise<void> = null;
-
   try {
-    // copy www/build to dist/ if generateDistribution is enabled
-    distributionPromise = generateDistributions(config, compilerCtx, buildCtx);
-
-    if (!buildCtx.isRebuild) {
-      // if this is the initial build then we need to wait on
-      // the distributions to finish, otherwise we can let it
-      // finish when it finishes
-      await distributionPromise;
-      distributionPromise = null;
-    }
-
     // commit all the writeFiles, mkdirs, rmdirs and unlinks to disk
     const commitResults = await compilerCtx.fs.commit();
 
@@ -56,13 +42,4 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
   }
 
   timeSpan.finish(`writeBuildFiles finished, files wrote: ${totalFilesWrote}`);
-
-  if (distributionPromise != null) {
-    // build didn't need to wait on this finishing
-    // let it just do its thing and finish when it gets to it
-    distributionPromise.then(() => {
-      compilerCtx.fs.commit();
-      compilerCtx.cache.commit();
-    });
-  }
 }

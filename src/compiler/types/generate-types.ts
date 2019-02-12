@@ -1,31 +1,12 @@
 import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { generateComponentTypes } from './generate-component-types';
-import { isDtsFile, pathJoin } from '@utils';
+import { isDtsFile } from '@utils';
 import { sys } from '@sys';
 import * as v from './validate-package-json';
 
 
-export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return o.type === 'dist';
-  });
-
-  if (outputTargets.length === 0) {
-    return;
-  }
-
-  const pkgData = await readPackageJson(config, compilerCtx);
-
-  const promises = outputTargets.map(async outputTarget => {
-    await generateTypesAndValidate(config, compilerCtx, buildCtx, pkgData, outputTarget);
-  });
-
-  await Promise.all(promises);
-}
-
-
-async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
   v.validatePackageFiles(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateCollection(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateNamespace(config, buildCtx.diagnostics);
@@ -47,6 +28,10 @@ async function generateTypesAndValidate(config: d.Config, compilerCtx: d.Compile
 
 
 async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+  if (typeof pkgData.types !== 'string') {
+    return;
+  }
+
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
   const distTypesDir = sys.path.dirname(pkgData.types);
@@ -58,34 +43,11 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
     const distPath = sys.path.join(config.rootDir, distTypesDir, relPath);
 
     const originalDtsContent = await compilerCtx.fs.readFile(srcDtsFile.absPath);
-    const distDtsContent = updateStencilTypesImports(config, outputTarget.typesDir, distPath, originalDtsContent);
+    const distDtsContent = updateStencilTypesImports(outputTarget.typesDir, distPath, originalDtsContent);
 
     await compilerCtx.fs.writeFile(distPath, distDtsContent);
   }));
 
   const distPath = sys.path.join(config.rootDir, distTypesDir);
   await generateComponentTypes(config, compilerCtx, buildCtx, distPath);
-}
-
-
-async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const pkgJsonPath = sys.path.join(config.rootDir, 'package.json');
-
-  let pkgJson: string;
-  try {
-    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
-
-  } catch (e) {
-    throw new Error(`Missing "package.json" file for distribution: ${pkgJsonPath}`);
-  }
-
-  let pkgData: d.PackageJsonData;
-  try {
-    pkgData = JSON.parse(pkgJson);
-
-  } catch (e) {
-    throw new Error(`Error parsing package.json: ${pkgJsonPath}, ${e}`);
-  }
-
-  return pkgData;
 }

@@ -5,5 +5,9 @@
     "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --dev --watch --serve",
     "start.prod": "node ../../bin/stencil build --watch --serve"
-  }
+  },
+  "collection": "dist/collection/collection-manifest.json",
+  "types": "dist/types/components.d.ts",
+  "module": "dist/esm/es5/index.js",
+  "main": "dist/index.js"
 }

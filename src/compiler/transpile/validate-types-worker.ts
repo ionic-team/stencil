@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import { removeStencilDecorators, removeStencilImports } from '../transformers/validate-types-transform';
-import { updateStencilTypesImports } from '../distribution/stencil-types';
+import { updateStencilTypesImports } from '../types/stencil-types';
 import path from 'path';
 import ts from 'typescript';
 

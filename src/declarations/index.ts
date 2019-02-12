@@ -22,7 +22,6 @@ export * from './dom';
 export * from './entry';
 export * from './events';
 export * from './file-system';
-export * from './functional-components';
 export * from './fs-watch';
 export * from './host-element';
 export * from './in-memory-fs';
