@@ -1,10 +1,17 @@
-<a name="0.17.3-0"></a>
-## 🐫 [0.17.3-0](https://github.com/ionic-team/stencil/compare/v0.17.2...v0.17.3-0) (2019-02-07)
+<a name="0.18.0-0"></a>
+# 🎢 [0.18.0-0](https://github.com/ionic-team/stencil/compare/v0.17.2...v0.18.0-0) (2019-02-12)
 
 
 ### Features
 
+* **typescript:** update to typescript 3.3.3 ([35d8d25](https://github.com/ionic-team/stencil/commit/35d8d25))
+
+
+### Bug Fixes
+
 * **docs:** generate docs for slots ([#1363](https://github.com/ionic-team/stencil/issues/1363)) ([a08acac](https://github.com/ionic-team/stencil/commit/a08acac)), closes [#1362](https://github.com/ionic-team/stencil/issues/1362)
+* **e2e:** expose page.url() method ([#1221](https://github.com/ionic-team/stencil/issues/1221)) ([c2df47e](https://github.com/ionic-team/stencil/commit/c2df47e)), closes [#1220](https://github.com/ionic-team/stencil/issues/1220)
+* **prerender:** export DEFAULT_MODE for platform-server ([#1366](https://github.com/ionic-team/stencil/issues/1366)) ([678b19d](https://github.com/ionic-team/stencil/commit/678b19d))
 
 
 
