@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
-import { generateComponentTypes } from './generate-component-types';
+import { generateAppTypes } from './generate-app-types';
 import { isDtsFile } from '@utils';
 import { sys } from '@sys';
 import * as v from './validate-package-json';
@@ -49,5 +49,5 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
   }));
 
   const distPath = sys.path.join(config.rootDir, distTypesDir);
-  await generateComponentTypes(config, compilerCtx, buildCtx, distPath);
+  await generateAppTypes(config, compilerCtx, buildCtx, distPath);
 }

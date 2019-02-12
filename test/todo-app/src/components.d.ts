@@ -16,10 +16,22 @@ export namespace Components {
   interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface TodoInput {}
-  interface TodoInputAttributes extends JSXElements.HTMLAttributes {}
+  interface TodoInputAttributes extends JSXElements.HTMLAttributes {
+    'onInputSubmit'?: (event: any /**TODO**/) => void;
+  }
 
-  interface TodoItem {}
-  interface TodoItemAttributes extends JSXElements.HTMLAttributes {}
+  interface TodoItem {
+    'checked': boolean;
+    'index': number;
+    'text': string;
+  }
+  interface TodoItemAttributes extends JSXElements.HTMLAttributes {
+    'checked'?: boolean;
+    'index'?: number;
+    'onItemCheck'?: (event: any /**TODO**/) => void;
+    'onItemRemove'?: (event: any /**TODO**/) => void;
+    'text'?: string;
+  }
 }
 
 declare global {

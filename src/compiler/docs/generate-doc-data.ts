@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { isDocsPublic, normalizePath, sortBy } from '@utils';
-import { ENCAPSULATION } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { sys } from '@sys';
 
@@ -52,11 +51,10 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): 
   return components.flat();
 }
 
-function getEncapsulation(cmpMeta: d.ComponentMeta): 'shadow' | 'scoped' | 'none' {
-  const encapsulation = cmpMeta.encapsulationMeta;
-  if (encapsulation === ENCAPSULATION.ShadowDom) {
+function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {
+  if (cmp.encapsulation === 'shadow') {
     return 'shadow';
-  } else if (encapsulation === ENCAPSULATION.ScopedCss) {
+  } else if (cmp.encapsulation === 'scoped') {
     return 'scoped';
   } else {
     return 'none';

@@ -97,3 +97,9 @@ export interface JsonDocsSlot {
   name: string;
   docs: string;
 }
+
+export interface StyleDoc {
+  name: string;
+  docs: string;
+  annotation: 'prop';
+}

@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
-import { ImportData } from './types-utils';
 import { logger, sys } from '@sys';
 
 
@@ -13,7 +12,7 @@ import { logger, sys } from '@sys';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key: string]: number }, cmp: d.ComponentCompilerMeta, filePath: string) {
+export function updateReferenceTypeImports(importDataObj: d.TypesImportData, allTypes: { [key: string]: number }, cmp: d.ComponentCompilerMeta, filePath: string) {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
   importDataObj = cmp.properties
@@ -45,7 +44,7 @@ function updateImportReferenceFactory(allTypes: { [key: string]: number }, fileP
     return `${name}${allTypes[name]}`;
   }
 
-  return (obj: ImportData, typeReferences: { [key: string]: d.ComponentCompilerTypeReference }) => {
+  return (obj: d.TypesImportData, typeReferences: { [key: string]: d.ComponentCompilerTypeReference }) => {
     Object.keys(typeReferences).map(typeName => {
       return [typeName, typeReferences[typeName]] as [string, d.ComponentCompilerTypeReference];
     }).forEach(([typeName, type]) => {

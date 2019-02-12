@@ -41,5 +41,6 @@ export * from './style';
 export * from './system';
 export * from './testing';
 export * from './transpile';
+export * from './types';
 export * from './vdom';
 export * from './worker';

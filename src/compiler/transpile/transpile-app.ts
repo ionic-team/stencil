@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { generateComponentTypes } from '../types/generate-component-types';
+import { generateAppTypes } from '../types/generate-app-types';
 import { transpileService } from './transpile-service';
 import { validateTypesMain } from './validate-types-main';
 
@@ -36,7 +36,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!
     // create the components.d.ts file and write to disk
-    await generateComponentTypes(config, compilerCtx, buildCtx, 'src');
+    await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
     if (!config._isTesting) {
       // now that we've updated the components.d.ts file

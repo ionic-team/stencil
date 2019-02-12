@@ -1,128 +1,84 @@
 import * as d from '@declarations';
-import { COMPONENTS_DTS_HEADER, ImportData, StencilModule, indentTypes, sortImportNames } from './types-utils';
-import { createTypesAsString } from './component-types-string';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
-import { getCollectionsTypeImports, updateReferenceTypeImports } from './update-import-refs';
-import { normalizePath } from '@utils';
-import { sys } from '@sys';
-import { updateStencilTypesImports } from './stencil-types';
-
-
-export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) {
-  // only gather components that are still root ts files we've found and have component metadata
-  // the compilerCtx cache may still have files that may have been deleted/renamed
-  const moduleFiles = compilerCtx.rootTsFiles
-    .slice()
-    .sort()
-    .map(tsFilePath => compilerCtx.moduleMap.get(tsFilePath))
-    .filter(m => m && m.cmps.length > 0);
-
-  // Generate d.ts files for component types
-  let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, moduleFiles, destination);
-
-  // immediately write the components.d.ts file to disk and put it into fs memory
-  let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
-
-  if (destination !== 'src') {
-    componentsDtsFilePath = sys.path.resolve(destination, GENERATED_DTS);
-    componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
-  }
-
-  await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
-  buildCtx.debug(`generated ${sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
-}
+import { dashToPascalCase } from '@utils';
+import { generateEventTypes } from './generate-event-types';
+import { generateMethodTypes } from './generate-method-types';
+import { generatePropTypes } from './generate-prop-types';
 
 
 /**
- * Generate the component.d.ts file that contains types for all components
- * @param config the project build configuration
- * @param options compiler options from tsconfig
+ * Generate a string based on the types that are defined within a component.
+ *
+ * @param cmp the metadata for the component that a type definition string is generated for
+ * @param importPath the path of the component file
  */
-async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], destination: string) {
-  let typeImportData: ImportData = {};
-  const allTypes: { [key: string]: number } = {};
-  const defineGlobalIntrinsicElements = destination === 'src';
+export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath: string) {
+  const tagName = cmp.tagName.toLowerCase();
+  const tagNameAsPascal = dashToPascalCase(tagName);
+  const interfaceName = `HTML${tagNameAsPascal}Element`;
+  const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
 
-  const collectionTypesImports = await getCollectionsTypeImports(compilerCtx, defineGlobalIntrinsicElements);
-  const collectionTypesImportsString = collectionTypesImports.map(cti => {
-    return `import '${cti.pkgName}';`;
-  })
-  .join('\n');
+  const propAttributes = generatePropTypes(cmp.properties);
+  const methodAttributes = generateMethodTypes(cmp.methods);
+  const eventAttributes = generateEventTypes(cmp.events);
 
-  const modules = moduleFiles.reduce((modules, moduleFile) => {
-    moduleFile.cmps.forEach(cmp => {
-      const importPath = normalizePath(sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
-          .replace(/\.(tsx|ts)$/, ''));
+  const stencilComponentAttributes = attributesToMultiLineString({
+    ...propAttributes,
+    ...methodAttributes
+  }, false);
 
-      typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, moduleFile.sourceFilePath);
-      const cmpTypes = createTypesAsString(cmp, importPath);
-      modules.push(cmpTypes);
-    });
-    return modules;
-  }, [] as StencilModule[]);
+  const stencilComponentJSXAttributes = attributesToMultiLineString({
+    ...propAttributes,
+    ...eventAttributes
+  }, true);
 
-  const componentsFileString = `
-export namespace Components {
-${modules.map(m => {
-  return `${m.StencilComponents}${m.JSXElements}`;
-})
-.join('\n')}
+  const typesModule: d.TypesModule = {
+    tagNameAsPascal: tagNameAsPascal,
+    StencilComponents: `
+interface ${tagNameAsPascal} {${
+  stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
+}}`,
+    JSXElements: `
+interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
+  stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
+}}`,
+    global: `
+interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLElement {}
+var ${interfaceName}: {
+  prototype: ${interfaceName};
+  new (): ${interfaceName};
+};`,
+    HTMLElementTagNameMap: `'${tagName}': ${interfaceName}`,
+    ElementTagNameMap: `'${tagName}': ${interfaceName};`,
+    IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
+  };
+
+  return typesModule;
 }
 
-declare global {
-interface StencilElementInterfaces {
-${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
-}
 
-interface StencilIntrinsicElements {
-${modules.map(m => m.IntrinsicElements).join('\n')}
-}
-
-${modules.map(m => m.global).join('\n')}
-
-interface HTMLElementTagNameMap {
-${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
-}
-
-interface ElementTagNameMap {
-${modules.map(m => m.ElementTagNameMap).join('\n')}
-}
-`;
-
-  const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {
-
-    const typeData = typeImportData[filePath];
-    let importFilePath: string;
-    if (sys.path.isAbsolute(filePath)) {
-      importFilePath = normalizePath('./' +
-        sys.path.relative(config.srcDir, filePath)
-      ).replace(/\.(tsx|ts)$/, '');
-    } else {
-      importFilePath = filePath;
-    }
-    finalString +=
-`import {
-${typeData.sort(sortImportNames).map(td => {
-  if (td.localName === td.importName) {
-    return `${td.importName},`;
-  } else {
-    return `${td.localName} as ${td.importName},`;
+function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') {
+  if (Object.keys(attributes).length === 0) {
+    return '';
   }
-}).join('\n')}
-} from '${importFilePath}';\n`;
 
-    return finalString;
-  }, '');
+  return Object.keys(attributes)
+    .sort()
+    .reduce((fullList, key) => {
+      const type = attributes[key];
+      if (type.public || !jsxAttributes) {
+        if (type.jsdoc) {
+          fullList.push(`/**`);
+          fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+          fullList.push(` */`);
+        }
+        const optional = (jsxAttributes)
+          ? !type.required
+          : type.optional;
 
-  const code = `
-import { JSXElements } from '@stencil/core';
-
-${collectionTypesImportsString}
-${typeImportString}
-${componentsFileString}
-}
-`;
-  return `${COMPONENTS_DTS_HEADER}
-
-${indentTypes(code)}`;
+        fullList.push(`'${key}'${ optional ? '?' : '' }: ${type.type};`);
+      }
+      return fullList;
+    }, <string[]>[])
+    .map(item => `${paddingString}${item}`)
+    .join(`\n`);
 }

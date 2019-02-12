@@ -1,3 +1,4 @@
+import * as d from '@declarations';
 
 
 export const COMPONENTS_DTS_HEADER = `/* tslint:disable */
@@ -31,46 +32,12 @@ export function indentTypes(code: string) {
 }
 
 
-export function sortImportNames(a: MemberNameData, b: MemberNameData) {
+export function sortImportNames(a: d.TypesMemberNameData, b: d.TypesMemberNameData) {
   const aName = a.localName.toLowerCase();
   const bName = b.localName.toLowerCase();
-
   if (aName < bName) return -1;
   if (aName > bName) return 1;
   if (a.localName < b.localName) return -1;
   if (a.localName > b.localName) return 1;
   return 0;
-}
-
-
-export interface ImportData {
-  [key: string]: MemberNameData[];
-}
-
-
-export interface MemberNameData {
-  localName: string;
-  importName?: string;
-}
-
-
-export interface StencilModule {
-  tagNameAsPascal: string;
-  StencilComponents: string;
-  JSXElements: string;
-  global: string;
-  HTMLElementTagNameMap: string;
-  ElementTagNameMap: string;
-  IntrinsicElements: string;
-}
-
-
-export interface TypeInfo {
-  [key: string]: {
-    type: string;
-    optional: boolean;
-    required: boolean;
-    public: boolean;
-    jsdoc?: string;
-  };
 }
