@@ -14,20 +14,19 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     // we haven't initialized this element yet
     hostRef.flags |= HOST_STATE.hasInitializedComponent;
 
-    if (BUILD.mode && !hostRef.modeName) {
-      // initializeComponent, BUILD.mode
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      hostRef.modeName = computeMode(elm);
-    }
-
     if (BUILD.lazyLoad) {
       // lazy loaded components
+      if (BUILD.mode && !hostRef.modeName) {
+        // initializeComponent, BUILD.mode
+        // looks like mode wasn't set as a property directly yet
+        // first check if there's an attribute
+        // next check the app's global
+        hostRef.modeName = computeMode(elm);
+      }
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds, hostRef.modeName);
+        Cstr = await loadModule(cmpMeta, hostRef.modeName);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
@@ -35,21 +34,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
           // the first time we create an instance of the implementation
           proxyComponent(Cstr, cmpMeta, 0, 1);
           Cstr.isProxied = true;
-        }
-
-        if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
-          // this component has styles but we haven't registered them yet
-          if (BUILD.mode && Cstr.mode) {
-            // this component implementation has a style mode
-            // use the given mode as the style key
-            styles.set(Cstr.mode, Cstr.style);
-
-          } else {
-            // this component implementation does not have a style mode
-            // use the tag name as the key (note, tag name will be all caps)
-            styles.set(elm.tagName, Cstr.style);
-          }
-          Cstr.isStyleRegistered = true;
         }
 
         // ok, time to construct the instance
@@ -88,21 +72,12 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       } catch (e) {
         consoleError(e);
       }
+    }
 
-    } else {
-      // native components
-      // the component instance and the host element are the same thing
-      if (BUILD.style) {
-        Cstr = elm.constructor as any;
-        if (!Cstr.isStyleRegistered && Cstr.style) {
-          if (BUILD.mode && Cstr.mode) {
-            styles.set(Cstr.mode, Cstr.style);
-          } else {
-            styles.set(elm.tagName, Cstr.style);
-          }
-          Cstr.isStyleRegistered = true;
-        }
-      }
+    if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
+      // this component has styles but we haven't registered them yet
+      styles.set(Cstr.styleId, Cstr.style);
+      Cstr.isStyleRegistered = true;
     }
   }
 

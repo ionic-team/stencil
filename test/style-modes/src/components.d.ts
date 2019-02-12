@@ -12,32 +12,58 @@ import { JSXElements } from '@stencil/core';
 
 export namespace Components {
 
-  interface HelloVdom {}
-  interface HelloVdomAttributes extends JSXElements.HTMLAttributes {}
+  interface AppRoot {}
+  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
+
+  interface ScopedMode {}
+  interface ScopedModeAttributes extends JSXElements.HTMLAttributes {}
+
+  interface ShadowMode {}
+  interface ShadowModeAttributes extends JSXElements.HTMLAttributes {}
 }
 
 declare global {
   interface StencilElementInterfaces {
-    'HelloVdom': Components.HelloVdom;
+    'AppRoot': Components.AppRoot;
+    'ScopedMode': Components.ScopedMode;
+    'ShadowMode': Components.ShadowMode;
   }
 
   interface StencilIntrinsicElements {
-    'hello-vdom': Components.HelloVdomAttributes;
+    'app-root': Components.AppRootAttributes;
+    'scoped-mode': Components.ScopedModeAttributes;
+    'shadow-mode': Components.ShadowModeAttributes;
   }
 
 
-  interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLElement {}
-  var HTMLHelloVdomElement: {
-    prototype: HTMLHelloVdomElement;
-    new (): HTMLHelloVdomElement;
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
+  var HTMLAppRootElement: {
+    prototype: HTMLAppRootElement;
+    new (): HTMLAppRootElement;
+  };
+
+  interface HTMLScopedModeElement extends Components.ScopedMode, HTMLElement {}
+  var HTMLScopedModeElement: {
+    prototype: HTMLScopedModeElement;
+    new (): HTMLScopedModeElement;
+  };
+
+  interface HTMLShadowModeElement extends Components.ShadowMode, HTMLElement {}
+  var HTMLShadowModeElement: {
+    prototype: HTMLShadowModeElement;
+    new (): HTMLShadowModeElement;
   };
 
   interface HTMLElementTagNameMap {
-    'hello-vdom': HTMLHelloVdomElement
+    'app-root': HTMLAppRootElement
+    'scoped-mode': HTMLScopedModeElement
+    'shadow-mode': HTMLShadowModeElement
   }
 
   interface ElementTagNameMap {
-    'hello-vdom': HTMLHelloVdomElement;
+    'app-root': HTMLAppRootElement;
+    'scoped-mode': HTMLScopedModeElement;
+    'shadow-mode': HTMLShadowModeElement;
   }
 
 }

@@ -50,6 +50,12 @@ export const enum HOST_STATE {
   hasLoadedComponent = 1 << 9,
 }
 
+export const enum CMP_FLAG {
+  shadowDomEncapsulation = 1 << 0,
+  scopedCssEncapsulation = 1 << 1,
+  hasSlotRelocation = 1 << 2,
+}
+
 /**
  * Member Types
  */

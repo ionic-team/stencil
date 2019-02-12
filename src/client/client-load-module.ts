@@ -5,11 +5,11 @@ import { dashToPascalCase } from '@utils';
 import { plt } from './client-window';
 
 
-export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, mode: string, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
+export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, mode: string, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
   // loadModuleImport
-  const bundleId = (BUILD.mode && typeof bundleIds !== 'string')
-    ? (bundleIds as d.BundleIds)[mode]
-    : bundleIds;
+  const bundleId = (BUILD.mode && typeof cmpMeta.lazyBundleIds !== 'string')
+    ? cmpMeta.lazyBundleIds[mode]
+    : cmpMeta.lazyBundleIds;
 
   const useScopedCss = (BUILD.shadowDom && !plt.supportsShadowDom);
   const url = `./${bundleId + (useScopedCss ? '.sc' : '')}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
@@ -18,5 +18,5 @@ export const loadModule = (elm: d.HostElement, bundleIds: d.ModeBundleId, mode: 
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackMode: "lazy" */
     url
-  ).then(importedModule => importedModule[dashToPascalCase(elm.nodeName)], consoleError);
+  ).then(importedModule => importedModule[dashToPascalCase(cmpMeta.cmpTag)], consoleError);
 };

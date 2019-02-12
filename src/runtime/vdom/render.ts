@@ -11,7 +11,7 @@ import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
 import { h } from './h';
 import { NODE_TYPE } from '../runtime-constants';
-import { SVG_NS, isDef, toLowerCase } from '@utils';
+import { SVG_NS, isDef, toLowerCase, CMP_FLAG } from '@utils';
 import { updateElement } from './update-element';
 
 
@@ -628,7 +628,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   if (BUILD.slotRelocation) {
-    useNativeShadowDom = plt.supportsShadowDom && !!cmpMeta.cmpShadowDomEncapsulation;
+    useNativeShadowDom = plt.supportsShadowDom && !!(cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation);
   }
 
   // if (BUILD.prerenderServerSide) {

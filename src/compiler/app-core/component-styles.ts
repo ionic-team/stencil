@@ -28,7 +28,7 @@ export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeNa
 
 
 function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string) {
-  return `${cmp.tagName.toUpperCase()}${modeName === DEFAULT_STYLE_MODE ? '' : `#${modeName}`}`;
+  return `${cmp.tagName.toLowerCase()}${modeName === DEFAULT_STYLE_MODE ? '' : `#${modeName}`}`;
 }
 
 export function getStyleIdPlaceholder(cmp: d.ComponentCompilerMeta) {

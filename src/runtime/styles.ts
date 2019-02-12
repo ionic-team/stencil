@@ -3,14 +3,14 @@ import { BUILD } from '@build-conditionals';
 import { doc, rootAppliedStyles, styles } from '@platform';
 
 
-export const attachStyles = (elm: d.HostElement, hostRef: d.HostRef, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
+export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
 
   if (BUILD.mode) {
-    if (!styles.has(styleId = elm.tagName + '#' + hostRef.modeName)) {
-      styleId = elm.tagName;
+    if (!styles.has(styleId = cmpMeta.cmpTag + '#' + mode)) {
+      styleId = cmpMeta.cmpTag;
     }
   } else {
-    styleId = elm.tagName;
+    styleId = cmpMeta.cmpTag;
   }
 
   if (styles.has(styleId)) {
@@ -47,6 +47,6 @@ export const attachStyles = (elm: d.HostElement, hostRef: d.HostRef, styleId?: s
 };
 
 
-export const getElementScopeId = (scopeId: string, isHostElement?: boolean) => {
+export const getElementScopeId = (scopeId: string, isHostElement: boolean) => {
   return scopeId + (isHostElement ? '-h' : '-s');
 };

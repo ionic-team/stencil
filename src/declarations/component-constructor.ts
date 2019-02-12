@@ -8,7 +8,7 @@ export interface ComponentConstructor {
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
   style?: string;
-  mode?: string;
+  styleId?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
   cmpMeta?: d.ComponentRuntimeMeta;

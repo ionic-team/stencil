@@ -112,11 +112,11 @@ export async function flushAll() {
 }
 
 
-export function loadModule(_elm: d.HostElement, bundleId: d.ModeBundleId, _mode: string) {
+export function loadModule(cmpMeta: d.ComponentLazyRuntimeMeta, _mode: string) {
   return new Promise<any>(resolve => {
     queuedLoadModules.push({
-      bundleId,
-      resolve: () => resolve(moduleLoaded.get(bundleId))
+      bundleId: cmpMeta.lazyBundleIds,
+      resolve: () => resolve(moduleLoaded.get(cmpMeta.lazyBundleIds))
     });
   });
 }

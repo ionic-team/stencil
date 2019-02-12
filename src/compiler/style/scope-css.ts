@@ -8,7 +8,7 @@ export async function scopeComponentCss(buildCtx: d.BuildCtx, cmp: d.ComponentCo
     const scopeId = getScopeId(cmp, mode);
 
     const hostScopeId = getElementScopeId(scopeId, true);
-    const slotScopeId = getElementScopeId(scopeId);
+    const slotScopeId = getElementScopeId(scopeId, false);
 
     cssText = await sys.scopeCss(cssText, scopeId, hostScopeId, slotScopeId);
 
@@ -19,8 +19,8 @@ export async function scopeComponentCss(buildCtx: d.BuildCtx, cmp: d.ComponentCo
   return cssText;
 }
 
-export const getScopeId = (cmpMeta: d.ComponentMeta, mode?: string) => {
-  return ('sc-' + cmpMeta.tagNameMeta) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
+export const getScopeId = (cmpMeta: d.ComponentCompilerMeta, mode?: string) => {
+  return ('sc-' + cmpMeta.tagName) + ((mode && mode !== DEFAULT_STYLE_MODE) ? '-' + mode : '');
 };
 
 

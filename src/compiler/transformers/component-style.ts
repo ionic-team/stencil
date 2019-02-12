@@ -9,9 +9,6 @@ export function addComponentStyle(classMembers: ts.ClassElement[], cmp: d.Compon
     return;
   }
 
-  if (cmp.hasMode) {
-    classMembers.push(createStaticGetter('mode', ts.createStringLiteral(getStyleIdPlaceholder(cmp))));
-  }
-
+  classMembers.push(createStaticGetter('styleId', ts.createStringLiteral(getStyleIdPlaceholder(cmp))));
   classMembers.push(createStaticGetter('style', ts.createStringLiteral(getStyleTextPlaceholder(cmp))));
 }

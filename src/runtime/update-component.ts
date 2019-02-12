@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { attachStyles, getElementScopeId } from './styles';
 import { BUILD } from '@build-conditionals';
 import { consoleError, plt } from '@platform';
-import { DEFAULT_STYLE_MODE, HOST_STATE, toLowerCase } from '@utils';
+import { CMP_FLAG, HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
 
@@ -44,7 +44,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpScopedCssEncapsulation)) {
+      if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
         // only required when we're NOT using native shadow dom (slot)
         // or this browser doesn't support native shadow dom
         // and this host element was NOT created with SSR
@@ -52,22 +52,19 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
         // create a node to represent where the original
         // content was first placed, which is useful later on
         // DOM WRITE!!
+        const scopeId = elm['s-sc'] = (BUILD.mode)
+          ? 'sc-' + cmpMeta.cmpTag + (hostRef.modeName ? '-' + hostRef.modeName : '')
+          : 'sc-' + cmpMeta.cmpTag;
 
-        if (BUILD.mode) {
-          elm['s-sc'] = ('sc-' + toLowerCase(elm.tagName)) + ((hostRef.modeName !== DEFAULT_STYLE_MODE) ? '-' + hostRef.modeName : '');
-        } else {
-          elm['s-sc'] = 'sc-' + toLowerCase(elm.tagName);
-        }
+        elm.classList.add(getElementScopeId(scopeId, true));
 
-        elm.classList.add(getElementScopeId(elm['s-sc'], true));
-
-        if (cmpMeta.cmpScopedCssEncapsulation) {
-          elm.classList.add(getElementScopeId(elm['s-sc']));
+        if (cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
+          elm.classList.add(getElementScopeId(scopeId, false));
         }
       }
     }
 
-    if (BUILD.shadowDom && plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation) {
+    if (BUILD.shadowDom && plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
       // DOM WRITE
       // this component is using shadow dom
       // and this browser supports shadow dom
@@ -77,7 +74,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
 
     if (BUILD.style) {
       // DOM WRITE!
-      attachStyles(elm, hostRef);
+      attachStyles(elm, cmpMeta, hostRef.modeName);
     }
   }
 

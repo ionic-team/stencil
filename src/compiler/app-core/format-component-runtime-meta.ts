@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
+import { LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE, CMP_FLAG } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
@@ -11,7 +11,9 @@ export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentComp
 
 
 export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean) {
-  const runtimeMeta: d.ComponentLazyRuntimeMeta = {};
+  const runtimeMeta: d.ComponentLazyRuntimeMeta = {
+    cmpFlags: 0,
+  };
 
   if (includeTagName) {
     runtimeMeta.cmpTag = compilerMeta.tagName;
@@ -28,14 +30,14 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
   }
 
   if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.cmpShadowDomEncapsulation = shortBoolean(true);
+    runtimeMeta.cmpFlags |= CMP_FLAG.shadowDomEncapsulation;
 
   } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.cmpScopedCssEncapsulation = shortBoolean(true);
+    runtimeMeta.cmpFlags |= CMP_FLAG.scopedCssEncapsulation;
   }
 
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
-    runtimeMeta.cmpHasSlotRelocation = shortBoolean(true);
+    runtimeMeta.cmpFlags |= CMP_FLAG.hasSlotRelocation;
   }
 
   return runtimeMeta;
@@ -48,9 +50,7 @@ export function stringifyRuntimeData(data: any) {
              .replace(/"cmpTag"/g, 'cmpTag')
              .replace(/"cmpMeta"/g, 'cmpMeta')
              .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
-             .replace(/"cmpShadowDomEncapsulation"/g, 'cmpShadowDomEncapsulation')
-             .replace(/"cmpScopedCssEncapsulation"/g, 'cmpScopedCssEncapsulation')
-             .replace(/"cmpHasSlotRelocation"/g, 'cmpHasSlotRelocation')
+             .replace(/"cmpFlags"/g, 'cmpFlags')
              .replace(/"cmpMembers"/g, 'cmpMembers');
 }
 
@@ -188,11 +188,6 @@ function computeListenerFlags(listener: d.ComponentCompilerListener) {
   }
   return flags;
 }
-
-function shortBoolean(val: boolean) {
-  return (val ? 1 : 0) as any;
-}
-
 
 function trimFalsy(data: any): any {
   const arr = (data as any[]);

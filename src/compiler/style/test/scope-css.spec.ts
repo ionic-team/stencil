@@ -248,7 +248,7 @@ describe('ShadowCss', function() {
 
   describe('getElementScopeId, slot', () => {
     it('should add -s suffix', () => {
-      expect(getElementScopeId('sc-my-tag')).toBe('sc-my-tag-s');
+      expect(getElementScopeId('sc-my-tag', false)).toBe('sc-my-tag-s');
     });
   });
 

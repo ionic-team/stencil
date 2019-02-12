@@ -7,6 +7,9 @@ import { componentOnReady } from './component-on-ready';
 
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
+  if (!BUILD.lazyLoad && Cstr.is) {
+    cmpMeta.cmpTag = Cstr.is;
+  }
   if (BUILD.member && cmpMeta.cmpMembers) {
     if (BUILD.watchCallback && Cstr.watchers) {
       cmpMeta.watchers = Cstr.watchers;

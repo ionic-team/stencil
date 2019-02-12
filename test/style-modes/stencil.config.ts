@@ -10,7 +10,7 @@ export const config: Config = {
       serviceWorker: null
     }
   ],
-
+  globalScript: 'src/global.ts',
   enableCache: false
 
 };

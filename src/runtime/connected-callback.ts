@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, tick } from '@platform';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
-import { HOST_STATE, LISTENER_FLAGS } from '@utils';
+import { CMP_FLAG, HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
@@ -39,19 +39,19 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if ((BUILD.slot && cmpMeta.cmpHasSlotRelocation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpShadowDomEncapsulation)) {
+        if ((BUILD.slot && cmpMeta.cmpFlags & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation)) {
           // only required when we're NOT using native shadow dom (slot)
           // or this browser doesn't support native shadow dom
           // and this host element was NOT created with SSR
           // let's pick out the inner content for slot projection
           // create a node to represent where the original
           // content was first placed, which is useful later on
-          elm['s-cr'] = doc.createComment(BUILD.isDebug ? `content-reference:${elm.tagName.toLowerCase()}` : '') as any;
+          elm['s-cr'] = doc.createComment(BUILD.isDebug ? `content-reference:${cmpMeta.cmpTag}` : '') as any;
           elm['s-cr']['s-cn'] = true;
           elm.insertBefore(elm['s-cr'], elm.firstChild);
         }
 
-        if (BUILD.es5 && !plt.supportsShadowDom && cmpMeta.cmpScopedCssEncapsulation) {
+        if (BUILD.es5 && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
           try {
             (elm as any).shadowRoot = elm;
           } catch (e) {}
