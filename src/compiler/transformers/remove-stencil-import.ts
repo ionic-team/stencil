@@ -10,10 +10,7 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
           .map(e => e.getText())
           .filter(name => KEEP_IMPORTS.includes(name));
 
-        if (origImports.length === keepImports.length) {
-          return importNode;
-
-        } else if (keepImports.length > 0) {
+        if (keepImports.length > 0) {
           return ts.updateImportDeclaration(
             importNode,
             undefined,

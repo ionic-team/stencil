@@ -9,6 +9,7 @@ import { JSXElements } from '@stencil/core';
 
 
 
+
 export namespace Components {
 
   interface HelloWorld {}
@@ -16,6 +17,14 @@ export namespace Components {
 }
 
 declare global {
+  interface StencilElementInterfaces {
+    'HelloWorld': Components.HelloWorld;
+  }
+
+  interface StencilIntrinsicElements {
+    'hello-world': Components.HelloWorldAttributes;
+  }
+
 
   interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLElement {}
   var HTMLHelloWorldElement: {

@@ -6,7 +6,7 @@ export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePat
 
   return {
     resolveId(id: string) {
-      if (id === '@stencil/core') {
+      if (id === '@stencil/core/app') {
         return appCoreEntryFilePath;
       }
 

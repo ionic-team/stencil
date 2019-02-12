@@ -48,6 +48,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
 
   const platformExports: string[] = [
     'createEvent',
+    'connectedCallback',
     'getConnect',
     'getContext',
     'getElement',
