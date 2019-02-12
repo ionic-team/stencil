@@ -283,7 +283,7 @@ export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.
 }
 
 
-const DEFAULT_MODE = 'md';
+export const DEFAULT_MODE = 'md';
 const MAX_LINK_REL_PRELOAD_COUNT = 6;
 export const HOST_CONFIG_FILENAME = 'host.config.json';
 
