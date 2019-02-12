@@ -45,7 +45,8 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
       } catch ({message}) {
         const error = buildError(buildCtx.diagnostics);
         error.messageText = message;
-        error.relFilePath = tsSourceFile.fileName;
+        error.absFilePath = tsSourceFile.fileName;
+        error.relFilePath = config.sys.path.relative(config.rootDir, tsSourceFile.fileName);
       }
       return undefined;
     }
