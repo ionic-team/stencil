@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, h, getMode } from '@stencil/core';
 
 @Component({
   tag: 'shadow-dom-mode',
@@ -10,10 +10,9 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class ShadowDomMode {
 
-  @Prop() mode: string;
+  private mode = getMode(this);
 
   render() {
     return <div>{this.mode}</div>;
   }
-
 }

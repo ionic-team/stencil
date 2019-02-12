@@ -16,7 +16,7 @@ export class ShadowDomModeRoot {
   render() {
     return (
       <div>
-        <shadow-dom-mode id="blue" mode="blue"></shadow-dom-mode>
+        <shadow-dom-mode id="blue" colormode="blue"></shadow-dom-mode>
         {this.showRed ? (
           <shadow-dom-mode id="red"></shadow-dom-mode>
         ) : null}

@@ -99,15 +99,6 @@ export namespace Components {
   interface LifecycleBasicC {}
   interface LifecycleBasicCAttributes extends JSXElements.HTMLAttributes {}
 
-  interface LifecycleOnReadyA {}
-  interface LifecycleOnReadyAAttributes extends JSXElements.HTMLAttributes {}
-
-  interface LifecycleOnReadyB {}
-  interface LifecycleOnReadyBAttributes extends JSXElements.HTMLAttributes {}
-
-  interface LifecycleOnReadyC {}
-  interface LifecycleOnReadyCAttributes extends JSXElements.HTMLAttributes {}
-
   interface LifecycleUnloadA {}
   interface LifecycleUnloadAAttributes extends JSXElements.HTMLAttributes {}
 
@@ -116,6 +107,15 @@ export namespace Components {
 
   interface LifecycleUnloadRoot {}
   interface LifecycleUnloadRootAttributes extends JSXElements.HTMLAttributes {}
+
+  interface LifecycleUpdateA {}
+  interface LifecycleUpdateAAttributes extends JSXElements.HTMLAttributes {}
+
+  interface LifecycleUpdateB {}
+  interface LifecycleUpdateBAttributes extends JSXElements.HTMLAttributes {}
+
+  interface LifecycleUpdateC {}
+  interface LifecycleUpdateCAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenJsxRoot {}
   interface ListenJsxRootAttributes extends JSXElements.HTMLAttributes {}
@@ -129,28 +129,8 @@ export namespace Components {
   interface NodeGlobals {}
   interface NodeGlobalsAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ReflectToAttr {
-    'bool': boolean;
-    'disabled': boolean;
-    'dynamicNu': number;
-    'dynamicStr': string;
-    'nu': number;
-    'null': string;
-    'otherBool': boolean;
-    'str': string;
-    'undef': string;
-  }
-  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {
-    'bool'?: boolean;
-    'disabled'?: boolean;
-    'dynamicNu'?: number;
-    'dynamicStr'?: string;
-    'nu'?: number;
-    'null'?: string;
-    'otherBool'?: boolean;
-    'str'?: string;
-    'undef'?: string;
-  }
+  interface ReflectToAttr {}
+  interface ReflectToAttrAttributes extends JSXElements.HTMLAttributes {}
 
   interface ScopedBasicRoot {}
   interface ScopedBasicRootAttributes extends JSXElements.HTMLAttributes {}
@@ -298,12 +278,12 @@ declare global {
     'LifecycleBasicA': Components.LifecycleBasicA;
     'LifecycleBasicB': Components.LifecycleBasicB;
     'LifecycleBasicC': Components.LifecycleBasicC;
-    'LifecycleOnReadyA': Components.LifecycleOnReadyA;
-    'LifecycleOnReadyB': Components.LifecycleOnReadyB;
-    'LifecycleOnReadyC': Components.LifecycleOnReadyC;
     'LifecycleUnloadA': Components.LifecycleUnloadA;
     'LifecycleUnloadB': Components.LifecycleUnloadB;
     'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
+    'LifecycleUpdateA': Components.LifecycleUpdateA;
+    'LifecycleUpdateB': Components.LifecycleUpdateB;
+    'LifecycleUpdateC': Components.LifecycleUpdateC;
     'ListenJsxRoot': Components.ListenJsxRoot;
     'ListenJsx': Components.ListenJsx;
     'ListenWindow': Components.ListenWindow;
@@ -379,12 +359,12 @@ declare global {
     'lifecycle-basic-a': Components.LifecycleBasicAAttributes;
     'lifecycle-basic-b': Components.LifecycleBasicBAttributes;
     'lifecycle-basic-c': Components.LifecycleBasicCAttributes;
-    'lifecycle-on-ready-a': Components.LifecycleOnReadyAAttributes;
-    'lifecycle-on-ready-b': Components.LifecycleOnReadyBAttributes;
-    'lifecycle-on-ready-c': Components.LifecycleOnReadyCAttributes;
     'lifecycle-unload-a': Components.LifecycleUnloadAAttributes;
     'lifecycle-unload-b': Components.LifecycleUnloadBAttributes;
     'lifecycle-unload-root': Components.LifecycleUnloadRootAttributes;
+    'lifecycle-update-a': Components.LifecycleUpdateAAttributes;
+    'lifecycle-update-b': Components.LifecycleUpdateBAttributes;
+    'lifecycle-update-c': Components.LifecycleUpdateCAttributes;
     'listen-jsx-root': Components.ListenJsxRootAttributes;
     'listen-jsx': Components.ListenJsxAttributes;
     'listen-window': Components.ListenWindowAttributes;
@@ -605,24 +585,6 @@ declare global {
     new (): HTMLLifecycleBasicCElement;
   };
 
-  interface HTMLLifecycleOnReadyAElement extends Components.LifecycleOnReadyA, HTMLElement {}
-  var HTMLLifecycleOnReadyAElement: {
-    prototype: HTMLLifecycleOnReadyAElement;
-    new (): HTMLLifecycleOnReadyAElement;
-  };
-
-  interface HTMLLifecycleOnReadyBElement extends Components.LifecycleOnReadyB, HTMLElement {}
-  var HTMLLifecycleOnReadyBElement: {
-    prototype: HTMLLifecycleOnReadyBElement;
-    new (): HTMLLifecycleOnReadyBElement;
-  };
-
-  interface HTMLLifecycleOnReadyCElement extends Components.LifecycleOnReadyC, HTMLElement {}
-  var HTMLLifecycleOnReadyCElement: {
-    prototype: HTMLLifecycleOnReadyCElement;
-    new (): HTMLLifecycleOnReadyCElement;
-  };
-
   interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLElement {}
   var HTMLLifecycleUnloadAElement: {
     prototype: HTMLLifecycleUnloadAElement;
@@ -639,6 +601,36 @@ declare global {
   var HTMLLifecycleUnloadRootElement: {
     prototype: HTMLLifecycleUnloadRootElement;
     new (): HTMLLifecycleUnloadRootElement;
+  };
+
+  interface HTMLLifecycleUpdateAElement extends Components.LifecycleUpdateA, HTMLElement {}
+  var HTMLLifecycleUpdateAElement: {
+    prototype: HTMLLifecycleUpdateAElement;
+    new (): HTMLLifecycleUpdateAElement;
+  };
+
+  interface HTMLLifecycleUpdateBElement extends Components.LifecycleUpdateB, HTMLElement {}
+  var HTMLLifecycleUpdateBElement: {
+    prototype: HTMLLifecycleUpdateBElement;
+    new (): HTMLLifecycleUpdateBElement;
+  };
+
+  interface HTMLLifecycleUpdateCElement extends Components.LifecycleUpdateC, HTMLElement {}
+  var HTMLLifecycleUpdateCElement: {
+    prototype: HTMLLifecycleUpdateCElement;
+    new (): HTMLLifecycleUpdateCElement;
+  };
+
+  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLElement {}
+  var HTMLListenJsxRootElement: {
+    prototype: HTMLListenJsxRootElement;
+    new (): HTMLListenJsxRootElement;
+  };
+
+  interface HTMLListenJsxElement extends Components.ListenJsx, HTMLElement {}
+  var HTMLListenJsxElement: {
+    prototype: HTMLListenJsxElement;
+    new (): HTMLListenJsxElement;
   };
 
   interface HTMLListenWindowElement extends Components.ListenWindow, HTMLElement {}
@@ -917,12 +909,14 @@ declare global {
     'lifecycle-basic-a': HTMLLifecycleBasicAElement
     'lifecycle-basic-b': HTMLLifecycleBasicBElement
     'lifecycle-basic-c': HTMLLifecycleBasicCElement
-    'lifecycle-on-ready-a': HTMLLifecycleOnReadyAElement
-    'lifecycle-on-ready-b': HTMLLifecycleOnReadyBElement
-    'lifecycle-on-ready-c': HTMLLifecycleOnReadyCElement
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
+    'lifecycle-update-a': HTMLLifecycleUpdateAElement
+    'lifecycle-update-b': HTMLLifecycleUpdateBElement
+    'lifecycle-update-c': HTMLLifecycleUpdateCElement
+    'listen-jsx-root': HTMLListenJsxRootElement
+    'listen-jsx': HTMLListenJsxElement
     'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
     'reflect-to-attr': HTMLReflectToAttrElement
@@ -996,12 +990,14 @@ declare global {
     'lifecycle-basic-a': HTMLLifecycleBasicAElement;
     'lifecycle-basic-b': HTMLLifecycleBasicBElement;
     'lifecycle-basic-c': HTMLLifecycleBasicCElement;
-    'lifecycle-on-ready-a': HTMLLifecycleOnReadyAElement;
-    'lifecycle-on-ready-b': HTMLLifecycleOnReadyBElement;
-    'lifecycle-on-ready-c': HTMLLifecycleOnReadyCElement;
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
+    'lifecycle-update-a': HTMLLifecycleUpdateAElement;
+    'lifecycle-update-b': HTMLLifecycleUpdateBElement;
+    'lifecycle-update-c': HTMLLifecycleUpdateCElement;
+    'listen-jsx-root': HTMLListenJsxRootElement;
+    'listen-jsx': HTMLListenJsxElement;
     'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
