@@ -1,5 +1,6 @@
 
 export * from './app-global';
+export * from './assets';
 export * from './build';
 export * from './build-conditionals';
 export * from './build-events';
@@ -9,10 +10,8 @@ export * from './collection-manifest';
 export * from './compiler';
 export * from './component-compiler-meta';
 export * from './component-constructor';
-export * from './componentOLD';
 export * from './component-interfaces';
 export * from './config';
-export * from './copy';
 export * from './decorators';
 export * from './dev-inspector';
 export * from './dev-server';

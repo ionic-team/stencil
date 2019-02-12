@@ -88,7 +88,7 @@ async function addExport(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTarge
 }
 
 
-export async function generateEsmHosts(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry, outputTarget: d.OutputTarget) {
+export async function generateEsmHosts(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: any, outputTarget: d.OutputTarget) {
   if (outputTarget.type !== 'dist' || !config.buildEsm) {
     return Promise.resolve();
   }
