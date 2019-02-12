@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
-import { removeStencilImport } from '../remove-stencil-import';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
@@ -57,8 +56,6 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.Trans
             return updateLazyComponentClass(opts, node, cmp);
           }
 
-        } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-          return removeStencilImport(node as ts.ImportDeclaration);
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);

@@ -60,6 +60,15 @@ export declare const State: d.StateDecorator;
  */
 export declare const Watch: d.WatchDecorator;
 
+/**
+ * setMode
+ */
+export declare const setMode: (handler: ((elm: HTMLElement) => string | undefined | null)) => void;
+
+/**
+ * getMode
+ */
+export declare const getMode: (ref: any) => string | undefined;
 
 export interface HostElement extends HTMLElement {}
 

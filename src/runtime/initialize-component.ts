@@ -4,7 +4,7 @@ import { consoleError, loadModule, styles, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { updateComponent } from './update-component';
-import { getMode } from './mode';
+import { computeMode } from './mode';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
@@ -14,12 +14,12 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     // we haven't initialized this element yet
     hostRef.flags |= HOST_STATE.hasInitializedComponent;
 
-    if (BUILD.mode && !elm.mode) {
+    if (BUILD.mode && !hostRef.modeName) {
       // initializeComponent, BUILD.mode
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
-      elm.mode = elm.getAttribute('mode') || getMode(elm);
+      hostRef.modeName = computeMode(elm);
     }
 
     if (BUILD.lazyLoad) {
@@ -27,7 +27,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds);
+        Cstr = await loadModule(elm, (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds, hostRef.modeName);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before

@@ -8,8 +8,8 @@ export function addLazyImports(transformCtx: ts.TransformationContext, tsSourceF
     'getConnect as __stencil_getConnect',
     'getContext as __stencil_getContext',
     'getElement as __stencil_getElement',
-    'h',
-    'registerInstance as __stencil_registerInstance'
+    'registerInstance as __stencil_registerInstance',
+    'h as __stencil_h',
   ];
 
   return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');

@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
-import { removeStencilImport } from '../remove-stencil-import';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
 
@@ -55,21 +54,19 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
             return updateNativeComponentClass(node, cmp);
           }
 
-        } else if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-          return removeStencilImport(node as ts.ImportDeclaration);
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
       const platformImports = [
-        'h',
         'connectedCallback',
         'getElement as __stencil_getElement',
         'getConnect as __stencil_getConnect',
         'getContext as __stencil_getContext',
         'createEvent as __stencil_createEvent',
-        'registerHost as __stencil_registerHost'
+        'registerHost as __stencil_registerHost',
+        'h as __stencil_h',
       ];
 
       tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');

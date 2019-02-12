@@ -8,4 +8,4 @@ export { getElement } from './element';
 export { h } from './vdom/h';
 export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/render';
-export { setMode } from './mode';
+export { setMode, getMode } from './mode';

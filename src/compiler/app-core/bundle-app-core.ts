@@ -3,6 +3,7 @@ import { buildConditionalsPlugin } from '../rollup-plugins/build-conditionals';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
+import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
 import { OutputAsset, OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencies';
@@ -19,6 +20,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
       plugins: [
         stencilDependenciesPlugin(config, appCoreEntryFilePath),
         buildConditionalsPlugin(build),
+        globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,

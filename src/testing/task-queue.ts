@@ -112,7 +112,7 @@ export async function flushAll() {
 }
 
 
-export function loadModule(_elm: d.HostElement, bundleId: d.ModeBundleId) {
+export function loadModule(_elm: d.HostElement, bundleId: d.ModeBundleId, _mode: string) {
   return new Promise<any>(resolve => {
     queuedLoadModules.push({
       bundleId,

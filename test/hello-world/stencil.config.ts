@@ -15,7 +15,6 @@ export const config: Config = {
       type: 'dist'
     }
   ],
-
+  globalScript: 'src/global/app.ts',
   enableCache: false
-
 };

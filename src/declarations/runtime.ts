@@ -86,6 +86,7 @@ export interface HostRef {
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;
   vnode?: d.VNode;
+  modeName?: string;
   watchCallbacks?: Map<string, string[]>;
 }
 

@@ -53,7 +53,7 @@ function syntheticRender(hasRender: boolean) {
     ts.createBlock([
       ts.createReturn(
         ts.createCall(
-          ts.createIdentifier('h'),
+          ts.createIdentifier('__stencil_h'),
           undefined,
           hArguments
         )

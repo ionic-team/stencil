@@ -9,8 +9,8 @@ export function addNativeImports(transformCtx: ts.TransformationContext, tsSourc
     'getConnect as __stencil_getConnect',
     'getContext as __stencil_getContext',
     'getElement as __stencil_getElement',
-    'h',
-    'registerHost as __stencil_registerHost'
+    'registerHost as __stencil_registerHost',
+    'h as __stencil_h',
   ];
 
   return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');

@@ -8,6 +8,7 @@ import { methodDecoratorsToStatic } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
+import { removeStencilImport } from '../remove-stencil-import';
 
 import { transformHostData } from '../transforms/host-data-transform';
 import ts from 'typescript';
@@ -20,6 +21,8 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
     function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
         node = visitClass(diagnostics, typeChecker, tsSourceFile, node);
+      } else if (ts.isImportDeclaration(node)) {
+        return removeStencilImport(node);
       }
 
       return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);

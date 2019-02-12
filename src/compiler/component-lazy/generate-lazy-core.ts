@@ -23,6 +23,7 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   const coreText: string[] = [];
 
   coreText.push(`import { bootstrapLazy } from '@stencil/core/platform';`);
+  coreText.push(`import '@global-scripts';`);
 
   coreText.push(`bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);`);
 
@@ -31,6 +32,8 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
     'getConnect',
     'getContext',
     'getElement',
+    'setMode',
+    'getMode',
     'h',
     'registerInstance'
   ];

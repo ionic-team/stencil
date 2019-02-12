@@ -54,7 +54,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
         // DOM WRITE!!
 
         if (BUILD.mode) {
-          elm['s-sc'] = ('sc-' + toLowerCase(elm.tagName)) + ((elm.mode !== DEFAULT_STYLE_MODE) ? '-' + elm.mode : '');
+          elm['s-sc'] = ('sc-' + toLowerCase(elm.tagName)) + ((hostRef.modeName !== DEFAULT_STYLE_MODE) ? '-' + hostRef.modeName : '');
         } else {
           elm['s-sc'] = 'sc-' + toLowerCase(elm.tagName);
         }
@@ -77,7 +77,7 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
 
     if (BUILD.style) {
       // DOM WRITE!
-      attachStyles(elm);
+      attachStyles(elm, hostRef);
     }
   }
 
