@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { getGlobalFileName, getRegistryFileName } from '../app-core/app-file-naming';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { sys } from '@sys';
 
@@ -53,7 +52,7 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 
   outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
 
-  addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
+  addGlobIgnores(outputTarget.serviceWorker.globIgnores);
 
   if (!outputTarget.serviceWorker.swDest) {
     outputTarget.serviceWorker.swDest = sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
@@ -65,13 +64,7 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 }
 
 
-function addGlobIgnores(config: d.Config, globIgnores: string[]) {
-  const appRegistry = `**/${getRegistryFileName(config)}`;
-  globIgnores.push(appRegistry);
-
-  const appGlobal = `**/${getGlobalFileName(config)}`;
-  globIgnores.push(appGlobal);
-
+function addGlobIgnores(globIgnores: string[]) {
   const hostConfigJson = `**/${HOST_CONFIG_FILENAME}`;
   globIgnores.push(hostConfigJson);
 }

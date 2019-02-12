@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { getAppBuildDir, getBrowserFilename } from '../app-core/app-file-naming';
 import { sys } from '@sys';
 
 
@@ -113,9 +112,9 @@ export function getBundleIds(_entryModules: d.EntryModule[], _components: d.Hydr
 }
 
 
-function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, bundleId: string) {
-  const unscopedFileName = getBrowserFilename(bundleId, false);
-  const unscopedWwwBuildPath = sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName);
+function getBundleUrl(_config: d.Config, outputTarget: d.OutputTargetWww, _bundleId: string) {
+  // const unscopedFileName = 'getBrowserFilename(bundleId, false)';
+  const unscopedWwwBuildPath = 'sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName)';
   return getUrlFromFilePath(outputTarget, unscopedWwwBuildPath);
 }
 
@@ -220,8 +219,8 @@ function addDefaults(config: d.Config, outputTarget: d.OutputTargetWww, hostConf
 }
 
 
-function addBuildDirCacheControl(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
-  const url = getUrlFromFilePath(outputTarget, getAppBuildDir(config, outputTarget));
+function addBuildDirCacheControl(_config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+  const url = getUrlFromFilePath(outputTarget, 'getAppBuildDir(config, outputTarget)');
 
   hostConfig.hosting.rules.push({
     include: sys.path.join(url, '**'),

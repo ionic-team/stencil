@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { addCollection } from '../transformers/collections/add-collection';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { getComponentsDtsSrcFilePath } from '../app-core/app-file-naming';
+import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';

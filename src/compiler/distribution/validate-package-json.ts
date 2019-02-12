@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
-import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app-core/app-file-naming';
+import { getComponentsDtsTypesFilePath, getDistEsmIndexPath } from '../output-targets/output-utils';
 import { sys } from '@sys';
 
 
@@ -56,7 +56,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 
 
 export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const mainAbs = getDistCjsIndexPath(outputTarget);
+  const mainAbs = sys.path.join(outputTarget.buildDir, 'index.js');
   const mainRel = sys.path.join(sys.path.relative(config.rootDir, mainAbs));
 
   if (typeof pkgData.main !== 'string' || pkgData.main === '') {
@@ -73,7 +73,7 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const loaderAbs = getLoaderPath(config, outputTarget);
+  const loaderAbs = sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`);
   const loaderRel = sys.path.join(sys.path.relative(config.rootDir, loaderAbs));
   if (normalizePath(pkgData.main) === loaderRel) {
     const err = buildWarn(diagnostics);

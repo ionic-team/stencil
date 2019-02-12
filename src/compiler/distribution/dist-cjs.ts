@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getDistCjsIndexPath } from '../app-core/app-file-naming';
+import { sys } from '@sys';
 
 
 export async function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
@@ -7,7 +7,7 @@ export async function generateCommonJsIndex(config: d.Config, compilerCtx: d.Com
     `// ${config.namespace}: CommonJS Main`
   ];
 
-  const distIndexCjsPath = getDistCjsIndexPath(outputTarget);
+  const distIndexCjsPath = sys.path.join(outputTarget.buildDir, 'index.js');
 
   await compilerCtx.fs.writeFile(distIndexCjsPath, cjs.join('\n'));
 }

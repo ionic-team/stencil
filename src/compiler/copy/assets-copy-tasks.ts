@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { getAppBuildDir } from '../app-core/app-file-naming';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
@@ -46,7 +45,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     // figure out what the path is to the component directory
 
     outputTargets.forEach(outputTarget => {
-      const buildDirDestination = sys.path.join(getAppBuildDir(config, outputTarget), assetsMeta.cmpRelativePath);
+      const buildDirDestination = sys.path.join(outputTarget.buildDir, config.fsNamespace, assetsMeta.cmpRelativePath);
 
       copyTasks.push({
         src: assetsMeta.absolutePath,

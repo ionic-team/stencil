@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from '../app-core/app-file-naming';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from '../output-targets/output-utils';
 import { dashToPascalCase, normalizePath } from '@utils';
 import { sys } from '@sys';
 
