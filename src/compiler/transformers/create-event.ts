@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
+import { CREATE_EVENT } from './exports';
 
 
 export function addCreateEvents(cmp: d.ComponentCompilerMeta) {
@@ -11,7 +12,7 @@ export function addCreateEvents(cmp: d.ComponentCompilerMeta) {
         ts.createIdentifier(ev.method)
       ),
       ts.createCall(
-        ts.createIdentifier('__stencil_createEvent'),
+        ts.createIdentifier(CREATE_EVENT),
         undefined,
         [
           ts.createThis(),

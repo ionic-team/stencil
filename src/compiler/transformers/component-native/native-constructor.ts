@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { addCreateEvents } from '../create-event';
 import ts from 'typescript';
+import { REGISTER_HOST } from '../exports';
 
 
 export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
@@ -51,7 +52,7 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
 
 function nativeRegisterHostStatement() {
   return ts.createStatement(ts.createCall(
-    ts.createIdentifier('__stencil_registerHost'),
+    ts.createIdentifier(REGISTER_HOST),
     undefined,
     [ ts.createThis() ]
   ));

@@ -1,16 +1,13 @@
 import { addImports } from '../transform-utils';
 import ts from 'typescript';
+import { COMMON_IMPORTS, REGISTER_HOST } from '../exports';
 
 
 export function addNativeImports(transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile) {
   const importFns = [
+    ...COMMON_IMPORTS,
     'connectedCallback',
-    'createEvent as __stencil_createEvent',
-    'getConnect as __stencil_getConnect',
-    'getContext as __stencil_getContext',
-    'getElement as __stencil_getElement',
-    'registerHost as __stencil_registerHost',
-    'h as __stencil_h',
+    `registerHost as ${REGISTER_HOST}`,
   ];
 
   return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');

@@ -1,11 +1,12 @@
 import ts from 'typescript';
+import { GET_CONNECT, GET_CONTEXT } from '../exports';
 
 export function transformContextProp(prop: ts.PropertyDeclaration, context: string, newMembers: ts.ClassElement[]) {
-  replace(prop, '__stencil_getContext', context, newMembers);
+  replace(prop, GET_CONTEXT, context, newMembers);
 }
 
 export function transformConnectProp(prop: ts.PropertyDeclaration, connect: string, newMembers: ts.ClassElement[]) {
-  replace(prop, '__stencil_getConnect', connect, newMembers);
+  replace(prop, GET_CONNECT, connect, newMembers);
 }
 
 function replace(prop: ts.PropertyDeclaration, functionName: string, arg: string, newMembers: ts.ClassElement[]) {

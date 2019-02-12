@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, addImports, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
-
+import { addNativeImports } from './native-imports';
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.shouldAbort) {
@@ -59,18 +59,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      const platformImports = [
-        'connectedCallback',
-        'getElement as __stencil_getElement',
-        'getConnect as __stencil_getConnect',
-        'getContext as __stencil_getContext',
-        'createEvent as __stencil_createEvent',
-        'registerHost as __stencil_registerHost',
-        'h as __stencil_h',
-      ];
-
-      tsSourceFile = addImports(transformCtx, tsSourceFile, platformImports, '@stencil/core/platform');
-
+      tsSourceFile = addNativeImports(transformCtx, tsSourceFile);
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };

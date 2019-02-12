@@ -1,15 +1,13 @@
 import { addImports } from '../transform-utils';
 import ts from 'typescript';
+import { COMMON_IMPORTS, REGISTER_INSTANCE } from '../exports';
 
 
 export function addLazyImports(transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile) {
   const importFns = [
-    'createEvent as __stencil_createEvent',
-    'getConnect as __stencil_getConnect',
-    'getContext as __stencil_getContext',
-    'getElement as __stencil_getElement',
-    'registerInstance as __stencil_registerInstance',
-    'h as __stencil_h',
+    ...COMMON_IMPORTS,
+
+    `registerInstance as ${REGISTER_INSTANCE}`,
   ];
 
   return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');

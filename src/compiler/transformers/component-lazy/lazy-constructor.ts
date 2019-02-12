@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { addCreateEvents } from '../create-event';
 import ts from 'typescript';
+import { REGISTER_INSTANCE } from '../exports';
 
 
 export function updateLazyComponentConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
@@ -50,7 +51,7 @@ export function updateLazyComponentConstructor(classMembers: ts.ClassElement[], 
 
 function registerInstanceStatement() {
   return ts.createStatement(ts.createCall(
-    ts.createIdentifier('__stencil_registerInstance'),
+    ts.createIdentifier(REGISTER_INSTANCE),
     undefined,
     [
       ts.createThis(),

@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { H } from '../exports';
 
 export function transformHostData(classElements: ts.ClassElement[]) {
   const hasHostData = !!classElements.find(e => ts.isMethodDeclaration(e) && e.name.getText() === 'hostData');
@@ -53,7 +54,7 @@ function syntheticRender(hasRender: boolean) {
     ts.createBlock([
       ts.createReturn(
         ts.createCall(
-          ts.createIdentifier('__stencil_h'),
+          ts.createIdentifier(H),
           undefined,
           hArguments
         )

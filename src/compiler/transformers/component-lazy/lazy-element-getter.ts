@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import ts from 'typescript';
+import { GET_ELEMENT } from '../exports';
 
 
 export function addLazyElementGetter(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
@@ -17,7 +18,7 @@ export function addLazyElementGetter(classMembers: ts.ClassElement[], cmp: d.Com
         ts.createBlock([
           ts.createReturn(
             ts.createCall(
-              ts.createIdentifier('__stencil_getElement'),
+              ts.createIdentifier(GET_ELEMENT),
               undefined,
               [ts.createThis()]
             )
