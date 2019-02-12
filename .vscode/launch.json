@@ -20,6 +20,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Test Hello World",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--config",
+        "${workspaceFolder}/test/hello-world/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Test End-To-End",
       "args": [
         "${workspaceFolder}/bin/stencil",
