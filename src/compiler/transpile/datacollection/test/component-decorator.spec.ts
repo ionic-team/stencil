@@ -115,5 +115,15 @@ describe('component decorator', () => {
         dependencies: []
       });
     });
+    it('should check for invalid component name', () => {
+      const sourceFilePath = path.resolve(__dirname, './fixtures/component-valid-name');
+      gatherMetadata(sourceFilePath, (checker, classNode) => {
+        try {
+          getComponentDecoratorMeta([], checker, classNode);
+        } catch (e) {
+        expect(e).toBeInstanceOf(SyntaxError);
+        }
+      });
+    });
   });
 });
