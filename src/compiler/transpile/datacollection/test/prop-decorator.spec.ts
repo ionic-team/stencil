@@ -34,7 +34,7 @@ describe('props decorator', () => {
           documentation: 'Create method for something',
           name: 'objectAnyThing',
           tags: [],
-          type: '(_: any) => any',
+          type: '(_: any) => Promise<any>',
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Unknown,
@@ -124,7 +124,7 @@ describe('props decorator', () => {
           documentation: '',
           name: 'values',
           tags: [],
-          type: `number | {}`,
+          type: `number | number[]`,
         },
         memberType: MEMBER_TYPE.Prop,
         propType: PROP_TYPE.Number,
@@ -256,9 +256,11 @@ describe('props decorator', () => {
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 11; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
+
+    expect(response[`any11`].propType).toEqual(PROP_TYPE.Unknown);
 
     // unknown
     for (let i = 0; i < 5; i++) {

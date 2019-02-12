@@ -170,7 +170,7 @@ describe('component', () => {
               'documentation': '',
               'name': 'buttons',
               'tags': [],
-              'type': '{}',
+              'type': 'ActionSheetButton[]',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,

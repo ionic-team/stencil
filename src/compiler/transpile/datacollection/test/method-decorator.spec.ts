@@ -25,7 +25,7 @@ describe('method decorator', () => {
       create: {
         memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: any) => any',
+          text: '(opts?: any) => Promise<ActionSheet>',
           optional: false,
           required: false,
           typeReferences: {
@@ -64,9 +64,9 @@ describe('method decorator', () => {
           ],
           returns: {
             documentation: 'action sheet',
-            type: 'any'
+            type: 'Promise<ActionSheet>'
           },
-          type: '(opts?: any) => any',
+          type: '(opts?: any) => Promise<ActionSheet>',
         }
       }
     });
@@ -83,7 +83,7 @@ describe('method decorator', () => {
       create: {
         memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: ActionSheetOptions) => any',
+          text: '(opts?: ActionSheetOptions) => Promise<void>',
           optional: false,
           required: false,
           typeReferences: {
@@ -115,9 +115,9 @@ describe('method decorator', () => {
           ],
           returns: {
             documentation: '',
-            type: 'any'
+            type: 'Promise<void>'
           },
-          type: '(opts?: ActionSheetOptions) => any',
+          type: '(opts?: ActionSheetOptions) => Promise<void>',
         }
       }
     });
@@ -134,7 +134,7 @@ describe('method decorator', () => {
       create: {
         memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: t.CoreContext) => any',
+          text: '(opts?: t.CoreContext) => Promise<void>',
           optional: false,
           required: false,
           typeReferences: {
@@ -163,9 +163,9 @@ describe('method decorator', () => {
           ],
           returns: {
             documentation: '',
-            type: 'any'
+            type: 'Promise<void>'
           },
-          type: '(opts?: CoreContext) => any'
+          type: '(opts?: CoreContext) => Promise<void>'
         }
       }
     });
