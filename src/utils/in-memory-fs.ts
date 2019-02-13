@@ -673,6 +673,17 @@ export function shouldIgnore(filePath: string) {
   return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
 }
 
+export function isTextFile(filePath: string) {
+  filePath = filePath.toLowerCase().trim();
+  return TXT_EXT.some(ext => filePath.endsWith(ext));
+}
+
+const TXT_EXT = [
+  '.ts', '.tsx', '.js', '.jsx', '.svg',
+  '.html', '.txt', '.md', '.markdown', '.json',
+  '.css', '.scss', '.sass', '.less', '.styl'
+];
+
 const IGNORE = [
   '.ds_store',
   '.gitignore',
