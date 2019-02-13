@@ -101,7 +101,7 @@ export interface ComponentCompilerVirtualProperty {
 export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
 
 export interface ComponentCompilerPropertyComplexType {
-  text: string;
+  original: string;
   resolved: string;
   references: ComponentCompilerTypeReferences;
 }
@@ -122,6 +122,13 @@ export interface ComponentCompilerEvent {
   cancelable: boolean;
   composed: boolean;
   docs: CompilerJsDoc;
+  complexType: ComponentCompilerEventComplexType;
+}
+
+export interface ComponentCompilerEventComplexType {
+  original: string;
+  resolved: string;
+  references: ComponentCompilerTypeReferences;
 }
 
 export interface ComponentCompilerListener {

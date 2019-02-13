@@ -12,7 +12,7 @@ import { logger, sys } from '@sys';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export function updateReferenceTypeImports(importDataObj: d.TypesImportData, allTypes: { [key: string]: number }, cmp: d.ComponentCompilerMeta, filePath: string) {
+export function updateReferenceTypeImports(importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
   importDataObj = cmp.properties
@@ -33,15 +33,15 @@ export function updateReferenceTypeImports(importDataObj: d.TypesImportData, all
   return importDataObj;
 }
 
-function updateImportReferenceFactory(allTypes: { [key: string]: number }, filePath: string) {
+function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: string) {
   function getIncrememntTypeName(name: string): string {
-    if (allTypes[name] == null) {
-      allTypes[name] = 1;
+    const counter = allTypes.get(name);
+    if (counter === undefined) {
+      allTypes.set(name, 1);
       return name;
     }
-
-    allTypes[name] += 1;
-    return `${name}${allTypes[name]}`;
+    allTypes.set(name, counter + 1);
+    return `${name}${counter}`;
   }
 
   return (obj: d.TypesImportData, typeReferences: { [key: string]: d.ComponentCompilerTypeReference }) => {

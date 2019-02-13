@@ -293,29 +293,21 @@ function getAllTypeReferences(node: ts.Node): string[] {
   const referencedTypes: string[] = [];
 
   function visit(node: ts.Node): ts.VisitResult<ts.Node> {
-    switch (node.kind) {
-    case ts.SyntaxKind.TypeReference:
-      const typeNode = node as ts.TypeReferenceNode;
-
-      if (ts.isIdentifier(typeNode.typeName)) {
-        const typeName = typeNode.typeName as ts.Identifier;
+    if (ts.isTypeReferenceNode(node)) {
+      if (ts.isIdentifier(node.typeName)) {
+        const typeName = node.typeName as ts.Identifier;
         referencedTypes.push(typeName.escapedText.toString());
       }
-      if (typeNode.typeArguments) {
-        typeNode.typeArguments
+      if (node.typeArguments) {
+        node.typeArguments
           .filter(ta => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
             const typeName = tr.typeName as ts.Identifier;
             referencedTypes.push(typeName.escapedText.toString());
           });
       }
-    /* tslint:disable */
-    default:
-      return ts.forEachChild(node, (node) => {
-        return visit(node);
-      });
     }
-    /* tslint:enable */
+    return ts.forEachChild(node, visit);
   }
 
   visit(node);

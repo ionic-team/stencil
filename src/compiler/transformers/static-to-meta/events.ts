@@ -16,7 +16,8 @@ export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.Component
       bubbles: parsedEvent.bubbles,
       cancelable: parsedEvent.cancelable,
       composed: parsedEvent.composed,
-      docs: parsedEvent.docs
+      docs: parsedEvent.docs,
+      complexType: parsedEvent.complexType
     };
   });
 }

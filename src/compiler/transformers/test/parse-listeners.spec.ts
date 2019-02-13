@@ -13,8 +13,14 @@ describe('parse listeners', () => {
         }
       }
     `);
-    expect(t.listeners[0].name).toBe('click');
-    expect(t.listeners[0].method).toBe('onClick');
+    expect(t.listeners).toEqual([{
+      name: 'click',
+      method: 'onClick',
+      capture: false,
+      disabled: false,
+      passive: false,
+      target: undefined
+    }]);
   });
 
   it('target', () => {
@@ -27,9 +33,14 @@ describe('parse listeners', () => {
         }
       }
     `);
-    expect(t.listeners[0].name).toBe('resize');
-    expect(t.listeners[0].method).toBe('windowResize');
-    expect(t.listeners[0].target).toBe('window');
+    expect(t.listeners).toEqual([{
+      name: 'resize',
+      method: 'windowResize',
+      target: 'window',
+      capture: false,
+      disabled: false,
+      passive: true,
+    }]);
   });
 
   it('multiple listeners', () => {
@@ -46,12 +57,24 @@ describe('parse listeners', () => {
         }
       }
     `);
-
-    expect(t.listeners[0].name).toBe('click');
-    expect(t.listeners[0].method).toBe('onClick');
-
-    expect(t.listeners[1].name).toBe('mousedown');
-    expect(t.listeners[1].method).toBe('onMouseDown');
+    expect(t.listeners).toEqual([
+      {
+        name: 'click',
+        method: 'onClick',
+        capture: false,
+        disabled: false,
+        passive: false,
+        target: undefined
+      },
+      {
+        name: 'mousedown',
+        method: 'onMouseDown',
+        capture: false,
+        disabled: false,
+        passive: true,
+        target: undefined
+      }
+    ]);
   });
 
   it('multiple listener decorators on same method', () => {
@@ -65,12 +88,58 @@ describe('parse listeners', () => {
         }
       }
     `);
-
-    expect(t.listeners[0].name).toBe('touchend');
-    expect(t.listeners[0].method).toBe('onUp');
-
-    expect(t.listeners[1].name).toBe('mouseup');
-    expect(t.listeners[1].method).toBe('onUp');
+    expect(t.listeners).toEqual([
+      {
+        name: 'touchend',
+        method: 'onUp',
+        capture: false,
+        disabled: false,
+        passive: true,
+        target: undefined
+      },
+      {
+        name: 'mouseup',
+        method: 'onUp',
+        capture: false,
+        disabled: false,
+        passive: true,
+        target: undefined
+      }
+    ]);
   });
 
+  it('different defaults', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Listen('touchend', {
+          capture: true,
+          passive: false,
+          enabled: false,
+        })
+        @Listen('click', { passive: true, target: 'document' })
+        onEvent(ev: UIEvent) {
+          console.log('up!');
+        }
+      }
+    `);
+    expect(t.listeners).toEqual([
+      {
+        name: 'touchend',
+        method: 'onEvent',
+        capture: true,
+        disabled: true,
+        passive: false,
+        target: undefined
+      },
+      {
+        name: 'click',
+        method: 'onEvent',
+        capture: false,
+        disabled: false,
+        passive: true,
+        target: 'document'
+      }
+    ]);
+  });
 });

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { dashToPascalCase } from '@utils';
+import { dashToPascalCase, sortBy } from '@utils';
 import { generateEventTypes } from './generate-event-types';
 import { generateMethodTypes } from './generate-method-types';
 import { generatePropTypes } from './generate-prop-types';
@@ -11,27 +11,27 @@ import { generatePropTypes } from './generate-prop-types';
  * @param cmp the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath: string) {
+export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath: string): d.TypesModule {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
 
-  const propAttributes = generatePropTypes(cmp.properties);
+  const propAttributes = generatePropTypes(cmp);
   const methodAttributes = generateMethodTypes(cmp.methods);
   const eventAttributes = generateEventTypes(cmp.events);
 
-  const stencilComponentAttributes = attributesToMultiLineString({
+  const stencilComponentAttributes = attributesToMultiLineString([
     ...propAttributes,
     ...methodAttributes
-  }, false);
+  ], false);
 
-  const stencilComponentJSXAttributes = attributesToMultiLineString({
+  const stencilComponentJSXAttributes = attributesToMultiLineString([
     ...propAttributes,
     ...eventAttributes
-  }, true);
+  ], true);
 
-  const typesModule: d.TypesModule = {
+  return {
     tagNameAsPascal: tagNameAsPascal,
     StencilComponents: `
 interface ${tagNameAsPascal} {${
@@ -51,34 +51,25 @@ var ${interfaceName}: {
     ElementTagNameMap: `'${tagName}': ${interfaceName};`,
     IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
   };
-
-  return typesModule;
 }
 
 
 function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') {
-  if (Object.keys(attributes).length === 0) {
-    return '';
-  }
-
-  return Object.keys(attributes)
-    .sort()
-    .reduce((fullList, key) => {
-      const type = attributes[key];
-      if (type.public || !jsxAttributes) {
-        if (type.jsdoc) {
-          fullList.push(`/**`);
-          fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
-          fullList.push(` */`);
-        }
-        const optional = (jsxAttributes)
-          ? !type.required
-          : type.optional;
-
-        fullList.push(`'${key}'${ optional ? '?' : '' }: ${type.type};`);
+  return sortBy(attributes, a => a.name)
+    .filter(type => type.public || !jsxAttributes)
+    .reduce((fullList, type) => {
+      if (type.jsdoc) {
+        fullList.push(`/**`);
+        fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+        fullList.push(` */`);
       }
+      const optional = (jsxAttributes)
+        ? !type.required
+        : type.optional;
+
+      fullList.push(`'${type.name}'${ optional ? '?' : '' }: ${type.type};`);
       return fullList;
-    }, <string[]>[])
+    }, [] as string[])
     .map(item => `${paddingString}${item}`)
     .join(`\n`);
 }

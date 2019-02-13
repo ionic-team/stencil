@@ -12,7 +12,9 @@ describe('parse states', () => {
     `);
 
     expect(getStaticGetter(t.outputText, 'states')).toEqual({ 'val': {} });
-    expect(t.state.name).toBe('val');
+    expect(t.state).toEqual({
+      name: 'val'
+    });
   });
 
 });

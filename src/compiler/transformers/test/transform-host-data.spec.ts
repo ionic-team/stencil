@@ -1,4 +1,4 @@
-import { getStaticGetter, transpileModule } from './transpile';
+import { transpileModule } from './transpile';
 
 
 describe('transform hostData', () => {
@@ -15,7 +15,7 @@ describe('transform hostData', () => {
       }
     `);
 
-    expect(t.outputText).toEqual('export class CmpA { hostData() { return { \'role\': \'alert\' }; } render() { return h("host", this.hostData()); } static get is() { return "cmp-a"; }}');
+    expect(t.outputText).toEqual('export class CmpA { hostData() { return { \'role\': \'alert\' }; } render() { return __stencil_h("host", this.hostData()); } static get is() { return "cmp-a"; }}');
   });
 
   it('should rename render()', () => {
@@ -33,7 +33,7 @@ describe('transform hostData', () => {
       }
     `);
 
-    expect(t.outputText).toEqual('export class CmpA { hostData() { return { \'role\': \'alert\' }; } __internalRender_() { return h("h1", null, "Hola"); } render() { return h("host", this.hostData(), this.__internalRender_()); } static get is() { return "cmp-a"; }}');
+    expect(t.outputText).toEqual('export class CmpA { hostData() { return { \'role\': \'alert\' }; } __internalRender_() { return h("h1", null, "Hola"); } render() { return __stencil_h("host", this.hostData(), this.__internalRender_()); } static get is() { return "cmp-a"; }}');
   });
 
   it('should not renamed render()', () => {

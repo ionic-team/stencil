@@ -16,7 +16,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -49,7 +49,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -78,7 +78,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'defaultValue': undefined,
         'docs': {
@@ -108,7 +108,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -137,7 +137,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': '{}', // TODO, needs to be string[]
-          'text': 'string[]'
+          'original': 'string[]'
         },
         'docs': {
           'text': '',
@@ -171,7 +171,7 @@ describe('parse props', () => {
             }
           },
           'resolved': 'any',
-          'text': 'Object'
+          'original': 'Object'
         },
         'docs': {
           'text': '',
@@ -202,7 +202,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -233,7 +233,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -263,7 +263,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'number',
-          'text': 'number'
+          'original': 'number'
         },
         'docs': {
           'text': '',
@@ -293,7 +293,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'boolean',
-          'text': 'boolean'
+          'original': 'boolean'
         },
         'docs': {
           'text': '',
@@ -323,7 +323,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'any',
-          'text': 'any'
+          'original': 'any'
         },
         'docs': {
           'text': '',
@@ -353,7 +353,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'string',
-          'text': 'string'
+          'original': 'string'
         },
         'docs': {
           'text': '',
@@ -384,7 +384,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'number',
-          'text': 'number'
+          'original': 'number'
         },
         'docs': {
           'text': '',
@@ -415,7 +415,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'boolean',
-          'text': 'boolean'
+          'original': 'boolean'
         },
         'docs': {
           'text': '',
@@ -447,7 +447,7 @@ describe('parse props', () => {
         'complexType': {
           'references': {},
           'resolved': 'any',
-          'text': 'any'
+          'original': 'any'
         },
         'docs': {
           'text': '',

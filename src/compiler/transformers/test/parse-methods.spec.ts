@@ -28,7 +28,19 @@ describe('parse methods', () => {
         'tags': []
       }
     } });
-    expect(t.method.name).toBe('someMethod');
+
+    expect(t.method).toEqual({
+      'complexType': {
+        'parameters': [],
+        'returns': {'docs': '', 'type': 'void'},
+        'signature': '() => void'
+      },
+      'docs': {
+        'tags': [],
+        'text': ''
+      },
+      'name': 'someMethod'
+    });
   });
 
 });

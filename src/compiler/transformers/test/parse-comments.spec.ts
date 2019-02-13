@@ -39,7 +39,7 @@ describe('parse comments', () => {
       'complexType': {
         'references': {},
         'resolved': '"md"',
-        'text': '\'md\'',
+        'original': '\'md\'',
       },
       'defaultValue': undefined,
       'docs': {
@@ -83,6 +83,11 @@ describe('parse comments', () => {
       'docs': {
         'tags': [],
         'text': 'This is an event',
+      },
+      'complexType': {
+        'original': 'any',
+        'references': {},
+        'resolved': 'any',
       },
       'method': 'event',
       'name': 'event',

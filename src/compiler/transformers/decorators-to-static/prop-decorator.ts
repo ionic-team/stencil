@@ -123,7 +123,7 @@ function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaratio
   const sourceFile = node.getSourceFile();
   const nodeType = node.type;
   return {
-    text: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
+    original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
     references: getAttributeTypeInfo(node, sourceFile)
   };

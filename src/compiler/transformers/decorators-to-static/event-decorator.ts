@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed, serializeSymbol } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -37,10 +37,10 @@ function parseEventDecorator(diagnostics: d.Diagnostic[], _sourceFile: ts.Source
     bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
     cancelable: opts && typeof opts.cancelable === 'boolean' ? opts.cancelable : true,
     composed: opts && typeof opts.composed === 'boolean' ? opts.composed : true,
-    docs: serializeSymbol(typeChecker, symbol)
+    docs: serializeSymbol(typeChecker, symbol),
+    complexType: getComplexType(typeChecker, prop)
   };
 }
-
 
 export function getEventName(diagnostics: d.Diagnostic[], eventOptions: d.EventOptions, memberName: string) {
   if (eventOptions && typeof eventOptions.eventName === 'string' && eventOptions.eventName.trim().length > 0) {
@@ -55,6 +55,26 @@ export function getEventName(diagnostics: d.Diagnostic[], eventOptions: d.EventO
   return memberName;
 }
 
+function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType {
+  const sourceFile = node.getSourceFile();
+  const eventType = node.type ? getEventType(node.type) : null;
+  return {
+    original: eventType ? eventType.getText() : 'any',
+    resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
+    references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {}
+  };
+}
+
+function getEventType(type: ts.TypeNode): ts.TypeNode | null {
+  if (ts.isTypeReferenceNode(type) &&
+    ts.isIdentifier(type.typeName) &&
+    type.typeName.text === 'EventEmitter' &&
+    type.typeArguments &&
+    type.typeArguments.length > 0) {
+      return type.typeArguments[0];
+  }
+  return null;
+}
 
 export function validateEventEmitterMemeberName(diagnostics: d.Diagnostic[], memberName: string) {
   const firstChar = memberName.charAt(0);

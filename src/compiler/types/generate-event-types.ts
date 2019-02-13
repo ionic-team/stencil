@@ -2,27 +2,17 @@ import * as d from '@declarations';
 import { captializeFirstLetter, isDocsPublic } from '@utils';
 
 
-export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]) {
-  const interfaceData: d.TypeInfo = {};
-
-  cmpEvents.forEach(cmpEvent => {
-
-    const memberName = `on${captializeFirstLetter(cmpEvent.name)}`;
-
-    const eventType = 'any /**TODO**/'; // (cmpEvent.eventType) ? `CustomEvent<${cmpEvent.eventType.text}>` : `CustomEvent`;
-
-    interfaceData[memberName] = {
-      type: `(event: ${eventType}) => void`, // TODO this is not good enough
+export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo {
+  return cmpEvents.map(cmpEvent => {
+    const name = `on${captializeFirstLetter(cmpEvent.name)}`;
+    const type = (cmpEvent.complexType.original) ? `CustomEvent<${cmpEvent.complexType.original}>` : `CustomEvent`;
+    return {
+      name,
+      type,
       optional: false,
       required: false,
-      public: isDocsPublic(cmpEvent.docs)
+      public: isDocsPublic(cmpEvent.docs),
+      jsdoc: (cmpEvent.docs != null && typeof cmpEvent.docs.text === 'string') ? cmpEvent.docs.text : undefined
     };
-
-    if (cmpEvent.docs != null && typeof cmpEvent.docs.text === 'string') {
-      interfaceData[memberName].jsdoc = cmpEvent.docs.text;
-    }
-
   });
-
-  return interfaceData;
 }

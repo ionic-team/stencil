@@ -338,6 +338,11 @@ function parseEvents(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCom
       docs: {
         text: 'TODO',
         tags: []
+      },
+      complexType: {
+        original: 'TODO',
+        resolved: 'TODO',
+        references: {}
       }
     };
     return event;

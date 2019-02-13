@@ -21,12 +21,11 @@ export interface TypesModule {
 }
 
 
-export interface TypeInfo {
-  [key: string]: {
-    type: string;
-    optional: boolean;
-    required: boolean;
-    public: boolean;
-    jsdoc?: string;
-  };
-}
+export type TypeInfo = {
+  name: string,
+  type: string;
+  optional: boolean;
+  required: boolean;
+  public: boolean;
+  jsdoc?: string;
+}[];

@@ -66,7 +66,7 @@ function getProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsPro
     .filter(member => isDocsPublic(member.docs))
     .map(member => ({
       name: member.name,
-      type: member.complexType.text,
+      type: member.complexType.resolved,
       mutable: member.mutable,
       attr: member.attribute,
       reflectToAttr: !!member.reflect,

@@ -43,14 +43,12 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
  */
 async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], destination: string) {
   let typeImportData: d.TypesImportData = {};
-  const allTypes: { [key: string]: number } = {};
+  const allTypes = new Map<string, number>();
   const defineGlobalIntrinsicElements = destination === 'src';
-
   const collectionTypesImports = await getCollectionsTypeImports(compilerCtx, defineGlobalIntrinsicElements);
-  const collectionTypesImportsString = collectionTypesImports.map(cti => {
-    return `import '${cti.pkgName}';`;
-  })
-  .join('\n');
+  const collectionTypesImportsString = collectionTypesImports
+    .map(cti => `import '${cti.pkgName}';`)
+    .join('\n');
 
   const modules = moduleFiles.reduce((modules, moduleFile) => {
     moduleFile.cmps.forEach(cmp => {
