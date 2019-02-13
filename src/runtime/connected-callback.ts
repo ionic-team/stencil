@@ -79,8 +79,23 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.taskQueue) {
+      // Lazy properties
+      // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+      if (BUILD.prop && cmpMeta.cmpMembers) {
+        Object.keys(cmpMeta.cmpMembers).forEach(memberName => {
+          if (elm.hasOwnProperty(memberName)) {
+            const value = (elm as any)[memberName];
+            delete (elm as any)[memberName];
+            (elm as any)[memberName] = value;
+          }
+        });
+      }
+
+      if (BUILD.taskQueue && BUILD.mode) {
         // connectedCallback, taskQueue, initialLoad
+        // angular sets attribute AFTER connectCallback
+        // https://github.com/angular/angular/issues/18909
+        // https://github.com/angular/angular/issues/19940
         tick.then(() => initializeComponent(elm, hostRef, cmpMeta));
 
       } else {

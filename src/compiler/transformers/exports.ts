@@ -5,6 +5,7 @@ export const GET_CONTEXT = '__stencil_getContext';
 export const GET_ELEMENT = '__stencil_getElement';
 export const REGISTER_INSTANCE = '__stencil_registerInstance';
 export const REGISTER_HOST = '__stencil_registerHost';
+export const CONNECTED_CALLBACK = '__stencil_connectedCallback';
 export const H = '__stencil_h';
 
 export const COMMON_IMPORTS = [

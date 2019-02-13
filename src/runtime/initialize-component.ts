@@ -1,15 +1,14 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, loadModule, styles, writeTask } from '@platform';
+import { consoleError, loadModule, styles } from '@platform';
 import { HOST_STATE } from '@utils';
 import { proxyComponent } from './proxy-component';
-import { updateComponent } from './update-component';
+import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-
   if (!(hostRef.flags & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
     hostRef.flags |= HOST_STATE.hasInitializedComponent;
@@ -96,14 +95,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       );
 
     } else {
-      // there is no ancestorc omponent or the ancestor component
-      // has already fired off its lifecycle update then
-      // fire off the initial update
-      if (BUILD.taskQueue) {
-        writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
-      } else {
-        updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
-      }
+      scheduleUpdate(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
     }
   }
 };

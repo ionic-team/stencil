@@ -1,19 +1,11 @@
 import * as d from '@declarations';
 import { attachStyles, getElementScopeId } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, plt } from '@platform';
+import { consoleError, plt, writeTask } from '@platform';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
-
-export const updateComponent = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
-  // updateComponent
-  if (BUILD.updatable) {
-    hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
-  }
-
-  elm['s-lr'] = false;
-
+export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
@@ -37,41 +29,48 @@ export const updateComponent = async (elm: d.HostElement, instance: any, hostRef
   } catch (e) {
     consoleError(e);
   }
+  // there is no ancestorc omponent or the ancestor component
+  // has already fired off its lifecycle update then
+  // fire off the initial update
+  if (BUILD.taskQueue) {
+    // LIFECYCHE
+    if (BUILD.updatable) {
+      hostRef.flags |= HOST_STATE.isQueuedForUpdate;
+    }
+    writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
+  } else {
+    // syncronuously write DOM
+    updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+  }
+};
+
+const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+  // updateComponent
+  if (BUILD.updatable && BUILD.taskQueue) {
+    hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
+  }
+
+  elm['s-lr'] = false;
 
   if (isInitialLoad) {
-    if (BUILD.slotRelocation) {
-      // initUpdate, BUILD.slotPolyfill
-      // if the slot polyfill is required we'll need to put some nodes
-      // in here to act as original content anchors as we move nodes around
-      // host element has been connected to the DOM
-      if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
-        // only required when we're NOT using native shadow dom (slot)
-        // or this browser doesn't support native shadow dom
-        // and this host element was NOT created with SSR
-        // let's pick out the inner content for slot projection
-        // create a node to represent where the original
-        // content was first placed, which is useful later on
-        // DOM WRITE!!
-        const scopeId = elm['s-sc'] = (BUILD.mode)
-          ? 'sc-' + cmpMeta.cmpTag + (hostRef.modeName ? '-' + hostRef.modeName : '')
-          : 'sc-' + cmpMeta.cmpTag;
+    if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
+      // only required when we're NOT using native shadow dom (slot)
+      // or this browser doesn't support native shadow dom
+      // and this host element was NOT created with SSR
+      // let's pick out the inner content for slot projection
+      // create a node to represent where the original
+      // content was first placed, which is useful later on
+      // DOM WRITE!!
+      const scopeId = elm['s-sc'] = (BUILD.mode)
+        ? 'sc-' + cmpMeta.cmpTag + (hostRef.modeName ? '-' + hostRef.modeName : '')
+        : 'sc-' + cmpMeta.cmpTag;
 
-        elm.classList.add(getElementScopeId(scopeId, true));
+      elm.classList.add(getElementScopeId(scopeId, true));
 
-        if (cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
-          elm.classList.add(getElementScopeId(scopeId, false));
-        }
+      if (cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
+        elm.classList.add(getElementScopeId(scopeId, false));
       }
     }
-
-    if (BUILD.shadowDom && plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
-      // DOM WRITE
-      // this component is using shadow dom
-      // and this browser supports shadow dom
-      // add the read-only property "shadowRoot" to the host element
-      elm.attachShadow({ 'mode': 'open' });
-    }
-
     if (BUILD.style) {
       // DOM WRITE!
       attachStyles(elm, cmpMeta, hostRef.modeName);

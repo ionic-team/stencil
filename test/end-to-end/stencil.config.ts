@@ -9,7 +9,15 @@ export const config: Config = {
 
   testing: {
   },
-
+  outputTargets: [
+    {
+      type: 'www',
+      serviceWorker: null
+    },
+    {
+      type: 'dist'
+    }
+  ],
   enableCache: false
 
 };

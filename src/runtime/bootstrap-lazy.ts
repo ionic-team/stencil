@@ -3,9 +3,10 @@ import { BUILD } from '@build-conditionals';
 import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { doc, getHostRef, registerHost } from '@platform';
-import { postUpdateComponent, updateComponent } from './update-component';
+import { doc, getHostRef, plt, registerHost } from '@platform';
+import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
+import { CMP_FLAG } from '@utils';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
@@ -24,6 +25,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         constructor() {
           super();
           registerHost(this);
+          if (BUILD.shadowDom && plt.supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
+            // DOM WRITE
+            // this component is using shadow dom
+            // and this browser supports shadow dom
+            // add the read-only property "shadowRoot" to the host element
+            this.attachShadow({ 'mode': 'open' });
+          }
         }
 
         connectedCallback() {
@@ -46,7 +54,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         forceUpdate() {
           if (BUILD.updatable) {
             const hostRef = getHostRef(this);
-            updateComponent(
+            scheduleUpdate(
               this,
               BUILD.lazyLoad ? hostRef.lazyInstance : this,
               hostRef,

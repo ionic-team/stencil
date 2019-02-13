@@ -8,6 +8,9 @@
 import { JSXElements } from '@stencil/core';
 
 
+import {
+  CarData,
+} from 'import';
 
 
 export namespace Components {
@@ -15,11 +18,22 @@ export namespace Components {
   interface AppRoot {}
   interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CarDetail {}
-  interface CarDetailAttributes extends JSXElements.HTMLAttributes {}
+  interface CarDetail {
+    'car': unknown;
+  }
+  interface CarDetailAttributes extends JSXElements.HTMLAttributes {
+    'car'?: unknown;
+  }
 
-  interface CarList {}
-  interface CarListAttributes extends JSXElements.HTMLAttributes {}
+  interface CarList {
+    'cars': unknown;
+    'selected': unknown;
+  }
+  interface CarListAttributes extends JSXElements.HTMLAttributes {
+    'cars'?: unknown;
+    'onCarSelected'?: (ev: CustomEvent<CarData>) => void;
+    'selected'?: unknown;
+  }
 
   interface DomApi {}
   interface DomApiAttributes extends JSXElements.HTMLAttributes {}
@@ -33,17 +47,41 @@ export namespace Components {
   interface ElementCmp {}
   interface ElementCmpAttributes extends JSXElements.HTMLAttributes {}
 
-  interface EventCmp {}
-  interface EventCmpAttributes extends JSXElements.HTMLAttributes {}
+  interface EventCmp {
+    'methodThatFiresEventWithOptions': () => void;
+    'methodThatFiresMyDocumentEvent': () => void;
+    'methodThatFiresMyWindowEvent': (value: number) => void;
+  }
+  interface EventCmpAttributes extends JSXElements.HTMLAttributes {
+    'onMy-event-with-options'?: (ev: CustomEvent<{ mph: number }>) => void;
+    'onMyDocumentEvent'?: (ev: CustomEvent<any>) => void;
+    'onMyWindowEvent'?: (ev: CustomEvent<number>) => void;
+  }
 
-  interface ListenCmp {}
-  interface ListenCmpAttributes extends JSXElements.HTMLAttributes {}
+  interface ListenCmp {
+    'opened': boolean;
+  }
+  interface ListenCmpAttributes extends JSXElements.HTMLAttributes {
+    'opened'?: boolean;
+  }
 
-  interface MethodCmp {}
-  interface MethodCmpAttributes extends JSXElements.HTMLAttributes {}
+  interface MethodCmp {
+    'someMethod': () => Promise<number>;
+    'someMethodWithArgs': (unit: string, value: number) => Promise<string>;
+    'someProp': number;
+  }
+  interface MethodCmpAttributes extends JSXElements.HTMLAttributes {
+    'someProp'?: number;
+  }
 
-  interface PropCmp {}
-  interface PropCmpAttributes extends JSXElements.HTMLAttributes {}
+  interface PropCmp {
+    'first': string;
+    'lastName': string;
+  }
+  interface PropCmpAttributes extends JSXElements.HTMLAttributes {
+    'first'?: string;
+    'lastName'?: string;
+  }
 
   interface StateCmp {}
   interface StateCmpAttributes extends JSXElements.HTMLAttributes {}

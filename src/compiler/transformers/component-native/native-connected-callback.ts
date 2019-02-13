@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { CONNECTED_CALLBACK } from '../exports';
 
 
 export function addNativeConnectedCallback(classMembers: ts.ClassElement[]) {
@@ -10,7 +11,7 @@ export function addNativeConnectedCallback(classMembers: ts.ClassElement[]) {
   ];
 
   const fnCall = ts.createCall(
-    ts.createIdentifier(methodName), undefined, args
+    ts.createIdentifier(CONNECTED_CALLBACK), undefined, args
   );
 
   const connectedCallback = classMembers.find(classMember => {

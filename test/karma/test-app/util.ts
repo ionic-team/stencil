@@ -87,7 +87,9 @@ export function setupDomTests(document: Document) {
 
           function appLoad() {
             window.removeEventListener('stencil_appload', appLoad);
-            resolve(app);
+            setTimeout(() => {
+              resolve(app);
+            }, 100);
           }
 
           window.addEventListener('stencil_appload', appLoad);

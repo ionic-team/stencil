@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, getHostRef, writeTask } from '@platform';
+import { consoleError, getHostRef } from '@platform';
 import { HOST_STATE } from '@utils';
 import { parsePropertyValue } from './parse-property-value';
-import { updateComponent } from './update-component';
+import { scheduleUpdate } from './update-component';
 
 
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -51,16 +51,12 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           // but only if we've already rendered, otherwise just chill out
           // queue that we need to do an update, but don't worry about queuing
           // up millions cuz this function ensures it only runs once
-          hostRef.flags |= HOST_STATE.isQueuedForUpdate;
-
-          writeTask(() =>
-            updateComponent(
-              elm,
-              (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
-              hostRef,
-              cmpMeta,
-              false
-            )
+          scheduleUpdate(
+            elm,
+            (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
+            hostRef,
+            cmpMeta,
+            false
           );
 
         }
