@@ -33,6 +33,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
   }
 
   const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
+  const docs = serializeSymbol(typeChecker, symbol);
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -41,6 +42,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation: parseStaticEncapsulation(staticMembers),
     properties: parseStaticProps(staticMembers),
+    virtualProperties: parseVirtualProps(docs),
     states: parseStaticStates(staticMembers),
     methods: parseStaticMethods(staticMembers),
     listeners: parseStaticListeners(staticMembers),
@@ -49,7 +51,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     styles: parseStaticStyles(tagName, moduleFile.sourceFilePath, staticMembers),
     styleDocs: [],
     dependencies: [],
-    docs: serializeSymbol(typeChecker, symbol),
+    docs,
     jsFilePath: null,
     sourceFilePath: null,
 
@@ -147,4 +149,24 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
   nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
+}
+
+function parseVirtualProps(docs: d.CompilerJsDoc) {
+  return docs.tags
+    .filter(({name}) => name === 'virtualProp')
+    .map(parseVirtualProp)
+    .filter(prop => !!prop);
+}
+
+function parseVirtualProp(tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtualProperty {
+  const results = /^\s*(?:\{([^}]+)\}\s+)?(\w+)\s+-\s+(.*)$/.exec(tag.text);
+  if (!results) {
+    return undefined;
+  }
+  const [, type, name, docs] = results;
+  return {
+    type: type == null ? 'any' : type.trim(),
+    name: name.trim(),
+    docs: docs.trim()
+  };
 }

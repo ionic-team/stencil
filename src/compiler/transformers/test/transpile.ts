@@ -85,6 +85,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   const tagName = cmp ? cmp.tagName : null;
   const componentClassName = cmp ? cmp.componentClassName : null;
   const properties = cmp ? cmp.properties : null;
+  const virtualProperties = cmp ? cmp.virtualProperties : null;
   const property = properties ? properties[0] : null;
   const states = cmp ? cmp.states : null;
   const state = states ? states[0] : null;
@@ -107,6 +108,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     componentClassName,
     tagName,
     properties,
+    virtualProperties,
     property,
     states,
     state,

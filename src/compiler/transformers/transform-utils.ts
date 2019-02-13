@@ -588,9 +588,7 @@ export function addImports(transformCtx: ts.TransformationContext, tsSourceFile:
 
 export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc {
   return {
-    tags: symbol.getJsDocTags().map(tag => {
-      return {text: tag.text, name: tag.name};
-    }),
+    tags: symbol.getJsDocTags().map(tag => ({text: tag.text, name: tag.name})),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
 }

@@ -62,6 +62,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
+  virtualProperties: ComponentCompilerVirtualProperty[];
   properties: ComponentCompilerProperty[];
   watchers: ComponentCompilerWatch[];
   sourceFilePath: string;
@@ -89,6 +90,12 @@ export interface ComponentCompilerStaticProperty {
 
 export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
   name: string;
+}
+
+export interface ComponentCompilerVirtualProperty {
+  name: string;
+  type: string;
+  docs: string;
 }
 
 export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
