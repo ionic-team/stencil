@@ -6,6 +6,9 @@ import { CMP_FLAG, HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
 export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+  if (BUILD.taskQueue && BUILD.updatable) {
+    hostRef.flags |= HOST_STATE.isQueuedForUpdate;
+  }
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
