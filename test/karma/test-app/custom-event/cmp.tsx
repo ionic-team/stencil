@@ -1,7 +1,7 @@
 import { Component, Element, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'custom-event'
+  tag: 'custom-event-root'
 })
 export class CustomEventCmp {
 

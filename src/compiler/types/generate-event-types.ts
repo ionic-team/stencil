@@ -5,7 +5,7 @@ import { captializeFirstLetter, isDocsPublic } from '@utils';
 export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo {
   return cmpEvents.map(cmpEvent => {
     const name = `on${captializeFirstLetter(cmpEvent.name)}`;
-    const type = (cmpEvent.complexType.original) ? `CustomEvent<${cmpEvent.complexType.original}>` : `CustomEvent`;
+    const type = (cmpEvent.complexType.original) ? `(ev: CustomEvent<${cmpEvent.complexType.original}>) => void` : `CustomEvent`;
     return {
       name,
       type,

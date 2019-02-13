@@ -91,8 +91,8 @@ export namespace Components {
   interface CssVariables {}
   interface CssVariablesAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CustomEvent {}
-  interface CustomEventAttributes extends JSXElements.HTMLAttributes {}
+  interface CustomEventRoot {}
+  interface CustomEventRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface DynamicCssVariable {}
   interface DynamicCssVariableAttributes extends JSXElements.HTMLAttributes {}
@@ -110,7 +110,7 @@ export namespace Components {
     'someMethod': () => void;
   }
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {
-    'onSomeEvent'?: (event: any /**TODO**/) => void;
+    'onSomeEvent'?: (ev: CustomEvent<any>) => void;
     'propVal'?: number;
   }
 
@@ -143,8 +143,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleAsyncBAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
-    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -152,8 +152,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleAsyncCAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
-    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -164,8 +164,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleBasicBAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
-    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -173,8 +173,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleBasicCAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (event: any /**TODO**/) => void;
-    'onLifecycleUpdate'?: (event: any /**TODO**/) => void;
+    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -396,7 +396,7 @@ declare global {
     'ConditionalRerender': Components.ConditionalRerender;
     'CssVariablesRoot': Components.CssVariablesRoot;
     'CssVariables': Components.CssVariables;
-    'CustomEvent': Components.CustomEvent;
+    'CustomEventRoot': Components.CustomEventRoot;
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
@@ -477,7 +477,7 @@ declare global {
     'conditional-rerender': Components.ConditionalRerenderAttributes;
     'css-variables-root': Components.CssVariablesRootAttributes;
     'css-variables': Components.CssVariablesAttributes;
-    'custom-event': Components.CustomEventAttributes;
+    'custom-event-root': Components.CustomEventRootAttributes;
     'dynamic-css-variable': Components.DynamicCssVariableAttributes;
     'dynamic-import': Components.DynamicImportAttributes;
     'es5-addclass-svg': Components.Es5AddclassSvgAttributes;
@@ -618,10 +618,10 @@ declare global {
     new (): HTMLCssVariablesElement;
   };
 
-  interface HTMLCustomEventElement extends Components.CustomEvent, HTMLElement {}
-  var HTMLCustomEventElement: {
-    prototype: HTMLCustomEventElement;
-    new (): HTMLCustomEventElement;
+  interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLElement {}
+  var HTMLCustomEventRootElement: {
+    prototype: HTMLCustomEventRootElement;
+    new (): HTMLCustomEventRootElement;
   };
 
   interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLElement {}
@@ -1027,7 +1027,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement
     'css-variables-root': HTMLCssVariablesRootElement
     'css-variables': HTMLCssVariablesElement
-    'custom-event': HTMLCustomEventElement
+    'custom-event-root': HTMLCustomEventRootElement
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
@@ -1108,7 +1108,7 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement;
     'css-variables-root': HTMLCssVariablesRootElement;
     'css-variables': HTMLCssVariablesElement;
-    'custom-event': HTMLCustomEventElement;
+    'custom-event-root': HTMLCustomEventRootElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
