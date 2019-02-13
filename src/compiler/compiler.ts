@@ -77,7 +77,7 @@ export class Compiler implements d.Compiler {
 
   async startDevServer() {
     if (this.config.sys.details.runtime !== 'node') {
-      throw new Error(`Dev Server only availabe in node`);
+      throw new Error(`Dev Server only available in node`);
     }
 
     // start up the dev server
