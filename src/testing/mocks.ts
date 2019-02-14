@@ -45,7 +45,7 @@ export function mockCompilerCtx() {
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        this._fs = new InMemoryFileSystem(mockFs(), { path: path } as any);
+        this._fs = new InMemoryFileSystem(mockFs(), path);
       }
       return this._fs;
     }
@@ -83,7 +83,7 @@ export function mockFs() {
 
 
 export function mockCache() {
-  const fs = new InMemoryFileSystem(mockFs(), { path: path } as any);
+  const fs = new InMemoryFileSystem(mockFs(), path);
   const config = mockConfig();
   config.enableCache = true;
 

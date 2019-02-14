@@ -163,7 +163,7 @@ describe(`in-memory-fs`, () => {
 
   beforeEach(() => {
     mockedFs = mockFs();
-    fs = new InMemoryFileSystem(mockedFs, { path: path } as any);
+    fs = new InMemoryFileSystem(mockedFs, path);
   });
 
 

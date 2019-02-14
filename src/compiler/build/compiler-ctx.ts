@@ -36,10 +36,10 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
 
   constructor(config: d.Config) {
-    this.cache = new Cache(config, new InMemoryFileSystem(sys.fs, sys));
+    this.cache = new Cache(config, new InMemoryFileSystem(sys.fs, sys.path));
     this.cache.initCacheDir();
 
-    this.fs = new InMemoryFileSystem(sys.fs, sys);
+    this.fs = new InMemoryFileSystem(sys.fs, sys.path);
   }
 
   reset() {

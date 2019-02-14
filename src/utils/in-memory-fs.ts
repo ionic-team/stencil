@@ -5,7 +5,7 @@ import { normalizePath } from './normalize-path';
 export class InMemoryFileSystem implements d.InMemoryFileSystem {
   private items: d.FsItems = new Map();
 
-  constructor(public disk: d.FileSystem, private sys: d.StencilSystem) {}
+  constructor(public disk: d.FileSystem, private path: d.Path) {}
 
   async accessData(filePath: string) {
     const item = this.getItem(filePath);
@@ -144,8 +144,8 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     await Promise.all(dirItems.map(async dirItem => {
       // let's loop through each of the files we've found so far
       // create an absolute path of the item inside of this directory
-      const absPath = normalizePath(this.sys.path.join(dirPath, dirItem));
-      const relPath = normalizePath(this.sys.path.relative(initPath, absPath));
+      const absPath = normalizePath(this.path.join(dirPath, dirItem));
+      const relPath = normalizePath(this.path.relative(initPath, absPath));
 
       // get the fs stats for the item, could be either a file or directory
       const stats = await this.stat(absPath);
@@ -371,7 +371,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   async commit() {
-    const instructions = getCommitInstructions(this.sys.path, this.items);
+    const instructions = getCommitInstructions(this.path, this.items);
 
     // ensure directories we need exist
     const dirsAdded = await this.commitEnsureDirs(instructions.dirsToEnsure);
@@ -482,7 +482,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     dirPath = normalizePath(dirPath);
 
     this.items.forEach((_, f) => {
-      const filePath = this.sys.path.relative(dirPath, f).split('/')[0];
+      const filePath = this.path.relative(dirPath, f).split('/')[0];
       if (!filePath.startsWith('.') && !filePath.startsWith('/')) {
         this.clearFileCache(f);
       }

@@ -5,6 +5,7 @@ export interface Compiler {
   build(): Promise<d.BuildResults>;
   config: d.Config;
   docs(): Promise<void>;
+  fs: d.InMemoryFileSystem;
   isValid: boolean;
   startDevServer(): Promise<d.DevServer>;
 }
