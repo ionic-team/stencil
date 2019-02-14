@@ -16,7 +16,7 @@ export function eventDecoratorsToStatic(diagnostics: d.Diagnostic[], sourceFile:
 }
 
 
-function parseEventDecorator(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerEvent {
+function parseEventDecorator(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent {
   const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {

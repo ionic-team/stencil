@@ -55,12 +55,12 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   dependencies: string[];
   elementRef: string;
   encapsulation: Encapsulation;
-  events: ComponentCompilerEvent[];
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
+  events: ComponentCompilerEvent[];
   methods: ComponentCompilerMethod[];
   virtualProperties: ComponentCompilerVirtualProperty[];
   properties: ComponentCompilerProperty[];
@@ -70,6 +70,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styleDocs: CompilerStyleDoc[];
   styles: d.StyleCompiler[];
   tagName: string;
+  internal: boolean;
 }
 
 
@@ -90,6 +91,7 @@ export interface ComponentCompilerStaticProperty {
 
 export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
   name: string;
+  internal: boolean;
 }
 
 export interface ComponentCompilerVirtualProperty {
@@ -115,7 +117,7 @@ export interface ComponentCompilerTypeReference {
   path?: string;
 }
 
-export interface ComponentCompilerEvent {
+export interface ComponentCompilerStaticEvent {
   name: string;
   method: string;
   bubbles: boolean;
@@ -123,6 +125,10 @@ export interface ComponentCompilerEvent {
   composed: boolean;
   docs: CompilerJsDoc;
   complexType: ComponentCompilerEventComplexType;
+}
+
+export interface ComponentCompilerEvent extends ComponentCompilerStaticEvent {
+  internal: boolean;
 }
 
 export interface ComponentCompilerEventComplexType {
@@ -159,6 +165,7 @@ export interface ComponentCompilerWatch {
 
 export interface ComponentCompilerMethod extends ComponentCompilerStaticMethod {
   name: string;
+  internal: boolean;
 }
 
 export interface ComponentCompilerState {

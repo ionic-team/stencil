@@ -607,3 +607,8 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
     return parts.join(' | ');
   }
 }
+
+
+export function isInternal(jsDocs: d.CompilerJsDoc | undefined) {
+  return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
+}

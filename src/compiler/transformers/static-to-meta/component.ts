@@ -5,7 +5,7 @@ import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { convertValueToLiteral, createStaticGetter, getComponentTagName, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getComponentTagName, isStaticGetter, serializeSymbol, isInternal } from '../transform-utils';
 import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
@@ -49,6 +49,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(tagName, moduleFile.sourceFilePath, staticMembers),
+    internal: isInternal(docs),
     styleDocs: [],
     dependencies: [],
     docs,

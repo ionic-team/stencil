@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getStaticValue } from '../transform-utils';
+import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -19,6 +19,7 @@ export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.Componen
       name: methodName,
       docs: parsedMethods[methodName].docs,
       complexType: parsedMethods[methodName].complexType,
+      internal: isInternal(parsedMethods[methodName].docs)
     };
   });
 }

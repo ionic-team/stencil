@@ -187,6 +187,7 @@ function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentComp
       required: false, // TODO
       reflect: !!propData.reflectToAttr,
       type: 'unknown',
+      internal: false,
       docs: {
         text: 'TODO',
         tags: []
@@ -258,6 +259,7 @@ function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCo
   cmpMeta.methods = cmpData.methods.map(methodData => {
     const method: d.ComponentCompilerMethod = {
       name: methodData.name,
+      internal: false,
       complexType: {
         signature: '',
         parameters: [],
@@ -333,6 +335,7 @@ function parseEvents(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCom
       bubbles: (eventData.bubbles !== false),
       cancelable: (eventData.cancelable !== false),
       composed: (eventData.composed !== false),
+      internal: false,
       docs: {
         text: 'TODO',
         tags: []

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getStaticValue } from '../transform-utils';
+import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -17,7 +17,8 @@ export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.Component
       cancelable: parsedEvent.cancelable,
       composed: parsedEvent.composed,
       docs: parsedEvent.docs,
-      complexType: parsedEvent.complexType
+      complexType: parsedEvent.complexType,
+      internal: isInternal(parsedEvent.docs)
     };
   });
 }

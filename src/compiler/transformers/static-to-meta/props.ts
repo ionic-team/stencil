@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getStaticValue } from '../transform-utils';
+import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -26,7 +26,8 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
       optional: !!val.optional,
       defaultValue: val.defaultValue,
       complexType: val.complexType,
-      docs: val.docs
+      docs: val.docs,
+      internal: isInternal(val.docs)
     };
   });
 }

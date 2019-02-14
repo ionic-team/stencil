@@ -1,6 +1,5 @@
 import * as d from '@declarations';
-import { dashToPascalCase } from '@utils';
-import { isDocsPublic } from '@utils';
+import { dashToPascalCase, sortBy } from '@utils';
 import { sys } from '@sys';
 
 
@@ -44,13 +43,8 @@ function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
     return cmps;
   }, [] as d.ComponentCompilerMeta[]);
 
-  return cmps
-    .filter(c => !excludeComponents.includes(c.tagName) && isDocsPublic(c.docs))
-    .sort((a, b) => {
-      if (a.tagName < b.tagName) return -1;
-      if (a.tagName > b.tagName) return 1;
-      return 0;
-    });
+  return sortBy(cmps, cmp => cmp.tagName)
+    .filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 }
 
 function generateProxies(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
@@ -113,7 +107,7 @@ export class ${tagNameAsPascal} {`];
     lines.push(`  ${output}!: EventEmitter<CustomEvent>;`);
   });
 
-  lines.push('  el: HTMLElement;');
+  lines.push('  protected el: HTMLElement;');
   lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef) {
     c.detach();
     this.el = r.nativeElement;`);
@@ -133,28 +127,16 @@ export class ${tagNameAsPascal} {`];
   return lines.join('\n');
 }
 
-function getInputs(cmpMeta: d.ComponentCompilerMeta) {
-  return cmpMeta.properties.filter(_prop => {
-    // TODO
-    // return isDocsPublic(prop.jsdoc);
-    return false;
-  });
+function getInputs(cmpMeta: d.ComponentCompilerMeta): string[] {
+  return cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name);
 }
 
-function getOutputs(cmpMeta: d.ComponentCompilerMeta) {
-  return cmpMeta.events.filter(_event => {
-    // TODO
-    // return isDocsPublic(event.jsdoc);
-    return false;
-  }).map(eventMeta => eventMeta.name);
+function getOutputs(cmpMeta: d.ComponentCompilerMeta): string[] {
+  return cmpMeta.events.filter(ev => !ev.internal).map(prop => prop.name)
 }
 
-function getMethods(cmpMeta: d.ComponentCompilerMeta) {
-  return cmpMeta.methods.filter(_method => {
-    // TODO
-    // return isDocsPublic(method.jsdoc);
-    return false;
-  });
+function getMethods(cmpMeta: d.ComponentCompilerMeta): string[] {
+  return cmpMeta.methods.filter(method => !method.internal).map(prop => prop.name)
 }
 
 function getProxyUtils(outputTarget: d.OutputTargetAngular) {
