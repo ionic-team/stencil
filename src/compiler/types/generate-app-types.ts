@@ -71,6 +71,11 @@ ${modules.map(m => {
 .join('\n')}
 }
 
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
+
 declare global {
 interface StencilElementInterfaces {
 ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}

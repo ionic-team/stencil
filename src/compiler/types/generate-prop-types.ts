@@ -6,7 +6,7 @@ export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
   return [
     ...cmpMeta.properties.map(cmpProp => ({
       name: cmpProp.name,
-      type: cmpProp.type,
+      type: cmpProp.complexType.original,
       optional: cmpProp.optional,
       required: cmpProp.required,
       public: isDocsPublic(cmpProp.docs),

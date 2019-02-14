@@ -400,7 +400,7 @@ export function resolveType(checker: ts.TypeChecker, type: ts.Type): string {
 const TYPE_FORMAT_FLAGS =
   ts.TypeFormatFlags.NoTruncation |
   ts.TypeFormatFlags.InTypeAlias |
-  ts.TypeFormatFlags.InElementType | ts.TypeFormatFlags.WriteArrayAsGenericType;
+  ts.TypeFormatFlags.InElementType;
 
 export function typeToString(checker: ts.TypeChecker, type: ts.Type) {
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);

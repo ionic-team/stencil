@@ -15,26 +15,19 @@ import { logger, sys } from '@sys';
 export function updateReferenceTypeImports(importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
-  importDataObj = cmp.properties
-    .filter(cmpProp => cmpProp.complexType && cmpProp.complexType.references)
-    .reduce((obj, cmpProp) => {
-      return updateImportReferences(obj, cmpProp.complexType.references);
-    }, importDataObj);
-
-  // TODO!!
-  // cmpMeta.eventsMeta
-  //   .filter((meta: d.EventMeta) => {
-  //     return meta.eventType && meta.eventType.typeReferences;
-  //   })
-  //   .reduce((obj, meta) => {
-  //     return updateImportReferences(obj, meta.eventType.typeReferences);
-  //   }, importDataObj);
-
-  return importDataObj;
+  return [
+    ...cmp.properties,
+    ...cmp.events,
+    ...cmp.methods,
+  ]
+  .filter(cmpProp => cmpProp.complexType && cmpProp.complexType.references)
+  .reduce((obj, cmpProp) => {
+    return updateImportReferences(obj, cmpProp.complexType.references);
+  }, importDataObj);
 }
 
 function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: string) {
-  function getIncrememntTypeName(name: string): string {
+  function getIncrementTypeName(name: string): string {
     const counter = allTypes.get(name);
     if (counter === undefined) {
       allTypes.set(name, 1);
@@ -59,7 +52,7 @@ function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: s
         importFileLocation = filePath;
 
       } else if (type.location === 'import') {
-        importFileLocation = type.location;
+        importFileLocation = type.path;
       }
 
       // If this is a relative path make it absolute
@@ -78,7 +71,7 @@ function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: s
         return;
       }
 
-      const newTypeName = getIncrememntTypeName(typeName);
+      const newTypeName = getIncrementTypeName(typeName);
       obj[importFileLocation].push({
         localName: typeName,
         importName: newTypeName

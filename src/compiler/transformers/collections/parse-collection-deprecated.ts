@@ -261,10 +261,8 @@ function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCo
       complexType: {
         signature: '',
         parameters: [],
-        returns: {
-          docs: 'TODO',
-          type: 'TODO'
-        }
+        return: 'TODO',
+        references: {}
       },
       docs: {
         text: 'TODO',

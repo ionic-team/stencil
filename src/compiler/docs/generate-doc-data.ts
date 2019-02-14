@@ -84,7 +84,10 @@ function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
     .filter(member => isDocsPublic(member.docs))
     .map(member => ({
       name: member.name,
-      returns: member.complexType.returns,
+      returns: {
+        type: member.complexType.return,
+        docs: '',
+      },
       signature: `${member.name}${member.complexType.signature}`,
       parameters: member.docs.tags,
       docs: member.docs.text,

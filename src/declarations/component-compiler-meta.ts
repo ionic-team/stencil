@@ -148,10 +148,8 @@ export interface ComponentCompilerStaticMethod {
 export interface ComponentCompilerMethodComplexType {
   signature: string;
   parameters: CompilerJsDoc[];
-  returns: {
-    type: string;
-    docs: string;
-  };
+  references: ComponentCompilerTypeReferences;
+  return: string;
 }
 
 export interface ComponentCompilerWatch {

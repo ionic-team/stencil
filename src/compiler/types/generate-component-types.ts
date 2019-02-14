@@ -42,7 +42,7 @@ interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
 }}`,
     global: `
-interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLElement {}
+interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${interfaceName}: {
   prototype: ${interfaceName};
   new (): ${interfaceName};
