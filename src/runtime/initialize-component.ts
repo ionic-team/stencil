@@ -15,17 +15,17 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.lazyLoad) {
       // lazy loaded components
-      if (BUILD.mode && !hostRef.modeName) {
+      if (BUILD.mode && hostRef.modeName === undefined) {
         // initializeComponent, BUILD.mode
         // looks like mode wasn't set as a property directly yet
         // first check if there's an attribute
         // next check the app's global
-        hostRef.modeName = computeMode(elm);
+        hostRef.modeName = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).lazyBundleIds !== 'string' ? computeMode(elm) : '';
       }
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(cmpMeta, hostRef.modeName);
+        Cstr = await loadModule(cmpMeta, hostRef);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
@@ -75,7 +75,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
       // this component has styles but we haven't registered them yet
-      styles.set(Cstr.styleId, Cstr.style);
+      styles.set(BUILD.mode ? cmpMeta.cmpTag + '#' + hostRef.modeName : cmpMeta.cmpTag, Cstr.style);
       Cstr.isStyleRegistered = true;
     }
   }

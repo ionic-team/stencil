@@ -28,7 +28,7 @@ function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.Clas
   addWatchers(classMembers, cmp);
 
   if (opts.addStyle) {
-    addComponentStyle(classMembers, cmp);
+    addComponentStyle(classMembers, cmp, false);
   }
 
   return classMembers;

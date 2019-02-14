@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE, CMP_FLAG } from '@utils';
+import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {

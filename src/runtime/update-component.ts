@@ -36,10 +36,6 @@ export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef:
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    // LIFECYCHE
-    if (BUILD.updatable) {
-      hostRef.flags |= HOST_STATE.isQueuedForUpdate;
-    }
     writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
   } else {
     // syncronuously write DOM
@@ -129,52 +125,44 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
 export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   if (!elm['s-al']) {
 
-    try {
-      if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
-        if (BUILD.cmpDidLoad && instance.componentDidLoad) {
-          instance.componentDidLoad();
-        }
-        emitLifecycleEvent(elm, 'componentDidLoad');
+    if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
+      hostRef.flags |= HOST_STATE.hasLoadedComponent;
 
-      } else {
-        if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
-          // we've already loaded this component
-          // fire off the user's componentDidUpdate method (if one was provided)
-          // componentDidUpdate runs AFTER render() has been called
-          // and all child components have finished updating
-          instance.componentDidUpdate();
-        }
-        emitLifecycleEvent(elm, 'componentDidUpdate');
-      }
-
-      if (BUILD.cmpDidRender && instance.componentDidRender) {
-        instance.componentDidRender();
-      }
-      emitLifecycleEvent(elm, 'componentDidRender');
-
-    } catch (e) {
-      consoleError(e);
-    }
-
-    if (BUILD.hotModuleReplacement) {
-      elm['s-hmr-load'] && elm['s-hmr-load']();
-    }
-
-    if (BUILD.lazyLoad && !(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
-      if (BUILD.style) {
+      if (BUILD.lazyLoad && BUILD.style) {
         // DOM WRITE!
         // add the css class that this element has officially hydrated
         elm.classList.add('hydrated');
       }
 
-      // fire off the user's elm.componentOnReady() resolve (if any)
-      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+      if (BUILD.cmpDidLoad && instance.componentDidLoad) {
+        instance.componentDidLoad();
+      }
 
+      emitLifecycleEvent(elm, 'componentDidLoad');
+
+      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
       if (BUILD.lifecycleDOMEvents && !hostRef.ancestorComponent) {
         emitLifecycleEvent(elm, 'appload');
       }
+    } else {
+      if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
+        // we've already loaded this component
+        // fire off the user's componentDidUpdate method (if one was provided)
+        // componentDidUpdate runs AFTER render() has been called
+        // and all child components have finished updating
+        instance.componentDidUpdate();
+      }
+      emitLifecycleEvent(elm, 'componentDidUpdate');
     }
-    hostRef.flags |= HOST_STATE.hasLoadedComponent;
+
+    if (BUILD.cmpDidRender && instance.componentDidRender) {
+      instance.componentDidRender();
+    }
+    emitLifecycleEvent(elm, 'componentDidRender');
+
+    if (BUILD.hotModuleReplacement) {
+      elm['s-hmr-load'] && elm['s-hmr-load']();
+    }
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up

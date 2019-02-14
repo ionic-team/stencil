@@ -5,10 +5,10 @@ import { dashToPascalCase } from '@utils';
 import { plt } from './client-window';
 
 
-export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, mode: string, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
+export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostRef, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
   // loadModuleImport
   const bundleId = (BUILD.mode && typeof cmpMeta.lazyBundleIds !== 'string')
-    ? cmpMeta.lazyBundleIds[mode]
+    ? cmpMeta.lazyBundleIds[hostRef.modeName]
     : cmpMeta.lazyBundleIds;
 
   const useScopedCss = (BUILD.shadowDom && !plt.supportsShadowDom);

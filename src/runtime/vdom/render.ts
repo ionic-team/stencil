@@ -11,7 +11,7 @@ import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
 import { h } from './h';
 import { NODE_TYPE } from '../runtime-constants';
-import { SVG_NS, isDef, toLowerCase, CMP_FLAG } from '@utils';
+import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
 import { updateElement } from './update-element';
 
 

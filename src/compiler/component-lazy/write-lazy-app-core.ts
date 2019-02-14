@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
 import { sys } from '@sys';
+import { DEFAULT_STYLE_MODE } from '@utils';
 
 
 export function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
@@ -45,18 +46,20 @@ async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.Compiler
 function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
   // [[{ios: 'abc12345', md: 'dec65432'}, {cmpTag: 'ion-icon', cmpMembers: []}]]
 
-  const lazyBundles = bundleModules.map(bundleModule => {
-    return formatLazyRuntimeBundle(bundleModule);
-  });
+  const lazyBundles = bundleModules
+    .map(bundleModule => formatLazyRuntimeBundle(bundleModule));
 
   return stringifyRuntimeData(lazyBundles);
 }
 
 
-function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
+function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRuntimeData {
   let bundleId: any;
+  if (bundleModule.outputs.length === 0) {
+    throw new Error('bundleModule.output must be at least one');
+  }
 
-  if (bundleModule.outputs.length > 1) {
+  if (bundleModule.outputs[0].modeName !== DEFAULT_STYLE_MODE) {
     // more than one mode, object of bundleIds with the mode as a key
     bundleId = {};
     bundleModule.outputs.forEach(output => {
@@ -68,9 +71,8 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule) {
     bundleId = bundleModule.outputs[0].bundleId;
   }
 
-  const lazyBundle: d.LazyBundleRuntimeData = [
+  return [
     bundleId,
     bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
-  return lazyBundle;
 }
