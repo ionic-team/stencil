@@ -4,6 +4,7 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const { run, transpile } = require('./script-utils');
+const { urlPlugin } = require('./plugin-url');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-mock-doc');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
@@ -14,10 +15,8 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 async function bundle() {
   const rollupBuild = await rollup.rollup({
     input: ENTRY_FILE,
-    external: [
-      'url'
-    ],
     plugins: [
+      urlPlugin(),
       rollupResolve(),
       rollupCommonjs()
     ],

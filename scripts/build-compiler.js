@@ -20,12 +20,9 @@ async function bundleCompiler() {
   const rollupBuild = await rollup.rollup({
     input: INPUT_FILE,
     external: [
-      'crypto',
-      'fs',
       'path',
       'typescript',
       '../mock-doc',
-      '../runtime',
       '../server',
       '../sys/node',
       '../utils'
@@ -39,9 +36,6 @@ async function bundleCompiler() {
             }
             if (id === '@mock-doc') {
               return '../mock-doc';
-            }
-            if (id === '@runtime') {
-              return '../runtime';
             }
             if (id === '@server') {
               return '../server';
