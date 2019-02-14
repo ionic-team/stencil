@@ -125,7 +125,7 @@
     "jest-cli": "~23.6.0",
     "pixelmatch": "4.0.2",
     "puppeteer": "~1.11.0",
-    "workbox-build": "~3.4.1"
+    "workbox-build": "~3.6.3"
   },
   "engines": {
     "node": ">=6.11.0"
