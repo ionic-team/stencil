@@ -36,7 +36,9 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
 
   constructor(config: d.Config) {
-    this.cache = new Cache(config, new InMemoryFileSystem(sys.fs, sys.path));
+    const cacheFs = config.enableCache ? new InMemoryFileSystem(sys.fs, sys.path) : null;
+    this.cache = new Cache(config, cacheFs);
+
     this.cache.initCacheDir();
 
     this.fs = new InMemoryFileSystem(sys.fs, sys.path);

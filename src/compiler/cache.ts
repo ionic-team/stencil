@@ -83,7 +83,7 @@ export class Cache implements d.Cache {
 
   createKey(domain: string, ...args: any[]) {
     if (!this.config.enableCache) {
-      return '';
+      return domain + (Math.random() * 9999999);
     }
     return domain + '_' + sys.generateContentHash(JSON.stringify(args), 32);
   }
@@ -98,10 +98,16 @@ export class Cache implements d.Cache {
   }
 
   clear() {
-    this.cacheFs.clearCache();
+    if (this.cacheFs != null) {
+      this.cacheFs.clearCache();
+    }
   }
 
   async clearExpiredCache() {
+    if (this.cacheFs == null) {
+      return;
+    }
+
     const now = Date.now();
 
     const lastClear = await sys.storage.get(EXP_STORAGE_KEY) as number;
