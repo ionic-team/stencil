@@ -6,6 +6,7 @@ import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
 import { sys } from '@sys';
 import { noop } from '@utils';
+import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 
 
 export class Renderer {
@@ -23,7 +24,7 @@ export class Renderer {
     // init the build context
     this.ctx = ctx || new CompilerContext(config);
 
-    this.outputTarget = outputTarget || config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
+    this.outputTarget = outputTarget || config.outputTargets.find(isOutputTargetWww);
 
     // load the component registry from the registry.json file
     this.cmpRegistry = registry || loadComponentRegistry(config, this.ctx, this.outputTarget);

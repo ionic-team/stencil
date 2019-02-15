@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { generateNativeAppCore } from '../component-native/generate-native-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { writeNativeBundled } from '../component-native/write-native-bundled';
+import { isOutputTargetDist } from './output-utils';
 
 
 export async function outputModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -9,10 +10,7 @@ export async function outputModuleWebComponents(config: d.Config, compilerCtx: d
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTarget[]).filter(o => {
-    return (o.type === 'dist');
-  });
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
   if (outputTargets.length === 0) {
     return;
   }

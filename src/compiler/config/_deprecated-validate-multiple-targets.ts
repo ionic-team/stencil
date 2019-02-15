@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { logger } from '@sys';
+import { isOutputTargetDist } from '../output-targets/output-utils';
 
 
 /**
@@ -85,7 +86,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
 
     if ((config as any).generateDistribution) {
       config.outputTargets = config.outputTargets || [];
-      let o = config.outputTargets.find(o => o.type === 'dist');
+      let o = config.outputTargets.find(isOutputTargetDist);
       if (!o) {
         o = { type: 'dist' };
         config.outputTargets.push(o);

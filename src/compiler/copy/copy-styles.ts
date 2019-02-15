@@ -4,7 +4,7 @@ import { sys } from '@sys';
 
 
 export async function copyComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
   if (outputTargets.length === 0) {
     return;
   }

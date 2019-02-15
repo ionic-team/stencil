@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { buildWarn, catchError, hasError } from '@utils';
 import { logger, sys } from '@sys';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -149,7 +150,10 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
     return false;
   }
 
-  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker && o.serviceWorker.swSrc);
+  const wwwServiceOutputs = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter(o => o.serviceWorker && o.serviceWorker.swSrc);
+
   return wwwServiceOutputs.some(outputTarget => {
     return buildCtx.filesChanged.some(fileChanged => sys.path.basename(fileChanged).toLowerCase() === sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });

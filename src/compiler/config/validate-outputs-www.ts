@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { sys } from '@sys';
 import { validatePrerender } from './validate-prerender';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetWww(config: d.Config) {
@@ -11,7 +12,7 @@ export function validateOutputTargetWww(config: d.Config) {
     ];
   }
 
-  const wwwOutputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www');
+  const wwwOutputTargets = config.outputTargets.filter(isOutputTargetWww);
 
   wwwOutputTargets.forEach(outputTarget => {
     validateOutputTarget(config, outputTarget);
@@ -44,9 +45,6 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
 
   validatePrerender(config, outputTarget);
 
-  if (typeof outputTarget.appBuild !== 'boolean') {
-    outputTarget.appBuild = true;
-  }
 }
 
 

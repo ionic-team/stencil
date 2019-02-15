@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { sys } from '@sys';
 import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
+import { isOutputTargetDocs, isOutputTargetDocsCustom, isOutputTargetDocsJson } from '../output-targets/output-utils';
 
 
 export function validateDocs(config: d.Config) {
@@ -17,7 +18,7 @@ export function validateDocs(config: d.Config) {
       file: config.flags.docsJson
     });
   }
-  const jsonDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+  const jsonDocsOutputs = config.outputTargets.filter(isOutputTargetDocsJson);
   jsonDocsOutputs.forEach(jsonDocsOutput => {
     validateJsonDocsOutputTarget(config, jsonDocsOutput);
   });
@@ -30,13 +31,13 @@ export function validateDocs(config: d.Config) {
       config.outputTargets.push({ type: 'docs' });
     }
   }
-  const readmeDocsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
+  const readmeDocsOutputs = config.outputTargets.filter(isOutputTargetDocs);
   readmeDocsOutputs.forEach(readmeDocsOutput => {
     validateReadmeOutputTarget(config, readmeDocsOutput);
   });
 
   // custom docs
-  const customDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
+  const customDocsOutputs = config.outputTargets.filter(isOutputTargetDocsCustom);
   customDocsOutputs.forEach(jsonDocsOutput => {
     validateCustomDocsOutputTarget(jsonDocsOutput);
   });

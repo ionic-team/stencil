@@ -3,6 +3,7 @@ import { loadConfig as compilerLoadConfig } from '../../compiler/config/load-con
 import { loadConfig as serverLoadConfig } from '../load-config';
 import { Renderer } from '../renderer';
 import { logger, sys } from '@sys';
+import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 
 
 export function initApp(ssrConfig: d.ServerConfigInput) {
@@ -27,9 +28,7 @@ export function initApp(ssrConfig: d.ServerConfigInput) {
   // start the ssr middleware
   ssrConfig.app.use(ssrPathRegex, ssrMiddleware(middlewareConfig));
 
-  const wwwOutput = (middlewareConfig.config as d.Config).outputTargets.find(o => {
-    return o.type === 'www';
-  }) as d.OutputTargetWww;
+  const wwwOutput = (middlewareConfig.config as d.Config).outputTargets.find(isOutputTargetWww);
 
   if (!wwwOutput || typeof wwwOutput.dir !== 'string') {
     throw new Error(`unable to find www directory to serve static files from`);

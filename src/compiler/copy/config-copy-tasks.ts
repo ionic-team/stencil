@@ -3,6 +3,7 @@ import { buildError, normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 import { sys } from '@sys';
+import { isOutputTargetBuild } from '../output-targets/output-utils';
 
 
 export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx) {
@@ -48,9 +49,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
     throw new Error(`copy "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
+  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
 
   if (isGlob(copyTask.src)) {
     const copyTasks = await processGlob(config, outputTargets, copyTask);
@@ -59,7 +58,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
   }
 
   await Promise.all(outputTargets.map(async outputTarget => {
-    if (outputTarget.collectionDir) {
+    if ('collectionDir' in outputTarget) {
       await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.collectionDir);
 
     } else {
@@ -81,7 +80,7 @@ async function processCopyTaskDestDir(config: d.Config, allCopyTasks: d.CopyTask
 }
 
 
-async function processGlob(config: d.Config, outputTargets: d.OutputTargetDist[], copyTask: d.CopyTask) {
+async function processGlob(config: d.Config, outputTargets: d.OutputTargetBuild[], copyTask: d.CopyTask) {
   const globCopyTasks: d.CopyTask[] = [];
 
   const globOpts = {
@@ -94,7 +93,7 @@ async function processGlob(config: d.Config, outputTargets: d.OutputTargetDist[]
   files.forEach(globRelPath => {
 
     outputTargets.forEach(outputTarget => {
-      if (outputTarget.collectionDir) {
+      if ('collectionDir' in outputTarget) {
         globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.collectionDir, globRelPath));
 
       } else {

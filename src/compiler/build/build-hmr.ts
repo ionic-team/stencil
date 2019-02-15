@@ -3,6 +3,7 @@ import { normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 import { logger, sys } from '@sys';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -174,7 +175,7 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
     return null;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return null;
   }
@@ -191,7 +192,7 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 
 
 function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
-  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return null;
   }

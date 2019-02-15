@@ -1,14 +1,15 @@
+import { generateReadmeDocs } from './generate-readme-docs';
 import * as d from '@declarations';
-import { BuildContext } from '../build/build-ctx';
 import { catchError, cleanDiagnostics, hasError } from '@utils';
 import { generateDocData } from './generate-doc-data';
 import { generateWebComponentsJson } from './generate-web-components-json';
 import { generateJsonDocs } from './generate-json-docs';
-import { generateReadmeDocs } from './generate-readme-docs';
+import { BuildContext } from '../build/build-ctx';
 import { generateCustomDocs } from './generate-custom-docs';
 import { logger, sys } from '@sys';
 import { strickCheckDocs } from './strict-check';
 import { transpileApp } from '../transpile/transpile-app';
+import { isOutputTargetDist, isOutputTargetDocs, isOutputTargetDocsCustom, isOutputTargetDocsJson } from '../output-targets/output-utils';
 
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
@@ -54,35 +55,35 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
   if (!config.buildDocs) {
     return;
   }
-  const distOutputTargets = config.outputTargets.filter(o => o.type === 'dist') as d.OutputTargetDist[];
+  const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
   const docsOutputTargets = config.outputTargets.filter(o => {
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
 
   const docsData = await generateDocData(compilerCtx, buildCtx);
 
-  const strictCheck = (docsOutputTargets as d.OutputTargetDocsReadme[]).some(o => !!o.strict);
-  if (strictCheck) {
-    strickCheckDocs(docsData);
-  }
-
   // generate web-components.json
   await generateWebComponentsJson(compilerCtx, distOutputTargets, docsData);
 
   // generate READMEs docs
-  const readmeTargets = docsOutputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
+  const readmeTargets = docsOutputTargets.filter(isOutputTargetDocs);
+  const strictCheck = readmeTargets.some(o => !!o.strict);
+  if (strictCheck) {
+    strickCheckDocs(docsData);
+  }
+
   if (readmeTargets.length > 0) {
     await generateReadmeDocs(config, compilerCtx, readmeTargets, docsData);
   }
 
   // generate json docs
-  const jsonTargets = docsOutputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+  const jsonTargets = docsOutputTargets.filter(isOutputTargetDocsJson);
   if (jsonTargets.length > 0) {
     await generateJsonDocs(compilerCtx, jsonTargets, docsData);
   }
 
   // generate custom docs
-  const customTargets = docsOutputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
+  const customTargets = docsOutputTargets.filter(isOutputTargetDocsCustom);
   if (customTargets.length > 0) {
     await generateCustomDocs(customTargets, docsData);
   }

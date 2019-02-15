@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { generateTypesAndValidate } from '../types/generate-types';
 import { sys } from '@sys';
+import { isOutputTargetDist } from './output-utils';
 
 
 export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -8,10 +9,7 @@ export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, 
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return o.type === 'dist';
-  });
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
   if (outputTargets.length === 0) {
     return;
   }

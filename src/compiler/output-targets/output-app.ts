@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
+import { isOutputTargetBuild } from './output-utils';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,10 +8,7 @@ export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetBuild[]).filter(o => {
-    return (o.type === 'www' || o.type === 'dist');
-  });
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
   if (outputTargets.length === 0) {
     return;
   }

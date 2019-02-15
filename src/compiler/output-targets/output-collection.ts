@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { sys } from '@sys';
+import { isOutputTargetDist } from './output-utils';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,10 +8,7 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return (o.type === 'dist' && o.collectionDir);
-  });
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
   if (outputTargets.length === 0) {
     return;
   }

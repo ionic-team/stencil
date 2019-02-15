@@ -66,13 +66,13 @@ export namespace Components {
   interface AttributeHostAttributes extends JSXElements.HTMLAttributes {}
 
   interface AttributeHtmlRoot {
-    'anyAttr': any;
-    'nuAttr': number;
+    'anyAttr': any | null;
+    'nuAttr': number | null;
     'strAttr': string;
   }
   interface AttributeHtmlRootAttributes extends JSXElements.HTMLAttributes {
-    'anyAttr'?: any;
-    'nuAttr'?: number;
+    'anyAttr'?: any | null;
+    'nuAttr'?: number | null;
     'strAttr'?: string;
   }
 
@@ -110,7 +110,7 @@ export namespace Components {
     'someMethod': () => void;
   }
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {
-    'onSomeEvent'?: (ev: CustomEvent<any>) => void;
+    'onSomeEvent'?: (event: CustomEvent<any>) => void;
     'propVal'?: number;
   }
 
@@ -143,8 +143,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleAsyncBAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -152,8 +152,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleAsyncCAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -164,8 +164,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleBasicBAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -173,8 +173,8 @@ export namespace Components {
     'value': string;
   }
   interface LifecycleBasicCAttributes extends JSXElements.HTMLAttributes {
-    'onLifecycleLoad'?: (ev: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (ev: CustomEvent<any>) => void;
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
     'value'?: string;
   }
 
@@ -249,10 +249,10 @@ export namespace Components {
   interface ShadowDomArrayRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ShadowDomArray {
-    'values': unknown;
+    'values': number[];
   }
   interface ShadowDomArrayAttributes extends JSXElements.HTMLAttributes {
-    'values'?: unknown;
+    'values'?: number[];
   }
 
   interface ShadowDomBasicRoot {}
@@ -380,6 +380,11 @@ export namespace Components {
 
   interface Tag88 {}
   interface Tag88Attributes extends JSXElements.HTMLAttributes {}
+}
+
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
 }
 
 declare global {
@@ -546,469 +551,469 @@ declare global {
   }
 
 
-  interface HTMLAttributeBasicRootElement extends Components.AttributeBasicRoot, HTMLElement {}
+  interface HTMLAttributeBasicRootElement extends Components.AttributeBasicRoot, HTMLStencilElement {}
   var HTMLAttributeBasicRootElement: {
     prototype: HTMLAttributeBasicRootElement;
     new (): HTMLAttributeBasicRootElement;
   };
 
-  interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLElement {}
+  interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
   var HTMLAttributeBasicElement: {
     prototype: HTMLAttributeBasicElement;
     new (): HTMLAttributeBasicElement;
   };
 
-  interface HTMLAttributeBooleanRootElement extends Components.AttributeBooleanRoot, HTMLElement {}
+  interface HTMLAttributeBooleanRootElement extends Components.AttributeBooleanRoot, HTMLStencilElement {}
   var HTMLAttributeBooleanRootElement: {
     prototype: HTMLAttributeBooleanRootElement;
     new (): HTMLAttributeBooleanRootElement;
   };
 
-  interface HTMLAttributeBooleanElement extends Components.AttributeBoolean, HTMLElement {}
+  interface HTMLAttributeBooleanElement extends Components.AttributeBoolean, HTMLStencilElement {}
   var HTMLAttributeBooleanElement: {
     prototype: HTMLAttributeBooleanElement;
     new (): HTMLAttributeBooleanElement;
   };
 
-  interface HTMLAttributeComplexElement extends Components.AttributeComplex, HTMLElement {}
+  interface HTMLAttributeComplexElement extends Components.AttributeComplex, HTMLStencilElement {}
   var HTMLAttributeComplexElement: {
     prototype: HTMLAttributeComplexElement;
     new (): HTMLAttributeComplexElement;
   };
 
-  interface HTMLAttributeHostElement extends Components.AttributeHost, HTMLElement {}
+  interface HTMLAttributeHostElement extends Components.AttributeHost, HTMLStencilElement {}
   var HTMLAttributeHostElement: {
     prototype: HTMLAttributeHostElement;
     new (): HTMLAttributeHostElement;
   };
 
-  interface HTMLAttributeHtmlRootElement extends Components.AttributeHtmlRoot, HTMLElement {}
+  interface HTMLAttributeHtmlRootElement extends Components.AttributeHtmlRoot, HTMLStencilElement {}
   var HTMLAttributeHtmlRootElement: {
     prototype: HTMLAttributeHtmlRootElement;
     new (): HTMLAttributeHtmlRootElement;
   };
 
-  interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLElement {}
+  interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
   var HTMLConditionalBasicElement: {
     prototype: HTMLConditionalBasicElement;
     new (): HTMLConditionalBasicElement;
   };
 
-  interface HTMLConditionalRerenderRootElement extends Components.ConditionalRerenderRoot, HTMLElement {}
+  interface HTMLConditionalRerenderRootElement extends Components.ConditionalRerenderRoot, HTMLStencilElement {}
   var HTMLConditionalRerenderRootElement: {
     prototype: HTMLConditionalRerenderRootElement;
     new (): HTMLConditionalRerenderRootElement;
   };
 
-  interface HTMLConditionalRerenderElement extends Components.ConditionalRerender, HTMLElement {}
+  interface HTMLConditionalRerenderElement extends Components.ConditionalRerender, HTMLStencilElement {}
   var HTMLConditionalRerenderElement: {
     prototype: HTMLConditionalRerenderElement;
     new (): HTMLConditionalRerenderElement;
   };
 
-  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLElement {}
+  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLStencilElement {}
   var HTMLCssVariablesRootElement: {
     prototype: HTMLCssVariablesRootElement;
     new (): HTMLCssVariablesRootElement;
   };
 
-  interface HTMLCssVariablesElement extends Components.CssVariables, HTMLElement {}
+  interface HTMLCssVariablesElement extends Components.CssVariables, HTMLStencilElement {}
   var HTMLCssVariablesElement: {
     prototype: HTMLCssVariablesElement;
     new (): HTMLCssVariablesElement;
   };
 
-  interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLElement {}
+  interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {}
   var HTMLCustomEventRootElement: {
     prototype: HTMLCustomEventRootElement;
     new (): HTMLCustomEventRootElement;
   };
 
-  interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLElement {}
+  interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {}
   var HTMLDynamicCssVariableElement: {
     prototype: HTMLDynamicCssVariableElement;
     new (): HTMLDynamicCssVariableElement;
   };
 
-  interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLElement {}
+  interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLStencilElement {}
   var HTMLDynamicImportElement: {
     prototype: HTMLDynamicImportElement;
     new (): HTMLDynamicImportElement;
   };
 
-  interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLElement {}
+  interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLStencilElement {}
   var HTMLEs5AddclassSvgElement: {
     prototype: HTMLEs5AddclassSvgElement;
     new (): HTMLEs5AddclassSvgElement;
   };
 
-  interface HTMLEsmImportElement extends Components.EsmImport, HTMLElement {}
+  interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {}
   var HTMLEsmImportElement: {
     prototype: HTMLEsmImportElement;
     new (): HTMLEsmImportElement;
   };
 
-  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLElement {}
+  interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {}
   var HTMLExternalImportAElement: {
     prototype: HTMLExternalImportAElement;
     new (): HTMLExternalImportAElement;
   };
 
-  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLElement {}
+  interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {}
   var HTMLExternalImportBElement: {
     prototype: HTMLExternalImportBElement;
     new (): HTMLExternalImportBElement;
   };
 
-  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLElement {}
+  interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {}
   var HTMLExternalImportCElement: {
     prototype: HTMLExternalImportCElement;
     new (): HTMLExternalImportCElement;
   };
 
-  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLElement {}
+  interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
   var HTMLInitCssRootElement: {
     prototype: HTMLInitCssRootElement;
     new (): HTMLInitCssRootElement;
   };
 
-  interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLElement {}
+  interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLStencilElement {}
   var HTMLKeyReorderRootElement: {
     prototype: HTMLKeyReorderRootElement;
     new (): HTMLKeyReorderRootElement;
   };
 
-  interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLElement {}
+  interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {}
   var HTMLKeyReorderElement: {
     prototype: HTMLKeyReorderElement;
     new (): HTMLKeyReorderElement;
   };
 
-  interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLElement {}
+  interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
   var HTMLLifecycleAsyncAElement: {
     prototype: HTMLLifecycleAsyncAElement;
     new (): HTMLLifecycleAsyncAElement;
   };
 
-  interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLElement {}
+  interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {}
   var HTMLLifecycleAsyncBElement: {
     prototype: HTMLLifecycleAsyncBElement;
     new (): HTMLLifecycleAsyncBElement;
   };
 
-  interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLElement {}
+  interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {}
   var HTMLLifecycleAsyncCElement: {
     prototype: HTMLLifecycleAsyncCElement;
     new (): HTMLLifecycleAsyncCElement;
   };
 
-  interface HTMLLifecycleBasicAElement extends Components.LifecycleBasicA, HTMLElement {}
+  interface HTMLLifecycleBasicAElement extends Components.LifecycleBasicA, HTMLStencilElement {}
   var HTMLLifecycleBasicAElement: {
     prototype: HTMLLifecycleBasicAElement;
     new (): HTMLLifecycleBasicAElement;
   };
 
-  interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLElement {}
+  interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLStencilElement {}
   var HTMLLifecycleBasicBElement: {
     prototype: HTMLLifecycleBasicBElement;
     new (): HTMLLifecycleBasicBElement;
   };
 
-  interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLElement {}
+  interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLStencilElement {}
   var HTMLLifecycleBasicCElement: {
     prototype: HTMLLifecycleBasicCElement;
     new (): HTMLLifecycleBasicCElement;
   };
 
-  interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLElement {}
+  interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {}
   var HTMLLifecycleUnloadAElement: {
     prototype: HTMLLifecycleUnloadAElement;
     new (): HTMLLifecycleUnloadAElement;
   };
 
-  interface HTMLLifecycleUnloadBElement extends Components.LifecycleUnloadB, HTMLElement {}
+  interface HTMLLifecycleUnloadBElement extends Components.LifecycleUnloadB, HTMLStencilElement {}
   var HTMLLifecycleUnloadBElement: {
     prototype: HTMLLifecycleUnloadBElement;
     new (): HTMLLifecycleUnloadBElement;
   };
 
-  interface HTMLLifecycleUnloadRootElement extends Components.LifecycleUnloadRoot, HTMLElement {}
+  interface HTMLLifecycleUnloadRootElement extends Components.LifecycleUnloadRoot, HTMLStencilElement {}
   var HTMLLifecycleUnloadRootElement: {
     prototype: HTMLLifecycleUnloadRootElement;
     new (): HTMLLifecycleUnloadRootElement;
   };
 
-  interface HTMLLifecycleUpdateAElement extends Components.LifecycleUpdateA, HTMLElement {}
+  interface HTMLLifecycleUpdateAElement extends Components.LifecycleUpdateA, HTMLStencilElement {}
   var HTMLLifecycleUpdateAElement: {
     prototype: HTMLLifecycleUpdateAElement;
     new (): HTMLLifecycleUpdateAElement;
   };
 
-  interface HTMLLifecycleUpdateBElement extends Components.LifecycleUpdateB, HTMLElement {}
+  interface HTMLLifecycleUpdateBElement extends Components.LifecycleUpdateB, HTMLStencilElement {}
   var HTMLLifecycleUpdateBElement: {
     prototype: HTMLLifecycleUpdateBElement;
     new (): HTMLLifecycleUpdateBElement;
   };
 
-  interface HTMLLifecycleUpdateCElement extends Components.LifecycleUpdateC, HTMLElement {}
+  interface HTMLLifecycleUpdateCElement extends Components.LifecycleUpdateC, HTMLStencilElement {}
   var HTMLLifecycleUpdateCElement: {
     prototype: HTMLLifecycleUpdateCElement;
     new (): HTMLLifecycleUpdateCElement;
   };
 
-  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLElement {}
+  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {}
   var HTMLListenJsxRootElement: {
     prototype: HTMLListenJsxRootElement;
     new (): HTMLListenJsxRootElement;
   };
 
-  interface HTMLListenJsxElement extends Components.ListenJsx, HTMLElement {}
+  interface HTMLListenJsxElement extends Components.ListenJsx, HTMLStencilElement {}
   var HTMLListenJsxElement: {
     prototype: HTMLListenJsxElement;
     new (): HTMLListenJsxElement;
   };
 
-  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLElement {}
+  interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
   var HTMLListenWindowElement: {
     prototype: HTMLListenWindowElement;
     new (): HTMLListenWindowElement;
   };
 
-  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLElement {}
+  interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {}
   var HTMLNodeGlobalsElement: {
     prototype: HTMLNodeGlobalsElement;
     new (): HTMLNodeGlobalsElement;
   };
 
-  interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLElement {}
+  interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {}
   var HTMLReflectToAttrElement: {
     prototype: HTMLReflectToAttrElement;
     new (): HTMLReflectToAttrElement;
   };
 
-  interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLElement {}
+  interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {}
   var HTMLScopedBasicRootElement: {
     prototype: HTMLScopedBasicRootElement;
     new (): HTMLScopedBasicRootElement;
   };
 
-  interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLElement {}
+  interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {}
   var HTMLScopedBasicElement: {
     prototype: HTMLScopedBasicElement;
     new (): HTMLScopedBasicElement;
   };
 
-  interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLElement {}
+  interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {}
   var HTMLShadowDomArrayRootElement: {
     prototype: HTMLShadowDomArrayRootElement;
     new (): HTMLShadowDomArrayRootElement;
   };
 
-  interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLElement {}
+  interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {}
   var HTMLShadowDomArrayElement: {
     prototype: HTMLShadowDomArrayElement;
     new (): HTMLShadowDomArrayElement;
   };
 
-  interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLElement {}
+  interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {}
   var HTMLShadowDomBasicRootElement: {
     prototype: HTMLShadowDomBasicRootElement;
     new (): HTMLShadowDomBasicRootElement;
   };
 
-  interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLElement {}
+  interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {}
   var HTMLShadowDomBasicElement: {
     prototype: HTMLShadowDomBasicElement;
     new (): HTMLShadowDomBasicElement;
   };
 
-  interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLElement {}
+  interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {}
   var HTMLShadowDomModeRootElement: {
     prototype: HTMLShadowDomModeRootElement;
     new (): HTMLShadowDomModeRootElement;
   };
 
-  interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLElement {}
+  interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {}
   var HTMLShadowDomModeElement: {
     prototype: HTMLShadowDomModeElement;
     new (): HTMLShadowDomModeElement;
   };
 
-  interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLElement {}
+  interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {}
   var HTMLShadowDomSlotBasicElement: {
     prototype: HTMLShadowDomSlotBasicElement;
     new (): HTMLShadowDomSlotBasicElement;
   };
 
-  interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLElement {}
+  interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLStencilElement {}
   var HTMLShadowDomSlotNestedRootElement: {
     prototype: HTMLShadowDomSlotNestedRootElement;
     new (): HTMLShadowDomSlotNestedRootElement;
   };
 
-  interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLElement {}
+  interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {}
   var HTMLShadowDomSlotNestedElement: {
     prototype: HTMLShadowDomSlotNestedElement;
     new (): HTMLShadowDomSlotNestedElement;
   };
 
-  interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLElement {}
+  interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLStencilElement {}
   var HTMLSlotArrayBasicElement: {
     prototype: HTMLSlotArrayBasicElement;
     new (): HTMLSlotArrayBasicElement;
   };
 
-  interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLElement {}
+  interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {}
   var HTMLSlotArrayComplexRootElement: {
     prototype: HTMLSlotArrayComplexRootElement;
     new (): HTMLSlotArrayComplexRootElement;
   };
 
-  interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLElement {}
+  interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLStencilElement {}
   var HTMLSlotArrayComplexElement: {
     prototype: HTMLSlotArrayComplexElement;
     new (): HTMLSlotArrayComplexElement;
   };
 
-  interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLElement {}
+  interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {}
   var HTMLSlotArrayTopElement: {
     prototype: HTMLSlotArrayTopElement;
     new (): HTMLSlotArrayTopElement;
   };
 
-  interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLElement {}
+  interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLStencilElement {}
   var HTMLSlotBasicOrderRootElement: {
     prototype: HTMLSlotBasicOrderRootElement;
     new (): HTMLSlotBasicOrderRootElement;
   };
 
-  interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLElement {}
+  interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {}
   var HTMLSlotBasicOrderElement: {
     prototype: HTMLSlotBasicOrderElement;
     new (): HTMLSlotBasicOrderElement;
   };
 
-  interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLElement {}
+  interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLStencilElement {}
   var HTMLSlotBasicRootElement: {
     prototype: HTMLSlotBasicRootElement;
     new (): HTMLSlotBasicRootElement;
   };
 
-  interface HTMLSlotBasicElement extends Components.SlotBasic, HTMLElement {}
+  interface HTMLSlotBasicElement extends Components.SlotBasic, HTMLStencilElement {}
   var HTMLSlotBasicElement: {
     prototype: HTMLSlotBasicElement;
     new (): HTMLSlotBasicElement;
   };
 
-  interface HTMLSlotDynamicWrapperRootElement extends Components.SlotDynamicWrapperRoot, HTMLElement {}
+  interface HTMLSlotDynamicWrapperRootElement extends Components.SlotDynamicWrapperRoot, HTMLStencilElement {}
   var HTMLSlotDynamicWrapperRootElement: {
     prototype: HTMLSlotDynamicWrapperRootElement;
     new (): HTMLSlotDynamicWrapperRootElement;
   };
 
-  interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLElement {}
+  interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLStencilElement {}
   var HTMLSlotDynamicWrapperElement: {
     prototype: HTMLSlotDynamicWrapperElement;
     new (): HTMLSlotDynamicWrapperElement;
   };
 
-  interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLElement {}
+  interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {}
   var HTMLSlotFallbackRootElement: {
     prototype: HTMLSlotFallbackRootElement;
     new (): HTMLSlotFallbackRootElement;
   };
 
-  interface HTMLSlotFallbackElement extends Components.SlotFallback, HTMLElement {}
+  interface HTMLSlotFallbackElement extends Components.SlotFallback, HTMLStencilElement {}
   var HTMLSlotFallbackElement: {
     prototype: HTMLSlotFallbackElement;
     new (): HTMLSlotFallbackElement;
   };
 
-  interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLElement {}
+  interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {}
   var HTMLSlotHtmlElement: {
     prototype: HTMLSlotHtmlElement;
     new (): HTMLSlotHtmlElement;
   };
 
-  interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLElement {}
+  interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLStencilElement {}
   var HTMLSlotLightDomRootElement: {
     prototype: HTMLSlotLightDomRootElement;
     new (): HTMLSlotLightDomRootElement;
   };
 
-  interface HTMLSlotLightDomContentElement extends Components.SlotLightDomContent, HTMLElement {}
+  interface HTMLSlotLightDomContentElement extends Components.SlotLightDomContent, HTMLStencilElement {}
   var HTMLSlotLightDomContentElement: {
     prototype: HTMLSlotLightDomContentElement;
     new (): HTMLSlotLightDomContentElement;
   };
 
-  interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLElement {}
+  interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLStencilElement {}
   var HTMLSlotMapOrderRootElement: {
     prototype: HTMLSlotMapOrderRootElement;
     new (): HTMLSlotMapOrderRootElement;
   };
 
-  interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLElement {}
+  interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {}
   var HTMLSlotMapOrderElement: {
     prototype: HTMLSlotMapOrderElement;
     new (): HTMLSlotMapOrderElement;
   };
 
-  interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLElement {}
+  interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLStencilElement {}
   var HTMLSlotReorderRootElement: {
     prototype: HTMLSlotReorderRootElement;
     new (): HTMLSlotReorderRootElement;
   };
 
-  interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLElement {}
+  interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {}
   var HTMLSlotReorderElement: {
     prototype: HTMLSlotReorderElement;
     new (): HTMLSlotReorderElement;
   };
 
-  interface HTMLSlotReplaceWrapperRootElement extends Components.SlotReplaceWrapperRoot, HTMLElement {}
+  interface HTMLSlotReplaceWrapperRootElement extends Components.SlotReplaceWrapperRoot, HTMLStencilElement {}
   var HTMLSlotReplaceWrapperRootElement: {
     prototype: HTMLSlotReplaceWrapperRootElement;
     new (): HTMLSlotReplaceWrapperRootElement;
   };
 
-  interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLElement {}
+  interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLStencilElement {}
   var HTMLSlotReplaceWrapperElement: {
     prototype: HTMLSlotReplaceWrapperElement;
     new (): HTMLSlotReplaceWrapperElement;
   };
 
-  interface HTMLCssCmpElement extends Components.CssCmp, HTMLElement {}
+  interface HTMLCssCmpElement extends Components.CssCmp, HTMLStencilElement {}
   var HTMLCssCmpElement: {
     prototype: HTMLCssCmpElement;
     new (): HTMLCssCmpElement;
   };
 
-  interface HTMLSassCmpElement extends Components.SassCmp, HTMLElement {}
+  interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
   var HTMLSassCmpElement: {
     prototype: HTMLSassCmpElement;
     new (): HTMLSassCmpElement;
   };
 
-  interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLElement {}
+  interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {}
   var HTMLSvgAttrElement: {
     prototype: HTMLSvgAttrElement;
     new (): HTMLSvgAttrElement;
   };
 
-  interface HTMLSvgClassElement extends Components.SvgClass, HTMLElement {}
+  interface HTMLSvgClassElement extends Components.SvgClass, HTMLStencilElement {}
   var HTMLSvgClassElement: {
     prototype: HTMLSvgClassElement;
     new (): HTMLSvgClassElement;
   };
 
-  interface HTMLTag3dComponentElement extends Components.Tag3dComponent, HTMLElement {}
+  interface HTMLTag3dComponentElement extends Components.Tag3dComponent, HTMLStencilElement {}
   var HTMLTag3dComponentElement: {
     prototype: HTMLTag3dComponentElement;
     new (): HTMLTag3dComponentElement;
   };
 
-  interface HTMLTag88Element extends Components.Tag88, HTMLElement {}
+  interface HTMLTag88Element extends Components.Tag88, HTMLStencilElement {}
   var HTMLTag88Element: {
     prototype: HTMLTag88Element;
     new (): HTMLTag88Element;

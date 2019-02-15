@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { logger, sys } from '@sys';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateDevServer(config: d.Config) {
@@ -46,7 +47,7 @@ export function validateDevServer(config: d.Config) {
 
   let serveDir: string = null;
   let baseUrl: string = null;
-  const wwwOutputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
+  const wwwOutputTarget = config.outputTargets.find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
     serveDir = wwwOutputTarget.dir;

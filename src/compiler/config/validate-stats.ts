@@ -1,11 +1,12 @@
 import * as d from '@declarations';
 import { sys } from '@sys';
+import { isOutputTargetStats } from '../output-targets/output-utils';
 
 
 export function validateStats(config: d.Config) {
 
   if (config.flags.stats) {
-    const hasOutputTarget = config.outputTargets.some(o => o.type === 'stats');
+    const hasOutputTarget = config.outputTargets.some(isOutputTargetStats);
     if (!hasOutputTarget) {
       config.outputTargets.push({
         type: 'stats'
@@ -13,8 +14,7 @@ export function validateStats(config: d.Config) {
     }
   }
 
-  const outputTargets = config.outputTargets.filter(o => o.type === 'stats') as d.OutputTargetStats[];
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetStats);
   outputTargets.forEach(outputTarget => {
     validateStatsOutputTarget(config, outputTarget);
   });

@@ -1,10 +1,11 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
+import { isOutputTargetAngular } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetAngular(config: d.Config) {
-  const distOutputTargets = config.outputTargets.filter(o => o.type === 'angular') as d.OutputTargetAngular[];
+  const distOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
 
   distOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];

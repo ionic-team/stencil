@@ -1,12 +1,13 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
+import { isOutputTargetDist } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetDist(config: d.Config) {
   const path = sys.path;
 
-  const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
+  const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
 
   distOutputTargets.forEach(outputTarget => {
 
@@ -48,10 +49,6 @@ export function validateOutputTargetDist(config: d.Config) {
 
     if (typeof outputTarget.empty !== 'boolean') {
       outputTarget.empty = DEFAULT_EMPTY_DIR;
-    }
-
-    if (typeof outputTarget.appBuild !== 'boolean') {
-      outputTarget.appBuild = true;
     }
   });
 }

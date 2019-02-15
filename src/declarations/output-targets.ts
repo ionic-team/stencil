@@ -234,7 +234,6 @@ export interface OutputTargetAngular extends OutputTargetBase {
 
 export interface OutputTargetBase {
   type: string;
-  appBuild?: boolean;
 }
 
 

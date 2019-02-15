@@ -9,19 +9,19 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
   async accessData(filePath: string) {
     const item = this.getItem(filePath);
+    if (typeof item.exists === 'boolean') {
+      return {
+        exists: item.exists,
+        isDirectory: item.isDirectory,
+        isFile: item.isFile
+      };
+    }
 
     const data = {
       exists: false,
       isDirectory: false,
       isFile: false
     };
-
-    if (typeof item.exists === 'boolean') {
-      data.exists = item.exists;
-      data.isDirectory = item.isDirectory;
-      data.isFile = item.isFile;
-      return data;
-    }
 
     try {
       const s = await this.stat(filePath);

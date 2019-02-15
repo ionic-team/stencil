@@ -2,10 +2,11 @@ import * as d from '@declarations';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
+import { isOutputTargetDist } from '../output-targets/output-utils';
 
 
 export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
 
   await Promise.all(outputTargets.map(async outputTarget => {
     await writeAppCollection(config, compilerCtx, buildCtx, outputTarget);

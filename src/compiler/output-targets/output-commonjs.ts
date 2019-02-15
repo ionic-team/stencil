@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { sys } from '@sys';
+import { isOutputTargetDist } from './output-utils';
 
 
 export async function outputCommonJsIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,18 +8,15 @@ export async function outputCommonJsIndexes(config: d.Config, compilerCtx: d.Com
     return;
   }
 
-  const outputsTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return o.type === 'dist';
-  });
-
-  if (outputsTargets.length === 0) {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
+  if (outputTargets.length === 0) {
     return;
   }
 
   const timespan = buildCtx.createTimeSpan(`generate commonjs started`, true);
 
-  const promises = outputsTargets.map(outputsTarget => {
-    return generateCommonJsIndex(config, compilerCtx, outputsTarget);
+  const promises = outputTargets.map(outputTarget => {
+    return generateCommonJsIndex(config, compilerCtx, outputTarget);
   });
 
   await Promise.all(promises);

@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
+import { isOutputTargetBuild } from '../output-targets/output-utils';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filesChanged: string[]) {
@@ -11,9 +12,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     return copyTasks;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
+  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
 
   if (outputTargets.length === 0) {
     return copyTasks;
@@ -55,7 +54,7 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
   });
 
   outputTargets.forEach(outputTarget => {
-    if (outputTarget.collectionDir) {
+    if ('collectionDir' in outputTarget) {
       // copy all of the files in asset directories to the app's collection directory
       copyToCollectionDir.forEach(assetsMeta => {
         // figure out what the path is to the component directory

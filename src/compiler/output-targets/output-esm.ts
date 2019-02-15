@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from './output-utils';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, isOutputTargetDist } from './output-utils';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
 
@@ -11,10 +11,7 @@ export async function outputEsmIndexes(config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return o.type === 'dist';
-  });
-
+  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
   if (outputTargets.length === 0) {
     return;
   }

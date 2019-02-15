@@ -1,10 +1,11 @@
 import * as d from '@declarations';
 import { normalizePath, sortBy } from '@utils';
 import { sys } from '@sys';
+import { isOutputTargetStats } from '../output-targets/output-utils';
 
 
 export async function generateBuildStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) {
-  const statsTargets = (config.outputTargets as d.OutputTargetStats[]).filter(o => o.type === 'stats');
+  const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
   await Promise.all(statsTargets.map(async outputTarget => {
     await generateStatsOutputTarget(config, compilerCtx, buildCtx, buildResults, outputTarget);
