@@ -144,9 +144,12 @@ export class Cache implements d.Cache {
   }
 
   async clearDiskCache() {
-    if (await this.cacheFs.access(this.config.cacheDir)) {
-      await this.cacheFs.remove(this.config.cacheDir);
-      await this.cacheFs.commit();
+    if (this.cacheFs != null) {
+      const hasAccess = await this.cacheFs.access(this.config.cacheDir);
+      if (hasAccess) {
+        await this.cacheFs.remove(this.config.cacheDir);
+        await this.cacheFs.commit();
+      }
     }
   }
 
@@ -155,7 +158,10 @@ export class Cache implements d.Cache {
   }
 
   getMemoryStats() {
-    return this.cacheFs.getMemoryStats();
+    if (this.cacheFs != null) {
+      return this.cacheFs.getMemoryStats();
+    }
+    return null;
   }
 
 }
