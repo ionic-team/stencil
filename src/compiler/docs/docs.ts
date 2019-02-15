@@ -36,7 +36,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 
   // finalize phase
   buildCtx.diagnostics = cleanDiagnostics(buildCtx.diagnostics);
-  logger.printDiagnostics(buildCtx.diagnostics);
+  logger.printDiagnostics(buildCtx.diagnostics, config.rootDir);
 
   // create a nice pretty message stating what happend
   let buildStatus = 'finished';
@@ -59,6 +59,9 @@ export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx,
   const docsOutputTargets = config.outputTargets.filter(o => {
     return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
   });
+
+  // ensure all the styles are built first, which parses all the css docs
+  await buildCtx.stylesPromise;
 
   const docsData = await generateDocData(compilerCtx, buildCtx);
 

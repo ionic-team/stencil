@@ -157,7 +157,7 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
     if (logger) {
       const diagnostics: d.Diagnostic[] = [];
       catchError(diagnostics, e);
-      logger.printDiagnostics(diagnostics);
+      logger.printDiagnostics(diagnostics, config.rootDir);
 
     } else {
       console.error(e);

@@ -22,7 +22,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      logger.printDiagnostics(buildCtx.buildResults.diagnostics);
+      logger.printDiagnostics(buildCtx.buildResults.diagnostics, config.rootDir);
     }
 
     if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {

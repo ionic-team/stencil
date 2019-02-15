@@ -291,12 +291,17 @@ export class NodeLogger implements d.Logger {
       }
     }
 
-    if (typeof diagnostic.relFilePath !== 'string') {
+    let filePath = diagnostic.relFilePath;
+    if (typeof filePath !== 'string') {
+      filePath = diagnostic.absFilePath;
+    }
+
+    if (typeof filePath === 'string') {
       if (header.length > 0) {
         header += ': ';
       }
 
-      header += color.cyan(diagnostic.relFilePath);
+      header += color.cyan(filePath);
 
       if (typeof diagnostic.lineNumber === 'number' && diagnostic.lineNumber > -1) {
         header += color.dim(`:`);
