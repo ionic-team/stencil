@@ -55,6 +55,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
     'getElement',
     'setMode',
     'getMode',
+    'Build',
     'Host',
     'h',
   ];

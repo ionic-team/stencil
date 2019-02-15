@@ -35,6 +35,7 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
     'getElement',
     'setMode',
     'getMode',
+    'Build',
     'Host',
     'h',
   ];

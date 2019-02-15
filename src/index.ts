@@ -68,7 +68,7 @@ export declare const setMode: (handler: ((elm: HTMLElement) => string | undefine
 /**
  * getMode
  */
-export declare const getMode: (ref: any) => string | undefined;
+export declare function getMode<T = (string | undefined)>(ref: any): T;
 
 /**
  * Host

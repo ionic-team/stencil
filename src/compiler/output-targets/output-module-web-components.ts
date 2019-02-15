@@ -2,20 +2,20 @@ import * as d from '@declarations';
 import { generateNativeAppCore } from '../component-native/generate-native-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { writeNativeBundled } from '../component-native/write-native-bundled';
-import { isOutputTargetDist } from './output-utils';
 
 
-export async function outputModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputModuleWebComponents(_config: d.Config, _compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
+  return;
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
-  if (outputTargets.length === 0) {
-    return;
-  }
+  // const outputTargets = config.outputTargets.filter(isOutputTargetDist);
+  // if (outputTargets.length === 0) {
+  //   return;
+  // }
 
-  return generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets as any);
+  // return generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets as any);
 }
 
 

@@ -35,5 +35,6 @@ export const KEEP_IMPORTS = [
   'h',
   'setMode',
   'getMode',
+  'Build',
   'Host'
 ];

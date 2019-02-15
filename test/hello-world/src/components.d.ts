@@ -16,6 +16,11 @@ export namespace Components {
   interface HelloWorldAttributes extends JSXElements.HTMLAttributes {}
 }
 
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
+
 declare global {
   interface StencilElementInterfaces {
     'HelloWorld': Components.HelloWorld;
@@ -26,7 +31,7 @@ declare global {
   }
 
 
-  interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLElement {}
+  interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
   var HTMLHelloWorldElement: {
     prototype: HTMLHelloWorldElement;
     new (): HTMLHelloWorldElement;

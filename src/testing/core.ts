@@ -17,11 +17,6 @@ export {
 } from '@declarations';
 
 /**
- * Build
- */
-export declare const Build: d.UserBuildConditionals;
-
-/**
  * Component
  */
 export declare const Component: d.ComponentDecorator;
@@ -61,5 +56,4 @@ export declare const State: d.StateDecorator;
  */
 export declare const Watch: d.WatchDecorator;
 
-
-export { Host, h } from '@runtime';
+export { Host, h, Build } from '@runtime';

@@ -5,14 +5,14 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
-import { OutputAsset, OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
+import { OutputAsset, OutputChunk, OutputOptions, RollupOptions } from 'rollup'; // types only
 import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencies';
 
 
 export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
   const rollupResults: d.RollupResult[] = [];
 
-  bundleEntryInputs[config.fsNamespace] = appCoreEntryFilePath;
+  bundleEntryInputs[config.fsNamespace] = '@core-entrypoint';
 
   try {
     const rollupOptions: RollupOptions = {
@@ -34,10 +34,13 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
         inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
       ],
+      manualChunks: {
+        [config.fsNamespace]: [appCoreEntryFilePath]
+      },
       onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
     };
 
-    const rollupBuild: RollupBuild = await sys.rollup.rollup(rollupOptions);
+    const rollupBuild = await sys.rollup.rollup(rollupOptions);
 
     const outputOptions: OutputOptions[] = [];
 
@@ -85,14 +88,13 @@ async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat
     isEntry: !!(rollupOutput as OutputChunk).isEntry,
     isAppCore: false
   };
+  const rollupChunk = rollupOutput as OutputChunk;
+  rollupResult.isAppCore = (rollupChunk.name === config.fsNamespace);
 
   if (!rollupResult.isEntry) {
     return rollupResult;
   }
 
-  const rollupChunk = rollupOutput as OutputChunk;
-
-  rollupResult.isAppCore = (rollupChunk.name === config.fsNamespace);
   rollupResult.entryKey = rollupChunk.name;
 
   return rollupResult;

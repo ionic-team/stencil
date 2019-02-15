@@ -1,3 +1,5 @@
+import * as d from '@declarations';
+import { BUILD } from '@build-conditionals';
 
 export { bootstrapLazy } from './bootstrap-lazy';
 export { connectedCallback } from './connected-callback';
@@ -9,3 +11,7 @@ export { h, Host } from './vdom/h';
 export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/render';
 export { setMode, getMode } from './mode';
+
+export const Build: d.UserBuildConditionals = {
+  isDev: BUILD.isDev
+};

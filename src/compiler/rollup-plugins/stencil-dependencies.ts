@@ -6,6 +6,10 @@ export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePat
 
   return {
     resolveId(id: string) {
+      if (id === '@core-entrypoint') {
+        return id;
+      }
+
       if (id === '@stencil/core/app') {
         return appCoreEntryFilePath;
       }
@@ -14,7 +18,12 @@ export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePat
         const clientPlatform = 'index.mjs';
         return sys.path.join(sys.compiler.distDir, 'client', clientPlatform);
       }
-
+      return null;
+    },
+    load(id: string) {
+      if (id === '@core-entrypoint') {
+        return `import '@stencil/core/app';`;
+      }
       return null;
     }
   };
