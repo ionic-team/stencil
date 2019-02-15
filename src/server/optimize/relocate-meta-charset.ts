@@ -1,7 +1,7 @@
 
 
 export function relocateMetaCharset(doc: Document) {
-  if (!doc || !doc.head) {
+  if (!doc.head) {
     return;
   }
 

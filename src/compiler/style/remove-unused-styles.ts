@@ -1,19 +1,19 @@
-import { Config, Diagnostic } from '@declarations';
+import * as d from '@declarations';
 import { parseCss } from './parse-css';
 import { StringifyCss } from './stringify-css';
-import { UsedSelectors } from '../html/used-selectors';
+import { UsedSelectors } from './used-selectors';
 
 
-export function removeUnusedStyles(config: Config, usedSelectors: UsedSelectors, cssContent: string, diagnostics?: Diagnostic[]) {
+export function removeUnusedStyles(results: d.HydrateResults, usedSelectors: UsedSelectors, cssContent: string) {
   let cleanedCss = cssContent;
 
   try {
     // parse the css from being applied to the document
-    const cssAst = parseCss(config, cssContent);
+    const cssAst = parseCss(cssContent);
 
-    if (cssAst.stylesheet.diagnostics.length) {
+    if (cssAst.stylesheet.diagnostics.length > 0) {
       cssAst.stylesheet.diagnostics.forEach(d => {
-        diagnostics.push(d);
+        results.diagnostics.push(d);
       });
       return cleanedCss;
     }
@@ -25,8 +25,8 @@ export function removeUnusedStyles(config: Config, usedSelectors: UsedSelectors,
       cleanedCss = stringify.compile(cssAst);
 
     } catch (e) {
-      diagnostics.push({
-        level: 'error',
+      results.diagnostics.push({
+        level: 'warn',
         type: 'css',
         header: 'CSS Stringify',
         messageText: e
@@ -34,8 +34,8 @@ export function removeUnusedStyles(config: Config, usedSelectors: UsedSelectors,
     }
 
   } catch (e) {
-    diagnostics.push({
-      level: 'error',
+    results.diagnostics.push({
+      level: 'warn',
       type: 'css',
       header: 'CSS Parse',
       messageText: e

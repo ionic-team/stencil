@@ -1,20 +1,6 @@
 import * as d from '.';
 
 
-export interface RenderOptions {
-  canonicalLink?: boolean;
-  collapseWhitespace?: boolean;
-  inlineAssetsMaxSize?: number;
-  inlineLoaderScript?: boolean;
-  inlineStyles?: boolean;
-  removeUnusedStyles?: boolean;
-  ssrIds?: boolean;
-  userAgent?: string;
-  cookie?: string;
-  direction?: string;
-  language?: string;
-}
-
 
 export interface PrerenderLocation {
   url?: string;
@@ -29,7 +15,6 @@ export interface HydrateResults {
   host?: string;
   hostname?: string;
   port?: string;
-  path?: string;
   pathname?: string;
   search?: string;
   query?: string;
@@ -59,13 +44,20 @@ export interface HydrateAnchor {
 }
 
 
-export interface HydrateOptions extends RenderOptions {
+export interface HydrateOptions {
+  canonicalLink?: boolean;
+  collapseWhitespace?: boolean;
+  inlineAssetsMaxSize?: number;
+  insertModulePreload?: boolean;
+  inlineStyles?: boolean;
+  removeUnusedStyles?: boolean;
+  relocateMetaCharset?: boolean;
+  ssrIds?: boolean;
   req?: {
     protocol: string;
     get: (key: string) => string;
     originalUrl: string;
   };
-  html?: string;
   url?: string;
   path?: string;
   referrer?: string;
@@ -73,14 +65,14 @@ export interface HydrateOptions extends RenderOptions {
   cookie?: string;
   direction?: string;
   language?: string;
-  isPrerender?: boolean;
-  serializeHtml?: boolean;
-  destroyDom?: boolean;
   console?: {
     [level: string]: (...msgs: string[]) => void;
   };
-  hydrateComponents?: boolean;
-  timestamp?: string;
+  collectAnchors?: boolean;
+  collectComponents?: boolean;
+  collectImgUrls?: boolean;
+  collectScriptUrls?: boolean;
+  collectStylesheetUrls?: boolean;
 }
 
 

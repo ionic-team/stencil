@@ -12,7 +12,7 @@ export async function generateLazyAppCore(config: d.Config, compilerCtx: d.Compi
     bundleEntryInputs[entryModule.entryKey] = entryModule.entryKey;
   });
 
-  return bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, appCoreEntryFilePath, bundleEntryInputs);
+  return bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, 'client', appCoreEntryFilePath, bundleEntryInputs);
 }
 
 

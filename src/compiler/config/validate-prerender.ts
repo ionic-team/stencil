@@ -32,9 +32,7 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
   setStringConfig(outputTarget, 'baseUrl', defaults.baseUrl);
   setBooleanConfig(outputTarget, 'canonicalLink', null, defaults.canonicalLink);
   setBooleanConfig(outputTarget, 'collapseWhitespace', null, defaults.collapseWhitespace);
-  setBooleanConfig(outputTarget, 'hydrateComponents', null, defaults.hydrateComponents);
   setBooleanConfig(outputTarget, 'inlineStyles', null, defaults.inlineStyles);
-  setBooleanConfig(outputTarget, 'inlineLoaderScript', null, defaults.inlineLoaderScript);
   setNumberConfig(outputTarget, 'inlineAssetsMaxSize', null, defaults.inlineAssetsMaxSize);
   setBooleanConfig(outputTarget, 'prerenderUrlCrawl', null, defaults.prerenderUrlCrawl);
   setArrayConfig(outputTarget, 'prerenderLocations', defaults.prerenderLocations);
@@ -56,10 +54,6 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
       path: outputTarget.baseUrl
     });
   }
-
-  if (outputTarget.hydrateComponents) {
-    config.buildEs5 = true;
-  }
 }
 
 
@@ -69,9 +63,7 @@ const FULL_PRERENDER_DEFAULTS: d.OutputTargetWww = {
   baseUrl: '/',
   canonicalLink: true,
   collapseWhitespace: true,
-  hydrateComponents: true,
   inlineStyles: true,
-  inlineLoaderScript: true,
   inlineAssetsMaxSize: 5000,
   prerenderUrlCrawl: true,
   prerenderPathHash: false,
@@ -87,9 +79,7 @@ const SSR_DEFAULTS: d.OutputTargetWww = {
   baseUrl: '/',
   canonicalLink: true,
   collapseWhitespace: true,
-  hydrateComponents: true,
   inlineStyles: true,
-  inlineLoaderScript: true,
   inlineAssetsMaxSize: 0,
   prerenderUrlCrawl: false,
   prerenderPathHash: false,
@@ -105,9 +95,7 @@ const PROD_NON_HYDRATE_DEFAULTS: d.OutputTargetWww = {
   baseUrl: '/',
   canonicalLink: false,
   collapseWhitespace: true,
-  hydrateComponents: false,
   inlineStyles: false,
-  inlineLoaderScript: true,
   inlineAssetsMaxSize: 0,
   prerenderUrlCrawl: false,
   prerenderPathHash: false,
@@ -123,9 +111,7 @@ const DEV_MODE_DEFAULTS: d.OutputTargetWww = {
   baseUrl: '/',
   canonicalLink: false,
   collapseWhitespace: false,
-  hydrateComponents: false,
   inlineStyles: false,
-  inlineLoaderScript: false,
   inlineAssetsMaxSize: 0,
   prerenderUrlCrawl: false,
   prerenderPathHash: false,

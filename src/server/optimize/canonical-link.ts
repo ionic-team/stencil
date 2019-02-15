@@ -1,11 +1,12 @@
-import { sys } from '@sys';
+import * as d from '@declarations';
+import { URL } from 'url';
 
 
-export function updateCanonicalLink(doc: Document, windowLocationPath: string) {
+export function updateCanonicalLink(doc: Document, opts: d.HydrateOptions) {
   // https://webmasters.googleblog.com/2009/02/specify-your-canonical.html
   // <link rel="canonical" href="http://www.example.com/product.php?item=swedish-fish" />
 
-  if (typeof windowLocationPath !== 'string') {
+  if (typeof opts.url !== 'string') {
     return;
   }
 
@@ -16,14 +17,14 @@ export function updateCanonicalLink(doc: Document, windowLocationPath: string) {
 
   const existingHref = canonicalLink.getAttribute('href');
 
-  const updatedRref = updateCanonicalLinkHref(existingHref, windowLocationPath);
+  const updatedRref = updateCanonicalLinkHref(existingHref, opts.url);
 
   canonicalLink.setAttribute('href', updatedRref);
 }
 
 
 export function updateCanonicalLinkHref(href: string, windowLocationPath: string) {
-  const parsedUrl = sys.url.parse(windowLocationPath);
+  const parsedUrl = new URL(windowLocationPath);
 
   if (typeof href === 'string') {
     href = href.trim();
@@ -36,5 +37,5 @@ export function updateCanonicalLinkHref(href: string, windowLocationPath: string
     href = '';
   }
 
-  return `${href}${parsedUrl.path}`;
+  return `${href}${parsedUrl.pathname}`;
 }

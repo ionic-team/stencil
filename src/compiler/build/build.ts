@@ -1,11 +1,10 @@
 import * as d from '@declarations';
-import { buildAuxiliaries } from './build-auxiliaries';
 import { catchError } from '@utils';
 import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
-import { initIndexHtmls } from '../html/init-index-html';
+import { initIndexHtmls } from './init-index-html';
 import { sys } from '@sys';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
@@ -63,10 +62,6 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
-
-    // await on our other optional stuff like docs, service workers, etc.
-    await buildAuxiliaries(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
   } catch (e) {

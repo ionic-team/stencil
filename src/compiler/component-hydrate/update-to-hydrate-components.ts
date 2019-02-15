@@ -1,25 +1,25 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { sys } from '@sys';
-import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';
 import { sortBy } from '@utils';
+import { sys } from '@sys';
+import { transformToHydrateComponentText } from '../transformers/component-hydrate/tranform-to-hydrate-component';
 
 
-export async function updateToNativeComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
-  const nativeCmps = await Promise.all(
-    cmps.map(cmp => updateToNativeComponent(compilerCtx, buildCtx, build, cmp))
+export async function updateToHydrateComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
+  const hydrateCmps = await Promise.all(
+    cmps.map(cmp => updateToHydrateComponent(compilerCtx, buildCtx, build, cmp))
   );
-  return sortBy(nativeCmps, c => c.componentClassName);
+  return sortBy(hydrateCmps, c => c.componentClassName);
 }
 
 
-async function updateToNativeComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
+async function updateToHydrateComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
   const inputFilePath = cmp.jsFilePath;
   const inputFileDir = sys.path.dirname(inputFilePath);
   const inputFileName = sys.path.basename(inputFilePath);
   const inputJsText = await compilerCtx.fs.readFile(inputFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputJsText);
+  const cacheKey = compilerCtx.cache.createKey('hydrate', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputJsText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = sys.path.join(inputFileDir, outputFileName);
 
@@ -32,7 +32,7 @@ async function updateToNativeComponent(compilerCtx: d.CompilerCtx, buildCtx: d.B
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
-    outputJsText = transformToNativeComponentText(compilerCtx, buildCtx, build, cmp, inputJsText);
+    outputJsText = transformToHydrateComponentText(compilerCtx, buildCtx, build, cmp, inputJsText);
 
     await compilerCtx.cache.put(cacheKey, outputJsText);
   }

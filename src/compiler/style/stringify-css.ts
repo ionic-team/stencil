@@ -5,7 +5,7 @@
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
 import { getSelectors } from './get-selectors';
-import { UsedSelectors } from '../html/used-selectors';
+import { UsedSelectors } from './used-selectors';
 
 
 export class StringifyCss {

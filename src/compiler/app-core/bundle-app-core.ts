@@ -9,7 +9,7 @@ import { OutputAsset, OutputChunk, OutputOptions, RollupOptions } from 'rollup';
 import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencies';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], corePlatform: 'client' | 'server', appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
   const rollupResults: d.RollupResult[] = [];
 
   bundleEntryInputs[config.fsNamespace] = '@core-entrypoint';
@@ -18,10 +18,10 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     const rollupOptions: RollupOptions = {
       input: bundleEntryInputs,
       plugins: [
-        stencilDependenciesPlugin(config, appCoreEntryFilePath),
+        stencilDependenciesPlugin(corePlatform, appCoreEntryFilePath),
         buildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),
-        componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
+        componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true

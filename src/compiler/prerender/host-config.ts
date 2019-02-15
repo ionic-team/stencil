@@ -34,7 +34,7 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
 
 export function generateHostRule(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRule: d.HostRule = {
-    include: hydrateResults.path,
+    include: hydrateResults.pathname,
     headers: generateHostRuleHeaders(config, outputTarget, entryModules, hydrateResults)
   };
 

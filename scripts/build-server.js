@@ -3,81 +3,74 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { transpile } = require('./script-utils');
-
-const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-server');
-const ENTRY_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
-const DEST_DIR = path.join(__dirname, '..', 'dist', 'server');
-const DEST_FILE = path.join(DEST_DIR, 'index.js');
+const { run, transpile, updateBuildIds } = require('./script-utils');
+const { urlPlugin } = require('./plugin-url');
 
 
-const success = transpile(path.join('..', 'src', 'server', 'tsconfig.json'));
+const DIST_DIR = path.join(__dirname, '..', 'dist');
+const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-server');
+const INPUT_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
+const SERVER_DIST_DIR = path.join(DIST_DIR, 'server');
+const SERVER_DIST_FILE = path.join(SERVER_DIST_DIR, 'index.mjs');
 
-if (success) {
 
-  async function bundleServer() {
-    const rollupBuild = await rollup.rollup({
-      input: ENTRY_FILE,
-      external: [
-        'assert',
-        'buffer',
-        'crypto',
-        'fs',
-        'module',
-        'os',
-        'path',
-        'child_process',
-        '../compiler',
-        '../mock-doc',
-        '../runtime',
-      ],
-      plugins: [
-        (() => {
-          return {
-            resolveId(id) {
-              if (id === '@stencil/core/build-conditionals') {
-                return '../compiler';
-              }
-              if (id === '@mock-doc') {
-                return '../mock-doc';
-              }
-              if (id === '@stencil/core/runtime') {
-                return '../runtime';
-              }
+async function bundleServer() {
+  const rollupBuild = await rollup.rollup({
+    input: INPUT_FILE,
+    external: [
+      '@stencil/core/app-components',
+      '@stencil/core/build-conditionals'
+    ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(id) {
+            if (id === '@build-conditionals') {
+              return '@stencil/core/build-conditionals';
+            }
+            if (id === '@mock-doc') {
+              return path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
+            }
+            if (id === '@platform') {
+              return path.join(TRANSPILED_DIR, 'server', 'index.js');
+            }
+            if (id === '@runtime') {
+              return path.join(TRANSPILED_DIR, 'runtime', 'index.js');
+            }
+            if (id === '@utils') {
+              return path.join(TRANSPILED_DIR, 'utils', 'index.js');
             }
           }
-        })(),
-        rollupResolve({
-          preferBuiltins: true
-        }),
-        rollupCommonjs()
-      ],
-      onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error(message);
-      }
-    });
+        }
+      })(),
+      urlPlugin(),
+      rollupResolve({
+        preferBuiltins: true
+      }),
+      rollupCommonjs()
+    ],
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
+  });
 
-    // copy over all the .d.ts file too
-    await fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
-      filter: (src) => {
-        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-      }
-    });
+  const { output } = await rollupBuild.generate({
+    format: 'esm',
+    file: SERVER_DIST_FILE
+  });
 
-    await rollupBuild.write({
-      format: 'cjs',
-      file: DEST_FILE
-    });
-  }
+  const outputText = updateBuildIds(output[0].code);
+
+  await fs.ensureDir(path.dirname(SERVER_DIST_FILE));
+  await fs.writeFile(SERVER_DIST_FILE, outputText);
+}
+
+
+run(async () => {
+  transpile(path.join('..', 'src', 'server', 'tsconfig.json'))
 
   await bundleServer();
 
-  process.on('exit', () => {
-    fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅  server`);
-  });
-
-} else {
-  console.log(`❌  server`);
-}
+  // await fs.remove(TRANSPILED_DIR);
+});

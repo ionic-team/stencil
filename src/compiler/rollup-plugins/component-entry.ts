@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { generateComponentEntry } from '../component-lazy/generate-cmp-entry';
 
 
-export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
+export function componentEntryPlugin(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
   const entrys = new Map<string, d.EntryModule>();
 
   return {
@@ -25,7 +25,7 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
       if (build.lazyLoad) {
         const entryModule = entrys.get(id);
         if (entryModule != null) {
-          return generateComponentEntry(config, compilerCtx, buildCtx, build, entryModule);
+          return generateComponentEntry(compilerCtx, buildCtx, build, entryModule);
         }
       }
 

@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Test Style Modes",
+      "name": "Style Modes",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
@@ -20,7 +20,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Test Hello World",
+      "name": "Hello World",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
@@ -33,7 +33,21 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Test End-To-End",
+      "name": "Hello World Prerender",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--prerender",
+        "--config",
+        "${workspaceFolder}/test/hello-world/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "End-To-End",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
@@ -46,7 +60,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Test Karma",
+      "name": "Karma",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",

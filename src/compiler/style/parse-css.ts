@@ -12,7 +12,7 @@ import * as d from '@declarations';
 const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
 
-export function parseCss(_config: d.Config, css: string, filePath?: string): {
+export function parseCss(css: string, filePath?: string): {
   type: string;
   stylesheet: {
     source: string;

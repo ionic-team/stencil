@@ -11,14 +11,14 @@ export function collapseHtmlWhitepace(node: Node) {
     for (let j = attributes.length - 1; j >= 0; j--) {
       const attr = attributes.item(j);
       if (!attr.value) {
-        if (SAFE_TO_REMOVE_EMPTY_ATTRS.includes(attr.name)) {
+        if (SAFE_TO_REMOVE_EMPTY_ATTRS.has(attr.name)) {
           (node as HTMLElement).removeAttribute(attr.name);
         }
       }
     }
   }
 
-  if (WHITESPACE_SENSITIVE_TAGS.includes((<HTMLElement>node).nodeName)) {
+  if (WHITESPACE_SENSITIVE_TAGS.has((<HTMLElement>node).nodeName)) {
     return;
   }
 
@@ -52,8 +52,8 @@ export function collapseHtmlWhitepace(node: Node) {
 }
 
 const REDUCE_WHITESPACE_REGEX = /\s\s+/g;
-const WHITESPACE_SENSITIVE_TAGS = ['PRE', 'SCRIPT', 'STYLE', 'TEXTAREA'];
-const SAFE_TO_REMOVE_EMPTY_ATTRS = [
+const WHITESPACE_SENSITIVE_TAGS = new Set(['PRE', 'SCRIPT', 'STYLE', 'TEXTAREA']);
+const SAFE_TO_REMOVE_EMPTY_ATTRS = new Set([
   'class',
   'style',
-];
+]);

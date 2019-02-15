@@ -4,46 +4,56 @@ import ts from 'typescript';
 import { REGISTER_HOST } from '../exports';
 
 
-export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, ensureSuper: boolean) {
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
 
   if (cstrMethodIndex >= 0) {
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-    const before: ts.Statement[] = [];
-
-    const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
-    if (!hasSuper) {
-      before.push(createSuper());
-    }
-
-    const body = ts.updateBlock(cstrMethod.body, [
-      ...before,
+    let statements: ts.Statement[] = [
       nativeRegisterHostStatement(),
       ...cstrMethod.body.statements,
       ...addCreateEvents(cmp)
-    ]);
+    ];
+
+    if (ensureSuper) {
+      const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
+      if (!hasSuper) {
+        statements = [
+          createSuper(),
+          ...statements
+        ];
+      }
+    }
 
     classMembers[cstrMethodIndex] = ts.updateConstructor(
       cstrMethod,
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethod.parameters,
-      body
+      ts.updateBlock(cstrMethod.body, statements)
     );
 
   } else {
     // create a constructor()
+    let statements: ts.Statement[] = [
+      nativeRegisterHostStatement(),
+      ...addCreateEvents(cmp)
+    ];
+
+    if (ensureSuper) {
+      statements = [
+        createSuper(),
+        ...statements
+      ];
+    }
+
     const cstrMethod = ts.createConstructor(
       undefined,
       undefined,
       undefined,
-      ts.createBlock([
-        createSuper(),
-        nativeRegisterHostStatement(),
-        ...addCreateEvents(cmp)
-      ], true)
+      ts.createBlock(statements, true)
     );
     classMembers.unshift(cstrMethod);
   }

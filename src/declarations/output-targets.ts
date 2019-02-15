@@ -56,24 +56,10 @@ export interface OutputTargetWww extends OutputTargetBase {
   collapseWhitespace?: boolean;
 
   /**
-   * If components should be hydrated while prerendering.
-   * Default: `true`
-   */
-  hydrateComponents?: boolean;
-
-  /**
    * If styles should be inlined during prerendering.
    * Default: `true`
    */
   inlineStyles?: boolean;
-
-  /**
-   * If the loader script should be inlined into the prerendered
-   * page or not. Inlining the loader script allows the first render
-   * to have one less request, but adds a small amount more to the file size.
-   * Default: `true`
-   */
-  inlineLoaderScript?: boolean;
 
 
   inlineAssetsMaxSize?: number;
@@ -142,17 +128,7 @@ export interface OutputTargetWww extends OutputTargetBase {
 }
 
 export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
-  html?: string;
-  url?: string;
-  path?: string;
-  referrer?: string;
-  userAgent?: string;
-  cookie?: string;
-  direction?: string;
-  language?: string;
-  isPrerender?: boolean;
-  serializeHtml?: boolean;
-  destroyDom?: boolean;
+
 }
 
 

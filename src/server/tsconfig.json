@@ -21,18 +21,25 @@
     "noUnusedParameters": true,
     "outDir": "../../dist/transpiled-server",
     "pretty": true,
+    "removeComments": true,
     "rootDir": "../",
-    "target": "es2015",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
       ],
+      "@compiler": [
+        "../compiler/index.ts"
+      ],
       "@declarations": [
         "../declarations/index.ts"
       ],
+      "@mock-doc": [
+        "../mock-doc/index.ts"
+      ],
       "@platform": [
-        "../client/index.ts"
+        "./platform.ts"
       ],
       "@runtime": [
         "../runtime/index.ts"
@@ -45,6 +52,9 @@
       ]
     }
   },
+  "include": [
+    "../../types/*.d.ts"
+  ],
   "files": [
     "./index.ts"
   ]

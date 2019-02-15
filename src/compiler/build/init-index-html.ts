@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -17,7 +16,7 @@ async function initIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, build
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (isOutputTargetWww(outputTarget)) {
+  if (outputTarget.type === 'www') {
     // only worry about this when generating www directory
 
     // check if there's even a src index.html file

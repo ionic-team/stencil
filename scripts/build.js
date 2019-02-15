@@ -29,6 +29,7 @@ run(async () => {
     ['Mock Doc', 'build-mock-doc.js'],
     ['Runtime', 'build-runtime.js'],
     ['Screenshot', 'build-screenshot.js'],
+    ['Server', 'build-server.js'],
     ['Submodules', 'build-submodules.js'],
     ['Sys Node', 'build-sys-node.js'],
     ['Testing', 'build-testing.js']

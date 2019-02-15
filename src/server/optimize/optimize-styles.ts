@@ -1,16 +1,16 @@
 import * as d from '@declarations';
-import { removeUnusedStyles } from './remove-unused-styles';
-import { UsedSelectors } from '../html/used-selectors';
+import { removeUnusedStyles } from '../../compiler/style/remove-unused-styles';
+import { UsedSelectors } from '../../compiler/style/used-selectors';
 
 
-export function optimizeSsrStyles(config: d.Config, outputTarget: d.OutputTargetHydrate, doc: Document, diagnostics: d.Diagnostic[]) {
+export function optimizeStyles(opts: d.HydrateOptions, results: d.HydrateResults, doc: Document) {
   const ssrStyleElm = mergeSsrStyles(doc);
 
   if (ssrStyleElm == null) {
     return;
   }
 
-  if (outputTarget.removeUnusedStyles !== false) {
+  if (opts.removeUnusedStyles !== false) {
     // removeUnusedStyles is the default
     try {
       // pick out all of the selectors that are actually
@@ -18,11 +18,11 @@ export function optimizeSsrStyles(config: d.Config, outputTarget: d.OutputTarget
       const usedSelectors = new UsedSelectors(doc.documentElement);
 
       // remove any selectors that are not used in this document
-      ssrStyleElm.innerHTML = removeUnusedStyles(config, usedSelectors, ssrStyleElm.innerHTML, diagnostics);
+      ssrStyleElm.innerHTML = removeUnusedStyles(results, usedSelectors, ssrStyleElm.innerHTML);
 
     } catch (e) {
-      diagnostics.push({
-        level: 'error',
+      results.diagnostics.push({
+        level: 'warn',
         type: 'hydrate',
         header: 'HTML Selector Parse',
         messageText: e

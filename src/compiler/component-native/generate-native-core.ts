@@ -8,7 +8,7 @@ import { updateToNativeComponents } from './update-to-native-component';
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const appCoreEntryFilePath = await generateNativeAppCoreEntry(config, compilerCtx, buildCtx, build, cmps);
 
-  return bundleAppCore(config, compilerCtx, buildCtx, build, [], appCoreEntryFilePath, {});
+  return bundleAppCore(config, compilerCtx, buildCtx, build, [], 'client', appCoreEntryFilePath, {});
 }
 
 
@@ -17,7 +17,7 @@ async function generateNativeAppCoreEntry(config: d.Config, compilerCtx: d.Compi
   const appCoreEntryFilePath = sys.path.join(config.cacheDir, appCoreEntryFileName);
 
   const coreText: string[] = [];
-  const nativeCmps = await updateToNativeComponents(config, compilerCtx, buildCtx, build, cmps);
+  const nativeCmps = await updateToNativeComponents(compilerCtx, buildCtx, build, cmps);
 
   const platformImports: string[] = [];
   platformImports.push('proxyComponent');

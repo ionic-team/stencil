@@ -5,7 +5,7 @@ import { sys } from '@sys';
 import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';
 
 
-export async function updateToLazyComponent(_config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
+export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
   const inputFilePath = cmp.jsFilePath;
   const inputFileDir = sys.path.dirname(inputFilePath);
   const inputFileName = sys.path.basename(inputFilePath);

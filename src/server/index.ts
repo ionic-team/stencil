@@ -1,5 +1,5 @@
 
-export { h } from '@runtime';
-export { initApp, ssrMiddleware, ssrPathRegex } from './middleware/express-middleware';
-export { loadConfig } from './load-config';
-export { Renderer } from './renderer';
+// export { initApp, ssrMiddleware, ssrPathRegex } from './middleware/express-middleware';
+export { hydrateDocumentSync, renderToStringSync } from './render';
+export { registerComponents } from './component-registry';
+export * from './platform';

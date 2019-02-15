@@ -1,8 +1,7 @@
-import * as d from '@declarations';
 import { sys } from '@sys';
 
 
-export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePath: string) {
+export function stencilDependenciesPlugin(corePlatform: 'client' | 'server', appCoreEntryFilePath: string) {
 
   return {
     resolveId(id: string) {
@@ -15,8 +14,8 @@ export function stencilDependenciesPlugin(_config: d.Config, appCoreEntryFilePat
       }
 
       if (id === '@stencil/core/platform') {
-        const clientPlatform = 'index.mjs';
-        return sys.path.join(sys.compiler.distDir, 'client', clientPlatform);
+        const platformEntry = 'index.mjs';
+        return sys.path.join(sys.compiler.distDir, corePlatform, platformEntry);
       }
       return null;
     },
