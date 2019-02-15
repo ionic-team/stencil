@@ -22,7 +22,7 @@
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
     "rootDir": "../",
-    "target": "es2015",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [

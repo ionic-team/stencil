@@ -22,7 +22,7 @@
     "outDir": "../../dist/transpiled-testing",
     "pretty": true,
     "rootDir": "../",
-    "target": "es2015",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@build-conditionals": [

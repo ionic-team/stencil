@@ -10,7 +10,7 @@
     ],
     "moduleResolution": "node",
     "module": "esnext",
-    "target": "es2015",
+    "target": "es2017",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",

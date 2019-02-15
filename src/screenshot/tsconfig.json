@@ -21,7 +21,7 @@
     "outDir": "../../dist/transpiled-screenshot",
     "pretty": true,
     "rootDir": "../",
-    "target": "es2015",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
       "@declarations": [
