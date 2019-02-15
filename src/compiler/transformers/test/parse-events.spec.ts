@@ -21,6 +21,7 @@ describe('parse events', () => {
       bubbles: true,
       cancelable: true,
       composed: true,
+      internal: false,
       complexType: {
         original: 'string',
         resolved: 'string',
@@ -54,6 +55,7 @@ describe('parse events', () => {
       bubbles: false,
       cancelable: false,
       composed: false,
+      internal: false,
       complexType: {
         original: 'void',
         resolved: `void`,

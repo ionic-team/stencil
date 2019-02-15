@@ -1,5 +1,6 @@
 
 export const CREATE_EVENT = '__stencil_createEvent';
+export const HOST = '__stencil_Host';
 export const GET_CONNECT = '__stencil_getConnect';
 export const GET_CONTEXT = '__stencil_getContext';
 export const GET_ELEMENT = '__stencil_getElement';
@@ -13,5 +14,6 @@ export const COMMON_IMPORTS = [
   `getConnect as ${GET_CONNECT}`,
   `getContext as ${GET_CONTEXT}`,
   `getElement as ${GET_ELEMENT}`,
+  `Host as ${HOST}`,
   `h as ${H}`,
 ];

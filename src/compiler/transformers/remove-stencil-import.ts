@@ -34,5 +34,6 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
 export const KEEP_IMPORTS = [
   'h',
   'setMode',
-  'getMode'
+  'getMode',
+  'Host'
 ];

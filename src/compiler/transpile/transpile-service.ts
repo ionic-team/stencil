@@ -402,6 +402,17 @@ const PRIME_TS_CACHE_TIMEOUT = 1000;
 
 
 export function isFileIncludePath(config: d.Config, readPath: string) {
+  // filter e2e tests
+  if (readPath.includes('.e2e.') || readPath.includes('/e2e.')) {
+    // keep this test if it's an e2e file and we should be testing e2e
+    return false;
+  }
+
+  // filter spec tests
+  if (readPath.includes('.spec.') || readPath.includes('/spec.')) {
+    return false;
+  }
+
   for (var i = 0; i < config.excludeSrc.length; i++) {
     if (minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude

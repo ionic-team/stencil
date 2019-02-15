@@ -24,10 +24,6 @@ export function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
       if (!path.isAbsolute(importee)) {
         importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);
       }
-      const accessData = await compilerCtx.fs.accessData(importee);
-      if (accessData.exists) {
-        return accessData.isFile ? importee : path.join(importee, '/index.js');
-      }
 
       importee = normalizePath(importee);
       const importeeDir = path.dirname(importee);
@@ -38,6 +34,12 @@ export function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
       let moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.ts');
       if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
         return moduleFile.jsFilePath;
+      }
+
+      // Direct FS check
+      const accessData = await compilerCtx.fs.accessData(importee);
+      if (accessData.exists) {
+        return accessData.isFile ? importee : path.join(importee, '/index.js');
       }
 
       // Test .ts extension
@@ -67,7 +69,7 @@ export function inMemoryFsRead(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
       if (!buildCtx.isActiveBuild) {
         return `/* build aborted */`;
       }
-      return compilerCtx.fs.readFile(normalizePath(sourcePath));
+      return compilerCtx.fs.readFile(sourcePath);
     }
   };
 }

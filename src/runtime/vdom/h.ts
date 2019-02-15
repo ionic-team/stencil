@@ -12,7 +12,6 @@ import { BUILD } from '@build-conditionals';
 
 const stack: any[] = [];
 
-
 export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
 export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export function h(nodeName: any, vnodeData: any) {
@@ -122,6 +121,7 @@ export function h(nodeName: any, vnodeData: any) {
   return vnode;
 }
 
+export const Host: d.FunctionalComponent<any> = {} as any;
 
 const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.forEach(cb),

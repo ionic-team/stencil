@@ -70,6 +70,11 @@ export declare const setMode: (handler: ((elm: HTMLElement) => string | undefine
  */
 export declare const getMode: (ref: any) => string | undefined;
 
+/**
+ * Host
+ */
+export declare const Host: d.FunctionalComponent<any>;
+
 export interface HostElement extends HTMLElement {}
 
 export declare namespace h {

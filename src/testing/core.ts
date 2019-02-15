@@ -62,4 +62,4 @@ export declare const State: d.StateDecorator;
 export declare const Watch: d.WatchDecorator;
 
 
-export { h } from '@runtime';
+export { Host, h } from '@runtime';

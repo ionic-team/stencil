@@ -28,14 +28,15 @@ async function generateLazyAppCoreEntry(config: d.Config, compilerCtx: d.Compile
   coreText.push(`bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);`);
 
   const platformExports: string[] = [
+    'registerInstance',
     'createEvent',
     'getConnect',
     'getContext',
     'getElement',
     'setMode',
     'getMode',
+    'Host',
     'h',
-    'registerInstance'
   ];
   coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
 

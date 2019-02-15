@@ -9,7 +9,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, plt } from '@platform';
-import { h } from './h';
+import { Host, h } from './h';
 import { NODE_TYPE } from '../runtime-constants';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
 import { updateElement } from './update-element';
@@ -600,7 +600,7 @@ interface RelocateNode {
 }
 
 const isHost = (node: any): node is d.VNode => {
-  return node && node.vtag === 'host';
+  return node && node.vtag === Host;
 };
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {

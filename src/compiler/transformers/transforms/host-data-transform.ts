@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { H } from '../exports';
+import { H, HOST } from '../exports';
 
 export function transformHostData(classElements: ts.ClassElement[]) {
   const hasHostData = !!classElements.find(e => ts.isMethodDeclaration(e) && e.name.getText() === 'hostData');
@@ -26,7 +26,7 @@ export function transformHostData(classElements: ts.ClassElement[]) {
 
 function syntheticRender(hasRender: boolean) {
   const hArguments = [
-    ts.createLiteral('host'),
+    ts.createIdentifier(HOST),
     ts.createCall(
       ts.createPropertyAccess(ts.createThis(), 'hostData'),
       undefined,
@@ -63,4 +63,4 @@ function syntheticRender(hasRender: boolean) {
   );
 }
 
-const INTERNAL_RENDER = '__internalRender_';
+const INTERNAL_RENDER = '__stencil_render';

@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Host, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -43,7 +43,7 @@ describe('hostData', () => {
 
       render() {
         return (
-          <host
+          <Host
             role='alert'
             aria-hidden={this.hidden ? 'true' : null}
             hidden={this.hidden}
