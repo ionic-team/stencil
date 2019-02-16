@@ -72,5 +72,5 @@ run(async () => {
 
   await bundleServer();
 
-  // await fs.remove(TRANSPILED_DIR);
+  await fs.remove(TRANSPILED_DIR);
 });

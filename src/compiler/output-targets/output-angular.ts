@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { dashToPascalCase, sortBy } from '@utils';
+import { isOutputTargetAngular } from './output-utils';
 import { sys } from '@sys';
 
 
@@ -8,9 +9,9 @@ export async function outputAngularProxies(config: d.Config, compilerCtx: d.Comp
     return;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetAngular[]).filter(o => {
-    return o.type === 'angular' && o.directivesProxyFile;
-  });
+  const outputTargets = config.outputTargets
+    .filter(isOutputTargetAngular)
+    .filter(o => o.directivesProxyFile);
 
   if (outputTargets.length === 0) {
     return;
@@ -132,11 +133,11 @@ function getInputs(cmpMeta: d.ComponentCompilerMeta): string[] {
 }
 
 function getOutputs(cmpMeta: d.ComponentCompilerMeta): string[] {
-  return cmpMeta.events.filter(ev => !ev.internal).map(prop => prop.name)
+  return cmpMeta.events.filter(ev => !ev.internal).map(prop => prop.name);
 }
 
 function getMethods(cmpMeta: d.ComponentCompilerMeta): string[] {
-  return cmpMeta.methods.filter(method => !method.internal).map(prop => prop.name)
+  return cmpMeta.methods.filter(method => !method.internal).map(prop => prop.name);
 }
 
 function getProxyUtils(outputTarget: d.OutputTargetAngular) {

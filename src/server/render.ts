@@ -6,7 +6,7 @@ import { MockDocument } from '@mock-doc';
 import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document';
 
 
-export function renderToStringSync(html: string, opts: d.HydrateOptions) {
+export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
   if (typeof html !== 'string') {
     throw new Error('Invalid html');
   }
@@ -32,7 +32,7 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions) {
 }
 
 
-export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions) {
+export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) {
   if (doc == null || doc.documentElement == null || typeof doc.documentElement.nodeType !== 'number') {
     throw new Error('Invalid document');
   }

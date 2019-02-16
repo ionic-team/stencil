@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { generateHydrateApp } from '../component-hydrate/generate-hydrate-app';
+import { isOutputTargetAngular, isOutputTargetDist, isOutputTargetWww } from './output-utils';
 
 
 export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,17 +8,16 @@ export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx
     return;
   }
 
-  const wwwOutputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => {
-    return (o.type === 'www' && typeof o.indexHtml === 'string');
-  });
+  const wwwOutputTargets = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter(o => o.indexHtml);
 
-  const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => {
-    return (o.type === 'dist');
-  });
+  const distOutputTargets = config.outputTargets
+    .filter(isOutputTargetDist);
 
-  const angularOutputTargets = (config.outputTargets as d.OutputTargetAngular[]).filter(o => {
-    return (o.type === 'angular');
-  });
+  const angularOutputTargets = config.outputTargets
+    .filter(isOutputTargetAngular)
+    .filter(o => o.serverModuleFile);
 
   const outputTargets = [
     ...wwwOutputTargets,
