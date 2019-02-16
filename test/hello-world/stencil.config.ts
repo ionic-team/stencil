@@ -3,9 +3,7 @@ import { Config } from '../../dist';
 export const config: Config = {
 
   namespace: 'HelloWorld',
-
   hashFileNames: false,
-
   outputTargets: [
     {
       type: 'www',
@@ -15,6 +13,5 @@ export const config: Config = {
       type: 'dist'
     }
   ],
-  globalScript: 'src/global/app.ts',
   enableCache: false
 };

@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { dashToPascalCase, normalizePath } from '@utils';
+import { normalizePath } from '@utils';
 import { sys } from '@sys';
 import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';
 
@@ -40,7 +40,7 @@ export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx
 
 function createComponentExport(cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) {
   const originalClassName = cmp.componentClassName;
-  const pascalCasedClassName = dashToPascalCase(cmp.tagName);
+  const pascalCasedClassName = cmp.tagName.replace(/-/g, '_');
   const filePath = normalizePath(lazyModuleFilePath);
 
   if (originalClassName === pascalCasedClassName) {

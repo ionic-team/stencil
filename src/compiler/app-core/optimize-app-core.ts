@@ -16,11 +16,17 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
 
   } else {
     opts.ecma = 7;
+    opts.module = true;
     opts.output.ecma = 7;
     opts.compress.ecma = 7;
+    opts.compress.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
   }
+
+  opts.compress.pure_getters = true;
+  opts.compress.keep_fargs = false;
+  opts.compress.passes = 3;
 
   if (build.isDebug) {
     // if in debug mode, still mangle the property names
@@ -90,7 +96,7 @@ export const PROD_MINIFY_OPTS = JSON.stringify({
     keep_infinity: true,
     loops: true,
     negate_iife: false,
-    passes: 3,
+    passes: 4,
     properties: true,
     pure_funcs: null,
     pure_getters: false,

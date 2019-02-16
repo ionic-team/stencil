@@ -75,7 +75,7 @@ export type RuntimeRef = d.HostElement | {};
 
 export interface HostRef {
   ancestorComponent?: d.HostElement;
-  flags: number;
+  stateFlags: number;
   hostElement?: d.HostElement;
   instanceValues?: Map<string, any>;
   lazyInstance?: d.ComponentInstance;

@@ -28,10 +28,14 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
     opts.module = true;
     opts.output.ecma = 7;
     opts.compress.ecma = 7;
+    opts.compress.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
     opts.compress.pure_getters = true;
   }
+  opts.compress.pure_getters = true;
+  opts.compress.keep_fargs = false;
+  opts.compress.passes = 3;
 
   if (config.logLevel === 'debug') {
     opts.mangle = {};
@@ -45,7 +49,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
     opts.compress.pure_funcs = ['assert', 'console.debug'];
   }
 
-  opts.compress.passes = 2;
+  opts.compress.passes = 3;
 
   if (preamble) {
     opts.output.preamble = generatePreamble(config, { suffix: buildTimestamp });

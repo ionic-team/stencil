@@ -9,9 +9,9 @@ import { computeMode } from './mode';
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if (!(hostRef.flags & HOST_STATE.hasInitializedComponent)) {
+  if (!(hostRef.stateFlags & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
-    hostRef.flags |= HOST_STATE.hasInitializedComponent;
+    hostRef.stateFlags |= HOST_STATE.hasInitializedComponent;
 
     if (BUILD.lazyLoad) {
       // lazy loaded components
@@ -38,17 +38,15 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         // ok, time to construct the instance
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
-        BUILD.member && (hostRef.flags |= HOST_STATE.isConstructingInstance);
-        try {
-          // construct the lazy-loaded component implementation
-          // passing the hostRef is very important during
-          // construction in order to directly wire together the
-          // host element and the lazy-loaded instance
-          new (Cstr as any)(hostRef);
-        } catch (err) {
-          consoleError(err);
-        }
-        BUILD.member && (hostRef.flags &= ~HOST_STATE.isConstructingInstance);
+        BUILD.member && (hostRef.stateFlags |= HOST_STATE.isConstructingInstance);
+
+        // construct the lazy-loaded component implementation
+        // passing the hostRef is very important during
+        // construction in order to directly wire together the
+        // host element and the lazy-loaded instance
+        new (Cstr as any)(hostRef);
+
+        BUILD.member && (hostRef.stateFlags &= ~HOST_STATE.isConstructingInstance);
 
         if (BUILD.hostListener && hostRef.queuedReceivedHostEvents) {
           // events may have already fired before the instance was even ready
@@ -80,22 +78,20 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     }
   }
 
-  if (!BUILD.lazyLoad || hostRef.lazyInstance) {
-    // we've successfully created a lazy instance
+  // we've successfully created a lazy instance
 
-    if (BUILD.lifecycle && hostRef.ancestorComponent && !hostRef.ancestorComponent['s-lr']) {
-      // this is the intial load and this component it has an ancestor component
-      // but the ancestor component has NOT fired its will update lifecycle yet
-      // so let's just cool our jets and wait for the ancestor to continue first
-      (hostRef.ancestorComponent['s-rc'] = hostRef.ancestorComponent['s-rc'] || []).push(() =>
-        // this will get fired off when the ancestor component
-        // finally gets around to rendering its lazy self
-        // fire off the initial update
-        initializeComponent(elm, hostRef, cmpMeta)
-      );
+  if (BUILD.lifecycle && hostRef.ancestorComponent && !hostRef.ancestorComponent['s-lr']) {
+    // this is the intial load and this component it has an ancestor component
+    // but the ancestor component has NOT fired its will update lifecycle yet
+    // so let's just cool our jets and wait for the ancestor to continue first
+    (hostRef.ancestorComponent['s-rc'] = hostRef.ancestorComponent['s-rc'] || []).push(() =>
+      // this will get fired off when the ancestor component
+      // finally gets around to rendering its lazy self
+      // fire off the initial update
+      initializeComponent(elm, hostRef, cmpMeta)
+    );
 
-    } else {
-      scheduleUpdate(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
-    }
+  } else {
+    scheduleUpdate(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
   }
 };

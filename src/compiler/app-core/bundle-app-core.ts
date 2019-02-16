@@ -55,7 +55,10 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     }
 
     const generatePromises = outputOptions.map(async outputOption => {
-      const { output } = await rollupBuild.generate(outputOption);
+      const { output } = await rollupBuild.generate({
+        ...outputOption,
+        chunkFileNames: config.devMode ? '[name]-[hash].js' : '[hash].js'
+      });
 
       if (!buildCtx.shouldAbort) {
         const outputPromises = output.map(rollupOutput => {

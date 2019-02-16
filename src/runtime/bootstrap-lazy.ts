@@ -20,64 +20,60 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
       cmpLazyMeta.lazyBundleIds = lazyBundle[0];
 
-      class StencilLazyHost extends HTMLElement {
-        // StencilLazyHost
-        constructor() {
-          super();
-          registerHost(this);
-          if (BUILD.shadowDom && plt.supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
-            // DOM WRITE
-            // this component is using shadow dom
-            // and this browser supports shadow dom
-            // add the read-only property "shadowRoot" to the host element
-            this.attachShadow({ 'mode': 'open' });
-          }
-        }
-
-        connectedCallback() {
-          connectedCallback(this, cmpLazyMeta);
-        }
-
-        disconnectedCallback() {
-          if (BUILD.cmpDidUnload) {
-            disconnectedCallback(this);
-          }
-        }
-
-        's-init'() {
-          const hostRef = getHostRef(this);
-          if (hostRef.lazyInstance) {
-            postUpdateComponent(this, hostRef.lazyInstance, hostRef);
-          }
-        }
-
-        forceUpdate() {
-          if (BUILD.updatable) {
-            const hostRef = getHostRef(this);
-            scheduleUpdate(
-              this,
-              BUILD.lazyLoad ? hostRef.lazyInstance : this,
-              hostRef,
-              cmpLazyMeta,
-              false
-            );
-          }
-        }
-
-        componentOnReady(): any {
-          return componentOnReady(getHostRef(this));
-        }
-      }
-
       if (!customElements.get(cmpLazyMeta.cmpTag)) {
-
         if (BUILD.style) {
           cmpTags.push(cmpLazyMeta.cmpTag);
         }
-
         customElements.define(
           cmpLazyMeta.cmpTag,
-          proxyComponent(StencilLazyHost as any, cmpLazyMeta, 1, 0) as any
+          proxyComponent(class extends HTMLElement {
+            // StencilLazyHost
+            constructor() {
+              super();
+              registerHost(this);
+              if (BUILD.shadowDom && plt.supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
+                // DOM WRITE
+                // this component is using shadow dom
+                // and this browser supports shadow dom
+                // add the read-only property "shadowRoot" to the host element
+                this.attachShadow({ 'mode': 'open' });
+              }
+            }
+
+            connectedCallback() {
+              connectedCallback(this, cmpLazyMeta);
+            }
+
+            disconnectedCallback() {
+              if (BUILD.cmpDidUnload) {
+                disconnectedCallback(this);
+              }
+            }
+
+            's-init'() {
+              const hostRef = getHostRef(this);
+              if (hostRef.lazyInstance) {
+                postUpdateComponent(this, hostRef, hostRef.lazyInstance);
+              }
+            }
+
+            forceUpdate() {
+              if (BUILD.updatable) {
+                const hostRef = getHostRef(this);
+                scheduleUpdate(
+                  this,
+                  BUILD.lazyLoad ? hostRef.lazyInstance : this,
+                  hostRef,
+                  cmpLazyMeta,
+                  false
+                );
+              }
+            }
+
+            componentOnReady(): any {
+              return componentOnReady(getHostRef(this));
+            }
+          } as any, cmpLazyMeta, 1, 0) as any
         );
       }
     })

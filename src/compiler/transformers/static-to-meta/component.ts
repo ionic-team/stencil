@@ -92,7 +92,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     hasVdomKey: true,
     hasVdomListener: true,
     hasVdomRef: true,
-    hasVdomRender: true,
+    hasVdomRender: true, // TODO: use import check
     hasVdomStyle: true,
     hasVdomText: true,
     hasWatchCallback: false,

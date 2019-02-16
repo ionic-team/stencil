@@ -18,11 +18,16 @@ export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerC
 
   } else {
     opts.ecma = 7;
+    opts.module = true;
     opts.output.ecma = 7;
     opts.compress.ecma = 7;
+    opts.compress.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
   }
+  opts.compress.pure_getters = true;
+  opts.compress.keep_fargs = false;
+  opts.compress.passes = 3;
 
   let cacheKey: string;
   if (compilerCtx) {

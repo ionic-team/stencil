@@ -30,9 +30,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       });
     }
 
-    if (!(hostRef.flags & HOST_STATE.hasConnected)) {
+    if (!(hostRef.stateFlags & HOST_STATE.hasConnected)) {
       // first time this component has connected
-      hostRef.flags |= HOST_STATE.hasConnected;
+      hostRef.stateFlags |= HOST_STATE.hasConnected;
 
       if (BUILD.slotRelocation) {
         // initUpdate, BUILD.slotRelocation

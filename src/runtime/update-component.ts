@@ -7,7 +7,7 @@ import { renderVdom } from './vdom/render';
 
 export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
-    hostRef.flags |= HOST_STATE.isQueuedForUpdate;
+    hostRef.stateFlags |= HOST_STATE.isQueuedForUpdate;
   }
   try {
     if (isInitialLoad) {
@@ -46,10 +46,12 @@ export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef:
 const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.flags &= ~HOST_STATE.isQueuedForUpdate;
+    hostRef.stateFlags &= ~HOST_STATE.isQueuedForUpdate;
   }
 
-  elm['s-lr'] = false;
+  if (BUILD.lifecycle) {
+    elm['s-lr'] = false;
+  }
 
   if (isInitialLoad) {
     if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
@@ -77,15 +79,15 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
-    try {
+    if (BUILD.vdomRender || BUILD.reflect) {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
-      hostRef.flags |= HOST_STATE.isActiveRender;
+      hostRef.stateFlags |= HOST_STATE.isActiveRender;
 
-      // looks like we've got child nodes to render into this host element
-      // or we need to update the css class/attrs on the host element
-      if (BUILD.vdomRender || BUILD.reflect) {
+      try {
+        // looks like we've got child nodes to render into this host element
+        // or we need to update the css class/attrs on the host element
         // DOM WRITE!
         renderVdom(
           elm,
@@ -93,22 +95,20 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
           cmpMeta,
           (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
         );
+      } catch (e) {
+        consoleError(e);
       }
-
-    } catch (e) {
-      consoleError(e);
-    }
-
-    if (BUILD.updatable) {
-      // tell the platform we're done rendering
-      // now any changes will again queue
-      hostRef.flags &= ~HOST_STATE.isActiveRender;
+      hostRef.stateFlags &= ~HOST_STATE.isActiveRender;
+    } else {
+      elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
   }
 
   // set that this component lifecycle rendering has completed
-  elm['s-lr'] = true;
-  hostRef.flags |= HOST_STATE.hasRendered;
+  if (BUILD.lifecycle) {
+    elm['s-lr'] = true;
+  }
+  hostRef.stateFlags |= HOST_STATE.hasRendered;
 
   if (BUILD.lifecycle && elm['s-rc']) {
     // ok, so turns out there are some child host elements
@@ -118,15 +118,15 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
     elm['s-rc'] = undefined;
   }
 
-  postUpdateComponent(elm, instance, hostRef);
+  postUpdateComponent(elm, hostRef, instance);
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, instance: any, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   if (!elm['s-al']) {
 
-    if (!(hostRef.flags & HOST_STATE.hasLoadedComponent)) {
-      hostRef.flags |= HOST_STATE.hasLoadedComponent;
+    if (!(hostRef.stateFlags & HOST_STATE.hasLoadedComponent)) {
+      hostRef.stateFlags |= HOST_STATE.hasLoadedComponent;
 
       if (BUILD.lazyLoad && BUILD.style) {
         // DOM WRITE!
