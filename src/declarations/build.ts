@@ -44,6 +44,7 @@ export interface BuildCtx {
   hasStyleChanges: boolean;
   hasSvg: boolean;
   hasWarning: boolean;
+  hydrateAppFilePath: string;
   indexBuildCount: number;
   isActiveBuild: boolean;
   isRebuild: boolean;

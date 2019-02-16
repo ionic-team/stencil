@@ -1,60 +1,50 @@
 
 
 export class UsedSelectors {
-  tags: string[] = [];
-  classNames: string[] = [];
-  ids: string[] = [];
-  attrs: string[] = [];
+  tags = new Set<string>();
+  classNames = new Set<string>();
+  ids = new Set<string>();
+  attrs = new Set<string>();
 
   constructor(elm: Element) {
     this.collectSelectors(elm);
   }
 
   private collectSelectors(elm: Element) {
-    var i: number;
-
-    if (elm && elm.tagName) {
+    if (elm != null && elm.tagName) {
 
       // tags
       const tagName = elm.tagName.toLowerCase();
-      if (!this.tags.includes(tagName)) {
-        this.tags.push(tagName);
-      }
-
-      // classes
-      const classList = elm.classList;
-      for (i = 0; i < classList.length; i++) {
-        const className = classList.item(i);
-
-        if (!this.classNames.includes(className)) {
-          this.classNames.push(className);
-        }
-      }
+      this.tags.add(tagName);
 
       // attributes
       const attributes = elm.attributes;
-      for (i = 0; i < attributes.length; i++) {
+      for (let i = 0, l = attributes.length; i < l; i++) {
         const attr = attributes.item(i);
 
         const attrName = attr.name.toLowerCase();
-        if (!attrName || attrName === 'class' || attrName === 'id' || attrName === 'style') continue;
 
-        if (!this.attrs.includes(attrName)) {
-          this.attrs.push(attrName);
-        }
-      }
+        if (attrName === 'class') {
+          // classes
+          const classList = elm.classList;
+          for (let i = 0, l = classList.length; i < l; i++) {
+            this.classNames.add(classList.item(i));
+          }
 
-      // ids
-      var idValue = elm.getAttribute('id');
-      if (idValue) {
-        idValue = idValue.trim();
-        if (idValue && !this.ids.includes(idValue)) {
-          this.ids.push(idValue);
+        } else if (attrName === 'style') {
+          continue;
+
+        } else if (attrName === 'id') {
+          // ids
+          this.ids.add(attr.value);
+
+        } else {
+          this.attrs.add(attrName);
         }
       }
 
       // drill down
-      for (i = 0; i < elm.children.length; i++) {
+      for (let i = 0, l = elm.children.length; i < l; i++) {
         this.collectSelectors(elm.children[i]);
       }
     }

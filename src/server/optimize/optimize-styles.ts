@@ -1,24 +1,19 @@
 import * as d from '@declarations';
-import { removeUnusedStyles } from '../../compiler/style/remove-unused-styles';
-import { UsedSelectors } from '../../compiler/style/used-selectors';
+import { removeUnusedStyles } from './remove-unused-styles';
 
 
 export function optimizeStyles(opts: d.HydrateOptions, results: d.HydrateResults, doc: Document) {
-  const ssrStyleElm = mergeSsrStyles(doc);
+  const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
 
-  if (ssrStyleElm == null) {
+  if (styleElms.length === 0) {
     return;
   }
 
-  if (opts.removeUnusedStyles !== false) {
-    // removeUnusedStyles is the default
-    try {
-      // pick out all of the selectors that are actually
-      // being used in the html document
-      const usedSelectors = new UsedSelectors(doc.documentElement);
+  const styleElm = mergeInlinedStyles(doc, styleElms);
 
-      // remove any selectors that are not used in this document
-      ssrStyleElm.innerHTML = removeUnusedStyles(results, usedSelectors, ssrStyleElm.innerHTML);
+  if (styleElm != null && opts.removeUnusedStyles !== false) {
+    try {
+      removeUnusedStyles(results, doc, styleElm);
 
     } catch (e) {
       results.diagnostics.push({
@@ -32,44 +27,33 @@ export function optimizeStyles(opts: d.HydrateOptions, results: d.HydrateResults
 }
 
 
-function mergeSsrStyles(doc: Document) {
-  // get all the styles that were added during prerendering
-  const ssrStyleElms = doc.head.querySelectorAll(`style[data-styles]`) as NodeListOf<HTMLStyleElement>;
-
-  if (ssrStyleElms.length === 0) {
-    // this doc doesn't have any ssr styles
-    return null;
-  }
-
+function mergeInlinedStyles(doc: Document, styleElms: NodeListOf<HTMLStyleElement>) {
   const styleText: string[] = [];
-  let ssrStyleElm: HTMLStyleElement;
+  let styleElm: HTMLStyleElement;
 
-  for (let i = ssrStyleElms.length - 1; i >= 0; i--) {
+  for (let i = styleElms.length - 1; i >= 0; i--) {
     // iterate backwards for funzies
-    ssrStyleElm = ssrStyleElms[i];
+    styleElm = styleElms[i];
 
     // collect up all the style text from each style element
-    styleText.push(ssrStyleElm.innerHTML);
+    styleText.push(styleElm.innerHTML);
 
     // remove this style element from the document
-    ssrStyleElm.parentNode.removeChild(ssrStyleElm);
+    styleElm.remove();
 
     if (i === 0) {
       // this is the first style element, let's use this
       // same element as the main one we'll load up
       // merge all of the styles we collected into one
-      ssrStyleElm.innerHTML = styleText.reverse().join('').trim();
+      const mergedStyles = styleText.reverse().join('').trim();
 
-      if (ssrStyleElm.innerHTML.length > 0) {
+      if (mergedStyles.length > 0) {
         // let's keep the first style element
         // and make it the first element in the head
-        doc.head.insertBefore(ssrStyleElm, doc.head.firstChild);
-
-        // return the ssr style element we loaded up
-        return ssrStyleElm;
+        doc.head.insertBefore(styleElm, doc.head.firstChild);
+        return styleElm;
       }
     }
   }
-
   return null;
 }

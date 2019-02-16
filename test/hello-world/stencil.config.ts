@@ -14,7 +14,7 @@ export const config: Config = {
     },
     {
       type: 'angular',
-      serverModuleFile: 'dist/angular/helloworld-serve.ts'
+      serverModuleFile: 'dist/server/helloworld-serve.ts'
     }
   ],
   enableCache: false

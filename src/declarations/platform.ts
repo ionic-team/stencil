@@ -20,7 +20,7 @@ export interface PlatformApi {
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
   propConnect?: (ctrlTag: string) => PropConnect;
   queue: d.QueueApi;
-  render?: d.RendererApi;
+  render?: any;
   tmpDisconnected: boolean;
   nextId?: () => string;
   hasConnectedComponent?: boolean;

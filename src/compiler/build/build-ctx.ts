@@ -39,6 +39,7 @@ export class BuildContext implements d.BuildCtx {
   hasSlot: boolean = null;
   hasStyleChanges = true;
   hasSvg: boolean = null;
+  hydrateAppFilePath: string = null;
   indexBuildCount = 0;
   isRebuild = false;
   moduleFiles: d.Module[] = [];

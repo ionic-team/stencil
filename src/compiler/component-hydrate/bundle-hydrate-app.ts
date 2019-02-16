@@ -8,10 +8,11 @@ import { RollupOptions } from 'rollup'; // types only
 import { stencilAppCorePlugin } from '../rollup-plugins/stencil-app-core';
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilServerEntryPointPlugin } from '../rollup-plugins/stencil-server-entrypoint';
-import { writeHydrateApp } from './write-hydrate-app';
 
 
-export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTarget[], build: d.Build, entryModules: d.EntryModule[], entryFilePath: string) {
+export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], entryFilePath: string) {
+  let code: string = null;
+
   try {
     const rollupOptions: RollupOptions = {
       input: '@core-entrypoint',
@@ -42,11 +43,11 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
       format: 'cjs'
     });
 
-    if (!buildCtx.shouldAbort) {
-      await writeHydrateApp(config, compilerCtx, outputTargets, output[0].code);
-    }
+    code = output[0].code;
 
   } catch (e) {
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
   }
+
+  return code;
 }

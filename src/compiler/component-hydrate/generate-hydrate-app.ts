@@ -1,34 +1,44 @@
 import * as d from '@declarations';
 import { bundleHydrateCore } from './bundle-hydrate-app';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { sys } from '@sys';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
+import { writeHydrateOutputs } from './write-hydrate-outputs';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTarget[]) {
   const timespan = buildCtx.createTimeSpan(`generate hydrate app started`, true);
 
-  const cmps = buildCtx.moduleFiles.reduce((cmps, m) => {
-    cmps.push(...m.cmps);
-    return cmps;
-  }, [] as d.ComponentCompilerMeta[]);
+  try {
+    const cmps = buildCtx.moduleFiles.reduce((cmps, m) => {
+      cmps.push(...m.cmps);
+      return cmps;
+    }, [] as d.ComponentCompilerMeta[]);
 
-  const build = getBuildFeatures(cmps) as d.Build;
+    const build = getBuildFeatures(cmps) as d.Build;
 
-  build.lazyLoad = false;
-  build.es5 = false;
-  build.polyfills = false;
-  build.hydrateClientSide = false;
-  build.hydrateServerSide = true;
+    build.lazyLoad = false;
+    build.es5 = false;
+    build.polyfills = false;
+    build.hydrateClientSide = false;
+    build.hydrateServerSide = true;
 
-  updateBuildConditionals(config, build);
-  build.lifecycleDOMEvents = false;
-  build.hotModuleReplacement = false;
+    updateBuildConditionals(config, build);
+    build.lifecycleDOMEvents = false;
+    build.hotModuleReplacement = false;
 
-  const appCoreEntryFilePath = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
+    const appCoreEntryFilePath = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
 
-  await bundleHydrateCore(config, compilerCtx, buildCtx, outputTargets, build, buildCtx.entryModules, appCoreEntryFilePath);
+    const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, appCoreEntryFilePath);
+
+    if (!buildCtx.shouldAbort && typeof code === 'string') {
+      await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, code);
+    }
+
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
+  }
 
   timespan.finish(`generate hydrate app finished`);
 }

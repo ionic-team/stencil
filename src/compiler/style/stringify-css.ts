@@ -198,7 +198,7 @@ export class StringifyCss {
         var jlen = sel.classNames.length;
         if (jlen > 0) {
           for (j = 0; j < jlen; j++) {
-            if (this.usedSelectors.classNames.indexOf(sel.classNames[j]) === -1) {
+            if (this.usedSelectors.classNames.has(sel.classNames[j])) {
               include = false;
               break;
             }
@@ -210,7 +210,7 @@ export class StringifyCss {
           jlen = sel.tags.length;
           if (jlen > 0) {
             for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.tags.indexOf(sel.tags[j]) === -1) {
+              if (this.usedSelectors.tags.has(sel.tags[j])) {
                 include = false;
                 break;
               }
@@ -223,7 +223,7 @@ export class StringifyCss {
           jlen = sel.attrs.length;
           if (jlen > 0) {
             for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.attrs.indexOf(sel.attrs[j]) === -1) {
+              if (this.usedSelectors.attrs.has(sel.attrs[j])) {
                 include = false;
                 break;
               }
@@ -236,7 +236,7 @@ export class StringifyCss {
           jlen = sel.ids.length;
           if (jlen > 0) {
             for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.ids.indexOf(sel.ids[j]) === -1) {
+              if (this.usedSelectors.ids.has(sel.ids[j])) {
                 include = false;
                 break;
               }

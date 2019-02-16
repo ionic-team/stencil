@@ -1,28 +1,30 @@
 import * as d from '@declarations';
-import { parseCss } from './parse-css';
-import { StringifyCss } from './stringify-css';
-import { UsedSelectors } from './used-selectors';
+import { parseCss } from '../../compiler/style/parse-css';
+import { StringifyCss } from '../../compiler/style/stringify-css';
+import { UsedSelectors } from '../../compiler/style/used-selectors';
 
 
-export function removeUnusedStyles(results: d.HydrateResults, usedSelectors: UsedSelectors, cssContent: string) {
-  let cleanedCss = cssContent;
-
+export function removeUnusedStyles(results: d.HydrateResults, doc: Document, styleElm: HTMLStyleElement) {
   try {
     // parse the css from being applied to the document
-    const cssAst = parseCss(cssContent);
+    const cssAst = parseCss(styleElm.innerHTML);
 
     if (cssAst.stylesheet.diagnostics.length > 0) {
       cssAst.stylesheet.diagnostics.forEach(d => {
         results.diagnostics.push(d);
       });
-      return cleanedCss;
+      return;
     }
 
     try {
+      // pick out all of the selectors that are actually
+      // being used in the html document
+      const usedSelectors = new UsedSelectors(doc.body);
+
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
       const stringify = new StringifyCss({ usedSelectors });
-      cleanedCss = stringify.compile(cssAst);
+      styleElm.innerHTML = stringify.compile(cssAst);
 
     } catch (e) {
       results.diagnostics.push({
@@ -41,6 +43,4 @@ export function removeUnusedStyles(results: d.HydrateResults, usedSelectors: Use
       messageText: e
     });
   }
-
-  return cleanedCss;
 }

@@ -1,7 +1,6 @@
 import * as d from '.';
 
 
-
 export interface PrerenderLocation {
   url?: string;
   path?: string;
@@ -45,62 +44,26 @@ export interface HydrateAnchor {
 
 
 export interface HydrateOptions {
-  canonicalLink?: boolean;
   collapseWhitespace?: boolean;
-  inlineAssetsMaxSize?: number;
-  insertModulePreload?: boolean;
-  inlineStyles?: boolean;
-  removeUnusedStyles?: boolean;
+  collectAnchors?: boolean;
+  collectComponents?: boolean;
+  collectImgUrls?: boolean;
+  collectScriptUrls?: boolean;
+  collectStylesheetUrls?: boolean;
+  canonicalLinkHref?: (url: string) => string;
+  cookie?: string;
+  direction?: string;
+  language?: string;
   relocateMetaCharset?: boolean;
-  ssrIds?: boolean;
+  referrer?: string;
+  removeUnusedStyles?: boolean;
   req?: {
     protocol: string;
     get: (key: string) => string;
     originalUrl: string;
   };
   url?: string;
-  path?: string;
-  referrer?: string;
   userAgent?: string;
-  cookie?: string;
-  direction?: string;
-  language?: string;
-  console?: {
-    [level: string]: (...msgs: string[]) => void;
-  };
-  collectAnchors?: boolean;
-  collectComponents?: boolean;
-  collectImgUrls?: boolean;
-  collectScriptUrls?: boolean;
-  collectStylesheetUrls?: boolean;
-}
-
-
-export interface RendererApi {
-  (
-    hostElm: d.HostElement,
-    oldVNode: d.VNode | Element,
-    newVNode: d.VNode,
-    useNativeShadowDom?: boolean,
-    encapsulation?: d.Encapsulation,
-    ssrId?: number
-  ): d.VNode;
-}
-
-
-export interface HostSnapshot {
-  $attributes?: HostSnapshotAttributes;
-}
-
-
-export interface HostSnapshotAttributes {
-  [attrName: string]: string;
-}
-
-
-export interface ContentSlots {
-  $?: Node[];
-  [slotName: string]: Node[] | undefined;
 }
 
 

@@ -1,10 +1,6 @@
 
 
 export function relocateMetaCharset(doc: Document) {
-  if (!doc.head) {
-    return;
-  }
-
   let charsetElm = doc.head.querySelector('meta[charset]');
   if (charsetElm == null) {
     // doesn't have <meta charset>, so create it

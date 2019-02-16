@@ -4,7 +4,7 @@ import { isOutputTargetAngular } from '../output-targets/output-utils';
 import { sys } from '@sys';
 
 
-export function writeAngularServerModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTarget[], hydrateAppFilePath: string) {
+export function writeAngularOutputs(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTarget[], hydrateAppFilePath: string) {
   const angularOutputTargets = outputTargets
     .filter(isOutputTargetAngular)
     .filter(o => o.serverModuleFile);
@@ -22,15 +22,14 @@ function generateAngularServerModule(config: d.Config, serverModuleFilePath: str
   const factoryName = `hydrate${namespace}Components`;
 
   const serverModuleFileDir = sys.path.dirname(serverModuleFilePath);
-  const hydrateAppFileDir = sys.path.dirname(hydrateAppFilePath);
 
-  let hydrateDocumentSyncImportPath = normalizePath(sys.path.relative(serverModuleFileDir, hydrateAppFileDir));
+  let hydrateDocumentSyncImportPath = normalizePath(sys.path.relative(serverModuleFileDir, hydrateAppFilePath));
   if (!hydrateDocumentSyncImportPath.startsWith('/') && !hydrateDocumentSyncImportPath.startsWith('.')) {
     hydrateDocumentSyncImportPath = './' + hydrateDocumentSyncImportPath;
   }
 
   return `
-import { NgModule } from '@angular/core';
+import { APP_ID, NgModule } from '@angular/core';
 import { BEFORE_APP_SERIALIZED } from '@angular/platform-server';
 import { DOCUMENT } from '@angular/platform-browser';
 import { hydrateDocumentSync } from '${hydrateDocumentSyncImportPath}';
@@ -41,22 +40,30 @@ import { hydrateDocumentSync } from '${hydrateDocumentSyncImportPath}';
       provide: BEFORE_APP_SERIALIZED,
       useFactory: ${factoryName},
       multi: true,
-      deps: [DOCUMENT]
+      deps: [DOCUMENT, APP_ID]
     }
   ]
 })
 export class ${moduleName} {}
 
-export function ${factoryName}(doc: any) {
+export function ${factoryName}(doc: any, appId: any) {
   return () => {
     hydrateDocumentSync(doc, {
+      collapseWhitespace: false,
       collectAnchors: false,
       collectComponents: false,
       collectImgUrls: false,
       collectScriptUrls: false,
-      collectStylesheetUrls: false
+      collectStylesheetUrls: false,
+      relocateMetaCharset: false,
+      removeUnusedStyles: true
     });
+
+    const styleElms = doc.head.querySelectorAll('style[data-styles]');
+    for (let i = 0, l = styleElms.length; i < l; i++) {
+      styleElms[i].setAttribute('ng-transition', appId);
+    }
   };
 }
-`;
+`.trim();
 }
