@@ -47,8 +47,8 @@ function generateModuleWebComponentCore(config: d.Config, compilerCtx: d.Compile
   build.lazyLoad = false;
   build.es5 = false;
   build.polyfills = false;
-  build.prerenderClientSide = false;
-  build.prerenderServerSide = false;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = false;
 
   updateBuildConditionals(config, build);
 

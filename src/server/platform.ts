@@ -1,7 +1,7 @@
 
-export function writeTask(cb: Function) {
+export const writeTask = (cb: Function) => {
   cb();
-}
+};
 
 export const tick = {
   then(cb: Function) {
@@ -9,13 +9,13 @@ export const tick = {
   }
 };
 
-export function consoleError(e: any) {
+export const consoleError = (e: any) => {
   console.error(e);
-}
+};
 
-export function loadModule(_a: any, _b: any) {
+export const loadModule = (_a: any, _b: any) => {
   return Promise.resolve<any>({});
-}
+};
 
 
 export {

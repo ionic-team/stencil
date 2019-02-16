@@ -6,13 +6,17 @@ import { sys } from '@sys';
 export async function generateLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const appCoreEntryFilePath = await generateLazyAppCoreEntry(config, compilerCtx);
 
-  const bundleEntryInputs: d.BundleEntryInputs = {};
+  const bundleCoreOptions: d.BundleCoreOptions = {
+    entryFilePath: appCoreEntryFilePath,
+    entryInputs: {},
+    moduleFormats: ['esm']
+  };
 
   buildCtx.entryModules.forEach(entryModule => {
-    bundleEntryInputs[entryModule.entryKey] = entryModule.entryKey;
+    bundleCoreOptions.entryInputs[entryModule.entryKey] = entryModule.entryKey;
   });
 
-  return bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, 'client', appCoreEntryFilePath, bundleEntryInputs);
+  return bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, bundleCoreOptions);
 }
 
 

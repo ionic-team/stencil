@@ -1,25 +1,27 @@
 import * as d from '@declarations';
-import { buildConditionalsPlugin } from '../rollup-plugins/build-conditionals';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
 import { OutputAsset, OutputChunk, OutputOptions, RollupOptions } from 'rollup'; // types only
-import { stencilDependenciesPlugin } from '../rollup-plugins/stencil-dependencies';
+import { stencilAppCorePlugin } from '../rollup-plugins/stencil-app-core';
+import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
+import { stencilClientEntryPointPlugin } from '../rollup-plugins/stencil-client-entrypoint';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], corePlatform: 'client' | 'server', appCoreEntryFilePath: string, bundleEntryInputs: d.BundleEntryInputs) {
+export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], bundleCoreOptions: d.BundleCoreOptions) {
   const rollupResults: d.RollupResult[] = [];
 
-  bundleEntryInputs[config.fsNamespace] = '@core-entrypoint';
+  bundleCoreOptions.entryInputs[config.fsNamespace] = '@core-entrypoint';
 
   try {
     const rollupOptions: RollupOptions = {
-      input: bundleEntryInputs,
+      input: bundleCoreOptions.entryInputs,
       plugins: [
-        stencilDependenciesPlugin(corePlatform, appCoreEntryFilePath),
-        buildConditionalsPlugin(build),
+        stencilAppCorePlugin(bundleCoreOptions.entryFilePath),
+        stencilClientEntryPointPlugin(),
+        stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
@@ -35,24 +37,19 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
         ...config.plugins
       ],
       manualChunks: {
-        [config.fsNamespace]: [appCoreEntryFilePath]
+        [config.fsNamespace]: [bundleCoreOptions.entryFilePath]
       },
       onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
     };
 
     const rollupBuild = await sys.rollup.rollup(rollupOptions);
 
-    const outputOptions: OutputOptions[] = [];
-
-    outputOptions.push({
-      format: 'esm'
+    const outputOptions = bundleCoreOptions.moduleFormats.map(moduleFormat => {
+      const outputOptions: OutputOptions = {
+        format: moduleFormat
+      };
+      return outputOptions;
     });
-
-    if (build.es5) {
-      outputOptions.push({
-        format: 'amd'
-      });
-    }
 
     const generatePromises = outputOptions.map(async outputOption => {
       const { output } = await rollupBuild.generate({
@@ -74,7 +71,7 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
 
     if (logger.level === 'debug') {
-      logger.error(`bundleAppCore, bundleEntryInputs: ${bundleEntryInputs}`);
+      logger.error(`bundleAppCore, bundleEntryInputs: ${bundleCoreOptions.entryInputs}`);
     }
   }
 

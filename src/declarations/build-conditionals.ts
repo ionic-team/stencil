@@ -84,10 +84,10 @@ export interface Build extends BuildFeatures {
   isDebug?: boolean;
   isDev?: boolean;
   isProd?: boolean;
+  hydrateServerSide?: boolean;
+  hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
   lazyLoad?: boolean;
-  prerenderServerSide?: boolean;
-  prerenderClientSide?: boolean;
   polyfills?: boolean;
   profile?: boolean;
   slotRelocation?: boolean;

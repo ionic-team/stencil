@@ -8,7 +8,13 @@ import { updateToNativeComponents } from './update-to-native-component';
 export async function generateNativeAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const appCoreEntryFilePath = await generateNativeAppCoreEntry(config, compilerCtx, buildCtx, build, cmps);
 
-  return bundleAppCore(config, compilerCtx, buildCtx, build, [], 'client', appCoreEntryFilePath, {});
+  const bundleCoreOptions: d.BundleCoreOptions = {
+    entryFilePath: appCoreEntryFilePath,
+    entryInputs: {},
+    moduleFormats: ['esm']
+  };
+
+  return bundleAppCore(config, compilerCtx, buildCtx, build, [], bundleCoreOptions);
 }
 
 

@@ -20,8 +20,12 @@ export interface ComponentConstructorWatchers {
   [propName: string]: string[];
 }
 
-export interface ComponentConstructorStaticMeta extends ComponentConstructor {
+export interface ComponentTestingConstructor extends ComponentConstructor {
   COMPILER_META: d.ComponentCompilerMeta;
+}
+
+export interface ComponentNativeConstructor extends ComponentConstructor {
+  cmpMeta: d.ComponentRuntimeMeta;
 }
 
 

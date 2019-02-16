@@ -1,9 +1,9 @@
 import * as d from '@declarations';
-import { bundleAppCore } from '../app-core/bundle-app-core';
+import { bundleHydrateCore } from './bundle-hydrate-app';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { sys } from '@sys';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
-import { DEFAULT_STYLE_MODE } from '@utils';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTarget[]) {
@@ -19,21 +19,16 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
   build.lazyLoad = false;
   build.es5 = false;
   build.polyfills = false;
-  build.prerenderClientSide = false;
-  build.prerenderServerSide = true;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = true;
 
   updateBuildConditionals(config, build);
+  build.lifecycleDOMEvents = false;
+  build.hotModuleReplacement = false;
 
   const appCoreEntryFilePath = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
 
-  const rollupResults = await bundleAppCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, 'server', appCoreEntryFilePath, {});
-
-  if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
-    const rollupResult = rollupResults.find(r => !r.isEntry);
-    if (rollupResult != null) {
-      await writeHydrateApp(config, compilerCtx, outputTargets, rollupResult);
-    }
-  }
+  await bundleHydrateCore(config, compilerCtx, buildCtx, outputTargets, build, buildCtx.entryModules, appCoreEntryFilePath);
 
   timespan.finish(`generate hydrate app finished`);
 }
@@ -98,37 +93,3 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
 
   return appCoreEntryFilePath;
 }
-
-
-async function writeHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTarget[], rollupResult: d.RollupResult) {
-  const distDir = getRendererDistDir(config, outputTargets);
-  const rendererDistFilePath = sys.path.join(distDir, SERVER_DIR, SERVER_INDEX);
-
-  await compilerCtx.fs.writeFile(rendererDistFilePath, rollupResult.code);
-
-  const distOutputTargets = (outputTargets as d.OutputTargetDist[]).filter(o => {
-    return (o.type === 'dist');
-  });
-
-  return Promise.all(distOutputTargets.map(distOutputTarget => {
-    const filePath = sys.path.join(distOutputTarget.buildDir, SERVER_DIR, SERVER_INDEX);
-    return compilerCtx.fs.writeFile(filePath, rollupResult.code);
-  }));
-}
-
-
-function getRendererDistDir(config: d.Config, outputTargets: d.OutputTarget[]) {
-  const distOutputTarget = (outputTargets as d.OutputTargetDist[]).find(o => {
-    return (o.type === 'dist');
-  });
-
-  if (distOutputTarget != null) {
-    return distOutputTarget.buildDir;
-  }
-
-  return sys.path.join(config.rootDir, 'dist');
-}
-
-
-const SERVER_DIR = `server`;
-const SERVER_INDEX = `index.js`;

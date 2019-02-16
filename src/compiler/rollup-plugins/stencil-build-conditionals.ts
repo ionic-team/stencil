@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 
 
-export function buildConditionalsPlugin(build: d.Build) {
+export function stencilBuildConditionalsPlugin(build: d.Build) {
   const buildData = `export const BUILD = ${JSON.stringify(build)}`;
 
   return {
@@ -17,8 +17,6 @@ export function buildConditionalsPlugin(build: d.Build) {
         return buildData;
       }
       return null;
-    },
-
-    name: 'buildConditionalsPlugin'
+    }
   };
 }

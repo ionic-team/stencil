@@ -53,8 +53,8 @@ function generateSelfContainedCore(config: d.Config, compilerCtx: d.CompilerCtx,
   build.lazyLoad = false;
   build.es5 = false;
   build.polyfills = false;
-  build.prerenderClientSide = false;
-  build.prerenderServerSide = false;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = false;
 
   updateBuildConditionals(config, build);
 

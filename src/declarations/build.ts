@@ -223,7 +223,13 @@ export interface BundleOutputChunk {
 
 export type SourceTarget = 'es5' | 'es2017';
 
-export type ModuleFormat = 'esm' | 'amd';
+export type ModuleFormat = 'esm' | 'amd' | 'cjs';
+
+export interface BundleCoreOptions {
+  entryFilePath: string;
+  entryInputs: BundleEntryInputs;
+  moduleFormats: d.ModuleFormat[];
+}
 
 export interface BundleEntryInputs {
   [entryKey: string]: string;

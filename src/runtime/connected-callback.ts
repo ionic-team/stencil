@@ -9,7 +9,7 @@ import { initializeComponent } from './initialize-component';
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorComponent?: d.HostElement) => {
   // connectedCallback
 
-  if (!BUILD.lazyLoad) {
+  if (!BUILD.lazyLoad || BUILD.hydrateServerSide) {
     cmpMeta = (elm.constructor as d.ComponentConstructor).cmpMeta;
   }
 
