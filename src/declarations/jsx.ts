@@ -394,6 +394,33 @@ export namespace JSXElements {
     muted?: boolean;
     preload?: string;
     src?: string;
+
+    // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
+    onAbort?: (event: Event) => void;
+    onCanPlay?: (event: Event) => void;
+    onCanPlayThrough?: (event: Event) => void;
+    onDurationChange?: (event: Event) => void;
+    onEmptied?: (event: Event) => void;
+    onEnded?: (event: Event) => void;
+    onError?: (event: Event) => void;
+    onInterruptBegin?: (event: Event) => void;
+    onInterruptEnd?: (event: Event) => void;
+    onLoadedData?: (event: Event) => void;
+    onLoadedMetaData?: (event: Event) => void;
+    onLoadStart?: (event: Event) => void;
+    onMozAudioAvailable?: (event: Event) => void;
+    onPause?: (event: Event) => void;
+    onPlay?: (event: Event) => void;
+    onPlaying?: (event: Event) => void;
+    onProgress?: (event: Event) => void;
+    onRateChange?: (event: Event) => void;
+    onSeeked?: (event: Event) => void;
+    onSeeking?: (event: Event) => void;
+    onStalled?: (event: Event) => void;
+    onSuspend?: (event: Event) => void;
+    onTimeUpdate?: (event: Event) => void;
+    onVolumeChange?: (event: Event) => void;
+    onWaiting?: (event: Event) => void;
   }
 
   export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
