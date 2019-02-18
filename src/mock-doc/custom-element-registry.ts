@@ -103,12 +103,12 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
 
 export function resetCustomElementRegistry(customElements: CustomElementRegistry) {
   if (customElements != null) {
-    const registry = registryMap.get(this);
+    const registry = registryMap.get(customElements as any);
     if (registry != null) {
       registry.clear();
     }
 
-    const whenDefinedResolves = whenDefinedResolvesMap.get(this);
+    const whenDefinedResolves = whenDefinedResolvesMap.get(customElements as any);
     if (whenDefinedResolves != null) {
       whenDefinedResolves.clear();
     }
