@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
-import { plt } from './client-window';
+import { supportsShadowDom } from './client-window';
 
 
 export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostRef, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
@@ -12,7 +12,7 @@ export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostR
 
   const url = `./${
     BUILD.shadowDom
-      ? bundleId + (!plt.supportsShadowDom ? '.sc' : '')
+      ? bundleId + (!supportsShadowDom ? '.sc' : '')
       : bundleId
     }.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
 

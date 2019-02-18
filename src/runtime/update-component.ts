@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { attachStyles, getElementScopeId } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, plt, writeTask } from '@platform';
+import { consoleError, supportsShadowDom, writeTask } from '@platform';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
@@ -54,7 +54,7 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
   }
 
   if (isInitialLoad) {
-    if ((BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
+    if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
       // only required when we're NOT using native shadow dom (slot)
       // or this browser doesn't support native shadow dom
       // and this host element was NOT created with SSR

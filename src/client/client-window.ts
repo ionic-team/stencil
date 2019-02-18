@@ -13,15 +13,18 @@ if (BUILD.taskQueue) {
   plt.queuePending = false;
 }
 
-if (BUILD.shadowDom) {
-  plt.supportsShadowDom = !!doc.documentElement.attachShadow;
-}
+export const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;
 
-if (BUILD.hostListener) {
-  plt.supportsListenerOptions = false;
-}
-
-// if (BUILD.exposeAppRegistry) {
-//   (win['s-apps'] = win['s-apps'] || []).push(BUILD.appNamespace);
-// }
+export const supportsListenerOptions = (BUILD.hostListener) ?
+function() {
+  let supportsListenerOptions = false;
+  try {
+    (win as Window).addEventListener('e', null,
+      Object.defineProperty({}, 'passive', {
+        get() { supportsListenerOptions = true; }
+      })
+    );
+  } catch (e) {}
+  return supportsListenerOptions;
+}() : false;
 

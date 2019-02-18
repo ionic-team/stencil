@@ -19,15 +19,17 @@ export const plt: d.PlatformRuntime = {
   isTmpDisconnected: false,
   queueCongestion: 0,
   queuePending: false,
-  supportsShadowDom: true
 };
+
+export const supportsShadowDom = true;
+
+export const supportsListenerOptions = true;
 
 export function resetPlatform() {
   resetWindow(win);
   hostRefs.clear();
   styles.clear();
   plt.isTmpDisconnected = false;
-  plt.supportsShadowDom = true;
 
   resetTaskQueue();
 }

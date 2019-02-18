@@ -21,6 +21,8 @@ export const loadModule = (_a: any, _b: any) => {
 export {
   win,
   plt,
+  supportsShadowDom,
+  supportsListenerOptions,
   doc,
   registerHost,
   connectedCallback,

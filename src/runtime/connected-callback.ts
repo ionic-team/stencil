@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { doc, getHostRef, plt, tick } from '@platform';
+import { doc, getHostRef, supportsShadowDom, tick } from '@platform';
 import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
 import { CMP_FLAG, HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
@@ -39,7 +39,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if ((BUILD.slot && cmpMeta.cmpFlags & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation)) {
+        if ((BUILD.slot && cmpMeta.cmpFlags & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation)) {
           // only required when we're NOT using native shadow dom (slot)
           // or this browser doesn't support native shadow dom
           // and this host element was NOT created with SSR
@@ -51,7 +51,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
           elm.insertBefore(elm['s-cr'], elm.firstChild);
         }
 
-        if (BUILD.es5 && !plt.supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
+        if (BUILD.es5 && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
           try {
             (elm as any).shadowRoot = elm;
           } catch (e) {}

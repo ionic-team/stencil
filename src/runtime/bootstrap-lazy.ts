@@ -3,7 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { doc, getHostRef, plt, registerHost } from '@platform';
+import { doc, getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
@@ -31,7 +31,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
             constructor() {
               super();
               registerHost(this);
-              if (BUILD.shadowDom && plt.supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
+              if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
                 // DOM WRITE
                 // this component is using shadow dom
                 // and this browser supports shadow dom

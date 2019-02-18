@@ -8,7 +8,7 @@
  */
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { doc, plt } from '@platform';
+import { doc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
 import { NODE_TYPE } from '../runtime-constants';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
@@ -628,7 +628,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   if (BUILD.slotRelocation) {
-    useNativeShadowDom = plt.supportsShadowDom && !!(cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation);
+    useNativeShadowDom = supportsShadowDom && !!(cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation);
   }
 
   // if (BUILD.prerenderServerSide) {

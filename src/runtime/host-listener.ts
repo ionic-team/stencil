@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { doc, plt, win } from '@platform';
+import { doc, supportsListenerOptions, win } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
 
 
@@ -30,7 +30,7 @@ export const getHostListenerTarget = (elm: Element, flags: number): EventTarget 
 
 
 export const hostListenerOpts = (flags: number) =>
-  plt.supportsListenerOptions ?
+  supportsListenerOptions ?
     {
       'passive': (flags & LISTENER_FLAGS.Passive) !== 0,
       'capture': (flags & LISTENER_FLAGS.Capture) !== 0,

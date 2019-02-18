@@ -7,4 +7,3 @@ export * from './client-log';
 export * from './client-style';
 export * from './client-task-queue';
 export * from '@runtime';
-export * from './client-passive-test';

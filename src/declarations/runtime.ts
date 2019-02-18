@@ -91,8 +91,6 @@ export interface PlatformRuntime {
   isTmpDisconnected?: boolean;
   queueCongestion?: number;
   queuePending?: boolean;
-  supportsListenerOptions?: boolean;
-  supportsShadowDom?: boolean;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

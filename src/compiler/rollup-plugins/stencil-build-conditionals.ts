@@ -7,7 +7,7 @@ export function stencilBuildConditionalsPlugin(build: d.Build) {
   return {
     resolveId(id: string) {
       if (id === '@stencil/core/build-conditionals') {
-        return '@stencil/core/build-conditionals';
+        return id;
       }
       return null;
     },
