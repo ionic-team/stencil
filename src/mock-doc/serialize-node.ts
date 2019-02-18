@@ -142,13 +142,12 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
     }
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
-      const ignoreTagContent = (opts.excludeTagContent != null && opts.excludeTagContent.includes(tagName) === true);
-
-      if (ignoreTagContent === false) {
+      if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
         const childNodes: MockNode[] = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : (node.childNodes);
+        const childNodeLength = childNodes.length;
 
-        if (childNodes.length > 0) {
-          if (childNodes.length === 1 && childNodes[0].nodeType === 3 && typeof node.nodeValue === 'string' && childNodes[0].nodeValue.trim() === '') {
+        if (childNodeLength > 0) {
+          if (childNodeLength === 1 && childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && (typeof childNodes[0].nodeValue !== 'string' || childNodes[0].nodeValue.trim() === '')) {
             // skip over empty text nodes
 
           } else {
@@ -156,19 +155,21 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
               output.indent = output.indent + opts.indentSpaces;
             }
 
-            for (let i = 0, ii = childNodes.length; i < ii; i++) {
+            for (let i = 0; i < childNodeLength; i++) {
               serializeToHtml(childNodes[i], opts, output);
             }
 
-            if (opts.newLines === true && ignoreTag === false) {
-              output.text.push('\n');
-            }
+            if (ignoreTag === false) {
+              if (opts.newLines === true) {
+                output.text.push('\n');
+              }
 
-            if (opts.indentSpaces > 0 && ignoreTag === false) {
-              output.indent = output.indent - opts.indentSpaces;
+              if (opts.indentSpaces > 0) {
+                output.indent = output.indent - opts.indentSpaces;
 
-              for (let i = 0; i < output.indent; i++) {
-                output.text.push(' ');
+                for (let i = 0; i < output.indent; i++) {
+                  output.text.push(' ');
+                }
               }
             }
           }
