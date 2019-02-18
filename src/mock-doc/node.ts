@@ -2,7 +2,7 @@ import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } 
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
+import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
@@ -567,6 +567,11 @@ export class MockElement extends MockNode {
     return serializeNodeToHtml(this, opts);
   }
 
+}
+
+export function resetElement(elm: any) {
+  resetEventListeners(elm);
+  attrsMap.delete(elm);
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {

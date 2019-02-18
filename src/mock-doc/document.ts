@@ -2,7 +2,7 @@ import { createElement } from './element';
 import { MockComment } from './comment-node';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockTextNode } from './node';
+import { MockElement, MockTextNode, resetElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
 import { resetEventListeners } from './event';
@@ -172,11 +172,12 @@ export function resetDocument(doc: Document) {
 
     const documentElement = doc.documentElement;
     if (documentElement != null) {
-      resetEventListeners(documentElement);
+      resetElement(documentElement);
 
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
-        documentElement.childNodes[i].childNodes.length = 0;
-        resetEventListeners(documentElement.childNodes[i]);
+        const childNode = documentElement.childNodes[i];
+        resetElement(childNode);
+        childNode.childNodes.length = 0;
       }
     }
   }
