@@ -107,6 +107,8 @@ async function bundleNodeSysMain() {
       'https',
       'module',
       'path',
+      'net',
+      'tty',
       'os',
       'typescript',
       'url',
