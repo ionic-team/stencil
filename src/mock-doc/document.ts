@@ -5,6 +5,7 @@ import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement, MockTextNode } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
+import { resetEventListeners } from './event';
 
 
 export class MockDocument extends MockElement {
@@ -167,10 +168,15 @@ export class MockDocument extends MockElement {
 
 export function resetDocument(doc: Document) {
   if (doc != null) {
+    resetEventListeners(doc);
+
     const documentElement = doc.documentElement;
     if (documentElement != null) {
+      resetEventListeners(documentElement);
+
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
         documentElement.childNodes[i].childNodes.length = 0;
+        resetEventListeners(documentElement.childNodes[i]);
       }
     }
   }

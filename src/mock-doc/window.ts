@@ -1,5 +1,5 @@
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
+import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockElement } from './node';
 import { MockHistory } from './history';
@@ -118,7 +118,9 @@ export class MockWindow {
     navMap.set(this, nav);
   }
 
-  parent: any = null;
+  get parent(): any {
+    return null;
+  }
 
   removeEventListener(type: string, handler: any) {
     removeEventListener(this, type, handler);
@@ -252,6 +254,14 @@ export function resetWindow(win: Window) {
     resetCustomElementRegistry(win.customElements);
     resetDocument(win.document);
     resetPerformance(win.performance);
+
+    for (const winProp in win) {
+      if (winProp !== 'document' && winProp !== 'performance' && winProp !== 'customElements') {
+        (win as any)[winProp] = undefined;
+      }
+    }
+
+    resetEventListeners(win);
 
     historyMap.delete(win as any);
     htmlElementCstrMap.delete(win as any);

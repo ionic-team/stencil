@@ -99,7 +99,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   const target: EventTarget = elm;
   ev.currentTarget = elm;
 
-  if (Array.isArray(target.__listeners)) {
+  if (Array.isArray(target.__listeners) === true) {
     const listeners = target.__listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
       try {
@@ -125,6 +125,13 @@ export function dispatchEvent(currentTarget: any, ev: MockEvent) {
   ev.target = currentTarget;
   triggerEventListener(currentTarget, ev);
   return true;
+}
+
+
+export function resetEventListeners(target: any) {
+  if (target != null && (target as EventTarget).__listeners != null) {
+    (target as EventTarget).__listeners = null;
+  }
 }
 
 
