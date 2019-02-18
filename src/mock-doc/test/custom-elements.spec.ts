@@ -1,5 +1,5 @@
 import { teardownGlobal } from '../global';
-import { mockWindow } from '..';
+import { MockWindow } from '..';
 
 
 describe('customElements', () => {
@@ -192,7 +192,7 @@ describe('customElements', () => {
   it('appendChild nested, scoped to mocked window', () => {
     let connectedInc = 0;
     let disconnectedInc = 0;
-    const win = mockWindow() as any;
+    const win = new MockWindow() as any;
 
     win.customElements.define('cmp-a', class extends win.HTMLElement {
       connectedCallback() {

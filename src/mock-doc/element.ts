@@ -189,10 +189,10 @@ function patchPropAttributes(prototype: any, attrs: any) {
 
     if (attr === Boolean) {
       Object.defineProperty(prototype, propName, {
-        get: function(this: MockElement) {
+        get(this: MockElement) {
           return this.hasAttribute(propName);
         },
-        set: function(this: MockElement, value: boolean) {
+        set(this: MockElement, value: boolean) {
           if (value) {
             this.setAttribute(propName, '');
           } else {
@@ -203,21 +203,21 @@ function patchPropAttributes(prototype: any, attrs: any) {
 
     } else if (attr === Number) {
       Object.defineProperty(prototype, propName, {
-        get: function(this: MockElement) {
+        get(this: MockElement) {
           const value = this.getAttribute(propName);
           return (value ? parseInt(value, 10) : 0);
         },
-        set: function(this: MockElement, value: boolean) {
+        set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
         }
       });
 
     } else {
       Object.defineProperty(prototype, propName, {
-        get: function(this: MockElement) {
+        get(this: MockElement) {
           return this.getAttribute(propName) || '';
         },
-        set: function(this: MockElement, value: boolean) {
+        set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
         }
       });

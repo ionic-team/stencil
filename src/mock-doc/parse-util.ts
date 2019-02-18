@@ -1,8 +1,7 @@
 import { MockComment } from './comment-node';
 import { MockDocument } from './document';
-import { MockElement, MockNode } from './node';
+import { MockElement, MockNode, MockTextNode } from './node';
 import { MockTemplateElement } from './element';
-import { MockTextNode } from './text-node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
 
@@ -140,7 +139,7 @@ function getParser(ownerDocument: MockDocument) {
       for (let i = 0; i < attrs.length; i++) {
         const attr = attrs[i];
 
-        if (!recipient.hasAttributeNS(attr.namespace, attr.name)) {
+        if (recipient.hasAttributeNS(attr.namespace, attr.name) === false) {
           recipient.setAttributeNS(attr.namespace, attr.name, attr.value);
         }
       }

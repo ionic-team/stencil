@@ -2,10 +2,11 @@ import { MockElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
-export class MockCustomElementRegistry implements CustomElementRegistry {
-  private _registry = new Map<string, { cstr: any, options: any }>();
-  private _whenDefinedResolves = new Map<string, Function>();
+const registryMap = new WeakMap<MockCustomElementRegistry, Map<string, { cstr: any, options: any }>>();
+const whenDefinedResolvesMap = new WeakMap<MockCustomElementRegistry, Map<string, Function[]>>();
 
+
+export class MockCustomElementRegistry implements CustomElementRegistry {
   constructor(private win: Window) {}
 
   define(tagName: string, cstr: any, options?: any) {
@@ -13,18 +14,29 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
       throw new Error(`Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`);
     }
 
-    this._registry.set(tagName, { cstr, options });
+    let registry = registryMap.get(this);
+    if (registry == null) {
+      registry = new Map();
+      registryMap.set(this, registry);
+    }
+    registry.set(tagName, { cstr, options });
 
-    const whenDefinedResolve = this._whenDefinedResolves.get(tagName);
-    if (whenDefinedResolve != null) {
-      whenDefinedResolve();
-      this._whenDefinedResolves.delete(tagName);
+    const whenDefinedResolves = whenDefinedResolvesMap.get(this);
+    if (whenDefinedResolves != null) {
+      const whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+      if (whenDefinedResolveFns != null) {
+        whenDefinedResolveFns.forEach(whenDefinedResolveFn => {
+          whenDefinedResolveFn();
+        });
+        whenDefinedResolveFns.length = 0;
+        whenDefinedResolves.delete(tagName);
+      }
     }
 
     if (this.win.document != null) {
       const hosts = this.win.document.querySelectorAll(tagName);
       hosts.forEach(host => {
-        if (!upgradedElements.has(host)) {
+        if (upgradedElements.has(host) === false) {
           tempDisableCallbacks.add(this.win.document);
 
           const upgradedCmp = creatCustomElement(this, this.win.document, tagName) as MockNode;
@@ -37,7 +49,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
 
           tempDisableCallbacks.delete(this.win.document);
 
-          if (proxyElements.has(host)) {
+          if (proxyElements.has(host) === true) {
             proxyElements.set(host, upgradedCmp);
           }
         }
@@ -48,9 +60,12 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
   }
 
   get(tagName: string) {
-    const def = this._registry.get(tagName.toLowerCase());
-    if (def != null) {
-      return def.cstr;
+    const registry = registryMap.get(this);
+    if (registry != null) {
+      const def = registry.get(tagName.toLowerCase());
+      if (def != null) {
+        return def.cstr;
+      }
     }
     return undefined;
   }
@@ -62,21 +77,44 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
   whenDefined(tagName: string) {
     tagName = tagName.toLowerCase();
 
-    if (this._registry.has(tagName)) {
+    const registry = registryMap.get(this);
+    if (registry != null && registry.has(tagName) === true) {
       return Promise.resolve();
     }
 
     return new Promise<void>(resolve => {
-      this._whenDefinedResolves.set(tagName, resolve);
+      let whenDefinedResolves = whenDefinedResolvesMap.get(this);
+      if (whenDefinedResolves == null) {
+        whenDefinedResolves = new Map();
+        whenDefinedResolvesMap.set(this, whenDefinedResolves);
+      }
+
+      let whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+      if (whenDefinedResolveFns == null) {
+        whenDefinedResolveFns = [];
+        whenDefinedResolves.set(tagName, whenDefinedResolveFns);
+      }
+
+      whenDefinedResolveFns.push(resolve);
     });
   }
-
-  $reset() {
-    this._registry.clear();
-    this._whenDefinedResolves.clear();
-  }
-
 }
+
+
+export function resetCustomElementRegistry(customElements: CustomElementRegistry) {
+  if (customElements != null) {
+    const registry = registryMap.get(this);
+    if (registry != null) {
+      registry.clear();
+    }
+
+    const whenDefinedResolves = whenDefinedResolvesMap.get(this);
+    if (whenDefinedResolves != null) {
+      whenDefinedResolves.clear();
+    }
+  }
+}
+
 
 export function creatCustomElement(customElements: MockCustomElementRegistry, ownerDocument: any, tagName: string) {
   const Cstr = customElements.get(tagName);
@@ -132,7 +170,7 @@ export function connectNode(ownerDocument: any, node: MockNode) {
   node.ownerDocument = ownerDocument;
 
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    if (node.nodeName.includes('-') && typeof (node as any).connectedCallback === 'function') {
+    if (node.nodeName.includes('-') === true && typeof (node as any).connectedCallback === 'function') {
       if (node.isConnected) {
         fireConnectedCallback(node);
       }
@@ -150,7 +188,7 @@ export function connectNode(ownerDocument: any, node: MockNode) {
 
 function fireConnectedCallback(node: any) {
   if (typeof (node as any).connectedCallback === 'function') {
-    if (!tempDisableCallbacks.has(node.ownerDocument)) {
+    if (tempDisableCallbacks.has(node.ownerDocument) === false) {
       try {
         node.connectedCallback();
       } catch (e) {
@@ -163,8 +201,8 @@ function fireConnectedCallback(node: any) {
 
 export function disconnectNode(node: MockNode) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    if (node.nodeName.includes('-') && typeof (node as any).disconnectedCallback === 'function') {
-      if (!tempDisableCallbacks.has(node.ownerDocument)) {
+    if (node.nodeName.includes('-') === true && typeof (node as any).disconnectedCallback === 'function') {
+      if (tempDisableCallbacks.has(node.ownerDocument) === false) {
         try {
           (node as any).disconnectedCallback();
         } catch (e) {
@@ -177,18 +215,20 @@ export function disconnectNode(node: MockNode) {
 }
 
 export function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
-  if (node.nodeName.includes('-') && typeof (node as any).attributeChangedCallback === 'function') {
-    attrName = attrName.toLowerCase();
+  attrName = attrName.toLowerCase();
 
-    const observedAttributes = (node as any).constructor.observedAttributes as string[];
-    if (Array.isArray(observedAttributes) && observedAttributes.some(obs => obs.toLowerCase() === attrName)) {
-      try {
-        (node as any).attributeChangedCallback(attrName, oldValue, newValue);
-      } catch (e) {
-        console.error(e);
-      }
+  const observedAttributes = (node as any).constructor.observedAttributes as string[];
+  if (Array.isArray(observedAttributes) === true && observedAttributes.some(obs => obs.toLowerCase() === attrName) === true) {
+    try {
+      (node as any).attributeChangedCallback(attrName, oldValue, newValue);
+    } catch (e) {
+      console.error(e);
     }
   }
+}
+
+export function checkAttributeChanged(node: MockNode) {
+  return (node.nodeName.includes('-') === true && typeof (node as any).attributeChangedCallback === 'function');
 }
 
 const tempDisableCallbacks = new Set();

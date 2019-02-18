@@ -7,13 +7,13 @@ export class MockClassList {
     const clsNames = getItems(this.elm);
     let updated = false;
     className.forEach(className => {
-      if (!clsNames.includes(className)) {
+      if (clsNames.includes(className) === false) {
         clsNames.push(className);
         updated = true;
       }
     });
     if (updated) {
-      this.elm.className = clsNames.join(' ');
+      this.elm.setAttributeNS(null, 'class', clsNames.join(' '));
     }
   }
 
@@ -28,7 +28,7 @@ export class MockClassList {
       }
     });
     if (updated) {
-      this.elm.className = clsNames.filter(c => c.length > 0).join(' ');
+      this.elm.setAttributeNS(null, 'class', clsNames.filter(c => c.length > 0).join(' '));
     }
   }
 
@@ -37,7 +37,7 @@ export class MockClassList {
   }
 
   toggle(className: string) {
-    if (this.contains(className)) {
+    if (this.contains(className) === true) {
       this.remove(className);
     } else {
       this.add(className);
@@ -60,8 +60,8 @@ export class MockClassList {
 
 
 function getItems(elm: HTMLElement) {
-  const className = elm.className;
-  if (className) {
+  const className = elm.getAttribute('class');
+  if (typeof className === 'string' && className.length > 0) {
     return className.trim().split(' ').filter(c => c.length > 0);
   }
   return [];

@@ -10,12 +10,12 @@ export function selectOne(selector: string, elm: MockElement) {
 
 function selectOneRecursion(selectors: cssWhat.ParseResults, elm: MockElement): MockElement {
   const children = elm.children;
-  for (let i = 0; i < children.length; i++) {
-    if (matchesSelectors(selectors, children[i])) {
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    if (matchesSelectors(selectors, children[i]) === true) {
       return children[i];
     }
     const childMatch = selectOneRecursion(selectors, children[i]);
-    if (childMatch) {
+    if (childMatch != null) {
       return childMatch;
     }
   }
@@ -32,8 +32,8 @@ export function selectAll(selector: string, elm: MockElement) {
 
 function selectAllRecursion(selectors: cssWhat.ParseResults, elm: MockElement, found: MockElement[]) {
   const children = elm.children;
-  for (let i = 0; i < children.length; i++) {
-    if (matchesSelectors(selectors, children[i])) {
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    if (matchesSelectors(selectors, children[i]) === true) {
       found.push(children[i]);
     }
     selectAllRecursion(selectors, children[i], found);
@@ -42,8 +42,8 @@ function selectAllRecursion(selectors: cssWhat.ParseResults, elm: MockElement, f
 
 
 function matchesSelectors(selectors: cssWhat.ParseResults, elm: MockElement) {
-  for (let i = 0; i < selectors.length; i++) {
-    if (matchesEverySelector(selectors[i], elm)) {
+  for (let i = 0, ii = selectors.length; i < ii; i++) {
+    if (matchesEverySelector(selectors[i], elm) === true) {
       return true;
     }
   }
@@ -52,8 +52,8 @@ function matchesSelectors(selectors: cssWhat.ParseResults, elm: MockElement) {
 
 
 function matchesEverySelector(selectorData: cssWhat.Selector[], elm: MockElement) {
-  for (let i = 0; i < selectorData.length; i++) {
-    if (!matchesSelector(selectorData[i], elm)) {
+  for (let i = 0, ii = selectorData.length; i < ii; i++) {
+    if (matchesSelector(selectorData[i], elm) === false) {
       return false;
     }
   }

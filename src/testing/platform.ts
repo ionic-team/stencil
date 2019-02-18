@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 export { Host, bootstrapLazy, createEvent, getElement, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
-import { setupGlobal } from '@mock-doc';
+import { resetWindow, setupGlobal } from '@mock-doc';
 
 export * from './task-queue';
 
@@ -23,7 +23,7 @@ export const plt: d.PlatformRuntime = {
 };
 
 export function resetPlatform() {
-  win.$reset();
+  resetWindow(win);
   hostRefs.clear();
   styles.clear();
   plt.isTmpDisconnected = false;

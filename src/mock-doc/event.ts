@@ -70,37 +70,37 @@ export class MockEventListener {
 export function addEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
-  if (target._listeners == null) {
-    target._listeners = [];
+  if (target.__listeners == null) {
+    target.__listeners = [];
   }
 
-  target._listeners.push(new MockEventListener(type, handler));
+  target.__listeners.push(new MockEventListener(type, handler));
 }
 
 
 export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
-  if (target._listeners) {
-    const elmListener = target._listeners.find(e => e.type === type && e.handler === handler);
-    if (elmListener) {
-      const index = target._listeners.indexOf(elmListener);
-      target._listeners.splice(index, 1);
+  if (target.__listeners != null) {
+    const elmListener = target.__listeners.find(e => e.type === type && e.handler === handler);
+    if (elmListener != null) {
+      const index = target.__listeners.indexOf(elmListener);
+      target.__listeners.splice(index, 1);
     }
   }
 }
 
 
 function triggerEventListener(elm: any, ev: MockEvent) {
-  if (!elm || ev.cancelBubble) {
+  if (elm == null || ev.cancelBubble === true) {
     return;
   }
 
   const target: EventTarget = elm;
   ev.currentTarget = elm;
 
-  if (Array.isArray(target._listeners)) {
-    const listeners = target._listeners.filter(e => e.type === ev.type);
+  if (Array.isArray(target.__listeners)) {
+    const listeners = target.__listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
       try {
         listener.handler.call(target, ev);
@@ -110,7 +110,7 @@ function triggerEventListener(elm: any, ev: MockEvent) {
     });
   }
 
-  if (!ev.bubbles) {
+  if (ev.bubbles === false) {
     return;
   }
 
@@ -129,5 +129,5 @@ export function dispatchEvent(currentTarget: any, ev: MockEvent) {
 
 
 export interface EventTarget {
-  _listeners: MockEventListener[];
+  __listeners: MockEventListener[];
 }

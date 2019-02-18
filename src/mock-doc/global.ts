@@ -1,4 +1,4 @@
-import { MockWindow } from './window';
+import { MockWindow, resetWindow } from './window';
 
 
 export function setupGlobal(global: any) {
@@ -23,10 +23,8 @@ export function setupGlobal(global: any) {
 
 
 export function teardownGlobal(global: any) {
-  const win = global.window as MockWindow;
-  if (win != null) {
-    win.$reset();
-  }
+  const win = global.window as Window;
+  resetWindow(win);
 }
 
 

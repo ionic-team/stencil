@@ -6,7 +6,7 @@ let sharedDocument: MockDocument;
 
 export function parseHtmlToDocument(html: string, ownerDocument: MockDocument = null) {
   if (ownerDocument == null) {
-    if (!sharedDocument) {
+    if (sharedDocument == null) {
       sharedDocument = new MockDocument();
     }
     ownerDocument = sharedDocument;
@@ -18,7 +18,7 @@ export function parseHtmlToDocument(html: string, ownerDocument: MockDocument = 
 
 export function parseHtmlToFragment(html: string, ownerDocument: MockDocument = null) {
   if (ownerDocument == null) {
-    if (!sharedDocument) {
+    if (sharedDocument == null) {
       sharedDocument = new MockDocument();
     }
     ownerDocument = sharedDocument;

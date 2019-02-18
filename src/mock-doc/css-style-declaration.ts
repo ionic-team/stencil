@@ -79,7 +79,7 @@ export function createCSSStyleDeclaration() {
 
 
 const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
-  get: function(cssStyle, prop: string) {
+  get(cssStyle, prop: string) {
     if (prop in cssStyle) {
       return (cssStyle as any)[prop];
     }
@@ -87,7 +87,7 @@ const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
     return cssStyle.getPropertyValue(prop);
   },
 
-  set: function(cssStyle, prop: string, value) {
+  set(cssStyle, prop: string, value) {
     if (prop in cssStyle) {
       (cssStyle as any)[prop] = value;
     } else {
@@ -100,18 +100,17 @@ const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
 
 function cssCaseToJsCase(str: string) {
   // font-size to fontSize
-  if (str.length > 1 && str.includes('-')) {
+  if (str.length > 1 && str.includes('-') === true) {
     str = str.toLowerCase().split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
     str = str.substr(0, 1).toLowerCase() + str.substr(1);
   }
-
   return str;
 }
 
 
 function jsCaseToCssCase(str: string) {
   // fontSize to font-size
-  if (str.length > 1 && (!str.includes('-') && /[A-Z]/.test(str))) {
+  if (str.length > 1 && (str.includes('-') === false && /[A-Z]/.test(str) === true)) {
     str = str.replace(/([A-Z])/g, g => ' ' + g[0]).trim().replace(/ /g, '-').toLowerCase();
   }
 

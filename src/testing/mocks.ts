@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { BuildContext, Cache, validateConfig } from '@compiler';
 import { InMemoryFileSystem } from '@utils';
-import { mockDocument, mockWindow } from '@mock-doc';
+import { MockWindow } from '@mock-doc';
 import { TestingConfig } from './testing-config';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
@@ -103,4 +103,13 @@ export function mockStencilSystem(): d.StencilSystem {
 }
 
 
-export { mockDocument, mockWindow };
+export function mockDocument(html: string = null) {
+  const win = new MockWindow(html);
+  return win.document as Document;
+}
+
+
+export function mockWindow(html: string = null) {
+  const win = new MockWindow(html);
+  return (win as any) as Window;
+}

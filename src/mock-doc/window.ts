@@ -1,11 +1,11 @@
-import { MockCustomElementRegistry } from './custom-element-registry';
+import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
-import { MockDocument } from './document';
+import { MockDocument, resetDocument } from './document';
 import { MockElement } from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
-import { MockPerformance } from './performance';
+import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
 
 
@@ -24,8 +24,12 @@ export class MockWindow {
   document: Document;
   performance: Performance;
 
-  constructor(html: string = null) {
-    this.document = new MockDocument(html, this) as any;
+  constructor(html: string | boolean = null) {
+    if (html !== false) {
+      this.document = new MockDocument(html, this) as any;
+    } else {
+      this.document = null;
+    }
     this.performance = new MockPerformance();
     this.customElements = new MockCustomElementRegistry(this as any);
   }
@@ -35,7 +39,7 @@ export class MockWindow {
   }
 
   close() {
-    this.$reset();
+    resetWindow(this as any);
   }
 
   dispatchEvent(ev: MockEvent) {
@@ -44,6 +48,10 @@ export class MockWindow {
 
   fetch() {
     return Promise.resolve();
+  }
+
+  get globalThis() {
+    return this;
   }
 
   get history() {
@@ -209,27 +217,49 @@ export class MockWindow {
     } as any;
   }
 
-  $reset() {
-    if (this.customElements != null) {
-      (customElements as MockCustomElementRegistry).$reset();
-    }
+}
 
-    if (this.document != null) {
-      ((this.document as any) as MockDocument).$reset();
-    }
 
-    if (this.performance != null) {
-      (this.performance as MockPerformance).$reset();
-    }
-
-    historyMap.delete(this);
-    htmlElementCstrMap.delete(this);
-    localStorageMap.delete(this);
-    locMap.delete(this);
-    navMap.delete(this);
-    sessionStorageMap.delete(this);
-    eventClassMap.delete(this);
-    customEventClassMap.delete(this);
+export function cloneWindow(srcWin: Window) {
+  if (srcWin == null) {
+    return null;
   }
 
+  const dstWin = new MockWindow(false);
+  if (srcWin.document != null) {
+    const dstDoc = new MockDocument(false, dstWin);
+    dstDoc.documentElement = srcWin.document.documentElement.cloneNode(true) as any;
+
+  } else {
+    dstWin.document = new MockDocument(null, dstWin) as any;
+  }
+  return dstWin;
+}
+
+
+export function cloneDocument(srcDoc: Document) {
+  if (srcDoc == null) {
+    return null;
+  }
+
+  const dstWin = cloneWindow(srcDoc.defaultView);
+  return dstWin.document;
+}
+
+
+export function resetWindow(win: Window) {
+  if (win != null) {
+    resetCustomElementRegistry(win.customElements);
+    resetDocument(win.document);
+    resetPerformance(win.performance);
+
+    historyMap.delete(win as any);
+    htmlElementCstrMap.delete(win as any);
+    localStorageMap.delete(win as any);
+    locMap.delete(win as any);
+    navMap.delete(win as any);
+    sessionStorageMap.delete(win as any);
+    eventClassMap.delete(win as any);
+    customEventClassMap.delete(win as any);
+  }
 }

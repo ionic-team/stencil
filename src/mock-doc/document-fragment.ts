@@ -14,7 +14,7 @@ export class MockDocumentFragment extends MockElement {
     const cloned = new MockDocumentFragment(null);
 
     if (deep) {
-      for (let i = 0; i < this.childNodes.length; i++) {
+      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
         const childNode = this.childNodes[i];
         if (childNode.nodeType === NODE_TYPES.ELEMENT_NODE || childNode.nodeType === NODE_TYPES.TEXT_NODE || childNode.nodeType === NODE_TYPES.COMMENT_NODE) {
           const clonedChildNode = this.childNodes[i].cloneNode(true);

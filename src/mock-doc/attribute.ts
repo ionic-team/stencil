@@ -7,21 +7,9 @@ export class MockAttributeMap {
     return this.items.length;
   }
 
-  cloneAttributes() {
-    const attributes = new MockAttributeMap();
-    attributes.items = this.items.map(srcAttr => {
-      const dstAttr = new MockAttr();
-      dstAttr.name = srcAttr.name;
-      dstAttr.value = srcAttr.value;
-      dstAttr.namespaceURI = srcAttr.namespaceURI;
-      return dstAttr;
-    });
-    return attributes;
-  }
-
-  getNamedItem(name: string) {
-    name = name.toLowerCase();
-    return this.items.find(attr => attr.name === name && (attr.namespaceURI == null || attr.namespaceURI === 'http://www.w3.org/1999/xlink')) || null;
+  getNamedItem(attrName: string) {
+    attrName = attrName.toLowerCase();
+    return this.items.find(attr => attr.name === attrName && (attr.namespaceURI == null || attr.namespaceURI === 'http://www.w3.org/1999/xlink')) || null;
   }
 
   setNamedItem(attr: MockAttr) {
@@ -37,22 +25,22 @@ export class MockAttributeMap {
     return this.items[index] || null;
   }
 
-  getNamedItemNS(namespaceURI: string, name: string) {
+  getNamedItemNS(namespaceURI: string, attrName: string) {
     if (namespaceURI == null || namespaceURI === 'http://www.w3.org/1999/xlink') {
-      return this.getNamedItem(name);
+      return this.getNamedItem(attrName);
     }
 
-    name = name.toLowerCase();
-    return this.items.find(attr => attr.name === name && attr.namespaceURI === namespaceURI) || null;
+    attrName = attrName.toLowerCase();
+    return this.items.find(attr => attr.name === attrName && attr.namespaceURI === namespaceURI) || null;
   }
 
   setNamedItemNS(attr: MockAttr) {
-    if (attr && attr.value != null) {
+    if (attr != null && attr.value != null) {
       attr.value = String(attr.value);
     }
 
     const existingAttr = this.items.find(a => a.name.toLowerCase() === attr.name.toLowerCase() && a.namespaceURI === attr.namespaceURI);
-    if (existingAttr) {
+    if (existingAttr != null) {
       existingAttr.value = attr.value;
     } else {
       this.items.push(attr);
@@ -60,7 +48,7 @@ export class MockAttributeMap {
   }
 
   removeNamedItemNS(attr: MockAttr) {
-    for (let i = 0; i < this.items.length; i++) {
+    for (let i = 0, ii = this.items.length; i < ii; i++) {
       if (this.items[i].name.toLowerCase() === attr.name && this.items[i].namespaceURI === attr.namespaceURI) {
         this.items.splice(i, 1);
         break;
@@ -69,11 +57,29 @@ export class MockAttributeMap {
   }
 }
 
+export function cloneAttributes(srcAttrs: MockAttributeMap) {
+  const dstAttrs = new MockAttributeMap();
+  if (srcAttrs != null) {
+    for (let i = 0, ii = srcAttrs.length; i < ii; i++) {
+      const srcAttr = srcAttrs.item(i);
+      const dstAttr = new MockAttr(srcAttr.name, srcAttr.value, srcAttr.namespaceURI);
+      dstAttrs.setNamedItemNS(dstAttr);
+    }
+  }
+  return dstAttrs;
+}
+
 
 export class MockAttr {
   private _name: string;
-  private _value = '';
+  private _value: string;
   private _namespaceURI: string;
+
+  constructor(attrName: string, attrValue = '', namespaceURL: string = null) {
+    this._name = attrName.toLowerCase();
+    this._value = String(attrValue || '');
+    this._namespaceURI = (namespaceURL != null) ? namespaceURL.toLowerCase() : namespaceURL;
+  }
 
   get name() {
     return this._name;
@@ -92,7 +98,7 @@ export class MockAttr {
   get namespaceURI() {
     return this._namespaceURI;
   }
-  set namespaceURI(value) {
-    this._namespaceURI = (value != null) ? value.toLowerCase() : value;
+  set namespaceURI(namespaceURI) {
+    this._namespaceURI = (namespaceURI != null) ? namespaceURI.toLowerCase() : namespaceURI;
   }
 }
