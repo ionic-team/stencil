@@ -10,12 +10,16 @@ import { resetEventListeners } from './event';
 
 export class MockDocument extends MockElement {
   defaultView: any;
+  cookie: string;
+  referrer: string;
 
   constructor(html: string | boolean = null, win: any = null) {
     super(null, null);
     this.nodeName = NODE_NAMES.DOCUMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_NODE;
     this.defaultView = win;
+    this.cookie = '';
+    this.referrer = '';
 
     this.appendChild(this.createDocumentTypeNode());
 
@@ -168,6 +172,11 @@ export class MockDocument extends MockElement {
 
 export function resetDocument(doc: Document) {
   if (doc != null) {
+    try {
+      doc.cookie = '';
+      (doc as any).referrer = '';
+    } catch (e) {}
+
     resetEventListeners(doc);
 
     const documentElement = doc.documentElement;

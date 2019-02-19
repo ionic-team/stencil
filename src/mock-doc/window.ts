@@ -78,7 +78,7 @@ export class MockWindow {
     localStorageMap.set(this, locStorage);
   }
 
-  get location() {
+  get location(): Location {
     let loc = locMap.get(this);
     if (loc == null) {
       loc = new MockLocation();
@@ -86,7 +86,7 @@ export class MockWindow {
     }
     return loc;
   }
-  set location(val: any) {
+  set location(val: Location) {
     if (typeof val === 'string') {
       let loc = locMap.get(this);
       if (loc == null) {
@@ -96,7 +96,7 @@ export class MockWindow {
       loc.href = val;
 
     } else {
-      locMap.set(this, val);
+      locMap.set(this, val as any);
     }
   }
 

@@ -1,7 +1,8 @@
 import { URL } from 'url';
 
 
-export class MockLocation {
+export class MockLocation implements Location {
+  ancestorOrigins: any = null;
   protocol = '';
   host = '';
   hostname = '';
