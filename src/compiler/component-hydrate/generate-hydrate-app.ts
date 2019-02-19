@@ -59,12 +59,12 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
   coreText.push(`import { ${platformImports.join(', ')} } from '@stencil/core/platform';`);
 
   hydrateCmps.forEach(cmpData => {
-    coreText.push(`import { ${cmpData.componentClassName} } from '${cmpData.filePath}';`);
+    coreText.push(`import { ${cmpData.cmp.componentClassName} } from '${cmpData.filePath}';`);
   });
 
   coreText.push(`const cmps = [`);
   hydrateCmps.forEach(cmpData => {
-    coreText.push(`  ${cmpData.componentClassName},`);
+    coreText.push(`  ${cmpData.cmp.componentClassName},`);
   });
   coreText.push(`];`);
   coreText.push(`registerComponents(cmps);`);

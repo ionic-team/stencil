@@ -1,18 +1,37 @@
 import ts from 'typescript';
+import * as d from '@declarations';
 import { CONNECTED_CALLBACK } from '../exports';
 
 
-export function addNativeConnectedCallback(classMembers: ts.ClassElement[]) {
+export function addNativeConnectedCallback(classMembers: ts.ClassElement[], build: d.Build) {
   // function call to stencil's exported connectedCallback(elm, plt)
   const methodName = 'connectedCallback';
 
-  const args: any = [
-    ts.createThis()
-  ];
-
-  const fnCall = ts.createCall(
-    ts.createIdentifier(CONNECTED_CALLBACK), undefined, args
-  );
+  let fnCall: ts.Expression;
+  if (!build.updatable && !build.lifecycle && !build.lifecycle && build.allRenderFn) {
+    fnCall = ts.createAssignment(
+      ts.createPropertyAccess(
+        ts.createThis(),
+        'textContent'
+      ),
+      ts.createCall(
+        ts.createPropertyAccess(
+          ts.createThis(),
+          'render'
+        ),
+        undefined,
+        undefined
+      )
+    );
+  } else {
+    fnCall = ts.createCall(
+      ts.createIdentifier(CONNECTED_CALLBACK),
+      undefined,
+      [
+        ts.createThis()
+      ]
+    );
+  }
 
   const connectedCallback = classMembers.find(classMember => {
     return (classMember.kind === ts.SyntaxKind.MethodDeclaration && (classMember.name as any).escapedText === methodName);

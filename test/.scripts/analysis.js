@@ -13,7 +13,7 @@ const rootDir = path.join(__dirname, '..');
 
 fileSizeProfile('Hello World App',
   [
-    path.join(rootDir, 'hello-world', 'www', 'build', 'app.js'),
+    path.join(rootDir, 'hello-world', 'dist', 'modules', 'helloworld.mjs'),
   ],
   output
 );

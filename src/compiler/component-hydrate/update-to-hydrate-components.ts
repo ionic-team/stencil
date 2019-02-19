@@ -9,7 +9,7 @@ export async function updateToHydrateComponents(compilerCtx: d.CompilerCtx, buil
   const hydrateCmps = await Promise.all(
     cmps.map(cmp => updateToHydrateComponent(compilerCtx, buildCtx, build, cmp))
   );
-  return sortBy(hydrateCmps, c => c.componentClassName);
+  return sortBy(hydrateCmps, c => c.cmp.componentClassName);
 }
 
 
@@ -23,10 +23,9 @@ async function updateToHydrateComponent(compilerCtx: d.CompilerCtx, buildCtx: d.
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = sys.path.join(inputFileDir, outputFileName);
 
-  const cmpData: d.ComponentCompilerNativeData = {
+  const cmpData: d.ComponentCompilerData = {
     filePath: outputFilePath,
-    tagName: cmp.tagName,
-    componentClassName: cmp.componentClassName,
+    exportLine: ``,
     cmp: cmp
   };
 

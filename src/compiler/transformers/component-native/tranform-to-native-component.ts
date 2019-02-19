@@ -21,7 +21,7 @@ export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, build
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform(compilerCtx)
+          nativeComponentTransform(compilerCtx, build)
         ]
       }
     };
@@ -42,7 +42,7 @@ export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, build
 }
 
 
-function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+function nativeComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
@@ -51,9 +51,8 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFac
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(node, cmp);
+            return updateNativeComponentClass(node, cmp, build);
           }
-
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);

@@ -5,7 +5,7 @@ import { sys } from '@sys';
 import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';
 
 
-export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta) {
+export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> {
   const inputFilePath = cmp.jsFilePath;
   const inputFileDir = sys.path.dirname(inputFilePath);
   const inputFileName = sys.path.basename(inputFilePath);
@@ -14,12 +14,6 @@ export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx
   const cacheKey = compilerCtx.cache.createKey('lazy', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = sys.path.join(inputFileDir, outputFileName);
-
-  const cmpData: d.ComponentCompilerLazyData = {
-    filePath: outputFilePath,
-    exportLine: createComponentExport(cmp, outputFilePath),
-    tagName: cmp.tagName
-  };
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
@@ -34,7 +28,11 @@ export async function updateToLazyComponent(compilerCtx: d.CompilerCtx, buildCtx
 
   await compilerCtx.fs.writeFile(outputFilePath, outputJsText, { inMemoryOnly: true });
 
-  return cmpData;
+  return {
+    filePath: outputFilePath,
+    exportLine: createComponentExport(cmp, outputFilePath),
+    cmp
+  };
 }
 
 
@@ -42,10 +40,5 @@ function createComponentExport(cmp: d.ComponentCompilerMeta, lazyModuleFilePath:
   const originalClassName = cmp.componentClassName;
   const pascalCasedClassName = cmp.tagName.replace(/-/g, '_');
   const filePath = normalizePath(lazyModuleFilePath);
-
-  if (originalClassName === pascalCasedClassName) {
-    return `export { ${originalClassName} } from '${filePath}';`;
-  }
-
   return `export { ${originalClassName} as ${pascalCasedClassName} } from '${filePath}';`;
 }

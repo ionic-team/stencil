@@ -1,8 +1,9 @@
 import { sys } from '@sys';
 
 
-export function stencilClientEntryPointPlugin() {
+export function stencilClientEntryPointPlugin(entry: string | undefined) {
   return {
+    name: 'stencilClientEntryPointPlugin',
     resolveId(id: string) {
       if (id === '@core-entrypoint') {
         return id;
@@ -15,7 +16,7 @@ export function stencilClientEntryPointPlugin() {
     },
     load(id: string) {
       if (id === '@core-entrypoint') {
-        return `import '@stencil/core/app';`;
+        return entry || `import '@stencil/core/app';`;
       }
       return null;
     }

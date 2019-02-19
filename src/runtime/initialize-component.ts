@@ -9,7 +9,7 @@ import { computeMode } from './mode';
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if (!(hostRef.stateFlags & HOST_STATE.hasInitializedComponent)) {
+  if ((BUILD.lazyLoad || BUILD.style) && !(hostRef.stateFlags & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
     hostRef.stateFlags |= HOST_STATE.hasInitializedComponent;
 
@@ -92,6 +92,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     );
 
   } else {
-    scheduleUpdate(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+    scheduleUpdate(elm, hostRef, cmpMeta, true);
   }
 };

@@ -82,4 +82,11 @@ export function isOutputTargetDocsCustom(o: d.OutputTarget): o is d.OutputTarget
   return o.type === 'docs-custom';
 }
 
+export function getComponentsFromModules(moduleFiles: d.Module[]) {
+  return moduleFiles.reduce((cmps, m) => {
+    cmps.push(...m.cmps);
+    return cmps;
+  }, [] as d.ComponentCompilerMeta[]);
+}
+
 export const GENERATED_DTS = 'components.d.ts';

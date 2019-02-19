@@ -53,7 +53,6 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           // up millions cuz this function ensures it only runs once
           scheduleUpdate(
             elm,
-            (BUILD.lazyLoad ? hostRef.lazyInstance : elm),
             hostRef,
             cmpMeta,
             false

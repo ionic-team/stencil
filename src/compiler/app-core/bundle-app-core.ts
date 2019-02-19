@@ -10,20 +10,22 @@ import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-
 import { stencilClientEntryPointPlugin } from '../rollup-plugins/stencil-client-entrypoint';
 
 
-export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], bundleCoreOptions: d.BundleCoreOptions) {
+export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
   const rollupResults: d.RollupResult[] = [];
-
-  bundleCoreOptions.entryInputs[config.fsNamespace] = '@core-entrypoint';
 
   try {
     const rollupOptions: RollupOptions = {
-      input: bundleCoreOptions.entryInputs,
+      input: {
+        // Generate entry point
+        [config.fsNamespace]: '@core-entrypoint',
+        ...bundleCoreOptions.entryInputs,
+      },
       plugins: [
-        stencilAppCorePlugin(bundleCoreOptions.entryFilePath),
-        stencilClientEntryPointPlugin(),
+        stencilAppCorePlugin(bundleCoreOptions.core),
+        stencilClientEntryPointPlugin(bundleCoreOptions.mainEntry),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),
-        componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
+        componentEntryPlugin(compilerCtx, buildCtx, build, buildCtx.entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -36,9 +38,6 @@ export async function bundleAppCore(config: d.Config, compilerCtx: d.CompilerCtx
         inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
       ],
-      manualChunks: {
-        [config.fsNamespace]: [bundleCoreOptions.entryFilePath]
-      },
       onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
     };
 

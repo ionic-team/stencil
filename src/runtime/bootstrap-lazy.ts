@@ -26,7 +26,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         }
         customElements.define(
           cmpLazyMeta.cmpTag,
-          proxyComponent(class extends HTMLElement {
+          class extends HTMLElement {
             // StencilLazyHost
             constructor() {
               super();
@@ -53,7 +53,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
             's-init'() {
               const hostRef = getHostRef(this);
               if (hostRef.lazyInstance) {
-                postUpdateComponent(this, hostRef, hostRef.lazyInstance);
+                postUpdateComponent(this, hostRef);
               }
             }
 
@@ -62,7 +62,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
                 const hostRef = getHostRef(this);
                 scheduleUpdate(
                   this,
-                  BUILD.lazyLoad ? hostRef.lazyInstance : this,
                   hostRef,
                   cmpLazyMeta,
                   false
@@ -73,7 +72,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
             componentOnReady(): any {
               return componentOnReady(getHostRef(this));
             }
-          } as any, cmpLazyMeta, 1, 0) as any
+
+            static get observedAttributes() {
+              return proxyComponent(this as any, cmpLazyMeta, 1, 0);
+            }
+          } as any
         );
       }
     })

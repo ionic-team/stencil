@@ -5,10 +5,11 @@ import { consoleError, supportsShadowDom, writeTask } from '@platform';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
-export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.stateFlags |= HOST_STATE.isQueuedForUpdate;
   }
+  const instance = BUILD.lazyLoad ? hostRef.lazyInstance : elm as any;
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
@@ -36,14 +37,14 @@ export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef:
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
+    writeTask(() => updateComponent(elm, hostRef, cmpMeta, true));
   } else {
     // syncronuously write DOM
-    updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+    updateComponent(elm, hostRef, cmpMeta, true);
   }
 };
 
-const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.stateFlags &= ~HOST_STATE.isQueuedForUpdate;
@@ -79,6 +80,7 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
+    const instance = (BUILD.lazyLoad) ? hostRef.lazyInstance : elm as any;
     if (BUILD.vdomRender || BUILD.reflect) {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
@@ -108,7 +110,9 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
   if (BUILD.lifecycle) {
     elm['s-lr'] = true;
   }
-  hostRef.stateFlags |= HOST_STATE.hasRendered;
+  if (BUILD.updatable || BUILD.lazyLoad) {
+    hostRef.stateFlags |= HOST_STATE.hasRendered;
+  }
 
   if (BUILD.lifecycle && elm['s-rc']) {
     // ok, so turns out there are some child host elements
@@ -118,13 +122,13 @@ const updateComponent = (elm: d.HostElement, instance: any, hostRef: d.HostRef, 
     elm['s-rc'] = undefined;
   }
 
-  postUpdateComponent(elm, hostRef, instance);
+  postUpdateComponent(elm, hostRef);
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, instance: any, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if (!elm['s-al']) {
-
+export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
+  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
+    const instance = BUILD.lazyLoad ? hostRef.lazyInstance : elm as any;
     if (!(hostRef.stateFlags & HOST_STATE.hasLoadedComponent)) {
       hostRef.stateFlags |= HOST_STATE.hasLoadedComponent;
 
@@ -140,7 +144,9 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, inst
 
       emitLifecycleEvent(elm, 'componentDidLoad');
 
-      hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+      if (BUILD.lazyLoad) {
+        hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+      }
       if (BUILD.lifecycleDOMEvents && !hostRef.ancestorComponent) {
         emitLifecycleEvent(elm, 'appload');
       }

@@ -195,17 +195,8 @@ export interface CompilerAssetDir {
   originalCollectionPath?: string;
 }
 
-
-export interface ComponentCompilerNativeData {
-  filePath: string;
-  tagName: string;
-  componentClassName: string;
-  cmp: d.ComponentCompilerMeta;
-}
-
-
-export interface ComponentCompilerLazyData {
+export interface ComponentCompilerData {
   exportLine: string;
   filePath: string;
-  tagName: string;
+  cmp: d.ComponentCompilerMeta;
 }

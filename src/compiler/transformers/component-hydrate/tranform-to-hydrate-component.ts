@@ -21,7 +21,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          hydrateComponentTransform(compilerCtx)
+          hydrateComponentTransform(compilerCtx, build)
         ]
       }
     };
@@ -42,7 +42,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
 }
 
 
-function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+function hydrateComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
@@ -51,7 +51,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFa
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateHydrateComponentClass(node, cmp);
+            return updateHydrateComponentClass(node, cmp, build);
           }
 
         }

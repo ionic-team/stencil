@@ -19,11 +19,9 @@ export async function outputAngularProxies(config: d.Config, compilerCtx: d.Comp
 
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
-  const promises = outputTargets.map(outputTarget => {
-    return angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles);
-  });
-
-  await Promise.all(promises);
+  await Promise.all(
+    outputTargets.map(outputTarget => angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles))
+  );
 
   timespan.finish(`generate angular proxies finished`);
 }

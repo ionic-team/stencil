@@ -6,8 +6,8 @@ import { setValue } from './set-value';
 import { componentOnReady } from './component-on-ready';
 
 
-export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
-  if (!BUILD.lazyLoad && Cstr.is) {
+export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1): string[] => {
+  if ((BUILD.slotRelocation || BUILD.style) && Cstr.is)   {
     cmpMeta.cmpTag = Cstr.is;
   }
   if (BUILD.member && cmpMeta.cmpMembers) {
@@ -20,33 +20,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     // It's better to have a const than two Object.entries()
     const members = Object.entries(cmpMeta.cmpMembers);
 
-    if (BUILD.observeAttribute && isElementConstructor) {
-      const attrNameToPropName = new Map();
-
-      if (BUILD.reflect) {
-        cmpMeta.attrsToReflect = [];
-      }
-
-      // create an array of attributes to observe
-      // and also create a map of html attribute name to js property name
-      Cstr.observedAttributes = members
-        .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
-        .map(([propName, m]) => {
-          const attribute = m[1] || propName;
-          attrNameToPropName.set(attribute, propName);
-          if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.attrsToReflect.push([propName, attribute]);
-          }
-          return attribute;
-        });
-
-      (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
-        const propName = attrNameToPropName.get(attrName);
-        this[propName] = newValue === null && typeof this[propName] === 'boolean'
-          ? false
-          : newValue;
-      };
-    }
     members.forEach(([memberName, [memberFlags]]) => {
       if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberFlags & MEMBER_FLAGS.State))) {
         // proxyComponent - prop
@@ -76,7 +49,33 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
       }
     });
-  }
+    if (BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
+      const attrNameToPropName = new Map();
 
-  return Cstr;
+      if (BUILD.reflect) {
+        cmpMeta.attrsToReflect = [];
+      }
+
+      (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
+        const propName = attrNameToPropName.get(attrName);
+        this[propName] = newValue === null && typeof this[propName] === 'boolean'
+          ? false
+          : newValue;
+      };
+
+      // create an array of attributes to observe
+      // and also create a map of html attribute name to js property name
+      return members
+        .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
+        .map(([propName, m]) => {
+          const attribute = m[1] || propName;
+          attrNameToPropName.set(attribute, propName);
+          if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
+            cmpMeta.attrsToReflect.push([propName, attribute]);
+          }
+          return attribute;
+        });
+    }
+  }
+  return [];
 };

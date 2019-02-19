@@ -10,7 +10,7 @@ import { outputEsmIndexes } from './output-esm';
 import { outputHydrate } from './output-hydrate';
 import { outputIndexHtmls } from './output-index-html';
 import { outputModuleWebComponents } from './output-module-web-components';
-import { outputSelfContainedWebComponents } from './output-self-contained-web-components';
+// import { outputSelfContainedWebComponents } from './output-self-contained-web-components';
 import { outputTypes } from './output-types';
 
 
@@ -29,6 +29,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 
   const generateOutputs = [
     outputAngularProxies(config, compilerCtx, buildCtx),
+    outputModuleWebComponents(config, compilerCtx, buildCtx),
     outputApp(config, compilerCtx, buildCtx),
     outputCollections(config, compilerCtx, buildCtx),
     outputCommonJsIndexes(config, compilerCtx, buildCtx),
@@ -37,8 +38,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputEsmIndexes(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
     outputIndexHtmls(config, compilerCtx, buildCtx),
-    outputModuleWebComponents(config, compilerCtx, buildCtx),
-    outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
+    // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     outputTypes(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];

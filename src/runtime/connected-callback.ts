@@ -6,15 +6,19 @@ import { CMP_FLAG, HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hostRef?: d.HostRef, ancestorComponent?: d.HostElement) => {
+export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   // connectedCallback
 
   if (!BUILD.lazyLoad || BUILD.hydrateServerSide) {
     cmpMeta = (elm.constructor as d.ComponentConstructor).cmpMeta;
   }
 
-  if (BUILD.updatable || BUILD.member || BUILD.lifecycle || BUILD.hostListener) {
-    hostRef = getHostRef(elm);
+  if (!BUILD.updatable && !BUILD.member && !BUILD.lifecycle && !BUILD.hostListener) {
+    // connectedCallback, initialLoad
+    initializeComponent(elm, getHostRef(elm), cmpMeta);
+
+  } else {
+    const hostRef = getHostRef(elm);
 
     if (BUILD.hostListener && cmpMeta.cmpHostListeners) {
       // initialize our event listeners on the host element
@@ -61,7 +65,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       if (BUILD.lifecycle) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
-        ancestorComponent = elm;
+        let ancestorComponent = elm;
 
         while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
@@ -102,9 +106,5 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         initializeComponent(elm, hostRef, cmpMeta);
       }
     }
-
-  } else {
-    // connectedCallback, initialLoad
-    initializeComponent(elm, getHostRef(elm), cmpMeta);
   }
 };
