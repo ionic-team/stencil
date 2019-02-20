@@ -1,9 +1,8 @@
-import { MockElement, MockNode } from './node';
-import { MockAttr } from './attribute';
+import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
-export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOptions = {}) {
+export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElementOptions = {}) {
   const output: SerializeOutput = {
     indent: 0,
     text: []
@@ -36,11 +35,11 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
   }
 
   if (opts.outerHTML === true) {
-    serializeToHtml(elm, opts, output);
+    serializeToHtml(elm as Node, opts, output);
 
   } else {
     for (let i = 0, ii = elm.childNodes.length; i < ii; i++) {
-      serializeToHtml(elm.childNodes[i], opts, output);
+      serializeToHtml(elm.childNodes[i] as Node, opts, output);
     }
   }
 
@@ -56,7 +55,7 @@ export function serializeNodeToHtml(elm: MockElement, opts: SerializeElementOpti
 }
 
 
-function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: SerializeOutput) {
+function serializeToHtml(node: Node, opts: SerializeElementOptions, output: SerializeOutput) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
     const tagName = node.nodeName.toLowerCase();
 
@@ -77,11 +76,11 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
       output.text.push('<' + tagName);
 
       if (opts.pretty === true) {
-        (node as MockElement).attributes.items.sort(sortAttrs);
+        sortHtmlAttributes(node as HTMLElement);
       }
 
-      for (let i = 0, attrsLength = (node as MockElement).attributes.items.length; i < attrsLength; i++) {
-        const attr = (node as MockElement).attributes.items[i];
+      for (let i = 0, attrsLength = (node as Element).attributes.length; i < attrsLength; i++) {
+        const attr = (node as Element).attributes.item(i);
         const attrName = attr.name;
 
         if (attrName === 'style') {
@@ -130,11 +129,17 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
         }
       }
 
-      if ((node as MockElement).hasAttribute('style') === true) {
-        output.text.push(` style="${
-          opts.minifyInlineStyles ? ((node as MockElement).style.cssTextMinified || (node as MockElement).style.cssText) :
-          ((node as MockElement).style.cssText)
-        }">`);
+      if ((node as Element).hasAttribute('style') === true) {
+        if (opts.minifyInlineStyles === true) {
+          const minCssText = ((node as HTMLElement).style as any).cssTextMinified;
+          if (typeof minCssText === 'string') {
+            output.text.push(` style="${minCssText}">`);
+          } else {
+            output.text.push(` style="${(node as HTMLElement).style.cssText}">`);
+          }
+        } else {
+          output.text.push(` style="${(node as HTMLElement).style.cssText}">`);
+        }
 
       } else {
         output.text.push('>');
@@ -143,7 +148,7 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
-        const childNodes: MockNode[] = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : (node.childNodes);
+        const childNodes = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : (node.childNodes);
         const childNodeLength = childNodes.length;
 
         if (childNodeLength > 0) {
@@ -225,9 +230,32 @@ function serializeToHtml(node: MockNode, opts: SerializeElementOptions, output: 
   }
 }
 
-function sortAttrs(a: MockAttr, b: MockAttr) {
-  if (a.name < b.name) return -1;
-  if (a.name > b.name) return 1;
+interface AttrItem {
+  key: string;
+  value: string;
+}
+
+function sortHtmlAttributes(elm: HTMLElement) {
+  const sortedAttrs: AttrItem[] = [];
+
+  const attrs = elm.attributes;
+  for (let i = attrs.length - 1; i >= 0; i--) {
+    const attr = attrs.item(i);
+    sortedAttrs.push({
+      key: attr.nodeName.toLowerCase(),
+      value: attr.nodeValue
+    });
+    elm.removeAttribute(attr.nodeName);
+  }
+
+  sortedAttrs.sort(sortAttrs).forEach(attr => {
+    elm.setAttribute(attr.key, attr.value);
+  });
+}
+
+function sortAttrs(a: AttrItem, b: AttrItem) {
+  if (a.key < b.key) return -1;
+  if (a.key > b.key) return 1;
   return 0;
 }
 

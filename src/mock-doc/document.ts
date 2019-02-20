@@ -58,7 +58,10 @@ export class MockDocument extends MockElement {
         this.childNodes[i].remove();
       }
     }
-    this.appendChild(documentElement);
+    if (documentElement != null) {
+      this.appendChild(documentElement);
+      setOwnerDocument(documentElement, this);
+    }
   }
 
   get head() {
@@ -73,6 +76,18 @@ export class MockDocument extends MockElement {
     documentElement.insertBefore(head, documentElement.firstChild);
     return head;
   }
+  set head(head) {
+    const documentElement = this.documentElement;
+    for (let i = documentElement.childNodes.length - 1; i >= 0; i--) {
+      if (documentElement.childNodes[i].nodeName === 'HEAD') {
+        documentElement.childNodes[i].remove();
+      }
+    }
+    if (head != null) {
+      documentElement.insertBefore(head, documentElement.firstChild);
+      setOwnerDocument(head, this);
+    }
+  }
 
   get body() {
     const documentElement = this.documentElement;
@@ -85,6 +100,18 @@ export class MockDocument extends MockElement {
     const body = new MockElement(this, 'body');
     documentElement.appendChild(body);
     return body;
+  }
+  set body(body) {
+    const documentElement = this.documentElement;
+    for (let i = documentElement.childNodes.length - 1; i >= 0; i--) {
+      if (documentElement.childNodes[i].nodeName === 'BODY') {
+        documentElement.childNodes[i].remove();
+      }
+    }
+    if (body != null) {
+      documentElement.appendChild(body);
+      setOwnerDocument(body, this);
+    }
   }
 
   appendChild(newNode: MockElement) {

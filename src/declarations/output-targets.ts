@@ -1,7 +1,7 @@
 import * as d from '.';
 
 
-export interface OutputTargetWww extends OutputTargetBase {
+export interface OutputTargetWww extends OutputTargetBase, d.HydrateOptions {
   /**
    * Webapp output target.
    */
@@ -45,26 +45,6 @@ export interface OutputTargetWww extends OutputTargetBase {
   baseUrl?: string;
 
   /**
-   * Add a canonical link to the `<head>`. Default: `true`
-   */
-  canonicalLink?: boolean;
-
-  /**
-   * If extra whitespace should be removed from the prerendered
-   * HTML or not. Default: `true`
-   */
-  collapseWhitespace?: boolean;
-
-  /**
-   * If styles should be inlined during prerendering.
-   * Default: `true`
-   */
-  inlineStyles?: boolean;
-
-
-  inlineAssetsMaxSize?: number;
-
-  /**
    * If prerendering should continue to crawl local links and prerender.
    * Default: `true`
    */
@@ -82,19 +62,12 @@ export interface OutputTargetWww extends OutputTargetBase {
    * `true` allows the URL to be crawled, and returning `false` will skip
    * the URL for prerendering. Default: `undefined`
    */
-  prerenderFilter?: (url: d.Url) => boolean;
+  prerenderFilter?: (url: URL) => boolean;
 
   /**
    * Format the HTML all pretty-like. Great for debugging, bad for build performance.
    */
   prettyHtml?: boolean;
-
-  /**
-   * Maximum number of pages to be prerendering at one time. The optimal number
-   * varies between machines and any feedback regarding the number that best
-   * works for your setup would help. Default: `12`
-   */
-  prerenderMaxConcurrent?: number;
 
   /**
    * Keep hashes in the URL while prerendering. Default: `false`
@@ -114,21 +87,6 @@ export interface OutputTargetWww extends OutputTargetBase {
   prerenderAbortRequests?: {
     domain?: string;
   }[];
-
-  /**
-   * Remove `<!--html comments-->` from prerendered output. Default: `true`
-   */
-  removeHtmlComments?: boolean;
-
-  /**
-   * Analyze each page after prerendering and removes any CSS not used.
-   * Default: `true`
-   */
-  removeUnusedStyles?: boolean;
-}
-
-export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
-
 }
 
 
@@ -216,7 +174,6 @@ export interface OutputTargetBase {
 
 export type OutputTargetBuild =
  | OutputTargetDist
- | OutputTargetHydrate
  | OutputTargetWebComponent
  | OutputTargetWww;
 
@@ -227,7 +184,6 @@ export type OutputTarget =
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme
- | OutputTargetHydrate
  | OutputTargetDist
  | OutputTargetWebComponent
  | OutputTargetSelfContained

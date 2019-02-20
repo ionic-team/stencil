@@ -1,10 +1,16 @@
 import * as d from '.';
 
 
-export interface PrerenderLocation {
-  url?: string;
-  path?: string;
-  status?: 'pending' | 'processing' | 'complete';
+export interface PrerenderInstructions {
+  config: d.Config;
+  compilerCtx: d.CompilerCtx;
+  buildCtx: d.BuildCtx;
+  outputTarget: d.OutputTargetWww;
+  resolve: Function;
+  templateId: string;
+  pathsProcessing: Set<string>;
+  pathsPending: Set<string>;
+  pathsCompleted: Set<string>;
 }
 
 
@@ -16,16 +22,13 @@ export interface HydrateResults {
   port?: string;
   pathname?: string;
   search?: string;
-  query?: string;
   hash?: string;
   html?: string;
-  styles?: string;
-  anchors?: HydrateAnchor[];
-  root?: HTMLElement;
   components?: HydrateComponent[];
-  styleUrls?: string[];
-  scriptUrls?: string[];
-  imgUrls?: string[];
+  anchors?: HydrateAnchorElement[];
+  styles?: HydrateStyleElement[];
+  scripts?: HydrateScriptElement[];
+  imgs?: HydrateImgElement[];
 }
 
 
@@ -36,34 +39,60 @@ export interface HydrateComponent {
 }
 
 
-export interface HydrateAnchor {
-  href?: string;
-  target?: string;
+export interface HydrateElement {
   [attrName: string]: string | undefined;
 }
 
 
+export interface HydrateAnchorElement extends HydrateElement {
+  href?: string;
+  target?: string;
+}
+
+
+export interface HydrateStyleElement extends HydrateElement {
+  href?: string;
+}
+
+
+export interface HydrateScriptElement extends HydrateElement {
+  src?: string;
+  type?: string;
+}
+
+
+export interface HydrateImgElement extends HydrateElement {
+  src?: string;
+}
+
+
 export interface HydrateOptions {
+  collapseBooleanAttributes?: boolean;
   collapseWhitespace?: boolean;
   collectAnchors?: boolean;
   collectComponents?: boolean;
   collectImgUrls?: boolean;
   collectScriptUrls?: boolean;
   collectStylesheetUrls?: boolean;
-  canonicalLinkHref?: (url: string) => string;
+  canonicalLinkHref?: string;
   cookie?: string;
   direction?: string;
+  headElements?: ElementData[];
   language?: string;
-  relocateMetaCharset?: boolean;
+  minifyInlineStyles?: boolean;
+  pretty?: boolean;
   referrer?: string;
+  removeHtmlComments?: boolean;
   removeUnusedStyles?: boolean;
-  req?: {
-    protocol: string;
-    get: (key: string) => string;
-    originalUrl: string;
-  };
+  title?: string;
   url?: string;
   userAgent?: string;
+}
+
+
+export interface ElementData {
+  tag: string;
+  attributes?: {[key: string]: string}[];
 }
 
 

@@ -3,11 +3,11 @@ import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { loadMinifyJsDiagnostics } from '@utils';
 import { optimizeCssWorker } from './optimize-css-worker';
+import { prerenderWorker } from '../../compiler/prerender/prerender-worker';
 import { requestLatestCompilerVersion } from './check-version';
 import { ShadowCss } from '../../compiler/style/shadow-css';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
-
 
 
 const Terser = require('terser/dist/bundle.js');
@@ -35,6 +35,10 @@ export class NodeSystemWorker {
       sourceMap: result.sourceMap,
       diagnostics: diagnostics
     };
+  }
+
+  prerenderUrl(hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions) {
+    return prerenderWorker(hydrateAppFilePath, templateId, writeToFilePath, hydrateOpts);
   }
 
   requestLatestCompilerVersion() {

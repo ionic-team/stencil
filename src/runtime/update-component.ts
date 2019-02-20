@@ -36,10 +36,10 @@ export const scheduleUpdate = async (elm: d.HostElement, instance: any, hostRef:
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
+    writeTask(() => updateComponent(elm, (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true));
   } else {
     // syncronuously write DOM
-    updateComponent(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+    updateComponent(elm, (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
   }
 };
 

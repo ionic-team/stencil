@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { addNativeImports } from '../component-native/native-imports';
+import { addHydrateImports } from './hydrate-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
@@ -59,7 +59,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFa
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addNativeImports(transformCtx, tsSourceFile);
+      tsSourceFile = addHydrateImports(transformCtx, tsSourceFile);
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };

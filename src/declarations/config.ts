@@ -233,7 +233,6 @@ export interface ConfigFlags {
   open?: boolean;
   port?: number;
   prerender?: boolean;
-  prerenderExternal?: boolean;
   prod?: boolean;
   profile?: boolean;
   root?: string;
@@ -242,7 +241,6 @@ export interface ConfigFlags {
   serve?: boolean;
   serviceWorker?: boolean;
   spec?: boolean;
-  ssr?: boolean;
   stats?: boolean;
   updateScreenshot?: boolean;
   version?: boolean;

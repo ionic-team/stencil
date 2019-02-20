@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
+import { outputPrerender } from '../output-targets/output-prerender';
 import { writeAppCollections } from '../collections/collection-data';
 
 
@@ -8,7 +9,6 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     return;
   }
 
-  // serialize and write the manifest file if need be
   await writeAppCollections(config, compilerCtx, buildCtx);
 
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
@@ -32,6 +32,8 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
       await compilerCtx.cache.commit();
       buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
       buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+
+      await outputPrerender(config, compilerCtx, buildCtx);
 
     } else {
       buildCtx.debug(`commit cache aborted, not active build`);

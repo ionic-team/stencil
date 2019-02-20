@@ -5,9 +5,13 @@ import { resetWindow, setupGlobal } from '@mock-doc';
 
 export * from './task-queue';
 
-export const win = setupGlobal(global);
+export const win = setupGlobal(global) as Window;
 
-export const doc = win.document;
+export const getWin = (_?: any) => win;
+
+export const getDoc = (_?: any) => win.document;
+
+export const getHead = (_?: any) => win.document.head;
 
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
@@ -49,13 +53,17 @@ export const registerHost = (elm: d.HostElement) =>
   });
 
 const Context = {
-  window: win,
-  document: doc,
   isServer: false,
   enableListener: () => console.log('TODO'),
   queue: {}
 };
 
-export function getContext(context: string): any {
+export function getContext(context: string, elm: Node): any {
+  if (context === 'window') {
+    return getWin(elm);
+  }
+  if (context === 'document') {
+    return getDoc(elm);
+  }
   return (Context as any)[context];
 }

@@ -276,7 +276,7 @@ export class MockElement extends MockNode {
     if (this.childNodes.length === 0) {
       return '';
     }
-    return serializeNodeToHtml(this, {
+    return serializeNodeToHtml(this as any, {
       newLines: false,
       indentSpaces: 0
     });
@@ -355,7 +355,7 @@ export class MockElement extends MockNode {
   }
 
   get outerHTML() {
-    return serializeNodeToHtml(this, {
+    return serializeNodeToHtml(this as any, {
       outerHTML: true,
       newLines: false,
       indentSpaces: 0
@@ -564,7 +564,7 @@ export class MockElement extends MockNode {
   onwheel() {/**/}
 
   toString(opts?: SerializeElementOptions) {
-    return serializeNodeToHtml(this, opts);
+    return serializeNodeToHtml(this as any, opts);
   }
 
 }

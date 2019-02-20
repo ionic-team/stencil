@@ -85,7 +85,7 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
   });
 
   const platformExports: string[] = [
-    'registerHost',
+    'registerInstance',
     'connectedCallback',
     'createEvent',
     'getConnect',

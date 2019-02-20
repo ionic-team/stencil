@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { doc, supportsListenerOptions, win } from '@platform';
+import { getDoc, getWin, supportsListenerOptions } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
 
 
@@ -21,9 +21,9 @@ export const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
 
 
 export const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
-  if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
-  if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
-  if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
+  if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return getDoc(elm);
+  if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return getWin(elm);
+  if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return getDoc(elm).body;
   if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
   return elm;
 };

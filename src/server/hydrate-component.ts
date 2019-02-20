@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
+import { connectedCallback, getHostRef, registerHost } from '@platform';
 import { getComponent } from './component-registry';
 
 
@@ -27,10 +28,13 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
     }
 
     try {
-      const instance = new Cstr(elm);
+      registerHost(elm);
+      const hostRef = getHostRef(elm);
+      const instance = new Cstr(hostRef);
       if (typeof instance.connectedCallback === 'function') {
         instance.connectedCallback();
       }
+      connectedCallback(elm, (Cstr as d.ComponentNativeConstructor).cmpMeta);
 
     } catch (e) {
       catchError(results.diagnostics, e);

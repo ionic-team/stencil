@@ -92,6 +92,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     );
 
   } else {
-    scheduleUpdate(elm, (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
+    scheduleUpdate(elm, (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any), hostRef, cmpMeta, true);
   }
 };

@@ -95,6 +95,20 @@ export class MockAttr {
     this._value = String(value || '');
   }
 
+  get nodeName() {
+    return this._name;
+  }
+  set nodeName(value) {
+    this._name = value.toLowerCase();
+  }
+
+  get nodeValue() {
+    return this._value;
+  }
+  set nodeValue(value) {
+    this._value = String(value || '');
+  }
+
   get namespaceURI() {
     return this._namespaceURI;
   }
