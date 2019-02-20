@@ -29,6 +29,9 @@
       "@declarations": [
         "../../declarations/index.ts"
       ],
+      "@mock-doc": [
+        "../../mock-doc/index.ts"
+      ],
       "@sys": [
         "./index.ts"
       ],
@@ -40,6 +43,7 @@
   "files": [
     "./index.ts",
     "./node-sys-worker.ts",
+    "../../../types/css-what.d.ts",
     "../../../types/rollup-plugin-commonjs.d.ts",
     "../../../types/rollup-plugin-node-globals.d.ts",
     "../../../types/rollup-plugin-node-resolve.d.ts"
