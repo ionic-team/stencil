@@ -8,7 +8,7 @@ export { disconnectedCallback } from './disconnected-callback';
 export { getConnect } from './connect';
 export { getElement } from './element';
 export { h, Host } from './vdom/h';
-export { proxyComponent } from './proxy-component';
+export { proxyNative, proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/render';
 export { setMode, getMode } from './mode';
 

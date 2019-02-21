@@ -5,12 +5,12 @@ import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
   return [
     bundleId,
-    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
+    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true, true))
   ];
 }
 
 
-export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean) {
+export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean, includeMethods: boolean) {
   const runtimeMeta: d.ComponentLazyRuntimeMeta = {
     cmpFlags: 0,
   };
@@ -19,7 +19,7 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
     runtimeMeta.cmpTag = compilerMeta.tagName;
   }
 
-  const members = formatComponentRuntimeMembers(compilerMeta);
+  const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   if (Object.keys(members).length > 0) {
     runtimeMeta.cmpMembers = members;
   }
@@ -55,11 +55,11 @@ export function stringifyRuntimeData(data: any) {
 }
 
 
-function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta): d.ComponentRuntimeMembers {
+function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta, includeMethods = true): d.ComponentRuntimeMembers {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
     ...formatStatesRuntimeMember(compilerMeta.states),
-    ...formatMethodsRuntimeMember(compilerMeta.methods),
+    ...includeMethods ? formatMethodsRuntimeMember(compilerMeta.methods) : {},
   };
 }
 

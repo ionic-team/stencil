@@ -25,7 +25,7 @@ function updateHydrateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: 
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, cmp, build, false);
-  addNativeConnectedCallback(classMembers, build);
+  addNativeConnectedCallback(classMembers, cmp, build);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addNativeRuntimeCmpMeta(classMembers, cmp);

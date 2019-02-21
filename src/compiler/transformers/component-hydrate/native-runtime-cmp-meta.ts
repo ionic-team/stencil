@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 
 export function addNativeRuntimeCmpMeta(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
-  const cmpMeta = formatComponentRuntimeMeta(cmp, true);
+  const cmpMeta = formatComponentRuntimeMeta(cmp, true, true);
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
   classMembers.push(staticMember);
 }

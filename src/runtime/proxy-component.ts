@@ -2,14 +2,23 @@ import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
 import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
-import { setValue } from './set-value';
+import { getValue, setValue } from './set-value';
 import { componentOnReady } from './component-on-ready';
+import { connectedCallback } from './connected-callback';
+import { disconnectedCallback } from './disconnected-callback';
 
 
-export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1): string[] => {
-  if ((BUILD.slotRelocation || BUILD.style) && Cstr.is)   {
-    cmpMeta.cmpTag = Cstr.is;
-  }
+export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
+  Cstr.prototype.connectedCallback = function() {
+    connectedCallback(this, cmpMeta);
+  };
+  Cstr.prototype.connectedCallback = function() {
+    disconnectedCallback(this);
+  };
+  return proxyComponent(Cstr, cmpMeta, 1, 1);
+};
+
+export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
   if (BUILD.member && cmpMeta.cmpMembers) {
     if (BUILD.watchCallback && Cstr.watchers) {
       cmpMeta.watchers = Cstr.watchers;
@@ -27,7 +36,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           {
             get(this: d.RuntimeRef) {
               // proxyComponent, get value
-              return getHostRef(this).instanceValues.get(memberName);
+              return getValue(this, memberName);
             },
             set(this: d.RuntimeRef, newValue) {
               // proxyComponent, set value
@@ -65,7 +74,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
       // create an array of attributes to observe
       // and also create a map of html attribute name to js property name
-      return members
+      Cstr.observedAttributes = members
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
           const attribute = m[1] || propName;
@@ -77,5 +86,5 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
     }
   }
-  return [];
+  return Cstr;
 };

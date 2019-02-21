@@ -43,6 +43,7 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
     moduleFormats: ['esm'],
     core: LAZY_CORE,
     mainEntry: LAZY_ENTRY,
+    coreChunk: true,
   };
 
   buildCtx.entryModules.forEach(entryModule => {

@@ -1,15 +1,14 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, supportsShadowDom, tick } from '@platform';
-import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
+import { getHostListenerTarget, hostListenerProxy, hostListenerOpts } from './host-listener';
 import { CMP_FLAG, HOST_STATE, LISTENER_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
-  // connectedCallback
-
-  if (!BUILD.lazyLoad || BUILD.hydrateServerSide) {
+    // connectedCallback
+  if (BUILD.hydrateServerSide) {
     cmpMeta = (elm.constructor as d.ComponentConstructor).cmpMeta;
   }
 

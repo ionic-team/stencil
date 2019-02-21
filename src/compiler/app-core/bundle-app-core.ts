@@ -40,6 +40,11 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       ],
       onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
     };
+    if (bundleCoreOptions.coreChunk) {
+      rollupOptions.manualChunks = {
+        [config.fsNamespace]: ['@stencil/core/app']
+      };
+    }
 
     const rollupBuild = await sys.rollup.rollup(rollupOptions);
 
@@ -88,7 +93,7 @@ async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat
     isAppCore: false
   };
   const rollupChunk = rollupOutput as OutputChunk;
-  rollupResult.isAppCore = (rollupChunk.name === config.fsNamespace);
+  rollupResult.isAppCore = rollupChunk.name === config.fsNamespace;
 
   if (!rollupResult.isEntry) {
     return rollupResult;

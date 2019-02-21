@@ -5,7 +5,6 @@ import { addNativeElementGetter } from './native-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateNativeConstructor } from './native-constructor';
 import { addWatchers } from '../transforms/watcher-meta-transform';
-import { addNativeObservedAttributes } from './native-observed-attributes';
 
 import ts from 'typescript';
 
@@ -42,8 +41,7 @@ function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, cmp, build, true);
-  addNativeConnectedCallback(classMembers, build);
-  addNativeObservedAttributes(classMembers, cmp);
+  addNativeConnectedCallback(classMembers, cmp, build);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addComponentStyle(classMembers, cmp);

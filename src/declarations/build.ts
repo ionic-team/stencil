@@ -228,6 +228,7 @@ export type ModuleFormat = 'esm' | 'amd' | 'cjs';
 
 export interface BundleCoreOptions {
   core?: string;
+  coreChunk?: boolean;
   mainEntry?: string;
   entryInputs: BundleEntryInputs;
   moduleFormats: d.ModuleFormat[];

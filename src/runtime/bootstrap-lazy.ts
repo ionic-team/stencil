@@ -26,13 +26,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         }
         customElements.define(
           cmpLazyMeta.cmpTag,
-          class extends HTMLElement {
+          proxyComponent(class extends HTMLElement {
             // StencilLazyHost
             constructor() {
               super();
               registerHost(this);
               if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
-                // DOM WRITE
                 // this component is using shadow dom
                 // and this browser supports shadow dom
                 // add the read-only property "shadowRoot" to the host element
@@ -72,11 +71,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
             componentOnReady(): any {
               return componentOnReady(getHostRef(this));
             }
-
-            static get observedAttributes() {
-              return proxyComponent(this as any, cmpLazyMeta, 1, 0);
-            }
-          } as any
+          } as any, cmpLazyMeta, 1, 0) as any
         );
       }
     })

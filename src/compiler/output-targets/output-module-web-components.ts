@@ -3,6 +3,8 @@ import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-con
 import { getComponentsFromModules, isOutputTargetDist } from './output-utils';
 import { bundleApp } from '../app-core/bundle-app-core';
 import { sys } from '@sys';
+import { dashToPascalCase } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 
 
 export async function outputModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -67,9 +69,17 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
 }
 
 function generateEntryPoint(entryModules: d.EntryModule[]) {
-  return entryModules.map(entry => {
-    return `export { ${
-      entry.cmps.map(cmp => cmp.componentClassName).join(', ')
-     } } from '${entry.entryKey}';`;
-  }).join('\n');
+  let count = 0;
+  const result: string[] = [
+    `import { proxyNative } from '@stencil/core/app';`
+  ];
+  entryModules.forEach(entry => entry.cmps.forEach(cmp => {
+    const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, true, false));
+    result.push(
+      `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
+      `export const ${dashToPascalCase(cmp.tagName)} = proxyNative($Cmp${count}, ${meta});`
+    );
+    count++;
+  }));
+  return result.join('\n');
 }
