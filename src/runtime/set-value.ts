@@ -33,8 +33,8 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           watchMethods.forEach(watchMethodName => {
             try {
               // fire off each of the watch methods that are watching this property
-              (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any)[watchMethodName].call(
-                (BUILD.lazyLoad ? hostRef.lazyInstance : elm as any),
+              (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any)[watchMethodName].call(
+                (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any),
                 newVal,
                 oldVal,
                 propName

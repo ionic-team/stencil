@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { bundleHydrateCore } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { sys } from '@sys';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
 
@@ -28,9 +27,9 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     build.lifecycleDOMEvents = false;
     build.hotModuleReplacement = false;
 
-    const appCoreEntryFilePath = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
+    const coreSource = await generateHydrateAppCoreEntry(compilerCtx, buildCtx, cmps, build);
 
-    const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, appCoreEntryFilePath);
+    const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, coreSource);
 
     if (!buildCtx.shouldAbort && typeof code === 'string') {
       await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, code);
@@ -44,19 +43,11 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
 }
 
 
-async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
-  const appCoreEntryFileName = `${config.fsNamespace}-hydrate.mjs`;
-  const appCoreEntryFilePath = sys.path.join(config.rootDir, appCoreEntryFileName);
-
+async function generateHydrateAppCoreEntry(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(compilerCtx, buildCtx, build, cmps);
 
-  const platformImports: string[] = [
-    'registerComponents',
-    'styles'
-  ];
-
-  coreText.push(`import { ${platformImports.join(', ')} } from '@stencil/core/platform';`);
+  coreText.push(`import { registerComponents, styles } from '@stencil/core/platform';`);
 
   hydrateCmps.forEach(cmpData => {
     coreText.push(`import { ${cmpData.cmp.componentClassName} } from '${cmpData.filePath}';`);
@@ -84,22 +75,6 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
     });
   });
 
-  const platformExports: string[] = [
-    'registerInstance',
-    'connectedCallback',
-    'createEvent',
-    'getConnect',
-    'getContext',
-    'getElement',
-    'setMode',
-    'getMode',
-    'Build',
-    'Host',
-    'h',
-  ];
-  coreText.push(`export { ${platformExports.join(', ')} } from '@stencil/core/platform';`);
-
-  await compilerCtx.fs.writeFile(appCoreEntryFilePath, coreText.join('\n'), { inMemoryOnly: true });
-
-  return appCoreEntryFilePath;
+  coreText.push(`export * from '@stencil/core/platform';`);
+  return coreText.join('\n');
 }

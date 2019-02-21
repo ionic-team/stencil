@@ -10,14 +10,14 @@ import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-
 import { stencilServerEntryPointPlugin } from '../rollup-plugins/stencil-server-entrypoint';
 
 
-export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], entryFilePath: string) {
+export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], coreSource: string) {
   let code: string = null;
 
   try {
     const rollupOptions: RollupOptions = {
       input: '@core-entrypoint',
       plugins: [
-        stencilAppCorePlugin(entryFilePath),
+        stencilAppCorePlugin(coreSource),
         stencilServerEntryPointPlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),

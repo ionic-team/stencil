@@ -9,7 +9,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.stateFlags |= HOST_STATE.isQueuedForUpdate;
   }
-  const instance = BUILD.lazyLoad ? hostRef.lazyInstance : elm as any;
+  const instance = BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any;
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
@@ -80,7 +80,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
-    const instance = (BUILD.lazyLoad) ? hostRef.lazyInstance : elm as any;
+    const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.lazyInstance : elm as any;
     if (BUILD.vdomRender || BUILD.reflect) {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
