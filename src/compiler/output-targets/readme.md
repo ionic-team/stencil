@@ -50,6 +50,11 @@ Stencil is able to generate components into various formats so they can be best 
 - Web componets themselves work fine within Angular, but you loose out on many of Angular's features, such as types or `@ViewChild`. In order for a Stencil project to fit right into the Angular ecosystem, this output target generates thin wrapper that can be imported by Angular.
 
 
+### `hydrate`
+
+- Generates a hydrate app, which is used by prerendering and Angular Universal server module.
+
+
 ## Output Folder Structure
 
 ```
@@ -63,6 +68,9 @@ Stencil is able to generate components into various formats so they can be best 
         - cmp-b.css
         - cmp-b.mjs
       - collection-manifest.json
+
+  - loader
+    - index.mjs (points to the esm/es2017/ directory)
 
   - modules/ (modules to be imported)
     - es5/
@@ -78,13 +86,16 @@ Stencil is able to generate components into various formats so they can be best 
           "es2015": "es2017/"
         }
 
-  - loader
-    - index.mjs (points to the esm/es2017/ directory)
-
   - selfcontained/
     - cmp-a.mjs
     - cmp-b.mjs
     - app.mjs (self-contained of all native components)
+
+  - server/
+    - hydrate.d.ts
+    - hydrate.js
+    - index.js
+    - package.json
 
   - types/
     - index.d.ts
