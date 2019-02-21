@@ -454,12 +454,13 @@ export interface EmulateViewport {
 
 export interface NewSpecPageOptions {
   components: any[];
-  html?: string;
-  url?: string;
+  cookie?: string;
   direction?: string;
-  language?: string;
-  referrer?: string;
-  userAgent?: string;
   flushQueue?: boolean;
+  html?: string;
+  language?: string;
   lazyLoad?: boolean;
+  referrer?: string;
+  url?: string;
+  userAgent?: string;
 }

@@ -80,6 +80,12 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     plt.doc.documentElement.setAttribute('lang', opts.language);
   }
 
+  if (typeof opts.cookie === 'string') {
+    try {
+      plt.doc.cookie = opts.cookie;
+    } catch (e) {}
+  }
+
   if (typeof opts.referrer === 'string') {
     try {
       (plt.doc as any).referrer = opts.referrer;
