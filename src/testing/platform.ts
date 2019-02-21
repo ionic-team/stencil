@@ -9,9 +9,11 @@ export const win = setupGlobal(global) as Window;
 
 export const getWin = (_?: any) => win;
 
-export const getDoc = (_?: any) => win.document;
+export const getDoc = (_?: any) => getWin().document;
 
-export const getHead = (_?: any) => win.document.head;
+export const getHead = (_?: any) => getDoc().head;
+
+export const getBody = (_?: any) => getDoc().body;
 
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 

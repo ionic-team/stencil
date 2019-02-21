@@ -55,10 +55,10 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   });
 
   const plt = {
-    win: platform.win as Window,
-    doc: platform.doc as Document,
-    head: platform.doc.head as HTMLHeadElement,
-    body: platform.doc.body as HTMLBodyElement,
+    win: platform.getWin() as Window,
+    doc: platform.getDoc() as Document,
+    head: platform.getHead() as HTMLHeadElement,
+    body: platform.getBody() as HTMLBodyElement,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,
@@ -70,6 +70,26 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   if (typeof opts.url === 'string') {
     plt.win.location.href = opts.url;
+  }
+
+  if (typeof opts.direction === 'string') {
+    plt.doc.documentElement.setAttribute('dir', opts.direction);
+  }
+
+  if (typeof opts.language === 'string') {
+    plt.doc.documentElement.setAttribute('lang', opts.language);
+  }
+
+  if (typeof opts.referrer === 'string') {
+    try {
+      (plt.doc as any).referrer = opts.referrer;
+    } catch (e) {}
+  }
+
+  if (typeof opts.userAgent === 'string') {
+    try {
+      (plt.win.navigator as any).userAgent = opts.userAgent;
+    } catch (e) {}
   }
 
   platform.bootstrapLazy(lazyBundles);

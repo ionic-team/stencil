@@ -456,6 +456,10 @@ export interface NewSpecPageOptions {
   components: any[];
   html?: string;
   url?: string;
+  direction?: string;
+  language?: string;
+  referrer?: string;
+  userAgent?: string;
   flushQueue?: boolean;
   lazyLoad?: boolean;
 }
