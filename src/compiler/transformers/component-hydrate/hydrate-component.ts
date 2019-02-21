@@ -1,14 +1,13 @@
 import * as d from '@declarations';
-import { addNativeConnectedCallback } from '../component-native/native-connected-callback';
-import { addNativeElementGetter } from '../component-native/native-element-getter';
+import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
 import { addNativeRuntimeCmpMeta } from './native-runtime-cmp-meta';
 import { addWatchers } from '../transforms/watcher-meta-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { updateNativeConstructor } from '../component-native/native-constructor';
+import { updateLazyComponentConstructor } from '../component-lazy/lazy-constructor';
 import ts from 'typescript';
 
 
-export function updateHydrateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
+export function updateHydrateComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -16,17 +15,16 @@ export function updateHydrateComponentClass(classNode: ts.ClassDeclaration, cmp:
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateHydrateHostComponentMembers(classNode, cmp, build)
+    updateHydrateHostComponentMembers(classNode, cmp)
   );
 }
 
 
-function updateHydrateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
+function updateHydrateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateNativeConstructor(classMembers, cmp, build, false);
-  addNativeConnectedCallback(classMembers, cmp, build);
-  addNativeElementGetter(classMembers, cmp);
+  updateLazyComponentConstructor(classMembers, cmp);
+  addLazyElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addNativeRuntimeCmpMeta(classMembers, cmp);
 

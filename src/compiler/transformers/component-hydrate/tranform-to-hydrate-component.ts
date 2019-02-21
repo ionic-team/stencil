@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { addNativeImports } from '../component-native/native-imports';
+import { addHydrateImports } from './hydrate-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
@@ -21,7 +21,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          hydrateComponentTransform(compilerCtx, build)
+          hydrateComponentTransform(compilerCtx)
         ]
       }
     };
@@ -42,7 +42,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
 }
 
 
-function hydrateComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): ts.TransformerFactory<ts.SourceFile> {
+function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
@@ -51,7 +51,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): 
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateHydrateComponentClass(node, cmp, build);
+            return updateHydrateComponentClass(node, cmp);
           }
 
         }
@@ -59,7 +59,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): 
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addNativeImports(transformCtx, tsSourceFile);
+      tsSourceFile = addHydrateImports(transformCtx, tsSourceFile);
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };

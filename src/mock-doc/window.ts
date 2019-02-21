@@ -78,7 +78,7 @@ export class MockWindow {
     localStorageMap.set(this, locStorage);
   }
 
-  get location() {
+  get location(): Location {
     let loc = locMap.get(this);
     if (loc == null) {
       loc = new MockLocation();
@@ -86,7 +86,7 @@ export class MockWindow {
     }
     return loc;
   }
-  set location(val: any) {
+  set location(val: Location) {
     if (typeof val === 'string') {
       let loc = locMap.get(this);
       if (loc == null) {
@@ -96,7 +96,7 @@ export class MockWindow {
       loc.href = val;
 
     } else {
-      locMap.set(this, val);
+      locMap.set(this, val as any);
     }
   }
 
@@ -227,15 +227,16 @@ export function cloneWindow(srcWin: Window) {
     return null;
   }
 
-  const dstWin = new MockWindow(false);
+  const clonedWin = new MockWindow(false);
   if (srcWin.document != null) {
-    const dstDoc = new MockDocument(false, dstWin);
-    dstDoc.documentElement = srcWin.document.documentElement.cloneNode(true) as any;
+    const clonedDoc = new MockDocument(false, clonedWin);
+    clonedWin.document = clonedDoc as any;
+    clonedDoc.documentElement = srcWin.document.documentElement.cloneNode(true) as any;
 
   } else {
-    dstWin.document = new MockDocument(null, dstWin) as any;
+    clonedWin.document = new MockDocument(null, clonedWin) as any;
   }
-  return dstWin;
+  return clonedWin;
 }
 
 

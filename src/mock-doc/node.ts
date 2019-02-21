@@ -2,7 +2,7 @@ import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } 
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
+import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
@@ -276,7 +276,7 @@ export class MockElement extends MockNode {
     if (this.childNodes.length === 0) {
       return '';
     }
-    return serializeNodeToHtml(this, {
+    return serializeNodeToHtml(this as any, {
       newLines: false,
       indentSpaces: 0
     });
@@ -355,7 +355,7 @@ export class MockElement extends MockNode {
   }
 
   get outerHTML() {
-    return serializeNodeToHtml(this, {
+    return serializeNodeToHtml(this as any, {
       outerHTML: true,
       newLines: false,
       indentSpaces: 0
@@ -564,9 +564,14 @@ export class MockElement extends MockNode {
   onwheel() {/**/}
 
   toString(opts?: SerializeElementOptions) {
-    return serializeNodeToHtml(this, opts);
+    return serializeNodeToHtml(this as any, opts);
   }
 
+}
+
+export function resetElement(elm: any) {
+  resetEventListeners(elm);
+  attrsMap.delete(elm);
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {

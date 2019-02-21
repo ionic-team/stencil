@@ -360,12 +360,6 @@ describe('parseFlags', () => {
     expect(flags.prerender).toBe(true);
   });
 
-  it('should parse --prerender-external', () => {
-    process.argv[2] = '--prerender-external';
-    const flags = parseFlags(process);
-    expect(flags.prerenderExternal).toBe(true);
-  });
-
   it('should parse --root', () => {
     process.argv[2] = '--root';
     process.argv[3] = 'custom-www';

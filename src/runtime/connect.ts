@@ -1,11 +1,11 @@
-import { doc } from '@platform';
+import { getDoc } from '@platform';
 
 
-export const getConnect = (tagName: string) => {
+export const getConnect = (tagName: string, elm: HTMLElement) => {
   function componentOnReady(): Promise<any> {
-    let element = doc.querySelector(tagName) as any;
+    let element = getDoc(elm).querySelector(tagName) as any;
     if (!element) {
-      element = doc.createElement(tagName);
+      element = getDoc(elm).createElement(tagName);
     }
     return element.componentOnReady();
   }
@@ -18,4 +18,4 @@ export const getConnect = (tagName: string) => {
     create,
     componentOnReady,
   };
-}
+};

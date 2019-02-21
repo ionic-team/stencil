@@ -142,12 +142,12 @@ export function sortComponents(components: d.HydrateComponent[]) {
 
 
 function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.styleUrls.forEach(styleUrl => {
+  hydrateResults.styles.forEach(style => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(styleUrl);
+    const url = sys.url.parse(style.href);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -156,12 +156,12 @@ function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydrat
 
 
 function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.scriptUrls.forEach(scriptUrl => {
+  hydrateResults.scripts.forEach(script => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(scriptUrl);
+    const url = sys.url.parse(script.src);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -170,12 +170,12 @@ function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydra
 
 
 function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.imgUrls.forEach(imgUrl => {
+  hydrateResults.imgs.forEach(img => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(imgUrl);
+    const url = sys.url.parse(img.src);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }

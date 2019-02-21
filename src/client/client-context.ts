@@ -1,10 +1,10 @@
-import { doc, win } from './client-window';
+import { getDoc, getWin } from './client-window';
 import { readTask, tick, writeTask } from './client-task-queue';
 
 
 const Context = {
-  window: win,
-  document: doc,
+  window: getWin(),
+  document: getDoc(),
   isServer: false,
   enableListener: () => console.log('TODO'),
   queue: {
@@ -14,5 +14,5 @@ const Context = {
   }
 };
 
-export const getContext = (context: string) =>
+export const getContext = (context: string, _elm?: HTMLElement) =>
   (Context as any)[context];

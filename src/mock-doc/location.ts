@@ -1,7 +1,8 @@
 import { URL } from 'url';
 
 
-export class MockLocation {
+export class MockLocation implements Location {
+  ancestorOrigins: any = null;
   protocol = '';
   host = '';
   hostname = '';
@@ -19,6 +20,7 @@ export class MockLocation {
   }
   set href(value) {
     const url = new URL(value);
+    this._href = url.href;
     this.protocol = url.protocol;
     this.host = url.host;
     this.port = url.port;

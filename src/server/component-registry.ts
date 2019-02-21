@@ -1,4 +1,5 @@
 import * as d from '@declarations';
+import { proxyComponent } from '@runtime';
 
 
 const cstrs = new Map();
@@ -11,6 +12,9 @@ export function getComponent(tagName: string): any {
 
 export function registerComponents(Cstrs: d.ComponentNativeConstructor[]) {
   Cstrs.forEach(Cstr => {
-    cstrs.set(Cstr.cmpMeta.cmpTag, Cstr);
+    cstrs.set(
+      Cstr.cmpMeta.cmpTag,
+      proxyComponent(Cstr, Cstr.cmpMeta, 0, 1)
+    );
   });
 }

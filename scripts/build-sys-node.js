@@ -41,6 +41,10 @@ function bundleExternal(entryFileName) {
           return callback();
         }
 
+        if (request === '@mock-doc') {
+          return callback(null, '../../mock-doc');
+        }
+
         if (request === '@sys') {
           return callback(null, '../../sys/node');
         }

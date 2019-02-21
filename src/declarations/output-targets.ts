@@ -45,30 +45,10 @@ export interface OutputTargetWww extends OutputTargetBase {
   baseUrl?: string;
 
   /**
-   * Add a canonical link to the `<head>`. Default: `true`
-   */
-  canonicalLink?: boolean;
-
-  /**
-   * If extra whitespace should be removed from the prerendered
-   * HTML or not. Default: `true`
-   */
-  collapseWhitespace?: boolean;
-
-  /**
-   * If styles should be inlined during prerendering.
-   * Default: `true`
-   */
-  inlineStyles?: boolean;
-
-
-  inlineAssetsMaxSize?: number;
-
-  /**
    * If prerendering should continue to crawl local links and prerender.
    * Default: `true`
    */
-  prerenderUrlCrawl?: boolean;
+  prerenderUrlCrawl?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
    * The starting points for prerendering. This should be relative
@@ -82,53 +62,67 @@ export interface OutputTargetWww extends OutputTargetBase {
    * `true` allows the URL to be crawled, and returning `false` will skip
    * the URL for prerendering. Default: `undefined`
    */
-  prerenderFilter?: (url: d.Url) => boolean;
+  prerenderFilter?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
-   * Format the HTML all pretty-like. Great for debugging, bad for build performance.
+   * Format the HTML all pretty-like. Great for debugging. Defaults to `false` in prod, `true` in dev mode;
    */
-  prettyHtml?: boolean;
+  prerenderPrettyHtml?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
-   * Maximum number of pages to be prerendering at one time. The optimal number
-   * varies between machines and any feedback regarding the number that best
-   * works for your setup would help. Default: `12`
+   * Remove any excess whitespace within the HTML. Defaults to `true` in prod, `false` in dev mode;
    */
-  prerenderMaxConcurrent?: number;
+  prerenderCollapseWhitespace?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
    * Keep hashes in the URL while prerendering. Default: `false`
    */
-  prerenderPathHash?: boolean;
+  prerenderPathHash?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
    * Keep querystrings in the URL while prerendering. Default: `false`
    */
-  prerenderPathQuery?: boolean;
+  prerenderPathQuery?: (url?: URL, prodMode?: boolean) => boolean;
 
   /**
-   * Network requests to abort while prerendering. Default is to ignore
-   * some common analytic and advertisement urls such `google-analytics.com`
-   * and `doubleclick`.
+   * Page title to give the HTML document. Default: `undefined`
    */
-  prerenderAbortRequests?: {
-    domain?: string;
-  }[];
+  prerenderTitle?: (url?: URL, prodMode?: boolean) => string;
 
   /**
-   * Remove `<!--html comments-->` from prerendered output. Default: `true`
+   * The canonical link href. Default: `undefined`
    */
-  removeHtmlComments?: boolean;
+  prerenderCanonicalLink?: (url?: URL, prodMode?: boolean) => string;
 
   /**
-   * Analyze each page after prerendering and removes any CSS not used.
-   * Default: `true`
+   * The value to set for `document.cookie`. Default: `undefined`
    */
-  removeUnusedStyles?: boolean;
-}
+  prerenderCookie?: (url?: URL, prodMode?: boolean) => string;
 
-export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
+  /**
+   * The value to set for `document.referrer`. Default: `undefined`
+   */
+  prerenderReferrer?: (url?: URL, prodMode?: boolean) => string;
 
+  /**
+   * The value to set for `navigator.userAgent`. Default: `stencil/prerender`
+   */
+  prerenderUserAgent?: (url?: URL, prodMode?: boolean) => string;
+
+  /**
+   * The page direction value set to the HTML element `<html dir="">` `dir` attribute. Default: `undefined`
+   */
+  prerenderDirection?: (url?: URL, prodMode?: boolean) => 'ltr' | 'rtl' | undefined;
+
+  /**
+   * The page language value set to the HTML element `<html lang="">` `lang` attribute. Default: `undefined`
+   */
+  prerenderLanguage?: (url?: URL, prodMode?: boolean) => string;
+
+  /**
+   * The page language value set to the HTML element `<html lang="">`. Default: `undefined`
+   */
+  prerenderHeadElements?: (url?: URL, prodMode?: boolean) => d.ElementData[];
 }
 
 
@@ -216,7 +210,6 @@ export interface OutputTargetBase {
 
 export type OutputTargetBuild =
  | OutputTargetDist
- | OutputTargetHydrate
  | OutputTargetWebComponent
  | OutputTargetWww;
 
@@ -227,7 +220,6 @@ export type OutputTarget =
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme
- | OutputTargetHydrate
  | OutputTargetDist
  | OutputTargetWebComponent
  | OutputTargetSelfContained

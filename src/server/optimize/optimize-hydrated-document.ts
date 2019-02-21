@@ -9,7 +9,7 @@ export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: 
 
   optimizeStyles(opts, results, doc);
 
-  if (opts.collapseWhitespace) {
+  if (opts.collapseWhitespace === true) {
     try {
       collapseHtmlWhitepace(doc.documentElement);
 
@@ -23,9 +23,9 @@ export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: 
     }
   }
 
-  if (typeof opts.canonicalLinkHref === 'function') {
+  if (typeof opts.canonicalLink === 'string') {
     try {
-      updateCanonicalLink(doc, opts);
+      updateCanonicalLink(doc, opts.canonicalLink);
 
     } catch (e) {
       results.diagnostics.push({
@@ -37,17 +37,15 @@ export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: 
     }
   }
 
-  if (opts.relocateMetaCharset !== false) {
-    try {
-      relocateMetaCharset(doc);
+  try {
+    relocateMetaCharset(doc);
 
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'warn',
-        type: 'hydrate',
-        header: 'Relocate Meta Charset',
-        messageText: e
-      });
-    }
+  } catch (e) {
+    results.diagnostics.push({
+      level: 'warn',
+      type: 'hydrate',
+      header: 'Relocate Meta Charset',
+      messageText: e
+    });
   }
 }

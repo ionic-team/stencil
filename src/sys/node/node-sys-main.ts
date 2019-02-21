@@ -216,6 +216,10 @@ export class NodeSystem implements d.StencilSystem {
     return details;
   }
 
+  prerenderUrl(hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions): Promise<d.HydrateResults> {
+    return this.sysWorker.run('prerenderUrl', [hydrateAppFilePath, templateId, writeToFilePath, hydrateOpts]);
+  }
+
   requestLatestCompilerVersion() {
     return this.sysWorker.run('requestLatestCompilerVersion');
   }

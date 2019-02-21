@@ -1,55 +1,35 @@
 import * as d from '@declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { normalizePath } from '@utils';
 
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
-  let defaults: d.OutputTargetWww;
-
-  if (config.flags.prerender) {
-    // forcing a prerender build
-    defaults = FULL_PRERENDER_DEFAULTS;
-
-  } else if (config.flags.ssr) {
-    // forcing a ssr build
-    defaults = SSR_DEFAULTS;
-
-  } else {
-    // not forcing a prerender build
-
-    if (config.devMode) {
-      // not forcing a prerender build
-      // but we're in dev mode
-      defaults = DEV_MODE_DEFAULTS;
-
-    } else {
-      // not forcing a prerender build
-      // but we're in prod mode
-      defaults = PROD_NON_HYDRATE_DEFAULTS;
-    }
+  if (!config.flags || !config.flags.prerender) {
+    return;
   }
 
-  setStringConfig(outputTarget, 'baseUrl', defaults.baseUrl);
-  setBooleanConfig(outputTarget, 'canonicalLink', null, defaults.canonicalLink);
-  setBooleanConfig(outputTarget, 'collapseWhitespace', null, defaults.collapseWhitespace);
-  setBooleanConfig(outputTarget, 'inlineStyles', null, defaults.inlineStyles);
-  setNumberConfig(outputTarget, 'inlineAssetsMaxSize', null, defaults.inlineAssetsMaxSize);
-  setBooleanConfig(outputTarget, 'prerenderUrlCrawl', null, defaults.prerenderUrlCrawl);
-  setArrayConfig(outputTarget, 'prerenderLocations', defaults.prerenderLocations);
-  setBooleanConfig(outputTarget, 'prerenderPathHash', null, defaults.prerenderPathHash);
-  setBooleanConfig(outputTarget, 'prerenderPathQuery', null, defaults.prerenderPathQuery);
-  setNumberConfig(outputTarget, 'prerenderMaxConcurrent', null, defaults.prerenderMaxConcurrent);
-  setBooleanConfig(outputTarget, 'removeUnusedStyles', null, defaults.removeUnusedStyles);
+  setStringConfig(outputTarget, 'baseUrl', DEFAULT_BASE_URL);
+  setNumberConfig(outputTarget, 'prerenderMaxConcurrent', null, DEFAULT_MAX_CONCURRENT);
+  setBooleanConfig(outputTarget, 'removeUnusedStyles', null, DEFAULT_REMOVE_UNUSED_STYLES);
 
-  defaults.baseUrl = normalizePath(defaults.baseUrl);
+  if (config.devMode) {
+    setBooleanConfig(outputTarget, 'collapseWhitespace', null, true);
+  }
+
+  outputTarget.baseUrl = normalizePath(outputTarget.baseUrl);
   if (!outputTarget.baseUrl.startsWith('/')) {
     throw new Error(`baseUrl "${outputTarget.baseUrl}" must start with a slash "/". This represents an absolute path to the root of the domain.`);
   }
+
   if (!outputTarget.baseUrl.endsWith('/')) {
     outputTarget.baseUrl += '/';
   }
 
-  if (config.flags.prerender && outputTarget.prerenderLocations.length === 0) {
+  if (!Array.isArray(outputTarget.prerenderLocations)) {
+    outputTarget.prerenderLocations = [];
+  }
+
+  if (outputTarget.prerenderLocations.length === 0) {
     outputTarget.prerenderLocations.push({
       path: outputTarget.baseUrl
     });
@@ -57,65 +37,6 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
 }
 
 
-const FULL_PRERENDER_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: true,
-  collapseWhitespace: true,
-  inlineStyles: true,
-  inlineAssetsMaxSize: 5000,
-  prerenderUrlCrawl: true,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 4,
-  removeUnusedStyles: true
-};
-
-
-const SSR_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: true,
-  collapseWhitespace: true,
-  inlineStyles: true,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};
-
-
-const PROD_NON_HYDRATE_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: false,
-  collapseWhitespace: true,
-  inlineStyles: false,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};
-
-
-const DEV_MODE_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: false,
-  collapseWhitespace: false,
-  inlineStyles: false,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};
+const DEFAULT_MAX_CONCURRENT = 30;
+const DEFAULT_BASE_URL = '/';
+const DEFAULT_REMOVE_UNUSED_STYLES = true;

@@ -2,7 +2,7 @@ import { createElement } from './element';
 import { MockComment } from './comment-node';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockTextNode } from './node';
+import { MockElement, MockTextNode, resetElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
 import { resetEventListeners } from './event';
@@ -10,12 +10,16 @@ import { resetEventListeners } from './event';
 
 export class MockDocument extends MockElement {
   defaultView: any;
+  cookie: string;
+  referrer: string;
 
   constructor(html: string | boolean = null, win: any = null) {
     super(null, null);
     this.nodeName = NODE_NAMES.DOCUMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_NODE;
     this.defaultView = win;
+    this.cookie = '';
+    this.referrer = '';
 
     this.appendChild(this.createDocumentTypeNode());
 
@@ -54,7 +58,10 @@ export class MockDocument extends MockElement {
         this.childNodes[i].remove();
       }
     }
-    this.appendChild(documentElement);
+    if (documentElement != null) {
+      this.appendChild(documentElement);
+      setOwnerDocument(documentElement, this);
+    }
   }
 
   get head() {
@@ -69,6 +76,18 @@ export class MockDocument extends MockElement {
     documentElement.insertBefore(head, documentElement.firstChild);
     return head;
   }
+  set head(head) {
+    const documentElement = this.documentElement;
+    for (let i = documentElement.childNodes.length - 1; i >= 0; i--) {
+      if (documentElement.childNodes[i].nodeName === 'HEAD') {
+        documentElement.childNodes[i].remove();
+      }
+    }
+    if (head != null) {
+      documentElement.insertBefore(head, documentElement.firstChild);
+      setOwnerDocument(head, this);
+    }
+  }
 
   get body() {
     const documentElement = this.documentElement;
@@ -81,6 +100,18 @@ export class MockDocument extends MockElement {
     const body = new MockElement(this, 'body');
     documentElement.appendChild(body);
     return body;
+  }
+  set body(body) {
+    const documentElement = this.documentElement;
+    for (let i = documentElement.childNodes.length - 1; i >= 0; i--) {
+      if (documentElement.childNodes[i].nodeName === 'BODY') {
+        documentElement.childNodes[i].remove();
+      }
+    }
+    if (body != null) {
+      documentElement.appendChild(body);
+      setOwnerDocument(body, this);
+    }
   }
 
   appendChild(newNode: MockElement) {
@@ -168,15 +199,21 @@ export class MockDocument extends MockElement {
 
 export function resetDocument(doc: Document) {
   if (doc != null) {
+    try {
+      doc.cookie = '';
+      (doc as any).referrer = '';
+    } catch (e) {}
+
     resetEventListeners(doc);
 
     const documentElement = doc.documentElement;
     if (documentElement != null) {
-      resetEventListeners(documentElement);
+      resetElement(documentElement);
 
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
-        documentElement.childNodes[i].childNodes.length = 0;
-        resetEventListeners(documentElement.childNodes[i]);
+        const childNode = documentElement.childNodes[i];
+        resetElement(childNode);
+        childNode.childNodes.length = 0;
       }
     }
   }

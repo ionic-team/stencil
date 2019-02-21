@@ -38,6 +38,7 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
+        "--max-workers=1",
         "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
