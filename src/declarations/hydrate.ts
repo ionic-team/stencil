@@ -71,9 +71,9 @@ export interface HydrateOptions {
   collapseWhitespace?: boolean;
   collectAnchors?: boolean;
   collectComponents?: boolean;
-  collectImgUrls?: boolean;
-  collectScriptUrls?: boolean;
-  collectStylesheetUrls?: boolean;
+  collectImgs?: boolean;
+  collectScripts?: boolean;
+  collectStylesheets?: boolean;
   canonicalLink?: string;
   cookie?: string;
   direction?: string;

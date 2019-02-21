@@ -33,9 +33,9 @@ export function generateHydrateResults(opts: d.HydrateOptions) {
     html: null,
     anchors: opts.collectAnchors ? [] : null,
     components: opts.collectComponents ? [] : null,
-    styles: opts.collectScriptUrls ? [] : null,
-    scripts: opts.collectStylesheetUrls ? [] : null,
-    imgs: opts.collectImgUrls ? [] : null
+    styles: opts.collectScripts ? [] : null,
+    scripts: opts.collectStylesheets ? [] : null,
+    imgs: opts.collectImgs ? [] : null
   };
 
   return hydrateResults;

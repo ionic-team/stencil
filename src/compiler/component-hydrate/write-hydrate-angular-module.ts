@@ -52,11 +52,9 @@ export function ${factoryName}(doc: any, appId: any) {
       collapseWhitespace: false,
       collectAnchors: false,
       collectComponents: false,
-      collectImgUrls: false,
-      collectScriptUrls: false,
-      collectStylesheetUrls: false,
-      relocateMetaCharset: false,
-      removeUnusedStyles: true
+      collectImgs: false,
+      collectScripts: false,
+      collectStylesheets: false
     });
 
     const styleElms = doc.head.querySelectorAll('style[data-styles]');

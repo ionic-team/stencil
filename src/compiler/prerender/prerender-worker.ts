@@ -23,9 +23,9 @@ export async function prerenderWorker(hydrateAppFilePath: string, templateId: st
 
     hydrateOpts.collectAnchors = true;
     hydrateOpts.collectComponents = false;
-    hydrateOpts.collectImgUrls = false;
-    hydrateOpts.collectScriptUrls = false;
-    hydrateOpts.collectStylesheetUrls = false;
+    hydrateOpts.collectImgs = false;
+    hydrateOpts.collectScripts = false;
+    hydrateOpts.collectStylesheets = false;
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html

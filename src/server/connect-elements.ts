@@ -14,13 +14,13 @@ export function connectElements(opts: d.HydrateOptions, results: d.HydrateResult
       } else if (opts.collectAnchors === true && tagName === 'a') {
         collectAnchors(results, elm as HTMLAnchorElement);
 
-      } else if (opts.collectScriptUrls === true && tagName === 'script') {
+      } else if (opts.collectScripts === true && tagName === 'script') {
         collectScriptElement(results, elm as HTMLScriptElement);
 
-      } else if (opts.collectStylesheetUrls === true && tagName === 'link') {
+      } else if (opts.collectStylesheets === true && tagName === 'link') {
         collectLinkElement(results, elm as HTMLLinkElement);
 
-      } else if (opts.collectImgUrls === true && tagName === 'img') {
+      } else if (opts.collectImgs === true && tagName === 'img') {
         collectImgElement(results, elm as HTMLImageElement);
       }
 
