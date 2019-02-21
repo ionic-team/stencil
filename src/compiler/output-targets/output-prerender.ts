@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { runPrerenderMain } from '../prerender/prerender-main';
+import { buildError } from '@utils';
 
 
 export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -9,6 +10,12 @@ export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerC
   }
 
   if (!config.flags || !config.flags.prerender) {
+    return;
+  }
+
+  if (typeof buildCtx.hydrateAppFilePath !== 'string') {
+    const diagnostic = buildError(buildCtx.diagnostics);
+    diagnostic.messageText = `hydrateAppFilePath was not found in order to prerender www output target`;
     return;
   }
 

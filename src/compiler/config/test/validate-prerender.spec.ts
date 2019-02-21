@@ -54,21 +54,13 @@ describe('validateConfig', () => {
   it('allow for preRender urls', () => {
     const www: d.OutputTargetWww = {
       type: 'www',
-      prerenderLocations: [
-        {
-          path: '/'
-        }, {
-          path: '/repos'
-        }
-      ]
+      prerenderLocations: ['/', '/repos']
     };
     config.outputTargets = [www];
     validateConfig(config);
     const outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     expect(outputTarget.baseUrl).toBe('/');
-    expect(outputTarget.prerenderLocations).toEqual([
-      { path: '/' }, { path: '/repos' }
-    ]);
+    expect(outputTarget.prerenderLocations).toEqual(['/', '/repos']);
   });
 
   it('default ssr when flag true, prod mode', () => {
@@ -104,7 +96,7 @@ describe('validateConfig', () => {
     expect(outputTarget.inlineLoaderScript).toBe(true);
     expect(outputTarget.inlineAssetsMaxSize).toBe(5000);
     expect(outputTarget.prerenderUrlCrawl).toBe(true);
-    expect(outputTarget.prerenderLocations).toEqual([{ path: '/' }]);
+    expect(outputTarget.prerenderLocations).toEqual(['/']);
     expect(outputTarget.prerenderPathHash).toBe(false);
     expect(outputTarget.prerenderPathQuery).toBe(false);
     expect(outputTarget.prerenderMaxConcurrent).toBe(4);

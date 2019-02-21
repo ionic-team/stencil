@@ -1,8 +1,70 @@
 import * as d from '../../../declarations';
-import { crawlAnchorsForNextPathnames } from '../crawl-anchors';
+import { crawlAnchorsForNextUrlPaths } from '../crawl-anchors';
 
 
-describe('crawlAnchorsForNextPathnames', () => {
+describe('crawlAnchorsForNextUrlPaths', () => {
+
+  it('true for non _self target attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '/',
+      target: '_blank'
+    }]);
+    expect(r).toEqual([]);
+  });
+
+  it('true for _SELF target attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '/',
+      target: '_SELF'
+    }]);
+    expect(r).toEqual([{ href: '/' }]);
+  });
+
+  it('true for _self target attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '/',
+      target: '_self'
+    }]);
+    expect(r).toEqual([{ href: '/' }]);
+  });
+
+  it('true for valid href attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '/'
+    }]);
+    expect(r).toEqual([{ href: '/' }]);
+  });
+
+  it('false for # href attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '#'
+    }]);
+    expect(r).toEqual([]);
+  });
+
+  it('false for spaces only href attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: '    '
+    }]);
+    expect(r).toEqual([]);
+  });
+
+  it('false for empty href attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{
+      href: ''
+    }]);
+    expect(r).toEqual([]);
+  });
+
+  it('false for no href attr', () => {
+    const r = crawlAnchorsForNextUrlPaths([{}]);
+    expect(r).toEqual([]);
+  });
+
+  it('false for invalid anchor', () => {
+    const r = crawlAnchorsForNextUrlPaths(null);
+    expect(r).toEqual([]);
+  });
 
   it('should normalize and not have duplicate pending urls', () => {
     const anchors: d.HydrateAnchorElement[] = [
@@ -24,7 +86,7 @@ describe('crawlAnchorsForNextPathnames', () => {
       { href: '/page-2?qs=3' },
     ];
 
-    const pathsnames = crawlAnchorsForNextPathnames(anchors);
+    const pathsnames = crawlAnchorsForNextUrlPaths(anchors);
 
     expect(pathsnames[0].href).toBe('/');
     expect(pathsnames[1].href).toBe('/?qs=1');
@@ -45,7 +107,7 @@ describe('crawlAnchorsForNextPathnames', () => {
       { href: `"./` },
       { href: `"./'` },
     ];
-    const pathsnames = crawlAnchorsForNextPathnames(anchors);
+    const pathsnames = crawlAnchorsForNextUrlPaths(anchors);
 
     expect(pathsnames[0].href).toBe('/');
     expect(pathsnames[1].href).toBe('./');

@@ -53,9 +53,9 @@ export interface OutputTargetWww extends OutputTargetBase {
   /**
    * The starting points for prerendering. This should be relative
    * paths. Default config is to starting at the index page: `/`.
-   * Default: `[{ path: '/' }]`
+   * Default: `['/']`
    */
-  prerenderLocations?: { path: string; }[];
+  prerenderLocations?: string[];
 
   /**
    * This filter is called for every url found while crawling. Returning
@@ -140,6 +140,12 @@ export interface OutputTargetDist extends OutputTargetBase {
 }
 
 
+export interface OutputTargetHydrate extends OutputTargetBase {
+  type: 'hydrate';
+  dir?: string;
+}
+
+
 export interface OutputTargetWebComponent extends OutputTargetBase {
   type: 'webcomponent';
 
@@ -221,6 +227,7 @@ export type OutputTarget =
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme
  | OutputTargetDist
- | OutputTargetWebComponent
+ | OutputTargetHydrate
  | OutputTargetSelfContained
+ | OutputTargetWebComponent
  | OutputTargetWww;

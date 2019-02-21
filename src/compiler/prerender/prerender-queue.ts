@@ -1,21 +1,25 @@
 import * as d from '@declarations';
 import { normalizePrerenderPath } from './normalize-prerender-path';
+import { URL } from 'url';
 
 
 export function addUrlPathsFromOutputTarget(instructions: d.PrerenderInstructions) {
   if (Array.isArray(instructions.outputTarget.prerenderLocations) === true) {
-    instructions.outputTarget.prerenderLocations.forEach(prerenderLocation => {
-      addUrlPathToPending(instructions, PRERENDER_HOST, prerenderLocation.path);
+    const url = new URL('/', PRERENDER_HOST);
+    instructions.outputTarget.prerenderLocations.forEach(p => {
+      addUrlPathToPending(instructions, url, p);
     });
   }
 }
 
 
-export function addUrlPathToPending(instructions: d.PrerenderInstructions, windowLocationHref: string, inputPath: string) {
+export function addUrlPathToPending(instructions: d.PrerenderInstructions, windowLocationUrl: URL, inputPath: string) {
+  const prodMode = (!instructions.config.devMode && instructions.config.logLevel !== 'debug');
+
   const normalizedPath = normalizePrerenderPath(
-    instructions.config,
+    prodMode,
     instructions.outputTarget,
-    windowLocationHref,
+    windowLocationUrl,
     inputPath
   );
 

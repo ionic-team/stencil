@@ -50,6 +50,10 @@ export function isOutputTargetDist(o: d.OutputTarget): o is d.OutputTargetDist {
   return o.type === 'dist';
 }
 
+export function isOutputTargetHydrate(o: d.OutputTarget): o is d.OutputTargetHydrate {
+  return o.type === 'hydrate';
+}
+
 export function isOutputTargetWww(o: d.OutputTarget): o is d.OutputTargetWww {
   return o.type === 'www';
 }

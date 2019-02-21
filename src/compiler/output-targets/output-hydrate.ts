@@ -1,37 +1,19 @@
 import * as d from '@declarations';
 import { generateHydrateApp } from '../component-hydrate/generate-hydrate-app';
-import { isOutputTargetAngular, isOutputTargetDist, isOutputTargetWww } from './output-utils';
+import { isOutputTargetHydrate } from './output-utils';
 
 
 export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.flags || !config.flags.prerender) {
+  const hydrateOutputTargets = config.outputTargets
+    .filter(isOutputTargetHydrate);
+
+  if (hydrateOutputTargets.length === 0) {
     return;
   }
 
-  const wwwOutputTargets = config.outputTargets
-    .filter(isOutputTargetWww)
-    .filter(o => o.indexHtml);
+  const timespan = buildCtx.createTimeSpan(`generate hydrate app started`, true);
 
-  const distOutputTargets = config.outputTargets
-    .filter(isOutputTargetDist);
+  await generateHydrateApp(config, compilerCtx, buildCtx, hydrateOutputTargets);
 
-  const angularOutputTargets = config.outputTargets
-    .filter(isOutputTargetAngular)
-    .filter(o => o.serverModuleFile);
-
-  const outputTargets = [
-    ...wwwOutputTargets,
-    ...distOutputTargets,
-    ...angularOutputTargets
-  ];
-
-  if (outputTargets.length === 0) {
-    return;
-  }
-
-  const timespan = buildCtx.createTimeSpan(`generate renderer started`, true);
-
-  await generateHydrateApp(config, compilerCtx, buildCtx, outputTargets);
-
-  timespan.finish(`generate renderer finished`);
+  timespan.finish(`generate hydrate app finished`);
 }

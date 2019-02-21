@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export function crawlAnchorsForNextUrlPaths(parsedAnchors: d.HydrateAnchorElement[]) {
@@ -9,7 +9,7 @@ export function crawlAnchorsForNextUrlPaths(parsedAnchors: d.HydrateAnchorElemen
       const href = getCrawlableHref(parsedAnchor);
 
       if (typeof href === 'string') {
-        if (!anchors.some(a => a.href === parsedAnchor.href)) {
+        if (!anchors.some(a => a.href === href)) {
           anchors.push({
             href: href
           });

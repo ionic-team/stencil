@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { validateDocs } from './validate-docs';
 import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateOutputTargetDist } from './validate-outputs-dist';
+import { validateOutputTargetHydrate } from './validate-outputs-hydrate';
 import { validateOutputTargetWww } from './validate-outputs-www';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
@@ -31,6 +32,7 @@ export function validateOutputTargets(config: d.Config) {
   validateOutputTargetWww(config);
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
+  validateOutputTargetHydrate(config);
   validateDocs(config);
   validateStats(config);
 

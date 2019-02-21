@@ -1,47 +1,88 @@
 import * as d from '@declarations';
-import { isOutputTargetDist } from '../output-targets/output-utils';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
+import { normalizePath } from '@utils';
 import { sys } from '@sys';
 import { writeAngularOutputs } from './write-hydrate-angular-module';
-import { writeDistOutputs } from './write-hydrate-dist';
 
 
-export async function writeHydrateOutputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTarget[], code: string) {
-  // no matter what, we need to write this file to disk
+export async function writeHydrateOutputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], code: string) {
+  // no matter what, we need to write at least one hydrate app file to disk
   // so it can be used later for prerendering
   // find at least one good place to save to disk
-  const hydrateAppFilePath = getHydrateAppFilePath(config, outputTargets);
-  const hydrateAppDtsFilePath = sys.path.join(sys.path.dirname(hydrateAppFilePath), HYDRATE_DTS);
+  // and later on we'll copy this hydrate app to all the output targets needed
+  const hydrateOutputTarget = outputTargets.find(isOutputTargetHydrate);
+  const hydrateAppDirPath = hydrateOutputTarget.dir;
+  const hydrateAppFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_JS_FILE_NAME);
+  const hydrateAppDtsFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_DTS_FILE_NAME);
 
   await Promise.all([
     compilerCtx.fs.writeFile(hydrateAppFilePath, code),
-    compilerCtx.fs.writeFile(hydrateAppDtsFilePath, DTS),
-    writeDistOutputs(config, compilerCtx, outputTargets, hydrateAppFilePath)
+    compilerCtx.fs.writeFile(hydrateAppDtsFilePath, HYDRATE_DTS_CODE),
+    writeHydrateOutputFiles(config, compilerCtx, outputTargets, code)
   ]);
 
-  await writeAngularOutputs(config, compilerCtx, outputTargets, hydrateAppFilePath);
+  await writeAngularOutputs(config, compilerCtx, config.outputTargets, hydrateAppFilePath);
 
   buildCtx.hydrateAppFilePath = hydrateAppFilePath;
 }
 
-
-function getHydrateAppFilePath(config: d.Config, outputTargets: d.OutputTarget[]) {
-  // first try a dist build
-  const distOutputTarget = outputTargets.find(isOutputTargetDist);
-  if (distOutputTarget != null) {
-    return sys.path.join(distOutputTarget.buildDir, SERVER_DIR, SERVER_HYDRATE);
-  }
-
-  // default to a dist dir
-  // more than likey this one is from a www prerender, but without a dist build
-  return sys.path.join(config.rootDir, 'dist', SERVER_DIR, SERVER_HYDRATE);
+function writeHydrateOutputFiles(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetHydrate[], hydrateAppFilePath: string) {
+  return Promise.all(outputTargets.map(outputTarget => {
+    return writeHydrateOutput(config, compilerCtx, outputTarget, hydrateAppFilePath);
+  }));
 }
 
 
-const SERVER_DIR = `server`;
-const SERVER_HYDRATE = `hydrate.js`;
-const HYDRATE_DTS = `hydrate.d.ts`;
+function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, hydrateAppCode: string) {
+  const hydrateAppDirPath = outputTarget.dir;
 
-const DTS = `
+  const hydrateAppFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_JS_FILE_NAME);
+  const hydrateAppDtsFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_DTS_FILE_NAME);
+
+  const indexPath = sys.path.join(hydrateAppDirPath, 'index.js');
+  const indexCode = getServerIndexCode(indexPath, hydrateAppFilePath);
+
+  const pkgJsonPath = sys.path.join(hydrateAppDirPath, 'package.json');
+  const pkgJsonCode = getServerPackageJson(config);
+
+  return Promise.all([
+    compilerCtx.fs.writeFile(hydrateAppFilePath, hydrateAppCode),
+    compilerCtx.fs.writeFile(hydrateAppDtsFilePath, HYDRATE_DTS_CODE),
+    compilerCtx.fs.writeFile(indexPath, indexCode),
+    compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
+  ]);
+}
+
+
+function getServerPackageJson(config: d.Config) {
+  const pkg: d.PackageJsonData = {
+    name: `${config.fsNamespace}/server`,
+    main: 'index.js'
+  };
+  return JSON.stringify(pkg, null, 2);
+}
+
+
+function getServerIndexCode(indexPath: string, hydrateAppFilePath: string) {
+  const serverModuleFileDir = sys.path.dirname(indexPath);
+
+  let requirePath = normalizePath(sys.path.relative(serverModuleFileDir, hydrateAppFilePath));
+  if (!requirePath.startsWith('/') && !requirePath.startsWith('.')) {
+    requirePath = './' + requirePath;
+  }
+
+  return `
+const hydrate = require('${requirePath}');
+exports.hydrateDocumentSync = hydrate.hydrateDocumentSync;
+exports.renderToStringSync = hydrate.renderToStringSync;
+`.trim();
+}
+
+
+const HYDRATE_JS_FILE_NAME = `hydrate.js`;
+const HYDRATE_DTS_FILE_NAME = `hydrate.d.ts`;
+
+const HYDRATE_DTS_CODE = `
 export declare function renderToStringSync(html: string, opts?: any): any;
 export declare function hydrateDocumentSync(doc: any, opts?: any): any;
-`;
+`.trim();

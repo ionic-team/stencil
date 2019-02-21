@@ -104,7 +104,7 @@ async function prerenderPath(instructions: d.PrerenderInstructions, p: string) {
       }
 
       if (doUrlCrawl) {
-        results.anchors.forEach(anchor => addUrlPathToPending(instructions, results.url, anchor.href));
+        results.anchors.forEach(anchor => addUrlPathToPending(instructions, url, anchor.href));
       }
     }
 

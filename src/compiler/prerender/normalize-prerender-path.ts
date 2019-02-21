@@ -3,23 +3,19 @@ import { logger } from '@sys';
 import { URL } from 'url';
 
 
-export function normalizePrerenderPath(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, inputPath: string) {
+export function normalizePrerenderPath(prodMode: boolean, outputTarget: d.OutputTargetWww, windowLocationUrl: URL, inputPath: string) {
   let normalizedPath: string = null;
-  const prodMode = (!config.devMode && config.logLevel !== 'debug');
 
   try {
     if (typeof inputPath !== 'string') {
       return null;
     }
 
-    // parse the window.location
-    const windowLocationUrl = new URL(windowLocationHref);
-
     // remove any quotes that somehow got in the href
     inputPath = inputPath.replace(/\'|\"/g, '');
 
     // parse the <a href> passed in
-    const hrefParseUrl = new URL(inputPath, windowLocationHref);
+    const hrefParseUrl = new URL(inputPath, windowLocationUrl.href);
 
     // don't bother for basically empty <a> tags
     if (hrefParseUrl.pathname == null) {

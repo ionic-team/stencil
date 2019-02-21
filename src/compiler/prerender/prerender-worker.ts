@@ -1,8 +1,9 @@
-import * as d from '@declarations';
-import { catchError } from '@utils';
+import * as d from '../../declarations';
+import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrlPaths } from './crawl-anchors';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import fs from 'fs';
+import path from 'path';
 
 
 export async function prerenderWorker(hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions) {
@@ -45,15 +46,8 @@ export async function prerenderWorker(hydrateAppFilePath: string, templateId: st
 
       results.anchors = crawlAnchorsForNextUrlPaths(hydrateResults.anchors);
 
-      await new Promise((resolve, reject) => {
-        fs.writeFile(writeToFilePath, html, err => {
-          if (err != null) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
+      // not waiting on the file to finish writing on purpose
+      writePrerenderedHtml(writeToFilePath, html);
     }
 
   } catch (e) {
@@ -64,6 +58,45 @@ export async function prerenderWorker(hydrateAppFilePath: string, templateId: st
   return results;
 }
 
+
+async function writePrerenderedHtml(writeToFilePath: string, html: string) {
+  await ensureDir(writeToFilePath);
+
+  fs.writeFile(writeToFilePath, html, err => {
+    if (err != null) {
+      console.error(err);
+    }
+  });
+}
+
+
+const ensuredDirs = new Set<string>();
+
+async function ensureDir(p: string) {
+  const allDirs: string[] = [];
+
+  while (typeof p === 'string' && p.length > 0 && p !== '/' && !p.endsWith(':/')) {
+    p = normalizePath(path.dirname(p));
+    allDirs.push(p);
+  }
+
+  allDirs.reverse();
+
+  for (let i = 0; i < allDirs.length; i++) {
+    const dir = allDirs[i];
+    if (ensuredDirs.has(dir) === false) {
+      ensuredDirs.add(dir);
+
+      try {
+        await new Promise(resolve => {
+          fs.mkdir(dir, _ => {
+            resolve();
+          });
+        });
+      } catch (e) {}
+    }
+  }
+}
 
 const templateWindows = new Map<string, Window>();
 

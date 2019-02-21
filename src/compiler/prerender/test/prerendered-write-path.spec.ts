@@ -1,81 +1,13 @@
 import * as path from 'path';
-import * as d from '@declarations';
-import { getWritePathFromUrl, isValidCrawlableAnchor } from '../prerender-utils';
+import * as d from '../../../declarations';
+import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 
 
-describe('isValidCrawlableAnchor', () => {
 
-  const root = path.resolve('/');
-
-  it('true for non _self target attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '/',
-      target: '_blank'
-    });
-    expect(r).toBe(false);
-  });
-
-  it('true for _SELF target attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '/',
-      target: '_SELF'
-    });
-    expect(r).toBe(true);
-  });
-
-  it('true for _self target attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '/',
-      target: '_self'
-    });
-    expect(r).toBe(true);
-  });
-
-  it('true for valid href attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '/'
-    });
-    expect(r).toBe(true);
-  });
-
-  it('false for # href attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '#'
-    });
-    expect(r).toBe(false);
-  });
-
-  it('false for spaces only href attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: '    '
-    });
-    expect(r).toBe(false);
-  });
-
-  it('false for empty href attr', () => {
-    const r = isValidCrawlableAnchor({
-      href: ''
-    });
-    expect(r).toBe(false);
-  });
-
-  it('false for no href attr', () => {
-    const r = isValidCrawlableAnchor({});
-    expect(r).toBe(false);
-  });
-
-  it('false for invalid anchor', () => {
-    const r = isValidCrawlableAnchor(null);
-    expect(r).toBe(false);
-  });
-
-});
-
-
-describe('getWritePathFromUrl', () => {
+describe('getWriteFilePathFromUrlPath', () => {
 
   let config: d.Config;
   let outputTarget: d.OutputTargetWww;
@@ -92,7 +24,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'some', 'crazy', 'path', 'index.html')));
   });
 
@@ -107,7 +39,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/docs/about/#safetydance';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'somepath', 'docs', 'about', 'index.html')));
   });
 
@@ -123,7 +55,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/base-url/';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'custom-dir', 'index.html')));
   });
 
@@ -139,7 +71,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/base-url';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'custom-dir', 'index.html')));
   });
 
@@ -148,7 +80,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/docs/about/#safetydance';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'about', 'index.html')));
   });
 
@@ -157,7 +89,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/docs/about?tainted=love';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'about', 'index.html')));
   });
 
@@ -166,7 +98,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/docs/';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'index.html')));
   });
 
@@ -175,7 +107,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/docs';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'www', 'docs', 'index.html')));
   });
 
@@ -184,7 +116,7 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
     const url = 'http://stenciljs.com/';
-    const p = getWritePathFromUrl(config, outputTarget, url);
+    const p = getWriteFilePathFromUrlPath(outputTarget, url);
     expect(p).toBe(normalizePath(path.join(root, 'www', 'index.html')));
   });
 
