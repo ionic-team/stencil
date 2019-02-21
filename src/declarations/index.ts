@@ -23,6 +23,7 @@ export * from './events';
 export * from './file-system';
 export * from './fs-watch';
 export * from './host-element';
+export * from './hydrate';
 export * from './in-memory-fs';
 export * from './jsdoc';
 export * from './jsx';

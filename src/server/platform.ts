@@ -1,3 +1,6 @@
+import * as d from '@declarations';
+import { getHostRef } from '../client';
+
 
 export const getDoc = (elm?: Node) => elm.ownerDocument;
 
@@ -27,12 +30,12 @@ const Context = {
   }
 };
 
-export const getContext = (context: string, elm: Node) => {
+export const getContext = (context: string, ref: d.RuntimeRef) => {
   if (context === 'window') {
-    return getWin(elm);
+    return getWin(getHostRef(ref).hostElement);
   }
   if (context === 'document') {
-    return getDoc(elm);
+    return getDoc(getHostRef(ref).hostElement);
   }
   return (Context as any)[context];
 };

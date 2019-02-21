@@ -3,8 +3,9 @@ import { logger } from '@sys';
 import { URL } from 'url';
 
 
-export function normalizePrerenderPath(outputTarget: d.OutputTargetWww, windowLocationHref: string, inputPath: string) {
+export function normalizePrerenderPath(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, inputPath: string) {
   let normalizedPath: string = null;
+  const prodMode = (!config.devMode && config.logLevel !== 'debug');
 
   try {
     if (typeof inputPath !== 'string') {
@@ -42,16 +43,22 @@ export function normalizePrerenderPath(outputTarget: d.OutputTargetWww, windowLo
 
     const filter = (typeof outputTarget.prerenderFilter === 'function') ? outputTarget.prerenderFilter : prerenderFilter;
     const isValidUrl = filter(hrefParseUrl);
-    if (isValidUrl === false) {
+    if (!isValidUrl) {
       return null;
     }
 
-    if (outputTarget.prerenderPathQuery === true && typeof hrefParseUrl.search === 'string') {
-      normalizedPath += hrefParseUrl.search;
+    if (typeof outputTarget.prerenderPathQuery === 'function' && typeof hrefParseUrl.search === 'string') {
+      const doPathQuery = outputTarget.prerenderPathQuery(hrefParseUrl, prodMode);
+      if (doPathQuery) {
+        normalizedPath += hrefParseUrl.search;
+      }
     }
 
-    if (outputTarget.prerenderPathHash === true && typeof hrefParseUrl.hash === 'string') {
-      normalizedPath += hrefParseUrl.hash;
+    if (typeof outputTarget.prerenderPathHash === 'function' && typeof hrefParseUrl.hash === 'string') {
+      const doPathHash = outputTarget.prerenderPathHash(hrefParseUrl, prodMode);
+      if (doPathHash) {
+        normalizedPath += hrefParseUrl.hash;
+      }
     }
 
   } catch (e) {

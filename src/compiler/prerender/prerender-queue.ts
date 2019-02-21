@@ -13,6 +13,7 @@ export function addUrlPathsFromOutputTarget(instructions: d.PrerenderInstruction
 
 export function addUrlPathToPending(instructions: d.PrerenderInstructions, windowLocationHref: string, inputPath: string) {
   const normalizedPath = normalizePrerenderPath(
+    instructions.config,
     instructions.outputTarget,
     windowLocationHref,
     inputPath

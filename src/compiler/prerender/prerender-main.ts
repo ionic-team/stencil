@@ -3,6 +3,7 @@ import { buildWarn, catchError, hasError } from '@utils';
 import { getWriteFilePathFromUrlPath as getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { PRERENDER_HOST, addUrlPathToPending, addUrlPathsFromOutputTarget } from './prerender-queue';
 import { sys } from '@sys';
+import { URL } from 'url';
 
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -83,44 +84,28 @@ async function prerenderPath(instructions: d.PrerenderInstructions, p: string) {
   const timeSpan = instructions.buildCtx.createTimeSpan(`prerender started: ${p}`);
 
   try {
+    const url = new URL(p, PRERENDER_HOST);
+    const prodMode = (!instructions.config.devMode && instructions.config.logLevel !== 'debug');
+
     // prender this path and wait on the results
-    const writeToFilePath = getWriteFilePathFromUrlPath(instructions.outputTarget, p);
-
-    const url = PRERENDER_HOST + p;
-
-    const hydrateOptions: d.HydrateOptions = {
-      collapseWhitespace: !!instructions.outputTarget.collapseWhitespace,
-      pretty: !!instructions.outputTarget.pretty,
-      canonicalLinkHref: null,
-      cookie: null,
-      direction: null,
-      headElements: null,
-      language: null,
-      referrer: null,
-      removeUnusedStyles: !!instructions.outputTarget.removeUnusedStyles,
-      title: null,
-      url: url,
-      userAgent: instructions.outputTarget.userAgent
-    };
-
-    if (instructions.config.devMode || instructions.config.logLevel === 'debug') {
-      hydrateOptions.collapseWhitespace = false;
-      hydrateOptions.pretty = true;
-    }
-
     const results = await sys.prerenderUrl(
       instructions.buildCtx.hydrateAppFilePath,
       instructions.templateId,
-      writeToFilePath,
-      hydrateOptions
+      getWriteFilePathFromUrlPath(instructions.outputTarget, p),
+      getHydrateOptions(instructions, url, prodMode)
     );
 
     instructions.buildCtx.diagnostics.push(...results.diagnostics);
 
-    if (instructions.outputTarget.prerenderUrlCrawl === true && Array.isArray(results.anchors) === true) {
-      results.anchors.forEach(anchor => {
-        addUrlPathToPending(instructions, results.url, anchor.href);
-      });
+    if (Array.isArray(results.anchors) === true) {
+      let doUrlCrawl = true;
+      if (typeof instructions.outputTarget.prerenderUrlCrawl === 'function') {
+        doUrlCrawl = instructions.outputTarget.prerenderUrlCrawl(url, prodMode);
+      }
+
+      if (doUrlCrawl) {
+        results.anchors.forEach(anchor => addUrlPathToPending(instructions, results.url, anchor.href));
+      }
     }
 
     timeSpan.finish(`prerender finished: ${p}`);
@@ -138,6 +123,28 @@ async function prerenderPath(instructions: d.PrerenderInstructions, p: string) {
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not
   drainPrerenderQueue(instructions);
+}
+
+
+function getHydrateOptions(instructions: d.PrerenderInstructions, url: URL, prodMode: boolean) {
+  const o = instructions.outputTarget;
+
+  const hydrateOptions: d.HydrateOptions = {
+    collapseWhitespace: typeof o.prerenderPrettyHtml === 'function' ? o.prerenderPrettyHtml(url, prodMode) : prodMode,
+    canonicalLink: typeof o.prerenderCanonicalLink === 'function' ? o.prerenderCanonicalLink(url, prodMode) : undefined,
+    cookie: typeof o.prerenderCookie === 'function' ? o.prerenderCookie(url, prodMode) : undefined,
+    direction: typeof o.prerenderDirection === 'function' ? o.prerenderDirection(url, prodMode) : undefined,
+    headElements: typeof o.prerenderHeadElements === 'function' ? o.prerenderHeadElements(url, prodMode) : undefined,
+    language: typeof o.prerenderLanguage === 'function' ? o.prerenderLanguage(url, prodMode) : undefined,
+    prettyHtml: typeof o.prerenderPrettyHtml === 'function' ? o.prerenderPrettyHtml(url, prodMode) : !prodMode,
+    referrer: typeof o.prerenderReferrer === 'function' ? o.prerenderReferrer(url, prodMode) : undefined,
+    removeUnusedStyles: true,
+    title: typeof o.prerenderTitle === 'function' ? o.prerenderTitle(url, prodMode) : undefined,
+    url: url.href,
+    userAgent: typeof o.prerenderUserAgent === 'function' ? o.prerenderUserAgent(url, prodMode) : `stencil/prerender`,
+  };
+
+  return hydrateOptions;
 }
 
 

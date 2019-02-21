@@ -21,7 +21,8 @@ function replace(prop: ts.PropertyDeclaration, functionName: string, arg: string
       ts.createIdentifier(functionName),
       undefined,
       [
-        ts.createLiteral(arg)
+        ts.createLiteral(arg),
+        ts.createThis()
       ]
     )
   );

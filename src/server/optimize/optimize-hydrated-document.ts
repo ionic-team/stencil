@@ -23,9 +23,9 @@ export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: 
     }
   }
 
-  if (typeof opts.canonicalLinkHref === 'string') {
+  if (typeof opts.canonicalLink === 'string') {
     try {
-      updateCanonicalLink(doc, opts.canonicalLinkHref);
+      updateCanonicalLink(doc, opts.canonicalLink);
 
     } catch (e) {
       results.diagnostics.push({

@@ -39,8 +39,8 @@ export async function prerenderWorker(hydrateAppFilePath: string, templateId: st
     } else {
       const html = serializeNodeToHtml(win.document, {
         collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
-        pretty: hydrateOpts.pretty,
-        removeHtmlComments: hydrateOpts.removeUnusedStyles
+        pretty: hydrateOpts.prettyHtml,
+        removeHtmlComments: false
       });
 
       results.anchors = crawlAnchorsForNextUrlPaths(hydrateResults.anchors);
