@@ -102,12 +102,6 @@ describe('validate-package-json', () => {
       expect(diagnostics).toHaveLength(0);
     });
 
-    it('missing main file', async () => {
-      packageJsonData.main = 'dist/index.js';
-      await v.validateMain(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
-    });
-
     it('missing main', async () => {
       await v.validateMain(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
       expect(diagnostics).toHaveLength(1);
