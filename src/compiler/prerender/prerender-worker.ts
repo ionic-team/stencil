@@ -1,50 +1,77 @@
 import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { crawlAnchorsForNextUrlPaths } from './crawl-anchors';
+import { crawlAnchorsForNextUrls } from './crawl-anchors';
+import { getPrerenderConfig } from './prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import fs from 'fs';
 import path from 'path';
 
 
-export async function prerenderWorker(hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions) {
+export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   // worker thread!
-  const results: d.HydrateResults = {
+  const results: d.PrerenderResults = {
     diagnostics: [],
-    url: hydrateOpts.url,
-    anchors: null
+    anchorUrls: null
   };
 
   try {
-    const win = getWindow(templateId);
+    const windowLocationUrl = new URL(prerenderRequest.url);
+    const win = getWindow(prerenderRequest.templateId);
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
-    const hydrateApp = requireFunc(hydrateAppFilePath);
+    const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
 
+    const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath) as d.HydrateConfig;
+
+    try {
+      if (typeof prerenderConfig.beforeHydrate === 'function') {
+        const rtn = prerenderConfig.beforeHydrate(win.document, windowLocationUrl);
+        if (rtn != null) {
+          await rtn;
+        }
+      }
+    } catch (e) {
+      catchError(results.diagnostics, e);
+    }
+
+    const hydrateOpts = prerenderConfig.hydrateOptions(windowLocationUrl);
     hydrateOpts.collectAnchors = true;
-    hydrateOpts.collectComponents = false;
-    hydrateOpts.collectImgs = false;
-    hydrateOpts.collectScripts = false;
-    hydrateOpts.collectStylesheets = false;
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
     const hydrateResults = await hydrateApp.hydrateDocumentSync(win.document, hydrateOpts) as d.HydrateResults;
-    results.url = hydrateResults.url;
 
     if (hydrateResults.diagnostics.length > 0) {
-      hydrateResults.diagnostics.forEach(diagnostic => {
-        results.diagnostics.push(diagnostic);
-      });
+      results.diagnostics.push(...hydrateResults.diagnostics);
 
     } else {
+      try {
+        if (typeof prerenderConfig.afterHydrate === 'function') {
+          const rtn = prerenderConfig.afterHydrate(win.document, windowLocationUrl);
+          if (rtn != null) {
+            await rtn;
+          }
+        }
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+
       const html = serializeNodeToHtml(win.document, {
         collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
         pretty: hydrateOpts.prettyHtml,
-        removeHtmlComments: false
+        removeHtmlComments: hydrateOpts.removeHtmlComments
       });
 
-      results.anchors = crawlAnchorsForNextUrlPaths(hydrateResults.anchors);
+      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
+
+      let writeToFilePath = prerenderRequest.writeToFilePath;
+      if (typeof prerenderConfig.filePath === 'function') {
+        const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
+        if (typeof userWriteToFilePath === 'string') {
+          writeToFilePath = userWriteToFilePath;
+        }
+      }
 
       // not waiting on the file to finish writing on purpose
       writePrerenderedHtml(writeToFilePath, html);
@@ -75,9 +102,13 @@ const ensuredDirs = new Set<string>();
 async function ensureDir(p: string) {
   const allDirs: string[] = [];
 
-  while (typeof p === 'string' && p.length > 0 && p !== '/' && !p.endsWith(':/')) {
+  while (true) {
     p = normalizePath(path.dirname(p));
-    allDirs.push(p);
+    if (typeof p === 'string' && p.length > 0 && p !== '/' && !p.endsWith(':/')) {
+      allDirs.push(p);
+    } else {
+      break;
+    }
   }
 
   allDirs.reverse();

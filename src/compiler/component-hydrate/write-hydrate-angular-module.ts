@@ -49,6 +49,7 @@ export class ${moduleName} {}
 export function ${factoryName}(doc: any, appId: any) {
   return () => {
     hydrateDocumentSync(doc, {
+      clientSideHydrate: false,
       collapseWhitespace: false,
       collectAnchors: false,
       collectComponents: false,

@@ -7,12 +7,7 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null,
-      prerenderCookie: () => 'mph=88',
-      prerenderReferrer: () => 'http://www.google.com/',
-      prerenderDirection: () => 'rtl',
-      prerenderLanguage: () => 'fr',
-      prerenderCanonicalLink: (url) => url.href,
-      prerenderTitle: () => 'Hello World!'
+      prerenderConfig: 'prerender.config.js'
     },
     {
       type: 'dist'

@@ -35,7 +35,7 @@ export interface StencilSystem {
   open?: (url: string, opts?: any) => Promise<void>;
   optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
   path?: Path;
-  prerenderUrl?: (hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions) => Promise<d.HydrateResults>;
+  prerenderUrl?: (prerenderRequest: d.PrerenderRequest) => Promise<d.PrerenderResults>;
   requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;

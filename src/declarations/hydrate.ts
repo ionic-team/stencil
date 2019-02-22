@@ -1,16 +1,19 @@
 import * as d from '.';
 
 
-export interface PrerenderInstructions {
+export interface PrerenderManager {
   config: d.Config;
   compilerCtx: d.CompilerCtx;
   buildCtx: d.BuildCtx;
   outputTarget: d.OutputTargetWww;
+  prodMode: boolean;
   resolve: Function;
   templateId: string;
-  pathsProcessing: Set<string>;
-  pathsPending: Set<string>;
-  pathsCompleted: Set<string>;
+  urlsProcessing: Set<string>;
+  urlsPending: Set<string>;
+  urlsCompleted: Set<string>;
+  prerenderConfig: d.HydrateConfig;
+  prerenderConfigPath: string;
 }
 
 
@@ -29,6 +32,21 @@ export interface HydrateResults {
   styles?: HydrateStyleElement[];
   scripts?: HydrateScriptElement[];
   imgs?: HydrateImgElement[];
+}
+
+
+export interface PrerenderRequest {
+  hydrateAppFilePath: string;
+  prerenderConfigPath: string;
+  templateId: string;
+  writeToFilePath: string;
+  url: string;
+}
+
+
+export interface PrerenderResults {
+  diagnostics: d.Diagnostic[];
+  anchorUrls: string[];
 }
 
 
@@ -67,6 +85,10 @@ export interface HydrateImgElement extends HydrateElement {
 
 
 export interface HydrateOptions {
+  afterHydrate?(doc: Document, url?: URL): void;
+  beforeHydrate?(doc: Document, url?: URL): void;
+  canonicalLink?: string;
+  clientSideHydrate?: boolean;
   collapseBooleanAttributes?: boolean;
   collapseWhitespace?: boolean;
   collectAnchors?: boolean;
@@ -74,10 +96,8 @@ export interface HydrateOptions {
   collectImgs?: boolean;
   collectScripts?: boolean;
   collectStylesheets?: boolean;
-  canonicalLink?: string;
   cookie?: string;
   direction?: string;
-  headElements?: ElementData[];
   language?: string;
   minifyInlineStyles?: boolean;
   prettyHtml?: boolean;
@@ -90,7 +110,18 @@ export interface HydrateOptions {
 }
 
 
-export interface ElementData {
-  tag: string;
-  attributes?: {[key: string]: string}[];
+export interface HydrateConfig {
+  entryUrls?: string[];
+
+  filterUrl?(url?: URL, base?: URL): boolean;
+
+  normalizeUrl?(url?: URL, base?: URL): string;
+
+  filePath?(url?: URL): string;
+
+  beforeHydrate?(doc?: Document, url?: URL): void | Promise<void>;
+
+  afterHydrate?(doc?: Document, url?: URL): void | Promise<void>;
+
+  hydrateOptions?(url?: URL): HydrateOptions;
 }

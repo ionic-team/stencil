@@ -45,84 +45,16 @@ export interface OutputTargetWww extends OutputTargetBase {
   baseUrl?: string;
 
   /**
-   * If prerendering should continue to crawl local links and prerender.
-   * Default: `true`
+   * Path to an external node module which has exports of the prerender config object.
+   * ```
+   * module.exports = {
+   *   afterHydrate(document, url) {
+   *     document.title = `URL: ${url.href}`;
+   *   }
+   * }
+   * ```
    */
-  prerenderUrlCrawl?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * The starting points for prerendering. This should be relative
-   * paths. Default config is to starting at the index page: `/`.
-   * Default: `['/']`
-   */
-  prerenderLocations?: string[];
-
-  /**
-   * This filter is called for every url found while crawling. Returning
-   * `true` allows the URL to be crawled, and returning `false` will skip
-   * the URL for prerendering. Default: `undefined`
-   */
-  prerenderFilter?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * Format the HTML all pretty-like. Great for debugging. Defaults to `false` in prod, `true` in dev mode;
-   */
-  prerenderPrettyHtml?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * Remove any excess whitespace within the HTML. Defaults to `true` in prod, `false` in dev mode;
-   */
-  prerenderCollapseWhitespace?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * Keep hashes in the URL while prerendering. Default: `false`
-   */
-  prerenderPathHash?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * Keep querystrings in the URL while prerendering. Default: `false`
-   */
-  prerenderPathQuery?: (url?: URL, prodMode?: boolean) => boolean;
-
-  /**
-   * Page title to give the HTML document. Default: `undefined`
-   */
-  prerenderTitle?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The canonical link href. Default: `undefined`
-   */
-  prerenderCanonicalLink?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The value to set for `document.cookie`. Default: `undefined`
-   */
-  prerenderCookie?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The value to set for `document.referrer`. Default: `undefined`
-   */
-  prerenderReferrer?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The value to set for `navigator.userAgent`. Default: `stencil/prerender`
-   */
-  prerenderUserAgent?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The page direction value set to the HTML element `<html dir="">` `dir` attribute. Default: `undefined`
-   */
-  prerenderDirection?: (url?: URL, prodMode?: boolean) => 'ltr' | 'rtl' | undefined;
-
-  /**
-   * The page language value set to the HTML element `<html lang="">` `lang` attribute. Default: `undefined`
-   */
-  prerenderLanguage?: (url?: URL, prodMode?: boolean) => string;
-
-  /**
-   * The page language value set to the HTML element `<html lang="">`. Default: `undefined`
-   */
-  prerenderHeadElements?: (url?: URL, prodMode?: boolean) => d.ElementData[];
+  prerenderConfig?: string;
 }
 
 

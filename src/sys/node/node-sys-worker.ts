@@ -37,8 +37,8 @@ export class NodeSystemWorker {
     };
   }
 
-  prerenderUrl(hydrateAppFilePath: string, templateId: string, writeToFilePath: string, hydrateOpts: d.HydrateOptions) {
-    return prerenderWorker(hydrateAppFilePath, templateId, writeToFilePath, hydrateOpts);
+  prerenderUrl(prerenderRequest: d.PrerenderRequest) {
+    return prerenderWorker(prerenderRequest);
   }
 
   requestLatestCompilerVersion() {

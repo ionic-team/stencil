@@ -21,8 +21,7 @@ export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerC
 
   const outputTargets = config.outputTargets
     .filter(isOutputTargetWww)
-    .filter(o => typeof o.indexHtml === 'string')
-    .filter(o => o.prerenderLocations != null && o.prerenderLocations.length > 0);
+    .filter(o => typeof o.indexHtml === 'string');
 
   await Promise.all(outputTargets.map(outputTarget => {
     return prerenderOutputTarget(config, compilerCtx, buildCtx, outputTarget);

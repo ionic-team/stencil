@@ -1,46 +1,38 @@
 import * as d from '@declarations';
-import { normalizePrerenderPath } from './normalize-prerender-path';
 import { URL } from 'url';
 
 
-export function addUrlPathsFromOutputTarget(instructions: d.PrerenderInstructions) {
-  if (Array.isArray(instructions.outputTarget.prerenderLocations) === true) {
-    const url = new URL('/', PRERENDER_HOST);
-    instructions.outputTarget.prerenderLocations.forEach(p => {
-      addUrlPathToPending(instructions, url, p);
+export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
+  const prerenderUrl = new URL(PRERENDER_HOST);
+
+  if (Array.isArray(manager.prerenderConfig.entryUrls) === true) {
+    manager.prerenderConfig.entryUrls.forEach(entryUrl => {
+      const url = manager.prerenderConfig.normalizeUrl(new URL(entryUrl, PRERENDER_HOST), prerenderUrl);
+      addUrlToPendingQueue(manager, url);
     });
+
+  } else {
+    const baseUrl = new URL(manager.outputTarget.baseUrl, PRERENDER_HOST);
+    const url = manager.prerenderConfig.normalizeUrl(baseUrl, prerenderUrl);
+    addUrlToPendingQueue(manager, url);
   }
 }
 
 
-export function addUrlPathToPending(instructions: d.PrerenderInstructions, windowLocationUrl: URL, inputPath: string) {
-  const prodMode = (!instructions.config.devMode && instructions.config.logLevel !== 'debug');
-
-  const normalizedPath = normalizePrerenderPath(
-    prodMode,
-    instructions.outputTarget,
-    windowLocationUrl,
-    inputPath
-  );
-
-  if (typeof normalizedPath !== 'string') {
+export function addUrlToPendingQueue(manager: d.PrerenderManager, url: string) {
+  if (manager.urlsPending.has(url) === true) {
     return;
   }
 
-  if (instructions.pathsPending.has(normalizedPath) === true) {
+  if (manager.urlsProcessing.has(url) === true) {
     return;
   }
 
-  if (instructions.pathsProcessing.has(normalizedPath) === true) {
+  if (manager.urlsCompleted.has(url) === true) {
     return;
   }
 
-  if (instructions.pathsCompleted.has(normalizedPath) === true) {
-    return;
-  }
-
-  // add this to our pending queue of urls to prerender
-  instructions.pathsPending.add(normalizedPath);
+  manager.urlsPending.add(url);
 }
 
 

@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { catchError } from '@utils';
 import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
-import { MockDocument } from '@mock-doc';
+import { MockDocument, serializeNodeToHtml } from '@mock-doc';
 import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document';
 
 
@@ -17,13 +17,17 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
   try {
     const doc: Document = new MockDocument(html) as any;
 
-    setupDocumentFromOpts(doc as any, opts);
+    const windowLocationUrl = setWindowUrl(doc as any, opts);
+    setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
     connectElements(opts, results, doc.documentElement);
-    updateDocumentFromOpts(doc as any, opts);
-    optimizeHydratedDocument(opts, results, doc);
+    optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
     if (results.diagnostics.length === 0) {
-      results.html = doc.documentElement.outerHTML;
+      results.html = serializeNodeToHtml(doc, {
+        collapseBooleanAttributes: opts.collapseBooleanAttributes,
+        pretty: opts.prettyHtml,
+        removeHtmlComments: opts.removeHtmlComments
+      });
     }
 
   } catch (e) {
@@ -43,10 +47,10 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
   const results = generateHydrateResults(opts);
 
   try {
-    setupDocumentFromOpts(doc as any, opts);
+    const windowLocationUrl = setWindowUrl(doc as any, opts);
+    setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
     connectElements(opts, results, doc.documentElement);
-    updateDocumentFromOpts(doc as any, opts);
-    optimizeHydratedDocument(opts, results, doc);
+    optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -56,7 +60,7 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
 }
 
 
-function setupDocumentFromOpts(doc: MockDocument, opts: d.HydrateOptions) {
+function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL, doc: Document, opts: d.HydrateOptions) {
   if (typeof opts.url === 'string') {
     try {
       (doc.defaultView as Window).location.href = opts.url;
@@ -69,7 +73,7 @@ function setupDocumentFromOpts(doc: MockDocument, opts: d.HydrateOptions) {
   }
   if (typeof opts.referrer === 'string') {
     try {
-      doc.referrer = opts.referrer;
+      (doc as any).referrer = opts.referrer;
     } catch (e) {}
   }
   if (typeof opts.direction === 'string') {
@@ -84,28 +88,25 @@ function setupDocumentFromOpts(doc: MockDocument, opts: d.HydrateOptions) {
   }
   if (typeof opts.userAgent === 'string') {
     try {
-      doc.defaultView.navigator.userAgent = opts.userAgent;
+      (doc.defaultView as any).navigator.userAgent = opts.userAgent;
     } catch (e) {}
+  }
+  try {
+    if (typeof opts.beforeHydrate === 'function') {
+      opts.beforeHydrate(doc as any, windowLocationUrl);
+    }
+  } catch (e) {
+    catchError(results.diagnostics, e);
   }
 }
 
 
-function updateDocumentFromOpts(doc: MockDocument, opts: d.HydrateOptions) {
-  if (typeof opts.title === 'string') {
-    try {
-      doc.title = opts.title;
-    } catch (e) {}
-  }
-
-  if (Array.isArray(opts.headElements) === true) {
-    opts.headElements.forEach(elmData => {
-      const headElm = doc.createElement(elmData.tag);
-      if (elmData.attributes != null) {
-        Object.keys(elmData.attributes).forEach(attrKey => {
-          headElm.setAttribute(attrKey, elmData.attributes[attrKey as any]);
-        });
-      }
-      doc.head.appendChild(headElm);
-    });
-  }
+function setWindowUrl(doc: MockDocument, opts: d.HydrateOptions) {
+  const url = typeof opts.url === 'string' ? opts.url : BASE_URL;
+  try {
+    (doc.defaultView as Window).location.href = url;
+  } catch (e) {}
+  return new URL(url, BASE_URL);
 }
+
+const BASE_URL = 'http://prerender.stenciljs.com';

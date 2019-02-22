@@ -1,29 +1,26 @@
 import * as d from '../../declarations';
 
 
-export function crawlAnchorsForNextUrlPaths(parsedAnchors: d.HydrateAnchorElement[]) {
-  const anchors: d.HydrateAnchorElement[] = [];
+export function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, windowLocationUrl: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+  const anchorUrls: string[] = [];
 
   if (Array.isArray(parsedAnchors) === true) {
     parsedAnchors.forEach(parsedAnchor => {
-      const href = getCrawlableHref(parsedAnchor);
-
+      const href = getCrawlableHref(prerenderConfig, windowLocationUrl, parsedAnchor);
       if (typeof href === 'string') {
-        if (!anchors.some(a => a.href === href)) {
-          anchors.push({
-            href: href
-          });
+        if (!anchorUrls.includes(href)) {
+          anchorUrls.push(href);
         }
       }
     });
   }
 
-  return anchors;
+  return anchorUrls;
 }
 
 
-function getCrawlableHref(anchor: d.HydrateAnchorElement) {
-  if (anchor == null || typeof anchor.href !== 'string') {
+function getCrawlableHref(prerenderConfig: d.HydrateConfig, windowLocationUrl: URL, anchor: d.HydrateAnchorElement) {
+  if (anchor == null) {
     return null;
   }
 
@@ -31,11 +28,20 @@ function getCrawlableHref(anchor: d.HydrateAnchorElement) {
     return null;
   }
 
-  const href = anchor.href.replace(/\'|\"/g, '').trim();
-
-  if (href === '' || href === '#') {
+  const href = anchor.href;
+  if (typeof href !== 'string') {
     return null;
   }
 
-  return href;
+  const url = new URL(href, windowLocationUrl.href);
+  if (url.hostname != null && windowLocationUrl.hostname != null && url.hostname !== windowLocationUrl.hostname) {
+    return null;
+  }
+
+  const isValid = prerenderConfig.filterUrl(url, windowLocationUrl);
+  if (!isValid) {
+    return null;
+  }
+
+  return prerenderConfig.normalizeUrl(url, windowLocationUrl);
 }

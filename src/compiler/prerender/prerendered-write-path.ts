@@ -1,13 +1,12 @@
 import * as d from '@declarations';
 import { PRERENDER_HOST } from './prerender-queue';
 import { sys } from '@sys';
-import { URL } from 'url';
 
 
-export function getWriteFilePathFromUrlPath(outputTarget: d.OutputTargetWww, url: string) {
-  const parsedUrl = new URL(url, PRERENDER_HOST);
+export function getWriteFilePathFromUrlPath(outputTarget: d.OutputTargetWww, inputUrl: string) {
+  const url = new URL(inputUrl, PRERENDER_HOST);
 
-  let pathName = parsedUrl.pathname;
+  let pathName = url.pathname;
   if (pathName.startsWith(outputTarget.baseUrl)) {
     pathName = pathName.substring(outputTarget.baseUrl.length);
 

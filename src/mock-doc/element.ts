@@ -1,6 +1,7 @@
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement } from './node';
 import { creatCustomElement } from './custom-element-registry';
+import { URL } from 'url';
 
 
 export function createElement(ownerDocument: any, tagName: string) {
@@ -50,10 +51,14 @@ class MockAnchorElement extends MockElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'a');
   }
+
+  get href() {
+    return fullUrl(this, 'href');
+  }
+  set href(value: string) {
+    this.setAttribute('href', value);
+  }
 }
-patchPropAttributes(MockAnchorElement.prototype, {
-  href: String
-});
 
 
 class MockButtonElement extends MockElement {
@@ -70,10 +75,16 @@ class MockImgElement extends MockElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'img');
   }
+
+  get src() {
+    return fullUrl(this, 'src');
+  }
+  set src(value: string) {
+    this.setAttribute('src', value);
+  }
 }
 patchPropAttributes(MockImgElement.prototype, {
   height: Number,
-  src: String,
   width: Number
 });
 
@@ -132,10 +143,16 @@ class MockLinkElement extends MockElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'link');
   }
+
+  get href() {
+    return fullUrl(this, 'href');
+  }
+  set href(value: string) {
+    this.setAttribute('href', value);
+  }
 }
 patchPropAttributes(MockLinkElement.prototype, {
   crossorigin: String,
-  href: String,
   media: String,
   rel: String,
   type: String
@@ -158,9 +175,15 @@ class MockScriptElement extends MockElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'script');
   }
+
+  get src() {
+    return fullUrl(this, 'src');
+  }
+  set src(value: string) {
+    this.setAttribute('src', value);
+  }
 }
 patchPropAttributes(MockScriptElement.prototype, {
-  src: String,
   type: String
 });
 
@@ -179,7 +202,22 @@ export class MockTemplateElement extends MockElement {
   set innerHTML(html: string) {
     this.content.innerHTML = html;
   }
+}
 
+
+function fullUrl(elm: MockElement, attrName: string) {
+  const val = elm.getAttribute(attrName) || '';
+  if (elm.ownerDocument != null) {
+    const win = elm.ownerDocument.defaultView as Window;
+    if (win != null) {
+      const loc = win.location;
+      if (loc != null) {
+        const url = new URL(val, loc.href);
+        return url.href;
+      }
+    }
+  }
+  return val.replace(/\'|\"/g, '').trim();
 }
 
 

@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { setStringConfig } from './config-utils';
+import { sys } from '@sys';
 
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
@@ -8,7 +9,7 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
     return;
   }
 
-  setStringConfig(outputTarget, 'baseUrl', DEFAULT_BASE_URL);
+  setStringConfig(outputTarget, 'baseUrl', '/');
 
   outputTarget.baseUrl = normalizePath(outputTarget.baseUrl);
   if (!outputTarget.baseUrl.startsWith('/')) {
@@ -19,14 +20,9 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
     outputTarget.baseUrl += '/';
   }
 
-  if (Array.isArray(outputTarget.prerenderLocations) === false) {
-    outputTarget.prerenderLocations = [];
-  }
-
-  if (outputTarget.prerenderLocations.length === 0) {
-    outputTarget.prerenderLocations.push(outputTarget.baseUrl);
+  if (typeof outputTarget.prerenderConfig === 'string') {
+    if (!sys.path.isAbsolute(outputTarget.prerenderConfig)) {
+      outputTarget.prerenderConfig = sys.path.join(config.rootDir, outputTarget.prerenderConfig);
+    }
   }
 }
-
-
-const DEFAULT_BASE_URL = '/';
