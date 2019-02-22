@@ -1,3 +1,13 @@
+<a name="0.18.1-0"></a>
+## 🌐 [0.18.1-0](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1-0) (2019-02-22)
+
+
+### Bug Fixes
+
+* **dist:** add dist/cjs directory ([24f5416](https://github.com/ionic-team/stencil/commit/24f5416))
+
+
+
 <a name="0.18.0"></a>
 # 🏐 [0.18.0](https://github.com/ionic-team/stencil/compare/v0.17.2...v0.18.0) (2019-02-12)
 
