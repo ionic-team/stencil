@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { copyComponentStyles } from '../copy/copy-styles';
-import { generateCommonJsIndex } from './dist-cjs';
 import { generateEsmIndexes } from './dist-esm';
 import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
@@ -53,7 +52,6 @@ async function generateDistribution(config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   await Promise.all([
-    generateCommonJsIndex(config, compilerCtx, outputTarget),
     generateEsmIndexes(config, compilerCtx, outputTarget),
     copyComponentStyles(config, compilerCtx, buildCtx),
     generateTypes(config, compilerCtx, outputTarget, buildCtx, pkgData)

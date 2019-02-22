@@ -59,6 +59,10 @@ export function getDistEsmDir(config: d.Config, outputTarget: d.OutputTargetDist
   return pathJoin(config, outputTarget.buildDir, 'esm', sourceTarget || '');
 }
 
+export function getDistCjsDir(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
+  return pathJoin(config, outputTarget.buildDir, 'cjs', sourceTarget || '');
+}
+
 export function getDistEsmComponentsDir(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   return pathJoin(config, getDistEsmDir(config, outputTarget, sourceTarget), 'build');
 }
@@ -73,6 +77,10 @@ export function getCoreEsmBuildPath(config: d.Config, outputTarget: d.OutputTarg
 
 export function getDefineCustomElementsPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
   return pathJoin(config, getDistEsmDir(config, outputTarget, sourceTarget), getDefineEsmFilename(config));
+}
+
+export function getDefineCustomElementsCjsPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
+  return pathJoin(config, getDistCjsDir(config, outputTarget, sourceTarget), getDefineEsmFilename(config));
 }
 
 export function getGlobalEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {

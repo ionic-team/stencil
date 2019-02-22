@@ -54,7 +54,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export async function validateMain(config: d.Config, _compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const mainAbs = getDistCjsIndexPath(config, outputTarget);
   const mainRel = pathJoin(config, config.sys.path.relative(config.rootDir, mainAbs));
 
@@ -64,13 +64,13 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const pkgFile = pathJoin(config, config.rootDir, pkgData.main);
-  const fileExists = await compilerCtx.fs.access(pkgFile);
-  if (!fileExists) {
-    const err = buildWarn(diagnostics);
-    err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found. It's recommended to set the "main" property to: ${mainRel}`;
-    return;
-  }
+  // const pkgFile = pathJoin(config, config.rootDir, pkgData.main);
+  // const fileExists = await compilerCtx.fs.access(pkgFile);
+  // if (!fileExists) {
+  //   const err = buildWarn(diagnostics);
+  //   err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found. It's recommended to set the "main" property to: ${mainRel}`;
+  //   return;
+  // }
 
   const loaderAbs = getLoaderPath(config, outputTarget);
   const loaderRel = pathJoin(config, config.sys.path.relative(config.rootDir, loaderAbs));

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app/app-polyfills';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath } from '../app/app-file-naming';
+import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, getDefineCustomElementsCjsPath } from '../app/app-file-naming';
 import { formatBrowserLoaderComponent } from '../../util/data-serialize';
 import { normalizePath, pathJoin } from '../util';
 import { dashToPascalCase } from '../../util/helpers';
@@ -126,10 +126,13 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
   const es5EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es5');
   const es2017EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es2017');
 
+  const cjsEs5EntryPoint = getDefineCustomElementsCjsPath(config, outputTarget, 'es5');
+
   const packageJsonContent = JSON.stringify({
     'name': 'loader',
     'typings': './index.d.ts',
     'module': './index.js',
+    'main': './index.cjs.js',
     'jsnext:main': './index.es2017.js',
     'es2015': './index.es2017.js',
     'es2017': './index.es2017.js'
@@ -137,13 +140,17 @@ async function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, o
 
   const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
   const indexDtsContent = generateIndexDts();
+
   const indexContent = `export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
   const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
+
+  const indexCjsContent = `module.exports = require('${normalizePath(config.sys.path.relative(loaderPath, cjsEs5EntryPoint))}');`;
 
   await Promise.all([
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'package.json'), packageJsonContent),
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.d.ts'), indexDtsContent),
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.js'), indexContent),
+    compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.cjs.js'), indexCjsContent),
     compilerCtx.fs.writeFile(pathJoin(config, loaderPath, 'index.es2017.js'), indexES2017Content)
   ]);
 }
