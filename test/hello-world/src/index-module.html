@@ -1,7 +1,7 @@
 
 <script type="module">
   import { HelloWorld } from './web-components.js';
-  customElements.define('my-cmp', HelloWorld);
+  customElements.define(HelloWorld.is, HelloWorld);
 </script>
 
-<my-cmp></my-cmp>
+<hello-world></hello-world>

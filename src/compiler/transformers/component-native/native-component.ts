@@ -6,7 +6,6 @@ import { addNativeElementGetter } from './native-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateNativeConstructor } from './native-constructor';
 import { addWatchers } from '../transforms/watcher-meta-transform';
-import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 
 
 export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
@@ -44,14 +43,8 @@ function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.
   addNativeConnectedCallback(classMembers, cmp, build);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addIs(classMembers, cmp);
   addComponentStyle(classMembers, cmp);
 
   return classMembers;
 }
 
-function addIs(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
-  classMembers.push(
-    createStaticGetter('is', convertValueToLiteral(cmp.tagName))
-  );
-}

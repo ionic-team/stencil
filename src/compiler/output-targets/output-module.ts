@@ -91,7 +91,7 @@ function generateEntryPoint(entryModules: d.EntryModule[]) {
         `export { ${cmp.componentClassName} as ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
       );
     } else {
-      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false, false));
+      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, true, false));
       result.push(
         `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
         `export const ${dashToPascalCase(cmp.tagName)} = /*#__PURE__*/proxyNative($Cmp${count}, ${meta});`
