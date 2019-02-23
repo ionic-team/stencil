@@ -9,6 +9,7 @@ import { disconnectedCallback } from './disconnected-callback';
 
 
 export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
+  cmpMeta.cmpTag = Cstr.is;
   Cstr.prototype.connectedCallback = function() {
     connectedCallback(this, cmpMeta);
   };
