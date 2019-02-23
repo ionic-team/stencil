@@ -12,7 +12,7 @@ export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
   Cstr.prototype.connectedCallback = function() {
     connectedCallback(this, cmpMeta);
   };
-  Cstr.prototype.connectedCallback = function() {
+  Cstr.prototype.disconnectedCallback = function() {
     disconnectedCallback(this);
   };
   return proxyComponent(Cstr, cmpMeta, 1, 1);

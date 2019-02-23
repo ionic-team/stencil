@@ -4,10 +4,10 @@ import ts from 'typescript';
 import { REGISTER_HOST } from '../exports';
 
 
-export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, build: d.Build, ensureSuper: boolean) {
-  if (!build.lifecycle && !build.updatable && !build.style) {
-    return;
-  }
+export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, _build: d.Build, ensureSuper: boolean) {
+  // if (!build.lifecycle && !build.updatable && !build.style) {
+  //   return;
+  // }
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
 
   if (cstrMethodIndex >= 0) {

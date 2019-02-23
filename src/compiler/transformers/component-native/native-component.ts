@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { addComponentStyle } from '../component-style';
-import { addNativeConnectedCallback } from './native-connected-callback';
+// import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateNativeConstructor } from './native-constructor';
@@ -41,7 +41,7 @@ function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, cmp, build, true);
-  addNativeConnectedCallback(classMembers, cmp, build);
+  // addNativeConnectedCallback(classMembers, cmp, build);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addComponentStyle(classMembers, cmp);
