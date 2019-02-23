@@ -38,11 +38,10 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
   cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);
 
   cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);
-
   if (cmpMeta.styles.length > 0) {
     cmpMeta.hasStyle = true;
     cmpMeta.hasMode = cmpMeta.styles.some(s => s.modeName !== DEFAULT_STYLE_MODE);
   }
-
   cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn || cmpMeta.hasComponentWillRenderFn || cmpMeta.hasComponentDidRenderFn);
+  cmpMeta.isPlain = !cmpMeta.hasMember && !cmpMeta.hasStyle && !cmpMeta.hasLifecycle && !cmpMeta.hasListener && !cmpMeta.hasVdomRender;
 }

@@ -24,10 +24,6 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
     opts.compress.module = true;
   }
 
-  opts.compress.pure_getters = true;
-  opts.compress.keep_fargs = false;
-  opts.compress.passes = 3;
-
   if (build.isDebug) {
     // if in debug mode, still mangle the property names
     // but at least make them readable of what the
@@ -98,8 +94,8 @@ export const PROD_MINIFY_OPTS = JSON.stringify({
     negate_iife: false,
     passes: 4,
     properties: true,
-    pure_funcs: null,
-    pure_getters: false,
+    pure_funcs: ['getHostRef'],
+    pure_getters: true,
     reduce_funcs: true,
     reduce_vars: true,
     sequences: true,
@@ -120,7 +116,6 @@ export const PROD_MINIFY_OPTS = JSON.stringify({
       reserved: RESERVED_PROPERTIES
     },
     toplevel: true,
-    reserved: ['h']
   },
   output: {
     ascii_only: false,

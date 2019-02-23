@@ -5,9 +5,10 @@ import { bundleApp } from '../app-core/bundle-app-core';
 import { sys } from '@sys';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
+import { optimizeModule } from '../app-core/optimize-module';
 
 
-export async function outputModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
@@ -33,9 +34,20 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
     if (rollupResults.length !== 1) {
       console.error('not a single file');
     } else {
+      let code = rollupResults[0].code;
+
+      if (config.minifyJs) {
+        const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', rollupResults[0].code);
+        buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+
+        if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
+          code = optimizeResults.output;
+        }
+      }
+
       await Promise.all(outputTargets.map(async outputTarget => {
         const filePath = sys.path.join(outputTarget.file);
-        await compilerCtx.fs.writeFile(filePath, rollupResults[0].code);
+        await compilerCtx.fs.writeFile(filePath, code);
       }));
     }
   }
@@ -74,12 +86,18 @@ function generateEntryPoint(entryModules: d.EntryModule[]) {
     `import { proxyNative } from '@stencil/core/app';`
   ];
   entryModules.forEach(entry => entry.cmps.forEach(cmp => {
-    const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false, false));
-    result.push(
-      `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
-      `export const ${dashToPascalCase(cmp.tagName)} = /*#__PURE__*/proxyNative($Cmp${count}, ${meta});`
-    );
-    count++;
+    if (cmp.isPlain) {
+      result.push(
+        `export { ${cmp.componentClassName} as ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
+      );
+    } else {
+      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false, false));
+      result.push(
+        `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
+        `export const ${dashToPascalCase(cmp.tagName)} = /*#__PURE__*/proxyNative($Cmp${count}, ${meta});`
+      );
+      count++;
+    }
   }));
   return result.join('\n');
 }

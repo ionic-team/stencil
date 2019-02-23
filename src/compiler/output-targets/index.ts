@@ -8,7 +8,7 @@ import { outputCommonJsIndexes } from './output-commonjs';
 import { outputEsmIndexes } from './output-esm';
 import { outputHydrate } from './output-hydrate';
 import { outputIndexHtmls } from './output-index-html';
-import { outputModuleWebComponents } from './output-module-web-components';
+import { outputModule } from './output-module';
 // import { outputSelfContainedWebComponents } from './output-self-contained-web-components';
 
 
@@ -39,6 +39,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 }
 
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  await outputModuleWebComponents(config, compilerCtx, buildCtx);
+  await outputModule(config, compilerCtx, buildCtx);
   return outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
 }

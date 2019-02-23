@@ -27,7 +27,8 @@ export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerC
   }
   opts.compress.pure_getters = true;
   opts.compress.keep_fargs = false;
-  opts.compress.passes = 3;
+  opts.compress.passes = 4;
+  opts.compress.pure_funcs = ['getHostRef'];
 
   let cacheKey: string;
   if (compilerCtx) {

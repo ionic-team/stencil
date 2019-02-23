@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { gatherVdomMeta } from '../static-to-meta/vdom';
 import ts from 'typescript';
+import { H } from '../exports';
 
 
 export function parseCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.CallExpression) {
@@ -23,10 +24,10 @@ export function parseCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.C
 function visitCallExpressionArgs(cmpMeta: d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
   const fnName = callExpressionName.escapedText as string;
 
-  if (fnName === 'h' || fnName === 'createElement') {
+  if (fnName === 'h' || fnName === H || fnName === 'createElement') {
     visitCallExpressionArg(cmpMeta, args[0]);
 
-    if (fnName === 'h') {
+    if (fnName === 'h' || fnName === H) {
       gatherVdomMeta(cmpMeta, args);
     }
 

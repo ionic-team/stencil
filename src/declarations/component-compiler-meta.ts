@@ -45,6 +45,7 @@ export interface ComponentCompilerFeatures {
   htmlAttrNames: string[];
   htmlTagNames: string[];
   isUpdateable: boolean;
+  isPlain: boolean;
   potentialCmpRefs: d.PotentialComponentRef[];
 }
 

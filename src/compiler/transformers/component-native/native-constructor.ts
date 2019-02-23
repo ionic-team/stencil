@@ -5,9 +5,9 @@ import { REGISTER_HOST } from '../exports';
 
 
 export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, _build: d.Build, ensureSuper: boolean) {
-  // if (!build.lifecycle && !build.updatable && !build.style) {
-  //   return;
-  // }
+  if (cmp.isPlain) {
+    return;
+  }
   const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
 
   if (cstrMethodIndex >= 0) {
