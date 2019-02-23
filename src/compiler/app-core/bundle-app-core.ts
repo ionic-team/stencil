@@ -5,10 +5,9 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
 import { OutputAsset, OutputChunk, OutputOptions, RollupOptions } from 'rollup'; // types only
-import { stencilAppCorePlugin } from '../rollup-plugins/stencil-app-core';
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
-import { stencilClientEntryPointPlugin } from '../rollup-plugins/stencil-client-entrypoint';
-
+import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
+import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
   const rollupResults: d.RollupResult[] = [];
@@ -21,8 +20,12 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         ...bundleCoreOptions.entryInputs,
       },
       plugins: [
-        stencilAppCorePlugin(bundleCoreOptions.core),
-        stencilClientEntryPointPlugin(bundleCoreOptions.mainEntry),
+        stencilLoaderPlugin({
+          '@stencil/core/app': DEFAULT_CORE,
+          '@core-entrypoint': DEFAULT_ENTRY,
+          ...bundleCoreOptions.loader
+        }),
+        stencilClientPlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(compilerCtx, buildCtx, build, buildCtx.entryModules),
@@ -63,7 +66,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
 
       if (!buildCtx.shouldAbort) {
         const outputPromises = output.map(rollupOutput => {
-          return createRollupResult(config, outputOption.format as any, rollupOutput);
+          return createRollupResult(config, outputOption.format as any, rollupOutput, buildCtx.entryModules);
         });
         rollupResults.push(...(await Promise.all(outputPromises)));
       }
@@ -83,17 +86,17 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
 }
 
 
-async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat, rollupOutput: OutputAsset | OutputChunk) {
+async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat, rollupOutput: OutputAsset | OutputChunk, entryModules: d.EntryModule[]) {
+  const rollupChunk = rollupOutput as OutputChunk;
   const rollupResult: d.RollupResult = {
     fileName: rollupOutput.fileName,
     code: rollupOutput.code,
     moduleFormat: moduleFormat,
     entryKey: null,
-    isEntry: !!(rollupOutput as OutputChunk).isEntry,
-    isAppCore: false
+    isEntry: !!rollupChunk.isEntry,
+    isComponent: !!rollupChunk.isEntry && entryModules.some(m => m.entryKey === rollupChunk.name),
+    isAppCore: rollupChunk.name === config.fsNamespace
   };
-  const rollupChunk = rollupOutput as OutputChunk;
-  rollupResult.isAppCore = rollupChunk.name === config.fsNamespace;
 
   if (!rollupResult.isEntry) {
     return rollupResult;
@@ -103,3 +106,12 @@ async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat
 
   return rollupResult;
 }
+
+export const DEFAULT_CORE = `
+import '@global-scripts';
+export * from '@stencil/core/platform';
+`;
+
+export const DEFAULT_ENTRY = `
+import '@stencil/core/app';
+`;

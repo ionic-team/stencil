@@ -5,9 +5,9 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
 import { RollupOptions } from 'rollup'; // types only
-import { stencilAppCorePlugin } from '../rollup-plugins/stencil-app-core';
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
-import { stencilServerEntryPointPlugin } from '../rollup-plugins/stencil-server-entrypoint';
+import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
+import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], coreSource: string) {
@@ -17,8 +17,11 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
     const rollupOptions: RollupOptions = {
       input: '@core-entrypoint',
       plugins: [
-        stencilAppCorePlugin(coreSource),
-        stencilServerEntryPointPlugin(),
+        stencilLoaderPlugin({
+          '@core-entrypoint': SERVER_ENTRY,
+          '@stencil/core/app': coreSource,
+        }),
+        stencilServerPlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
@@ -51,3 +54,8 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
 
   return code;
 }
+
+const SERVER_ENTRY = `
+import '@stencil/core/app';
+export { hydrateDocumentSync, renderToStringSync } from '@stencil/core/platform';
+`;

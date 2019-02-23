@@ -61,7 +61,9 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
   const bundleCoreOptions: d.BundleCoreOptions = {
     entryInputs: {},
     moduleFormats: ['esm'],
-    mainEntry: generateEntryPoint(buildCtx.entryModules)
+    loader: {
+      '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
+    }
   };
   return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
 }

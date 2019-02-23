@@ -5,7 +5,7 @@ import { sys } from '@sys';
 import { RollupOptions } from 'rollup';
 import { dashToPascalCase } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
-import { stencilClientEntryPointPlugin } from '../rollup-plugins/stencil-client-entrypoint';
+import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
@@ -40,7 +40,9 @@ import * as c from 'modules';
   const rollupOptions: RollupOptions = {
     input: '@core-entrypoint',
     plugins: [
-      stencilClientEntryPointPlugin(entryPoint),
+      stencilLoaderPlugin({
+        '@core-entrypoint': entryPoint
+      }),
       inMemoryFsRead(compilerCtx, buildCtx),
     ]
   };

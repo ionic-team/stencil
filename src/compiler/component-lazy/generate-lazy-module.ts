@@ -5,16 +5,16 @@ import { sortBy } from '@utils';
 
 
 export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], rollupResults: d.RollupResult[]) {
-  const entryCompononetResults = rollupResults.filter(rollupResult => {
-    return rollupResult.isEntry && !rollupResult.isAppCore;
+  const entryComponetsResults = rollupResults.filter(rollupResult => {
+    return rollupResult.isComponent;
   });
 
   const chunkResults = rollupResults.filter(rollupResult => {
-    return !rollupResult.isEntry && !rollupResult.isAppCore;
+    return !rollupResult.isComponent && !rollupResult.isAppCore;
   });
 
   const outputResults = await Promise.all([
-    Promise.all(entryCompononetResults.map(rollupResult => {
+    Promise.all(entryComponetsResults.map(rollupResult => {
       return generateLazyEntryModule(config, compilerCtx, buildCtx, outputTargets, buildCtx.entryModules, rollupResult);
     })),
     Promise.all(chunkResults.map(rollupResult => {

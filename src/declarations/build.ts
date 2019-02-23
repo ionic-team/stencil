@@ -227,10 +227,9 @@ export type SourceTarget = 'es5' | 'es2017';
 export type ModuleFormat = 'esm' | 'amd' | 'cjs';
 
 export interface BundleCoreOptions {
-  core?: string;
   coreChunk?: boolean;
-  mainEntry?: string;
   entryInputs: BundleEntryInputs;
+  loader: {[id: string]: string};
   moduleFormats: d.ModuleFormat[];
 }
 
@@ -243,6 +242,7 @@ export interface RollupResult {
   fileName: string;
   code: string;
   isEntry: boolean;
+  isComponent: boolean;
   isAppCore: boolean;
   moduleFormat: ModuleFormat;
 }

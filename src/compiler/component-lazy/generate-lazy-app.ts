@@ -39,10 +39,15 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
 async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const bundleCoreOptions: d.BundleCoreOptions = {
-    entryInputs: {},
+    entryInputs: {
+      'loader.js': '@external-entrypoint',
+    },
     moduleFormats: ['esm'],
-    core: LAZY_CORE,
-    mainEntry: LAZY_ENTRY,
+    loader: {
+      '@stencil/core/app': CORE,
+      '@core-entrypoint': LAZY_ENTRY,
+      '@external-entrypoint': EXTERNAL_ENTRY,
+    },
     coreChunk: true,
   };
 
@@ -53,15 +58,20 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
   return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
 }
 
-const LAZY_CORE = `
-import { bootstrapLazy } from '@stencil/core/platform';
+const CORE = `
 import '@global-scripts';
-
-bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);
-
+import { bootstrapLazy } from '@stencil/core/platform';
 export * from '@stencil/core/platform';
+export function defineCustomElements() {
+  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);
+};
 `;
 
 const LAZY_ENTRY = `
-import '@stencil/core/app';
+import { defineCustomElements } from '@stencil/core/app';
+defineCustomElements();
+`;
+
+const EXTERNAL_ENTRY = `
+export { defineCustomElements } from '@stencil/core/app';
 `;
