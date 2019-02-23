@@ -83,6 +83,7 @@ export interface CollectionData {
   components?: ComponentData[];
   collections?: CollectionDependencyData[];
   global?: string;
+  modules?: string[];
   compiler?: {
     name: string;
     version: string;

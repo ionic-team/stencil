@@ -5,7 +5,7 @@ import { replaceStylePlaceholders } from '../app-core/component-styles';
 import { sys } from '@sys';
 
 
-export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], entryModule: d.EntryModule, code: string, modeName: string) {
+export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], entryModule: d.EntryModule, code: string, modeName: string) {
   if (config.minifyJs) {
     const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', code);
     buildCtx.diagnostics.push(...optimizeResults.diagnostics);
@@ -27,7 +27,7 @@ export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerC
   };
 
   const promises = outputTargets.map(outputTarget => {
-    const filePath = sys.path.join(outputTarget.buildDir, output.fileName);
+    const filePath = sys.path.join(outputTarget.dir, output.fileName);
     return compilerCtx.fs.writeFile(filePath, output.code);
   });
 

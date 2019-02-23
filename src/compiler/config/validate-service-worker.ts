@@ -3,64 +3,57 @@ import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { sys } from '@sys';
 
 
-export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
+export function validateServiceWorker(config: d.Config, serviceWorker: d.ServiceWorkerConfig, dir: string) {
   if (config.devMode && !config.flags.serviceWorker) {
-    outputTarget.serviceWorker = null;
-    return;
+    return null;
   }
 
-  if (outputTarget.serviceWorker === false || outputTarget.serviceWorker === null) {
-    outputTarget.serviceWorker = null;
-    return;
+  if (serviceWorker === false || serviceWorker === null) {
+    return null;
   }
 
-  if (!outputTarget.serviceWorker && outputTarget.type !== 'www') {
-    outputTarget.serviceWorker = null;
-    return;
+  if (serviceWorker === true) {
+    serviceWorker = {};
+
+  } else if (!serviceWorker && config.devMode) {
+    return null;
   }
 
-  if (outputTarget.serviceWorker === true) {
-    outputTarget.serviceWorker = {};
-
-  } else if (!outputTarget.serviceWorker && config.devMode) {
-    outputTarget.serviceWorker = null;
-    return;
-  }
-
-  if (typeof outputTarget.serviceWorker !== 'object') {
+  if (typeof serviceWorker !== 'object') {
     // what was passed in could have been a boolean
     // in that case let's just turn it into an empty obj so Object.assign doesn't crash
-    outputTarget.serviceWorker = {};
+    serviceWorker = {};
   }
 
-  if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
-    if (typeof outputTarget.serviceWorker.globPatterns === 'string') {
-      outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
+  if (!Array.isArray(serviceWorker.globPatterns)) {
+    if (typeof serviceWorker.globPatterns === 'string') {
+      serviceWorker.globPatterns = [serviceWorker.globPatterns];
 
-    } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
-      outputTarget.serviceWorker.globPatterns = [DEFAULT_GLOB_PATTERNS];
+    } else if (typeof serviceWorker.globPatterns !== 'string') {
+      serviceWorker.globPatterns = [DEFAULT_GLOB_PATTERNS];
     }
   }
 
-  if (typeof outputTarget.serviceWorker.globDirectory !== 'string') {
-    outputTarget.serviceWorker.globDirectory = outputTarget.dir;
+  if (typeof serviceWorker.globDirectory !== 'string') {
+    serviceWorker.globDirectory = dir;
   }
 
-  if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
-    outputTarget.serviceWorker.globIgnores = [outputTarget.serviceWorker.globIgnores];
+  if (typeof serviceWorker.globIgnores === 'string') {
+    serviceWorker.globIgnores = [serviceWorker.globIgnores];
   }
 
-  outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
+  serviceWorker.globIgnores = serviceWorker.globIgnores || [];
 
-  addGlobIgnores(outputTarget.serviceWorker.globIgnores);
+  addGlobIgnores(serviceWorker.globIgnores);
 
-  if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
+  if (!serviceWorker.swDest) {
+    serviceWorker.swDest = sys.path.join(dir, DEFAULT_FILENAME);
   }
 
-  if (!sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
+  if (!sys.path.isAbsolute(serviceWorker.swDest)) {
+    serviceWorker.swDest = sys.path.join(dir, serviceWorker.swDest);
   }
+  return serviceWorker;
 }
 
 

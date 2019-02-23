@@ -1,14 +1,14 @@
-import * as d from '@declarations';
 import { normalizePath } from '@utils';
 
 
-export function validateResourcesUrl(outputTarget: d.OutputTargetBuild) {
-  if (typeof outputTarget.resourcesUrl === 'string') {
-    outputTarget.resourcesUrl = normalizePath(outputTarget.resourcesUrl.trim());
+export function validateResourcesUrl(resourcesUrl: string) {
+  if (typeof resourcesUrl === 'string') {
+    resourcesUrl = normalizePath(resourcesUrl.trim());
 
-    if (outputTarget.resourcesUrl.charAt(outputTarget.resourcesUrl.length - 1) !== '/') {
+    if (resourcesUrl.charAt(resourcesUrl.length - 1) !== '/') {
       // ensure there's a trailing /
-      outputTarget.resourcesUrl += '/';
+      resourcesUrl += '/';
     }
   }
+  return resourcesUrl;
 }

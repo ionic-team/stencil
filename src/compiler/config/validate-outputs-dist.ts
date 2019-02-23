@@ -1,7 +1,8 @@
 import * as d from '@declarations';
-import { normalizePath } from '@utils';
+import { WEB_COMPONENTS_JSON_FILE_NAME, normalizePath } from '@utils';
 import { sys } from '@sys';
 import { isOutputTargetDist } from '../output-targets/output-utils';
+import { validateResourcesUrl } from './validate-resources-url';
 
 
 export function validateOutputTargetDist(config: d.Config) {
@@ -10,6 +11,8 @@ export function validateOutputTargetDist(config: d.Config) {
   const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
 
   distOutputTargets.forEach(outputTarget => {
+
+    outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
 
     if (!outputTarget.dir) {
       outputTarget.dir = DEFAULT_DIR;
@@ -50,6 +53,29 @@ export function validateOutputTargetDist(config: d.Config) {
     if (typeof outputTarget.empty !== 'boolean') {
       outputTarget.empty = DEFAULT_EMPTY_DIR;
     }
+
+    config.outputTargets.push({
+      type: 'dist-collection',
+      dir: outputTarget.dir,
+      collectionDir: outputTarget.collectionDir,
+      empty: outputTarget.empty
+    });
+
+    config.outputTargets.push({
+      type: 'dist-modules',
+      file: path.join(outputTarget.dir, 'modules', 'index.mjs')
+    });
+
+    config.outputTargets.push({
+      type: 'dist-lazy',
+      dir: outputTarget.buildDir,
+      empty: outputTarget.empty
+    });
+
+    config.outputTargets.push({
+      type: 'docs-vscode',
+      file: path.join(outputTarget.buildDir, WEB_COMPONENTS_JSON_FILE_NAME)
+    });
   });
 }
 

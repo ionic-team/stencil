@@ -13,11 +13,8 @@ export async function writeHydrateOutputs(config: d.Config, compilerCtx: d.Compi
   const hydrateOutputTarget = outputTargets.find(isOutputTargetHydrate);
   const hydrateAppDirPath = hydrateOutputTarget.dir;
   const hydrateAppFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_JS_FILE_NAME);
-  const hydrateAppDtsFilePath = sys.path.join(hydrateAppDirPath, HYDRATE_DTS_FILE_NAME);
 
   await Promise.all([
-    compilerCtx.fs.writeFile(hydrateAppFilePath, code),
-    compilerCtx.fs.writeFile(hydrateAppDtsFilePath, HYDRATE_DTS_CODE),
     writeHydrateOutputFiles(config, compilerCtx, outputTargets, code)
   ]);
 
@@ -26,9 +23,9 @@ export async function writeHydrateOutputs(config: d.Config, compilerCtx: d.Compi
   buildCtx.hydrateAppFilePath = hydrateAppFilePath;
 }
 
-function writeHydrateOutputFiles(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetHydrate[], hydrateAppFilePath: string) {
+function writeHydrateOutputFiles(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetHydrate[], hydrateAppCode: string) {
   return Promise.all(outputTargets.map(outputTarget => {
-    return writeHydrateOutput(config, compilerCtx, outputTarget, hydrateAppFilePath);
+    return writeHydrateOutput(config, compilerCtx, outputTarget, hydrateAppCode);
   }));
 }
 

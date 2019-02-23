@@ -3,7 +3,7 @@ import { optimizeModule } from '../app-core/optimize-module';
 import { sys } from '@sys';
 
 
-export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], rollupResult: d.RollupResult) {
+export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: d.RollupResult) {
   let code = rollupResult.code;
 
   if (config.minifyJs) {
@@ -16,7 +16,7 @@ export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCt
   }
 
   return Promise.all(outputTargets.map(outputTarget => {
-    const filePath = sys.path.join(outputTarget.buildDir, rollupResult.fileName);
+    const filePath = sys.path.join(outputTarget.dir, rollupResult.fileName);
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }

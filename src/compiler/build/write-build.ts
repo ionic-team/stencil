@@ -1,15 +1,12 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
 import { outputPrerender } from '../output-targets/output-prerender';
-import { writeAppCollections } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort) {
     return;
   }
-
-  await writeAppCollections(config, compilerCtx, buildCtx);
 
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 

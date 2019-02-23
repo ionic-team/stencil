@@ -1,12 +1,12 @@
 import * as d from '@declarations';
-import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME, sortBy } from '@utils';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
-import { isOutputTargetDist } from '../output-targets/output-utils';
+import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 
 
 export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
 
   await Promise.all(outputTargets.map(async outputTarget => {
     await writeAppCollection(config, compilerCtx, buildCtx, outputTarget);
@@ -18,9 +18,9 @@ export async function writeAppCollections(config: d.Config, compilerCtx: d.Compi
 // change, but the external user data will always use the same api
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
-async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist) {
+async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
   // get the absolute path to the directory where the collection will be saved
-  const collectionDir = normalizePath(outputTarget.collectionDir);
+  const collectionDir = normalizePath(outputTarget.dir);
 
   // create an absolute file path to the actual collection json file
   const collectionFilePath = normalizePath(sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
@@ -37,42 +37,35 @@ async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, 
 export function serializeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, entryModules: d.EntryModule[], globalModule: d.Module) {
   // create the single collection we're going to fill up with data
   const collectionData: d.CollectionData = {
-    components: [],
+    components: serializeComponents(config, collectionDir, entryModules),
     collections: serializeCollectionDependencies(compilerCtx),
     compiler: {
       name: sys.compiler.name,
       version: sys.compiler.version,
       typescriptVersion: sys.compiler.typescriptVersion
     },
-    bundles: []
+    bundles: serializeBundles(config)
   };
-
-  // add component data for each of the collection files
-  entryModules.forEach(entryModule => {
-    entryModule.cmps.forEach(cmp => {
-      const cmpData = serializeComponent(config, collectionDir, cmp);
-      if (cmpData) {
-        collectionData.components.push(cmpData);
-      }
-    });
-  });
-
-  // sort it alphabetically, cuz
-  collectionData.components.sort((a, b) => {
-    if (a.tag < b.tag) return -1;
-    if (a.tag > b.tag) return 1;
-    return 0;
-  });
 
   // set the global path if it exists
   serializeAppGlobal(config, collectionDir, collectionData, globalModule);
-
-  serializeBundles(config, collectionData);
 
   // success!
   return collectionData;
 }
 
+function serializeComponents(config: d.Config, collectionDir: string, entryModules: d.EntryModule[]) {
+  const components: d.ComponentData[] = [];
+  entryModules.forEach(entryModule => {
+    entryModule.cmps.forEach(cmp => {
+      const cmpData = serializeComponent(config, collectionDir, cmp);
+      if (cmpData) {
+        components.push(cmpData);
+      }
+    });
+  });
+  return sortBy(components, c => c.tag);
+}
 
 export function serializeCollectionDependencies(compilerCtx: d.CompilerCtx) {
   const collectionDeps = compilerCtx.collections.map(c => {
@@ -157,16 +150,6 @@ export function serializeComponent(config: d.Config, collectionDir: string, cmp:
   serializeComponentPath(collectionDir, compiledComponentAbsoluteFilePath, cmpData);
   serializeStyles(compiledComponentRelativeDirPath, cmpData, cmp);
   serializeAssetsDir(compiledComponentRelativeDirPath, cmpData, cmp);
-  // serializeProps(cmpData, cmpMeta);
-  // serializeStates(cmpData, cmpMeta);
-  // serializeListeners(cmpData, cmpMeta);
-  // serializeMethods(cmpData, cmpMeta);
-  // serializeContextMember(cmpData, cmpMeta);
-  // serializeConnectMember(cmpData, cmpMeta);
-  // serializeHostElementMember(cmpData, cmpMeta);
-  // serializeEvents(cmpData, cmpMeta);
-  // serializeHost(cmpData, cmpMeta);
-  // serializeEncapsulation(cmpData, cmpMeta);
 
   return cmpData;
 }
@@ -246,218 +229,6 @@ function serializeAssetsDir(compiledComponentRelativeDirPath: string, cmpData: d
   }).sort();
 }
 
-
-// function serializeProps(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
-//     const memberMeta = cmpMeta.membersMeta[memberName];
-
-//     if (memberMeta.memberType === MEMBER_TYPE.Prop || memberMeta.memberType === MEMBER_TYPE.PropMutable) {
-//       cmpData.props = cmpData.props || [];
-
-//       const propData: d.PropData = {
-//         name: memberName
-//       };
-
-//       if (memberMeta.propType === PROP_TYPE.Boolean) {
-//         propData.type = BOOLEAN_KEY;
-
-//       } else if (memberMeta.propType === PROP_TYPE.Number) {
-//         propData.type = NUMBER_KEY;
-
-//       } else if (memberMeta.propType === PROP_TYPE.String) {
-//         propData.type = STRING_KEY;
-
-//       } else if (memberMeta.propType === PROP_TYPE.Any) {
-//         propData.type = ANY_KEY;
-//       }
-
-//       if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
-//         propData.mutable = true;
-//       }
-
-//       if (memberMeta.reflectToAttrib) {
-//         propData.reflectToAttr = true;
-//       }
-
-//       if (typeof memberMeta.attribName === 'string') {
-//         propData.attr = memberMeta.attribName;
-//       }
-
-//       if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
-//         propData.watch = memberMeta.watchCallbacks.slice();
-//       }
-
-//       cmpData.props.push(propData);
-//     }
-//   });
-// }
-
-
-// function serializeStates(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
-//     const member = cmpMeta.membersMeta[memberName];
-
-//     if (member.memberType === MEMBER_TYPE.State) {
-//       cmpData.states = cmpData.states || [];
-
-//       cmpData.states.push({
-//         name: memberName
-//       });
-//     }
-//   });
-// }
-
-
-// function serializeListeners(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (invalidArrayData(cmpMeta.listenersMeta)) {
-//     return;
-//   }
-
-//   cmpData.listeners = cmpMeta.listenersMeta.map(listenerMeta => {
-//     const listenerData: d.ListenerData = {
-//       event: listenerMeta.eventName,
-//       method: listenerMeta.eventMethodName
-//     };
-//     if (listenerMeta.eventPassive === false) {
-//       listenerData.passive = false;
-//     }
-//     if (listenerMeta.eventDisabled === true) {
-//       listenerData.enabled = false;
-//     }
-//     if (listenerMeta.eventCapture === false) {
-//       listenerData.capture = false;
-//     }
-//     return listenerData;
-
-//   }).sort((a, b) => {
-//     if (a.event.toLowerCase() < b.event.toLowerCase()) return -1;
-//     if (a.event.toLowerCase() > b.event.toLowerCase()) return 1;
-//     return 0;
-//   });
-// }
-
-
-// function serializeMethods(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
-//     const member = cmpMeta.membersMeta[memberName];
-
-//     if (member.memberType === MEMBER_TYPE.Method) {
-//       cmpData.methods = cmpData.methods || [];
-
-//       cmpData.methods.push({
-//         name: memberName
-//       });
-//     }
-//   });
-// }
-
-
-// function serializeContextMember(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-//     const member = cmpMeta.membersMeta[memberName];
-
-//     if (member.ctrlId && member.memberType === MEMBER_TYPE.PropContext) {
-//       cmpData.context = cmpData.context || [];
-
-//       cmpData.context.push({
-//         name: memberName,
-//         id: member.ctrlId
-//       });
-//     }
-//   });
-// }
-
-
-// function serializeConnectMember(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-//     const member = cmpMeta.membersMeta[memberName];
-
-//     if (member.ctrlId && member.memberType === MEMBER_TYPE.PropConnect) {
-//       cmpData.connect = cmpData.connect || [];
-
-//       cmpData.connect.push({
-//         name: memberName,
-//         tag: member.ctrlId
-//       });
-//     }
-//   });
-// }
-
-
-// function serializeHostElementMember(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.membersMeta) return;
-
-//   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-//     const member = cmpMeta.membersMeta[memberName];
-
-//     if (member.memberType === MEMBER_TYPE.Element) {
-//       cmpData.hostElement = {
-//         name: memberName
-//       };
-//     }
-//   });
-// }
-
-
-// function serializeEvents(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (invalidArrayData(cmpMeta.eventsMeta)) {
-//     return;
-//   }
-
-//   cmpData.events = cmpMeta.eventsMeta.map(eventMeta => {
-//     const eventData: d.EventData = {
-//       event: eventMeta.eventName
-//     };
-//     if (eventMeta.eventMethodName !== eventMeta.eventName) {
-//       eventData.method = eventMeta.eventMethodName;
-//     }
-//     if (eventMeta.eventBubbles === false) {
-//       eventData.bubbles = false;
-//     }
-//     if (eventMeta.eventCancelable === false) {
-//       eventData.cancelable = false;
-//     }
-//     if (eventMeta.eventComposed === false) {
-//       eventData.composed = false;
-//     }
-//     return eventData;
-
-//   }).sort((a, b) => {
-//     if (a.event.toLowerCase() < b.event.toLowerCase()) return -1;
-//     if (a.event.toLowerCase() > b.event.toLowerCase()) return 1;
-//     return 0;
-//   });
-// }
-
-
-// function serializeHost(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (!cmpMeta.hostMeta || Array.isArray(cmpMeta.hostMeta) || !Object.keys(cmpMeta.hostMeta).length) {
-//     return;
-//   }
-//   cmpData.host = cmpMeta.hostMeta;
-// }
-
-
-// function serializeEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentCompilerMeta) {
-//   if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
-//     cmpData.shadow = true;
-
-//   } else if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
-//     cmpData.scoped = true;
-//   }
-// }
-
-
 export function serializeAppGlobal(config: d.Config, collectionDir: string, collectionData: d.CollectionData, globalModule: d.Module) {
   if (!globalModule) {
     return;
@@ -488,8 +259,8 @@ export function parseGlobal(collectionDir: string, collectionData: d.CollectionD
 }
 
 
-export function serializeBundles(config: d.Config, collectionData: d.CollectionData) {
-  collectionData.bundles = config.bundles.map(b => {
+export function serializeBundles(config: d.Config) {
+  return config.bundles.map(b => {
     return {
       components: b.components.slice().sort()
     };
@@ -515,11 +286,6 @@ function invalidArrayData(arr: any[]) {
   return (!arr || !Array.isArray(arr) || arr.length === 0);
 }
 
-// function nameSort(a: string, b: string) {
-//   if (a.toLowerCase() < b.toLowerCase()) return -1;
-//   if (a.toLowerCase() > b.toLowerCase()) return 1;
-//   return 0;
-// }
 
 
 export const BOOLEAN_KEY = 'Boolean';

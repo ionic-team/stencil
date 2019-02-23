@@ -6,7 +6,7 @@ import { sys } from '@sys';
 import * as v from './validate-package-json';
 
 
-export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistCollection) {
   v.validatePackageFiles(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateCollection(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateNamespace(config, buildCtx.diagnostics);
@@ -26,8 +26,7 @@ export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.
   }
 }
 
-
-async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistCollection) {
   if (typeof pkgData.types !== 'string') {
     return;
   }

@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { isOutputTargetAngular, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
+import { isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
 import { sys } from '@sys';
 
 
@@ -33,23 +33,8 @@ export function validateOutputTargetHydrate(config: d.Config) {
         config.outputTargets.push(hydrateForWwwOutputTarget);
       });
     }
-
-    const angularServerModuleOutputTargets = config.outputTargets
-      .filter(isOutputTargetAngular)
-      .filter(o => o.serverModuleFile);
-
-    if (angularServerModuleOutputTargets.length > 0) {
-      // we're creating an angular universal server module, so we'll need a hydrate app
-      angularServerModuleOutputTargets.forEach(angularServerModuleOutputTarget => {
-        const hydrateAppDir = sys.path.dirname(angularServerModuleOutputTarget.serverModuleFile);
-        const hydrateForWwwOutputTarget: d.OutputTargetHydrate = {
-          type: 'hydrate',
-          dir: hydrateAppDir
-        };
-        config.outputTargets.push(hydrateForWwwOutputTarget);
-      });
-    }
   }
+
 
   const hydrateOutputTargets = config.outputTargets
     .filter(isOutputTargetHydrate);

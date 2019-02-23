@@ -55,7 +55,6 @@ export function setStringConfig(config: any, configName: string, defaultValue: s
   }
 }
 
-
 export function setArrayConfig(config: any, configName: string, defaultValue?: any[]) {
   const userConfigName = getUserConfigName(config, configName);
 
@@ -71,7 +70,6 @@ export function setArrayConfig(config: any, configName: string, defaultValue?: a
     }
   }
 }
-
 
 function getUserConfigName(config: d.Config, correctConfigName: string) {
   const userConfigNames = Object.keys(config);

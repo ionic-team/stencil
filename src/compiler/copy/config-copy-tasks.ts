@@ -58,12 +58,7 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
   }
 
   await Promise.all(outputTargets.map(async outputTarget => {
-    if ('collectionDir' in outputTarget) {
-      await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.collectionDir);
-
-    } else {
-      await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.dir);
-    }
+    await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.dir);
   }));
 }
 

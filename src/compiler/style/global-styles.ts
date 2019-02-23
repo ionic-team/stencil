@@ -6,7 +6,7 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { sys } from '@sys';
 
 
-export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild) {
+export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
   if (canSkip) {
     return;
@@ -51,7 +51,7 @@ async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, bui
 }
 
 
-async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild) {
+async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   if (typeof config.globalStyle !== 'string') {
     return true;
   }

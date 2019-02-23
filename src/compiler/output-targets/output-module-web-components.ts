@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { getComponentsFromModules, isOutputTargetDist } from './output-utils';
+import { getComponentsFromModules, isOutputTargetDistModules } from './output-utils';
 import { bundleApp } from '../app-core/bundle-app-core';
 import { sys } from '@sys';
 import { dashToPascalCase } from '@utils';
@@ -12,7 +12,7 @@ export async function outputModuleWebComponents(config: d.Config, compilerCtx: d
     return;
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetDist);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistModules);
   if (outputTargets.length === 0) {
     return;
   }
@@ -20,15 +20,13 @@ export async function outputModuleWebComponents(config: d.Config, compilerCtx: d
   return generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets);
 }
 
-export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[]) {
+export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModules[]) {
   await buildCtx.stylesPromise;
 
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
   const cmps = getComponentsFromModules(buildCtx.moduleFiles);
-
   const build = getBuildConditionals(config, cmps);
-
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build);
 
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
@@ -36,7 +34,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
       console.error('not a single file');
     } else {
       await Promise.all(outputTargets.map(async outputTarget => {
-        const filePath = sys.path.join(outputTarget.buildDir, 'modules', config.fsNamespace + '.mjs');
+        const filePath = sys.path.join(outputTarget.file);
         await compilerCtx.fs.writeFile(filePath, rollupResults[0].code);
       }));
     }

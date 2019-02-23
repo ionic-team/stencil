@@ -71,32 +71,49 @@ export interface OutputTargetDist extends OutputTargetBase {
   esmLoaderPath?: string;
 }
 
+export interface OutputTargetDistCollection extends OutputTargetBase {
+  type: 'dist-collection';
+
+  dir?: string;
+  collectionDir?: string;
+  typesDir?: string;
+  empty?: boolean;
+}
+
+export interface OutputTargetDistLazy extends OutputTargetBase {
+  type: 'dist-lazy';
+
+  dir?: string;
+  empty?: boolean;
+  resourcesUrl?: string;
+}
+
+export interface OutputTargetDistModules extends OutputTargetBase {
+  type: 'dist-modules';
+
+  file?: string;
+}
+
+
+export interface OutputTargetDistSelfcontained extends OutputTargetBase {
+  type: 'dist-selfcontained';
+
+  dir?: string;
+  buildDir?: string;
+  resourcesUrl?: string;
+  empty?: boolean;
+}
+
 
 export interface OutputTargetHydrate extends OutputTargetBase {
   type: 'hydrate';
   dir?: string;
 }
 
-
-export interface OutputTargetWebComponent extends OutputTargetBase {
-  type: 'webcomponent';
-
-  dir?: string;
-  buildDir?: string;
-  resourcesUrl?: string;
-  empty?: boolean;
+export interface OutputTargetDocsVscode extends OutputTargetBase {
+  type: 'docs-vscode';
+  file?: string;
 }
-
-
-export interface OutputTargetSelfContained extends OutputTargetBase {
-  type: 'selfcontained';
-
-  dir?: string;
-  buildDir?: string;
-  resourcesUrl?: string;
-  empty?: boolean;
-}
-
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs';
@@ -147,19 +164,22 @@ export interface OutputTargetBase {
 
 
 export type OutputTargetBuild =
- | OutputTargetDist
- | OutputTargetWebComponent
+ | OutputTargetDistCollection
+ | OutputTargetDistLazy
  | OutputTargetWww;
 
 
 export type OutputTarget =
- | OutputTargetAngular
- | OutputTargetStats
+ | OutputTargetDist
+ | OutputTargetDistCollection
+ | OutputTargetDistLazy
+ | OutputTargetDistModules
+ | OutputTargetDistSelfcontained
+ | OutputTargetWww
+ | OutputTargetHydrate
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme
- | OutputTargetDist
- | OutputTargetHydrate
- | OutputTargetSelfContained
- | OutputTargetWebComponent
- | OutputTargetWww;
+ | OutputTargetDocsVscode
+ | OutputTargetAngular
+ | OutputTargetStats;

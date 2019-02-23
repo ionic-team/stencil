@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
-import { isOutputTargetBuild } from '../output-targets/output-utils';
+import { isOutputTargetDistCollection, isOutputTargetDistLazy, isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filesChanged: string[]) {
@@ -12,8 +12,11 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     return copyTasks;
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
-
+  const outputTargets = config.outputTargets.filter(o => (
+    isOutputTargetDistLazy(o),
+    isOutputTargetDistCollection(o),
+    isOutputTargetWww(o)
+  ));
   if (outputTargets.length === 0) {
     return copyTasks;
   }
@@ -39,11 +42,11 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     });
   });
 
-  // copy all of the files in asset directories to the app's build and/or dist directory
-  copyToBuildDir.forEach(assetsMeta => {
-    // figure out what the path is to the component directory
-
-    outputTargets.forEach(outputTarget => {
+  const wwwOutputTargets = outputTargets.filter(isOutputTargetWww);
+  wwwOutputTargets.forEach(outputTarget => {
+    // copy all of the files in asset directories to the app's build and/or dist directory
+    copyToBuildDir.forEach(assetsMeta => {
+      // figure out what the path is to the component directory
       const buildDirDestination = sys.path.join(outputTarget.buildDir, config.fsNamespace, assetsMeta.cmpRelativePath);
 
       copyTasks.push({
@@ -53,22 +56,35 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     });
   });
 
-  outputTargets.forEach(outputTarget => {
-    if ('collectionDir' in outputTarget) {
-      // copy all of the files in asset directories to the app's collection directory
-      copyToCollectionDir.forEach(assetsMeta => {
-        // figure out what the path is to the component directory
-        const collectionDirDestination = sys.path.join(
-          outputTarget.collectionDir,
-          sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-        );
+  const lazyOutputTargets = outputTargets.filter(isOutputTargetDistLazy);
+  lazyOutputTargets.forEach(outputTarget => {
+    // copy all of the files in asset directories to the app's build and/or dist directory
+    copyToBuildDir.forEach(assetsMeta => {
+      // figure out what the path is to the component directory
+      const buildDirDestination = sys.path.join(outputTarget.dir, config.fsNamespace, assetsMeta.cmpRelativePath);
 
-        copyTasks.push({
-          src: assetsMeta.absolutePath,
-          dest: collectionDirDestination
-        });
+      copyTasks.push({
+        src: assetsMeta.absolutePath,
+        dest: buildDirDestination
       });
-    }
+    });
+  });
+
+  const collectionOutputTargets = outputTargets.filter(isOutputTargetDistCollection);
+  collectionOutputTargets.forEach(outputTarget => {
+    // copy all of the files in asset directories to the app's collection directory
+    copyToCollectionDir.forEach(assetsMeta => {
+      // figure out what the path is to the component directory
+      const collectionDirDestination = sys.path.join(
+        outputTarget.dir,
+        sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+      );
+
+      copyTasks.push({
+        src: assetsMeta.absolutePath,
+        dest: collectionDirDestination
+      });
+    });
   });
 
   buildCtx.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);

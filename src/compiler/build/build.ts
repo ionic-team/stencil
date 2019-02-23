@@ -8,6 +8,7 @@ import { initIndexHtmls } from './init-index-html';
 import { sys } from '@sys';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
+import { generateStyles } from '../style/generate-styles';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -40,6 +41,10 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
     const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort) return buildCtx.abort();
+
+    // preprocess and generate styles before any outputTarget starts
+    buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     // generate the core app files

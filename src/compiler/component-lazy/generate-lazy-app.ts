@@ -5,7 +5,7 @@ import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
 import { bundleApp } from '../app-core/bundle-app-core';
 
 
-export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetBuild[], cmps: d.ComponentCompilerMeta[]) {
+export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
   const timespan = buildCtx.createTimeSpan(`generate lazy components started`, true);
 
   const build = getBuildConditionals(config, cmps);

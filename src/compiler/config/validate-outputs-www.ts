@@ -3,6 +3,8 @@ import { setBooleanConfig, setStringConfig } from './config-utils';
 import { sys } from '@sys';
 import { validatePrerender } from './validate-prerender';
 import { isOutputTargetWww } from '../output-targets/output-utils';
+import { validateResourcesUrl } from './validate-resources-url';
+import { validateServiceWorker } from './validate-service-worker';
 
 
 export function validateOutputTargetWww(config: d.Config) {
@@ -44,7 +46,14 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
 
   validatePrerender(config, outputTarget);
+  outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
+  outputTarget.serviceWorker = validateServiceWorker(config, outputTarget.serviceWorker, outputTarget.dir);
 
+  // Add dist-lazy output target
+  config.outputTargets.push({
+    type: 'dist-lazy',
+    dir: outputTarget.buildDir
+  });
 }
 
 

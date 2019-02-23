@@ -4,8 +4,7 @@ import { isOutputTargetHydrate } from './output-utils';
 
 
 export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const hydrateOutputTargets = config.outputTargets
-    .filter(isOutputTargetHydrate);
+  const hydrateOutputTargets = config.outputTargets.filter(isOutputTargetHydrate);
 
   if (hydrateOutputTargets.length === 0) {
     return;

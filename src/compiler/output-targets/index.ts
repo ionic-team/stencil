@@ -1,7 +1,6 @@
 import * as d from '@declarations';
-import { generateDocs } from '../docs/docs';
+import { outputDocs } from './output-docs';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
-import { generateStyles } from '../style/generate-styles';
 import { outputAngularProxies } from './output-angular';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
@@ -11,7 +10,6 @@ import { outputHydrate } from './output-hydrate';
 import { outputIndexHtmls } from './output-index-html';
 import { outputModuleWebComponents } from './output-module-web-components';
 // import { outputSelfContainedWebComponents } from './output-self-contained-web-components';
-import { outputTypes } from './output-types';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -19,31 +17,28 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     return;
   }
 
-  buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
-
-  if (buildCtx.shouldAbort) {
-    return;
-  }
-
   const timespan = buildCtx.createTimeSpan(`generate app files started`);
 
   const generateOutputs = [
-    outputAngularProxies(config, compilerCtx, buildCtx),
-    outputModuleWebComponents(config, compilerCtx, buildCtx),
-    outputApp(config, compilerCtx, buildCtx),
     outputCollections(config, compilerCtx, buildCtx),
+    outputAngularProxies(config, compilerCtx, buildCtx),
+    outputModulesApp(config, compilerCtx, buildCtx),
     outputCommonJsIndexes(config, compilerCtx, buildCtx),
-    generateDocs(config, compilerCtx, buildCtx),
+    outputDocs(config, compilerCtx, buildCtx),
     generateServiceWorkers(config, compilerCtx, buildCtx),
     outputEsmIndexes(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
     outputIndexHtmls(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
-    outputTypes(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];
 
   await Promise.all(generateOutputs);
 
   timespan.finish(`generate app files finished`);
+}
+
+async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  await outputModuleWebComponents(config, compilerCtx, buildCtx);
+  return outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
 }

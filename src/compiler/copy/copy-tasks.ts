@@ -5,16 +5,8 @@ import { getConfigCopyTasks } from './config-copy-tasks';
 import { sys } from '@sys';
 
 
-export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function copyTasks(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, copyTasks: d.CopyTask) {
   try {
-    const cmpAssetsCopyTasks = getComponentAssetsCopyTasks(config, compilerCtx, buildCtx, buildCtx.filesChanged);
-    const configCopyTasks = await getConfigCopyTasks(config, buildCtx, );
-
-    const copyTasks = [
-      ...configCopyTasks,
-      ...cmpAssetsCopyTasks
-    ];
-
     if (copyTasks.length > 0) {
       const timeSpan = buildCtx.createTimeSpan(`copyTasks started`, true);
 

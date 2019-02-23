@@ -42,12 +42,28 @@ export function getComponentsDtsSrcFilePath(config: d.Config) {
   return sys.path.join(config.srcDir, GENERATED_DTS);
 }
 
-export function getComponentsDtsTypesFilePath(outputTarget: d.OutputTargetDist) {
+export function getComponentsDtsTypesFilePath(outputTarget: d.OutputTargetDistCollection) {
   return sys.path.join(outputTarget.typesDir, GENERATED_DTS);
 }
 
 export function isOutputTargetDist(o: d.OutputTarget): o is d.OutputTargetDist {
   return o.type === 'dist';
+}
+
+export function isOutputTargetDistCollection(o: d.OutputTarget): o is d.OutputTargetDistCollection {
+  return o.type === 'dist-collection';
+}
+
+export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDistLazy {
+  return o.type === 'dist-lazy';
+}
+
+export function isOutputTargetDistModules(o: d.OutputTarget): o is d.OutputTargetDistModules {
+  return o.type === 'dist-modules';
+}
+
+export function isOutputTargetDistSelfcontained(o: d.OutputTarget): o is d.OutputTargetDistSelfcontained {
+  return o.type === 'dist-selfcontained';
 }
 
 export function isOutputTargetHydrate(o: d.OutputTarget): o is d.OutputTargetHydrate {
@@ -59,11 +75,7 @@ export function isOutputTargetWww(o: d.OutputTarget): o is d.OutputTargetWww {
 }
 
 export function isOutputTargetBuild(o: d.OutputTarget): o is d.OutputTargetBuild {
-  return o.type === 'dist' || o.type === 'www';
-}
-
-export function isOutputTargetSelfcontained(o: d.OutputTarget): o is d.OutputTargetSelfContained {
-  return o.type === 'selfcontained';
+  return o.type === 'dist-collection' || o.type === 'dist-lazy' || o.type === 'www';
 }
 
 export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats {
@@ -74,16 +86,21 @@ export function isOutputTargetDocs(o: d.OutputTarget): o is d.OutputTargetDocsRe
   return o.type === 'docs';
 }
 
-export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAngular {
-  return o.type === 'angular';
-}
-
 export function isOutputTargetDocsJson(o: d.OutputTarget): o is d.OutputTargetDocsJson {
   return o.type === 'docs-json';
 }
 
+export function isOutputTargetDocsVscode(o: d.OutputTarget): o is d.OutputTargetDocsVscode {
+  return o.type === 'docs-vscode';
+}
+
+
 export function isOutputTargetDocsCustom(o: d.OutputTarget): o is d.OutputTargetDocsCustom {
   return o.type === 'docs-custom';
+}
+
+export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAngular {
+  return o.type === 'angular';
 }
 
 export function getComponentsFromModules(moduleFiles: d.Module[]) {

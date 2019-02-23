@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -17,11 +18,11 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
   }));
 
   // create the global styles
-  const globalStyles = await Promise.all(config.outputTargets
-    .filter(outputTarget => outputTarget.type !== 'stats')
-    .map(async (outputTarget: d.OutputTargetBuild) => {
-      await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
-    }));
+  const globalStyles = await Promise.all(
+    config.outputTargets
+      .filter(isOutputTargetWww)
+      .map(outputTarget => generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget))
+  );
 
   await Promise.all([
     componentStyles,

@@ -4,8 +4,8 @@ import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetHydrate } from './validate-outputs-hydrate';
 import { validateOutputTargetWww } from './validate-outputs-www';
-import { validateResourcesUrl } from './validate-resources-url';
-import { validateServiceWorker } from './validate-service-worker';
+import { validateOutputTargetDistCollection } from './validate-outputs-dist-collection';
+import { validateOutputTargetDistLazy } from './validate-outputs-dist-lazy';
 import { validateStats } from './validate-stats';
 import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
@@ -33,17 +33,16 @@ export function validateOutputTargets(config: d.Config) {
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
   validateOutputTargetHydrate(config);
+  validateOutputTargetDistCollection(config);
+  validateOutputTargetDistLazy(config);
+  validateOutputTargetHydrate(config);
+
   validateDocs(config);
   validateStats(config);
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
     throw new Error(`outputTarget required`);
   }
-
-  config.outputTargets.forEach(outputTarget => {
-    validateResourcesUrl(outputTarget as d.OutputTargetBuild);
-    validateServiceWorker(config, outputTarget as d.OutputTargetWww);
-  });
 }
 
 

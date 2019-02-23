@@ -25,5 +25,14 @@ export function validateOutputTargetAngular(config: d.Config) {
     if (outputTarget.serverModuleFile && !sys.path.isAbsolute(outputTarget.serverModuleFile)) {
       outputTarget.serverModuleFile = normalizePath(sys.path.join(config.rootDir, outputTarget.serverModuleFile));
     }
+
+    // Add hydrated output target if needed
+    if (outputTarget.serverModuleFile) {
+      const hydrateAppDir = sys.path.dirname(outputTarget.serverModuleFile);
+      config.outputTargets.push({
+        type: 'hydrate',
+        dir: hydrateAppDir
+      });
+    }
   });
 }

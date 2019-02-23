@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
-import { getComponentsFromModules, isOutputTargetBuild } from './output-utils';
+import { getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
 import { sys } from '@sys';
 import { RollupOptions } from 'rollup';
 import { dashToPascalCase } from '@utils';
@@ -8,12 +8,12 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { stencilClientEntryPointPlugin } from '../rollup-plugins/stencil-client-entrypoint';
 
 
-export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return;
   }
