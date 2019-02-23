@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { getComponentsFromModules, isOutputTargetDistModules } from './output-utils';
+import { getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { bundleApp } from '../app-core/bundle-app-core';
 import { sys } from '@sys';
 import { dashToPascalCase } from '@utils';
@@ -12,7 +12,7 @@ export async function outputModuleWebComponents(config: d.Config, compilerCtx: d
     return;
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistModules);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
   if (outputTargets.length === 0) {
     return;
   }
@@ -20,7 +20,7 @@ export async function outputModuleWebComponents(config: d.Config, compilerCtx: d
   return generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets);
 }
 
-export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModules[]) {
+export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
   await buildCtx.stylesPromise;
 
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
@@ -75,7 +75,7 @@ function generateEntryPoint(entryModules: d.EntryModule[]) {
     const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, true, false));
     result.push(
       `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
-      `export const ${dashToPascalCase(cmp.tagName)} = proxyNative($Cmp${count}, ${meta});`
+      `export const ${dashToPascalCase(cmp.tagName)} = /*#__PURE__*/proxyNative($Cmp${count}, ${meta});`
     );
     count++;
   }));

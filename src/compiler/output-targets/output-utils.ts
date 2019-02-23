@@ -58,8 +58,8 @@ export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDi
   return o.type === 'dist-lazy';
 }
 
-export function isOutputTargetDistModules(o: d.OutputTarget): o is d.OutputTargetDistModules {
-  return o.type === 'dist-modules';
+export function isOutputTargetDistModule(o: d.OutputTarget): o is d.OutputTargetDistModule {
+  return o.type === 'dist-module';
 }
 
 export function isOutputTargetDistSelfcontained(o: d.OutputTarget): o is d.OutputTargetDistSelfcontained {

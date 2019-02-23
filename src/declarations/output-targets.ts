@@ -88,8 +88,8 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   resourcesUrl?: string;
 }
 
-export interface OutputTargetDistModules extends OutputTargetBase {
-  type: 'dist-modules';
+export interface OutputTargetDistModule extends OutputTargetBase {
+  type: 'dist-module';
 
   file?: string;
 }
@@ -173,7 +173,7 @@ export type OutputTarget =
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy
- | OutputTargetDistModules
+ | OutputTargetDistModule
  | OutputTargetDistSelfcontained
  | OutputTargetWww
  | OutputTargetHydrate

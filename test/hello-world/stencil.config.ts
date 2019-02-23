@@ -9,9 +9,8 @@ export const config: Config = {
       serviceWorker: null,
       prerenderConfig: 'prerender.config.js'
     },
-    {
-      type: 'dist'
-    },
+    { type: 'dist-collection' },
+    { type: 'dist-module' },
     {
       type: 'angular',
       serverModuleFile: 'dist/server/helloworld-serve.ts'
