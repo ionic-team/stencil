@@ -4,31 +4,16 @@ import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
+import { getComponentsFromModules } from '../output-targets/output-utils';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
   const timespan = buildCtx.createTimeSpan(`generate hydrate app started`, true);
 
   try {
-    const cmps = buildCtx.moduleFiles.reduce((cmps, m) => {
-      cmps.push(...m.cmps);
-      return cmps;
-    }, [] as d.ComponentCompilerMeta[]);
-
-    const build = getBuildFeatures(cmps) as d.Build;
-
-    build.lazyLoad = false;
-    build.es5 = false;
-    build.polyfills = false;
-    build.hydrateClientSide = false;
-    build.hydrateServerSide = true;
-
-    updateBuildConditionals(config, build);
-    build.lifecycleDOMEvents = false;
-    build.hotModuleReplacement = false;
-
+    const cmps = getComponentsFromModules(buildCtx.moduleFiles);
+    const build = getBuildConditionals(config, cmps);
     const coreSource = await generateHydrateAppCoreEntry(compilerCtx, buildCtx, cmps, build);
-
     const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, coreSource);
 
     if (!buildCtx.shouldAbort && typeof code === 'string') {
@@ -42,6 +27,20 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
   timespan.finish(`generate hydrate app finished`);
 }
 
+function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
+  const build = getBuildFeatures(cmps) as d.Build;
+
+  build.lazyLoad = false;
+  build.es5 = false;
+  build.polyfills = false;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = true;
+
+  updateBuildConditionals(config, build);
+  build.lifecycleDOMEvents = false;
+  build.hotModuleReplacement = false;
+  return build;
+}
 
 async function generateHydrateAppCoreEntry(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const coreText: string[] = [];

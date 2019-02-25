@@ -61,10 +61,10 @@ export function validateOutputTargetDist(config: d.Config) {
       empty: outputTarget.empty
     });
 
-    config.outputTargets.push({
-      type: 'dist-module',
-      file: path.join(outputTarget.dir, 'modules', 'index.mjs')
-    });
+    // config.outputTargets.push({
+    //   type: 'dist-module',
+    //   file: path.join(outputTarget.dir, 'modules', 'index.mjs')
+    // });
 
     config.outputTargets.push({
       type: 'dist-lazy',

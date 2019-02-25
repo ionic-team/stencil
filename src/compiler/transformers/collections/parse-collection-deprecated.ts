@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { getModule } from '../../build/compiler-ctx';
 import { sys } from '@sys';
 import { normalizePath } from '@utils';
+import { setComponentBuildConditionals } from '../component-build-conditionals';
 
 
 export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, collectionManifest: d.CollectionManifest) {
@@ -17,28 +18,91 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   const sourceFilePath = normalizePath(sys.path.join(collectionDir, cmpData.componentPath));
   const moduleFile = getModule(compilerCtx, sourceFilePath);
 
-  const cmpMeta: d.ComponentCompilerMeta = {} as any;
-  moduleFile.cmps = [cmpMeta];
   moduleFile.isCollectionDependency = true;
   moduleFile.collectionName = collection.collectionName;
   moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);
+  moduleFile.originalCollectionComponentPath = cmpData.componentPath;
+  moduleFile.jsFilePath = parseJsFilePath(collectionDir, cmpData);
+  const cmpMeta: d.ComponentCompilerMeta = {
+    excludeFromCollection: moduleFile.excludeFromCollection,
+    isCollectionDependency: moduleFile.isCollectionDependency,
 
-  parseTag(cmpData, cmpMeta);
+    tagName: parseTag(cmpData),
+    componentClassName: parseComponentClass(cmpData),
+    virtualProperties: [],
+    docs: {
+      text: '',
+      tags: []
+    },
+    internal: false,
+    dependencies: [],
+    jsFilePath: moduleFile.jsFilePath,
+    sourceFilePath: '',
+    styleDocs: [],
+    assetsDirs: parseAssetsDir(collectionDir, cmpData),
+    styles: parseStyles(collectionDir, cmpData),
+    properties: parseProps(cmpData),
+    states: parseStates(cmpData),
+    listeners: parseListeners(cmpData),
+    methods: parseMethods(cmpData),
+    elementRef: parseHostElementMember(cmpData),
+    events: parseEvents(cmpData),
+    encapsulation: parseEncapsulation(cmpData),
+    watchers: parseWatchers(cmpData),
+
+    hasAsyncLifecycle: false,
+    hasAttributeChangedCallbackFn: false,
+    hasComponentWillLoadFn: true,
+    hasComponentDidLoadFn: true,
+    hasComponentWillUpdateFn: true,
+    hasComponentDidUpdateFn: true,
+    hasComponentWillRenderFn: false,
+    hasComponentDidRenderFn: false,
+    hasComponentDidUnloadFn: true,
+    hasConnectedCallbackFn: false,
+    hasDisonnectedCallbackFn: false,
+    hasElement: false,
+    hasEvent: false,
+    hasLifecycle: false,
+    hasListener: false,
+    hasListenerTarget: false,
+    hasListenerTargetWindow: false,
+    hasListenerTargetDocument: false,
+    hasListenerTargetBody: false,
+    hasListenerTargetParent: false,
+    hasMember: false,
+    hasMethod: false,
+    hasMode: false,
+    hasAttribute: false,
+    hasProp: false,
+    hasPropMutable: false,
+    hasReflect: false,
+    hasRenderFn: false,
+    hasState: false,
+    hasStyle: false,
+    hasVdomAttribute: true,
+    hasVdomClass: true,
+    hasVdomFunctional: true,
+    hasVdomKey: true,
+    hasVdomListener: true,
+    hasVdomRef: true,
+    hasVdomRender: false,
+    hasVdomStyle: true,
+    hasVdomText: true,
+    hasWatchCallback: false,
+    isPlain: false,
+    htmlAttrNames: [],
+    htmlTagNames: [],
+    isUpdateable: false,
+    potentialCmpRefs: []
+  };
+  setComponentBuildConditionals(cmpMeta);
+
+  moduleFile.cmps.push(cmpMeta);
+
   // parseComponentDependencies(cmpData, cmpMeta);
-  parseComponentClass(cmpData, cmpMeta);
-  parseModuleJsFilePath(collectionDir, cmpData, moduleFile);
-  parseStyles(collectionDir, cmpData, cmpMeta);
-  parseAssetsDir(collectionDir, cmpData, cmpMeta);
-  parseProps(cmpData, cmpMeta);
-  parseStates(cmpData, cmpMeta);
-  parseListeners(cmpData, cmpMeta);
-  parseMethods(cmpData, cmpMeta);
   // parseContextMember(cmpData, cmpMeta);
   // parseConnectMember(cmpData, cmpMeta);
-  parseHostElementMember(cmpData, cmpMeta);
-  parseEvents(cmpData, cmpMeta);
-  parseEncapsulation(cmpData, cmpMeta);
-
   collection.moduleFiles.push(moduleFile);
 }
 
@@ -63,21 +127,18 @@ function excludeFromCollection(config: d.Config, cmpData: d.ComponentDataDepreca
 }
 
 
-function parseTag(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
-  cmpMeta.tagName = cmpData.tag;
+function parseTag(cmpData: d.ComponentDataDeprecated) {
+  return cmpData.tag;
 }
 
 
-function parseModuleJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecated, moduleFile: d.Module) {
+function parseJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   // convert the path that's relative to the collection file
   // into an absolute path to the component's js file path
   if (typeof cmpData.componentPath !== 'string') {
     throw new Error(`parseModuleJsFilePath, "componentPath" missing on cmpData: ${cmpData.tag}`);
   }
-  moduleFile.jsFilePath = normalizePath(sys.path.join(collectionDir, cmpData.componentPath));
-
-  // remember the original component path from its collection
-  moduleFile.originalCollectionComponentPath = cmpData.componentPath;
+  return normalizePath(sys.path.join(collectionDir, cmpData.componentPath));
 }
 
 
@@ -90,33 +151,33 @@ function parseModuleJsFilePath(collectionDir: string, cmpData: d.ComponentDataDe
 // }
 
 
-function parseComponentClass(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
-  cmpMeta.componentClassName = cmpData.componentClass;
+function parseComponentClass(cmpData: d.ComponentDataDeprecated) {
+  return cmpData.componentClass;
 }
 
 
-function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const stylesData = cmpData.styles;
 
   if (stylesData) {
     const modeNames = Object.keys(stylesData);
 
-    cmpMeta.styles = modeNames.map(modeName => {
+    return modeNames.map(modeName => {
       return parseStyle(collectionDir, cmpData, stylesData[modeName], modeName.toLowerCase());
     });
 
   } else {
-    cmpMeta.styles = [];
+    return [];
   }
 }
 
 
-function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.assetPaths)) {
-    return;
+    return [];
   }
 
-  cmpMeta.assetsDirs = cmpData.assetPaths.map(assetsPath => {
+  return cmpData.assetPaths.map(assetsPath => {
     const assetsMeta: d.AssetsMeta = {
       absolutePath: normalizePath(sys.path.join(
         collectionDir,
@@ -171,73 +232,72 @@ function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, m
 }
 
 
-function parseProps(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseProps(cmpData: d.ComponentDataDeprecated) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
-    return;
+    return [];
   }
 
-  cmpMeta.properties = propsData.map(propData => {
+  return propsData.map(propData => {
     const prop: d.ComponentCompilerProperty = {
       name: propData.name,
       attribute: (typeof propData.attr === 'string' ? propData.attr : null),
       mutable: !!propData.mutable,
-      optional: false, // TODO
-      required: false, // TODO
+      optional: true,
+      required: false,
       reflect: !!propData.reflectToAttr,
-      type: 'unknown',
+      type: convertType(propData.type),
       internal: false,
       docs: {
-        text: 'TODO',
+        text: '',
         tags: []
       }
     };
-
-    // the standard is the first character of the type is capitalized
-    // however, lowercase and normalize for good measure
-    const type = typeof propData.type === 'string' ? propData.type.toLowerCase().trim() : null;
-
-    if (type === BOOLEAN_KEY.toLowerCase()) {
-      prop.type = 'boolean';
-
-    } else if (type === NUMBER_KEY.toLowerCase()) {
-      prop.type = 'number';
-
-    } else if (type === STRING_KEY.toLowerCase()) {
-      prop.type = 'string';
-    }
-
-    // if (!invalidArrayData(propData.watch)) {
-    //   member.watchCallbacks = propData.watch.slice().sort();
-    // }
-
     return prop;
   });
 }
 
 
-function parseStates(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseStates(cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.states)) {
-    return;
+    return [];
   }
 
-  cmpMeta.states = cmpData.states.map(state => {
+  return cmpData.states.map(state => {
     return {
       name: state.name
     };
   });
 }
 
+function parseWatchers(cmpData: d.ComponentDataDeprecated) {
+  if (invalidArrayData(cmpData.props)) {
+    return [];
+  }
+  const watchers: d.ComponentCompilerWatch[] = [];
 
-function parseListeners(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+  cmpData.props
+    .filter(prop => prop.watch && prop.watch.length > 0)
+    .forEach(prop => {
+      prop.watch.forEach(watch => {
+        watchers.push({
+          propName: prop.name,
+          methodName: watch
+        });
+      });
+    });
+  return watchers;
+}
+
+function parseListeners(cmpData: d.ComponentDataDeprecated) {
   const listenersData = cmpData.listeners;
 
   if (invalidArrayData(listenersData)) {
-    return;
+    return [];
   }
 
-  cmpMeta.listeners = listenersData.map(listenerData => {
+  return listenersData.map(listenerData => {
     const listener: d.ComponentCompilerListener = {
       name: listenerData.event,
       method: listenerData.method,
@@ -251,12 +311,12 @@ function parseListeners(cmpData: d.ComponentDataDeprecated, cmpMeta: d.Component
 }
 
 
-function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseMethods(cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.methods)) {
-    return;
+    return [];
   }
 
-  cmpMeta.methods = cmpData.methods.map(methodData => {
+  return cmpData.methods.map(methodData => {
     const method: d.ComponentCompilerMethod = {
       name: methodData.name,
       internal: false,
@@ -275,6 +335,15 @@ function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCo
   });
 }
 
+function convertType(type: string): d.ComponentCompilerPropertyType {
+  switch (type) {
+    case 'String': return 'string';
+    case 'Any': return 'any';
+    case 'Number': return 'number';
+    case 'Boolean': return 'boolean';
+    default: return 'unknown';
+  }
+}
 
 // function parseContextMember(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
 //   if (invalidArrayData(cmpData.context)) {
@@ -312,23 +381,23 @@ function parseMethods(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCo
 // }
 
 
-function parseHostElementMember(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseHostElementMember(cmpData: d.ComponentDataDeprecated) {
   if (!cmpData.hostElement) {
-    return;
+    return undefined;
   }
 
-  cmpMeta.elementRef = cmpData.hostElement.name;
+  return cmpData.hostElement.name;
 }
 
 
-function parseEvents(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseEvents(cmpData: d.ComponentDataDeprecated) {
   const eventsData = cmpData.events;
 
   if (invalidArrayData(eventsData)) {
-    return;
+    return [];
   }
 
-  cmpMeta.events = eventsData.map(eventData => {
+  return eventsData.map(eventData => {
     const event: d.ComponentCompilerEvent = {
       name: eventData.event,
       method: (eventData.method) ? eventData.method : eventData.event,
@@ -352,15 +421,15 @@ function parseEvents(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCom
 
 
 
-function parseEncapsulation(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
+function parseEncapsulation(cmpData: d.ComponentDataDeprecated) {
   if (cmpData.shadow === true) {
-    cmpMeta.encapsulation = 'shadow';
+    return 'shadow';
 
   } else if (cmpData.scoped === true) {
-    cmpMeta.encapsulation = 'scoped';
+    return 'scoped';
 
   } else {
-    cmpMeta.encapsulation = 'none';
+    return 'none';
   }
 }
 
@@ -368,8 +437,3 @@ function parseEncapsulation(cmpData: d.ComponentDataDeprecated, cmpMeta: d.Compo
 function invalidArrayData(arr: any[]) {
   return (!arr || !Array.isArray(arr) || arr.length === 0);
 }
-
-
-const BOOLEAN_KEY = 'Boolean';
-const NUMBER_KEY = 'Number';
-const STRING_KEY = 'String';

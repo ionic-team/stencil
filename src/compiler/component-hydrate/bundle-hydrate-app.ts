@@ -56,6 +56,5 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
 }
 
 const SERVER_ENTRY = `
-import '@stencil/core/app';
-export { hydrateDocumentSync, renderToStringSync } from '@stencil/core/platform';
+export { hydrateDocumentSync, renderToStringSync } from '@stencil/core/app';
 `;

@@ -69,11 +69,10 @@ async function writeManifest(config: d.Config, compilerCtx: d.CompilerCtx, build
 }
 
 
-export function serializeCollectionManifest(config: d.Config, _compilerCtx: d.CompilerCtx, _collectionDir: string, moduleFiles: d.Module[], _globalModule: d.Module): d.CollectionData {
+export function serializeCollectionManifest(config: d.Config, _compilerCtx: d.CompilerCtx, _collectionDir: string, moduleFiles: d.Module[], _globalModule: d.Module): d.CollectionManifest {
   // create the single collection we're going to fill up with data
-
   return {
-    modules: moduleFiles.map(mod => sys.path.relative(config.srcDir, mod.jsFilePath)),
+    entries: moduleFiles.map(mod => sys.path.relative(config.srcDir, mod.jsFilePath)),
     compiler: {
       name: sys.compiler.name,
       version: sys.compiler.version,
