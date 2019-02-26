@@ -17,8 +17,8 @@ export async function generateDocData(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
   };
 }
 
-async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
-  const components = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
+async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     const filePath = moduleFile.sourceFilePath;
     const dirPath = normalizePath(sys.path.dirname(filePath));
     const readmePath = normalizePath(sys.path.join(dirPath, 'readme.md'));
@@ -48,7 +48,10 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): 
       }));
     }));
 
-  return components.flat();
+  return results.reduce((docsComponents, result) => {
+    docsComponents.push(...result);
+    return docsComponents;
+  }, [] as d.JsonDocsComponent[]);
 }
 
 function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {
