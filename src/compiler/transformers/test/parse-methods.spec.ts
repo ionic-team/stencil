@@ -17,10 +17,8 @@ describe('parse methods', () => {
     expect(getStaticGetter(t.outputText, 'methods')).toEqual({ 'someMethod': {
       'complexType': {
         'parameters': [],
-        'returns': {
-          'docs': '',
-          'type': 'void',
-        },
+        'return': 'void',
+        'references': {},
         'signature': '() => void',
       },
       'docs': {
@@ -32,13 +30,15 @@ describe('parse methods', () => {
     expect(t.method).toEqual({
       'complexType': {
         'parameters': [],
-        'returns': {'docs': '', 'type': 'void'},
+        'return': 'void',
+        'references': {},
         'signature': '() => void'
       },
       'docs': {
         'tags': [],
         'text': ''
       },
+      'internal': false,
       'name': 'someMethod'
     });
   });

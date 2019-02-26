@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { addCreateEvents } from '../create-event';
 import ts from 'typescript';
 import { REGISTER_HOST } from '../exports';
+import { addLegacyProps } from '../legacy-props';
 
 
 export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, _build: d.Build, ensureSuper: boolean) {
@@ -17,7 +18,8 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     let statements: ts.Statement[] = [
       nativeRegisterHostStatement(),
       ...cstrMethod.body.statements,
-      ...addCreateEvents(cmp)
+      ...addCreateEvents(cmp),
+      ...addLegacyProps(cmp)
     ];
 
     if (ensureSuper) {
@@ -42,7 +44,8 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     // create a constructor()
     let statements: ts.Statement[] = [
       nativeRegisterHostStatement(),
-      ...addCreateEvents(cmp)
+      ...addCreateEvents(cmp),
+      ...addLegacyProps(cmp)
     ];
 
     if (ensureSuper) {

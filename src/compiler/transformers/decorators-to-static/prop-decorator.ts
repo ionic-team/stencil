@@ -1,23 +1,30 @@
 import * as d from '@declarations';
 import { catchError, toDashCase } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, resolveType, serializeSymbol, typeToString } from '../transform-utils';
-import { transformConnectProp, transformContextProp } from './deprecated-prop';
 import ts from 'typescript';
 
 
 export function propDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+  const connect: any[] = [];
+  const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, newMembers))
+    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, context, connect, newMembers))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
+  if (context.length > 0) {
+    newMembers.push(createStaticGetter('contextProps', convertValueToLiteral(context)));
+  }
+  if (connect.length > 0) {
+    newMembers.push(createStaticGetter('connectProps', convertValueToLiteral(connect)));
+  }
 }
 
 
-function parsePropDecorator(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, newMembers: ts.ClassElement[]) {
+function parsePropDecorator(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], newMembers: ts.ClassElement[]) {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -27,13 +34,19 @@ function parsePropDecorator(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
   const propOptions = getPropOptions(propDecorator, diagnostics);
 
   if (propOptions.context) {
-    // TODO: add deprecation warning
-    transformContextProp(prop, propOptions.context, newMembers);
+    context.push({
+      name: propName,
+      context: propOptions.context,
+    });
+    removeProp(prop, newMembers);
     return null;
   }
   if (propOptions.connect) {
-    // TODO: add deprecation warning
-    transformConnectProp(prop, propOptions.connect, newMembers);
+    connect.push({
+      name: propName,
+      connect: propOptions.connect,
+    });
+    removeProp(prop, newMembers);
     return null;
   }
 
@@ -194,4 +207,11 @@ function isAny(t: ts.Type) {
     return !!(t.flags & ts.TypeFlags.Any);
   }
   return false;
+}
+
+function removeProp(prop: ts.ClassElement, classElements: ts.ClassElement[]) {
+  const index = classElements.findIndex(p => prop === p);
+  if (index >= 0) {
+    classElements.splice(index, 1);
+  }
 }

@@ -49,6 +49,7 @@ describe('parse comments', () => {
         }],
         'text': 'This is a prop',
       },
+      'internal': false,
       'mutable': false,
       'name': 'prop',
       'optional': false,
@@ -64,16 +65,15 @@ describe('parse comments', () => {
             'text': '',
           },
         ],
-        'returns': {
-          'docs': '',
-          'type': '{}',
-        },
+        'return': '{}',
+        'references': {},
         'signature': '(prop: string) => {}',
       },
       'docs': {
         'tags': [],
         'text': 'This is a method',
       },
+      'internal': false,
       'name': 'method',
     });
     expect(t.event).toEqual({
@@ -89,6 +89,7 @@ describe('parse comments', () => {
         'references': {},
         'resolved': 'any',
       },
+      'internal': false,
       'method': 'event',
       'name': 'event',
     });

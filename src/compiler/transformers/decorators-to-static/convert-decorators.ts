@@ -9,8 +9,6 @@ import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
 import { removeStencilImport } from '../remove-stencil-import';
-
-import { transformHostData } from '../transforms/host-data-transform';
 import ts from 'typescript';
 
 
@@ -46,9 +44,6 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
   }
 
   const newMembers: ts.ClassElement[] = [...cmpNode.members];
-
-  // transform hostData() into synthetic render()
-  transformHostData(newMembers);
 
   // parser component decorator (Component)
   componentDecoratorToStatic(cmpNode, newMembers, componentDecorator);

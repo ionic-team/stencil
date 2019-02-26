@@ -96,6 +96,8 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   const methods = cmp ? cmp.methods : null;
   const method = methods ? methods[0] : null;
   const elementRef = cmp ? cmp.elementRef : null;
+  const legacyConnect = cmp ? cmp.legacyConnect : null;
+  const legacyContext = cmp ? cmp.legacyContext : null;
 
   return {
     outputText,
@@ -118,7 +120,9 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     event,
     methods,
     method,
-    elementRef
+    elementRef,
+    legacyContext,
+    legacyConnect
   };
 }
 

@@ -10,7 +10,7 @@ import { JSXElements } from '@stencil/core';
 
 import {
   CarData,
-} from 'import';
+} from './car-list/car-data';
 
 
 export namespace Components {
@@ -19,20 +19,20 @@ export namespace Components {
   interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface CarDetail {
-    'car': unknown;
+    'car': CarData;
   }
   interface CarDetailAttributes extends JSXElements.HTMLAttributes {
-    'car'?: unknown;
+    'car'?: CarData;
   }
 
   interface CarList {
-    'cars': unknown;
-    'selected': unknown;
+    'cars': CarData[];
+    'selected': CarData;
   }
   interface CarListAttributes extends JSXElements.HTMLAttributes {
-    'cars'?: unknown;
-    'onCarSelected'?: (ev: CustomEvent<CarData>) => void;
-    'selected'?: unknown;
+    'cars'?: CarData[];
+    'onCarSelected'?: (event: CustomEvent<CarData>) => void;
+    'selected'?: CarData;
   }
 
   interface DomApi {}
@@ -53,9 +53,9 @@ export namespace Components {
     'methodThatFiresMyWindowEvent': (value: number) => void;
   }
   interface EventCmpAttributes extends JSXElements.HTMLAttributes {
-    'onMy-event-with-options'?: (ev: CustomEvent<{ mph: number }>) => void;
-    'onMyDocumentEvent'?: (ev: CustomEvent<any>) => void;
-    'onMyWindowEvent'?: (ev: CustomEvent<number>) => void;
+    'onMy-event-with-options'?: (event: CustomEvent<{ mph: number }>) => void;
+    'onMyDocumentEvent'?: (event: CustomEvent<any>) => void;
+    'onMyWindowEvent'?: (event: CustomEvent<number>) => void;
   }
 
   interface ListenCmp {
@@ -85,6 +85,11 @@ export namespace Components {
 
   interface StateCmp {}
   interface StateCmpAttributes extends JSXElements.HTMLAttributes {}
+}
+
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
 }
 
 declare global {
@@ -119,73 +124,73 @@ declare global {
   }
 
 
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLCarDetailElement extends Components.CarDetail, HTMLElement {}
+  interface HTMLCarDetailElement extends Components.CarDetail, HTMLStencilElement {}
   var HTMLCarDetailElement: {
     prototype: HTMLCarDetailElement;
     new (): HTMLCarDetailElement;
   };
 
-  interface HTMLCarListElement extends Components.CarList, HTMLElement {}
+  interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {}
   var HTMLCarListElement: {
     prototype: HTMLCarListElement;
     new (): HTMLCarListElement;
   };
 
-  interface HTMLDomApiElement extends Components.DomApi, HTMLElement {}
+  interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {}
   var HTMLDomApiElement: {
     prototype: HTMLDomApiElement;
     new (): HTMLDomApiElement;
   };
 
-  interface HTMLDomInteractionElement extends Components.DomInteraction, HTMLElement {}
+  interface HTMLDomInteractionElement extends Components.DomInteraction, HTMLStencilElement {}
   var HTMLDomInteractionElement: {
     prototype: HTMLDomInteractionElement;
     new (): HTMLDomInteractionElement;
   };
 
-  interface HTMLDomVisibleElement extends Components.DomVisible, HTMLElement {}
+  interface HTMLDomVisibleElement extends Components.DomVisible, HTMLStencilElement {}
   var HTMLDomVisibleElement: {
     prototype: HTMLDomVisibleElement;
     new (): HTMLDomVisibleElement;
   };
 
-  interface HTMLElementCmpElement extends Components.ElementCmp, HTMLElement {}
+  interface HTMLElementCmpElement extends Components.ElementCmp, HTMLStencilElement {}
   var HTMLElementCmpElement: {
     prototype: HTMLElementCmpElement;
     new (): HTMLElementCmpElement;
   };
 
-  interface HTMLEventCmpElement extends Components.EventCmp, HTMLElement {}
+  interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {}
   var HTMLEventCmpElement: {
     prototype: HTMLEventCmpElement;
     new (): HTMLEventCmpElement;
   };
 
-  interface HTMLListenCmpElement extends Components.ListenCmp, HTMLElement {}
+  interface HTMLListenCmpElement extends Components.ListenCmp, HTMLStencilElement {}
   var HTMLListenCmpElement: {
     prototype: HTMLListenCmpElement;
     new (): HTMLListenCmpElement;
   };
 
-  interface HTMLMethodCmpElement extends Components.MethodCmp, HTMLElement {}
+  interface HTMLMethodCmpElement extends Components.MethodCmp, HTMLStencilElement {}
   var HTMLMethodCmpElement: {
     prototype: HTMLMethodCmpElement;
     new (): HTMLMethodCmpElement;
   };
 
-  interface HTMLPropCmpElement extends Components.PropCmp, HTMLElement {}
+  interface HTMLPropCmpElement extends Components.PropCmp, HTMLStencilElement {}
   var HTMLPropCmpElement: {
     prototype: HTMLPropCmpElement;
     new (): HTMLPropCmpElement;
   };
 
-  interface HTMLStateCmpElement extends Components.StateCmp, HTMLElement {}
+  interface HTMLStateCmpElement extends Components.StateCmp, HTMLStencilElement {}
   var HTMLStateCmpElement: {
     prototype: HTMLStateCmpElement;
     new (): HTMLStateCmpElement;

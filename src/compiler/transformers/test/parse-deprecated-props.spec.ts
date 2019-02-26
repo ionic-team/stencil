@@ -1,8 +1,8 @@
-import { transpileModule } from './transpile';
+import { getStaticGetter, transpileModule } from './transpile';
 
 describe('parse deprecated props', () => {
 
-  it('should parse all comments', () => {
+  it('should parse connect and context', () => {
     const t = transpileModule(`
       @Component({
         tag: 'cmp-a'
@@ -12,7 +12,18 @@ describe('parse deprecated props', () => {
         @Prop({ connect: 'ion-menu-controller' }) menuController: HTMLElement;
       }
     `);
-    expect(t.outputText).toEqual('export class CmpA { constructor() { this.isServer = __stencil_getContext("isServer"); this.menuController = __stencil_getConnect("ion-menu-controller"); } static get is() { return "cmp-a"; }}');
+    expect(getStaticGetter(t.outputText, 'contextProps')).toEqual([
+      {'context': 'isServer', 'name': 'isServer'}
+    ]);
+    expect(getStaticGetter(t.outputText, 'connectProps')).toEqual([
+      {'connect': 'ion-menu-controller', 'name': 'menuController'}
+    ]);
+    expect(t.legacyContext).toEqual([
+      {'context': 'isServer', 'name': 'isServer'}
+    ]);
+    expect(t.legacyConnect).toEqual([
+      {'connect': 'ion-menu-controller', 'name': 'menuController'}
+    ]);
   });
 
 });

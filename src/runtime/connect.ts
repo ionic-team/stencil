@@ -1,7 +1,7 @@
 import { getDoc } from '@platform';
 
 
-export const getConnect = (tagName: string, elm: HTMLElement) => {
+export const getConnect = (elm: HTMLElement, tagName: string) => {
   function componentOnReady(): Promise<any> {
     let element = getDoc(elm).querySelector(tagName) as any;
     if (!element) {

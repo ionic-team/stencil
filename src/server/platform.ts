@@ -30,12 +30,15 @@ const Context = {
   }
 };
 
-export const getContext = (context: string, ref: d.RuntimeRef) => {
+export const getContext = (ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
     return getWin(getHostRef(ref).hostElement);
   }
   if (context === 'document') {
     return getDoc(getHostRef(ref).hostElement);
+  }
+  if (context === 'isServer') {
+    return true;
   }
   return (Context as any)[context];
 };

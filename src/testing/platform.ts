@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-export { Host, bootstrapLazy, createEvent, getElement, h } from '@runtime';
+export { Host, bootstrapLazy, createEvent, getElement, getConnect, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
 
@@ -60,12 +60,16 @@ const Context = {
   queue: {}
 };
 
-export function getContext(context: string, elm: Node): any {
+export const getContext = (elm: Node, context: string) => {
   if (context === 'window') {
     return getWin(elm);
   }
   if (context === 'document') {
     return getDoc(elm);
   }
+  if (context === 'isServer') {
+    return true;
+  }
   return (Context as any)[context];
-}
+};
+

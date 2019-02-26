@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { addCreateEvents } from '../create-event';
+import { addLegacyProps } from '../legacy-props';
 import ts from 'typescript';
 import { REGISTER_INSTANCE } from '../exports';
 
@@ -22,7 +23,8 @@ export function updateLazyComponentConstructor(classMembers: ts.ClassElement[], 
     const body = ts.updateBlock(cstrMethod.body, [
       registerInstanceStatement(),
       ...cstrMethod.body.statements,
-      ...addCreateEvents(cmp)
+      ...addCreateEvents(cmp),
+      ...addLegacyProps(cmp)
     ]);
 
     classMembers[cstrMethodIndex] = ts.updateConstructor(
@@ -41,7 +43,8 @@ export function updateLazyComponentConstructor(classMembers: ts.ClassElement[], 
       cstrMethodArgs,
       ts.createBlock([
         registerInstanceStatement(),
-        ...addCreateEvents(cmp)
+        ...addCreateEvents(cmp),
+        ...addLegacyProps(cmp)
       ], true),
     );
     classMembers.unshift(cstrMethod);

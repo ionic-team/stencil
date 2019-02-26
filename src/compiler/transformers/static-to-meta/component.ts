@@ -1,12 +1,12 @@
+import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
-import * as d from '@declarations';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { convertValueToLiteral, createStaticGetter, getComponentTagName, isStaticGetter, serializeSymbol, isInternal } from '../transform-utils';
-import { parseStaticMethods } from './methods';
+import { convertValueToLiteral, createStaticGetter, getComponentTagName, isInternal, isStaticGetter, serializeSymbol, getStaticValue } from '../transform-utils';
+import * as d from '@declarations';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
 import { parseStaticWatchers } from './watchers';
@@ -14,6 +14,7 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
+import { transformHostData } from '../transforms/host-data-transform';
 
 
 export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
@@ -32,6 +33,11 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`);
   }
 
+  let classMembers = [...cmpNode.members];
+
+  // Transform hostData()
+  transformHostData(classMembers);
+
   const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
   const docs = serializeSymbol(typeChecker, symbol);
   const cmp: d.ComponentCompilerMeta = {
@@ -49,6 +55,8 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(tagName, moduleFile.sourceFilePath, staticMembers),
+    legacyConnect: getStaticValue(staticMembers, 'connectProps'),
+    legacyContext: getStaticValue(staticMembers, 'contextProps'),
     internal: isInternal(docs),
     styleDocs: [],
     dependencies: [],
@@ -131,18 +139,18 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.sourceFilePath;
 
     const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
-    const classMembers = [...cmpNode.members, cmpMetaStaticProp];
-
-    cmpNode = ts.updateClassDeclaration(
-      cmpNode,
-      cmpNode.decorators,
-      cmpNode.modifiers,
-      cmpNode.name,
-      cmpNode.typeParameters,
-      cmpNode.heritageClauses,
-      classMembers
-    );
+    classMembers = [...classMembers, cmpMetaStaticProp];
   }
+
+  cmpNode = ts.updateClassDeclaration(
+    cmpNode,
+    cmpNode.decorators,
+    cmpNode.modifiers,
+    cmpNode.name,
+    cmpNode.typeParameters,
+    cmpNode.heritageClauses,
+    classMembers
+  );
 
   // add to module map
   moduleFile.cmps.push(cmp);

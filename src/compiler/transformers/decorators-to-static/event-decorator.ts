@@ -50,7 +50,7 @@ export function getEventName(diagnostics: d.Diagnostic[], eventOptions: d.EventO
 
   // event name wasn't provided
   // so let's default to use the member name
-  validateEventEmitterMemeberName(diagnostics, memberName);
+  validateEventEmitterMemberName(diagnostics, memberName);
 
   return memberName;
 }
@@ -76,7 +76,7 @@ function getEventType(type: ts.TypeNode): ts.TypeNode | null {
   return null;
 }
 
-export function validateEventEmitterMemeberName(diagnostics: d.Diagnostic[], memberName: string) {
+function validateEventEmitterMemberName(diagnostics: d.Diagnostic[], memberName: string) {
   const firstChar = memberName.charAt(0);
 
   if (/[A-Z]/.test(firstChar)) {

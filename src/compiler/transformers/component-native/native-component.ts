@@ -16,7 +16,7 @@ export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: 
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode),
-    updateNatveHostComponentMembers(classNode, cmp, build)
+    updateNativeHostComponentMembers(classNode, cmp, build)
   );
 }
 
@@ -36,7 +36,7 @@ function updateNativeHostComponentHeritageClauses(classNode: ts.ClassDeclaration
 }
 
 
-function updateNatveHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
+function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, cmp, build, true);

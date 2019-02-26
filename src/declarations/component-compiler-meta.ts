@@ -72,8 +72,20 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styles: d.StyleCompiler[];
   tagName: string;
   internal: boolean;
+
+  legacyConnect?: ComponentCompilerLegacyConnect[];
+  legacyContext?: ComponentCompilerLegacyContext[];
 }
 
+export interface ComponentCompilerLegacyConnect {
+  name: string;
+  connect: string;
+}
+
+export interface ComponentCompilerLegacyContext {
+  name: string;
+  context: string;
+}
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 

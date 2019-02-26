@@ -14,5 +14,5 @@ const Context = {
   }
 };
 
-export const getContext = (context: string, _elm?: HTMLElement) =>
+export const getContext = (_elm: HTMLElement, context: string) =>
   (Context as any)[context];
