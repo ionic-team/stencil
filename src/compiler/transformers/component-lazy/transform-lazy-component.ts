@@ -8,10 +8,8 @@ import ts from 'typescript';
 
 export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
   if (buildCtx.shouldAbort) {
-    console.log('abort');
     return null;
   }
-  console.log('here');
 
   let outputText: string = null;
 
@@ -30,7 +28,6 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
     };
 
     const transpileOutput = ts.transpileModule(inputText, transpileOpts);
-    console.log(buildCtx.hasError, transpileOutput.outputText);
 
     loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
 
