@@ -44,13 +44,16 @@ export function parseClassMethods(typeChecker: ts.TypeChecker, cmpNode: ts.Class
     }
   }
 
+  const hasHostData = classMethods.some(m => isMethod(m, 'hostData'));
+
   cmpMeta.hasComponentDidRenderFn = classMethods.some(m => isMethod(m, 'componentDidRender'));
   cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
   cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
   cmpMeta.hasComponentDidUnloadFn = classMethods.some(m => isMethod(m, 'componentDidUnload'));
   cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn);
 
-  cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render'));
+  cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render')) || hasHostData;
+  cmpMeta.hasVdomRender = cmpMeta.hasVdomRender || hasHostData;
 }
 
 

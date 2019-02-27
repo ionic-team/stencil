@@ -14,7 +14,6 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
-import { transformHostData } from '../transforms/host-data-transform';
 
 
 export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
@@ -33,14 +32,10 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`);
   }
 
-  let classMembers = [...cmpNode.members];
-
-  // Transform hostData()
-  transformHostData(classMembers);
-
   const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
   const docs = serializeSymbol(typeChecker, symbol);
   const cmp: d.ComponentCompilerMeta = {
+    isLegacy: false,
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency: moduleFile.isCollectionDependency,
@@ -139,18 +134,18 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     delete copyCmp.sourceFilePath;
 
     const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
-    classMembers = [...classMembers, cmpMetaStaticProp];
-  }
+    const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
-  cmpNode = ts.updateClassDeclaration(
-    cmpNode,
-    cmpNode.decorators,
-    cmpNode.modifiers,
-    cmpNode.name,
-    cmpNode.typeParameters,
-    cmpNode.heritageClauses,
-    classMembers
-  );
+    cmpNode = ts.updateClassDeclaration(
+      cmpNode,
+      cmpNode.decorators,
+      cmpNode.modifiers,
+      cmpNode.name,
+      cmpNode.typeParameters,
+      cmpNode.heritageClauses,
+      classMembers
+    );
+  }
 
   // add to module map
   moduleFile.cmps.push(cmp);

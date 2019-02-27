@@ -78,6 +78,7 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
       isCollectionDependency: false,
       jsFilePath: null,
       localImports: [],
+      isLegacy: false,
       originalCollectionComponentPath: null
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);

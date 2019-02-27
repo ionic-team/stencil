@@ -71,6 +71,11 @@ export declare const setMode: (handler: ((elm: HTMLElement) => string | undefine
 export declare function getMode<T = (string | undefined)>(ref: any): T;
 
 /**
+ * getAssetPath
+ */
+export declare function getAssetPath(path: string): string;
+
+/**
  * Host
  */
 export declare const Host: d.FunctionalComponent<any>;

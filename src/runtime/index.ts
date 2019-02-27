@@ -11,6 +11,7 @@ export { h, Host } from './vdom/h';
 export { proxyNative, proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/render';
 export { setMode, getMode } from './mode';
+export { getAssetPath } from './get-asset-path';
 
 export const Build: d.UserBuildConditionals = {
   isDev: BUILD.isDev

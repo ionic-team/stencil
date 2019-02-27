@@ -68,7 +68,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     config.outputTargets.push({
       type: 'dist-lazy',
-      dir: outputTarget.buildDir,
+      dir: path.join(outputTarget.buildDir, config.fsNamespace),
       empty: outputTarget.empty
     });
 

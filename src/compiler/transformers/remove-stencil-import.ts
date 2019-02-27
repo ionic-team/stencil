@@ -36,5 +36,6 @@ export const KEEP_IMPORTS = [
   'setMode',
   'getMode',
   'Build',
-  'Host'
+  'Host',
+  'getAssetPath'
 ];

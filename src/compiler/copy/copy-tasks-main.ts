@@ -8,7 +8,7 @@ import { sys } from '@sys';
 export async function copyTasksMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
     const cmpAssetsCopyTasks = getComponentAssetsCopyTasks(config, compilerCtx, buildCtx, buildCtx.filesChanged);
-    const configCopyTasks = await getConfigCopyTasks(config, buildCtx, );
+    const configCopyTasks = await getConfigCopyTasks(config, buildCtx);
 
     const copyTasks = [
       ...configCopyTasks,

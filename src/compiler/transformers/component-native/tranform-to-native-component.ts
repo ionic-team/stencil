@@ -58,7 +58,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): t
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addNativeImports(transformCtx, tsSourceFile);
+      tsSourceFile = addNativeImports(transformCtx, compilerCtx, tsSourceFile);
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };

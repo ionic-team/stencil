@@ -19,11 +19,13 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   const moduleFile = getModule(compilerCtx, sourceFilePath);
 
   moduleFile.isCollectionDependency = true;
+  moduleFile.isLegacy = true;
   moduleFile.collectionName = collection.collectionName;
   moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);
   moduleFile.originalCollectionComponentPath = cmpData.componentPath;
   moduleFile.jsFilePath = parseJsFilePath(collectionDir, cmpData);
   const cmpMeta: d.ComponentCompilerMeta = {
+    isLegacy: moduleFile.isLegacy,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency: moduleFile.isCollectionDependency,
 
@@ -49,6 +51,8 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     events: parseEvents(cmpData),
     encapsulation: parseEncapsulation(cmpData),
     watchers: parseWatchers(cmpData),
+    legacyConnect: parseConnectProps(cmpData),
+    legacyContext: parseContextProps(cmpData),
 
     hasAsyncLifecycle: false,
     hasAttributeChangedCallbackFn: false,
@@ -253,6 +257,39 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
         text: '',
         tags: []
       }
+    };
+    return prop;
+  });
+}
+
+
+function parseConnectProps(cmpData: d.ComponentDataDeprecated) {
+  const connectData = cmpData.connect;
+
+  if (invalidArrayData(connectData)) {
+    return [];
+  }
+
+  return connectData.map(propData => {
+    const prop: d.ComponentCompilerLegacyConnect = {
+      name: propData.name,
+      connect: propData.tag
+    };
+    return prop;
+  });
+}
+
+function parseContextProps(cmpData: d.ComponentDataDeprecated) {
+  const contextData = cmpData.context;
+
+  if (invalidArrayData(contextData)) {
+    return [];
+  }
+
+  return contextData.map(propData => {
+    const prop: d.ComponentCompilerLegacyContext = {
+      name: propData.name,
+      context: propData.id
     };
     return prop;
   });

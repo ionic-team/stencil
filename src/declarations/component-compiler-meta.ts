@@ -58,6 +58,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   encapsulation: Encapsulation;
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
+  isLegacy: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
@@ -73,8 +74,8 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   tagName: string;
   internal: boolean;
 
-  legacyConnect?: ComponentCompilerLegacyConnect[];
-  legacyContext?: ComponentCompilerLegacyContext[];
+  legacyConnect: ComponentCompilerLegacyConnect[];
+  legacyContext: ComponentCompilerLegacyContext[];
 }
 
 export interface ComponentCompilerLegacyConnect {

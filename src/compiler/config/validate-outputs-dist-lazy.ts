@@ -15,7 +15,7 @@ export function validateOutputTargetDistLazy(config: d.Config) {
     outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
 
     if (!outputTarget.dir) {
-      outputTarget.dir = DEFAULT_DIR;
+      outputTarget.dir = path.join(DEFAULT_DIR, config.fsNamespace);
     }
 
     if (!path.isAbsolute(outputTarget.dir)) {

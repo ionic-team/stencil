@@ -14,6 +14,7 @@ export interface Module {
   excludeFromCollection: boolean;
   externalImports: string[];
   isCollectionDependency: boolean;
+  isLegacy: boolean;
   jsFilePath: string;
   localImports: string[];
   originalCollectionComponentPath: string;

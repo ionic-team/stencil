@@ -61,7 +61,7 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.Trans
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addLazyImports(transformCtx, tsSourceFile);
+      tsSourceFile = addLazyImports(transformCtx, compilerCtx, tsSourceFile);
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
