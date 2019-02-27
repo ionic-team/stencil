@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { CompilerUpgrade, validateCollectionCompatibility } from '../collections/collection-compatibility';
+import { CompilerUpgrade, validateCollectionCompatibility } from '../transformers/collections/collection-compatibility';
 import { logger, sys } from '@sys';
 
 

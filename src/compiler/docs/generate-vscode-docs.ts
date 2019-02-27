@@ -21,11 +21,13 @@ function serializeAttribute(prop: d.JsonDocsProp) {
     'name': prop.attr,
     'description': prop.docs,
   };
-  const unions = prop.type.split('|').map(u => u.trim()).filter(u => u !== 'undefined' && u !== 'null');
-  const includeValues = unions.every(u => /^("|').+("|')$/gm.test(u));
-  if (includeValues) {
-    attribute.values = unions.map(u => ({
-      name: u.slice(1, -1)
-    }));
+  if (typeof prop.type === 'string') {
+    const unions = prop.type.split('|').map(u => u.trim()).filter(u => u !== 'undefined' && u !== 'null');
+    const includeValues = unions.every(u => /^("|').+("|')$/gm.test(u));
+    if (includeValues) {
+      attribute.values = unions.map(u => ({
+        name: u.slice(1, -1)
+      }));
+    }
   }
 }

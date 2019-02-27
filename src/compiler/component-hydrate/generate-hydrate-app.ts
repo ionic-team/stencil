@@ -2,14 +2,12 @@ import * as d from '@declarations';
 import { bundleHydrateCore } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { getComponentsFromModules } from '../output-targets/output-utils';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
-import { getComponentsFromModules } from '../output-targets/output-utils';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
-  const timespan = buildCtx.createTimeSpan(`generate hydrate app started`, true);
-
   try {
     const cmps = getComponentsFromModules(buildCtx.moduleFiles);
     const build = getBuildConditionals(config, cmps);
@@ -23,8 +21,6 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
-
-  timespan.finish(`generate hydrate app finished`);
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
@@ -39,6 +35,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   updateBuildConditionals(config, build);
   build.lifecycleDOMEvents = false;
   build.hotModuleReplacement = false;
+  build.slotRelocation = true;
   return build;
 }
 
