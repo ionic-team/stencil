@@ -262,12 +262,6 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
       docs: {
         text: '',
         tags: []
-      },
-      complexType: {
-        // TODO
-        original: null,
-        resolved: null,
-        references: {}
       }
     };
     return prop;
