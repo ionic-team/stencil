@@ -89,7 +89,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     const collectedPaths: d.FsReaddirItem[] = [];
 
-    if (opts.inMemoryOnly) {
+    if (opts.inMemoryOnly === true) {
       let inMemoryDir = dirPath;
       if (!inMemoryDir.endsWith('/')) {
         inMemoryDir += '/';
@@ -163,7 +163,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         isFile: stats.isFile
       });
 
-      if (opts.recursive && stats.isDirectory) {
+      if (opts.recursive === true && stats.isDirectory === true) {
         // looks like it's yet another directory
         // let's keep drilling down
         await this.readDirectory(initPath, absPath, opts, collectedPaths);
@@ -221,10 +221,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   async remove(itemPath: string) {
     const stats = await this.stat(itemPath);
 
-    if (stats.isDirectory) {
+    if (stats.isDirectory === true) {
       await this.removeDir(itemPath);
 
-    } else if (stats.isFile) {
+    } else if (stats.isFile === true) {
       await this.removeItem(itemPath);
     }
   }
@@ -309,7 +309,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       queuedWrite: false
     };
 
-    if (shouldIgnore(filePath)) {
+    if (shouldIgnore(filePath) === true) {
       results.ignored = true;
       return results;
     }
@@ -320,7 +320,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     item.isDirectory = false;
     item.queueDeleteFromDisk = false;
 
-    results.changedContent = item.fileText !== content;
+    results.changedContent = (item.fileText !== content);
     results.queuedWrite = false;
 
     item.fileText = content;
@@ -329,7 +329,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.useCache = false;
     }
 
-    if (opts != null && opts.inMemoryOnly) {
+    if (opts != null && opts.inMemoryOnly === true) {
       // we don't want to actually write this to disk
       // just keep it in memory
       if (item.queueWriteToDisk) {
@@ -342,24 +342,24 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         // it wasn't already queued to be written
         item.queueWriteToDisk = false;
       }
-    } else if (opts != null && opts.immediateWrite) {
+    } else if (opts != null && opts.immediateWrite === true) {
 
       // If this is an immediate write then write the file
       // and do not add it to the queue
+      await this.ensureDir(filePath);
       await this.disk.writeFile(filePath, item.fileText);
 
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
       // from our existing cached content
-      if (!item.queueWriteToDisk && results.changedContent) {
+      if (!item.queueWriteToDisk && results.changedContent === true) {
         // not already queued to be written
         // and the content is different
         item.queueWriteToDisk = true;
         results.queuedWrite = true;
       }
     }
-
 
     return results;
   }
@@ -402,13 +402,30 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     };
   }
 
+  private async ensureDir(p: string) {
+    const allDirs: string[] = [];
+
+    while (true) {
+      p = this.path.dirname(p);
+      if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false) {
+        allDirs.push(p);
+      } else {
+        break;
+      }
+    }
+
+    allDirs.reverse();
+
+    await this.commitEnsureDirs(allDirs);
+  }
+
   private async commitEnsureDirs(dirsToEnsure: string[]) {
     const dirsAdded: string[] = [];
 
     for (const dirPath of dirsToEnsure) {
       const item = this.getItem(dirPath);
 
-      if (item.exists && item.isDirectory) {
+      if (item.exists === true && item.isDirectory === true) {
         // already cached that this path is indeed an existing directory
         continue;
       }
@@ -500,7 +517,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   cancelDeleteFilesFromDisk(filePaths: string[]) {
     filePaths.forEach(filePath => {
       const item = this.getItem(filePath);
-      if (item.isFile && item.queueDeleteFromDisk) {
+      if (item.isFile === true && item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
     });
@@ -509,7 +526,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   cancelDeleteDirectoriesFromDisk(dirPaths: string[]) {
     dirPaths.forEach(dirPath => {
       const item = this.getItem(dirPath);
-      if (item.queueDeleteFromDisk) {
+      if (item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
     });
@@ -561,9 +578,9 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
 
   d.forEach((item, itemPath) => {
 
-    if (item.queueWriteToDisk) {
+    if (item.queueWriteToDisk === true) {
 
-      if (item.isFile) {
+      if (item.isFile === true) {
         instructions.filesToWrite.push(itemPath);
 
         const dir = normalizePath(path.dirname(itemPath));
@@ -581,7 +598,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
           instructions.filesToDelete.splice(fileDeleteIndex, 1);
         }
 
-      } else if (item.isDirectory) {
+      } else if (item.isDirectory === true) {
         if (!instructions.dirsToEnsure.includes(itemPath)) {
           instructions.dirsToEnsure.push(itemPath);
         }
@@ -592,7 +609,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
         }
       }
 
-    } else if (item.queueDeleteFromDisk) {
+    } else if (item.queueDeleteFromDisk === true) {
       if (item.isDirectory && !instructions.dirsToEnsure.includes(itemPath)) {
         instructions.dirsToDelete.push(itemPath);
 
@@ -611,7 +628,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
 
     for (let j = 2; j < segments.length; j++) {
       const dir = segments.slice(0, j).join('/');
-      if (!instructions.dirsToEnsure.includes(dir)) {
+      if (instructions.dirsToEnsure.includes(dir) === false) {
         instructions.dirsToEnsure.push(dir);
       }
     }
@@ -647,7 +664,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
   });
 
   instructions.dirsToDelete = instructions.dirsToDelete.filter(dir => {
-    if (dir === '/' || dir.endsWith(':/')) {
+    if (dir === '/' || dir.endsWith(':/') === true) {
       return false;
     }
     return true;
@@ -655,7 +672,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
 
   instructions.dirsToEnsure = instructions.dirsToEnsure.filter(dir => {
     const item = d.get(dir);
-    if (item != null && item.exists && item.isDirectory) {
+    if (item != null && item.exists === true && item.isDirectory === true) {
       return false;
     }
     if (dir === '/' || dir.endsWith(':/')) {
