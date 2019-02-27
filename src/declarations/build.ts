@@ -1,4 +1,5 @@
 import * as d from '.';
+import { ModuleFormat } from 'rollup';
 
 export interface RollupResultModule {
   id: string;
@@ -224,13 +225,10 @@ export interface BundleOutputChunk {
 
 export type SourceTarget = 'es5' | 'es2017';
 
-export type ModuleFormat = 'esm' | 'amd' | 'cjs';
-
 export interface BundleCoreOptions {
   coreChunk?: boolean;
   entryInputs: BundleEntryInputs;
   loader: {[id: string]: string};
-  moduleFormats: d.ModuleFormat[];
 }
 
 export interface BundleEntryInputs {

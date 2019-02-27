@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
-import { bundleApp } from '../app-core/bundle-app-core';
+import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
 
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
@@ -39,7 +39,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
 async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const bundleCoreOptions: d.BundleCoreOptions = {
-    moduleFormats: ['esm'],
     loader: {
       '@stencil/core/app': CORE,
       '@core-entrypoint': BROWSER_ENTRY,
@@ -55,7 +54,8 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
     bundleCoreOptions.entryInputs[entryModule.entryKey] = entryModule.entryKey;
   });
 
-  return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  return generateRollupBuild(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 
 const CORE = `

@@ -244,6 +244,7 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
   }
 
   return propsData.map(propData => {
+    const type = convertType(propData.type);
     const prop: d.ComponentCompilerProperty = {
       name: propData.name,
       attribute: (typeof propData.attr === 'string' ? propData.attr : null),
@@ -251,8 +252,13 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
       optional: true,
       required: false,
       reflect: !!propData.reflectToAttr,
-      type: convertType(propData.type),
+      type,
       internal: false,
+      complexType: {
+        original: type,
+        resolved: type,
+        references: {},
+      },
       docs: {
         text: '',
         tags: []

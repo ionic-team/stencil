@@ -96,7 +96,7 @@ export interface ComponentCompilerStaticProperty {
   optional: boolean;
   required: boolean;
   type: ComponentCompilerPropertyType;
-  complexType?: ComponentCompilerPropertyComplexType;
+  complexType: ComponentCompilerPropertyComplexType;
   attribute?: string;
   reflect?: boolean;
   docs: CompilerJsDoc;

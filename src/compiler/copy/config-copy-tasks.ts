@@ -3,7 +3,7 @@ import { buildError, normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 import { sys } from '@sys';
-import { isOutputTargetBuild } from '../output-targets/output-utils';
+// import { isOutputTargetBuild } from '../output-targets/output-utils';
 
 
 export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx) {
@@ -35,7 +35,7 @@ export async function getConfigCopyTasks(config: d.Config, buildCtx: d.BuildCtx)
 }
 
 
-export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask): Promise<any> {
+export async function processCopyTasks(_config: d.Config, _allCopyTasks: d.CopyTask[], copyTask: d.CopyTask): Promise<any> {
   if (!copyTask) {
     // possible null was set, which is fine, just skip over this one
     return;
@@ -49,21 +49,21 @@ export async function processCopyTasks(config: d.Config, allCopyTasks: d.CopyTas
     throw new Error(`copy "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
+  // const outputTargets = config.outputTargets.filter(isOutputTargetBuild);
 
-  if (isGlob(copyTask.src)) {
-    const copyTasks = await processGlob(config, outputTargets, copyTask);
-    allCopyTasks.push(...copyTasks);
-    return;
-  }
+  // if (isGlob(copyTask.src)) {
+  //   const copyTasks = await processGlob(config, outputTargets, copyTask);
+  //   allCopyTasks.push(...copyTasks);
+  //   return;
+  // }
 
-  await Promise.all(outputTargets.map(async outputTarget => {
-    await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.dir);
-  }));
+  // await Promise.all(outputTargets.map(async outputTarget => {
+  //   await processCopyTaskDestDir(config, allCopyTasks, copyTask, outputTarget.dir);
+  // }));
 }
 
 
-async function processCopyTaskDestDir(config: d.Config, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask, destAbsDir: string) {
+export async function processCopyTaskDestDir(config: d.Config, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask, destAbsDir: string) {
   const processedCopyTask: d.CopyTask = {
     src: getSrcAbsPath(config, copyTask.src),
     dest: getDestAbsPath(copyTask.src, destAbsDir, copyTask.dest)
@@ -75,7 +75,7 @@ async function processCopyTaskDestDir(config: d.Config, allCopyTasks: d.CopyTask
 }
 
 
-async function processGlob(config: d.Config, outputTargets: d.OutputTargetBuild[], copyTask: d.CopyTask) {
+export async function processGlob(config: d.Config, outputTargets: d.OutputTargetBuild[], copyTask: d.CopyTask) {
   const globCopyTasks: d.CopyTask[] = [];
 
   const globOpts = {

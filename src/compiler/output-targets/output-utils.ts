@@ -74,10 +74,6 @@ export function isOutputTargetWww(o: d.OutputTarget): o is d.OutputTargetWww {
   return o.type === 'www';
 }
 
-export function isOutputTargetBuild(o: d.OutputTarget): o is d.OutputTargetBuild {
-  return o.type === 'dist-collection' || o.type === 'dist-lazy' || o.type === 'www';
-}
-
 export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats {
   return o.type === 'stats';
 }

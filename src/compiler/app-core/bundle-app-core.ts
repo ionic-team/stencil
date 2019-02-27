@@ -4,14 +4,12 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
-import { OutputAsset, OutputChunk, OutputOptions, RollupOptions } from 'rollup'; // types only
+import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
-  const rollupResults: d.RollupResult[] = [];
-
   try {
     const rollupOptions: RollupOptions = {
       input: {
@@ -50,29 +48,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     }
 
     const rollupBuild = await sys.rollup.rollup(rollupOptions);
-
-    const outputOptions = bundleCoreOptions.moduleFormats.map(moduleFormat => {
-      const outputOptions: OutputOptions = {
-        format: moduleFormat
-      };
-      return outputOptions;
-    });
-
-    const generatePromises = outputOptions.map(async outputOption => {
-      const { output } = await rollupBuild.generate({
-        ...outputOption,
-        chunkFileNames: config.devMode ? '[name]-[hash].js' : '[hash].js'
-      });
-
-      if (!buildCtx.shouldAbort) {
-        const outputPromises = output.map(rollupOutput => {
-          return createRollupResult(config, outputOption.format as any, rollupOutput, buildCtx.entryModules);
-        });
-        rollupResults.push(...(await Promise.all(outputPromises)));
-      }
-    });
-
-    await Promise.all(generatePromises);
+    return rollupBuild;
 
   } catch (e) {
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
@@ -82,29 +58,22 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     }
   }
 
-  return rollupResults;
+  return undefined;
 }
 
-
-async function createRollupResult(config: d.Config, moduleFormat: d.ModuleFormat, rollupOutput: OutputAsset | OutputChunk, entryModules: d.EntryModule[]) {
-  const rollupChunk = rollupOutput as OutputChunk;
-  const rollupResult: d.RollupResult = {
-    fileName: rollupOutput.fileName,
-    code: rollupOutput.code,
-    moduleFormat: moduleFormat,
-    entryKey: null,
-    isEntry: !!rollupChunk.isEntry,
-    isComponent: !!rollupChunk.isEntry && entryModules.some(m => m.entryKey === rollupChunk.name),
-    isAppCore: rollupChunk.name === config.fsNamespace
-  };
-
-  if (!rollupResult.isEntry) {
-    return rollupResult;
-  }
-
-  rollupResult.entryKey = rollupChunk.name;
-
-  return rollupResult;
+export async function generateRollupBuild(build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> {
+  const { output } = await build.generate(options);
+  return output
+    .filter(chunk => !('isAsset' in chunk))
+    .map((chunk: OutputChunk) => ({
+      fileName: chunk.fileName,
+      code: chunk.code,
+      moduleFormat: options.format,
+      entryKey: chunk.name,
+      isEntry: !!chunk.isEntry,
+      isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
+      isAppCore: chunk.name === config.fsNamespace
+    }));
 }
 
 export const DEFAULT_CORE = `

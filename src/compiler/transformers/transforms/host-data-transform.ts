@@ -2,9 +2,9 @@ import ts from 'typescript';
 import { H, HOST } from '../exports';
 
 export function transformHostData(classElements: ts.ClassElement[]) {
-  const hasHostData = !!classElements.find(e => ts.isMethodDeclaration(e) && e.name.getText() === 'hostData');
+  const hasHostData = !!classElements.find(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
   if (hasHostData) {
-    const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && e.name.getText() === 'render');
+    const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
       classElements[renderIndex] = ts.updateMethod(

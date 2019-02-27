@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
-import { bundleApp } from '../app-core/bundle-app-core';
+import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
 import { sys } from '@sys';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
@@ -72,12 +72,13 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const bundleCoreOptions: d.BundleCoreOptions = {
     entryInputs: {},
-    moduleFormats: ['esm'],
     loader: {
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
     }
   };
-  return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  return generateRollupBuild(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 
 function generateEntryPoint(entryModules: d.EntryModule[]) {
