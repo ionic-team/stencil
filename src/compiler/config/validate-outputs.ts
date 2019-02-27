@@ -59,6 +59,7 @@ const VALID_TYPES = [
   'docs-json',
   'docs-custom',
   'docs-vscode',
+  'hydrate',
   'stats',
   'www'
 ];

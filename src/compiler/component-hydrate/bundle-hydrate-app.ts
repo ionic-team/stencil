@@ -6,8 +6,8 @@ import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { logger, sys } from '@sys';
 import { RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
-import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
 
 
 export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], coreSource: string) {
@@ -16,6 +16,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
   try {
     const rollupOptions: RollupOptions = {
       input: '@core-entrypoint',
+      inlineDynamicImports: true,
       plugins: [
         stencilLoaderPlugin({
           '@core-entrypoint': SERVER_ENTRY,
