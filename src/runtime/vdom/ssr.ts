@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '@utils';
 
 
-export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
+export function createVNodesFromSsr(plt: any, domApi: any, rootElm: Element) {
   const allSsrElms: d.HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
   const ilen = allSsrElms.length;
   let elm: d.HostElement,
@@ -30,7 +30,7 @@ export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootEl
 }
 
 
-function addChildSsrVNodes(domApi: d.DomApi, node: d.RenderNode, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean) {
+function addChildSsrVNodes(domApi: any, node: d.RenderNode, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean) {
   const nodeType = domApi.$nodeType(node);
   let previousComment: Comment;
   let childVNodeId: string,

@@ -17,7 +17,6 @@ export * from './dev-inspector';
 export * from './dev-server';
 export * from './diagnostics';
 export * from './docs';
-export * from './dom';
 export * from './entry';
 export * from './events';
 export * from './file-system';
