@@ -17,7 +17,7 @@ export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
     lines: []
   };
 
-  if (rollupError.loc && rollupError.loc.file) {
+  if (rollupError.loc != null && typeof rollupError.loc.file === 'string') {
     diagnostic.absFilePath = rollupError.loc.file;
 
     try {
@@ -38,7 +38,7 @@ export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
         diagnostic.columnNumber = errorLine.errorCharStart;
 
         const highlightLine = errorLine.text.substr(rollupError.loc.column);
-        for (var i = 0; i < highlightLine.length; i++) {
+        for (let i = 0; i < highlightLine.length; i++) {
           if (charBreak.has(highlightLine.charAt(i))) {
             break;
           }
@@ -133,6 +133,5 @@ function formatErrorCode(errorCode: any) {
       return toTitleCase(c.toLowerCase());
     }).join(' ');
   }
-
-  return errorCode;
+  return errorCode || '';
 }
