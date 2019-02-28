@@ -16,8 +16,17 @@ export function validateOutputTargetHydrate(config: d.Config) {
 
     if (hasWwwOutput && config.flags && config.flags.prerender) {
       // we're prerendering a www output target, so we'll need a hydrate app
+      let hydrateDir: string;
+      const distOutput = config.outputTargets.find(isOutputTargetDist);
+      if (distOutput != null && typeof distOutput.dir === 'string') {
+        hydrateDir = sys.path.join(distOutput.dir, 'hydrate');
+      } else {
+        hydrateDir = 'dist/hydrate';
+      }
+
       const hydrateForWwwOutputTarget: d.OutputTargetHydrate = {
-        type: 'hydrate'
+        type: 'hydrate',
+        dir: hydrateDir
       };
       config.outputTargets.push(hydrateForWwwOutputTarget);
     }
@@ -29,15 +38,7 @@ export function validateOutputTargetHydrate(config: d.Config) {
   hydrateOutputTargets.forEach(outputTarget => {
     if (typeof outputTarget.dir !== 'string') {
       // no directory given, see if we've got a dist to go off of
-      const distOutput = config.outputTargets.find(isOutputTargetDist);
-      if (distOutput != null) {
-        // a dist dir is set, go off of that
-        outputTarget.dir = sys.path.join(distOutput.dir, 'hydrate');
-
-      } else {
-        // no default dist dir set, so let's do a default
-        outputTarget.dir = sys.path.join(config.rootDir, 'dist', 'hydrate');
-      }
+      outputTarget.dir = 'hydrate';
     }
 
     if (!sys.path.isAbsolute(outputTarget.dir)) {
