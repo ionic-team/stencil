@@ -148,7 +148,7 @@ export function getDestAbsPath(config: d.Config, src: string, destAbsPath: strin
   }
 
   if (config.sys.path.isAbsolute(src)) {
-    throw new Error(`copy task, "to" property must exist if "from" property is an absolute path: ${src}`);
+    throw new Error(`copy task, "dest" property must exist if "src" property is an absolute path: ${src}`);
   }
 
   return config.sys.path.join(destAbsPath, src);
