@@ -18,8 +18,10 @@ async function bundleServer() {
   const rollupBuild = await rollup.rollup({
     input: INPUT_FILE,
     external: [
-      '@stencil/core/app-components',
-      '@stencil/core/build-conditionals'
+      '@stencil/core/build-conditionals',
+      '../mock-doc',
+      '../runtime',
+      '../utils'
     ],
     plugins: [
       (() => {
@@ -29,16 +31,16 @@ async function bundleServer() {
               return '@stencil/core/build-conditionals';
             }
             if (id === '@mock-doc') {
-              return path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
+              return '../mock-doc';
+            }
+            if (id === '@runtime') {
+              return '../runtime';
+            }
+            if (id === '@utils') {
+              return '../utils';
             }
             if (id === '@platform') {
               return path.join(TRANSPILED_DIR, 'server', 'index.js');
-            }
-            if (id === '@runtime') {
-              return path.join(TRANSPILED_DIR, 'runtime', 'index.js');
-            }
-            if (id === '@utils') {
-              return path.join(TRANSPILED_DIR, 'utils', 'index.js');
             }
           }
         }
@@ -60,9 +62,9 @@ async function bundleServer() {
     file: SERVER_DIST_FILE
   });
 
-  const outputText = updateBuildIds(output[0].code);
+  await fs.emptyDir(SERVER_DIST_DIR);
 
-  await fs.ensureDir(path.dirname(SERVER_DIST_FILE));
+  const outputText = updateBuildIds(output[0].code);
   await fs.writeFile(SERVER_DIST_FILE, outputText);
 }
 

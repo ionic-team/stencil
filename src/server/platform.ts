@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { getHostRef } from '../client';
 
 
 export const getDoc = (elm?: Node) => elm.ownerDocument;
@@ -43,23 +42,43 @@ export const getContext = (ref: d.RuntimeRef, context: string) => {
   return (Context as any)[context];
 };
 
+export const plt: d.PlatformRuntime = {};
+
+export const supportsShadowDom = false;
+
+export const supportsListenerOptions = false;
+
+const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
+
+export const getHostRef = (ref: d.RuntimeRef) =>
+  hostRefs.get(ref);
+
+export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
+  hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
+
+export const registerHost = (elm: d.HostElement) => {
+  const hostRef: d.HostRef = {
+    stateFlags: 0,
+    hostElement: elm,
+    instanceValues: new Map()
+  };
+  return hostRefs.set(elm, hostRef);
+};
+
+
+export const styles: d.StyleMap = new Map();
+
+export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
+
 
 export {
-  plt,
-  registerInstance,
-  registerHost,
-  supportsShadowDom,
-  supportsListenerOptions,
   connectedCallback,
   createEvent,
   getConnect,
   getElement,
   setMode,
   getMode,
-  getHostRef,
-  styles,
-  rootAppliedStyles,
   Build,
   Host,
   h
-} from '../client';
+} from '@runtime';

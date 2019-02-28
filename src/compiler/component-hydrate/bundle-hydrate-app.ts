@@ -28,15 +28,18 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
         componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
-          main: true
+          main: true,
+          preferBuiltins: true
         }),
         sys.rollup.plugins.emptyJsResolver(),
         sys.rollup.plugins.commonjs({
-          include: 'node_modules/**',
           sourceMap: false
         }),
         inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
+      ],
+      external: [
+        'url'
       ],
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };

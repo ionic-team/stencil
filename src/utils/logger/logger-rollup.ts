@@ -81,9 +81,7 @@ export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
         diagnostic.debugText = sourceText;
       }
 
-    } catch (e) {
-      diagnostic.messageText = `Error loading: ${diagnostic.absFilePath}`;
-    }
+    } catch (e) {}
   }
 
   buildCtx.diagnostics.push(diagnostic);
