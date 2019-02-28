@@ -8,7 +8,7 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
         const origImports = importNode.importClause.namedBindings.elements;
         const keepImports = origImports
           .map(e => e.getText())
-          .filter(name => KEEP_IMPORTS.includes(name));
+          .filter(name => KEEP_IMPORTS.has(name));
 
         if (keepImports.length > 0) {
           return ts.updateImportDeclaration(
@@ -31,11 +31,13 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
   return importNode;
 }
 
-export const KEEP_IMPORTS = [
+const KEEP_IMPORTS = new Set([
   'h',
   'setMode',
   'getMode',
   'Build',
   'Host',
-  'getAssetPath'
-];
+  'getAssetPath',
+  'getWindow',
+  'getDocument'
+]);

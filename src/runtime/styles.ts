@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { getDoc, rootAppliedStyles, styles } from '@platform';
+import { getDocument, rootAppliedStyles, styles } from '@platform';
 
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
@@ -27,7 +27,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     if (!appliedStyles.has(styleId)) {
       dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
 
-      styleElm = getDoc(elm).createElement('style');
+      styleElm = getDocument(elm).createElement('style');
       styleElm.innerHTML = styles.get(styleId);
 
       styleContainerNode.insertBefore(

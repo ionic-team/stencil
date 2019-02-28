@@ -3,7 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { getDoc, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { getDocument, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
@@ -79,7 +79,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
   );
 
   if (BUILD.style) {
-    const visibilityStyle = getDoc().createElement('style');
+    const visibilityStyle = getDocument().createElement('style');
     visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
     visibilityStyle.setAttribute('data-styles', '');
 

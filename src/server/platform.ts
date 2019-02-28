@@ -1,11 +1,11 @@
 import * as d from '@declarations';
 
 
-export const getDoc = (elm?: Node) => elm.ownerDocument;
+export const getDocument = (elm?: Node) => elm.ownerDocument;
 
-export const getWin = (elm?: Node) => getDoc(elm).defaultView;
+export const getWindow = (elm?: Node) => getDocument(elm).defaultView;
 
-export const getHead = (elm?: Node) => getDoc(elm).head;
+export const getHead = (elm?: Node) => getDocument(elm).head;
 
 export const writeTask = (cb: Function) => cb();
 
@@ -31,10 +31,10 @@ const Context = {
 
 export const getContext = (ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
-    return getWin(getHostRef(ref).hostElement);
+    return getWindow(getHostRef(ref).hostElement);
   }
   if (context === 'document') {
-    return getDoc(getHostRef(ref).hostElement);
+    return getDocument(getHostRef(ref).hostElement);
   }
   if (context === 'isServer') {
     return true;

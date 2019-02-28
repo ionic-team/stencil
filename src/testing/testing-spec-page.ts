@@ -54,11 +54,13 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     return lazyBundleRuntimeMeta;
   });
 
+  const win = platform.getWin() as Window;
+
   const plt = {
-    win: platform.getWin() as Window,
-    doc: platform.getDoc() as Document,
-    head: platform.getHead() as HTMLHeadElement,
-    body: platform.getBody() as HTMLBodyElement,
+    win: win,
+    doc: win.document,
+    head: win.document.head,
+    body: win.document.body,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,

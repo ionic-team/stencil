@@ -8,7 +8,7 @@
  */
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { getDoc, plt, supportsShadowDom } from '@platform';
+import { getDocument, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
 import { NODE_TYPE } from '../runtime-constants';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
@@ -53,17 +53,17 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   if (isDef(newVNode.vtext)) {
     // create text node
-    newVNode.elm = getDoc(parentElm).createTextNode(newVNode.vtext) as any;
+    newVNode.elm = getDocument(parentElm).createTextNode(newVNode.vtext) as any;
 
   } else if (BUILD.slotRelocation && newVNode.isSlotReference) {
     // create a slot reference html text node
-    newVNode.elm = BUILD.isDebug ? getDoc(parentElm).createComment(`slot-reference:${hostTagName}`) : getDoc(parentElm).createTextNode('') as any;
+    newVNode.elm = BUILD.isDebug ? getDocument(parentElm).createComment(`slot-reference:${hostTagName}`) : getDocument(parentElm).createTextNode('') as any;
 
   } else {
     // create element
     elm = newVNode.elm = ((BUILD.svg && (isSvgMode || newVNode.vtag === 'svg')) ?
-                      getDoc(parentElm).createElementNS(SVG_NS, newVNode.vtag as string) :
-                      getDoc(parentElm).createElement(
+                      getDocument(parentElm).createElementNS(SVG_NS, newVNode.vtag as string) :
+                      getDocument(parentElm).createElement(
                         (BUILD.slotRelocation && newVNode.isSlotFallback) ? 'slot-fb' : newVNode.vtag as string)
                       ) as any;
 
@@ -204,7 +204,7 @@ const addVnodes = (
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
       childNode = (BUILD.vdomText && isDef(vnodes[startIdx].vtext)) ?
-                  getDoc(parentElm).createTextNode(vnodes[startIdx].vtext) :
+                  getDocument(parentElm).createTextNode(vnodes[startIdx].vtext) :
                   createElm(null, parentVNode, startIdx, parentElm);
 
       if (childNode) {
@@ -666,7 +666,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
         if (!relocateNode.nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          const orgLocationNode = BUILD.isDebug ? getDoc(hostElm).createComment(`node-reference:${relocateNode.nodeToRelocate.textContent}`) as any : getDoc(hostElm).createTextNode('') as any;
+          const orgLocationNode = BUILD.isDebug ? getDocument(hostElm).createComment(`node-reference:${relocateNode.nodeToRelocate.textContent}`) as any : getDocument(hostElm).createTextNode('') as any;
           orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 
           relocateNode.nodeToRelocate.parentNode.insertBefore(
