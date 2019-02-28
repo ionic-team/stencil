@@ -39,7 +39,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         inMemoryFsRead(compilerCtx, buildCtx),
         ...config.plugins
       ],
-      onwarn: createOnWarnFn(logger, buildCtx.diagnostics),
+      onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
     if (bundleCoreOptions.coreChunk) {
       rollupOptions.manualChunks = {

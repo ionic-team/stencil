@@ -92,25 +92,15 @@ export function loadRollupDiagnostics(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
 
-export function createOnWarnFn(logger: d.Logger, diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
+export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
-    if (!warning || previousWarns.has(warning.message)) {
+    if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
       return;
     }
 
     previousWarns.add(warning.message);
-
-    if (warning.code) {
-      if (ignoreWarnCodes.has(warning.code)) {
-        return;
-      }
-      if (suppressWarnCodes.has(warning.code)) {
-        logger.debug(warning.message);
-        return;
-      }
-    }
 
     let label = '';
     if (bundleModulesFiles) {
@@ -131,10 +121,8 @@ export function createOnWarnFn(logger: d.Logger, diagnostics: d.Diagnostic[], bu
 }
 
 const ignoreWarnCodes = new Set([
-  `THIS_IS_UNDEFINED`, `NON_EXISTENT_EXPORT`
-]);
-
-const suppressWarnCodes = new Set([
+  `THIS_IS_UNDEFINED`,
+  `NON_EXISTENT_EXPORT`,
   `CIRCULAR_DEPENDENCY`
 ]);
 
