@@ -21,11 +21,10 @@ export function propsToMarkdown(props: d.JsonDocsProp[]) {
   ]);
 
   props.forEach(prop => {
-    const propName = `\`${prop.name}\`${prop.required ? ' _(required)_' : ''}`;
     table.addRow([
-      propName,
-      prop.attr ? `\`${prop.attr}\`` : '--',
-      prop.docs,
+      getPropertyField(prop),
+      getAttributeField(prop),
+      getDocsField(prop),
       `\`${prop.type}\``,
       `\`${prop.default}\``
     ]);
@@ -36,4 +35,19 @@ export function propsToMarkdown(props: d.JsonDocsProp[]) {
   content.push(``);
 
   return content;
+}
+
+function getPropertyField(prop: d.JsonDocsProp) {
+  return `\`${prop.name}\`${prop.required ? ' _(required)_' : ''}`;
+}
+
+function getAttributeField(prop: d.JsonDocsProp) {
+  return prop.attr ? `\`${prop.attr}\`` : '--';
+}
+
+function getDocsField(prop: d.JsonDocsProp) {
+  return `${prop.deprecation !== undefined
+    ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+    : ''
+  }${prop.docs}`;
 }

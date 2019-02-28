@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { dashToPascalCase, sortBy } from '@utils';
-import { isOutputTargetAngular } from './output-utils';
+import { getComponentsFromModules, isOutputTargetAngular } from './output-utils';
 import { sys } from '@sys';
 
 
@@ -37,11 +37,7 @@ function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d
 }
 
 function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
-  const cmps = moduleFiles.reduce((cmps, m) => {
-    cmps.push(...m.cmps);
-    return cmps;
-  }, [] as d.ComponentCompilerMeta[]);
-
+  const cmps = getComponentsFromModules(moduleFiles);
   return sortBy(cmps, cmp => cmp.tagName)
     .filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 }
@@ -127,7 +123,10 @@ export class ${tagNameAsPascal} {`];
 }
 
 function getInputs(cmpMeta: d.ComponentCompilerMeta): string[] {
-  return cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name);
+  return [
+    ...cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name),
+    ...cmpMeta.virtualProperties.map(prop => prop.name)
+  ].sort();
 }
 
 function getOutputs(cmpMeta: d.ComponentCompilerMeta): string[] {

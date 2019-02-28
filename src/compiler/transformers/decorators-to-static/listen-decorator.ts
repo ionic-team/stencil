@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { buildError, buildWarn } from '@utils';
+import { buildError, buildWarn, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
 
@@ -9,13 +9,7 @@ export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], tsSourceFi
     .filter(ts.isMethodDeclaration)
     .map(method => parseListenDecorators(diagnostics, tsSourceFile, method));
 
-  const flatListeners = listeners.reduce((arr, listener) => {
-    if (listener) {
-      arr.push(...listener);
-    }
-    return arr;
-  }, []);
-
+  const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
     newMembers.push(createStaticGetter('listeners', convertValueToLiteral(flatListeners)));
   }
@@ -25,7 +19,7 @@ export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], tsSourceFi
 function parseListenDecorators(diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, method: ts.MethodDeclaration) {
   const listenDecorators = method.decorators.filter(isDecoratorNamed('Listen'));
   if (listenDecorators.length === 0) {
-    return null;
+    return [];
   }
 
   return listenDecorators.map(listenDecorator => {

@@ -22,7 +22,7 @@ export interface JsonDocsComponent {
   tag: string;
   readme: string;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
   usage: JsonDocsUsage;
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];
@@ -31,7 +31,7 @@ export interface JsonDocsComponent {
   slots: JsonDocsSlot[];
 }
 
-export interface JsonDocsTags {
+export interface JsonDocsTag {
   name: string;
   text?: string;
 }
@@ -48,8 +48,9 @@ export interface JsonDocsProp {
   attr: string | undefined;
   reflectToAttr: boolean;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
   default: string;
+  deprecation: string | undefined;
 
   optional: boolean;
   required: boolean;
@@ -59,7 +60,8 @@ export interface JsonDocsProp {
 export interface JsonDocsMethod {
   name: string;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
+  deprecation: string | undefined;
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
@@ -82,7 +84,8 @@ export interface JsonDocsEvent {
   cancelable: boolean;
   composed: boolean;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
+  deprecation: string | undefined;
   detail: string;
 }
 

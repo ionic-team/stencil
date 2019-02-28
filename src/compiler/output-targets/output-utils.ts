@@ -1,5 +1,6 @@
 import * as d from '@declarations';
 import { sys } from '@sys';
+import { flatOne } from '@utils';
 
 
 export function getDistEsmDir(outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
@@ -100,10 +101,7 @@ export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAng
 }
 
 export function getComponentsFromModules(moduleFiles: d.Module[]) {
-  return moduleFiles.reduce((cmps, m) => {
-    cmps.push(...m.cmps);
-    return cmps;
-  }, [] as d.ComponentCompilerMeta[]);
+  return flatOne(moduleFiles.map(m => m.cmps));
 }
 
 export const GENERATED_DTS = 'components.d.ts';

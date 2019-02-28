@@ -23,6 +23,16 @@ export function sortBy<T>(array: T[], prop: ((item: T) => string)) {
   });
 }
 
+export function flatOne<T>(array: T[][]): T[] {
+  if (array.flat) {
+    return array.flat(1);
+  }
+  return array.reduce((result, item) => {
+    result.push(...item);
+    return result;
+  }, [] as T[]);
+}
+
 export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
   return keys.reduce((final, key) => {
     if (obj[key]) {

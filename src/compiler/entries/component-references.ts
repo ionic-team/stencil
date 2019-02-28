@@ -1,13 +1,13 @@
 import * as d from '@declarations';
+import { flatOne } from '@utils';
 
 
 export function getComponentRefsFromSourceStrings(moduleFiles: d.Module[]) {
   const componentRefs: d.ComponentRef[] = [];
 
-  const tags = moduleFiles.reduce((tags, m) => {
-    m.cmps.forEach(cmp => tags.push(cmp.tagName));
-    return tags;
-  }, [] as string[]);
+  const tags = flatOne(
+    moduleFiles.map(m => m.cmps.map(c => c.tagName))
+  );
 
   moduleFiles.forEach(moduleFile => {
     moduleFile.cmps.forEach(cmp => {

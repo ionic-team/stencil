@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { isDocsPublic, normalizePath, sortBy } from '@utils';
+import { isDocsPublic, normalizePath, sortBy, flatOne } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { sys } from '@sys';
 
@@ -17,7 +17,7 @@ export async function generateDocData(compilerCtx: d.CompilerCtx, buildCtx: d.Bu
   };
 }
 
-async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
   const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     const filePath = moduleFile.sourceFilePath;
     const dirPath = normalizePath(sys.path.dirname(filePath));
@@ -26,7 +26,7 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
     const readme = await getUserReadmeContent(compilerCtx, readmePath);
     const usage = await generateUsages(compilerCtx, usagesDir);
     return moduleFile.cmps
-      .filter(cmp => isDocsPublic(cmp.docs))
+      .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
       .map(cmp => ({
         dirPath,
         filePath,
@@ -40,7 +40,7 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
         docsTags: cmp.docs.tags,
         encapsulation: getEncapsulation(cmp),
 
-        props: getProperties(cmp.properties),
+        props: getProperties(cmp),
         methods: getMethods(cmp.methods),
         events: getEvents(cmp.events),
         styles: getStyles(cmp),
@@ -48,10 +48,7 @@ async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
       }));
     }));
 
-  return results.reduce((docsComponents, result) => {
-    docsComponents.push(...result);
-    return docsComponents;
-  }, [] as d.JsonDocsComponent[]);
+  return sortBy(flatOne(results), cmp => cmp.tag);
 }
 
 function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {
@@ -64,9 +61,15 @@ function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | '
   }
 }
 
-function getProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] {
-  return sortBy(properties, member => member.name)
-    .filter(member => isDocsPublic(member.docs))
+function getProperties(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] {
+  return sortBy([
+    ...getRealProperties(cmpMeta.properties),
+    ...getVirtualProperties(cmpMeta.virtualProperties)
+  ], p => p.name);
+}
+
+function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] {
+  return properties.filter(member => isDocsPublic(member.docs))
     .map(member => ({
       name: member.name,
       type: member.complexType.resolved,
@@ -76,10 +79,28 @@ function getProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsPro
       docs: member.docs.text,
       docsTags: member.docs.tags,
       default: member.defaultValue,
+      deprecation: getDeprecation(member.docs.tags),
 
       optional: member.optional,
       required: member.required,
     }));
+}
+
+function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] {
+  return virtualProps.map(member => ({
+    name: member.name,
+    type: member.type,
+    mutable: false,
+    attr: member.name,
+    reflectToAttr: false,
+    docs: member.docs,
+    docsTags: [],
+    default: undefined,
+    deprecation: undefined,
+
+    optional: true,
+    required: false,
+  }));
 }
 
 function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
@@ -95,6 +116,7 @@ function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
       parameters: member.docs.tags,
       docs: member.docs.text,
       docsTags: member.docs.tags,
+      deprecation: getDeprecation(member.docs.tags)
     }));
 }
 
@@ -104,12 +126,13 @@ function getEvents(events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] {
     .filter(eventMeta => isDocsPublic(eventMeta.docs))
     .map(eventMeta => ({
       event: eventMeta.name,
-      detail: 'TODO',
+      detail: eventMeta.complexType.resolved,
       bubbles: eventMeta.bubbles,
       cancelable: eventMeta.cancelable,
       composed: eventMeta.composed,
       docs: eventMeta.docs.text,
       docsTags: eventMeta.docs.tags,
+      deprecation: getDeprecation(eventMeta.docs.tags)
     }));
 }
 
@@ -128,7 +151,15 @@ function getStyles(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] {
   });
 }
 
-function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
+function getDeprecation(tags: d.JsonDocsTag[]) {
+  const deprecation = tags.find(t => t.name === 'deprecated');
+  if (deprecation) {
+    return deprecation.text || '';
+  }
+  return undefined;
+}
+
+function getSlots(tags: d.JsonDocsTag[]): d.JsonDocsSlot[] {
   return tags
     .filter(tag => tag.name === 'slot' && tag.text)
     .map(({text}) => {

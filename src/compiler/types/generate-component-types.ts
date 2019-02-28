@@ -66,7 +66,6 @@ function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: bool
       const optional = (jsxAttributes)
         ? !type.required
         : type.optional;
-
       fullList.push(`'${type.name}'${ optional ? '?' : '' }: ${type.type};`);
       return fullList;
     }, [] as string[])

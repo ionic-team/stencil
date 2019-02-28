@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
+import { flatOne } from '@utils';
 
 
 export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) {
@@ -8,13 +9,7 @@ export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedPr
     .filter(ts.isMethodDeclaration)
     .map(method => parseWatchDecorator(diagnostics, method));
 
-  const flatWatchers = watchers.reduce((arr, listener) => {
-    if (listener) {
-      arr.push(...listener);
-    }
-    return arr;
-  }, []);
-
+  const flatWatchers = flatOne(watchers);
   if (flatWatchers.length > 0) {
     newMembers.push(createStaticGetter('watchers', convertValueToLiteral(flatWatchers)));
   }
