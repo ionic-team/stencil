@@ -69,7 +69,6 @@ export function parseListener(diagnostics: d.Diagnostic[], tsSourceFile: ts.Sour
     passive: (typeof opts.passive === 'boolean') ? opts.passive :
       // if the event name is kown to be a passive event then set it to true
       (PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase())),
-    disabled: (opts.enabled === false)
   };
   return listener;
 }

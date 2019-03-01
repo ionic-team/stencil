@@ -75,7 +75,6 @@ export interface DevInspectorMembersMap {
 export interface DevInspectorListenerMeta {
   event: string;
   capture: boolean;
-  disabled: boolean;
   passive: boolean;
   method: string;
 }

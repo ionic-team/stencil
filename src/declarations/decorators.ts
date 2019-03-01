@@ -65,10 +65,8 @@ export interface ListenDecorator {
 }
 export interface ListenOptions {
   target?: ListenTargetOptions;
-  eventName?: string;
   capture?: boolean;
   passive?: boolean;
-  enabled?: boolean;
 }
 
 export type ListenTargetOptions = 'parent' | 'body' | 'document' | 'window';

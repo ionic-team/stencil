@@ -28,13 +28,12 @@ export const enum EVENT_FLAGS {
 
 export const enum LISTENER_FLAGS {
   Passive = 1 << 0,
-  Disabled = 1 << 1,
-  Capture = 1 << 2,
+  Capture = 1 << 1,
 
-  TargetDocument = 1 << 3,
-  TargetWindow = 1 << 4,
-  TargetParent = 1 << 5,
-  TargetBody = 1 << 6,
+  TargetDocument = 1 << 2,
+  TargetWindow = 1 << 3,
+  TargetParent = 1 << 4,
+  TargetBody = 1 << 5,
 }
 
 export const enum HOST_STATE {

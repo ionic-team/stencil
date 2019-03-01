@@ -3,7 +3,6 @@ import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
 import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
 import { getValue, setValue } from './set-value';
-import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 
@@ -54,7 +53,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           value(this: d.HostElement) {
             const ref = getHostRef(this);
             const args = arguments;
-            return componentOnReady(ref).then(() => ref.lazyInstance[memberName].apply(ref.lazyInstance, args));
+            return ref.onReadyPromise.then(() => ref.lazyInstance[memberName].apply(ref.lazyInstance, args));
           }
         });
       }

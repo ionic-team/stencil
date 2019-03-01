@@ -15,7 +15,6 @@ export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.Compon
       method: parsedListener.method,
       capture: !!parsedListener.capture,
       passive: !!parsedListener.passive,
-      disabled: !!parsedListener.disabled,
       target: parsedListener.target
     };
   });

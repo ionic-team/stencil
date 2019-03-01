@@ -3,15 +3,25 @@ import { BUILD } from '@build-conditionals';
 import { getDocument, getWindow, supportsListenerOptions } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
 
+export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
+  const removeFns = listeners.map(([flags, name, method]) => {
+    const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
+    const handler = hostListenerProxy(hostRef, method);
+    const opts = hostListenerOpts(flags);
+    target.addEventListener(name, handler, opts);
+    return () => target.removeEventListener(name, handler, opts);
+  });
+  return () => removeFns.forEach(fn => fn());
+};
 
-export const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
+const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
   return (ev: Event) => {
     if (BUILD.lazyLoad) {
       if (hostRef.lazyInstance) {
         // instance is ready, let's call it's member method for this event
         return hostRef.lazyInstance[methodName](ev);
       } else {
-        hostRef.queuedReceivedHostEvents.push(methodName, ev);
+        hostRef.onReadyPromise.then(() => hostRef.lazyInstance[methodName](ev));
       }
     } else {
       return (hostRef.hostElement as any)[methodName](ev);
@@ -20,7 +30,7 @@ export const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
 };
 
 
-export const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
+const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return getDocument(elm);
   if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return getWindow(elm);
   if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return getDocument(elm).body;
@@ -29,7 +39,7 @@ export const getHostListenerTarget = (elm: Element, flags: number): EventTarget 
 };
 
 
-export const hostListenerOpts = (flags: number) =>
+const hostListenerOpts = (flags: number) =>
   supportsListenerOptions ?
     {
       'passive': (flags & LISTENER_FLAGS.Passive) !== 0,

@@ -17,7 +17,6 @@ describe('parse listeners', () => {
       name: 'click',
       method: 'onClick',
       capture: false,
-      disabled: false,
       passive: false,
       target: undefined
     }]);
@@ -38,7 +37,6 @@ describe('parse listeners', () => {
       method: 'windowResize',
       target: 'window',
       capture: false,
-      disabled: false,
       passive: true,
     }]);
   });
@@ -62,7 +60,6 @@ describe('parse listeners', () => {
         name: 'click',
         method: 'onClick',
         capture: false,
-        disabled: false,
         passive: false,
         target: undefined
       },
@@ -70,7 +67,6 @@ describe('parse listeners', () => {
         name: 'mousedown',
         method: 'onMouseDown',
         capture: false,
-        disabled: false,
         passive: true,
         target: undefined
       }
@@ -93,7 +89,6 @@ describe('parse listeners', () => {
         name: 'touchend',
         method: 'onUp',
         capture: false,
-        disabled: false,
         passive: true,
         target: undefined
       },
@@ -101,7 +96,6 @@ describe('parse listeners', () => {
         name: 'mouseup',
         method: 'onUp',
         capture: false,
-        disabled: false,
         passive: true,
         target: undefined
       }
@@ -115,7 +109,6 @@ describe('parse listeners', () => {
         @Listen('touchend', {
           capture: true,
           passive: false,
-          enabled: false,
         })
         @Listen('click', { passive: true, target: 'document' })
         onEvent(ev: UIEvent) {
@@ -128,7 +121,6 @@ describe('parse listeners', () => {
         name: 'touchend',
         method: 'onEvent',
         capture: true,
-        disabled: true,
         passive: false,
         target: undefined
       },
@@ -136,7 +128,6 @@ describe('parse listeners', () => {
         name: 'click',
         method: 'onEvent',
         capture: false,
-        disabled: false,
         passive: true,
         target: 'document'
       }

@@ -14,11 +14,12 @@ export const registerHost = (elm: d.HostElement) => {
   const hostRef: d.HostRef = {
     stateFlags: 0,
   };
-  if (BUILD.lazyLoad) {
-    hostRef.hostElement = elm;
-  }
   if (BUILD.prop || BUILD.state) {
     hostRef.instanceValues = new Map();
+  }
+  if (BUILD.lazyLoad) {
+    hostRef.hostElement = elm;
+    hostRef.onReadyPromise = new Promise(r => hostRef.onReadyResolve = r);
   }
   return hostRefs.set(elm, hostRef);
 };

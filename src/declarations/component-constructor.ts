@@ -64,6 +64,5 @@ export interface ComponentConstructorListener {
   name: string;
   method: string;
   capture?: boolean;
-  disabled?: boolean;
   passive?: boolean;
 }

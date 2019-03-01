@@ -79,12 +79,11 @@ export interface HostRef {
   hostElement?: d.HostElement;
   instanceValues?: Map<string, any>;
   lazyInstance?: d.ComponentInstance;
-  queuedReceivedHostEvents?: any[];
   onReadyPromise?: Promise<any>;
   onReadyResolve?: (elm: any) => void;
   vnode?: d.VNode;
+  rmListeners?: () => void;
   modeName?: string;
-  watchCallbacks?: Map<string, string[]>;
 }
 
 export interface PlatformRuntime {

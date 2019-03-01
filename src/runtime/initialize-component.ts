@@ -48,24 +48,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
         BUILD.member && (hostRef.stateFlags &= ~HOST_STATE.isConstructingInstance);
 
-        if (BUILD.hostListener && hostRef.queuedReceivedHostEvents) {
-          // events may have already fired before the instance was even ready
-          // now that the instance is ready, let's replay all of the events that
-          // we queued up earlier that were originally meant for the instance
-          for (let i = 0; i < hostRef.queuedReceivedHostEvents.length; i += 2) {
-            // data was added in sets of two
-            // first item the eventMethodName
-            // second item is the event data
-            // take a look at hostEventListenerProxy()
-            try {
-              hostRef.lazyInstance[hostRef.queuedReceivedHostEvents[i]](hostRef.queuedReceivedHostEvents[i + 1]);
-            } catch (err) {
-              consoleError(err);
-            }
-          }
-          hostRef.queuedReceivedHostEvents = undefined;
-        }
-
       } catch (e) {
         consoleError(e);
       }

@@ -171,9 +171,6 @@ function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
 
 function computeListenerFlags(listener: d.ComponentCompilerListener) {
   let flags = 0;
-  if (listener.disabled) {
-    flags |= LISTENER_FLAGS.Disabled;
-  }
   if (listener.capture) {
     flags |= LISTENER_FLAGS.Capture;
   }

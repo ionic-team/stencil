@@ -1,8 +1,8 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
 import { getDocument, getHostRef, supportsShadowDom, tick } from '@platform';
-import { getHostListenerTarget, hostListenerOpts, hostListenerProxy } from './host-listener';
-import { CMP_FLAG, HOST_STATE, LISTENER_FLAGS } from '@utils';
+import { addEventListeners } from './host-listener';
+import { CMP_FLAG, HOST_STATE } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
@@ -23,14 +23,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
       // have fired even before the instance is ready
-      cmpMeta.cmpHostListeners.forEach(([flags, name, method]) => {
-        if ((flags & LISTENER_FLAGS.Disabled) === 0) {
-          if (BUILD.lazyLoad) {
-            (hostRef.queuedReceivedHostEvents || (hostRef.queuedReceivedHostEvents = []));
-          }
-          (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm).addEventListener(name, hostListenerProxy(hostRef, method), hostListenerOpts(flags));
-        }
-      });
+      hostRef.rmListeners = addEventListeners(elm, hostRef, cmpMeta.cmpHostListeners);
     }
 
     if (!(hostRef.stateFlags & HOST_STATE.hasConnected)) {

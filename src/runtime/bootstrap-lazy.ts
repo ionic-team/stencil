@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { componentOnReady } from './component-on-ready';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 import { getDocument, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
@@ -68,8 +67,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
               }
             }
 
-            componentOnReady(): any {
-              return componentOnReady(getHostRef(this));
+            componentOnReady() {
+              return getHostRef(this).onReadyPromise;
             }
           } as any, cmpLazyMeta, 1, 0) as any
         );

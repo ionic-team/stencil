@@ -3,7 +3,7 @@
     "rules": {
         "ban-comma-operator": false,
         "no-empty": [true, "allow-empty-catch"],
-        "no-floating-promises": true,
+        "no-floating-promises": false,
         "no-import-side-effect": false,
         "no-var-keyword": false,
         "no-var-requires": false,

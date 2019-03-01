@@ -346,7 +346,6 @@ function parseListeners(cmpData: d.ComponentDataDeprecated) {
       method: listenerData.method,
       target: undefined, // TODO
       passive: (listenerData.passive !== false),
-      disabled: (listenerData.enabled === false),
       capture: (listenerData.capture !== false)
     };
     return listener;
