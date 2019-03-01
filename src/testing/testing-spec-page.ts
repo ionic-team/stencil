@@ -55,12 +55,13 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   });
 
   const win = platform.getWin() as Window;
+  const doc = win != null ? win.document : null;
 
   const plt = {
     win: win,
-    doc: win.document,
-    head: win.document.head,
-    body: win.document.body,
+    doc: doc,
+    head: doc != null ? doc.head : null,
+    body: doc != null ? doc.body : null,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,

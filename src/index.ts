@@ -86,6 +86,11 @@ export declare function getWindow(ref: any): Window;
 export declare function getDocument(ref: any): Document;
 
 /**
+ * getElement
+ */
+export declare function getElement(ref: any): HTMLElement;
+
+/**
  * Host
  */
 export declare const Host: d.FunctionalComponent<any>;

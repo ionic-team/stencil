@@ -1,11 +1,33 @@
 import * as d from '@declarations';
 
 
-export const getDocument = (elm?: Node) => elm.ownerDocument;
+export const getDocument = (elm?: Node) => {
+  if (elm != null) {
+    if (elm.nodeType === 9) {
+      return elm as Document;
+    }
+    return elm.ownerDocument;
+  }
+  return null;
+};
 
-export const getWindow = (elm?: Node) => getDocument(elm).defaultView;
+export const getWindow = (elm?: Node) => {
+  const doc = getDocument(elm);
+  if (doc != null) {
+    return doc.defaultView;
+  }
+  return null;
+};
 
-export const getHead = (elm?: Node) => getDocument(elm).head;
+export const getHead = (elm?: Node) => {
+  const doc = getDocument(elm);
+  if (doc != null) {
+    return doc.head;
+  }
+  return null;
+};
+
+export const readTask = (cb: Function) => cb();
 
 export const writeTask = (cb: Function) => cb();
 
@@ -24,7 +46,7 @@ const Context = {
   enableListener: () => console.log('TODO'),
   queue: {
     write: writeTask,
-    read: writeTask,
+    read: readTask,
     tick
   }
 };
