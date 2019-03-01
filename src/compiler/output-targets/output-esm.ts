@@ -129,9 +129,9 @@ function generateDefineCustomElements(config: d.Config, compilerCtx: d.CompilerC
 import { defineCustomElement } from './${getCoreEsmFileName(config)}';
 import { COMPONENTS } from './${componentsFileName}';
 
-export function defineCustomElements(win, opts) {
+export const defineCustomElements = (win, opts) => {
   return defineCustomElement(win, COMPONENTS, opts);
-}
+};
 `;
 
   const defineFilePath = getDefineCustomElementsPath(config, outputTarget, sourceTarget);

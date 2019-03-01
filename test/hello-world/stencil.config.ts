@@ -9,6 +9,10 @@ export const config: Config = {
     {
       type: 'dist-module',
       file: 'www/web-components.js'
+    },
+    {
+      type: 'www',
+      serviceWorker: null
     }
   ],
   copy: [

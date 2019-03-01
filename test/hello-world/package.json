@@ -9,5 +9,8 @@
   "collection": "dist/collection/collection-manifest.json",
   "types": "dist/types/components.d.ts",
   "module": "dist/esm/es5/index.js",
-  "main": "dist/index.js"
+  "main": "dist/index.js",
+  "devDependencies": {
+    "workbox-build": "3.4.1"
+  }
 }

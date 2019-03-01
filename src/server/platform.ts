@@ -31,10 +31,10 @@ const Context = {
 
 export const getContext = (ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
-    return getWindow(getHostRef(ref).hostElement);
+    return getWindow(getHostRef(ref).$hostElement$);
   }
   if (context === 'document') {
-    return getDocument(getHostRef(ref).hostElement);
+    return getDocument(getHostRef(ref).$hostElement$);
   }
   if (context === 'isServer') {
     return true;
@@ -54,13 +54,13 @@ export const getHostRef = (ref: d.RuntimeRef) =>
   hostRefs.get(ref);
 
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
+  hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 
 export const registerHost = (elm: d.HostElement) => {
   const hostRef: d.HostRef = {
-    stateFlags: 0,
-    hostElement: elm,
-    instanceValues: new Map()
+    $stateFlags$: 0,
+    $hostElement$: elm,
+    $instanceValues$: new Map()
   };
   return hostRefs.set(elm, hostRef);
 };

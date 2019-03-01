@@ -154,7 +154,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 };
 
 const putBackInOriginalLocation = (parentElm: Node, recursive?: boolean, i?: number, childNode?: d.RenderNode) => {
-  plt.isTmpDisconnected = true;
+  plt.$isTmpDisconnected$ = true;
 
   const oldSlotChildNodes = parentElm.childNodes;
   for (i = oldSlotChildNodes.length - 1; i >= 0; i--) {
@@ -182,7 +182,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive?: boolean, i?: num
     }
   }
 
-  plt.isTmpDisconnected = false;
+  plt.$isTmpDisconnected$ = false;
 };
 
 const addVnodes = (
@@ -604,7 +604,7 @@ const isHost = (node: any): node is d.VNode => {
 };
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
-  const oldVNode = hostRef.vnode || {};
+  const oldVNode = hostRef.$vnode$ || {};
   hostTagName = toLowerCase(hostElm.tagName);
 
   if (isHost(renderFnResults)) {
@@ -613,14 +613,14 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     renderFnResults = h(null, null, renderFnResults as any);
   }
 
-  if (BUILD.reflect && cmpMeta.attrsToReflect) {
+  if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     (renderFnResults as d.VNode).vattrs = (renderFnResults as d.VNode).vattrs || {};
-    cmpMeta.attrsToReflect.forEach(([propName, attribute]) =>
+    cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) =>
       (renderFnResults as d.VNode).vattrs[attribute] = (hostElm as any)[propName]);
   }
 
   renderFnResults.ishost = true;
-  hostRef.vnode = renderFnResults;
+  hostRef.$vnode$ = renderFnResults;
   renderFnResults.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
   if (BUILD.slotRelocation) {
@@ -628,7 +628,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   if (BUILD.slotRelocation) {
-    useNativeShadowDom = supportsShadowDom && !!(cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation);
+    useNativeShadowDom = supportsShadowDom && !!(cmpMeta.f & CMP_FLAG.shadowDomEncapsulation);
   }
 
   // if (BUILD.prerenderServerSide) {
@@ -678,7 +678,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
       // while we're moving nodes around existing nodes, temporarily disable
       // the disconnectCallback from working
-      plt.isTmpDisconnected = true;
+      plt.$isTmpDisconnected$ = true;
 
       for (let i = 0; i < relocateNodes.length; i++) {
         const relocateNode = relocateNodes[i];
@@ -724,7 +724,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
       // done moving nodes around
       // allow the disconnect callback to work again
-      plt.isTmpDisconnected = false;
+      plt.$isTmpDisconnected$ = false;
     }
 
     if (checkSlotFallbackVisibility) {

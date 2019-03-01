@@ -11,20 +11,21 @@ export type LazyBundleRuntimeData = [
 ];
 
 
+
 export interface ComponentRuntimeMeta {
-  cmpMembers?: d.ComponentRuntimeMembers;
-  cmpHostListeners?: d.ComponentRuntimeHostListener[];
-  cmpFlags?: number;
-  cmpTag?: string;
+  m?: d.ComponentRuntimeMembers;
+  l?: d.ComponentRuntimeHostListener[];
+  f?: number;
+  t?: string;
 
   // added later
-  attrsToReflect?: [string, string][];
-  watchers?: d.ComponentConstructorWatchers;
+  $attrsToReflect$?: [string, string][];
+  $watchers$?: d.ComponentConstructorWatchers;
 }
 
 
 export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
-  lazyBundleIds?: d.ModeBundleIds;
+  $lazyBundleIds$?: d.ModeBundleIds;
 }
 
 
@@ -74,22 +75,22 @@ export interface ModeBundleIds {
 export type RuntimeRef = d.HostElement | {};
 
 export interface HostRef {
-  ancestorComponent?: d.HostElement;
-  stateFlags: number;
-  hostElement?: d.HostElement;
-  instanceValues?: Map<string, any>;
-  lazyInstance?: d.ComponentInstance;
-  onReadyPromise?: Promise<any>;
-  onReadyResolve?: (elm: any) => void;
-  vnode?: d.VNode;
-  rmListeners?: () => void;
-  modeName?: string;
+  $ancestorComponent$?: d.HostElement;
+  $stateFlags$: number;
+  $hostElement$?: d.HostElement;
+  $instanceValues$?: Map<string, any>;
+  $lazyInstance$?: d.ComponentInstance;
+  $onReadyPromise$?: Promise<any>;
+  $onReadyResolve$?: (elm: any) => void;
+  $vnode$?: d.VNode;
+  $rmListeners$?: () => void;
+  $modeName$?: string;
 }
 
 export interface PlatformRuntime {
-  isTmpDisconnected?: boolean;
-  queueCongestion?: number;
-  queuePending?: boolean;
+  $isTmpDisconnected$?: boolean;
+  $queueCongestion$?: number;
+  $queuePending$?: boolean;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

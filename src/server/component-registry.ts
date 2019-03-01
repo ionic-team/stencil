@@ -13,7 +13,7 @@ export function getComponent(tagName: string): any {
 export function registerComponents(Cstrs: d.ComponentNativeConstructor[]) {
   Cstrs.forEach(Cstr => {
     cstrs.set(
-      Cstr.cmpMeta.cmpTag,
+      Cstr.cmpMeta.t,
       proxyComponent(Cstr, Cstr.cmpMeta, 0, 1)
     );
   });

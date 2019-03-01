@@ -25,6 +25,9 @@ export class NodeSystemWorker {
   }
 
   minifyJs(input: string, opts?: any) {
+    if (opts && opts.mangle && opts.mangle.properties && opts.mangle.properties.regex) {
+      opts.mangle.properties.regex = new RegExp(opts.mangle.properties.regex);
+    }
     const result: d.MinifyJsResult = Terser.minify(input, opts);
     const diagnostics: d.Diagnostic[] = [];
 

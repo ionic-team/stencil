@@ -4,9 +4,9 @@ import { getAssetPath } from '@runtime';
 
 
 const Context = {
-  window: getWindow(),
-  document: getDocument(),
-  resourcesUrl: getAssetPath('.'),
+  window: /*@__PURE__*/getWindow(),
+  document: /*@__PURE__*/getDocument(),
+  resourcesUrl: /*@__PURE__*/getAssetPath('.'),
   isServer: false,
   enableListener: () => console.log('TODO'),
   queue: {

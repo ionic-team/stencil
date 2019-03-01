@@ -17,20 +17,20 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
     lazyBundle[1].forEach(cmpLazyMeta => {
 
-      cmpLazyMeta.lazyBundleIds = lazyBundle[0];
+      cmpLazyMeta.$lazyBundleIds$ = lazyBundle[0];
 
-      if (!customElements.get(cmpLazyMeta.cmpTag)) {
+      if (!customElements.get(cmpLazyMeta.t)) {
         if (BUILD.style) {
-          cmpTags.push(cmpLazyMeta.cmpTag);
+          cmpTags.push(cmpLazyMeta.t);
         }
         customElements.define(
-          cmpLazyMeta.cmpTag,
+          cmpLazyMeta.t,
           proxyComponent(class extends HTMLElement {
             // StencilLazyHost
             constructor() {
               super();
               registerHost(this);
-              if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) {
+              if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.f & CMP_FLAG.shadowDomEncapsulation) {
                 // this component is using shadow dom
                 // and this browser supports shadow dom
                 // add the read-only property "shadowRoot" to the host element
@@ -50,7 +50,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
             's-init'() {
               const hostRef = getHostRef(this);
-              if (hostRef.lazyInstance) {
+              if (hostRef.$lazyInstance$) {
                 postUpdateComponent(this, hostRef);
               }
             }
@@ -68,7 +68,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
             }
 
             componentOnReady() {
-              return getHostRef(this).onReadyPromise;
+              return getHostRef(this).$onReadyPromise$;
             }
           } as any, cmpLazyMeta, 1, 0) as any
         );

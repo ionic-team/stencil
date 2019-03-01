@@ -115,8 +115,8 @@ export async function flushAll() {
 export function loadModule(cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef) {
   return new Promise<any>(resolve => {
     queuedLoadModules.push({
-      bundleId: cmpMeta.lazyBundleIds,
-      resolve: () => resolve(moduleLoaded.get(cmpMeta.lazyBundleIds))
+      bundleId: cmpMeta.$lazyBundleIds$,
+      resolve: () => resolve(moduleLoaded.get(cmpMeta.$lazyBundleIds$))
     });
   });
 }

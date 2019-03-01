@@ -3,6 +3,7 @@ import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
+import { OutputOptions } from 'rollup';
 
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
@@ -55,16 +56,20 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
   });
 
   const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
-  return generateRollupBuild(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
+  const outputOpts: OutputOptions = {
+    format: 'esm',
+    chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
+  };
+  return generateRollupBuild(rollupBuild, outputOpts, config, buildCtx.entryModules);
 }
 
 const CORE = `
 import { bootstrapLazy } from '@stencil/core/platform';
 export * from '@stencil/core/platform';
 import '@global-scripts';
-export function defineCustomElements(win) {
+export const defineCustomElements = (win) => {
   bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);
-}
+};
 `;
 
 const BROWSER_ENTRY = `

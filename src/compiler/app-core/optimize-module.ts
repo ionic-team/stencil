@@ -6,7 +6,13 @@ import { sys } from '@sys';
 export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
   const opts: any = {
     output: {},
-    compress: {}
+    compress: {},
+    mangle: {
+      properties: {
+        regex: '^\\$.+\\$$',
+      },
+      toplevel: true,
+    }
   };
 
   if (sourceTarget === 'es5') {
@@ -29,6 +35,7 @@ export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerC
   opts.compress.keep_fargs = false;
   opts.compress.passes = 4;
   opts.compress.pure_funcs = ['getHostRef'];
+  opts.output.comments = '/webpack/';
 
   let cacheKey: string;
   if (compilerCtx) {

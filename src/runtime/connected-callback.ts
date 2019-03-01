@@ -19,35 +19,35 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
   } else {
     const hostRef = getHostRef(elm);
 
-    if (BUILD.hostListener && cmpMeta.cmpHostListeners) {
+    if (BUILD.hostListener && cmpMeta.l) {
       // initialize our event listeners on the host element
       // we do this now so that we can listening to events that may
       // have fired even before the instance is ready
-      hostRef.rmListeners = addEventListeners(elm, hostRef, cmpMeta.cmpHostListeners);
+      hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.l);
     }
 
-    if (!(hostRef.stateFlags & HOST_STATE.hasConnected)) {
+    if (!(hostRef.$stateFlags$ & HOST_STATE.hasConnected)) {
       // first time this component has connected
-      hostRef.stateFlags |= HOST_STATE.hasConnected;
+      hostRef.$stateFlags$ |= HOST_STATE.hasConnected;
 
       if (BUILD.slotRelocation) {
         // initUpdate, BUILD.slotRelocation
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if ((BUILD.slot && cmpMeta.cmpFlags & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation)) {
+        if ((BUILD.slot && cmpMeta.f & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation)) {
           // only required when we're NOT using native shadow dom (slot)
           // or this browser doesn't support native shadow dom
           // and this host element was NOT created with SSR
           // let's pick out the inner content for slot projection
           // create a node to represent where the original
           // content was first placed, which is useful later on
-          elm['s-cr'] = getDocument(elm).createComment(BUILD.isDebug ? `content-reference:${cmpMeta.cmpTag}` : '') as any;
+          elm['s-cr'] = getDocument(elm).createComment(BUILD.isDebug ? `content-reference:${cmpMeta.t}` : '') as any;
           elm['s-cr']['s-cn'] = true;
           elm.insertBefore(elm['s-cr'], elm.firstChild);
         }
 
-        if (BUILD.es5 && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
+        if (BUILD.es5 && !supportsShadowDom && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
           try {
             (elm as any).shadowRoot = elm;
           } catch (e) {}
@@ -65,7 +65,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
           if (ancestorComponent['s-init'] && !ancestorComponent['s-lr']) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
-            hostRef.ancestorComponent = ancestorComponent;
+            hostRef.$ancestorComponent$ = ancestorComponent;
 
             // ensure there is an array to contain a reference to each of the child components
             // and set this component as one of the ancestor's child components it should wait on
@@ -77,8 +77,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
       // Lazy properties
       // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-      if (BUILD.prop && cmpMeta.cmpMembers) {
-        Object.keys(cmpMeta.cmpMembers).forEach(memberName => {
+      if (BUILD.prop && cmpMeta.m) {
+        Object.keys(cmpMeta.m).forEach(memberName => {
           if (elm.hasOwnProperty(memberName)) {
             const value = (elm as any)[memberName];
             delete (elm as any)[memberName];

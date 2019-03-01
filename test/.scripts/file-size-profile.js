@@ -2,7 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const brotli = require('brotli');
+const glob = require('glob');
 
+let totalBrotli = 0;
+let totalGzip = 0;
+let totalMinify = 0;
 
 module.exports = function fileSizeProfile(appName, filePaths, output) {
   output.push(``, `## ${appName}`);
@@ -10,9 +14,17 @@ module.exports = function fileSizeProfile(appName, filePaths, output) {
   output.push(`| File                       | Brotli   | Gzipped  | Minified |`)
   output.push(`|----------------------------|----------|----------|----------|`);
 
-  filePaths.forEach(filePath => {
-    output.push(getBuildFileSize(filePath));
+  totalBrotli = 0;
+  totalGzip = 0;
+  totalMinify = 0;
+  filePaths.forEach(pattern => {
+    glob.sync(pattern).forEach(filePath => {
+      output.push(getBuildFileSize(filePath));
+    });
   });
+
+  // render SUM
+  output.push(render('TOTAL', totalBrotli, totalGzip, totalMinify));
 
   output.push(``, ``);
 }
@@ -28,37 +40,33 @@ function getBuildFileSize(filePath) {
     let minifiedSize;
 
     if (content.length > 0) {
-      brotliSize = getFileSize(brotli.compress(content).length);
-      gzipSize = getFileSize(zlib.gzipSync(content, { level: 9 }).length);
-      minifiedSize = getFileSize(fs.statSync(filePath).size);
+      const brotliResult = brotli.compress(content);
+      brotliSize = brotliResult ? brotliResult.length : 0;
+      gzipSize = zlib.gzipSync(content, { level: 9 }).length;
+      minifiedSize = fs.statSync(filePath).size;
     } else {
-      brotliSize = gzipSize = minifiedSize = getFileSize(0);
+      brotliSize = gzipSize = minifiedSize = 0;
     }
+    totalBrotli += brotliSize;
+    totalGzip += gzipSize;
+    totalMinify += minifiedSize;
 
-    while (fileName.length < 26) {
-      fileName += ' ';
-    }
-
-    while (brotliSize.length < 8) {
-      brotliSize += ' ';
-    }
-
-    while (gzipSize.length < 8) {
-      gzipSize += ' ';
-    }
-
-    while (minifiedSize.length < 8) {
-      minifiedSize += ' ';
-    }
-
-    return `| ${fileName} | ${brotliSize} | ${gzipSize} | ${minifiedSize} |`;
+    return render(fileName, brotliSize, gzipSize, minifiedSize);
 
   } catch (e) {
-    return e;
+    console.error(e);
+    return '';
   }
 }
 
+function render(fileName, brotliSize, gzipSize, minifiedSize) {
+  return `| ${fileName.padEnd(26)} | ${getFileSize(brotliSize).padEnd(8)} | ${getFileSize(gzipSize).padEnd(8)} | ${getFileSize(minifiedSize).padEnd(8)} |`;
+}
+
 function getFileSize(bytes) {
+  if (bytes === 0) {
+    return 'ERROR';
+  }
   if (bytes < 1024) {
     return `${bytes}B`;
   }

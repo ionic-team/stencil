@@ -8,18 +8,29 @@ export const getHostRef = (ref: d.RuntimeRef) =>
   hostRefs.get(ref);
 
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
+  hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 
 export const registerHost = (elm: d.HostElement) => {
-  const hostRef: d.HostRef = {
-    stateFlags: 0,
-  };
-  if (BUILD.prop || BUILD.state) {
-    hostRef.instanceValues = new Map();
-  }
+  // TODO: it's so ugly, but minifies really well
   if (BUILD.lazyLoad) {
-    hostRef.hostElement = elm;
-    hostRef.onReadyPromise = new Promise(r => hostRef.onReadyResolve = r);
+
+    const hostRef: d.HostRef = {
+      $stateFlags$: 0,
+      $hostElement$: elm
+    };
+    hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+    if (BUILD.prop || BUILD.state) {
+      hostRef.$instanceValues$ = new Map();
+    }
+    return hostRefs.set(elm, hostRef);
+
+  } else {
+    const hostRef: d.HostRef = {
+      $stateFlags$: 0,
+    };
+    if (BUILD.prop || BUILD.state) {
+      hostRef.$instanceValues$ = new Map();
+    }
+    return hostRefs.set(elm, hostRef);
   }
-  return hostRefs.set(elm, hostRef);
 };

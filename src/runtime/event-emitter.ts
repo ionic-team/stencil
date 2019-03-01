@@ -5,7 +5,7 @@ import { BUILD } from '@build-conditionals';
 
 
 export function createEvent(ref: d.RuntimeRef, name: string, flags: number) {
-  const el = (BUILD.lazyLoad ? getHostRef(ref).hostElement : ref) as d.HostElement;
+  const el = (BUILD.lazyLoad ? getHostRef(ref).$hostElement$ : ref) as d.HostElement;
   const eventMeta = {
     bubbles: !!(flags & EVENT_FLAGS.Bubbles),
     composed: !!(flags & EVENT_FLAGS.Composed),

@@ -12,32 +12,32 @@ export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentComp
 
 export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean, includeMethods: boolean) {
   const runtimeMeta: d.ComponentLazyRuntimeMeta = {
-    cmpFlags: 0,
+    f: 0,
   };
 
   if (includeTagName) {
-    runtimeMeta.cmpTag = compilerMeta.tagName;
+    runtimeMeta.t = compilerMeta.tagName;
   }
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   if (Object.keys(members).length > 0) {
-    runtimeMeta.cmpMembers = members;
+    runtimeMeta.m = members;
   }
 
   const hostListeners = formatHostListeners(compilerMeta);
   if (hostListeners.length > 0) {
-    runtimeMeta.cmpHostListeners = hostListeners;
+    runtimeMeta.l = hostListeners;
   }
 
   if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.cmpFlags |= CMP_FLAG.shadowDomEncapsulation;
+    runtimeMeta.f |= CMP_FLAG.shadowDomEncapsulation;
 
   } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.cmpFlags |= CMP_FLAG.scopedCssEncapsulation;
+    runtimeMeta.f |= CMP_FLAG.scopedCssEncapsulation;
   }
 
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
-    runtimeMeta.cmpFlags |= CMP_FLAG.hasSlotRelocation;
+    runtimeMeta.f |= CMP_FLAG.hasSlotRelocation;
   }
 
   return runtimeMeta;
@@ -46,12 +46,7 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 
 export function stringifyRuntimeData(data: any) {
   // stringify the data, then remove property double-quotes so they can be property renamed
-  return JSON.stringify(data)
-             .replace(/"cmpTag"/g, 'cmpTag')
-             .replace(/"cmpMeta"/g, 'cmpMeta')
-             .replace(/"cmpHostListeners"/g, 'cmpHostListeners')
-             .replace(/"cmpFlags"/g, 'cmpFlags')
-             .replace(/"cmpMembers"/g, 'cmpMembers');
+  return JSON.stringify(data);
 }
 
 

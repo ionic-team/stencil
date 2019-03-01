@@ -20,9 +20,9 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
 export const styles: d.StyleMap = new Map();
 
 export const plt: d.PlatformRuntime = {
-  isTmpDisconnected: false,
-  queueCongestion: 0,
-  queuePending: false,
+  $isTmpDisconnected$: false,
+  $queueCongestion$: 0,
+  $queuePending$: false,
 };
 
 export const supportsShadowDom = true;
@@ -33,7 +33,7 @@ export function resetPlatform() {
   resetWindow(win);
   hostRefs.clear();
   styles.clear();
-  plt.isTmpDisconnected = false;
+  plt.$isTmpDisconnected$ = false;
 
   resetTaskQueue();
 }
@@ -43,13 +43,13 @@ export const getHostRef = (elm: d.RuntimeRef) =>
   hostRefs.get(elm);
 
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set(hostRef.lazyInstance = lazyInstance, hostRef);
+  hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 
 export const registerHost = (elm: d.HostElement) =>
   hostRefs.set(elm, {
-    stateFlags: 0,
-    hostElement: elm,
-    instanceValues: new Map(),
+    $stateFlags$: 0,
+    $hostElement$: elm,
+    $instanceValues$: new Map(),
   });
 
 const Context = {

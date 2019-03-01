@@ -17,7 +17,7 @@ export namespace Components {
 
   interface TodoInput {}
   interface TodoInputAttributes extends JSXElements.HTMLAttributes {
-    'onInputSubmit'?: (event: any /**TODO**/) => void;
+    'onInputSubmit'?: (event: CustomEvent<any>) => void;
   }
 
   interface TodoItem {
@@ -28,10 +28,15 @@ export namespace Components {
   interface TodoItemAttributes extends JSXElements.HTMLAttributes {
     'checked'?: boolean;
     'index'?: number;
-    'onItemCheck'?: (event: any /**TODO**/) => void;
-    'onItemRemove'?: (event: any /**TODO**/) => void;
+    'onItemCheck'?: (event: CustomEvent<any>) => void;
+    'onItemRemove'?: (event: CustomEvent<any>) => void;
     'text'?: string;
   }
+}
+
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
 }
 
 declare global {
@@ -48,19 +53,19 @@ declare global {
   }
 
 
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLTodoInputElement extends Components.TodoInput, HTMLElement {}
+  interface HTMLTodoInputElement extends Components.TodoInput, HTMLStencilElement {}
   var HTMLTodoInputElement: {
     prototype: HTMLTodoInputElement;
     new (): HTMLTodoInputElement;
   };
 
-  interface HTMLTodoItemElement extends Components.TodoItem, HTMLElement {}
+  interface HTMLTodoItemElement extends Components.TodoItem, HTMLStencilElement {}
   var HTMLTodoItemElement: {
     prototype: HTMLTodoItemElement;
     new (): HTMLTodoItemElement;

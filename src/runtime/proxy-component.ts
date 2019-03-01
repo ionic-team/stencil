@@ -8,7 +8,7 @@ import { disconnectedCallback } from './disconnected-callback';
 
 
 export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
-  cmpMeta.cmpTag = Cstr.is;
+  cmpMeta.t = Cstr.is;
   Cstr.prototype.connectedCallback = function() {
     connectedCallback(this, cmpMeta);
   };
@@ -19,15 +19,15 @@ export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
 };
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
-  if (BUILD.member && cmpMeta.cmpMembers) {
+  if (BUILD.member && cmpMeta.m) {
     if (BUILD.watchCallback && Cstr.watchers) {
-      cmpMeta.watchers = Cstr.watchers;
+      cmpMeta.$watchers$ = Cstr.watchers;
     }
     if (!BUILD.lazyLoad) {
       Cstr.cmpMeta = cmpMeta;
     }
     // It's better to have a const than two Object.entries()
-    const members = Object.entries(cmpMeta.cmpMembers);
+    const members = Object.entries(cmpMeta.m);
 
     members.forEach(([memberName, [memberFlags]]) => {
       if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberFlags & MEMBER_FLAGS.State))) {
@@ -53,7 +53,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           value(this: d.HostElement) {
             const ref = getHostRef(this);
             const args = arguments;
-            return ref.onReadyPromise.then(() => ref.lazyInstance[memberName].apply(ref.lazyInstance, args));
+            return ref.$onReadyPromise$.then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args));
           }
         });
       }
@@ -62,7 +62,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       const attrNameToPropName = new Map();
 
       if (BUILD.reflect) {
-        cmpMeta.attrsToReflect = [];
+        cmpMeta.$attrsToReflect$ = [];
       }
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
@@ -80,7 +80,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           const attribute = m[1] || propName;
           attrNameToPropName.set(attribute, propName);
           if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.attrsToReflect.push([propName, attribute]);
+            cmpMeta.$attrsToReflect$.push([propName, attribute]);
           }
           return attribute;
         });

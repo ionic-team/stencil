@@ -1,3 +1,3 @@
 import { getHostRef } from '@platform';
 
-export const getElement = (ref: any) => getHostRef(ref).hostElement;
+export const getElement = (ref: any) => getHostRef(ref).$hostElement$;

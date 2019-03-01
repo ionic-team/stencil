@@ -7,9 +7,9 @@ import { renderVdom } from './vdom/render';
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
-    hostRef.stateFlags |= HOST_STATE.isQueuedForUpdate;
+    hostRef.$stateFlags$ |= HOST_STATE.isQueuedForUpdate;
   }
-  const instance = BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.lazyInstance : elm as any;
+  const instance = BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.$lazyInstance$ : elm as any;
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
@@ -47,7 +47,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
 const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.stateFlags &= ~HOST_STATE.isQueuedForUpdate;
+    hostRef.$stateFlags$ &= ~HOST_STATE.isQueuedForUpdate;
   }
 
   if (BUILD.lifecycle) {
@@ -55,7 +55,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
   }
 
   if (isInitialLoad) {
-    if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.cmpFlags & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation)) {
+    if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
       // only required when we're NOT using native shadow dom (slot)
       // or this browser doesn't support native shadow dom
       // and this host element was NOT created with SSR
@@ -64,28 +64,28 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       // content was first placed, which is useful later on
       // DOM WRITE!!
       const scopeId = elm['s-sc'] = (BUILD.mode)
-        ? 'sc-' + cmpMeta.cmpTag + (hostRef.modeName ? '-' + hostRef.modeName : '')
-        : 'sc-' + cmpMeta.cmpTag;
+        ? 'sc-' + cmpMeta.t + (hostRef.$modeName$ ? '-' + hostRef.$modeName$ : '')
+        : 'sc-' + cmpMeta.t;
 
       elm.classList.add(getElementScopeId(scopeId, true));
 
-      if (cmpMeta.cmpFlags & CMP_FLAG.scopedCssEncapsulation) {
+      if (cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
         elm.classList.add(getElementScopeId(scopeId, false));
       }
     }
     if (BUILD.style) {
       // DOM WRITE!
-      attachStyles(elm, cmpMeta, hostRef.modeName);
+      attachStyles(elm, cmpMeta, hostRef.$modeName$);
     }
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
-    const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.lazyInstance : elm as any;
+    const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
     if (BUILD.vdomRender || BUILD.reflect) {
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
-      hostRef.stateFlags |= HOST_STATE.isActiveRender;
+      hostRef.$stateFlags$ |= HOST_STATE.isActiveRender;
 
       try {
         // looks like we've got child nodes to render into this host element
@@ -100,7 +100,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       } catch (e) {
         consoleError(e);
       }
-      hostRef.stateFlags &= ~HOST_STATE.isActiveRender;
+      hostRef.$stateFlags$ &= ~HOST_STATE.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
@@ -111,7 +111,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     elm['s-lr'] = true;
   }
   if (BUILD.updatable || BUILD.lazyLoad) {
-    hostRef.stateFlags |= HOST_STATE.hasRendered;
+    hostRef.$stateFlags$ |= HOST_STATE.hasRendered;
   }
 
   if (BUILD.lifecycle && elm['s-rc']) {
@@ -128,9 +128,9 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
 
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
-    const instance = BUILD.lazyLoad ? hostRef.lazyInstance : elm as any;
-    if (!(hostRef.stateFlags & HOST_STATE.hasLoadedComponent)) {
-      hostRef.stateFlags |= HOST_STATE.hasLoadedComponent;
+    const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+    if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {
+      hostRef.$stateFlags$ |= HOST_STATE.hasLoadedComponent;
 
       if (BUILD.lazyLoad && BUILD.style) {
         // DOM WRITE!
@@ -145,9 +145,9 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       emitLifecycleEvent(elm, 'componentDidLoad');
 
       if (BUILD.lazyLoad) {
-        hostRef.onReadyResolve && hostRef.onReadyResolve(elm);
+        hostRef.$onReadyResolve$ && hostRef.$onReadyResolve$(elm);
       }
-      if (BUILD.lifecycleDOMEvents && !hostRef.ancestorComponent) {
+      if (BUILD.lifecycleDOMEvents && !hostRef.$ancestorComponent$) {
         emitLifecycleEvent(elm, 'appload');
       }
     } else {
@@ -172,11 +172,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && hostRef.ancestorComponent) {
+    if (BUILD.lifecycle && hostRef.$ancestorComponent$) {
       // ok so this element already has a known ancestor component
       // let's make sure we remove this element from its ancestor's
       // known list of child elements which are actively loading
-      ancestorsActivelyLoadingChildren = hostRef.ancestorComponent['s-al'];
+      ancestorsActivelyLoadingChildren = hostRef.$ancestorComponent$['s-al'];
 
       if (ancestorsActivelyLoadingChildren) {
         // remove this element from the actively loading map
@@ -187,12 +187,12 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         // then let's call the ancestor's initializeComponent method if there's no length
         // (which actually ends up as this method again but for the ancestor)
         if (!ancestorsActivelyLoadingChildren.size) {
-          hostRef.ancestorComponent['s-al'] = undefined;
-          hostRef.ancestorComponent['s-init']();
+          hostRef.$ancestorComponent$['s-al'] = undefined;
+          hostRef.$ancestorComponent$['s-init']();
         }
       }
 
-      hostRef.ancestorComponent = undefined;
+      hostRef.$ancestorComponent$ = undefined;
     }
 
     // ( •_•)

@@ -13,8 +13,8 @@ const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
   // queue dom reads
   queue.push(cb);
 
-  if (!plt.queuePending) {
-    plt.queuePending = true;
+  if (!plt.$queuePending$) {
+    plt.$queuePending$ = true;
 
     requestAnimationFrame(flush);
   }
@@ -52,7 +52,7 @@ const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
 
 
 const flush = () => {
-  plt.queueCongestion++;
+  plt.$queueCongestion$++;
 
   // always force a bunch of medium callbacks to run, but still have
   // a throttle on how many can run in a certain time
@@ -60,7 +60,7 @@ const flush = () => {
   // DOM READS!!!
   consume(queueDomReads);
 
-  const timeout = performance.now() + (7 * Math.ceil(plt.queueCongestion * (1.0 / 22.0)));
+  const timeout = performance.now() + (7 * Math.ceil(plt.$queueCongestion$ * (1.0 / 22.0)));
 
   // DOM WRITES!!!
   consumeTimeout(queueDomWrites, timeout);
@@ -71,13 +71,13 @@ const flush = () => {
     queueDomWrites.length = 0;
   }
 
-  if (plt.queuePending = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
+  if (plt.$queuePending$ = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
     requestAnimationFrame(flush);
 
   } else {
-    plt.queueCongestion = 0;
+    plt.$queueCongestion$ = 0;
   }
 };
 

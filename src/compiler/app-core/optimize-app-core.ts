@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { RESERVED_PROPERTIES } from './reserved-properties';
 import { sys } from '@sys';
 
 
@@ -37,6 +36,12 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
     opts.output.comments = 'all';
 
   } else {
+    opts.mangle = {
+      properties: {
+        regex: '^\\$.+\\$$',
+      },
+      toplevel: true,
+    };
     opts.output.comments = '/webpack/';
   }
 
@@ -55,11 +60,7 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
   const results = await sys.minifyJs(input, opts);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
 
-    if (!build.lazyLoad) {
-      results.output = results.output.replace(/export(.*);/, '');
-
-      results.output = results.output.replace(/disconnectedCallback\(\){}/g, '');
-    }
+    results.output = results.output.replace(/disconnectedCallback\(\){}/g, '');
 
     await compilerCtx.cache.put(cacheKey, results.output);
   }
@@ -107,15 +108,6 @@ export const PROD_MINIFY_OPTS = JSON.stringify({
     unsafe: true,
     unused: true,
     warnings: false
-  },
-  mangle: {
-    properties: {
-      builtins: false,
-      debug: false,
-      keep_quoted: true,
-      reserved: RESERVED_PROPERTIES
-    },
-    toplevel: true,
   },
   output: {
     ascii_only: false,

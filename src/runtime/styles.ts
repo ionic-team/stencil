@@ -5,7 +5,7 @@ import { getDocument, rootAppliedStyles, styles } from '@platform';
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
 
-  styleId = BUILD.mode ? cmpMeta.cmpTag + '#' + mode : cmpMeta.cmpTag;
+  styleId = BUILD.mode ? cmpMeta.t + '#' + mode : cmpMeta.t;
 
   if (styles.has(styleId)) {
     if (BUILD.shadowDom && elm.shadowRoot) {
