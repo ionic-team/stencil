@@ -11,15 +11,15 @@ export function validateOutputTargetDistModule(config: d.Config) {
 
   moduleOutputTargets.forEach(outputTarget => {
 
-    if (!outputTarget.file) {
-      outputTarget.file = DEFAULT_DIR;
+    if (!outputTarget.dir) {
+      outputTarget.dir = DEFAULT_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.file)) {
-      outputTarget.file = normalizePath(path.join(config.rootDir, outputTarget.file));
+    if (!path.isAbsolute(outputTarget.dir)) {
+      outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
     }
 
   });
 }
 
-const DEFAULT_DIR = 'dist/module/index.js';
+const DEFAULT_DIR = 'dist/module/';

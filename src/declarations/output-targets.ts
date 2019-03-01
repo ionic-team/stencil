@@ -91,7 +91,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
 export interface OutputTargetDistModule extends OutputTargetBase {
   type: 'dist-module';
 
-  file?: string;
+  dir?: string;
 }
 
 

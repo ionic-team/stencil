@@ -15,7 +15,6 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     const rollupOptions: RollupOptions = {
       input: {
         // Generate entry point
-        [config.fsNamespace]: '@core-entrypoint',
         ...bundleCoreOptions.entryInputs,
       },
       plugins: [

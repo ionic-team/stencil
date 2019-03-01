@@ -46,6 +46,7 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
       '@external-entrypoint': EXTERNAL_ENTRY,
     },
     entryInputs: {
+      [config.fsNamespace]: '@core-entrypoint',
       'loader': '@external-entrypoint',
     },
     coreChunk: true,

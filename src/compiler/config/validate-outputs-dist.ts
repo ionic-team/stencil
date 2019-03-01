@@ -63,7 +63,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     config.outputTargets.push({
       type: 'dist-module',
-      file: path.join(outputTarget.dir, 'modules', 'index.mjs')
+      dir: path.join(outputTarget.dir, 'modules')
     });
 
     config.outputTargets.push({

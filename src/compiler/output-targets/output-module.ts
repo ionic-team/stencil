@@ -31,25 +31,25 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build);
 
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
-    if (rollupResults.length !== 1) {
-      console.error('not a single file');
-    } else {
-      let code = rollupResults[0].code;
+    await Promise.all(
+      rollupResults.map(async result => {
+        let code = result.code;
 
-      if (config.minifyJs) {
-        const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', rollupResults[0].code);
-        buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+        if (config.minifyJs) {
+          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', code);
+          buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
-        if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
-          code = optimizeResults.output;
+          if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
+            code = optimizeResults.output;
+          }
         }
-      }
 
-      await Promise.all(outputTargets.map(async outputTarget => {
-        const filePath = sys.path.join(outputTarget.file);
-        await compilerCtx.fs.writeFile(filePath, code);
-      }));
-    }
+        await Promise.all(outputTargets.map(async outputTarget => {
+          const filePath = sys.path.join(outputTarget.dir, result.fileName);
+          await compilerCtx.fs.writeFile(filePath, code);
+        }));
+      })
+    );
   }
 
   timespan.finish(`generate module web components finished`);
@@ -71,7 +71,9 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
 export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const bundleCoreOptions: d.BundleCoreOptions = {
-    entryInputs: {},
+    entryInputs: {
+      'index': '@core-entrypoint'
+    },
     loader: {
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
     }
