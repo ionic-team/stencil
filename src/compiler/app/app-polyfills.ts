@@ -30,17 +30,13 @@ export async function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.Comp
   });
 }
 
-
-
 // order of the polyfills matters!! test test test
 // actual source of the polyfills are found in /src/client/polyfills/
 const INLINE_POLYFILLS = [
   'dom.js',
   'array.js',
   'object.js',
-  'string.js',
-  'promise.js',
-  'map.js',
+  'es6shim.js',
   'fetch.js',
   'url.js'
 ];

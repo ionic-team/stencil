@@ -57,16 +57,16 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
 
   const cssShimOutput = minify.code;
 
-  const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
-  const mapPolyfill = fs.readFileSync(mapPolyfillFilePath, 'utf8');
+  const es6shimPolyfillFilePath = path.join(SRC_DIR, 'es6shim.js');
+  const es6shimPolyfill = fs.readFileSync(es6shimPolyfillFilePath, 'utf8');
 
-  const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
+  const cssShimEs6shimPolyfill = es6shimPolyfill + '\n' + cssShimOutput;
 
   const esmFilePath = path.join(esmDir, 'css-shim.js');
   const es5FilePath = path.join(es5Dir, 'css-shim.js');
 
-  fs.writeFileSync(esmFilePath, esmWrap(cssShimMapPolyfill));
-  fs.writeFileSync(es5FilePath, cssShimMapPolyfill);
+  fs.writeFileSync(esmFilePath, esmWrap(cssShimEs6shimPolyfill));
+  fs.writeFileSync(es5FilePath, cssShimEs6shimPolyfill);
 };
 
 
