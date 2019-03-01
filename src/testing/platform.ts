@@ -7,11 +7,11 @@ export * from './task-queue';
 
 export const win = setupGlobal(global) as Window;
 
-export const getWindow = (_?: any) => win;
+export const getWin = (_?: any) => win;
 
-export const getDocument = (_?: any) => getWindow().document;
+export const getDoc = (_?: any) => getWin().document;
 
-export const getHead = (_?: any) => getDocument().head;
+export const getHead = (_?: any) => getDoc().head;
 
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
@@ -63,10 +63,10 @@ const Context = {
 
 export const getContext = (elm: Node, context: string) => {
   if (context === 'window') {
-    return getWindow(elm);
+    return getWin(elm);
   }
   if (context === 'document') {
-    return getDocument(elm);
+    return getDoc(elm);
   }
   if (context === 'isServer') {
     return true;

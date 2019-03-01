@@ -1,11 +1,11 @@
-import { getDocument, getWindow } from './client-window';
+import { getDoc, getWin } from './client-window';
 import { readTask, tick, writeTask } from './client-task-queue';
 import { getAssetPath } from '@runtime';
 
 
 const Context = {
-  window: /*@__PURE__*/getWindow(),
-  document: /*@__PURE__*/getDocument(),
+  window: /*@__PURE__*/getWin(),
+  document: /*@__PURE__*/getDoc(),
   resourcesUrl: /*@__PURE__*/getAssetPath('.'),
   isServer: false,
   enableListener: () => console.log('TODO'),

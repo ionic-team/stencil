@@ -1,6 +1,6 @@
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
-import { getDocument, getHostRef, supportsShadowDom, tick } from '@platform';
+import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
 import { addEventListeners } from './host-listener';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { initializeComponent } from './initialize-component';
@@ -42,7 +42,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
           // let's pick out the inner content for slot projection
           // create a node to represent where the original
           // content was first placed, which is useful later on
-          elm['s-cr'] = getDocument(elm).createComment(BUILD.isDebug ? `content-reference:${cmpMeta.t}` : '') as any;
+          elm['s-cr'] = getDoc(elm).createComment(BUILD.isDebug ? `content-reference:${cmpMeta.t}` : '') as any;
           elm['s-cr']['s-cn'] = true;
           elm.insertBefore(elm['s-cr'], elm.firstChild);
         }

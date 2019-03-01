@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 
 
-export const getDocument = (elm?: Node) => {
+export const getDoc = (elm?: Node) => {
   if (elm != null) {
     if (elm.nodeType === 9) {
       return elm as Document;
@@ -11,8 +11,8 @@ export const getDocument = (elm?: Node) => {
   return null;
 };
 
-export const getWindow = (elm?: Node) => {
-  const doc = getDocument(elm);
+export const getWin = (elm?: Node) => {
+  const doc = getDoc(elm);
   if (doc != null) {
     return doc.defaultView;
   }
@@ -20,7 +20,7 @@ export const getWindow = (elm?: Node) => {
 };
 
 export const getHead = (elm?: Node) => {
-  const doc = getDocument(elm);
+  const doc = getDoc(elm);
   if (doc != null) {
     return doc.head;
   }
@@ -53,10 +53,10 @@ const Context = {
 
 export const getContext = (ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
-    return getWindow(getHostRef(ref).$hostElement$);
+    return getWin(getHostRef(ref).$hostElement$);
   }
   if (context === 'document') {
-    return getDocument(getHostRef(ref).$hostElement$);
+    return getDoc(getHostRef(ref).$hostElement$);
   }
   if (context === 'isServer') {
     return true;
@@ -101,6 +101,9 @@ export {
   getElement,
   setMode,
   getMode,
+  getWindow,
+  getDocument,
+  getAssetPath,
   Build,
   Host,
   h
