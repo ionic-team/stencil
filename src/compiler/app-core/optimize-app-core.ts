@@ -27,8 +27,12 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
     // if in debug mode, still mangle the property names
     // but at least make them readable of what the
     // properties originally were named
-    opts.mangle.properties.debug = true;
-    opts.mangle.keep_fnames = true;
+    opts.mangle = {
+      properties: {
+        debug: true
+      },
+      keep_fnames: true
+    };
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
     opts.output.beautify = true;
