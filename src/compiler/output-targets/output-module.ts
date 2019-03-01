@@ -89,13 +89,14 @@ function generateEntryPoint(entryModules: d.EntryModule[]) {
   entryModules.forEach(entry => entry.cmps.forEach(cmp => {
     if (cmp.isPlain) {
       result.push(
-        `export { ${cmp.componentClassName} as ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
+        `export { ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
       );
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, true, false));
+      const exportName = dashToPascalCase(cmp.tagName);
       result.push(
-        `import { ${cmp.componentClassName} as $Cmp${count} } from '${entry.entryKey}';`,
-        `export const ${dashToPascalCase(cmp.tagName)} = /*#__PURE__*/proxyNative($Cmp${count}, ${meta});`
+        `import { ${exportName} as $Cmp${count} } from '${entry.entryKey}';`,
+        `export const ${exportName} = /*@__PURE__*/proxyNative($Cmp${count}, ${meta});`
       );
       count++;
     }
