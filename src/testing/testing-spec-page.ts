@@ -54,14 +54,13 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     return lazyBundleRuntimeMeta;
   });
 
-  const win = platform.getWin() as Window;
-  const doc = win != null ? win.document : null;
+  const win = platform.getWindow() as Window;
 
   const plt = {
     win: win,
-    doc: doc,
-    head: doc != null ? doc.head : null,
-    body: doc != null ? doc.body : null,
+    doc: win.document,
+    head: win.document.head,
+    body: win.document.body,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,
@@ -113,7 +112,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   plt.root = findRoot(cmpTags, plt.body);
   if (plt.root) {
-    plt.rootInstance = platform.getHostRef(plt.root).lazyInstance;
+    plt.rootInstance = platform.getHostRef(plt.root).$lazyInstance$;
   }
   return plt;
 }

@@ -45,12 +45,15 @@ export const getHostRef = (elm: d.RuntimeRef) =>
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 
-export const registerHost = (elm: d.HostElement) =>
-  hostRefs.set(elm, {
+export const registerHost = (elm: d.HostElement) => {
+  const hostRef: d.HostRef = {
     $stateFlags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
-  });
+  };
+  hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+  hostRefs.set(elm, hostRef);
+};
 
 const Context = {
   isServer: false,
