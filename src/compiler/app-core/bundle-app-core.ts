@@ -25,7 +25,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         stencilClientPlugin(),
         stencilBuildConditionalsPlugin(build),
-        globalScriptsPlugin(config, compilerCtx),
+        globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(compilerCtx, buildCtx, build, buildCtx.entryModules),
         sys.rollup.plugins.nodeResolve({
           jsnext: true,
@@ -77,7 +77,6 @@ export async function generateRollupBuild(build: RollupBuild, options: OutputOpt
 }
 
 export const DEFAULT_CORE = `
-import '@global-scripts';
 export * from '@stencil/core/platform';
 `;
 

@@ -6,7 +6,6 @@ const rollupCommonjs = require('rollup-plugin-commonjs');
 const { run, transpile, updateBuildIds } = require('./script-utils');
 const { urlPlugin } = require('./plugin-url');
 
-
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-server');
 const INPUT_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
@@ -19,6 +18,7 @@ async function bundleServer() {
     input: INPUT_FILE,
     external: [
       '@stencil/core/build-conditionals',
+      '@stencil/core/global-scripts',
       '../mock-doc',
       '../runtime',
       '../utils'
@@ -29,6 +29,9 @@ async function bundleServer() {
           resolveId(id) {
             if (id === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
+            }
+            if (id === '@global-scripts') {
+              return '@stencil/core/global-scripts';
             }
             if (id === '@mock-doc') {
               return '../mock-doc';

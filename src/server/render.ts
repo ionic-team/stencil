@@ -4,6 +4,7 @@ import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
 import { MockDocument, serializeNodeToHtml } from '@mock-doc';
 import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document';
+import globalScripts from '@global-scripts';
 
 
 export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
@@ -19,6 +20,7 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
 
     const windowLocationUrl = setWindowUrl(doc as any, opts);
     setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
+
     connectElements(opts, results, doc.documentElement);
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
@@ -49,6 +51,7 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
   try {
     const windowLocationUrl = setWindowUrl(doc as any, opts);
     setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
+
     connectElements(opts, results, doc.documentElement);
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
@@ -61,9 +64,16 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
 
 
 function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL, doc: Document, opts: d.HydrateOptions) {
+  const win = (doc.defaultView as Window);
+
   if (typeof opts.url === 'string') {
     try {
-      (doc.defaultView as Window).location.href = opts.url;
+      win.location.href = opts.url;
+    } catch (e) {}
+  }
+  if (typeof opts.userAgent === 'string') {
+    try {
+      (win.navigator as any).userAgent = opts.userAgent;
     } catch (e) {}
   }
   if (typeof opts.cookie === 'string') {
@@ -86,15 +96,16 @@ function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL
       doc.documentElement.setAttribute('lang', opts.language);
     } catch (e) {}
   }
-  if (typeof opts.userAgent === 'string') {
+  if (typeof opts.beforeHydrate === 'function') {
     try {
-      (doc.defaultView as any).navigator.userAgent = opts.userAgent;
-    } catch (e) {}
-  }
-  try {
-    if (typeof opts.beforeHydrate === 'function') {
       opts.beforeHydrate(doc as any, windowLocationUrl);
+    } catch (e) {
+      catchError(results.diagnostics, e);
     }
+  }
+
+  try {
+    globalScripts(win);
   } catch (e) {
     catchError(results.diagnostics, e);
   }
