@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 export { Host, bootstrapLazy, createEvent, getElement, getConnect, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';

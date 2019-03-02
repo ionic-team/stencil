@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import { logger, sys } from '@sys';
 import * as puppeteer from 'puppeteer';

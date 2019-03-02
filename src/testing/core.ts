@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 
 
 export {
@@ -14,7 +14,7 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXElements,
-} from '@declarations';
+} from '../declarations';
 
 /**
  * Component

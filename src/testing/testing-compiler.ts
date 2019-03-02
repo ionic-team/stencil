@@ -1,9 +1,9 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { Compiler, validateConfig } from '@compiler';
 import { TestingConfig } from './testing-config';
 
 
-export class TestingCompiler extends Compiler {
+class TCompiler extends Compiler {
   config: d.Config;
 
   constructor(config?: d.Config) {
@@ -29,3 +29,5 @@ export class TestingCompiler extends Compiler {
   }
 
 }
+
+export const TestingCompiler = (TCompiler as any) as d.Compiler;

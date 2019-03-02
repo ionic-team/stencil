@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { hasError } from '@utils';
 import { logger, sys } from '@sys';
 import { runJest } from './jest/jest-runner';

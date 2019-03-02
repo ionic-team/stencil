@@ -1,5 +1,5 @@
 import { TestingFs } from './testing-fs';
-import { StencilSystem } from '@declarations';
+import { StencilSystem } from '../declarations';
 import fs from 'fs';
 import path from 'path';
 

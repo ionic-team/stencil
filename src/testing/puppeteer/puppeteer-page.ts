@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import { closePage } from './puppeteer-browser';
 import { find, findAll } from './puppeteer-find';

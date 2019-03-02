@@ -96,18 +96,14 @@ async function bundleTesting() {
   });
 
   // copy over all the .d.ts file too
-  await fs.copy(path.dirname(TRANSPILED_TESTING_DIR), DEST_DIR, {
-    filter: (src) => {
-      return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
-    }
+  await fs.copy(TRANSPILED_TESTING_DIR, DEST_DIR, {
+    filter: (src) => !src.endsWith('.js') && !src.includes('.spec.')
   });
 
   const { output } = await rollupBuild.generate({
     format: 'cjs',
     dir: DEST_DIR
   });
-
-  await fs.ensureDir(DEST_DIR);
 
   await Promise.all(output.map(async chunk => {
     const outputText = updateBuildIds(chunk.code);
@@ -118,6 +114,8 @@ async function bundleTesting() {
 
 run(async () => {
   transpile(path.join('..', 'src', 'testing', 'tsconfig.json'));
+
+  await fs.emptyDir(DEST_DIR);
 
   await bundleTesting();
 

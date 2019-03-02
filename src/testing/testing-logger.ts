@@ -1,7 +1,7 @@
-import { Diagnostic, Logger, LoggerTimeSpan } from '@declarations';
+import * as d from '../declarations';
 
 
-export class TestingLogger implements Logger {
+export class TestingLogger implements d.Logger {
 
   enable = false;
 
@@ -38,14 +38,14 @@ export class TestingLogger implements Logger {
   gray(msg: string) { return msg; }
   bold(msg: string) { return msg; }
   dim(msg: string) { return msg; }
-  createTimeSpan(_startMsg: string, _debug = false): LoggerTimeSpan {
+  createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
     return {
       finish: () => {
         /* finish */
       }
     };
   }
-  printDiagnostics(_diagnostics: Diagnostic[]) {
+  printDiagnostics(_diagnostics: d.Diagnostic[]) {
     /* */
   }
   buildLogFilePath: string = null;

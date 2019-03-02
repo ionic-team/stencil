@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { MAX_ERRORS, splitLineBreaks } from './logger-utils';
 import ts from 'typescript';
 

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { logger } from '@sys';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';

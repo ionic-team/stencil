@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BuildContext, Cache, validateConfig } from '@compiler';
 import { InMemoryFileSystem } from '@utils';
 import { MockWindow } from '@mock-doc';
@@ -89,7 +89,7 @@ export function mockCache() {
 
   const cache = new Cache(config, fs);
   cache.initCacheDir();
-  return cache;
+  return cache as d.Cache;
 }
 
 

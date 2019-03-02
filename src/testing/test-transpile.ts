@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpileModule } from '@compiler';
 import ts from 'typescript';
