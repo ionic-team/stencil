@@ -2,6 +2,17 @@ import { MockElement } from './node';
 import cssWhat from 'css-what';
 
 
+export function closest(selector: string, elm: MockElement) {
+  while (elm != null) {
+    if (elm.matches(selector)) {
+      return elm;
+    }
+    elm = elm.parentNode as any;
+  }
+  return null;
+}
+
+
 export function matches(selector: string, elm: MockElement) {
   const selectors = cssWhat(selector);
   return matchesSelectors(selectors, elm);

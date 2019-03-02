@@ -4,6 +4,33 @@ import { MockElement } from '../node';
 
 describe('selector', () => {
 
+  it('closest', () => {
+    const doc = new MockDocument(`
+      <div>
+        <span>
+          <p></p>
+        </span>
+      </div>
+    `);
+
+    const p = doc.querySelector('p');
+    const div = doc.querySelector('div');
+    expect(p.closest('div')).toBe(div);
+  });
+
+  it('no closest', () => {
+    const doc = new MockDocument(`
+      <div>
+        <span>
+          <p></p>
+        </span>
+      </div>
+    `);
+
+    const p = doc.querySelector('p');
+    expect(p.closest('div#my-id')).toBe(null);
+  });
+
   it('matches, tag/class/id', () => {
     const elm = new MockElement(null, 'h1');
     elm.classList.add('my-class');

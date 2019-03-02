@@ -1,6 +1,6 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
+import { closest, matches, selectAll, selectOne } from './selector';
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
-import { matches, selectAll, selectOne } from './selector';
 import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
@@ -214,8 +214,8 @@ export class MockElement extends MockNode {
     return cloned;
   }
 
-  closest() {
-    throw new Error(`closest() ${NOT_IMPL}`);
+  closest(selector: string) {
+    return closest(selector, this);
   }
 
   get dir() { return this.getAttributeNS(null, 'dir') || ''; }
