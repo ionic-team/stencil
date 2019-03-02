@@ -1,12 +1,12 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
+import { matches, selectAll, selectOne } from './selector';
 import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
-import { selectAll, selectOne } from './selector';
 
 
 export class MockNode {
@@ -340,8 +340,8 @@ export class MockElement extends MockNode {
     return children[children.length - 1] || null;
   }
 
-  matches() {
-    throw new Error(`matches() ${NOT_IMPL}`);
+  matches(selector: string) {
+    return matches(selector, this);
   }
 
   get nextElementSibling() {

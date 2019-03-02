@@ -2,6 +2,12 @@ import { MockElement } from './node';
 import cssWhat from 'css-what';
 
 
+export function matches(selector: string, elm: MockElement) {
+  const selectors = cssWhat(selector);
+  return matchesSelectors(selectors, elm);
+}
+
+
 export function selectOne(selector: string, elm: MockElement) {
   const selectors = cssWhat(selector);
   return selectOneRecursion(selectors, elm);
