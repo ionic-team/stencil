@@ -50,10 +50,13 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
   const results = generateHydrateResults(opts);
 
   try {
-    const win: Window = doc.defaultView || {
-      location: {},
-      navigator: {}
-    } as any;
+    const win: Window = doc.defaultView || new MockWindow(false) as any;
+    if (win.document !== doc) {
+      (win as any).document = doc;
+    }
+    if (doc.defaultView !== win) {
+      (doc as any).defaultView = win;
+    }
 
     const windowLocationUrl = setWindowUrl(win, opts);
     setupDocumentFromOpts(results, windowLocationUrl, win, doc, opts);

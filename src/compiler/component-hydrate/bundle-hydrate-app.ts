@@ -52,6 +52,19 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
 
     code = output[0].code;
 
+    // hack to remove some unnecessary async ticks
+    if (!code.includes(`initializeComponent = async`)) {
+      throw new Error(`"initializeComponent = async" not found`);
+    }
+    code = code.replace(`initializeComponent = async`, `initializeComponent =`);
+
+    // remove the async ticks for now
+    // this is temporary until Angular Universal can get async
+    code = code.replace(`scheduleUpdate = async`, `scheduleUpdate =`);
+    code = code.replace(`await instance.componentWillLoad()`, `instance.componentWillLoad()`);
+    code = code.replace(`await instance.componentWillUpdate()`, `instance.componentWillUpdate()`);
+    code = code.replace(`await instance.componentWillRender()`, `instance.componentWillRender()`);
+
   } catch (e) {
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
   }

@@ -8,10 +8,6 @@ import { initializeComponent } from './initialize-component';
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
     // connectedCallback
-  if (BUILD.hydrateServerSide) {
-    cmpMeta = (elm.constructor as d.ComponentConstructor).cmpMeta;
-  }
-
   if (!BUILD.updatable && !BUILD.member && !BUILD.lifecycle && !BUILD.hostListener) {
     // connectedCallback, initialLoad
     initializeComponent(elm, getHostRef(elm), cmpMeta);
