@@ -6,7 +6,7 @@ import { relocateMetaCharset } from './relocate-meta-charset';
 import { updateCanonicalLink } from './canonical-link';
 
 
-export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
+export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
   optimizeStyles(opts, results, doc);
 
   if (typeof opts.title === 'string') {
@@ -31,11 +31,11 @@ export async function optimizeHydratedDocument(opts: d.HydrateOptions, results: 
     relocateMetaCharset(doc);
   } catch (e) {}
 
-  try {
-    if (typeof opts.afterHydrate === 'function') {
+  if (typeof opts.afterHydrate === 'function') {
+    try {
       opts.afterHydrate(doc as any, windowLocationUrl);
+    } catch (e) {
+      catchError(results.diagnostics, e);
     }
-  } catch (e) {
-    catchError(results.diagnostics, e);
   }
 }

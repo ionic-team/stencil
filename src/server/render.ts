@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { catchError } from '@utils';
 import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
-import { MockDocument, serializeNodeToHtml } from '@mock-doc';
+import { MockWindow, serializeNodeToHtml } from '@mock-doc';
 import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document';
 import globalScripts from '@global-scripts';
 
@@ -16,12 +16,13 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
   const results = generateHydrateResults(opts);
 
   try {
-    const doc: Document = new MockDocument(html) as any;
+    const win: Window = new MockWindow(html) as any;
+    const doc = win.document;
 
-    const windowLocationUrl = setWindowUrl(doc as any, opts);
-    setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
+    const windowLocationUrl = setWindowUrl(win, opts);
+    setupDocumentFromOpts(results, windowLocationUrl, win, doc, opts);
 
-    connectElements(opts, results, doc.documentElement);
+    connectElements(opts, results, doc.body);
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
     if (results.diagnostics.length === 0) {
@@ -49,10 +50,15 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
   const results = generateHydrateResults(opts);
 
   try {
-    const windowLocationUrl = setWindowUrl(doc as any, opts);
-    setupDocumentFromOpts(results, windowLocationUrl, doc, opts);
+    const win: Window = doc.defaultView || {
+      location: {},
+      navigator: {}
+    } as any;
 
-    connectElements(opts, results, doc.documentElement);
+    const windowLocationUrl = setWindowUrl(win, opts);
+    setupDocumentFromOpts(results, windowLocationUrl, win, doc, opts);
+
+    connectElements(opts, results, doc.body);
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
   } catch (e) {
@@ -63,9 +69,7 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
 }
 
 
-function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL, doc: Document, opts: d.HydrateOptions) {
-  const win = (doc.defaultView as Window);
-
+function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL, win: Window, doc: Document, opts: d.HydrateOptions) {
   if (typeof opts.url === 'string') {
     try {
       win.location.href = opts.url;
@@ -112,10 +116,10 @@ function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL
 }
 
 
-function setWindowUrl(doc: MockDocument, opts: d.HydrateOptions) {
+function setWindowUrl(win: Window, opts: d.HydrateOptions) {
   const url = typeof opts.url === 'string' ? opts.url : BASE_URL;
   try {
-    (doc.defaultView as Window).location.href = url;
+    win.location.href = url;
   } catch (e) {}
   return new URL(url, BASE_URL);
 }
