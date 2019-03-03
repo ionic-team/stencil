@@ -28,6 +28,13 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
     }
 
     try {
+      if (typeof elm.componentOnReady !== 'function') {
+        elm.componentOnReady = componentOnReady;
+      }
+      if (typeof elm.forceUpdate !== 'function') {
+        elm.forceUpdate = forceUpdate;
+      }
+
       registerHost(elm);
       const hostRef = getHostRef(elm);
       const instance = new Cstr(hostRef);
@@ -40,6 +47,15 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
       catchError(results.diagnostics, e);
     }
   }
+}
+
+
+function componentOnReady(this: d.HostElement) {
+  return Promise.resolve(this);
+}
+
+function forceUpdate(this: d.HostElement) {
+  //
 }
 
 

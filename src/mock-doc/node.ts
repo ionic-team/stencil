@@ -597,9 +597,6 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
   return newNode;
 }
 
-const NOT_IMPL = `is not implemented for MockElement. For unit tests, instead try document.getElementById(), document.getElementsByTagName(), or document.getElementsByClassName()`;
-
-
 
 export class MockTextNode extends MockNode {
 

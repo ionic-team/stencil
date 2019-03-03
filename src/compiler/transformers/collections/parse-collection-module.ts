@@ -8,9 +8,8 @@ export function parseCollection(config: d.Config, compilerCtx: d.CompilerCtx, bu
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;
 
-  compilerCtx.collections = compilerCtx.collections || [];
   let collection: d.CollectionCompilerMeta = compilerCtx.collections.find(c => c.collectionName === collectionName);
-  if (collection) {
+  if (collection != null) {
     // we've already cached the collection, no need for another resolve/readFile/parse
     // thought being that /node_modules/ isn't changing between watch builds
     return collection;

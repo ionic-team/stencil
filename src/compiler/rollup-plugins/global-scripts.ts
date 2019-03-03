@@ -9,14 +9,17 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
 
   if (typeof config.globalScript === 'string') {
     const mod = compilerCtx.moduleMap.get(config.globalScript);
-    if (mod && mod.jsFilePath) {
+    if (mod != null && mod.jsFilePath) {
       paths.push(mod.jsFilePath);
     }
   }
-  // TODO: dependencies
-  // paths.push(
-  //   ...compilerCtx.collections.map(collection => collection.global.jsFilePath)
-  // );
+
+  compilerCtx.collections.forEach(collection => {
+    if (collection.global != null && typeof collection.global.jsFilePath === 'string') {
+      paths.push(collection.global.jsFilePath);
+    }
+  });
+
   return {
     resolveId(id: string) {
       if (id === '@stencil/core/global-scripts') {
@@ -94,7 +97,7 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
       });
 
       output.push(
-        `export default function(win) {`
+        `export default function(win, isServer) {`
       );
 
       output.push(
@@ -103,7 +106,7 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
 
       paths.forEach((_, index) => {
         output.push(
-          `  global${index}(win, doc);`
+          `  global${index}(win, doc, isServer);`
         );
       });
 

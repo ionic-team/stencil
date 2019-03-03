@@ -25,7 +25,6 @@ export function parseImport(sys: d.StencilSystem, config: d.Config, compilerCtx:
         addCollection(sys, config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 
         // test if this side effect import is a collection
-        compilerCtx.collections = compilerCtx.collections || [];
         const isCollectionImport = compilerCtx.collections.some(c => {
           return c.collectionName === importPath;
         });

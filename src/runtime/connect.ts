@@ -1,13 +1,14 @@
-import { getDoc } from '@platform';
+import * as d from '@declarations';
+import { getDoc, getElement } from '@platform';
 
 
-export const getConnect = (elm: HTMLElement, tagName: string) => {
+export const getConnect = (ref: d.HostRef, tagName: string) => {
   function componentOnReady(): Promise<any> {
-    let element = getDoc(elm).querySelector(tagName) as any;
-    if (!element) {
-      element = getDoc(elm).createElement(tagName);
+    let elm = getDoc(getElement(ref)).querySelector(tagName) as any;
+    if (!elm) {
+      elm = getDoc(getElement(ref)).createElement(tagName);
     }
-    return element.componentOnReady();
+    return elm.componentOnReady ? elm.componentOnReady() : Promise.resolve(ref.$hostElement$);
   }
 
   function create() {

@@ -51,6 +51,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       } catch (e) {
         consoleError(e);
       }
+
+    } else if (BUILD.hydrateServerSide) {
+      Cstr = elm.constructor as any;
     }
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {

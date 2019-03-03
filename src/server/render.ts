@@ -112,7 +112,7 @@ function setupDocumentFromOpts(results: d.HydrateResults, windowLocationUrl: URL
   }
 
   try {
-    globalScripts(win);
+    globalScripts(win, true);
   } catch (e) {
     catchError(results.diagnostics, e);
   }

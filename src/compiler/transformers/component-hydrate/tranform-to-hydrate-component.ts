@@ -53,14 +53,14 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFa
           if (cmp != null) {
             return updateHydrateComponentClass(node, cmp);
           }
-
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addHydrateImports(transformCtx, tsSourceFile);
-      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+      tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+
+      return addHydrateImports(transformCtx, compilerCtx, tsSourceFile);
     };
   };
 }

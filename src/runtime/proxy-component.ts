@@ -23,7 +23,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     if (BUILD.watchCallback && Cstr.watchers) {
       cmpMeta.$watchers$ = Cstr.watchers;
     }
-    if (!BUILD.lazyLoad) {
+    if (!BUILD.lazyLoad && !BUILD.hydrateServerSide) {
       Cstr.cmpMeta = cmpMeta;
     }
     // It's better to have a const than two Object.entries()

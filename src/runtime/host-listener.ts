@@ -16,12 +16,12 @@ export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listen
 
 const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
   return (ev: Event) => {
-    if (BUILD.lazyLoad) {
+    if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
       if (hostRef.$lazyInstance$) {
         // instance is ready, let's call it's member method for this event
         return hostRef.$lazyInstance$[methodName](ev);
       } else {
-        hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev));
+        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev));
       }
     } else {
       return (hostRef.$hostElement$ as any)[methodName](ev);
