@@ -15,6 +15,10 @@ export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.Hydr
     } catch (e) {}
   }
 
+  if (opts.removeScripts) {
+    removeScripts(doc.documentElement);
+  }
+
   if (opts.collapseWhitespace === true) {
     try {
       collapseHtmlWhitepace(doc.documentElement);
@@ -36,6 +40,21 @@ export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.Hydr
       opts.afterHydrate(doc as any, windowLocationUrl);
     } catch (e) {
       catchError(results.diagnostics, e);
+    }
+  }
+
+  results.title = doc.title;
+}
+
+
+function removeScripts(elm: HTMLElement) {
+  const children = elm.children;
+  for (let i = children.length - 1; i >= 0; i--) {
+    const child = children[i];
+    removeScripts(child as any);
+
+    if (child.nodeName === 'SCRIPT') {
+      child.remove();
     }
   }
 }

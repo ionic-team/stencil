@@ -32,6 +32,7 @@ export interface HydrateResults {
   styles?: HydrateStyleElement[];
   scripts?: HydrateScriptElement[];
   imgs?: HydrateImgElement[];
+  title: string;
 }
 
 
@@ -103,6 +104,7 @@ export interface HydrateOptions {
   prettyHtml?: boolean;
   referrer?: string;
   removeHtmlComments?: boolean;
+  removeScripts?: string[];
   removeUnusedStyles?: boolean;
   title?: string;
   url?: string;
