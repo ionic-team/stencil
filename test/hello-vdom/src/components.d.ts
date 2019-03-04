@@ -16,6 +16,11 @@ export namespace Components {
   interface HelloVdomAttributes extends JSXElements.HTMLAttributes {}
 }
 
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
+
 declare global {
   interface StencilElementInterfaces {
     'HelloVdom': Components.HelloVdom;
@@ -26,7 +31,7 @@ declare global {
   }
 
 
-  interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLElement {}
+  interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
   var HTMLHelloVdomElement: {
     prototype: HTMLHelloVdomElement;
     new (): HTMLHelloVdomElement;

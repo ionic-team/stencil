@@ -8,7 +8,7 @@ export function addHydrateImports(transformCtx: ts.TransformationContext, compil
   const importFns = [
     ...COMMON_IMPORTS,
     `connectedCallback as ${CONNECTED_CALLBACK}`,
-    `registerInstance as ${REGISTER_INSTANCE}`,
+    `registerInstance as ${REGISTER_INSTANCE}`
   ];
 
   const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
@@ -16,5 +16,8 @@ export function addHydrateImports(transformCtx: ts.TransformationContext, compil
     importFns.push('h');
   }
 
-  return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');
+  tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');
+  tsSourceFile = addImports(transformCtx, tsSourceFile, ['console'], '@stencil/core/console');
+
+  return tsSourceFile;
 }

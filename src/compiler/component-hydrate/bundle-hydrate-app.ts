@@ -5,6 +5,7 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
+import { stencilConsolePlugin } from '../rollup-plugins/stencil-console';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
 import { sys } from '@sys';
@@ -23,6 +24,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
           '@stencil/core/app': coreSource,
         }),
         stencilServerPlugin(),
+        stencilConsolePlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
