@@ -27,7 +27,7 @@ export namespace Components {
   }
 
   interface AttributeBooleanRoot {
-    'toggleState': () => void;
+    'toggleState': () => Promise<void>;
   }
   interface AttributeBooleanRootAttributes extends JSXElements.HTMLAttributes {}
 
@@ -107,7 +107,7 @@ export namespace Components {
 
   interface EsmImport {
     'propVal': number;
-    'someMethod': () => void;
+    'someMethod': () => Promise<void>;
   }
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {
     'onSomeEvent'?: (event: CustomEvent<any>) => void;

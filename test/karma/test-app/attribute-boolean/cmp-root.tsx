@@ -10,7 +10,7 @@ export class AttributeBooleanRoot {
   @State() state = false;
 
   @Method()
-  toggleState() {
+  async toggleState() {
     this.state = !this.state;
   }
 

@@ -1,7 +1,7 @@
 import * as d from '@declarations';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';
-import { buildError, normalizePath } from '@utils';
+import { buildError, normalizePath, buildWarn } from '@utils';
 import { sys } from '@sys';
 import { validatePublicName } from '../reserved-public-members';
 
@@ -29,15 +29,25 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
   const signature = typeChecker.getSignatureFromDeclaration(method);
   const returnType = typeChecker.getReturnTypeOfSignature(signature);
   const returnTypeNode = typeChecker.typeToTypeNode(returnType);
-  const signatureString = typeChecker.signatureToString(
+  let returnString = typeToString(typeChecker, returnType);
+  let signatureString = typeChecker.signatureToString(
     signature,
     method,
     flags,
     ts.SignatureKind.Call
   );
-  const returnString = typeToString(typeChecker, returnType);
 
-  if (!isTypePromise(returnString)) {
+  if (returnString === 'void') {
+    const warn = buildWarn(diagnostics);
+    warn.header = '@Method requires async';
+    warn.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
+    warn.absFilePath = normalizePath(sourceFile.fileName);
+    warn.relFilePath = normalizePath(sys.path.relative(config.rootDir, sourceFile.fileName));
+
+    returnString = 'Promise<void>';
+    signatureString.replace(/=> void$/, '=> Promise<void>');
+
+  } else if (!isTypePromise(returnString)) {
     const err = buildError(diagnostics);
     err.header = '@Method requires async';
     err.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
