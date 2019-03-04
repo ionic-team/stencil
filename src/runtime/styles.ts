@@ -7,6 +7,16 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 
   styleId = BUILD.mode ? cmpMeta.t + '#' + mode : cmpMeta.t;
 
+  if (BUILD.mode) {
+    styleId = cmpMeta.t + '#' + mode;
+    if (!styles.has(styleId)) {
+      styleId = cmpMeta.t;
+    }
+
+  } else {
+    styleId = cmpMeta.t;
+  }
+
   if (styles.has(styleId)) {
     if (BUILD.shadowDom && elm.shadowRoot) {
       // we already know we're in a shadow dom

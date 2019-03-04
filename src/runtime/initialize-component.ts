@@ -13,15 +13,16 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     // we haven't initialized this element yet
     hostRef.$stateFlags$ |= HOST_STATE.hasInitializedComponent;
 
+    if (BUILD.mode && hostRef.$modeName$ == null) {
+      // initializeComponent, BUILD.mode
+      // looks like mode wasn't set as a property directly yet
+      // first check if there's an attribute
+      // next check the app's global
+      hostRef.$modeName$ = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
+    }
+
     if (BUILD.lazyLoad) {
       // lazy loaded components
-      if (BUILD.mode && hostRef.$modeName$ === undefined) {
-        // initializeComponent, BUILD.mode
-        // looks like mode wasn't set as a property directly yet
-        // first check if there's an attribute
-        // next check the app's global
-        hostRef.$modeName$ = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
-      }
       try {
         // request the component's implementation to be
         // wired up with the host element
