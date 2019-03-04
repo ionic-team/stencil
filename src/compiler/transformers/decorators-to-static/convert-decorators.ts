@@ -12,13 +12,13 @@ import { removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
-export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
+export function convertDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
     function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
-        node = visitClass(diagnostics, typeChecker, tsSourceFile, node);
+        node = visitClass(config, diagnostics, typeChecker, tsSourceFile, node);
       } else if (ts.isImportDeclaration(node)) {
         return removeStencilImport(node);
       }
@@ -33,7 +33,7 @@ export function convertDecoratorsToStatic(diagnostics: d.Diagnostic[], typeCheck
 }
 
 
-function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) {
+function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) {
   if (!cmpNode.decorators) {
     return cmpNode;
   }
@@ -54,7 +54,7 @@ function visitClass(diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, ts
     propDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
     stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
     eventDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
-    methodDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    methodDecoratorsToStatic(config, diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
     listenDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, newMembers);

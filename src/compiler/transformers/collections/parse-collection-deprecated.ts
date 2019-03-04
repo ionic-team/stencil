@@ -54,7 +54,6 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     legacyConnect: parseConnectProps(cmpData),
     legacyContext: parseContextProps(cmpData),
 
-    hasAsyncLifecycle: false,
     hasAttributeChangedCallbackFn: false,
     hasComponentWillLoadFn: true,
     hasComponentDidLoadFn: true,

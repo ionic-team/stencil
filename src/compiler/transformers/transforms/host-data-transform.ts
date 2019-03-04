@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { H, HOST } from '../exports';
 
 export function transformHostData(classElements: ts.ClassElement[]) {
-  const hasHostData = !!classElements.find(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
+  const hasHostData = classElements.some(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
   if (hasHostData) {
     const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
     if (renderIndex >= 0) {
@@ -26,7 +26,9 @@ export function transformHostData(classElements: ts.ClassElement[]) {
 
 function syntheticRender(hasRender: boolean) {
   const hArguments = [
+    // __stencil_Host
     ts.createIdentifier(HOST),
+    // this.hostData()
     ts.createCall(
       ts.createPropertyAccess(ts.createThis(), 'hostData'),
       undefined,
@@ -35,6 +37,7 @@ function syntheticRender(hasRender: boolean) {
   ];
   if (hasRender) {
     hArguments.push(
+      // this.render()
       ts.createCall(
         ts.createPropertyAccess(ts.createThis(), INTERNAL_RENDER),
         undefined,
@@ -42,6 +45,12 @@ function syntheticRender(hasRender: boolean) {
       )
     );
   }
+
+  /**
+   * render() {
+   *   return h(arguments);
+   * }
+   */
   return ts.createMethod(
     undefined,
     undefined,

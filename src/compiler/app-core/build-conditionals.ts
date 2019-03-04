@@ -4,7 +4,6 @@ import * as d from '@declarations';
 export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
-    asyncLifecycle: cmps.some(c => c.hasAsyncLifecycle),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
     cmpDidUnload: cmps.some(c => c.hasComponentDidUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),

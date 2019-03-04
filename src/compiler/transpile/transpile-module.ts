@@ -74,7 +74,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
 
   program.emit(undefined, undefined, undefined, false, {
     before: [
-      convertDecoratorsToStatic(buildCtx.diagnostics, typeChecker)
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
     ],
     after: [
       convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),

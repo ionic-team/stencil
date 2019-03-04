@@ -2,7 +2,6 @@ import * as d from '.';
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
-  hasAsyncLifecycle: boolean;
   hasAttribute: boolean;
   hasAttributeChangedCallbackFn: boolean;
   hasComponentWillLoadFn: boolean;

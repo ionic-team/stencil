@@ -59,7 +59,6 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     jsFilePath: null,
     sourceFilePath: null,
 
-    hasAsyncLifecycle: false,
     hasAttributeChangedCallbackFn: false,
     hasComponentWillLoadFn: false,
     hasComponentDidLoadFn: false,
@@ -106,8 +105,6 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     potentialCmpRefs: []
   };
 
-  parseClassMethods(typeChecker, cmpNode, cmp);
-
   function visitComponentChildNode(node: ts.Node): ts.VisitResult<ts.Node> {
     if (ts.isCallExpression(node)) {
       parseCallExpression(cmp, node);
@@ -118,6 +115,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
   }
   ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
 
+  parseClassMethods(cmpNode, cmp);
   setComponentBuildConditionals(cmp);
 
   if (transformOpts.addCompilerMeta) {

@@ -122,7 +122,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
       return {
         before: [
-          convertDecoratorsToStatic(transpileCtx.buildCtx.diagnostics, typeChecker)
+          convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
           convertStaticToMeta(sys, config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)

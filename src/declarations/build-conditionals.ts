@@ -56,7 +56,6 @@ export interface BuildFeatures {
   updatable?: boolean;
 
   // lifecycle events
-  asyncLifecycle?: boolean;
   lifecycle?: boolean;
   cmpDidLoad?: boolean;
   cmpWillLoad?: boolean;

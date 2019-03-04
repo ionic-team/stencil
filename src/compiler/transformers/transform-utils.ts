@@ -417,37 +417,6 @@ export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set
   }
 }
 
-export function getLeadingComments(node: ts.Node, sourceFile: ts.SourceFile) {
-  if (node.parent) {
-    const nodePos = node.pos;
-    const parentPos = node.parent.pos;
-
-    if (node.parent.kind === ts.SyntaxKind.SourceFile || nodePos !== parentPos) {
-      const comments = ts.getLeadingCommentRanges(sourceFile.text, nodePos);
-      if (Array.isArray(comments)) {
-        return comments.map((comment) => {
-          return sourceFile.text.substring(comment.pos, comment.end);
-        });
-      }
-    }
-  }
-  return undefined;
-}
-
-export function copyComments(src: ts.Node, dst: ts.Node) {
-  const comments = getLeadingComments(src, src.getSourceFile());
-  if (comments) {
-    const newComments = comments.map(text => ({
-      hasTrailingNewLine: false,
-      kind: ts.SyntaxKind.MultiLineCommentTrivia,
-      text: text,
-      pos: -1,
-      end: -1,
-    }));
-    ts.setSyntheticLeadingComments(dst, newComments as any);
-  }
-}
-
 export function getModuleFromSourceFile(compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -509,12 +478,6 @@ export function createImportDeclaration(importPath: string, importFnName: string
     ])),
     ts.createLiteral(importPath)
   );
-}
-
-
-export function addVariable(varName: string, expression: ts.Expression) {
-  const left = ts.createUniqueName(varName);
-  return ts.createBinary(left, ts.SyntaxKind.EqualsToken, expression);
 }
 
 
@@ -611,4 +574,23 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
 
 export function isInternal(jsDocs: d.CompilerJsDoc | undefined) {
   return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
+}
+
+export function isMethod(member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration {
+  return ts.isMethodDeclaration(member) && member.name && (member.name as any).escapedText === methodName;
+}
+
+
+export function isAsyncFn(typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) {
+  if (methodDeclaration.modifiers) {
+    if (methodDeclaration.modifiers.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
+      return true;
+    }
+  }
+
+  const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
+  const returnType = methodSignature.getReturnType();
+  const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
+
+  return typeStr.includes('Promise<');
 }
