@@ -28,6 +28,7 @@ export class MockLocation {
     this.username = url.username;
     this.password = url.password;
     this.origin = url.origin;
+    this._href = value;
   }
 
   assign(_url: string) {
