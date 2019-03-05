@@ -190,7 +190,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   // auto add css prefixes and minifies when configured
   compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
 
-  if (requiresScopedStyles(cmp.encapsulation, config)) {
+  if (requiresScopedStyles(cmp.encapsulation)) {
     // only create scoped styles if we need to
     compiledStyle.styleTextScoped = await scopeComponentCss(buildCtx, cmp, modeName, compiledStyle.styleText);
     if (cmp.encapsulation === 'scoped') {
@@ -272,11 +272,8 @@ export function escapeCssForJs(style: string) {
 }
 
 
-export function requiresScopedStyles(encapsulation: d.Encapsulation, config: d.Config) {
-  return (
-    (encapsulation === 'shadow' && config.buildScoped) ||
-    (encapsulation === 'scoped')
-  );
+function requiresScopedStyles(encapsulation: d.Encapsulation) {
+  return (encapsulation === 'shadow' || encapsulation === 'scoped');
 }
 
 

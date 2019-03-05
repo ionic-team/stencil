@@ -1,9 +1,10 @@
 import * as d from '@declarations';
-import { attachStyles, getElementScopeId } from './styles';
+import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, supportsShadowDom, writeTask } from '@platform';
-import { CMP_FLAG, HOST_STATE } from '@utils';
+import { consoleError, writeTask } from '@platform';
+import { HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
+
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
@@ -55,24 +56,6 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
   }
 
   if (isInitialLoad) {
-    if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
-      // only required when we're NOT using native shadow dom (slot)
-      // or this browser doesn't support native shadow dom
-      // and this host element was NOT created with SSR
-      // let's pick out the inner content for slot projection
-      // create a node to represent where the original
-      // content was first placed, which is useful later on
-      // DOM WRITE!!
-      const scopeId = elm['s-sc'] = (BUILD.mode)
-        ? 'sc-' + cmpMeta.t + (hostRef.$modeName$ ? '-' + hostRef.$modeName$ : '')
-        : 'sc-' + cmpMeta.t;
-
-      elm.classList.add(getElementScopeId(scopeId, true));
-
-      if (cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
-        elm.classList.add(getElementScopeId(scopeId, false));
-      }
-    }
     if (BUILD.style) {
       // DOM WRITE!
       attachStyles(elm, cmpMeta, hostRef.$modeName$);

@@ -63,7 +63,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
       // this component has styles but we haven't registered them yet
-      styles.set(BUILD.mode ? cmpMeta.t + '#' + hostRef.$modeName$ : cmpMeta.t, Cstr.style);
+      styles.set(BUILD.mode ? (Cstr.styleId || cmpMeta.t) : cmpMeta.t, Cstr.style);
       Cstr.isStyleRegistered = true;
     }
   }

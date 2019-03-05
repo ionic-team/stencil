@@ -62,12 +62,9 @@ async function generateHydrateAppCoreEntry(compilerCtx: d.CompilerCtx, buildCtx:
     cmpData.cmp.styles.forEach(style => {
       let styleId = cmpData.cmp.tagName;
       if (style.modeName !== DEFAULT_STYLE_MODE) {
-        styleId += `#${style.modeName}`;
+        styleId += `-${style.modeName}`;
       }
-
-      if (style.compiledStyleTextScoped)
-
-      coreText.push(`styles.set('${styleId}', '${style.compiledStyleTextScoped}');`);
+      coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScoped}');`);
     });
   });
 
