@@ -1,10 +1,11 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { connectedCallback, getComponent, registerHost } from '@platform';
+import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
 
 
 export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
   const Cstr = getComponent(tagName);
+
   if (Cstr != null) {
     if (opts.collectComponents) {
       const depth = getNodeDepth(elm);
@@ -34,12 +35,39 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
       }
 
       registerHost(elm);
+
+      initializePropertiesFromAttributes(elm, Cstr.cmpMeta);
+
       connectedCallback(elm, Cstr.cmpMeta);
 
     } catch (e) {
       catchError(results.diagnostics, e);
     }
   }
+}
+
+
+function initializePropertiesFromAttributes(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
+  if (cmpMeta.m == null) {
+    return;
+  }
+
+  const hostRef = getHostRef(elm);
+
+  Object.entries(cmpMeta.m)
+    .filter(([_, m]) => m[0])
+    .forEach(([propName, m]) => {
+      const attributeName = (m[1] || propName);
+
+      const attrValue = elm.getAttribute(attributeName);
+      if (attrValue != null) {
+        const propValue = (attrValue === null && typeof (elm as any)[propName] === 'boolean')
+        ? false
+        : attrValue;
+
+        hostRef.$instanceValues$.set(propName, propValue);
+      }
+    });
 }
 
 

@@ -77,12 +77,12 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       Cstr.observedAttributes = members
         .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
         .map(([propName, m]) => {
-          const attribute = m[1] || propName;
-          attrNameToPropName.set(attribute, propName);
+          const attrName = m[1] || propName;
+          attrNameToPropName.set(attrName, propName);
           if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.$attrsToReflect$.push([propName, attribute]);
+            cmpMeta.$attrsToReflect$.push([propName, attrName]);
           }
-          return attribute;
+          return attrName;
         });
     }
   }
