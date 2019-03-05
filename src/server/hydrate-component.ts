@@ -1,13 +1,11 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { connectedCallback, getHostRef, registerHost } from '@platform';
-import { getComponent } from './component-registry';
+import { connectedCallback, getComponent, registerHost } from '@platform';
 
 
 export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
   const Cstr = getComponent(tagName);
-
-  if (typeof Cstr === 'function') {
+  if (Cstr != null) {
     if (opts.collectComponents) {
       const depth = getNodeDepth(elm);
 
@@ -36,12 +34,7 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
       }
 
       registerHost(elm);
-      const hostRef = getHostRef(elm);
-      const instance = new Cstr(hostRef);
-      if (typeof instance.connectedCallback === 'function') {
-        instance.connectedCallback();
-      }
-      connectedCallback(elm, (Cstr as d.ComponentNativeConstructor).cmpMeta);
+      connectedCallback(elm, Cstr.cmpMeta);
 
     } catch (e) {
       catchError(results.diagnostics, e);

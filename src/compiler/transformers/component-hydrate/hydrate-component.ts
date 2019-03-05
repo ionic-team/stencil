@@ -1,8 +1,9 @@
 import * as d from '@declarations';
 import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
-import { addNativeRuntimeCmpMeta } from './native-runtime-cmp-meta';
+import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
 import { addWatchers } from '../transforms/watcher-meta-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { transformHostData } from '../transforms/host-data-transform';
 import { updateLazyComponentConstructor } from '../component-lazy/lazy-constructor';
 import ts from 'typescript';
 
@@ -26,7 +27,8 @@ function updateHydrateHostComponentMembers(classNode: ts.ClassDeclaration, cmp: 
   updateLazyComponentConstructor(classMembers, cmp);
   addLazyElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addNativeRuntimeCmpMeta(classMembers, cmp);
+  addHydrateRuntimeCmpMeta(classMembers, cmp);
+  transformHostData(classMembers);
 
   return classMembers;
 }

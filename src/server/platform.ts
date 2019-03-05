@@ -1,5 +1,23 @@
 import * as d from '@declarations';
 
+const cstrs = new Map<string, d.ComponentNativeConstructor>();
+
+export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef): any => {
+  return cstrs.get(cmpMeta.t);
+};
+
+
+export const getComponent = (tagName: string) => {
+  return cstrs.get(tagName);
+};
+
+
+export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
+  Cstrs.forEach(Cstr => {
+    cstrs.set(Cstr.cmpMeta.t, Cstr);
+  });
+};
+
 
 export const getDoc = (elm?: Node) => {
   if (elm != null) {
@@ -38,8 +56,6 @@ export const tick = {
 };
 
 export const consoleError = (e: any) => console.error(e);
-
-export const loadModule = (_a: any, _b: any) => Promise.resolve() as any;
 
 const Context = {
   isServer: true,

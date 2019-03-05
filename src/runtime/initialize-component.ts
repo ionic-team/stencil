@@ -9,7 +9,7 @@ import { computeMode } from './mode';
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style) && !(hostRef.$stateFlags$ & HOST_STATE.hasInitializedComponent)) {
+  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
     hostRef.$stateFlags$ |= HOST_STATE.hasInitializedComponent;
 
@@ -21,12 +21,16 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       hostRef.$modeName$ = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
     }
 
-    if (BUILD.lazyLoad) {
+    if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
       // lazy loaded components
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(cmpMeta, hostRef);
+        if (BUILD.hydrateServerSide) {
+          Cstr = loadModule(cmpMeta, hostRef) as any;
+        } else {
+          Cstr = await loadModule(cmpMeta, hostRef) as any;
+        }
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before

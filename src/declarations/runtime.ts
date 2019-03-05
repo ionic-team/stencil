@@ -13,9 +13,16 @@ export type LazyBundleRuntimeData = [
 
 
 export interface ComponentRuntimeMeta {
+  /** members */
   m?: d.ComponentRuntimeMembers;
+
+  /** listeners */
   l?: d.ComponentRuntimeHostListener[];
+
+  /** flags */
   f?: number;
+
+  /** tagname */
   t?: string;
 
   // added later
