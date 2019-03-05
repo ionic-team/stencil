@@ -1,9 +1,10 @@
 import * as d from '../../../declarations';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import ts from 'typescript';
+import { buildWarn, normalizePath } from '../../util';
 
 
-export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration) {
+export function getListenDecoratorMeta(config: d.Config, diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
   const listeners: d.ListenMeta[] = [];
 
   classNode.members
@@ -18,7 +19,7 @@ export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cl
             const jsdoc = serializeSymbol(checker, symbol);
 
             listeners.push({
-              ...validateListener(eventName.trim(), listenOptions, member.name.getText()),
+              ...validateListener(config, diagnostics, sourceFile, eventName.trim(), listenOptions, member.name.getText()),
               jsdoc
             });
           });
@@ -29,7 +30,7 @@ export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cl
 }
 
 
-export function validateListener(eventName: string, rawListenOpts: d.ListenOptions = {}, methodName: string): d.ListenMeta | null {
+export function validateListener(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, eventName: string, rawListenOpts: d.ListenOptions = {}, methodName: string): d.ListenMeta | null {
   let rawEventName = eventName;
 
   let splt = eventName.split(':');
@@ -51,6 +52,12 @@ export function validateListener(eventName: string, rawListenOpts: d.ListenOptio
     throw new Error(`@Listen can only contain one period: ${eventName}`);
   }
   if (splt.length > 1) {
+    const warn = buildWarn(diagnostics);
+    warn.header = `@Listen('eventName.KEY') is deprecated`;
+    warn.messageText = `Future versions of Stencil will REMOVE the possibility of listening to specific keys, since the Web platform already provides a built-in alternative using "event.key". Check out the docs are https://www.w3.org/TR/uievents-key/#named-key-attribute-values`;
+    warn.absFilePath = normalizePath(sourceFile.fileName);
+    warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+
     const suffix = splt[1].toLowerCase().trim();
     if (!isValidKeycodeSuffix(suffix)) {
       throw new Error(`invalid @Listen suffix "${suffix}" for "${eventName}"`);
@@ -73,6 +80,20 @@ export function validateListener(eventName: string, rawListenOpts: d.ListenOptio
   // default to enabled=true if it wasn't provided
   listenMeta.eventDisabled = (rawListenOpts.enabled === false);
 
+  if (rawListenOpts.eventName !== undefined) {
+    const warn = buildWarn(diagnostics);
+    warn.header = '@Listen(event, {eventName}) is deprecated';
+    warn.messageText = `Future versions of Stencil will the "eventName" option of the @Listen() decorator`;
+    warn.absFilePath = normalizePath(sourceFile.fileName);
+    warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+  }
+  if (rawListenOpts.enabled !== undefined) {
+    const warn = buildWarn(diagnostics);
+    warn.header = '@Listen(event, {enabled}) is deprecated';
+    warn.messageText = `Future versions of Stencil will REMOVE the possibility of disabling events created with the @Listen() decorator.`;
+    warn.absFilePath = normalizePath(sourceFile.fileName);
+    warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+  }
   return listenMeta;
 }
 

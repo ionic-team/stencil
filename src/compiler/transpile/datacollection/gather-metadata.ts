@@ -123,7 +123,7 @@ export function visitClass(
   };
 
   cmpMeta.eventsMeta = getEventDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile);
-  cmpMeta.listenersMeta = getListenDecoratorMeta(typeChecker, classNode);
+  cmpMeta.listenersMeta = getListenDecoratorMeta(config, diagnostics, typeChecker, classNode, sourceFile);
 
   // watch meta collection MUST happen after prop/state decorator meta collection
   getWatchDecoratorMeta(diagnostics, classNode, cmpMeta);
