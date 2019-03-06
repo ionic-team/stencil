@@ -1,10 +1,10 @@
-import * as d  from '../../../declarations';
-import { buildWarn } from '../../util';
+import * as d from '../../../declarations';
+import { buildError } from '../../util';
 
 
 export function validatePublicName(diagnostics: d.Diagnostic[], componentClass: string, memberName: string, decorator: string, memberType: string) {
   if (isReservedMember(memberName)) {
-    const diagnostic = buildWarn(diagnostics);
+    const diagnostic = buildError(diagnostics);
     diagnostic.messageText = [
       `The ${decorator} name "${memberName}" used within the "${componentClass}" class is a reserved public name. `,
       `Please rename the "${memberName}" ${memberType} so it does not conflict with an existing standardized prototype member. `,
