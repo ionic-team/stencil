@@ -26,7 +26,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
 
     const polyfillContent = fs.readFileSync(srcFilePath, 'utf8');
 
-    const esmWrapped = (fileName === 'tslib.js')
+    const esmWrapped = (fileName === 'tslib.js' || fileName === 'system.js')
       ? polyfillContent
       : esmWrap(polyfillContent);
 

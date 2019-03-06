@@ -41,7 +41,8 @@ const INLINE_POLYFILLS = [
   'promise.js',
   'map.js',
   'fetch.js',
-  'url.js'
+  'url.js',
+  'system.js',
 ];
 
 const POLYFILLS = [

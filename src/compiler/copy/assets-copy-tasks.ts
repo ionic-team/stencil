@@ -56,12 +56,12 @@ export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.Com
     });
   });
 
-  const lazyOutputTargets = outputTargets.filter(isOutputTargetDistLazy);
+  const lazyOutputTargets = outputTargets.filter(isOutputTargetDistLazy).filter(o => !!o.copyDir);
   lazyOutputTargets.forEach(outputTarget => {
     // copy all of the files in asset directories to the app's build and/or dist directory
     copyToBuildDir.forEach(assetsMeta => {
       // figure out what the path is to the component directory
-      const buildDirDestination = sys.path.join(outputTarget.dir, assetsMeta.cmpRelativePath);
+      const buildDirDestination = sys.path.join(outputTarget.copyDir, assetsMeta.cmpRelativePath);
 
       copyTasks.push({
         src: assetsMeta.absolutePath,

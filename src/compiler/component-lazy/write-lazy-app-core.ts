@@ -5,18 +5,15 @@ import { sys } from '@sys';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
-  const appCoreRollupResults = rollupResults.filter(r => r.isAppCore);
-
+export async function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
+  const appCoreRollupResult = rollupResults.find(r => r.isAppCore);
+  console.log(rollupResults.filter(r => r.isAppCore).length);
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
-
-  return Promise.all(appCoreRollupResults.map(rollupResult => {
-    return writeLazyAppCoreResults(config, compilerCtx, buildCtx, outputTargets, build, lazyRuntimeData, rollupResult);
-  }));
+  await writeLazyAppCoreResults(config, compilerCtx, buildCtx, destinations, build, lazyRuntimeData, appCoreRollupResult);
+  return appCoreRollupResult.fileName;
 }
 
-
-async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], build: d.Build, lazyRuntimeData: string, rollupResult: d.RollupResult) {
+async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], build: d.Build, lazyRuntimeData: string, rollupResult: d.RollupResult) {
   let code = rollupResult.code.replace(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`
@@ -35,9 +32,8 @@ async function writeLazyAppCoreResults(config: d.Config, compilerCtx: d.Compiler
   }
 
   // inject the component metadata
-
-  await Promise.all(outputTargets.map(outputTarget => {
-    const filePath = sys.path.join(outputTarget.dir, rollupResult.fileName);
+  await Promise.all(destinations.map(dst => {
+    const filePath = sys.path.join(dst, rollupResult.fileName);
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }

@@ -52,7 +52,9 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   // Add dist-lazy output target
   config.outputTargets.push({
     type: 'dist-lazy',
-    dir: outputTarget.buildDir
+    copyDir: outputTarget.buildDir,
+    esmDir: outputTarget.buildDir,
+    systemDir: outputTarget.buildDir
   });
 }
 

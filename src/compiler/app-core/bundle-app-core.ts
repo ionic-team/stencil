@@ -13,10 +13,7 @@ import { sys } from '@sys';
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
   try {
     const rollupOptions: RollupOptions = {
-      input: {
-        // Generate entry point
-        ...bundleCoreOptions.entryInputs,
-      },
+      input: bundleCoreOptions.entryInputs,
       plugins: [
         stencilLoaderPlugin({
           '@stencil/core/app': DEFAULT_CORE,
@@ -72,7 +69,7 @@ export async function generateRollupBuild(build: RollupBuild, options: OutputOpt
       entryKey: chunk.name,
       isEntry: !!chunk.isEntry,
       isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
-      isAppCore: chunk.name === config.fsNamespace
+      isAppCore: !chunk.isEntry && chunk.name === config.fsNamespace
     }));
 }
 

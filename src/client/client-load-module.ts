@@ -18,6 +18,7 @@ export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostR
 
   return import(
     /* webpackInclude: /\.entry\.js$/ */
+    /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
     /* webpackMode: "lazy" */
     url
   ).then(importedModule => importedModule[cmpMeta.t.replace(/-/g, '_')], consoleError);

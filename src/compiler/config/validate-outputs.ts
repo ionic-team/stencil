@@ -5,7 +5,6 @@ import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetHydrate } from './validate-outputs-hydrate';
 import { validateOutputTargetWww } from './validate-outputs-www';
 import { validateOutputTargetDistCollection } from './validate-outputs-dist-collection';
-import { validateOutputTargetDistLazy } from './validate-outputs-dist-lazy';
 import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
 import { validateStats } from './validate-stats';
 import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
@@ -35,7 +34,6 @@ export function validateOutputTargets(config: d.Config) {
   validateOutputTargetAngular(config);
   validateOutputTargetHydrate(config);
   validateOutputTargetDistCollection(config);
-  validateOutputTargetDistLazy(config);
   validateOutputTargetHydrate(config);
   validateOutputTargetDistModule(config);
 
@@ -52,7 +50,6 @@ const VALID_TYPES = [
   'angular',
   'dist',
   'dist-collection',
-  'dist-lazy',
   'dist-module',
   'dist-selfcontained',
   'docs',

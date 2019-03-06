@@ -90,9 +90,8 @@ export async function processGlob(config: d.Config, outputTargets: d.OutputTarge
     outputTargets.forEach(outputTarget => {
       if ('collectionDir' in outputTarget) {
         globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.collectionDir, globRelPath));
-
-      } else {
-        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.dir, globRelPath));
+      } else if ('copyDir' in outputTarget) {
+        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.copyDir, globRelPath));
       }
     });
 

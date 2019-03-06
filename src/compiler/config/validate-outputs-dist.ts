@@ -66,10 +66,12 @@ export function validateOutputTargetDist(config: d.Config) {
       dir: path.join(outputTarget.dir, 'modules')
     });
 
+    const lazyDir = path.join(outputTarget.buildDir, config.fsNamespace);
     config.outputTargets.push({
       type: 'dist-lazy',
-      dir: path.join(outputTarget.buildDir, config.fsNamespace),
-      empty: outputTarget.empty
+      copyDir: lazyDir,
+      esmDir: lazyDir,
+      systemDir: lazyDir
     });
 
     config.outputTargets.push({

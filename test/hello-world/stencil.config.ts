@@ -4,11 +4,10 @@ export const config: Config = {
   namespace: 'HelloWorld',
   hashFileNames: false,
   outputTargets: [
-    { type: 'dist-collection' },
-    { type: 'dist-lazy' },
+    { type: 'dist' },
     {
       type: 'dist-module',
-      file: 'www/web-components.js'
+      dir: 'www'
     },
     {
       type: 'www',

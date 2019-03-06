@@ -5,7 +5,7 @@ import { replaceStylePlaceholders } from '../app-core/component-styles';
 import { sys } from '@sys';
 
 
-export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], entryModule: d.EntryModule, code: string, modeName: string) {
+export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], entryModule: d.EntryModule, code: string, modeName: string, sufix: string) {
   if (config.minifyJs) {
     const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', code);
     buildCtx.diagnostics.push(...optimizeResults.diagnostics);
@@ -17,7 +17,7 @@ export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerC
 
   code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
-  const bundleId = getBundleId(config, entryModule.entryKey, code, modeName);
+  const bundleId = getBundleId(config, entryModule.entryKey, code, modeName, sufix);
 
   const output: d.BundleModuleOutput = {
     bundleId: bundleId,
@@ -26,20 +26,20 @@ export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerC
     modeName: modeName,
   };
 
-  const promises = outputTargets.map(outputTarget => {
-    const filePath = sys.path.join(outputTarget.dir, output.fileName);
-    return compilerCtx.fs.writeFile(filePath, output.code);
-  });
-
-  await Promise.all(promises);
+  await Promise.all(
+    destinations.map(dst => {
+      const filePath = sys.path.join(dst, output.fileName);
+      return compilerCtx.fs.writeFile(filePath, output.code);
+    })
+  );
 
   return output;
 }
 
 
-function getBundleId(config: d.Config, entryKey: string, code: string, modeName: string) {
+function getBundleId(config: d.Config, entryKey: string, code: string, modeName: string, sufix: string) {
   if (config.hashFileNames) {
-    return sys.generateContentHash(code, config.hashedFileNameLength);
+    return sys.generateContentHash(code, config.hashedFileNameLength) + sufix;
   }
 
   let bundleId = entryKey;
@@ -47,5 +47,5 @@ function getBundleId(config: d.Config, entryKey: string, code: string, modeName:
     bundleId += '-' + modeName;
   }
 
-  return bundleId;
+  return bundleId + sufix;
 }

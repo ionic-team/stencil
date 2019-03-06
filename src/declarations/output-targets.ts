@@ -80,12 +80,19 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   empty?: boolean;
 }
 
+
+
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
-  dir?: string;
-  empty?: boolean;
+  esmEs5Dir?: string;
+  copyDir?: string;
+  esmDir?: string;
+  systemDir?: string;
+  cjsDir?: string;
   resourcesUrl?: string;
+
+  empty?: boolean;
 }
 
 export interface OutputTargetDistModule extends OutputTargetBase {
@@ -164,8 +171,7 @@ export interface OutputTargetBase {
 
 export type OutputTargetBuild =
  | OutputTargetDistCollection
- | OutputTargetDistLazy
- | OutputTargetWww;
+ | OutputTargetDistLazy;
 
 
 export type OutputTarget =
