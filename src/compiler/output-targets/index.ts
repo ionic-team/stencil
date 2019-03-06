@@ -28,7 +28,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     generateServiceWorkers(config, compilerCtx, buildCtx),
     outputEsmIndexes(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
-    outputIndexHtmls(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];
@@ -40,5 +39,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   await outputModule(config, compilerCtx, buildCtx);
-  return outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
+  await outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
+  await outputIndexHtmls(config, compilerCtx, buildCtx);
 }

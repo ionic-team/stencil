@@ -1,6 +1,7 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
 import { sys } from '@sys';
+import { MockDocument, serializeNodeToHtml } from '@mock-doc';
 import { updateIndexHtmlServiceWorker } from '../service-worker/inject-sw-script';
 
 
@@ -42,8 +43,8 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
   // get the source index html content
   try {
     let indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
-
     try {
+      indexSrcHtml = await updateModulePreload(config, compilerCtx, outputTarget, indexSrcHtml);
       indexSrcHtml = await updateIndexHtmlServiceWorker(config, buildCtx, outputTarget, indexSrcHtml);
 
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexSrcHtml);
@@ -58,4 +59,54 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // it's ok if there's no index file
     buildCtx.debug(`no index html: ${config.srcIndexHtml}`);
   }
+}
+
+export async function updateModulePreload(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, indexSrcHtml: string) {
+  const doc = new MockDocument(indexSrcHtml);
+  const expectedSrc = `build/${config.fsNamespace}.mjs.js`;
+  const script = Array.from(doc.querySelectorAll('script'))
+    .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
+
+  if (!script) {
+    return indexSrcHtml;
+  }
+
+  let content = await compilerCtx.fs.readFile(sys.path.join(outputTarget.dir, expectedSrc));
+  const result = content.match(/import.*from\s*'(.*)';/);
+  if (!result) {
+    return indexSrcHtml;
+  }
+  const corePath = result[1];
+  const newPath = sys.path.join(
+    sys.path.dirname(expectedSrc),
+    corePath
+  );
+  content = content.replace(corePath, './' + newPath);
+
+  // insert modulepreload
+  script.parentNode.insertBefore(
+    createModulePreload(doc, newPath),
+    script
+  );
+
+  // insert inline script
+  const inlinedScript = doc.createElement('script');
+  inlinedScript.setAttribute('type', 'module');
+  inlinedScript.textContent = content;
+  script.parentNode.insertBefore(
+    inlinedScript,
+    script
+  );
+
+  // remove original script
+  script.remove();
+
+  return serializeNodeToHtml(doc);
+}
+
+function createModulePreload(doc: MockDocument, href: string) {
+  const link = doc.createElement('link');
+  link.setAttribute('rel', 'modulepreload');
+  link.setAttribute('href', href);
+  return link;
 }

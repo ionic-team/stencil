@@ -7,7 +7,6 @@ import { DEFAULT_STYLE_MODE } from '@utils';
 
 export async function writeLazyAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], build: d.Build, rollupResults: d.RollupResult[], bundleModules: d.BundleModule[]) {
   const appCoreRollupResult = rollupResults.find(r => r.isAppCore);
-  console.log(rollupResults.filter(r => r.isAppCore).length);
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
   await writeLazyAppCoreResults(config, compilerCtx, buildCtx, destinations, build, lazyRuntimeData, appCoreRollupResult);
   return appCoreRollupResult.fileName;
