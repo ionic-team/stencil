@@ -459,7 +459,8 @@ export interface NewSpecPageOptions {
   flushQueue?: boolean;
   html?: string;
   language?: string;
-  lazyLoad?: boolean;
+  hydrateClientSide?: boolean;
+  hydrateServerSide?: boolean;
   referrer?: string;
   url?: string;
   userAgent?: string;

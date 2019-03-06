@@ -7,7 +7,7 @@ import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document'
 import globalScripts from '@global-scripts';
 
 
-export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
+export async function renderToString(html: string, opts: d.HydrateOptions = {}) {
   if (typeof html !== 'string') {
     throw new Error('Invalid html');
   }
@@ -22,14 +22,16 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
     const windowLocationUrl = setWindowUrl(win, opts);
     setupDocumentFromOpts(results, windowLocationUrl, win, doc, opts);
 
-    connectElements(opts, results, doc.body);
+    const waitPromises: Promise<any>[] = [];
+    connectElements(opts, results, doc.body, waitPromises);
+    await Promise.all(waitPromises);
+
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
     if (results.diagnostics.length === 0) {
       results.html = serializeNodeToHtml(doc, {
         collapseBooleanAttributes: opts.collapseBooleanAttributes,
-        pretty: opts.prettyHtml,
-        removeHtmlComments: opts.removeHtmlComments
+        pretty: opts.prettyHtml
       });
     }
 
@@ -41,7 +43,7 @@ export function renderToStringSync(html: string, opts: d.HydrateOptions = {}) {
 }
 
 
-export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) {
+export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}) {
   if (doc == null || doc.documentElement == null || typeof doc.documentElement.nodeType !== 'number') {
     throw new Error('Invalid document');
   }
@@ -61,7 +63,10 @@ export function hydrateDocumentSync(doc: Document, opts: d.HydrateOptions = {}) 
     const windowLocationUrl = setWindowUrl(win, opts);
     setupDocumentFromOpts(results, windowLocationUrl, win, doc, opts);
 
-    connectElements(opts, results, doc.body);
+    const waitPromises: Promise<any>[] = [];
+    connectElements(opts, results, doc.body, waitPromises);
+    await Promise.all(waitPromises);
+
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 
   } catch (e) {

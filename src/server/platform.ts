@@ -3,7 +3,9 @@ import * as d from '@declarations';
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
 export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef): any => {
-  return cstrs.get(cmpMeta.t);
+  return new Promise(resolve => {
+    resolve(cstrs.get(cmpMeta.t));
+  });
 };
 
 

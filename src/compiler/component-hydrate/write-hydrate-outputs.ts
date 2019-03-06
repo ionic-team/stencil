@@ -51,6 +51,6 @@ async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCt
 
 
 const HYDRATE_DTS_CODE = `
-export declare function renderToStringSync(html: string, opts?: any): any;
-export declare function hydrateDocumentSync(doc: any, opts?: any): any;
+export declare function renderToString(html: string, opts?: any): Promise<any>;
+export declare function hydrateDocument(doc: any, opts?: any): Promise<any>;
 `.trim();

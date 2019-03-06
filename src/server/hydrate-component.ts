@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
 
 
-export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
+export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
   const Cstr = getComponent(tagName);
 
   if (Cstr != null) {
@@ -27,14 +27,18 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
     }
 
     try {
+      registerHost(elm);
+
       if (typeof elm.componentOnReady !== 'function') {
-        elm.componentOnReady = componentOnReady;
+        elm.componentOnReady = function() {
+          return getHostRef(this).$onReadyPromise$;
+        };
       }
       if (typeof elm.forceUpdate !== 'function') {
         elm.forceUpdate = forceUpdate;
       }
 
-      registerHost(elm);
+      waitPromises.push(elm.componentOnReady());
 
       initializePropertiesFromAttributes(elm, Cstr.cmpMeta);
 
@@ -70,10 +74,6 @@ function initializePropertiesFromAttributes(elm: d.HostElement, cmpMeta: d.Compo
     });
 }
 
-
-function componentOnReady(this: d.HostElement) {
-  return Promise.resolve(this);
-}
 
 function forceUpdate(this: d.HostElement) {
   //

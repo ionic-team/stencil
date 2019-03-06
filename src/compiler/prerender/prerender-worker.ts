@@ -40,7 +40,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydrateResults = await hydrateApp.hydrateDocumentSync(win.document, hydrateOpts) as d.HydrateResults;
+    const hydrateResults = await hydrateApp.hydrateDocument(win.document, hydrateOpts) as d.HydrateResults;
 
     if (hydrateResults.diagnostics.length > 0) {
       results.diagnostics.push(...hydrateResults.diagnostics);
@@ -59,8 +59,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
       const html = serializeNodeToHtml(win.document, {
         collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
-        pretty: hydrateOpts.prettyHtml,
-        removeHtmlComments: hydrateOpts.removeHtmlComments
+        pretty: hydrateOpts.prettyHtml
       });
 
       results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);

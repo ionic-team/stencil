@@ -62,3 +62,8 @@ export interface RenderNode extends d.HostElement {
    */
   ['s-si']?: string;
 }
+
+
+export interface RenderDocument extends Document {
+  's-ids': number;
+}

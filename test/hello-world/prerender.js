@@ -3,14 +3,14 @@ const path = require('path');
 const hydrate = require('./dist/hydrate');
 
 
-function run() {
+async function run() {
   const html = `
     <html>
       <hello-world></hello-world>
     </html>
   `;
 
-  const results = hydrate.renderToStringSync(html, {
+  const results = await hydrate.renderToString(html, {
     prettyHtml: true,
     title: 'Hello World'
   });

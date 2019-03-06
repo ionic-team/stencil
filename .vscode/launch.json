@@ -81,21 +81,28 @@
       "protocol": "inspector"
     },
     {
-      "name": "Test",
       "type": "node",
       "request": "launch",
-      "runtimeArgs": [
-        "--inspect-brk",
-        "./node_modules/.bin/jest",
-        "--config",
-        "jest.debugger.json",
-        "-i",
-        "--env",
-        "jest-environment-node-debug"
+      "name": "Jest All",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--runInBand"
       ],
-      "cwd": "${workspaceRoot}",
-      "protocol": "inspector",
-      "sourceMaps": true
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
     }
   ]
 }

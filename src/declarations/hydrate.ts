@@ -103,7 +103,6 @@ export interface HydrateOptions {
   minifyInlineStyles?: boolean;
   prettyHtml?: boolean;
   referrer?: string;
-  removeHtmlComments?: boolean;
   removeScripts?: string[];
   removeUnusedStyles?: boolean;
   title?: string;

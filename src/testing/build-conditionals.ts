@@ -32,4 +32,6 @@ export function resetBuildConditionals(b: d.Build) {
   b.vdomFunctional = true;
   b.vdomText = true;
   b.allRenderFn = false;
+  b.hydrateClientSide = false;
+  b.hydrateServerSide = false;
 }

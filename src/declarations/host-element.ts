@@ -13,6 +13,11 @@ export interface HostElement extends HTMLElement {
   // and should be common between all versions of stencil
 
   /**
+   * Unique stencil id for this element
+   */
+  ['s-id']?: string;
+
+  /**
    * Content Reference:
    * Reference to the HTML Comment that's placed inside of the
    * host element's original content. This comment is used to

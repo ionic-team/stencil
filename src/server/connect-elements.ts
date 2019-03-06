@@ -2,14 +2,14 @@ import * as d from '@declarations';
 import { hydrateComponent } from './hydrate-component';
 
 
-export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement) {
+export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[]) {
   if (elm != null && typeof elm.nodeName === 'string') {
 
     if (elm.hasAttribute('no-prerender') === false) {
       const tagName = elm.nodeName.toLowerCase();
 
       if (tagName.includes('-') === true) {
-        hydrateComponent(opts, results, tagName, elm);
+        hydrateComponent(opts, results, tagName, elm, waitPromises);
 
       } else if (opts.collectAnchors === true && tagName === 'a') {
         collectAnchors(results, elm as HTMLAnchorElement);
@@ -27,7 +27,7 @@ export function connectElements(opts: d.HydrateOptions, results: d.HydrateResult
       const children = elm.children;
       if (children != null) {
         for (let i = 0, ii = children.length; i < ii; i++) {
-          connectElements(opts, results, children[i] as any);
+          connectElements(opts, results, children[i] as any, waitPromises);
         }
       }
     }

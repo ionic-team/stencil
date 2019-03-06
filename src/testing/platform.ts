@@ -31,6 +31,8 @@ export const supportsListenerOptions = true;
 
 export function resetPlatform() {
   resetWindow(win);
+  (win.document as d.RenderDocument)['s-ids'] = undefined;
+
   hostRefs.clear();
   styles.clear();
   plt.$isTmpDisconnected$ = false;

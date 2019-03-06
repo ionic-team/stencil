@@ -1,14 +1,16 @@
 import * as d from '@declarations';
-import { BUILD } from '@build-conditionals';
-import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
+import { addChildVNodes } from './hydrate';
 import { addEventListeners } from './host-listener';
+import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, HOST_STATE } from '@utils';
+import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
+import { HYDRATE_HOST_ID } from './runtime-constants';
 import { initializeComponent } from './initialize-component';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   // connectedCallback
-  if (!BUILD.updatable && !BUILD.member && !BUILD.lifecycle && !BUILD.hostListener) {
+  if (!BUILD.updatable && !BUILD.member && !BUILD.lifecycle && !BUILD.hostListener && !BUILD.hydrateServerSide) {
     // connectedCallback, initialLoad
     initializeComponent(elm, getHostRef(elm), cmpMeta);
 
@@ -31,16 +33,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if ((BUILD.slot && cmpMeta.f & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation)) {
-          // only required when we're NOT using native shadow dom (slot)
-          // or this browser doesn't support native shadow dom
-          // and this host element was NOT created with SSR
-          // let's pick out the inner content for slot projection
-          // create a node to represent where the original
-          // content was first placed, which is useful later on
-          elm['s-cr'] = getDoc(elm).createComment(BUILD.isDebug ? `content-reference:${cmpMeta.t}` : '') as any;
-          elm['s-cr']['s-cn'] = true;
-          elm.insertBefore(elm['s-cr'], elm.firstChild);
+        if ((BUILD.slot && cmpMeta.f & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateClientSide || BUILD.hydrateServerSide) {
+          setContentReference(elm, cmpMeta.t, hostRef);
         }
 
         if (BUILD.es5 && !supportsShadowDom && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
@@ -95,4 +89,50 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
     }
   }
+};
+
+
+const setContentReference = (elm: d.HostElement, tagName: string, hostRef: d.HostRef, contentRefElm?: d.RenderNode) => {
+  // only required when we're NOT using native shadow dom (slot)
+  // or this browser doesn't support native shadow dom
+  // and this host element was NOT created with SSR
+  // let's pick out the inner content for slot projection
+  // create a node to represent where the original
+  // content was first placed, which is useful later on
+  const doc = getDoc(elm) as d.RenderDocument;
+
+  if (BUILD.hydrateClientSide) {
+    const hydrateId = elm.getAttribute(HYDRATE_HOST_ID);
+    if (hydrateId) {
+      elm[HYDRATE_HOST_ID] = hydrateId;
+
+      (hostRef.$vnode$ as d.HydrateVNode) = {
+        vtag: tagName,
+        hydrateFn(vnode) {
+          vnode.elm.removeAttribute(HYDRATE_HOST_ID);
+        }
+      };
+
+      addChildVNodes(elm, elm, hostRef.$vnode$, hydrateId);
+      return;
+    }
+  }
+
+  let crName: string;
+  if (BUILD.hydrateServerSide) {
+    doc['s-ids'] = (doc['s-ids'] || 1);
+    elm[HYDRATE_HOST_ID] = (doc['s-ids']++) + '';
+    crName = `r.` + elm[HYDRATE_HOST_ID];
+    elm.setAttribute(HYDRATE_HOST_ID, elm[HYDRATE_HOST_ID] as any);
+
+  } else if (BUILD.isDebug) {
+    crName = `content-ref:${elm.tagName}`;
+
+  } else {
+    crName = '';
+  }
+
+  contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
+  contentRefElm['s-cn'] = true;
+  elm.insertBefore(contentRefElm, elm.firstChild);
 };

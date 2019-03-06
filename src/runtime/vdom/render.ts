@@ -8,10 +8,10 @@
  */
 import * as d from '@declarations';
 import { BUILD } from '@build-conditionals';
+import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
 import { getDoc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
-import { NODE_TYPE } from '../runtime-constants';
-import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
+import { HYDRATE_CHILD_ID, NODE_TYPE } from '../runtime-constants';
 import { updateElement } from './update-element';
 
 
@@ -22,6 +22,7 @@ let checkSlotRelocate: boolean;
 let contentRef: d.RenderNode;
 let hostTagName: string;
 let isSvgMode = false;
+let hydrateId: string;
 
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, i?: number, elm?: d.RenderNode, childNode?: d.RenderNode, newVNode?: d.VNode, oldVNode?: d.VNode) => {
@@ -56,8 +57,12 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     newVNode.elm = getDoc(parentElm).createTextNode(newVNode.vtext) as any;
 
   } else if (BUILD.slotRelocation && newVNode.isSlotReference) {
-    // create a slot reference html text node
-    newVNode.elm = BUILD.isDebug ? getDoc(parentElm).createComment(`slot-reference:${hostTagName}`) : getDoc(parentElm).createTextNode('') as any;
+    // create a slot reference node
+    if (BUILD.hydrateServerSide) {
+      newVNode.elm = getDoc(parentElm).createComment(`s.${hydrateId}.${childIndex}`);
+    } else {
+      newVNode.elm = BUILD.isDebug ? getDoc(parentElm).createComment(`slot-reference:${hostTagName}`) : getDoc(parentElm).createTextNode('') as any;
+    }
 
   } else {
     // create element
@@ -86,16 +91,10 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
-    // if (BUILD.prerenderServerSide && isDef(ssrId)) {
-    //   // SSR ONLY: this is an SSR render and this
-    //   // logic does not run on the client
-
-    //   // give this element the SSR child id that can be read by the client
-    //   elm.setAttribute(
-    //     SSR_CHILD_ID,
-    //     ssrId + '.' + childIndex + (hasChildNodes(newVNode.vchildren) ? '' : '.')
-    //   );
-    // }
+    if (BUILD.hydrateServerSide && isDef(hydrateId)) {
+      // give this element the hydrate child id that can be read by the client
+      elm.setAttribute(HYDRATE_CHILD_ID, hydrateId + '.' + childIndex);
+    }
 
     if (newVNode.vchildren) {
       for (i = 0; i < newVNode.vchildren.length; ++i) {
@@ -104,19 +103,19 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
         // return node could have been null
         if (childNode) {
-          // if (BUILD.prerenderServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-          //   // SSR ONLY: add the text node's start comment
-          //   elm.appendChild(doc.createComment('s.' + ssrId + '.' + i));
-          // }
+          if (BUILD.hydrateServerSide && isDef(hydrateId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
+            // add the text node's start comment
+            elm.appendChild(getDoc(parentElm).createComment('t.' + hydrateId + '.' + i));
+          }
 
           // append our new node
           elm.appendChild(childNode);
 
-          // if (BUILD.prerenderServerSide && isDef(ssrId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-          //   // SSR ONLY: add the text node's end comment
-          //   elm.appendChild(doc.createComment('/'));
-          //   elm.appendChild(doc.createTextNode(' '));
-          // }
+          if (BUILD.hydrateServerSide && isDef(hydrateId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
+            // add the text node's end comment
+            elm.appendChild(getDoc(parentElm).createComment('/'));
+            elm.appendChild(getDoc(parentElm).createTextNode(' '));
+          }
         }
       }
     }
@@ -385,6 +384,11 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement,
   oldChildren = oldVNode.vchildren;
   newChildren = newVNode.vchildren;
 
+  if (BUILD.hydrateClientSide && (oldVNode as d.HydrateVNode).hydrateFn) {
+    (oldVNode as d.HydrateVNode).hydrateFn(oldVNode, useNativeShadowDom);
+    (oldVNode as d.HydrateVNode).hydrateFn = null;
+  }
+
   if (BUILD.svg) {
     // test if we're rendering an svg element, or still rendering nodes inside of one
     // only add this to the when the compiler sees we're using an svg somewhere
@@ -579,21 +583,6 @@ export const callNodeRefs = (vNode: d.VNode, isDestroy?: boolean) => {
 };
 
 
-const hasChildNodes = (children: d.VNode[]) => {
-  // SSR ONLY: check if there are any more nested child elements
-  // if there aren't, this info is useful so the client runtime
-  // doesn't have to climb down and check so many elements
-  if (children) {
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].vtag !== 'slot' || hasChildNodes(children[i].vchildren)) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-
 interface RelocateNode {
   slotRefNode: d.RenderNode;
   nodeToRelocate: d.RenderNode;
@@ -623,24 +612,13 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   hostRef.$vnode$ = renderFnResults;
   renderFnResults.elm = oldVNode.elm = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
+  if (BUILD.hydrateServerSide) {
+    hydrateId = hostElm.getAttribute('s-id');
+  }
+
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-  }
-
-  if (BUILD.slotRelocation) {
     useNativeShadowDom = supportsShadowDom && !!(cmpMeta.f & CMP_FLAG.shadowDomEncapsulation);
-  }
-
-  // if (BUILD.prerenderServerSide) {
-  //   if (!isShadowDom) {
-  //     ssrId = ssrPatchId;
-  //   } else {
-  //     ssrId = null;
-  //   }
-  // }
-
-  if (BUILD.slotRelocation) {
-    // get the scopeId
     scopeId = hostElm['s-sc'];
 
     // always reset
@@ -649,12 +627,6 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
   // synchronous patch
   patch(oldVNode, renderFnResults);
-
-  // if (BUILD.prerenderServerSide && isDef(ssrId)) {
-  //   // SSR ONLY: we've been given an SSR id, so the host element
-  //   // should be given the ssr id attribute
-  //   oldVNode.elm.setAttribute(SSR_VNODE_ID, ssrId as any);
-  // }
 
   if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {

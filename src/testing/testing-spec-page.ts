@@ -34,10 +34,20 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     const cmpBuild = getBuildFeatures([Cstr.COMPILER_META]) as any;
 
     Object.keys(cmpBuild).forEach(key => {
-      if (cmpBuild[key] === true) {
+      if ((cmpBuild as any)[key] === true) {
         (bc.BUILD as any)[key] = true;
       }
     });
+
+    if (opts.hydrateClientSide) {
+      bc.BUILD.hydrateClientSide = true;
+      bc.BUILD.hydrateServerSide = false;
+
+    } else if (opts.hydrateServerSide) {
+      bc.BUILD.hydrateServerSide = true;
+      bc.BUILD.hydrateClientSide = false;
+      platform.supportsShadowDom = false;
+    }
 
     const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 89999) + 10000)}`;
 

@@ -127,7 +127,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
       emitLifecycleEvent(elm, 'componentDidLoad');
 
-      if (BUILD.lazyLoad) {
+      if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
         hostRef.$onReadyResolve$ && hostRef.$onReadyResolve$(elm);
       }
       if (BUILD.lifecycleDOMEvents && !hostRef.$ancestorComponent$) {

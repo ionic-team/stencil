@@ -26,11 +26,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       try {
         // request the component's implementation to be
         // wired up with the host element
-        if (BUILD.hydrateServerSide) {
-          Cstr = loadModule(cmpMeta, hostRef) as any;
-        } else {
-          Cstr = await loadModule(cmpMeta, hostRef) as any;
-        }
+        Cstr = await loadModule(cmpMeta, hostRef);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
