@@ -1,5 +1,10 @@
-<a name="0.18.1-1"></a>
-## 🌙 [0.18.1-1](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1-1) (2019-03-05)
+<a name="0.18.1-2"></a>
+## 🍅 [0.18.1-2](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1-2) (2019-03-07)
+
+
+### Features
+
+* **server:** serve openBrowser configurable with open flag ([#1407](https://github.com/ionic-team/stencil/issues/1407)) ([cb4d916](https://github.com/ionic-team/stencil/commit/cb4d916))
 
 
 ### Bug Fixes
