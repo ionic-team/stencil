@@ -38,6 +38,8 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   serviceWorker?: d.ServiceWorkerConfig | null;
 
+  polyfills?: boolean;
+
   /**
    * The base url of the app, which should be a relative path.
    * Default: `/`
@@ -91,6 +93,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   systemDir?: string;
   cjsDir?: string;
   resourcesUrl?: string;
+  polyfills?: boolean;
 
   empty?: boolean;
 }

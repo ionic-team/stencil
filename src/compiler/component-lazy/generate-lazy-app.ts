@@ -14,9 +14,9 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
 
   // const esmEs5Outputs = outputTargets.map(o => o.esmEs5Dir).filter(o => !!o);
-  const esmOutputs = outputTargets.map(o => o.esmDir).filter(o => !!o);
+  const esmOutputs = outputTargets.filter(o => !!o.esmDir);
   // const cjsOutputs = outputTargets.map(o => o.cjsDir).filter(o => !!o);
-  const systemOutputs = outputTargets.map(o => o.systemDir).filter(o => !!o);
+  const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   await buildCtx.stylesPromise;
 
@@ -26,8 +26,9 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
       entryFileNames: '[name].mjs.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
+    const destinations = esmOutputs.map(o => o.esmDir);
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    await generateLazyModules(config, compilerCtx, buildCtx, esmOutputs, results, 'es2017', '');
+    await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '');
   }
 
   if (systemOutputs.length > 0) {
@@ -36,11 +37,14 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
       entryFileNames: '[name].system.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
+    const destinations = esmOutputs.map(o => o.esmDir);
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    await generateLazyModules(config, compilerCtx, buildCtx, systemOutputs, results, 'es5', '.system');
-    const loader = await getSystemLoader(`${config.fsNamespace}.system.js`);
+    await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system');
     await Promise.all(
-      systemOutputs.map(dst => compilerCtx.fs.writeFile(sys.path.join(dst, `${config.fsNamespace}.js`), loader))
+      systemOutputs.map(async o => {
+        const loader = await getSystemLoader(`${config.fsNamespace}.system.js`, o.polyfills);
+        await compilerCtx.fs.writeFile(sys.path.join(o.systemDir, `${config.fsNamespace}.js`), loader)
+      })
     );
   }
 
@@ -83,9 +87,9 @@ function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d
   return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
 }
 
-async function getSystemLoader(coreFilename: string) {
+async function getSystemLoader(coreFilename: string, includePolyfills: boolean) {
   const staticName = sys.path.join('polyfills', 'esm', 'system.js');
-  const polyfills = await getAppBrowserCorePolyfills();
+  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills() : '';
   const systemLoader = await sys.getClientCoreFile({ staticName: staticName });
   return `
 ${polyfills}

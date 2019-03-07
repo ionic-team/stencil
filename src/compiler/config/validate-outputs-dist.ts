@@ -71,7 +71,8 @@ export function validateOutputTargetDist(config: d.Config) {
       type: 'dist-lazy',
       copyDir: lazyDir,
       esmDir: lazyDir,
-      systemDir: lazyDir
+      systemDir: lazyDir,
+      polyfills: true,
     });
 
     config.outputTargets.push({

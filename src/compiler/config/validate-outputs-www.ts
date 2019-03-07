@@ -49,12 +49,15 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
   outputTarget.serviceWorker = validateServiceWorker(config, outputTarget.serviceWorker, outputTarget.dir);
 
+  outputTarget.polyfills = !!outputTarget.polyfills;
+
   // Add dist-lazy output target
   config.outputTargets.push({
     type: 'dist-lazy',
     copyDir: outputTarget.buildDir,
     esmDir: outputTarget.buildDir,
-    systemDir: outputTarget.buildDir
+    systemDir: outputTarget.buildDir,
+    polyfills: outputTarget.polyfills
   });
 }
 
