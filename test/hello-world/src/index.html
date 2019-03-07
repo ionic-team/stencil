@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
 
-<script src="build/helloworld.mjs.js" type="module"></script>
-<script src="build/helloworld.js" nomodule></script>
+<head>
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.7/webcomponents-bundle.js"></script>
 
-<hello-world></hello-world>
+  <script src="build/helloworld.mjs.js" type="module"></script>
+  <script src="build/helloworld.js" nomodule></script>
+</head>
+
+<body>
+  <hello-world></hello-world>
+</body>
