@@ -12,16 +12,7 @@ export const config: Config = {
     {
       type: 'www',
       empty: false
-    },
-    // {
-    //   type: 'webcomponent',
-    //   dir: 'www/webcomponent',
-    //   empty: false
-    // },
-    // {
-    //   type: 'dist',
-    //   dir: 'test-dist'
-    // }
+    }
   ],
   copy: [
     { src: '**/*.html' },

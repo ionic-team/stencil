@@ -48,9 +48,9 @@ export namespace Components {
   interface ElementCmpAttributes extends JSXElements.HTMLAttributes {}
 
   interface EventCmp {
-    'methodThatFiresEventWithOptions': () => void;
-    'methodThatFiresMyDocumentEvent': () => void;
-    'methodThatFiresMyWindowEvent': (value: number) => void;
+    'methodThatFiresEventWithOptions': () => Promise<void>;
+    'methodThatFiresMyDocumentEvent': () => Promise<void>;
+    'methodThatFiresMyWindowEvent': (value: number) => Promise<void>;
   }
   interface EventCmpAttributes extends JSXElements.HTMLAttributes {
     'onMy-event-with-options'?: (event: CustomEvent<{ mph: number }>) => void;
