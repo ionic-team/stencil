@@ -6,7 +6,11 @@ import { sys } from '@sys';
 export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
   const opts: any = {
     output: {},
-    compress: {},
+    compress: {
+      global_defs: {
+        'STENCIL_SOURCE_TARGET': sourceTarget
+      }
+    },
     mangle: {
       properties: {
         regex: '^\\$.+\\$$',

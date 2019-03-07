@@ -1,14 +1,15 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { collapseHtmlWhitepace } from './collapse-html-whitespace';
-import { optimizeStyles } from './optimize-styles';
-import { relocateMetaCharset } from './relocate-meta-charset';
-import { updateCanonicalLink } from './canonical-link';
+import { collapseHtmlWhitepace } from '../../compiler/html/collapse-html-whitespace';
+import { optimizeStyles } from '../../compiler/html/optimize-styles';
+import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
+import { updateCanonicalLink } from '../../compiler/html/canonical-link';
 
 
 export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
-  optimizeStyles(opts, results, doc);
+  optimizeStyles(doc, opts, results);
 
+  console.log('hello');
   if (typeof opts.title === 'string') {
     try {
       doc.title = opts.title;

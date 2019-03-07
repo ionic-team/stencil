@@ -17,7 +17,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
 
       if (util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
-        content += getDevServerClientScript(devServerConfig, req);
+        // content += getDevServerClientScript(devServerConfig, req);
 
       } else if (util.isCssFile(req.filePath)) {
         content = updateStyleUrls(req.url, content);
@@ -105,7 +105,7 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 const urlVersionIds = new Map<string, string>();
 
 
-function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
-  return `\n<iframe src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
-}
+// function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+//   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
+//   return `\n<iframe src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
+// }

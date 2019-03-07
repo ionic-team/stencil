@@ -221,6 +221,9 @@ export class MockWindow {
 
 }
 
+export function createWindow(html: string | boolean = null): Window {
+  return new MockWindow(html) as any;
+}
 
 export function cloneWindow(srcWin: Window) {
   if (srcWin == null) {

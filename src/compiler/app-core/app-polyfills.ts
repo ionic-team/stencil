@@ -17,16 +17,18 @@ export async function getAppBrowserCorePolyfills() {
 }
 
 
-export async function copyEsmCorePolyfills(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+export function copyEsmCorePolyfills(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const polyfillsBuildDir = sys.path.join(outputTarget.buildDir, 'esm', 'es5', 'polyfills');
 
-  await POLYFILLS.map(async polyfillFile => {
-    const staticName = sys.path.join('polyfills', 'esm', polyfillFile);
-    const polyfillsContent = await sys.getClientCoreFile({ staticName: staticName });
+  return Promise.all(
+    POLYFILLS.map(async polyfillFile => {
+      const staticName = sys.path.join('polyfills', 'esm', polyfillFile);
+      const polyfillsContent = await sys.getClientCoreFile({ staticName: staticName });
 
-    const polyfillDst = sys.path.join(polyfillsBuildDir, polyfillFile);
-    await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);
-  });
+      const polyfillDst = sys.path.join(polyfillsBuildDir, polyfillFile);
+      await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);
+    })
+  );
 }
 
 

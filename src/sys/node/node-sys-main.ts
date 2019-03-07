@@ -240,7 +240,7 @@ export class NodeSystem implements d.StencilSystem {
     return color;
   }
 
-  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
+  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 

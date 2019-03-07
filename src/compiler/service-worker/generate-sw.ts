@@ -159,5 +159,35 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
   });
 }
 
+export function getRegisterSW(swUrl: string) {
+  return `
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('${swUrl}')
+      .then(function(reg) {
+        reg.onupdatefound = function() {
+          var installingWorker = reg.installing;
+          installingWorker.onstatechange = function() {
+            if (installingWorker.state === 'installed') {
+              window.dispatchEvent(new Event('swUpdate'))
+            }
+          }
+        }
+      })
+      .catch(function(err) { console.error('service worker error', err) });
+  });
+}`;
+}
+
+export const UNREGISTER_SW = `
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  // auto-unregister service worker during dev mode
+  navigator.serviceWorker.getRegistration().then(function(registration) {
+    if (registration) {
+      registration.unregister().then(function() { location.reload(true) });
+    }
+  });
+}
+`;
 
 const WORKBOX_BUILD_MODULE_ID = 'workbox-build';

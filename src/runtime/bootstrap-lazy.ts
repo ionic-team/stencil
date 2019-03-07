@@ -6,7 +6,7 @@ import { getDoc, getHead, getHostRef, registerHost, supportsShadowDom } from '@p
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
-
+import { HTMLElement } from './html-element';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
   // bootstrapLazy
@@ -27,8 +27,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
           cmpLazyMeta.t,
           proxyComponent(class extends HTMLElement {
             // StencilLazyHost
-            constructor() {
-              super();
+            constructor(self: HTMLElement) {
+              // @ts-ignore
+              super(self);
               registerHost(this);
               if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.f & CMP_FLAG.shadowDomEncapsulation) {
                 // this component is using shadow dom

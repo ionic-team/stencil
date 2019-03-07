@@ -196,6 +196,9 @@ export class MockDocument extends MockElement {
 
 }
 
+export function createDocument(html: string | boolean = null, win: any = null): Document {
+  return new MockDocument(html, win) as any;
+}
 
 export function resetDocument(doc: Document) {
   if (doc != null) {

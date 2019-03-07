@@ -53,7 +53,7 @@ export class NodeSystemWorker {
     return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
   }
 
-  transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
+  transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
   }
 

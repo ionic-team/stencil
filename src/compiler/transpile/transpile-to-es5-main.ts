@@ -24,6 +24,5 @@ export async function transpileToEs5Main(config: d.Config, compilerCtx: d.Compil
   if (results.diagnostics.length === 0) {
     await compilerCtx.cache.put(cacheKey, results.code);
   }
-
   return results;
 }

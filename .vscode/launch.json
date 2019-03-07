@@ -26,6 +26,7 @@
         "build",
         "--dev",
         "--prerender",
+        "--prod",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
       ],

@@ -1,7 +1,7 @@
 import * as d from '@declarations';
-import { parseCss } from '../../compiler/style/parse-css';
-import { StringifyCss } from '../../compiler/style/stringify-css';
-import { UsedSelectors } from '../../compiler/style/used-selectors';
+import { parseCss } from '../style/parse-css';
+import { StringifyCss } from '../style/stringify-css';
+import { UsedSelectors } from '../style/used-selectors';
 
 
 export function removeUnusedStyles(results: d.HydrateResults, doc: Document, styleElm: HTMLStyleElement) {

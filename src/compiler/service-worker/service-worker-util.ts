@@ -17,19 +17,3 @@ export function generateServiceWorkerUrl(outputTarget: d.OutputTargetWww) {
 
   return swUrl;
 }
-
-
-export function appendSwScript(indexHtml: string, htmlToAppend: string) {
-  const match = indexHtml.match(BODY_CLOSE_REG);
-
-  if (match) {
-    indexHtml = indexHtml.replace(match[0], `${htmlToAppend}\n${match[0]}`);
-  } else {
-    indexHtml += '\n' + htmlToAppend;
-  }
-
-  return indexHtml;
-}
-
-
-const BODY_CLOSE_REG = /<\/body>/i;

@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { removeUnusedStyles } from './remove-unused-styles';
 
 
-export function optimizeStyles(opts: d.HydrateOptions, results: d.HydrateResults, doc: Document) {
+export function optimizeStyles(doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
   const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
 
   if (styleElms.length === 0) {

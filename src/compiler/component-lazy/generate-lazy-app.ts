@@ -1,10 +1,10 @@
 import * as d from '@declarations';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { writeLazyAppCore } from '../component-lazy/write-lazy-app-core';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
 import { OutputOptions } from 'rollup';
 import { sys } from '@sys';
+import { getAppBrowserCorePolyfills } from '../app-core/app-polyfills';
 
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
@@ -27,8 +27,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    const bundleModules = await generateLazyModules(config, compilerCtx, buildCtx, esmOutputs, results, '');
-    await writeLazyAppCore(config, compilerCtx, buildCtx, esmOutputs, build, results, bundleModules);
+    await generateLazyModules(config, compilerCtx, buildCtx, esmOutputs, results, 'es2017', '');
   }
 
   if (systemOutputs.length > 0) {
@@ -38,8 +37,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    const bundleModules = await generateLazyModules(config, compilerCtx, buildCtx, systemOutputs, results, '.system');
-    await writeLazyAppCore(config, compilerCtx, buildCtx, systemOutputs, build, results, bundleModules);
+    await generateLazyModules(config, compilerCtx, buildCtx, systemOutputs, results, 'es5', '.system');
     const loader = await getSystemLoader(`${config.fsNamespace}.system.js`);
     await Promise.all(
       systemOutputs.map(dst => compilerCtx.fs.writeFile(sys.path.join(dst, `${config.fsNamespace}.js`), loader))
@@ -87,8 +85,10 @@ function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d
 
 async function getSystemLoader(coreFilename: string) {
   const staticName = sys.path.join('polyfills', 'esm', 'system.js');
+  const polyfills = await getAppBrowserCorePolyfills();
   const systemLoader = await sys.getClientCoreFile({ staticName: staticName });
   return `
+${polyfills}
 ${systemLoader}
 // Find resourceUrl
 var doc = document;
@@ -103,7 +103,7 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
 
 // Load resource
-System.import(new URL('./${coreFilename}', resourcesUrl).pathname).then(m => console.log(m));
+System.import(new URL('./${coreFilename}', resourcesUrl).pathname);
 `;
 }
 
