@@ -27,8 +27,6 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   empty?: boolean;
 
-  resourcesUrl?: string;
-
   /**
    * The default index html file of the app, commonly found at the
    * root of the `src` directory.
@@ -36,15 +34,31 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   indexHtml?: string;
 
-  serviceWorker?: d.ServiceWorkerConfig | null;
-
-  polyfills?: boolean;
+  /**
+   * The copy config is an array of objects that defines any files or folders that should
+   * be copied over to the build directory.
+   *
+   * Each object in the array must include a src property which can be either an absolute path,
+   * a relative path or a glob pattern. The config can also provide an optional dest property
+   * which can be either an absolute path or a path relative to the build directory.
+   * Also note that any files within src/assets are automatically copied to www/assets for convenience.
+   *
+   * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
+   */
+  copy?: d.CopyTask[];
 
   /**
    * The base url of the app, which should be a relative path.
    * Default: `/`
    */
   baseUrl?: string;
+
+  /**
+   * By default, stencil will include all the polyfills required by legacy browsers in the ES5 build.
+   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsability to provide them before
+   * stencil initializes.
+   */
+  polyfills?: boolean;
 
   /**
    * Path to an external node module which has exports of the prerender config object.
@@ -57,6 +71,9 @@ export interface OutputTargetWww extends OutputTargetBase {
    * ```
    */
   prerenderConfig?: string;
+
+  serviceWorker?: d.ServiceWorkerConfig | null;
+  resourcesUrl?: string;
 }
 
 

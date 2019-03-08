@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { logger, sys } from '@sys';
 import { validateAssetVerioning } from './validate-asset-versioning';
-import { validateCopy } from './validate-copy';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
@@ -53,6 +52,9 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     setBooleanConfig(config, 'devMode', null, DEFAULT_DEV_MODE);
   }
 
+  // Default copy
+  config.copy = config.copy || [];
+
   // get a good namespace
   validateNamespace(config);
 
@@ -93,8 +95,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
       throw new Error(`config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`);
     }
   }
-
-  validateCopy(config);
 
   validatePlugins(config);
 

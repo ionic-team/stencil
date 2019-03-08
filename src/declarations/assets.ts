@@ -9,7 +9,7 @@ export interface AssetsMeta {
 
 
 export interface CopyTask {
-  src?: string;
+  src: string;
   dest?: string;
   warn?: boolean;
 }

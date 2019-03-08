@@ -27,6 +27,7 @@ export class BuildContext implements d.BuildCtx {
   filesDeleted: string[] = [];
   filesUpdated: string[] = [];
   filesWritten: string[] = [];
+  skipAssetsCopy = false;
   global: d.Module = null;
   graphData: d.GraphData = null;
   hasConfigChanges = false;
@@ -53,6 +54,7 @@ export class BuildContext implements d.BuildCtx {
   timeSpan: d.LoggerTimeSpan = null;
   timestamp: string;
   transpileBuildCount = 0;
+  pendingCopyTasks: Promise<d.CopyResults>[] = [];
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
   constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {}

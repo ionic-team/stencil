@@ -2,7 +2,7 @@ import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
-import { isCopyTaskFile } from '../copy/config-copy-tasks';
+import { isCopyTaskFile } from '../copy/local-copy-tasks';
 import { normalizePath } from '@utils';
 import { sys } from '@sys';
 

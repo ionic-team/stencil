@@ -11,13 +11,13 @@ export const config: Config = {
     },
     {
       type: 'www',
-      serviceWorker: null
-    }
-  ],
-  copy: [
-    {
-      src: 'index-module.html',
-      dest: 'index-module.html'
+      serviceWorker: null,
+      copy: [
+        {
+          src: 'index-module.html',
+          dest: 'index-module.html'
+        }
+      ]
     }
   ],
   enableCache: false

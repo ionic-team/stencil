@@ -15,17 +15,15 @@ export class NodeFs implements d.FileSystem {
       });
     });
   }
-
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      const readStream = fs.createReadStream(src);
-      readStream.on('error', reject);
-
-      const writeStream = fs.createWriteStream(dest);
-      writeStream.on('error', reject);
-      writeStream.on('close', resolve);
-
-      readStream.pipe(writeStream);
+      return fs.copyFile(src, dest, fs.constants.COPYFILE_FICLONE, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   }
 

@@ -7,9 +7,8 @@ import { outputCollections } from './output-collection';
 import { outputCommonJsIndexes } from './output-commonjs';
 import { outputEsmIndexes } from './output-esm';
 import { outputHydrate } from './output-hydrate';
-import { outputIndexHtmls } from './output-index-html';
+import { outputWww } from './output-www';
 import { outputModule } from './output-module';
-// import { outputSelfContainedWebComponents } from './output-self-contained-web-components';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -18,7 +17,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
   }
 
   const timespan = buildCtx.createTimeSpan(`generate app files started`);
-
   const generateOutputs = [
     outputCollections(config, compilerCtx, buildCtx),
     outputAngularProxies(config, compilerCtx, buildCtx),
@@ -40,5 +38,5 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   await outputModule(config, compilerCtx, buildCtx);
   await outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
-  await outputIndexHtmls(config, compilerCtx, buildCtx);
+  await outputWww(config, compilerCtx, buildCtx);
 }

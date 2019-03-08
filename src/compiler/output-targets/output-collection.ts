@@ -3,6 +3,8 @@ import { sys } from '@sys';
 import { isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, normalizePath } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';
+
+
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
     return;
@@ -33,11 +35,9 @@ function writeCollectionModules(config: d.Config, compilerCtx: d.CompilerCtx, bu
 
 async function writeCollectionModule(config: d.Config, compilerCtx: d.CompilerCtx, moduleFile: d.Module, outputTargets: d.OutputTargetDistCollection[]) {
   const relPath = sys.path.relative(config.srcDir, moduleFile.jsFilePath);
-  const content = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
-
   return Promise.all(outputTargets.map(outputTarget => {
     const outputFilePath = sys.path.join(outputTarget.collectionDir, relPath);
-    return compilerCtx.fs.writeFile(outputFilePath, content);
+    return compilerCtx.fs.disk.copyFile(moduleFile.jsFilePath, outputFilePath);
   }));
 }
 

@@ -37,6 +37,8 @@ export interface StencilConfig {
    * Also note that any files within src/assets are automatically copied to www/assets for convenience.
    *
    * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
+   *
+   * @deprecated
    */
   copy?: d.CopyTask[];
 

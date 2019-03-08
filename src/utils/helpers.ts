@@ -33,6 +33,18 @@ export function flatOne<T>(array: T[][]): T[] {
   }, [] as T[]);
 }
 
+export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
+  const set = new Set();
+  return array.filter(item => {
+    const key = predicate(item);
+    if (set.has(key)) {
+      return false;
+    }
+    set.add(key);
+    return true;
+  });
+}
+
 export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
   return keys.reduce((final, key) => {
     if (obj[key]) {

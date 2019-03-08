@@ -6,17 +6,10 @@ import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { serializeNodeToHtml } from '@mock-doc';
 import { isOutputTargetWww } from './output-utils';
 import { createDocument } from '../../mock-doc/document';
+import { copyTasks } from '../copy/local-copy-tasks';
 
-
-export async function outputIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.srcIndexHtml) {
-    return;
-  }
-
-  const outputTargets = config.outputTargets
-    .filter(isOutputTargetWww)
-    .filter(o => o.indexHtml);
-
+export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
   }
@@ -24,12 +17,21 @@ export async function outputIndexHtmls(config: d.Config, compilerCtx: d.Compiler
   const timespan = buildCtx.createTimeSpan(`generate index.html started`, true);
 
   await Promise.all(
-    outputTargets.map(outputTarget => generateIndexHtml(config, compilerCtx, buildCtx, outputTarget))
+    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, outputTarget))
   );
 
   timespan.finish(`generate index.html finished`);
 }
 
+async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+  // Copy assets into www
+  copyTasks(config, compilerCtx, buildCtx, outputTarget.copy, outputTarget.dir);
+
+  // Process
+  if (config.srcIndexHtml && outputTarget.indexHtml) {
+    await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+  }
+}
 
 async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   if (buildCtx.shouldAbort) {

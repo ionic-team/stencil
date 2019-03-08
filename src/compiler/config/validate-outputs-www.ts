@@ -5,6 +5,7 @@ import { validatePrerender } from './validate-prerender';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
+import { validateCopy } from './validate-copy';
 
 
 export function validateOutputTargetWww(config: d.Config) {
@@ -15,7 +16,6 @@ export function validateOutputTargetWww(config: d.Config) {
   }
 
   const wwwOutputTargets = config.outputTargets.filter(isOutputTargetWww);
-
   wwwOutputTargets.forEach(outputTarget => {
     validateOutputTarget(config, outputTarget);
   });
@@ -44,11 +44,14 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
-
   validatePrerender(config, outputTarget);
+
+  outputTarget.copy = validateCopy(outputTarget.copy, [
+    ...config.copy,
+    ...DEFAULT_WWW_COPY,
+  ]);
   outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
   outputTarget.serviceWorker = validateServiceWorker(config, outputTarget.serviceWorker, outputTarget.dir);
-
   outputTarget.polyfills = !!outputTarget.polyfills;
 
   // Add dist-lazy output target
@@ -62,6 +65,10 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
 }
 
 
+const DEFAULT_WWW_COPY = [
+  { src: 'assets', warn: false },
+  { src: 'manifest.json', warn: false }
+];
 const DEFAULT_DIR = 'www';
 const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_BUILD_DIR = 'build';

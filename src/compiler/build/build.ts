@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { copyTasksMain } from '../copy/copy-tasks-main';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
@@ -9,6 +8,8 @@ import { sys } from '@sys';
 import { transpileApp } from '../transpile/transpile-app';
 import { writeBuildFiles } from './write-build';
 import { generateStyles } from '../style/generate-styles';
+import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
+import { waitForCopyTasks } from '../copy/copy-tasks';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -40,8 +41,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
-    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    buildCtx.skipAssetsCopy = canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
 
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
@@ -61,7 +61,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       // i'm sure it's done by now, but let's double check
       // make sure this finishes before the write build files
       // so they're not stepping on each other writing files
-      copyTaskPromise
+      waitForCopyTasks(buildCtx)
     ]);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 

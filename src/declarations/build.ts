@@ -30,6 +30,7 @@ export interface BuildCtx {
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
+  skipAssetsCopy: boolean;
   finish(): Promise<BuildResults>;
   global: d.Module;
   graphData: GraphData;
@@ -62,6 +63,7 @@ export interface BuildCtx {
   timeSpan: d.LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
+  pendingCopyTasks: Promise<d.CopyResults>[];
   validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
   validateTypesBuild?(): Promise<void>;
