@@ -7,13 +7,8 @@ import { supportsShadowDom } from '@platform';
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
 
-  if (BUILD.mode) {
+  if (BUILD.mode && mode) {
     styleId = cmpMeta.t + '-' + mode;
-
-    if (!styles.has(styleId)) {
-      styleId = cmpMeta.t;
-    }
-
   } else {
     styleId = cmpMeta.t;
   }

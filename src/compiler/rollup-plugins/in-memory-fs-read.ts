@@ -12,6 +12,10 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
         // ignore IDs with null character, these belong to other plugins
         return null;
       }
+      // skip non-paths
+      if (importee[0] !== '.' && importee[0] !== '/') {
+        return null;
+      }
 
       // note: node-resolve plugin has already ran
       // we can assume the importee is a file path
@@ -29,12 +33,6 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
       const importeeBase = path.basename(importee);
       const importeeExt = path.extname(importee);
 
-      // Test .ts extension
-      let moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.ts');
-      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
-        return moduleFile.jsFilePath;
-      }
-
       // Direct FS check
       const accessData = await compilerCtx.fs.accessData(importee);
       if (accessData.exists) {
@@ -42,7 +40,13 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
       }
 
       // Test .ts extension
-      moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.js');
+      let moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.ts');
+      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
+        return moduleFile.jsFilePath;
+      }
+
+      // Test .ts extension
+      moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.tsx');
       if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
         return moduleFile.jsFilePath;
       }
@@ -61,6 +65,8 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
           return moduleFile.jsFilePath;
         }
       }
+      console.error('path not found', importee);
+
       return null;
     },
 

@@ -62,7 +62,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDev = !!config.devMode;
   b.isProd = !config.devMode;
   b.hotModuleReplacement = false; // TODO b.isDev
-  b.lifecycleDOMEvents = b.isDebug;
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
   b.slotRelocation = !!(b.scoped || (b.hydrateServerSide) || (b.es5 && b.shadowDom));
 

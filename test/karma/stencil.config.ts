@@ -1,10 +1,9 @@
-import { Config } from '../../dist'
 import { sass } from '@stencil/sass';
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
 
 
-export const config: Config = {
+export const config = {
   namespace: 'TestApp',
   srcDir: 'test-app',
   tsconfig: 'tsconfig-stencil.json',
@@ -32,6 +31,5 @@ export const config: Config = {
       index: 'index.html'
     }
   },
-  exposeAppOnReady: true,
-  exposeAppRegistry: true
+  _isTesting: true
 };

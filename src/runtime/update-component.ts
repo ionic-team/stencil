@@ -55,11 +55,9 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     elm['s-lr'] = false;
   }
 
-  if (isInitialLoad) {
-    if (BUILD.style) {
-      // DOM WRITE!
-      attachStyles(elm, cmpMeta, hostRef.$modeName$);
-    }
+  if (BUILD.style && isInitialLoad) {
+    // DOM WRITE!
+    attachStyles(elm, cmpMeta, hostRef.$modeName$);
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {

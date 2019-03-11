@@ -38,10 +38,10 @@ describe('lifecycle-async', function() {
 
     updates = app.querySelectorAll('.lifecycle-updates-a li');
     expect(updates[0].textContent).toBe('componentWillUpdate-a');
-    expect(updates[1].textContent).toBe('componentDidUpdate-a');
-    expect(updates[2].textContent).toBe('componentWillUpdate-b');
-    expect(updates[3].textContent).toBe('componentDidUpdate-b');
-    expect(updates[4].textContent).toBe('componentWillUpdate-c');
+    expect(updates[1].textContent).toBe('componentWillUpdate-b');
+    expect(updates[2].textContent).toBe('componentDidUpdate-a');
+    expect(updates[3].textContent).toBe('componentWillUpdate-c');
+    expect(updates[4].textContent).toBe('componentDidUpdate-b');
     expect(updates[5].textContent).toBe('componentDidUpdate-c');
     expect(updates.length).toBe(6);
   });

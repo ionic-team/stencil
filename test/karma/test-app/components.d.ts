@@ -107,7 +107,7 @@ export namespace Components {
 
   interface EsmImport {
     'propVal': number;
-    'someMethod': () => Promise<void>;
+    'someMethod': () => void;
   }
   interface EsmImportAttributes extends JSXElements.HTMLAttributes {
     'onSomeEvent'?: (event: CustomEvent<any>) => void;
