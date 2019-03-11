@@ -88,6 +88,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   collectionDir?: string;
   typesDir?: string;
   esmLoaderPath?: string;
+  copy?: d.CopyTask[];
 }
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
@@ -97,6 +98,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   collectionDir?: string;
   typesDir?: string;
   empty?: boolean;
+  copy?: d.CopyTask[];
 }
 
 
@@ -111,6 +113,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   cjsDir?: string;
   resourcesUrl?: string;
   polyfills?: boolean;
+  copy?: d.CopyTask[];
 
   empty?: boolean;
 }

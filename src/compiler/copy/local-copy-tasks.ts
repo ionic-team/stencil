@@ -7,13 +7,20 @@ import minimatch from 'minimatch';
 
 
 export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tasks: d.CopyTask[], dest: string) {
-  const allCopyTasks = flatOne(
-    await Promise.all(tasks.map(task => processCopyTask(config, task, dest)))
-  );
+  const allCopyTasks = await processCopyTasks(config, dest, tasks);
   return performCopyTasks(compilerCtx, buildCtx, allCopyTasks);
 }
 
-async function processCopyTask(config: d.Config, copyTask: d.CopyTask, dest: string): Promise<d.CopyTask[]> {
+export async function processCopyTasks(config: d.Config, dest: string, tasks: d.CopyTask[]) {
+  if (!tasks) {
+    return [];
+  }
+  return flatOne(
+    await Promise.all(tasks.map(task => processCopyTask(config, dest, task)))
+  );
+}
+
+async function processCopyTask(config: d.Config, dest: string, copyTask: d.CopyTask): Promise<d.CopyTask[]> {
   if (!copyTask.src) {
     throw new Error(`copy missing "src" property`);
   }

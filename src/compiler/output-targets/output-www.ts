@@ -6,7 +6,9 @@ import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { serializeNodeToHtml } from '@mock-doc';
 import { isOutputTargetWww } from './output-utils';
 import { createDocument } from '../../mock-doc/document';
-import { copyTasks } from '../copy/local-copy-tasks';
+import { processCopyTasks } from '../copy/local-copy-tasks';
+import { performCopyTasks } from '../copy/copy-tasks';
+import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
@@ -14,18 +16,21 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate index.html started`, true);
+  const timespan = buildCtx.createTimeSpan(`generate www started`, true);
 
   await Promise.all(
     outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, outputTarget))
   );
 
-  timespan.finish(`generate index.html finished`);
+  timespan.finish(`generate www finished`);
 }
 
 async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // Copy assets into www
-  copyTasks(config, compilerCtx, buildCtx, outputTarget.copy, outputTarget.dir);
+  performCopyTasks(compilerCtx, buildCtx, [
+    ...await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
+    ...getComponentAssetsCopyTasks(buildCtx, outputTarget.dir, true)
+  ]);
 
   // Process
   if (config.srcIndexHtml && outputTarget.indexHtml) {

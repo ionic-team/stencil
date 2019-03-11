@@ -3,9 +3,12 @@ import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
 import { sys } from '@sys';
 import { RollupOptions } from 'rollup';
-import { dashToPascalCase } from '@utils';
+import { dashToPascalCase, flatOne } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
+import { performCopyTasks } from '../copy/copy-tasks';
+import { processCopyTasks } from '../copy/local-copy-tasks';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
@@ -18,6 +21,8 @@ export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
+  copyAssets(config, compilerCtx, buildCtx, outputTargets);
+
   const cmps = getComponentsFromModules(buildCtx.moduleFiles);
   // if (cmps.length > MIN_FOR_LAZY_LOAD) {
   //   return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets, cmps);
@@ -28,6 +33,17 @@ export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
   return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets, cmps);
 }
 
+async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  const allCopyTasks = flatOne(
+    await Promise.all(
+      outputTargets.map(async o => [
+        ...getComponentAssetsCopyTasks(buildCtx, o.copyDir, true),
+        ...await processCopyTasks(config, o.copyDir, o.copy)
+      ])
+    )
+  );
+  return performCopyTasks(compilerCtx, buildCtx, allCopyTasks);
+}
 
 export async function generateNativeApp(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
   const entryPoint = `
