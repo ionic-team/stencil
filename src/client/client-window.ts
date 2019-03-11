@@ -12,7 +12,7 @@ export const getHead = (_?: any) => getDoc().head;
 export const plt: d.PlatformRuntime = {};
 
 if (BUILD.taskQueue) {
-  plt.$queueCongestion$ = 0;
+  plt.$queueCongestion$ = 1e5;
   plt.$queuePending$ = false;
 }
 
