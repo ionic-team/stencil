@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { attachMessageHandler } from './worker/worker-child';
 import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { loadMinifyJsDiagnostics } from '@utils';

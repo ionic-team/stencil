@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, serializeSymbol, typeToString } from '../transform-utils';
 import { buildError, buildWarn, normalizePath } from '@utils';
 import { validatePublicName } from '../reserved-public-members';

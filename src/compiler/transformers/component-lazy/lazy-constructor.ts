@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import ts from 'typescript';

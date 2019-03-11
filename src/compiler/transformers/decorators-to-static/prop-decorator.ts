@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { catchError, toDashCase } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, resolveType, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';

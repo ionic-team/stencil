@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export async function generateCustomDocs(config: d.Config, customOutputs: d.OutputTargetDocsCustom[], docsData: d.JsonDocs) {

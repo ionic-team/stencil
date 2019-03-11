@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
 import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { optimizeModule } from '../app-core/optimize-module';

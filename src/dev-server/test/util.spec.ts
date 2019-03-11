@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../util';
 
 

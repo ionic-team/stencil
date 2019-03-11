@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { EMPTY_OBJ } from '@utils';
 import { NODE_TYPE } from '../runtime-constants';

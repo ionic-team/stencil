@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { generateAppTypes } from './generate-app-types';
 import { isDtsFile } from '@utils';

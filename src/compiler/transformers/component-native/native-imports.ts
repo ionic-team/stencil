@@ -1,6 +1,6 @@
 import { addImports, getModuleFromSourceFile } from '../transform-utils';
 import ts from 'typescript';
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { COMMON_IMPORTS, CONNECTED_CALLBACK, PROXY_COMPONENT, REGISTER_HOST } from '../exports';
 
 

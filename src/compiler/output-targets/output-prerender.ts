@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { runPrerenderMain } from '../prerender/prerender-main';
 import { buildError } from '@utils';

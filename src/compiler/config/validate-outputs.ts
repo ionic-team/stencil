@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { validateDocs } from './validate-docs';
 import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateOutputTargetDist } from './validate-outputs-dist';

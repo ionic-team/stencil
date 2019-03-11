@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
 import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 

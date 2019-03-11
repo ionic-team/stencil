@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { configReload } from '../config-reload';
 import { normalizePath } from '../../util';
 import * as path from 'path';

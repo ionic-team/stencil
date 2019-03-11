@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { normalizePath } from '@utils';
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';

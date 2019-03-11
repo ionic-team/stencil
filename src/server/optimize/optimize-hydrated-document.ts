@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { collapseHtmlWhitepace } from '../../compiler/html/collapse-html-whitespace';
 import { optimizeStyles } from '../../compiler/html/optimize-styles';

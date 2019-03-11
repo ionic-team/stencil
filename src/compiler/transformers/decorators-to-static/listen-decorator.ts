@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { buildError, buildWarn, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';

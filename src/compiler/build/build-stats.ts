@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath, sortBy } from '@utils';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 

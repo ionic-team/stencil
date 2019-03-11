@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export const COMPONENTS_DTS_HEADER = `/* tslint:disable */

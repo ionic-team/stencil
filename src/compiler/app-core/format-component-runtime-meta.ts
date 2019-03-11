@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
 
 

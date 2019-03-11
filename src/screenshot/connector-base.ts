@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
 import { join } from 'path';
 import { tmpdir } from 'os';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
 import { isOutputTargetDocs, isOutputTargetDocsCustom, isOutputTargetDocsJson } from '../output-targets/output-utils';
 

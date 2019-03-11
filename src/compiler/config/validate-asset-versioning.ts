@@ -1,4 +1,4 @@
-import { Config, ConfigAssetVersioning } from '@declarations';
+import { Config, ConfigAssetVersioning } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 
 

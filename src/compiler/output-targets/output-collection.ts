@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';

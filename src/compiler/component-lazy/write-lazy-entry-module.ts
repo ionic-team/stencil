@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { replaceStylePlaceholders } from '../app-core/component-styles';
 

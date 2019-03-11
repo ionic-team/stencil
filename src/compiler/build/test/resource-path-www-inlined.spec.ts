@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { mockDom } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';

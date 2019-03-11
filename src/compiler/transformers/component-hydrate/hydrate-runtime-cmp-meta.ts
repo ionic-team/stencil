@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { formatComponentRuntimeMeta } from '../../app-core/format-component-runtime-meta';
 import ts from 'typescript';

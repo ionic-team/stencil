@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { parseCss } from '../style/parse-css';
 import { StringifyCss } from '../style/stringify-css';
 import { UsedSelectors } from '../style/used-selectors';

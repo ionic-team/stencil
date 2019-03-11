@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

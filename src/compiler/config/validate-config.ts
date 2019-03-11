@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';

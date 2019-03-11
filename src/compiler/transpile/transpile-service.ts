@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { addCollection } from '../transformers/collections/add-collection';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';

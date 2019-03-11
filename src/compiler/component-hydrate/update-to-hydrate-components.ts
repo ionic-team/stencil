@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { sortBy } from '@utils';
 import { transformToHydrateComponentText } from '../transformers/component-hydrate/tranform-to-hydrate-component';

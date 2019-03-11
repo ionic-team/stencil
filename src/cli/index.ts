@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { getConfigFilePath } from './cli-utils';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';

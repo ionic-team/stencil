@@ -27,9 +27,6 @@
       "@build-conditionals": [
         "../compiler/app-core/build-conditionals.ts"
       ],
-      "@declarations": [
-        "../declarations/index.ts"
-      ],
       "@runtime": [
         "../runtime/index.ts"
       ],

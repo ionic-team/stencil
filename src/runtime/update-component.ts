@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { consoleError, writeTask } from '@platform';

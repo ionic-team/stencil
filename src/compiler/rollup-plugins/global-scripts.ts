@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { ModuleKind, getBuildScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';

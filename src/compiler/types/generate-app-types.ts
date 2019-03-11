@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { COMPONENTS_DTS_HEADER, indentTypes, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';

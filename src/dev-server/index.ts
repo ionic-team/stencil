@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { NodeFs } from '@sys';
 import { sendError } from './dev-server-utils';
 import { startDevServerWorker } from './start-server-worker';

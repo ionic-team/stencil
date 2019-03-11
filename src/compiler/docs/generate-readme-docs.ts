@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
 import { propsToMarkdown } from './markdown-props';
 import { eventsToMarkdown } from './markdown-events';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { isOutputTargetDistLazy } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';

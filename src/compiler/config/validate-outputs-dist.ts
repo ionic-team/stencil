@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { WEB_COMPONENTS_JSON_FILE_NAME, normalizePath } from '@utils';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';

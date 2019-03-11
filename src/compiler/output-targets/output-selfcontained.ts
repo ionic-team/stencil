@@ -1,4 +1,4 @@
-// import * as d from '@declarations';
+// import * as d from '../../declarations';
 // import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 // import { writeNativeSelfContained } from '../component-native/write-native-self-contained';
 

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildWarn, catchError, hasError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 

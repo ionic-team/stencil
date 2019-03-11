@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { outputDocs } from './output-docs';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { outputAngularProxies } from './output-angular';

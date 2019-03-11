@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildError, catchError, hasFileExtension, normalizePath } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';

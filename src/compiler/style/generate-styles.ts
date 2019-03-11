@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
 import { isOutputTargetWww } from '../output-targets/output-utils';

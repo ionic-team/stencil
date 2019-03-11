@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 
 export { bootstrapLazy } from './bootstrap-lazy';

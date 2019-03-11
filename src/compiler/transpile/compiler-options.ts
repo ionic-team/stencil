@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';

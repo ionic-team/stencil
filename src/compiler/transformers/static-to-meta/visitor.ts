@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { getModule, resetModule } from '../../build/compiler-ctx';
 import ts from 'typescript';
 import { parseStaticComponentMeta } from './component';

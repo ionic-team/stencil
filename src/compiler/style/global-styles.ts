@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildError, catchError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { optimizeCss } from './optimize-css';

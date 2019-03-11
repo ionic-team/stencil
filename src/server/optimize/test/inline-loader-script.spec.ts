@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { isLoaderScriptSrc, setDataResourcesUrlAttr } from '../inline-loader-script';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';

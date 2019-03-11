@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { EVENT_FLAGS } from '@utils';
 import { getElement, getWin } from '@platform';

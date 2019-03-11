@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { bundleHydrateCore } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';

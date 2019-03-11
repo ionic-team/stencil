@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { getCssImports, getModuleId, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
 import { mockBuildCtx, mockConfig } from '../../../testing/mocks';
 import { normalizePath } from '../../util';

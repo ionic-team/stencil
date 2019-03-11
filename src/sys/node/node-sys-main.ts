@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import color from 'ansi-colors';
 import { createContext, runInContext } from './node-context';
 import { FsWatcher } from './node-fs-watcher';

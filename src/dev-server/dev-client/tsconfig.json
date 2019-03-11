@@ -22,12 +22,7 @@
     "pretty": true,
     "rootDir": "../../",
     "target": "es5",
-    "baseUrl": ".",
-    "paths": {
-      "@declarations": [
-        "../../declarations/index.ts"
-      ]
-    }
+    "baseUrl": "."
   },
   "files": [
     "./index.ts"

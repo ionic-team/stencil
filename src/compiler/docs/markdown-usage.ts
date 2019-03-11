@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { captializeFirstLetter } from '@utils';
 
 export function usageToMarkdown(usages: d.JsonDocsUsage) {

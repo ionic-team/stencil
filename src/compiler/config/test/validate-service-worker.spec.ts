@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { validateServiceWorker } from '../validate-service-worker';
 

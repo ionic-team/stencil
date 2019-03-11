@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
 import ts from 'typescript';
 

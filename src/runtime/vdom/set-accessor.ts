@@ -7,7 +7,7 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { toLowerCase } from '@utils';
 import { XLINK_NS } from '../runtime-constants';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../transformers/collections/collection-compatibility';
 
 

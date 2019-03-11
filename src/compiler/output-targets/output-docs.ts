@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { generateDocData } from '../docs/generate-doc-data';
 import { strickCheckDocs } from '../docs/strict-check';
 import { generateReadmeDocs } from '../docs/generate-readme-docs';

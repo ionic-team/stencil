@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { dashToPascalCase, normalizePath } from '@utils';
 import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';

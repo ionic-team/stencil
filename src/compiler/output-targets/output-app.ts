@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';

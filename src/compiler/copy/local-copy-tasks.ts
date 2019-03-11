@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { flatOne, normalizePath } from '@utils';
 import { performCopyTasks } from './copy-tasks';
 import isGlob from 'is-glob';

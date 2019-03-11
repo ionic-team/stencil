@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { applyPolyfills } from './polyfills';
 import { initClient } from './init-client';
 

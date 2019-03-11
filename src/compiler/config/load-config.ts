@@ -1,4 +1,4 @@
-import { Config } from '@declarations';
+import { Config } from '../../declarations';
 
 
 export function loadConfig(config: string | Config) {

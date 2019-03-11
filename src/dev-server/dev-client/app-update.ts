@@ -1,4 +1,4 @@
-import  * as d from '@declarations';
+import  * as d from '../../declarations';
 import { appError, clearDevServerModal } from './app-error';
 import { hmrComponents } from './hmr-components';
 import { hmrExternalStyles } from './hmr-external-styles';

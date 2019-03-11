@@ -1,4 +1,4 @@
-import { Config } from '@declarations';
+import { Config } from '../../declarations';
 import { dashToPascalCase } from '@utils';
 import { setStringConfig } from './config-utils';
 

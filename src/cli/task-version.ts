@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { printUpdateMessage, requestLatestCompilerVersion } from '@sys';
 import exit from 'exit';
 

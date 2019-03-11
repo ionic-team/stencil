@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { normalizePath } from '@utils';
 import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';

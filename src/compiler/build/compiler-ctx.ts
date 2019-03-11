@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BuildEvents } from '../events';
 import { Cache } from '../cache';
 import { InMemoryFileSystem, normalizePath } from '@utils';

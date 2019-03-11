@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { generateHydrateApp } from '../component-hydrate/generate-hydrate-app';
 import { isOutputTargetHydrate } from './output-utils';
 

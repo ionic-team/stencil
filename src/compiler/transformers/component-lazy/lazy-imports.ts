@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addImports, getModuleFromSourceFile } from '../transform-utils';
 import { COMMON_IMPORTS, REGISTER_INSTANCE } from '../exports';
 import ts from 'typescript';

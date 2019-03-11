@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';

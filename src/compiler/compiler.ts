@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
 import { catchError } from '@utils';

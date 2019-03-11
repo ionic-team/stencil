@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { getFilePathFromUrl } from './asset-versioning-utils';
 import { hasFileExtension } from '@utils';
 

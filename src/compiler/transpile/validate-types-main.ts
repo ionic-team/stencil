@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { getUserCompilerOptions } from './compiler-options';

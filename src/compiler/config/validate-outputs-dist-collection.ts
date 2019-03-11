@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 

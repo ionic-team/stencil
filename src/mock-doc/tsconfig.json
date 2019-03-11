@@ -23,12 +23,7 @@
     "pretty": true,
     "rootDir": "../",
     "target": "es2017",
-    "baseUrl": ".",
-    "paths": {
-      "@declarations": [
-        "../declarations/index.ts"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": [
     "../../types/*.d.ts"

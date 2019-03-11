@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';

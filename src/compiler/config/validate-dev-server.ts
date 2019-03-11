@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { ModuleKind, ScriptTarget } from '../transform-utils';
 import { noop } from '@utils';

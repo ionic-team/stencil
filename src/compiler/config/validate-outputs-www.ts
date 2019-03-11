@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validatePrerender } from './validate-prerender';
 import { isOutputTargetWww } from '../output-targets/output-utils';

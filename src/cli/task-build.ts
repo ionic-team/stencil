@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { getLatestCompilerVersion, validateCompilerVersion } from '@sys';
 import { hasError } from './cli-utils';
 import exit from 'exit';

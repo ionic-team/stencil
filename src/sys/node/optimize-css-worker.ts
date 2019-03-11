@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 import cssnano, { CssNanoOptions } from 'cssnano';
 import autoprefixer, { Options } from 'autoprefixer';

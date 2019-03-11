@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export async function getAppBrowserCorePolyfills(config: d.Config) {

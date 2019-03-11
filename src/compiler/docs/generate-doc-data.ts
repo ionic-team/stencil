@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';

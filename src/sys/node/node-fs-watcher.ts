@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { GENERATED_DTS } from '../../compiler/output-targets/output-utils';
 import { normalizePath } from '@utils';
 import crypto from 'crypto';

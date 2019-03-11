@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addComponentStyle } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';

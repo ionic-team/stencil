@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { catchError } from '@utils';
 import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';

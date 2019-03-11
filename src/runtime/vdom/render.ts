@@ -6,7 +6,7 @@
  *
  * Modified for Stencil's renderer and slot projection
  */
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
 import { getDoc, plt, supportsShadowDom } from '@platform';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateConfig } from '../validate-config';
 

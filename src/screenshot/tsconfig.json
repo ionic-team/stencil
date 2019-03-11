@@ -24,9 +24,6 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@declarations": [
-        "../declarations/index.ts"
-      ],
       "@sys": [
         "../sys/node/index.ts"
       ],

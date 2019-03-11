@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { optimizeCss } from '../optimize-css';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import * as path from 'path';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';

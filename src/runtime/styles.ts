@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
 import { getDoc, rootAppliedStyles, styles } from '@platform';

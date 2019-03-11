@@ -32,9 +32,6 @@
       "@build-conditionals": [
         "../../../compiler/app-core/build-conditionals.ts"
       ],
-      "@declarations": [
-        "../../../declarations/index.ts"
-      ],
       "@utils": [
         "../../../utils/index.ts"
       ]

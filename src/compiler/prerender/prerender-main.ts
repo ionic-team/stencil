@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { buildWarn, catchError, hasError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';

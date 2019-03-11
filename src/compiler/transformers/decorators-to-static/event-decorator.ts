@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { buildWarn } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol } from '../transform-utils';
 import ts from 'typescript';

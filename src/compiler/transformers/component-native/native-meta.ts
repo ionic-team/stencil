@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 
 

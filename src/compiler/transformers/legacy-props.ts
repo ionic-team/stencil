@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { GET_CONNECT, GET_CONTEXT } from './exports';
 
 export function addLegacyProps(cmp: d.ComponentCompilerMeta) {

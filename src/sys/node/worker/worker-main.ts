@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';

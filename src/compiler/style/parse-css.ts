@@ -5,7 +5,7 @@
  * Licensed under the MIT License
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 // http://www.w3.org/TR/CSS21/grammar.html
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027

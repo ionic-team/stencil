@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
 import { transpileModule } from './transpile';
 

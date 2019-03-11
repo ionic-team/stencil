@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { sortBy } from '@utils';
 import { updateToLazyComponent } from '../component-lazy/update-to-lazy-component';
 import { updateToNativeComponent } from '../component-native/update-to-native-component';

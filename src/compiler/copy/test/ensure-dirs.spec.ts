@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { ensureDirs } from '../copy-tasks-worker';
 import { normalizePath } from '../../util';
 import * as path from 'path';

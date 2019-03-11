@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {

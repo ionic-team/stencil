@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import ts from 'typescript';
 import { addComponentStyle } from '../component-style';
 import { addNativeConnectedCallback } from './native-connected-callback';

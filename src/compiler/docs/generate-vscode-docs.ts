@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 export async function generateWebComponentsJson(compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDocsVscode[], docsData: d.JsonDocs) {

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { isDecoratorNamed, removeDecorators } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';

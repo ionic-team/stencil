@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { isDevClient } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';

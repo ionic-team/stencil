@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 

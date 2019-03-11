@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { createRequestHandler } from '../request-handler';
 import { mockConfig } from '../../testing/mocks';
 import { normalizePath } from '@utils';

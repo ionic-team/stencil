@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { addChildVNodes } from './hydrate';
 import { addEventListeners } from './host-listener';
 import { BUILD } from '@build-conditionals';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildError, buildWarn, catchError } from '@utils';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE } from '@utils';

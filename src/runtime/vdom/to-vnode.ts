@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
 
 

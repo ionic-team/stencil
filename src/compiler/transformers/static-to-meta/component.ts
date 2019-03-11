@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
 import { setComponentBuildConditionals } from '../component-build-conditionals';

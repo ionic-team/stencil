@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addCollection } from '../collections/add-collection';
 import { normalizePath } from '@utils';
 import ts from 'typescript';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { gatherVdomMeta } from '../static-to-meta/vdom';
 import ts from 'typescript';
 import { H } from '../exports';

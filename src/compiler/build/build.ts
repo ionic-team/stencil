@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError } from '@utils';
 import { emptyOutputTargetDirs } from './empty-dir';

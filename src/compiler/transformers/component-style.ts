@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { createStaticGetter } from './transform-utils';
 import { getStyleIdPlaceholder, getStyleTextPlaceholder } from '../app-core/component-styles';
 import ts from 'typescript';

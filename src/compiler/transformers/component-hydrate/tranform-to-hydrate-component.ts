@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addHydrateImports } from './hydrate-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';

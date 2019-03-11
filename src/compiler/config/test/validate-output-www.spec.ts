@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { validateOutputTargetWww } from '../validate-outputs-www';
 import * as path from 'path';
 

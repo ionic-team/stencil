@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { generateAppTypes } from '../types/generate-app-types';
 import { transpileService } from './transpile-service';

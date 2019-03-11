@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { validateConfig } from '../validate-config';
 import { mockLogger } from '../../../testing/mocks';
 import * as path from 'path';

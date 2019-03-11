@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
 import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';

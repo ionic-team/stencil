@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import * as v from '../validate-package-json';
 import * as path from 'path';

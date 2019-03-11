@@ -7,7 +7,7 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 
 const stack: any[] = [];

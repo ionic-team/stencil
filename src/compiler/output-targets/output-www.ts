@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { optimizeEsmLoaderImport } from '../html/optimize-esm-import';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 
 
 export function strickCheckDocs(config: d.Config, docsData: d.JsonDocs) {

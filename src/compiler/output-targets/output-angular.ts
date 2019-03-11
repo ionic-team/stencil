@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { dashToPascalCase, sortBy } from '@utils';
 import { getComponentsFromModules, isOutputTargetAngular } from './output-utils';
 

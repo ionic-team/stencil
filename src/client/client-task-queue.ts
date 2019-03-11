@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
 import { plt } from './client-window';

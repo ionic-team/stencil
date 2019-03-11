@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';

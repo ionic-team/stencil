@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';

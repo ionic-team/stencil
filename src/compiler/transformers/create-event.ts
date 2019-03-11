@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
 import { CREATE_EVENT } from './exports';

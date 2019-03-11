@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { pathJoin } from '../../util';
 import { validateConfig } from '../validate-config';

@@ -32,9 +32,6 @@
       "@compiler": [
         "../compiler/index.ts"
       ],
-      "@declarations": [
-        "../declarations/index.ts"
-      ],
       "@global-scripts": [
         "./global-scripts.ts"
       ],

@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 import { HYDRATE_CHILD_ID, NODE_TYPE } from './runtime-constants';
 import { toLowerCase } from '@utils';
 import { getDoc } from '@platform';

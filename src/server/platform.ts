@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../declarations';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 

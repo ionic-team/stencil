@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { _deprecatedToMultipleTarget } from '../_deprecated-validate-multiple-targets';
 import { mockLogger } from '../../../testing/mocks';
 

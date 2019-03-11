@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
 import { getComponentsDtsTypesFilePath } from '../output-targets/output-utils';

@@ -1,4 +1,4 @@
-import { Config } from '@declarations';
+import { Config } from '../../declarations';
 import { normalizePath } from '@utils';
 import { setStringConfig } from './config-utils';
 import ts from 'typescript';

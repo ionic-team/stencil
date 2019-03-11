@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { unduplicate } from '@utils';
 
 export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] {

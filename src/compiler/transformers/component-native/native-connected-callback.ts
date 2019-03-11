@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import * as d from '@declarations';
+import * as d from '../../../declarations';
 // import { formatHostListeners } from '../../app-core/format-component-runtime-meta';
 // import { convertValueToLiteral } from '../transform-utils';
 

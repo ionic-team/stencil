@@ -1,4 +1,4 @@
-import * as d from '@declarations';
+import * as d from '../../declarations';
 import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, isOutputTargetDist } from './output-utils';
