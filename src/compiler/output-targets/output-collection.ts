@@ -18,7 +18,7 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
 
-  copyAssets(compilerCtx, buildCtx, outputTargets);
+  copyAssets(config, compilerCtx, buildCtx, outputTargets);
 
   await Promise.all([
     writeTypes(config, compilerCtx, buildCtx, outputTargets),
@@ -29,11 +29,11 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
   timespan.finish(`generate collections finished`);
 }
 
-function copyAssets(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
+function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
   const copyTasks = flatOne(outputTargets.map(o => ([
-    ...getComponentAssetsCopyTasks(buildCtx, o.dir, false),
+    ...getComponentAssetsCopyTasks(config, buildCtx, o.dir, false),
   ])));
-  return performCopyTasks(compilerCtx, buildCtx, copyTasks);
+  return performCopyTasks(config, compilerCtx, buildCtx, copyTasks);
 }
 
 

@@ -26,9 +26,9 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
 
 async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // Copy assets into www
-  performCopyTasks(compilerCtx, buildCtx, [
+  performCopyTasks(config, compilerCtx, buildCtx, [
     ...await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
-    ...getComponentAssetsCopyTasks(buildCtx, outputTarget.dir, true)
+    ...getComponentAssetsCopyTasks(config, buildCtx, outputTarget.dir, true)
   ]);
 
   // Process

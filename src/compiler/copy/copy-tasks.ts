@@ -1,13 +1,12 @@
 import * as d from '@declarations';
 import { buildError } from '@utils';
-import { sys } from '@sys';
 
 
-export async function performCopyTasks(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, copyTasks: d.CopyTask[]) {
+export async function performCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, copyTasks: d.CopyTask[]) {
   try {
     if (copyTasks.length > 0) {
       const timeSpan = buildCtx.createTimeSpan(`copyTasks started`, true);
-      const promise = sys.copy(copyTasks);
+      const promise = config.sys.copy(copyTasks);
       buildCtx.pendingCopyTasks.push(promise);
 
       const copyResults = await promise;

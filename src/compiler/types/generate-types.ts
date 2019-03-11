@@ -41,7 +41,7 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
     const distPath = config.sys.path.join(config.rootDir, distTypesDir, relPath);
 
     const originalDtsContent = await compilerCtx.fs.readFile(srcDtsFile.absPath);
-    const distDtsContent = updateStencilTypesImports(outputTarget.typesDir, distPath, originalDtsContent);
+    const distDtsContent = updateStencilTypesImports(config.sys.path, outputTarget.typesDir, distPath, originalDtsContent);
 
     await compilerCtx.fs.writeFile(distPath, distDtsContent);
   }));

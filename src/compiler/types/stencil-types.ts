@@ -1,13 +1,12 @@
 import * as d from '@declarations';
 import { isOutputTargetDist } from '../output-targets/output-utils';
-import { sys } from '@sys';
 
 
-export function updateStencilTypesImports(typesDir: string, dtsFilePath: string, dtsContent: string) {
-  const dir = sys.path.dirname(dtsFilePath);
-  const relPath = sys.path.relative(dir, typesDir);
+export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFilePath: string, dtsContent: string) {
+  const dir = path.dirname(dtsFilePath);
+  const relPath = path.relative(dir, typesDir);
 
-  let coreDtsPath = sys.path.join(relPath, CORE_FILENAME);
+  let coreDtsPath = path.join(relPath, CORE_FILENAME);
   if (!coreDtsPath.startsWith('.')) {
     coreDtsPath = `./${coreDtsPath}`;
   }

@@ -1,8 +1,8 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 
-export function getComponentAssetsCopyTasks(buildCtx: d.BuildCtx, dest: string, allAssets: boolean) {
+
+export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildCtx, dest: string, allAssets: boolean) {
   if (buildCtx.skipAssetsCopy) {
     return [];
   }
@@ -20,7 +20,7 @@ export function getComponentAssetsCopyTasks(buildCtx: d.BuildCtx, dest: string, 
         cmp.assetsDirs.forEach(assetsMeta => {
           copyTasks.push({
             src: assetsMeta.absolutePath,
-            dest: sys.path.join(dest, assetsMeta.cmpRelativePath)
+            dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath)
           });
         });
       }
@@ -33,7 +33,7 @@ export function getComponentAssetsCopyTasks(buildCtx: d.BuildCtx, dest: string, 
 }
 
 
-export function canSkipAssetsCopy(compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
+export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
@@ -46,7 +46,7 @@ export function canSkipAssetsCopy(compilerCtx: d.CompilerCtx, entryModules: d.En
   // loop through each of the changed files
   filesChanged.forEach(changedFile => {
     // get the directory of where the changed file is in
-    const changedFileDirPath = normalizePath(sys.path.dirname(changedFile));
+    const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
 
     // loop through all the possible asset directories
     entryModules.forEach(entryModule => {

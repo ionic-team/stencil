@@ -40,7 +40,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
-    buildCtx.skipAssetsCopy = canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
+    buildCtx.skipAssetsCopy = canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
 
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);

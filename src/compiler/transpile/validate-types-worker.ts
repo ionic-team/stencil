@@ -39,7 +39,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       }
 
       if (typeof compilerOptions.declarationDir === 'string') {
-        data = updateStencilTypesImports(compilerOptions.declarationDir, outputFileName, data);
+        data = updateStencilTypesImports(path, compilerOptions.declarationDir, outputFileName, data);
       }
 
       ts.sys.writeFile(outputFileName, data, writeByteOrderMark);

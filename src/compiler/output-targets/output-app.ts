@@ -36,12 +36,12 @@ async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   const allCopyTasks = flatOne(
     await Promise.all(
       outputTargets.map(async o => [
-        ...getComponentAssetsCopyTasks(buildCtx, o.copyDir, true),
+        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, true),
         ...await processCopyTasks(config, o.copyDir, o.copy)
       ])
     )
   );
-  return performCopyTasks(compilerCtx, buildCtx, allCopyTasks);
+  return performCopyTasks(config, compilerCtx, buildCtx, allCopyTasks);
 }
 
 export async function generateNativeApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {

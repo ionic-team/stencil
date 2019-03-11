@@ -26,7 +26,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
 
   if (destination !== 'src') {
     componentsDtsFilePath = config.sys.path.resolve(destination, GENERATED_DTS);
-    componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
+    componentTypesFileContent = updateStencilTypesImports(config.sys.path, destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
   await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
