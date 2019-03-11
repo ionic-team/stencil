@@ -1,19 +1,18 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { sys } from '@sys';
-import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';
 import { dashToPascalCase, normalizePath } from '@utils';
+import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';
 
 
-export async function updateToNativeComponent(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> {
+export async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> {
   const inputFilePath = cmp.jsFilePath;
-  const inputFileDir = sys.path.dirname(inputFilePath);
-  const inputFileName = sys.path.basename(inputFilePath);
+  const inputFileDir = config.sys.path.dirname(inputFilePath);
+  const inputFileName = config.sys.path.basename(inputFilePath);
   const inputJsText = await compilerCtx.fs.readFile(inputFilePath);
 
   const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, build.es5, inputJsText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
-  const outputFilePath = sys.path.join(inputFileDir, outputFileName);
+  const outputFilePath = config.sys.path.join(inputFileDir, outputFileName);
 
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);

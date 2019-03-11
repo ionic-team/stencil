@@ -4,7 +4,6 @@ import { configFileReload } from '../config/config-reload';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
 import { isCopyTaskFile } from '../copy/local-copy-tasks';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 
 
 export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {
@@ -19,7 +18,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 
   // recursively drill down through any directories added and fill up more data
   buildCtx.dirsAdded.forEach(dirAdded => {
-    addDir(compilerCtx, buildCtx, dirAdded);
+    addDir(config, compilerCtx, buildCtx, dirAdded);
   });
 
   // files changed include updated, added and deleted
@@ -38,8 +37,8 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   }
 
   // collect all the scripts that were added/deleted
-  buildCtx.scriptsAdded = scriptsAdded(buildCtx);
-  buildCtx.scriptsDeleted = scriptsDeleted(buildCtx);
+  buildCtx.scriptsAdded = scriptsAdded(config, buildCtx);
+  buildCtx.scriptsDeleted = scriptsDeleted(config, buildCtx);
   buildCtx.hasScriptChanges = hasScriptChanges(buildCtx);
 
   // collect all the styles that were added/deleted
@@ -64,7 +63,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 }
 
 
-function addDir(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
+function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   dir = normalizePath(dir);
 
   if (!buildCtx.dirsAdded.includes(dir)) {
@@ -74,11 +73,11 @@ function addDir(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   const items = compilerCtx.fs.disk.readdirSync(dir);
 
   items.forEach(dirItem => {
-    const itemPath = sys.path.join(dir, dirItem);
+    const itemPath = config.sys.path.join(dir, dirItem);
     const stat = compilerCtx.fs.disk.statSync(itemPath);
 
     if (stat.isDirectory()) {
-      addDir(compilerCtx, buildCtx, itemPath);
+      addDir(config, compilerCtx, buildCtx, itemPath);
 
     } else if (stat.isFile()) {
       if (!buildCtx.filesAdded.includes(itemPath)) {
@@ -117,19 +116,19 @@ export function shouldRebuild(buildCtx: d.BuildCtx) {
 }
 
 
-function scriptsAdded(buildCtx: d.BuildCtx) {
+function scriptsAdded(config: d.Config, buildCtx: d.BuildCtx) {
   // collect all the scripts that were added
   return buildCtx.filesAdded.filter(f => {
     return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
-  }).map(f => sys.path.basename(f));
+  }).map(f => config.sys.path.basename(f));
 }
 
 
-function scriptsDeleted(buildCtx: d.BuildCtx) {
+function scriptsDeleted(config: d.Config, buildCtx: d.BuildCtx) {
   // collect all the scripts that were deleted
   return buildCtx.filesDeleted.filter(f => {
     return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
-  }).map(f => sys.path.basename(f));
+  }).map(f => config.sys.path.basename(f));
 }
 
 
@@ -167,7 +166,7 @@ const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 
 function hasIndexHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  const anyIndexHtmlChanged = buildCtx.filesChanged.some(fileChanged => sys.path.basename(fileChanged).toLowerCase() === 'index.html');
+  const anyIndexHtmlChanged = buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
   if (anyIndexHtmlChanged) {
     // any index.html in any directory that changes counts too
     return true;
@@ -186,7 +185,7 @@ function hasIndexHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
 function checkForConfigUpdates(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // figure out if one of the changed files is the config
   if (buildCtx.filesChanged.some(f => f === config.configPath)) {
-    buildCtx.debug(`reload config file: ${sys.path.relative(config.rootDir, config.configPath)}`);
+    buildCtx.debug(`reload config file: ${config.sys.path.relative(config.rootDir, config.configPath)}`);
     configFileReload(config, compilerCtx);
     buildCtx.requiresFullBuild = true;
   }

@@ -1,10 +1,10 @@
 import * as d from '@declarations';
+import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
-import { OutputOptions } from 'rollup';
-import { sys } from '@sys';
 import { getAppBrowserCorePolyfills } from '../app-core/app-polyfills';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
+import { OutputOptions } from 'rollup';
 
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
@@ -28,7 +28,9 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
     };
     const destinations = esmOutputs.map(o => o.esmDir);
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '');
+    if (results != null) {
+      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '');
+    }
   }
 
   if (systemOutputs.length > 0) {
@@ -39,13 +41,15 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
     };
     const destinations = esmOutputs.map(o => o.esmDir);
     const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system');
-    await Promise.all(
-      systemOutputs.map(async o => {
-        const loader = await getSystemLoader(`${config.fsNamespace}.system.js`, o.polyfills);
-        await compilerCtx.fs.writeFile(sys.path.join(o.systemDir, `${config.fsNamespace}.js`), loader)
-      })
-    );
+    if (results != null) {
+      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system');
+      await Promise.all(
+        systemOutputs.map(async o => {
+          const loader = await getSystemLoader(config, `${config.fsNamespace}.system.js`, o.polyfills);
+          await compilerCtx.fs.writeFile(config.sys.path.join(o.systemDir, `${config.fsNamespace}.js`), loader)
+        })
+      );
+    }
   }
 
   timespan.finish(`generate lazy components finished`);
@@ -58,8 +62,10 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.lazyLoad = true;
   build.es5 = false;
   build.polyfills = false;
-  build.hydrateClientSide = false;
   build.hydrateServerSide = false;
+
+  const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
+  build.hydrateClientSide = hasHydrateOutputTargets;
 
   updateBuildConditionals(config, build);
 
@@ -87,10 +93,10 @@ function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d
   return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
 }
 
-async function getSystemLoader(coreFilename: string, includePolyfills: boolean) {
-  const staticName = sys.path.join('polyfills', 'esm', 'system.js');
-  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills() : '';
-  const systemLoader = await sys.getClientCoreFile({ staticName: staticName });
+async function getSystemLoader(config: d.Config, coreFilename: string, includePolyfills: boolean) {
+  const staticName = config.sys.path.join('polyfills', 'esm', 'system.js');
+  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
+  const systemLoader = await config.sys.getClientCoreFile({ staticName: staticName });
   return `
 ${polyfills}
 ${systemLoader}

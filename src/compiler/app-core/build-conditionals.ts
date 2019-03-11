@@ -53,9 +53,6 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     taskQueue: true,
   };
 
-  f.member = (f.member || f.updatable || f.mode || f.lifecycle);
-  f.taskQueue = (f.updatable || f.mode || f.lifecycle);
-
   return f;
 }
 
@@ -68,6 +65,11 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.lifecycleDOMEvents = b.isDebug;
   b.profile = !!(config.flags && config.flags.profile);
   b.slotRelocation = !!(b.scoped || (b.hydrateServerSide) || (b.es5 && b.shadowDom));
+
+  b.updatable = (b.updatable || b.hydrateClientSide);
+  b.member = (b.member || b.updatable || b.mode || b.lifecycle);
+  b.taskQueue = (b.updatable || b.mode || b.lifecycle);
+
 }
 
 

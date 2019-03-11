@@ -21,7 +21,6 @@ async function bundleCompiler() {
   const rollupBuild = await rollup.rollup({
     input: INPUT_FILE,
     external: [
-      'path',
       'typescript',
       '../mock-doc',
       '../server',
@@ -47,6 +46,9 @@ async function bundleCompiler() {
             if (id === '@utils') {
               return '../utils';
             }
+            if (id === 'path') {
+              return path.join(__dirname, 'helpers', 'path.js');
+            }
           }
         }
       })(),
@@ -54,7 +56,10 @@ async function bundleCompiler() {
       rollupResolve({
         preferBuiltins: true
       }),
-      rollupCommonjs()
+      rollupCommonjs({
+        ignore: ['path'],
+        ignoreGlobal: true
+      })
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;

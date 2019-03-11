@@ -1,5 +1,7 @@
 import * as d from '../declarations';
-import * as path from 'path';
+import { TestingLogger } from './testing-logger';
+import { TestingSystem } from './testing-sys';
+import path from 'path';
 
 
 export class TestingConfig implements d.Config {
@@ -19,9 +21,11 @@ export class TestingConfig implements d.Config {
   outputTargets: d.OutputTarget[];
   buildEs5: boolean;
   hashFileNames: boolean;
+  logger = new TestingLogger();
   maxConcurrentWorkers = 1;
   minifyCss: boolean;
   minifyJs: boolean;
+  sys = new TestingSystem();
   testing: d.TestingConfig;
   validateTypes = false;
   nodeResolve: d.NodeResolveConfig = {

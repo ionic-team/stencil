@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
 import { runJest } from './jest-runner';
-import { logger, sys } from '@sys';
 
 
 export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) {
-  logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
+  config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
 
   const ScreenshotConnector = require(config.testing.screenshotConnector) as any;
   const connector: d.ScreenshotConnector = new ScreenshotConnector();
@@ -12,10 +11,10 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   // for CI, let's wait a little longer than locally before taking the screenshot
   const timeoutBeforeScreenshot = config.flags.ci ? 30 : 10;
 
-  const pixelmatchModulePath = sys.path.join(sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
-  logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
+  const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
+  config.logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
 
-  const initTimespan = logger.createTimeSpan(`screenshot, initBuild started`, true);
+  const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
   await connector.initBuild({
     buildId: createBuildId(),
     buildMessage: createBuildMessage(),
@@ -23,9 +22,9 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     appNamespace: config.namespace,
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
-    packageDir: sys.compiler.packageDir,
+    packageDir: config.sys.compiler.packageDir,
     updateMaster: config.flags.updateScreenshot,
-    logger: logger,
+    logger: config.logger,
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
     allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
     pixelmatchThreshold: config.testing.pixelmatchThreshold,
@@ -49,26 +48,26 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   env.__STENCIL_SCREENSHOT_BUILD__ = connector.toJson(masterBuild, screenshotCache);
 
-  const testsTimespan = logger.createTimeSpan(`screenshot, tests started`, true);
+  const testsTimespan = config.logger.createTimeSpan(`screenshot, tests started`, true);
 
   const passed = await runJest(config, env);
 
   testsTimespan.finish(`screenshot, tests finished, passed: ${passed}`);
 
   try {
-    const completeTimespan = logger.createTimeSpan(`screenshot, completeTimespan started`, true);
+    const completeTimespan = config.logger.createTimeSpan(`screenshot, completeTimespan started`, true);
     let results = await connector.completeBuild(masterBuild);
     completeTimespan.finish(`screenshot, completeTimespan finished`);
 
     if (results) {
-      const publishTimespan = logger.createTimeSpan(`screenshot, publishBuild started`, true);
+      const publishTimespan = config.logger.createTimeSpan(`screenshot, publishBuild started`, true);
       results = await connector.publishBuild(results);
       publishTimespan.finish(`screenshot, publishBuild finished`);
 
       if (config.flags.updateScreenshot) {
         // updating the master screenshot
         if (results.currentBuild && typeof results.currentBuild.previewUrl === 'string') {
-          logger.info(logger.magenta(results.currentBuild.previewUrl));
+          config.logger.info(config.logger.magenta(results.currentBuild.previewUrl));
         }
 
       } else {
@@ -77,20 +76,20 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
           try {
             await connector.updateScreenshotCache(screenshotCache, results);
           } catch (e) {
-            logger.error(e);
+            config.logger.error(e);
           }
 
-          logger.info(`screenshots compared: ${results.compare.diffs.length}`);
+          config.logger.info(`screenshots compared: ${results.compare.diffs.length}`);
 
           if (typeof results.compare.url === 'string') {
-            logger.info(logger.magenta(results.compare.url));
+            config.logger.info(config.logger.magenta(results.compare.url));
           }
         }
       }
     }
 
   } catch (e) {
-    logger.error(e, e.stack);
+    config.logger.error(e, e.stack);
   }
 
   return passed;

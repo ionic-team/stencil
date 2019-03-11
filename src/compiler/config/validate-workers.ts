@@ -1,12 +1,11 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 
 
 export function validateWorkers(config: d.Config) {
   let cpus = 1;
 
-  if (sys && sys.details && typeof sys.details.cpus === 'number') {
-    cpus = sys.details.cpus;
+  if (config.sys && config.sys.details && typeof config.sys.details.cpus === 'number') {
+    cpus = config.sys.details.cpus;
   }
 
   if (typeof config.maxConcurrentWorkers !== 'number') {

@@ -2,6 +2,7 @@ import * as d from '@declarations';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
 import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
+
 export async function updateIndexHtmlServiceWorker(doc: Document, config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   if (!outputTarget.serviceWorker && config.devMode) {
     // if we're not generating a sw, and this is a dev build
@@ -10,13 +11,13 @@ export async function updateIndexHtmlServiceWorker(doc: Document, config: d.Conf
 
   } else if (outputTarget.serviceWorker) {
     // we have a valid sw config, so we'll need to inject the register sw script
-    await injectRegisterServiceWorker(buildCtx, outputTarget, doc);
+    await injectRegisterServiceWorker(config, buildCtx, outputTarget, doc);
   }
 }
 
 
-export async function injectRegisterServiceWorker(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, doc: Document) {
-  const swUrl = generateServiceWorkerUrl(outputTarget);
+export async function injectRegisterServiceWorker(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, doc: Document) {
+  const swUrl = generateServiceWorkerUrl(config, outputTarget);
   const serviceWorker = getRegisterSwScript(doc, buildCtx, swUrl);
   doc.body.appendChild(serviceWorker);
 }

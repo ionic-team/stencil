@@ -1,12 +1,11 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 
 
-export async function getAppBrowserCorePolyfills() {
+export async function getAppBrowserCorePolyfills(config: d.Config) {
   // first load up all of the polyfill content
   const readFilePromises = INLINE_POLYFILLS.map(polyfillFile => {
-    const staticName = sys.path.join('polyfills', 'es5', polyfillFile);
-    return sys.getClientCoreFile({ staticName: staticName });
+    const staticName = config.sys.path.join('polyfills', 'es5', polyfillFile);
+    return config.sys.getClientCoreFile({ staticName: staticName });
   });
 
   // read all the polyfill content, in this particular order
@@ -17,15 +16,15 @@ export async function getAppBrowserCorePolyfills() {
 }
 
 
-export function copyEsmCorePolyfills(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const polyfillsBuildDir = sys.path.join(outputTarget.buildDir, 'esm', 'es5', 'polyfills');
+export function copyEsmCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+  const polyfillsBuildDir = config.sys.path.join(outputTarget.buildDir, 'esm', 'es5', 'polyfills');
 
   return Promise.all(
     POLYFILLS.map(async polyfillFile => {
-      const staticName = sys.path.join('polyfills', 'esm', polyfillFile);
-      const polyfillsContent = await sys.getClientCoreFile({ staticName: staticName });
+      const staticName = config.sys.path.join('polyfills', 'esm', polyfillFile);
+      const polyfillsContent = await config.sys.getClientCoreFile({ staticName: staticName });
 
-      const polyfillDst = sys.path.join(polyfillsBuildDir, polyfillFile);
+      const polyfillDst = config.sys.path.join(polyfillsBuildDir, polyfillFile);
       await compilerCtx.fs.writeFile(polyfillDst, polyfillsContent);
     })
   );

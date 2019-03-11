@@ -3,7 +3,6 @@ import { buildError, catchError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
-import { sys } from '@sys';
 
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
@@ -19,8 +18,8 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
 
     const fileName = `${config.fsNamespace}.css`;
 
-    const filePath = sys.path.join(outputTarget.buildDir, fileName);
-    buildCtx.debug(`global style: ${sys.path.relative(config.rootDir, filePath)}`);
+    const filePath = config.sys.path.join(outputTarget.buildDir, fileName);
+    buildCtx.debug(`global style: ${config.sys.path.relative(config.rootDir, filePath)}`);
     await compilerCtx.fs.writeFile(filePath, styleText);
 
   } catch (e) {
@@ -104,7 +103,7 @@ async function hasChangedImportFile(config: d.Config, compilerCtx: d.CompilerCtx
 
 
 async function hasChangedImportContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, content: string, checkedFiles: string[]): Promise<boolean> {
-  const cssImports = getCssImports(buildCtx, filePath, content);
+  const cssImports = getCssImports(config, buildCtx, filePath, content);
   if (cssImports.length === 0) {
     // don't bother
     return false;

@@ -1,36 +1,35 @@
 import * as d from '@declarations';
 import { PRERENDER_HOST } from './prerender-queue';
-import { sys } from '@sys';
 
 
-export function getWriteFilePathFromUrlPath(outputTarget: d.OutputTargetWww, inputUrl: string) {
+export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputUrl: string) {
   const url = new URL(inputUrl, PRERENDER_HOST);
 
   let pathName = url.pathname;
-  if (pathName.startsWith(outputTarget.baseUrl)) {
-    pathName = pathName.substring(outputTarget.baseUrl.length);
+  if (pathName.startsWith(manager.outputTarget.baseUrl)) {
+    pathName = pathName.substring(manager.outputTarget.baseUrl.length);
 
-  } else if (outputTarget.baseUrl === pathName + '/') {
+  } else if (manager.outputTarget.baseUrl === pathName + '/') {
     pathName = '/';
   }
 
   // figure out the directory where this file will be saved
-  const dir = sys.path.join(
-    outputTarget.dir,
+  const dir = manager.config.sys.path.join(
+    manager.outputTarget.dir,
     pathName
   );
 
   // create the full path where this will be saved (normalize for windowz)
   let filePath: string;
 
-  if (dir + '/' === outputTarget.dir + '/') {
+  if (dir + '/' === manager.outputTarget.dir + '/') {
     // this is the root of the output target directory
     // use the configured index.html
-    const basename = outputTarget.indexHtml.substr(dir.length + 1);
-    filePath = sys.path.join(dir, basename);
+    const basename = manager.outputTarget.indexHtml.substr(dir.length + 1);
+    filePath = manager.config.sys.path.join(dir, basename);
 
   } else {
-    filePath = sys.path.join(dir, `index.html`);
+    filePath = manager.config.sys.path.join(dir, `index.html`);
   }
 
   return filePath;

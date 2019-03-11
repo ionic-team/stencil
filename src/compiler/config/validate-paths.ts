@@ -1,12 +1,11 @@
 import { Config } from '@declarations';
 import { normalizePath } from '@utils';
 import { setStringConfig } from './config-utils';
-import { logger, sys } from '@sys';
 import ts from 'typescript';
 
 
 export function validatePaths(config: Config) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   if (typeof config.globalScript === 'string' && !path.isAbsolute(config.globalScript)) {
     if (!path.isAbsolute(config.globalScript)) {
@@ -17,7 +16,7 @@ export function validatePaths(config: Config) {
 
   if (Array.isArray(config.globalStyle)) {
     // DEPRECATED 2018-05-31
-    logger.warn(`"globalStyle" config no longer accepts an array. Please update to only use a single entry point for a global style css file.`);
+    config.logger.warn(`"globalStyle" config no longer accepts an array. Please update to only use a single entry point for a global style css file.`);
     if (config.globalStyle.length > 0) {
       config.globalStyle = config.globalStyle[0];
     }
@@ -67,7 +66,7 @@ export function validatePaths(config: Config) {
       config.buildLogFilePath = path.join(config.rootDir, config.buildLogFilePath);
     }
     config.buildLogFilePath = normalizePath(config.buildLogFilePath);
-    logger.buildLogFilePath = config.buildLogFilePath;
+    config.logger.buildLogFilePath = config.buildLogFilePath;
   }
 }
 

@@ -2,12 +2,11 @@ import * as d from '@declarations';
 import { getConfigFilePath } from './cli-utils';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
-import { logger, sys } from '@sys';
 import { shouldIgnoreError } from '@utils';
 import exit from 'exit';
 
 
-export async function run(process: NodeJS.Process) {
+export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
 
   process.on(`unhandledRejection`, (r: any) => {
     if (!shouldIgnoreError(r)) {
@@ -30,6 +29,9 @@ export async function run(process: NodeJS.Process) {
     }
     config = sys.loadConfigFile(configPath, process);
 
+    config.sys = (config.sys || sys);
+    config.logger = (config.logger || logger);
+
   } catch (e) {
     logger.error(e);
     exit(1);
@@ -37,7 +39,7 @@ export async function run(process: NodeJS.Process) {
 
   try {
     if (typeof config.logLevel === 'string') {
-      logger.level = config.logLevel;
+      config.logger.level = config.logLevel;
     }
 
     config.flags = flags;
@@ -48,7 +50,7 @@ export async function run(process: NodeJS.Process) {
 
   } catch (e) {
     if (!shouldIgnoreError(e)) {
-      logger.error(`uncaught cli error: ${e}${logger.level === 'debug' ? e.stack : ''}`);
+      config.logger.error(`uncaught cli error: ${e}${config.logger.level === 'debug' ? e.stack : ''}`);
       exit(1);
     }
   }

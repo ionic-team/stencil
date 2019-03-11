@@ -1,11 +1,10 @@
 import * as d from '@declarations';
-import { logger, sys } from '@sys';
 import { validateConfig } from './validate-config';
 
 
 export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
   try {
-    const updatedConfig = sys.loadConfigFile(config.configPath);
+    const updatedConfig = config.sys.loadConfigFile(config.configPath);
 
     configReload(config, updatedConfig);
 
@@ -13,7 +12,7 @@ export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
     compilerCtx.reset();
 
   } catch (e) {
-    logger.error(e);
+    config.logger.error(e);
   }
 }
 

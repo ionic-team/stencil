@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { catchError } from '@utils';
-import { sys } from '@sys';
 import { optimizeEsmLoaderImport } from '../html/optimize-esm-import';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { serializeNodeToHtml } from '@mock-doc';
@@ -58,7 +57,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, serializeNodeToHtml(doc));
 
-      buildCtx.debug(`generateIndexHtml, write: ${sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
+      buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
     } catch (e) {
       catchError(buildCtx.diagnostics, e);

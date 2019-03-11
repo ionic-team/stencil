@@ -1,6 +1,5 @@
 import { CompilerCtx, Config, OutputTargetBuild } from '@declarations';
 import { getAppBuildDir } from '../app/app-file-naming';
-import { sys } from '@sys';
 
 
 export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetBuild) {
@@ -9,7 +8,7 @@ export async function generateEs5DisabledMessage(config: Config, compilerCtx: Co
   // tests on a browser that doesn't support es2017
   const fileName = 'es5-build-disabled.js';
 
-  const filePath = sys.path.join(getAppBuildDir(config, outputTarget), fileName);
+  const filePath = config.sys.path.join(getAppBuildDir(config, outputTarget), fileName);
   await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
 
   return fileName;

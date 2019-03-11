@@ -10,4 +10,9 @@ try {
   }
 } catch (e) {}
 
-require('../dist/cli').run(process);
+var cli = require('../dist/cli');
+var node = require('../sys/node');
+var sys = new node.NodeSystem();
+var logger = new node.NodeLogger();
+
+cli.run(process, sys, logger);

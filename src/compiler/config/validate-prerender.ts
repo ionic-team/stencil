@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { setStringConfig } from './config-utils';
-import { sys } from '@sys';
 
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
@@ -21,8 +20,8 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
   }
 
   if (typeof outputTarget.prerenderConfig === 'string') {
-    if (!sys.path.isAbsolute(outputTarget.prerenderConfig)) {
-      outputTarget.prerenderConfig = sys.path.join(config.rootDir, outputTarget.prerenderConfig);
+    if (!config.sys.path.isAbsolute(outputTarget.prerenderConfig)) {
+      outputTarget.prerenderConfig = config.sys.path.join(config.rootDir, outputTarget.prerenderConfig);
     }
   }
 }

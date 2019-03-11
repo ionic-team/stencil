@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { normalizePrerenderLocation } from '../prerender/prerender-utils';
-import { sys } from '@sys';
 
 
-export function getFilePathFromUrl(outputTarget: d.OutputTargetHydrate, windowLocationHref: string, url: string) {
+export function getFilePathFromUrl(config: d.Config, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, url: string) {
   if (typeof url !== 'string' || url.trim() === '') {
     return null;
   }
@@ -13,7 +12,7 @@ export function getFilePathFromUrl(outputTarget: d.OutputTargetHydrate, windowLo
     return null;
   }
 
-  return sys.path.join(outputTarget.dir, location.path);
+  return config.sys.path.join(outputTarget.dir, location.path);
 }
 
 

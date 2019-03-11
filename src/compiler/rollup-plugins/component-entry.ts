@@ -4,7 +4,7 @@ import { updateToLazyComponent } from '../component-lazy/update-to-lazy-componen
 import { updateToNativeComponent } from '../component-native/update-to-native-component';
 
 
-export function componentEntryPlugin(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
+export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
   const entrys = new Map<string, d.EntryModule>();
 
   return {
@@ -25,8 +25,8 @@ export function componentEntryPlugin(compilerCtx: d.CompilerCtx, buildCtx: d.Bui
       if (entryModule != null) {
         const modules = await Promise.all(
           build.lazyLoad
-            ? entryModule.cmps.map(cmp => updateToLazyComponent(compilerCtx, buildCtx, build, cmp))
-            : entryModule.cmps.map(cmp => updateToNativeComponent(compilerCtx, buildCtx, build, cmp))
+            ? entryModule.cmps.map(cmp => updateToLazyComponent(config, compilerCtx, buildCtx, build, cmp))
+            : entryModule.cmps.map(cmp => updateToNativeComponent(config, compilerCtx, buildCtx, build, cmp))
         );
 
         return sortBy(modules, m => m.cmp.tagName)

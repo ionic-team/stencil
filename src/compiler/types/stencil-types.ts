@@ -1,6 +1,6 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { isOutputTargetDist } from '../output-targets/output-utils';
+import { sys } from '@sys';
 
 
 export function updateStencilTypesImports(typesDir: string, dtsFilePath: string, dtsContent: string) {
@@ -29,12 +29,12 @@ export async function copyStencilCoreDts(config: d.Config, compilerCtx: d.Compil
     .filter(isOutputTargetDist)
     .filter(o => o.typesDir);
 
-  const srcStencilCoreDts = await sys.getClientCoreFile({
+  const srcStencilCoreDts = await config.sys.getClientCoreFile({
     staticName: 'declarations/stencil.core.d.ts'
    });
 
   return Promise.all(typesOutputTargets.map(outputTarget => {
-    const coreDtsFilePath = sys.path.join(outputTarget.typesDir, CORE_DTS);
+    const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);
     return compilerCtx.fs.writeFile(coreDtsFilePath, srcStencilCoreDts);
   }));
 }

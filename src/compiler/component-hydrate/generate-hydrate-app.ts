@@ -11,7 +11,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
   try {
     const cmps = getComponentsFromModules(buildCtx.moduleFiles);
     const build = getBuildConditionals(config, cmps);
-    const coreSource = await generateHydrateAppCoreEntry(compilerCtx, buildCtx, cmps, build);
+    const coreSource = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
     const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, coreSource);
 
     if (!buildCtx.shouldAbort && typeof code === 'string') {
@@ -39,9 +39,9 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-async function generateHydrateAppCoreEntry(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
+async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
   const coreText: string[] = [];
-  const hydrateCmps = await updateToHydrateComponents(compilerCtx, buildCtx, build, cmps);
+  const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, build, cmps);
 
   coreText.push(`import { registerComponents, styles } from '@stencil/core/platform';`);
 

@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BuildContext, Cache, validateConfig } from '@compiler';
+import { BuildContext, Cache, validateConfig } from '../compiler';
 import { InMemoryFileSystem } from '@utils';
 import { MockWindow } from '@mock-doc';
 import { TestingConfig } from './testing-config';

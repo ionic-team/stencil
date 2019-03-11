@@ -1,36 +1,35 @@
 import * as d from '@declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { isDocsPublic, normalizePath, sortBy, flatOne } from '@utils';
+import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
-import { sys } from '@sys';
 
 
-export async function generateDocData(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
+export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
-      name: sys.compiler.name,
-      version: sys.compiler.version,
-      typescriptVersion: sys.compiler.typescriptVersion
+      name: config.sys.compiler.name,
+      version: config.sys.compiler.version,
+      typescriptVersion: config.sys.compiler.typescriptVersion
     },
-    components: await getComponents(compilerCtx, buildCtx)
+    components: await getComponents(config, compilerCtx, buildCtx)
   };
 }
 
-async function getComponents(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
+async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
   const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     const filePath = moduleFile.sourceFilePath;
-    const dirPath = normalizePath(sys.path.dirname(filePath));
-    const readmePath = normalizePath(sys.path.join(dirPath, 'readme.md'));
-    const usagesDir = normalizePath(sys.path.join(dirPath, 'usage'));
+    const dirPath = normalizePath(config.sys.path.dirname(filePath));
+    const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
+    const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
     const readme = await getUserReadmeContent(compilerCtx, readmePath);
-    const usage = await generateUsages(compilerCtx, usagesDir);
+    const usage = await generateUsages(config, compilerCtx, usagesDir);
     return moduleFile.cmps
       .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
       .map(cmp => ({
         dirPath,
         filePath,
-        fileName: sys.path.basename(filePath),
+        fileName: config.sys.path.basename(filePath),
         readmePath,
         usagesDir,
         tag: cmp.tagName,
@@ -212,7 +211,7 @@ function generateDocs(readme: string, jsdoc: d.CompilerJsDoc) {
   return contentLines.join('\n').trim();
 }
 
-async function generateUsages(compilerCtx: d.CompilerCtx, usagesDir: string) {
+async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
   const rtn: d.JsonDocsUsage = {};
 
   try {
@@ -225,7 +224,7 @@ async function generateUsages(compilerCtx: d.CompilerCtx, usagesDir: string) {
         return;
       }
 
-      const fileName = sys.path.basename(f.relPath);
+      const fileName = config.sys.path.basename(f.relPath);
       if (!fileName.toLowerCase().endsWith('.md')) {
         return;
       }

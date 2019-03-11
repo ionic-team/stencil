@@ -1,5 +1,4 @@
 import { Config } from '@declarations';
-import { sys } from '@sys';
 
 
 export function loadConfig(config: string | Config) {

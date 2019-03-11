@@ -12,8 +12,7 @@
  */
 
 import { ShadowCss } from '../shadow-css';
-import { getElementScopeId, getScopeId } from '../../../util/scope';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { getElementScopeId } from '../../../runtime/styles';
 
 
 describe('ShadowCss', function() {
@@ -224,21 +223,6 @@ describe('ShadowCss', function() {
     });
 
   });
-
-  describe('getScopeId', () => {
-    it('should work without mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' })).toBe('sc-my-tag');
-    });
-
-    it('should work with default mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' }, DEFAULT_STYLE_MODE)).toBe('sc-my-tag');
-    });
-
-    it('should work with md mode', () => {
-      expect(getScopeId({ tagNameMeta: 'my-tag' }, 'md')).toBe('sc-my-tag-md');
-    });
-  });
-
 
   describe('getElementScopeId, host', () => {
     it('should add -h suffix', () => {

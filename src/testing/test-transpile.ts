@@ -1,22 +1,26 @@
 import * as d from '../declarations';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
-import { transpileModule } from '@compiler';
+import { transpileModule } from '../compiler';
+import path from 'path';
 import ts from 'typescript';
 
 
+const TRANSPILE_CONFIG: d.Config = {
+  cwd: process.cwd(),
+  rootDir: '/',
+  srcDir: '/',
+  devMode: true,
+  _isTesting: true,
+  validateTypes: false,
+  enableCache: false,
+  sys: {
+    path: path
+  }
+};
+
+
 export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  const config: d.Config = {
-    cwd: process.cwd(),
-    rootDir: '/',
-    srcDir: '/',
-    devMode: true,
-    _isTesting: true,
-    validateTypes: false
-  };
-
-  const results = transpileModule(config, input, opts, sourceFilePath);
-
-  return results;
+  return transpileModule(TRANSPILE_CONFIG, input, opts, sourceFilePath);
 }
 
 

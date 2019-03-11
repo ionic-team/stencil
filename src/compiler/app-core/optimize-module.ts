@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { sys } from '@sys';
 
 
-export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
+export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
   const opts: any = {
     output: {},
     compress: {
@@ -53,7 +52,7 @@ export async function optimizeModule(_config: d.Config, compilerCtx: d.CompilerC
     }
   }
 
-  const results = await sys.minifyJs(input, opts);
+  const results = await config.sys.minifyJs(input, opts);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     await compilerCtx.cache.put(cacheKey, results.output);
   }

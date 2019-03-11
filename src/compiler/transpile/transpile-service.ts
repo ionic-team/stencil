@@ -7,7 +7,6 @@ import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import minimatch from 'minimatch';
-import { logger, sys } from '@sys';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
@@ -125,7 +124,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
           convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          convertStaticToMeta(sys, config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
+          convertStaticToMeta(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
         ]
       };
     }
@@ -187,7 +186,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   const content = await ctx.compilerCtx.fs.readFile(sourceFilePath);
 
   // create a cache key out of the content and compiler options
-  const cacheKey = `transpileService_${sys.generateContentHash(content + sourceFilePath + ctx.configKey, 32)}` ;
+  const cacheKey = `transpileService_${config.sys.generateContentHash(content + sourceFilePath + ctx.configKey, 32)}` ;
 
   if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!
@@ -217,7 +216,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
-        addCollection(sys, config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+        addCollection(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
       });
 
       // write the cached js output too
@@ -276,7 +275,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
-          addCollection(sys, config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
+          addCollection(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
         });
       }
 
@@ -356,7 +355,7 @@ async function scanDirForTsFiles(config: d.Config, compilerCtx: d.CompilerCtx, b
   scanDirTimeSpan.finish(`scan for ts files finished: ${tsFilePaths.length}`);
 
   if (tsFilePaths.length === 0) {
-    logger.warn(`No components found within: ${config.srcDir}`);
+    config.logger.warn(`No components found within: ${config.srcDir}`);
   }
 
   return tsFilePaths;
@@ -436,7 +435,7 @@ function createConfigKey(config: d.Config, compilerOptions: ts.CompilerOptions) 
   // create a unique config key with stuff that "might" matter for typescript builds
   // not using the entire config object
   // since not everything is a primitive and could have circular references
-  return sys.generateContentHash(JSON.stringify(
+  return config.sys.generateContentHash(JSON.stringify(
     [
       config.devMode,
       config.minifyCss,

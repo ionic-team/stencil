@@ -8,7 +8,6 @@ import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-
 import { stencilConsolePlugin } from '../rollup-plugins/stencil-console';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
-import { sys } from '@sys';
 
 
 export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], coreSource: string) {
@@ -23,21 +22,21 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
           '@core-entrypoint': SERVER_ENTRY,
           '@stencil/core/app': coreSource,
         }),
-        stencilServerPlugin(),
+        stencilServerPlugin(config),
         stencilConsolePlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
-        componentEntryPlugin(compilerCtx, buildCtx, build, entryModules),
-        sys.rollup.plugins.nodeResolve({
+        componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
+        config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true,
           preferBuiltins: true
         }),
-        sys.rollup.plugins.emptyJsResolver(),
-        sys.rollup.plugins.commonjs({
+        config.sys.rollup.plugins.emptyJsResolver(),
+        config.sys.rollup.plugins.commonjs({
           sourceMap: false
         }),
-        inMemoryFsRead(compilerCtx, buildCtx),
+        inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
       external: [
@@ -46,7 +45,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
 
-    const rollupBuild = await sys.rollup.rollup(rollupOptions);
+    const rollupBuild = await config.sys.rollup.rollup(rollupOptions);
 
     const { output } = await rollupBuild.generate({
       format: 'cjs'

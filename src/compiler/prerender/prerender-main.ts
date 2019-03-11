@@ -3,7 +3,6 @@ import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-
 import { buildWarn, catchError, hasError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
-import { sys } from '@sys';
 
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -40,7 +39,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       return;
     }
 
-    manager.templateId = await createPrerenderTemplate(templateHtml);
+    manager.templateId = await createPrerenderTemplate(config, templateHtml);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
@@ -90,12 +89,12 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       hydrateAppFilePath: manager.buildCtx.hydrateAppFilePath,
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
-      writeToFilePath: getWriteFilePathFromUrlPath(manager.outputTarget, url),
+      writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
       url: url
     };
 
     // prender this path and wait on the results
-    const results = await sys.prerenderUrl(prerenderRequest);
+    const results = await manager.config.sys.prerenderUrl(prerenderRequest);
 
     manager.buildCtx.diagnostics.push(...results.diagnostics);
 
@@ -120,9 +119,9 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 }
 
 
-async function createPrerenderTemplate(templateHtml: string) {
-  const templateFileName = `prerender-template-${sys.generateContentHash(templateHtml, 12)}.html`;
-  const templateId = sys.path.join(sys.details.tmpDir, templateFileName);
-  await sys.fs.writeFile(templateId, templateHtml);
+async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
+  const templateFileName = `prerender-template-${config.sys.generateContentHash(templateHtml, 12)}.html`;
+  const templateId = config.sys.path.join(config.sys.details.tmpDir, templateFileName);
+  await config.sys.fs.writeFile(templateId, templateHtml);
   return templateId;
 }

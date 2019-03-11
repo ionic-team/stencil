@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 
 
@@ -26,8 +25,8 @@ function validateStatsOutputTarget(config: d.Config, outputTarget: d.OutputTarge
     outputTarget.file = DEFAULT_JSON_FILE_NAME;
   }
 
-  if (!sys.path.isAbsolute(outputTarget.file)) {
-    outputTarget.file = sys.path.join(config.rootDir, outputTarget.file);
+  if (!config.sys.path.isAbsolute(outputTarget.file)) {
+    outputTarget.file = config.sys.path.join(config.rootDir, outputTarget.file);
   }
 }
 

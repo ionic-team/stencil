@@ -28,9 +28,6 @@
       "@build-conditionals": [
         "./build-conditionals.ts"
       ],
-      "@compiler": [
-        "../compiler/index.ts"
-      ],
       "@declarations": [
         "../declarations/index.ts"
       ],

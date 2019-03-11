@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { BuildEvents } from '../events';
 import { Cache } from '../cache';
 import { InMemoryFileSystem, normalizePath } from '@utils';
-import { sys } from '@sys';
 
 
 /**
@@ -20,6 +19,7 @@ export class CompilerContext implements d.CompilerCtx {
   events = new BuildEvents();
   fs: d.InMemoryFileSystem;
   fsWatcher: d.FsWatcher = null;
+  hasFsWatcherEvents = false;
   hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
   isActivelyBuilding = false;
@@ -36,12 +36,12 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
 
   constructor(config: d.Config) {
-    const cacheFs = config.enableCache ? new InMemoryFileSystem(sys.fs, sys.path) : null;
+    const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;
     this.cache = new Cache(config, cacheFs);
 
     this.cache.initCacheDir();
 
-    this.fs = new InMemoryFileSystem(sys.fs, sys.path);
+    this.fs = (config.sys.fs != null ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null);
   }
 
   reset() {
@@ -49,13 +49,16 @@ export class CompilerContext implements d.CompilerCtx {
     this.cachedStyleMeta.clear();
     this.collections.length = 0;
     this.compilerOptions = null;
-    this.fs.clearCache();
     this.lastComponentStyleInput.clear();
     this.lazyModuleRollupCache = null;
     this.moduleMap.clear();
     this.resolvedCollections.clear();
     this.rootTsFiles.length = 0;
     this.tsService = null;
+
+    if (this.fs != null) {
+      this.fs.clearCache();
+    }
   }
 }
 

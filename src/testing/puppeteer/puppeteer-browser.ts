@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
-import { logger, sys } from '@sys';
 import * as puppeteer from 'puppeteer';
 
 
@@ -11,19 +10,19 @@ export async function startPuppeteerBrowser(config: d.Config) {
 
   const env: d.E2EProcessEnv = process.env;
 
-  const puppeteerModulePath = sys.lazyRequire.getModulePath('puppeteer');
+  const puppeteerModulePath = config.sys.lazyRequire.getModulePath('puppeteer');
   const puppeteer = require(puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
-  logger.debug(`puppeteer: ${puppeteerModulePath}`);
+  config.logger.debug(`puppeteer: ${puppeteerModulePath}`);
 
-  logger.debug(`puppeteer headless: ${config.testing.browserHeadless}`);
+  config.logger.debug(`puppeteer headless: ${config.testing.browserHeadless}`);
 
   if (Array.isArray(config.testing.browserArgs)) {
-    logger.debug(`puppeteer args: ${config.testing.browserArgs.join(' ')}`);
+    config.logger.debug(`puppeteer args: ${config.testing.browserArgs.join(' ')}`);
   }
 
   if (typeof config.testing.browserSlowMo === 'number') {
-    logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
+    config.logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
   }
 
   const launchOpts: puppeteer.LaunchOptions = {
@@ -49,7 +48,7 @@ export async function startPuppeteerBrowser(config: d.Config) {
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
-  logger.debug(`puppeteer browser wsEndpoint: ${env.__STENCIL_BROWSER_WS_ENDPOINT__}`);
+  config.logger.debug(`puppeteer browser wsEndpoint: ${env.__STENCIL_BROWSER_WS_ENDPOINT__}`);
 
   return browser;
 }

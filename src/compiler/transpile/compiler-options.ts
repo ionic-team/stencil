@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { logger, sys } from '@sys';
 import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
 
@@ -23,7 +22,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
       }
 
     } else {
-      const configBasePath = sys.path.dirname(config.configPath);
+      const configBasePath = config.sys.path.dirname(config.configPath);
       const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, configBasePath);
       if (parseResult.errors && parseResult.errors.length > 0) {
         loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
@@ -37,7 +36,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     }
 
   } catch (e) {
-    logger.debug(`getUserCompilerOptions: ${e}`);
+    config.logger.debug(`getUserCompilerOptions: ${e}`);
   }
 
   if (config._isTesting) {
@@ -63,19 +62,19 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
   }
 
   if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module) {
-    logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
   }
 
   if (compilerOptions.target !==  DEFAULT_COMPILER_OPTIONS.target) {
-    logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`);
+    config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`);
   }
 
   if (compilerOptions.esModuleInterop !== true) {
-    logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
+    config.logger.warn(`To improve module interoperability, it is highly recommend to set the tsconfig.json "esModuleInterop" setting to "true". This update allows star imports written as: import * as foo from "foo", to instead be written with the familiar default syntax of: import foo from "foo". For more info, please see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html`);
   }
 
   if (compilerOptions.allowSyntheticDefaultImports !== true) {
-    logger.warn(`To standardize default imports, it is recommend to set the tsconfig.json "allowSyntheticDefaultImports" setting to "true".`);
+    config.logger.warn(`To standardize default imports, it is recommend to set the tsconfig.json "allowSyntheticDefaultImports" setting to "true".`);
   }
 
   validateCompilerOptions(compilerOptions);

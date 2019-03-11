@@ -1,11 +1,10 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetDistCollection(config: d.Config) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
 

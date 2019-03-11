@@ -3,7 +3,6 @@ import { buildError, buildWarn, catchError } from '@utils';
 import { calcComponentDependencies } from './component-dependencies';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentEntries } from './entry-components';
-import { sys } from '@sys';
 import { validateComponentTag } from '../config/validate-component';
 
 
@@ -201,7 +200,7 @@ export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx)
     m.cmps.forEach(cmp => {
       if (definedTags.has(cmp.tagName)) {
         const error = buildError(buildCtx.diagnostics);
-        error.messageText = `Component tag "${cmp.tagName}" has been defined in multiple files: ${sys.path.relative(config.rootDir, m.sourceFilePath)}`;
+        error.messageText = `Component tag "${cmp.tagName}" has been defined in multiple files: ${config.sys.path.relative(config.rootDir, m.sourceFilePath)}`;
 
       } else {
         definedTags.add(cmp.tagName);

@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { hasError, normalizePath } from '@utils';
-import { sys } from '@sys';
 
 
 export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string, legacyBuild: boolean) {
@@ -34,7 +33,7 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     return cachedContent;
   }
 
-  const minifyResults = await sys.optimizeCss(opts);
+  const minifyResults = await config.sys.optimizeCss(opts);
   minifyResults.diagnostics.forEach(d => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);

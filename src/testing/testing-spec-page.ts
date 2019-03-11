@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '@compiler';
+import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
 
 
 export async function newSpecPage(opts: d.NewSpecPageOptions) {

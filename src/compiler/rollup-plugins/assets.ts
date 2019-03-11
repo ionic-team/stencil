@@ -1,14 +1,12 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { Plugin } from 'rollup';
 
 
 
-export function assetsPlugin(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin {
-
+export function assetsPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin {
   return {
     resolveId(id: string) {
-      if (isAsset(id)) {
+      if (!NOT_ASSETS.includes(config.sys.path.extname(id).toLowerCase())) {
         return id;
       }
       return null;
@@ -21,9 +19,6 @@ export function assetsPlugin(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): 
   };
 }
 
-function isAsset(id: string) {
-  return !NOT_ASSETS.includes(sys.path.extname(id).toLowerCase());
-}
 
 const NOT_ASSETS = [
   '.js',

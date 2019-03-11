@@ -1,51 +1,50 @@
 import * as d from '../declarations';
 import { normalizePath } from '@utils';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 
 export class TestingFs implements d.FileSystem {
-  data: {[filePath: string]: { isFile: boolean; isDirectory: boolean; content?: string; } } = {};
+  data = new Map<string, Data>();
 
   diskWrites = 0;
   diskReads = 0;
 
   access(itemPath: string) {
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         try {
           this.statSync(itemPath);
           resolve();
         } catch (e) {
           reject(e);
         }
-      }, this.resolveTime);
+      });
     });
   }
 
   copyFile(srcPath: string, destPath: string) {
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        this.diskReads++;
+    srcPath = normalizePath(srcPath);
+    destPath = normalizePath(destPath);
 
-        if (!this.data[srcPath]) {
+    return new Promise<void>((resolve, reject) => {
+      process.nextTick(() => {
+        this.diskReads++;
+        const data = this.data.get(srcPath);
+        if (data != null) {
           reject(`copyFile, srcPath doesn't exists: ${srcPath}`);
+
         } else {
           this.diskWrites++;
-          this.data[destPath] = this.data[srcPath];
+          this.data.set(destPath, data);
           resolve();
         }
-      }, this.resolveTime);
-    });
-  }
-
-  exists(filePath: string) {
-    return new Promise<boolean>(resolve => {
-      resolve(!!this.data[filePath]);
+      });
     });
   }
 
   existsSync(filePath: string) {
-    return !!this.data[filePath];
+    return this.data.has(normalizePath(filePath));
   }
 
   createReadStream(_filePath: string): any {
@@ -54,20 +53,20 @@ export class TestingFs implements d.FileSystem {
 
   mkdir(dirPath: string) {
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         dirPath = normalizePath(dirPath);
         this.diskWrites++;
 
-        if (this.data[dirPath]) {
+        if (this.data.has(dirPath)) {
           reject(`mkdir, dir already exists: ${dirPath}`);
         } else {
-          this.data[dirPath] = {
+          this.data.set(dirPath, {
             isDirectory: true,
             isFile: false
-          };
+          });
           resolve();
         }
-      }, this.resolveTime);
+      });
     });
   }
 
@@ -75,28 +74,28 @@ export class TestingFs implements d.FileSystem {
     dirPath = normalizePath(dirPath);
     this.diskWrites++;
 
-    if (this.data[dirPath]) {
+    if (this.data.has(dirPath)) {
       throw new Error(`mkdir, dir already exists: ${dirPath}`);
     } else {
-      this.data[dirPath] = {
+      this.data.set(dirPath, {
         isDirectory: true,
         isFile: false
-      };
+      });
     }
   }
 
   readdir(dirPath: string) {
+    dirPath = normalizePath(dirPath);
     return new Promise<string[]>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         try {
-
           const dirs = this.readdirSync(dirPath);
           resolve(dirs.sort());
 
         } catch (e) {
           reject(e);
         }
-      }, this.resolveTime);
+      });
     });
   }
 
@@ -104,15 +103,14 @@ export class TestingFs implements d.FileSystem {
     dirPath = normalizePath(dirPath);
     this.diskReads++;
 
-    if (!this.data[dirPath]) {
+    if (!this.data.has(dirPath)) {
       throw new Error(`readdir, dir doesn't exists: ${dirPath}`);
     }
 
-    const filePaths = Object.keys(this.data);
     const dirs: string[] = [];
 
-    filePaths.forEach(f => {
-      const pathRelative = path.relative(dirPath, f);
+    this.data.forEach((_, key) => {
+      const pathRelative = path.relative(dirPath, key);
       // Windows: pathRelative =  ..\dir2\dir3\dir4\file2.js
       const dirItem = normalizePath(pathRelative).split('/')[0];
 
@@ -128,67 +126,80 @@ export class TestingFs implements d.FileSystem {
 
   readFile(filePath: string) {
     return new Promise<string>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         try {
+          filePath = normalizePath(filePath);
           resolve(this.readFileSync(filePath));
         } catch (e) {
           reject(e);
         }
-      }, this.resolveTime);
+      });
     });
   }
 
   readFileSync(filePath: string) {
     filePath = normalizePath(filePath);
     this.diskReads++;
-    if (this.data[filePath] && typeof this.data[filePath].content === 'string') {
-      return this.data[filePath].content;
+    const data = this.data.get(filePath);
+
+    if (data != null && typeof data.content === 'string') {
+      return data.content;
     }
-    throw new Error(`readFile, path doesn't exist: ${filePath}`);
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    this.data.set(filePath, {
+      isFile: true,
+      isDirectory: false,
+      content: content
+    });
+
+    return content;
   }
 
   rmdir(dirPath: string) {
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         dirPath = normalizePath(dirPath);
 
-        if (!this.data[dirPath]) {
+        if (!this.data.has(dirPath)) {
           reject(`rmdir, dir doesn't exists: ${dirPath}`);
         } else {
-          Object.keys(this.data).forEach(item => {
-            if (item.startsWith(dirPath + '/') || item === dirPath) {
+          this.data.forEach((_, key) => {
+            if (key.startsWith(dirPath + '/') || key === dirPath) {
               this.diskWrites++;
-              delete this.data[item];
+              this.data.delete(key);
             }
           });
           resolve();
         }
-      }, this.resolveTime);
+      });
     });
   }
 
   stat(itemPath: string) {
     return new Promise<d.FsStats>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         try {
           resolve(this.statSync(itemPath));
         } catch (e) {
           reject(e);
         }
-      }, this.resolveTime);
+      });
     });
   }
 
   statSync(itemPath: string) {
     itemPath = normalizePath(itemPath);
     this.diskReads++;
-    if (this.data[itemPath]) {
-      const isDirectory = this.data[itemPath].isDirectory;
-      const isFile = this.data[itemPath].isFile;
+    const data = this.data.get(itemPath);
+
+    if (data != null) {
+      const isDirectory = data.isDirectory;
+      const isFile = data.isFile;
       return  {
         isDirectory: () => isDirectory,
         isFile: () => isFile,
-        size: this.data[itemPath].content ? this.data[itemPath].content.length : 0
+        size: data.content != null ? data.content.length : 0
       } as d.FsStats;
     }
     throw new Error(`stat, path doesn't exist: ${itemPath}`);
@@ -196,44 +207,43 @@ export class TestingFs implements d.FileSystem {
 
   unlink(filePath: string) {
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      process.nextTick(() => {
         filePath = normalizePath(filePath);
         this.diskWrites++;
 
-        if (!this.data[filePath]) {
+        if (!this.data.has(filePath)) {
           reject(`unlink, file doesn't exists: ${filePath}`);
         } else {
-          delete this.data[filePath];
+          this.data.delete(filePath);
           resolve();
         }
-
-      }, this.resolveTime);
+      });
     });
   }
 
   writeFile(filePath: string, content: string) {
-    filePath = normalizePath(filePath);
     return new Promise<void>(resolve => {
-      setTimeout(() => {
+      process.nextTick(() => {
+        filePath = normalizePath(filePath);
         this.diskWrites++;
-        this.data[filePath] = {
+        this.data.set(filePath, {
           isDirectory: false,
           isFile: true,
           content: content
-        };
+        });
         resolve();
-      }, this.resolveTime);
+      });
     });
   }
 
   writeFileSync(filePath: string, content: string) {
     filePath = normalizePath(filePath);
     this.diskWrites++;
-    this.data[filePath] = {
+    this.data.set(filePath, {
       isDirectory: false,
       isFile: true,
       content: content
-    };
+    });
   }
 
   writeFiles(files: { [filePath: string]: string }) {
@@ -242,7 +252,10 @@ export class TestingFs implements d.FileSystem {
     }));
   }
 
-  get resolveTime() {
-    return (Math.random() * 6);
-  }
+}
+
+interface Data {
+  isFile: boolean;
+  isDirectory: boolean;
+  content?: string;
 }

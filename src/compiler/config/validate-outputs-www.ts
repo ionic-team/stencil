@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
-import { sys } from '@sys';
 import { validatePrerender } from './validate-prerender';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
@@ -23,24 +22,24 @@ export function validateOutputTargetWww(config: d.Config) {
 
 
 function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   setStringConfig(outputTarget, 'dir', DEFAULT_DIR);
 
   if (!path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = sys.path.join(config.rootDir, outputTarget.dir);
+    outputTarget.dir = path.join(config.rootDir, outputTarget.dir);
   }
 
   setStringConfig(outputTarget, 'buildDir', DEFAULT_BUILD_DIR);
 
   if (!path.isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = sys.path.join(outputTarget.dir, outputTarget.buildDir);
+    outputTarget.buildDir = path.join(outputTarget.dir, outputTarget.buildDir);
   }
 
   setStringConfig(outputTarget, 'indexHtml', DEFAULT_INDEX_HTML);
 
   if (!path.isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = sys.path.join(outputTarget.dir, outputTarget.indexHtml);
+    outputTarget.indexHtml = path.join(outputTarget.dir, outputTarget.indexHtml);
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);

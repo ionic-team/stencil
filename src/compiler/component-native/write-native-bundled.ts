@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/component-styles';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
-import { sys } from '@sys';
 
 
 export function writeNativeBundled(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, outputTargets: d.OutputTargetWebComponent[], cmps: d.ComponentCompilerMeta[], rollupResults: d.RollupResult[]) {
@@ -22,7 +21,7 @@ export function writeNativeBundled(config: d.Config, compilerCtx: d.CompilerCtx,
 
 async function writeNativeBundledMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[], modeName: string, code: string) {
   if (config.minifyJs) {
-    const results = await optimizeAppCoreBundle(compilerCtx, build, code);
+    const results = await optimizeAppCoreBundle(config, compilerCtx, build, code);
     buildCtx.diagnostics.push(...results.diagnostics);
 
     if (results.diagnostics.length === 0 && typeof results.output === 'string') {
@@ -43,7 +42,7 @@ function writeNativeBundledOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   }
   fileName += `.js`;
 
-  const filePath = sys.path.join(outputTarget.buildDir, fileName);
+  const filePath = config.sys.path.join(outputTarget.buildDir, fileName);
 
   return compilerCtx.fs.writeFile(filePath, modeOutputText);
 }

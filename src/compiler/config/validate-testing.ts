@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 
 
 export function validateTesting(config: d.Config) {
@@ -27,7 +26,7 @@ export function validateTesting(config: d.Config) {
     testing.browserHeadless = true;
   }
 
-  const path = sys.path;
+  const path = config.sys.path;
 
   if (typeof testing.rootDir === 'string') {
     if (!path.isAbsolute(testing.rootDir)) {
@@ -48,8 +47,8 @@ export function validateTesting(config: d.Config) {
     }
 
   } else {
-    testing.screenshotConnector = sys.path.join(
-      sys.compiler.packageDir, 'screenshot', 'local-connector.js'
+    testing.screenshotConnector = path.join(
+      config.sys.compiler.packageDir, 'screenshot', 'local-connector.js'
     );
   }
 
@@ -59,7 +58,7 @@ export function validateTesting(config: d.Config) {
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return sys.path.join(testing.rootDir, ignorePattern);
+      return path.join(testing.rootDir, ignorePattern);
     });
 
     config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
@@ -69,7 +68,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
-      sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
     );
 
   } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
@@ -81,7 +80,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.testEnvironment !== 'string') {
     testing.testEnvironment = path.join(
-      sys.compiler.packageDir, 'testing', 'jest.environment.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.environment.js'
     );
 
   } else if (!path.isAbsolute(testing.testEnvironment)) {
@@ -129,7 +128,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.runner !== 'string') {
     testing.runner = path.join(
-      sys.compiler.packageDir, 'testing', 'jest.runner.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.runner.js'
     );
   }
 
@@ -153,7 +152,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.transform[DEFAULT_TS_TRANSFORM] !== 'string') {
     testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      sys.compiler.packageDir, 'testing', 'jest.preprocessor.js'
+      config.sys.compiler.packageDir, 'testing', 'jest.preprocessor.js'
     );
 
   } else if (!path.isAbsolute(testing.transform[DEFAULT_TS_TRANSFORM])) {

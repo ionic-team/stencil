@@ -4,25 +4,25 @@ import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 
-export function parseImport(sys: d.StencilSystem, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) {
+export function parseImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
-    if (sys.path.isAbsolute(importPath)) {
+    if (config.sys.path.isAbsolute(importPath)) {
       // absolute import
       importPath = normalizePath(importPath);
       moduleFile.localImports.push(importPath);
 
     } else if (importPath.startsWith('.')) {
       // relative import
-      importPath = normalizePath(sys.path.resolve(dirPath, importPath));
+      importPath = normalizePath(config.sys.path.resolve(dirPath, importPath));
       moduleFile.localImports.push(importPath);
 
     } else {
       // node resolve import
       if (!importNode.importClause) {
         // node resolve side effect import
-        addCollection(sys, config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
+        addCollection(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 
         // test if this side effect import is a collection
         const isCollectionImport = compilerCtx.collections.some(c => {

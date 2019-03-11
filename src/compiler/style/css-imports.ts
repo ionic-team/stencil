@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { buildError, normalizePath } from '@utils';
-import { logger, sys } from '@sys';
 import { parseStyleDocs } from '../docs/style-docs';
 
 
@@ -20,7 +19,7 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
     parseStyleDocs(styleDocs, styleText);
   }
 
-  const cssImports = getCssImports(buildCtx, resolvedFilePath, styleText);
+  const cssImports = getCssImports(config, buildCtx, resolvedFilePath, styleText);
   if (cssImports.length === 0) {
     return styleText;
   }
@@ -66,7 +65,7 @@ async function loadStyleText(compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
 }
 
 
-export function getCssImports(buildCtx: d.BuildCtx, filePath: string, styleText: string) {
+export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: string, styleText: string) {
   const imports: d.CssImportData[] = [];
 
   if (!styleText.includes('@import')) {
@@ -76,7 +75,7 @@ export function getCssImports(buildCtx: d.BuildCtx, filePath: string, styleText:
 
   styleText = stripComments(styleText);
 
-  const dir = sys.path.dirname(filePath);
+  const dir = config.sys.path.dirname(filePath);
   const importeeExt = filePath.split('.').pop().toLowerCase();
 
   let r: RegExpExecArray;
@@ -88,31 +87,31 @@ export function getCssImports(buildCtx: d.BuildCtx, filePath: string, styleText:
 
     if (!isLocalCssImport(cssImportData.srcImport)) {
       // do nothing for @import url(http://external.css)
-      logger.debug(`did not resolve external css @import: ${cssImportData.srcImport}`);
+      config.logger.debug(`did not resolve external css @import: ${cssImportData.srcImport}`);
       continue;
     }
 
     if (isCssNodeModule(cssImportData.url)) {
       // node resolve this path cuz it starts with ~
-      resolveCssNodeModule(buildCtx.diagnostics, filePath, cssImportData);
+      resolveCssNodeModule(config, buildCtx.diagnostics, filePath, cssImportData);
 
-    } else if (sys.path.isAbsolute(cssImportData.url)) {
+    } else if (config.sys.path.isAbsolute(cssImportData.url)) {
       // absolute path already
       cssImportData.filePath = normalizePath(cssImportData.url);
 
     } else {
       // relative path
-      cssImportData.filePath = normalizePath(sys.path.join(dir, cssImportData.url));
+      cssImportData.filePath = normalizePath(config.sys.path.join(dir, cssImportData.url));
     }
 
     if (importeeExt !== 'css' && !cssImportData.filePath.toLowerCase().endsWith('.css')) {
       cssImportData.filePath += `.${importeeExt}`;
 
       if (importeeExt === 'scss') {
-        const fileName = '_' + sys.path.basename(cssImportData.filePath);
-        const dirPath = sys.path.dirname(cssImportData.filePath);
+        const fileName = '_' + config.sys.path.basename(cssImportData.filePath);
+        const dirPath = config.sys.path.dirname(cssImportData.filePath);
 
-        cssImportData.altFilePath = sys.path.join(dirPath, fileName);
+        cssImportData.altFilePath = config.sys.path.join(dirPath, fileName);
       }
     }
 
@@ -132,12 +131,12 @@ export function isCssNodeModule(url: string) {
 }
 
 
-export function resolveCssNodeModule(diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
+export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
   try {
-    const dir = sys.path.dirname(filePath);
+    const dir = config.sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-    cssImportData.filePath = sys.resolveModule(dir, moduleId, { manuallyResolve: true });
-    cssImportData.filePath = sys.path.dirname(cssImportData.filePath);
+    cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { manuallyResolve: true });
+    cssImportData.filePath = config.sys.path.dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
 
@@ -165,15 +164,15 @@ export function isLocalCssImport(srcImport: string) {
 }
 
 
-export function replaceNodeModuleUrl(baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
-  nodeModulePath = normalizePath(sys.path.dirname(nodeModulePath));
+export function replaceNodeModuleUrl(config: d.Config, baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
+  nodeModulePath = normalizePath(config.sys.path.dirname(nodeModulePath));
   url = normalizePath(url);
 
   const absPathToNodeModuleCss = normalizePath(url.replace(`~${moduleId}`, nodeModulePath));
 
-  const baseCssDir = normalizePath(sys.path.dirname(baseCssFilePath));
+  const baseCssDir = normalizePath(config.sys.path.dirname(baseCssFilePath));
 
-  const relToRoot = normalizePath(sys.path.relative(baseCssDir, absPathToNodeModuleCss));
+  const relToRoot = normalizePath(config.sys.path.relative(baseCssDir, absPathToNodeModuleCss));
   return relToRoot;
 }
 

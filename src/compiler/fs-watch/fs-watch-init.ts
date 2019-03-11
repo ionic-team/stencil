@@ -1,7 +1,5 @@
 import * as d from '@declarations';
 import { catchError, normalizePath } from '@utils';
-import { FsWatchNormalizer } from './fs-watch-normalizer';
-import { sys } from '@sys';
 
 
 export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -11,15 +9,17 @@ export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx
     return false;
   }
 
-  if (sys.createFsWatcher == null) {
-    // mocking and some testing systems probably won't have this
+  if (typeof config.sys.createFsWatcher !== 'function') {
     return false;
   }
 
   try {
-    buildCtx.debug(`initFsWatcher: ${sys.path.relative(config.rootDir, config.srcDir)}`);
+    buildCtx.debug(`initFsWatcher: ${config.sys.path.relative(config.rootDir, config.srcDir)}`);
 
-    compilerCtx.fsWatcher = await sys.createFsWatcher(sys.fs, compilerCtx.events, config.rootDir);
+    // since creation is async, let's make sure multiple don't get created
+    compilerCtx.fsWatcher = (true as any);
+
+    compilerCtx.fsWatcher = await config.sys.createFsWatcher(config, config.sys.fs, compilerCtx.events);
 
     await compilerCtx.fsWatcher.addDirectory(config.srcDir);
 
@@ -28,11 +28,10 @@ export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx
       await compilerCtx.fsWatcher.addFile(config.configPath);
     }
 
-    const fsWatchNormalizer = new FsWatchNormalizer(config, compilerCtx.events);
-    fsWatchNormalizer.subscribe();
-
   } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+    const diagnostics: d.Diagnostic[] = [];
+    catchError(diagnostics, e);
+    config.logger.printDiagnostics(diagnostics, config.rootDir);
     return false;
   }
 

@@ -128,12 +128,14 @@ export interface StencilConfig {
   globalScript?: string;
   hydratedCssClass?: string;
   includeSrc?: string[];
+  logger?: d.Logger;
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
   minifyCss?: boolean;
   minifyJs?: boolean;
   preamble?: string;
   srcIndexHtml?: string;
+  sys?: d.StencilSystem;
   testing?: d.TestingConfig;
   tsconfig?: string;
   validateTypes?: boolean;

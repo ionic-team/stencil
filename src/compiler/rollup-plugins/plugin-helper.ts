@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { buildError } from '@utils';
-import { sys } from '@sys';
 
 
 export function pluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {
@@ -35,7 +34,7 @@ export function pluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, built
               }
             }
 
-            fromMsg = ` from ${sys.path.relative(config.rootDir, importer)}`;
+            fromMsg = ` from ${config.sys.path.relative(config.rootDir, importer)}`;
           }
 
           const diagnostic = buildError(builtCtx.diagnostics);

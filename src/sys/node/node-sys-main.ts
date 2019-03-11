@@ -131,8 +131,8 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
   }
 
-  async createFsWatcher(fs: d.FileSystem, events: d.BuildEvents, rootDir: string) {
-    const fsWatcher = new FsWatcher(fs, events, rootDir);
+  async createFsWatcher(config: d.Config, fs: d.FileSystem, events: d.BuildEvents) {
+    const fsWatcher = new FsWatcher(config, fs, events);
 
     this.addDestroy(() => {
       fsWatcher.close();

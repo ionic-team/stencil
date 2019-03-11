@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { isOutputTargetDist } from './output-utils';
 
 
@@ -28,12 +27,12 @@ export async function outputCommonJsIndexes(config: d.Config, compilerCtx: d.Com
 function generateCommonJsIndex(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   const outputText = `// ${config.namespace}: CommonJS Main`;
 
-  return writeCommonJsOutput(compilerCtx, outputTarget, outputText);
+  return writeCommonJsOutput(config, compilerCtx, outputTarget, outputText);
 }
 
 
-function writeCommonJsOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
-  const distIndexCjsPath = sys.path.join(outputTarget.buildDir, 'index.js');
+function writeCommonJsOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, outputText: string) {
+  const distIndexCjsPath = config.sys.path.join(outputTarget.buildDir, 'index.js');
 
   return compilerCtx.fs.writeFile(distIndexCjsPath, outputText);
 }

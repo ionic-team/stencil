@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
-import { sys } from '@sys';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { optimizeModule } from '../app-core/optimize-module';
@@ -45,7 +44,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
         }
 
         await Promise.all(outputTargets.map(async outputTarget => {
-          const filePath = sys.path.join(outputTarget.dir, result.fileName);
+          const filePath = config.sys.path.join(outputTarget.dir, result.fileName);
           await compilerCtx.fs.writeFile(filePath, code);
         }));
       })

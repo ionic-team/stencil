@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { getAllModes, replaceStylePlaceholders } from '../app-core/component-styles';
 import { optimizeAppCoreBundle } from '../app-core/optimize-app-core';
-import { sys } from '@sys';
 
 
 export function writeNativeSelfContained(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, outputTargets: d.OutputTargetSelfContained[], cmps: d.ComponentCompilerMeta[], outputText: string) {
@@ -13,7 +12,7 @@ export function writeNativeSelfContained(config: d.Config, compilerCtx: d.Compil
 
     return Promise.all(cmps.map(cmp => {
       return Promise.all(outputTargets.map(outputTarget => {
-        return writeNativeSelfContainedModeOutput(compilerCtx, outputTarget, cmp, modeOutputText, modeName);
+        return writeNativeSelfContainedModeOutput(config, compilerCtx, outputTarget, cmp, modeOutputText, modeName);
       }));
     }));
   }));
@@ -24,7 +23,7 @@ async function writeNativeSelfContainedMode(config: d.Config, compilerCtx: d.Com
   code = replaceStylePlaceholders(cmps, modeName, code);
 
   if (config.minifyJs) {
-    const results = await optimizeAppCoreBundle(compilerCtx, build, code);
+    const results = await optimizeAppCoreBundle(config, compilerCtx, build, code);
     buildCtx.diagnostics.push(...results.diagnostics);
 
     if (results.diagnostics.length === 0 && typeof results.output === 'string') {
@@ -36,14 +35,14 @@ async function writeNativeSelfContainedMode(config: d.Config, compilerCtx: d.Com
 }
 
 
-function writeNativeSelfContainedModeOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetSelfContained, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
+function writeNativeSelfContainedModeOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetSelfContained, cmpMeta: d.ComponentCompilerMeta, modeOutputText: string, modeName: string) {
   let fileName = `${cmpMeta.tagName}`;
   if (modeName !== DEFAULT_STYLE_MODE) {
     fileName += `.${modeName}`;
   }
   fileName += `.js`;
 
-  const filePath = sys.path.join(outputTarget.dir, fileName);
+  const filePath = config.sys.path.join(outputTarget.dir, fileName);
 
   return compilerCtx.fs.writeFile(filePath, modeOutputText);
 }

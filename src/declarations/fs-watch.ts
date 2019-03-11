@@ -9,8 +9,8 @@ export interface FsWatchResults {
 
 
 export interface FsWatcher {
-  addFile(path: string): Promise<void>;
-  addDirectory(path: string): Promise<void>;
+  addFile(path: string): Promise<boolean>;
+  addDirectory(path: string): Promise<boolean>;
   close(): void;
 }
 

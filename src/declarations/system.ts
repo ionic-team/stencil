@@ -13,7 +13,7 @@ export interface StencilSystem {
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   color?: any;
-  createFsWatcher?(fs: d.FileSystem, events: d.BuildEvents, rootDir: string): Promise<d.FsWatcher>;
+  createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents): Promise<d.FsWatcher>;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
@@ -48,7 +48,7 @@ export interface StencilSystem {
     format(url: Url): string;
     resolve(from: string, to: string): string;
   };
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
+  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
   vm?: {
     createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;

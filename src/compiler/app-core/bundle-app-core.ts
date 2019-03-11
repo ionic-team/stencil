@@ -7,7 +7,6 @@ import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup';
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
-import { sys } from '@sys';
 
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
@@ -20,20 +19,20 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           '@core-entrypoint': DEFAULT_ENTRY,
           ...bundleCoreOptions.loader
         }),
-        stencilClientPlugin(),
+        stencilClientPlugin(config),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
-        componentEntryPlugin(compilerCtx, buildCtx, build, buildCtx.entryModules),
-        sys.rollup.plugins.nodeResolve({
+        componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
+        config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
         }),
-        sys.rollup.plugins.emptyJsResolver(),
-        sys.rollup.plugins.commonjs({
+        config.sys.rollup.plugins.emptyJsResolver(),
+        config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(compilerCtx, buildCtx),
+        inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(buildCtx.diagnostics),
@@ -44,7 +43,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       };
     }
 
-    const rollupBuild = await sys.rollup.rollup(rollupOptions);
+    const rollupBuild = await config.sys.rollup.rollup(rollupOptions);
     return rollupBuild;
 
   } catch (e) {

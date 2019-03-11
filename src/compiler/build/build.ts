@@ -1,22 +1,21 @@
 import * as d from '@declarations';
+import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError } from '@utils';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
-import { initIndexHtmls } from './init-index-html';
-import { sys } from '@sys';
-import { transpileApp } from '../transpile/transpile-app';
-import { writeBuildFiles } from './write-build';
 import { generateStyles } from '../style/generate-styles';
-import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
+import { initIndexHtmls } from './init-index-html';
+import { transpileApp } from '../transpile/transpile-app';
 import { waitForCopyTasks } from '../copy/copy-tasks';
+import { writeBuildFiles } from './write-build';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
     // ensure any existing worker tasks are not running
     // and we've got a clean slate
-    sys.cancelWorkerTasks();
+    config.sys.cancelWorkerTasks();
 
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist

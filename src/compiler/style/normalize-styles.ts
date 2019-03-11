@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
-import { sys } from '@sys';
 
 
-export function normalizeStyles(tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) {
+export function normalizeStyles(config: d.Config, tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) {
   styles.forEach(style => {
 
     if (style.modeName === DEFAULT_STYLE_MODE) {
@@ -14,28 +13,28 @@ export function normalizeStyles(tagName: string, componentFilePath: string, styl
 
     if (Array.isArray(style.externalStyles)) {
       style.externalStyles.forEach(externalStyle => {
-        normalizeExternalStyle(componentFilePath, externalStyle);
+        normalizeExternalStyle(config, componentFilePath, externalStyle);
       });
     }
   });
 }
 
 
-function normalizeExternalStyle(componentFilePath: string, externalStyle: d.ExternalStyleCompiler) {
+function normalizeExternalStyle(config: d.Config, componentFilePath: string, externalStyle: d.ExternalStyleCompiler) {
   if (typeof externalStyle.originalComponentPath !== 'string' || externalStyle.originalComponentPath.trim().length === 0) {
     return;
   }
 
   // get the absolute path of the directory which the component is sitting in
-  const componentDir = sys.path.dirname(componentFilePath);
+  const componentDir = config.sys.path.dirname(componentFilePath);
 
-  if (sys.path.isAbsolute(externalStyle.originalComponentPath)) {
+  if (config.sys.path.isAbsolute(externalStyle.originalComponentPath)) {
     // this path is absolute already!
     // add to our list of style absolute paths
     externalStyle.absolutePath = normalizePath(externalStyle.originalComponentPath);
 
     // if this is an absolute path already, let's convert it to be relative
-    externalStyle.relativePath = normalizePath(sys.path.relative(componentDir, externalStyle.originalComponentPath));
+    externalStyle.relativePath = normalizePath(config.sys.path.relative(componentDir, externalStyle.originalComponentPath));
 
   } else {
     // this path is relative to the component
@@ -43,6 +42,6 @@ function normalizeExternalStyle(componentFilePath: string, externalStyle: d.Exte
     externalStyle.relativePath = normalizePath(externalStyle.originalComponentPath);
 
     // create the absolute path to the style file
-    externalStyle.absolutePath = normalizePath(sys.path.join(componentDir, externalStyle.originalComponentPath));
+    externalStyle.absolutePath = normalizePath(config.sys.path.join(componentDir, externalStyle.originalComponentPath));
   }
 }

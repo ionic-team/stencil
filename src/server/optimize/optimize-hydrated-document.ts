@@ -9,7 +9,6 @@ import { updateCanonicalLink } from '../../compiler/html/canonical-link';
 export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
   optimizeStyles(doc, opts, results);
 
-  console.log('hello');
   if (typeof opts.title === 'string') {
     try {
       doc.title = opts.title;

@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { CompilerUpgrade, validateCollectionCompatibility } from '../transformers/collections/collection-compatibility';
-import { logger, sys } from '@sys';
 
 
 /**
@@ -12,8 +11,8 @@ import { logger, sys } from '@sys';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export function updateReferenceTypeImports(importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) {
-  const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
+export function updateReferenceTypeImports(config: d.Config, importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) {
+  const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
 
   return [
     ...cmp.properties,
@@ -26,7 +25,7 @@ export function updateReferenceTypeImports(importDataObj: d.TypesImportData, all
   }, importDataObj);
 }
 
-function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: string) {
+function updateImportReferenceFactory(config: d.Config, allTypes: Map<string, number>, filePath: string) {
   function getIncrementTypeName(name: string): string {
     const counter = allTypes.get(name);
     if (counter === undefined) {
@@ -58,8 +57,8 @@ function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: s
       // If this is a relative path make it absolute
       if (importFileLocation.startsWith('.')) {
         importFileLocation =
-          sys.path.resolve(
-            sys.path.dirname(filePath),
+          config.sys.path.resolve(
+            config.sys.path.dirname(filePath),
             importFileLocation
           );
       }
@@ -83,11 +82,11 @@ function updateImportReferenceFactory(allTypes: Map<string, number>, filePath: s
 }
 
 
-export async function getCollectionsTypeImports(compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
+export async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
   const collections = compilerCtx.collections.map(collection => {
-    const upgrades = validateCollectionCompatibility(collection);
+    const upgrades = validateCollectionCompatibility(config, collection);
     const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.indexOf(CompilerUpgrade.Add_Local_Intrinsic_Elements) !== -1;
-    return getCollectionTypesImport(compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
+    return getCollectionTypesImport(config, compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
   });
 
   const collectionTypes = await Promise.all(collections);
@@ -95,12 +94,12 @@ export async function getCollectionsTypeImports(compilerCtx: d.CompilerCtx, incl
 }
 
 
-async function getCollectionTypesImport(compilerCtx: d.CompilerCtx, collection: d.Collection, includeIntrinsicElements = false) {
+async function getCollectionTypesImport(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.Collection, includeIntrinsicElements = false) {
   let typeImport = null;
 
   try {
     const collectionDir = collection.moduleDir;
-    const collectionPkgJson = sys.path.join(collectionDir, 'package.json');
+    const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
 
     const pkgJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
     const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
@@ -113,11 +112,11 @@ async function getCollectionTypesImport(compilerCtx: d.CompilerCtx, collection: 
     }
 
   } catch (e) {
-    logger.debug(`getCollectionTypesImport: ${e}`);
+    config.logger.debug(`getCollectionTypesImport: ${e}`);
   }
 
   if (typeImport == null) {
-    logger.debug(`unabled to find "${collection.collectionName}" collection types`);
+    config.logger.debug(`unabled to find "${collection.collectionName}" collection types`);
   }
 
   return typeImport;

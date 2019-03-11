@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from './build/compiler-build-id';
 import { generatePreamble } from '@utils';
-import { sys } from '@sys';
 
 
 /**
@@ -65,7 +64,7 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, dia
     }
   }
 
-  const r = await sys.minifyJs(jsText, opts);
+  const r = await config.sys.minifyJs(jsText, opts);
   if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
     r.output = auxMinify(r.output);
     if (compilerCtx) {

@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { buildWarn, catchError, hasError } from '@utils';
-import { logger, sys } from '@sys';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
@@ -13,10 +12,10 @@ export async function generateServiceWorkers(config: d.Config, compilerCtx: d.Co
   }
 
   // let's make sure they have what we need from workbox installed
-  await sys.lazyRequire.ensure(logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
+  await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
 
   // we've ensure workbox is installed, so let's require it now
-  const workbox: d.Workbox = sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
+  const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
 
   const promises = wwwServiceOutputs.map(async outputTarget => {
     await generateServiceWorker(config, buildCtx, outputTarget, workbox);
@@ -155,7 +154,7 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
     .filter(o => o.serviceWorker && o.serviceWorker.swSrc);
 
   return wwwServiceOutputs.some(outputTarget => {
-    return buildCtx.filesChanged.some(fileChanged => sys.path.basename(fileChanged).toLowerCase() === sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
+    return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });
 }
 

@@ -22,6 +22,11 @@ export namespace Components {
   interface ShadowModeAttributes extends JSXElements.HTMLAttributes {}
 }
 
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
+
 declare global {
   interface StencilElementInterfaces {
     'AppRoot': Components.AppRoot;
@@ -36,19 +41,19 @@ declare global {
   }
 
 
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLScopedModeElement extends Components.ScopedMode, HTMLElement {}
+  interface HTMLScopedModeElement extends Components.ScopedMode, HTMLStencilElement {}
   var HTMLScopedModeElement: {
     prototype: HTMLScopedModeElement;
     new (): HTMLScopedModeElement;
   };
 
-  interface HTMLShadowModeElement extends Components.ShadowMode, HTMLElement {}
+  interface HTMLShadowModeElement extends Components.ShadowMode, HTMLStencilElement {}
   var HTMLShadowModeElement: {
     prototype: HTMLShadowModeElement;
     new (): HTMLShadowModeElement;

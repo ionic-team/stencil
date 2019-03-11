@@ -1,12 +1,11 @@
 import * as d from '@declarations';
 import { WEB_COMPONENTS_JSON_FILE_NAME, normalizePath } from '@utils';
-import { sys } from '@sys';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 
 
 export function validateOutputTargetDist(config: d.Config) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
 

@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { logger, sys } from '@sys';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
@@ -36,7 +35,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   } else if (typeof config.logLevel !== 'string') {
     config.logLevel = 'info';
   }
-  logger.level = config.logLevel;
+  config.logger.level = config.logLevel;
 
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
@@ -112,7 +111,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {
-      return sys.path.join(config.srcDir, include);
+      return config.sys.path.join(config.srcDir, include);
     });
   }
 

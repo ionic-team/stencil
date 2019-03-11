@@ -1,11 +1,10 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import { isOutputTargetDistModule } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetDistModule(config: d.Config) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   const moduleOutputTargets = config.outputTargets.filter(isOutputTargetDistModule);
 

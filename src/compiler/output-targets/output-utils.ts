@@ -1,26 +1,25 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { flatOne } from '@utils';
 
 
-export function getDistEsmDir(outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
-  return sys.path.join(outputTarget.buildDir, 'esm', sourceTarget || '');
+export function getDistEsmDir(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
+  return config.sys.path.join(outputTarget.buildDir, 'esm', sourceTarget || '');
 }
 
-export function getDistEsmComponentsDir(outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
-  return sys.path.join(getDistEsmDir(outputTarget, sourceTarget), 'build');
+export function getDistEsmComponentsDir(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
+  return config.sys.path.join(getDistEsmDir(config, outputTarget, sourceTarget), 'build');
 }
 
-export function getDistEsmIndexPath(outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
-  return sys.path.join(getDistEsmDir(outputTarget, sourceTarget), 'index.js');
+export function getDistEsmIndexPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
+  return config.sys.path.join(getDistEsmDir(config, outputTarget, sourceTarget), 'index.js');
 }
 
 export function getDefineCustomElementsPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
-  return sys.path.join(getDistEsmDir(outputTarget, sourceTarget), getDefineEsmFilename(config));
+  return config.sys.path.join(getDistEsmDir(config, outputTarget, sourceTarget), getDefineEsmFilename(config));
 }
 
 export function getComponentsEsmBuildPath(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) {
-  return sys.path.join(getDistEsmDir(outputTarget, sourceTarget), getComponentsEsmFileName(config));
+  return config.sys.path.join(getDistEsmDir(config, outputTarget, sourceTarget), getComponentsEsmFileName(config));
 }
 
 export function getCoreEsmFileName(config: d.Config) {
@@ -35,16 +34,16 @@ export function getComponentsEsmFileName(config: d.Config) {
   return `${config.fsNamespace}.components.js`;
 }
 
-export function getLoaderEsmPath(outputTarget: d.OutputTargetDist) {
-  return sys.path.join(outputTarget.buildDir, outputTarget.esmLoaderPath);
+export function getLoaderEsmPath(config: d.Config, outputTarget: d.OutputTargetDist) {
+  return config.sys.path.join(outputTarget.buildDir, outputTarget.esmLoaderPath);
 }
 
 export function getComponentsDtsSrcFilePath(config: d.Config) {
-  return sys.path.join(config.srcDir, GENERATED_DTS);
+  return config.sys.path.join(config.srcDir, GENERATED_DTS);
 }
 
-export function getComponentsDtsTypesFilePath(outputTarget: d.OutputTargetDistCollection) {
-  return sys.path.join(outputTarget.typesDir, GENERATED_DTS);
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDistCollection) {
+  return config.sys.path.join(outputTarget.typesDir, GENERATED_DTS);
 }
 
 export function isOutputTargetDist(o: d.OutputTarget): o is d.OutputTargetDist {

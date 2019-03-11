@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger, sys } from '@sys';
 import { normalizePath } from '@utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
@@ -16,20 +15,20 @@ export function parseCollection(config: d.Config, compilerCtx: d.CompilerCtx, bu
   }
 
   // get the root directory of the dependency
-  const collectionPackageRootDir = sys.path.dirname(pkgJsonFilePath);
+  const collectionPackageRootDir = config.sys.path.dirname(pkgJsonFilePath);
 
   // figure out the full path to the collection collection file
-  const collectionFilePath = sys.path.join(collectionPackageRootDir, pkgData.collection);
+  const collectionFilePath = config.sys.path.join(collectionPackageRootDir, pkgData.collection);
 
-  const relPath = sys.path.relative(config.rootDir, collectionFilePath);
-  logger.debug(`load collection: ${collectionName}, ${relPath}`);
+  const relPath = config.sys.path.relative(config.rootDir, collectionFilePath);
+  config.logger.debug(`load collection: ${collectionName}, ${relPath}`);
 
   // we haven't cached the collection yet, let's read this file
   // sync on purpose :(
   const collectionJsonStr = compilerCtx.fs.readFileSync(collectionFilePath);
 
   // get the directory where the collection collection file is sitting
-  const collectionDir = normalizePath(sys.path.dirname(collectionFilePath));
+  const collectionDir = normalizePath(config.sys.path.dirname(collectionFilePath));
 
   // parse the json string into our collection data
   collection = parseCollectionManifest(

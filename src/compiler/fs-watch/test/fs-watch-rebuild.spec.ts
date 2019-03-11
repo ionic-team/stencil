@@ -1,10 +1,8 @@
-import * as d from '@declarations';
-import { BuildEvents } from '../../events';
-import { generateBuildFromFsWatch, shouldRebuild } from '../fs-watch-rebuild';
+import * as d from '../../../declarations';
 import { generateBuildFromFsWatch } from '../fs-watch-rebuild';
 import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { normalizePath } from '../../../utils';
 import * as path from 'path';
-import { normalizePath } from '@utils';
 
 
 describe('watch-rebuild', () => {

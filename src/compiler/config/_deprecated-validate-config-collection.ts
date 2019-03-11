@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger } from '@sys';
 
 
 /**
@@ -28,6 +27,6 @@ export function _deprecatedValidateConfigCollections(config: d.Config) {
       errorMsg.push(`import '${collection.name}';  `);
     });
 
-    logger.error(errorMsg.join(''));
+    config.logger.error(errorMsg.join(''));
   }
 }

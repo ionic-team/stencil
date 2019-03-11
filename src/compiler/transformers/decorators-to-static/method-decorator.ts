@@ -1,9 +1,9 @@
 import * as d from '@declarations';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, serializeSymbol, typeToString } from '../transform-utils';
-import ts from 'typescript';
 import { buildError, buildWarn, normalizePath } from '@utils';
-import { sys } from '@sys';
 import { validatePublicName } from '../reserved-public-members';
+import ts from 'typescript';
+
 
 export function methodDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
   const methods = decoratedProps
@@ -42,7 +42,7 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       warn.header = '@Method requires async';
       warn.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
       warn.absFilePath = normalizePath(sourceFile.fileName);
-      warn.relFilePath = normalizePath(sys.path.relative(config.rootDir, sourceFile.fileName));
+      warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
 
       returnString = 'Promise<void>';
       signatureString = signatureString.replace(/=> void$/, '=> Promise<void>');
@@ -52,7 +52,7 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       err.header = '@Method requires async';
       err.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
       err.absFilePath = normalizePath(sourceFile.fileName);
-      err.relFilePath = normalizePath(sys.path.relative(config.rootDir, sourceFile.fileName));
+      err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
     }
   }
 

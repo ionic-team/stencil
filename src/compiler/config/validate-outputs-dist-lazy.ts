@@ -1,12 +1,11 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import { isOutputTargetDistLazy } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 
 
 export function validateOutputTargetDistLazy(config: d.Config) {
-  const path = sys.path;
+  const path = config.sys.path;
 
   const distOutputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
 

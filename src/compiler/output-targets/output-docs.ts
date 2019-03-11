@@ -24,12 +24,12 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
   // ensure all the styles are built first, which parses all the css docs
   await buildCtx.stylesPromise;
 
-  const docsData = await generateDocData(compilerCtx, buildCtx);
+  const docsData = await generateDocData(config, compilerCtx, buildCtx);
 
   // generate READMEs docs
   const strictCheck = readmeTargets.some(o => !!o.strict);
   if (strictCheck) {
-    strickCheckDocs(docsData);
+    strickCheckDocs(config, docsData);
   }
 
   if (readmeTargets.length > 0) {
@@ -48,6 +48,6 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   // generate custom docs
   if (customTargets.length > 0) {
-    await generateCustomDocs(customTargets, docsData);
+    await generateCustomDocs(config, customTargets, docsData);
   }
 }

@@ -3,7 +3,6 @@ import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
 import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, isOutputTargetDist } from './output-utils';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 
 
 export async function outputEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -41,7 +40,7 @@ export function generateEsmSourceTargets(config: d.Config, compilerCtx: d.Compil
 
 
 function generateEsmIndexShortcut(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const indexPath = getDistEsmIndexPath(outputTarget);
+  const indexPath = getDistEsmIndexPath(config, outputTarget);
   const contentJs = config.buildEs5
     ? `export * from './es5/index.js';`
     : `export * from './es2017/index.js';`;
@@ -55,26 +54,26 @@ async function generateEsmIndex(config: d.Config, compilerCtx: d.CompilerCtx, ou
     `// ${config.namespace}: ES Module`
   ];
 
-  const exportsIndexPath = sys.path.join(getDistEsmComponentsDir(outputTarget, sourceTarget), 'index.js');
+  const exportsIndexPath = config.sys.path.join(getDistEsmComponentsDir(config, outputTarget, sourceTarget), 'index.js');
   const fileExists = await compilerCtx.fs.access(exportsIndexPath);
   if (fileExists) {
-    await addExport(compilerCtx, outputTarget, sourceTarget, esm, exportsIndexPath);
+    await addExport(config, compilerCtx, outputTarget, sourceTarget, esm, exportsIndexPath);
   }
 
-  const distIndexEsmPath = getDistEsmIndexPath(outputTarget, sourceTarget);
+  const distIndexEsmPath = getDistEsmIndexPath(config, outputTarget, sourceTarget);
 
   return Promise.all([
     compilerCtx.fs.writeFile(distIndexEsmPath, esm.join('\n')),
-    copyEsmCorePolyfills(compilerCtx, outputTarget),
-    patchCollection(compilerCtx, outputTarget)
+    copyEsmCorePolyfills(config, compilerCtx, outputTarget),
+    patchCollection(config, compilerCtx, outputTarget)
   ]);
 }
 
 
-async function addExport(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget, esm: string[], filePath: string) {
+async function addExport(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget, esm: string[], filePath: string) {
   const fileExists = await compilerCtx.fs.access(filePath);
   if (fileExists) {
-    let relPath = normalizePath(sys.path.relative(getDistEsmDir(outputTarget, sourceTarget), filePath));
+    let relPath = normalizePath(config.sys.path.relative(getDistEsmDir(config, outputTarget, sourceTarget), filePath));
 
     if (!relPath.startsWith('.')) {
       relPath = './' + relPath;
@@ -152,7 +151,7 @@ function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget:
 }
 
 function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
-  const loaderPath = getLoaderEsmPath(outputTarget);
+  const loaderPath = getLoaderEsmPath(config, outputTarget);
   const es5EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es5');
   const es2017EntryPoint = getDefineCustomElementsPath(config, outputTarget, 'es2017');
 
@@ -165,25 +164,25 @@ function generateEsmLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputT
 
   const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
   const indexDtsContent = generateIndexDts();
-  const indexContent = `export * from '${normalizePath(sys.path.relative(loaderPath, indexPath))}';`;
-  const indexES2017Content = `export * from '${normalizePath(sys.path.relative(loaderPath, es2017EntryPoint))}';`;
+  const indexContent = `export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
+  const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
 
   return Promise.all([
-    compilerCtx.fs.writeFile(sys.path.join(loaderPath, 'package.json'), packageJsonContent),
-    compilerCtx.fs.writeFile(sys.path.join(loaderPath, 'index.d.ts'), indexDtsContent),
-    compilerCtx.fs.writeFile(sys.path.join(loaderPath, 'index.js'), indexContent),
-    compilerCtx.fs.writeFile(sys.path.join(loaderPath, 'index.es2017.js'), indexES2017Content)
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'package.json'), packageJsonContent),
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.d.ts'), indexDtsContent),
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.js'), indexContent),
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.js'), indexES2017Content)
   ]);
 }
 
 
-function patchCollection(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
+function patchCollection(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist) {
   // it's possible a d.ts file was exported from the index.ts file
   // which is fine, except that messes with any raw JS exports
   // in the collection/index.js
   // so let's just make this work by putting in empty js files
   // and call it a day
-  const collectionInterfacePath = sys.path.join(outputTarget.collectionDir, 'interface.js');
+  const collectionInterfacePath = config.sys.path.join(outputTarget.collectionDir, 'interface.js');
   return compilerCtx.fs.writeFile(collectionInterfacePath, '');
 }
 

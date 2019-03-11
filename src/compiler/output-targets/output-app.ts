@@ -1,14 +1,13 @@
 import * as d from '@declarations';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
+import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
-import { sys } from '@sys';
-import { RollupOptions } from 'rollup';
 import { dashToPascalCase, flatOne } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
-import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { processCopyTasks } from '../copy/local-copy-tasks';
+import { RollupOptions } from 'rollup';
+import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
@@ -45,7 +44,7 @@ async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   return performCopyTasks(compilerCtx, buildCtx, allCopyTasks);
 }
 
-export async function generateNativeApp(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
+export async function generateNativeApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
   const entryPoint = `
 import * as c from 'modules';
 [
@@ -59,11 +58,11 @@ import * as c from 'modules';
       stencilLoaderPlugin({
         '@core-entrypoint': entryPoint
       }),
-      inMemoryFsRead(compilerCtx, buildCtx),
+      inMemoryFsRead(config, compilerCtx, buildCtx),
     ]
   };
 
-  const results = await sys.rollup.rollup(rollupOptions);
+  const results = await config.sys.rollup.rollup(rollupOptions);
   await results.generate({
     format: 'esm',
     file: 'app.mjs.js'

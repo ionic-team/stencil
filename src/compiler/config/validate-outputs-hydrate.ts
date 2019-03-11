@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
-import { sys } from '@sys';
 
 
 export function validateOutputTargetHydrate(config: d.Config) {
@@ -19,7 +18,7 @@ export function validateOutputTargetHydrate(config: d.Config) {
       let hydrateDir: string;
       const distOutput = config.outputTargets.find(isOutputTargetDist);
       if (distOutput != null && typeof distOutput.dir === 'string') {
-        hydrateDir = sys.path.join(distOutput.dir, 'hydrate');
+        hydrateDir = config.sys.path.join(distOutput.dir, 'hydrate');
       } else {
         hydrateDir = 'dist/hydrate';
       }
@@ -41,8 +40,8 @@ export function validateOutputTargetHydrate(config: d.Config) {
       outputTarget.dir = 'hydrate';
     }
 
-    if (!sys.path.isAbsolute(outputTarget.dir)) {
-      outputTarget.dir = sys.path.join(config.rootDir, outputTarget.dir);
+    if (!config.sys.path.isAbsolute(outputTarget.dir)) {
+      outputTarget.dir = config.sys.path.join(config.rootDir, outputTarget.dir);
     }
   });
 }

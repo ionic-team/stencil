@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { dashToPascalCase, sortBy } from '@utils';
 import { getComponentsFromModules, isOutputTargetAngular } from './output-utils';
-import { sys } from '@sys';
 
 
 export async function outputAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -20,18 +19,18 @@ export async function outputAngularProxies(config: d.Config, compilerCtx: d.Comp
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
   await Promise.all(
-    outputTargets.map(outputTarget => angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles))
+    outputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, outputTarget, buildCtx.moduleFiles))
   );
 
   timespan.finish(`generate angular proxies finished`);
 }
 
-function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
+function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
   const components = getComponents(outputTarget.excludeComponents, moduleFiles);
 
   return Promise.all([
-    generateProxies(compilerCtx, components, outputTarget),
-    generateAngularArray(compilerCtx, components, outputTarget),
+    generateProxies(config, compilerCtx, components, outputTarget),
+    generateAngularArray(config, compilerCtx, components, outputTarget),
     generateAngularUtils(compilerCtx, outputTarget)
   ]);
 }
@@ -42,7 +41,7 @@ function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
     .filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 }
 
-function generateProxies(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
+function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
   const proxies = getProxies(components);
 
   const imports = `/* tslint:disable */
@@ -54,7 +53,7 @@ import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular
 
   const final: string[] = [
     imports,
-    getProxyUtils(outputTarget),
+    getProxyUtils(config, outputTarget),
     sourceImports,
     proxies,
   ];
@@ -137,21 +136,21 @@ function getMethods(cmpMeta: d.ComponentCompilerMeta): string[] {
   return cmpMeta.methods.filter(method => !method.internal).map(prop => prop.name);
 }
 
-function getProxyUtils(outputTarget: d.OutputTargetAngular) {
+function getProxyUtils(config: d.Config, outputTarget: d.OutputTargetAngular) {
   if (!outputTarget.directivesUtilsFile) {
     return PROXY_UTILS.replace(/export function/g, 'function');
   } else {
-    const utilsPath = relativeImport(outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile);
+    const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile);
     return `import { proxyInputs, proxyMethods, proxyOutputs } from '${utilsPath}';\n`;
   }
 }
 
-function generateAngularArray(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular): Promise<any> {
+function generateAngularArray(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular): Promise<any> {
   if (!outputTarget.directivesArrayFile) {
     return Promise.resolve();
   }
 
-  const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+  const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
   const directives = components
     .map(cmpMeta => dashToPascalCase(cmpMeta.tagName))
     .map(className => `d.${className}`)
@@ -173,10 +172,10 @@ async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: d.
   }
 }
 
-function relativeImport(pathFrom: string, pathTo: string) {
-  let relativePath = sys.path.relative(sys.path.dirname(pathFrom), sys.path.dirname(pathTo));
+function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
+  let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
   relativePath = relativePath === '' ? '.' : relativePath;
-  return `${relativePath}/${sys.path.basename(pathTo, '.ts')}`;
+  return `${relativePath}/${config.sys.path.basename(pathTo, '.ts')}`;
 }
 
 const PROXY_UTILS = `import { fromEvent } from 'rxjs';

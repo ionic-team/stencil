@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { getLatestCompilerVersion, logger, sys, validateCompilerVersion } from '@sys';
+import { getLatestCompilerVersion, validateCompilerVersion } from '@sys';
 import { hasError } from './cli-utils';
 import exit from 'exit';
 
@@ -17,12 +17,12 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     try {
       devServerStart = compiler.startDevServer();
     } catch (e) {
-      logger.error(e);
+      config.logger.error(e);
       exit(1);
     }
   }
 
-  const latestVersion = getLatestCompilerVersion(sys, logger);
+  const latestVersion = getLatestCompilerVersion(config.sys, config.logger);
 
   const results = await compiler.build();
 
@@ -32,7 +32,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   }
 
   if (!config.watch && hasError(results && results.diagnostics)) {
-    sys.destroy();
+    config.sys.destroy();
 
     if (devServer) {
       await devServer.close();
@@ -43,7 +43,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
 
   if (config.watch || devServerStart) {
     process.once('SIGINT', () => {
-      sys.destroy();
+      config.sys.destroy();
 
       if (devServer) {
         devServer.close();
@@ -51,7 +51,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     });
   }
 
-  await validateCompilerVersion(sys, logger, latestVersion);
+  await validateCompilerVersion(config.sys, config.logger, latestVersion);
 
   return results;
 }

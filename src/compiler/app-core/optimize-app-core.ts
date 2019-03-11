@@ -1,9 +1,8 @@
 import * as d from '@declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { sys } from '@sys';
 
 
-export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d.Build, input: string) {
+export async function optimizeAppCoreBundle(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build, input: string) {
   const opts = JSON.parse(PROD_MINIFY_OPTS);
 
   if (build.es5) {
@@ -61,7 +60,7 @@ export async function optimizeAppCoreBundle(compilerCtx: d.CompilerCtx, build: d
     }
   }
 
-  const results = await sys.minifyJs(input, opts);
+  const results = await config.sys.minifyJs(input, opts);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
 
     results.output = results.output.replace(/disconnectedCallback\(\){}/g, '');

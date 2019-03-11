@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { catchError } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
-import { sys } from '@sys';
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
@@ -68,7 +67,7 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
 export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) {
   const pluginCtx: PluginCtx = {
     config: config,
-    sys: sys,
+    sys: config.sys,
     fs: compilerCtx.fs,
     cache: compilerCtx.cache,
     diagnostics: []

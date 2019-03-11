@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger, sys } from '@sys';
 import exit from 'exit';
 
 
@@ -21,7 +20,7 @@ export async function taskTest(config: d.Config) {
 
     if (config.flags.screenshot) {
       // ensure we've got pixelmatch for screenshots
-      logger.warn(logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
+      config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
     }
   }
 
@@ -29,8 +28,8 @@ export async function taskTest(config: d.Config) {
   // jest and puppeteer are quite large, so this
   // is an experiment to lazy install these
   // modules only when you need them
-  await sys.lazyRequire.ensure(
-    logger,
+  await config.sys.lazyRequire.ensure(
+    config.logger,
     config.rootDir,
     ensureModuleIds
   );
@@ -51,7 +50,7 @@ export async function taskTest(config: d.Config) {
     }
 
   } catch (e) {
-    logger.error(e);
+    config.logger.error(e);
     exit(1);
   }
 }

@@ -1,12 +1,12 @@
-import { sys } from '@sys';
+import * as d from '@declarations';
 
 
-export function stencilClientPlugin() {
+export function stencilClientPlugin(config: d.Config) {
   return {
     name: 'stencilClientEntryPointPlugin',
     resolveId(id: string) {
       if (id === '@stencil/core/platform') {
-        return sys.path.join(sys.compiler.distDir, 'client', 'index.mjs');
+        return config.sys.path.join(config.sys.compiler.distDir, 'client', 'index.mjs');
       }
       return null;
     }

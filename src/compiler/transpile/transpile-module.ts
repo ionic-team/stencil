@@ -2,11 +2,9 @@ import * as d from '@declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { sys } from '@sys';
-import { validateConfig } from '../config/validate-config';
-import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -14,7 +12,6 @@ import ts from 'typescript';
  * Mainly used as the typescript preprocessor for unit tests
  */
 export function transpileModule(config: d.Config, input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  config = validateConfig(config);
   const compilerCtx = new CompilerContext(config);
   const buildCtx = new BuildContext(config, compilerCtx);
 
@@ -77,7 +74,7 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
       lazyComponentTransform(compilerCtx, transformOpts)
     ]
   });

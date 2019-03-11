@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { getFilePathFromUrl } from './asset-versioning-utils';
 import { hasFileExtension } from '@utils';
-import { logger, sys } from '@sys';
 
 
 export async function versionManifestAssets(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document) {
@@ -24,7 +23,7 @@ async function versionManifest(config: d.Config, compilerCtx: d.CompilerCtx, out
     return;
   }
 
-  const orgFilePath = getFilePathFromUrl(outputTarget, windowLocationHref, url);
+  const orgFilePath = getFilePathFromUrl(config, outputTarget, windowLocationHref, url);
   if (!orgFilePath) {
     return;
   }
@@ -46,7 +45,7 @@ async function versionManifest(config: d.Config, compilerCtx: d.CompilerCtx, out
     await generateVersionedManifest(config, compilerCtx, linkElm, orgFilePath, manifest);
 
   } catch (e) {
-    logger.error(`versionManifest: ${e}`);
+    config.logger.error(`versionManifest: ${e}`);
   }
 }
 
@@ -59,14 +58,14 @@ async function versionManifestIcon(config: d.Config, compilerCtx: d.CompilerCtx,
 async function generateVersionedManifest(config: d.Config, compilerCtx: d.CompilerCtx, linkElm: HTMLLinkElement, orgFilePath: string, manifest: Manifest) {
   const jsonStr = JSON.stringify(manifest);
 
-  const dir = sys.path.dirname(orgFilePath);
-  const orgFileName = sys.path.basename(orgFilePath);
+  const dir = config.sys.path.dirname(orgFilePath);
+  const orgFileName = config.sys.path.basename(orgFilePath);
 
-  const hash = sys.generateContentHash(jsonStr, config.hashedFileNameLength);
+  const hash = config.sys.generateContentHash(jsonStr, config.hashedFileNameLength);
 
   const newFileName = orgFileName.toLowerCase().replace(`.json`, `.${hash}.json`);
 
-  const newFilePath = sys.path.join(dir, newFileName);
+  const newFilePath = config.sys.path.join(dir, newFileName);
 
   await Promise.all([
     compilerCtx.fs.remove(orgFilePath),

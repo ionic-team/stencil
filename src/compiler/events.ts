@@ -2,7 +2,7 @@ import * as d from '@declarations';
 
 
 export class BuildEvents implements d.BuildEvents {
-  private evCallbacks: { [eventName: string]: Function[] } = {};
+  private evCallbacks = new Map<string, Function[]>();
 
   subscribe(eventName: 'fileUpdate', cb: (path: string) => void): Function;
   subscribe(eventName: 'fileAdd', cb: (path: string) => void): Function;
@@ -14,12 +14,13 @@ export class BuildEvents implements d.BuildEvents {
   subscribe(eventName: 'buildLog', cb: (buildLog: d.BuildLog) => void): Function;
   subscribe(eventName: d.CompilerEventName, cb: Function): Function {
     const evName = getEventName(eventName);
+    const callbacks = this.evCallbacks.get(eventName);
 
-    if (!this.evCallbacks[evName]) {
-      this.evCallbacks[evName] = [];
+    if (callbacks == null) {
+      this.evCallbacks.set(evName, [cb]);
+    } else {
+      callbacks.push(cb);
     }
-
-    this.evCallbacks[evName].push(cb);
 
     return () => {
       this.unsubscribe(evName, cb);
@@ -28,27 +29,26 @@ export class BuildEvents implements d.BuildEvents {
 
 
   unsubscribe(eventName: string, cb: Function) {
-    const evName = getEventName(eventName);
+    const callbacks = this.evCallbacks.get(getEventName(eventName));
 
-    if (this.evCallbacks[evName]) {
-      const index = this.evCallbacks[evName].indexOf(cb);
+    if (callbacks != null) {
+      const index = callbacks.indexOf(cb);
       if (index > -1) {
-        this.evCallbacks[evName].splice(index, 1);
+        callbacks.splice(index, 1);
       }
     }
   }
 
   unsubscribeAll() {
-    this.evCallbacks = {};
+    this.evCallbacks.clear();
   }
 
 
   emit(eventName: d.CompilerEventName, ...args: any[]) {
-    const evName = getEventName(eventName);
-    const evCallbacks = this.evCallbacks[evName];
+    const callbacks = this.evCallbacks.get(getEventName(eventName));
 
-    if (evCallbacks) {
-      evCallbacks.forEach(cb => {
+    if (callbacks != null) {
+      callbacks.forEach(cb => {
         try {
           cb.apply(this, args);
         } catch (e) {
@@ -60,6 +60,6 @@ export class BuildEvents implements d.BuildEvents {
 
 }
 
-function getEventName(evName: string) {
+const getEventName = (evName: string) => {
   return evName.trim().toLowerCase();
-}
+};

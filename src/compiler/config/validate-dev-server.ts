@@ -1,7 +1,6 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { logger, sys } from '@sys';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
@@ -52,13 +51,13 @@ export function validateDevServer(config: d.Config) {
   if (wwwOutputTarget) {
     serveDir = wwwOutputTarget.dir;
     baseUrl = wwwOutputTarget.baseUrl;
-    logger.debug(`dev server www root: ${serveDir}, base url: ${baseUrl}`);
+    config.logger.debug(`dev server www root: ${serveDir}, base url: ${baseUrl}`);
 
   } else {
     serveDir = config.rootDir;
 
     if (config.flags && config.flags.serve) {
-      logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
+      config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
     }
   }
 
@@ -79,13 +78,13 @@ export function validateDevServer(config: d.Config) {
   setStringConfig(config.devServer, 'root', serveDir);
   setStringConfig(config.devServer, 'baseUrl', baseUrl);
 
-  if (!sys.path.isAbsolute(config.devServer.root)) {
-    config.devServer.root = sys.path.join(config.rootDir, config.devServer.root);
+  if (!config.sys.path.isAbsolute(config.devServer.root)) {
+    config.devServer.root = config.sys.path.join(config.rootDir, config.devServer.root);
   }
 
   if (config.devServer.excludeHmr) {
     if (!Array.isArray(config.devServer.excludeHmr)) {
-      logger.error(`dev server excludeHmr must be an array of glob strings`);
+      config.logger.error(`dev server excludeHmr must be an array of glob strings`);
     }
 
   } else {

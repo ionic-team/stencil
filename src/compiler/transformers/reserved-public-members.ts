@@ -1,7 +1,6 @@
 import * as d from '@declarations';
-import ts from 'typescript';
 import { buildWarn, normalizePath } from '@utils';
-import { sys } from '@sys';
+import ts from 'typescript';
 
 
 export function validatePublicName(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, memberName: string, decorator: string, memberType: string) {
@@ -14,7 +13,7 @@ export function validatePublicName(config: d.Config, diagnostics: d.Diagnostic[]
       `unexpected runtime errors or user-interface issues on various browsers, so it's best to avoid them entirely.`
     ].join('');
     warn.absFilePath = normalizePath(sourceFile.fileName);
-    warn.relFilePath = normalizePath(sys.path.relative(config.rootDir, sourceFile.fileName));
+    warn.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
   }
 }
 

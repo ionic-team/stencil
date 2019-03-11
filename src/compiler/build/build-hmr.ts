@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { normalizePath } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
-import { logger, sys } from '@sys';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
@@ -21,7 +20,7 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     hmr.scriptsDeleted = buildCtx.scriptsDeleted.slice();
   }
 
-  const excludeHmr = excludeHmrFiles(config.devServer.excludeHmr, buildCtx.filesChanged);
+  const excludeHmr = excludeHmrFiles(config, config.devServer.excludeHmr, buildCtx.filesChanged);
   if (excludeHmr.length > 0) {
     hmr.excludeHmr = excludeHmr.slice();
   }
@@ -186,7 +185,7 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
   }
 
   return cssFiles.map(cssFile => {
-    return sys.path.basename(cssFile);
+    return config.sys.path.basename(cssFile);
   }).sort();
 }
 
@@ -199,7 +198,7 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 
   const imageFiles = buildCtx.filesChanged.reduce((arr, filePath) => {
     if (IMAGE_EXT.some(ext => filePath.toLowerCase().endsWith(ext))) {
-      const fileName = sys.path.basename(filePath);
+      const fileName = config.sys.path.basename(filePath);
       if (!arr.includes(fileName)) {
         arr.push(fileName);
       }
@@ -215,7 +214,7 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-function excludeHmrFiles(excludeHmr: string[], filesChanged: string[]) {
+function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
   const excludeFiles: string[] = [];
 
   if (!excludeHmr || excludeHmr.length === 0) {
@@ -234,8 +233,8 @@ function excludeHmrFiles(excludeHmr: string[], filesChanged: string[]) {
       }
 
       if (shouldExclude) {
-        logger.debug(`excludeHmr: ${fileChanged}`);
-        excludeFiles.push(sys.path.basename(fileChanged));
+        config.logger.debug(`excludeHmr: ${fileChanged}`);
+        excludeFiles.push(config.sys.path.basename(fileChanged));
       }
 
       return shouldExclude;

@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import ts from 'typescript';
 
 
@@ -41,7 +40,7 @@ export function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, tsCo
             // Build the subrule replacing the wildcard with actual path
             const enrichedSubrule: string = normalizePath(normalizedSubrule.replace(/\*$/, wildcard));
 
-            const finalPath = normalizePath(sys.path.join(config.rootDir, enrichedSubrule));
+            const finalPath = config.sys.path.join(config.rootDir, enrichedSubrule);
 
             for (let i = 0; i < extensions.length; i++) {
               const moduleFile = compilerCtx.moduleMap.get(`${finalPath}.${extensions[i]}`);

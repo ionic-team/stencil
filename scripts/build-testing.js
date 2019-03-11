@@ -63,9 +63,6 @@ async function bundleTesting() {
             if (id === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
             }
-            if (id === '@compiler') {
-              return '../compiler';
-            }
             if (id === '@mock-doc') {
               return '../mock-doc';
             }

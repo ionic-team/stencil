@@ -1,3 +1,4 @@
+import * as d from '@declarations';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
@@ -5,8 +6,7 @@ import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { convertValueToLiteral, createStaticGetter, getComponentTagName, isInternal, isStaticGetter, serializeSymbol, getStaticValue } from '../transform-utils';
-import * as d from '@declarations';
+import { convertValueToLiteral, createStaticGetter, getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
 import { parseStaticWatchers } from './watchers';
@@ -16,7 +16,7 @@ import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
 
-export function parseStaticComponentMeta(transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
+export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -49,7 +49,7 @@ export function parseStaticComponentMeta(transformCtx: ts.TransformationContext,
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
-    styles: parseStaticStyles(tagName, moduleFile.sourceFilePath, staticMembers),
+    styles: parseStaticStyles(config, tagName, moduleFile.sourceFilePath, staticMembers),
     legacyConnect: getStaticValue(staticMembers, 'connectProps'),
     legacyContext: getStaticValue(staticMembers, 'contextProps'),
     internal: isInternal(docs),

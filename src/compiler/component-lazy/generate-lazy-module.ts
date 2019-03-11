@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
 import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { optimizeModule } from '../app-core/optimize-module';
-import { sys } from '@sys';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 
@@ -82,7 +81,7 @@ export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCt
   }
 
   return Promise.all(destinations.map(dst => {
-    const filePath = sys.path.join(dst, filename);
+    const filePath = config.sys.path.join(dst, filename);
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }

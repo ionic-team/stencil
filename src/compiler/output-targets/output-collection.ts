@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 import { isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';
@@ -46,11 +45,11 @@ function writeJsFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.
 }
 
 async function writeModuleFile(config: d.Config, compilerCtx: d.CompilerCtx, moduleFile: d.Module, outputTargets: d.OutputTargetDistCollection[]) {
-  const relPath = sys.path.relative(config.srcDir, moduleFile.jsFilePath);
+  const relPath = config.sys.path.relative(config.srcDir, moduleFile.jsFilePath);
   const jsContent = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
   await Promise.all(
     outputTargets.map(o => {
-      const outputFilePath = sys.path.join(o.collectionDir, relPath);
+      const outputFilePath = config.sys.path.join(o.collectionDir, relPath);
       return compilerCtx.fs.writeFile(outputFilePath, jsContent);
     })
   );
@@ -59,7 +58,7 @@ async function writeModuleFile(config: d.Config, compilerCtx: d.CompilerCtx, mod
 async function writeManifests(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
   const collectionData = JSON.stringify(serializeCollectionManifest(config, buildCtx.moduleFiles), null, 2);
   return Promise.all(
-    outputTargets.map(o => writeManifest(compilerCtx, collectionData, o))
+    outputTargets.map(o => writeManifest(config, compilerCtx, collectionData, o))
   );
 }
 
@@ -68,12 +67,12 @@ async function writeManifests(config: d.Config, compilerCtx: d.CompilerCtx, buil
 // change, but the external user data will always use the same api
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
-async function writeManifest(compilerCtx: d.CompilerCtx, collectionData: string, outputTarget: d.OutputTargetDistCollection) {
+async function writeManifest(config: d.Config, compilerCtx: d.CompilerCtx, collectionData: string, outputTarget: d.OutputTargetDistCollection) {
   // get the absolute path to the directory where the collection will be saved
   const collectionDir = normalizePath(outputTarget.collectionDir);
 
   // create an absolute file path to the actual collection json file
-  const collectionFilePath = normalizePath(sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
+  const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
 
   // don't bother serializing/writing the collection if we're not creating a distribution
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);
@@ -83,11 +82,11 @@ async function writeManifest(compilerCtx: d.CompilerCtx, collectionData: string,
 export function serializeCollectionManifest(config: d.Config, moduleFiles: d.Module[]): d.CollectionManifest {
   // create the single collection we're going to fill up with data
   return {
-    entries: moduleFiles.map(mod => sys.path.relative(config.srcDir, mod.jsFilePath)),
+    entries: moduleFiles.map(mod => config.sys.path.relative(config.srcDir, mod.jsFilePath)),
     compiler: {
-      name: sys.compiler.name,
-      version: sys.compiler.version,
-      typescriptVersion: sys.compiler.typescriptVersion
+      name: config.sys.compiler.name,
+      version: config.sys.compiler.version,
+      typescriptVersion: config.sys.compiler.typescriptVersion
     }
   };
 }
@@ -106,7 +105,7 @@ export async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, b
 
 
 async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const pkgJsonPath = sys.path.join(config.rootDir, 'package.json');
+  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
   let pkgJson: string;
   try {

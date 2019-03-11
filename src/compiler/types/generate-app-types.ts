@@ -4,7 +4,6 @@ import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { getCollectionsTypeImports, updateReferenceTypeImports } from './update-import-refs';
 import { normalizePath } from '@utils';
-import { sys } from '@sys';
 import { updateStencilTypesImports } from './stencil-types';
 
 
@@ -26,13 +25,13 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
   if (destination !== 'src') {
-    componentsDtsFilePath = sys.path.resolve(destination, GENERATED_DTS);
+    componentsDtsFilePath = config.sys.path.resolve(destination, GENERATED_DTS);
     componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
   await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
 
-  timespan.finish(`generated app types finished: ${sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
+  timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
 }
 
 
@@ -45,17 +44,17 @@ async function generateComponentTypesFile(config: d.Config, compilerCtx: d.Compi
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
   const defineGlobalIntrinsicElements = destination === 'src';
-  const collectionTypesImports = await getCollectionsTypeImports(compilerCtx, defineGlobalIntrinsicElements);
+  const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
   const collectionTypesImportsString = collectionTypesImports
     .map(cti => `import '${cti.pkgName}';`)
     .join('\n');
 
   const modules = moduleFiles.reduce((modules, moduleFile) => {
     moduleFile.cmps.forEach(cmp => {
-      const importPath = normalizePath(sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
+      const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
           .replace(/\.(tsx|ts)$/, ''));
 
-      typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, moduleFile.sourceFilePath);
+      typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, moduleFile.sourceFilePath);
 
       const cmpTypes = generateComponentTypes(cmp, importPath);
       modules.push(cmpTypes);
@@ -100,9 +99,9 @@ ${modules.map(m => m.ElementTagNameMap).join('\n')}
 
     const typeData = typeImportData[filePath];
     let importFilePath: string;
-    if (sys.path.isAbsolute(filePath)) {
+    if (config.sys.path.isAbsolute(filePath)) {
       importFilePath = normalizePath('./' +
-        sys.path.relative(config.srcDir, filePath)
+        config.sys.path.relative(config.srcDir, filePath)
       ).replace(/\.(tsx|ts)$/, '');
     } else {
       importFilePath = filePath;

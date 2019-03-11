@@ -1,9 +1,8 @@
 import * as d from '@declarations';
+import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { ModuleKind, ScriptTarget } from '../transform-utils';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
-import { sys } from '@sys';
-import { convertStaticToMeta } from '../static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -14,7 +13,7 @@ export function parseCollectionComponents(config: d.Config, compilerCtx: d.Compi
 
   if (collectionManifest.entries) {
     collectionManifest.entries.forEach(entryPath => {
-      const componentPath = sys.path.join(collectionDir, entryPath);
+      const componentPath = config.sys.path.join(collectionDir, entryPath);
       const sourceText = compilerCtx.fs.readFileSync(componentPath);
       transpileCollectionEntry(config, compilerCtx, buildCtx, collection, componentPath, sourceText);
     });
@@ -66,7 +65,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, collection, {
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, collection, {
         addCompilerMeta: false,
         addStyle: true
       })

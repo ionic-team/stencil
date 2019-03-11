@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger } from '@sys';
 
 
 export function setBooleanConfig(config: any, configName: string, flagName: string, defaultValue: boolean) {
@@ -77,7 +76,7 @@ function getUserConfigName(config: d.Config, correctConfigName: string) {
   for (const userConfigName of userConfigNames) {
     if (userConfigName.toLowerCase() === correctConfigName.toLowerCase()) {
       if (userConfigName !== correctConfigName) {
-        logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
+        config.logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
         return userConfigName;
       }
       break;

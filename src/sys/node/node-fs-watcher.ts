@@ -1,5 +1,5 @@
 import * as d from '@declarations';
-import { logger } from '@sys';
+import { GENERATED_DTS } from '../../compiler/output-targets/output-utils';
 import { normalizePath } from '@utils';
 import crypto from 'crypto';
 import path from 'path';
@@ -15,53 +15,122 @@ export class FsWatcher implements d.FsWatcher {
   private flushTmrId: any;
   private dirWatchers = new Map<string, d.FsWatcherItem>();
   private fileWatchers = new Map<string, d.FsWatcherItem>();
+  private dirItems = new Map<string, Set<string>>();
 
-  constructor(private fs: d.FileSystem, private events: d.BuildEvents, private rootDir: string) {
+  constructor(private config: d.Config, private fs: d.FileSystem, private events: d.BuildEvents) {
     events.subscribe('buildFinish', this.reset.bind(this));
   }
 
   async addDirectory(dirPath: string, emit = false) {
-    dirPath = normalizePath(dirPath);
+    const shouldQueue = await this.addDirectoryRecursive(dirPath, emit);
 
-    if (!this.dirWatchers.has(dirPath)) {
-      const watcher = ts.sys.watchDirectory(dirPath, this.onDirectoryWatch.bind(this), true);
-      this.dirWatchers.set(dirPath, watcher);
-    }
-
-    if (emit && !this.dirsAdded.includes(dirPath)) {
-      this.log('directory added', dirPath);
-
-      this.dirsAdded.push(dirPath);
+    if (emit && shouldQueue) {
       this.queue();
     }
+
+    return shouldQueue;
+  }
+
+  private async addDirectoryRecursive(dirPath: string, emit = false) {
+    dirPath = normalizePath(dirPath);
+
+    if (this.shouldIgnore(dirPath)) {
+      return false;
+    }
+
+    let hasChanges = false;
+    if (emit && !this.dirsAdded.includes(dirPath)) {
+      this.dirsAdded.push(dirPath);
+      this.log('directory added', dirPath);
+    }
+
+    if (!this.dirWatchers.has(dirPath)) {
+      const watcher = ts.sys.watchDirectory(dirPath, this.onDirectoryWatch.bind(this), false);
+      this.dirWatchers.set(dirPath, watcher);
+      hasChanges = true;
+    }
+
+    const subItems = await this.fs.readdir(dirPath);
+    await Promise.all(subItems.map(async fileName => {
+      const itemPath = path.join(dirPath, fileName);
+
+      const stat = await this.fs.stat(itemPath);
+      if (stat.isFile()) {
+        const fileHasChanges = await this.addFile(itemPath, emit, false);
+        if (fileHasChanges) {
+          hasChanges = true;
+        }
+
+      } else if (stat.isDirectory()) {
+        this.addDirItem(dirPath, itemPath);
+        const dirHasChanges = await this.addDirectoryRecursive(itemPath, emit);
+        if (dirHasChanges) {
+          hasChanges = true;
+        }
+      }
+    }));
+
+    return hasChanges;
   }
 
   removeDirectory(dirPath: string, emit = false) {
-    dirPath = normalizePath(dirPath);
+    this.removeDirectoryRecursive(dirPath);
 
-    const watcher = this.dirWatchers.get(dirPath);
-    if (watcher) {
-      this.dirWatchers.delete(dirPath);
-      watcher.close();
-    }
-
-    if (emit && !this.dirsDeleted.push(dirPath)) {
+    if (emit && !this.dirsDeleted.includes(dirPath)) {
       this.log('directory deleted', dirPath);
-
       this.dirsDeleted.push(dirPath);
       this.queue();
     }
   }
 
-  async addFile(filePath: string, emit = false) {
+  private removeDirectoryRecursive(dirPath: string) {
+    dirPath = normalizePath(dirPath);
+
+    const dirWatcher = this.dirWatchers.get(dirPath);
+    if (dirWatcher != null) {
+      this.dirWatchers.delete(dirPath);
+      dirWatcher.close();
+    }
+
+    const fileWatcher = this.fileWatchers.get(dirPath);
+    if (fileWatcher != null) {
+      this.fileWatchers.delete(dirPath);
+      fileWatcher.close();
+    }
+
+    const dirItems = this.dirItems.get(dirPath);
+    if (dirItems != null) {
+      dirItems.forEach(subDirItem => {
+        this.removeDirectoryRecursive(subDirItem);
+      });
+      this.dirItems.delete(dirPath);
+    }
+  }
+
+  private addDirItem(dirPath: string, dirItem: string) {
+    const dirItems = this.dirItems.get(dirPath);
+    if (dirItems == null) {
+      this.dirItems.set(dirPath, new Set([dirItem]));
+    } else {
+      dirItems.add(dirItem);
+    }
+  }
+
+  async addFile(filePath: string, emit = false, queue = true) {
     filePath = normalizePath(filePath);
 
+    if (this.shouldIgnore(filePath)) {
+      return false;
+    }
+
+    let hasChanges = false;
     if (!this.fileWatchers.has(filePath)) {
       const watcher = ts.sys.watchFile(filePath, this.onFileWatch.bind(this));
       this.fileWatchers.set(filePath, watcher);
+      this.addDirItem(normalizePath(path.dirname(filePath)), filePath);
     }
 
-    if (emit) {
+    if (emit && !this.filesAdded.includes(filePath)) {
       const buffer = await this.fs.readFile(filePath);
       const hash = crypto
                     .createHash('md5')
@@ -75,21 +144,28 @@ export class FsWatcher implements d.FsWatcher {
       } else {
         this.log('file added', filePath);
         this.filesUpdated.set(filePath, hash);
-        this.queue();
+        this.filesAdded.push(filePath);
+
+        if (queue) {
+          this.queue();
+        }
+        hasChanges = true;
       }
     }
+
+    return hasChanges;
   }
 
   removeFile(filePath: string, emit = false) {
     filePath = normalizePath(filePath);
 
     const watcher = this.fileWatchers.get(filePath);
-    if (watcher) {
+    if (watcher != null) {
       this.fileWatchers.delete(filePath);
       watcher.close();
     }
 
-    if (emit && !this.filesDeleted.push(filePath)) {
+    if (emit && !this.filesDeleted.includes(filePath)) {
       this.log('file deleted', filePath);
 
       this.filesDeleted.push(filePath);
@@ -97,22 +173,34 @@ export class FsWatcher implements d.FsWatcher {
     }
   }
 
-  onFileChanged(fsPath: string) {
+  async onFileChanged(fsPath: string) {
     fsPath = normalizePath(fsPath);
-    this.log('onFileChanged', fsPath);
 
-  }
+    if (this.filesUpdated.has(fsPath)) {
+      this.log('file already queued to update', fsPath);
+      return;
+    }
 
-  onFileDeleted(fsPath: string) {
-    fsPath = normalizePath(fsPath);
-    this.log('onFileDeleted', fsPath);
+    try {
+      const buffer = await this.fs.readFile(fsPath);
+      const hash = crypto
+                    .createHash('md5')
+                    .update(buffer)
+                    .digest('base64');
 
-  }
+      const existingHash = this.filesUpdated.get(fsPath);
+      if (existingHash === hash) {
+        this.log('file unchanged', fsPath);
 
-  onFileCreated(fsPath: string) {
-    fsPath = normalizePath(fsPath);
-    this.log('onFileCreated', fsPath);
+      } else {
+        this.log('file updated', fsPath);
+        this.filesUpdated.set(fsPath, hash);
+        this.queue();
+      }
 
+    } catch (e) {
+      this.log(`onFileChanged: ${e}`, fsPath);
+    }
   }
 
   async onDirectoryWatch(fsPath: string) {
@@ -169,11 +257,11 @@ export class FsWatcher implements d.FsWatcher {
         break;
 
       case ts.FileWatcherEventKind.Deleted:
-        this.onFileDeleted(fsPath);
+        this.removeFile(fsPath, true);
         break;
 
       case ts.FileWatcherEventKind.Created:
-        this.onFileCreated(fsPath);
+        this.addFile(fsPath, true);
         break;
 
       default:
@@ -190,6 +278,7 @@ export class FsWatcher implements d.FsWatcher {
 
   flush() {
     if (this.dirsAdded.length === 0 && this.dirsDeleted.length === 0 && this.filesAdded.length === 0 && this.filesDeleted.length === 0 && this.filesUpdated.size === 0) {
+      this.log(`flush, empty queue`, this.config.rootDir);
       return;
     }
 
@@ -199,12 +288,8 @@ export class FsWatcher implements d.FsWatcher {
       dirsDeleted: this.dirsDeleted.slice(),
       filesAdded: this.filesAdded.slice(),
       filesDeleted: this.filesDeleted.slice(),
-      filesUpdated: []
+      filesUpdated: Array.from(this.filesUpdated.keys())
     };
-
-    for (const key in this.filesUpdated.keys()) {
-      fsWatchResults.filesUpdated.push(key);
-    }
 
     // send out the event of what we've learend
     this.events.emit('fsChange', fsWatchResults);
@@ -220,6 +305,9 @@ export class FsWatcher implements d.FsWatcher {
   }
 
   close() {
+    clearTimeout(this.flushTmrId);
+    this.reset();
+
     this.dirWatchers.forEach(watcher => {
       watcher.close();
     });
@@ -231,11 +319,42 @@ export class FsWatcher implements d.FsWatcher {
     this.fileWatchers.clear();
   }
 
+  private shouldIgnore(filePath: string) {
+    for (let i = 0; i < IGNORES.length; i++) {
+      if (filePath.endsWith(IGNORES[i])) {
+        return true;
+      }
+    }
+
+    if (this.config.watchIgnoredRegex != null) {
+      if (this.config.watchIgnoredRegex.test(filePath)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private log(msg: string, filePath: string) {
-    const relPath = path.relative(this.rootDir, filePath);
-    logger.debug(`fs-watcher, ${msg}: ${relPath}, ${Date.now().toString().substring(6)}`);
+    if (this.config.logger != null) {
+      const relPath = path.relative(this.config.rootDir, filePath);
+      this.config.logger.debug(`fs-watcher, ${msg}: ${relPath}, ${Date.now().toString().substring(6)}`);
+    }
   }
 
 }
 
 const FLUSH_TIMEOUT = 50;
+
+const IGNORES = [
+  GENERATED_DTS,
+  '.log',
+  '.sql',
+  '.sqlite',
+  '.DS_Store',
+  '.Spotlight-V100',
+  '.Trashes',
+  'ehthumbs.db',
+  'Thumbs.db',
+  '.gitignore',
+  'package-lock.json'
+];

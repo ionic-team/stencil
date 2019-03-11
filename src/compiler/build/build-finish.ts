@@ -2,7 +2,6 @@ import * as d from '@declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
 import { initFsWatcher } from '../fs-watch/fs-watch-init';
-import { logger, sys } from '@sys';
 import { writeCacheStats } from './cache-stats';
 
 
@@ -22,20 +21,20 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      logger.printDiagnostics(buildCtx.buildResults.diagnostics, config.rootDir);
+      config.logger.printDiagnostics(buildCtx.buildResults.diagnostics, config.rootDir);
     }
 
     if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {
       // we've opened up the dev server
       // let's print out the dev server url
-      logger.info(`dev server: ${logger.cyan(config.devServer.browserUrl)}`);
+      config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
       compilerCtx.hasLoggedServerUrl = true;
     }
 
     if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted && buildCtx.isActiveBuild) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
-      logHmr(buildCtx);
+      logHmr(config.logger, buildCtx);
     }
 
     // create a nice pretty message stating what happend
@@ -75,7 +74,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
-    logger.writeLogs(buildCtx.isRebuild);
+    config.logger.writeLogs(buildCtx.isRebuild);
 
     if (config.watch) {
       // this is a watch build
@@ -84,7 +83,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
 
     } else {
       // not a watch build, so lets destroy anything left open
-      sys.destroy();
+      config.sys.destroy();
     }
   }
 
@@ -102,12 +101,12 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
 }
 
 
-function logHmr(buildCtx: d.BuildCtx) {
+function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
   if (hmr.componentsUpdated) {
-    cleanupUpdateMsg(`updated component`, hmr.componentsUpdated);
+    cleanupUpdateMsg(logger, `updated component`, hmr.componentsUpdated);
   }
 
   if (hmr.inlineStylesUpdated) {
@@ -117,20 +116,20 @@ function logHmr(buildCtx: d.BuildCtx) {
       }
       return arr;
     }, [] as string[]);
-    cleanupUpdateMsg(`updated style`, inlineStyles);
+    cleanupUpdateMsg(logger, `updated style`, inlineStyles);
   }
 
   if (hmr.externalStylesUpdated) {
-    cleanupUpdateMsg(`updated stylesheet`, hmr.externalStylesUpdated);
+    cleanupUpdateMsg(logger, `updated stylesheet`, hmr.externalStylesUpdated);
   }
 
   if (hmr.imagesUpdated) {
-    cleanupUpdateMsg(`updated image`, hmr.imagesUpdated);
+    cleanupUpdateMsg(logger, `updated image`, hmr.imagesUpdated);
   }
 }
 
 
-function cleanupUpdateMsg(msg: string, fileNames: string[]) {
+function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
   if (fileNames.length > 0) {
     let fileMsg = '';
 

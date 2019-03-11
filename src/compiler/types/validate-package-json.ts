@@ -2,12 +2,11 @@ import * as d from '@declarations';
 import { buildWarn, normalizePath } from '@utils';
 import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
 import { getComponentsDtsTypesFilePath } from '../output-targets/output-utils';
-import { sys } from '@sys';
 
 
 export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (Array.isArray(pkgData.files)) {
-    const actualDistDir = normalizePath(sys.path.relative(config.rootDir, outputTarget.dir));
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
 
     const validPaths = [
       `${actualDistDir}`,
@@ -28,8 +27,8 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 
 
 export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const moduleAbs = sys.path.join(outputTarget.dir, 'esm', 'es5', 'index.js');
-  const moduleRel = normalizePath(sys.path.relative(config.rootDir, moduleAbs));
+  const moduleAbs = config.sys.path.join(outputTarget.dir, 'esm', 'es5', 'index.js');
+  const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
   if (typeof pkgData.module !== 'string') {
     const err = buildWarn(diagnostics);
@@ -44,7 +43,7 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
-  const pkgFile = sys.path.join(config.rootDir, pkgData.module);
+  const pkgFile = config.sys.path.join(config.rootDir, pkgData.module);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
@@ -55,8 +54,8 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
 
 
 export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const mainAbs = sys.path.join(outputTarget.dir, 'index.js');
-  const mainRel = normalizePath(sys.path.relative(config.rootDir, mainAbs));
+  const mainAbs = config.sys.path.join(outputTarget.dir, 'index.js');
+  const mainRel = normalizePath(config.sys.path.relative(config.rootDir, mainAbs));
 
   if (typeof pkgData.main !== 'string' || pkgData.main === '') {
     const err = buildWarn(diagnostics);
@@ -64,7 +63,7 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const pkgFile = sys.path.join(config.rootDir, pkgData.main);
+  const pkgFile = config.sys.path.join(config.rootDir, pkgData.main);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
@@ -72,8 +71,8 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const loaderAbs = sys.path.join(outputTarget.dir, `${config.fsNamespace}.js`);
-  const loaderRel = normalizePath(sys.path.relative(config.rootDir, loaderAbs));
+  const loaderAbs = config.sys.path.join(outputTarget.dir, `${config.fsNamespace}.js`);
+  const loaderRel = normalizePath(config.sys.path.relative(config.rootDir, loaderAbs));
   if (normalizePath(pkgData.main) === loaderRel) {
     const err = buildWarn(diagnostics);
     err.messageText = `package.json "main" property should not be set to "${pkgData.main}", which is the browser loader (this was a previous recommendation, but recently updated). Instead, please set the "main" property to: ${mainRel}`;
@@ -104,7 +103,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
     return false;
   }
 
-  const pkgFile = sys.path.join(config.rootDir, pkgData.types);
+  const pkgFile = config.sys.path.join(config.rootDir, pkgData.types);
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
@@ -119,7 +118,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
 
 export function validateCollection(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (outputTarget.collectionDir) {
-    const collectionRel = sys.path.join(sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+    const collectionRel = config.sys.path.join(config.sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
     if (!pkgData.collection || normalizePath(pkgData.collection) !== collectionRel) {
       const err = buildWarn(diagnostics);
       err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
@@ -145,6 +144,6 @@ export function validateNamespace(config: d.Config, diagnostics: d.Diagnostic[])
 
 
 export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDistCollection) {
-  const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
-  return normalizePath(sys.path.relative(config.rootDir, typesAbs));
+  const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
+  return normalizePath(config.sys.path.relative(config.rootDir, typesAbs));
 }

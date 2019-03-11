@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { normalizePath } from '@utils';
-import { logger, sys } from '@sys';
 import exit from 'exit';
 
 
@@ -20,19 +19,19 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
   config.devServer.root = process.cwd();
 
   if (typeof flags.root === 'string') {
-    if (!sys.path.isAbsolute(config.flags.root)) {
-      config.devServer.root = sys.path.relative(process.cwd(), flags.root);
+    if (!config.sys.path.isAbsolute(config.flags.root)) {
+      config.devServer.root = config.sys.path.relative(process.cwd(), flags.root);
     }
   }
   config.devServer.root = normalizePath(config.devServer.root);
 
   const devServer = await compiler.startDevServer();
   if (devServer) {
-    logger.info(`dev server: ${devServer.browserUrl}`);
+    config.logger.info(`dev server: ${devServer.browserUrl}`);
   }
 
   process.once('SIGINT', () => {
-    sys.destroy();
+    config.sys.destroy();
     devServer && devServer.close();
     exit(0);
   });

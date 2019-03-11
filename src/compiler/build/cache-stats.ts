@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger, sys } from '@sys';
 
 
 export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,11 +6,11 @@ export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
-  const statsPath = sys.path.join(config.rootDir, 'stencil-cache-stats.json');
+  const statsPath = config.sys.path.join(config.rootDir, 'stencil-cache-stats.json');
 
-  logger.warn(`cache stats enabled for debugging, which is horrible for build times. Only enableCacheStats when debugging memory issues.`);
+  config.logger.warn(`cache stats enabled for debugging, which is horrible for build times. Only enableCacheStats when debugging memory issues.`);
 
-  const timeSpan = logger.createTimeSpan(`cache stats started: ${statsPath}`);
+  const timeSpan = config.logger.createTimeSpan(`cache stats started: ${statsPath}`);
 
   let statsData: any = {};
   try {

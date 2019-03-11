@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { logger } from '@sys';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 
 
@@ -199,7 +198,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
       `to have an { type: "www" } output target. `,
       `More information aobut the new format can be found here: https://stenciljs.com/docs/config`
     ];
-    logger.warn(warningMsg.join(''));
+    config.logger.warn(warningMsg.join(''));
   }
 
   return deprecatedConfigs;

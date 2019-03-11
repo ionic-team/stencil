@@ -1,6 +1,5 @@
 import * as d from '@declarations';
 import { getModule } from '../../build/compiler-ctx';
-import { sys } from '@sys';
 import { normalizePath } from '@utils';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 
@@ -15,7 +14,7 @@ export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.Compi
 
 
 function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
-  const sourceFilePath = normalizePath(sys.path.join(collectionDir, cmpData.componentPath));
+  const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
   const moduleFile = getModule(compilerCtx, sourceFilePath);
 
   moduleFile.isCollectionDependency = true;
@@ -23,7 +22,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   moduleFile.collectionName = collection.collectionName;
   moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);
   moduleFile.originalCollectionComponentPath = cmpData.componentPath;
-  moduleFile.jsFilePath = parseJsFilePath(collectionDir, cmpData);
+  moduleFile.jsFilePath = parseJsFilePath(config, collectionDir, cmpData);
   const cmpMeta: d.ComponentCompilerMeta = {
     isLegacy: moduleFile.isLegacy,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -41,8 +40,8 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     jsFilePath: moduleFile.jsFilePath,
     sourceFilePath: '',
     styleDocs: [],
-    assetsDirs: parseAssetsDir(collectionDir, cmpData),
-    styles: parseStyles(collectionDir, cmpData),
+    assetsDirs: parseAssetsDir(config, collectionDir, cmpData),
+    styles: parseStyles(config, collectionDir, cmpData),
     properties: parseProps(cmpData),
     states: parseStates(cmpData),
     listeners: parseListeners(cmpData),
@@ -135,13 +134,13 @@ function parseTag(cmpData: d.ComponentDataDeprecated) {
 }
 
 
-function parseJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
+function parseJsFilePath(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   // convert the path that's relative to the collection file
   // into an absolute path to the component's js file path
   if (typeof cmpData.componentPath !== 'string') {
     throw new Error(`parseModuleJsFilePath, "componentPath" missing on cmpData: ${cmpData.tag}`);
   }
-  return normalizePath(sys.path.join(collectionDir, cmpData.componentPath));
+  return normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
 }
 
 
@@ -159,14 +158,14 @@ function parseComponentClass(cmpData: d.ComponentDataDeprecated) {
 }
 
 
-function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
+function parseStyles(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const stylesData = cmpData.styles;
 
   if (stylesData) {
     const modeNames = Object.keys(stylesData);
 
     return modeNames.map(modeName => {
-      return parseStyle(collectionDir, cmpData, stylesData[modeName], modeName.toLowerCase());
+      return parseStyle(config, collectionDir, cmpData, stylesData[modeName], modeName.toLowerCase());
     });
 
   } else {
@@ -175,19 +174,19 @@ function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated) 
 }
 
 
-function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
+function parseAssetsDir(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.assetPaths)) {
     return [];
   }
 
   return cmpData.assetPaths.map(assetsPath => {
     const assetsMeta: d.AssetsMeta = {
-      absolutePath: normalizePath(sys.path.join(
+      absolutePath: normalizePath(config.sys.path.join(
         collectionDir,
         assetsPath
       )),
-      cmpRelativePath: normalizePath(sys.path.relative(
-        sys.path.dirname(cmpData.componentPath),
+      cmpRelativePath: normalizePath(config.sys.path.relative(
+        config.sys.path.dirname(cmpData.componentPath),
         assetsPath
       )),
       originalCollectionPath: normalizePath(assetsPath)
@@ -202,7 +201,7 @@ function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecate
 }
 
 
-function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
+function parseStyle(config: d.Config, collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
   const modeStyle: d.StyleCompiler = {
     modeName: modeName,
     styleId: cmpData.tag,
@@ -215,12 +214,12 @@ function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, m
   if (Array.isArray(modeStyleData.stylePaths)) {
     modeStyleData.stylePaths.forEach(stylePath => {
       const externalStyle: d.ExternalStyleCompiler = {
-        absolutePath: normalizePath(sys.path.join(
+        absolutePath: normalizePath(config.sys.path.join(
           collectionDir,
           stylePath
         )),
-        relativePath: normalizePath(sys.path.relative(
-          sys.path.dirname(cmpData.componentPath),
+        relativePath: normalizePath(config.sys.path.relative(
+          config.sys.path.dirname(cmpData.componentPath),
           stylePath
         )),
         originalCollectionPath: stylePath,

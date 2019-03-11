@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 
 
 export async function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResultss: d.HydrateResults[]) {
@@ -24,7 +23,7 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
 
   addDefaults(config, outputTarget, hostConfig);
 
-  const hostConfigFilePath = sys.path.join(outputTarget.dir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = config.sys.path.join(outputTarget.dir, HOST_CONFIG_FILENAME);
 
   await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
 
@@ -49,18 +48,18 @@ export function generateHostRule(config: d.Config, outputTarget: d.OutputTargetW
 export function generateHostRuleHeaders(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
-  addStyles(hostRuleHeaders, hydrateResults);
-  addCoreJs(outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
+  addStyles(config, hostRuleHeaders, hydrateResults);
+  addCoreJs(config, outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
-  addScripts(hostRuleHeaders, hydrateResults);
-  addImgs(hostRuleHeaders, hydrateResults);
+  addScripts(config, hostRuleHeaders, hydrateResults);
+  addImgs(config, hostRuleHeaders, hydrateResults);
 
   return hostRuleHeaders;
 }
 
 
-function addCoreJs(outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
-  const url = getUrlFromFilePath(outputTarget, appCoreWWWPath);
+function addCoreJs(config: d.Config, outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
+  const url = getUrlFromFilePath(config, outputTarget, appCoreWWWPath);
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
 }
@@ -112,15 +111,15 @@ export function getBundleIds(_entryModules: d.EntryModule[], _components: d.Hydr
 }
 
 
-function getBundleUrl(_config: d.Config, outputTarget: d.OutputTargetWww, _bundleId: string) {
+function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, _bundleId: string) {
   // const unscopedFileName = 'getBrowserFilename(bundleId, false)';
   const unscopedWwwBuildPath = 'sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName)';
-  return getUrlFromFilePath(outputTarget, unscopedWwwBuildPath);
+  return getUrlFromFilePath(config, outputTarget, unscopedWwwBuildPath);
 }
 
 
-export function getUrlFromFilePath(outputTarget: d.OutputTargetWww, filePath: string) {
-  let url = sys.path.join('/', sys.path.relative(outputTarget.dir, filePath));
+export function getUrlFromFilePath(config: d.Config, outputTarget: d.OutputTargetWww, filePath: string) {
+  let url = config.sys.path.join('/', config.sys.path.relative(outputTarget.dir, filePath));
 
   url = outputTarget.baseUrl + url.substring(1);
 
@@ -141,13 +140,13 @@ export function sortComponents(components: d.HydrateComponent[]) {
 }
 
 
-function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addStyles(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.styles.forEach(style => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(style.href);
+    const url = config.sys.url.parse(style.href);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -155,13 +154,13 @@ function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydrat
 }
 
 
-function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addScripts(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.scripts.forEach(script => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(script.src);
+    const url = config.sys.url.parse(script.src);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -169,13 +168,13 @@ function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydra
 }
 
 
-function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addImgs(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.imgs.forEach(img => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = sys.url.parse(img.src);
+    const url = config.sys.url.parse(img.src);
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
@@ -215,15 +214,15 @@ function formatLinkRelPreloadValue(url: string) {
 
 function addDefaults(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   addBuildDirCacheControl(config, outputTarget, hostConfig);
-  addServiceWorkerNoCacheControl(outputTarget, hostConfig);
+  addServiceWorkerNoCacheControl(config, outputTarget, hostConfig);
 }
 
 
-function addBuildDirCacheControl(_config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
-  const url = getUrlFromFilePath(outputTarget, 'getAppBuildDir(config, outputTarget)');
+function addBuildDirCacheControl(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+  const url = getUrlFromFilePath(config, outputTarget, 'getAppBuildDir(config, outputTarget)');
 
   hostConfig.hosting.rules.push({
-    include: sys.path.join(url, '**'),
+    include: config.sys.path.join(url, '**'),
     headers: [
       {
         name: `Cache-Control`,
@@ -234,12 +233,12 @@ function addBuildDirCacheControl(_config: d.Config, outputTarget: d.OutputTarget
 }
 
 
-function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+function addServiceWorkerNoCacheControl(config: d.Config, outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   if (!outputTarget.serviceWorker) {
     return;
   }
 
-  const url = getUrlFromFilePath(outputTarget, outputTarget.serviceWorker.swDest);
+  const url = getUrlFromFilePath(config, outputTarget, outputTarget.serviceWorker.swDest);
 
   hostConfig.hosting.rules.push({
     include: url,
@@ -254,7 +253,7 @@ function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostCon
 
 
 async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) {
-  const hostConfigFilePath = sys.path.join(config.srcDir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = config.sys.path.join(config.srcDir, HOST_CONFIG_FILENAME);
   try {
     const userHostConfigStr = await compilerCtx.fs.readFile(hostConfigFilePath);
 

@@ -1,5 +1,4 @@
 import * as d from '@declarations';
-import { sys } from '@sys';
 
 
 export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
@@ -11,14 +10,14 @@ export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, c
     return;
   }
 
-  let content = await compilerCtx.fs.readFile(sys.path.join(outputTarget.dir, expectedSrc));
+  let content = await compilerCtx.fs.readFile(config.sys.path.join(outputTarget.dir, expectedSrc));
   const result = content.match(/import.*from\s*(?:'|")(.*)(?:'|");/);
   if (!result) {
     return;
   }
   const corePath = result[1];
-  const newPath = sys.path.join(
-    sys.path.dirname(expectedSrc),
+  const newPath = config.sys.path.join(
+    config.sys.path.dirname(expectedSrc),
     corePath
   );
   content = content.replace(corePath, newPath[0] === '.' ? newPath : './' + newPath);
