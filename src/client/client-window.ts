@@ -12,8 +12,9 @@ export const getHead = (_?: any) => getDoc().head;
 export const plt: d.PlatformRuntime = {};
 
 if (BUILD.taskQueue) {
-  plt.$queueCongestion$ = 1e5;
+  plt.$queueCongestion$ = 0;
   plt.$queuePending$ = false;
+  plt.$queueAsync$ = false;
 }
 
 export const supportsShadowDom = (BUILD.shadowDom) ? !!getDoc().documentElement.attachShadow : false;

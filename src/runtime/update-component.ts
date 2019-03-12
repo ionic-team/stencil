@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, writeTask } from '@platform';
+import { consoleError, writeTask, plt } from '@platform';
 import { HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
@@ -110,6 +110,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
   if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
     const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+    const ancestorComponent = hostRef.$ancestorComponent$;
     if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {
       hostRef.$stateFlags$ |= HOST_STATE.hasLoadedComponent;
 
@@ -128,7 +129,10 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
         hostRef.$onReadyResolve$ && hostRef.$onReadyResolve$(elm);
       }
-      if (BUILD.lifecycleDOMEvents && !hostRef.$ancestorComponent$) {
+      // on appload
+      if (!ancestorComponent) {
+        // we have finish the first big initial render
+        plt.$queueAsync$ = true;
         emitLifecycleEvent(elm, 'appload');
       }
     } else {
@@ -153,13 +157,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && hostRef.$ancestorComponent$) {
+    if (BUILD.lifecycle && ancestorComponent) {
       // ok so this element already has a known ancestor component
       // let's make sure we remove this element from its ancestor's
       // known list of child elements which are actively loading
-      ancestorsActivelyLoadingChildren = hostRef.$ancestorComponent$['s-al'];
-
-      if (ancestorsActivelyLoadingChildren) {
+      if (ancestorsActivelyLoadingChildren = ancestorComponent['s-al']) {
         // remove this element from the actively loading map
         ancestorsActivelyLoadingChildren.delete(elm);
 
@@ -167,9 +169,9 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         // to see if the ancestor is actually loaded or not
         // then let's call the ancestor's initializeComponent method if there's no length
         // (which actually ends up as this method again but for the ancestor)
-        if (!ancestorsActivelyLoadingChildren.size) {
-          hostRef.$ancestorComponent$['s-al'] = undefined;
-          hostRef.$ancestorComponent$['s-init']();
+        if (ancestorsActivelyLoadingChildren.size === 0) {
+          ancestorComponent['s-al'] = undefined;
+          ancestorComponent['s-init']();
         }
       }
 

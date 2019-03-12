@@ -60,7 +60,9 @@ const flush = () => {
   // DOM READS!!!
   consume(queueDomReads);
 
-  const timeout = performance.now() + (7 * Math.ceil(plt.$queueCongestion$ * (1.0 / 22.0)));
+  const timeout = plt.$queueAsync$
+    ? performance.now() + (7 * Math.ceil(plt.$queueCongestion$ * (1.0 / 22.0)))
+    : Infinity;
 
   // DOM WRITES!!!
   consumeTimeout(queueDomWrites, timeout);

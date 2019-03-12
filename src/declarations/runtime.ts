@@ -97,6 +97,7 @@ export interface HostRef {
 export interface PlatformRuntime {
   $isTmpDisconnected$?: boolean;
   $queueCongestion$?: number;
+  $queueAsync$?: boolean;
   $queuePending$?: boolean;
 }
 
