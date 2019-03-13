@@ -13,7 +13,7 @@ export {
   EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSXElements,
+  JSXBase,
 } from '../declarations';
 
 /**

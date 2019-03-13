@@ -12,7 +12,7 @@ export {
   EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSXElements,
+  JSXBase,
 } from './declarations';
 
 /**
@@ -92,8 +92,6 @@ export declare const Host: d.FunctionalComponent<any>;
 
 export interface HostElement extends HTMLElement {}
 
-
-// Collections will extend
 declare namespace LocalJSX {
   interface Element {}
   interface IntrinsicElements {}
@@ -110,8 +108,7 @@ export declare namespace h {
   export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
 
   export namespace JSX {
-    interface Element extends LocalJSX.Element {}
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements, d.JSXElements.DefaultIntrinsicElements {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements, d.JSXBase.IntrinsicElements {
       [tagName: string]: any;
     }
   }

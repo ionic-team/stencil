@@ -12,12 +12,12 @@ export interface TypesMemberNameData {
 
 export interface TypesModule {
   tagNameAsPascal: string;
-  StencilComponents: string;
-  JSXElements: string;
-  global: string;
+  component: string;
+  jsx: string;
+  element: string;
+
   HTMLElementTagNameMap: string;
   ElementTagNameMap: string;
-  IntrinsicElements: string;
 }
 
 

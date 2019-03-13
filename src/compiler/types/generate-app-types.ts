@@ -63,7 +63,7 @@ declare module "@stencil/core" {
 
   const componentsFileString = `
 export namespace Components {
-  ${modules.map(m => `${m.StencilComponents}${m.JSXElements}`).join('\n')}
+  ${modules.map(m => `${m.component}`).join('\n')}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -72,18 +72,20 @@ interface HTMLStencilElement extends HTMLElement {
 }
 
 declare namespace LocalJSX {
+  ${modules.map(m => `${m.jsx}`).join('\n')}
+
   interface ElementInterfaces {
   ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
   }
 
   interface IntrinsicElements {
-  ${modules.map(m => m.IntrinsicElements).join('\n')}
+  ${modules.map(m => `'${m.tagNameAsPascal}': LocalJSX.${m.tagNameAsPascal};`).join('\n')}
   }
 }
 export { LocalJSX as JSX };
 ${jsxAugmentation}
 declare global {
-  ${modules.map(m => m.global).join('\n')}
+  ${modules.map(m => m.element).join('\n')}
   interface HTMLElementTagNameMap {
   ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
   }
@@ -120,7 +122,7 @@ ${typeData.sort(sortImportNames).map(td => {
   }, '');
 
   const code = `
-import { JSXElements } from '@stencil/core';
+import { JSXBase } from '@stencil/core';
 
 ${typeImportString}
 ${componentsFileString}

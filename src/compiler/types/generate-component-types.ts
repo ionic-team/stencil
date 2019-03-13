@@ -14,8 +14,7 @@ import { generatePropTypes } from './generate-prop-types';
 export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath: string): d.TypesModule {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
-  const interfaceName = `HTML${tagNameAsPascal}Element`;
-  const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
+  const htmlElementName = `HTML${tagNameAsPascal}Element`;
 
   const propAttributes = generatePropTypes(cmp);
   const methodAttributes = generateMethodTypes(cmp.methods);
@@ -32,30 +31,23 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath
   ], true);
 
   return {
-    tagNameAsPascal: tagNameAsPascal,
-    StencilComponents: `
-interface ${tagNameAsPascal} {${
-  stencilComponentAttributes !== '' ? `\n${stencilComponentAttributes}\n` : ''
-}}`,
-    JSXElements: `
-interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
-  stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
-}}`,
-    global: cmp.isLegacy ? '' : `
-interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
-var ${interfaceName}: {
-  prototype: ${interfaceName};
-  new (): ${interfaceName};
+    tagNameAsPascal,
+    component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
+    jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
+    element: cmp.isLegacy ? '' : `
+interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
+var ${htmlElementName}: {
+  prototype: ${htmlElementName};
+  new (): ${htmlElementName};
 };`,
-    HTMLElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${interfaceName}`,
-    ElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${interfaceName};`,
-    IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
+    HTMLElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${htmlElementName}`,
+    ElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${htmlElementName};`,
   };
 }
 
 
 function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') {
-  return sortBy(attributes, a => a.name)
+  const attributesStr = sortBy(attributes, a => a.name)
     .filter(type => type.public || !jsxAttributes)
     .reduce((fullList, type) => {
       if (type.jsdoc) {
@@ -71,4 +63,6 @@ function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: bool
     }, [] as string[])
     .map(item => `${paddingString}${item}`)
     .join(`\n`);
+
+  return attributesStr !== '' ? `\n${attributesStr}\n` : '';
 }
