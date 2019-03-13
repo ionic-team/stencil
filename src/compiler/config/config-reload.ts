@@ -56,7 +56,9 @@ export function configReload(config: d.Config, updatedConfig: d.Config) {
 const CONFIG_RELOAD_KEEPERS: d.Config = {
   flags: null,
   cwd: null,
+  logger: null,
   rootDir: null,
+  sys: null,
   watch: null
 };
 

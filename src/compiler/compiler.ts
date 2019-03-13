@@ -18,11 +18,11 @@ export class Compiler implements d.Compiler {
 
   constructor(compilerConfig: d.Config) {
     [ this.isValid, this.config ] = isValid(compilerConfig);
-    const config = this.config;
-    const sys = config.sys;
-    const logger = config.logger;
 
     if (this.isValid) {
+      const config = this.config;
+      const sys = config.sys;
+      const logger = config.logger;
       const details = sys.details;
 
       let startupMsg = `${sys.compiler.name} v${sys.compiler.version} `;
