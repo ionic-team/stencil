@@ -92,6 +92,13 @@ export declare const Host: d.FunctionalComponent<any>;
 
 export interface HostElement extends HTMLElement {}
 
+
+// Collections will extend
+declare namespace LocalJSX {
+  interface Element {}
+  interface IntrinsicElements {}
+}
+
 export declare namespace h {
   export function h(sel: any): d.VNode;
   export function h(sel: Node, data: d.VNodeData): d.VNode;
@@ -103,9 +110,11 @@ export declare namespace h {
   export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
 
   export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends d.JSXElements.DefaultIntrinsicElements {
+    interface Element extends LocalJSX.Element {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements, d.JSXElements.DefaultIntrinsicElements {
       [tagName: string]: any;
     }
   }
 }
+
+export { LocalJSX as JSX };

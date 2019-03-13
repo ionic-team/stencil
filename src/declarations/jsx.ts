@@ -119,6 +119,64 @@ export namespace JSXElements {
     'var': JSXElements.HTMLAttributes;
     video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
     wbr: JSXElements.HTMLAttributes;
+
+
+    // SVG
+    animate: JSXElements.SVGAttributes;
+    circle: JSXElements.SVGAttributes;
+    clipPath: JSXElements.SVGAttributes;
+    defs: JSXElements.SVGAttributes;
+    desc: JSXElements.SVGAttributes;
+    ellipse: JSXElements.SVGAttributes;
+    feBlend: JSXElements.SVGAttributes;
+    feColorMatrix: JSXElements.SVGAttributes;
+    feComponentTransfer: JSXElements.SVGAttributes;
+    feComposite: JSXElements.SVGAttributes;
+    feConvolveMatrix: JSXElements.SVGAttributes;
+    feDiffuseLighting: JSXElements.SVGAttributes;
+    feDisplacementMap: JSXElements.SVGAttributes;
+    feDistantLight: JSXElements.SVGAttributes;
+    feDropShadow: JSXElements.SVGAttributes;
+    feFlood: JSXElements.SVGAttributes;
+    feFuncA: JSXElements.SVGAttributes;
+    feFuncB: JSXElements.SVGAttributes;
+    feFuncG: JSXElements.SVGAttributes;
+    feFuncR: JSXElements.SVGAttributes;
+    feGaussianBlur: JSXElements.SVGAttributes;
+    feImage: JSXElements.SVGAttributes;
+    feMerge: JSXElements.SVGAttributes;
+    feMergeNode: JSXElements.SVGAttributes;
+    feMorphology: JSXElements.SVGAttributes;
+    feOffset: JSXElements.SVGAttributes;
+    fePointLight: JSXElements.SVGAttributes;
+    feSpecularLighting: JSXElements.SVGAttributes;
+    feSpotLight: JSXElements.SVGAttributes;
+    feTile: JSXElements.SVGAttributes;
+    feTurbulence: JSXElements.SVGAttributes;
+    filter: JSXElements.SVGAttributes;
+    foreignObject: JSXElements.SVGAttributes;
+    g: JSXElements.SVGAttributes;
+    image: JSXElements.SVGAttributes;
+    line: JSXElements.SVGAttributes;
+    linearGradient: JSXElements.SVGAttributes;
+    marker: JSXElements.SVGAttributes;
+    mask: JSXElements.SVGAttributes;
+    metadata: JSXElements.SVGAttributes;
+    path: JSXElements.SVGAttributes;
+    pattern: JSXElements.SVGAttributes;
+    polygon: JSXElements.SVGAttributes;
+    polyline: JSXElements.SVGAttributes;
+    radialGradient: JSXElements.SVGAttributes;
+    rect: JSXElements.SVGAttributes;
+    stop: JSXElements.SVGAttributes;
+    svg: JSXElements.SVGAttributes;
+    switch: JSXElements.SVGAttributes;
+    symbol: JSXElements.SVGAttributes;
+    text: JSXElements.SVGAttributes;
+    textPath: JSXElements.SVGAttributes;
+    tspan: JSXElements.SVGAttributes;
+    use: JSXElements.SVGAttributes;
+    view: JSXElements.SVGAttributes;
   }
 
   export interface SlotAttributes {

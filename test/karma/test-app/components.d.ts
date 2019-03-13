@@ -9,11 +9,7 @@ import { JSXElements } from '@stencil/core';
 
 
 
-
 export namespace Components {
-
-  interface AttributeBasicRoot {}
-  interface AttributeBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface AttributeBasic {
     'customAttr': string;
@@ -26,10 +22,8 @@ export namespace Components {
     'single'?: string;
   }
 
-  interface AttributeBooleanRoot {
-    'toggleState': () => Promise<void>;
-  }
-  interface AttributeBooleanRootAttributes extends JSXElements.HTMLAttributes {}
+  interface AttributeBasicRoot {}
+  interface AttributeBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface AttributeBoolean {
     'boolState': boolean;
@@ -41,6 +35,11 @@ export namespace Components {
     'noreflect'?: boolean;
     'strState'?: string;
   }
+
+  interface AttributeBooleanRoot {
+    'toggleState': () => Promise<void>;
+  }
+  interface AttributeBooleanRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface AttributeComplex {
     'bool0': boolean;
@@ -79,17 +78,20 @@ export namespace Components {
   interface ConditionalBasic {}
   interface ConditionalBasicAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ConditionalRerenderRoot {}
-  interface ConditionalRerenderRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface ConditionalRerender {}
   interface ConditionalRerenderAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CssVariablesRoot {}
-  interface CssVariablesRootAttributes extends JSXElements.HTMLAttributes {}
+  interface ConditionalRerenderRoot {}
+  interface ConditionalRerenderRootAttributes extends JSXElements.HTMLAttributes {}
+
+  interface CssCmp {}
+  interface CssCmpAttributes extends JSXElements.HTMLAttributes {}
 
   interface CssVariables {}
   interface CssVariablesAttributes extends JSXElements.HTMLAttributes {}
+
+  interface CssVariablesRoot {}
+  interface CssVariablesRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface CustomEventRoot {}
   interface CustomEventRootAttributes extends JSXElements.HTMLAttributes {}
@@ -126,15 +128,15 @@ export namespace Components {
   interface InitCssRoot {}
   interface InitCssRootAttributes extends JSXElements.HTMLAttributes {}
 
-  interface KeyReorderRoot {}
-  interface KeyReorderRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface KeyReorder {
     'num': number;
   }
   interface KeyReorderAttributes extends JSXElements.HTMLAttributes {
     'num'?: number;
   }
+
+  interface KeyReorderRoot {}
+  interface KeyReorderRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface LifecycleAsyncA {}
   interface LifecycleAsyncAAttributes extends JSXElements.HTMLAttributes {}
@@ -204,11 +206,11 @@ export namespace Components {
     'value'?: number;
   }
 
-  interface ListenJsxRoot {}
-  interface ListenJsxRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface ListenJsx {}
   interface ListenJsxAttributes extends JSXElements.HTMLAttributes {}
+
+  interface ListenJsxRoot {}
+  interface ListenJsxRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ListenWindow {}
   interface ListenWindowAttributes extends JSXElements.HTMLAttributes {}
@@ -239,14 +241,14 @@ export namespace Components {
     'undef'?: string;
   }
 
-  interface ScopedBasicRoot {}
-  interface ScopedBasicRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SassCmp {}
+  interface SassCmpAttributes extends JSXElements.HTMLAttributes {}
 
   interface ScopedBasic {}
   interface ScopedBasicAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ShadowDomArrayRoot {}
-  interface ShadowDomArrayRootAttributes extends JSXElements.HTMLAttributes {}
+  interface ScopedBasicRoot {}
+  interface ScopedBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ShadowDomArray {
     'values': number[];
@@ -255,23 +257,23 @@ export namespace Components {
     'values'?: number[];
   }
 
-  interface ShadowDomBasicRoot {}
-  interface ShadowDomBasicRootAttributes extends JSXElements.HTMLAttributes {}
+  interface ShadowDomArrayRoot {}
+  interface ShadowDomArrayRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ShadowDomBasic {}
   interface ShadowDomBasicAttributes extends JSXElements.HTMLAttributes {}
 
-  interface ShadowDomModeRoot {}
-  interface ShadowDomModeRootAttributes extends JSXElements.HTMLAttributes {}
+  interface ShadowDomBasicRoot {}
+  interface ShadowDomBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ShadowDomMode {}
   interface ShadowDomModeAttributes extends JSXElements.HTMLAttributes {}
 
+  interface ShadowDomModeRoot {}
+  interface ShadowDomModeRootAttributes extends JSXElements.HTMLAttributes {}
+
   interface ShadowDomSlotBasic {}
   interface ShadowDomSlotBasicAttributes extends JSXElements.HTMLAttributes {}
-
-  interface ShadowDomSlotNestedRoot {}
-  interface ShadowDomSlotNestedRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface ShadowDomSlotNested {
     'i': number;
@@ -280,32 +282,32 @@ export namespace Components {
     'i'?: number;
   }
 
+  interface ShadowDomSlotNestedRoot {}
+  interface ShadowDomSlotNestedRootAttributes extends JSXElements.HTMLAttributes {}
+
   interface SlotArrayBasic {}
   interface SlotArrayBasicAttributes extends JSXElements.HTMLAttributes {}
-
-  interface SlotArrayComplexRoot {}
-  interface SlotArrayComplexRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotArrayComplex {}
   interface SlotArrayComplexAttributes extends JSXElements.HTMLAttributes {}
 
+  interface SlotArrayComplexRoot {}
+  interface SlotArrayComplexRootAttributes extends JSXElements.HTMLAttributes {}
+
   interface SlotArrayTop {}
   interface SlotArrayTopAttributes extends JSXElements.HTMLAttributes {}
-
-  interface SlotBasicOrderRoot {}
-  interface SlotBasicOrderRootAttributes extends JSXElements.HTMLAttributes {}
-
-  interface SlotBasicOrder {}
-  interface SlotBasicOrderAttributes extends JSXElements.HTMLAttributes {}
-
-  interface SlotBasicRoot {}
-  interface SlotBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotBasic {}
   interface SlotBasicAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotDynamicWrapperRoot {}
-  interface SlotDynamicWrapperRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotBasicOrder {}
+  interface SlotBasicOrderAttributes extends JSXElements.HTMLAttributes {}
+
+  interface SlotBasicOrderRoot {}
+  interface SlotBasicOrderRootAttributes extends JSXElements.HTMLAttributes {}
+
+  interface SlotBasicRoot {}
+  interface SlotBasicRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotDynamicWrapper {
     'tag': string;
@@ -314,8 +316,8 @@ export namespace Components {
     'tag'?: string;
   }
 
-  interface SlotFallbackRoot {}
-  interface SlotFallbackRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotDynamicWrapperRoot {}
+  interface SlotDynamicWrapperRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotFallback {
     'inc': number;
@@ -324,6 +326,9 @@ export namespace Components {
     'inc'?: number;
   }
 
+  interface SlotFallbackRoot {}
+  interface SlotFallbackRootAttributes extends JSXElements.HTMLAttributes {}
+
   interface SlotHtml {
     'inc': number;
   }
@@ -331,20 +336,17 @@ export namespace Components {
     'inc'?: number;
   }
 
-  interface SlotLightDomRoot {}
-  interface SlotLightDomRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface SlotLightDomContent {}
   interface SlotLightDomContentAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotMapOrderRoot {}
-  interface SlotMapOrderRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotLightDomRoot {}
+  interface SlotLightDomRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotMapOrder {}
   interface SlotMapOrderAttributes extends JSXElements.HTMLAttributes {}
 
-  interface SlotReorderRoot {}
-  interface SlotReorderRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotMapOrderRoot {}
+  interface SlotMapOrderRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotReorder {
     'reordered': boolean;
@@ -353,8 +355,8 @@ export namespace Components {
     'reordered'?: boolean;
   }
 
-  interface SlotReplaceWrapperRoot {}
-  interface SlotReplaceWrapperRootAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotReorderRoot {}
+  interface SlotReorderRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SlotReplaceWrapper {
     'href': string;
@@ -363,11 +365,8 @@ export namespace Components {
     'href'?: string;
   }
 
-  interface CssCmp {}
-  interface CssCmpAttributes extends JSXElements.HTMLAttributes {}
-
-  interface SassCmp {}
-  interface SassCmpAttributes extends JSXElements.HTMLAttributes {}
+  interface SlotReplaceWrapperRoot {}
+  interface SlotReplaceWrapperRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface SvgAttr {}
   interface SvgAttrAttributes extends JSXElements.HTMLAttributes {}
@@ -387,20 +386,21 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
-    'AttributeBasicRoot': Components.AttributeBasicRoot;
+declare namespace LocalJSX {
+  interface ElementInterfaces {
     'AttributeBasic': Components.AttributeBasic;
-    'AttributeBooleanRoot': Components.AttributeBooleanRoot;
+    'AttributeBasicRoot': Components.AttributeBasicRoot;
     'AttributeBoolean': Components.AttributeBoolean;
+    'AttributeBooleanRoot': Components.AttributeBooleanRoot;
     'AttributeComplex': Components.AttributeComplex;
     'AttributeHost': Components.AttributeHost;
     'AttributeHtmlRoot': Components.AttributeHtmlRoot;
     'ConditionalBasic': Components.ConditionalBasic;
-    'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
     'ConditionalRerender': Components.ConditionalRerender;
-    'CssVariablesRoot': Components.CssVariablesRoot;
+    'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
+    'CssCmp': Components.CssCmp;
     'CssVariables': Components.CssVariables;
+    'CssVariablesRoot': Components.CssVariablesRoot;
     'CustomEventRoot': Components.CustomEventRoot;
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
@@ -410,8 +410,8 @@ declare global {
     'ExternalImportB': Components.ExternalImportB;
     'ExternalImportC': Components.ExternalImportC;
     'InitCssRoot': Components.InitCssRoot;
-    'KeyReorderRoot': Components.KeyReorderRoot;
     'KeyReorder': Components.KeyReorder;
+    'KeyReorderRoot': Components.KeyReorderRoot;
     'LifecycleAsyncA': Components.LifecycleAsyncA;
     'LifecycleAsyncB': Components.LifecycleAsyncB;
     'LifecycleAsyncC': Components.LifecycleAsyncC;
@@ -424,64 +424,64 @@ declare global {
     'LifecycleUpdateA': Components.LifecycleUpdateA;
     'LifecycleUpdateB': Components.LifecycleUpdateB;
     'LifecycleUpdateC': Components.LifecycleUpdateC;
-    'ListenJsxRoot': Components.ListenJsxRoot;
     'ListenJsx': Components.ListenJsx;
+    'ListenJsxRoot': Components.ListenJsxRoot;
     'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
     'ReflectToAttr': Components.ReflectToAttr;
-    'ScopedBasicRoot': Components.ScopedBasicRoot;
-    'ScopedBasic': Components.ScopedBasic;
-    'ShadowDomArrayRoot': Components.ShadowDomArrayRoot;
-    'ShadowDomArray': Components.ShadowDomArray;
-    'ShadowDomBasicRoot': Components.ShadowDomBasicRoot;
-    'ShadowDomBasic': Components.ShadowDomBasic;
-    'ShadowDomModeRoot': Components.ShadowDomModeRoot;
-    'ShadowDomMode': Components.ShadowDomMode;
-    'ShadowDomSlotBasic': Components.ShadowDomSlotBasic;
-    'ShadowDomSlotNestedRoot': Components.ShadowDomSlotNestedRoot;
-    'ShadowDomSlotNested': Components.ShadowDomSlotNested;
-    'SlotArrayBasic': Components.SlotArrayBasic;
-    'SlotArrayComplexRoot': Components.SlotArrayComplexRoot;
-    'SlotArrayComplex': Components.SlotArrayComplex;
-    'SlotArrayTop': Components.SlotArrayTop;
-    'SlotBasicOrderRoot': Components.SlotBasicOrderRoot;
-    'SlotBasicOrder': Components.SlotBasicOrder;
-    'SlotBasicRoot': Components.SlotBasicRoot;
-    'SlotBasic': Components.SlotBasic;
-    'SlotDynamicWrapperRoot': Components.SlotDynamicWrapperRoot;
-    'SlotDynamicWrapper': Components.SlotDynamicWrapper;
-    'SlotFallbackRoot': Components.SlotFallbackRoot;
-    'SlotFallback': Components.SlotFallback;
-    'SlotHtml': Components.SlotHtml;
-    'SlotLightDomRoot': Components.SlotLightDomRoot;
-    'SlotLightDomContent': Components.SlotLightDomContent;
-    'SlotMapOrderRoot': Components.SlotMapOrderRoot;
-    'SlotMapOrder': Components.SlotMapOrder;
-    'SlotReorderRoot': Components.SlotReorderRoot;
-    'SlotReorder': Components.SlotReorder;
-    'SlotReplaceWrapperRoot': Components.SlotReplaceWrapperRoot;
-    'SlotReplaceWrapper': Components.SlotReplaceWrapper;
-    'CssCmp': Components.CssCmp;
     'SassCmp': Components.SassCmp;
+    'ScopedBasic': Components.ScopedBasic;
+    'ScopedBasicRoot': Components.ScopedBasicRoot;
+    'ShadowDomArray': Components.ShadowDomArray;
+    'ShadowDomArrayRoot': Components.ShadowDomArrayRoot;
+    'ShadowDomBasic': Components.ShadowDomBasic;
+    'ShadowDomBasicRoot': Components.ShadowDomBasicRoot;
+    'ShadowDomMode': Components.ShadowDomMode;
+    'ShadowDomModeRoot': Components.ShadowDomModeRoot;
+    'ShadowDomSlotBasic': Components.ShadowDomSlotBasic;
+    'ShadowDomSlotNested': Components.ShadowDomSlotNested;
+    'ShadowDomSlotNestedRoot': Components.ShadowDomSlotNestedRoot;
+    'SlotArrayBasic': Components.SlotArrayBasic;
+    'SlotArrayComplex': Components.SlotArrayComplex;
+    'SlotArrayComplexRoot': Components.SlotArrayComplexRoot;
+    'SlotArrayTop': Components.SlotArrayTop;
+    'SlotBasic': Components.SlotBasic;
+    'SlotBasicOrder': Components.SlotBasicOrder;
+    'SlotBasicOrderRoot': Components.SlotBasicOrderRoot;
+    'SlotBasicRoot': Components.SlotBasicRoot;
+    'SlotDynamicWrapper': Components.SlotDynamicWrapper;
+    'SlotDynamicWrapperRoot': Components.SlotDynamicWrapperRoot;
+    'SlotFallback': Components.SlotFallback;
+    'SlotFallbackRoot': Components.SlotFallbackRoot;
+    'SlotHtml': Components.SlotHtml;
+    'SlotLightDomContent': Components.SlotLightDomContent;
+    'SlotLightDomRoot': Components.SlotLightDomRoot;
+    'SlotMapOrder': Components.SlotMapOrder;
+    'SlotMapOrderRoot': Components.SlotMapOrderRoot;
+    'SlotReorder': Components.SlotReorder;
+    'SlotReorderRoot': Components.SlotReorderRoot;
+    'SlotReplaceWrapper': Components.SlotReplaceWrapper;
+    'SlotReplaceWrapperRoot': Components.SlotReplaceWrapperRoot;
     'SvgAttr': Components.SvgAttr;
     'SvgClass': Components.SvgClass;
     'Tag3dComponent': Components.Tag3dComponent;
     'Tag88': Components.Tag88;
   }
 
-  interface StencilIntrinsicElements {
-    'attribute-basic-root': Components.AttributeBasicRootAttributes;
+  interface IntrinsicElements {
     'attribute-basic': Components.AttributeBasicAttributes;
-    'attribute-boolean-root': Components.AttributeBooleanRootAttributes;
+    'attribute-basic-root': Components.AttributeBasicRootAttributes;
     'attribute-boolean': Components.AttributeBooleanAttributes;
+    'attribute-boolean-root': Components.AttributeBooleanRootAttributes;
     'attribute-complex': Components.AttributeComplexAttributes;
     'attribute-host': Components.AttributeHostAttributes;
     'attribute-html-root': Components.AttributeHtmlRootAttributes;
     'conditional-basic': Components.ConditionalBasicAttributes;
-    'conditional-rerender-root': Components.ConditionalRerenderRootAttributes;
     'conditional-rerender': Components.ConditionalRerenderAttributes;
-    'css-variables-root': Components.CssVariablesRootAttributes;
+    'conditional-rerender-root': Components.ConditionalRerenderRootAttributes;
+    'css-cmp': Components.CssCmpAttributes;
     'css-variables': Components.CssVariablesAttributes;
+    'css-variables-root': Components.CssVariablesRootAttributes;
     'custom-event-root': Components.CustomEventRootAttributes;
     'dynamic-css-variable': Components.DynamicCssVariableAttributes;
     'dynamic-import': Components.DynamicImportAttributes;
@@ -491,8 +491,8 @@ declare global {
     'external-import-b': Components.ExternalImportBAttributes;
     'external-import-c': Components.ExternalImportCAttributes;
     'init-css-root': Components.InitCssRootAttributes;
-    'key-reorder-root': Components.KeyReorderRootAttributes;
     'key-reorder': Components.KeyReorderAttributes;
+    'key-reorder-root': Components.KeyReorderRootAttributes;
     'lifecycle-async-a': Components.LifecycleAsyncAAttributes;
     'lifecycle-async-b': Components.LifecycleAsyncBAttributes;
     'lifecycle-async-c': Components.LifecycleAsyncCAttributes;
@@ -505,57 +505,60 @@ declare global {
     'lifecycle-update-a': Components.LifecycleUpdateAAttributes;
     'lifecycle-update-b': Components.LifecycleUpdateBAttributes;
     'lifecycle-update-c': Components.LifecycleUpdateCAttributes;
-    'listen-jsx-root': Components.ListenJsxRootAttributes;
     'listen-jsx': Components.ListenJsxAttributes;
+    'listen-jsx-root': Components.ListenJsxRootAttributes;
     'listen-window': Components.ListenWindowAttributes;
     'node-globals': Components.NodeGlobalsAttributes;
     'reflect-to-attr': Components.ReflectToAttrAttributes;
-    'scoped-basic-root': Components.ScopedBasicRootAttributes;
-    'scoped-basic': Components.ScopedBasicAttributes;
-    'shadow-dom-array-root': Components.ShadowDomArrayRootAttributes;
-    'shadow-dom-array': Components.ShadowDomArrayAttributes;
-    'shadow-dom-basic-root': Components.ShadowDomBasicRootAttributes;
-    'shadow-dom-basic': Components.ShadowDomBasicAttributes;
-    'shadow-dom-mode-root': Components.ShadowDomModeRootAttributes;
-    'shadow-dom-mode': Components.ShadowDomModeAttributes;
-    'shadow-dom-slot-basic': Components.ShadowDomSlotBasicAttributes;
-    'shadow-dom-slot-nested-root': Components.ShadowDomSlotNestedRootAttributes;
-    'shadow-dom-slot-nested': Components.ShadowDomSlotNestedAttributes;
-    'slot-array-basic': Components.SlotArrayBasicAttributes;
-    'slot-array-complex-root': Components.SlotArrayComplexRootAttributes;
-    'slot-array-complex': Components.SlotArrayComplexAttributes;
-    'slot-array-top': Components.SlotArrayTopAttributes;
-    'slot-basic-order-root': Components.SlotBasicOrderRootAttributes;
-    'slot-basic-order': Components.SlotBasicOrderAttributes;
-    'slot-basic-root': Components.SlotBasicRootAttributes;
-    'slot-basic': Components.SlotBasicAttributes;
-    'slot-dynamic-wrapper-root': Components.SlotDynamicWrapperRootAttributes;
-    'slot-dynamic-wrapper': Components.SlotDynamicWrapperAttributes;
-    'slot-fallback-root': Components.SlotFallbackRootAttributes;
-    'slot-fallback': Components.SlotFallbackAttributes;
-    'slot-html': Components.SlotHtmlAttributes;
-    'slot-light-dom-root': Components.SlotLightDomRootAttributes;
-    'slot-light-dom-content': Components.SlotLightDomContentAttributes;
-    'slot-map-order-root': Components.SlotMapOrderRootAttributes;
-    'slot-map-order': Components.SlotMapOrderAttributes;
-    'slot-reorder-root': Components.SlotReorderRootAttributes;
-    'slot-reorder': Components.SlotReorderAttributes;
-    'slot-replace-wrapper-root': Components.SlotReplaceWrapperRootAttributes;
-    'slot-replace-wrapper': Components.SlotReplaceWrapperAttributes;
-    'css-cmp': Components.CssCmpAttributes;
     'sass-cmp': Components.SassCmpAttributes;
+    'scoped-basic': Components.ScopedBasicAttributes;
+    'scoped-basic-root': Components.ScopedBasicRootAttributes;
+    'shadow-dom-array': Components.ShadowDomArrayAttributes;
+    'shadow-dom-array-root': Components.ShadowDomArrayRootAttributes;
+    'shadow-dom-basic': Components.ShadowDomBasicAttributes;
+    'shadow-dom-basic-root': Components.ShadowDomBasicRootAttributes;
+    'shadow-dom-mode': Components.ShadowDomModeAttributes;
+    'shadow-dom-mode-root': Components.ShadowDomModeRootAttributes;
+    'shadow-dom-slot-basic': Components.ShadowDomSlotBasicAttributes;
+    'shadow-dom-slot-nested': Components.ShadowDomSlotNestedAttributes;
+    'shadow-dom-slot-nested-root': Components.ShadowDomSlotNestedRootAttributes;
+    'slot-array-basic': Components.SlotArrayBasicAttributes;
+    'slot-array-complex': Components.SlotArrayComplexAttributes;
+    'slot-array-complex-root': Components.SlotArrayComplexRootAttributes;
+    'slot-array-top': Components.SlotArrayTopAttributes;
+    'slot-basic': Components.SlotBasicAttributes;
+    'slot-basic-order': Components.SlotBasicOrderAttributes;
+    'slot-basic-order-root': Components.SlotBasicOrderRootAttributes;
+    'slot-basic-root': Components.SlotBasicRootAttributes;
+    'slot-dynamic-wrapper': Components.SlotDynamicWrapperAttributes;
+    'slot-dynamic-wrapper-root': Components.SlotDynamicWrapperRootAttributes;
+    'slot-fallback': Components.SlotFallbackAttributes;
+    'slot-fallback-root': Components.SlotFallbackRootAttributes;
+    'slot-html': Components.SlotHtmlAttributes;
+    'slot-light-dom-content': Components.SlotLightDomContentAttributes;
+    'slot-light-dom-root': Components.SlotLightDomRootAttributes;
+    'slot-map-order': Components.SlotMapOrderAttributes;
+    'slot-map-order-root': Components.SlotMapOrderRootAttributes;
+    'slot-reorder': Components.SlotReorderAttributes;
+    'slot-reorder-root': Components.SlotReorderRootAttributes;
+    'slot-replace-wrapper': Components.SlotReplaceWrapperAttributes;
+    'slot-replace-wrapper-root': Components.SlotReplaceWrapperRootAttributes;
     'svg-attr': Components.SvgAttrAttributes;
     'svg-class': Components.SvgClassAttributes;
     'tag-3d-component': Components.Tag3dComponentAttributes;
     'tag-88': Components.Tag88Attributes;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
 
-  interface HTMLAttributeBasicRootElement extends Components.AttributeBasicRoot, HTMLStencilElement {}
-  var HTMLAttributeBasicRootElement: {
-    prototype: HTMLAttributeBasicRootElement;
-    new (): HTMLAttributeBasicRootElement;
-  };
+declare global {
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
   var HTMLAttributeBasicElement: {
@@ -563,16 +566,22 @@ declare global {
     new (): HTMLAttributeBasicElement;
   };
 
-  interface HTMLAttributeBooleanRootElement extends Components.AttributeBooleanRoot, HTMLStencilElement {}
-  var HTMLAttributeBooleanRootElement: {
-    prototype: HTMLAttributeBooleanRootElement;
-    new (): HTMLAttributeBooleanRootElement;
+  interface HTMLAttributeBasicRootElement extends Components.AttributeBasicRoot, HTMLStencilElement {}
+  var HTMLAttributeBasicRootElement: {
+    prototype: HTMLAttributeBasicRootElement;
+    new (): HTMLAttributeBasicRootElement;
   };
 
   interface HTMLAttributeBooleanElement extends Components.AttributeBoolean, HTMLStencilElement {}
   var HTMLAttributeBooleanElement: {
     prototype: HTMLAttributeBooleanElement;
     new (): HTMLAttributeBooleanElement;
+  };
+
+  interface HTMLAttributeBooleanRootElement extends Components.AttributeBooleanRoot, HTMLStencilElement {}
+  var HTMLAttributeBooleanRootElement: {
+    prototype: HTMLAttributeBooleanRootElement;
+    new (): HTMLAttributeBooleanRootElement;
   };
 
   interface HTMLAttributeComplexElement extends Components.AttributeComplex, HTMLStencilElement {}
@@ -599,28 +608,34 @@ declare global {
     new (): HTMLConditionalBasicElement;
   };
 
-  interface HTMLConditionalRerenderRootElement extends Components.ConditionalRerenderRoot, HTMLStencilElement {}
-  var HTMLConditionalRerenderRootElement: {
-    prototype: HTMLConditionalRerenderRootElement;
-    new (): HTMLConditionalRerenderRootElement;
-  };
-
   interface HTMLConditionalRerenderElement extends Components.ConditionalRerender, HTMLStencilElement {}
   var HTMLConditionalRerenderElement: {
     prototype: HTMLConditionalRerenderElement;
     new (): HTMLConditionalRerenderElement;
   };
 
-  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLStencilElement {}
-  var HTMLCssVariablesRootElement: {
-    prototype: HTMLCssVariablesRootElement;
-    new (): HTMLCssVariablesRootElement;
+  interface HTMLConditionalRerenderRootElement extends Components.ConditionalRerenderRoot, HTMLStencilElement {}
+  var HTMLConditionalRerenderRootElement: {
+    prototype: HTMLConditionalRerenderRootElement;
+    new (): HTMLConditionalRerenderRootElement;
+  };
+
+  interface HTMLCssCmpElement extends Components.CssCmp, HTMLStencilElement {}
+  var HTMLCssCmpElement: {
+    prototype: HTMLCssCmpElement;
+    new (): HTMLCssCmpElement;
   };
 
   interface HTMLCssVariablesElement extends Components.CssVariables, HTMLStencilElement {}
   var HTMLCssVariablesElement: {
     prototype: HTMLCssVariablesElement;
     new (): HTMLCssVariablesElement;
+  };
+
+  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLStencilElement {}
+  var HTMLCssVariablesRootElement: {
+    prototype: HTMLCssVariablesRootElement;
+    new (): HTMLCssVariablesRootElement;
   };
 
   interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {}
@@ -677,16 +692,16 @@ declare global {
     new (): HTMLInitCssRootElement;
   };
 
-  interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLStencilElement {}
-  var HTMLKeyReorderRootElement: {
-    prototype: HTMLKeyReorderRootElement;
-    new (): HTMLKeyReorderRootElement;
-  };
-
   interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {}
   var HTMLKeyReorderElement: {
     prototype: HTMLKeyReorderElement;
     new (): HTMLKeyReorderElement;
+  };
+
+  interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLStencilElement {}
+  var HTMLKeyReorderRootElement: {
+    prototype: HTMLKeyReorderRootElement;
+    new (): HTMLKeyReorderRootElement;
   };
 
   interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
@@ -761,16 +776,16 @@ declare global {
     new (): HTMLLifecycleUpdateCElement;
   };
 
-  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {}
-  var HTMLListenJsxRootElement: {
-    prototype: HTMLListenJsxRootElement;
-    new (): HTMLListenJsxRootElement;
-  };
-
   interface HTMLListenJsxElement extends Components.ListenJsx, HTMLStencilElement {}
   var HTMLListenJsxElement: {
     prototype: HTMLListenJsxElement;
     new (): HTMLListenJsxElement;
+  };
+
+  interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {}
+  var HTMLListenJsxRootElement: {
+    prototype: HTMLListenJsxRootElement;
+    new (): HTMLListenJsxRootElement;
   };
 
   interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {}
@@ -791,10 +806,10 @@ declare global {
     new (): HTMLReflectToAttrElement;
   };
 
-  interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {}
-  var HTMLScopedBasicRootElement: {
-    prototype: HTMLScopedBasicRootElement;
-    new (): HTMLScopedBasicRootElement;
+  interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
+  var HTMLSassCmpElement: {
+    prototype: HTMLSassCmpElement;
+    new (): HTMLSassCmpElement;
   };
 
   interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {}
@@ -803,10 +818,10 @@ declare global {
     new (): HTMLScopedBasicElement;
   };
 
-  interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {}
-  var HTMLShadowDomArrayRootElement: {
-    prototype: HTMLShadowDomArrayRootElement;
-    new (): HTMLShadowDomArrayRootElement;
+  interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {}
+  var HTMLScopedBasicRootElement: {
+    prototype: HTMLScopedBasicRootElement;
+    new (): HTMLScopedBasicRootElement;
   };
 
   interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {}
@@ -815,10 +830,10 @@ declare global {
     new (): HTMLShadowDomArrayElement;
   };
 
-  interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {}
-  var HTMLShadowDomBasicRootElement: {
-    prototype: HTMLShadowDomBasicRootElement;
-    new (): HTMLShadowDomBasicRootElement;
+  interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {}
+  var HTMLShadowDomArrayRootElement: {
+    prototype: HTMLShadowDomArrayRootElement;
+    new (): HTMLShadowDomArrayRootElement;
   };
 
   interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {}
@@ -827,10 +842,10 @@ declare global {
     new (): HTMLShadowDomBasicElement;
   };
 
-  interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {}
-  var HTMLShadowDomModeRootElement: {
-    prototype: HTMLShadowDomModeRootElement;
-    new (): HTMLShadowDomModeRootElement;
+  interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {}
+  var HTMLShadowDomBasicRootElement: {
+    prototype: HTMLShadowDomBasicRootElement;
+    new (): HTMLShadowDomBasicRootElement;
   };
 
   interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {}
@@ -839,16 +854,16 @@ declare global {
     new (): HTMLShadowDomModeElement;
   };
 
+  interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {}
+  var HTMLShadowDomModeRootElement: {
+    prototype: HTMLShadowDomModeRootElement;
+    new (): HTMLShadowDomModeRootElement;
+  };
+
   interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {}
   var HTMLShadowDomSlotBasicElement: {
     prototype: HTMLShadowDomSlotBasicElement;
     new (): HTMLShadowDomSlotBasicElement;
-  };
-
-  interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLStencilElement {}
-  var HTMLShadowDomSlotNestedRootElement: {
-    prototype: HTMLShadowDomSlotNestedRootElement;
-    new (): HTMLShadowDomSlotNestedRootElement;
   };
 
   interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {}
@@ -857,16 +872,16 @@ declare global {
     new (): HTMLShadowDomSlotNestedElement;
   };
 
+  interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLStencilElement {}
+  var HTMLShadowDomSlotNestedRootElement: {
+    prototype: HTMLShadowDomSlotNestedRootElement;
+    new (): HTMLShadowDomSlotNestedRootElement;
+  };
+
   interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLStencilElement {}
   var HTMLSlotArrayBasicElement: {
     prototype: HTMLSlotArrayBasicElement;
     new (): HTMLSlotArrayBasicElement;
-  };
-
-  interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {}
-  var HTMLSlotArrayComplexRootElement: {
-    prototype: HTMLSlotArrayComplexRootElement;
-    new (): HTMLSlotArrayComplexRootElement;
   };
 
   interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLStencilElement {}
@@ -875,28 +890,16 @@ declare global {
     new (): HTMLSlotArrayComplexElement;
   };
 
+  interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {}
+  var HTMLSlotArrayComplexRootElement: {
+    prototype: HTMLSlotArrayComplexRootElement;
+    new (): HTMLSlotArrayComplexRootElement;
+  };
+
   interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {}
   var HTMLSlotArrayTopElement: {
     prototype: HTMLSlotArrayTopElement;
     new (): HTMLSlotArrayTopElement;
-  };
-
-  interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLStencilElement {}
-  var HTMLSlotBasicOrderRootElement: {
-    prototype: HTMLSlotBasicOrderRootElement;
-    new (): HTMLSlotBasicOrderRootElement;
-  };
-
-  interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {}
-  var HTMLSlotBasicOrderElement: {
-    prototype: HTMLSlotBasicOrderElement;
-    new (): HTMLSlotBasicOrderElement;
-  };
-
-  interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLStencilElement {}
-  var HTMLSlotBasicRootElement: {
-    prototype: HTMLSlotBasicRootElement;
-    new (): HTMLSlotBasicRootElement;
   };
 
   interface HTMLSlotBasicElement extends Components.SlotBasic, HTMLStencilElement {}
@@ -905,10 +908,22 @@ declare global {
     new (): HTMLSlotBasicElement;
   };
 
-  interface HTMLSlotDynamicWrapperRootElement extends Components.SlotDynamicWrapperRoot, HTMLStencilElement {}
-  var HTMLSlotDynamicWrapperRootElement: {
-    prototype: HTMLSlotDynamicWrapperRootElement;
-    new (): HTMLSlotDynamicWrapperRootElement;
+  interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {}
+  var HTMLSlotBasicOrderElement: {
+    prototype: HTMLSlotBasicOrderElement;
+    new (): HTMLSlotBasicOrderElement;
+  };
+
+  interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLStencilElement {}
+  var HTMLSlotBasicOrderRootElement: {
+    prototype: HTMLSlotBasicOrderRootElement;
+    new (): HTMLSlotBasicOrderRootElement;
+  };
+
+  interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLStencilElement {}
+  var HTMLSlotBasicRootElement: {
+    prototype: HTMLSlotBasicRootElement;
+    new (): HTMLSlotBasicRootElement;
   };
 
   interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLStencilElement {}
@@ -917,10 +932,10 @@ declare global {
     new (): HTMLSlotDynamicWrapperElement;
   };
 
-  interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {}
-  var HTMLSlotFallbackRootElement: {
-    prototype: HTMLSlotFallbackRootElement;
-    new (): HTMLSlotFallbackRootElement;
+  interface HTMLSlotDynamicWrapperRootElement extends Components.SlotDynamicWrapperRoot, HTMLStencilElement {}
+  var HTMLSlotDynamicWrapperRootElement: {
+    prototype: HTMLSlotDynamicWrapperRootElement;
+    new (): HTMLSlotDynamicWrapperRootElement;
   };
 
   interface HTMLSlotFallbackElement extends Components.SlotFallback, HTMLStencilElement {}
@@ -929,16 +944,16 @@ declare global {
     new (): HTMLSlotFallbackElement;
   };
 
+  interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {}
+  var HTMLSlotFallbackRootElement: {
+    prototype: HTMLSlotFallbackRootElement;
+    new (): HTMLSlotFallbackRootElement;
+  };
+
   interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {}
   var HTMLSlotHtmlElement: {
     prototype: HTMLSlotHtmlElement;
     new (): HTMLSlotHtmlElement;
-  };
-
-  interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLStencilElement {}
-  var HTMLSlotLightDomRootElement: {
-    prototype: HTMLSlotLightDomRootElement;
-    new (): HTMLSlotLightDomRootElement;
   };
 
   interface HTMLSlotLightDomContentElement extends Components.SlotLightDomContent, HTMLStencilElement {}
@@ -947,10 +962,10 @@ declare global {
     new (): HTMLSlotLightDomContentElement;
   };
 
-  interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLStencilElement {}
-  var HTMLSlotMapOrderRootElement: {
-    prototype: HTMLSlotMapOrderRootElement;
-    new (): HTMLSlotMapOrderRootElement;
+  interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLStencilElement {}
+  var HTMLSlotLightDomRootElement: {
+    prototype: HTMLSlotLightDomRootElement;
+    new (): HTMLSlotLightDomRootElement;
   };
 
   interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {}
@@ -959,10 +974,10 @@ declare global {
     new (): HTMLSlotMapOrderElement;
   };
 
-  interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLStencilElement {}
-  var HTMLSlotReorderRootElement: {
-    prototype: HTMLSlotReorderRootElement;
-    new (): HTMLSlotReorderRootElement;
+  interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLStencilElement {}
+  var HTMLSlotMapOrderRootElement: {
+    prototype: HTMLSlotMapOrderRootElement;
+    new (): HTMLSlotMapOrderRootElement;
   };
 
   interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {}
@@ -971,10 +986,10 @@ declare global {
     new (): HTMLSlotReorderElement;
   };
 
-  interface HTMLSlotReplaceWrapperRootElement extends Components.SlotReplaceWrapperRoot, HTMLStencilElement {}
-  var HTMLSlotReplaceWrapperRootElement: {
-    prototype: HTMLSlotReplaceWrapperRootElement;
-    new (): HTMLSlotReplaceWrapperRootElement;
+  interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLStencilElement {}
+  var HTMLSlotReorderRootElement: {
+    prototype: HTMLSlotReorderRootElement;
+    new (): HTMLSlotReorderRootElement;
   };
 
   interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLStencilElement {}
@@ -983,16 +998,10 @@ declare global {
     new (): HTMLSlotReplaceWrapperElement;
   };
 
-  interface HTMLCssCmpElement extends Components.CssCmp, HTMLStencilElement {}
-  var HTMLCssCmpElement: {
-    prototype: HTMLCssCmpElement;
-    new (): HTMLCssCmpElement;
-  };
-
-  interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
-  var HTMLSassCmpElement: {
-    prototype: HTMLSassCmpElement;
-    new (): HTMLSassCmpElement;
+  interface HTMLSlotReplaceWrapperRootElement extends Components.SlotReplaceWrapperRoot, HTMLStencilElement {}
+  var HTMLSlotReplaceWrapperRootElement: {
+    prototype: HTMLSlotReplaceWrapperRootElement;
+    new (): HTMLSlotReplaceWrapperRootElement;
   };
 
   interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {}
@@ -1018,20 +1027,20 @@ declare global {
     prototype: HTMLTag88Element;
     new (): HTMLTag88Element;
   };
-
   interface HTMLElementTagNameMap {
-    'attribute-basic-root': HTMLAttributeBasicRootElement
     'attribute-basic': HTMLAttributeBasicElement
-    'attribute-boolean-root': HTMLAttributeBooleanRootElement
+    'attribute-basic-root': HTMLAttributeBasicRootElement
     'attribute-boolean': HTMLAttributeBooleanElement
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement
     'attribute-complex': HTMLAttributeComplexElement
     'attribute-host': HTMLAttributeHostElement
     'attribute-html-root': HTMLAttributeHtmlRootElement
     'conditional-basic': HTMLConditionalBasicElement
-    'conditional-rerender-root': HTMLConditionalRerenderRootElement
     'conditional-rerender': HTMLConditionalRerenderElement
-    'css-variables-root': HTMLCssVariablesRootElement
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement
+    'css-cmp': HTMLCssCmpElement
     'css-variables': HTMLCssVariablesElement
+    'css-variables-root': HTMLCssVariablesRootElement
     'custom-event-root': HTMLCustomEventRootElement
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
@@ -1041,8 +1050,8 @@ declare global {
     'external-import-b': HTMLExternalImportBElement
     'external-import-c': HTMLExternalImportCElement
     'init-css-root': HTMLInitCssRootElement
-    'key-reorder-root': HTMLKeyReorderRootElement
     'key-reorder': HTMLKeyReorderElement
+    'key-reorder-root': HTMLKeyReorderRootElement
     'lifecycle-async-a': HTMLLifecycleAsyncAElement
     'lifecycle-async-b': HTMLLifecycleAsyncBElement
     'lifecycle-async-c': HTMLLifecycleAsyncCElement
@@ -1055,45 +1064,44 @@ declare global {
     'lifecycle-update-a': HTMLLifecycleUpdateAElement
     'lifecycle-update-b': HTMLLifecycleUpdateBElement
     'lifecycle-update-c': HTMLLifecycleUpdateCElement
-    'listen-jsx-root': HTMLListenJsxRootElement
     'listen-jsx': HTMLListenJsxElement
+    'listen-jsx-root': HTMLListenJsxRootElement
     'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
     'reflect-to-attr': HTMLReflectToAttrElement
-    'scoped-basic-root': HTMLScopedBasicRootElement
-    'scoped-basic': HTMLScopedBasicElement
-    'shadow-dom-array-root': HTMLShadowDomArrayRootElement
-    'shadow-dom-array': HTMLShadowDomArrayElement
-    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
-    'shadow-dom-basic': HTMLShadowDomBasicElement
-    'shadow-dom-mode-root': HTMLShadowDomModeRootElement
-    'shadow-dom-mode': HTMLShadowDomModeElement
-    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement
-    'slot-array-basic': HTMLSlotArrayBasicElement
-    'slot-array-complex-root': HTMLSlotArrayComplexRootElement
-    'slot-array-complex': HTMLSlotArrayComplexElement
-    'slot-array-top': HTMLSlotArrayTopElement
-    'slot-basic-order-root': HTMLSlotBasicOrderRootElement
-    'slot-basic-order': HTMLSlotBasicOrderElement
-    'slot-basic-root': HTMLSlotBasicRootElement
-    'slot-basic': HTMLSlotBasicElement
-    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement
-    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement
-    'slot-fallback-root': HTMLSlotFallbackRootElement
-    'slot-fallback': HTMLSlotFallbackElement
-    'slot-html': HTMLSlotHtmlElement
-    'slot-light-dom-root': HTMLSlotLightDomRootElement
-    'slot-light-dom-content': HTMLSlotLightDomContentElement
-    'slot-map-order-root': HTMLSlotMapOrderRootElement
-    'slot-map-order': HTMLSlotMapOrderElement
-    'slot-reorder-root': HTMLSlotReorderRootElement
-    'slot-reorder': HTMLSlotReorderElement
-    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement
-    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement
-    'css-cmp': HTMLCssCmpElement
     'sass-cmp': HTMLSassCmpElement
+    'scoped-basic': HTMLScopedBasicElement
+    'scoped-basic-root': HTMLScopedBasicRootElement
+    'shadow-dom-array': HTMLShadowDomArrayElement
+    'shadow-dom-array-root': HTMLShadowDomArrayRootElement
+    'shadow-dom-basic': HTMLShadowDomBasicElement
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
+    'shadow-dom-mode': HTMLShadowDomModeElement
+    'shadow-dom-mode-root': HTMLShadowDomModeRootElement
+    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement
+    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement
+    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement
+    'slot-array-basic': HTMLSlotArrayBasicElement
+    'slot-array-complex': HTMLSlotArrayComplexElement
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement
+    'slot-array-top': HTMLSlotArrayTopElement
+    'slot-basic': HTMLSlotBasicElement
+    'slot-basic-order': HTMLSlotBasicOrderElement
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement
+    'slot-basic-root': HTMLSlotBasicRootElement
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement
+    'slot-fallback': HTMLSlotFallbackElement
+    'slot-fallback-root': HTMLSlotFallbackRootElement
+    'slot-html': HTMLSlotHtmlElement
+    'slot-light-dom-content': HTMLSlotLightDomContentElement
+    'slot-light-dom-root': HTMLSlotLightDomRootElement
+    'slot-map-order': HTMLSlotMapOrderElement
+    'slot-map-order-root': HTMLSlotMapOrderRootElement
+    'slot-reorder': HTMLSlotReorderElement
+    'slot-reorder-root': HTMLSlotReorderRootElement
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement
     'svg-attr': HTMLSvgAttrElement
     'svg-class': HTMLSvgClassElement
     'tag-3d-component': HTMLTag3dComponentElement
@@ -1101,18 +1109,19 @@ declare global {
   }
 
   interface ElementTagNameMap {
-    'attribute-basic-root': HTMLAttributeBasicRootElement;
     'attribute-basic': HTMLAttributeBasicElement;
-    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
+    'attribute-basic-root': HTMLAttributeBasicRootElement;
     'attribute-boolean': HTMLAttributeBooleanElement;
+    'attribute-boolean-root': HTMLAttributeBooleanRootElement;
     'attribute-complex': HTMLAttributeComplexElement;
     'attribute-host': HTMLAttributeHostElement;
     'attribute-html-root': HTMLAttributeHtmlRootElement;
     'conditional-basic': HTMLConditionalBasicElement;
-    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
     'conditional-rerender': HTMLConditionalRerenderElement;
-    'css-variables-root': HTMLCssVariablesRootElement;
+    'conditional-rerender-root': HTMLConditionalRerenderRootElement;
+    'css-cmp': HTMLCssCmpElement;
     'css-variables': HTMLCssVariablesElement;
+    'css-variables-root': HTMLCssVariablesRootElement;
     'custom-event-root': HTMLCustomEventRootElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
@@ -1122,8 +1131,8 @@ declare global {
     'external-import-b': HTMLExternalImportBElement;
     'external-import-c': HTMLExternalImportCElement;
     'init-css-root': HTMLInitCssRootElement;
-    'key-reorder-root': HTMLKeyReorderRootElement;
     'key-reorder': HTMLKeyReorderElement;
+    'key-reorder-root': HTMLKeyReorderRootElement;
     'lifecycle-async-a': HTMLLifecycleAsyncAElement;
     'lifecycle-async-b': HTMLLifecycleAsyncBElement;
     'lifecycle-async-c': HTMLLifecycleAsyncCElement;
@@ -1136,49 +1145,48 @@ declare global {
     'lifecycle-update-a': HTMLLifecycleUpdateAElement;
     'lifecycle-update-b': HTMLLifecycleUpdateBElement;
     'lifecycle-update-c': HTMLLifecycleUpdateCElement;
-    'listen-jsx-root': HTMLListenJsxRootElement;
     'listen-jsx': HTMLListenJsxElement;
+    'listen-jsx-root': HTMLListenJsxRootElement;
     'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
-    'scoped-basic-root': HTMLScopedBasicRootElement;
-    'scoped-basic': HTMLScopedBasicElement;
-    'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
-    'shadow-dom-array': HTMLShadowDomArrayElement;
-    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
-    'shadow-dom-basic': HTMLShadowDomBasicElement;
-    'shadow-dom-mode-root': HTMLShadowDomModeRootElement;
-    'shadow-dom-mode': HTMLShadowDomModeElement;
-    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
-    'slot-array-basic': HTMLSlotArrayBasicElement;
-    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
-    'slot-array-complex': HTMLSlotArrayComplexElement;
-    'slot-array-top': HTMLSlotArrayTopElement;
-    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
-    'slot-basic-order': HTMLSlotBasicOrderElement;
-    'slot-basic-root': HTMLSlotBasicRootElement;
-    'slot-basic': HTMLSlotBasicElement;
-    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
-    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
-    'slot-fallback-root': HTMLSlotFallbackRootElement;
-    'slot-fallback': HTMLSlotFallbackElement;
-    'slot-html': HTMLSlotHtmlElement;
-    'slot-light-dom-root': HTMLSlotLightDomRootElement;
-    'slot-light-dom-content': HTMLSlotLightDomContentElement;
-    'slot-map-order-root': HTMLSlotMapOrderRootElement;
-    'slot-map-order': HTMLSlotMapOrderElement;
-    'slot-reorder-root': HTMLSlotReorderRootElement;
-    'slot-reorder': HTMLSlotReorderElement;
-    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
-    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
-    'css-cmp': HTMLCssCmpElement;
     'sass-cmp': HTMLSassCmpElement;
+    'scoped-basic': HTMLScopedBasicElement;
+    'scoped-basic-root': HTMLScopedBasicRootElement;
+    'shadow-dom-array': HTMLShadowDomArrayElement;
+    'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
+    'shadow-dom-basic': HTMLShadowDomBasicElement;
+    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement;
+    'shadow-dom-mode': HTMLShadowDomModeElement;
+    'shadow-dom-mode-root': HTMLShadowDomModeRootElement;
+    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
+    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
+    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
+    'slot-array-basic': HTMLSlotArrayBasicElement;
+    'slot-array-complex': HTMLSlotArrayComplexElement;
+    'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
+    'slot-array-top': HTMLSlotArrayTopElement;
+    'slot-basic': HTMLSlotBasicElement;
+    'slot-basic-order': HTMLSlotBasicOrderElement;
+    'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
+    'slot-basic-root': HTMLSlotBasicRootElement;
+    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
+    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
+    'slot-fallback': HTMLSlotFallbackElement;
+    'slot-fallback-root': HTMLSlotFallbackRootElement;
+    'slot-html': HTMLSlotHtmlElement;
+    'slot-light-dom-content': HTMLSlotLightDomContentElement;
+    'slot-light-dom-root': HTMLSlotLightDomRootElement;
+    'slot-map-order': HTMLSlotMapOrderElement;
+    'slot-map-order-root': HTMLSlotMapOrderRootElement;
+    'slot-reorder': HTMLSlotReorderElement;
+    'slot-reorder-root': HTMLSlotReorderRootElement;
+    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
+    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
     'svg-attr': HTMLSvgAttrElement;
     'svg-class': HTMLSvgClassElement;
     'tag-3d-component': HTMLTag3dComponentElement;
     'tag-88': HTMLTag88Element;
   }
-
 }
+

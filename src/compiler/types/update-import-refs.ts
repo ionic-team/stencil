@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { CompilerUpgrade, validateCollectionCompatibility } from '../transformers/collections/collection-compatibility';
 
 
 /**
@@ -79,45 +78,4 @@ function updateImportReferenceFactory(config: d.Config, allTypes: Map<string, nu
 
     return obj;
   };
-}
-
-
-export async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx, includeIntrinsicElements = false) {
-  const collections = compilerCtx.collections.map(collection => {
-    const upgrades = validateCollectionCompatibility(config, collection);
-    const shouldIncludeLocalIntrinsicElements = includeIntrinsicElements && upgrades.indexOf(CompilerUpgrade.Add_Local_Intrinsic_Elements) !== -1;
-    return getCollectionTypesImport(config, compilerCtx, collection, shouldIncludeLocalIntrinsicElements);
-  });
-
-  const collectionTypes = await Promise.all(collections);
-  return collectionTypes;
-}
-
-
-async function getCollectionTypesImport(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.Collection, includeIntrinsicElements = false) {
-  let typeImport = null;
-
-  try {
-    const collectionDir = collection.moduleDir;
-    const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
-
-    const pkgJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
-    const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
-
-    if (pkgData.types && pkgData.collection) {
-      typeImport = {
-        pkgName: pkgData.name,
-        includeIntrinsicElements
-      };
-    }
-
-  } catch (e) {
-    config.logger.debug(`getCollectionTypesImport: ${e}`);
-  }
-
-  if (typeImport == null) {
-    config.logger.debug(`unabled to find "${collection.collectionName}" collection types`);
-  }
-
-  return typeImport;
 }

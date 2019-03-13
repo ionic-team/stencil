@@ -57,6 +57,10 @@ export function calculateRequiredUpgrades(config: d.Config, collectionVersion: s
     upgrades.push(CompilerUpgrade.Add_Local_Intrinsic_Elements);
   }
 
+  if (config.sys.semver.lt(collectionVersion, '1.0.0')) {
+    upgrades.push(CompilerUpgrade.Legacy_Global_JSX);
+  }
+
   return upgrades;
 }
 
@@ -66,5 +70,6 @@ export const enum CompilerUpgrade {
   Metadata_Upgrade_From_0_1_0,
   Remove_Stencil_Imports,
   Add_Component_Dependencies,
-  Add_Local_Intrinsic_Elements
+  Add_Local_Intrinsic_Elements,
+  Legacy_Global_JSX
 }

@@ -33,6 +33,8 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   // hold on to stuff we know is being used
   cleanModuleFileCache(compilerCtx);
 
+  buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
+
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!
     // create the components.d.ts file and write to disk
@@ -44,8 +46,6 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
       validateTypesMain(config, compilerCtx, buildCtx);
     }
   }
-
-  buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
 }
 
 

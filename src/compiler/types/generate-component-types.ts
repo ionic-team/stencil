@@ -41,14 +41,14 @@ interface ${tagNameAsPascal} {${
 interface ${jsxInterfaceName} extends JSXElements.HTMLAttributes {${
   stencilComponentJSXAttributes !== '' ? `\n${stencilComponentJSXAttributes}\n` : ''
 }}`,
-    global: `
+    global: cmp.isLegacy ? '' : `
 interface ${interfaceName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${interfaceName}: {
   prototype: ${interfaceName};
   new (): ${interfaceName};
 };`,
-    HTMLElementTagNameMap: `'${tagName}': ${interfaceName}`,
-    ElementTagNameMap: `'${tagName}': ${interfaceName};`,
+    HTMLElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${interfaceName}`,
+    ElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${interfaceName};`,
     IntrinsicElements: `'${tagName}': Components.${jsxInterfaceName};`
   };
 }

@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { COMPONENTS_DTS_HEADER, indentTypes, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
-import { getCollectionsTypeImports, updateReferenceTypeImports } from './update-import-refs';
-import { normalizePath } from '@utils';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath, getComponentsFromModules } from '../output-targets/output-utils';
+import { updateReferenceTypeImports } from './update-import-refs';
+import { normalizePath, sortBy } from '@utils';
 import { updateStencilTypesImports } from './stencil-types';
 
 
@@ -12,14 +12,9 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
 
-  const moduleFiles = compilerCtx.rootTsFiles
-    .slice()
-    .sort()
-    .map(tsFilePath => compilerCtx.moduleMap.get(tsFilePath))
-    .filter(m => m && m.cmps.length > 0);
 
   // Generate d.ts files for component types
-  let componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, moduleFiles, destination);
+  let componentTypesFileContent = await generateComponentTypesFile(config, buildCtx, destination);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
@@ -40,34 +35,35 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], destination: string) {
+async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx, destination: string) {
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
-  const defineGlobalIntrinsicElements = destination === 'src';
-  const collectionTypesImports = await getCollectionsTypeImports(config, compilerCtx, defineGlobalIntrinsicElements);
-  const collectionTypesImportsString = collectionTypesImports
-    .map(cti => `import '${cti.pkgName}';`)
-    .join('\n');
+  const isSrcTypes = destination === 'src';
+  const components = sortBy(
+    getComponentsFromModules(buildCtx.moduleFiles).filter(cmp => isSrcTypes || !cmp.isCollectionDependency),
+    cmp => cmp.tagName
+  );
 
-  const modules = moduleFiles.reduce((modules, moduleFile) => {
-    moduleFile.cmps.forEach(cmp => {
-      const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFile.sourceFilePath)
-          .replace(/\.(tsx|ts)$/, ''));
+  const modules: d.TypesModule[] = components.map(cmp => {
+    const importPath = normalizePath(config.sys.path.relative(config.srcDir, cmp.sourceFilePath)
+    .replace(/\.(tsx|ts)$/, ''));
+    typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, cmp.sourceFilePath);
 
-      typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, moduleFile.sourceFilePath);
+    return generateComponentTypes(cmp, importPath);
+  });
 
-      const cmpTypes = generateComponentTypes(cmp, importPath);
-      modules.push(cmpTypes);
-    });
-    return modules;
-  }, [] as d.TypesModule[]);
+  const jsxAugmentation = !isSrcTypes ? '' : `
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+`;
 
   const componentsFileString = `
 export namespace Components {
-${modules.map(m => {
-  return `${m.StencilComponents}${m.JSXElements}`;
-})
-.join('\n')}
+  ${modules.map(m => `${m.StencilComponents}${m.JSXElements}`).join('\n')}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -75,23 +71,26 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
+declare namespace LocalJSX {
+  interface ElementInterfaces {
+  ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
+  }
+
+  interface IntrinsicElements {
+  ${modules.map(m => m.IntrinsicElements).join('\n')}
+  }
+}
+export { LocalJSX as JSX };
+${jsxAugmentation}
 declare global {
-interface StencilElementInterfaces {
-${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
-}
+  ${modules.map(m => m.global).join('\n')}
+  interface HTMLElementTagNameMap {
+  ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
+  }
 
-interface StencilIntrinsicElements {
-${modules.map(m => m.IntrinsicElements).join('\n')}
-}
-
-${modules.map(m => m.global).join('\n')}
-
-interface HTMLElementTagNameMap {
-${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
-}
-
-interface ElementTagNameMap {
-${modules.map(m => m.ElementTagNameMap).join('\n')}
+  interface ElementTagNameMap {
+  ${modules.map(m => m.ElementTagNameMap).join('\n')}
+  }
 }
 `;
 
@@ -123,10 +122,8 @@ ${typeData.sort(sortImportNames).map(td => {
   const code = `
 import { JSXElements } from '@stencil/core';
 
-${collectionTypesImportsString}
 ${typeImportString}
 ${componentsFileString}
-}
 `;
   return `${COMPONENTS_DTS_HEADER}
 

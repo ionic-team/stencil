@@ -5,9 +5,10 @@ import { Component } from '@stencil/core';
 })
 export class HelloWorld {
 
+  private valuek = 12;
   render() {
     return (
-      'Hello World'
+      'Hello World' + this.valuek
     );
   }
 }
