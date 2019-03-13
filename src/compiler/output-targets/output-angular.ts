@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
+import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetAngular } from './output-utils';
 import { dashToPascalCase, sortBy } from '@utils';
-import { getComponentsFromModules, isOutputTargetAngular } from './output-utils';
 
 
 export async function outputAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

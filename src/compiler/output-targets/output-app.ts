@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
+import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
-import { getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
 import { dashToPascalCase, flatOne } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { performCopyTasks } from '../copy/copy-tasks';
@@ -11,7 +11,7 @@ import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

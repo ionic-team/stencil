@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isOutputTargetDistCollection } from './output-utils';
+import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
@@ -7,7 +7,7 @@ import { performCopyTasks } from '../copy/copy-tasks';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

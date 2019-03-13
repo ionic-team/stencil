@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
+import { canSkipAppCoreBuild, getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, isOutputTargetDist } from './output-utils';
 import { copyEsmCorePolyfills } from '../app-core/app-polyfills';
 import { dashToPascalCase } from '@utils';
-import { getComponentsEsmBuildPath, getComponentsEsmFileName, getCoreEsmFileName, getDefineCustomElementsPath, getDistEsmComponentsDir, getDistEsmDir, getDistEsmIndexPath, getLoaderEsmPath, isOutputTargetDist } from './output-utils';
 import { normalizePath } from '@utils';
 
 
 export async function outputEsmIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

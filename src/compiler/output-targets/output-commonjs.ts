@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist } from './output-utils';
+import { canSkipAppCoreBuild, isOutputTargetDist } from './output-utils';
 
 
 export async function outputCommonJsIndexes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

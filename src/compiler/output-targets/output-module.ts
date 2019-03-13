@@ -1,14 +1,14 @@
 import * as d from '../../declarations';
-import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
+import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
+import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { optimizeModule } from '../app-core/optimize-module';
 
 
 export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!buildCtx.requiresFullBuild && buildCtx.isRebuild && !buildCtx.hasScriptChanges) {
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 
