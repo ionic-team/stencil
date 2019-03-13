@@ -123,8 +123,34 @@ export class Compiler implements d.Compiler {
   trigger(eventName: 'dirAdd', path: string): void;
   trigger(eventName: 'dirDelete', path: string): void;
   trigger(eventName: d.CompilerEventName, ...args: any[]) {
-    args.unshift(eventName);
-    this.ctx.events.emit.apply(this.ctx.events, args);
+    const fsWatchResults: d.FsWatchResults = {
+      dirsAdded: [],
+      dirsDeleted: [],
+      filesAdded: [],
+      filesDeleted: [],
+      filesUpdated: []
+    };
+
+    switch (eventName) {
+      case 'fileUpdate':
+        fsWatchResults.filesUpdated.push(args[0]);
+        break;
+      case 'fileAdd':
+        fsWatchResults.filesAdded.push(args[0]);
+        break;
+      case 'fileDelete':
+        fsWatchResults.filesDeleted.push(args[0]);
+        break;
+      case 'dirAdd':
+        fsWatchResults.dirsAdded.push(args[0]);
+        break;
+      case 'dirDelete':
+        fsWatchResults.dirsDeleted.push(args[0]);
+        break;
+    }
+
+    this.ctx.events.emit('fsChange', fsWatchResults);
+    this.ctx.events.emit.apply(this.ctx.events, [eventName, ...args]);
   }
 
   docs() {

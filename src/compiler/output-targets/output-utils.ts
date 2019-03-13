@@ -103,4 +103,16 @@ export function getComponentsFromModules(moduleFiles: d.Module[]) {
   return flatOne(moduleFiles.map(m => m.cmps));
 }
 
+export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export const GENERATED_DTS = 'components.d.ts';
