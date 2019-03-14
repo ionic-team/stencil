@@ -26,7 +26,7 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
     sendMsg(process, {
       serverStated: {
         browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, '/'),
-        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, DEV_SERVER_INIT_URL)
+        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL)
       }
     });
 

@@ -14,6 +14,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
   config.flags.serve = true;
   config.devServer.openBrowser = flags.open;
   config.devServer.hotReplacement = false;
+  config.devServer.initialLoadUrl = '/';
   config.maxConcurrentWorkers = 1;
 
   config.devServer.root = process.cwd();
