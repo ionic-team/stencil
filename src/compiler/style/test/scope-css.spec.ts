@@ -300,31 +300,31 @@ describe('ShadowCss', function() {
 
     it('media query', () => {
       const input = `@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}`;
-      const expected = `@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}`;
+      const expected = `@media screen and (max-width:800px, max-height:100%) {div{font-size:50px;}}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 
     it('div', () => {
       const input = `/*!@div*/div.sc-ion-tag {}`;
-      const expected = `div {}`;
+      const expected = `div{}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 
     it('new lines', () => {
       const input = `/*!@div*/div.sc-ion-tag \n\n\n     \t{}`;
-      const expected = `div \n\n\n     \t{}`;
+      const expected = `div{}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 
     it(':host', () => {
       const input = `/*!@:host*/.a-h {}`;
-      const expected = `.a-h {}`;
+      const expected = `:host{}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 
     it('::slotted', () => {
       const input = `/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}`;
-      const expected = `::slotted(ul), ::slotted(li) {}`;
+      const expected = `::slotted(ul), ::slotted(li){}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 

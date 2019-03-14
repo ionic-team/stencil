@@ -1,3 +1,5 @@
+import { stringLiteral } from "@babel/types";
+
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -15,13 +17,18 @@ export class ShadowCss {
   shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false): string {
     const commentsWithHash = extractCommentsWithHash(cssText);
     cssText = stripComments(cssText);
-    const orgSelectors = new Map();
+    const orgSelectors: {
+      placeholder: string,
+      comment: string,
+    }[] = [];
 
     if (commentOriginalSelector) {
       const processCommentedSelector = (rule: CssRule) => {
-        const commentId = `/*!@_${orgSelectors.size}_*/`;
-        orgSelectors.set(rule.selector, commentId);
-        rule.selector = commentId + rule.selector;
+        const placeholder = `/*!@___${orgSelectors.length}___*/`;
+        const comment = `/*!@${rule.selector}*/`;
+
+        orgSelectors.push({ placeholder, comment });
+        rule.selector = placeholder + rule.selector;
         return rule;
       };
 
@@ -42,9 +49,8 @@ export class ShadowCss {
     cssText = [scopedCssText, ...commentsWithHash].join('\n');
 
     if (commentOriginalSelector) {
-      orgSelectors.forEach(commentId => {
-        const commentedOriginalSelector = `x`;
-        cssText = cssText.replace(commentId, commentedOriginalSelector);
+      orgSelectors.forEach(({placeholder, comment}) => {
+        cssText = cssText.replace(placeholder, comment);
       });
     }
 

@@ -78,4 +78,4 @@ export const getElementScopeId = (scopeId: string, isHostElement: boolean) =>
 
 
 export const convertScopedToShadow = (css: string) =>
-  css.replace(/\/\*!@([^/]*)\\*\/[^{]*{/g, '$1{');
+  css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
