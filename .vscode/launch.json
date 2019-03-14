@@ -25,6 +25,8 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
+        "--debug",
+        "--max-workers=1",
         "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
@@ -51,6 +53,29 @@
       "name": "Hello World Prerender",
       "args": [
         "${workspaceFolder}/test/hello-world/prerender.js"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Prerender Shadow",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--max-workers=1",
+        "--config",
+        "${workspaceFolder}/test/prerender-shadow/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Prerender Shadow Debug",
+      "args": [
+        "${workspaceFolder}/test/prerender-shadow/prerender.js"
       ],
       "protocol": "inspector"
     },

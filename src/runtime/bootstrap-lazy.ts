@@ -1,17 +1,24 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
+import { convertToShadowCss } from './client-hydrate';
 import { disconnectedCallback } from './disconnected-callback';
-import { getDoc, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { getDoc, getHead, getHostRef, registerHost, styles, supportsShadowDom } from '@platform';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
 import { HTMLElement } from './html-element';
 
+
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
   // bootstrapLazy
 
   const cmpTags: string[] = [];
+
+  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
+    getDoc().querySelectorAll('style[h-id]')
+      .forEach(convertToShadowCss);
+  }
 
   lazyBundles.forEach(lazyBundle =>
 
@@ -36,6 +43,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
                 // and this browser supports shadow dom
                 // add the read-only property "shadowRoot" to the host element
                 this.attachShadow({ 'mode': 'open' });
+
+                if (BUILD.hydrateClientSide) {
+                  const styleText = styles.get(cmpLazyMeta.t);
+                  if (styleText) {
+                    this.shadowRoot.innerHTML = `<style>${styleText}</style>`;
+                  }
+                }
               }
             }
 

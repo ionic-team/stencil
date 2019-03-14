@@ -64,7 +64,12 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
       if (style.modeName !== DEFAULT_STYLE_MODE) {
         styleId += `-${style.modeName}`;
       }
-      coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScoped}');`);
+
+      if (typeof style.compiledStyleTextScopedCommented === 'string') {
+        coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScopedCommented}');`);
+      } else {
+        coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScoped}');`);
+      }
     });
   });
 

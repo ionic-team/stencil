@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
 
 
-export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
   const cacheKey = getComponentStylesCacheKey(moduleFile, cmp, styleMeta.modeName);
 
   const cachedStyleMeta = compilerCtx.cachedStyleMeta.get(cacheKey);
@@ -32,6 +32,10 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
   const hasChangedImport = await isChangedStyleEntryImport(config, compilerCtx, buildCtx, styleMeta);
   if (hasChangedImport) {
     // one of the files that's imported by the style url changed
+    return null;
+  }
+
+  if (commentOriginalSelector && typeof cachedStyleMeta.compiledStyleTextScopedCommented !== 'string') {
     return null;
   }
 

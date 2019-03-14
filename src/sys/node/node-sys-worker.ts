@@ -48,9 +48,9 @@ export class NodeSystemWorker {
     return requestLatestCompilerVersion();
   }
 
-  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
+  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean) {
     const sc = new ShadowCss();
-    return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
+    return sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
   }
 
   transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {

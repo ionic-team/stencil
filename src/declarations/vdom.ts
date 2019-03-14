@@ -14,10 +14,6 @@ export interface VNode extends FVNode {
   elm?: any;
 }
 
-export interface HydrateVNode extends VNode {
-  hydrateFn?(vnode: HydrateVNode, useNativeShadowDom: boolean): any;
-}
-
 export interface VNodeData {
   class?: {[className: string]: boolean};
   style?: any;

@@ -1,221 +1,57 @@
 /**
- * This file is a port of shadow_css.ts from Angular,
- * which is a port of shadowCSS from webcomponents.js to TypeScript.
- * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
- */
-
-/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
- */
-
-/**
+ *
  * This file is a port of shadowCSS from webcomponents.js to TypeScript.
- *
- * Please make sure to keep to edits in sync with the source file.
- *
- * Source:
  * https://github.com/webcomponents/webcomponentsjs/blob/4efecd7e0e/src/ShadowCSS/ShadowCSS.js
- *
- * The original file level comment is reproduced below
+ * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
  */
-
-/*
-  This is a limited shim for ShadowDOM css styling.
-  https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/shadow/index.html#styles
-
-  The intention here is to support only the styling features which can be
-  relatively simply implemented. The goal is to allow users to avoid the
-  most obvious pitfalls and do so without compromising performance significantly.
-  For ShadowDOM styling that's not covered here, a set of best practices
-  can be provided that should allow users to accomplish more complex styling.
-
-  The following is a list of specific ShadowDOM styling features and a brief
-  discussion of the approach used to shim.
-
-  Shimmed features:
-
-  * :host, :host-context: ShadowDOM allows styling of the shadowRoot's host
-  element using the :host rule. To shim this feature, the :host styles are
-  reformatted and prefixed with a given scope name and promoted to a
-  document level stylesheet.
-  For example, given a scope name of .foo, a rule like this:
-
-  :host {
-        background: red;
-      }
-    }
-
-  becomes:
-
-    .foo {
-      background: red;
-    }
-
-  * encapsulation: Styles defined within ShadowDOM, apply only to
-  dom inside the ShadowDOM. Polymer uses one of two techniques to implement
-  this feature.
-
-  By default, rules are prefixed with the host element tag name
-  as a descendant selector. This ensures styling does not leak out of the 'top'
-  of the element's ShadowDOM. For example,
-
-  div {
-      font-weight: bold;
-    }
-
-  becomes:
-
-  x-foo div {
-      font-weight: bold;
-    }
-
-  becomes:
-
-
-  Alternatively, if WebComponents.ShadowCSS.strictStyling is set to true then
-  selectors are scoped by adding an attribute selector suffix to each
-  simple selector that contains the host element tag name. Each element
-  in the element's ShadowDOM template is also given the scope attribute.
-  Thus, these rules match only elements that have the scope attribute.
-  For example, given a scope name of x-foo, a rule like this:
-
-    div {
-      font-weight: bold;
-    }
-
-  becomes:
-
-    div[x-foo] {
-      font-weight: bold;
-    }
-
-  Note that elements that are dynamically added to a scope must have the scope
-  selector added to them manually.
-
-  * upper/lower bound encapsulation: Styles which are defined outside a
-  shadowRoot should not cross the ShadowDOM boundary and should not apply
-  inside a shadowRoot.
-
-  This styling behavior is not emulated. Some possible ways to do this that
-  were rejected due to complexity and/or performance concerns include: (1) reset
-  every possible property for every possible selector for a given scope name;
-  (2) re-implement css in javascript.
-
-  As an alternative, users should make sure to use selectors
-  specific to the scope in which they are working.
-
-  * ::distributed: This behavior is not emulated. It's often not necessary
-  to style the contents of a specific insertion point and instead, descendants
-  of the host element can be styled selectively. Users can also create an
-  extra node around an insertion point and style that node's contents
-  via descendent selectors. For example, with a shadowRoot like this:
-
-  <style>
-      ::content(div) {
-        background: red;
-      }
-    </style>
-    <content></content>
-
-  could become:
-
-    <style>
-      / *@polyfill .content-container div * /
-      ::content(div) {
-        background: red;
-      }
-    </style>
-    <div class="content-container">
-      <content></content>
-    </div>
-
-  Note the use of @polyfill in the comment above a ShadowDOM specific style
-  declaration. This is a directive to the styling shim to use the selector
-  in comments in lieu of the next selector when running under polyfill.
-*/
-
 export class ShadowCss {
   strictStyling = true;
 
-  /*
-  * Shim some cssText with the given selector. Returns cssText that can
-  * be included in the document via WebComponents.ShadowCSS.addCssToDocument(css).
-  *
-  * When strictStyling is true:
-  * - selector is the attribute added to all elements inside the host,
-  * - hostSelector is the attribute added to the host itself.
-  */
-  shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = ''): string {
+  shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false): string {
     const commentsWithHash = extractCommentsWithHash(cssText);
     cssText = stripComments(cssText);
-    cssText = this._insertDirectives(cssText);
+    const orgSelectors = new Map();
 
-    const scopedCssText = this._scopeCssText(cssText, scopeId, hostScopeId, slotScopeId);
-    return [scopedCssText, ...commentsWithHash].join('\n');
+    if (commentOriginalSelector) {
+      const processCommentedSelector = (rule: CssRule) => {
+        const commentId = `/*!@_${orgSelectors.size}_*/`;
+        orgSelectors.set(rule.selector, commentId);
+        rule.selector = commentId + rule.selector;
+        return rule;
+      };
+
+      cssText = processRules(cssText, rule => {
+        if (rule.selector[0] !== '@') {
+          return processCommentedSelector(rule);
+
+        } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') ||
+        rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+          rule.content = processRules(rule.content, processCommentedSelector);
+          return rule;
+        }
+        return rule;
+      });
+    }
+
+    const scopedCssText = this._scopeCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
+    cssText = [scopedCssText, ...commentsWithHash].join('\n');
+
+    if (commentOriginalSelector) {
+      orgSelectors.forEach(commentId => {
+        const commentedOriginalSelector = `x`;
+        cssText = cssText.replace(commentId, commentedOriginalSelector);
+      });
+    }
+
+    return cssText;
   }
 
-  private _insertDirectives(cssText: string): string {
-    cssText = this._insertPolyfillDirectivesInCssText(cssText);
-    return this._insertPolyfillRulesInCssText(cssText);
-  }
-
-  /*
-   * Process styles to convert native ShadowDOM rules that will trip
-   * up the css parser; we rely on decorating the stylesheet with inert rules.
-   *
-   * For example, we convert this rule:
-   *
-   * polyfill-next-selector { content: ':host menu-item'; }
-   * ::content menu-item {
-   *
-   * to this:
-   *
-   * scopeName menu-item {
-   *
-  **/
-  private _insertPolyfillDirectivesInCssText(cssText: string): string {
-    // Difference with webcomponents.js: does not handle comments
-    return cssText.replace(
-        _cssContentNextSelectorRe, function(...m: string[]) { return m[2] + '{'; });
-  }
-
-  /*
-   * Process styles to add rules which will only apply under the polyfill
-   *
-   * For example, we convert this rule:
-   *
-   * polyfill-rule {
-   *   content: ':host menu-item';
-   * ...
-   * }
-   *
-   * to this:
-   *
-   * scopeName menu-item {...}
-   *
-  **/
-  private _insertPolyfillRulesInCssText(cssText: string): string {
-    // Difference with webcomponents.js: does not handle comments
-    return cssText.replace(_cssContentRuleRe, (...m: string[]) => {
-      const rule = m[0].replace(m[1], '').replace(m[2], '');
-      return m[4] + rule;
-    });
-  }
-
-  /* Ensure styles are scoped. Pseudo-scoping takes a rule like:
-   *
-   *  .foo {... }
-   *
-   *  and converts this to
-   *
-   *  scopeName .foo { ... }
-  */
-  private _scopeCssText(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string): string {
-    const unscopedRules = this._extractUnscopedRulesFromCssText(cssText);
+  private _scopeCssText(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean): string {
     // replace :host and :host-context -shadowcsshost and -shadowcsshost respectively
     cssText = this._insertPolyfillHostInCssText(cssText);
     cssText = this._convertColonHost(cssText);
@@ -223,40 +59,12 @@ export class ShadowCss {
     cssText = this._convertColonSlotted(cssText, slotScopeId);
     cssText = this._convertShadowDOMSelectors(cssText);
     if (scopeId) {
-      cssText = this._scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId);
+      cssText = this._scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
     }
-    cssText = cssText + '\n' + unscopedRules;
 
     cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
     cssText = cssText.replace(/>\s*\*\s+([^{, ]+)/gm, ' $1 ');
     return cssText.trim();
-  }
-
-  /*
-   * Process styles to add rules which will only apply under the polyfill
-   * and do not process via CSSOM. (CSSOM is destructive to rules on rare
-   * occasions, e.g. -webkit-calc on Safari.)
-   * For example, we convert this rule:
-   *
-   * @polyfill-unscoped-rule {
-   *   content: 'menu-item';
-   * ... }
-   *
-   * to this:
-   *
-   * menu-item {...}
-   *
-  **/
-  private _extractUnscopedRulesFromCssText(cssText: string): string {
-    // Difference with webcomponents.js: does not handle comments
-    let r = '';
-    let m: RegExpExecArray|null;
-    _cssContentUnscopedRuleRe.lastIndex = 0;
-    while ((m = _cssContentUnscopedRuleRe.exec(cssText)) !== null) {
-      const rule = m[0].replace(m[2], '').replace(m[1], m[4]);
-      r += rule + '\n\n';
-    }
-    return r;
   }
 
   /*
@@ -350,7 +158,7 @@ export class ShadowCss {
   }
 
   // change a selector like 'div' to 'name div'
-  private _scopeSelectors(cssText: string, scopeSelector: string, hostSelector: string, slotSelector: string): string {
+  private _scopeSelectors(cssText: string, scopeSelector: string, hostSelector: string, slotSelector: string, commentOriginalSelector: boolean): string {
     return processRules(cssText, (rule: CssRule) => {
       let selector = rule.selector;
       let content = rule.content;
@@ -360,8 +168,11 @@ export class ShadowCss {
       } else if (
           rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') ||
           rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
-        content = this._scopeSelectors(rule.content, scopeSelector, hostSelector, slotSelector);
+        content = this._scopeSelectors(rule.content, scopeSelector, hostSelector, slotSelector, commentOriginalSelector);
       }
+
+      selector = selector.replace(/\s{2,}/g, ' ').trim();
+
       return new CssRule(selector, content);
     });
   }
@@ -370,24 +181,18 @@ export class ShadowCss {
       selector: string, scopeSelector: string, hostSelector: string, slotSelector: string, strict: boolean) {
 
     return selector.split(',')
-        .map(part => part.trim().split(_shadowDeepSelectors))
-        .map((deepParts) => {
-          const [shallowPart, ...otherParts] = deepParts;
-          const applyScope = (shallowPart: string) => {
+        .map(shallowPart => {
+          if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
+            return shallowPart.trim();
+          }
 
-            if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
-              return shallowPart;
-            }
-
-            if (this._selectorNeedsScoping(shallowPart, scopeSelector)) {
-              return strict ?
-                  this._applyStrictSelectorScope(shallowPart, scopeSelector, hostSelector) :
-                  this._applySelectorScope(shallowPart, scopeSelector, hostSelector);
-            } else {
-              return shallowPart;
-            }
-          };
-          return [applyScope(shallowPart), ...otherParts].join(' ');
+          if (this._selectorNeedsScoping(shallowPart, scopeSelector)) {
+            return strict ?
+                this._applyStrictSelectorScope(shallowPart, scopeSelector, hostSelector).trim() :
+                this._applySelectorScope(shallowPart, scopeSelector, hostSelector).trim();
+          } else {
+            return shallowPart.trim();
+          }
         })
         .join(', ');
   }
@@ -541,11 +346,6 @@ class SafeSelector {
   content(): string { return this._content; }
 }
 
-const _cssContentNextSelectorRe =
-    /polyfill-next-selector[^}]*content:[\s]*?(['"])(.*?)\1[;\s]*}([^{]*?){/gim;
-const _cssContentRuleRe = /(polyfill-rule)[^}]*(content:[\s]*(['"])(.*?)\3)[;\s]*[^}]*}/gim;
-const _cssContentUnscopedRuleRe =
-    /(polyfill-unscoped-rule)[^}]*(content:[\s]*(['"])(.*?)\3)[;\s]*[^}]*}/gim;
 const _polyfillHost = '-shadowcsshost';
 const _polyfillSlotted = '-shadowcssslotted';
 // note: :host-context pre-processed to -shadowcsshostcontext.
@@ -560,16 +360,9 @@ const _polyfillHostNoCombinator = _polyfillHost + '-no-combinator';
 const _polyfillHostNoCombinatorRe = /-shadowcsshost-no-combinator([^\s]*)/;
 const _shadowDOMSelectorsRe = [
   /::shadow/g,
-  /::content/g,
-  // Deprecated selectors
-  /\/shadow-deep\//g,
-  /\/shadow\//g,
+  /::content/g
 ];
 
-// The deep combinator is deprecated in the CSS spec
-// Support for `>>>`, `deep`, `::ng-deep` is then also deprecated and will be removed in the future.
-// see https://github.com/angular/angular/pull/17677
-const _shadowDeepSelectors = /(?:>>>)|(?:\/deep\/)|(?:::ng-deep)/g;
 const _selectorReSuffix = '([>\\s~+\[.,{:][\\s\\S]*)?$';
 const _polyfillHostRe = /-shadowcsshost/gim;
 const _colonHostRe = /:host/gim;
@@ -594,11 +387,11 @@ const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
 
-export class CssRule {
+class CssRule {
   constructor(public selector: string, public content: string) {}
 }
 
-export function processRules(input: string, ruleCallback: (rule: CssRule) => CssRule): string {
+function processRules(input: string, ruleCallback: (rule: CssRule) => CssRule): string {
   const inputWithEscapedBlocks = escapeBlocks(input);
   let nextBlockIndex = 0;
   return inputWithEscapedBlocks.escapedString.replace(_ruleRe, function(...m: string[]) {

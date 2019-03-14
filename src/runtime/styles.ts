@@ -31,15 +31,24 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     }
 
     if (!appliedStyles.has(styleId)) {
-      dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
+      if (BUILD.hydrateClientSide && elm.shadowRoot && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
+        styleElm.innerHTML = styles.get(styleId);
 
-      styleElm = getDoc(elm).createElement('style');
-      styleElm.innerHTML = styles.get(styleId);
+      } else {
+        dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
 
-      styleContainerNode.insertBefore(
-        styleElm,
-        (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild
-      );
+        styleElm = getDoc(elm).createElement('style');
+        styleElm.innerHTML = styles.get(styleId);
+
+        if (BUILD.hydrateServerSide) {
+          styleElm.setAttribute('h-id', cmpMeta.t);
+        }
+
+        styleContainerNode.insertBefore(
+          styleElm,
+          (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild
+        );
+      }
 
       appliedStyles.add(styleId);
     }
@@ -66,3 +75,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 
 export const getElementScopeId = (scopeId: string, isHostElement: boolean) =>
   scopeId + (isHostElement ? '-h' : '-s');
+
+
+export const convertScopedToShadow = (css: string) =>
+  css.replace(/\/\*!@([^/]*)\\*\/[^{]*{/g, '$1{');

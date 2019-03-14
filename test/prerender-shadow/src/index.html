@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<script id="appScript" type="module"></script>
+
+<cmp-c>
+  cmp-c light-dom text top
+  <p>cmp-c light-dom paragraph</p>
+  cmp-c light-dom text bottom
+</cmp-c>
+
+<script>
+  setTimeout(() => {
+    document.getElementById('appScript').src = '/build/app.mjs.js';
+  }, 1500);
+</script>

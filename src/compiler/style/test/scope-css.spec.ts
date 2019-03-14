@@ -12,20 +12,37 @@
  */
 
 import { ShadowCss } from '../shadow-css';
-import { getElementScopeId } from '../../../runtime/styles';
+import { convertScopedToShadow, getElementScopeId } from '../../../runtime/styles';
 
 
 describe('ShadowCss', function() {
 
-  function s(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '') {
+  function s(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false) {
     const sc = new ShadowCss();
-    const shim = sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId);
+    const shim = sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
 
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));
   }
 
-  it('should handle empty string', () => { expect(s('', 'a')).toEqual(''); });
+  it('should handle empty string', () => {
+    expect(s('', 'a')).toEqual('');
+  });
+
+  it('should handle empty string, commented org selector', () => {
+    expect(s('', 'a', 'h', 's', true)).toEqual('');
+  });
+
+  it('div', () => {
+    const r = s('div {}', 'sc-ion-tag', 'sc-ion-tag-h', '', true);
+    expect(r).toEqual('/*!@div*/div.sc-ion-tag {}');
+  });
+
+  it('should add an attribute to every rule, commented org selector', () => {
+    const css = 'one {color: red;}two {color: red;}';
+    const expected = '/*!@one*/one.a {color:red;}/*!@two*/two.a {color:red;}';
+    expect(s(css, 'a', 'h', 's', true)).toEqual(expected);
+  });
 
   it('should add an attribute to every rule', () => {
     const css = 'one {color: red;}two {color: red;}';
@@ -58,10 +75,23 @@ describe('ShadowCss', function() {
     expect(s(css, 'a')).toEqual(expected);
   });
 
+  it('should handle media rules, commentOriginalSelector', () => {
+    const css = '@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}';
+    const expected =
+        '@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}';
+    expect(s(css, 'a', 'h', 's', true)).toEqual(expected);
+  });
+
   it('should handle page rules', () => {
     const css = '@page {div {font-size:50px;}}';
     const expected = '@page {div.a {font-size:50px;}}';
     expect(s(css, 'a')).toEqual(expected);
+  });
+
+  it('should handle page rules, commentOriginalSelector', () => {
+    const css = '@page {div {font-size:50px;}}';
+    const expected = '@page {/*!@div*/div.a {font-size:50px;}}';
+    expect(s(css, 'a', '', '', true)).toEqual(expected);
   });
 
   it('should handle document rules', () => {
@@ -86,6 +116,11 @@ describe('ShadowCss', function() {
   it('should handle keyframes rules', () => {
     const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
     expect(s(css, 'a')).toEqual(css);
+  });
+
+  it('should handle keyframes rules, commentOriginalSelector', () => {
+    const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
+    expect(s(css, 'a', '', '', true)).toEqual(css);
   });
 
   it('should handle -webkit-keyframes rules', () => {
@@ -115,6 +150,9 @@ describe('ShadowCss', function() {
   });
 
   describe((':host'), () => {
+    it('should handle no context, commentOriginalSelector',
+        () => { expect(s(':host {}', 'a', 'a-h', '', true)).toEqual('/*!@:host*/.a-h {}'); });
+
     it('should handle no context',
         () => { expect(s(':host {}', 'a', 'a-h')).toEqual('.a-h {}'); });
 
@@ -127,6 +165,13 @@ describe('ShadowCss', function() {
     it('should handle attribute selector', () => {
       expect(s(':host([a="b"]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
       expect(s(':host([a=b]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
+    });
+
+    it('should handle multiple tag selectors', () => {
+      expect(s(':host(ul,li) {}', 'a', 'a-h', '', true))
+        .toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
+      expect(s(':host(ul,li) > .z {}', 'a', 'a-h', '', true))
+        .toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
     });
 
     it('should handle multiple tag selectors', () => {
@@ -146,6 +191,16 @@ describe('ShadowCss', function() {
           .toEqual('[a="b"].a-h, [c="d"].a-h {}');
     });
 
+    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
+      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h', '', true))
+          .toEqual('/*!@:host([a=\"b\"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
+    });
+
+    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
+      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h', '', true))
+          .toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
+    });
+
     it('should handle pseudo selectors', () => {
       expect(s(':host(:before) {}', 'a', 'a-h')).toEqual('.a-h:before {}');
       expect(s(':host:before {}', 'a', 'a-h')).toEqual('.a-h:before {}');
@@ -159,6 +214,13 @@ describe('ShadowCss', function() {
   });
 
   describe((':host-context'), () => {
+
+    it('should handle tag selector, commentOriginalSelector', () => {
+      expect(s(':host-context(div) {}', 'a', 'a-h', '', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
+      expect(s(':host-context(ul) > .y {}', 'a', 'a-h', '', true))
+          .toEqual('/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}');
+    });
+
     it('should handle tag selector', () => {
       expect(s(':host-context(div) {}', 'a', 'a-h')).toEqual('div.a-h, div .a-h {}');
       expect(s(':host-context(ul) > .y {}', 'a', 'a-h'))
@@ -181,6 +243,11 @@ describe('ShadowCss', function() {
   });
 
   describe(('::slotted'), () => {
+
+    it('should handle *, commentOriginalSelector', () => {
+      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s', true);
+      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}');
+    });
 
     it('should handle *', () => {
       const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
@@ -222,6 +289,45 @@ describe('ShadowCss', function() {
       expect(r).toEqual('.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
     });
 
+    it('should handle multiple selector, commentOriginalSelector', () => {
+      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s', true);
+      expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+    });
+
+  });
+
+  describe('convertScopedToShadow', () => {
+
+    it('media query', () => {
+      const input = `@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}`;
+      const expected = `@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}`;
+      expect(convertScopedToShadow(input)).toBe(expected);
+    });
+
+    it('div', () => {
+      const input = `/*!@div*/div.sc-ion-tag {}`;
+      const expected = `div {}`;
+      expect(convertScopedToShadow(input)).toBe(expected);
+    });
+
+    it('new lines', () => {
+      const input = `/*!@div*/div.sc-ion-tag \n\n\n     \t{}`;
+      const expected = `div \n\n\n     \t{}`;
+      expect(convertScopedToShadow(input)).toBe(expected);
+    });
+
+    it(':host', () => {
+      const input = `/*!@:host*/.a-h {}`;
+      const expected = `.a-h {}`;
+      expect(convertScopedToShadow(input)).toBe(expected);
+    });
+
+    it('::slotted', () => {
+      const input = `/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}`;
+      const expected = `::slotted(ul), ::slotted(li) {}`;
+      expect(convertScopedToShadow(input)).toBe(expected);
+    });
+
   });
 
   describe('getElementScopeId, host', () => {
@@ -236,61 +342,9 @@ describe('ShadowCss', function() {
     });
   });
 
-  it('should support polyfill-next-selector', () => {
-    let css = s('polyfill-next-selector {content: \'x > y\'} z {}', 'a');
-    expect(css).toEqual('x.a > y.a{}');
-
-    css = s('polyfill-next-selector {content: "x > y"} z {}', 'a');
-    expect(css).toEqual('x.a > y.a{}');
-
-    css = s(`polyfill-next-selector {content: 'button[priority="1"]'} z {}`, 'a');
-    expect(css).toEqual('button[priority="1"].a{}');
-  });
-
-  it('should support polyfill-unscoped-rule', () => {
-    let css = s('polyfill-unscoped-rule {content: \'#menu > .bar\';color: blue;}', 'a');
-    expect(css).toContain('#menu > .bar {;color:blue;}');
-
-    css = s('polyfill-unscoped-rule {content: "#menu > .bar";color: blue;}', 'a');
-    expect(css).toContain('#menu > .bar {;color:blue;}');
-
-    css = s(`polyfill-unscoped-rule {content: 'button[priority="1"]'}`, 'a');
-    expect(css).toContain('button[priority="1"] {}');
-  });
-
-  it('should support multiple instances polyfill-unscoped-rule', () => {
-    const css =
-        s('polyfill-unscoped-rule {content: \'foo\';color: blue;}' +
-              'polyfill-unscoped-rule {content: \'bar\';color: blue;}',
-          'a');
-    expect(css).toContain('foo {;color:blue;}');
-    expect(css).toContain('bar {;color:blue;}');
-  });
-
-  it('should support polyfill-rule', () => {
-    let css = s('polyfill-rule {content: \':host.foo .bar\';color: blue;}', 'a', 'a-h');
-    expect(css).toEqual('.foo.a-h .bar.a {;color:blue;}');
-
-    css = s('polyfill-rule {content: ":host.foo .bar";color:blue;}', 'a', 'a-h');
-    expect(css).toEqual('.foo.a-h .bar.a {;color:blue;}');
-
-    css = s(`polyfill-rule {content: 'button[priority="1"]'}`, 'a', 'a-h');
-    expect(css).toEqual('button[priority="1"].a {}');
-  });
-
   it('should handle ::shadow', () => {
     const css = s('x::shadow > y {}', 'a');
     expect(css).toEqual('x.a > y.a {}');
-  });
-
-  it('should handle /deep/', () => {
-    const css = s('x /deep/ y {}', 'a');
-    expect(css).toEqual('x.a y {}');
-  });
-
-  it('should handle >>>', () => {
-    const css = s('x >>> y {}', 'a');
-    expect(css).toEqual('x.a y {}');
   });
 
   it('should pass through @import directives', () => {

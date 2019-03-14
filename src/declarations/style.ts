@@ -6,6 +6,7 @@ export interface StyleCompiler {
   externalStyles: ExternalStyleCompiler[];
   compiledStyleText: string;
   compiledStyleTextScoped: string;
+  compiledStyleTextScopedCommented: string;
 }
 
 

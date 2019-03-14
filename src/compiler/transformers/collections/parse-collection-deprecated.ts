@@ -208,7 +208,8 @@ function parseStyle(config: d.Config, collectionDir: string, cmpData: d.Componen
     styleStr: modeStyleData.style,
     externalStyles: [],
     compiledStyleText: null,
-    compiledStyleTextScoped: null
+    compiledStyleTextScoped: null,
+    compiledStyleTextScopedCommented: null
   };
 
   if (Array.isArray(modeStyleData.stylePaths)) {

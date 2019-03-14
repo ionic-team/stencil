@@ -2,14 +2,14 @@ import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 
 
-export async function scopeComponentCss(config: d.Config, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, mode: string, cssText: string) {
+export async function scopeComponentCss(config: d.Config, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, mode: string, cssText: string, commentOriginalSelector: boolean) {
   try {
     const scopeId = getScopeId(cmp, mode);
 
     const hostScopeId = getElementScopeId(scopeId, true);
     const slotScopeId = getElementScopeId(scopeId, false);
 
-    cssText = await config.sys.scopeCss(cssText, scopeId, hostScopeId, slotScopeId);
+    cssText = await config.sys.scopeCss(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

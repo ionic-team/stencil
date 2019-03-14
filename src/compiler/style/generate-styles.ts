@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { generateComponentStylesMode } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
-import { isOutputTargetWww } from '../output-targets/output-utils';
+import { isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -11,9 +11,11 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
+  const commentOriginalSelector = config.outputTargets.some(isOutputTargetHydrate);
+
   const componentStyles = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     await Promise.all(moduleFile.cmps.map(async cmps => {
-      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile, cmps);
+      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile, cmps, commentOriginalSelector);
     }));
   }));
 
@@ -33,9 +35,9 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) {
+export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) {
   await Promise.all(cmp.styles.map(async style => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, cmp, style, style.modeName);
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, cmp, style, style.modeName, commentOriginalSelector);
   }));
 }
 

@@ -87,7 +87,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
     if ((BUILD.slotRelocation || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
       // if there is a scopeId and this is the initial render
-      // then let's add the scopeId as an attribute
+      // then let's add the scopeId as a css class
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
@@ -383,11 +383,6 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, elm?: d.HostElement,
   elm = newVNode.elm = oldVNode.elm;
   oldChildren = oldVNode.vchildren;
   newChildren = newVNode.vchildren;
-
-  if (BUILD.hydrateClientSide && (oldVNode as d.HydrateVNode).hydrateFn) {
-    (oldVNode as d.HydrateVNode).hydrateFn(oldVNode, useNativeShadowDom);
-    (oldVNode as d.HydrateVNode).hydrateFn = null;
-  }
 
   if (BUILD.svg) {
     // test if we're rendering an svg element, or still rendering nodes inside of one

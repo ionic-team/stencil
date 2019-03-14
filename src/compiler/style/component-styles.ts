@@ -7,16 +7,17 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
   if (buildCtx.isRebuild) {
-    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta);
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta, commentOriginalSelector);
     if (cachedCompiledStyles) {
       styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
       styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
+      styleMeta.compiledStyleTextScopedCommented = cachedCompiledStyles.compiledStyleTextScopedCommented;
       return;
     }
   }
@@ -25,10 +26,11 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta);
 
   // format and set the styles for use later
-  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, cmp, modeName, styleMeta.externalStyles, compiledStyles);
+  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, cmp, modeName, styleMeta.externalStyles, compiledStyles, commentOriginalSelector);
 
   styleMeta.compiledStyleText = compiledStyleMeta.styleText;
   styleMeta.compiledStyleTextScoped = compiledStyleMeta.styleTextScoped;
+  styleMeta.compiledStyleTextScopedCommented = compiledStyleMeta.styleTextScopedCommented;
 
   if (config.watch) {
     // since this is a watch and we'll be checking this again
@@ -173,11 +175,12 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[]) {
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[], commentOriginalSelector: boolean) {
   // join all the component's styles for this mode together into one line
   const compiledStyle = {
     styleText: compiledStyles.join('\n\n').trim(),
-    styleTextScoped: null as string
+    styleTextScoped: null as string,
+    styleTextScopedCommented: null as string
   };
 
   let filePath: string = null;
@@ -191,9 +194,13 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   if (requiresScopedStyles(cmp.encapsulation)) {
     // only create scoped styles if we need to
-    compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText);
+    compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, false);
     if (cmp.encapsulation === 'scoped') {
       compiledStyle.styleText = compiledStyle.styleTextScoped;
+    }
+
+    if (commentOriginalSelector && cmp.encapsulation === 'shadow') {
+      compiledStyle.styleTextScopedCommented = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, true);
     }
   }
 
@@ -248,6 +255,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   compiledStyle.styleText = escapeCssForJs(compiledStyle.styleText);
   compiledStyle.styleTextScoped = escapeCssForJs(compiledStyle.styleTextScoped);
+  compiledStyle.styleTextScopedCommented = escapeCssForJs(compiledStyle.styleTextScopedCommented);
 
   return compiledStyle;
 }

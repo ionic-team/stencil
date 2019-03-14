@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, writeTask, plt } from '@platform';
+import { consoleError, plt, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
@@ -108,7 +108,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
 
 
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
+  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents || BUILD.hydrateServerSide) && !elm['s-al']) {
     const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
     if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {

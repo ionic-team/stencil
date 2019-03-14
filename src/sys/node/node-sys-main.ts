@@ -232,8 +232,8 @@ export class NodeSystem implements d.StencilSystem {
     return NodeRollup;
   }
 
-  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
-    return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId]);
+  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean) {
+    return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector]);
   }
 
   get color() {

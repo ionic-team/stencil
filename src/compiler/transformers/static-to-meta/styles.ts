@@ -24,6 +24,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         styleId: null,
         compiledStyleText: null,
         compiledStyleTextScoped: null,
+        compiledStyleTextScopedCommented: null,
         externalStyles: []
       });
     }
@@ -39,6 +40,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         styleId: null,
         compiledStyleText: null,
         compiledStyleTextScoped: null,
+        compiledStyleTextScopedCommented: null,
         externalStyles: [{
           absolutePath: null,
           relativePath: null,
@@ -57,6 +59,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
       styleId: null,
       compiledStyleText: null,
       compiledStyleTextScoped: null,
+      compiledStyleTextScopedCommented: null,
       externalStyles: parsedStyleUrls.map(parsedStyleUrl => {
         const externalStyle: d.ExternalStyleCompiler = {
           absolutePath: null,
@@ -106,6 +109,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
           styleId: null,
           compiledStyleText: null,
           compiledStyleTextScoped: null,
+          compiledStyleTextScopedCommented: null,
           externalStyles: externalStyles
         });
       }
