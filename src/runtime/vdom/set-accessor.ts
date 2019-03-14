@@ -24,15 +24,8 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
         const newList = parseClassList(newValue);
 
         // remove classes in oldList, not included in newList
-        const toRemove = oldList.filter(item => !newList.includes(item));
-        const classList = parseClassList(elm.className)
-          .filter(item => !toRemove.includes(item));
-
-        // add classes from newValue that are not in oldList or classList
-        const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
-        classList.push(...toAdd);
-
-        elm.className = classList.join(' ');
+        elm.classList.remove(...oldList.filter(item => !newList.includes(item)));
+        elm.classList.add(...newList);
       }
 
     } else {
@@ -68,7 +61,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
   } else if (BUILD.vdomRef && memberName === 'ref') {
     // minifier will clean this up
 
-  } else if (BUILD.vdomListener && /^on[A-Z]/.test(memberName) && !(memberName in elm)) {
+  } else if (BUILD.vdomListener && memberName.startsWith('on') && !(memberName in elm)) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
@@ -144,7 +137,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 };
 
 const parseClassList = (value: string | undefined | null): string[] =>
-  (value == null || value === '') ? [] : value.trim().split(/\s+/);
+  (value == null || value === '') ? [] : value.split(' ');
 
 export function vdomListenerProxy(this: d.HostElement, ev: Event) {
   return vdomListenersMap.get(this).get(ev.type)(ev);

@@ -109,8 +109,6 @@ export const registerHost = (elm: d.HostElement) => {
 
 export const styles: d.StyleMap = new Map();
 
-export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
-
 
 export {
   connectedCallback,

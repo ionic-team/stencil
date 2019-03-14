@@ -1,10 +1,11 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, loadModule, styles } from '@platform';
+import { consoleError, loadModule } from '@platform';
 import { HOST_STATE } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
+import { getScopeId, registerStyle } from './styles';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
@@ -19,6 +20,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       // first check if there's an attribute
       // next check the app's global
       hostRef.$modeName$ = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
+    }
+    if (BUILD.hydrateServerSide && hostRef.$modeName$) {
+      elm.setAttribute('s-mode', hostRef.$modeName$);
     }
 
     if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
@@ -59,10 +63,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
       // this component has styles but we haven't registered them yet
-      styles.set(BUILD.mode
-        ? cmpMeta.t + (hostRef.$modeName$ ? '-' + hostRef.$modeName$ : '')
-        : cmpMeta.t,
-      Cstr.style);
+      registerStyle(getScopeId(cmpMeta.t, hostRef.$modeName$), Cstr.style);
       Cstr.isStyleRegistered = true;
     }
   }
@@ -73,7 +74,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
-    (hostRef.$ancestorComponent$['s-rc'] = hostRef.$ancestorComponent$['s-rc'] || []).push(() =>
+    hostRef.$ancestorComponent$['s-rc'].push(() =>
       // this will get fired off when the ancestor component
       // finally gets around to rendering its lazy self
       // fire off the initial update

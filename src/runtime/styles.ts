@@ -1,47 +1,50 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
-import { getDoc, rootAppliedStyles, styles } from '@platform';
+import { getDoc, styles } from '@platform';
 import { supportsShadowDom } from '@platform';
 
 
-export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string, styleId?: string, styleElm?: HTMLStyleElement, styleContainerNode?: HTMLElement, appliedStyles?: d.AppliedStyleMap, dataStyles?: NodeListOf<Element>) => {
+const supportsConstructibleStylesheets = !BUILD.hydrateServerSide && !!(document as any).adoptedStyleSheets;
 
-  if (BUILD.mode && mode) {
-    styleId = cmpMeta.t + '-' + mode;
+export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
+
+export const registerStyle = (styleId: string, cssText: string) => {
+  let style = styles.get(styleId);
+  if (supportsConstructibleStylesheets) {
+    style = style || new CSSStyleSheet();
+    (style as any).replaceSync(cssText);
   } else {
-    styleId = cmpMeta.t;
+    style = cssText;
   }
+  styles.set(styleId, style);
+  return style;
+};
 
-  if (styles.has(styleId)) {
-    if (BUILD.shadowDom && elm.shadowRoot) {
-      // we already know we're in a shadow dom
-      // so shadow root is the container for these styles
-      styleContainerNode = elm.shadowRoot as any;
-
-    } else {
-      // climb up the dom and see if we're in a shadow dom
-      styleContainerNode = (elm as any).getRootNode();
-      styleContainerNode = (styleContainerNode as any).host || (styleContainerNode as any).head;
-    }
-
-    appliedStyles = rootAppliedStyles.get(styleContainerNode);
+export const addStyle = (styleContainerNode: any, style: CSSStyleSheet | string, styleId: string) => {
+  if (!styleId) {
+    return;
+  }
+  if (typeof style === 'string') {
+    styleContainerNode = styleContainerNode.head ? styleContainerNode.head : styleContainerNode;
+    let appliedStyles = rootAppliedStyles.get(styleContainerNode);
     if (!appliedStyles) {
       rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
     }
 
     if (!appliedStyles.has(styleId)) {
-      if (BUILD.hydrateClientSide && elm.shadowRoot && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
-        styleElm.innerHTML = styles.get(styleId);
+      let styleElm;
+      if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
+        styleElm.innerHTML = style;
 
       } else {
-        dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
+        const dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
 
-        styleElm = getDoc(elm).createElement('style');
-        styleElm.innerHTML = styles.get(styleId);
+        styleElm = getDoc(styleContainerNode).createElement('style');
+        styleElm.innerHTML = style;
 
         if (BUILD.hydrateServerSide) {
-          styleElm.setAttribute('h-id', cmpMeta.t);
+          styleElm.setAttribute('h-id', styleId);
         }
 
         styleContainerNode.insertBefore(
@@ -52,6 +55,21 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 
       appliedStyles.add(styleId);
     }
+  } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
+    styleContainerNode.adoptedStyleSheets = [
+      ...styleContainerNode.adoptedStyleSheets,
+      style
+    ];
+  }
+};
+
+export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
+  const styleId = getScopeId(cmpMeta.t, mode);
+  const style = styles.get(styleId);
+  if (style) {
+    addStyle((BUILD.shadowDom && elm.shadowRoot)
+      ? elm.shadowRoot
+      : (elm as any).getRootNode(), style, styleId);
   }
 
   if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
@@ -62,16 +80,18 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     // create a node to represent where the original
     // content was first placed, which is useful later on
     // DOM WRITE!!
-    styleId = elm['s-sc'] = ('sc-' + styleId);
-
-    elm.classList.add(getElementScopeId(styleId, true));
+    elm['s-sc'] = styleId;
+    elm.classList.add(styleId + '-h');
 
     if (cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
-      elm.classList.add(getElementScopeId(styleId, false));
+      elm.classList.add(styleId + '-s');
     }
   }
 };
 
+
+export const getScopeId = (tagName: string, mode: string) =>
+  'sc-' + ((BUILD.mode && mode) ? tagName + '-' + mode : tagName);
 
 export const getElementScopeId = (scopeId: string, isHostElement: boolean) =>
   scopeId + (isHostElement ? '-h' : '-s');

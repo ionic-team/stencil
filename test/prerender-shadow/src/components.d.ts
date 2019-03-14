@@ -5,15 +5,12 @@
  */
 
 
-import { JSXElements } from '@stencil/core';
-
+import { JSXBase } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface CmpC {}
-  interface CmpCAttributes extends JSXElements.HTMLAttributes {}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -21,22 +18,33 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
+declare namespace LocalJSX {
+  interface CmpC extends JSXBase.HTMLAttributes {}
+
+  interface ElementInterfaces {
     'CmpC': Components.CmpC;
   }
 
-  interface StencilIntrinsicElements {
-    'cmp-c': Components.CmpCAttributes;
+  interface IntrinsicElements {
+    'CmpC': LocalJSX.CmpC;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
   var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;
     new (): HTMLCmpCElement;
   };
-
   interface HTMLElementTagNameMap {
     'cmp-c': HTMLCmpCElement
   }
@@ -44,5 +52,5 @@ declare global {
   interface ElementTagNameMap {
     'cmp-c': HTMLCmpCElement;
   }
-
 }
+

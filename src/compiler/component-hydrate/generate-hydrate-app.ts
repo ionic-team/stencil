@@ -60,7 +60,7 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
 
   hydrateCmps.forEach(cmpData => {
     cmpData.cmp.styles.forEach(style => {
-      let styleId = cmpData.cmp.tagName;
+      let styleId = 'sc-' + cmpData.cmp.tagName;
       if (style.modeName !== DEFAULT_STYLE_MODE) {
         styleId += `-${style.modeName}`;
       }

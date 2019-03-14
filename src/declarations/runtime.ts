@@ -103,7 +103,7 @@ export interface PlatformRuntime {
 
 export type RefMap = WeakMap<any, HostRef>;
 
-export type StyleMap = Map<string, string>;
+export type StyleMap = Map<string, CSSStyleSheet | string>;
 
 export type RootAppliedStyleMap = WeakMap<Element, Set<string>>;
 

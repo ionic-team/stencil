@@ -15,8 +15,6 @@ export const getHead = (_?: any) => getDoc().head;
 
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
-export const rootAppliedStyles: d.RootAppliedStyleMap = new WeakMap();
-
 export const styles: d.StyleMap = new Map();
 
 export const plt: d.PlatformRuntime = {

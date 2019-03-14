@@ -2,15 +2,22 @@ import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, HOST_STATE } from '@utils';
-import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
+import { getDoc, getHostRef, styles, supportsShadowDom, tick } from '@platform';
 import { HYDRATE_HOST_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
+import { addStyle, getScopeId } from './styles';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   // connectedCallback
   const hostRef = getHostRef(elm);
+
+  // Syncronous style 
+  if (BUILD.shadowDom && BUILD.hydrateClientSide && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
+    const styleId = getScopeId(cmpMeta.t, elm.getAttribute('s-mode'));
+    addStyle(elm.shadowRoot, styles.get(styleId), styleId);
+  }
 
   if (BUILD.hostListener && cmpMeta.l) {
     // initialize our event listeners on the host element

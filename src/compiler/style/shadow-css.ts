@@ -1,5 +1,3 @@
-import { stringLiteral } from "@babel/types";
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

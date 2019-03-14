@@ -19,7 +19,7 @@ export const parsePropertyValue = (propValue: any, expectedPropType: number) => 
     if (expectedPropType & PROP_TYPE.String) {
       // could have been passed as a number or boolean
       // but we still want it as a string
-      return propValue + '';
+      return String(propValue);
     }
 
     // redundant return here for better minification

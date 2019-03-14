@@ -3,7 +3,7 @@ import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
 import { convertToShadowCss } from './client-hydrate';
 import { disconnectedCallback } from './disconnected-callback';
-import { getDoc, getHead, getHostRef, registerHost, styles, supportsShadowDom } from '@platform';
+import { getDoc, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
@@ -33,6 +33,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
         customElements.define(
           cmpLazyMeta.t,
           proxyComponent(class extends HTMLElement {
+
+            ['s-lr'] = false;
+            ['s-rc']: (() => void)[] = [];
+
             // StencilLazyHost
             constructor(self: HTMLElement) {
               // @ts-ignore
@@ -43,13 +47,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
                 // and this browser supports shadow dom
                 // add the read-only property "shadowRoot" to the host element
                 this.attachShadow({ 'mode': 'open' });
-
-                if (BUILD.hydrateClientSide) {
-                  const styleText = styles.get(cmpLazyMeta.t);
-                  if (styleText) {
-                    this.shadowRoot.innerHTML = `<style>${styleText}</style>`;
-                  }
-                }
               }
             }
 
@@ -94,6 +91,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
 
   if (BUILD.style) {
     const visibilityStyle = getDoc().createElement('style');
+    // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
     visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
     visibilityStyle.setAttribute('data-styles', '');
 

@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, plt, writeTask } from '@platform';
+import { consoleError, writeTask, plt } from '@platform';
 import { HOST_STATE } from '@utils';
 import { renderVdom } from './vdom/render';
 
@@ -95,7 +95,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     hostRef.$stateFlags$ |= HOST_STATE.hasRendered;
   }
 
-  if (BUILD.lifecycle && elm['s-rc']) {
+  if (BUILD.lifecycle && elm['s-rc'] !== undefined) {
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
@@ -127,7 +127,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       emitLifecycleEvent(elm, 'componentDidLoad');
 
       if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
-        hostRef.$onReadyResolve$ && hostRef.$onReadyResolve$(elm);
+        hostRef.$onReadyResolve$(elm);
       }
       // on appload
       if (!ancestorComponent) {
