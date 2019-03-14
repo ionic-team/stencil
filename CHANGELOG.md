@@ -1,5 +1,5 @@
-<a name="0.18.1-2"></a>
-## 🍅 [0.18.1-2](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1-2) (2019-03-07)
+<a name="0.18.1-3"></a>
+## 🐗 [0.18.1-3](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1-3) (2019-03-14)
 
 
 ### Features
@@ -9,8 +9,9 @@
 
 ### Bug Fixes
 
+* **copy:** use fs.copyFile and reduce concurrent copy tasks ([e51c0a4](https://github.com/ionic-team/stencil/commit/e51c0a4))
+* **dev-server:** serve command launch root url ([#1410](https://github.com/ionic-team/stencil/issues/1410)) ([7abdc39](https://github.com/ionic-team/stencil/commit/7abdc39))
 * **dist:** add dist/cjs directory ([24f5416](https://github.com/ionic-team/stencil/commit/24f5416))
-
 
 
 <a name="0.18.0"></a>
