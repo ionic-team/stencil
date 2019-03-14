@@ -27,29 +27,31 @@ export class Compiler implements d.Compiler {
         startupMsg += `💎`;
       }
 
-      config.logger.info(config.logger.cyan(startupMsg));
+      if (config.suppressLogs !== true) {
+        config.logger.info(config.logger.cyan(startupMsg));
 
-      if (config.sys.semver.prerelease(config.sys.compiler.version)) {
-        config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+        if (config.sys.semver.prerelease(config.sys.compiler.version)) {
+          config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+        }
+        if (config.devMode && config.buildEs5) {
+          config.logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
+          If you need ESM output, use the '--esm' flag instead.`);
+        }
+        if (config.devMode && !config.enableCache) {
+          config.logger.warn(`Disabling cache during development will slow down incremental builds.`);
+
+        }
+        config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
+        config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
+
+        config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
+        config.logger.debug(`compiler build: __BUILDID__`);
+
+        const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
+        config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
+
+        config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
       }
-      if (config.devMode && config.buildEs5) {
-        config.logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
-        If you need ESM output, use the '--esm' flag instead.`);
-      }
-      if (config.devMode && !config.enableCache) {
-        config.logger.warn(`Disabling cache during development will slow down incremental builds.`);
-
-      }
-      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
-      config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
-
-      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
-      config.logger.debug(`compiler build: __BUILDID__`);
-
-      const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
-      config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
-
-      config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
 
       this.ctx = getCompilerCtx(config);
 
