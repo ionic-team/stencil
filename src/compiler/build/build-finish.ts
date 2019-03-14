@@ -72,6 +72,15 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
     }
 
+    if (buildCtx.isActiveBuild && !aborted && !buildCtx.hasError) {
+      // this is the most recent build, it wasn't aborted, and it was a successful build
+      compilerCtx.activeDirsAdded.length = 0;
+      compilerCtx.activeDirsDeleted.length = 0;
+      compilerCtx.activeFilesAdded.length = 0;
+      compilerCtx.activeFilesDeleted.length = 0;
+      compilerCtx.activeFilesUpdated.length = 0;
+    }
+
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
     config.logger.writeLogs(buildCtx.isRebuild);

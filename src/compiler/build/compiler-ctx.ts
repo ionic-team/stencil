@@ -12,6 +12,11 @@ import { InMemoryFileSystem, normalizePath } from '@utils';
  */
 export class CompilerContext implements d.CompilerCtx {
   activeBuildId = -1;
+  activeFilesAdded: string[] = [];
+  activeFilesDeleted: string[] = [];
+  activeFilesUpdated: string[] = [];
+  activeDirsAdded: string[] = [];
+  activeDirsDeleted: string[] = [];
   cache: d.Cache;
   cachedStyleMeta = new Map<string, d.StyleCompiler>();
   collections: d.CollectionCompilerMeta[] = [];

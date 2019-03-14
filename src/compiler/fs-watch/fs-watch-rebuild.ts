@@ -10,11 +10,13 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   const buildCtx = new BuildContext(config, compilerCtx);
 
   // copy watch results over to build ctx data
-  buildCtx.filesUpdated.push(...fsWatchResults.filesUpdated);
-  buildCtx.filesAdded.push(...fsWatchResults.filesAdded);
-  buildCtx.filesDeleted.push(...fsWatchResults.filesDeleted);
-  buildCtx.dirsDeleted.push(...fsWatchResults.dirsDeleted);
-  buildCtx.dirsAdded.push(...fsWatchResults.dirsAdded);
+  // also add in any active build data that
+  // hasn't gone though a full build yet
+  mergeData(buildCtx.filesUpdated, fsWatchResults.filesUpdated, compilerCtx.activeFilesUpdated);
+  mergeData(buildCtx.filesAdded, fsWatchResults.filesAdded, compilerCtx.activeFilesAdded);
+  mergeData(buildCtx.filesDeleted, fsWatchResults.filesDeleted, compilerCtx.activeFilesDeleted);
+  mergeData(buildCtx.dirsDeleted, fsWatchResults.dirsDeleted, compilerCtx.activeDirsDeleted);
+  mergeData(buildCtx.dirsAdded, fsWatchResults.dirsAdded, compilerCtx.activeDirsAdded);
 
   // recursively drill down through any directories added and fill up more data
   buildCtx.dirsAdded.forEach(dirAdded => {
@@ -63,6 +65,21 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 }
 
 
+function mergeData(target: string[], arr1: string[], arr2: string[]) {
+  arr1.forEach(p => {
+    if (!target.includes(p)) {
+      target.push(p);
+    }
+  });
+  arr2.forEach(p => {
+    if (!target.includes(p)) {
+      target.push(p);
+    }
+  });
+  target.sort();
+}
+
+
 function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   dir = normalizePath(dir);
 
@@ -73,7 +90,7 @@ function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildC
   const items = compilerCtx.fs.disk.readdirSync(dir);
 
   items.forEach(dirItem => {
-    const itemPath = config.sys.path.join(dir, dirItem);
+    const itemPath = normalizePath(config.sys.path.join(dir, dirItem));
     const stat = compilerCtx.fs.disk.statSync(itemPath);
 
     if (stat.isDirectory()) {

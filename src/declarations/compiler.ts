@@ -13,6 +13,11 @@ export interface Compiler {
 
 export interface CompilerCtx {
   activeBuildId: number;
+  activeDirsAdded: string[];
+  activeDirsDeleted: string[];
+  activeFilesAdded: string[];
+  activeFilesDeleted: string[];
+  activeFilesUpdated: string[];
   cache: d.Cache;
   cachedStyleMeta: Map<string, d.StyleCompiler>;
   collections: d.CollectionCompilerMeta[];

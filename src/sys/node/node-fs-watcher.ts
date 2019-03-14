@@ -18,7 +18,6 @@ export class FsWatcher implements d.FsWatcher {
   private dirItems = new Map<string, Set<string>>();
 
   constructor(private config: d.Config, private fs: d.FileSystem, private events: d.BuildEvents) {
-    events.subscribe('buildFinish', this.reset.bind(this));
   }
 
   async addDirectory(dirPath: string, emit = false) {
@@ -290,6 +289,8 @@ export class FsWatcher implements d.FsWatcher {
       filesDeleted: this.filesDeleted.slice(),
       filesUpdated: Array.from(this.filesUpdated.keys())
     };
+
+    this.reset();
 
     // send out the event of what we've learend
     this.events.emit('fsChange', fsWatchResults);
