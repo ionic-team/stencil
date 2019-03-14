@@ -200,8 +200,7 @@ export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx)
     m.cmps.forEach(cmp => {
       if (definedTags.has(cmp.tagName)) {
         const error = buildError(buildCtx.diagnostics);
-        error.messageText = `Component tag "${cmp.tagName}" has been defined in multiple files: ${config.sys.path.relative(config.rootDir, m.sourceFilePath)}`;
-
+        error.messageText = `Component tag "${cmp.tagName}" has been defined in multiple times: ${config.sys.path.relative(config.rootDir, m.sourceFilePath)}`;
       } else {
         definedTags.add(cmp.tagName);
       }

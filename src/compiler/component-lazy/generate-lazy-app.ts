@@ -8,7 +8,7 @@ import { OutputOptions } from 'rollup';
 
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
-  const timespan = buildCtx.createTimeSpan(`generate lazy components started`, true);
+  const timespan = buildCtx.createTimeSpan(`generate lazy components started`);
 
   const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
@@ -46,7 +46,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
       await Promise.all(
         systemOutputs.map(async o => {
           const loader = await getSystemLoader(config, `${config.fsNamespace}.system.js`, o.polyfills);
-          await compilerCtx.fs.writeFile(config.sys.path.join(o.systemDir, `${config.fsNamespace}.js`), loader)
+          await compilerCtx.fs.writeFile(config.sys.path.join(o.systemDir, `${config.fsNamespace}.js`), loader);
         })
       );
     }
@@ -72,7 +72,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const bundleCoreOptions: d.BundleCoreOptions = {
     loader: {
       '@stencil/core/app': CORE,
@@ -84,13 +84,15 @@ function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d
       'loader': '@external-entrypoint',
     },
     coreChunk: true,
+    cache: compilerCtx.lazyModuleRollupCache
   };
 
   buildCtx.entryModules.forEach(entryModule => {
     bundleCoreOptions.entryInputs[entryModule.entryKey] = entryModule.entryKey;
   });
-
-  return bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  compilerCtx.lazyModuleRollupCache = rollupBuild.cache;
+  return rollupBuild;
 }
 
 async function getSystemLoader(config: d.Config, coreFilename: string, includePolyfills: boolean) {

@@ -24,6 +24,8 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
   // ensure all the styles are built first, which parses all the css docs
   await buildCtx.stylesPromise;
 
+  const timespan = buildCtx.createTimeSpan(`generate docs started`);
+
   const docsData = await generateDocData(config, compilerCtx, buildCtx);
 
   // generate READMEs docs
@@ -50,4 +52,5 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
   if (customTargets.length > 0) {
     await generateCustomDocs(config, customTargets, docsData);
   }
+  timespan.finish(`generate docs finished`);
 }

@@ -17,7 +17,10 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        target: getBuildScriptTarget(build)
+        target: getBuildScriptTarget(build),
+        skipLibCheck: true,
+        noResolve: true,
+        noLib: true,
       },
       fileName: cmp.jsFilePath,
       transformers: {

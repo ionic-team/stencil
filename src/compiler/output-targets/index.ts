@@ -16,7 +16,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate app files started`);
   const generateOutputs = [
     outputCollections(config, compilerCtx, buildCtx),
     outputAngularProxies(config, compilerCtx, buildCtx),
@@ -31,8 +30,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
   ];
 
   await Promise.all(generateOutputs);
-
-  timespan.finish(`generate app files finished`);
 }
 
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

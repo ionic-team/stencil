@@ -27,6 +27,7 @@ export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx
 
       if (buildCtx.isRebuild) {
         // reset since we're doing a full parse again
+        console.log('reset module');
         resetModule(moduleFile);
       }
 

@@ -231,6 +231,7 @@ export interface BundleCoreOptions {
   coreChunk?: boolean;
   entryInputs: BundleEntryInputs;
   loader: {[id: string]: string};
+  cache?: any;
 }
 
 export interface BundleEntryInputs {

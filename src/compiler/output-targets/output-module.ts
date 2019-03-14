@@ -16,12 +16,13 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
   if (outputTargets.length === 0) {
     return;
   }
-
-  return generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets);
+  const timespan = buildCtx.createTimeSpan(`generate webcomponents module started`);
+  await generateModuleWebComponents(config, compilerCtx, buildCtx, outputTargets);
+  timespan.finish(`generate webcomponents module finished`);
 }
 
 export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
-  await buildCtx.stylesPromise;
+  // await buildCtx.stylesPromise;
 
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 

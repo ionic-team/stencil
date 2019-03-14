@@ -1,4 +1,5 @@
 import * as d from '.';
+import { RollupBuild, RollupOptions } from 'rollup';
 
 
 export interface StencilSystem {
@@ -63,7 +64,7 @@ export interface ResolveModuleOptions {
 
 export interface RollupInterface {
   rollup: {
-    (config: any): Promise<any>;
+    (config: RollupOptions): Promise<RollupBuild>;
   };
   plugins: {
     nodeResolve(opts: any): any;

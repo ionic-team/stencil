@@ -146,6 +146,7 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
   }
 
   // add to module map
+  console.log('add ', cmp.tagName);
   moduleFile.cmps.push(cmp);
 
   // add to node map

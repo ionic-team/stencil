@@ -35,6 +35,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
+      cache: bundleCoreOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
     if (bundleCoreOptions.coreChunk) {

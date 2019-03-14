@@ -11,10 +11,6 @@ export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFil
     coreDtsPath = `./${coreDtsPath}`;
   }
 
-  if (dtsContent.includes('JSX')) {
-    dtsContent = `import '${coreDtsPath}';\n${dtsContent}`;
-  }
-
   if (dtsContent.includes('@stencil/core')) {
     dtsContent = dtsContent.replace(/\@stencil\/core/g, coreDtsPath);
   }
@@ -30,7 +26,7 @@ export async function copyStencilCoreDts(config: d.Config, compilerCtx: d.Compil
 
   const srcStencilCoreDts = await config.sys.getClientCoreFile({
     staticName: 'declarations/stencil.core.d.ts'
-   });
+  });
 
   return Promise.all(typesOutputTargets.map(outputTarget => {
     const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);

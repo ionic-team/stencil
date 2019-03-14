@@ -33,6 +33,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
   // hold on to stuff we know is being used
   cleanModuleFileCache(compilerCtx);
 
+  console.log('read moduleFiles');
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
 
   if (doTranspile && !buildCtx.hasError) {
