@@ -11,14 +11,14 @@ describe('renderer', () => {
 
   beforeEach(() => {
     hostElm = document.createElement('div');
-    vnode0 = {};
-    vnode0.elm = hostElm;
+    vnode0 = {$flags$: 0};
+    vnode0.$elm$ = hostElm;
   });
 
   describe('created element', () => {
 
     it('has tag', () => {
-      patch(vnode0, h('div', null));
+      patch(vnode0, h('div', null), document);
       expect(hostElm.tagName).toEqual('DIV');
     });
 
@@ -29,7 +29,7 @@ describe('renderer', () => {
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
         )
-      ));
+      ), document);
 
       expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
       expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVG_NS);
@@ -42,7 +42,7 @@ describe('renderer', () => {
           h('circle', null)
         ] as any),
         h('div', null)
-      ] as any));
+      ] as any), document);
 
       expect(hostElm.tagName).toEqual('DIV');
       expect(hostElm.namespaceURI).not.toEqual(SVG_NS);
@@ -62,9 +62,9 @@ describe('renderer', () => {
         h('div', null,
           h('svg', null)
         )
-      ));
+      ), document);
 
-      const vnode1 = toVNode(vnode0.elm);
+      const vnode1 = toVNode(vnode0.$elm$);
 
       patch(vnode1, h('div', null, [
           h('div', null,
@@ -72,12 +72,12 @@ describe('renderer', () => {
           ),
           h('div', null)
         ] as any
-      ));
+      ), document);
 
-      const vnode2 = toVNode(vnode1.elm) as any;
-      expect(vnode2.vchildren[0].elm.tagName).toEqual('DIV');
-      expect(vnode2.vchildren[0].vchildren[0].elm.tagName).toEqual('SVG');
-      expect(vnode2.vchildren[1].elm.tagName).toEqual('DIV');
+      const vnode2 = toVNode(vnode1.$elm$);
+      expect(vnode2.$children$[0].$elm$.tagName).toEqual('DIV');
+      expect(vnode2.$children$[0].$children$[0].$elm$.tagName).toEqual('SVG');
+      expect(vnode2.$children$[1].$elm$.tagName).toEqual('DIV');
     });
   });
 

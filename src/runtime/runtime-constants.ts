@@ -1,4 +1,9 @@
 
+export const enum VNODE_FLAGS {
+  isSlotReference = 1 << 0,
+  isSlotFallback = 1 << 1,
+  isHost = 1 << 2,
+}
 
 export const enum NODE_TYPE {
   ElementNode = 1,

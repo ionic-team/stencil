@@ -10,22 +10,27 @@
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { toLowerCase } from '@utils';
-import { XLINK_NS } from '../runtime-constants';
+import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 
 const vdomListenersMap = new WeakMap<HTMLElement, Map<string, Function>>();
 
-export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHost: boolean) => {
+export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
   if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
       if (oldValue !== newValue) {
         const oldList = parseClassList(oldValue);
         const newList = parseClassList(newValue);
+        const toRemove = oldList.filter(item => !newList.includes(item));
+        const classList = parseClassList(elm.className)
+          .filter(item => !toRemove.includes(item));
 
-        // remove classes in oldList, not included in newList
-        elm.classList.remove(...oldList.filter(item => !newList.includes(item)));
-        elm.classList.add(...newList);
+        // add classes from newValue that are not in oldList or classList
+        const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
+        classList.push(...toAdd);
+
+        elm.className = classList.join(' ');
       }
 
     } else {
@@ -125,7 +130,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       } else {
         elm.removeAttribute(memberName);
       }
-    } else if ((!isProp || isHost || isSvg) && !isComplex) {
+    } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue.toString();
       if (isXlinkNs) {
         elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);

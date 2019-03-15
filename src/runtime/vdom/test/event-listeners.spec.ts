@@ -9,8 +9,8 @@ describe('event listeners', () => {
 
   beforeEach(() => {
     hostElm = document.createElement('div');
-    vnode0 = {};
-    vnode0.elm = hostElm;
+    vnode0 = { $flags$: 0 };
+    vnode0.$elm$ = hostElm;
   });
 
   it('attaches click event handler to element', () => {
@@ -22,7 +22,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent')
     );
 
-    patch(vnode0, vnode);
+    patch(vnode0, vnode, document);
     hostElm.click();
 
     expect(result.length).toBe(1);
@@ -39,10 +39,10 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    patch(vnode0, vnode1);
+    patch(vnode0, vnode1, document);
     hostElm.click();
 
-    patch(vnode1, vnode2);
+    patch(vnode1, vnode2, document);
     hostElm.click();
 
     expect(result[0]).toBe(1);
@@ -58,7 +58,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    patch(vnode0, vnode1);
+    patch(vnode0, vnode1, document);
     hostElm.click();
     hostElm.click();
 
@@ -68,7 +68,7 @@ describe('event listeners', () => {
       h('a', null, 'Click my parent'),
     );
 
-    patch(vnode1, vnode2);
+    patch(vnode1, vnode2, document);
     hostElm.click();
     hostElm.click();
 
@@ -86,7 +86,7 @@ describe('event listeners', () => {
       h('a', { onClick: click }, 'Click my parent'),
     );
 
-    patch(vnode0, vnode1);
+    patch(vnode0, vnode1, document);
     hostElm.click();
 
     expect(result.length).toBe(1);

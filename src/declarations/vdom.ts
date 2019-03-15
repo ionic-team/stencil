@@ -10,9 +10,6 @@ export interface Hyperscript {
   (sel: any, data: VNodeData, children: VNode): VNode;
 }
 
-export interface VNode extends FVNode {
-  elm?: any;
-}
 
 export interface VNodeData {
   class?: {[className: string]: boolean};
@@ -33,32 +30,30 @@ export interface VNodeProdData {
 }
 
 export interface FunctionalUtilities {
-  forEach: (children: FVNode[], cb: (vnode: ChildNode, index: number, array: FVNode[]) => void) => void;
-  map: (children: FVNode[], cb: (vnode: ChildNode, index: number, array: FVNode[]) => ChildNode) => FVNode[];
+  forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
+  map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => ChildNode) => VNode[];
 }
 
 export interface FunctionalComponent<T = {}> {
-  (props: T, children: FVNode[], utils: FunctionalUtilities): FVNode | FVNode[];
+  (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
-export interface FVNode {
-  // using v prefixes largely so closure has no issue property renaming
-  vtag?: string | number | Function;
-  vkey?: string | number;
-  vtext?: string;
-  vchildren?: FVNode[];
-  vattrs?: any;
-  vname?: string;
-  ishost?: boolean;
-  isSlotFallback?: boolean;
-  isSlotReference?: boolean;
+export interface VNode {
+  $tag$?: string | number | Function;
+  $key$?: string | number;
+  $text$?: string;
+  $children$?: VNode[];
+  $attrs$?: any;
+  $name$?: string;
+  $flags$: number;
+  $elm$?: any;
 }
 
 export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
   vtext?: string;
-  vchildren?: ChildNode[];
+  vchildren?: VNode[];
   vattrs?: any;
   vname?: string;
 }

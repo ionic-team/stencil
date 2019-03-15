@@ -10,11 +10,13 @@ describe('updateElement', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr plutonium';
     const oldVNode: d.VNode = {
-      vattrs: { class: 'mr plutonium' }
+      $flags$: 0,
+      $attrs$: { class: 'mr plutonium' }
     };
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: { class: 'mr fusion' }
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -24,10 +26,12 @@ describe('updateElement', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
     const oldVNode: d.VNode = {
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $attrs$: { class: 'mr fusion' }
     };
     const newVnode: d.VNode = {
-      elm: elm
+      $flags$: 0,
+      $elm$: elm
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('');
@@ -37,11 +41,13 @@ describe('updateElement', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
     const oldVNode: d.VNode = {
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $attrs$: { class: 'mr fusion' }
     };
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: { class: 'mr fusion' }
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -49,10 +55,11 @@ describe('updateElement', () => {
 
   it('should add new classes when no oldVNode.vattrs', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = {};
+    const oldVNode: d.VNode = { $flags$: 0 };
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: { class: 'mr fusion' }
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -62,8 +69,9 @@ describe('updateElement', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     const oldVNode: d.VNode = null;
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: { class: 'mr fusion' }
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: { class: 'mr fusion' }
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -74,7 +82,8 @@ describe('updateElement', () => {
       const elm = document.createElement('my-tag') as HTMLElement;
       const oldVNode: d.VNode = null;
       const newVnode: d.VNode = {
-        elm: elm
+        $flags$: 0,
+        $elm$: elm
       };
       updateElement(oldVNode, newVnode, false);
     }).not.toThrow();
@@ -87,8 +96,9 @@ describe('updateElement', () => {
     };
     const oldVNode: d.VNode = null;
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: {
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' }
       }
@@ -103,8 +113,9 @@ describe('updateElement', () => {
     elm.host = 'localhost:8888';
     const oldVNode: d.VNode = null;
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: {
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' }
       }
@@ -118,8 +129,9 @@ describe('updateElement', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     const oldVNode: d.VNode = null;
     const newVnode: d.VNode = {
-      elm: elm,
-      vattrs: {
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' }
       }
@@ -134,8 +146,9 @@ describe('updateElement', () => {
     const elm = document.createElement('section') as HTMLElement;
     const initialVNode: d.VNode = null;
     const firstVNode: d.VNode = {
-      elm: elm,
-      vattrs: {
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: {
         content: 'attributes removed',
         padding: false,
         bold: 'false',
@@ -143,8 +156,9 @@ describe('updateElement', () => {
       }
     };
     const secondVNode: d.VNode = {
-      elm: elm,
-      vattrs: {
+      $flags$: 0,
+      $elm$: elm,
+      $attrs$: {
         content: 'attributes added',
         padding: true,
         bold: 'true',
@@ -155,28 +169,28 @@ describe('updateElement', () => {
     };
     updateElement(initialVNode, firstVNode, false);
     expect(spy).toHaveBeenCalledTimes(4);
-    expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', undefined, 'attributes removed', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(2, elm, 'padding', undefined, false, false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(3, elm, 'bold', undefined, 'false', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(4, elm, 'no-attr', undefined, null, false, undefined);
+    expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', undefined, 'attributes removed', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(2, elm, 'padding', undefined, false, false, 0);
+    expect(spy).toHaveBeenNthCalledWith(3, elm, 'bold', undefined, 'false', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(4, elm, 'no-attr', undefined, null, false, 0);
     spy.mockReset();
 
     updateElement(firstVNode, secondVNode, false);
     expect(spy).toHaveBeenCalledTimes(5);
-    expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', 'attributes removed', 'attributes added', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(2, elm, 'padding', false, true, false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(3, elm, 'bold', 'false', 'true', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(4, elm, 'margin', undefined, '', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(5, elm, 'color', undefined, 'lime', false, undefined);
+    expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', 'attributes removed', 'attributes added', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(2, elm, 'padding', false, true, false, 0);
+    expect(spy).toHaveBeenNthCalledWith(3, elm, 'bold', 'false', 'true', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(4, elm, 'margin', undefined, '', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(5, elm, 'color', undefined, 'lime', false, 0);
     spy.mockReset();
 
     updateElement(secondVNode, firstVNode, false);
     expect(spy).toHaveBeenCalledTimes(5);
-    expect(spy).toHaveBeenNthCalledWith(1, elm, 'margin', '', undefined, false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(2, elm, 'color', 'lime', undefined, false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(3, elm, 'content', 'attributes added', 'attributes removed', false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(4, elm, 'padding', true, false, false, undefined);
-    expect(spy).toHaveBeenNthCalledWith(5, elm, 'bold', 'true', 'false', false, undefined);
+    expect(spy).toHaveBeenNthCalledWith(1, elm, 'margin', '', undefined, false, 0);
+    expect(spy).toHaveBeenNthCalledWith(2, elm, 'color', 'lime', undefined, false, 0);
+    expect(spy).toHaveBeenNthCalledWith(3, elm, 'content', 'attributes added', 'attributes removed', false, 0);
+    expect(spy).toHaveBeenNthCalledWith(4, elm, 'padding', true, false, false, 0);
+    expect(spy).toHaveBeenNthCalledWith(5, elm, 'bold', 'true', 'false', false, 0);
     spy.mockReset();
     spy.mockRestore();
   });

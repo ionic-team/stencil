@@ -5,15 +5,12 @@
  */
 
 
-import { JSXElements } from '@stencil/core';
-
+import { JSXBase } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface HelloVdom {}
-  interface HelloVdomAttributes extends JSXElements.HTMLAttributes {}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -21,22 +18,33 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
+declare namespace LocalJSX {
+  interface HelloVdom extends JSXBase.HTMLAttributes {}
+
+  interface ElementInterfaces {
     'HelloVdom': Components.HelloVdom;
   }
 
-  interface StencilIntrinsicElements {
-    'hello-vdom': Components.HelloVdomAttributes;
+  interface IntrinsicElements {
+    'HelloVdom': LocalJSX.HelloVdom;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
   var HTMLHelloVdomElement: {
     prototype: HTMLHelloVdomElement;
     new (): HTMLHelloVdomElement;
   };
-
   interface HTMLElementTagNameMap {
     'hello-vdom': HTMLHelloVdomElement
   }
@@ -44,5 +52,5 @@ declare global {
   interface ElementTagNameMap {
     'hello-vdom': HTMLHelloVdomElement;
   }
-
 }
+

@@ -8,7 +8,6 @@ export const getDoc = (_?: any) => document;
 
 export const getHead = (_?: any) => getDoc().head;
 
-
 export const plt: d.PlatformRuntime = {};
 
 if (BUILD.taskQueue) {
@@ -32,10 +31,10 @@ export const supportsListenerOptions = (BUILD.hostListener) ? (() => {
 })() : false;
 
 
-export const supportsConstructibleStylesheets = BUILD.style ? ((s?: boolean) => {
+export const supportsConstructibleStylesheets = BUILD.style ? (() => {
   try {
     new CSSStyleSheet();
-    s = true;
+    return true;
   } catch (e) {}
-  return s;
-})(false) : false;
+  return false;
+})() : false;

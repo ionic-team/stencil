@@ -15,7 +15,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     hostElm,
     hostElm.shadowRoot,
     hostElm,
-    (hostRef.$vnode$ = { vtag: tagName, elm: hostElm }),
+    (hostRef.$vnode$ = { $flags$: 0, $tag$: tagName, $elm$: hostElm }),
     hydrateId
   );
 };
@@ -40,18 +40,19 @@ const clientHydrate = (hostElm: d.HostElement, shadowRoot: ShadowRoot, node: d.R
         node.removeAttribute(HYDRATE_CHILD_ID);
 
         childVNode = {
-          vtag: toLowerCase(node.tagName),
-          elm: node
+          $flags$: 0,
+          $tag$: toLowerCase(node.tagName),
+          $elm$: node
         };
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
-        if (!parentVNode.vchildren) {
-          parentVNode.vchildren = [];
+        if (!parentVNode.$children$) {
+          parentVNode.$children$ = [];
         }
 
         // add our child vnode to a specific index of the vnode's children
-        parentVNode.vchildren[<any>childVNodeSplt[1]] = childVNode;
+        parentVNode.$children$[<any>childVNodeSplt[1]] = childVNode;
 
         // this is now the new parent vnode for all the next child checks
         parentVNode = childVNode;
@@ -81,22 +82,23 @@ const clientHydrate = (hostElm: d.HostElement, shadowRoot: ShadowRoot, node: d.R
       if (childVNodeSplt[0] === 's') {
         // slot node reference
         childVNode = {
-          vtag: 'slot',
+          $flags$: 0,
+          $tag$: 'slot',
         };
 
         if (BUILD.shadowDom && shadowRoot) {
-          childVNode.elm = getDoc(node).createElement('slot');
-          node.parentNode.insertBefore(childVNode.elm, node);
+          childVNode.$elm$ = getDoc(node).createElement('slot');
+          node.parentNode.insertBefore(childVNode.$elm$, node);
           node.remove();
 
         } else if (BUILD.slotRelocation) {
           node['s-sr'] = true;
         }
 
-        if (!parentVNode.vchildren) {
-          parentVNode.vchildren = [];
+        if (!parentVNode.$children$) {
+          parentVNode.$children$ = [];
         }
-        parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+        parentVNode.$children$[<any>childVNodeSplt[2]] = childVNode;
 
       } else if (childVNodeSplt[0] === 'r') {
         // content reference node for the host element
@@ -127,18 +129,19 @@ const clientHydrate = (hostElm: d.HostElement, shadowRoot: ShadowRoot, node: d.R
 
       // cool, this is a text node and it's got a start comment
       childVNode = {
-        vtext: node.textContent,
-        elm: node
+        $flags$: 0,
+        $text$: node.textContent,
+        $elm$: node
       };
 
       // this is a new child vnode
       // so ensure its parent vnode has the vchildren array
-      if (!parentVNode.vchildren) {
-        parentVNode.vchildren = [];
+      if (!parentVNode.$children$) {
+        parentVNode.$children$ = [];
       }
 
       // add our child vnode to a specific index of the vnode's children
-      parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+      parentVNode.$children$[<any>childVNodeSplt[2]] = childVNode;
     }
   }
 };

@@ -49,13 +49,13 @@ export function h(nodeName: any, vnodeData: any) {
       }
 
       if (simple && lastSimple) {
-        (children[children.length - 1] as d.VNode).vtext += child;
+        (children[children.length - 1] as d.VNode).$text$ += child;
 
       } else if (children === null) {
-        children = [simple ? { vtext: child } as d.VNode : child];
+        children = [simple ? { $flags$: 0, $text$: child } : child];
 
       } else {
-        children.push(simple ? { vtext: child } as d.VNode : child);
+        children.push(simple ? { $flags$: 0, $text$: child } : child);
       }
 
       lastSimple = simple;
@@ -96,26 +96,26 @@ export function h(nodeName: any, vnodeData: any) {
   }
 
   const vnode: d.VNode = {
-    vtag: nodeName,
-    vchildren: children,
-    elm: undefined,
-    ishost: false,
+    $tag$: nodeName,
+    $children$: children,
+    $elm$: undefined,
+    $flags$: 0
   };
 
   if (BUILD.vdomAttribute) {
-    vnode.vattrs = vnodeData;
+    vnode.$attrs$ = vnodeData;
   }
 
   if (BUILD.vdomText) {
-    vnode.vtext = undefined;
+    vnode.$text$ = undefined;
   }
 
   if (BUILD.vdomKey) {
-    vnode.vkey = vkey;
+    vnode.$key$ = vkey;
   }
 
   if (BUILD.slotRelocation) {
-    vnode.vname = vname;
+    vnode.$name$ = vname;
   }
 
   return vnode;
@@ -124,6 +124,29 @@ export function h(nodeName: any, vnodeData: any) {
 export const Host: d.FunctionalComponent<any> = {} as any;
 
 const vdomFnUtils: d.FunctionalUtilities = {
-  'forEach': (children, cb) => children.forEach(cb),
-  'map': (children, cb) => children.map(cb)
+  'forEach': (children, cb) => children.map(convertToPublic).forEach(cb),
+  'map': (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate)
+};
+
+const convertToPublic = (node: d.VNode): d.ChildNode => {
+  return {
+    vattrs: node.$attrs$,
+    vchildren: node.$children$,
+    vkey: node.$key$,
+    vname: node.$name$,
+    vtag: node.$tag$,
+    vtext: node.$text$
+  };
+};
+
+const convertToPrivate = (node: d.ChildNode): d.VNode => {
+  return {
+    $flags$: 0,
+    $attrs$: node.vattrs,
+    $children$: node.vchildren,
+    $key$: node.vkey,
+    $name$: node.vname,
+    $tag$: node.vtag,
+    $text$: node.vtext
+  };
 };
