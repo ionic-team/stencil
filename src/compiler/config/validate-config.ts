@@ -60,9 +60,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   // figure out all of the config paths and absolute paths
   validatePaths(config);
 
-  // setup the outputTargets
-  validateOutputTargets(config);
-
   // validate how many workers we can use
   validateWorkers(config);
 
@@ -78,6 +75,9 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
   setBooleanConfig(config, 'buildEsm', 'esm', config.buildEs5);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
+
+  // setup the outputTargets
+  validateOutputTargets(config);
 
   if (typeof config.validateTypes !== 'boolean') {
     config.validateTypes = true;

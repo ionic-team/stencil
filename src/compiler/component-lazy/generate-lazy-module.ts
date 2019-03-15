@@ -7,6 +7,9 @@ import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/fo
 
 
 export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupResult[], sourceTarget: d.SourceTarget, sufix: string) {
+  if (destinations.length === 0) {
+    return;
+  }
   const entryComponetsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
   const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isAppCore);
 

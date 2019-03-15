@@ -41,6 +41,10 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.esmLoaderPath = DEFAULT_ESM_LOADER_DIR;
     }
 
+    if (!path.isAbsolute(outputTarget.esmLoaderPath)) {
+      outputTarget.esmLoaderPath = normalizePath(path.resolve(outputTarget.dir, outputTarget.esmLoaderPath));
+    }
+
     if (!outputTarget.typesDir) {
       outputTarget.typesDir = DEFAULT_TYPES_DIR;
     }
@@ -68,6 +72,17 @@ export function validateOutputTargetDist(config: d.Config) {
       systemDir: lazyDir,
       polyfills: true,
     });
+
+    if (config.buildEsm) {
+      config.outputTargets.push({
+        type: 'dist-lazy',
+        esmDir: path.join(outputTarget.dir, 'esm', 'es2017'),
+        esmEs5Dir: path.join(outputTarget.dir, 'esm', 'es5'),
+        cjsDir: path.join(outputTarget.dir, 'cjs', 'es2017'),
+        loaderDir: outputTarget.esmLoaderPath,
+        polyfills: true,
+      });
+    }
 
     config.outputTargets.push({
       type: 'docs-vscode',

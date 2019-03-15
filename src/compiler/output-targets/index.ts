@@ -5,7 +5,6 @@ import { outputAngularProxies } from './output-angular';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputCommonJsIndexes } from './output-commonjs';
-import { outputEsmIndexes } from './output-esm';
 import { outputHydrate } from './output-hydrate';
 import { outputWww } from './output-www';
 import { outputModule } from './output-module';
@@ -23,7 +22,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputCommonJsIndexes(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),
     generateServiceWorkers(config, compilerCtx, buildCtx),
-    outputEsmIndexes(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise

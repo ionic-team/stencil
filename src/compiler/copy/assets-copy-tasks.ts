@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildCtx, dest: string, allAssets: boolean) {
-  if (buildCtx.skipAssetsCopy) {
+  if (buildCtx.skipAssetsCopy || !dest) {
     return [];
   }
 

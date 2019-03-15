@@ -15,18 +15,18 @@ import { HYDRATE_CHILD_ID, NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
 
 
-let useNativeShadowDom = false;
 let scopeId: string;
-let checkSlotFallbackVisibility: boolean;
-let checkSlotRelocate: boolean;
 let contentRef: d.RenderNode;
 let hostTagName: string;
-let isSvgMode = false;
 let hydrateId: string;
+let useNativeShadowDom = false;
+let checkSlotFallbackVisibility = false;
+let checkSlotRelocate = false;
+let isSvgMode = false;
 
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, doc: Document) => {
-  let newVNode: d.VNode = newParentVNode.$children$[childIndex];
+  let newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;

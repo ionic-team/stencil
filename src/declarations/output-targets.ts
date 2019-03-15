@@ -106,11 +106,12 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
-  esmEs5Dir?: string;
   copyDir?: string;
   esmDir?: string;
+  esmEs5Dir?: string;
   systemDir?: string;
   cjsDir?: string;
+  loaderDir?: string;
   resourcesUrl?: string;
   polyfills?: boolean;
   copy?: d.CopyTask[];
