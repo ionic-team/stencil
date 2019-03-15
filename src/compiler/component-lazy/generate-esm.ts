@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateRollupBuild } from '../app-core/bundle-app-core';
+import { generateRollupOutput } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { normalizePath } from '@utils';
@@ -14,7 +14,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       entryFileNames: '[name].mjs.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
-    const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const es2017destinations = esmOutputs.map(o => o.esmDir);
       await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, results, 'es2017', '');

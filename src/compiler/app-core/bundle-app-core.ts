@@ -54,7 +54,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
   return undefined;
 }
 
-export async function generateRollupBuild(build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> {
+export async function generateRollupOutput(build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> {
   if (build == null) {
     return null;
   }

@@ -180,7 +180,7 @@ export interface OutputTargetStats extends OutputTargetBase {
 export interface OutputTargetAngular extends OutputTargetBase {
   type: 'angular';
 
-  componentCorePackage?: string;
+  componentCorePackage: string;
   directivesProxyFile?: string;
   directivesArrayFile?: string;
   directivesUtilsFile?: string;

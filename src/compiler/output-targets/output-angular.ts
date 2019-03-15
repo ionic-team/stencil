@@ -27,7 +27,6 @@ export async function outputAngularProxies(config: d.Config, compilerCtx: d.Comp
 
 function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
   const components = getComponents(outputTarget.excludeComponents, moduleFiles);
-
   return Promise.all([
     generateProxies(config, compilerCtx, components, outputTarget),
     generateAngularArray(config, compilerCtx, components, outputTarget),
@@ -46,15 +45,12 @@ function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, component
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';`;
-
-  const sourceImports = !outputTarget.componentCorePackage ? ''
-    : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
+import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';
+import { Components } from '${outputTarget.componentCorePackage}';`;
 
   const final: string[] = [
     imports,
     getProxyUtils(config, outputTarget),
-    sourceImports,
     proxies,
   ];
 
@@ -92,7 +88,7 @@ function getProxy(cmpMeta: d.ComponentCompilerMeta) {
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
   const lines = [`
-export declare interface ${tagNameAsPascal} extends StencilComponents<'${tagNameAsPascal}'> {}
+export declare interface ${tagNameAsPascal} extends Components.${tagNameAsPascal} {}
 @Component({ ${directiveOpts.join(', ')} })
 export class ${tagNameAsPascal} {`];
 
@@ -160,7 +156,7 @@ function generateAngularArray(config: d.Config, compilerCtx: d.CompilerCtx, comp
 import * as d from '${proxyPath}';
 
 export const DIRECTIVES = [
-${directives}
+  ${directives}
 ];
 `;
   return compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, c);

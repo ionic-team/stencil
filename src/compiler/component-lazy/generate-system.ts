@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { generateRollupBuild } from '../app-core/bundle-app-core';
+import { generateRollupOutput } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { getAppBrowserCorePolyfills } from '../app-core/app-polyfills';
 import { OutputOptions, RollupBuild } from 'rollup';
@@ -13,7 +13,7 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
       entryFileNames: '[name].system.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
     };
-    const results = await generateRollupBuild(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map(o => o.esmDir);
       await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system');

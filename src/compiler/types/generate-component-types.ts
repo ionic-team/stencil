@@ -11,7 +11,7 @@ import { generatePropTypes } from './generate-prop-types';
  * @param cmp the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath: string): d.TypesModule {
+export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesModule {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
@@ -29,19 +29,19 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta, _importPath
     ...propAttributes,
     ...eventAttributes
   ], true);
-
+  const onlyJSX = cmp.isCollectionDependency;
   return {
     tagNameAsPascal,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
     jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
-    element: cmp.isLegacy ? '' : `
+    element: onlyJSX ? '' : `
 interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${htmlElementName}: {
   prototype: ${htmlElementName};
   new (): ${htmlElementName};
 };`,
-    HTMLElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${htmlElementName}`,
-    ElementTagNameMap: cmp.isLegacy ? '' : `'${tagName}': ${htmlElementName};`,
+    HTMLElementTagNameMap: onlyJSX ? '' : `'${tagName}': ${htmlElementName}`,
+    ElementTagNameMap: onlyJSX ? '' : `'${tagName}': ${htmlElementName};`,
   };
 }
 

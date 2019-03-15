@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { bundleApp, generateRollupBuild } from '../app-core/bundle-app-core';
+import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
 import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
@@ -80,7 +80,7 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
   };
 
   const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
-  return generateRollupBuild(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
+  return generateRollupOutput(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 
 function generateEntryPoint(entryModules: d.EntryModule[]) {

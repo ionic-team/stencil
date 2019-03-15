@@ -40,16 +40,13 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   const allTypes = new Map<string, number>();
   const isSrcTypes = destination === 'src';
   const components = sortBy(
-    getComponentsFromModules(buildCtx.moduleFiles).filter(cmp => isSrcTypes || !cmp.isCollectionDependency),
+    getComponentsFromModules(buildCtx.moduleFiles),
     cmp => cmp.tagName
   );
 
   const modules: d.TypesModule[] = components.map(cmp => {
-    const importPath = normalizePath(config.sys.path.relative(config.srcDir, cmp.sourceFilePath)
-    .replace(/\.(tsx|ts)$/, ''));
     typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, cmp.sourceFilePath);
-
-    return generateComponentTypes(cmp, importPath);
+    return generateComponentTypes(cmp);
   });
 
   const jsxAugmentation = !isSrcTypes ? '' : `
@@ -63,7 +60,7 @@ declare module "@stencil/core" {
 
   const componentsFileString = `
 export namespace Components {
-  ${modules.map(m => `${m.component}`).join('\n')}
+  ${modules.map(m => `${m.component}`).join('\n').trim()}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -72,7 +69,7 @@ interface HTMLStencilElement extends HTMLElement {
 }
 
 declare namespace LocalJSX {
-  ${modules.map(m => `${m.jsx}`).join('\n')}
+  ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
   interface ElementInterfaces {
   ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
