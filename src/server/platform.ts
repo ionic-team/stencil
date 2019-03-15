@@ -88,6 +88,8 @@ export const supportsShadowDom = false;
 
 export const supportsListenerOptions = false;
 
+export const supportsConstructibleStylesheets = false;
+
 const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
 
 export const getHostRef = (ref: d.RuntimeRef) =>

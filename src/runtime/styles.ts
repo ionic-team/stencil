@@ -1,11 +1,8 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
-import { getDoc, styles } from '@platform';
-import { supportsShadowDom } from '@platform';
+import { getDoc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 
-
-const supportsConstructibleStylesheets = !BUILD.hydrateServerSide && !!(document as any).adoptedStyleSheets;
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
 
@@ -23,44 +20,44 @@ export const registerStyle = (styleId: string, cssText: string) => {
 
 export const addStyle = (styleContainerNode: any, styleId: string) => {
   const style = styles.get(styleId);
-  if (!style) {
-    return;
-  }
-  if (typeof style === 'string') {
-    styleContainerNode = styleContainerNode.head ? styleContainerNode.head : styleContainerNode;
-    let appliedStyles = rootAppliedStyles.get(styleContainerNode);
-    if (!appliedStyles) {
-      rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
-    }
-
-    if (!appliedStyles.has(styleId)) {
-      let styleElm;
-      if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
-        styleElm.innerHTML = style;
-
-      } else {
-        const dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
-
-        styleElm = getDoc(styleContainerNode).createElement('style');
-        styleElm.innerHTML = style;
-
-        if (BUILD.hydrateServerSide) {
-          styleElm.setAttribute('h-id', styleId);
-        }
-
-        styleContainerNode.insertBefore(
-          styleElm,
-          (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild
-        );
+  if (style) {
+    if (typeof style === 'string') {
+      styleContainerNode = styleContainerNode.head ? styleContainerNode.head : styleContainerNode;
+      let appliedStyles = rootAppliedStyles.get(styleContainerNode);
+      if (!appliedStyles) {
+        rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
       }
 
-      appliedStyles.add(styleId);
+      if (!appliedStyles.has(styleId)) {
+        let styleElm;
+        if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
+          styleElm.innerHTML = style;
+
+        } else {
+          const dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
+
+          styleElm = getDoc(styleContainerNode).createElement('style');
+          styleElm.innerHTML = style;
+
+          if (BUILD.hydrateServerSide) {
+            styleElm.setAttribute('h-id', styleId);
+          }
+
+          styleContainerNode.insertBefore(
+            styleElm,
+            (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild
+          );
+        }
+
+        appliedStyles.add(styleId);
+      }
+
+    } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
+      styleContainerNode.adoptedStyleSheets = [
+        ...styleContainerNode.adoptedStyleSheets,
+        style
+      ];
     }
-  } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
-    styleContainerNode.adoptedStyleSheets = [
-      ...styleContainerNode.adoptedStyleSheets,
-      style
-    ];
   }
 };
 

@@ -27,6 +27,8 @@ export const supportsShadowDom = true;
 
 export const supportsListenerOptions = true;
 
+export const supportsConstructibleStylesheets = false;
+
 export function resetPlatform() {
   resetWindow(win);
   (win.document as d.RenderDocument)['s-ids'] = undefined;
