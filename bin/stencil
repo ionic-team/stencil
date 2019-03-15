@@ -1,19 +1,18 @@
 #!/usr/bin/env node
 'use strict';
 
-var cli = require('../dist/cli/index.js');
-var nodeSys = require('../dist/sys/node/index.js');
-
-var sys = new nodeSys.NodeSystem();
-var logger = new nodeSys.NodeLogger();
-
 try {
   var v = process.version.replace('v', '').split('.');
   var major = parseInt(v[0], 10);
   var minor = parseInt(v[1], 10);
   if (major < 8 || (major === 8 && minor < 9)) {
-    logger.warn(logger.yellow('Your current version of Node is ' + process.version + ', however the recommendation is a minimum of Node 8.x LTS. Note that future versions of Stencil will eventually remove support for non-LTS Node versions.'));
+    console.log('\nYour current version of Node is ' + process.version + ', however the recommendation is a minimum of Node LTS (https://github.com/nodejs/Release). Note that future versions of Stencil will eventually remove support for non-LTS Node versions.\n');
   }
 } catch (e) {}
+
+var cli = require('../dist/cli/index.js');
+var nodeSys = require('../dist/sys/node/index.js');
+var sys = new nodeSys.NodeSystem();
+var logger = new nodeSys.NodeLogger();
 
 cli.run(process, sys, logger);
