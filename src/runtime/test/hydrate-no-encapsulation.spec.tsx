@@ -43,7 +43,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a>
+      <cmp-a class="hydrated">
         <!--r.1-->
         <p class="hi">
           Hello
@@ -102,9 +102,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a>
+      <cmp-a class="hydrated">
         <!--r.1-->
-        <cmp-b>
+        <cmp-b class="hydrated">
           <!--r.2-->
           <!--s.2.0-->
           light-dom
@@ -164,9 +164,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a>
+      <cmp-a class="hydrated">
         <!--r.1-->
-        <cmp-b>
+        <cmp-b class="hydrated">
           <!--r.2-->
           <header></header>
           <!--s.2.1-->
@@ -228,9 +228,9 @@ it('nested, text slot, header/footer', async () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a>
+      <cmp-a class="hydrated">
         <!--r.1-->
-        <cmp-b>
+        <cmp-b class="hydrated">
           <!--r.2-->
           <header></header>
           <!--s.2.1-->
