@@ -24,7 +24,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   // send data over to our worker process to validate types
   // don't let this block the main thread and we'll check
   // its response sometime later
-  const timeSpan = buildCtx.createTimeSpan(`validateTypes started`);
+  const timeSpan = buildCtx.createTimeSpan(`type checking started`);
 
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   const rootTsFiles = compilerCtx.rootTsFiles.slice();
@@ -37,7 +37,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
 
   buildCtx.validateTypesHandler = async (results: d.ValidateTypesResults) => {
-    timeSpan.finish(`validateTypes finished`);
+    timeSpan.finish(`type checking finished`);
 
     compilerCtx.fs.cancelDeleteDirectoriesFromDisk(results.dirPaths);
     compilerCtx.fs.cancelDeleteFilesFromDisk(results.filePaths);

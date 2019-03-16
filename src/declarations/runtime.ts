@@ -99,6 +99,7 @@ export interface PlatformRuntime {
   $queueCongestion$?: number;
   $queueAsync$?: boolean;
   $queuePending$?: boolean;
+  $importMetaUrl$?: string;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

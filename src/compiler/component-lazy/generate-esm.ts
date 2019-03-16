@@ -51,8 +51,8 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     'es2017': './index.es2017.js'
   }, null, 2);
 
-  const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.esm.js');
-  const es2017EntryPoint = config.sys.path.join(es2017Dir, 'loader.esm.js');
+  const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs.js');
+  const es2017EntryPoint = config.sys.path.join(es2017Dir, 'loader.mjs.js');
   const cjsEntryPoint = config.sys.path.join(cjsDir, 'loader.cjs.js');
 
   const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;

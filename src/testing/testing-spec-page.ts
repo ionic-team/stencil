@@ -110,7 +110,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     } catch (e) {}
   }
 
-  platform.bootstrapLazy(lazyBundles);
+  platform.bootstrapLazy(lazyBundles, plt.win);
 
   if (typeof opts.html === 'string') {
     plt.body.innerHTML = opts.html;

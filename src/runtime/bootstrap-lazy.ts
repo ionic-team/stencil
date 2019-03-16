@@ -3,34 +3,35 @@ import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
 import { convertToShadowCss } from './client-hydrate';
 import { disconnectedCallback } from './disconnected-callback';
-import { getDoc, getHead, getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
 import { CMP_FLAG } from '@utils';
 import { HTMLElement } from './html-element';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
-  // bootstrapLazy
-
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window, options: d.CustomElementsDefineOptions = {}) => {
   const cmpTags: string[] = [];
+  const exclude = options.exclude || [];
+  const doc = win.document;
+  const head = doc.head;
+  const y = head.querySelector('meta[charset]');
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    getDoc().querySelectorAll('style[h-id]')
+    doc.querySelectorAll('style[h-id]')
       .forEach(convertToShadowCss);
   }
-
   lazyBundles.forEach(lazyBundle =>
 
     lazyBundle[1].forEach(cmpLazyMeta => {
 
       cmpLazyMeta.$lazyBundleIds$ = lazyBundle[0];
 
-      if (!customElements.get(cmpLazyMeta.t)) {
+      if (!exclude.includes(cmpLazyMeta.t) && !win.customElements.get(cmpLazyMeta.t)) {
         if (BUILD.style) {
           cmpTags.push(cmpLazyMeta.t);
         }
-        customElements.define(
+        win.customElements.define(
           cmpLazyMeta.t,
           proxyComponent(class extends HTMLElement {
 
@@ -90,12 +91,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData) => {
   );
 
   if (BUILD.style) {
-    const visibilityStyle = getDoc().createElement('style');
     // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
+    const visibilityStyle = doc.createElement('style');
     visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
     visibilityStyle.setAttribute('data-styles', '');
-
-    const y = getHead().querySelector('meta[charset]');
-    getHead().insertBefore(visibilityStyle, y ? y.nextSibling : getHead().firstChild);
+    head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
   }
 };

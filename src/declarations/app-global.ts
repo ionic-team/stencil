@@ -23,6 +23,9 @@ export interface WindowData extends Window {
 }
 
 
+export interface CustomElementsDefineOptions {
+  exclude?: string[];
+}
 
 export interface AppGlobal {
   ael?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;

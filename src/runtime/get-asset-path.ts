@@ -1,9 +1,11 @@
+import {plt} from '@platform';
+
 export const getAssetPath = (path: string) => {
   try {
     // @ts-ignore
-    return new URL(path, import.meta.url).pathname;
+    return new URL(path, plt.$importMetaUrl$ || '/').pathname;
   } catch (e) {
-    throw new Error('TODO');
+    return '/';
   }
 };
 

@@ -77,9 +77,9 @@ const CORE = `
 import { bootstrapLazy } from '@stencil/core/platform';
 import globalScripts from '@stencil/core/global-scripts';
 export * from '@stencil/core/platform';
-export const defineCustomElements = win => {
+export const defineCustomElements = (win, options) => {
   globalScripts(win);
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/]);
+  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], win, options);
 };
 `;
 
