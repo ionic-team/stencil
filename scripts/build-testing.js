@@ -43,7 +43,6 @@ if (success) {
         'rollup',
         'rollup-plugin-commonjs',
         'rollup-plugin-node-resolve',
-        'rollup-pluginutils',
         'stream',
         'typescript',
         'util',
