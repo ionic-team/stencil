@@ -60,7 +60,7 @@ describe('bundle-module', () => {
         `,
         [path.join(root, 'src', 'package.json')]: `
           {
-            "thename": "test"
+            "thename": "thevalue"
           }
         `
       });
@@ -69,14 +69,17 @@ describe('bundle-module', () => {
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      console.log(c.fs.keys);
       expectFiles(c.fs, [
         path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-b.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-a.sc.entry.js'),
         path.join(root, 'www', 'build', 'app', 'cmp-b.sc.entry.js'),
-        path.join(root, 'www', 'build', 'app', 'chunk-8fcccdcc.js'),
+        path.join(root, 'www', 'build', 'app', 'chunk-0f34e174.js'),
       ]);
+
+      const jsonData = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'chunk-0f34e174.js'));
+      expect(jsonData).toContain('thename');
+      expect(jsonData).toContain('thevalue');
     });
 
   });

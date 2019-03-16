@@ -54,14 +54,14 @@ describe('build', () => {
     expect(r.diagnostics).toEqual([]);
 
     const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.es5.entry.js'));
-    expect(cmpA).toEqual(`App.loadBundle("cmp-a",["exports","./chunk-7feb3c75.js"],function(e,n){var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-a"},enumerable:!0,configurable:!0}),e}();e.CmpA=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
+    expect(cmpA).toEqual(`App.loadBundle("cmp-a",["exports","./chunk-5895a08a.js"],function(e,n){var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-a"},enumerable:!0,configurable:!0}),e}();e.CmpA=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
 
     const cmpB = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-b.es5.entry.js'));
-    expect(cmpB).toEqual(`App.loadBundle("cmp-b",["exports","./chunk-7feb3c75.js"],function(e,n){var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-b"},enumerable:!0,configurable:!0}),e}();e.CmpB=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
+    expect(cmpB).toEqual(`App.loadBundle("cmp-b",["exports","./chunk-5895a08a.js"],function(e,n){var u=function(){function e(){n.someFn(!0)}return Object.defineProperty(e,"is",{get:function(){return"cmp-b"},enumerable:!0,configurable:!0}),e}();e.CmpB=u,Object.defineProperty(e,"__esModule",{value:!0})});`);
 
     const chunkFileName = r.filesWritten.find(f => f.includes('chunk') && f.includes('es5'));
     const chunk = await c.fs.readFile(chunkFileName);
-    expect(chunk).toEqual(`App.loadBundle("chunk-7feb3c75.js",["exports"],function(o){o.someFn=function(o){o?console.log(!0):console.log(!1)}});`);
+    expect(chunk).toEqual(`App.loadBundle("chunk-5895a08a.js",["exports"],function(o){o.someFn=function(o){o?console.log(!0):console.log(!1)}});`);
   });
 
   it('should minify es2017 build', async () => {
