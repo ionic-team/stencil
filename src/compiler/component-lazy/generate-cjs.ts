@@ -15,7 +15,7 @@ export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, 
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = cjsOutputs.map(o => o.cjsDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '.cjs');
+      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '.cjs', false);
     }
   }
 }

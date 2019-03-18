@@ -16,7 +16,7 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system');
+      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system', false);
       await generateSystemLoader(config, compilerCtx, systemOutputs);
     }
   }

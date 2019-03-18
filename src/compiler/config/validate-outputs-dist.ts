@@ -80,6 +80,7 @@ export function validateOutputTargetDist(config: d.Config) {
         esmEs5Dir: path.join(outputTarget.dir, 'esm', 'es5'),
         cjsDir: path.join(outputTarget.dir, 'cjs', 'es2017'),
         loaderDir: outputTarget.esmLoaderPath,
+        replaceImportMeta: true,
         polyfills: true,
       });
     }

@@ -115,6 +115,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   resourcesUrl?: string;
   polyfills?: boolean;
   copy?: d.CopyTask[];
+  replaceImportMeta?: boolean;
 
   empty?: boolean;
 }

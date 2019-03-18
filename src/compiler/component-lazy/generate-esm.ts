@@ -16,11 +16,19 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const es2017destinations = esmOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, results, 'es2017', '');
+      // TODO(manu): refactor, this code is a mess
+      const es2017destinationsReplace = esmOutputs.filter(o => !!o.replaceImportMeta).map(o => o.esmDir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinationsReplace, results, 'es2017', '', true);
 
-      const es5destinations = esmEs5Outputs.map(o => o.esmEs5Dir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, results, 'es5', '');
+      const es2017destinations = esmOutputs.filter(o => !o.replaceImportMeta).map(o => o.esmDir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, results, 'es2017', '', false);
+
+      const es5destinationsReplace = esmEs5Outputs.filter(o => !!o.replaceImportMeta).map(o => o.esmEs5Dir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es5destinationsReplace, results, 'es5', '', true);
+
+      const es5destinations = esmEs5Outputs.filter(o => !o.replaceImportMeta).map(o => o.esmEs5Dir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, results, 'es5', '', false);
+
       await generateEsmLoaders(config, compilerCtx, outputTargets);
     }
   }
