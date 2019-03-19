@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.18.1-0",
+  "version": "0.18.1-iefix.1",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -133,6 +133,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ionic-team/stencil.git"
+  },
+  "publishConfig": {
+    "registry": "https://extranet.aoe.com/artifactory/api/npm/congstar-npm-local/"
   },
   "author": "Ionic Team",
   "homepage": "https://stenciljs.com/",
