@@ -59,7 +59,8 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
     copyDir: outputTarget.buildDir,
     esmDir: outputTarget.buildDir,
     systemDir: outputTarget.buildDir,
-    polyfills: outputTarget.polyfills
+    polyfills: outputTarget.polyfills,
+    systemLoaderFile: config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`)
   });
 }
 

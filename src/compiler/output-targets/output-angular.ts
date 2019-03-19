@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetAngular } from './output-utils';
-import { dashToPascalCase, sortBy } from '@utils';
+import { dashToPascalCase, relativeImport, sortBy } from '@utils';
 
 
 export async function outputAngularProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -136,7 +136,7 @@ function getProxyUtils(config: d.Config, outputTarget: d.OutputTargetAngular) {
   if (!outputTarget.directivesUtilsFile) {
     return PROXY_UTILS.replace(/export function/g, 'function');
   } else {
-    const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile);
+    const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile, '.ts');
     return `import { proxyInputs, proxyMethods, proxyOutputs } from '${utilsPath}';\n`;
   }
 }
@@ -146,7 +146,7 @@ function generateAngularArray(config: d.Config, compilerCtx: d.CompilerCtx, comp
     return Promise.resolve();
   }
 
-  const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+  const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile, '.ts');
   const directives = components
     .map(cmpMeta => dashToPascalCase(cmpMeta.tagName))
     .map(className => `d.${className}`)
@@ -166,12 +166,6 @@ async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: d.
   if (outputTarget.directivesUtilsFile) {
     await compilerCtx.fs.writeFile(outputTarget.directivesUtilsFile, '/* tslint:disable */\n' + PROXY_UTILS);
   }
-}
-
-function relativeImport(config: d.Config, pathFrom: string, pathTo: string) {
-  let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
-  relativePath = relativePath === '' ? '.' : relativePath;
-  return `${relativePath}/${config.sys.path.basename(pathTo, '.ts')}`;
 }
 
 const PROXY_UTILS = `import { fromEvent } from 'rxjs';

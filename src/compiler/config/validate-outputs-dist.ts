@@ -70,17 +70,22 @@ export function validateOutputTargetDist(config: d.Config) {
       copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: lazyDir,
+      systemLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.js'),
+      esmLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.mjs.js'),
       polyfills: true,
     });
 
     if (config.buildEsm) {
       config.outputTargets.push({
         type: 'dist-lazy',
-        esmDir: path.join(outputTarget.dir, 'esm', 'es2017'),
-        esmEs5Dir: path.join(outputTarget.dir, 'esm', 'es5'),
-        cjsDir: path.join(outputTarget.dir, 'cjs', 'es2017'),
+        esmDir: path.join(outputTarget.dir, 'esm'),
+        esmEs5Dir: path.join(outputTarget.dir, 'esm', 'legacy'),
+        cjsDir: path.join(outputTarget.dir, 'cjs'),
+
+        cjsIndexFile: path.join(outputTarget.dir, 'index.js'),
+        esmIndexFile: path.join(outputTarget.dir, 'index.mjs'),
         loaderDir: outputTarget.esmLoaderPath,
-        replaceImportMeta: true,
+        webpackBuild: true,
         polyfills: true,
       });
     }

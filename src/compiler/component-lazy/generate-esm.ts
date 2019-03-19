@@ -2,9 +2,9 @@ import * as d from '../../declarations';
 import { generateRollupOutput } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
-import { normalizePath } from '@utils';
+import { relativeImport } from '@utils';
 
-export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, webpackBuild: boolean, outputTargets: d.OutputTargetDistLazy[]) {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir) : [];
   const esmOutputs = outputTargets.filter(o => !!o.esmDir);
 
@@ -12,69 +12,48 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
     const esmOpts: OutputOptions = {
       format: 'esm',
       entryFileNames: '[name].mjs.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
+      chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js',
     };
-    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    if (results != null) {
-      // TODO(manu): refactor, this code is a mess
-      const es2017destinationsReplace = esmOutputs.filter(o => !!o.replaceImportMeta).map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinationsReplace, results, 'es2017', '', true);
+    if (!webpackBuild) {
+      esmOpts.dynamicImportFunction = '__stencil_import';
+    }
+    const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
-      const es2017destinations = esmOutputs.filter(o => !o.replaceImportMeta).map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, results, 'es2017', '', false);
+    if (output != null) {
+      const es2017destinations = esmOutputs.map(o => o.esmDir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, output, 'es2017', '', webpackBuild);
 
-      const es5destinationsReplace = esmEs5Outputs.filter(o => !!o.replaceImportMeta).map(o => o.esmEs5Dir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es5destinationsReplace, results, 'es5', '', true);
+      const es5destinations = esmEs5Outputs.map(o => o.esmEs5Dir);
+      await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, output, 'es5', '', webpackBuild);
 
-      const es5destinations = esmEs5Outputs.filter(o => !o.replaceImportMeta).map(o => o.esmEs5Dir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, results, 'es5', '', false);
-
-      await generateEsmLoaders(config, compilerCtx, outputTargets);
+      await generateShortcuts(config, compilerCtx, outputTargets);
     }
   }
 }
 
-function generateEsmLoaders(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
   return Promise.all(
-    outputTargets.map(o => generateLoader(config, compilerCtx, o))
+    outputTargets.map(async o => {
+      if (o.esmDir) {
+        if (o.esmLoaderFile) {
+          const entryPointPath = config.buildEs5 && o.esmEs5Dir
+            ? config.sys.path.join(o.esmEs5Dir, `${config.fsNamespace}.mjs.js`)
+            : config.sys.path.join(o.esmDir, `${config.fsNamespace}.mjs.js`);
+
+          const relativePath = relativeImport(config, o.esmLoaderFile, entryPointPath);
+          const shortcutContent = `export * from '${relativePath}';`;
+          await compilerCtx.fs.writeFile(o.esmLoaderFile, shortcutContent);
+        }
+        if (o.esmIndexFile) {
+          const entryPointPath = config.buildEs5 && o.esmEs5Dir
+            ? config.sys.path.join(o.esmEs5Dir, 'index.mjs.js')
+            : config.sys.path.join(o.esmDir, 'index.mjs.js');
+
+          const relativePath = relativeImport(config, o.esmIndexFile, entryPointPath);
+          const shortcutContent = `export * from '${relativePath}';`;
+          await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent);
+        }
+      }
+    })
   );
 }
-
-async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazy) {
-  const loaderPath = outputTarget.loaderDir;
-  const es5Dir = outputTarget.esmEs5Dir;
-  const es2017Dir = outputTarget.esmDir;
-  const cjsDir = outputTarget.cjsDir;
-  if (!loaderPath || !es5Dir || !es2017Dir || !cjsDir) {
-    return;
-  }
-
-  const packageJsonContent = JSON.stringify({
-    'name': 'loader',
-    'typings': './index.d.ts',
-    'module': './index.js',
-    'main': './index.cjs.js',
-    'jsnext:main': './index.es2017.js',
-    'es2015': './index.es2017.js',
-    'es2017': './index.es2017.js'
-  }, null, 2);
-
-  const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs.js');
-  const es2017EntryPoint = config.sys.path.join(es2017Dir, 'loader.mjs.js');
-  const cjsEntryPoint = config.sys.path.join(cjsDir, 'loader.cjs.js');
-
-  const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
-  const indexContent = `export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
-  const indexES2017Content = `export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
-  const indexCjsContent = `module.exports = require('${normalizePath(config.sys.path.relative(loaderPath, cjsEntryPoint))}');`;
-
-  await Promise.all([
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'package.json'), packageJsonContent),
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.d.ts'), INDEX_DTS),
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.js'), indexContent),
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.cjs.js'), indexCjsContent),
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.js'), indexES2017Content)
-  ]);
-}
-
-const INDEX_DTS = 'export declare function defineCustomElements(win: any, opts?: any): Promise<void>;';

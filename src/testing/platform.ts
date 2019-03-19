@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-export { Host, bootstrapLazy, createEvent, getElement, getConnect, h, insertVdomAnnotations } from '@runtime';
+export { Host, bootstrapLazy, patchDynamicImport, createEvent, getElement, getConnect, insertVdomAnnotations, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
 

@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 
 export { bootstrapLazy } from './bootstrap-lazy';
+export { patchDynamicImport } from './dynamic-import-shim';
 export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';
 export { disconnectedCallback } from './disconnected-callback';
