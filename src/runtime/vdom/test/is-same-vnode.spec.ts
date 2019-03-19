@@ -1,6 +1,6 @@
 // import * as d from '../declarations';
 import { h } from '../h';
-import { isSameVnode } from '../render';
+import { isSameVnode } from '../vdom-render';
 
 
 describe('isSameVnode', () => {

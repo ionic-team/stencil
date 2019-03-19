@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-export { Host, bootstrapLazy, createEvent, getElement, getConnect, h } from '@runtime';
+export { Host, bootstrapLazy, createEvent, getElement, getConnect, h, insertVdomAnnotations } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
 
@@ -31,7 +31,6 @@ export const supportsConstructibleStylesheets = false;
 
 export function resetPlatform() {
   resetWindow(win);
-  (win.document as d.RenderDocument)['s-ids'] = undefined;
 
   hostRefs.clear();
   styles.clear();

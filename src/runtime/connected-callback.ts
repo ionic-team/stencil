@@ -105,22 +105,15 @@ const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) =
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  const doc = getDoc(elm) as d.RenderDocument;
   let crName: string;
-  if (BUILD.hydrateServerSide) {
-    doc['s-ids'] = (doc['s-ids'] || 1);
-    elm[HYDRATE_HOST_ID] = (doc['s-ids']++) + '';
-    crName = `r.` + elm[HYDRATE_HOST_ID];
-    elm.setAttribute(HYDRATE_HOST_ID, elm[HYDRATE_HOST_ID] as any);
-
-  } else if (BUILD.isDebug) {
+  if (BUILD.isDebug) {
     crName = `content-ref:${elm.tagName}`;
 
   } else {
     crName = '';
   }
 
-  contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
+  contentRefElm = elm['s-cr'] = (getDoc(elm).createComment(crName) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

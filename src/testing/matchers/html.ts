@@ -12,20 +12,23 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
     serializeA = serializeNodeToHtml((input as any), {
       pretty: true,
       outerHTML: true,
-      excludeTags: ['body']
+      excludeTags: ['body'],
+      serializeShadowRoot: true
     });
 
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
     serializeA = serializeNodeToHtml((input as any), {
       pretty: true,
       excludeTags: ['style'],
-      excludeTagContent: ['style']
+      excludeTagContent: ['style'],
+      serializeShadowRoot: true
     });
 
   } else if (typeof input === 'string') {
     const parseA = parseHtmlToFragment(input);
     serializeA = serializeNodeToHtml(parseA, {
-      pretty: true
+      pretty: true,
+      serializeShadowRoot: true
     });
 
   } else {

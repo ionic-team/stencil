@@ -462,6 +462,7 @@ export interface NewSpecPageOptions {
   hydrateClientSide?: boolean;
   hydrateServerSide?: boolean;
   referrer?: string;
+  serializedShadowDom?: boolean;
   url?: string;
   userAgent?: string;
 }
