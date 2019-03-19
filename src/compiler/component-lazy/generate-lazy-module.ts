@@ -84,7 +84,7 @@ export async function writeLazyCore(config: d.Config, compilerCtx: d.CompilerCtx
     `${lazyRuntimeData}`
   );
   if (webpackBuild) {
-    code = code.replace('/*!STENCIL:IMPORT.META.URL*/ import.meta.url', '""');
+    code = code.replace(/import\.meta\.url/g, '""');
   }
   return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, code, filename);
 }
