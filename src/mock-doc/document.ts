@@ -202,11 +202,6 @@ export function createDocument(html: string | boolean = null, win: any = null): 
 
 export function resetDocument(doc: Document) {
   if (doc != null) {
-    try {
-      doc.cookie = '';
-      (doc as any).referrer = '';
-    } catch (e) {}
-
     resetEventListeners(doc);
 
     const documentElement = doc.documentElement;
@@ -219,9 +214,37 @@ export function resetDocument(doc: Document) {
         childNode.childNodes.length = 0;
       }
     }
+
+    for (const key in doc) {
+      if (doc.hasOwnProperty(key) && !DOC_KEY_KEEPERS.has(key)) {
+        delete (doc as any)[key];
+      }
+    }
+
+    try {
+      (doc as any).nodeName = NODE_NAMES.DOCUMENT_NODE;
+    } catch (e) {}
+    try {
+      (doc as any).nodeType = NODE_TYPES.DOCUMENT_NODE;
+    } catch (e) {}
+    try {
+      (doc as any).cookie = '';
+    } catch (e) {}
+    try {
+      (doc as any).referrer = '';
+    } catch (e) {}
   }
 }
 
+const DOC_KEY_KEEPERS = new Set([
+  'nodeName',
+  'nodeType',
+  'nodeValue',
+  'ownerDocument',
+  'parentNode',
+  'childNodes',
+  '_shadowRoot'
+]);
 
 function getElementById(elm: MockElement, id: string): MockElement {
   const children = elm.children;
