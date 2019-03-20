@@ -15,10 +15,10 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
 
   const [bundleModules] = await Promise.all([
     Promise.all(entryComponentsResults.map(rollupResult => {
-      return generateLazyEntryModule(config, compilerCtx, buildCtx, destinations, rollupResult, sourceTarget, webpackBuild, sufix);
+      return generateLazyEntryModule(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, sufix, rollupResult);
     })),
     Promise.all(chunkResults.map(rollupResult => {
-      return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, rollupResult.code, rollupResult.fileName);
+      return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, rollupResult);
     }))
   ]);
 
@@ -31,7 +31,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
 }
 
 
-async function generateLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResult: d.RollupResult, sourceTarget: d.SourceTarget, webpackBuild: boolean, sufix: string): Promise<d.BundleModule> {
+async function generateLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, sufix: string, rollupResult: d.RollupResult): Promise<d.BundleModule> {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
   const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, rollupResult.code);
   const outputs = await Promise.all(
@@ -48,14 +48,14 @@ async function generateLazyEntryModule(config: d.Config, compilerCtx: d.Compiler
   };
 }
 
-export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, code: string, filename: string) {
-  if ((filename.startsWith('loader') || filename.startsWith('index')) && !webpackBuild) {
+export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, rollupResult: d.RollupResult) {
+  if (!webpackBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
     return;
   }
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, code);
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, rollupResult.code);
 
   await Promise.all(destinations.map(dst => {
-    const filePath = config.sys.path.join(dst, filename);
+    const filePath = config.sys.path.join(dst, rollupResult.fileName);
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }
@@ -89,7 +89,12 @@ export async function writeLazyCore(config: d.Config, compilerCtx: d.CompilerCtx
   if (webpackBuild) {
     code = code.replace(/import\.meta\.url/g, '""');
   }
-  return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, code, filename);
+  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, code);
+
+  await Promise.all(destinations.map(dst => {
+    const filePath = config.sys.path.join(dst, filename);
+    return compilerCtx.fs.writeFile(filePath, code);
+  }));
 }
 
 function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {

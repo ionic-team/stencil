@@ -119,9 +119,10 @@ export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?:
 }
 
 const ignoreWarnCodes = new Set([
-  `THIS_IS_UNDEFINED`,
-  `NON_EXISTENT_EXPORT`,
-  `CIRCULAR_DEPENDENCY`
+  'THIS_IS_UNDEFINED',
+  'NON_EXISTENT_EXPORT',
+  'CIRCULAR_DEPENDENCY',
+  'EMPTY_BUNDLE'
 ]);
 
 
