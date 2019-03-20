@@ -11,23 +11,25 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'system',
-      entryFileNames: '[name].system.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
+      entryFileNames: build.isDev ? '[name].system.js' : 'p-[hash].system.js',
+      chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js'
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map(o => o.esmDir);
       await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', '.system', false);
-      await generateSystemLoaders(config, compilerCtx, systemOutputs);
+      await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
     }
   }
 }
 
-function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, systemOutputs: d.OutputTargetDistLazy[]) {
+function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) {
+  const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
+
   return Promise.all(
     systemOutputs.map(async o => {
       if (o.systemLoaderFile) {
-        const entryPointPath = config.sys.path.join(o.systemDir, `${config.fsNamespace}.system.js`);
+        const entryPointPath = config.sys.path.join(o.systemDir, loaderFilename);
         const relativePath = relativeImport(config, o.systemLoaderFile, entryPointPath);
         const loaderContent = await getSystemLoader(config, relativePath, o.polyfills);
         await compilerCtx.fs.writeFile(o.systemLoaderFile, loaderContent);

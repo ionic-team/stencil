@@ -244,7 +244,9 @@ export interface RollupResult {
   code: string;
   isEntry: boolean;
   isComponent: boolean;
-  isAppCore: boolean;
+  isCore: boolean;
+  isIndex: boolean;
+  isBrowserLoader: boolean;
   moduleFormat: ModuleFormat;
 }
 

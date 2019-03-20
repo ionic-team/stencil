@@ -10,11 +10,11 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   if (destinations.length === 0) {
     return;
   }
-  const entryComponetsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
-  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isAppCore);
+  const entryComponentsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
+  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isCore);
 
   const [bundleModules] = await Promise.all([
-    Promise.all(entryComponetsResults.map(rollupResult => {
+    Promise.all(entryComponentsResults.map(rollupResult => {
       return generateLazyEntryModule(config, compilerCtx, buildCtx, destinations, rollupResult, sourceTarget, webpackBuild, sufix);
     })),
     Promise.all(chunkResults.map(rollupResult => {
@@ -22,7 +22,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
     }))
   ]);
 
-  const coreResults = rollupResults.filter(rollupResult => rollupResult.isAppCore);
+  const coreResults = rollupResults.filter(rollupResult => rollupResult.isCore);
   await Promise.all(
     coreResults.map(rollupResult => {
       return writeLazyCore(config, compilerCtx, buildCtx, destinations, sourceTarget, rollupResult.code, rollupResult.fileName, bundleModules, webpackBuild);
@@ -49,9 +49,12 @@ async function generateLazyEntryModule(config: d.Config, compilerCtx: d.Compiler
 }
 
 export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, code: string, filename: string) {
+  if ((filename.startsWith('loader') || filename.startsWith('index')) && !webpackBuild) {
+    return;
+  }
   code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, code);
 
-  return Promise.all(destinations.map(dst => {
+  await Promise.all(destinations.map(dst => {
     const filePath = config.sys.path.join(dst, filename);
     return compilerCtx.fs.writeFile(filePath, code);
   }));

@@ -69,7 +69,9 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
       entryKey: chunk.name,
       isEntry: !!chunk.isEntry,
       isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
-      isAppCore: !chunk.isEntry && chunk.name === config.fsNamespace
+      isCore: !chunk.isEntry && chunk.name === config.fsNamespace,
+      isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
+      isIndex: chunk.isEntry && chunk.name === 'index',
     }));
 }
 

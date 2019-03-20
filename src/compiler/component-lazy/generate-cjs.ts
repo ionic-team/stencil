@@ -11,21 +11,22 @@ export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, 
     const esmOpts: OutputOptions = {
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].js' : '[hash].js'
+      chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js'
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = cjsOutputs.map(o => o.cjsDir);
       await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', '.cjs', false);
-      await generateShortcuts(config, compilerCtx, cjsOutputs);
+      await generateShortcuts(config, compilerCtx, results, cjsOutputs);
     }
   }
 }
 
-function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], outputTargets: d.OutputTargetDistLazy[]) {
+  const indexFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
   return Promise.all(outputTargets.map(async o => {
     if (o.cjsIndexFile) {
-      const entryPointPath = config.sys.path.join(o.cjsDir, 'index.cjs.js');
+      const entryPointPath = config.sys.path.join(o.cjsDir, indexFilename);
       const relativePath = relativeImport(config, o.cjsIndexFile, entryPointPath);
       const shortcutContent = `module.exports = require('${relativePath}');`;
       await compilerCtx.fs.writeFile(o.cjsIndexFile, shortcutContent);
