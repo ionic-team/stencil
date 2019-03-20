@@ -49,7 +49,11 @@ export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
 
 export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string) {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
-  relativePath = relativePath[0] !== '.' ? './' + relativePath : relativePath;
+  if (relativePath === '') {
+    relativePath = '.';
+  } else if (relativePath[0] !== '.') {
+    relativePath = './' + relativePath;
+  }
   return normalizePath(`${relativePath}/${config.sys.path.basename(pathTo, ext)}`);
 }
 
