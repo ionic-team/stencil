@@ -60,7 +60,12 @@ export class MockNode {
       if (node.nodeType === NODE_TYPES.DOCUMENT_NODE) {
         return true;
       }
+
       node = node.parentNode;
+
+      if (node != null && node.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+        node = node.host;
+      }
     }
 
     return false;
