@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
+import { connectedCallback, getComponent, getHostRef, parsePropertyValue, registerHost } from '@platform';
 
 
 export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
@@ -62,13 +62,10 @@ function initializePropertiesFromAttributes(elm: d.HostElement, cmpMeta: d.Compo
     .filter(([_, m]) => m[0])
     .forEach(([propName, m]) => {
       const attributeName = (m[1] || propName);
-
       const attrValue = elm.getAttribute(attributeName);
-      if (attrValue != null) {
-        const propValue = (attrValue === null && typeof (elm as any)[propName] === 'boolean')
-        ? false
-        : attrValue;
 
+      if (attrValue != null) {
+        const propValue = parsePropertyValue(attrValue, m[0]);
         hostRef.$instanceValues$.set(propName, propValue);
       }
     });

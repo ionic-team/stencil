@@ -125,5 +125,6 @@ export {
   getAssetPath,
   Host,
   h,
-  insertVdomAnnotations
+  insertVdomAnnotations,
+  parsePropertyValue
 } from '@runtime';

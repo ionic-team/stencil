@@ -11,6 +11,7 @@ export { getConnect } from './connect';
 export { getDocument, getElement, getWindow } from './element';
 export { h, Host } from './vdom/h';
 export { insertVdomAnnotations } from './vdom/vdom-annotations';
+export { parsePropertyValue } from './parse-property-value';
 export { proxyNative, proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/vdom-render';
 export { setMode, getMode } from './mode';

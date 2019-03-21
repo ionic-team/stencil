@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-export { Host, bootstrapLazy, patchDynamicImport, createEvent, getElement, getConnect, insertVdomAnnotations, h } from '@runtime';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
 
@@ -75,3 +74,14 @@ export const getContext = (elm: Node, context: string) => {
   return (Context as any)[context];
 };
 
+export {
+  Host,
+  bootstrapLazy,
+  patchDynamicImport,
+  createEvent,
+  getElement,
+  getConnect,
+  insertVdomAnnotations,
+  h,
+  parsePropertyValue
+} from '@runtime';
