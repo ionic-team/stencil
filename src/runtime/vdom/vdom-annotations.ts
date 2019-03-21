@@ -5,35 +5,73 @@ import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_HOST_ID, NODE_TYPE, ORG_LOCAT
 
 export const insertVdomAnnotations = (doc: Document) => {
   if (doc != null) {
-    const data: DocData = {
-      ids: 0
+    const docData: DocData = {
+      hostIds: 0,
+      rootLevelIds: 0
     };
-    elementVNodeAnnotations(doc, doc.body, data);
+    const orgLocationNodes: d.RenderNode[] = [];
+
+    elementVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
+
+    orgLocationNodes.forEach(orgLocationNode => {
+      if (orgLocationNode != null) {
+        const nodeRef = orgLocationNode['s-nr'];
+
+        let hostId = nodeRef['s-host-id'];
+        let nodeId = nodeRef['s-node-id'];
+        let childId = `${hostId}.${nodeId}`;
+
+        if (hostId == null) {
+          hostId = 0;
+          docData.rootLevelIds++;
+          nodeId = docData.rootLevelIds;
+          childId = `${hostId}.${nodeId}`;
+
+          if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
+            nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
+
+          } else {
+            const commentBeforeTextNode = doc.createComment(childId);
+            commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
+            nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
+          }
+        }
+
+        orgLocationNode.nodeValue = `${ORG_LOCATION_ID}.${childId}`;
+      }
+    });
   }
 };
 
 
-const elementVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData) => {
+const elementVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData, orgLocationNodes: d.RenderNode[]) => {
   if (node == null) {
     return;
+  }
+
+  if (node['s-nr']) {
+    orgLocationNodes.push(node);
   }
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
     node.childNodes.forEach(childNode => {
       const hostRef = getHostRef(childNode);
       if (hostRef != null) {
-        insertVNodeAnnotations(doc, childNode as any, hostRef.$vnode$, docData);
+        const cmpData: CmpData = {
+          nodeIds: 0
+        };
+        insertVNodeAnnotations(doc, childNode as any, hostRef.$vnode$, docData, cmpData);
       }
 
-      elementVNodeAnnotations(doc, childNode as any, docData);
+      elementVNodeAnnotations(doc, childNode as any, docData, orgLocationNodes);
     });
   }
 };
 
 
-const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.VNode, docData: DocData) => {
+const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.VNode, docData: DocData, cmpData: CmpData) => {
   if (vnode != null) {
-    const hostId = ++docData.ids;
+    const hostId = ++docData.hostIds;
 
     hostElm.setAttribute(HYDRATE_HOST_ID, hostId as any);
 
@@ -44,24 +82,24 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
     if (vnode.$children$ != null) {
       const depth = 0;
       vnode.$children$.forEach((vnodeChild, index) => {
-        insertChildVNodeAnnotations(doc, vnodeChild, hostId, depth, index);
+        insertChildVNodeAnnotations(doc, vnodeChild, cmpData, hostId, depth, index);
       });
     }
   }
 };
 
 
-const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, hostId: number, depth: number, index: number) => {
+const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData: CmpData, hostId: number, depth: number, index: number) => {
   const childElm = vnodeChild.$elm$ as d.RenderNode;
   if (childElm == null) {
     return;
   }
 
-  const childId = `${hostId}.${depth}.${index}`;
-  const orgLocation = childElm['s-ol'];
-  if (orgLocation != null) {
-    orgLocation.nodeValue = `${ORG_LOCATION_ID}.${childId}`;
-  }
+  const nodeId = cmpData.nodeIds++;
+  const childId = `${hostId}.${nodeId}.${depth}.${index}`;
+
+  childElm['s-host-id'] = hostId;
+  childElm['s-node-id'] = nodeId;
 
   if (childElm.nodeType === NODE_TYPE.ElementNode) {
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
@@ -83,12 +121,18 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, hostId:
   if (vnodeChild.$children$ != null) {
     const childDepth = depth + 1;
     vnodeChild.$children$.forEach((vnode, index) => {
-      insertChildVNodeAnnotations(doc, vnode, hostId, childDepth, index);
+      insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
     });
   }
 };
 
 
 interface DocData {
-  ids: number;
+  hostIds: number;
+  rootLevelIds: number;
+}
+
+
+interface CmpData {
+  nodeIds: number;
 }

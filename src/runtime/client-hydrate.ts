@@ -6,75 +6,90 @@ import { getDoc } from '@platform';
 import { toLowerCase } from '@utils';
 
 
-export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hydrateId: string, hostRef: d.HostRef) => {
-  const rootNodes: Element[] = [];
-  const removeNodes: Element[] = [];
-  const orgLocationRefs = new Map<string, d.RenderNode>();
+export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
   const shadowRoot = hostElm.shadowRoot;
+  const childRenderNodes: RenderNodeData[] = [];
+  const slotNodes: RenderNodeData[] = [];
+  const orgLocationNodes: RenderNodeData[] = [];
+  const shadowRootNodes: d.RenderNode[] = (BUILD.shadowDom && shadowRoot ? [] : null);
+  const vnode: d.VNode = hostRef.$vnode$ = {
+    $flags$: 0,
+    $tag$: tagName
+  };
 
-  hostElm[HYDRATE_HOST_ID] = hydrateId;
+  hostElm[HYDRATE_HOST_ID] = hostId;
   hostElm.removeAttribute(HYDRATE_HOST_ID);
   hostElm.classList.add('hydrated');
 
-  clientHydrate(
-    hostElm,
-    tagName,
-    shadowRoot,
-    hostElm,
-    (hostRef.$vnode$ = { $flags$: 0, $tag$: tagName, $elm$: hostElm }),
-    hydrateId,
-    false,
-    rootNodes,
-    orgLocationRefs,
-    removeNodes
-  );
+  clientHydrate(vnode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
-  rootNodes.forEach(rootNode => {
-    if (rootNode) {
-      if (BUILD.shadowDom && shadowRoot) {
-        shadowRoot.appendChild(rootNode);
-      } else {
-        hostElm.appendChild(rootNode);
+  childRenderNodes.forEach(c => {
+    const orgLocationNode = orgLocationNodes.find(o => o.$hostId$ === c.$hostId$ && o.$nodeId$ === c.$nodeId$);
+
+    const node = c.$elm$ as d.RenderNode;
+
+    if (BUILD.shadowDom && shadowRoot) {
+      if (orgLocationNode && c.$hostId$ === '0') {
+        orgLocationNode.$elm$.parentNode.insertBefore(
+          node,
+          orgLocationNode.$elm$.nextSibling
+        );
+      }
+
+    } else {
+      node['s-hn'] = tagName;
+
+      if (orgLocationNode) {
+        node['s-ol'] = orgLocationNode.$elm$;
+        node['s-ol']['s-nr'] = node;
       }
     }
   });
 
-  removeNodes.forEach(removeNode => removeNode.remove());
+  if (BUILD.shadowDom && shadowRoot) {
+    shadowRootNodes.forEach(shadowRootNode => {
+      if (shadowRootNode) {
+        shadowRoot.appendChild(shadowRootNode as any);
+      }
+    });
+  }
 };
 
-
-const clientHydrate = (hostElm: d.HostElement, tagName: string, shadowRoot: ShadowRoot, node: d.RenderNode, parentVNode: d.VNode, hydrateId: string, withinComponentShadow: boolean, rootNodes: Node[], orgLocationRefs: Map<string, d.RenderNode>, removeNodes: Node[]) => {
-  let previousComment: Comment;
-  let childVNodeId: string;
-  let childVNodeSplt: string[];
-  let childVNode: d.VNode;
-  let orgLocationNode: d.RenderNode;
+const clientHydrate = (
+  parentVNode: d.VNode,
+  childRenderNodes: RenderNodeData[],
+  slotNodes: RenderNodeData[],
+  orgLocationNodes: RenderNodeData[],
+  shadowRootNodes: d.RenderNode[],
+  hostElm: d.HostElement,
+  node: d.RenderNode,
+  hostId: string
+) => {
+  let childNodeType: string;
+  let childIdSplt: string[];
+  let childVNode: RenderNodeData;
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
-    childVNodeId = (node as HTMLElement).getAttribute(HYDRATE_CHILD_ID);
 
-    if (childVNodeId) {
-      // split the start comment's data with a period
-      // `${hostId}.${depth}.${index}`;
-      childVNodeSplt = childVNodeId.split('.');
+    childNodeType = (node as HTMLElement).getAttribute(HYDRATE_CHILD_ID);
+    if (childNodeType) {
+      // got the node data from the element's attribute
+      // `${hostId}.${nodeId}.${depth}.${index}`
+      childIdSplt = childNodeType.split('.');
 
-      // ensure this this element is a child element of the ssr vnode
-      if (childVNodeSplt[0] === hydrateId) {
-        // cool, this element is a child to the parent vnode
-        node.removeAttribute(HYDRATE_CHILD_ID);
-        node['s-hn'] = tagName;
-
-        orgLocationNode = orgLocationRefs.get(childVNodeId);
-        if (orgLocationNode) {
-          node['s-ol'] = orgLocationNode;
-          node['s-ol']['s-nr'] = node;
-        }
-
+      if (childIdSplt[0] === hostId || childIdSplt[0] === '0') {
         childVNode = {
           $flags$: 0,
+          $hostId$: childIdSplt[0],
+          $nodeId$: childIdSplt[1],
+          $depth$: childIdSplt[2],
+          $index$: childIdSplt[3],
           $tag$: toLowerCase(node.tagName),
           $elm$: node
         };
+
+        childRenderNodes.push(childVNode);
+        node.removeAttribute(HYDRATE_CHILD_ID);
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
@@ -83,118 +98,122 @@ const clientHydrate = (hostElm: d.HostElement, tagName: string, shadowRoot: Shad
         }
 
         // add our child vnode to a specific index of the vnode's children
-        parentVNode.$children$[<any>childVNodeSplt[2]] = childVNode;
+        parentVNode.$children$[childVNode.$index$ as any] = childVNode;
 
         // this is now the new parent vnode for all the next child checks
         parentVNode = childVNode;
 
-        if (BUILD.shadowDom && shadowRoot && childVNodeSplt[1] === '0') {
-          rootNodes[childVNodeSplt[2] as any] = node;
+        if (shadowRootNodes && childVNode.$depth$ === '0') {
+          shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
         }
       }
     }
 
     if (node.shadowRoot) {
       // keep drilling down through the shadow root nodes
-      node.shadowRoot.childNodes.forEach(childShadowRootNode =>
-        clientHydrate(hostElm, tagName, shadowRoot, childShadowRootNode as any, parentVNode, hydrateId, withinComponentShadow, rootNodes, orgLocationRefs, removeNodes));
+      for (let i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
+        clientHydrate(parentVNode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
+      }
     }
 
-    // keep drilling down through the child nodes
-    node.childNodes.forEach(childNode =>
-      clientHydrate(hostElm, tagName, shadowRoot, childNode as any, parentVNode, hydrateId, withinComponentShadow, rootNodes, orgLocationRefs, removeNodes));
+    // recursively drill down, end to start so we can remove nodes
+    for (let i = node.childNodes.length - 1; i >= 0; i--) {
+      clientHydrate(parentVNode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
+    }
 
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
-    childVNodeSplt = node.nodeValue.split('.');
+    // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
+    childIdSplt = node.nodeValue.split('.');
 
-    if (childVNodeSplt[1] === hydrateId) {
-      node['s-hn'] = tagName;
+    if (childIdSplt[1] === hostId || childIdSplt[1] === '0') {
+      // comment node for either the host id or a 0 host id
+      childNodeType = childIdSplt[0];
 
-      if (childVNodeSplt[0] === SLOT_NODE_ID) {
-        // slot node reference
-        // `${SLOT_NODE_ID}.${hostId}.${depth}.${index}.${(childElm['s-sn'] || '')}`;
-        childVNode = {
-          $flags$: 0,
-          $tag$: 'slot'
-        };
-
-        if (childVNodeSplt[4]) {
-          node['s-sn'] = childVNode.$name$ = childVNodeSplt[4];
-        } else {
-          node['s-sn'] = '';
-        }
-
-        if (BUILD.shadowDom && shadowRoot && childVNodeSplt[2] === '0') {
-          childVNode.$elm$ = getDoc(node).createElement('slot');
-          rootNodes[<any>childVNodeSplt[3]] = childVNode.$elm$;
-          removeNodes.push(node);
-
-        } else if (BUILD.slotRelocation) {
-          childVNode.$elm$ = node;
-          node['s-sr'] = true;
-        }
-
-        if (!parentVNode.$children$) {
-          parentVNode.$children$ = [];
-        }
-        parentVNode.$children$[<any>childVNodeSplt[3]] = childVNode;
-
-      } else if (childVNodeSplt[0] === CONTENT_REF_ID) {
-        // content reference node for the host element
-        if (BUILD.shadowDom && shadowRoot) {
-          removeNodes.push(node);
-
-        } else if (BUILD.slotRelocation) {
-          hostElm['s-cr'] = node;
-          node['s-cn'] = true;
-        }
-
-      } else if (childVNodeSplt[0] === ORG_LOCATION_ID) {
-        // `${ORG_LOCATION_ID}.${hostId}.${depth}.${index}`;
-        orgLocationRefs.set(childVNodeSplt.slice(1).join('.'), node);
-      }
-    }
-
-  } else if (node.nodeType === NODE_TYPE.TextNode &&
-            (previousComment = <Comment>node.previousSibling) &&
-            previousComment.nodeType === NODE_TYPE.CommentNode) {
-
-    // split the start comment's data with a period
-    childVNodeId = previousComment.nodeValue;
-    childVNodeSplt = childVNodeId.split('.');
-
-    // ensure this is a hydrated text node start comment
-    // which should start with an "t" and delimited by periods
-    if (childVNodeSplt[0] === TEXT_NODE_ID && childVNodeSplt[1] === hydrateId) {
-      // `${TEXT_NODE_ID}.${hostId}.${depth}.${index}`;
-      node['s-hn'] = tagName;
-      removeNodes.push(previousComment);
-
-      orgLocationNode = orgLocationRefs.get(childVNodeId.replace(TEXT_NODE_ID + '.', ''));
-      if (orgLocationNode) {
-        node['s-ol'] = orgLocationNode;
-        node['s-ol']['s-nr'] = node;
-      }
-
-      // cool, this is a text node and it's got a start comment
       childVNode = {
         $flags$: 0,
-        $text$: node.textContent,
+        $hostId$: childIdSplt[1],
+        $nodeId$: childIdSplt[2],
+        $depth$: childIdSplt[3],
+        $index$: childIdSplt[4],
         $elm$: node
       };
 
-      if (BUILD.shadowDom && shadowRoot && childVNodeSplt[2] === '0') {
-        rootNodes[childVNodeSplt[3] as any] = node;
-      }
+      if (childNodeType === TEXT_NODE_ID) {
+        childVNode.$elm$ = node.nextSibling as any;
+        if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
+          childRenderNodes.push(childVNode);
 
-      // this is a new child vnode
-      // so ensure its parent vnode has the vchildren array
-      if (!parentVNode.$children$) {
-        parentVNode.$children$ = [];
-      }
+          // remove the text comment since it's no longer needed
+          node.remove();
 
-      // add our child vnode to a specific index of the vnode's children
-      parentVNode.$children$[<any>childVNodeSplt[3]] = childVNode;
+          if (!parentVNode.$children$) {
+            parentVNode.$children$ = [];
+          }
+          parentVNode.$children$[childVNode.$index$ as any] = childVNode;
+
+          if (shadowRootNodes && childVNode.$depth$ === '0') {
+            shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
+          }
+        }
+
+      } else if (childNodeType === ORG_LOCATION_ID) {
+        // `${ORG_LOCATION_ID}.${hostId}.${nodeId}`
+        orgLocationNodes.push(childVNode);
+
+      } else if (childVNode.$hostId$ === hostId) {
+        // this comment node is specifcally for this host id
+
+        if (childNodeType === SLOT_NODE_ID) {
+          // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
+          childVNode.$tag$ = 'slot';
+
+          if (childIdSplt[5]) {
+            node['s-sn'] = childVNode.$name$ = childIdSplt[5];
+          } else {
+            node['s-sn'] = '';
+          }
+          node['s-sr'] = true;
+
+          if (BUILD.shadowDom && shadowRootNodes) {
+            // browser support shadowRoot and this is a shadow dom component
+            // create an actual slot element
+            childVNode.$elm$ = getDoc(node).createElement(childVNode.$tag$);
+
+            if (childVNode.$name$) {
+              // add the slot name attribute
+              childVNode.$elm$.setAttribute('name', childVNode.$name$);
+            }
+
+            // insert the new slot element before the slot comment
+            node.parentNode.insertBefore(childVNode.$elm$, node);
+
+            // remove the slot comment since it's not needed for shadow
+            node.remove();
+
+            if (childVNode.$depth$ === '0') {
+              shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
+            }
+          }
+
+          slotNodes.push(childVNode);
+
+          if (!parentVNode.$children$) {
+            parentVNode.$children$ = [];
+          }
+          parentVNode.$children$[childVNode.$index$ as any] = childVNode;
+
+        } else if (childNodeType === CONTENT_REF_ID) {
+          // `${CONTENT_REF_ID}.${hostId}`;
+          if (BUILD.shadowDom && shadowRootNodes) {
+            // remove the content ref comment since it's not needed for shadow
+            node.remove();
+
+          } else if (BUILD.slotRelocation) {
+            hostElm['s-cr'] = node;
+            node['s-cn'] = true;
+          }
+        }
+      }
     }
   }
 };
@@ -207,3 +226,11 @@ export const convertToShadowCss = (styleElm: HTMLStyleElement) => {
   );
   styleElm.remove();
 };
+
+
+interface RenderNodeData extends d.VNode {
+  $hostId$: string;
+  $nodeId$: string;
+  $depth$: string;
+  $index$: string;
+}

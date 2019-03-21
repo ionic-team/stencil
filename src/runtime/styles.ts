@@ -18,8 +18,15 @@ export const registerStyle = (styleId: string, cssText: string) => {
   return style;
 };
 
-export const addStyle = (styleContainerNode: any, styleId: string) => {
-  const style = styles.get(styleId);
+export const addStyle = (styleContainerNode: any, tagName: string, mode: string, ) => {
+  let styleId = getScopeId(tagName, mode);
+  let style = styles.get(styleId);
+
+  if (BUILD.mode && !style) {
+    styleId = getScopeId(tagName);
+    style = styles.get(styleId);
+  }
+
   if (style) {
     if (typeof style === 'string') {
       styleContainerNode = styleContainerNode.head ? styleContainerNode.head : styleContainerNode;
@@ -59,13 +66,13 @@ export const addStyle = (styleContainerNode: any, styleId: string) => {
       ];
     }
   }
+  return styleId;
 };
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
-  const styleId = getScopeId(cmpMeta.t, mode);
-  addStyle((BUILD.shadowDom && elm.shadowRoot)
+  const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot)
     ? elm.shadowRoot
-    : (elm as any).getRootNode(), styleId);
+    : (elm as any).getRootNode(), cmpMeta.t, mode);
 
   if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
     // only required when we're NOT using native shadow dom (slot)
@@ -85,7 +92,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 };
 
 
-export const getScopeId = (tagName: string, mode: string) =>
+export const getScopeId = (tagName: string, mode?: string) =>
   'sc-' + ((BUILD.mode && mode) ? tagName + '-' + mode : tagName);
 
 export const getElementScopeId = (scopeId: string, isHostElement: boolean) =>

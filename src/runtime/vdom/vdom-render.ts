@@ -617,7 +617,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
           const orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
-            ? doc.createComment(`node-reference`) as any
+            ? doc.createComment(`org-loc`) as any
             : doc.createTextNode('') as any;
           orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 

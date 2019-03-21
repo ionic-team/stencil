@@ -58,7 +58,12 @@ export interface RenderNode extends d.HostElement {
   ['s-si']?: string;
 
   /**
-   * Scope Id
+   * Host Id (hydrate only)
    */
-  ['s-si']?: string;
+  ['s-host-id']?: number;
+
+  /**
+   * Node Id (hydrate only)
+   */
+  ['s-node-id']?: number;
 }

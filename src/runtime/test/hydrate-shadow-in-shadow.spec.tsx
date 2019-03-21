@@ -2,56 +2,79 @@ import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
-describe('hydrate shadow', () => {
+describe('hydrate, shadow in shadow', () => {
 
-  it('no slot', async () => {
+  it('nested cmp-b w/ shadow/slot, root level text', async () => {
     @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
       render() {
         return (
           <Host>
-            <p>Hello</p>
+            <cmp-b>
+              <slot></slot>
+            </cmp-b>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            <slot></slot>
           </Host>
         );
       }
     }
     // @ts-ignore
     const serverHydrated = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
+      components: [CmpA, CmpB],
+      html: `<cmp-a>light-dom</cmp-a>`,
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <p c-id="1.0.0">
-          <!--t.1.1.0-->
-          Hello
-        </p>
+        <!--o.0.1-->
+        <cmp-b c-id="1.0.0.0" s-id="2">
+          <!--r.2-->
+          <!--o.1.1-->
+          <!--s.2.0.0.0.-->
+          <!--s.1.1.1.0.-->
+          <!--t.0.1-->
+          light-dom
+        </cmp-b>
       </cmp-a>
     `);
 
     // @ts-ignore
     const clientHydrated = await newSpecPage({
-      components: [CmpA],
+      components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
+      serializedShadowDom: true
     });
-    expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <shadow-root>
-          <p>
-            Hello
-          </p>
+          <cmp-b class="hydrated">
+            <shadow-root>
+              <slot></slot>
+            </shadow-root>
+            <!--o.1.1-->
+            <slot></slot>
+          </cmp-b>
         </shadow-root>
+        <!--o.0.1-->
+        light-dom
       </cmp-a>
     `);
   });
 
   it('nested cmp-b w/ shadow, text slot', async () => {
-    @Component({ tag: 'cmp-a' })
+    @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
       render() {
         return (
@@ -80,11 +103,11 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1.0-->
-          <!--s.2.0.0.-->
-          <!--t.1.1.0-->
+          <!--o.1.1-->
+          <!--s.2.0.0.0.-->
+          <!--t.1.1.1.0-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -100,14 +123,15 @@ describe('hydrate shadow', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
-        <!--r.1-->
-        <cmp-b class="hydrated">
-          <shadow-root>
-            <slot></slot>
-          </shadow-root>
-          <!--o.1.1.0-->
-          light-dom
-        </cmp-b>
+        <shadow-root>
+          <cmp-b class="hydrated">
+            <shadow-root>
+              <slot></slot>
+            </shadow-root>
+            <!--o.1.1-->
+            light-dom
+          </cmp-b>
+        </shadow-root>
       </cmp-a>
     `);
   });
@@ -143,10 +167,10 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <header c-id="2.0.0"></header>
-          <!--s.2.0.1.-->
+          <header c-id="2.0.0.0"></header>
+          <!--s.2.1.0.1.-->
         </cmp-b>
       </cmp-a>
     `);
@@ -203,11 +227,11 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--t.2.0.0-->
+          <!--t.2.0.0.0-->
           shadow-header
-          <!--s.2.0.1.-->
+          <!--s.2.1.0.1.-->
         </cmp-b>
       </cmp-a>
     `);
@@ -264,12 +288,12 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1.0-->
-          <header c-id="2.0.0"></header>
-          <!--s.2.0.1.-->
-          <!--t.1.1.0-->
+          <!--o.1.1-->
+          <header c-id="2.0.0.0"></header>
+          <!--s.2.1.0.1.-->
+          <!--t.1.1.1.0-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -290,7 +314,7 @@ describe('hydrate shadow', () => {
             <header></header>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1.0-->
+          <!--o.1.1-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -328,12 +352,12 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--t.2.0.0-->
+          <!--t.2.0.0.0-->
           shadow-header
-          <footer c-id="2.0.1">
-            <!--t.2.1.0-->
+          <footer c-id="2.1.0.1">
+            <!--t.2.2.1.0-->
             shadow-footer
           </footer>
         </cmp-b>
@@ -395,14 +419,14 @@ describe('hydrate shadow', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0" s-id="2">
+        <cmp-b c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1.0-->
-          <header c-id="2.0.0"></header>
-          <!--s.2.0.1.-->
-          <!--t.1.1.0-->
+          <!--o.1.1-->
+          <header c-id="2.0.0.0"></header>
+          <!--s.2.1.0.1.-->
+          <!--t.1.1.1.0-->
           light-dom
-          <footer c-id="2.0.2"></footer>
+          <footer c-id="2.2.0.2"></footer>
         </cmp-b>
       </cmp-a>
     `);
@@ -423,7 +447,7 @@ describe('hydrate shadow', () => {
             <slot></slot>
             <footer></footer>
           </shadow-root>
-          <!--o.1.1.0-->
+          <!--o.1.1-->
           light-dom
         </cmp-b>
       </cmp-a>
