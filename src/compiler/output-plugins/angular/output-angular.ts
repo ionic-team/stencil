@@ -1,14 +1,14 @@
 import * as d from '../../../declarations';
 import { OutputTargetAngular } from './types';
-import { dashToPascalCase, flatOne, relativeImport, sortBy } from '@utils';
+import { dashToPascalCase, flatOne, relativeImport, sortBy } from './utils';
 
 
-export function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: OutputTargetAngular, moduleFiles: d.Module[]) {
+export function angularDirectiveProxyOutput(compilerCtx: d.CompilerCtx, outputTarget: OutputTargetAngular, moduleFiles: d.Module[]) {
   const components = getComponents(outputTarget.excludeComponents, moduleFiles);
 
   return Promise.all([
-    generateProxies(config, compilerCtx, components, outputTarget),
-    generateAngularArray(config, compilerCtx, components, outputTarget),
+    generateProxies(compilerCtx, components, outputTarget),
+    generateAngularArray(compilerCtx, components, outputTarget),
     generateAngularUtils(compilerCtx, outputTarget)
   ]);
 }
@@ -23,7 +23,7 @@ export function getComponentsFromModules(moduleFiles: d.Module[]) {
   return flatOne(moduleFiles.map(m => m.cmps));
 }
 
-function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular) {
+function generateProxies(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular) {
   const proxies = getProxies(components);
 
   const imports = `/* tslint:disable */
@@ -35,7 +35,7 @@ import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular
 
   const final: string[] = [
     imports,
-    getProxyUtils(config, outputTarget),
+    getProxyUtils(outputTarget),
     sourceImports,
     proxies,
   ];
@@ -118,21 +118,21 @@ function getMethods(cmpMeta: d.ComponentCompilerMeta): string[] {
   return cmpMeta.methods.filter(method => !method.internal).map(prop => prop.name);
 }
 
-function getProxyUtils(config: d.Config, outputTarget: OutputTargetAngular) {
+function getProxyUtils(outputTarget: OutputTargetAngular) {
   if (!outputTarget.directivesUtilsFile) {
     return PROXY_UTILS.replace(/export function/g, 'function');
   } else {
-    const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile, '.ts');
+    const utilsPath = relativeImport(outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile, '.ts');
     return `import { proxyInputs, proxyMethods, proxyOutputs } from '${utilsPath}';\n`;
   }
 }
 
-function generateAngularArray(config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular): Promise<any> {
+function generateAngularArray(compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: OutputTargetAngular): Promise<any> {
   if (!outputTarget.directivesArrayFile) {
     return Promise.resolve();
   }
 
-  const proxyPath = relativeImport(config, outputTarget.directivesArrayFile, outputTarget.directivesProxyFile, '.ts');
+  const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile, '.ts');
   const directives = components
     .map(cmpMeta => dashToPascalCase(cmpMeta.tagName))
     .map(className => `d.${className}`)

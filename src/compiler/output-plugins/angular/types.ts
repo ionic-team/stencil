@@ -1,6 +1,4 @@
-import { OutputTargetBase } from '../../../declarations';
-
-export interface OutputTargetAngular extends OutputTargetBase {
+export interface OutputTargetAngular {
   type: 'angular';
 
   componentCorePackage?: string;

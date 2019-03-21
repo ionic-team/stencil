@@ -1,18 +1,19 @@
-import * as d from '../../../declarations';
-import { normalizePath } from '@utils';
+import { Config, Plugin } from '../../../declarations';
+import { normalizePath } from './utils';
 import { angularDirectiveProxyOutput } from './output-angular';
 import { OutputTargetAngular } from './types';
+import path from 'path';
 
-export const plugin: d.Plugin<OutputTargetAngular> = {
+export const plugin: Plugin<OutputTargetAngular> = {
   name: 'angular',
   validate(outputTarget, config) {
     return normalizeOutputTarget(config, outputTarget);
   },
-  async createOutput(outputTargets, config, compilerCtx, buildCtx) {
+  async createOutput(outputTargets, _config, compilerCtx, buildCtx) {
     const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
     await Promise.all(
-      outputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, outputTarget, buildCtx.moduleFiles))
+      outputTargets.map(outputTarget => angularDirectiveProxyOutput(compilerCtx, outputTarget, buildCtx.moduleFiles))
     );
 
     timespan.finish(`generate angular proxies finished`);
@@ -20,9 +21,7 @@ export const plugin: d.Plugin<OutputTargetAngular> = {
 };
 
 
-function normalizeOutputTarget(config: d.Config, outputTarget: any) {
-  const path = config.sys.path;
-
+function normalizeOutputTarget(config: Config, outputTarget: any) {
   const results: OutputTargetAngular = {
     ...outputTarget,
     excludeComponents: outputTarget.excludeComponents || []
