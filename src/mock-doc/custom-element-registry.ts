@@ -170,11 +170,19 @@ export function connectNode(ownerDocument: any, node: MockNode) {
   node.ownerDocument = ownerDocument;
 
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    if (node.nodeName.includes('-') === true && typeof (node as any).connectedCallback === 'function') {
-      if (node.isConnected) {
+    if (node.nodeName.includes('-') === true) {
+      if (typeof (node as any).connectedCallback === 'function' && node.isConnected) {
         fireConnectedCallback(node);
       }
+
+      const shadowRoot = ((node as any) as Element).shadowRoot;
+      if (shadowRoot != null) {
+        shadowRoot.childNodes.forEach(childNode => {
+          connectNode(ownerDocument, childNode as any);
+        });
+      }
     }
+
     node.childNodes.forEach(childNode => {
       connectNode(ownerDocument, childNode);
     });

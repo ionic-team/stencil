@@ -26,7 +26,7 @@ export async function writeLazyModule(config: d.Config, compilerCtx: d.CompilerC
 
 function getBundleId(config: d.Config, entryKey: string, code: string, modeName: string, sufix: string) {
   if (config.hashFileNames) {
-    return config.sys.generateContentHash(code, config.hashedFileNameLength) + sufix;
+    return `p-${config.sys.generateContentHash(code, config.hashedFileNameLength)}${sufix}`;
   }
 
   let bundleId = entryKey;

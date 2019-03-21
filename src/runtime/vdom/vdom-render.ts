@@ -11,14 +11,13 @@ import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
 import { getDoc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
-import { HYDRATE_CHILD_ID, NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
+import { NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
 
 
 let scopeId: string;
 let contentRef: d.RenderNode;
 let hostTagName: string;
-let hydrateId: string;
 let useNativeShadowDom = false;
 let checkSlotFallbackVisibility = false;
 let checkSlotRelocate = false;
@@ -26,7 +25,7 @@ let isSvgMode = false;
 
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, doc: Document) => {
-  let newVNode = newParentVNode.$children$[childIndex];
+  const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
@@ -62,11 +61,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   } else if (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotReference) {
     // create a slot reference node
-    if (BUILD.hydrateServerSide) {
-      newVNode.$elm$ = doc.createComment(`s.${hydrateId}.${childIndex}`);
-    } else {
-      newVNode.$elm$ = BUILD.isDebug ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('') as any;
-    }
+    newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('') as any;
 
   } else {
     // create element
@@ -95,11 +90,6 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
-    if (BUILD.hydrateServerSide && isDef(hydrateId)) {
-      // give this element the hydrate child id that can be read by the client
-      elm.setAttribute(HYDRATE_CHILD_ID, hydrateId + '.' + childIndex);
-    }
-
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
@@ -107,19 +97,8 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
         // return node could have been null
         if (childNode) {
-          if (BUILD.hydrateServerSide && isDef(hydrateId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-            // add the text node's start comment
-            elm.appendChild(doc.createComment('t.' + hydrateId + '.' + i));
-          }
-
           // append our new node
           elm.appendChild(childNode);
-
-          if (BUILD.hydrateServerSide && isDef(hydrateId) && childNode.nodeType === NODE_TYPE.TextNode && !childNode['s-cr']) {
-            // add the text node's end comment
-            elm.appendChild(doc.createComment('/'));
-            elm.appendChild(doc.createTextNode(' '));
-          }
         }
       }
     }
@@ -205,10 +184,7 @@ const addVnodes = (
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      childNode = (BUILD.vdomText && isDef(vnodes[startIdx].$text$))
-        ? doc.createTextNode(vnodes[startIdx].$text$)
-        : createElm(null, parentVNode, startIdx, parentElm, doc);
-
+      childNode = createElm(null, parentVNode, startIdx, parentElm, doc);
       if (childNode) {
         vnodes[startIdx].$elm$ = childNode as any;
         containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
@@ -598,7 +574,7 @@ const isHost = (node: any): node is d.VNode => {
 };
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
-  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0};
+  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
   const doc = getDoc(hostElm);
   hostTagName = toLowerCase(hostElm.tagName);
 
@@ -617,10 +593,6 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   renderFnResults.$flags$ |= VNODE_FLAGS.isHost;
   hostRef.$vnode$ = renderFnResults;
   renderFnResults.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
-
-  if (BUILD.hydrateServerSide) {
-    hydrateId = hostElm.getAttribute('s-id');
-  }
 
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
@@ -644,8 +616,8 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
         if (!relocateNode.nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          const orgLocationNode = BUILD.isDebug
-            ? doc.createComment(`node-reference:${relocateNode.nodeToRelocate.textContent}`) as any
+          const orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
+            ? doc.createComment(`org-loc`) as any
             : doc.createTextNode('') as any;
           orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
 

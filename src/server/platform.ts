@@ -113,6 +113,7 @@ export const styles: d.StyleMap = new Map();
 
 
 export {
+  Build,
   connectedCallback,
   createEvent,
   getConnect,
@@ -122,7 +123,7 @@ export {
   getWindow,
   getDocument,
   getAssetPath,
-  Build,
   Host,
-  h
+  h,
+  insertVdomAnnotations
 } from '@runtime';

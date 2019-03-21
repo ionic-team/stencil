@@ -111,11 +111,17 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmEs5Dir?: string;
   systemDir?: string;
   cjsDir?: string;
-  loaderDir?: string;
   resourcesUrl?: string;
   polyfills?: boolean;
   copy?: d.CopyTask[];
-  replaceImportMeta?: boolean;
+  webpackBuild?: boolean;
+
+  esmIndexFile?: string;
+  esmLoaderFile?: string;
+  systemLoaderFile?: string;
+  cjsIndexFile?: string;
+
+  loaderDir?: string;
 
   empty?: boolean;
 }

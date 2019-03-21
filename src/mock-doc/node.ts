@@ -60,7 +60,12 @@ export class MockNode {
       if (node.nodeType === NODE_TYPES.DOCUMENT_NODE) {
         return true;
       }
+
       node = node.parentNode;
+
+      if (node != null && node.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+        node = node.host;
+      }
     }
 
     return false;
@@ -154,6 +159,7 @@ const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
 
 export class MockElement extends MockNode {
   namespaceURI: string;
+  private _shadowRoot: ShadowRoot;
 
   constructor(ownerDocument: any, nodeName: string) {
     super(
@@ -167,6 +173,19 @@ export class MockElement extends MockNode {
 
   addEventListener(type: string, handler: (ev?: any) => void) {
     addEventListener(this, type, handler);
+  }
+
+  attachShadow(_opts: ShadowRootInit) {
+    this._shadowRoot = this.ownerDocument.createDocumentFragment();
+    (this._shadowRoot as any).host = this;
+    return this._shadowRoot;
+  }
+
+  get shadowRoot() {
+    return this._shadowRoot || null;
+  }
+  set shadowRoot(value: any) {
+    this._shadowRoot = value;
   }
 
   get attributes() {
@@ -572,6 +591,9 @@ export class MockElement extends MockNode {
 export function resetElement(elm: any) {
   resetEventListeners(elm);
   attrsMap.delete(elm);
+  try {
+    elm.shadowRoot = null;
+  } catch (e) {}
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {

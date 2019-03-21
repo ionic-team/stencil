@@ -2,6 +2,33 @@
 
 Component lifecycle events fire `componentWillLoad` from top to bottom, then fire `componentDidLoad` from bottom to top. It should take into account each component can finish lazy-loaded requests in any random order. Additionally, any `componentWillLoad` can return a promise that all child components should wait on until it's resolved, while still keeping the correct firing order.
 
+/dist
+  /cjs
+    | Modern CJS build
+    / index.js (rollup)
+    / loader.js (rollup)
+  /esm
+    | Modern ESM build (es2017 or es2018)
+    / index.js (rollup)
+    / loader.js (rollup)
+    /legacy
+      | ES5-ESM build (es2017)
+      / index.js (rollup)
+  index.js => cjs/index.js (generated manually)
+  index.mjs => esm/legacy/index.js (or) esm/index.js (generated manually)
+  ionic.js
+  ionic.mjs
+    /ionic
+      /ionic.esm.js
+      /ionic.js
+
+// User's index
+- pkg.module: dist/index.mjs
+- pkg.main = dist/index.js
+
+
+
+
 ```
 <cmp-a>
   <cmp-b>

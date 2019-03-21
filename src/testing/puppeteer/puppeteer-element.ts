@@ -302,14 +302,9 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     throw new Error(`outerHTML is read-only`);
   }
 
-  private _shadowRoot: DocumentFragment = null;
   get shadowRoot() {
     this._validate();
-    return this._shadowRoot;
-  }
-
-  set shadowRoot(_: any) {
-    throw new Error(`shadowRoot is read-only`);
+    return super.shadowRoot;
   }
 
   get tabIndex() {
@@ -464,11 +459,11 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     }, this._elmHandle);
 
     if (shadowRootHTML) {
-      this._shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
-      (this._shadowRoot as any).host = this;
+      (this as any).shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
+      (this as any).shadowRoot.host = this;
 
     } else {
-      this._shadowRoot = null;
+      (this as any).shadowRoot = null;
     }
 
     const frag = parseHtmlToFragment(outerHTML);

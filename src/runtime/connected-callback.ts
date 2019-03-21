@@ -1,12 +1,12 @@
 import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
+import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
 import { HYDRATE_HOST_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
-import { addStyle, getScopeId } from './styles';
 
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -29,7 +29,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       hydrateId = elm.getAttribute(HYDRATE_HOST_ID);
       if (hydrateId) {
         if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
-          addStyle(elm.shadowRoot, getScopeId(cmpMeta.t, elm.getAttribute('s-mode')));
+          addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
         }
         initializeClientHydrate(elm, cmpMeta.t, hydrateId, hostRef);
       }
@@ -105,22 +105,15 @@ const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) =
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  const doc = getDoc(elm) as d.RenderDocument;
   let crName: string;
-  if (BUILD.hydrateServerSide) {
-    doc['s-ids'] = (doc['s-ids'] || 1);
-    elm[HYDRATE_HOST_ID] = (doc['s-ids']++) + '';
-    crName = `r.` + elm[HYDRATE_HOST_ID];
-    elm.setAttribute(HYDRATE_HOST_ID, elm[HYDRATE_HOST_ID] as any);
-
-  } else if (BUILD.isDebug) {
+  if (BUILD.isDebug) {
     crName = `content-ref:${elm.tagName}`;
 
   } else {
     crName = '';
   }
 
-  contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
+  contentRefElm = elm['s-cr'] = (getDoc(elm).createComment(crName) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

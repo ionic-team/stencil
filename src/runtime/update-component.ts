@@ -1,9 +1,9 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, writeTask, plt } from '@platform';
+import { consoleError, plt, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
-import { renderVdom } from './vdom/render';
+import { renderVdom } from './vdom/vdom-render';
 
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {

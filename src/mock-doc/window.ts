@@ -259,9 +259,9 @@ export function resetWindow(win: Window) {
     resetDocument(win.document);
     resetPerformance(win.performance);
 
-    for (const winProp in win) {
-      if (winProp !== 'document' && winProp !== 'performance' && winProp !== 'customElements') {
-        (win as any)[winProp] = undefined;
+    for (const key in win) {
+      if (win.hasOwnProperty(key) && key !== 'document' && key !== 'performance' && key !== 'customElements') {
+        delete (win as any)[key];
       }
     }
 
@@ -275,5 +275,11 @@ export function resetWindow(win: Window) {
     sessionStorageMap.delete(win as any);
     eventClassMap.delete(win as any);
     customEventClassMap.delete(win as any);
+
+    if (win.document != null) {
+      try {
+        (win.document as any).defaultView = win;
+      } catch (e) {}
+    }
   }
 }

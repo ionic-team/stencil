@@ -5,15 +5,12 @@
  */
 
 
-import { JSXElements } from '@stencil/core';
-
+import { JSXBase } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface HelloWorld {}
-  interface HelloWorldAttributes extends JSXElements.HTMLAttributes {}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -21,22 +18,33 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
+declare namespace LocalJSX {
+  interface HelloWorld extends JSXBase.HTMLAttributes {}
+
+  interface ElementInterfaces {
     'HelloWorld': Components.HelloWorld;
   }
 
-  interface StencilIntrinsicElements {
-    'hello-world': Components.HelloWorldAttributes;
+  interface IntrinsicElements {
+    'HelloWorld': LocalJSX.HelloWorld;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
   var HTMLHelloWorldElement: {
     prototype: HTMLHelloWorldElement;
     new (): HTMLHelloWorldElement;
   };
-
   interface HTMLElementTagNameMap {
     'hello-world': HTMLHelloWorldElement
   }
@@ -44,5 +52,5 @@ declare global {
   interface ElementTagNameMap {
     'hello-world': HTMLHelloWorldElement;
   }
-
 }
+

@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { h } from '../h';
-import { patch } from '../render';
+import { patch } from '../vdom-render';
 
 
 describe('event listeners', () => {

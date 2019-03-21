@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '@utils';
+import { catchError, normalizePath } from '@utils';
 import { optimizeEsmLoaderImport } from '../html/optimize-esm-import';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { serializeNodeToHtml } from '@mock-doc';
@@ -35,6 +35,27 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   if (config.srcIndexHtml && outputTarget.indexHtml) {
     await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }
+  await generateHostConfig(config, compilerCtx, outputTarget);
+}
+
+function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+  const buildDir = normalizePath(config.sys.path.relative(outputTarget.dir, outputTarget.buildDir));
+  const hostConfigPath = config.sys.path.join(outputTarget.dir, 'host.config.json');
+  const hostConfigContent = JSON.stringify({
+    'hosting': {
+      'headers': [
+        {
+          'source': `/${buildDir}/p-*.js`,
+          'headers': [ {
+            'key': 'Cache-Control',
+            'value': 'max-age=365000000, immutable'
+          } ]
+        }
+      ]
+    }
+  }, null, '  ');
+
+  return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
 }
 
 async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {

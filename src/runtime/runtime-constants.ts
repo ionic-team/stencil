@@ -14,6 +14,11 @@ export const enum NODE_TYPE {
   DocumentFragment = 11
 }
 
+export const CONTENT_REF_ID = 'r';
+export const ORG_LOCATION_ID = 'o';
+export const SLOT_NODE_ID = 's';
+export const TEXT_NODE_ID = 't';
+
 export const HYDRATE_HOST_ID = 's-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 

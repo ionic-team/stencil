@@ -34,12 +34,16 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     opts.removeHtmlComments = false;
   }
 
+  if (typeof opts.serializeShadowRoot !== 'boolean') {
+    opts.serializeShadowRoot = false;
+  }
+
   if (opts.outerHTML === true) {
-    serializeToHtml(elm as Node, opts, output);
+    serializeToHtml(elm as Node, opts, output, false);
 
   } else {
     for (let i = 0, ii = elm.childNodes.length; i < ii; i++) {
-      serializeToHtml(elm.childNodes[i] as Node, opts, output);
+      serializeToHtml(elm.childNodes[i] as Node, opts, output, false);
     }
   }
 
@@ -55,9 +59,9 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
 }
 
 
-function serializeToHtml(node: Node, opts: SerializeElementOptions, output: SerializeOutput) {
-  if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
-    const tagName = node.nodeName.toLowerCase();
+function serializeToHtml(node: Node, opts: SerializeElementOptions, output: SerializeOutput, isShadowRoot: boolean) {
+  if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
+    const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
 
     const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName) === true);
 
@@ -147,6 +151,18 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
     }
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
+      if (opts.serializeShadowRoot && (node as HTMLElement).shadowRoot != null) {
+        output.indent = output.indent + opts.indentSpaces;
+        serializeToHtml((node as HTMLElement).shadowRoot, opts, output, true);
+        output.indent = output.indent - opts.indentSpaces;
+        if (opts.newLines === true && node.childNodes.length === 0) {
+          output.text.push('\n');
+          for (let i = 0; i < output.indent; i++) {
+            output.text.push(' ');
+          }
+        }
+      }
+
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
         const childNodes = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : (node.childNodes);
         const childNodeLength = childNodes.length;
@@ -161,7 +177,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
             }
 
             for (let i = 0; i < childNodeLength; i++) {
-              serializeToHtml(childNodes[i], opts, output);
+              serializeToHtml(childNodes[i], opts, output, false);
             }
 
             if (ignoreTag === false) {
@@ -171,7 +187,6 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
               if (opts.indentSpaces > 0) {
                 output.indent = output.indent - opts.indentSpaces;
-
                 for (let i = 0; i < output.indent; i++) {
                   output.text.push(' ');
                 }
@@ -303,4 +318,5 @@ export interface SerializeElementOptions {
   removeAttributeQuotes?: boolean;
   removeHtmlComments?: boolean;
   removeEmptyAttributes?: boolean;
+  serializeShadowRoot?: boolean;
 }

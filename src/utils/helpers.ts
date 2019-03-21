@@ -1,3 +1,5 @@
+import * as d from '../declarations';
+import { normalizePath } from './normalize-path';
 
 export const isDef = (v: any) => v != null;
 
@@ -43,6 +45,16 @@ export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
     set.add(key);
     return true;
   });
+}
+
+export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string) {
+  let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
+  if (relativePath === '') {
+    relativePath = '.';
+  } else if (relativePath[0] !== '.') {
+    relativePath = './' + relativePath;
+  }
+  return normalizePath(`${relativePath}/${config.sys.path.basename(pathTo, ext)}`);
 }
 
 export const pluck = (obj: {[key: string]: any }, keys: string[]) => {

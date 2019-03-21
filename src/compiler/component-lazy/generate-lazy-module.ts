@@ -6,34 +6,34 @@ import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 
 
-export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupResult[], sourceTarget: d.SourceTarget, sufix: string, replaceImportMeta: boolean) {
+export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupResult[], sourceTarget: d.SourceTarget, sufix: string, webpackBuild: boolean) {
   if (destinations.length === 0) {
     return;
   }
-  const entryComponetsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
-  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isAppCore);
+  const entryComponentsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
+  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isCore);
 
   const [bundleModules] = await Promise.all([
-    Promise.all(entryComponetsResults.map(rollupResult => {
-      return generateLazyEntryModule(config, compilerCtx, buildCtx, destinations, rollupResult, sourceTarget, sufix);
+    Promise.all(entryComponentsResults.map(rollupResult => {
+      return generateLazyEntryModule(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, sufix, rollupResult);
     })),
     Promise.all(chunkResults.map(rollupResult => {
-      return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, rollupResult.code, rollupResult.fileName);
+      return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, webpackBuild, rollupResult);
     }))
   ]);
 
-  const coreResults = rollupResults.filter(rollupResult => rollupResult.isAppCore);
+  const coreResults = rollupResults.filter(rollupResult => rollupResult.isCore);
   await Promise.all(
     coreResults.map(rollupResult => {
-      return writeLazyCore(config, compilerCtx, buildCtx, destinations, sourceTarget, rollupResult.code, rollupResult.fileName, bundleModules, replaceImportMeta);
+      return writeLazyCore(config, compilerCtx, buildCtx, destinations, sourceTarget, rollupResult.code, rollupResult.fileName, bundleModules, webpackBuild);
     })
   );
 }
 
 
-async function generateLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResult: d.RollupResult, sourceTarget: d.SourceTarget, sufix: string): Promise<d.BundleModule> {
+async function generateLazyEntryModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, sufix: string, rollupResult: d.RollupResult): Promise<d.BundleModule> {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, rollupResult.code);
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, rollupResult.code);
   const outputs = await Promise.all(
     entryModule.modeNames.map(modeName =>
       writeLazyModule(config, compilerCtx, destinations, entryModule, code, modeName, sufix)
@@ -48,16 +48,19 @@ async function generateLazyEntryModule(config: d.Config, compilerCtx: d.Compiler
   };
 }
 
-export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, code: string, filename: string) {
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, code);
+export async function writeLazyChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, webpackBuild: boolean, rollupResult: d.RollupResult) {
+  if (!webpackBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
+    return;
+  }
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, rollupResult.code);
 
-  return Promise.all(destinations.map(dst => {
-    const filePath = config.sys.path.join(dst, filename);
+  await Promise.all(destinations.map(dst => {
+    const filePath = config.sys.path.join(dst, rollupResult.fileName);
     return compilerCtx.fs.writeFile(filePath, code);
   }));
 }
 
-export async function convertChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, code: string) {
+export async function convertChunk(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceTarget: d.SourceTarget, webpackBuild: boolean, code: string) {
   if (sourceTarget === 'es5') {
     const transpileResults = await transpileToEs5Main(config, compilerCtx, code, true);
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
@@ -67,7 +70,7 @@ export async function convertChunk(config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   if (config.minifyJs) {
-    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, code);
+    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, webpackBuild, code);
     buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
     if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
@@ -77,16 +80,21 @@ export async function convertChunk(config: d.Config, compilerCtx: d.CompilerCtx,
   return code;
 }
 
-export async function writeLazyCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, code: string, filename: string, bundleModules: d.BundleModule[], replaceImportMeta: boolean) {
+export async function writeLazyCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], sourceTarget: d.SourceTarget, code: string, filename: string, bundleModules: d.BundleModule[], webpackBuild: boolean) {
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
   code = code.replace(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`
   );
-  if (replaceImportMeta) {
-    code = code.replace('/*!STENCIL:IMPORT.META.URL*/ import.meta.url', '""');
+  if (webpackBuild) {
+    code = code.replace(/import\.meta\.url/g, '""');
   }
-  return writeLazyChunk(config, compilerCtx, buildCtx, destinations, sourceTarget, code, filename);
+  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, webpackBuild, code);
+
+  await Promise.all(destinations.map(dst => {
+    const filePath = config.sys.path.join(dst, filename);
+    return compilerCtx.fs.writeFile(filePath, code);
+  }));
 }
 
 function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {

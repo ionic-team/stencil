@@ -8,6 +8,47 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('shadow root to template', () => {
+    const elm = doc.createElement('cmp-a');
+    expect(elm.shadowRoot).toEqual(null);
+
+    const shadowRoot = elm.attachShadow({ mode: 'open' });
+    expect(shadowRoot.nodeType).toEqual(11);
+    expect(elm.shadowRoot.nodeType).toEqual(11);
+
+    expect(shadowRoot.host).toEqual(elm);
+
+    const shadowTop = doc.createElement('article');
+    shadowTop.innerHTML = 'shadow top';
+    shadowRoot.appendChild(shadowTop);
+
+    const slot = doc.createElement('slot');
+    shadowRoot.appendChild(slot);
+
+    const shadowBottom = doc.createElement('section');
+    shadowBottom.innerHTML = 'shadow bottom';
+    shadowRoot.appendChild(shadowBottom);
+
+    elm.innerHTML = '<div>light dom</div>';
+
+    expect(elm).toEqualHtml(`
+      <cmp-a>
+        <shadow-root>
+          <article>
+            shadow top
+          </article>
+          <slot></slot>
+          <section>
+            shadow bottom
+          </section>
+        </shadow-root>
+        <div>
+          light dom
+        </div>
+      </cmp-a>
+    `);
+  });
+
   it('template', () => {
     const input = `<template>text</template>`;
     doc.body.innerHTML = input;

@@ -1,4 +1,4 @@
-import { toVNode } from '../to-vnode';
+import { toVNode } from './to-vnode';
 
 
 describe('toVNode()', () => {

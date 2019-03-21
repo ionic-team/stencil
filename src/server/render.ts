@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { catchError } from '@utils';
 import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
+import { insertVdomAnnotations } from '@platform';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
 import { optimizeHydratedDocument } from './optimize/optimize-hydrated-document';
 import globalScripts from '@global-scripts';
@@ -25,6 +26,8 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
     const waitPromises: Promise<any>[] = [];
     connectElements(opts, results, doc.body, waitPromises);
     await Promise.all(waitPromises);
+
+    insertVdomAnnotations(doc);
 
     optimizeHydratedDocument(opts, results, windowLocationUrl, doc);
 

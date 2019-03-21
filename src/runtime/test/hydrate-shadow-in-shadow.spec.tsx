@@ -2,153 +2,79 @@ import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
-describe('hydrate no encapsulation', () => {
+describe('hydrate, shadow in shadow', () => {
 
-  it('root element, no slot', async () => {
-    @Component({ tag: 'cmp-a' })
+  it('nested cmp-b w/ shadow/slot, root level text', async () => {
+    @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
       render() {
         return (
           <Host>
-            <p class='hi'>Hello</p>
+            <cmp-b>
+              <slot></slot>
+            </cmp-b>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            <slot></slot>
           </Host>
         );
       }
     }
     // @ts-ignore
     const serverHydrated = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
+      components: [CmpA, CmpB],
+      html: `<cmp-a>light-dom</cmp-a>`,
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a s-id="1">
         <!--r.1-->
-        <p c-id="1.0.0.0" class="hi">
-          <!--t.1.1.1.0-->
-          Hello
-        </p>
+        <!--o.0.1-->
+        <cmp-b c-id="1.0.0.0" s-id="2">
+          <!--r.2-->
+          <!--o.1.1-->
+          <!--s.2.0.0.0.-->
+          <!--s.1.1.1.0.-->
+          <!--t.0.1-->
+          light-dom
+        </cmp-b>
       </cmp-a>
     `);
 
     // @ts-ignore
     const clientHydrated = await newSpecPage({
-      components: [CmpA],
+      components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
+      serializedShadowDom: true
     });
-    expect(clientHydrated.root['s-id']).toBe('1');
-    expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
-    expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
-        <!--r.1-->
-        <p class="hi">
-          Hello
-        </p>
+        <shadow-root>
+          <cmp-b class="hydrated">
+            <shadow-root>
+              <slot></slot>
+            </shadow-root>
+            <!--o.1.1-->
+            <slot></slot>
+          </cmp-b>
+        </shadow-root>
+        <!--o.0.1-->
+        light-dom
       </cmp-a>
     `);
   });
 
-  it('root text, no slot', async () => {
-    @Component({ tag: 'cmp-a' })
-    class CmpA {
-      render() {
-        return (
-          <Host>
-            Hello
-          </Host>
-        );
-      }
-    }
-    // @ts-ignore
-    const serverHydrated = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
-    });
-    expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a s-id="1">
-        <!--r.1-->
-        <!--t.1.0.0.0-->
-        Hello
-      </cmp-a>
-    `);
-
-    // @ts-ignore
-    const clientHydrated = await newSpecPage({
-      components: [CmpA],
-      html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
-    });
-    expect(clientHydrated.root['s-id']).toBe('1');
-    expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
-    expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
-
-    expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
-        <!--r.1-->
-        Hello
-      </cmp-a>
-    `);
-  });
-
-  it('root multiple text/element, no slot', async () => {
-    @Component({ tag: 'cmp-a' })
-    class CmpA {
-      render() {
-        return (
-          <Host>
-            top
-            <p>middle</p>
-            bottom
-          </Host>
-        );
-      }
-    }
-    // @ts-ignore
-    const serverHydrated = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
-    });
-    expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a s-id="1">
-        <!--r.1-->
-        <!--t.1.0.0.0-->
-        top
-        <p c-id="1.1.0.1">
-          <!--t.1.2.1.0-->
-          middle
-        </p>
-        <!--t.1.3.0.2-->
-        bottom
-      </cmp-a>
-    `);
-
-    // @ts-ignore
-    const clientHydrated = await newSpecPage({
-      components: [CmpA],
-      html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
-    });
-    expect(clientHydrated.root['s-id']).toBe('1');
-
-    expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
-        <!--r.1-->
-        top
-        <p>
-          middle
-        </p>
-        bottom
-      </cmp-a>
-    `);
-  });
-
-  it('nested, text slot, footer', async () => {
-    @Component({ tag: 'cmp-a' })
+  it('nested cmp-b w/ shadow, text slot', async () => {
+    @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
       render() {
         return (
@@ -158,13 +84,12 @@ describe('hydrate no encapsulation', () => {
         );
       }
     }
-    @Component({ tag: 'cmp-b' })
+    @Component({ tag: 'cmp-b', shadow: true })
     class CmpB {
       render() {
         return (
           <Host>
             <slot></slot>
-            <footer></footer>
           </Host>
         );
       }
@@ -184,7 +109,6 @@ describe('hydrate no encapsulation', () => {
           <!--s.2.0.0.0.-->
           <!--t.1.1.1.0-->
           light-dom
-          <footer c-id="2.1.0.1"></footer>
         </cmp-b>
       </cmp-a>
     `);
@@ -193,35 +117,37 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
+      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
-        <!--r.1-->
-        <cmp-b class="hydrated">
-          <!--r.2-->
-          <!--o.1.1-->
-          <!--s.2.0.0.0.-->
-          light-dom
-          <footer></footer>
-        </cmp-b>
+        <shadow-root>
+          <cmp-b class="hydrated">
+            <shadow-root>
+              <slot></slot>
+            </shadow-root>
+            <!--o.1.1-->
+            light-dom
+          </cmp-b>
+        </shadow-root>
       </cmp-a>
     `);
   });
 
-  it('nested, text slot, header', async () => {
+  it('nested cmp-b w/ shadow, shadow element header', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
         return (
           <Host>
-            <cmp-b>light-dom</cmp-b>
+            <cmp-b></cmp-b>
           </Host>
         );
       }
     }
-    @Component({ tag: 'cmp-b' })
+    @Component({ tag: 'cmp-b', shadow: true })
     class CmpB {
       render() {
         return (
@@ -232,7 +158,127 @@ describe('hydrate no encapsulation', () => {
         );
       }
     }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `<cmp-a></cmp-a>`,
+      hydrateServerSide: true
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a s-id="1">
+        <!--r.1-->
+        <cmp-b c-id="1.0.0.0" s-id="2">
+          <!--r.2-->
+          <header c-id="2.0.0.0"></header>
+          <!--s.2.1.0.1.-->
+        </cmp-b>
+      </cmp-a>
+    `);
 
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+      serializedShadowDom: true
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated">
+        <!--r.1-->
+        <cmp-b class="hydrated">
+          <shadow-root>
+            <header></header>
+            <slot></slot>
+          </shadow-root>
+        </cmp-b>
+      </cmp-a>
+    `);
+  });
+
+  it('nested cmp-b w/ shadow, shadow text header', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <Host>
+            <cmp-b></cmp-b>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            shadow-header
+            <slot></slot>
+          </Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `<cmp-a></cmp-a>`,
+      hydrateServerSide: true
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a s-id="1">
+        <!--r.1-->
+        <cmp-b c-id="1.0.0.0" s-id="2">
+          <!--r.2-->
+          <!--t.2.0.0.0-->
+          shadow-header
+          <!--s.2.1.0.1.-->
+        </cmp-b>
+      </cmp-a>
+    `);
+
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+      serializedShadowDom: true
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated">
+        <!--r.1-->
+        <cmp-b class="hydrated">
+          <shadow-root>
+            shadow-header
+            <slot></slot>
+          </shadow-root>
+        </cmp-b>
+      </cmp-a>
+    `);
+  });
+
+  it('nested shadow, text slot, header', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <Host>
+            <cmp-b>light-dom</cmp-b>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            <header></header>
+            <slot></slot>
+          </Host>
+        );
+      }
+    }
     // @ts-ignore
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
@@ -264,11 +310,78 @@ describe('hydrate no encapsulation', () => {
       <cmp-a class="hydrated">
         <!--r.1-->
         <cmp-b class="hydrated">
-          <!--r.2-->
+          <shadow-root>
+            <header></header>
+            <slot></slot>
+          </shadow-root>
           <!--o.1.1-->
-          <header></header>
-          <!--s.2.1.0.1.-->
           light-dom
+        </cmp-b>
+      </cmp-a>
+    `);
+  });
+
+  it('nested cmp-b w/ shadow, shadow header text, shadow footer elm w/ text', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <Host>
+            <cmp-b></cmp-b>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            shadow-header
+            <footer>shadow-footer</footer>
+          </Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `<cmp-a></cmp-a>`,
+      hydrateServerSide: true
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a s-id="1">
+        <!--r.1-->
+        <cmp-b c-id="1.0.0.0" s-id="2">
+          <!--r.2-->
+          <!--t.2.0.0.0-->
+          shadow-header
+          <footer c-id="2.1.0.1">
+            <!--t.2.2.1.0-->
+            shadow-footer
+          </footer>
+        </cmp-b>
+      </cmp-a>
+    `);
+
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+      serializedShadowDom: true
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated">
+        <!--r.1-->
+        <cmp-b class="hydrated">
+          <shadow-root>
+            shadow-header
+            <footer>
+              shadow-footer
+            </footer>
+          </shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -285,7 +398,7 @@ describe('hydrate no encapsulation', () => {
         );
       }
     }
-    @Component({ tag: 'cmp-b' })
+    @Component({ tag: 'cmp-b', shadow: true })
     class CmpB {
       render() {
         return (
@@ -329,106 +442,13 @@ describe('hydrate no encapsulation', () => {
       <cmp-a class="hydrated">
         <!--r.1-->
         <cmp-b class="hydrated">
-          <!--r.2-->
-          <!--o.1.1-->
-          <header></header>
-          <!--s.2.1.0.1.-->
-          light-dom
-          <footer></footer>
-        </cmp-b>
-      </cmp-a>
-    `);
-  });
-
-  it('nested, multiple slots, header/footer', async () => {
-    @Component({ tag: 'cmp-a' })
-    class CmpA {
-      render() {
-        return (
-          <Host>
-            <cmp-b>
-              <div slot='bottom'>bottom light-dom</div>
-              <div slot='top'>top light-dom</div>
-              middle light-dom
-            </cmp-b>
-          </Host>
-        );
-      }
-    }
-    @Component({ tag: 'cmp-b' })
-    class CmpB {
-      render() {
-        return (
-          <Host>
+          <shadow-root>
             <header></header>
-            <slot name='top'></slot>
             <slot></slot>
-            <slot name='bottom'></slot>
             <footer></footer>
-          </Host>
-        );
-      }
-    }
-    // @ts-ignore
-    const serverHydrated = await newSpecPage({
-      components: [CmpA, CmpB],
-      html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
-    });
-    expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a s-id="1">
-        <!--r.1-->
-        <cmp-b c-id="1.0.0.0" s-id="2">
-          <!--r.2-->
+          </shadow-root>
           <!--o.1.1-->
-          <!--o.1.3-->
-          <!--o.1.5-->
-          <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.top-->
-          <div c-id="1.3.1.1" slot="top">
-            <!--t.1.4.2.0-->
-            top light-dom
-          </div>
-          <!--s.2.2.0.2.-->
-          <!--t.1.5.1.2-->
-          middle light-dom
-          <!--s.2.3.0.3.bottom-->
-          <div c-id="1.1.1.0" slot="bottom">
-            <!--t.1.2.2.0-->
-            bottom light-dom
-          </div>
-          <footer c-id="2.4.0.4"></footer>
-        </cmp-b>
-      </cmp-a>
-    `);
-
-    // @ts-ignore
-    const clientHydrated = await newSpecPage({
-      components: [CmpA, CmpB],
-      html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
-    });
-
-    expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
-        <!--r.1-->
-        <cmp-b class="hydrated">
-          <!--r.2-->
-          <!--o.1.1-->
-          <!--o.1.3-->
-          <!--o.1.5-->
-          <header></header>
-          <!--s.2.1.0.1.top-->
-          <div slot="top">
-            top light-dom
-          </div>
-          <!--s.2.2.0.2.-->
-          middle light-dom
-          <!--s.2.3.0.3.bottom-->
-          <div slot="bottom">
-            bottom light-dom
-          </div>
-          <footer></footer>
+          light-dom
         </cmp-b>
       </cmp-a>
     `);

@@ -22,6 +22,16 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   platform.resetPlatform();
   bc.resetBuildConditionals(bc.BUILD);
 
+  if (opts.hydrateServerSide) {
+    platform.supportsShadowDom = false;
+  } else {
+    if (opts.serializedShadowDom === false) {
+      platform.supportsShadowDom = false;
+    } else {
+      platform.supportsShadowDom = true;
+    }
+  }
+
   const cmpTags = new Set<string>();
 
   const lazyBundles: d.LazyBundlesRuntimeData = opts.components.map((Cstr: d.ComponentTestingConstructor) => {
@@ -46,7 +56,6 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     } else if (opts.hydrateServerSide) {
       bc.BUILD.hydrateServerSide = true;
       bc.BUILD.hydrateClientSide = false;
-      platform.supportsShadowDom = false;
     }
 
     const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 89999) + 10000)}`;
@@ -65,12 +74,13 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   });
 
   const win = platform.getWin() as Window;
+  const doc = win.document;
 
-  const plt = {
+  const results = {
     win: win,
-    doc: win.document,
-    head: win.document.head,
-    body: win.document.body,
+    doc: doc,
+    head: doc.head,
+    body: doc.body,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,
@@ -81,65 +91,71 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   };
 
   if (typeof opts.url === 'string') {
-    plt.win.location.href = opts.url;
+    results.win.location.href = opts.url;
   }
 
   if (typeof opts.direction === 'string') {
-    plt.doc.documentElement.setAttribute('dir', opts.direction);
+    results.doc.documentElement.setAttribute('dir', opts.direction);
   }
 
   if (typeof opts.language === 'string') {
-    plt.doc.documentElement.setAttribute('lang', opts.language);
+    results.doc.documentElement.setAttribute('lang', opts.language);
   }
 
   if (typeof opts.cookie === 'string') {
     try {
-      plt.doc.cookie = opts.cookie;
+      results.doc.cookie = opts.cookie;
     } catch (e) {}
   }
 
   if (typeof opts.referrer === 'string') {
     try {
-      (plt.doc as any).referrer = opts.referrer;
+      (results.doc as any).referrer = opts.referrer;
     } catch (e) {}
   }
 
   if (typeof opts.userAgent === 'string') {
     try {
-      (plt.win.navigator as any).userAgent = opts.userAgent;
+      (results.win.navigator as any).userAgent = opts.userAgent;
     } catch (e) {}
   }
 
-  platform.bootstrapLazy(lazyBundles, plt.win);
+  platform.bootstrapLazy(lazyBundles, win);
 
   if (typeof opts.html === 'string') {
-    plt.body.innerHTML = opts.html;
+    results.body.innerHTML = opts.html;
   }
 
   if (opts.flushQueue !== false) {
-    await plt.flush();
+    await results.flush();
   }
 
-  plt.root = findRoot(cmpTags, plt.body);
-  if (plt.root) {
-    plt.rootInstance = platform.getHostRef(plt.root).$lazyInstance$;
+  results.root = findRoot(cmpTags, results.body);
+  if (results.root != null) {
+    results.rootInstance = platform.getHostRef(results.root).$lazyInstance$;
   }
-  return plt;
+
+  if (opts.hydrateServerSide) {
+    platform.insertVdomAnnotations(doc);
+  }
+
+  return results;
 }
 
 
 function findRoot(cmpTags: Set<string>, node: Element): any {
   if (node != null) {
     const children = node.children;
+    const childrenLength = children.length;
 
-    for (let i = 0; i < children.length; i++) {
+    for (let i = 0; i < childrenLength; i++) {
       const elm = children[i];
       if (cmpTags.has(elm.nodeName.toLowerCase())) {
         return elm;
       }
     }
 
-    for (let i = 0; i < children.length; i++) {
+    for (let i = 0; i < childrenLength; i++) {
       const r = findRoot(cmpTags, children[i]);
       if (r != null) {
         return r;
