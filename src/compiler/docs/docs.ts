@@ -2,7 +2,10 @@ import * as d from '../../declarations';
 import { catchError, cleanDiagnostics, hasError } from '@utils';
 import { BuildContext } from '../build/build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
-import { outputDocs } from '../output-targets/output-docs';
+import { plugin as docsPlugin } from '../output-plugins/docs';
+import { plugin as jsonDocsPlugin } from '../output-plugins/docs-json';
+import { plugin as vscodeDocsPlugin } from '../output-plugins/docs-vscode'
+import { createPluginOutput } from '../output-plugins/create-plugin-output';
 
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
@@ -20,7 +23,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
     await transpileApp(config, compilerCtx, buildCtx);
 
     // generate each of the docs
-    await outputDocs(config, compilerCtx, buildCtx);
+    await createPluginOutput(config, compilerCtx, buildCtx, [docsPlugin, jsonDocsPlugin, vscodeDocsPlugin]);
 
   } catch (e) {
     // catch all phase

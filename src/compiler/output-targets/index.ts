@@ -1,13 +1,12 @@
 import * as d from '../../declarations';
-import { outputDocs } from './output-docs';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
-import { outputAngularProxies } from './output-angular';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputCommonJsIndexes } from './output-commonjs';
 import { outputHydrate } from './output-hydrate';
 import { outputWww } from './output-www';
 import { outputModule } from './output-module';
+import { createPluginOutput } from '../output-plugins/create-plugin-output';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -17,12 +16,11 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 
   const generateOutputs = [
     outputCollections(config, compilerCtx, buildCtx),
-    outputAngularProxies(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
     outputCommonJsIndexes(config, compilerCtx, buildCtx),
-    outputDocs(config, compilerCtx, buildCtx),
     generateServiceWorkers(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
+    createPluginOutput(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];

@@ -1,20 +1,13 @@
-import * as d from '../../declarations';
-import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
+import * as d from '../../../declarations';
 import { propsToMarkdown } from './markdown-props';
 import { eventsToMarkdown } from './markdown-events';
 import { methodsToMarkdown } from './markdown-methods';
 import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
 import { slotsToMarkdown } from './markdown-slots';
+import { AUTO_GENERATE_COMMENT, NOTE } from '../../docs/constants';
 
-
-export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docs: d.JsonDocs) {
-  await Promise.all(docs.components.map(cmpData => {
-    return generateReadme(config, compilerCtx, readmeOutputs, cmpData);
-  }));
-}
-
-async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent) {
+export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent) {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
   const content = generateMarkdown(userContent, docsData);
