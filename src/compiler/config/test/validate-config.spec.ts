@@ -109,22 +109,6 @@ describe('validation', () => {
   });
 
 
-  describe('hydrate css', () => {
-
-    it('should set hydratedCssClass', () => {
-      config.hydratedCssClass = '💎';
-      validateConfig(config);
-      expect(config.hydratedCssClass).toBe('💎');
-    });
-
-    it('should default hydratedCssClass', () => {
-      validateConfig(config);
-      expect(config.hydratedCssClass).toBe('hydrated');
-    });
-
-  });
-
-
   describe('hashed filenames', () => {
 
     it('should throw error when hashedFileNameLength too large', () => {

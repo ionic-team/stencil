@@ -126,7 +126,6 @@ export interface StencilConfig {
   devServer?: d.DevServerConfig;
   enableCacheStats?: boolean;
   globalScript?: string;
-  hydratedCssClass?: string;
   includeSrc?: string[];
   logger?: d.Logger;
   maxConcurrentWorkers?: number;

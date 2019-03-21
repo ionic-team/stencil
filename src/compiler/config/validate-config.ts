@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
@@ -105,7 +105,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
 
-  setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
   setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
@@ -153,4 +152,3 @@ const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
 const DEFAULT_EXCLUDES = ['**/*.+(spec|e2e).*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
-const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';
