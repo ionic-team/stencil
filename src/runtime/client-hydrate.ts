@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_HOST_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
+import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { getDoc } from '@platform';
 import { toLowerCase } from '@utils';
 
@@ -17,9 +16,8 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     $tag$: tagName
   };
 
-  hostElm[HYDRATE_HOST_ID] = hostId;
-  hostElm.removeAttribute(HYDRATE_HOST_ID);
-  hostElm.classList.add('hydrated');
+  hostElm[HYDRATE_ID] = hostId;
+  hostElm.removeAttribute(HYDRATE_ID);
 
   clientHydrate(vnode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
@@ -216,15 +214,6 @@ const clientHydrate = (
       }
     }
   }
-};
-
-
-export const convertToShadowCss = (styleElm: HTMLStyleElement) => {
-  registerStyle(
-    styleElm.getAttribute('h-id'),
-    convertScopedToShadow(styleElm.innerHTML)
-  );
-  styleElm.remove();
 };
 
 

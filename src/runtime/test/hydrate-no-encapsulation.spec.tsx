@@ -42,7 +42,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
         <p class="hi">
           Hello
@@ -87,7 +87,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
         Hello
       </cmp-a>
@@ -136,7 +136,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
         top
         <p>
@@ -197,9 +197,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <!--r.2-->
           <!--o.1.1-->
           <!--s.2.0.0.0.-->
@@ -261,9 +261,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <!--r.2-->
           <!--o.1.1-->
           <header></header>
@@ -326,9 +326,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <!--r.2-->
           <!--o.1.1-->
           <header></header>
@@ -410,9 +410,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <!--r.2-->
           <!--o.1.1-->
           <!--o.1.3-->

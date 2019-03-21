@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
 import { getDoc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { HYDRATE_ID } from './runtime-constants';
 
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
@@ -47,7 +48,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
           styleElm.innerHTML = style;
 
           if (BUILD.hydrateServerSide) {
-            styleElm.setAttribute('h-id', styleId);
+            styleElm.setAttribute(HYDRATE_ID, styleId);
           }
 
           styleContainerNode.insertBefore(

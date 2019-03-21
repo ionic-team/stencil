@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getHostRef } from '@platform';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_HOST_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
+import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
 
 
 export const insertVdomAnnotations = (doc: Document) => {
@@ -73,7 +73,7 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
   if (vnode != null) {
     const hostId = ++docData.hostIds;
 
-    hostElm.setAttribute(HYDRATE_HOST_ID, hostId as any);
+    hostElm.setAttribute(HYDRATE_ID, hostId as any);
 
     if (hostElm['s-cr'] != null) {
       hostElm['s-cr'].nodeValue = `${CONTENT_REF_ID}.${hostId}`;

@@ -1,13 +1,14 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
+import { CMP_FLAG } from '@utils';
 import { connectedCallback } from './connected-callback';
-import { convertToShadowCss } from './client-hydrate';
+import { convertScopedToShadow, registerStyle } from './styles';
 import { disconnectedCallback } from './disconnected-callback';
 import { getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { HTMLElement } from './html-element';
+import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 import { proxyComponent } from './proxy-component';
-import { CMP_FLAG } from '@utils';
-import { HTMLElement } from './html-element';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window, options: d.CustomElementsDefineOptions = {}) => {
@@ -18,8 +19,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   const y = head.querySelector('meta[charset]');
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    doc.querySelectorAll('style[h-id]')
-      .forEach(convertToShadowCss);
+    doc.querySelectorAll('style[s-id]')
+      .forEach(styleElm => {
+        registerStyle(
+          styleElm.getAttribute(HYDRATE_ID),
+          convertScopedToShadow(styleElm.innerHTML)
+        );
+      });
   }
   lazyBundles.forEach(lazyBundle =>
 

@@ -50,7 +50,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <div>
             <slot></slot>
@@ -110,7 +110,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           top
           <slot></slot>
@@ -162,7 +162,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           shadow-text
         </shadow-root>
@@ -215,7 +215,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <div>
             <slot></slot>
@@ -275,9 +275,9 @@ describe('hydrate, shadow parent', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
-          <cmp-b class="hydrated">
+          <cmp-b>
             <!--r.2-->
             <!--o.1.1-->
             <!--s.2.0.0.0.-->
@@ -344,7 +344,7 @@ describe('hydrate, shadow parent', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <section>
             <slot name="start"></slot>

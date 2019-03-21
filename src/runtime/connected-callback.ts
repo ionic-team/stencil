@@ -4,7 +4,7 @@ import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, HOST_STATE } from '@utils';
 import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
-import { HYDRATE_HOST_ID } from './runtime-constants';
+import { HYDRATE_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
 
@@ -26,7 +26,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
     let hydrateId: string;
     if (BUILD.hydrateClientSide) {
-      hydrateId = elm.getAttribute(HYDRATE_HOST_ID);
+      hydrateId = elm.getAttribute(HYDRATE_ID);
       if (hydrateId) {
         if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
           addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));

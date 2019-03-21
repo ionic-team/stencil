@@ -40,7 +40,7 @@ describe('hydrate, shadow child', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <p>
             Hello
@@ -99,9 +99,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <slot></slot>
           </shadow-root>
@@ -160,9 +160,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
@@ -221,9 +221,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <slot></slot>
@@ -283,9 +283,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
@@ -349,9 +349,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <footer>
@@ -415,9 +415,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
