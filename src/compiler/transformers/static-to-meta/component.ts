@@ -14,7 +14,7 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
-import { normalizePath } from '@utils';
+import { normalizePath, unduplicate } from '@utils';
 
 
 export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
@@ -51,8 +51,8 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(config, tagName, moduleFile.sourceFilePath, staticMembers),
-    legacyConnect: getStaticValue(staticMembers, 'connectProps'),
-    legacyContext: getStaticValue(staticMembers, 'contextProps'),
+    legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
+    legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(config, staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
@@ -118,6 +118,19 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
   ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
 
   parseClassMethods(cmpNode, cmp);
+
+  cmp.legacyConnect.forEach(({connect}) => {
+    cmp.htmlTagNames.push(connect);
+    if (connect.includes('-')) {
+      cmp.potentialCmpRefs.push({
+        tag: connect
+      });
+    }
+  });
+
+  cmp.htmlAttrNames = unduplicate(cmp.htmlAttrNames);
+  cmp.htmlTagNames = unduplicate(cmp.htmlTagNames);
+  cmp.potentialCmpRefs = unduplicate(cmp.potentialCmpRefs, item => item.tag);
   setComponentBuildConditionals(cmp);
 
   if (transformOpts.addCompilerMeta) {

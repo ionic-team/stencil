@@ -48,9 +48,7 @@ export function gatherVdomMeta(cmpMeta: d.ComponentCompilerMeta, args: ts.NodeAr
           }
 
           attrs.forEach(attrName => {
-            if (!cmpMeta.htmlAttrNames.includes(attrName)) {
-              cmpMeta.htmlAttrNames.push(attrName);
-            }
+            cmpMeta.htmlAttrNames.push(attrName);
           });
         }
       }

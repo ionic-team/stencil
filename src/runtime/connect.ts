@@ -10,7 +10,7 @@ export const getConnect = (ref: d.HostRef, tagName: string) => {
       elm = doc.createElement(tagName) as any;
       doc.body.appendChild(elm);
     }
-    return elm.componentOnReady();
+    return 'componentOnReady' in elm ? elm.componentOnReady() : Promise.resolve(elm);
   }
 
   function create() {

@@ -140,7 +140,6 @@ function parseJsFilePath(config: d.Config, collectionDir: string, cmpData: d.Com
   if (typeof cmpData.componentPath !== 'string') {
     throw new Error(`parseModuleJsFilePath, "componentPath" missing on cmpData: ${cmpData.tag}`);
   }
-  console.log(collectionDir, cmpData.componentPath)
   return normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
 }
 

@@ -35,10 +35,13 @@ export function flatOne<T>(array: T[][]): T[] {
   }, [] as T[]);
 }
 
-export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
+export function unduplicate<T>(array: T[], predicate: (item: T) => any = (i) => i): T[] {
   const set = new Set();
   return array.filter(item => {
     const key = predicate(item);
+    if (key == null) {
+      return true;
+    }
     if (set.has(key)) {
       return false;
     }

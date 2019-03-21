@@ -17,47 +17,40 @@ export function parseCollectionManifest(config: d.Config, compilerCtx: d.Compile
       version: compilerVersion.version || '',
       typescriptVersion: compilerVersion.typescriptVersion || ''
     },
-    bundles: []
+    bundles: parseBundles(collectionManifest),
+    global: parseGlobal(config, compilerCtx, collectionDir, collectionManifest)
   };
 
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
-  parseGlobal(config, compilerCtx, collectionDir, collectionManifest, collection);
-  parseBundles(collectionManifest, collection);
 
   return collection;
 }
 
 
 export function parseCollectionDependencies(collectionManifest: d.CollectionManifest) {
-  const dependencies: string[] = [];
-
-  if (Array.isArray(collectionManifest.collections)) {
-    collectionManifest.collections.forEach(c => {
-      dependencies.push(c.name);
-    });
-  }
-
-  return dependencies;
+  return (collectionManifest.collections || []).map(c => c.name);
 }
 
 
-export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
-  if (typeof collectionManifest.global !== 'string') return;
+export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest) {
+  if (typeof collectionManifest.global !== 'string') {
+    return undefined;
+  }
 
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
 
-  collection.global = getModule(config, compilerCtx, sourceFilePath);
-  collection.global.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+  const globalModule = getModule(config, compilerCtx, sourceFilePath);
+  globalModule.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+  return globalModule;
 }
 
 
-export function parseBundles(collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
+export function parseBundles(collectionManifest: d.CollectionManifest) {
   if (invalidArrayData(collectionManifest.bundles)) {
-    collection.bundles = [];
-    return;
+    return [];
   }
 
-  collection.bundles = collectionManifest.bundles.map(b => {
+  return collectionManifest.bundles.map(b => {
     return {
       components: b.components.slice().sort()
     };

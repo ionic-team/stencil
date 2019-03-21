@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
-import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath, sortBy } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
@@ -91,13 +91,26 @@ export function serializeCollectionManifest(config: d.Config, compilerCtx: d.Com
       name: config.sys.compiler.name,
       version: config.sys.compiler.version,
       typescriptVersion: config.sys.compiler.typescriptVersion
-    }
+    },
+    collections: serializeCollectionDependencies(compilerCtx),
+    bundles: config.bundles.map(b => ({
+      components: b.components.slice().sort()
+    }))
   };
   if (config.globalScript) {
     const mod = compilerCtx.moduleMap.get(config.globalScript);
     collectionManifest.global = config.sys.path.relative(config.srcDir, mod.jsFilePath);
   }
   return collectionManifest;
+}
+
+function serializeCollectionDependencies(compilerCtx: d.CompilerCtx): d.CollectionDependencyData[] {
+  const collectionDeps = compilerCtx.collections.map(c => ({
+    name: c.collectionName,
+    tags: flatOne(c.moduleFiles.map(m => m.cmps)).map(cmp => cmp.tagName).sort()
+  }));
+
+  return sortBy(collectionDeps, item => item.name);
 }
 
 export async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
