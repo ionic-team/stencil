@@ -99,7 +99,7 @@ export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAng
   return o.type === 'angular';
 }
 
-export function getComponentsFromModules(moduleFiles: d.Module[]) {
+export function getComponentsFromModules(moduleFiles: (d.Module | d.EntryModule)[]) {
   return flatOne(moduleFiles.map(m => m.cmps));
 }
 

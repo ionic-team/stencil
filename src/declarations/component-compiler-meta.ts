@@ -50,7 +50,7 @@ export interface ComponentCompilerFeatures {
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
-  assetsDirs?: CompilerAssetDir[];
+  assetsDirs: CompilerAssetDir[];
   componentClassName: string;
   dependencies: string[];
   elementRef: string;
@@ -204,7 +204,6 @@ export interface CompilerAssetDir {
   absolutePath?: string;
   cmpRelativePath?: string;
   originalComponentPath?: string;
-  originalCollectionPath?: string;
 }
 
 export interface ComponentCompilerData {

@@ -14,7 +14,6 @@ export interface ExternalStyleCompiler {
   absolutePath: string;
   relativePath: string;
   originalComponentPath: string;
-  originalCollectionPath: string;
 }
 
 

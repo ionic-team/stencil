@@ -4,6 +4,7 @@ import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath } from '@utils';
 import { generateTypesAndValidate } from '../types/generate-types';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
+import { processCopyTasks } from '../copy/local-copy-tasks';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -29,10 +30,11 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
   timespan.finish(`generate collections finished`);
 }
 
-function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
-  const copyTasks = flatOne(outputTargets.map(o => ([
-    ...getComponentAssetsCopyTasks(config, buildCtx, o.dir, false),
-  ])));
+async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
+  const copyTasks = flatOne(await Promise.all(outputTargets.map(async o => ([
+    ...getComponentAssetsCopyTasks(config, buildCtx, o.collectionDir, true),
+    ...await processCopyTasks(config, o.collectionDir, o.copy)
+  ]))));
   return performCopyTasks(config, compilerCtx, buildCtx, copyTasks);
 }
 
@@ -56,7 +58,7 @@ async function writeModuleFile(config: d.Config, compilerCtx: d.CompilerCtx, mod
 }
 
 async function writeManifests(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
-  const collectionData = JSON.stringify(serializeCollectionManifest(config, buildCtx.moduleFiles), null, 2);
+  const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
   return Promise.all(
     outputTargets.map(o => writeManifest(config, compilerCtx, collectionData, o))
   );
@@ -79,16 +81,23 @@ async function writeManifest(config: d.Config, compilerCtx: d.CompilerCtx, colle
 }
 
 
-export function serializeCollectionManifest(config: d.Config, moduleFiles: d.Module[]): d.CollectionManifest {
+export function serializeCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): d.CollectionManifest {
   // create the single collection we're going to fill up with data
-  return {
-    entries: moduleFiles.map(mod => config.sys.path.relative(config.srcDir, mod.jsFilePath)),
+  const collectionManifest: d.CollectionManifest = {
+    entries: buildCtx.moduleFiles
+      .filter(mod => !mod.isCollectionDependency && mod.cmps.length > 0)
+      .map(mod => config.sys.path.relative(config.srcDir, mod.jsFilePath)),
     compiler: {
       name: config.sys.compiler.name,
       version: config.sys.compiler.version,
       typescriptVersion: config.sys.compiler.typescriptVersion
     }
   };
+  if (config.globalScript) {
+    const mod = compilerCtx.moduleMap.get(config.globalScript);
+    collectionManifest.global = config.sys.path.relative(config.srcDir, mod.jsFilePath);
+  }
+  return collectionManifest;
 }
 
 export async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {

@@ -35,12 +35,12 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx, destination: string) {
+async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx, _destination: string) {
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
-  const isSrcTypes = destination === 'src';
+  // const isSrcTypes = destination === 'src';
   const components = sortBy(
-    getComponentsFromModules(buildCtx.moduleFiles),
+    getComponentsFromModules(buildCtx.moduleFiles).filter(cmp => !cmp.isCollectionDependency),
     cmp => cmp.tagName
   );
 
@@ -49,7 +49,7 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
     return generateComponentTypes(cmp);
   });
 
-  const jsxAugmentation = !isSrcTypes ? '' : `
+  const jsxAugmentation = `
 declare module "@stencil/core" {
   export namespace JSX {
     interface ElementInterfaces extends LocalJSX.ElementInterfaces {}

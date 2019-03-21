@@ -44,7 +44,6 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         externalStyles: [{
           absolutePath: null,
           relativePath: null,
-          originalCollectionPath: null,
           originalComponentPath: parsedStyleUrl
         }]
       });
@@ -64,7 +63,6 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         const externalStyle: d.ExternalStyleCompiler = {
           absolutePath: null,
           relativePath: null,
-          originalCollectionPath: null,
           originalComponentPath: parsedStyleUrl.trim()
         };
         return externalStyle;
@@ -85,7 +83,6 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         externalStyles.push({
           absolutePath: null,
           relativePath: null,
-          originalCollectionPath: null,
           originalComponentPath: styleObj.trim()
         });
 
@@ -95,7 +92,6 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
             externalStyles.push({
               absolutePath: null,
               relativePath: null,
-              originalCollectionPath: null,
               originalComponentPath: styleUrl.trim()
             });
           }

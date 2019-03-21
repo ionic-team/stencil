@@ -46,7 +46,7 @@ export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collec
 
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
 
-  collection.global = getModule(compilerCtx, sourceFilePath);
+  collection.global = getModule(config, compilerCtx, sourceFilePath);
   collection.global.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
 }
 

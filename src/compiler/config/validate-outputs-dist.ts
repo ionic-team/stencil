@@ -61,7 +61,7 @@ export function validateOutputTargetDist(config: d.Config) {
       type: 'dist-collection',
       dir: outputTarget.dir,
       collectionDir: outputTarget.collectionDir,
-      empty: outputTarget.empty
+      empty: outputTarget.empty,
     });
 
     const lazyDir = path.join(outputTarget.buildDir, config.fsNamespace);

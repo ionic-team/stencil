@@ -14,6 +14,7 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
+import { normalizePath } from '@utils';
 
 
 export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
@@ -53,11 +54,12 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     legacyConnect: getStaticValue(staticMembers, 'connectProps'),
     legacyContext: getStaticValue(staticMembers, 'contextProps'),
     internal: isInternal(docs),
+    assetsDirs: parseAssetsDirs(config, staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
     dependencies: [],
     docs,
-    jsFilePath: null,
-    sourceFilePath: null,
+    jsFilePath: moduleFile.jsFilePath,
+    sourceFilePath: moduleFile.sourceFilePath,
 
     hasAttributeChangedCallbackFn: false,
     hasComponentWillLoadFn: false,
@@ -172,4 +174,29 @@ function parseVirtualProp(tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtu
     name: name.trim(),
     docs: docs.trim()
   };
+}
+
+function parseAssetsDirs(config: d.Config, staticMembers: ts.ClassElement[], componentFilePath: string): d.AssetsMeta[] {
+  const dirs: string[] = getStaticValue(staticMembers, 'assetsDirs') || [];
+  const componentDir = normalizePath(config.sys.path.dirname(componentFilePath));
+
+  return dirs.map(dir => {
+    // get the relative path from the component file to the assets directory
+    dir = normalizePath(dir.trim());
+
+    let absolutePath = dir;
+    let cmpRelativePath = dir;
+    if (config.sys.path.isAbsolute(dir)) {
+      // if this is an absolute path already, let's convert it to be relative
+      cmpRelativePath = config.sys.path.relative(componentDir, dir);
+    } else {
+      // create the absolute path to the asset dir
+      absolutePath = config.sys.path.join(componentDir, dir);
+    }
+    return {
+      absolutePath,
+      cmpRelativePath,
+      originalComponentPath: dir,
+    };
+  });
 }

@@ -36,7 +36,7 @@ async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   const allCopyTasks = flatOne(
     await Promise.all(
       outputTargets.map(async o => [
-        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, true),
+        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, false),
         ...await processCopyTasks(config, o.copyDir, o.copy)
       ])
     )

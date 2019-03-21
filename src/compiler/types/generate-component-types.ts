@@ -29,19 +29,18 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesMod
     ...propAttributes,
     ...eventAttributes
   ], true);
-  const onlyJSX = cmp.isCollectionDependency;
   return {
     tagNameAsPascal,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
     jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
-    element: onlyJSX ? '' : `
+    element: `
 interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${htmlElementName}: {
   prototype: ${htmlElementName};
   new (): ${htmlElementName};
 };`,
-    HTMLElementTagNameMap: onlyJSX ? '' : `'${tagName}': ${htmlElementName}`,
-    ElementTagNameMap: onlyJSX ? '' : `'${tagName}': ${htmlElementName};`,
+    HTMLElementTagNameMap: `'${tagName}': ${htmlElementName}`,
+    ElementTagNameMap: `'${tagName}': ${htmlElementName};`,
   };
 }
 
