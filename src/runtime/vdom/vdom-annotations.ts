@@ -30,7 +30,15 @@ export const insertVdomAnnotations = (doc: Document) => {
           if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
             nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
 
-          } else {
+          } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
+            if (hostId === 0) {
+              const textContent = nodeRef.nodeValue.trim();
+              if (textContent === '') {
+                // useless whitespace node at the document root
+                orgLocationNode.remove();
+                return;
+              }
+            }
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
             nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);

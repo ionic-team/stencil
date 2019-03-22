@@ -26,15 +26,14 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
 
     const node = c.$elm$ as d.RenderNode;
 
-    if (BUILD.shadowDom && shadowRoot) {
-      if (orgLocationNode && c.$hostId$ === '0') {
-        orgLocationNode.$elm$.parentNode.insertBefore(
-          node,
-          orgLocationNode.$elm$.nextSibling
-        );
-      }
+    if (orgLocationNode && c.$hostId$ === '0') {
+      orgLocationNode.$elm$.parentNode.insertBefore(
+        node,
+        orgLocationNode.$elm$.nextSibling
+      );
+    }
 
-    } else {
+    if (!shadowRoot) {
       node['s-hn'] = tagName;
 
       if (orgLocationNode) {
