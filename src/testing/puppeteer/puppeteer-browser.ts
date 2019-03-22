@@ -25,11 +25,16 @@ export async function startPuppeteerBrowser(config: d.Config) {
     config.logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
   }
 
+  if (typeof config.testing.devtools === 'number') {
+    config.logger.debug(`puppeteer devtools: ${config.testing.devtools}`);
+  }
+
   const launchOpts: puppeteer.LaunchOptions = {
     ignoreHTTPSErrors: true,
     args: config.testing.browserArgs,
     headless: config.testing.browserHeadless,
-    slowMo: config.testing.browserSlowMo
+    slowMo: config.testing.browserSlowMo,
+    devtools: config.testing.devtools
   };
 
   if (config.testing.browserExecutablePath) {
