@@ -19,14 +19,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   const y = head.querySelector('meta[charset]');
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    doc.querySelectorAll('style[s-id]')
-      .forEach(styleElm => {
-        registerStyle(
-          styleElm.getAttribute(HYDRATE_ID),
-          convertScopedToShadow(styleElm.innerHTML)
-        );
-      });
+    const styles = doc.querySelectorAll('style[s-id]');
+    let globalStyles = '';
+
+    styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
+
+    styles.forEach(styleElm => {
+      registerStyle(
+        styleElm.getAttribute(HYDRATE_ID),
+        globalStyles + convertScopedToShadow(styleElm.innerHTML)
+      );
+    });
   }
+
   lazyBundles.forEach(lazyBundle =>
 
     lazyBundle[1].forEach(cmpLazyMeta => {

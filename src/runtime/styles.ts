@@ -16,7 +16,6 @@ export const registerStyle = (styleId: string, cssText: string) => {
     style = cssText;
   }
   styles.set(styleId, style);
-  return style;
 };
 
 export const addStyle = (styleContainerNode: any, tagName: string, mode: string, ) => {

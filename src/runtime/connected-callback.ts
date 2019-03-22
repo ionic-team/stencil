@@ -24,18 +24,18 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
     // first time this component has connected
     hostRef.$stateFlags$ |= HOST_STATE.hasConnected;
 
-    let hydrateId: string;
+    let hostId: string;
     if (BUILD.hydrateClientSide) {
-      hydrateId = elm.getAttribute(HYDRATE_ID);
-      if (hydrateId) {
+      hostId = elm.getAttribute(HYDRATE_ID);
+      if (hostId) {
         if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
           addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
         }
-        initializeClientHydrate(elm, cmpMeta.t, hydrateId, hostRef);
+        initializeClientHydrate(elm, cmpMeta.t, hostId, hostRef);
       }
     }
 
-    if (BUILD.slotRelocation && !hydrateId) {
+    if (BUILD.slotRelocation && !hostId) {
       // initUpdate, BUILD.slotRelocation
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
