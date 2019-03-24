@@ -58,7 +58,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
       }
     });
-    if (BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
+    if (!BUILD.hydrateServerSide && BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
       const attrNameToPropName = new Map();
 
       if (BUILD.reflect) {

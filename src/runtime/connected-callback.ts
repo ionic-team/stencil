@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAG, HOST_STATE } from '@utils';
+import { CMP_FLAG, HOST_STATE, MEMBER_FLAGS } from '@utils';
 import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
@@ -75,8 +75,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
     // Lazy properties
     // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
     if (BUILD.prop && cmpMeta.m) {
-      Object.keys(cmpMeta.m).forEach(memberName => {
-        if (elm.hasOwnProperty(memberName)) {
+      Object.entries(cmpMeta.m).forEach(([memberName, [memberFlags]]) => {
+        if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
           const value = (elm as any)[memberName];
           delete (elm as any)[memberName];
           (elm as any)[memberName] = value;

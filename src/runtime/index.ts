@@ -9,6 +9,7 @@ export { disconnectedCallback } from './disconnected-callback';
 export { getAssetPath } from './get-asset-path';
 export { getConnect } from './connect';
 export { getDocument, getElement, getWindow } from './element';
+export { getValue, setValue } from './set-value';
 export { h, Host } from './vdom/h';
 export { insertVdomAnnotations } from './vdom/vdom-annotations';
 export { parsePropertyValue } from './parse-property-value';

@@ -12,7 +12,7 @@ export const getValue = (ref: d.RuntimeRef, propName: string) =>
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
   // check our new property value against our internal value
   const hostRef = getHostRef(ref);
-  const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : ref as d.HostElement;
+  const elm = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$hostElement$ : ref as d.HostElement;
   const oldVal = hostRef.$instanceValues$.get(propName);
   const flags = hostRef.$stateFlags$;
   newVal = parsePropertyValue(newVal, cmpMeta.m[propName][0]);
