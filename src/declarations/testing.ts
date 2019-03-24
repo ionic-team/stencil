@@ -392,6 +392,12 @@ export interface TestingConfig extends JestConfig {
   browserSlowMo?: number;
 
   /**
+   * Whether to auto-open a DevTools panel for each tab.
+   * If this option is true, the headless option will be set false
+   */
+  browserDevtools?: boolean;
+
+  /**
    * Array of browser emulations to be using during e2e tests. A full e2e
    * test is ran for each emulation.
    */
