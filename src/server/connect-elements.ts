@@ -5,7 +5,7 @@ import { hydrateComponent } from './hydrate-component';
 export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[]) {
   if (elm != null && typeof elm.nodeName === 'string') {
 
-    if (elm.hasAttribute('no-prerender') === false) {
+    if (!elm.hasAttribute('no-hydrate')) {
       const tagName = elm.nodeName.toLowerCase();
 
       if (tagName.includes('-') === true) {

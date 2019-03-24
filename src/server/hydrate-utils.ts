@@ -5,6 +5,10 @@ import { URL } from 'url';
 export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
   const outputOpts: d.HydrateOptions = Object.assign({}, inputOpts);
 
+  if (typeof outputOpts.maxHydrateCount !== 'number') {
+    outputOpts.maxHydrateCount = 300;
+  }
+
   return outputOpts;
 }
 
@@ -31,6 +35,7 @@ export function generateHydrateResults(opts: d.HydrateOptions) {
     search: urlParse.search,
     hash: urlParse.hash,
     html: null,
+    hydratedCount: 0,
     anchors: opts.collectAnchors ? [] : null,
     components: opts.collectComponents ? [] : null,
     styles: opts.collectScripts ? [] : null,

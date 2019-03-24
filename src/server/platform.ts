@@ -57,7 +57,11 @@ export const tick = {
   }
 };
 
-export const consoleError = (e: any) => console.error(e);
+export const consoleError = (e: any) => {
+  if (e != null) {
+    console.error(e.stack || e.message || e);
+  }
+};
 
 const Context = {
   isServer: true,
@@ -118,13 +122,15 @@ export {
   createEvent,
   getConnect,
   getElement,
-  setMode,
   getMode,
+  getValue,
   getWindow,
   getDocument,
   getAssetPath,
   Host,
   h,
   insertVdomAnnotations,
-  parsePropertyValue
+  parsePropertyValue,
+  setMode,
+  setValue
 } from '@runtime';

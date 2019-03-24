@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { catchError } from '@utils';
+import { buildError, catchError } from '@utils';
 import { connectElements } from './connect-elements';
 import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
 import { insertVdomAnnotations } from '@platform';
@@ -9,12 +9,14 @@ import globalScripts from '@global-scripts';
 
 
 export async function renderToString(html: string, opts: d.HydrateOptions = {}) {
-  if (typeof html !== 'string') {
-    throw new Error('Invalid html');
-  }
-
   opts = normalizeHydrateOptions(opts);
   const results = generateHydrateResults(opts);
+
+  if (typeof html !== 'string') {
+    const err = buildError(results.diagnostics);
+    err.messageText = `Invalid html`;
+    return results;
+  }
 
   try {
     const win: Window = new MockWindow(html) as any;
@@ -47,12 +49,14 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
 
 
 export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}) {
-  if (doc == null || doc.documentElement == null || typeof doc.documentElement.nodeType !== 'number') {
-    throw new Error('Invalid document');
-  }
-
   opts = normalizeHydrateOptions(opts);
   const results = generateHydrateResults(opts);
+
+  if (doc == null || doc.documentElement == null || typeof doc.documentElement.nodeType !== 'number') {
+    const err = buildError(results.diagnostics);
+    err.messageText = `Invalid document`;
+    return results;
+  }
 
   try {
     const win: Window = doc.defaultView || new MockWindow(false) as any;

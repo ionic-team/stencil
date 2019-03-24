@@ -81,7 +81,9 @@ export {
   createEvent,
   getElement,
   getConnect,
+  getValue,
   insertVdomAnnotations,
   h,
-  parsePropertyValue
+  parsePropertyValue,
+  setValue
 } from '@runtime';
