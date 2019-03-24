@@ -1,12 +1,12 @@
-import * as d from '../../declarations';
+import * as d from '../declarations';
 import { catchError } from '@utils';
-import { collapseHtmlWhitepace } from '../../compiler/html/collapse-html-whitespace';
-import { optimizeStyles } from '../../compiler/html/optimize-styles';
-import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
-import { updateCanonicalLink } from '../../compiler/html/canonical-link';
+import { collapseHtmlWhitepace } from '../compiler/html/collapse-html-whitespace';
+import { optimizeStyles } from '../compiler/html/optimize-styles';
+import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
+import { updateCanonicalLink } from '../compiler/html/canonical-link';
 
 
-export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
+export function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
   optimizeStyles(doc, opts, results);
 
   if (typeof opts.title === 'string') {
@@ -19,7 +19,7 @@ export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.Hydr
     removeScripts(doc.documentElement);
   }
 
-  if (opts.collapseWhitespace === true) {
+  if (opts.collapseWhitespace) {
     try {
       collapseHtmlWhitepace(doc.documentElement);
     } catch (e) {}
@@ -41,6 +41,10 @@ export function optimizeHydratedDocument(opts: d.HydrateOptions, results: d.Hydr
     } catch (e) {
       catchError(results.diagnostics, e);
     }
+  }
+
+  if (opts.clientHydrateAnnotations) {
+    doc.documentElement.classList.add('hydrated');
   }
 
   results.title = doc.title;

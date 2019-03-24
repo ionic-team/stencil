@@ -1,63 +1,69 @@
 import * as d from '../../declarations';
-import { getHostRef } from '@platform';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
+import { getHostRef } from '@platform';
 
 
-export const insertVdomAnnotations = (doc: Document) => {
-  if (doc != null) {
-    const docData: DocData = {
-      hostIds: 0,
-      rootLevelIds: 0
-    };
-    const orgLocationNodes: d.RenderNode[] = [];
-
-    elementVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
-
-    orgLocationNodes.forEach(orgLocationNode => {
-      if (orgLocationNode != null) {
-        const nodeRef = orgLocationNode['s-nr'];
-
-        let hostId = nodeRef['s-host-id'];
-        let nodeId = nodeRef['s-node-id'];
-        let childId = `${hostId}.${nodeId}`;
-
-        if (hostId == null) {
-          hostId = 0;
-          docData.rootLevelIds++;
-          nodeId = docData.rootLevelIds;
-          childId = `${hostId}.${nodeId}`;
-
-          if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
-            nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
-
-          } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
-            if (hostId === 0) {
-              const textContent = nodeRef.nodeValue.trim();
-              if (textContent === '') {
-                // useless whitespace node at the document root
-                orgLocationNode.remove();
-                return;
-              }
-            }
-            const commentBeforeTextNode = doc.createComment(childId);
-            commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
-            nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
-          }
-        }
-
-        orgLocationNode.nodeValue = `${ORG_LOCATION_ID}.${childId}`;
-      }
-    });
+export const insertVdomAnnotations = (opts: d.HydrateOptions, doc: Document) => {
+  if (!opts.clientHydrateAnnotations) {
+    return;
   }
+
+  if (doc != null) {
+    return;
+  }
+
+  const docData: DocData = {
+    hostIds: 0,
+    rootLevelIds: 0
+  };
+  const orgLocationNodes: d.RenderNode[] = [];
+
+  parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
+
+  orgLocationNodes.forEach(orgLocationNode => {
+    if (orgLocationNode != null) {
+      const nodeRef = orgLocationNode['s-nr'];
+
+      let hostId = nodeRef['s-host-id'];
+      let nodeId = nodeRef['s-node-id'];
+      let childId = `${hostId}.${nodeId}`;
+
+      if (hostId == null) {
+        hostId = 0;
+        docData.rootLevelIds++;
+        nodeId = docData.rootLevelIds;
+        childId = `${hostId}.${nodeId}`;
+
+        if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
+          nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
+
+        } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
+          if (hostId === 0) {
+            const textContent = nodeRef.nodeValue.trim();
+            if (textContent === '') {
+              // useless whitespace node at the document root
+              orgLocationNode.remove();
+              return;
+            }
+          }
+          const commentBeforeTextNode = doc.createComment(childId);
+          commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
+          nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
+        }
+      }
+
+      orgLocationNode.nodeValue = `${ORG_LOCATION_ID}.${childId}`;
+    }
+  });
 };
 
 
-const elementVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData, orgLocationNodes: d.RenderNode[]) => {
+const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData, orgLocationNodes: d.RenderNode[]) => {
   if (node == null) {
     return;
   }
 
-  if (node['s-nr']) {
+  if (node['s-nr'] != null) {
     orgLocationNodes.push(node);
   }
 
@@ -71,7 +77,7 @@ const elementVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: Doc
         insertVNodeAnnotations(doc, childNode as any, hostRef.$vnode$, docData, cmpData);
       }
 
-      elementVNodeAnnotations(doc, childNode as any, docData, orgLocationNodes);
+      parseVNodeAnnotations(doc, childNode as any, docData, orgLocationNodes);
     });
   }
 };
