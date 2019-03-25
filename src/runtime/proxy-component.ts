@@ -1,10 +1,10 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { getHostRef } from '@platform';
-import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
-import { getValue, setValue } from './set-value';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
+import { getHostRef } from '@platform';
+import { getValue, setValue } from './set-value';
+import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
 
 
 export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -17,6 +17,7 @@ export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
   };
   return proxyComponent(Cstr, cmpMeta, 1, 1);
 };
+
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
   if (BUILD.member && cmpMeta.m) {
@@ -58,7 +59,8 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
       }
     });
-    if (!BUILD.hydrateServerSide && BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
+
+    if (BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
       const attrNameToPropName = new Map();
 
       if (BUILD.reflect) {
@@ -86,5 +88,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         });
     }
   }
+
   return Cstr;
 };

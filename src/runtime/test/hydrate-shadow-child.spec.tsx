@@ -105,7 +105,7 @@ describe('hydrate, shadow child', () => {
           <shadow-root>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -290,7 +290,7 @@ describe('hydrate, shadow child', () => {
             <header></header>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -423,7 +423,7 @@ describe('hydrate, shadow child', () => {
             <slot></slot>
             <footer></footer>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -515,9 +515,9 @@ describe('hydrate, shadow child', () => {
               <slot></slot>
             </section>
           </shadow-root>
-          <!--o.0.1-->
+          <!---->
           cmp-b-top-text
-          <!--o.0.2-->
+          <!---->
           <cmp-c>
             <shadow-root>
               <article>

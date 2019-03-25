@@ -29,7 +29,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       hostId = elm.getAttribute(HYDRATE_ID);
       if (hostId) {
         if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
-          addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
+          const scopeId = addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
+          elm.classList.remove(scopeId + '-h');
+          elm.classList.remove(scopeId + '-s');
         }
         initializeClientHydrate(elm, cmpMeta.t, hostId, hostRef);
       }

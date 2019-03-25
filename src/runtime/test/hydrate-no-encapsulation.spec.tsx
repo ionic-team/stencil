@@ -201,7 +201,7 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b>
           <!--r.2-->
-          <!--o.1.1-->
+          <!---->
           <!--s.2.0.0.0.-->
           light-dom
           <footer></footer>
@@ -265,7 +265,7 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b>
           <!--r.2-->
-          <!--o.1.1-->
+          <!---->
           <header></header>
           <!--s.2.1.0.1.-->
           light-dom
@@ -330,7 +330,7 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b>
           <!--r.2-->
-          <!--o.1.1-->
+          <!---->
           <header></header>
           <!--s.2.1.0.1.-->
           light-dom
@@ -414,9 +414,9 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b>
           <!--r.2-->
-          <!--o.1.1-->
-          <!--o.1.3-->
-          <!--o.1.5-->
+          <!---->
+          <!---->
+          <!---->
           <header></header>
           <!--s.2.1.0.1.top-->
           <div slot="top">

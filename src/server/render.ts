@@ -28,7 +28,9 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
     connectElements(opts, results, doc.body, waitPromises);
     await Promise.all(waitPromises);
 
-    insertVdomAnnotations(opts, doc);
+    if (opts.clientHydrateAnnotations) {
+      insertVdomAnnotations(doc);
+    }
 
     finalizeWindow(opts, results, windowLocationUrl, doc);
 
@@ -72,7 +74,9 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
     connectElements(opts, results, doc.body, waitPromises);
     await Promise.all(waitPromises);
 
-    insertVdomAnnotations(opts, doc);
+    if (opts.clientHydrateAnnotations) {
+      insertVdomAnnotations(doc);
+    }
 
     finalizeWindow(opts, results, windowLocationUrl, doc);
 

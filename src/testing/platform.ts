@@ -35,6 +35,11 @@ export function resetPlatform() {
   styles.clear();
   plt.$isTmpDisconnected$ = false;
 
+  if (plt.$orgLocNodes$ != null) {
+    plt.$orgLocNodes$.clear();
+    plt.$orgLocNodes$ = undefined;
+  }
+
   resetTaskQueue();
 }
 

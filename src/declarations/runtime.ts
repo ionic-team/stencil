@@ -95,11 +95,12 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  $isTmpDisconnected$?: boolean;
-  $queueCongestion$?: number;
-  $queueAsync$?: boolean;
-  $queuePending$?: boolean;
   $importMetaUrl$?: string;
+  $isTmpDisconnected$?: boolean;
+  $orgLocNodes$?: Map<string, d.RenderNode>;
+  $queueAsync$?: boolean;
+  $queueCongestion$?: number;
+  $queuePending$?: boolean;
 }
 
 export type RefMap = WeakMap<any, HostRef>;
