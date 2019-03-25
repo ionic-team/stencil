@@ -167,6 +167,16 @@ export class MockWindow {
       HtmlElementCstr = class extends MockElement {
         constructor() {
           super(ownerDocument, '');
+
+          const observedAttributes = (this.constructor as any).observedAttributes;
+          if (Array.isArray(observedAttributes) && typeof (this as any).attributeChangedCallback === 'function') {
+            observedAttributes.forEach(attrName => {
+              const attrValue = this.getAttribute(attrName);
+              if (attrValue != null) {
+                (this as any).attributeChangedCallback(attrName, null, attrValue);
+              }
+            });
+          }
         }
       };
       htmlElementCstrMap.set(this, HtmlElementCstr);
