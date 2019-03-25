@@ -42,7 +42,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
     if (BUILD.updatable) {
       for (const prop in oldValue) {
         if (!newValue || newValue[prop] == null) {
-          if (/-/.test(prop)) {
+          if (!BUILD.hydrateServerSide && /-/.test(prop)) {
             elm.style.removeProperty(prop);
           } else {
             (elm as any).style[prop] = '';
@@ -53,7 +53,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
     for (const prop in newValue) {
       if (!oldValue || newValue[prop] !== oldValue[prop]) {
-        if (/-/.test(prop)) {
+        if (!BUILD.hydrateServerSide && /-/.test(prop)) {
           elm.style.setProperty(prop, newValue[prop]);
         } else {
           (elm as any).style[prop] = newValue[prop];

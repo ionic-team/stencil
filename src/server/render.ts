@@ -6,6 +6,7 @@ import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils
 import { initializeWindow } from './window-initialize';
 import { insertVdomAnnotations } from '@platform';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
+import { polyfillDocumentImplementation } from './polyfill-implementation';
 
 
 export async function renderToString(html: string, opts: d.HydrateOptions = {}) {
@@ -53,7 +54,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
   opts = normalizeHydrateOptions(opts);
   const results = generateHydrateResults(opts);
 
-  if (doc == null || doc.documentElement == null || typeof doc.documentElement.nodeType !== 'number') {
+  if (doc == null || doc.nodeType !== 9 || doc.documentElement == null || doc.documentElement.nodeType !== 1) {
     const err = buildError(results.diagnostics);
     err.messageText = `Invalid document`;
     return results;
@@ -67,6 +68,8 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
     if (doc.defaultView !== win) {
       (doc as any).defaultView = win;
     }
+
+    polyfillDocumentImplementation(win, doc);
 
     const windowLocationUrl = initializeWindow(results, win, doc, opts);
 
