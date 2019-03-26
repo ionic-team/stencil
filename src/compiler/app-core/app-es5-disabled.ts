@@ -1,36 +1,38 @@
-import { CompilerCtx, Config, OutputTargetBuild } from '../../declarations';
-import { getAppBuildDir } from '../app/app-file-naming';
+import * as d from '../../declarations';
+import { escapeHtml } from '@utils';
 
 
-export async function generateEs5DisabledMessage(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetBuild) {
+export async function generateEs5DisabledMessage(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017
-  const fileName = 'es5-build-disabled.js';
-
-  const filePath = config.sys.path.join(getAppBuildDir(config, outputTarget), fileName);
-  await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
-
+  const fileName = `${config.fsNamespace}.js`;
+  const filePath = config.sys.path.join(outputTarget.buildDir, fileName);
+  await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript(config));
   return fileName;
 }
 
 
-function getDisabledMessageScript() {
-  const html = `
-  <style>
-  body {
-    font-family: sans-serif;
-    padding: 20px;
-    line-height:22px;
-  }
-  h1 {
-    font-size: 18px;
-  }
-  h2 {
-    font-size: 14px;
-    margin-top: 40px;
-  }
-  </style>
+function getDisabledMessageScript(config: d.Config) {
+  const style = `
+<style>
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  line-height:22px;
+}
+h1 {
+  font-size: 18px;
+}
+h2 {
+  font-size: 14px;
+  margin-top: 40px;
+}
+</style>
+`;
+
+  const htmlLegacy = `
+  ${style}
 
   <h1>This Stencil app is disabled for this browser.</h1>
 
@@ -78,7 +80,32 @@ function getDisabledMessageScript() {
     <code id="current-browser-output"></code>
   </pre>
   `;
+  const htmlUpdate = `
+  ${style}
 
+  <h1>Update src/index.html</h1>
+
+  <p>Stencil recently changed the way it is imported in order to improve performance.</p>
+  <p>Previ</p>
+
+
+  <h2>BEFORE:</h2>
+  <p>Previously, a single ".js" loader was loaded.</p>
+  <pre>
+    <code>${escapeHtml(`
+<script src="build/${config.fsNamespace}.js"></script>
+`)}</code>
+  </pre>
+
+  <h2>AFTER:</h2>
+  <p>Currently, developers need to include to scripts, but only one will be loaded, based in the native support for ES Modules</p>
+  <pre>
+    <code>${escapeHtml(`
+<script type="module" src="build/${config.fsNamespace}.mjs.js"></script>
+<script nomodule src="build/${config.fsNamespace}.js"></script>
+`)}</code>
+  </pre>
+  `;
   const script = `
     function supportsDynamicImports() {
       try {
@@ -87,17 +114,27 @@ function getDisabledMessageScript() {
       } catch (e) {}
       return false;
     }
-    document.body.innerHTML = '${html.replace(/\r\n|\r|\n/g, '').replace(/\'/g, `\\'`).trim()}';
+    var supportsEsModules = !!('noModule' in document.createElement('script'));
 
-    document.getElementById('current-browser-output').textContent = window.navigator.userAgent;
-    document.getElementById('es-modules-test').textContent = !!('noModule' in document.createElement('script'));
-    document.getElementById('es-dynamic-modules-test').textContent = supportsDynamicImports();
-    document.getElementById('shadow-dom-test').textContent = !!(document.head.attachShadow);
-    document.getElementById('custom-elements-test').textContent = !!(window.customElements);
-    document.getElementById('css-variables-test').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
-    document.getElementById('fetch-test').textContent = !!(window.fetch);
+    if (!supportsEsModules) {
+      document.body.innerHTML = '${inlineHTML(htmlLegacy)}';
+
+      document.getElementById('current-browser-output').textContent = window.navigator.userAgent;
+      document.getElementById('es-modules-test').textContent = supportsEsModules;
+      document.getElementById('es-dynamic-modules-test').textContent = supportsDynamicImports();
+      document.getElementById('shadow-dom-test').textContent = !!(document.head.attachShadow);
+      document.getElementById('custom-elements-test').textContent = !!(window.customElements);
+      document.getElementById('css-variables-test').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
+      document.getElementById('fetch-test').textContent = !!(window.fetch);
+    } else {
+      document.body.innerHTML = '${inlineHTML(htmlUpdate)}';
+    }
   `;
 
   // timeout just to ensure <body> is ready
   return `setTimeout(function(){ ${script} }, 10)`;
+}
+
+function inlineHTML(html: string) {
+  return html.replace(/\n/g, '\\n').replace(/\'/g, `\\'`).trim();
 }

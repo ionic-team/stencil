@@ -19,7 +19,7 @@ export interface EntryBundle {
   sourceTarget: string;
 }
 
-export type EntryPoint = EntryComponent[];
+export type EntryPoint = d.ComponentCompilerMeta[];
 
 export interface EntryComponent {
   tag: string;
@@ -29,11 +29,6 @@ export interface EntryComponent {
 export interface ComponentRef {
   tag: string;
   filePath: string;
-}
-
-export interface PotentialComponentRef {
-  tag?: string;
-  html?: string;
 }
 
 export interface ModuleGraph {

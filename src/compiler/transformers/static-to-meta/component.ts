@@ -122,15 +122,13 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
   cmp.legacyConnect.forEach(({connect}) => {
     cmp.htmlTagNames.push(connect);
     if (connect.includes('-')) {
-      cmp.potentialCmpRefs.push({
-        tag: connect
-      });
+      cmp.potentialCmpRefs.push(connect);
     }
   });
 
   cmp.htmlAttrNames = unduplicate(cmp.htmlAttrNames);
   cmp.htmlTagNames = unduplicate(cmp.htmlTagNames);
-  cmp.potentialCmpRefs = unduplicate(cmp.potentialCmpRefs, item => item.tag);
+  cmp.potentialCmpRefs = unduplicate(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
   if (transformOpts.addCompilerMeta) {

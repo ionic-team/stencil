@@ -15,7 +15,7 @@ export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase(
 
 export const noop = (): any => { /* noop*/ };
 
-export function sortBy<T>(array: T[], prop: ((item: T) => string)) {
+export function sortBy<T>(array: T[], prop: ((item: T) => string | number)) {
   return array.slice().sort((a, b) => {
     const nameA = prop(a);
     const nameB = prop(b);

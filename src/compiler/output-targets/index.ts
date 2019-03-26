@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { outputDocs } from './output-docs';
-import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { outputAngularProxies } from './output-angular';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
@@ -19,7 +18,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputAngularProxies(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),
-    generateServiceWorkers(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise

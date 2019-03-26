@@ -1,5 +1,5 @@
 
-export function patchDynamicImport(win: any) {
+export const patchDynamicImport = (win: any) => {
   try {
     win.__stencil_import = new Function('return import(arguments[0]);');
   } catch (e) {

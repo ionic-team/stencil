@@ -17,6 +17,7 @@ export interface BuildCtx {
   bundleBuildCount: number;
   collections: d.Collection[];
   components: string[];
+  indexDoc: Document;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
@@ -24,7 +25,6 @@ export interface BuildCtx {
   dirsAdded: string[];
   dirsDeleted: string[];
   entryModules: d.EntryModule[];
-  entryPoints: d.EntryPoint[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];

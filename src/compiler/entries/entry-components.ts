@@ -1,54 +1,85 @@
 import * as d from '../../declarations';
-import { buildWarn } from '@utils';
-import { processAppGraph } from './app-graph';
+import { sortBy } from '@utils';
+import { getPredefinedEntryPoints } from './entry-modules';
+import { calcComponentDependencies } from './component-dependencies';
 
 
 export function generateComponentEntries(
+  config: d.Config,
   buildCtx: d.BuildCtx,
   cmps: d.ComponentCompilerMeta[],
-  userConfigEntryTags: string[][],
-  appEntryTags: string[]
 ): d.EntryPoint[] {
+  if (config.devMode) {
+    return cmps.map(cmp => [cmp]);
+  }
+  calcComponentDependencies(cmps);
+
+  const predefinedEntryPoints = getPredefinedEntryPoints(config, buildCtx, cmps)
+
   // user config entry modules you leave as is
   // whatever the user put in the bundle is how it goes
+  cmps = sortBy(cmps, cmp => cmp.dependants.length);
 
-  // get all the config.bundle entry tags the user may have manually configured
-  const userConfigEntryPoints = processUserConfigBundles(userConfigEntryTags);
+  const included = new Set();
+  predefinedEntryPoints.forEach(entry => {
+    entry.forEach(cmp => included.add(cmp));
+  });
 
-  // process all of the app's components not already found
-  // in the config or the root html
-  const appEntries = processAppComponentEntryTags(buildCtx, cmps, userConfigEntryPoints, appEntryTags);
-
-  return [
-    ...userConfigEntryPoints,
-    ...appEntries
+  const bundlers: d.ComponentCompilerMeta[][] = [
+    ...predefinedEntryPoints,
+    ...cmps.filter(cmp => !included.has(cmp)).map(cmp => [cmp])
   ];
+  return optimizeBundlers(bundlers, 0.6);
 }
 
+function optimizeBundlers(entryPoints: d.ComponentCompilerMeta[][], threshold: number) {
 
-export function processAppComponentEntryTags(buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], entryPoints: d.EntryPoint[], appEntryTags: string[]) {
-  // remove any tags already found in user config
-  appEntryTags = appEntryTags.filter(tag => !entryPoints.some(ep => ep.some(em => em.tag === tag)));
-  if (entryPoints.length > 0 && appEntryTags.length > 0) {
-    appEntryTags.forEach(appEntryTag => {
-      const warn = buildWarn(buildCtx.diagnostics);
-      warn.header = `Stencil Config`;
-      warn.messageText = `config.bundles does not include component tag "${appEntryTag}". When manually configurating config.bundles, all component tags used by this app must be listed in a component bundle.`;
-    });
-  }
-
-  return processAppGraph(buildCtx, cmps, appEntryTags);
-}
-
-
-export function processUserConfigBundles(userConfigEntryTags: string[][]) {
-  return userConfigEntryTags.map(entryTags => {
-    return entryTags.map(entryTag => {
-      const entryComponent: d.EntryComponent = {
-        tag: entryTag,
-        dependencyOf: ['#config']
-      };
-      return entryComponent;
+  const cmpMap = new Map<string, number>();
+  entryPoints.forEach((entry, index) => {
+    entry.forEach(cmp => {
+      cmpMap.set(cmp.tagName, index);
     });
   });
+
+  const visited = new Uint8Array(entryPoints.length);
+  const matrix = entryPoints.map(entry => {
+    const vector = new Uint8Array(entryPoints.length);
+    entry.forEach(cmp => {
+      cmp.dependants.forEach(tag => vector[cmpMap.get(tag)] = 1);
+    });
+    entry.forEach(cmp => vector[cmpMap.get(cmp.tagName)] = 0);
+    return vector;
+  });
+
+  // resolve similar components
+  const bundles: d.ComponentCompilerMeta[][] = [];
+
+  for (let i = 0; i < matrix.length; i++) {
+    if (visited[i] === 0) {
+      const bundle = [...entryPoints[i]];
+      visited[i] = 1;
+      for (let j = i + 1; j < matrix.length; j++) {
+        if (visited[j] === 0 && computeScore(matrix[i], matrix[j]) > threshold) {
+          bundle.push(...entryPoints[j]);
+          visited[j] = 1;
+        }
+      }
+      bundles.push(bundle);
+    }
+  }
+  return bundles;
+}
+
+function computeScore(m0: Uint8Array, m1: Uint8Array) {
+  let total = 0;
+  let match = 0;
+  for (let i = 0; i < m0.length; i++) {
+    if (m0[i] === 1 || m1[i] === 1) {
+      total++;
+      if (m0[i] === m1[i]) {
+        match++;
+      }
+    }
+  }
+  return match / total;
 }

@@ -16,11 +16,11 @@ export class BuildContext implements d.BuildCtx {
   collections: d.Collection[] = [];
   components: string[] = [];
   data: any = {};
+  indexDoc: Document = undefined;
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
   entryModules: d.EntryModule[] = [];
-  entryPoints: d.EntryPoint[] = [];
   filesAdded: string[] = [];
   filesChanged: string[] = [];
   filesDeleted: string[] = [];

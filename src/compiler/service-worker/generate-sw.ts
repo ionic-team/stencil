@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, hasError } from '@utils';
+import { buildWarn, catchError, hasError, unduplicate } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
@@ -17,11 +17,11 @@ export async function generateServiceWorkers(config: d.Config, compilerCtx: d.Co
   // we've ensure workbox is installed, so let's require it now
   const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
 
-  const promises = wwwServiceOutputs.map(async outputTarget => {
-    await generateServiceWorker(config, buildCtx, outputTarget, workbox);
-  });
-
-  await Promise.all(promises);
+  await Promise.all(
+    wwwServiceOutputs.map(outputTarget => (
+      generateServiceWorker(config, buildCtx, outputTarget, workbox)
+    ))
+  );
 }
 
 
@@ -83,17 +83,18 @@ async function injectManifest(buildCtx: d.BuildCtx, outputTarget: d.OutputTarget
 
 
 function ignoreLegacyBundles(config: d.Config, serviceWorker: d.ServiceWorkerConfig) {
-  const ignorePattern = `**/${config.fsNamespace}/*.es5.entry.js`;
-
   if (typeof serviceWorker.globIgnores === 'string') {
     serviceWorker.globIgnores = [serviceWorker.globIgnores];
   }
 
   serviceWorker.globIgnores = serviceWorker.globIgnores || [];
 
-  if (!serviceWorker.globIgnores.includes(ignorePattern)) {
-    serviceWorker.globIgnores.push(ignorePattern);
-  }
+  serviceWorker.globIgnores.push(
+    `**/${config.fsNamespace}/*.system.entry.js`,
+    `**/${config.fsNamespace}/*.system.js`,
+  );
+
+  serviceWorker.globIgnores = unduplicate(serviceWorker.globIgnores);
 }
 
 

@@ -46,9 +46,7 @@ function visitCallExpressionArg(cmpMeta: d.ComponentCompilerMeta, arg: ts.Expres
       cmpMeta.htmlTagNames.push(tag);
 
       if (tag.includes('-')) {
-        cmpMeta.potentialCmpRefs.push({
-          tag: tag
-        });
+        cmpMeta.potentialCmpRefs.push(tag);
       }
     }
   }

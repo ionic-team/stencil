@@ -15,6 +15,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       entryFileNames: '[name].mjs.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js',
     };
+    // This is needed until Firefox 67, which ships native dynamic imports
     if (!webpackBuild) {
       esmOpts.dynamicImportFunction = '__stencil_import';
     }
@@ -29,7 +30,9 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
 
       await generateShortcuts(config, compilerCtx, outputTargets, output);
     }
+    return output;
   }
+  return undefined;
 }
 
 export function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) {

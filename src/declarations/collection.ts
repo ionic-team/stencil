@@ -59,7 +59,7 @@ export interface ModuleFile {
   originalCollectionComponentPath?: string;
   externalImports?: string[];
   localImports?: string[];
-  potentialCmpRefs?: d.PotentialComponentRef[];
+  potentialCmpRefs?: string[];
   hasSlot?: boolean;
   hasSvg?: boolean;
 }

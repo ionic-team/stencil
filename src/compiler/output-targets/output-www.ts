@@ -4,10 +4,11 @@ import { optimizeEsmLoaderImport } from '../html/optimize-esm-import';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { serializeNodeToHtml } from '@mock-doc';
 import { isOutputTargetWww } from './output-utils';
-import { createDocument } from '../../mock-doc/document';
 import { processCopyTasks } from '../copy/local-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
+import { generateServiceWorkers } from '../service-worker/generate-sw';
+import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
@@ -20,6 +21,7 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
   await Promise.all(
     outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, outputTarget))
   );
+  await generateServiceWorkers(config, compilerCtx, buildCtx);
 
   timespan.finish(`generate www finished`);
 }
@@ -30,6 +32,9 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     ...await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
     ...getComponentAssetsCopyTasks(config, buildCtx, outputTarget.dir, false)
   ]);
+  if (!config.buildEs5) {
+    await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
+  }
 
   // Process
   if (config.srcIndexHtml && outputTarget.indexHtml) {
@@ -70,9 +75,9 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   // get the source index html content
   try {
-    const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
-    const doc = createDocument(indexSrcHtml);
+
     try {
+      const doc = buildCtx.indexDoc;
       await updateIndexHtmlServiceWorker(doc, config, buildCtx, outputTarget);
       await optimizeEsmLoaderImport(doc, config, compilerCtx, outputTarget);
 

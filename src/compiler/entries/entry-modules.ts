@@ -1,37 +1,22 @@
 import * as d from '../../declarations';
-import { buildError, buildWarn, catchError } from '@utils';
-import { calcComponentDependencies } from './component-dependencies';
+import { buildWarn, catchError, flatOne, unduplicate } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentEntries } from './entry-components';
 import { validateComponentTag } from '../config/validate-component';
+import { getComponentsFromModules } from '../output-targets/output-utils';
 
 
-export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
+export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx, ) {
   // figure out how modules and components connect
-  calcComponentDependencies(buildCtx.moduleFiles);
+  const cmps = getComponentsFromModules(buildCtx.moduleFiles);
 
   try {
-    const cmps = validateComponentEntries(config, buildCtx);
-
-    const userConfigEntryModulesTags = getUserConfigEntryTags(buildCtx, config.bundles, cmps);
-
-    const appEntryTags = getAppEntryTags(cmps);
-
-    buildCtx.entryPoints = generateComponentEntries(
+    const entryPoints = generateComponentEntries(
+      config,
       buildCtx,
       cmps,
-      userConfigEntryModulesTags,
-      appEntryTags
     );
-
-    const cleanedEntryModules = regroupEntryModules(cmps, buildCtx.entryPoints);
-
-    buildCtx.entryModules = cleanedEntryModules
-      .map(createEntryModule())
-      .filter((entryModule, index, array) => {
-        const firstIndex = array.findIndex(e => e.entryKey === entryModule.entryKey);
-        return firstIndex === index;
-      });
+    buildCtx.entryModules = entryPoints.map(createEntryModule);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
@@ -98,133 +83,94 @@ export function getComponentStyleModes(cmpMeta: d.ComponentCompilerMeta) {
 }
 
 
-export function regroupEntryModules(cmps: d.ComponentCompilerMeta[], entryPoints: d.EntryPoint[]) {
+export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
+  // generate a unique entry key based on the components within this entry module
+  const entryKey = cmps
+    .sort(sortComponents)
+    .map(c => c.tagName)
+    .join('.');
 
-  const cleanedEntryModules = entryPoints.map(entryPoint => {
-    return cmps.filter(cmp => {
-      return entryPoint.some(ep => cmp.tagName === ep.tag);
-    });
-  });
+  return {
+    cmps,
+    entryKey,
 
-  return cleanedEntryModules
-    .filter(m => m.length > 0)
-    .sort((a, b) => {
-      if (a[0].tagName < b[0].tagName) return -1;
-      if (a[0].tagName > b[0].tagName) return 1;
-      if (a.length < b.length) return -1;
-      if (a.length > b.length) return 1;
-      return 0;
-    });
-}
+    // get the modes used in this bundle
+    modeNames: getEntryModes(cmps),
 
-
-export function createEntryModule() {
-  return (cmps: d.ComponentCompilerMeta[]): d.EntryModule => {
-    // generate a unique entry key based on the components within this entry module
-    const entryKey = cmps
-      .sort(sortComponents)
-      .map(c => c.tagName)
-      .join('.');
-
-    return {
-      cmps,
-      entryKey,
-
-      // get the modes used in this bundle
-      modeNames: getEntryModes(cmps),
-
-      // figure out if we'll need a scoped css build
-      requiresScopedStyles: true
-    };
+    // figure out if we'll need a scoped css build
+    requiresScopedStyles: true
   };
 }
 
 
-export function getAppEntryTags(cmps: d.ComponentCompilerMeta[]) {
-  return cmps
-    .filter(cmp => !cmp.isCollectionDependency)
-    .map(cmp => cmp.tagName)
-    .sort((a, b) => {
-      if (a.length < b.length) return 1;
-      if (a.length > b.length) return -1;
-      if (a[0] < b[0]) return -1;
-      if (a[0] > b[0]) return 1;
-      return 0;
-    });
+export function getPredefinedEntryPoints(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
+  if (config.devMode) {
+    return [];
+  }
+  const userConfigEntryPoints = getUserConfigEntryPoints(config, buildCtx, cmps);
+  if (userConfigEntryPoints.length > 0) {
+    return userConfigEntryPoints;
+  }
+  const entryPointsHints = getEntryHints(buildCtx, cmps);
+  const mainBundle = unduplicate([
+    ...entryPointsHints,
+    ...flatOne(entryPointsHints
+      .map(cmp => resolveTag(cmp).dependencies)
+    )
+  ]).map(resolveTag);
+
+  function resolveTag(tag: string) {
+    return cmps.find(cmp => cmp.tagName === tag);
+  }
+
+  return [mainBundle];
 }
 
-
-export function getUserConfigEntryTags(buildCtx: d.BuildCtx, configBundles: d.ConfigBundle[], cmps: d.ComponentCompilerMeta[]) {
-  configBundles = (configBundles || [])
-    .filter(b => b.components && b.components.length > 0)
-    .sort((a, b) => {
-      if (a.components.length < b.components.length) return 1;
-      if (a.components.length > b.components.length) return -1;
-      return 0;
-    });
+export function getUserConfigEntryPoints(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
 
   const definedTags = new Set<string>();
-  const entryTags = configBundles
-    .map(b => {
-    return b.components
-      .map(tag => {
-        tag = validateComponentTag(tag);
+  const entryTags = config.bundles.map(b => {
+    return b.components.map(tag => {
+      tag = validateComponentTag(tag);
 
-        const moduleFile = cmps.find(cmp => cmp.tagName === tag);
-        if (!moduleFile) {
-          const warn = buildWarn(buildCtx.diagnostics);
-          warn.header = `Stencil Config`;
-          warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
-        }
+      const component = cmps.find(cmp => cmp.tagName === tag);
+      if (!component) {
+        const warn = buildWarn(buildCtx.diagnostics);
+        warn.header = `Stencil Config`;
+        warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
+      }
 
-        if (definedTags.has(tag)) {
-          const warn = buildWarn(buildCtx.diagnostics);
-          warn.header = `Stencil Config`;
-          warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
-        }
+      if (definedTags.has(tag)) {
+        const warn = buildWarn(buildCtx.diagnostics);
+        warn.header = `Stencil Config`;
+        warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
+      }
 
-        definedTags.add(tag);
-        return tag;
-      })
-      .sort();
+      definedTags.add(tag);
+      return component;
+    }).sort();
   });
-
   return entryTags;
 }
 
-
-export function validateComponentEntries(config: d.Config, buildCtx: d.BuildCtx) {
-  const definedTags = new Set<string>();
-
-  return buildCtx.moduleFiles.reduce((cmps, m) => {
-    m.cmps.forEach(cmp => {
-      if (definedTags.has(cmp.tagName)) {
-        const error = buildError(buildCtx.diagnostics);
-        error.messageText = `Component tag "${cmp.tagName}" has been defined in multiple times: ${config.sys.path.relative(config.rootDir, m.sourceFilePath)}`;
-      } else {
-        definedTags.add(cmp.tagName);
+function getEntryHints(buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
+  const tags = new Set(cmps.map(cmp => cmp.tagName.toUpperCase()));
+  const found: string[] = [];
+  if (buildCtx.indexDoc) {
+    function searchComponents(el: Element) {
+      if (tags.has(el.tagName)) {
+        found.push(el.tagName.toLowerCase());
       }
-      cmps.push(cmp);
-    });
-    return cmps;
-  }, [] as d.ComponentCompilerMeta[]);
+
+      for (let i = 0; i < el.childElementCount; i++) {
+        searchComponents(el.children[i]);
+      }
+    }
+    searchComponents(buildCtx.indexDoc.documentElement);
+  }
+  return found;
 }
 
-// function sortModuleFiles(a: d.Module, b: d.Module) {
-//   a.cmps.sort(sortComponents);
-//   b.cmps.sort(sortComponents);
-
-//   if (a.isCollectionDependency && !b.isCollectionDependency) {
-//     return 1;
-//   }
-//   if (!a.isCollectionDependency && b.isCollectionDependency) {
-//     return -1;
-//   }
-
-//   if (a.cmpCompilerMeta.tagName < b.cmpCompilerMeta.tagName) return -1;
-//   if (a.cmpCompilerMeta.tagName > b.cmpCompilerMeta.tagName) return 1;
-//   return 0;
-// }
 
 function sortComponents(a: d.ComponentCompilerMeta, b: d.ComponentCompilerMeta) {
   if (a.tagName < b.tagName) return -1;

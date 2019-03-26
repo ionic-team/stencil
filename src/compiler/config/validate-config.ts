@@ -10,6 +10,7 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import { sortBy } from '@utils';
 
 
 export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
@@ -83,7 +84,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     config.validateTypes = true;
   }
 
-  setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
+  setBooleanConfig(config, 'hashFileNames', null, !config.devMode);
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
 
   if (config.hashFileNames) {
@@ -125,6 +126,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');
+  config.bundles = sortBy(config.bundles, (a) => a.components.length);
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
