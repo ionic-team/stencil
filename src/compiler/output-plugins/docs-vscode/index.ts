@@ -4,7 +4,7 @@ import { normalizePath } from '@utils';
 export const plugin: d.Plugin<d.OutputTargetDocsVscode> = {
   name: 'docs-vscode',
   validate(outputTarget, config) {
-    return normalizeOutputTarget(config, outputTarget)
+    return normalizeOutputTarget(config, outputTarget);
   },
   async createOutput(outputTargets, _config, compilerCtx, _buildCtx, docsData) {
     const json = {

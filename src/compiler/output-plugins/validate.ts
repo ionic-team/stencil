@@ -7,7 +7,7 @@ export function validatePluginOutputs(config: d.Config) {
   config.outputTargets.forEach(outputTarget => {
     const outputPlugin = outputPlugins.find(plugin => plugin.name === outputTarget.type);
     if (outputPlugin) {
-      outputTarget = outputPlugin.validate(outputTarget, config)
+      outputTarget = outputPlugin.validate(outputTarget, config);
     }
   });
 }

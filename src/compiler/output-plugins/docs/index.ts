@@ -27,11 +27,9 @@ function normalizeOutputTarget(config: d.Config, outputTarget: any) {
     strict: !!outputTarget.strict
   };
 
-  if (typeof outputTarget.dir !== 'string') {
+  if (outputTarget.dir == null || typeof outputTarget.dir !== 'string') {
     results.dir = config.srcDir;
-  }
-
-  if (!path.isAbsolute(outputTarget.dir)) {
+  } else if (!path.isAbsolute(outputTarget.dir)) {
     results.dir = path.join(config.rootDir, outputTarget.dir);
   }
 
