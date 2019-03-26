@@ -186,7 +186,7 @@ export interface OutputTargetStats extends OutputTargetBase {
 export interface OutputPluginTarget extends OutputTargetBase {
   type: string;
 
-  [key: string]: any
+  [key: string]: any;
 }
 
 export interface OutputTargetBase {

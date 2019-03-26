@@ -1,10 +1,17 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
+import { isOutputTargetDist } from '../../output-targets/output-utils';
 
 export const plugin: d.Plugin<d.OutputTargetDocsVscode> = {
   name: 'docs-vscode',
   validate(outputTarget, config) {
-    return normalizeOutputTarget(config, outputTarget);
+    let outputDir = config.rootDir;
+    const distOutputTarget = config.outputTargets.find(isOutputTargetDist);
+    if (distOutputTarget && distOutputTarget.buildDir) {
+      outputDir = distOutputTarget.buildDir;
+    }
+
+    return normalizeOutputTarget(config, outputTarget, outputDir);
   },
   async createOutput(outputTargets, _config, compilerCtx, _buildCtx, docsData) {
     const json = {
@@ -23,16 +30,19 @@ export const plugin: d.Plugin<d.OutputTargetDocsVscode> = {
   }
 };
 
-function normalizeOutputTarget(config: d.Config, outputTarget: any) {
+function normalizeOutputTarget(config: d.Config, outputTarget: any, outputDir: string) {
   const path = config.sys.path;
+  let file: string = (outputTarget.file != null && typeof outputTarget.file === 'string') ?
+    outputTarget.file :
+    path.join(outputDir, WEB_COMPONENTS_JSON_FILE_NAME);
 
-  if (typeof outputTarget.file !== 'string') {
-    throw new Error(`docs-json outputTarget missing the "file" option`);
+  if (!path.isAbsolute(file)) {
+    file = path.join(config.rootDir, file);
   }
 
   const results: d.OutputTargetDocsVscode = {
     type: 'docs-vscode',
-    file: path.join(config.rootDir, outputTarget.file),
+    file
   };
 
   return results;
@@ -53,3 +63,5 @@ function serializeAttribute(prop: d.JsonDocsProp) {
     }
   }
 }
+
+export const WEB_COMPONENTS_JSON_FILE_NAME = 'web-components.json';

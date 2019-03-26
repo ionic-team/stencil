@@ -15,8 +15,6 @@ export function validateOutputTargets(config: d.Config) {
   // setup outputTargets from deprecated config properties
   _deprecatedToMultipleTarget(config);
 
-  // Validate Plugins for outputs
-  validatePluginOutputs(config);
 
   if (Array.isArray(config.outputTargets)) {
     const validTargetTypes = VALID_TYPES.concat(getPluginOutputTypeNames(config));
@@ -42,6 +40,9 @@ export function validateOutputTargets(config: d.Config) {
   validateOutputTargetDistModule(config);
 
   validateStats(config);
+
+  // Validate Plugins for outputs
+  validatePluginOutputs(config);
 
 
   if (!config.outputTargets || config.outputTargets.length === 0) {

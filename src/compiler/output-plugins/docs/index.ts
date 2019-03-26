@@ -21,17 +21,19 @@ export const plugin: d.Plugin<d.OutputTargetDocsReadme> = {
 
 function normalizeOutputTarget(config: d.Config, outputTarget: any) {
   const path = config.sys.path;
+  let dir = (outputTarget.dir != null && typeof outputTarget.dir === 'string') ?
+    outputTarget.dir :
+    config.srcDir;
+
+  if (!path.isAbsolute(dir)) {
+    dir = path.join(config.rootDir, dir);
+  }
 
   const results: d.OutputTargetDocsReadme = {
     type: 'docs',
-    strict: !!outputTarget.strict
+    strict: !!outputTarget.strict,
+    dir
   };
-
-  if (outputTarget.dir == null || typeof outputTarget.dir !== 'string') {
-    results.dir = config.srcDir;
-  } else if (!path.isAbsolute(outputTarget.dir)) {
-    results.dir = path.join(config.rootDir, outputTarget.dir);
-  }
 
   return results;
 }

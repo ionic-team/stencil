@@ -123,7 +123,6 @@ export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
  */
 export const BANNER = `Built with http://stenciljs.com`;
 export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
-export const WEB_COMPONENTS_JSON_FILE_NAME = 'web-components.json';
 export const APP_NAMESPACE_REGEX = /["']__APP__['"]/g;
 
 
