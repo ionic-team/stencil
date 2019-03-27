@@ -55,8 +55,18 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
       fs.createReadStream(req.filePath).pipe(res);
     }
 
+    if (devServerConfig.logRequests) {
+      util.sendMsg(process, {
+        requestLog: {
+          method: req.method,
+          url: req.url,
+          status: 200
+        }
+      });
+    }
+
   } catch (e) {
-    serve500(res, e);
+    serve500(devServerConfig, req, res, e);
   }
 }
 

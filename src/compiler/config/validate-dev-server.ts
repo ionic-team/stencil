@@ -75,6 +75,10 @@ export function validateDevServer(config: d.Config) {
     baseUrl += '/';
   }
 
+  if (typeof config.devServer.logRequests !== 'boolean') {
+    config.devServer.logRequests = (config.logLevel === 'debug');
+  }
+
   setStringConfig(config.devServer, 'root', serveDir);
   setStringConfig(config.devServer, 'baseUrl', baseUrl);
 

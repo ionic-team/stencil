@@ -114,7 +114,7 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
 
   if (msg.requestBuildResults) {
     // we received a request to send up the latest build results
-    if (compilerCtx.lastBuildResults) {
+    if (compilerCtx.lastBuildResults != null) {
       // we do have build results, so let's send them to the child process
       // but don't send any previous live reload data
       const msg: d.DevServerMessage = {
@@ -140,6 +140,23 @@ function mainReceivedMessageFromWorker(config: d.Config, compilerCtx: d.Compiler
     // received a message from the child process that is an error
     config.logger.error(msg.error.message);
     config.logger.debug(msg.error);
+    return;
+  }
+
+  if (msg.requestLog) {
+    const req = msg.requestLog;
+    const logger = config.logger;
+
+    let status: any;
+    if (req.status >= 400) {
+      status = logger.red(req.method);
+    } else if (req.status >= 300) {
+      status = logger.magenta(req.method);
+    } else {
+      status = logger.cyan(req.method);
+    }
+
+    logger.info(logger.dim(`${status} ${req.url}`));
     return;
   }
 }

@@ -5,7 +5,7 @@ import { serveFile } from './serve-file';
 import * as http from 'http';
 import * as path from 'path';
 import * as url from 'url';
-import { responseHeaders } from './dev-server-utils';
+import { responseHeaders, sendMsg } from './dev-server-utils';
 
 
 export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
@@ -21,6 +21,16 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs
   } catch (e) {}
 
   if (!req.pathname.endsWith('/')) {
+    if (devServerConfig.logRequests) {
+      sendMsg(process, {
+        requestLog: {
+          method: req.method,
+          url: req.url,
+          status: 302
+        }
+      });
+    }
+
     res.writeHead(302, {
       'location': req.pathname + '/'
     });
@@ -48,8 +58,18 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, fs
       res.write(templateHtml);
       res.end();
 
+      if (devServerConfig.logRequests) {
+        sendMsg(process, {
+          requestLog: {
+            method: req.method,
+            url: req.url,
+            status: 200
+          }
+        });
+      }
+
     } catch (e) {
-      serve500(res, e);
+      serve500(devServerConfig, req, res, e);
     }
 
   } catch (e) {

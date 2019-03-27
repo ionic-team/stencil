@@ -15,7 +15,7 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.F
     }
 
     if (util.isDevServerClient(req.pathname)) {
-      return serveDevClientScript(devServerConfig, fs, res);
+      return serveDevClientScript(devServerConfig, fs, req, res);
     }
 
     if (util.isInitialDevServerLoad(req.pathname)) {
@@ -34,12 +34,12 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.F
     }
 
   } catch (e) {
-    return serve500(res, e);
+    return serve500(devServerConfig, req, res, e);
   }
 }
 
 
-async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.FileSystem, res: http.ServerResponse) {
+async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   const filePath = path.join(devServerConfig.devServerDir, 'static', 'dev-server-client.html');
 
   let content = await fs.readFile(filePath);
@@ -57,4 +57,14 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
   }));
   res.write(content);
   res.end();
+
+  if (devServerConfig.logRequests) {
+    util.sendMsg(process, {
+      requestLog: {
+        method: req.method,
+        url: req.url,
+        status: 200
+      }
+    });
+  }
 }

@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import * as http  from 'http';
 import * as path  from 'path';
-import { responseHeaders } from './dev-server-utils';
+import { responseHeaders, sendMsg } from './dev-server-utils';
 import { serve500 } from './serve-500';
 
 
@@ -24,15 +24,25 @@ export async function serve404(devServerConfig: d.DevServerConfig, fs: d.FileSys
       'File: ' + req.filePath
     ].join('\n');
 
-    serve404Content(res, content);
+    serve404Content(devServerConfig, req, res, content);
+
+    if (devServerConfig.logRequests) {
+      sendMsg(process, {
+        requestLog: {
+          method: req.method,
+          url: req.url,
+          status: 404
+        }
+      });
+    }
 
   } catch (e) {
-    serve500(res, e);
+    serve500(devServerConfig, req, res, e);
   }
 }
 
 
-export function serve404Content(res: http.ServerResponse, content: string) {
+export function serve404Content(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, content: string) {
   try {
     const headers = responseHeaders({
       'Content-Type': 'text/plain'
@@ -43,6 +53,6 @@ export function serve404Content(res: http.ServerResponse, content: string) {
     res.end();
 
   } catch (e) {
-    serve500(res, e);
+    serve500(devServerConfig, req, res, e);
   }
 }
