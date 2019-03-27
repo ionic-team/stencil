@@ -30,6 +30,8 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
     entries: []
   };
 
+  compilerCtx.lastBuildResults = Object.assign({}, buildResults);
+
   const hmr = generateHmr(config, compilerCtx, buildCtx);
   if (hmr) {
     buildResults.hmr = hmr;
