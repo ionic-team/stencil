@@ -8,18 +8,15 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef)
   });
 };
 
-
 export const getComponent = (tagName: string) => {
   return cstrs.get(tagName);
 };
-
 
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   Cstrs.forEach(Cstr => {
     cstrs.set(Cstr.cmpMeta.$tagName$, Cstr);
   });
 };
-
 
 export const getDoc = (elm?: Node) => {
   if (elm != null) {
@@ -47,15 +44,15 @@ export const getHead = (elm?: Node) => {
   return null;
 };
 
-export const readTask = (cb: Function) => cb();
-
-export const writeTask = (cb: Function) => cb();
-
-export const tick = {
-  then(cb: Function) {
-    cb();
-  }
+export const readTask = (cb: Function) => {
+  process.nextTick(cb);
 };
+
+export const writeTask = (cb: Function) => {
+  process.nextTick(cb);
+};
+
+export const tick = Promise.resolve();
 
 export const consoleError = (e: any) => {
   if (e != null) {
