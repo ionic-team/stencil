@@ -13,6 +13,11 @@ export {
   FunctionalComponent,
   QueueApi,
   JSXBase,
+  Config as InternalConfig,
+  Plugin,
+  CompilerCtx,
+  Module,
+  ComponentCompilerMeta
 } from './declarations';
 
 /**
