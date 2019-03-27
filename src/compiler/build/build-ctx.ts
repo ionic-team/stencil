@@ -14,7 +14,7 @@ export class BuildContext implements d.BuildCtx {
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
-  components: string[] = [];
+  components: d.ComponentCompilerMeta[] = [];
   data: any = {};
   indexDoc: Document = undefined;
   diagnostics: d.Diagnostic[] = [];

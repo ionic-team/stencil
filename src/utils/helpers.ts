@@ -50,12 +50,14 @@ export function unduplicate<T>(array: T[], predicate: (item: T) => any = (i) => 
   });
 }
 
-export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string) {
+export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string, addPrefix = true) {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
-  if (relativePath === '') {
-    relativePath = '.';
-  } else if (relativePath[0] !== '.') {
-    relativePath = './' + relativePath;
+  if (addPrefix) {
+    if (relativePath === '') {
+      relativePath = '.';
+    } else if (relativePath[0] !== '.') {
+      relativePath = './' + relativePath;
+    }
   }
   return normalizePath(`${relativePath}/${config.sys.path.basename(pathTo, ext)}`);
 }

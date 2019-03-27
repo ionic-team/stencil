@@ -16,7 +16,7 @@ export interface BuildCtx {
   buildMessages: string[];
   bundleBuildCount: number;
   collections: d.Collection[];
-  components: string[];
+  components: d.ComponentCompilerMeta[];
   indexDoc: Document;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
@@ -247,12 +247,14 @@ export interface RollupResult {
   isCore: boolean;
   isIndex: boolean;
   isBrowserLoader: boolean;
+  imports: string[];
   moduleFormat: ModuleFormat;
 }
 
 export interface BundleModule {
   entryKey: string;
   modeNames: string[];
+  rollupResult: RollupResult;
   cmps: d.ComponentCompilerMeta[];
   outputs: BundleModuleOutput[];
 }

@@ -1,44 +1,61 @@
-import * as d from '../../declarations';
-import { catchError, normalizePath } from '@utils';
-import { optimizeEsmLoaderImport } from '../html/optimize-esm-import';
-import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
-import { serializeNodeToHtml } from '@mock-doc';
-import { isOutputTargetWww } from './output-utils';
 import { processCopyTasks } from '../copy/local-copy-tasks';
+import * as d from '../../declarations';
+import { inlineEsmImport } from '../html/inline-esm-import';
+import { optimizeCriticalPath } from '../html/inject-module-preloads';
+import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
+import { cloneDocument, serializeNodeToHtml } from '@mock-doc';
+import { isOutputTargetWww } from './output-utils';
+import { catchError, normalizePath, unduplicate } from '@utils';
 import { performCopyTasks } from '../copy/copy-tasks';
-import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
+import { getUsedComponents } from '../html/used-components';
 
-export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
   }
 
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
+  const criticalPath = getCriticalPath(buildCtx, bundleModules);
 
   await Promise.all(
-    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, outputTarget))
+    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalPath, outputTarget))
   );
   await generateServiceWorkers(config, compilerCtx, buildCtx);
 
   timespan.finish(`generate www finished`);
 }
 
-async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
+  const preloadPaths = getUsedComponents(buildCtx.indexDoc, buildCtx.components)
+    .flatMap(tagName => getModulesForTagName(tagName, bundleModules))
+    .sort();
+
+  return unduplicate(preloadPaths);
+}
+
+function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[]) {
+  const bundle = bundleModules.find(bundle => bundle.cmps.some(c => c.tagName === tagName));
+  return [
+    ...(bundle.outputs.length === 1) ? [bundle.outputs[0].fileName] : [],
+    ...bundle.rollupResult.imports
+  ];
+}
+
+async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
   // Copy assets into www
-  performCopyTasks(config, compilerCtx, buildCtx, [
-    ...await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
-    ...getComponentAssetsCopyTasks(config, buildCtx, outputTarget.dir, false)
-  ]);
+  performCopyTasks(config, compilerCtx, buildCtx,
+    await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
+  );
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
   }
 
   // Process
   if (config.srcIndexHtml && outputTarget.indexHtml) {
-    await generateIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);
 }
@@ -63,7 +80,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
 }
 
-async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
   if (buildCtx.shouldAbort) {
     return;
   }
@@ -77,9 +94,10 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
   try {
 
     try {
-      const doc = buildCtx.indexDoc;
+      const doc = cloneDocument(buildCtx.indexDoc);
       await updateIndexHtmlServiceWorker(doc, config, buildCtx, outputTarget);
-      await optimizeEsmLoaderImport(doc, config, compilerCtx, outputTarget);
+      await inlineEsmImport(doc, config, compilerCtx, outputTarget);
+      optimizeCriticalPath(doc, config, criticalPath, outputTarget);
 
       await compilerCtx.fs.writeFile(outputTarget.indexHtml, serializeNodeToHtml(doc));
 

@@ -23,14 +23,14 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
 
     if (output != null) {
       const es2017destinations = esmOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, output, 'es2017', '', webpackBuild);
+      const componentBundle = await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, output, 'es2017', '', webpackBuild);
 
       const es5destinations = esmEs5Outputs.map(o => o.esmEs5Dir);
       await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, output, 'es5', '', webpackBuild);
 
       await generateShortcuts(config, compilerCtx, outputTargets, output);
+      return componentBundle;
     }
-    return output;
   }
   return undefined;
 }

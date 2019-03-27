@@ -3,12 +3,11 @@ import { buildWarn, catchError, flatOne, unduplicate } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentEntries } from './entry-components';
 import { validateComponentTag } from '../config/validate-component';
-import { getComponentsFromModules } from '../output-targets/output-utils';
-
+import { getUsedComponents } from '../html/used-components';
 
 export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx, ) {
   // figure out how modules and components connect
-  const cmps = getComponentsFromModules(buildCtx.moduleFiles);
+  const cmps = buildCtx.components;
 
   try {
     const entryPoints = generateComponentEntries(
@@ -86,8 +85,8 @@ export function getComponentStyleModes(cmpMeta: d.ComponentCompilerMeta) {
 export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
   // generate a unique entry key based on the components within this entry module
   const entryKey = cmps
-    .sort(sortComponents)
     .map(c => c.tagName)
+    .sort()
     .join('.');
 
   return {
@@ -111,7 +110,11 @@ export function getPredefinedEntryPoints(config: d.Config, buildCtx: d.BuildCtx,
   if (userConfigEntryPoints.length > 0) {
     return userConfigEntryPoints;
   }
-  const entryPointsHints = getEntryHints(buildCtx, cmps);
+  if (!buildCtx.indexDoc) {
+    return [];
+  }
+
+  const entryPointsHints = getUsedComponents(buildCtx.indexDoc, cmps);
   const mainBundle = unduplicate([
     ...entryPointsHints,
     ...flatOne(entryPointsHints
@@ -151,29 +154,4 @@ export function getUserConfigEntryPoints(config: d.Config, buildCtx: d.BuildCtx,
     }).sort();
   });
   return entryTags;
-}
-
-function getEntryHints(buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
-  const tags = new Set(cmps.map(cmp => cmp.tagName.toUpperCase()));
-  const found: string[] = [];
-  if (buildCtx.indexDoc) {
-    function searchComponents(el: Element) {
-      if (tags.has(el.tagName)) {
-        found.push(el.tagName.toLowerCase());
-      }
-
-      for (let i = 0; i < el.childElementCount; i++) {
-        searchComponents(el.children[i]);
-      }
-    }
-    searchComponents(buildCtx.indexDoc.documentElement);
-  }
-  return found;
-}
-
-
-function sortComponents(a: d.ComponentCompilerMeta, b: d.ComponentCompilerMeta) {
-  if (a.tagName < b.tagName) return -1;
-  if (a.tagName > b.tagName) return 1;
-  return 0;
 }

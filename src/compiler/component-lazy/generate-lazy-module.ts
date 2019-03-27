@@ -8,7 +8,7 @@ import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/fo
 
 export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupResult[], sourceTarget: d.SourceTarget, sufix: string, webpackBuild: boolean) {
   if (destinations.length === 0) {
-    return;
+    return [];
   }
   const entryComponentsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
   const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isCore);
@@ -28,6 +28,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
       return writeLazyCore(config, compilerCtx, buildCtx, destinations, sourceTarget, rollupResult.code, rollupResult.fileName, bundleModules, webpackBuild);
     })
   );
+  return bundleModules;
 }
 
 
@@ -41,6 +42,7 @@ async function generateLazyEntryModule(config: d.Config, compilerCtx: d.Compiler
   );
 
   return {
+    rollupResult,
     entryKey: rollupResult.entryKey,
     modeNames: entryModule.modeNames.slice(),
     cmps: entryModule.cmps,

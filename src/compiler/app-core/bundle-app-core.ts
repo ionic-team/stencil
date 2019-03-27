@@ -67,6 +67,7 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
       code: chunk.code,
       moduleFormat: options.format,
       entryKey: chunk.name,
+      imports: chunk.imports,
       isEntry: !!chunk.isEntry,
       isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
       isCore: !chunk.isEntry && chunk.name === config.fsNamespace,

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { COMPONENTS_DTS_HEADER, indentTypes, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath, getComponentsFromModules } from '../output-targets/output-utils';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { normalizePath, sortBy } from '@utils';
 import { updateStencilTypesImports } from './stencil-types';
@@ -40,7 +40,7 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   const allTypes = new Map<string, number>();
   // const isSrcTypes = destination === 'src';
   const components = sortBy(
-    getComponentsFromModules(buildCtx.moduleFiles).filter(cmp => !cmp.isCollectionDependency),
+    buildCtx.components.filter(cmp => !cmp.isCollectionDependency),
     cmp => cmp.tagName
   );
 

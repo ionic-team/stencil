@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetAngular } from './output-utils';
+import { canSkipAppCoreBuild, isOutputTargetAngular } from './output-utils';
 import { dashToPascalCase, relativeImport, sortBy } from '@utils';
 
 
@@ -19,14 +19,14 @@ export async function outputAngularProxies(config: d.Config, compilerCtx: d.Comp
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
 
   await Promise.all(
-    outputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, outputTarget, buildCtx.moduleFiles))
+    outputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget))
   );
 
   timespan.finish(`generate angular proxies finished`);
 }
 
-function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, moduleFiles: d.Module[]) {
-  const components = getComponents(outputTarget.excludeComponents, moduleFiles);
+function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetAngular,) {
+  const components = getComponents(outputTarget.excludeComponents, buildCtx);
   return Promise.all([
     generateProxies(config, compilerCtx, components, outputTarget),
     generateAngularArray(config, compilerCtx, components, outputTarget),
@@ -34,8 +34,8 @@ function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCt
   ]);
 }
 
-function getComponents(excludeComponents: string[], moduleFiles: d.Module[]) {
-  const cmps = getComponentsFromModules(moduleFiles);
+function getComponents(excludeComponents: string[], buildCtx: d.BuildCtx) {
+  const cmps = buildCtx.components;
   return sortBy(cmps, cmp => cmp.tagName)
     .filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 }

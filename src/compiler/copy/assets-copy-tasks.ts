@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
-import { getComponentsFromModules } from '../output-targets/output-utils';
 
 
 export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
@@ -11,10 +10,7 @@ export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.Build
   // get a list of all the directories to copy
   // these paths should be absolute
   const copyTasks: d.CopyTask[] = [];
-
-  const cmps = (collectionsPath)
-    ? getComponentsFromModules(buildCtx.moduleFiles)
-    : getComponentsFromModules(buildCtx.entryModules);
+  const cmps = buildCtx.components;
 
   cmps
     .filter(cmp => cmp.assetsDirs != null && cmp.assetsDirs.length > 0)

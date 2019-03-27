@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
-import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetDistModule } from './output-utils';
+import { canSkipAppCoreBuild, isOutputTargetDistModule } from './output-utils';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
@@ -26,7 +26,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
 
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
-  const cmps = getComponentsFromModules(buildCtx.moduleFiles);
+  const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build);
 

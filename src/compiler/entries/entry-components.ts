@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { sortBy } from '@utils';
 import { getPredefinedEntryPoints } from './entry-modules';
-import { calcComponentDependencies } from './component-dependencies';
+import { resolveComponentDependencies } from './resolve-component-dependencies';
 
 
 export function generateComponentEntries(
@@ -12,7 +12,7 @@ export function generateComponentEntries(
   if (config.devMode) {
     return cmps.map(cmp => [cmp]);
   }
-  calcComponentDependencies(cmps);
+  resolveComponentDependencies(cmps);
 
   const predefinedEntryPoints = getPredefinedEntryPoints(config, buildCtx, cmps)
 

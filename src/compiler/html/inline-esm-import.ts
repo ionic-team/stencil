@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 
 
-export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  const expectedSrc = `build/${config.fsNamespace}.mjs.js`;
+export async function inlineEsmImport(doc: Document, config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+  const expectedSrc = `/build/${config.fsNamespace}.mjs.js`;
   const script = Array.from(doc.querySelectorAll('script'))
     .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
 
@@ -20,13 +20,7 @@ export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, c
     config.sys.path.dirname(expectedSrc),
     corePath
   );
-  content = content.replace(corePath, newPath[0] === '.' ? newPath : './' + newPath);
-
-  // insert modulepreload
-  script.parentNode.insertBefore(
-    createModulePreload(doc, newPath),
-    script
-  );
+  content = content.replace(corePath, newPath);
 
   // insert inline script
   const inlinedScript = doc.createElement('script');
@@ -40,11 +34,3 @@ export async function optimizeEsmLoaderImport(doc: Document, config: d.Config, c
   // remove original script
   script.remove();
 }
-
-function createModulePreload(doc: Document, href: string) {
-  const link = doc.createElement('link');
-  link.setAttribute('rel', 'modulepreload');
-  link.setAttribute('href', href);
-  return link;
-}
-
