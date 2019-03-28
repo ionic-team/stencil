@@ -13,11 +13,11 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
   // connectedCallback
   const hostRef = getHostRef(elm);
 
-  if (BUILD.hostListener && cmpMeta.l) {
+  if (BUILD.hostListener && cmpMeta.$listeners$) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
     // have fired even before the instance is ready
-    hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.l);
+    hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.$listeners$);
   }
 
   if (!(hostRef.$stateFlags$ & HOST_STATE.hasConnected)) {
@@ -28,12 +28,12 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
     if (BUILD.hydrateClientSide) {
       hostId = elm.getAttribute(HYDRATE_ID);
       if (hostId) {
-        if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
-          const scopeId = addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
+        if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
+          const scopeId = addStyle(elm.shadowRoot, cmpMeta.$tagName$, elm.getAttribute('s-mode'));
           elm.classList.remove(scopeId + '-h');
           elm.classList.remove(scopeId + '-s');
         }
-        initializeClientHydrate(elm, cmpMeta.t, hostId, hostRef);
+        initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
       }
     }
 
@@ -42,12 +42,12 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if ((BUILD.slot && cmpMeta.f & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateServerSide) {
+      if ((BUILD.slot && cmpMeta.$flags$ & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateServerSide) {
         setContentReference(elm);
       }
     }
 
-    if (BUILD.slotRelocation && BUILD.es5 && !supportsShadowDom && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
+    if (BUILD.slotRelocation && BUILD.es5 && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
       try {
         (elm as any).shadowRoot = elm;
       } catch (e) {}
@@ -76,8 +76,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
     // Lazy properties
     // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-    if (BUILD.prop && cmpMeta.m) {
-      Object.entries(cmpMeta.m).forEach(([memberName, [memberFlags]]) => {
+    if (BUILD.prop && cmpMeta.$members$) {
+      Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
         if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
           const value = (elm as any)[memberName];
           delete (elm as any)[memberName];

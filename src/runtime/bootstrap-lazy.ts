@@ -8,7 +8,6 @@ import { getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { HTMLElement } from './html-element';
 import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
-import { proxyComponent } from './proxy-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window, options: d.CustomElementsDefineOptions = {}) => {
@@ -16,14 +15,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   const exclude = options.exclude || [];
   const doc = win.document;
   const head = doc.head;
-  const y = head.querySelector('meta[charset]');
+  const customElements = win.customElements;
+  const y = /*@__PURE__*/head.querySelector('meta[charset]');
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';
-
     styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
-
     styles.forEach(styleElm => {
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
@@ -33,73 +31,82 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   }
 
   lazyBundles.forEach(lazyBundle =>
+    lazyBundle[1].forEach(compactMeta => {
+      const cmpMeta: d.ComponentRuntimeMeta = {
+        $flags$: compactMeta[0],
+        $tagName$: compactMeta[1],
+        $members$: compactMeta[2],
+      };
+      if (BUILD.reflect) {
+        cmpMeta.$attrsToReflect$ = [];
+      }
+      if (BUILD.watchCallback) {
+        cmpMeta.$watchers$ = {};
+      }
+      const tagName = cmpMeta.$tagName$;
+      const HostElement = class extends HTMLElement {
+        ['s-lr'] = false;
+        ['s-rc']: (() => void)[] = [];
 
-    lazyBundle[1].forEach(cmpLazyMeta => {
-
-      cmpLazyMeta.$lazyBundleIds$ = lazyBundle[0];
-
-      if (!exclude.includes(cmpLazyMeta.t) && !win.customElements.get(cmpLazyMeta.t)) {
-        if (BUILD.style) {
-          cmpTags.push(cmpLazyMeta.t);
+        // StencilLazyHost
+        constructor(self: HTMLElement) {
+          // @ts-ignore
+          super(self);
+          registerHost(this);
+          if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
+            // this component is using shadow dom
+            // and this browser supports shadow dom
+            // add the read-only property "shadowRoot" to the host element
+            this.attachShadow({ 'mode': 'open' });
+          }
         }
-        win.customElements.define(
-          cmpLazyMeta.t,
-          proxyComponent(class extends HTMLElement {
 
-            ['s-lr'] = false;
-            ['s-rc']: (() => void)[] = [];
+        connectedCallback() {
+          connectedCallback(this, cmpMeta);
+        }
 
-            // StencilLazyHost
-            constructor(self: HTMLElement) {
-              // @ts-ignore
-              super(self);
-              registerHost(this);
-              if (BUILD.shadowDom && supportsShadowDom && cmpLazyMeta.f & CMP_FLAG.shadowDomEncapsulation) {
-                // this component is using shadow dom
-                // and this browser supports shadow dom
-                // add the read-only property "shadowRoot" to the host element
-                this.attachShadow({ 'mode': 'open' });
-              }
-            }
+        disconnectedCallback() {
+          if (BUILD.cmpDidUnload) {
+            disconnectedCallback(this);
+          }
+        }
 
-            connectedCallback() {
-              connectedCallback(this, cmpLazyMeta);
-            }
+        's-init'() {
+          const hostRef = getHostRef(this);
+          if (hostRef.$lazyInstance$) {
+            postUpdateComponent(this, hostRef);
+          }
+        }
 
-            disconnectedCallback() {
-              if (BUILD.cmpDidUnload) {
-                disconnectedCallback(this);
-              }
-            }
+        forceUpdate() {
+          if (BUILD.updatable) {
+            const hostRef = getHostRef(this);
+            scheduleUpdate(
+              this,
+              hostRef,
+              cmpMeta,
+              false
+            );
+          }
+        }
 
-            's-init'() {
-              const hostRef = getHostRef(this);
-              if (hostRef.$lazyInstance$) {
-                postUpdateComponent(this, hostRef);
-              }
-            }
+        componentOnReady() {
+          return getHostRef(this).$onReadyPromise$;
+        }
+      };
+      cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
-            forceUpdate() {
-              if (BUILD.updatable) {
-                const hostRef = getHostRef(this);
-                scheduleUpdate(
-                  this,
-                  hostRef,
-                  cmpLazyMeta,
-                  false
-                );
-              }
-            }
-
-            componentOnReady() {
-              return getHostRef(this).$onReadyPromise$;
-            }
-          } as any, cmpLazyMeta, 1, 0) as any
+      if (!exclude.includes(tagName) && !customElements.get(tagName)) {
+        if (BUILD.style) {
+          cmpTags.push(tagName);
+        }
+        customElements.define(
+          tagName,
+          HostElement
         );
       }
-    })
+    }));
 
-  );
 
   if (BUILD.style) {
     // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';

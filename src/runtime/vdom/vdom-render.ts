@@ -596,7 +596,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = supportsShadowDom && !!(cmpMeta.f & CMP_FLAG.shadowDomEncapsulation);
+    useNativeShadowDom = supportsShadowDom && !!(cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation);
     scopeId = hostElm['s-sc'];
 
     // always reset

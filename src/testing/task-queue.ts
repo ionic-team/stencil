@@ -112,7 +112,7 @@ export async function flushAll() {
 }
 
 
-export function loadModule(cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef) {
+export function loadModule(cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef) {
   return new Promise<any>(resolve => {
     queuedLoadModules.push({
       bundleId: cmpMeta.$lazyBundleIds$,

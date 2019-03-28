@@ -127,6 +127,6 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRunt
 
   return [
     bundleId,
-    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true, true))
+    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
 }

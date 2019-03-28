@@ -35,6 +35,11 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
+      treeshake: {
+        annotations: true,
+        propertyReadSideEffects: false,
+        pureExternalModules: false
+      },
       cache: bundleCoreOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };

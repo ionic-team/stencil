@@ -13,10 +13,10 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
     elm.forceUpdate = forceUpdate;
   }
 
-  if (cmpMeta.m != null) {
+  if (cmpMeta.$members$ != null) {
     const hostRef = getHostRef(elm);
 
-    const members = Object.entries(cmpMeta.m);
+    const members = Object.entries(cmpMeta.$members$);
 
     members.forEach(([memberName, m]) => {
       const memberFlags = m[0];

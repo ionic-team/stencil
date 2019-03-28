@@ -17,7 +17,7 @@ export class NodeFs implements d.FileSystem {
   }
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      return fs.copyFile(src, dest, fs.constants.COPYFILE_FICLONE, (err) => {
+      return fs.copyFile(src, dest, 0, (err) => {
         if (err) {
           reject(err);
         } else {

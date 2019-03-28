@@ -29,6 +29,9 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
 }
 
 function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
+  if (!buildCtx.indexDoc) {
+    return [];
+  }
   const preloadPaths = getUsedComponents(buildCtx.indexDoc, buildCtx.components)
     .flatMap(tagName => getModulesForTagName(tagName, bundleModules))
     .sort();
@@ -54,7 +57,7 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // Process
-  if (config.srcIndexHtml && outputTarget.indexHtml) {
+  if (buildCtx.indexDoc && outputTarget.indexHtml) {
     await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);

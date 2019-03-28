@@ -2,9 +2,9 @@ import * as d from '../declarations';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
-export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef): any => {
+export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef): any => {
   return new Promise(resolve => {
-    resolve(cstrs.get(cmpMeta.t));
+    resolve(cstrs.get(cmpMeta.$tagName$));
   });
 };
 
@@ -16,7 +16,7 @@ export const getComponent = (tagName: string) => {
 
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   Cstrs.forEach(Cstr => {
-    cstrs.set(Cstr.cmpMeta.t, Cstr);
+    cstrs.set(Cstr.cmpMeta.$tagName$, Cstr);
   });
 };
 

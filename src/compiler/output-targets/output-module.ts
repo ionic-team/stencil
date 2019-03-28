@@ -94,7 +94,7 @@ function generateEntryPoint(entryModules: d.EntryModule[]) {
         `export { ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
       );
     } else {
-      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, true, false));
+      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
       const exportName = dashToPascalCase(cmp.tagName);
       result.push(
         `import { ${exportName} as $Cmp${count} } from '${entry.entryKey}';`,

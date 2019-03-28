@@ -7,31 +7,33 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   any,
-  ComponentLazyRuntimeMeta[]
+  ComponentRuntimeMetaCompact[]
+];
+
+
+export type ComponentRuntimeMetaCompact = [
+  /** flags */
+  number,
+
+  /** tagname */
+  string,
+
+  /** members */
+  {[memberName: string]: ComponentRuntimeMember}?,
+
+  /** listeners */
+  d.ComponentRuntimeHostListener[]?
 ];
 
 
 
 export interface ComponentRuntimeMeta {
-  /** members */
-  m?: d.ComponentRuntimeMembers;
-
-  /** listeners */
-  l?: d.ComponentRuntimeHostListener[];
-
-  /** flags */
-  f?: number;
-
-  /** tagname */
-  t?: string;
-
-  // added later
+  $flags$: number;
+  $tagName$: string;
+  $members$?: d.ComponentRuntimeMembers;
+  $listeners$?: d.ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
   $watchers$?: d.ComponentConstructorWatchers;
-}
-
-
-export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
   $lazyBundleIds$?: d.ModeBundleIds;
 }
 

@@ -7,8 +7,16 @@ import { getValue, setValue } from './set-value';
 import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
 
 
-export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
-  cmpMeta.t = Cstr.is;
+export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
+  const cmpMeta: d.ComponentRuntimeMeta = {
+    $flags$: compactMeta[0],
+    $tagName$: compactMeta[1],
+    $members$: compactMeta[2],
+    $watchers$: Cstr.$watchers$
+  };
+  if (BUILD.reflect) {
+    cmpMeta.$attrsToReflect$ = [];
+  }
   Cstr.prototype.connectedCallback = function() {
     connectedCallback(this, cmpMeta);
   };
@@ -20,15 +28,12 @@ export const proxyNative = (Cstr: any, cmpMeta: d.ComponentRuntimeMeta) => {
 
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
-  if (BUILD.member && cmpMeta.m) {
+  if (BUILD.member && cmpMeta.$members$) {
     if (BUILD.watchCallback && Cstr.watchers) {
       cmpMeta.$watchers$ = Cstr.watchers;
     }
-    if (!BUILD.lazyLoad && !BUILD.hydrateServerSide) {
-      Cstr.cmpMeta = cmpMeta;
-    }
     // It's better to have a const than two Object.entries()
-    const members = Object.entries(cmpMeta.m);
+    const members = Object.entries(cmpMeta.$members$);
 
     members.forEach(([memberName, [memberFlags]]) => {
       if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && proxyState && (memberFlags & MEMBER_FLAGS.State))) {
@@ -62,10 +67,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
 
     if (BUILD.observeAttribute && (!BUILD.lazyLoad || isElementConstructor)) {
       const attrNameToPropName = new Map();
-
-      if (BUILD.reflect) {
-        cmpMeta.$attrsToReflect$ = [];
-      }
 
       (Cstr as any).prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
         const propName = attrNameToPropName.get(attrName);

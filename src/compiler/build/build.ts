@@ -35,8 +35,11 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     if (config.srcIndexHtml) {
-      const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
-      buildCtx.indexDoc = createDocument(indexSrcHtml);
+      const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
+      if (hasIndex) {
+        const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
+        buildCtx.indexDoc = createDocument(indexSrcHtml);
+      }
     }
 
     // we've got the compiler context filled with app modules and collection dependency modules

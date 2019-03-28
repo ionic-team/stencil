@@ -72,9 +72,9 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
   const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot)
     ? elm.shadowRoot
-    : (elm as any).getRootNode(), cmpMeta.t, mode);
+    : (elm as any).getRootNode(), cmpMeta.$tagName$, mode);
 
-  if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
+  if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation)) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -85,7 +85,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     elm['s-sc'] = styleId;
     elm.classList.add(styleId + '-h');
 
-    if (cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
+    if (cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
       elm.classList.add(styleId + '-s');
     }
   }

@@ -5,42 +5,30 @@ import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
   return [
     bundleId,
-    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true, true))
+    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
 }
 
 
-export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeTagName: boolean, includeMethods: boolean) {
-  const runtimeMeta: d.ComponentLazyRuntimeMeta = {
-    f: 0,
-  };
-
-  if (includeTagName) {
-    runtimeMeta.t = compilerMeta.tagName;
+export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact {
+  let flags = 0;
+  if (compilerMeta.encapsulation === 'shadow') {
+    flags |= CMP_FLAG.shadowDomEncapsulation;
+  } else if (compilerMeta.encapsulation === 'scoped') {
+    flags |= CMP_FLAG.scopedCssEncapsulation;
+  }
+  if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
+    flags |= CMP_FLAG.hasSlotRelocation;
   }
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
-  if (Object.keys(members).length > 0) {
-    runtimeMeta.m = members;
-  }
-
   const hostListeners = formatHostListeners(compilerMeta);
-  if (hostListeners.length > 0) {
-    runtimeMeta.l = hostListeners;
-  }
-
-  if (compilerMeta.encapsulation === 'shadow') {
-    runtimeMeta.f |= CMP_FLAG.shadowDomEncapsulation;
-
-  } else if (compilerMeta.encapsulation === 'scoped') {
-    runtimeMeta.f |= CMP_FLAG.scopedCssEncapsulation;
-  }
-
-  if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
-    runtimeMeta.f |= CMP_FLAG.hasSlotRelocation;
-  }
-
-  return runtimeMeta;
+  return trimFalsy([
+    flags,
+    compilerMeta.tagName,
+    Object.keys(members).length > 0 ? members : undefined,
+    hostListeners.length > 0 ? hostListeners : undefined
+  ]);
 }
 
 
