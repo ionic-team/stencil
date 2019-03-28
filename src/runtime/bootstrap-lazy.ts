@@ -4,6 +4,7 @@ import { CMP_FLAG } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { disconnectedCallback } from './disconnected-callback';
+import { proxyComponent } from './proxy-component';
 import { getHostRef, registerHost, supportsShadowDom } from '@platform';
 import { HTMLElement } from './html-element';
 import { HYDRATE_ID } from './runtime-constants';
@@ -17,6 +18,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   const head = doc.head;
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
+  const visibilityStyle = /*@__PURE__*/doc.createElement('style');
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
@@ -36,6 +38,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
         $flags$: compactMeta[0],
         $tagName$: compactMeta[1],
         $members$: compactMeta[2],
+        $listeners$: compactMeta[3],
       };
       if (BUILD.reflect) {
         cmpMeta.$attrsToReflect$ = [];
@@ -102,7 +105,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
         }
         customElements.define(
           tagName,
-          HostElement
+          proxyComponent(HostElement as any, cmpMeta, 1, 0) as any
         );
       }
     }));
@@ -110,7 +113,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
 
   if (BUILD.style) {
     // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-    const visibilityStyle = doc.createElement('style');
     visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
     visibilityStyle.setAttribute('data-styles', '');
     head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);

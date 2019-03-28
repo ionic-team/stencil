@@ -12,6 +12,7 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
     $flags$: compactMeta[0],
     $tagName$: compactMeta[1],
     $members$: compactMeta[2],
+    $listeners$: compactMeta[3],
     $watchers$: Cstr.$watchers$
   };
   if (BUILD.reflect) {

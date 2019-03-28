@@ -36,6 +36,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype before
           // the first time we create an instance of the implementation
+          if (BUILD.watchCallback) {
+            cmpMeta.$watchers$ = Cstr.watchers;
+          }
           proxyComponent(Cstr, cmpMeta, 0, 1);
           Cstr.isProxied = true;
         }
