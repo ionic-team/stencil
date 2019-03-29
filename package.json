@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.0",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,6 +38,7 @@
     "jest.clearCache": "jest --clearCache",
     "lint": "tslint --project src/tsconfig.json",
     "release": "node scripts/release.js",
+    "release.alpha": "npm version prerelease && npm publish --tag one --access public",
     "release.prepare": "node scripts/release.js --prepare",
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
