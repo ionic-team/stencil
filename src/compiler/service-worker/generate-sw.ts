@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, hasError, unduplicate } from '@utils';
+import { buildWarn, catchError, hasError, unique } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
@@ -94,7 +94,7 @@ function ignoreLegacyBundles(config: d.Config, serviceWorker: d.ServiceWorkerCon
     `**/${config.fsNamespace}/*.system.js`,
   );
 
-  serviceWorker.globIgnores = unduplicate(serviceWorker.globIgnores);
+  serviceWorker.globIgnores = unique(serviceWorker.globIgnores);
 }
 
 

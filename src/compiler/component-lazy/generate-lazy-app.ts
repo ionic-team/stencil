@@ -11,13 +11,12 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   const timespan = buildCtx.createTimeSpan(`generate lazy components started`);
 
   const cmps = buildCtx.components;
-  cmps.push()
   const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
 
   await buildCtx.stylesPromise;
 
-  const [bundleMpdules] = await Promise.all([
+  const [bundleModules] = await Promise.all([
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.webpackBuild)),
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.webpackBuild)),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
@@ -28,7 +27,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
 
   timespan.finish(`generate lazy components finished`);
 
-  return bundleMpdules;
+  return bundleModules;
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {

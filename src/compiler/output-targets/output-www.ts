@@ -1,11 +1,11 @@
+import { isOutputTargetWww } from './output-utils';
 import { processCopyTasks } from '../copy/local-copy-tasks';
-import * as d from '../../declarations';
 import { inlineEsmImport } from '../html/inline-esm-import';
 import { optimizeCriticalPath } from '../html/inject-module-preloads';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { cloneDocument, serializeNodeToHtml } from '@mock-doc';
-import { isOutputTargetWww } from './output-utils';
-import { catchError, normalizePath, unduplicate } from '@utils';
+import * as d from '../../declarations';
+import { catchError, flatOne, normalizePath, unique } from '@utils';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
@@ -18,10 +18,10 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
   }
 
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
-  const criticalPath = getCriticalPath(buildCtx, bundleModules);
+  const criticalBundles = getCriticalPath(buildCtx, bundleModules);
 
   await Promise.all(
-    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalPath, outputTarget))
+    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
   );
   await generateServiceWorkers(config, compilerCtx, buildCtx);
 
@@ -32,18 +32,19 @@ function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) 
   if (!buildCtx.indexDoc) {
     return [];
   }
-  const preloadPaths = getUsedComponents(buildCtx.indexDoc, buildCtx.components)
-    .flatMap(tagName => getModulesForTagName(tagName, bundleModules, 'md'))
-    .sort();
-
-  return unduplicate(preloadPaths);
+  return unique(
+    flatOne(
+      getUsedComponents(buildCtx.indexDoc, buildCtx.components)
+        .map(tagName => getModulesForTagName(tagName, bundleModules))
+    )
+  ).sort();
 }
 
-function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[], defaultMode?: string) {
+function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[], _defaultMode?: string) {
   const bundle = bundleModules.find(bundle => bundle.cmps.some(c => c.tagName === tagName));
   const entry = bundle.outputs.length === 1
     ? [bundle.outputs[0].fileName]
-    : bundle.outputs.filter(o => o.modeName === defaultMode).map(o => o.fileName);
+    : [];
   return [
     ...entry,
     ...bundle.rollupResult.imports
@@ -101,6 +102,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
     try {
       const doc = cloneDocument(buildCtx.indexDoc);
+
       await updateIndexHtmlServiceWorker(doc, config, buildCtx, outputTarget);
       await inlineEsmImport(doc, config, compilerCtx, outputTarget);
       optimizeCriticalPath(doc, config, criticalPath, outputTarget);

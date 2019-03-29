@@ -16,57 +16,61 @@ export function generateComponentBundles(
 
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
 
-  // user config entry modules you leave as is
-  // whatever the user put in the bundle is how it goes
   cmps = sortBy(cmps, cmp => cmp.dependants.length);
-  const included = new Set();
+
+  // Visit components that are already in one of the default bundlers
+  const visited = new Set();
   defaultBundles.forEach(entry => {
-    entry.forEach(cmp => included.add(cmp));
+    entry.forEach(cmp => visited.add(cmp));
   });
 
   const bundlers: d.ComponentCompilerMeta[][] = [
     ...defaultBundles,
-    ...cmps.filter(cmp => !included.has(cmp)).map(cmp => [cmp])
+    ...cmps
+        .filter(cmp => !visited.has(cmp))
+        .map(cmp => [cmp])
   ];
   return optimizeBundlers(bundlers, 0.6);
+
 }
 
 
-function optimizeBundlers(entryPoints: d.ComponentCompilerMeta[][], threshold: number) {
-  const cmpMap = new Map<string, number>();
-  entryPoints.forEach((entry, index) => {
+function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: number) {
+  const cmpIndexMap = new Map<string, number>();
+  bundles.forEach((entry, index) => {
     entry.forEach(cmp => {
-      cmpMap.set(cmp.tagName, index);
+      cmpIndexMap.set(cmp.tagName, index);
     });
   });
 
-  const visited = new Uint8Array(entryPoints.length);
-  const matrix = entryPoints.map(entry => {
-    const vector = new Uint8Array(entryPoints.length);
+  const visited = new Uint8Array(bundles.length);
+  const matrix = bundles.map(entry => {
+    const vector = new Uint8Array(bundles.length);
     entry.forEach(cmp => {
-      cmp.dependants.forEach(tag => vector[cmpMap.get(tag)] = 1);
+      cmp.dependants.forEach(tag => vector[cmpIndexMap.get(tag)] = 1);
     });
-    entry.forEach(cmp => vector[cmpMap.get(cmp.tagName)] = 0);
+    entry.forEach(cmp => vector[cmpIndexMap.get(cmp.tagName)] = 0);
     return vector;
   });
 
   // resolve similar components
-  const bundles: d.ComponentCompilerMeta[][] = [];
+  const newBundles: d.ComponentCompilerMeta[][] = [];
 
   for (let i = 0; i < matrix.length; i++) {
+    // check if bundle is visited (0 means it's not)
     if (visited[i] === 0) {
-      const bundle = [...entryPoints[i]];
+      const bundle = [...bundles[i]];
       visited[i] = 1;
       for (let j = i + 1; j < matrix.length; j++) {
-        if (visited[j] === 0 && computeScore(matrix[i], matrix[j]) > threshold) {
-          bundle.push(...entryPoints[j]);
+        if (visited[j] === 0 && computeScore(matrix[i], matrix[j]) >= threshold) {
+          bundle.push(...bundles[j]);
           visited[j] = 1;
         }
       }
-      bundles.push(bundle);
+      newBundles.push(bundle);
     }
   }
-  return bundles;
+  return newBundles;
 }
 
 function computeScore(m0: Uint8Array, m1: Uint8Array) {

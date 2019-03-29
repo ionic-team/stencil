@@ -1,12 +1,9 @@
 import * as d from '../../declarations';
-import { buildWarn, flatOne, unduplicate } from '@utils';
+import { buildWarn, flatOne, unique } from '@utils';
 import { validateComponentTag } from '../config/validate-component';
 import { getUsedComponents } from '../html/used-components';
 
 export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
-  if (config.devMode) {
-    return [];
-  }
   const userConfigEntryPoints = getUserConfigBundles(config, buildCtx, cmps);
   if (userConfigEntryPoints.length > 0) {
     return userConfigEntryPoints;
@@ -19,10 +16,11 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
     return [];
   }
 
-  const mainBundle = unduplicate([
+  const mainBundle = unique([
     ...entryPointsHints,
     ...flatOne(entryPointsHints
-      .map(cmp => resolveTag(cmp).dependencies)
+      .map(resolveTag)
+      .map(cmp => cmp.dependencies)
     )
   ]).map(resolveTag);
 

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { unduplicate } from '@utils';
+import { unique } from '@utils';
 
 export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] {
   if (copy === null || copy === false) {
@@ -8,7 +8,7 @@ export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
   if (!Array.isArray(copy)) {
     copy = [];
   }
-  return unduplicate([
+  return unique([
     ...defaultCopy,
     ...copy
   ], task => task.src);

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { flatOne, unduplicate } from '@utils';
+import { flatOne, unique } from '@utils';
 
 export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
   computeDependencies(cmps);
@@ -30,7 +30,7 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
       .map(tagName => cmps.find(c => c.tagName === tagName))
       .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
-  return unduplicate([
+  return unique([
     ...dependencies,
     ...transitiveDeps
   ]).sort();

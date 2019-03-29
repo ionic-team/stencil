@@ -35,7 +35,7 @@ export function flatOne<T>(array: T[][]): T[] {
   }, [] as T[]);
 }
 
-export function unduplicate<T>(array: T[], predicate: (item: T) => any = (i) => i): T[] {
+export function unique<T>(array: T[], predicate: (item: T) => any = (i) => i): T[] {
   const set = new Set();
   return array.filter(item => {
     const key = predicate(item);

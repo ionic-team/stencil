@@ -14,7 +14,7 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
-import { normalizePath, unduplicate } from '@utils';
+import { normalizePath, unique } from '@utils';
 
 
 export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
@@ -126,9 +126,9 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     }
   });
 
-  cmp.htmlAttrNames = unduplicate(cmp.htmlAttrNames);
-  cmp.htmlTagNames = unduplicate(cmp.htmlTagNames);
-  cmp.potentialCmpRefs = unduplicate(cmp.potentialCmpRefs);
+  cmp.htmlAttrNames = unique(cmp.htmlAttrNames);
+  cmp.htmlTagNames = unique(cmp.htmlTagNames);
+  cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
   if (transformOpts.addCompilerMeta) {
