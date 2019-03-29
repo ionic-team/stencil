@@ -11,6 +11,7 @@ export interface TypesMemberNameData {
 
 
 export interface TypesModule {
+  isDep: boolean;
   tagNameAsPascal: string;
   component: string;
   jsx: string;
