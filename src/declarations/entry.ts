@@ -19,8 +19,6 @@ export interface EntryBundle {
   sourceTarget: string;
 }
 
-export type EntryPoint = d.ComponentCompilerMeta[];
-
 export interface EntryComponent {
   tag: string;
   dependencyOf?: string[];

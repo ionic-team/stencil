@@ -1,39 +1,38 @@
 import * as d from '../../declarations';
 import { sortBy } from '@utils';
-import { getPredefinedEntryPoints } from './entry-modules';
+import { getDefaultBundles } from './default-bundles';
 import { resolveComponentDependencies } from './resolve-component-dependencies';
 
 
-export function generateComponentEntries(
+export function generateComponentBundles(
   config: d.Config,
   buildCtx: d.BuildCtx,
-  cmps: d.ComponentCompilerMeta[],
-): d.EntryPoint[] {
+): d.ComponentCompilerMeta[][] {
+  let cmps = buildCtx.components;
   if (config.devMode) {
     return cmps.map(cmp => [cmp]);
   }
   resolveComponentDependencies(cmps);
 
-  const predefinedEntryPoints = getPredefinedEntryPoints(config, buildCtx, cmps)
+  const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
 
   // user config entry modules you leave as is
   // whatever the user put in the bundle is how it goes
   cmps = sortBy(cmps, cmp => cmp.dependants.length);
-
   const included = new Set();
-  predefinedEntryPoints.forEach(entry => {
+  defaultBundles.forEach(entry => {
     entry.forEach(cmp => included.add(cmp));
   });
 
   const bundlers: d.ComponentCompilerMeta[][] = [
-    ...predefinedEntryPoints,
+    ...defaultBundles,
     ...cmps.filter(cmp => !included.has(cmp)).map(cmp => [cmp])
   ];
   return optimizeBundlers(bundlers, 0.6);
 }
 
-function optimizeBundlers(entryPoints: d.ComponentCompilerMeta[][], threshold: number) {
 
+function optimizeBundlers(entryPoints: d.ComponentCompilerMeta[][], threshold: number) {
   const cmpMap = new Map<string, number>();
   entryPoints.forEach((entry, index) => {
     entry.forEach(cmp => {

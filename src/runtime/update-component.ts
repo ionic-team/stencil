@@ -133,7 +133,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       // on appload
       if (!ancestorComponent) {
         // we have finish the first big initial render
-        plt.$queueAsync$ = true;
+        elm.ownerDocument.documentElement.classList.add('hydrated');
+        setTimeout(() => plt.$queueAsync$ = true, 1000);
         emitLifecycleEvent(elm, 'appload');
       }
     } else {

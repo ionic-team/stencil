@@ -21,9 +21,10 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
 
   copyAssets(config, compilerCtx, buildCtx, outputTargets);
 
+  const moduleFiles = buildCtx.moduleFiles.filter(m => !m.isCollectionDependency && m.jsFilePath);
   await Promise.all([
     writeTypes(config, compilerCtx, buildCtx, outputTargets),
-    writeJsFiles(config, compilerCtx, buildCtx, outputTargets),
+    writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
     writeManifests(config, compilerCtx, buildCtx, outputTargets)
   ]);
 
@@ -39,9 +40,9 @@ async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
 }
 
 
-function writeJsFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
+function writeJsFiles(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], outputTargets: d.OutputTargetDistCollection[]) {
   return Promise.all(
-    buildCtx.moduleFiles
+    moduleFiles
       .map(moduleFile => writeModuleFile(config, compilerCtx, moduleFile, outputTargets))
   );
 }

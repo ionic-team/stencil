@@ -1,4 +1,4 @@
-import { setAccessor, vdomListenerProxy } from '../set-accessor';
+import { setAccessor } from '../set-accessor';
 
 
 describe('setAccessor for custom elements', () => {
@@ -31,8 +31,8 @@ describe('setAccessor for custom elements', () => {
       setAccessor(elm, 'onClick', orgValue, undefined, false, 0);
 
       expect(addEventSpy).toHaveBeenCalledTimes(1);
-      expect(addEventSpy).toHaveBeenCalledWith('click', vdomListenerProxy);
-      expect(removeEventSpy).toHaveBeenCalledWith('click', vdomListenerProxy);
+      expect(addEventSpy).toHaveBeenCalledWith('click', orgValue);
+      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue);
     });
 
     it('should remove standardized multiple-word then add event listener w/ different value', () => {
@@ -44,8 +44,8 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onMouseOver', orgValue, undefined, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('mouseover', vdomListenerProxy);
-      expect(removeEventSpy).toHaveBeenCalledWith('mouseover', vdomListenerProxy);
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', orgValue);
+      expect(removeEventSpy).toHaveBeenCalledWith('mouseover', orgValue);
     });
 
     it('should remove standardized then add event listener w/ different value', () => {
@@ -58,8 +58,8 @@ describe('setAccessor for custom elements', () => {
       const newValue = () => {/**/};
       setAccessor(elm, 'onClick', orgValue, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledTimes(1);
-      expect(removeEventSpy).not.toHaveBeenCalled();
+      expect(addEventSpy).toHaveBeenCalledTimes(2);
+      expect(removeEventSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should add custom event listener when no old value', () => {
@@ -70,7 +70,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onIonChange', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('ionChange', vdomListenerProxy);
+      expect(addEventSpy).toHaveBeenCalledWith('ionChange', newValue);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
@@ -82,7 +82,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onMouseOver', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('mouseover', vdomListenerProxy);
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', newValue);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
@@ -94,7 +94,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onClick', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('click', vdomListenerProxy);
+      expect(addEventSpy).toHaveBeenCalledWith('click', newValue);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
