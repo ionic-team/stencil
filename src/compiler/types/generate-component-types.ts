@@ -24,12 +24,13 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesMod
     ...propAttributes,
     ...methodAttributes
   ], false);
-
+  const isDep = cmp.isCollectionDependency;
   const stencilComponentJSXAttributes = attributesToMultiLineString([
     ...propAttributes,
     ...eventAttributes
   ], true);
   return {
+    isDep,
     tagNameAsPascal,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
     jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,

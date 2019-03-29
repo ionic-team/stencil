@@ -40,7 +40,7 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   const allTypes = new Map<string, number>();
   // const isSrcTypes = destination === 'src';
   const components = sortBy(
-    buildCtx.components.filter(cmp => !cmp.isCollectionDependency),
+    buildCtx.components,
     cmp => cmp.tagName
   );
 
@@ -48,6 +48,8 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
     typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, cmp.sourceFilePath);
     return generateComponentTypes(cmp);
   });
+
+  const localModules = modules.filter(m => !m.isDep);
 
   const jsxAugmentation = `
 declare module "@stencil/core" {
@@ -69,26 +71,26 @@ interface HTMLStencilElement extends HTMLElement {
 }
 
 declare namespace LocalJSX {
-  ${modules.map(m => `${m.jsx}`).join('\n').trim()}
+  ${localModules.map(m => `${m.jsx}`).join('\n').trim()}
 
   interface ElementInterfaces {
-  ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
+  ${localModules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
   }
 
   interface IntrinsicElements {
-  ${modules.map(m => `'${m.tagNameAsPascal}': LocalJSX.${m.tagNameAsPascal};`).join('\n')}
+  ${localModules.map(m => `'${m.tagNameAsPascal}': LocalJSX.${m.tagNameAsPascal};`).join('\n')}
   }
 }
 export { LocalJSX as JSX };
 ${jsxAugmentation}
 declare global {
-  ${modules.map(m => m.element).join('\n')}
+  ${localModules.map(m => m.element).join('\n')}
   interface HTMLElementTagNameMap {
-  ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
+  ${localModules.map(m => m.HTMLElementTagNameMap).join('\n')}
   }
 
   interface ElementTagNameMap {
-  ${modules.map(m => m.ElementTagNameMap).join('\n')}
+  ${localModules.map(m => m.ElementTagNameMap).join('\n')}
   }
 }
 `;
