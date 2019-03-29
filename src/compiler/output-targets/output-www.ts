@@ -33,16 +33,19 @@ function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) 
     return [];
   }
   const preloadPaths = getUsedComponents(buildCtx.indexDoc, buildCtx.components)
-    .flatMap(tagName => getModulesForTagName(tagName, bundleModules))
+    .flatMap(tagName => getModulesForTagName(tagName, bundleModules, 'md'))
     .sort();
 
   return unduplicate(preloadPaths);
 }
 
-function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[]) {
+function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[], defaultMode?: string) {
   const bundle = bundleModules.find(bundle => bundle.cmps.some(c => c.tagName === tagName));
+  const entry = bundle.outputs.length === 1
+    ? [bundle.outputs[0].fileName]
+    : bundle.outputs.filter(o => o.modeName === defaultMode).map(o => o.fileName);
   return [
-    ...(bundle.outputs.length === 1) ? [bundle.outputs[0].fileName] : [],
+    ...entry,
     ...bundle.rollupResult.imports
   ];
 }

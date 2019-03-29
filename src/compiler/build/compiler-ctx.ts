@@ -103,7 +103,6 @@ export function resetModule(moduleFile: d.Module) {
   moduleFile.excludeFromCollection = false;
   moduleFile.externalImports.length = 0;
   moduleFile.isCollectionDependency = false;
-  moduleFile.jsFilePath = null;
   moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
 }

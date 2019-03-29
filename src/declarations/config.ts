@@ -113,6 +113,7 @@ export interface StencilConfig {
    */
   srcDir?: string;
 
+  entryComponentsHint?: string[];
   assetVersioning?: ConfigAssetVersioning;
   buildEs5?: boolean;
   buildEsm?: boolean;

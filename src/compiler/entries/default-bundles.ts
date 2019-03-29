@@ -11,11 +11,14 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
   if (userConfigEntryPoints.length > 0) {
     return userConfigEntryPoints;
   }
-  if (!buildCtx.indexDoc) {
+  let entryPointsHints = config.entryComponentsHint;
+  if (!entryPointsHints && buildCtx.indexDoc) {
+    entryPointsHints = getUsedComponents(buildCtx.indexDoc, cmps);
+  }
+  if (!entryPointsHints) {
     return [];
   }
 
-  const entryPointsHints = getUsedComponents(buildCtx.indexDoc, cmps);
   const mainBundle = unduplicate([
     ...entryPointsHints,
     ...flatOne(entryPointsHints
