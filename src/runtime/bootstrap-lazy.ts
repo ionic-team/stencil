@@ -6,6 +6,7 @@ import { convertScopedToShadow, registerStyle } from './styles';
 import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
 import { getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { hmrStart } from './hmr-component';
 import { HTMLElement } from './html-element';
 import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
@@ -78,6 +79,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
           const hostRef = getHostRef(this);
           if (hostRef.$lazyInstance$) {
             postUpdateComponent(this, hostRef);
+          }
+        }
+
+        's-hmr'(hmrVersionId: string) {
+          if (BUILD.hotModuleReplacement) {
+            hmrStart(this, cmpMeta, hmrVersionId);
           }
         }
 

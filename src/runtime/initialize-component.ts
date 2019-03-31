@@ -8,7 +8,7 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 
 
-export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
+export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
@@ -30,7 +30,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(cmpMeta, hostRef);
+        Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
