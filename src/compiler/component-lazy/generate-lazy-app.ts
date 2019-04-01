@@ -14,6 +14,10 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
 
+  if (buildCtx.shouldAbort) {
+    return null;
+  }
+
   await buildCtx.stylesPromise;
 
   const [bundleModules] = await Promise.all([

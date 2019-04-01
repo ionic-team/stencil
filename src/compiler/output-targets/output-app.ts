@@ -21,12 +21,7 @@ export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
   }
 
   copyAssets(config, compilerCtx, buildCtx, outputTargets);
-  // if (cmps.length > MIN_FOR_LAZY_LOAD) {
-  //   return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets, cmps);
-  // } else {
-  //   // we need raw web components
-  //   return generateNativeApp(compilerCtx, buildCtx, cmps);
-  // }
+
   return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets);
 }
 

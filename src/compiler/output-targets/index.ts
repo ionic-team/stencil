@@ -29,5 +29,8 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   await outputModule(config, compilerCtx, buildCtx);
   const bundleModules = await outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
-  await outputWww(config, compilerCtx, buildCtx, bundleModules);
+
+  if (!buildCtx.shouldAbort) {
+    await outputWww(config, compilerCtx, buildCtx, bundleModules);
+  }
 }
