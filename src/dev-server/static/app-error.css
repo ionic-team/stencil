@@ -71,13 +71,18 @@
   border-bottom: 1px solid #ddd;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
-  background-color: #f8f8f8;
+  background-color: #f9f9f9;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
 }
 
+a.dev-server-diagnostic-file-header {
+  color: #0000EE;
+}
+
 a.dev-server-diagnostic-file-header:hover {
   text-decoration: none;
+  background-color: #f4f4f4;
 }
 
 .dev-server-diagnostic-file-name {

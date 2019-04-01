@@ -119,7 +119,7 @@ ${typeData.sort(sortImportNames).map(td => {
   }, '');
 
   const code = `
-import { JSXBase } from '@stencil/core';
+import { JSXBase, JSX } from '@stencil/core';
 
 ${typeImportString}
 ${componentsFileString}

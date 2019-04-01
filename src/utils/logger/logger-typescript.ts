@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { MAX_ERRORS, splitLineBreaks } from './logger-utils';
+import { splitLineBreaks } from './logger-utils';
 import ts from 'typescript';
 
 
@@ -9,7 +9,7 @@ import ts from 'typescript';
  */
 
 export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
-  const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
+  const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {
     resultsDiagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
