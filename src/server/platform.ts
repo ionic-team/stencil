@@ -2,7 +2,7 @@ import * as d from '../declarations';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
-export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef): any => {
+export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
   return new Promise(resolve => {
     resolve(cstrs.get(cmpMeta.$tagName$));
   });
