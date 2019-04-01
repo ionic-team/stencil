@@ -8,9 +8,11 @@ export function polyfillDocumentImplementation(win: any, doc: any) {
     HTMLUnknownElement.getRootNode = getRootNode;
   }
 
-  const CustomEvent = doc.createEvent('CustomEvent').constructor;
-  if (win.CustomEvent !== CustomEvent) {
-      win.CustomEvent = CustomEvent;
+  if (typeof doc.createEvent === 'function') {
+    const CustomEvent = doc.createEvent('CustomEvent').constructor;
+    if (win.CustomEvent !== CustomEvent) {
+        win.CustomEvent = CustomEvent;
+    }
   }
 }
 
