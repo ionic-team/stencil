@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
@@ -36,6 +37,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
         config.sys.rollup.plugins.commonjs({
           sourceMap: false
         }),
+        bundleJson(config),
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
