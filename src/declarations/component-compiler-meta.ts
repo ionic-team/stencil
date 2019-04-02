@@ -211,4 +211,6 @@ export interface ComponentCompilerData {
   exportLine: string;
   filePath: string;
   cmp: d.ComponentCompilerMeta;
+  uniqueComponentClassName?: string;
+  importLine?: string;
 }
