@@ -11,6 +11,7 @@
     "bin/",
     "compiler/",
     "dist/",
+    "internal/",
     "mock-doc/",
     "polyfills/",
     "runtime/",

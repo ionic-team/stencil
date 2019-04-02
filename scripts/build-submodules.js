@@ -9,6 +9,7 @@ const ROOT_DIR = path.join(__dirname, '..');
 // these files are gitignored already
 const SUBMODULES = [
   'compiler',
+  'internal',
   'mock-doc',
   'screenshot',
   'server',

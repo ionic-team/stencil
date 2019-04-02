@@ -20,6 +20,7 @@ dist/
 
 # submodule packages
 /compiler
+/internal
 /mock-doc
 /polyfills
 /server

@@ -12,7 +12,6 @@ export {
   EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSXBase,
   Config as InternalConfig,
   Plugin,
   CompilerCtx,

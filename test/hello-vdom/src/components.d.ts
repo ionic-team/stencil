@@ -5,7 +5,8 @@
  */
 
 
-import { JSXBase } from '@stencil/core';
+import { JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 
 
 
