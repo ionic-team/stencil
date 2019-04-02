@@ -1,4 +1,4 @@
-import { Component } from '../../../../../dist/index';
+import { Component, h } from '@stencil/core';
 
 
 @Component({

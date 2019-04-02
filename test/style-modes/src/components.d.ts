@@ -5,21 +5,15 @@
  */
 
 
-import { JSXElements } from '@stencil/core';
-
+import { JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface AppRoot {}
-  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface ScopedMode {}
-  interface ScopedModeAttributes extends JSXElements.HTMLAttributes {}
-
   interface ShadowMode {}
-  interface ShadowModeAttributes extends JSXElements.HTMLAttributes {}
 }
 
 interface HTMLStencilElement extends HTMLElement {
@@ -27,19 +21,33 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
+declare namespace LocalJSX {
+  interface AppRoot extends JSXBase.HTMLAttributes {}
+  interface ScopedMode extends JSXBase.HTMLAttributes {}
+  interface ShadowMode extends JSXBase.HTMLAttributes {}
+
+  interface ElementInterfaces {
     'AppRoot': Components.AppRoot;
     'ScopedMode': Components.ScopedMode;
     'ShadowMode': Components.ShadowMode;
   }
 
-  interface StencilIntrinsicElements {
-    'app-root': Components.AppRootAttributes;
-    'scoped-mode': Components.ScopedModeAttributes;
-    'shadow-mode': Components.ShadowModeAttributes;
+  interface IntrinsicElements {
+    'AppRoot': LocalJSX.AppRoot;
+    'ScopedMode': LocalJSX.ScopedMode;
+    'ShadowMode': LocalJSX.ShadowMode;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
@@ -58,7 +66,6 @@ declare global {
     prototype: HTMLShadowModeElement;
     new (): HTMLShadowModeElement;
   };
-
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement
     'scoped-mode': HTMLScopedModeElement
@@ -70,5 +77,5 @@ declare global {
     'scoped-mode': HTMLScopedModeElement;
     'shadow-mode': HTMLShadowModeElement;
   }
-
 }
+

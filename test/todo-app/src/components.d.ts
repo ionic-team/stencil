@@ -5,32 +5,18 @@
  */
 
 
-import { JSXElements } from '@stencil/core';
-
+import { JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface AppRoot {}
-  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
-
   interface TodoInput {}
-  interface TodoInputAttributes extends JSXElements.HTMLAttributes {
-    'onInputSubmit'?: (event: CustomEvent<any>) => void;
-  }
-
   interface TodoItem {
     'checked': boolean;
     'index': number;
     'text': string;
-  }
-  interface TodoItemAttributes extends JSXElements.HTMLAttributes {
-    'checked'?: boolean;
-    'index'?: number;
-    'onItemCheck'?: (event: CustomEvent<any>) => void;
-    'onItemRemove'?: (event: CustomEvent<any>) => void;
-    'text'?: string;
   }
 }
 
@@ -39,19 +25,41 @@ interface HTMLStencilElement extends HTMLElement {
   forceUpdate(): void;
 }
 
-declare global {
-  interface StencilElementInterfaces {
+declare namespace LocalJSX {
+  interface AppRoot extends JSXBase.HTMLAttributes {}
+  interface TodoInput extends JSXBase.HTMLAttributes {
+    'onInputSubmit'?: (event: CustomEvent<any>) => void;
+  }
+  interface TodoItem extends JSXBase.HTMLAttributes {
+    'checked'?: boolean;
+    'index'?: number;
+    'onItemCheck'?: (event: CustomEvent<any>) => void;
+    'onItemRemove'?: (event: CustomEvent<any>) => void;
+    'text'?: string;
+  }
+
+  interface ElementInterfaces {
     'AppRoot': Components.AppRoot;
     'TodoInput': Components.TodoInput;
     'TodoItem': Components.TodoItem;
   }
 
-  interface StencilIntrinsicElements {
-    'app-root': Components.AppRootAttributes;
-    'todo-input': Components.TodoInputAttributes;
-    'todo-item': Components.TodoItemAttributes;
+  interface IntrinsicElements {
+    'AppRoot': LocalJSX.AppRoot;
+    'TodoInput': LocalJSX.TodoInput;
+    'TodoItem': LocalJSX.TodoItem;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
@@ -70,7 +78,6 @@ declare global {
     prototype: HTMLTodoItemElement;
     new (): HTMLTodoItemElement;
   };
-
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement
     'todo-input': HTMLTodoInputElement
@@ -82,5 +89,5 @@ declare global {
     'todo-input': HTMLTodoInputElement;
     'todo-item': HTMLTodoItemElement;
   }
-
 }
+

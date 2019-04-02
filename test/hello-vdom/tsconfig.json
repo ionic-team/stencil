@@ -21,7 +21,7 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../dist/index"],
+      "@stencil/core": ["../../dist"],
       "@stencil/core/internal": ["../../internal"]
     }
   }

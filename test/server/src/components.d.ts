@@ -5,31 +5,45 @@
  */
 
 
-import '@stencil/core';
-
+import { JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 
 
 
 export namespace Components {
-
   interface AppRoot {}
-  interface AppRootAttributes extends StencilHTMLAttributes {}
-
   interface CurrentDate {}
-  interface CurrentDateAttributes extends StencilHTMLAttributes {}
 }
 
-declare global {
-  interface StencilElementInterfaces {
+interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
+
+declare namespace LocalJSX {
+  interface AppRoot extends JSXBase.HTMLAttributes {}
+  interface CurrentDate extends JSXBase.HTMLAttributes {}
+
+  interface ElementInterfaces {
     'AppRoot': Components.AppRoot;
     'CurrentDate': Components.CurrentDate;
   }
 
-  interface StencilIntrinsicElements {
-    'app-root': Components.AppRootAttributes;
-    'current-date': Components.CurrentDateAttributes;
+  interface IntrinsicElements {
+    'AppRoot': LocalJSX.AppRoot;
+    'CurrentDate': LocalJSX.CurrentDate;
   }
+}
+export { LocalJSX as JSX };
 
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
+declare global {
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
@@ -42,7 +56,6 @@ declare global {
     prototype: HTMLCurrentDateElement;
     new (): HTMLCurrentDateElement;
   };
-
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement
     'current-date': HTMLCurrentDateElement
@@ -52,14 +65,5 @@ declare global {
     'app-root': HTMLAppRootElement;
     'current-date': HTMLCurrentDateElement;
   }
-
-
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
-
 }
+

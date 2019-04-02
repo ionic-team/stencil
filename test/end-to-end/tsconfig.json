@@ -24,7 +24,8 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core/testing": ["../../src/testing/index.ts"],
-      "@stencil/core": ["../../dist"]
+      "@stencil/core": ["../../dist"],
+      "@stencil/core/internal": ["../../internal"]
     }
   }
 }
