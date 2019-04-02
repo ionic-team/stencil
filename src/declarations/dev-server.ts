@@ -23,7 +23,7 @@ export interface DevServerConfig {
   port?: number;
   protocol?: 'http' | 'https';
   root?: string;
-  ssl?: DevServerSSLConfig;
+  ssl?: () => Promise<DevServerSSLConfig>;
   websocket?: boolean;
 }
 
@@ -34,8 +34,8 @@ export interface DevServerStartResponse {
 }
 
 export interface DevServerSSLConfig {
-  certPath?: string;
-  keyPath?: string;
+  cert?: string | Buffer | Array<string | Buffer>;
+  key?: string | Buffer | Array<Buffer | Object>;
 }
 
 
