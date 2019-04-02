@@ -29,7 +29,7 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
 }
 
 function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
-  if (!buildCtx.indexDoc) {
+  if (!buildCtx.indexDoc || !bundleModules) {
     return [];
   }
   return unique(
