@@ -23,10 +23,11 @@ export interface DevServerConfig {
   port?: number;
   protocol?: 'http' | 'https';
   root?: string;
-  ssl?: () => Promise<DevServerSSLConfig>;
+  ssl?: DevServerGetSSL | DevServerSSLConfig;
   websocket?: boolean;
 }
 
+export type DevServerGetSSL = () => Promise<DevServerSSLConfig>;
 
 export interface DevServerStartResponse {
   browserUrl?: string;

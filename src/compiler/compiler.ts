@@ -82,6 +82,10 @@ export class Compiler implements d.Compiler {
       throw new Error(`Dev Server only availabe in node`);
     }
 
+    if (this.config.devServer && this.config.devServer.ssl && typeof this.config.devServer.ssl !== 'object') {
+      this.config.devServer.ssl = await this.config.devServer.ssl();
+    }
+
     // start up the dev server
     const devServer = await startDevServerMain(this.config, this.ctx);
 
