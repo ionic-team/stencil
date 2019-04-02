@@ -85,26 +85,24 @@ h2 {
 
   <h1>Update src/index.html</h1>
 
-  <p>Stencil recently changed the way it is imported in order to improve performance.</p>
-  <p>Previ</p>
-
+  <p>Stencil recently changed how scripts are loaded in order to improve performance.</p>
 
   <h2>BEFORE:</h2>
-  <p>Previously, a single ".js" loader was loaded.</p>
+  <p>Previously, a single ".js" loader script was used.</p>
   <pre>
-    <code>${escapeHtml(`
-<script src="build/${config.fsNamespace}.js"></script>
+    <code>${escapeHtml(`<script src="build/${config.fsNamespace}.js"></script>
 `)}</code>
   </pre>
 
   <h2>AFTER:</h2>
-  <p>Currently, developers need to include to scripts, but only one will be loaded, based in the native support for ES Modules</p>
+  <p>The index.html should now include two scripts using the modern ES Module script pattern.
+  Note that only one file will actually be requested and loaded based on the browser's native support for ES Modules.
+  For more info, please see <a href="https://developers.google.com/web/fundamentals/primers/modules#browser" target="_blank">Using JavaScript modules on the web</a>.
+  </p>
   <pre>
-    <code>${escapeHtml(`
-<script type="module" src="build/${config.fsNamespace}.mjs.js"></script>
-<script nomodule src="build/${config.fsNamespace}.js"></script>
-`)}</code>
-  </pre>
+  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="build/${config.fsNamespace}<span style="background:yellow">.mjs</span>.js"${escapeHtml(`></script>`)}
+  ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="build/${config.fsNamespace}.js"></script>`)}</code>
+    </pre>
   `;
   const script = `
     function supportsDynamicImports() {
