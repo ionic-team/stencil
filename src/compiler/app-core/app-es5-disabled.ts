@@ -88,13 +88,13 @@ h2 {
   <p>Stencil recently changed how scripts are loaded in order to improve performance.</p>
 
   <h2>BEFORE:</h2>
-  <p>Previously, a single ".js" loader script was used.</p>
+  <p>Previously, a single script was included that handled loading the correct JavaScript based on browser support.</p>
   <pre>
     <code>${escapeHtml(`<script src="build/${config.fsNamespace}.js"></script>
 `)}</code>
   </pre>
 
-  <h2>AFTER:</h2>
+  <h2 style="margin-top:0">AFTER:</h2>
   <p>The index.html should now include two scripts using the modern ES Module script pattern.
   Note that only one file will actually be requested and loaded based on the browser's native support for ES Modules.
   For more info, please see <a href="https://developers.google.com/web/fundamentals/primers/modules#browser" target="_blank">Using JavaScript modules on the web</a>.
