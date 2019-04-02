@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError, cleanDiagnostics, hasError } from '@utils';
+import { catchError, hasError, normalizeDiagnostics } from '@utils';
 import { BuildContext } from '../build/build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
 import { plugin as docsPlugin } from '../output-plugins/docs';
@@ -31,7 +31,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   }
 
   // finalize phase
-  buildCtx.diagnostics = cleanDiagnostics(buildCtx.diagnostics);
+  buildCtx.diagnostics = normalizeDiagnostics(compilerCtx, buildCtx.diagnostics);
   config.logger.printDiagnostics(buildCtx.diagnostics, config.rootDir);
 
   // create a nice pretty message stating what happend

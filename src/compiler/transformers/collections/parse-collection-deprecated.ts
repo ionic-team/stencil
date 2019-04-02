@@ -15,7 +15,7 @@ export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.Compi
 
 function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
-  const moduleFile = getModule(compilerCtx, sourceFilePath);
+  const moduleFile = getModule(config, compilerCtx, sourceFilePath);
 
   moduleFile.isCollectionDependency = true;
   moduleFile.isLegacy = true;
@@ -189,7 +189,7 @@ function parseAssetsDir(config: d.Config, collectionDir: string, cmpData: d.Comp
         config.sys.path.dirname(cmpData.componentPath),
         assetsPath
       )),
-      originalCollectionPath: normalizePath(assetsPath)
+      originalComponentPath: normalizePath(assetsPath)
     };
     return assetsMeta;
 
@@ -223,7 +223,6 @@ function parseStyle(config: d.Config, collectionDir: string, cmpData: d.Componen
           config.sys.path.dirname(cmpData.componentPath),
           stylePath
         )),
-        originalCollectionPath: stylePath,
         originalComponentPath: stylePath
       };
 
@@ -254,7 +253,7 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
       type,
       internal: false,
       complexType: {
-        original: type,
+        original: type === 'unknown' ? 'any' : type,
         resolved: type,
         references: {},
       },
@@ -284,7 +283,7 @@ function parseConnectProps(cmpData: d.ComponentDataDeprecated) {
   });
 }
 
-function parseContextProps(cmpData: d.ComponentDataDeprecated) {
+function parseContextProps(cmpData: d.ComponentDataDeprecated): d.ComponentCompilerLegacyContext[] {
   const contextData = cmpData.context;
 
   if (invalidArrayData(contextData)) {
@@ -292,11 +291,10 @@ function parseContextProps(cmpData: d.ComponentDataDeprecated) {
   }
 
   return contextData.map(propData => {
-    const prop: d.ComponentCompilerLegacyContext = {
+    return {
       name: propData.name,
       context: propData.id
     };
-    return prop;
   });
 }
 
@@ -362,13 +360,13 @@ function parseMethods(cmpData: d.ComponentDataDeprecated) {
       name: methodData.name,
       internal: false,
       complexType: {
-        signature: '',
+        signature: '(...args: any[]) => Promise<any>',
         parameters: [],
-        return: 'TODO',
+        return: 'Promise<any>',
         references: {}
       },
       docs: {
-        text: 'TODO',
+        text: '',
         tags: []
       }
     };
@@ -447,12 +445,12 @@ function parseEvents(cmpData: d.ComponentDataDeprecated) {
       composed: (eventData.composed !== false),
       internal: false,
       docs: {
-        text: 'TODO',
+        text: '',
         tags: []
       },
       complexType: {
-        original: 'TODO',
-        resolved: 'TODO',
+        original: 'any',
+        resolved: 'any',
         references: {}
       }
     };

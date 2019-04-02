@@ -2,14 +2,13 @@ import * as d from '../../declarations';
 import { bundleHydrateCore } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
-import { getComponentsFromModules } from '../output-targets/output-utils';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
   try {
-    const cmps = getComponentsFromModules(buildCtx.moduleFiles);
+    const cmps = buildCtx.components;
     const build = getBuildConditionals(config, cmps);
     const coreSource = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
     const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, coreSource);
@@ -45,13 +44,11 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
 
   coreText.push(`import { registerComponents, styles } from '@stencil/core/platform';`);
 
-  hydrateCmps.forEach(cmpData => {
-    coreText.push(`import { ${cmpData.cmp.componentClassName} } from '${cmpData.filePath}';`);
-  });
+  hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
 
   coreText.push(`const cmps = [`);
   hydrateCmps.forEach(cmpData => {
-    coreText.push(`  ${cmpData.cmp.componentClassName},`);
+    coreText.push(`  ${cmpData.uniqueComponentClassName},`);
   });
   coreText.push(`];`);
   coreText.push(`registerComponents(cmps);`);

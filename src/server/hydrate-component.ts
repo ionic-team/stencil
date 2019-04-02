@@ -1,82 +1,57 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
+import { connectedCallback, getComponent, registerHost } from '@platform';
+import { proxyHostElement } from './proxy-host-element';
 
 
 export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
   const Cstr = getComponent(tagName);
 
   if (Cstr != null) {
-    if (opts.collectComponents) {
-      const depth = getNodeDepth(elm);
+    const cmpMeta = Cstr.cmpMeta;
 
-      const cmp = results.components.find(c => c.tag === tagName);
-      if (cmp) {
-        cmp.count++;
-        if (depth > cmp.depth) {
-          cmp.depth = depth;
+    if (cmpMeta != null) {
+      if (opts.collectComponents) {
+        const depth = getNodeDepth(elm);
+
+        const cmp = results.components.find(c => c.tag === tagName);
+        if (cmp) {
+          cmp.count++;
+          if (depth > cmp.depth) {
+            cmp.depth = depth;
+          }
+
+        } else {
+          results.components.push({
+            tag: tagName,
+            count: 1,
+            depth: depth
+          });
+        }
+      }
+      if (results.hydratedCount >= opts.maxHydrateCount) {
+        return;
+      }
+      results.hydratedCount++;
+
+      const hydratePromise = new Promise(async resolve => {
+        try {
+          registerHost(elm);
+          proxyHostElement(elm, cmpMeta);
+          connectedCallback(elm, cmpMeta);
+
+          await elm.componentOnReady();
+
+        } catch (e) {
+          catchError(results.diagnostics, e);
         }
 
-      } else {
-        results.components.push({
-          tag: tagName,
-          count: 1,
-          depth: depth
-        });
-      }
-    }
+        resolve();
+      });
 
-    try {
-      registerHost(elm);
-
-      if (typeof elm.componentOnReady !== 'function') {
-        elm.componentOnReady = function() {
-          return getHostRef(this).$onReadyPromise$;
-        };
-      }
-      if (typeof elm.forceUpdate !== 'function') {
-        elm.forceUpdate = forceUpdate;
-      }
-
-      waitPromises.push(elm.componentOnReady());
-
-      initializePropertiesFromAttributes(elm, Cstr.cmpMeta);
-
-      connectedCallback(elm, Cstr.cmpMeta);
-
-    } catch (e) {
-      catchError(results.diagnostics, e);
+      waitPromises.push(hydratePromise);
     }
   }
-}
-
-
-function initializePropertiesFromAttributes(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
-  if (cmpMeta.m == null) {
-    return;
-  }
-
-  const hostRef = getHostRef(elm);
-
-  Object.entries(cmpMeta.m)
-    .filter(([_, m]) => m[0])
-    .forEach(([propName, m]) => {
-      const attributeName = (m[1] || propName);
-
-      const attrValue = elm.getAttribute(attributeName);
-      if (attrValue != null) {
-        const propValue = (attrValue === null && typeof (elm as any)[propName] === 'boolean')
-        ? false
-        : attrValue;
-
-        hostRef.$instanceValues$.set(propName, propValue);
-      }
-    });
-}
-
-
-function forceUpdate(this: d.HostElement) {
-  //
 }
 
 

@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
@@ -32,9 +33,15 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           include: 'node_modules/**',
           sourceMap: false
         }),
+        bundleJson(config),
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
+      treeshake: {
+        annotations: true,
+        propertyReadSideEffects: false,
+        pureExternalModules: false
+      },
       cache: bundleCoreOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
@@ -67,6 +74,7 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
       code: chunk.code,
       moduleFormat: options.format,
       entryKey: chunk.name,
+      imports: chunk.imports,
       isEntry: !!chunk.isEntry,
       isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
       isCore: !chunk.isEntry && chunk.name === config.fsNamespace,

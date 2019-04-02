@@ -8,7 +8,7 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 
 
-export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, Cstr?: d.ComponentConstructor) => {
+export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_STATE.hasInitializedComponent)) {
     // we haven't initialized this element yet
@@ -19,7 +19,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
-      hostRef.$modeName$ = typeof (cmpMeta as d.ComponentLazyRuntimeMeta).$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
+      hostRef.$modeName$ = typeof cmpMeta.$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
     }
     if (BUILD.hydrateServerSide && hostRef.$modeName$) {
       elm.setAttribute('s-mode', hostRef.$modeName$);
@@ -30,12 +30,15 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       try {
         // request the component's implementation to be
         // wired up with the host element
-        Cstr = await loadModule(cmpMeta, hostRef);
+        Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
 
         if (BUILD.member && !Cstr.isProxied) {
           // we'eve never proxied this Constructor before
           // let's add the getters/setters to its prototype before
           // the first time we create an instance of the implementation
+          if (BUILD.watchCallback) {
+            cmpMeta.$watchers$ = Cstr.watchers;
+          }
           proxyComponent(Cstr, cmpMeta, 0, 1);
           Cstr.isProxied = true;
         }
@@ -63,7 +66,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
       // this component has styles but we haven't registered them yet
-      registerStyle(getScopeId(cmpMeta.t, hostRef.$modeName$), Cstr.style);
+      registerStyle(getScopeId(cmpMeta.$tagName$, hostRef.$modeName$), Cstr.style);
       Cstr.isStyleRegistered = true;
     }
   }

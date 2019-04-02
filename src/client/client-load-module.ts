@@ -4,7 +4,7 @@ import { consoleError } from './client-log';
 import { supportsShadowDom } from './client-window';
 
 
-export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostRef, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
+export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
   // loadModuleImport
   const bundleId = (BUILD.mode && typeof cmpMeta.$lazyBundleIds$ !== 'string')
     ? cmpMeta.$lazyBundleIds$[hostRef.$modeName$]
@@ -21,5 +21,5 @@ export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, hostRef: d.HostR
     /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
     /* webpackMode: "lazy" */
     url
-  ).then(importedModule => importedModule[cmpMeta.t.replace(/-/g, '_')], consoleError);
+  ).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
 };

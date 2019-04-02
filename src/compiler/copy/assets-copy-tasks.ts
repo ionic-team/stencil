@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildCtx, dest: string, allAssets: boolean) {
+export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
   if (buildCtx.skipAssetsCopy || !dest) {
     return [];
   }
@@ -10,22 +10,31 @@ export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildC
   // get a list of all the directories to copy
   // these paths should be absolute
   const copyTasks: d.CopyTask[] = [];
+  const cmps = buildCtx.components;
 
-  buildCtx.entryModules.forEach(entryModule => {
-    entryModule.cmps.forEach(cmp => {
-      if (
-        (cmp.assetsDirs != null && cmp.assetsDirs.length > 0) &&
-        (allAssets || (!cmp.excludeFromCollection && !cmp.isCollectionDependency))) {
-
+  cmps
+    .filter(cmp => cmp.assetsDirs != null && cmp.assetsDirs.length > 0)
+    .forEach(cmp => {
+      if (!collectionsPath) {
         cmp.assetsDirs.forEach(assetsMeta => {
           copyTasks.push({
             src: assetsMeta.absolutePath,
             dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath)
           });
         });
+      } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
+        cmp.assetsDirs.forEach(assetsMeta => {
+          const collectionDirDestination = config.sys.path.join(
+            dest,
+            config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+          );
+          copyTasks.push({
+            src: assetsMeta.absolutePath,
+            dest: collectionDirDestination
+          });
+        });
       }
     });
-  });
 
   buildCtx.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);
 

@@ -68,7 +68,7 @@ export class CompilerContext implements d.CompilerCtx {
 }
 
 
-export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -76,15 +76,16 @@ export function getModule(compilerCtx: d.CompilerCtx, sourceFilePath: string) {
     return moduleFile;
 
   } else {
+    const p = config.sys.path.parse(sourceFilePath);
     const moduleFile: d.Module = {
       sourceFilePath: sourceFilePath,
+      jsFilePath: config.sys.path.join(p.dir, p.name + '.js'),
       cmps: [],
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,
       externalImports: [],
       isCollectionDependency: false,
-      jsFilePath: null,
       localImports: [],
       isLegacy: false,
       originalCollectionComponentPath: null
@@ -102,7 +103,6 @@ export function resetModule(moduleFile: d.Module) {
   moduleFile.excludeFromCollection = false;
   moduleFile.externalImports.length = 0;
   moduleFile.isCollectionDependency = false;
-  moduleFile.jsFilePath = null;
   moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
 }

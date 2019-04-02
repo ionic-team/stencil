@@ -1,8 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_HOST_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
-import { getDoc } from '@platform';
+import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
+import { getDoc, plt } from '@platform';
 import { toLowerCase } from '@utils';
 
 
@@ -10,40 +9,43 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
   const slotNodes: RenderNodeData[] = [];
-  const orgLocationNodes: RenderNodeData[] = [];
   const shadowRootNodes: d.RenderNode[] = (BUILD.shadowDom && shadowRoot ? [] : null);
   const vnode: d.VNode = hostRef.$vnode$ = {
     $flags$: 0,
     $tag$: tagName
   };
 
-  hostElm[HYDRATE_HOST_ID] = hostId;
-  hostElm.removeAttribute(HYDRATE_HOST_ID);
-  hostElm.classList.add('hydrated');
+  if (!plt.$orgLocNodes$) {
+    initializeDocumentHydrate(getDoc(hostElm).body, plt.$orgLocNodes$ = new Map());
+  }
 
-  clientHydrate(vnode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, hostElm, hostId);
+  hostElm[HYDRATE_ID] = hostId;
+  hostElm.removeAttribute(HYDRATE_ID);
+
+  clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
   childRenderNodes.forEach(c => {
-    const orgLocationNode = orgLocationNodes.find(o => o.$hostId$ === c.$hostId$ && o.$nodeId$ === c.$nodeId$);
-
+    const orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
+    const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
-    if (BUILD.shadowDom && shadowRoot) {
-      if (orgLocationNode && c.$hostId$ === '0') {
-        orgLocationNode.$elm$.parentNode.insertBefore(
-          node,
-          orgLocationNode.$elm$.nextSibling
-        );
-      }
+    if (orgLocationNode && c.$hostId$ === '0') {
+      orgLocationNode.parentNode.insertBefore(
+        node,
+        orgLocationNode.nextSibling
+      );
+    }
 
-    } else {
+    if (!shadowRoot) {
       node['s-hn'] = tagName;
 
       if (orgLocationNode) {
-        node['s-ol'] = orgLocationNode.$elm$;
+        node['s-ol'] = orgLocationNode;
         node['s-ol']['s-nr'] = node;
       }
     }
+
+    plt.$orgLocNodes$.delete(orgLocationId);
   });
 
   if (BUILD.shadowDom && shadowRoot) {
@@ -59,7 +61,6 @@ const clientHydrate = (
   parentVNode: d.VNode,
   childRenderNodes: RenderNodeData[],
   slotNodes: RenderNodeData[],
-  orgLocationNodes: RenderNodeData[],
   shadowRootNodes: d.RenderNode[],
   hostElm: d.HostElement,
   node: d.RenderNode,
@@ -109,16 +110,17 @@ const clientHydrate = (
       }
     }
 
-    if (node.shadowRoot) {
-      // keep drilling down through the shadow root nodes
-      for (let i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
-        clientHydrate(parentVNode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
-      }
+    // recursively drill down, end to start so we can remove nodes
+    let i = node.childNodes.length - 1;
+    for (; i >= 0; i--) {
+      clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
     }
 
-    // recursively drill down, end to start so we can remove nodes
-    for (let i = node.childNodes.length - 1; i >= 0; i--) {
-      clientHydrate(parentVNode, childRenderNodes, slotNodes, orgLocationNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
+    if (node.shadowRoot) {
+      // keep drilling down through the shadow root nodes
+      for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
+        clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
+      }
     }
 
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
@@ -155,10 +157,6 @@ const clientHydrate = (
             shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
           }
         }
-
-      } else if (childNodeType === ORG_LOCATION_ID) {
-        // `${ORG_LOCATION_ID}.${hostId}.${nodeId}`
-        orgLocationNodes.push(childVNode);
 
       } else if (childVNode.$hostId$ === hostId) {
         // this comment node is specifcally for this host id
@@ -219,12 +217,25 @@ const clientHydrate = (
 };
 
 
-export const convertToShadowCss = (styleElm: HTMLStyleElement) => {
-  registerStyle(
-    styleElm.getAttribute('h-id'),
-    convertScopedToShadow(styleElm.innerHTML)
-  );
-  styleElm.remove();
+export const initializeDocumentHydrate = (node: d.HostElement, rootOriginalLocations: Map<string, any>) => {
+  if (node.nodeType === NODE_TYPE.ElementNode) {
+    let i = 0;
+    for (; i < node.childNodes.length; i++) {
+      initializeDocumentHydrate(node.childNodes[i] as any, rootOriginalLocations);
+    }
+    if (node.shadowRoot) {
+      for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
+        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, rootOriginalLocations);
+      }
+    }
+
+  } else if (node.nodeType === NODE_TYPE.CommentNode) {
+    const childIdSplt = node.nodeValue.split('.');
+    if (childIdSplt[0] === ORG_LOCATION_ID) {
+      rootOriginalLocations.set(childIdSplt[1] + '.' + childIdSplt[2], node);
+      node.nodeValue = '';
+    }
+  }
 };
 
 

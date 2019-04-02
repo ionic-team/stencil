@@ -27,7 +27,7 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 
 
 export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const moduleAbs = config.sys.path.join(outputTarget.dir, 'esm', 'es5', 'index.js');
+  const moduleAbs = config.sys.path.join(outputTarget.dir, 'index.mjs');
   const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
   if (typeof pkgData.module !== 'string') {

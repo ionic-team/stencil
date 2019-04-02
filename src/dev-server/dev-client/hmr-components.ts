@@ -10,7 +10,7 @@ export function hmrComponents(elm: Element, versionId: string, hmrTagNames: stri
   });
 
   if (updatedTags.length > 0) {
-    logBuild(`Updated components: ${updatedTags.sort().join(', ')}`);
+    logBuild(`Updated component${updatedTags.length > 1 ? 's' : ''}: ${updatedTags.sort().join(', ')}`);
   }
 }
 

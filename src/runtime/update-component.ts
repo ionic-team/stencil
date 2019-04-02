@@ -3,6 +3,7 @@ import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { consoleError, plt, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
+import { HYDRATED_CLASS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
@@ -114,10 +115,10 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {
       hostRef.$stateFlags$ |= HOST_STATE.hasLoadedComponent;
 
-      if (BUILD.lazyLoad && BUILD.style) {
+      if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.style) {
         // DOM WRITE!
         // add the css class that this element has officially hydrated
-        elm.classList.add('hydrated');
+        elm.classList.add(HYDRATED_CLASS);
       }
 
       if (BUILD.cmpDidLoad && instance.componentDidLoad) {
@@ -132,7 +133,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       // on appload
       if (!ancestorComponent) {
         // we have finish the first big initial render
-        plt.$queueAsync$ = true;
+        elm.ownerDocument.documentElement.classList.add('hydrated');
+        setTimeout(() => plt.$queueAsync$ = true, 1000);
         emitLifecycleEvent(elm, 'appload');
       }
     } else {

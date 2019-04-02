@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
-import { sortBy } from '@utils';
+import { dashToPascalCase, sortBy, toTitleCase } from '@utils';
 import { transformToHydrateComponentText } from '../transformers/component-hydrate/tranform-to-hydrate-component';
 
 
@@ -25,8 +25,20 @@ async function updateToHydrateComponent(config: d.Config, compilerCtx: d.Compile
   const cmpData: d.ComponentCompilerData = {
     filePath: outputFilePath,
     exportLine: ``,
-    cmp: cmp
+    cmp: cmp,
+    uniqueComponentClassName: ``,
+    importLine: ``
   };
+
+  const pascalCasedClassName = dashToPascalCase(toTitleCase(cmp.tagName));
+
+  if (cmp.componentClassName !== pascalCasedClassName) {
+    cmpData.uniqueComponentClassName = pascalCasedClassName;
+    cmpData.importLine = `import { ${cmp.componentClassName} as ${cmpData.uniqueComponentClassName} } from '${cmpData.filePath}';`;
+  } else {
+    cmpData.uniqueComponentClassName = cmp.componentClassName;
+    cmpData.importLine = `import { ${cmpData.uniqueComponentClassName} } from '${cmpData.filePath}';`;
+  }
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {

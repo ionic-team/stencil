@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { getDoc, getWin, supportsListenerOptions } from '@platform';
+import { consoleError, getDoc, getWin, supportsListenerOptions } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
 
 export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
@@ -21,7 +21,7 @@ const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
         // instance is ready, let's call it's member method for this event
         return hostRef.$lazyInstance$[methodName](ev);
       } else {
-        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev));
+        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(consoleError);
       }
     } else {
       return (hostRef.$hostElement$ as any)[methodName](ev);

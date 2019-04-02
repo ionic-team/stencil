@@ -15,7 +15,7 @@ export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase(
 
 export const noop = (): any => { /* noop*/ };
 
-export function sortBy<T>(array: T[], prop: ((item: T) => string)) {
+export function sortBy<T>(array: T[], prop: ((item: T) => string | number)) {
   return array.slice().sort((a, b) => {
     const nameA = prop(a);
     const nameB = prop(b);
@@ -35,10 +35,13 @@ export function flatOne<T>(array: T[][]): T[] {
   }, [] as T[]);
 }
 
-export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
+export function unique<T>(array: T[], predicate: (item: T) => any = (i) => i): T[] {
   const set = new Set();
   return array.filter(item => {
     const key = predicate(item);
+    if (key == null) {
+      return true;
+    }
     if (set.has(key)) {
       return false;
     }
@@ -47,12 +50,14 @@ export function unduplicate<T>(array: T[], predicate: (item: T) => any): T[] {
   });
 }
 
-export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string) {
+export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string, addPrefix = true) {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
-  if (relativePath === '') {
-    relativePath = '.';
-  } else if (relativePath[0] !== '.') {
-    relativePath = './' + relativePath;
+  if (addPrefix) {
+    if (relativePath === '') {
+      relativePath = '.';
+    } else if (relativePath[0] !== '.') {
+      relativePath = './' + relativePath;
+    }
   }
   return normalizePath(`${relativePath}/${config.sys.path.basename(pathTo, ext)}`);
 }

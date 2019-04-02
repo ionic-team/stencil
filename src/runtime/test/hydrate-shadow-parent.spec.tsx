@@ -50,13 +50,13 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <div>
             <slot></slot>
           </div>
         </shadow-root>
-        <!--o.0.1-->
+        <!---->
         middle
       </cmp-a>
     `);
@@ -110,13 +110,13 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           top
           <slot></slot>
           bottom
         </shadow-root>
-        <!--o.0.1-->
+        <!---->
         middle
       </cmp-a>
     `);
@@ -162,7 +162,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           shadow-text
         </shadow-root>
@@ -215,7 +215,7 @@ describe('hydrate, shadow parent', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <div>
             <slot></slot>
@@ -275,11 +275,11 @@ describe('hydrate, shadow parent', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
-          <cmp-b class="hydrated">
+          <cmp-b>
             <!--r.2-->
-            <!--o.1.1-->
+            <!---->
             <!--s.2.0.0.0.-->
             cmp-a-light-dom
           </cmp-b>
@@ -344,7 +344,7 @@ describe('hydrate, shadow parent', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <section>
             <slot name="start"></slot>
@@ -356,9 +356,102 @@ describe('hydrate, shadow parent', () => {
             <slot name="end"></slot>
           </section>
         </shadow-root>
-        <!--o.0.1-->
+        <!---->
         Title
       </cmp-a>
+    `);
+  });
+
+  it('root level component, nested shadow slot', async () => {
+    @Component({ tag: 'ion-tab-button', shadow: true })
+    class TabButton {
+      render() {
+        return (
+          <Host>
+            <a>
+              <slot></slot>
+              <ion-ripple-effect></ion-ripple-effect>
+            </a>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'ion-badge', shadow: true })
+    class Badge {
+      render() {
+        return (
+          <Host>
+            <slot></slot>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'ion-ripple-effect', shadow: true })
+    class RippleEffect {
+      render() {
+        return (
+          <Host></Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [Badge, RippleEffect, TabButton],
+      html: `
+        <ion-tab-button>
+          <ion-badge>root-text</ion-badge>
+        </ion-tab-button>
+      `,
+      hydrateServerSide: true
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <ion-tab-button s-id="1">
+        <!--r.1-->
+        <!--o.0.2-->
+        <a c-id="1.0.0.0">
+          <!--s.1.1.1.0.-->
+          <ion-badge c-id="0.2" s-id="2">
+            <!--r.2-->
+            <!--o.0.4-->
+            <!--s.2.0.0.0.-->
+            <!--t.0.4-->
+            root-text
+          </ion-badge>
+          <ion-ripple-effect c-id="1.2.1.1" s-id="3">
+            <!--r.3-->
+          </ion-ripple-effect>
+        </a>
+      </ion-tab-button>
+    `);
+
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [Badge, RippleEffect, TabButton],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+      serializedShadowDom: true
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <ion-tab-button>
+        <shadow-root>
+          <a>
+            <slot></slot>
+            <ion-ripple-effect>
+              <shadow-root>
+              </shadow-root>
+            </ion-ripple-effect>
+          </a>
+        </shadow-root>
+        <!---->
+        <ion-badge>
+          <shadow-root>
+            <slot></slot>
+          </shadow-root>
+          <!---->
+          root-text
+        </ion-badge>
+      </ion-tab-button>
     `);
   });
 

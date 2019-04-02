@@ -11,6 +11,10 @@ export const config: Config = {
     }
   ],
 
-  enableCache: false
+  enableCache: false,
+
+  devServer: {
+    logRequests: true
+  }
 
 };

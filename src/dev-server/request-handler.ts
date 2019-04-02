@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { isDevClient } from './dev-server-utils';
+import { isDevClient, sendMsg } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';
@@ -19,11 +19,32 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
 
       if (req.url === '') {
         res.writeHead(302, { 'location': '/' });
+
+        if (devServerConfig.logRequests) {
+          sendMsg(process, {
+            requestLog: {
+              method: req.method,
+              url: req.url,
+              status: 302
+            }
+          });
+        }
+
         return res.end();
       }
 
       if (!req.url.startsWith(devServerConfig.baseUrl)) {
-        return serve404Content(res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
+        if (devServerConfig.logRequests) {
+          sendMsg(process, {
+            requestLog: {
+              method: req.method,
+              url: req.url,
+              status: 404
+            }
+          });
+        }
+
+        return serve404Content(devServerConfig, req, res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
       }
 
       if (isDevClient(req.pathname)) {
@@ -59,7 +80,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
       return serve404(devServerConfig, fs, req, res);
 
     } catch (e) {
-      return serve500(res, e);
+      return serve500(devServerConfig, incomingReq as any, res, e);
     }
   };
 }

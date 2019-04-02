@@ -265,14 +265,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
     if (outputFilePath.endsWith('.js')) {
       // this is the JS output of the typescript file transpiling
-      const moduleFile = getModule(ctx.compilerCtx, sourceFilePath);
-      moduleFile.jsFilePath = outputFilePath;
-
-      moduleFile.cmps.forEach(cmp => {
-        cmp.jsFilePath = outputFilePath;
-        cmp.sourceFilePath = sourceFilePath;
-      });
-
+      const moduleFile = getModule(config, ctx.compilerCtx, sourceFilePath);
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
           addCollection(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);

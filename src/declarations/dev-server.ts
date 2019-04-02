@@ -19,6 +19,7 @@ export interface DevServerConfig {
   historyApiFallback?: HistoryApiFallback;
   hotReplacement?: boolean;
   initialLoadUrl?: string;
+  logRequests?: boolean;
   openBrowser?: boolean;
   port?: number;
   protocol?: 'http' | 'https';
@@ -72,6 +73,11 @@ export interface DevServerMessage {
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
   isActivelyBuilding?: boolean;
+  requestLog?: {
+    method: string;
+    url: string;
+    status: number;
+  };
 }
 
 

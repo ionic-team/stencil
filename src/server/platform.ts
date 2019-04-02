@@ -2,24 +2,21 @@ import * as d from '../declarations';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
-export const loadModule = (cmpMeta: d.ComponentLazyRuntimeMeta, _hostRef: d.HostRef): any => {
+export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
   return new Promise(resolve => {
-    resolve(cstrs.get(cmpMeta.t));
+    resolve(cstrs.get(cmpMeta.$tagName$));
   });
 };
-
 
 export const getComponent = (tagName: string) => {
   return cstrs.get(tagName);
 };
 
-
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   Cstrs.forEach(Cstr => {
-    cstrs.set(Cstr.cmpMeta.t, Cstr);
+    cstrs.set(Cstr.cmpMeta.$tagName$, Cstr);
   });
 };
-
 
 export const getDoc = (elm?: Node) => {
   if (elm != null) {
@@ -47,17 +44,21 @@ export const getHead = (elm?: Node) => {
   return null;
 };
 
-export const readTask = (cb: Function) => cb();
-
-export const writeTask = (cb: Function) => cb();
-
-export const tick = {
-  then(cb: Function) {
-    cb();
-  }
+export const readTask = (cb: Function) => {
+  process.nextTick(cb);
 };
 
-export const consoleError = (e: any) => console.error(e);
+export const writeTask = (cb: Function) => {
+  process.nextTick(cb);
+};
+
+export const tick = Promise.resolve();
+
+export const consoleError = (e: any) => {
+  if (e != null) {
+    console.error(e.stack || e.message || e);
+  }
+};
 
 const Context = {
   isServer: true,
@@ -118,12 +119,15 @@ export {
   createEvent,
   getConnect,
   getElement,
-  setMode,
   getMode,
+  getValue,
   getWindow,
   getDocument,
   getAssetPath,
   Host,
   h,
-  insertVdomAnnotations
+  insertVdomAnnotations,
+  parsePropertyValue,
+  setMode,
+  setValue
 } from '@runtime';

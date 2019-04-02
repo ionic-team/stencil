@@ -102,6 +102,10 @@ declare namespace LocalJSX {
   interface IntrinsicElements {}
 }
 
+/**
+ * The "h" namespace is used to import JSX types for elements and attributes.
+ * It is imported in order to avoid conflicting global JSX issues.
+ */
 export declare namespace h {
   export function h(sel: any): d.VNode;
   export function h(sel: Node, data: d.VNodeData): d.VNode;

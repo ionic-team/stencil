@@ -23,7 +23,7 @@ export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx
 
     return tsSourceFile => {
       dirPath = config.sys.path.dirname(tsSourceFile.fileName);
-      moduleFile = getModule(compilerCtx, tsSourceFile.fileName);
+      moduleFile = getModule(config, compilerCtx, tsSourceFile.fileName);
 
       if (buildCtx.isRebuild) {
         // reset since we're doing a full parse again
@@ -34,7 +34,7 @@ export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx
         moduleFile.isCollectionDependency = true;
         moduleFile.collectionName = collection.collectionName;
         collection.moduleFiles.push(moduleFile);
-
+        console.log(collection.moduleFiles.length);
       } else {
         moduleFile.isCollectionDependency = false;
         moduleFile.collectionName = null;

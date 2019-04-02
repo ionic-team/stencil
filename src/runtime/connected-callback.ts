@@ -2,9 +2,9 @@ import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAG, HOST_STATE } from '@utils';
+import { CMP_FLAG, HOST_STATE, MEMBER_FLAGS } from '@utils';
 import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
-import { HYDRATE_HOST_ID } from './runtime-constants';
+import { HYDRATE_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
 
@@ -13,39 +13,41 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
   // connectedCallback
   const hostRef = getHostRef(elm);
 
-  if (BUILD.hostListener && cmpMeta.l) {
+  if (BUILD.hostListener && cmpMeta.$listeners$) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
     // have fired even before the instance is ready
-    hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.l);
+    hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.$listeners$);
   }
 
   if (!(hostRef.$stateFlags$ & HOST_STATE.hasConnected)) {
     // first time this component has connected
     hostRef.$stateFlags$ |= HOST_STATE.hasConnected;
 
-    let hydrateId: string;
+    let hostId: string;
     if (BUILD.hydrateClientSide) {
-      hydrateId = elm.getAttribute(HYDRATE_HOST_ID);
-      if (hydrateId) {
-        if (BUILD.shadowDom && supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) {
-          addStyle(elm.shadowRoot, cmpMeta.t, elm.getAttribute('s-mode'));
+      hostId = elm.getAttribute(HYDRATE_ID);
+      if (hostId) {
+        if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
+          const scopeId = addStyle(elm.shadowRoot, cmpMeta.$tagName$, elm.getAttribute('s-mode'));
+          elm.classList.remove(scopeId + '-h');
+          elm.classList.remove(scopeId + '-s');
         }
-        initializeClientHydrate(elm, cmpMeta.t, hydrateId, hostRef);
+        initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
       }
     }
 
-    if (BUILD.slotRelocation && !hydrateId) {
+    if (BUILD.slotRelocation && !hostId) {
       // initUpdate, BUILD.slotRelocation
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if ((BUILD.slot && cmpMeta.f & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateServerSide) {
+      if ((BUILD.slot && cmpMeta.$flags$ & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateServerSide) {
         setContentReference(elm);
       }
     }
 
-    if (BUILD.slotRelocation && BUILD.es5 && !supportsShadowDom && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
+    if (BUILD.slotRelocation && BUILD.es5 && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
       try {
         (elm as any).shadowRoot = elm;
       } catch (e) {}
@@ -74,9 +76,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
     // Lazy properties
     // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-    if (BUILD.prop && cmpMeta.m) {
-      Object.keys(cmpMeta.m).forEach(memberName => {
-        if (elm.hasOwnProperty(memberName)) {
+    if (BUILD.prop && cmpMeta.$members$) {
+      Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
+        if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
           const value = (elm as any)[memberName];
           delete (elm as any)[memberName];
           (elm as any)[memberName] = value;

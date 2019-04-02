@@ -32,7 +32,7 @@ function getRegisterSwScript(doc: Document, buildCtx: d.BuildCtx, swUrl: string)
   const script = doc.createElement('script');
   script.setAttribute('data-build', `${buildCtx.timestamp}`);
   script.innerHTML = getRegisterSW(swUrl);
-return script;
+  return script;
 }
 
 function getUnregisterSwScript(doc: Document) {

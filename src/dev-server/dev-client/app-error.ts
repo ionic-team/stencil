@@ -37,7 +37,11 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 
   const title = doc.createElement('div');
   title.className = 'dev-server-diagnostic-title';
-  title.textContent = `${titleCase(diagnostic.type)} ${titleCase(diagnostic.level)}`;
+  if (typeof diagnostic.header === 'string' && diagnostic.header.trim().length > 0) {
+    title.textContent = diagnostic.header;
+  } else {
+    title.textContent = `${titleCase(diagnostic.type)} ${titleCase(diagnostic.level)}`;
+  }
   masthead.appendChild(title);
 
   const message = doc.createElement('div');

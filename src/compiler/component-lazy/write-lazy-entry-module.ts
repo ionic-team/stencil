@@ -29,7 +29,7 @@ function getBundleId(config: d.Config, entryKey: string, code: string, modeName:
     return `p-${config.sys.generateContentHash(code, config.hashedFileNameLength)}${sufix}`;
   }
 
-  let bundleId = entryKey;
+  let bundleId = entryKey.slice(0, 200);
   if (modeName !== DEFAULT_STYLE_MODE) {
     bundleId += '-' + modeName;
   }

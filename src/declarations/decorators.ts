@@ -14,8 +14,11 @@ export interface ComponentOptions {
   styles?: string;
   scoped?: boolean;
   shadow?: boolean;
-  assetsDir?: string;
   assetsDirs?: string[];
+  /**
+   * @deprecated Use `assetsDirs` instead
+   */
+  assetsDir?: string;
 }
 
 

@@ -57,17 +57,17 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
-          <cmp-b class="hydrated">
+          <cmp-b>
             <shadow-root>
               <slot></slot>
             </shadow-root>
-            <!--o.1.1-->
+            <!---->
             <slot></slot>
           </cmp-b>
         </shadow-root>
-        <!--o.0.1-->
+        <!---->
         light-dom
       </cmp-a>
     `);
@@ -122,13 +122,13 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
-          <cmp-b class="hydrated">
+          <cmp-b>
             <shadow-root>
               <slot></slot>
             </shadow-root>
-            <!--o.1.1-->
+            <!---->
             light-dom
           </cmp-b>
         </shadow-root>
@@ -184,9 +184,9 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
@@ -245,9 +245,9 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <slot></slot>
@@ -307,14 +307,14 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -373,9 +373,9 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <footer>
@@ -439,15 +439,15 @@ describe('hydrate, shadow in shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
             <footer></footer>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>

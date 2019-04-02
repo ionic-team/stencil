@@ -45,14 +45,15 @@ export interface ComponentCompilerFeatures {
   htmlTagNames: string[];
   isUpdateable: boolean;
   isPlain: boolean;
-  potentialCmpRefs: d.PotentialComponentRef[];
+  potentialCmpRefs: string[];
 }
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
-  assetsDirs?: CompilerAssetDir[];
+  assetsDirs: CompilerAssetDir[];
   componentClassName: string;
   dependencies: string[];
+  dependants?: string[];
   elementRef: string;
   encapsulation: Encapsulation;
   excludeFromCollection: boolean;
@@ -204,11 +205,12 @@ export interface CompilerAssetDir {
   absolutePath?: string;
   cmpRelativePath?: string;
   originalComponentPath?: string;
-  originalCollectionPath?: string;
 }
 
 export interface ComponentCompilerData {
   exportLine: string;
   filePath: string;
   cmp: d.ComponentCompilerMeta;
+  uniqueComponentClassName?: string;
+  importLine?: string;
 }

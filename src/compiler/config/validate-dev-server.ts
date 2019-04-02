@@ -22,8 +22,11 @@ export function validateDevServer(config: d.Config) {
     setNumberConfig(config.devServer, 'port', null, 3333);
   }
 
+  if (typeof config.devServer.hotReplacement !== 'boolean') {
+    config.devServer.hotReplacement = true;
+  }
+
   setBooleanConfig(config.devServer, 'gzip', null, true);
-  setBooleanConfig(config.devServer, 'hotReplacement', null, true);
   setBooleanConfig(config.devServer, 'openBrowser', null, true);
 
   validateProtocol(config.devServer);
@@ -73,6 +76,10 @@ export function validateDevServer(config: d.Config) {
 
   if (!baseUrl.endsWith('/')) {
     baseUrl += '/';
+  }
+
+  if (typeof config.devServer.logRequests !== 'boolean') {
+    config.devServer.logRequests = (config.logLevel === 'debug');
   }
 
   setStringConfig(config.devServer, 'root', serveDir);

@@ -31,39 +31,18 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
       importee = normalizePath(importee);
       const importeeDir = path.dirname(importee);
       const importeeBase = path.basename(importee);
-      const importeeExt = path.extname(importee);
 
       // Direct FS check
-      const accessData = await compilerCtx.fs.accessData(importee);
+      let filePath = importee;
+      let accessData = await compilerCtx.fs.accessData(filePath);
       if (accessData.exists) {
-        return accessData.isFile ? importee : path.join(importee, '/index.js');
+        return accessData.isFile ? filePath : path.join(filePath, '/index.js');
       }
 
-      // Test .ts extension
-      let moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.ts');
-      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
-        return moduleFile.jsFilePath;
-      }
-
-      // Test .ts extension
-      moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + '.tsx');
-      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
-        return moduleFile.jsFilePath;
-      }
-
-      // Test original extension
-      moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase) + importeeExt);
-      if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
-        return moduleFile.jsFilePath;
-      }
-
-      // No extension
-      if (importeeExt === '') {
-        // Test original extension
-        moduleFile = compilerCtx.moduleMap.get(path.join(importeeDir, importeeBase, 'index.js'));
-        if (moduleFile != null && typeof moduleFile.jsFilePath === 'string') {
-          return moduleFile.jsFilePath;
-        }
+      filePath = path.join(importeeDir, importeeBase) + '.js';
+      accessData = await compilerCtx.fs.accessData(filePath);
+      if (accessData.exists) {
+        return filePath;
       }
       console.error('path not found', importee);
 

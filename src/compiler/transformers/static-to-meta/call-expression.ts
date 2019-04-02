@@ -43,16 +43,10 @@ function visitCallExpressionArg(cmpMeta: d.ComponentCompilerMeta, arg: ts.Expres
 
     if (typeof tag === 'string') {
       tag = tag.toLowerCase();
-      if (!cmpMeta.htmlTagNames.includes(tag)) {
-        cmpMeta.htmlTagNames.push(tag);
-      }
+      cmpMeta.htmlTagNames.push(tag);
 
       if (tag.includes('-')) {
-        if (!cmpMeta.potentialCmpRefs.some(cr => cr.tag === tag)) {
-          cmpMeta.potentialCmpRefs.push({
-            tag: tag
-          });
-        }
+        cmpMeta.potentialCmpRefs.push(tag);
       }
     }
   }

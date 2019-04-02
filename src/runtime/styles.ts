@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
 import { getDoc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { HYDRATE_ID } from './runtime-constants';
 
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
@@ -15,7 +16,6 @@ export const registerStyle = (styleId: string, cssText: string) => {
     style = cssText;
   }
   styles.set(styleId, style);
-  return style;
 };
 
 export const addStyle = (styleContainerNode: any, tagName: string, mode: string, ) => {
@@ -47,7 +47,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
           styleElm.innerHTML = style;
 
           if (BUILD.hydrateServerSide) {
-            styleElm.setAttribute('h-id', styleId);
+            styleElm.setAttribute(HYDRATE_ID, styleId);
           }
 
           styleContainerNode.insertBefore(
@@ -72,9 +72,9 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
   const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot)
     ? elm.shadowRoot
-    : (elm as any).getRootNode(), cmpMeta.t, mode);
+    : (elm as any).getRootNode(), cmpMeta.$tagName$, mode);
 
-  if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.f & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.f & CMP_FLAG.scopedCssEncapsulation)) {
+  if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation)) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -85,7 +85,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     elm['s-sc'] = styleId;
     elm.classList.add(styleId + '-h');
 
-    if (cmpMeta.f & CMP_FLAG.scopedCssEncapsulation) {
+    if (cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
       elm.classList.add(styleId + '-s');
     }
   }

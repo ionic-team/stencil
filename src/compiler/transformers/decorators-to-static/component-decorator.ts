@@ -32,6 +32,16 @@ export function componentDecoratorToStatic(cmpNode: ts.ClassDeclaration, newMemb
     newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(componentOptions.styleUrls)));
   }
 
+  let assetsDirs = componentOptions.assetsDirs || [];
+  if (componentOptions.assetsDir) {
+    assetsDirs = [
+      ...assetsDirs,
+      componentOptions.assetsDir,
+    ];
+  }
+  if (assetsDirs.length > 0) {
+    newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
+  }
   if (typeof componentOptions.styles === 'string') {
     const styles = componentOptions.styles.trim();
     if (styles.length > 0) {

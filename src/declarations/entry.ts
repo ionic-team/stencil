@@ -19,8 +19,6 @@ export interface EntryBundle {
   sourceTarget: string;
 }
 
-export type EntryPoint = EntryComponent[];
-
 export interface EntryComponent {
   tag: string;
   dependencyOf?: string[];
@@ -29,11 +27,6 @@ export interface EntryComponent {
 export interface ComponentRef {
   tag: string;
   filePath: string;
-}
-
-export interface PotentialComponentRef {
-  tag?: string;
-  html?: string;
 }
 
 export interface ModuleGraph {

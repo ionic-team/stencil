@@ -40,7 +40,6 @@ async function bundleTesting() {
       'rollup',
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
-      'rollup-pluginutils',
       'stream',
       'tty',
       'typescript',

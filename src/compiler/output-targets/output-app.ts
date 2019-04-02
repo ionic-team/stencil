@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, getComponentsFromModules, isOutputTargetDistLazy } from './output-utils';
+import { canSkipAppCoreBuild, isOutputTargetDistLazy } from './output-utils';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { dashToPascalCase, flatOne } from '@utils';
@@ -12,31 +12,24 @@ import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
   if (canSkipAppCoreBuild(buildCtx)) {
-    return;
+    return undefined;
   }
 
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
-    return;
+    return undefined;
   }
 
   copyAssets(config, compilerCtx, buildCtx, outputTargets);
 
-  const cmps = getComponentsFromModules(buildCtx.moduleFiles);
-  // if (cmps.length > MIN_FOR_LAZY_LOAD) {
-  //   return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets, cmps);
-  // } else {
-  //   // we need raw web components
-  //   return generateNativeApp(compilerCtx, buildCtx, cmps);
-  // }
-  return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets, cmps);
+  return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets);
 }
 
 async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
   const allCopyTasks = flatOne(
     await Promise.all(
       outputTargets.map(async o => [
-        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, true),
+        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, false),
         ...await processCopyTasks(config, o.copyDir, o.copy)
       ])
     )

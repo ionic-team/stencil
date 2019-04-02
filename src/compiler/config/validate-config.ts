@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
@@ -10,6 +10,7 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import { sortBy } from '@utils';
 
 
 export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
@@ -90,7 +91,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     config.validateTypes = true;
   }
 
-  setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
+  setBooleanConfig(config, 'hashFileNames', null, !config.devMode);
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
 
   if (config.hashFileNames) {
@@ -111,7 +112,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
 
-  setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
   setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
@@ -132,6 +132,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');
+  config.bundles = sortBy(config.bundles, (a) => a.components.length);
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
@@ -159,4 +160,3 @@ const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
 const DEFAULT_EXCLUDES = ['**/*.+(spec|e2e).*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
-const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';

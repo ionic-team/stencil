@@ -7,17 +7,22 @@ import { generateSystem } from './generate-system';
 import { generateCjs } from './generate-cjs';
 import { generateLoaders } from './generate-loader';
 
-export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[], cmps: d.ComponentCompilerMeta[]) {
+export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
   const timespan = buildCtx.createTimeSpan(`generate lazy components started`);
 
+  const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
 
+  if (buildCtx.shouldAbort) {
+    return null;
+  }
+
   await buildCtx.stylesPromise;
 
-  await Promise.all([
-    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.webpackBuild)),
+  const [bundleModules] = await Promise.all([
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.webpackBuild)),
+    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.webpackBuild)),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
     generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
 
@@ -25,6 +30,8 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   ]);
 
   timespan.finish(`generate lazy components finished`);
+
+  return bundleModules;
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {

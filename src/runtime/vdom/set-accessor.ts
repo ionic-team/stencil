@@ -12,9 +12,6 @@ import { BUILD } from '@build-conditionals';
 import { toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
-
-const vdomListenersMap = new WeakMap<HTMLElement, Map<string, Function>>();
-
 export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
   if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
@@ -42,7 +39,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
     if (BUILD.updatable) {
       for (const prop in oldValue) {
         if (!newValue || newValue[prop] == null) {
-          if (/-/.test(prop)) {
+          if (!BUILD.hydrateServerSide && /-/.test(prop)) {
             elm.style.removeProperty(prop);
           } else {
             (elm as any).style[prop] = '';
@@ -53,7 +50,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
     for (const prop in newValue) {
       if (!oldValue || newValue[prop] !== oldValue[prop]) {
-        if (/-/.test(prop)) {
+        if (!BUILD.hydrateServerSide && /-/.test(prop)) {
           elm.style.setProperty(prop, newValue[prop]);
         } else {
           (elm as any).style[prop] = newValue[prop];
@@ -87,23 +84,11 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
       // except for the first character, we keep the event name case
       memberName = toLowerCase(memberName[2]) + memberName.substring(3);
     }
-
-    let vdomListeners = vdomListenersMap.get(elm);
+    if (oldValue) {
+      elm.removeEventListener(memberName, oldValue);
+    }
     if (newValue) {
-      if (!vdomListeners) {
-        vdomListenersMap.set(elm, vdomListeners = new Map());
-      }
-      vdomListeners.set(memberName, newValue);
-
-      if (!oldValue) {
-        elm.addEventListener(memberName, vdomListenerProxy);
-      }
-
-    } else if (vdomListeners) {
-      vdomListeners.delete(memberName);
-      if (vdomListeners.size === 0) {
-        elm.removeEventListener(memberName, vdomListenerProxy);
-      }
+      elm.addEventListener(memberName, newValue);
     }
 
   } else {
@@ -143,7 +128,3 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
 const parseClassList = (value: string | undefined | null): string[] =>
   (value == null || value === '') ? [] : value.split(' ');
-
-export function vdomListenerProxy(this: d.HostElement, ev: Event) {
-  return vdomListenersMap.get(this).get(ev.type)(ev);
-}

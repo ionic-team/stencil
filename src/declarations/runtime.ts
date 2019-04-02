@@ -7,31 +7,33 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   any,
-  ComponentLazyRuntimeMeta[]
+  ComponentRuntimeMetaCompact[]
+];
+
+
+export type ComponentRuntimeMetaCompact = [
+  /** flags */
+  number,
+
+  /** tagname */
+  string,
+
+  /** members */
+  {[memberName: string]: ComponentRuntimeMember}?,
+
+  /** listeners */
+  d.ComponentRuntimeHostListener[]?
 ];
 
 
 
 export interface ComponentRuntimeMeta {
-  /** members */
-  m?: d.ComponentRuntimeMembers;
-
-  /** listeners */
-  l?: d.ComponentRuntimeHostListener[];
-
-  /** flags */
-  f?: number;
-
-  /** tagname */
-  t?: string;
-
-  // added later
+  $flags$: number;
+  $tagName$: string;
+  $members$?: d.ComponentRuntimeMembers;
+  $listeners$?: d.ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
   $watchers$?: d.ComponentConstructorWatchers;
-}
-
-
-export interface ComponentLazyRuntimeMeta extends ComponentRuntimeMeta {
   $lazyBundleIds$?: d.ModeBundleIds;
 }
 
@@ -95,11 +97,12 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  $isTmpDisconnected$?: boolean;
-  $queueCongestion$?: number;
-  $queueAsync$?: boolean;
-  $queuePending$?: boolean;
   $importMetaUrl$?: string;
+  $isTmpDisconnected$?: boolean;
+  $orgLocNodes$?: Map<string, d.RenderNode>;
+  $queueAsync$?: boolean;
+  $queueCongestion$?: number;
+  $queuePending$?: boolean;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

@@ -30,7 +30,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
         } else {
           clearInterval(requestBuildResultsTmrId);
         }
-      }, 1000);
+      }, REQUEST_BUILD_RESULTS_INTERVAL_MS);
     }
 
     // we just connected, let's just
@@ -135,7 +135,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
     // ensure clear out any other pending reconnect timeouts
     clearTimeout(reconnectTmrId);
 
-    if (reconnectAttempts > RECONNECT_ATTEMPTS) {
+    if (reconnectAttempts >= RECONNECT_ATTEMPTS) {
       logWarn(`Dev Server`, `Canceling reconnect attempts`);
 
     } else {
@@ -160,6 +160,7 @@ function getSocketUrl(location: Location) {
 }
 
 
-const RECONNECT_ATTEMPTS = 500;
+const RECONNECT_ATTEMPTS = 1000;
 const RECONNECT_RETRY_MS = 2500;
 const NORMAL_CLOSURE_CODE = 1000;
+const REQUEST_BUILD_RESULTS_INTERVAL_MS = 500;

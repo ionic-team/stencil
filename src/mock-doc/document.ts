@@ -6,6 +6,7 @@ import { MockElement, MockTextNode, resetElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
 import { resetEventListeners } from './event';
+import { MockWindow } from './window';
 
 
 export class MockDocument extends MockElement {
@@ -196,8 +197,8 @@ export class MockDocument extends MockElement {
 
 }
 
-export function createDocument(html: string | boolean = null, win: any = null): Document {
-  return new MockDocument(html, win) as any;
+export function createDocument(html: string | boolean = null): Document {
+  return new MockWindow(html).document;
 }
 
 export function resetDocument(doc: Document) {

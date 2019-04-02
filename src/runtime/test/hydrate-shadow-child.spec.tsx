@@ -40,7 +40,7 @@ describe('hydrate, shadow child', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <shadow-root>
           <p>
             Hello
@@ -99,13 +99,13 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -160,9 +160,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
@@ -221,9 +221,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <slot></slot>
@@ -283,14 +283,14 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -349,9 +349,9 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             shadow-header
             <footer>
@@ -415,16 +415,116 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b>
           <shadow-root>
             <header></header>
             <slot></slot>
             <footer></footer>
           </shadow-root>
-          <!--o.1.1-->
+          <!---->
           light-dom
+        </cmp-b>
+      </cmp-a>
+    `);
+  });
+
+  it('root level element, non-shadow, shadow, shadow,', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <Host></Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-b', shadow: true })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            <section>
+              <slot></slot>
+            </section>
+          </Host>
+        );
+      }
+    }
+    @Component({ tag: 'cmp-c', shadow: true })
+    class CmpC {
+      render() {
+        return (
+          <Host>
+            <article>
+              cmp-c
+            </article>
+          </Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB, CmpC],
+      html: `
+        <cmp-a>
+          <cmp-b>
+            cmp-b-top-text
+            <cmp-c></cmp-c>
+          </cmp-b>
+        </cmp-a>
+      `,
+      hydrateServerSide: true
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a s-id="1">
+        <!--r.1-->
+        <cmp-b s-id="2">
+          <!--r.2-->
+          <!--o.0.1-->
+          <!--o.0.2-->
+          <section c-id="2.0.0.0">
+            <!--s.2.1.1.0.-->
+            <!--t.0.1-->
+            cmp-b-top-text
+            <cmp-c c-id="0.2" s-id="3">
+              <!--r.3-->
+              <article c-id="3.0.0.0">
+                <!--t.3.1.1.0-->
+                cmp-c
+              </article>
+            </cmp-c>
+          </section>
+        </cmp-b>
+      </cmp-a>
+    `);
+
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB, CmpC],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <cmp-a>
+        <!--r.1-->
+        <cmp-b>
+          <shadow-root>
+            <section>
+              <slot></slot>
+            </section>
+          </shadow-root>
+          <!---->
+          cmp-b-top-text
+          <!---->
+          <cmp-c>
+            <shadow-root>
+              <article>
+                cmp-c
+              </article>
+            </shadow-root>
+          </cmp-c>
         </cmp-b>
       </cmp-a>
     `);

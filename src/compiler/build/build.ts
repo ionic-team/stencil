@@ -9,6 +9,7 @@ import { initIndexHtmls } from './init-index-html';
 import { transpileApp } from '../transpile/transpile-app';
 import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
+import { createDocument } from '../../mock-doc/document';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -32,6 +33,14 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // buildCtx.moduleFiles is populated here
     await transpileApp(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
+
+    if (config.srcIndexHtml) {
+      const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
+      if (hasIndex) {
+        const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
+        buildCtx.indexDoc = createDocument(indexSrcHtml);
+      }
+    }
 
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected

@@ -12,7 +12,7 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     }
   }
   if (BUILD.cmpDidUnload) {
-    const instance: any = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
+    const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
     if (instance && instance.componentDidUnload) {
       try {
         instance.componentDidUnload();

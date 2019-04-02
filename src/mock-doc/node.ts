@@ -71,6 +71,10 @@ export class MockNode {
     return false;
   }
 
+  isSameNode(node: any) {
+    return this === node;
+  }
+
   get lastChild() {
     return this.childNodes[this.childNodes.length - 1] || null;
   }
@@ -597,24 +601,26 @@ export function resetElement(elm: any) {
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
-  newNode.remove();
-  newNode.parentNode = parentNode;
-  newNode.ownerDocument = parentNode.ownerDocument;
+  if (newNode !== referenceNode) {
+    newNode.remove();
+    newNode.parentNode = parentNode;
+    newNode.ownerDocument = parentNode.ownerDocument;
 
-  if (referenceNode != null) {
-    const index = parentNode.childNodes.indexOf(referenceNode);
-    if (index > -1) {
-      parentNode.childNodes.splice(index, 0, newNode);
+    if (referenceNode != null) {
+      const index = parentNode.childNodes.indexOf(referenceNode);
+      if (index > -1) {
+        parentNode.childNodes.splice(index, 0, newNode);
+
+      } else {
+        throw new Error(`referenceNode not found in parentNode.childNodes`);
+      }
 
     } else {
-      throw new Error(`referenceNode not found in parentNode.childNodes`);
+      parentNode.childNodes.push(newNode);
     }
 
-  } else {
-    parentNode.childNodes.push(newNode);
+    connectNode(parentNode.ownerDocument, newNode);
   }
-
-  connectNode(parentNode.ownerDocument, newNode);
 
   return newNode;
 }

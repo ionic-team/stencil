@@ -37,7 +37,7 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
 
 function createComponentExport(cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) {
   const originalClassName = cmp.componentClassName;
-  const pascalCasedClassName = cmp.tagName.replace(/-/g, '_');
+  const underscoredClassName = cmp.tagName.replace(/-/g, '_');
   const filePath = normalizePath(lazyModuleFilePath);
-  return `export { ${originalClassName} as ${pascalCasedClassName} } from '${filePath}';`;
+  return `export { ${originalClassName} as ${underscoredClassName} } from '${filePath}';`;
 }

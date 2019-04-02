@@ -33,6 +33,7 @@ export interface HydrateResults {
   scripts?: HydrateScriptElement[];
   imgs?: HydrateImgElement[];
   title: string;
+  hydratedCount: number;
 }
 
 
@@ -89,7 +90,7 @@ export interface HydrateOptions {
   afterHydrate?(doc: Document, url?: URL): void;
   beforeHydrate?(doc: Document, url?: URL): void;
   canonicalLink?: string;
-  clientSideHydrate?: boolean;
+  clientHydrateAnnotations?: boolean;
   collapseBooleanAttributes?: boolean;
   collapseWhitespace?: boolean;
   collectAnchors?: boolean;
@@ -100,6 +101,7 @@ export interface HydrateOptions {
   cookie?: string;
   direction?: string;
   language?: string;
+  maxHydrateCount?: number;
   minifyInlineStyles?: boolean;
   prettyHtml?: boolean;
   referrer?: string;
