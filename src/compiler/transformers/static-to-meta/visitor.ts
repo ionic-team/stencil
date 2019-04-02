@@ -34,7 +34,6 @@ export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx
         moduleFile.isCollectionDependency = true;
         moduleFile.collectionName = collection.collectionName;
         collection.moduleFiles.push(moduleFile);
-        console.log(collection.moduleFiles.length);
       } else {
         moduleFile.isCollectionDependency = false;
         moduleFile.collectionName = null;
