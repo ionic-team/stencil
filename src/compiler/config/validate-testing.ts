@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateTesting(config: d.Config) {
@@ -61,7 +62,7 @@ export function validateTesting(config: d.Config) {
       return path.join(testing.rootDir, ignorePattern);
     });
 
-    config.outputTargets.filter(o => (o.type === 'dist' || o.type === 'www') && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
+    config.outputTargets.filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
       testing.testPathIgnorePatterns.push(outputTarget.dir);
     });
   }

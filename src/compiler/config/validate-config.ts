@@ -77,6 +77,13 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'buildEsm', 'esm', config.buildEs5);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
+  /**
+   * validate plugins becore output targets because some plugins will be registered
+   * for output targets
+   */
+
+  validatePlugins(config);
+
   // setup the outputTargets
   validateOutputTargets(config);
 
@@ -96,7 +103,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     }
   }
 
-  validatePlugins(config);
 
   validateAssetVerioning(config);
 

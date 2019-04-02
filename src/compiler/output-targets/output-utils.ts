@@ -78,28 +78,7 @@ export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats
   return o.type === 'stats';
 }
 
-export function isOutputTargetDocs(o: d.OutputTarget): o is d.OutputTargetDocsReadme {
-  return o.type === 'docs';
-}
-
-export function isOutputTargetDocsJson(o: d.OutputTarget): o is d.OutputTargetDocsJson {
-  return o.type === 'docs-json';
-}
-
-export function isOutputTargetDocsVscode(o: d.OutputTarget): o is d.OutputTargetDocsVscode {
-  return o.type === 'docs-vscode';
-}
-
-
-export function isOutputTargetDocsCustom(o: d.OutputTarget): o is d.OutputTargetDocsCustom {
-  return o.type === 'docs-custom';
-}
-
-export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAngular {
-  return o.type === 'angular';
-}
-
-export function getComponentsFromModules(moduleFiles: (d.Module | d.EntryModule)[]) {
+export function getComponentsFromModules(moduleFiles: d.Module[]) {
   return flatOne(moduleFiles.map(m => m.cmps));
 }
 

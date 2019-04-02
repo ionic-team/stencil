@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { WEB_COMPONENTS_JSON_FILE_NAME, normalizePath } from '@utils';
+import { normalizePath } from '@utils';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 
@@ -89,11 +89,6 @@ export function validateOutputTargetDist(config: d.Config) {
         polyfills: true,
       });
     }
-
-    config.outputTargets.push({
-      type: 'docs-vscode',
-      file: path.join(outputTarget.buildDir, WEB_COMPONENTS_JSON_FILE_NAME)
-    });
   });
 }
 

@@ -1,22 +1,22 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
 
-export function slotsToMarkdown(slots: d.JsonDocsSlot[]) {
+export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
   const content: string[] = [];
-  if (slots.length === 0) {
+  if (styles.length === 0) {
     return content;
   }
 
-  content.push(`## Slots`);
+  content.push(`## CSS Custom Properties`);
   content.push(``);
 
   const table = new MarkdownTable();
-  table.addHeader(['Slot', 'Description']);
+  table.addHeader(['Name', 'Description']);
 
-  slots.forEach(style => {
+  styles.forEach(style => {
     table.addRow([
-      style.name === '' ? '' : `\`"${style.name}"\``,
+      `\`${style.name}\``,
       style.docs
     ]);
   });

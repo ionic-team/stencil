@@ -1,6 +1,13 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
+import { plugin as docsPlugin } from '../output-plugins/docs';
+import { plugin as jsonDocsPlugin } from '../output-plugins/docs-json';
+import { plugin as vscodeDocsPlugin } from '../output-plugins/docs-vscode';
 
 
-export function validatePlugins(config: Config) {
-  config.plugins = (config.plugins || []).filter(p => !!p);
+export function validatePlugins(config: d.Config) {
+
+  // Add internal plugins as part of the default list of plugins
+  config.plugins = (config.plugins || []).concat(
+    [docsPlugin, jsonDocsPlugin, vscodeDocsPlugin]
+  ).filter((p: any) => !!p);
 }

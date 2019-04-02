@@ -183,21 +183,16 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
+export interface OutputPluginTarget extends OutputTargetBase {
+  type: string;
 
-export interface OutputTargetAngular extends OutputTargetBase {
-  type: 'angular';
-
-  componentCorePackage: string;
-  directivesProxyFile?: string;
-  directivesArrayFile?: string;
-  directivesUtilsFile?: string;
-  excludeComponents?: string[];
+  [key: string]: any;
 }
-
 
 export interface OutputTargetBase {
   type: string;
 }
+
 
 
 export type OutputTargetBuild =
@@ -206,6 +201,7 @@ export type OutputTargetBuild =
 
 
 export type OutputTarget =
+ OutputPluginTarget
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy
@@ -213,9 +209,4 @@ export type OutputTarget =
  | OutputTargetDistSelfcontained
  | OutputTargetWww
  | OutputTargetHydrate
- | OutputTargetDocsJson
- | OutputTargetDocsCustom
- | OutputTargetDocsReadme
- | OutputTargetDocsVscode
- | OutputTargetAngular
  | OutputTargetStats;
