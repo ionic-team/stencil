@@ -34,7 +34,7 @@ describe('test/server', () => {
           expect($('h1').text().trim()).toBe('Stencil SSR Example');
 
           const css = $('style[data-styles]').html().trim();
-          expect(css).toBe(`main{font-family:"Comic Sans MS";background:#000;padding:30px}h1{margin-top:0;color:red}p{color:#00f}span{color:green}`);
+          expect(css).toBe(`main{font-family:Comic Sans MS;background:#000;padding:30px}h1{margin-top:0;color:red}p{color:#00f}span{color:green}`);
         }
 
         // first request
@@ -114,7 +114,7 @@ describe('test/server', () => {
           expect($('h1').text().trim()).toBe('Stencil SSR Example');
 
           const css = $('style[data-styles]').html().trim();
-          expect(css).toBe(`main{font-family:"Comic Sans MS";background:#000;padding:30px}h1{margin-top:0;color:red}p{color:#00f}span{color:green}`);
+          expect(css).toBe(`main{font-family:Comic Sans MS;background:#000;padding:30px}h1{margin-top:0;color:red}p{color:#00f}span{color:green}`);
         }
 
         http.get(`http://localhost:${port}/`, (res) => {

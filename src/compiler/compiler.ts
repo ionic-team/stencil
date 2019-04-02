@@ -27,28 +27,37 @@ export class Compiler implements d.Compiler {
         startupMsg += `💎`;
       }
 
-      config.logger.info(config.logger.cyan(startupMsg));
+      if (config.suppressLogs !== true) {
+        config.logger.info(config.logger.cyan(startupMsg));
 
-      config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
-      config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
+        if (config.sys.semver.prerelease(config.sys.compiler.version)) {
+          config.logger.warn(config.sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+        }
+        if (config.devMode && config.buildEs5) {
+          config.logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
+          If you need ESM output, use the '--esm' flag instead.`);
+        }
+        if (config.devMode && !config.enableCache) {
+          config.logger.warn(`Disabling cache during development will slow down incremental builds.`);
 
-      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
-      config.logger.debug(`compiler build: __BUILDID__`);
+        }
+        config.logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
+        config.logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
-      const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
-      config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
+        config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
+        config.logger.debug(`compiler build: __BUILDID__`);
 
-      config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
+        const workerOpts = config.sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker);
+        config.logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
+
+        config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
+      }
 
       this.ctx = getCompilerCtx(config);
 
       this.on('fsChange', fsWatchResults => {
         this.rebuild(fsWatchResults);
       });
-
-      if (config.flags.serve) {
-        this.startDevServer();
-      }
     }
   }
 
@@ -74,14 +83,16 @@ export class Compiler implements d.Compiler {
     }
 
     // start up the dev server
-    const devServerConfig = await startDevServerMain(this.config, this.ctx);
+    const devServer = await startDevServerMain(this.config, this.ctx);
 
-    // get the browser url to be logged out at the end of the build
-    this.config.devServer.browserUrl = devServerConfig.browserUrl;
+    if (devServer) {
+      // get the browser url to be logged out at the end of the build
+      this.config.devServer.browserUrl = devServer.browserUrl;
 
-    return {
-      browserUrl: this.config.devServer.browserUrl
-    };
+      this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
+    }
+
+    return devServer;
   }
 
   on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;

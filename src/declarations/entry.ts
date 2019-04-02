@@ -6,8 +6,6 @@ export interface EntryModule {
   filePath?: string;
   dependencies?: string[];
   moduleFiles: d.ModuleFile[];
-  compiledModuleJsText?: string;
-  compiledModuleLegacyJsText?: string;
   requiresScopedStyles?: boolean;
   modeNames?: string[];
   entryBundles?: EntryBundle[];

@@ -10,6 +10,11 @@ export default function bundleEntryFile(config: d.Config, buildCtx: d.BuildCtx, 
     name: 'bundleEntryFilePlugin',
 
     resolveId(importee: string) {
+      if (/\0/.test(importee)) {
+        // ignore IDs with null character, these belong to other plugins
+        return null;
+      }
+
       if (!buildCtx.isActiveBuild) {
         return `_not_active_build.js`;
       }

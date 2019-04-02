@@ -3,16 +3,17 @@ import { addCollection } from './datacollection/discover-collections';
 import addComponentMetadata from './transformers/add-component-metadata';
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/gather-metadata';
-import { getComponentsDtsSrcFilePath } from '../distribution/distribution';
+import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
 import { getModuleFile } from '../build/compiler-ctx';
 import { getModuleImports } from './transformers/module-imports';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import minimatch from 'minimatch';
 import { normalizePath, pathJoin } from '../util';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -73,12 +74,14 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     hasQueuedTsServicePrime: false
   };
 
-  const userCompilerOptions = await getUserCompilerOptions(config, transpileCtx.compilerCtx);
-  const compilerOptions = Object.assign({}, userCompilerOptions);
+  const userCompilerOptions = await getUserCompilerOptions(config, transpileCtx.compilerCtx, transpileCtx.buildCtx);
+  const compilerOptions = Object.assign({}, userCompilerOptions) as ts.CompilerOptions;
 
   compilerOptions.isolatedModules = false;
   compilerOptions.suppressOutputPathCheck = true;
   compilerOptions.allowNonTsExtensions = true;
+  compilerOptions.removeComments = !config.devMode;
+  compilerOptions.sourceMap = false;
   compilerOptions.lib = undefined;
   compilerOptions.types = undefined;
   compilerOptions.noEmit = undefined;
@@ -181,6 +184,8 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     return;
   }
 
+  const hasWarning = ctx.buildCtx.hasWarning && !config._isTesting;
+
   // look up the old cache key using the ts file path
   const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
 
@@ -190,7 +195,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   // create a cache key out of the content and compiler options
   const cacheKey = `transpileService_${config.sys.generateContentHash(content + tsFilePath + ctx.configKey, 32)}` ;
 
-  if (oldCacheKey === cacheKey && checkCacheKey) {
+  if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!
     return;
   }
@@ -200,7 +205,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
 
   let ensureExternalImports: string[] = null;
 
-  if (useFsCache) {
+  if (useFsCache && !hasWarning) {
     // let's check to see if we've already cached this in our filesystem
     // but only bother for the very first build
     const cachedStr = await ctx.compilerCtx.cache.get(cacheKey);
@@ -275,7 +280,7 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
         });
       }
 
-      if (config.enableCache) {
+      if (config.enableCache && !hasWarning) {
         // cache this module file and js text for later
         const cacheModuleFile: CachedModuleFile = {
           moduleFile: moduleFile,
@@ -407,14 +412,14 @@ const PRIME_TS_CACHE_TIMEOUT = 1000;
 
 export function isFileIncludePath(config: d.Config, readPath: string) {
   for (var i = 0; i < config.excludeSrc.length; i++) {
-    if (config.sys.minimatch(readPath, config.excludeSrc[i])) {
+    if (minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude
       return false;
     }
   }
 
   for (i = 0; i < config.includeSrc.length; i++) {
-    if (config.sys.minimatch(readPath, config.includeSrc[i])) {
+    if (minimatch(readPath, config.includeSrc[i])) {
       // this file is a file we want to include
       return true;
     }

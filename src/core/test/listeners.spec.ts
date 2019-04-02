@@ -1,7 +1,7 @@
 import { createListenerCallback, enableEventListener, initElementListeners } from '../listeners';
 import { DomApi, HostElement, PlatformApi } from '../../declarations';
 import { initComponentInstance } from '../init-component-instance';
-import { mockComponentInstance, mockDispatchEvent, mockDomApi, mockPlatform, mockWindow } from '../../testing/mocks';
+import { mockComponentInstance, mockDispatchEvent, mockPlatform, mockWindow, testingPerf } from '../../testing/mocks';
 
 
 describe('instance listeners', () => {
@@ -76,7 +76,7 @@ describe('instance listeners', () => {
 
       expect(plt.queuedEvents.get(elm)).toHaveLength(2);
 
-      const instance = initComponentInstance(plt, elm, {});
+      const instance = initComponentInstance(plt, elm, {}, testingPerf);
 
       const data = instance.getData();
       expect(data).toEqual({ detail: { some: 'data' } });
@@ -360,7 +360,7 @@ describe('instance listeners', () => {
       };
 
       // test if target-addEventListener is called properly
-      domApi.$addEventListener(el, eventName, f, capture, passive);
+      domApi.$addEventListener(el, eventName, f, 0, capture, passive);
       expect(target.addEventListener).toHaveBeenCalledWith(targetName, internalCallback, {
         passive: passive,
         capture: capture
@@ -376,7 +376,7 @@ describe('instance listeners', () => {
       expect(calledCallback).toBeTruthy();
 
       // test if the listener is removed
-      domApi.$removeEventListener(el, eventName);
+      domApi.$removeEventListener(el, eventName, 0);
       expect(target.removeEventListener).toHaveBeenCalledWith(targetName, internalCallback, {
         passive: passive,
         capture: capture

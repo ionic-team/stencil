@@ -50,7 +50,7 @@ describe('plugin', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed!');
   });
 
@@ -86,7 +86,7 @@ describe('plugin', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed!');
   });
 
@@ -133,7 +133,7 @@ describe('plugin', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(cmpA).toContain('imported depFun()');
   });
 
@@ -180,7 +180,7 @@ describe('plugin', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.js'));
+    const cmpA = await c.fs.readFile(path.join(root, 'www', 'build', 'app', 'cmp-a.entry.js'));
     expect(cmpA).toContain('imported depFun()');
   });
 

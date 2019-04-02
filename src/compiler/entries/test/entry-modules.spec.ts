@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { entryRequiresScopedStyles, getAppEntryTags, getEntryEncapsulations, getEntryModes,
+import { getAppEntryTags, getEntryEncapsulations, getEntryModes,
   getUserConfigEntryTags, regroupEntryModules } from '../entry-modules';
 import { ENCAPSULATION } from '../../../util/constants';
 
@@ -14,60 +14,26 @@ describe('graph-dependencies', () => {
     { cmpMeta: { tagNameMeta: 'cmp-e' }, sourceFilePath: '/cmp-e.tsx' }
   ];
 
-  describe('bundleRequiresScopedStyles', () => {
-
-    it('scoped if using shadow', () => {
-      const requiresScopedCss = entryRequiresScopedStyles([
-        ENCAPSULATION.ShadowDom
-      ]);
-      expect(requiresScopedCss).toBe(true);
-    });
-
-    it('scoped if using scoped', () => {
-      const requiresScopedCss = entryRequiresScopedStyles([
-        ENCAPSULATION.ScopedCss
-      ]);
-      expect(requiresScopedCss).toBe(true);
-    });
-
-    it('no scoped if only using no encapsulation', () => {
-      const requiresScopedCss = entryRequiresScopedStyles([
-        ENCAPSULATION.NoEncapsulation, ENCAPSULATION.NoEncapsulation
-      ]);
-      expect(requiresScopedCss).toBe(false);
-    });
-
-    it('no scoped if empty', () => {
-      const requiresScopedCss = entryRequiresScopedStyles([]);
-      expect(requiresScopedCss).toBe(false);
-    });
-
-  });
-
   describe('getBundleEncapsulations', () => {
 
     it('should add scoped when using shadow', () => {
-      const entryModule: d.EntryModule = {
-        moduleFiles: [
-          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
-        ]
-      };
-      const modes = getEntryEncapsulations(entryModule);
+      const moduleFiles: d.ModuleFile[] = [
+        { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
+      ];
+      const modes = getEntryEncapsulations(moduleFiles);
       expect(modes.length).toBe(2);
       expect(modes[0]).toBe(ENCAPSULATION.ShadowDom);
       expect(modes[1]).toBe(ENCAPSULATION.ScopedCss);
     });
 
     it('get all encapsulations', () => {
-      const entryModule: d.EntryModule = {
-        moduleFiles: [
-          { cmpMeta: { encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-          { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
-        ]
-      };
-      const modes = getEntryEncapsulations(entryModule);
+      const moduleFiles: d.ModuleFile[] = [
+        { cmpMeta: { encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
+        { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
+        { cmpMeta: { encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
+        { cmpMeta: { encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
+      ];
+      const modes = getEntryEncapsulations(moduleFiles);
       expect(modes.length).toBe(3);
       expect(modes[0]).toBe(ENCAPSULATION.NoEncapsulation);
       expect(modes[1]).toBe(ENCAPSULATION.ShadowDom);
@@ -75,12 +41,10 @@ describe('graph-dependencies', () => {
     });
 
     it('get no encapsulation', () => {
-      const entryModule: d.EntryModule = {
-        moduleFiles: [
-          { cmpMeta: { }, sourceFilePath: '/cmp-a.tsx' },
-        ]
-      };
-      const modes = getEntryEncapsulations(entryModule);
+      const moduleFiles: d.ModuleFile[] = [
+        { cmpMeta: { }, sourceFilePath: '/cmp-a.tsx' },
+      ];
+      const modes = getEntryEncapsulations(moduleFiles);
       expect(modes.length).toBe(1);
       expect(modes[0]).toBe(ENCAPSULATION.NoEncapsulation);
     });
@@ -142,137 +106,6 @@ describe('graph-dependencies', () => {
       expect(modes.length).toBe(2);
       expect(modes[0]).toBe('modeA');
       expect(modes[1]).toBe('modeB');
-    });
-
-  });
-
-  describe('regroupEntryModules', () => {
-
-    it('should prefer ShadowDom', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
-      ];
-
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' }, { tag: 'cmp-c' }, { tag: 'cmp-d' } ]
-      ];
-
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(3);
-      expect(entryModules[0]).toHaveLength(1);
-      expect(entryModules[0][0].cmpMeta.tagNameMeta).toBe('cmp-a');
-      expect(entryModules[1]).toHaveLength(1);
-      expect(entryModules[1][0].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(entryModules[2]).toHaveLength(2);
-      expect(entryModules[2][0].cmpMeta.tagNameMeta).toBe('cmp-c');
-      expect(entryModules[2][1].cmpMeta.tagNameMeta).toBe('cmp-d');
-    });
-
-    it('should prefer ScopedCss', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
-      ];
-
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' }, { tag: 'cmp-c' }, { tag: 'cmp-d' } ]
-      ];
-
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(3);
-      expect(entryModules[0]).toHaveLength(1);
-      expect(entryModules[0][0].cmpMeta.tagNameMeta).toBe('cmp-a');
-      expect(entryModules[2]).toHaveLength(1);
-      expect(entryModules[1][0].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(entryModules[1][1].cmpMeta.tagNameMeta).toBe('cmp-c');
-      expect(entryModules[2]).toHaveLength(1);
-      expect(entryModules[2][0].cmpMeta.tagNameMeta).toBe('cmp-d');
-    });
-
-    it('should prefer NoEncapsulation', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-c.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-d.tsx' },
-      ];
-
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' }, { tag: 'cmp-c' }, { tag: 'cmp-d' } ]
-      ];
-
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(3);
-      expect(entryModules[0]).toHaveLength(2);
-      expect(entryModules[0][0].cmpMeta.tagNameMeta).toBe('cmp-a');
-      expect(entryModules[0][1].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(entryModules[1]).toHaveLength(1);
-      expect(entryModules[1][0].cmpMeta.tagNameMeta).toBe('cmp-c');
-      expect(entryModules[2]).toHaveLength(1);
-      expect(entryModules[2][0].cmpMeta.tagNameMeta).toBe('cmp-d');
-    });
-
-    it('should evenly split when all the same', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-c.tsx' },
-      ];
-
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' }, { tag: 'cmp-c' } ]
-      ];
-
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(3);
-      expect(entryModules[0]).toHaveLength(1);
-      expect(entryModules[1]).toHaveLength(1);
-      expect(entryModules[2]).toHaveLength(1);
-    });
-
-    it('should add only ShadowDom', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ShadowDom }, sourceFilePath: '/cmp-b.tsx' },
-      ];
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' } ]
-      ];
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(1);
-      expect(entryModules[0]).toHaveLength(2);
-    });
-
-    it('should add only ScopedCss', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulationMeta: ENCAPSULATION.ScopedCss }, sourceFilePath: '/cmp-b.tsx' },
-      ];
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' } ]
-      ];
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(1);
-      expect(entryModules[0]).toHaveLength(2);
-    });
-
-    it('should add only NoEncapsulation', () => {
-      const allModules: d.ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-a.tsx' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', encapsulation: ENCAPSULATION.NoEncapsulation }, sourceFilePath: '/cmp-b.tsx' },
-        {/* empty on purpose */} as any
-      ];
-      const entryPoints: d.EntryPoint[] = [
-        [ { tag: 'cmp-a' }, { tag: 'cmp-b' } ]
-      ];
-      const entryModules = regroupEntryModules(allModules, entryPoints);
-      expect(entryModules).toHaveLength(1);
-      expect(entryModules[0]).toHaveLength(2);
     });
 
   });

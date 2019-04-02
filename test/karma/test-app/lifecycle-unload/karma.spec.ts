@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('lifecycle-unload', function() {
@@ -36,7 +36,7 @@ describe('lifecycle-unload', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     const cmpA = app.querySelector('lifecycle-unload-a');
     expect(cmpA).toBe(null);
@@ -47,7 +47,7 @@ describe('lifecycle-unload', function() {
     expect(unload.children.length).toBe(2);
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     main = app.querySelector('lifecycle-unload-a').shadowRoot.querySelector('main');
     expect(main.children[0].textContent.trim()).toBe('cmp-a - top');
@@ -58,7 +58,7 @@ describe('lifecycle-unload', function() {
     expect(main.children[1].shadowRoot.children[2].textContent.trim()).toBe('cmp-b - bottom');
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     unload = app.querySelector('#lifecycle-unload-results');
     expect(unload.children[0].textContent.trim()).toBe('cmp-a unload');
@@ -81,7 +81,7 @@ describe('lifecycle-unload', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     const cmpA = app.querySelector('lifecycle-unload-a');
     expect(cmpA).toBe(null);
@@ -92,7 +92,7 @@ describe('lifecycle-unload', function() {
     expect(unload.children.length).toBe(2);
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     main = app.querySelector('lifecycle-unload-a main');
     expect(main.children[0].textContent.trim()).toBe('cmp-a - top');
@@ -102,7 +102,7 @@ describe('lifecycle-unload', function() {
     expect(main.children[2].textContent.trim()).toBe('cmp-a - bottom');
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     unload = app.querySelector('#lifecycle-unload-results');
     expect(unload.children[0].textContent.trim()).toBe('cmp-a unload');

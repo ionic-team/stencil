@@ -12,8 +12,8 @@ import { getWatchDecoratorMeta } from './watch-decorator';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from '../../style/normalize-styles';
 import { validateComponentClass } from './validate-component';
-import * as ts from 'typescript';
-import { buildError } from '../../util';
+import ts from 'typescript';
+import { buildError, buildWarn } from '../../util';
 import { isDecoratorNamed } from './utils';
 
 
@@ -29,7 +29,7 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
         }
 
         if (ts.isClassDeclaration(node)) {
-          const cmpMeta = visitClass(buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
+          const cmpMeta = visitClass(config, buildCtx.diagnostics, typeChecker, node as ts.ClassDeclaration, tsSourceFile);
           if (cmpMeta) {
             if (moduleFile.cmpMeta) {
               throw new Error(`More than one @Component() class in a single file is not valid`);
@@ -45,7 +45,8 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
       } catch ({message}) {
         const error = buildError(buildCtx.diagnostics);
         error.messageText = message;
-        error.relFilePath = tsSourceFile.fileName;
+        error.absFilePath = tsSourceFile.fileName;
+        error.relFilePath = config.sys.path.relative(config.rootDir, tsSourceFile.fileName);
       }
       return undefined;
     }
@@ -65,11 +66,15 @@ export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
         const fileExports = (fileSymbol && typeChecker.getExportsOfModule(fileSymbol)) || [];
 
         if (fileExports.length > 1) {
-          const error = buildError(buildCtx.diagnostics);
-          error.messageText = `@Component() must be the only export of the module`;
-          error.relFilePath = tsSourceFile.fileName;
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.messageText = `@Component() should be the only export of the module.
+Numerous export statements within a component module may cause undesirable bundling output, leading to unoptimized lazy loading.
+Create a new auxiliary \`.ts\` file in order to export shared functionality.`;
+          warn.relFilePath = tsSourceFile.fileName;
 
-        } else if (
+        }
+
+        if (
           fileExports.length === 0 ||
           !isComponentClass(fileExports[0])
         ) {
@@ -93,6 +98,7 @@ function isComponentClass(symbol: ts.Symbol) {
 
 
 export function visitClass(
+  config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   classNode: ts.ClassDeclaration,
@@ -111,13 +117,13 @@ export function visitClass(
   cmpMeta.membersMeta = {
     // membersMeta is shared with @Prop, @State, @Method, @Element
     ...getElementDecoratorMeta(typeChecker, classNode),
-    ...getMethodDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile, componentClass),
+    ...getMethodDecoratorMeta(config, diagnostics, typeChecker, classNode, sourceFile, componentClass),
     ...getStateDecoratorMeta(classNode),
     ...getPropDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile, componentClass)
   };
 
   cmpMeta.eventsMeta = getEventDecoratorMeta(diagnostics, typeChecker, classNode, sourceFile);
-  cmpMeta.listenersMeta = getListenDecoratorMeta(typeChecker, classNode);
+  cmpMeta.listenersMeta = getListenDecoratorMeta(config, diagnostics, typeChecker, classNode, sourceFile);
 
   // watch meta collection MUST happen after prop/state decorator meta collection
   getWatchDecoratorMeta(diagnostics, classNode, cmpMeta);

@@ -21,7 +21,7 @@ describe('cli', () => {
   beforeEach(() => {
     process = {} as any;
     process.cwd = () => '/User/ellie_mae';
-    process.exit = (code) => { exitCode = code; };
+    (process as any).exit = (code) => { exitCode = code; };
     process.once = () => process;
     process.on = () => process;
     process.env = {};

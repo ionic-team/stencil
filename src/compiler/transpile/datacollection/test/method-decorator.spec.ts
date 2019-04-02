@@ -1,7 +1,16 @@
 import { gatherMetadata } from './test-utils';
 import { getMethodDecoratorMeta } from '../method-decorator';
 import * as path from 'path';
+import { MEMBER_TYPE } from '../../../../util/constants';
+import { Config } from '../../../../declarations';
+import { mockConfig } from '../../../../testing/mocks';
 
+
+let config: Config;
+
+beforeEach(() => {
+  config = mockConfig();
+});
 
 describe('method decorator', () => {
 
@@ -9,14 +18,16 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: any) => any',
+          text: '(opts?: any) => Promise<ActionSheet>',
+          optional: false,
+          required: false,
           typeReferences: {
             ActionSheet: {
               referenceLocation: 'global',
@@ -32,7 +43,30 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
-          type: '(opts?: any) => any',
+          tags: [{
+            name: 'param',
+            text: 'opts action sheet options'
+          }, {
+            name: 'returns',
+            text: 'action sheet'
+          }
+          ],
+          parameters: [
+            {
+              documentation: 'action sheet options',
+              name: 'opts',
+              tags: [{
+                name: 'param',
+                text: 'opts action sheet options'
+              }],
+              type: 'any'
+            }
+          ],
+          returns: {
+            documentation: 'action sheet',
+            type: 'Promise<ActionSheet>'
+          },
+          type: '(opts?: any) => Promise<ActionSheet>',
         }
       }
     });
@@ -42,14 +76,16 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example-w-export-interface');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: ActionSheetOptions) => any',
+          text: '(opts?: ActionSheetOptions) => Promise<void>',
+          optional: false,
+          required: false,
           typeReferences: {
             ActionSheetOptions: {
               referenceLocation: 'local',
@@ -62,7 +98,26 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
-          type: '(opts?: ActionSheetOptions) => any',
+          tags: [{
+            name: 'param',
+            text: 'opts action sheet options'
+          }],
+          parameters: [
+            {
+              documentation: 'action sheet options',
+              name: 'opts',
+              tags: [{
+                name: 'param',
+                text: 'opts action sheet options'
+              }],
+              type: 'ActionSheetOptions'
+            }
+          ],
+          returns: {
+            documentation: '',
+            type: 'Promise<void>'
+          },
+          type: '(opts?: ActionSheetOptions) => Promise<void>',
         }
       }
     });
@@ -72,14 +127,16 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example-w-external-type-import');
     gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta([], checker, classNode, sourceFile, 'ClassName');
+      response = getMethodDecoratorMeta(config, [], checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
       create: {
-        memberType: 6,
+        memberType: MEMBER_TYPE.Method,
         attribType: {
-          text: '(opts?: t.CoreContext) => any',
+          text: '(opts?: t.CoreContext) => Promise<void>',
+          optional: false,
+          required: false,
           typeReferences: {
             Promise: {
               referenceLocation: 'global',
@@ -89,7 +146,26 @@ describe('method decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'create',
-          type: '(opts?: CoreContext) => any'
+          tags: [{
+            name: 'param',
+            text: 'opts action sheet options'
+          }],
+          parameters: [
+            {
+              documentation: 'action sheet options',
+              name: 'opts',
+              tags: [{
+                name: 'param',
+                text: 'opts action sheet options'
+              }],
+              type: 'CoreContext'
+            }
+          ],
+          returns: {
+            documentation: '',
+            type: 'Promise<void>'
+          },
+          type: '(opts?: CoreContext) => Promise<void>'
         }
       }
     });

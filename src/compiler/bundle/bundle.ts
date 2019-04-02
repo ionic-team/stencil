@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
+import { deriveModules } from './derive-modules';
 import { generateBundleModules } from './bundle-modules';
 
 
@@ -8,28 +9,32 @@ export async function generateModuleMap(config: d.Config, compilerCtx: d.Compile
     return null;
   }
 
-  if (buildCtx.isRebuild && !buildCtx.requiresFullBuild && !buildCtx.hasScriptChanges && compilerCtx.lastJsModules) {
+  if (buildCtx.isRebuild && !buildCtx.requiresFullBuild && !buildCtx.hasScriptChanges && compilerCtx.lastRawModules) {
     // this is a rebuild, it doesn't require a full build
     // there were no script changes, and we've got a good cache of the last js modules
     // let's skip this
-    buildCtx.debug(`generateModuleMap, using lastJsModules cache`);
-    return compilerCtx.lastJsModules;
+    buildCtx.debug(`generateModuleMap, using lastRawModules cache`);
+    return compilerCtx.lastRawModules;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`module map started`);
-  let jsModules: d.JSModuleMap;
+  const moduleMapTimespan = buildCtx.createTimeSpan(`module map started`);
+  let moduleFormats: d.JSModuleFormats;
 
   try {
-    jsModules = await generateBundleModules(config, compilerCtx, buildCtx, entryModules);
+    moduleFormats = await generateBundleModules(config, compilerCtx, buildCtx, entryModules);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
+  const moduleDeriveTimespan = buildCtx.createTimeSpan(`module derive started`, true);
+  const derivesModules = await deriveModules(config, compilerCtx, buildCtx, moduleFormats);
+  moduleDeriveTimespan.finish(`module derive finished`);
+
   // remember for next time incase we change just a css file or something
-  compilerCtx.lastJsModules = jsModules;
+  compilerCtx.lastRawModules = derivesModules;
 
-  timeSpan.finish(`module map finished`);
+  moduleMapTimespan.finish(`module map finished`);
 
-  return jsModules;
+  return derivesModules;
 }

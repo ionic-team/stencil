@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('attribute-host', function() {
@@ -33,7 +33,7 @@ describe('attribute-host', function() {
     }
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     expect(elm.style.getPropertyValue('border-color')).toEqual('black');
     expect(elm.style.getPropertyValue('display')).toEqual('block');
@@ -51,7 +51,7 @@ describe('attribute-host', function() {
     expect(elm.getAttribute('no-attr')).toBe(null);
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     expect(elm.style.getPropertyValue('border-color')).toEqual('');
     expect(elm.style.getPropertyValue('display')).toEqual('inline-block');
@@ -69,7 +69,7 @@ describe('attribute-host', function() {
     expect(elm.getAttribute('no-attr')).toBe(null);
 
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     expect(elm.style.getPropertyValue('border-color')).toEqual('black');
     expect(elm.style.getPropertyValue('display')).toEqual('block');

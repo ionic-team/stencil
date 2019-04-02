@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { minifyJs } from '../minifier';
-import { minifyStyle } from '../style/minify-style';
+import { optimizeCss } from '../style/optimize-css';
 
 
 export async function minifyInlineScripts(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, diagnostics: d.Diagnostic[]) {
@@ -57,14 +57,7 @@ export async function minifyInlineScript(config: d.Config, compilerCtx: d.Compil
     return;
   }
 
-  const minifyResults = await minifyJs(config, compilerCtx, script.innerHTML, 'es5', false);
-  minifyResults.diagnostics.forEach(diagnostic => {
-    diagnostics.push(diagnostic);
-  });
-
-  if (typeof minifyResults.output === 'string') {
-    script.innerHTML = minifyResults.output;
-  }
+  script.innerHTML = await minifyJs(config, compilerCtx, diagnostics, script.innerHTML, 'es5', false);
 }
 
 
@@ -110,6 +103,6 @@ export function canMinifyInlineStyle(style: HTMLStyleElement) {
 
 async function minifyInlineStyle(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], style: HTMLStyleElement) {
   if (canMinifyInlineStyle(style)) {
-    style.innerHTML = await minifyStyle(config, compilerCtx, diagnostics, style.innerHTML);
+    style.innerHTML = await optimizeCss(config, compilerCtx, diagnostics, style.innerHTML, null, true);
   }
 }

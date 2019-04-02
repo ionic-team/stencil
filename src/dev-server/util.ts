@@ -38,7 +38,8 @@ export function responseHeaders(headers: d.DevResponseHeaders): any {
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
   'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
   'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server'
+  'X-Powered-By': 'Stencil Dev Server',
+  'Access-Control-Allow-Origin': '*'
 };
 
 
@@ -135,16 +136,12 @@ export const DEV_SERVER_INIT_URL = `${DEV_SERVER_URL}-init`;
 export const OPEN_IN_EDITOR_URL = `${DEV_SERVER_URL}-open-in-editor`;
 
 
-export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest, contentLength: number) {
+export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   if (!devServerConfig.gzip) {
     return false;
   }
 
   if (req.method !== 'GET') {
-    return false;
-  }
-
-  if (contentLength < 1024) {
     return false;
   }
 

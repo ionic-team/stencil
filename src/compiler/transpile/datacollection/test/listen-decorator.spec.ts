@@ -1,15 +1,23 @@
 import { getListenDecoratorMeta } from '../listen-decorator';
 import { gatherMetadata } from './test-utils';
 import * as path from 'path';
+import { mockConfig } from '../../../../testing/mocks';
+import { Config } from '../../../../declarations';
 
+
+let config: Config;
+
+beforeEach(() => {
+  config = mockConfig();
+});
 
 describe('listen decorator', () => {
 
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/listen-simple');
-    gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getListenDecoratorMeta(checker, classNode);
+    gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
+      response = getListenDecoratorMeta(config, diagnostics, checker, classNode, sourceFile);
     });
 
     expect(response).toEqual([
@@ -22,6 +30,7 @@ describe('listen decorator', () => {
         jsdoc: {
           documentation: 'Create listen for something',
           name: 'viewDidLoad',
+          tags: [],
           type: '(ev: any) => void',
         },
       },
@@ -34,6 +43,7 @@ describe('listen decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'method',
+          tags: [],
           type: '() => void',
         },
       },
@@ -46,6 +56,7 @@ describe('listen decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'method',
+          tags: [],
           type: '() => void',
         },
       },
@@ -58,6 +69,7 @@ describe('listen decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'method',
+          tags: [],
           type: '() => void',
         },
       }

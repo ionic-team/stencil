@@ -345,7 +345,8 @@ describe('h()', () => {
       expect(args.length).toBe(3);
       expect(args[0]).toEqual({ id: 'blank' });
       expect(args[1].length).toEqual(1);
-      expect(args[2]).toHaveProperties(['map', 'foreach']);
+      expect(typeof args[2].map).toBe('function');
+      expect(typeof args[2].forEach).toBe('function');
     });
 
     it('should receive an empty object when component receives no props', async () => {
@@ -407,9 +408,11 @@ describe('h()', () => {
         });
         return h('article', null);
       };
-      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
+      h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
       expect(output).toEqual([
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             id: 'blue',
           },
@@ -431,6 +434,8 @@ describe('h()', () => {
           vtext: undefined,
         },
         {
+          elm: undefined,
+          ishost: false,
           vattrs: null,
           vchildren: null,
           vkey: undefined,
@@ -456,6 +461,8 @@ describe('h()', () => {
       const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'), h('span', null));
       expect(vnode).toEqual([
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             class: 'my-class',
             id: 'blue'
@@ -471,6 +478,8 @@ describe('h()', () => {
           vtext: undefined
         },
         {
+          elm: undefined,
+          ishost: false,
           vattrs: {
             class: 'my-class'
           },

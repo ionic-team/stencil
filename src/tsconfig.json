@@ -20,7 +20,13 @@
     "noUnusedParameters": true,
     "outDir": "../dist/transpiled-core",
     "pretty": true,
-    "target": "es2017"
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/mock-doc": [
+        "../dist/mock-doc"
+      ]
+    }
   },
   "include": [
     "index.ts",

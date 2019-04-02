@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { mockStencilSystem } from '../../../testing/mocks';
-import { normalizePath } from '../../../compiler/util';
 import { validateServiceWorker } from '../validate-service-worker';
+
 
 describe('validateServiceWorker', () => {
 
@@ -105,7 +105,7 @@ describe('validateServiceWorker', () => {
       dir: '/www'
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{js,css,json,html,ico,png,svg}']);
+    expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{js,css,json,html}']);
   });
 
   it('should create default sw config when www type and prod mode', () => {
@@ -160,6 +160,7 @@ describe('validateServiceWorker', () => {
 
   it('should create sw config when in devMode if flag serviceWorker', () => {
     outputTarget = {
+      type: 'www',
       dir: '/www',
       serviceWorker: true as any
     };

@@ -10,53 +10,16 @@ export function validateOutputTargetAngular(config: d.Config) {
   distOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];
 
-    if (typeof outputTarget.appBuild !== 'boolean') {
-      outputTarget.appBuild = true;
-    }
-
-    if (!outputTarget.dir) {
-      outputTarget.dir = DEFAULT_DIR;
-    }
-
-    if (!path.isAbsolute(outputTarget.dir)) {
-      outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
-    }
-
-    if (!outputTarget.buildDir) {
-      outputTarget.buildDir = DEFAULT_BUILD_DIR;
-    }
-
-    if (!path.isAbsolute(outputTarget.buildDir)) {
-      outputTarget.buildDir = normalizePath(path.join(outputTarget.dir, outputTarget.buildDir));
-    }
-
-    if (!outputTarget.typesDir) {
-      outputTarget.typesDir = DEFAULT_TYPES_DIR;
-    }
-
-    if (!path.isAbsolute(outputTarget.typesDir)) {
-      outputTarget.typesDir = normalizePath(path.join(outputTarget.dir, outputTarget.typesDir));
-    }
-
-    if (typeof outputTarget.empty !== 'boolean') {
-      outputTarget.empty = DEFAULT_EMPTY_DIR;
-    }
-
-    if (typeof outputTarget.appBuild !== 'boolean') {
-      outputTarget.appBuild = true;
-    }
-
     if (!path.isAbsolute(outputTarget.directivesProxyFile)) {
       outputTarget.directivesProxyFile = normalizePath(path.join(config.rootDir, outputTarget.directivesProxyFile));
     }
 
-    if (!path.isAbsolute(outputTarget.directivesArrayFile)) {
+    if (outputTarget.directivesArrayFile && !path.isAbsolute(outputTarget.directivesArrayFile)) {
       outputTarget.directivesArrayFile = normalizePath(path.join(config.rootDir, outputTarget.directivesArrayFile));
+    }
+
+    if (outputTarget.directivesUtilsFile && !path.isAbsolute(outputTarget.directivesUtilsFile)) {
+      outputTarget.directivesUtilsFile = normalizePath(path.join(config.rootDir, outputTarget.directivesUtilsFile));
     }
   });
 }
-
-const DEFAULT_DIR = 'dist';
-const DEFAULT_BUILD_DIR = '';
-const DEFAULT_EMPTY_DIR = true;
-const DEFAULT_TYPES_DIR = 'types';

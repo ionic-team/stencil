@@ -2,6 +2,9 @@ const fs = require('fs-extra');
 const path = require('path');
 const webpack = require('webpack');
 const rollup = require('rollup');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
+const rollupJson = require('rollup-plugin-json');
 const glob = require('glob');
 const transpile = require('./transpile');
 
@@ -14,9 +17,9 @@ const transpileSuccess = transpile(path.join('..', 'src', 'sys', 'node', 'tsconf
 
 if (transpileSuccess) {
   // bundle external deps
+  bundleExternal('graceful-fs.js');
   bundleExternal('node-fetch.js');
   bundleExternal('open-in-editor.js');
-  bundleExternal('sys-util.js');
   bundleExternal('sys-worker.js');
   bundleExternal('websocket.js');
 
@@ -27,7 +30,7 @@ if (transpileSuccess) {
   copyXdgOpen();
 
   // open-in-editor's visualstudio.vbs file
-  copyOpenInEditor()
+  copyOpenInEditor();
 
   process.on('exit', () => {
     fs.removeSync(TRANSPILED_DIR);
@@ -71,6 +74,14 @@ function bundleExternal(entryFileName) {
       // bundle this import
       callback();
     },
+    resolve: {
+      alias: {
+        'postcss': path.resolve(__dirname, '..', 'node_modules', 'postcss'),
+        'source-map': path.resolve(__dirname, '..', 'node_modules', 'source-map'),
+        'chalk': path.resolve(__dirname, 'helpers', 'empty.js'),
+        'cssnano-preset-default': path.resolve(__dirname, 'helpers', 'cssnano-preset-default'),
+      }
+    },
     optimization: {
       minimize: false
     },
@@ -103,13 +114,37 @@ function bundleNodeSysMain() {
   rollup.rollup({
     input: inputPath,
     external: [
+      'assert',
       'child_process',
       'crypto',
+      'events',
       'fs',
+      'module',
       'path',
       'os',
       'typescript',
-      'url'
+      'url',
+      'util',
+      './graceful-fs.js'
+    ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(importee) {
+            if (importee === 'resolve') {
+              return path.join(__dirname, 'helpers', 'resolve.js');
+            }
+            if (importee === 'graceful-fs') {
+              return './graceful-fs.js';
+            }
+          }
+        }
+      })(),
+      rollupResolve({
+        preferBuiltins: true,
+      }),
+      rollupCommonjs(),
+      rollupJson()
     ],
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
@@ -122,9 +157,9 @@ function bundleNodeSysMain() {
       format: 'cjs',
       file: outputPath
 
-    }).then(output => {
+    }).then(({ output }) => {
       try {
-        let outputText = output.code;
+        let outputText = output[0].code;
 
         const buildId = (process.argv.find(a => a.startsWith('--build-id=')) || '').replace('--build-id=', '');
         outputText = outputText.replace(/__BUILDID__/g, buildId);
@@ -145,7 +180,7 @@ function bundleNodeSysMain() {
     });
 
   }).catch(err => {
-    console.error(`build sys.node error: ${err}`);
+    console.error(`build sys.node error: ${err.stack}`);
     process.exit(1);
   });
 }

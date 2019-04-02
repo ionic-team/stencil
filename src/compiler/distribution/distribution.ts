@@ -1,14 +1,16 @@
 import * as d from '../../declarations';
 import { copyComponentStyles } from '../copy/copy-styles';
-import { generateCommonJsIndex } from './dist-cjs';
-import { generateEsmIndex } from './dist-esm';
+import { generateEsmIndexes } from './dist-esm';
 import { generateAngularProxies } from './dist-angular';
 import { generateTypes } from '../collections/collection-types';
-import { hasError, pathJoin } from '../util';
+import { hasError } from '../util';
 import * as v from './validate-package-json';
 
 
 export async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
+  if (config.devMode) {
+    return;
+  }
   await Promise.all([
     generateAngularProxies(config, compilerCtx, cmpRegistry)
   ]);
@@ -50,8 +52,7 @@ async function generateDistribution(config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   await Promise.all([
-    generateCommonJsIndex(config, compilerCtx, outputTarget),
-    generateEsmIndex(config, compilerCtx, outputTarget),
+    generateEsmIndexes(config, compilerCtx, outputTarget),
     copyComponentStyles(config, compilerCtx, buildCtx),
     generateTypes(config, compilerCtx, outputTarget, buildCtx, pkgData)
   ]);
@@ -83,16 +84,3 @@ async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
 
   return pkgData;
 }
-
-
-export function getComponentsDtsSrcFilePath(config: d.Config) {
-  return pathJoin(config, config.srcDir, GENERATED_DTS);
-}
-
-
-export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
-  return pathJoin(config, outputTarget.typesDir, GENERATED_DTS);
-}
-
-
-export const GENERATED_DTS = 'components.d.ts';

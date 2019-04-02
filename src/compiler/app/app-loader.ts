@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
-import { formatBrowserLoaderComponentRegistry } from '../../util/data-serialize';
+import { formatBrowserLoaderComponentTagNames } from '../../util/data-serialize';
 import { generatePreamble } from '../util';
 import { getLoaderPath } from './app-file-naming';
 import { minifyJs } from '../minifier';
@@ -37,13 +37,7 @@ export async function generateLoader(
 
   if (config.minifyJs) {
     // minify the loader which should always be es5
-    const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true, buildCtx.timestamp);
-
-    if (minifyJsResults.diagnostics.length > 0) {
-      buildCtx.diagnostics.push(...minifyJsResults.diagnostics);
-    } else {
-      loaderContent = minifyJsResults.output;
-    }
+    loaderContent = await minifyJs(config, compilerCtx, buildCtx.diagnostics, loaderContent, 'es5', true, buildCtx.timestamp);
 
   } else {
     // dev
@@ -69,9 +63,7 @@ export function injectAppIntoLoader(
   cmpRegistry: d.ComponentRegistry,
   loaderContent: string
 ) {
-  const cmpLoaderRegistry = formatBrowserLoaderComponentRegistry(cmpRegistry);
-
-  const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
+  const cmpTags = formatBrowserLoaderComponentTagNames(cmpRegistry);
 
   const resourcesUrl = outputTarget.resourcesUrl ? `"${outputTarget.resourcesUrl}"` : 0;
 
@@ -82,7 +74,7 @@ export function injectAppIntoLoader(
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,
-    cmpLoaderRegistryStr,
+    `"${cmpTags.join(',')}"`,
     'HTMLElement.prototype'
   ].join(',');
 

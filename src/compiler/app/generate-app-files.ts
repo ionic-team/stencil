@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
-import { generateAppGlobalScript } from './app-global-scripts';
+import { generateBrowserAppGlobalScript } from './app-global-scripts';
 import { generateCoreBrowser } from './app-core-browser';
-import { generateEsmCore } from './app-core-esm';
+import { generateEsmCores } from './app-core-esm';
 import { generateEsmHosts } from '../distribution/dist-esm';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateLoader } from './app-loader';
@@ -48,13 +48,13 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 
     await Promise.all([
       // browser core esm build
-      generateBrowserCoreEsm(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry),
+      generateBrowserCore(config, compilerCtx, buildCtx, outputTarget, entryModules, cmpRegistry, appRegistry),
 
       // browser core es5 build
-      generateBrowserCoreEs5(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry),
+      generateBrowserCoreEs5(config, compilerCtx, buildCtx, outputTarget, entryModules, cmpRegistry, appRegistry),
 
       // core esm
-      generateEsmCore(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry)
+      generateEsmCores(config, compilerCtx, buildCtx, outputTarget, entryModules)
     ]);
 
     await Promise.all([
@@ -74,26 +74,28 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 }
 
 
-async function generateBrowserCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+async function generateBrowserCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry, appRegistry: d.AppRegistry) {
   // browser esm core build
-  const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+  const globalJsContentsEsm = await generateBrowserAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es2017');
 
   // figure out which sections should be included in the core build
   const buildConditionals = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, entryModules);
 
-  const coreFilename = await generateCoreBrowser(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEsm, buildConditionals);
+  const staticName = 'core.browser.js';
+  const coreFilename = await generateCoreBrowser(config, compilerCtx, buildCtx, outputTarget, cmpRegistry, staticName, globalJsContentsEsm, buildConditionals);
   appRegistry.core = coreFilename;
 }
 
 
-async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+async function generateBrowserCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry, appRegistry: d.AppRegistry) {
   if (config.buildEs5) {
     // browser core es5 build
-    const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
+    const globalJsContentsEs5 = await generateBrowserAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
 
     const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, 'core.pf', buildCtx, entryModules);
 
-    const coreFilenameEs5 = await generateCoreBrowser(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs5, buildConditionalsEs5);
+    const staticName = 'core.browser.legacy.js';
+    const coreFilenameEs5 = await generateCoreBrowser(config, compilerCtx, buildCtx, outputTarget, cmpRegistry, staticName, globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;
 
   } else {

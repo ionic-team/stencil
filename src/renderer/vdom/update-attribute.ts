@@ -1,15 +1,19 @@
 import { toLowerCase } from '../../util/helpers';
 
 
-export function updateAttribute(
+export const updateAttribute = (
   elm: HTMLElement,
   memberName: string,
   newValue: any,
   isBooleanAttr = typeof newValue === 'boolean',
-) {
-  const isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+  isXlinkNs?: boolean
+) => {
+  if (_BUILD_.hasSvg) {
+    isXlinkNs = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+  }
+
   if (newValue == null || (isBooleanAttr && (!newValue || newValue === 'false'))) {
-    if (isXlinkNs) {
+    if (_BUILD_.hasSvg && isXlinkNs) {
       elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
 
     } else {
@@ -22,13 +26,13 @@ export function updateAttribute(
     } else {
       newValue = newValue.toString();
     }
-    if (isXlinkNs) {
+    if (_BUILD_.hasSvg && isXlinkNs) {
       elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
 
     } else {
       elm.setAttribute(memberName, newValue);
     }
   }
-}
+};
 
 const XLINK_NS = 'http://www.w3.org/1999/xlink';

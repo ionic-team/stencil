@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('reflect-to-attr', function() {
@@ -28,7 +28,7 @@ describe('reflect-to-attr', function() {
     cmp.bool = true;
     cmp.otherBool = false;
 
-    await flush(app);
+    await waitForChanges();
 
     expect(cmp.getAttribute('str')).toEqual('second');
     expect(cmp.getAttribute('nu')).toEqual('-12.2');
@@ -39,6 +39,20 @@ describe('reflect-to-attr', function() {
 
     expect(cmp.getAttribute('dynamic-str')).toEqual('value');
     expect(cmp.getAttribute('dynamic-nu')).toEqual('123');
+  });
+
+  it('should reflect booleans property', async () => {
+    const cmp = app.querySelector('reflect-to-attr') as any;
+    expect(cmp.disabled).toBe(false);
+
+    const toggle = app.querySelector('#toggle') as any;
+    toggle.click();
+    await waitForChanges();
+    expect(cmp.disabled).toBe(true);
+
+    toggle.click();
+    await waitForChanges();
+    expect(cmp.disabled).toBe(false);
   });
 
 });

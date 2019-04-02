@@ -15,7 +15,7 @@ describe('hydrate', () => {
     outputTarget = config.outputTargets[0] as OutputTargetHydrate;
   });
 
-  it('should add scope attributes', async () => {
+  it('should add scope classes', async () => {
     const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
@@ -53,6 +53,7 @@ describe('hydrate', () => {
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
         <head>
+          <meta charset="utf-8">
           <style data-styles="">
             .sc-ion-test-h {
               color:red;
@@ -60,7 +61,7 @@ describe('hydrate', () => {
           </style>
         </head>
         <body>
-          <ion-test class="sc-ion-test-h ${config.hydratedCssClass}" ssrv="0">
+          <ion-test class="sc-ion-test-h sc-ion-test-s ${config.hydratedCssClass}" ssrv="0">
             <div class="sc-ion-test" ssrc="0.0."></div>
           </ion-test>
         </body>
@@ -118,7 +119,7 @@ describe('hydrate', () => {
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head></head>
+        <head><meta charset="utf-8"></head>
         <body>
           <ion-test ssrv="0" class="${config.hydratedCssClass}">
             <elm-a ssrc="0.0.">
@@ -181,7 +182,7 @@ describe('hydrate', () => {
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head></head>
+        <head><meta charset="utf-8"></head>
         <body>
           <ion-test ssrv="0" class="${config.hydratedCssClass}">
             <elm-a ssrc="0.0">
@@ -235,7 +236,7 @@ describe('hydrate', () => {
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head></head>
+        <head><meta charset="utf-8"></head>
         <body>
           <ion-test ssrv="0" class="${config.hydratedCssClass}">
             <div ssrc="0.0."></div>

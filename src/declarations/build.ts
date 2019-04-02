@@ -1,5 +1,11 @@
 import * as d from '.';
 
+export interface RollupResultModule {
+  id: string;
+}
+export interface RollupResults {
+  modules: RollupResultModule[];
+}
 
 export interface BuildCtx {
   abort(): Promise<BuildResults>;
@@ -44,6 +50,8 @@ export interface BuildCtx {
   scriptsAdded: string[];
   scriptsDeleted: string[];
   hasError: boolean;
+  hasWarning: boolean;
+  rollupResults?: RollupResults;
   startTime: number;
   styleBuildCount: number;
   stylesUpdated: BuildStyleUpdate[];
@@ -145,6 +153,7 @@ export interface BuildStats {
   };
   components: BuildComponent[];
   entries: BuildEntry[];
+  rollupResults: RollupResults;
   sourceGraph: BuildSourceGraph;
   collections: {
     name: string;
@@ -210,10 +219,21 @@ export interface JSModuleList {
   };
 }
 
-export interface JSModuleMap {
+export interface JSModuleFormats {
   esm?: JSModuleList;
-  es5?: JSModuleList;
-  esmEs5?: JSModuleList;
+  amd?: JSModuleList;
+}
+
+export interface DerivedChunk {
+  entryKey: string;
+  filename: string;
+  code: string;
+}
+
+export interface DerivedModule {
+  list: DerivedChunk[];
+  sourceTarget: d.SourceTarget;
+  isBrowser: boolean;
 }
 
 

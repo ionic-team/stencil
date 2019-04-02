@@ -1,17 +1,23 @@
 import * as d from '../../declarations';
+import color from 'ansi-colors';
 import { createContext, runInContext } from './node-context';
 import { createFsWatcher } from './node-fs-watcher';
 import { createDom } from './node-dom';
+import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
+import { NodeLazyRequire } from './node-lazy-require';
+import { NodeResolveModule } from './node-resolve-module';
+import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '../../compiler/util';
+import opn from 'opn';
+import semver from 'semver';
 import { WorkerManager } from './worker/index';
 
 
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as os from 'os';
+import { createHash } from 'crypto';
+import { cpus, platform, release, tmpdir } from 'os';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -19,38 +25,46 @@ import * as url from 'url';
 export class NodeSystem implements d.StencilSystem {
   private packageJsonData: d.PackageJsonData;
   private distDir: string;
-  private sysUtil: any;
+  private packageDir: string;
   private sysWorker: WorkerManager;
   private typescriptPackageJson: d.PackageJsonData;
-  private resolveModuleCache: { [cacheKey: string]: string } = {};
   private destroys: Function[] = [];
+  private nodeLazyRequire: NodeLazyRequire;
+  private nodeResolveModule: NodeResolveModule;
   storage: NodeStorage;
 
   fs: d.FileSystem;
   path: d.Path;
 
+  semver: d.Semver = {
+    lt: semver.lt,
+    lte: semver.lte,
+    gt: semver.gt,
+    gte: semver.gte,
+    prerelease: semver.prerelease,
+    satisfies: semver.satisfies
+  };
+
   constructor(fs?: d.FileSystem) {
     this.fs = fs || new NodeFs();
     this.path = path;
-
-    const rootDir = path.join(__dirname, '..', '..', '..');
-    this.distDir = path.join(rootDir, 'dist');
-
-    this.sysUtil = require(path.join(this.distDir, 'sys', 'node', 'sys-util.js'));
-
-    try {
-      this.packageJsonData = require(path.join(rootDir, 'package.json'));
-    } catch (e) {
-      throw new Error(`unable to resolve "package.json" from: ${rootDir}`);
-    }
-
-    try {
-      this.typescriptPackageJson = require(this.resolveModule(rootDir, 'typescript')) as d.PackageJsonData;
-    } catch (e) {
-      throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
-    }
-
+    this.nodeResolveModule = new NodeResolveModule();
     this.storage = new NodeStorage(this.fs);
+
+    this.packageDir = path.join(__dirname, '..', '..', '..');
+    this.distDir = path.join(this.packageDir, 'dist');
+
+    try {
+      this.packageJsonData = require(path.join(this.packageDir, 'package.json'));
+    } catch (e) {
+      throw new Error(`unable to resolve "package.json" from: ${this.packageDir}`);
+    }
+
+    try {
+      this.typescriptPackageJson = require(this.resolveModule(this.packageDir, 'typescript')) as d.PackageJsonData;
+    } catch (e) {
+      throw new Error(`unable to resolve "typescript" from: ${this.packageDir}`);
+    }
   }
 
   initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number) {
@@ -59,7 +73,7 @@ export class NodeSystem implements d.StencilSystem {
     }
     const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
 
-    const availableCpus = os.cpus().length;
+    const availableCpus = cpus().length;
     if (typeof maxConcurrentWorkers === 'number') {
       maxConcurrentWorkers = Math.max(1, Math.min(availableCpus, maxConcurrentWorkers));
     } else {
@@ -102,12 +116,9 @@ export class NodeSystem implements d.StencilSystem {
       name: this.packageJsonData.name,
       version: this.packageJsonData.version,
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
+      packageDir: this.packageDir,
       typescriptVersion: this.typescriptPackageJson.version
     };
-  }
-
-  async autoprefixCss(input: string, opts: any): Promise<string> {
-    return this.sysWorker.run('autoprefixCss', [input, opts]);
   }
 
   async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
@@ -138,9 +149,9 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   generateContentHash(content: any, length: number) {
-    let hash = crypto.createHash('md5')
-                     .update(content)
-                     .digest('base64');
+    let hash = createHash('md5')
+               .update(content)
+               .digest('base64');
 
     if (typeof length === 'number') {
       hash = hash.replace(/\W/g, '')
@@ -158,7 +169,7 @@ export class NodeSystem implements d.StencilSystem {
 
   glob(pattern: string, opts: any) {
     return new Promise<string[]>((resolve, reject) => {
-      this.sysUtil.glob(pattern, opts, (err: any, files: string[]) => {
+      glob(pattern, opts, (err: any, files: string[]) => {
         if (err) {
           reject(err);
         } else {
@@ -166,10 +177,6 @@ export class NodeSystem implements d.StencilSystem {
         }
       });
     });
-  }
-
-  isGlob(str: string) {
-    return this.sysUtil.isGlob(str);
   }
 
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
@@ -182,20 +189,23 @@ export class NodeSystem implements d.StencilSystem {
     return config;
   }
 
-  minifyCss(input: string, filePath?: string, opts: any = {}) {
-    return this.sysWorker.run('minifyCss', [input, filePath, opts]);
+  get lazyRequire() {
+    if (!this.nodeLazyRequire) {
+      this.nodeLazyRequire = new NodeLazyRequire(this.semver, this.nodeResolveModule, this.packageJsonData);
+    }
+    return this.nodeLazyRequire;
+  }
+
+  optimizeCss(inputOpts: d.OptimizeCssInput) {
+    return this.sysWorker.run('optimizeCss', [inputOpts]);
   }
 
   minifyJs(input: string, opts?: any) {
     return this.sysWorker.run('minifyJs', [input, opts]);
   }
 
-  minimatch(filePath: string, pattern: string, opts: any) {
-    return this.sysUtil.minimatch(filePath, pattern, opts);
-  }
-
-  open(p: string) {
-    return this.sysUtil.opn(p);
+  open(target: string, opts: any) {
+    return opn(target, opts) as Promise<any>;
   }
 
   get details() {
@@ -205,14 +215,15 @@ export class NodeSystem implements d.StencilSystem {
       platform: '',
       release: '',
       runtime: 'node',
-      runtimeVersion: ''
+      runtimeVersion: '',
+      tmpDir: tmpdir()
     };
     try {
-      const cpus = os.cpus();
-      details.cpuModel = cpus[0].model;
-      details.cpus = cpus.length;
-      details.platform = os.platform();
-      details.release = os.release();
+      const sysCpus = cpus();
+      details.cpuModel = sysCpus[0].model;
+      details.cpus = sysCpus.length;
+      details.platform = platform();
+      details.release = release();
       details.runtimeVersion = process.version;
     } catch (e) {}
     return details;
@@ -222,63 +233,24 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('requestLatestCompilerVersion');
   }
 
-  resolveModule(fromDir: string, moduleId: string) {
-    const cacheKey = `${fromDir}:${moduleId}`;
-    if (this.resolveModuleCache[cacheKey]) {
-      return this.resolveModuleCache[cacheKey];
-    }
-
-    const Module = require('module');
-
-    fromDir = path.resolve(fromDir);
-    const fromFile = path.join(fromDir, 'noop.js');
-
-    let dir = Module._resolveFilename(moduleId, {
-      id: fromFile,
-      filename: fromFile,
-      paths: Module._nodeModulePaths(fromDir)
-    });
-
-    const root = path.parse(fromDir).root;
-    let packageJsonFilePath: any;
-
-    while (dir !== root) {
-      dir = path.dirname(dir);
-      packageJsonFilePath = path.join(dir, 'package.json');
-
-      try {
-        fs.accessSync(packageJsonFilePath);
-      } catch (e) {
-        continue;
-      }
-
-      this.resolveModuleCache[cacheKey] = packageJsonFilePath;
-
-      return packageJsonFilePath;
-    }
-
-    throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
+  resolveModule(fromDir: string, moduleId: string, opts?: d.ResolveModuleOptions) {
+    return this.nodeResolveModule.resolveModule(fromDir, moduleId, opts);
   }
 
   get rollup() {
-    const rollup = require('rollup');
-    rollup.plugins = {
-      commonjs: require('rollup-plugin-commonjs'),
-      nodeResolve: require('rollup-plugin-node-resolve')
-    };
-    return rollup;
+    return NodeRollup;
   }
 
   scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
     return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId]);
   }
 
-  get semver() {
-    return this.sysUtil.semver;
+  get color() {
+    return color;
   }
 
-  async transpileToEs5(cwd: string, input: string) {
-    return this.sysWorker.run('transpileToEs5', [cwd, input]);
+  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
+    return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 
   get url() {
@@ -298,10 +270,6 @@ export class NodeSystem implements d.StencilSystem {
       createContext,
       runInContext
     };
-  }
-
-  get workbox() {
-    return require('workbox-build');
   }
 
 }

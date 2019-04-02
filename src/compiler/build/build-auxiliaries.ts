@@ -17,7 +17,7 @@ export async function buildAuxiliaries(config: d.Config, compilerCtx: d.Compiler
   // generate component docs
   // and service workers can run in parallel
   await Promise.all([
-    generateDocs(config, compilerCtx),
+    generateDocs(config, compilerCtx, buildCtx),
     generateServiceWorkers(config, compilerCtx, buildCtx),
     generateProxies(config, compilerCtx, cmpRegistry)
   ]);

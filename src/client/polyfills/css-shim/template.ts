@@ -1,6 +1,6 @@
 import { findRegex } from './utils';
 import { CSSTemplate, CSSVariables } from './interfaces';
-import { COMMENTS, EMPTY_SELECTORS, TRAILING_LINES, VAR_ASSIGN_START, VAR_USAGE_START } from './regex';
+import { COMMENTS, TRAILING_LINES, VAR_ASSIGN_START, VAR_USAGE_START } from './regex';
 
 
 export function resolveVar(props: CSSVariables, prop: string, fallback: CSSTemplate | undefined): string {
@@ -128,7 +128,6 @@ export function compileTemplate(cssText: string): CSSTemplate {
   cssText = cssText.replace(COMMENTS, '');
 
   cssText = removeCustomAssigns(cssText)
-    .replace(EMPTY_SELECTORS, '')
     .replace(TRAILING_LINES, '');
 
   const segments: CSSTemplate = [];

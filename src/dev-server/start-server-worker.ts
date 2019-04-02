@@ -3,6 +3,7 @@ import { createHttpServer } from './server-http';
 import { createWebSocket } from './server-web-socket';
 import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './util';
 import { getEditors } from './open-in-editor';
+import exit from 'exit';
 
 
 export async function startDevServerWorker(process: NodeJS.Process, devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
@@ -14,8 +15,10 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
     // create the http server listening for and responding to requests from the browser
     let httpServer = await createHttpServer(devServerConfig, fs, destroys);
 
-    // upgrade web socket requests the server receives
-    createWebSocket(process, httpServer, destroys);
+    if (devServerConfig.websocket) {
+      // upgrade web socket requests the server receives
+      createWebSocket(process, httpServer, destroys);
+    }
 
     // start listening!
     httpServer.listen(devServerConfig.port, devServerConfig.address);
@@ -25,11 +28,11 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
     sendMsg(process, {
       serverStated: {
         browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, '/'),
-        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, DEV_SERVER_INIT_URL)
+        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.baseUrl, devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL)
       }
     });
 
-    function closeServer() {
+    const closeServer = () => {
       // probably recived a SIGINT message from the parent cli process
       // let's do our best to gracefully close everything down first
       destroys.forEach(destroy => {
@@ -40,11 +43,11 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
       httpServer = null;
 
       setTimeout(() => {
-        process.exit();
+        exit(0);
       }, 5000).unref();
 
       process.removeAllListeners('message');
-    }
+    };
 
     process.once('SIGINT', closeServer);
 

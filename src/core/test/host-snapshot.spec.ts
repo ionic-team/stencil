@@ -14,15 +14,15 @@ describe('host-snapshot', () => {
     domApi = mockDomApi();
     cmpMeta = { tagNameMeta: 'ion-tag' };
     hostElm = domApi.$createElement('cmp-a') as any;
-    __BUILD_CONDITIONALS__ = getDefaultBuildConditionals();
+    _BUILD_ = getDefaultBuildConditionals();
   });
 
   it('do not attach shadow root when not shadow', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
-    __BUILD_CONDITIONALS__.shadowDom = false;
-    __BUILD_CONDITIONALS__.slotPolyfill = true;
+    _BUILD_.shadowDom = false;
+    _BUILD_.slotPolyfill = true;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
   });
@@ -31,7 +31,7 @@ describe('host-snapshot', () => {
     let wasAttached = false;
     domApi.$attachShadow = () => wasAttached = true;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
-    __BUILD_CONDITIONALS__.isDev = false;
+    _BUILD_.isDev = false;
     domApi.$supportsShadowDom = false;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(wasAttached).toBe(false);
@@ -47,9 +47,10 @@ describe('host-snapshot', () => {
   });
 
   it('manually set shadowRoot to host element if no shadow dom $supportsShadowDom', () => {
+    (window as any).HTMLElement = { prototype: {} };
     domApi.$supportsShadowDom = false;
     cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
-    __BUILD_CONDITIONALS__.isDev = false;
+    _BUILD_.isDev = false;
     initHostSnapshot(domApi, cmpMeta, hostElm);
     expect(hostElm.shadowRoot).toBe(hostElm);
   });
@@ -95,13 +96,6 @@ describe('host-snapshot', () => {
     expect(s.$attributes['dont-care']).toBeUndefined();
     expect(s.$attributes['first']).toBe('Marty');
     expect(s.$attributes['last-name']).toBe('McFly');
-  });
-
-  it('set id, no members', () => {
-    hostElm['s-id'] = 'App88';
-    const s = initHostSnapshot(domApi, cmpMeta, hostElm);
-    expect(s.$id).toBe('App88');
-    expect(s.$attributes).toEqual({});
   });
 
 });

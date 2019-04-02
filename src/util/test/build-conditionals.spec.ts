@@ -90,8 +90,13 @@ describe('build conditionals', () => {
       expect(bc.hasSvg).toBe(true);
     });
 
-    it('set Build.hasSvg always true (for now)', async () => {
-      buildCtx.hasSvg = false;
+    it('default Build.hasSvg false', async () => {
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
+      expect(bc.hasSvg).toBe(true);
+    });
+
+    it('set Build.hasSvg true', async () => {
+      buildCtx.hasSvg = true;
       const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.hasSvg).toBe(true);
     });
@@ -171,25 +176,50 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
-        hostTheme: true
+        hostTheme: true,
+        updatable: false
       });
     });
 
-    it('styles', () => {
-      cmpMeta.stylesMeta = {};
+    it('styles, no modes', () => {
+      cmpMeta.stylesMeta = {
+        $: {externalStyles: [{cmpRelativePath: 'styles.css'}]}
+      };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
         styles: true,
-        hostTheme: false
+        hostTheme: false,
+        hasMode: false,
+        updatable: false
+      });
+    });
+
+    it('styles, with modes', () => {
+      cmpMeta.stylesMeta = {
+        ios: {externalStyles: [{cmpRelativePath: 'ios.css'}]},
+        md: {externalStyles: [{cmpRelativePath: 'md.css'}]}
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: false,
+        shadowDom: false,
+        scoped: false,
+        event: false,
+        listener: false,
+        styles: true,
+        hasMode: true,
+        hostTheme: false,
+        updatable: false
       });
     });
 
@@ -197,38 +227,41 @@ describe('build conditionals', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: true,
-        slotPolyfill: false,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 
-    it('slotPolyfill cuz ScopedCss', () => {
+    it('scoped cuz ScopedCss', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.ScopedCss;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: true,
         event: false,
         listener: false,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 
-    it('slotPolyfill cuz NoEncapsulation', () => {
+    it('no scoped or shadow cuz NoEncapsulation', () => {
       cmpMeta.encapsulationMeta = ENCAPSULATION.NoEncapsulation;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 
@@ -237,12 +270,13 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.listener).toBeTruthy();
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: true,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 
@@ -250,12 +284,13 @@ describe('build conditionals', () => {
       cmpMeta.eventsMeta = [{ eventName: 'name' }];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: true,
         listener: false,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 
@@ -266,13 +301,14 @@ describe('build conditionals', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.element).toBeTruthy();
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        element: true
+        element: true,
+        updatable: false
       });
     });
 
@@ -282,13 +318,14 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        method: true
+        method: true,
+        updatable: false
       });
     });
 
@@ -298,13 +335,14 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        propContext: true
+        propContext: true,
+        updatable: false
       });
     });
 
@@ -314,13 +352,66 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
+        propConnect: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        propConnect: true
+        updatable: false
+      });
+    });
+
+    it('prop', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.Prop,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        prop: true,
+        event: false,
+        listener: false,
+        hostTheme: false,
+        updatable: true,
+      });
+    });
+
+    it('propMutable', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.PropMutable,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        prop: true,
+        propMutable: true,
+        event: false,
+        listener: false,
+        hostTheme: false,
+        updatable: true
+      });
+    });
+
+    it('state', () => {
+      cmpMeta.membersMeta.name = {
+        memberType: MEMBER_TYPE.State,
+      };
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild).toEqual({
+        hasMembers: true,
+        shadowDom: false,
+        scoped: false,
+        state: true,
+        event: false,
+        listener: false,
+        hostTheme: false,
+        updatable: true
       });
     });
 
@@ -331,13 +422,15 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
+        prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -348,13 +441,15 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
+        prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -365,13 +460,15 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
+        prop: true,
         listener: false,
-        styles: false,
         hostTheme: false,
-        observeAttr: true
+        observeAttr: true,
+        updatable: true
       });
     });
 
@@ -382,40 +479,28 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: true,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
+        prop: true,
         event: false,
         listener: false,
-        styles: false,
         hostTheme: false,
-        observeAttr: true
-      });
-    });
-
-    it('do not set observeAttr w/out valid prop type', () => {
-      cmpMeta.membersMeta.name = {
-        memberType: MEMBER_TYPE.Prop,
-      };
-      setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild).toEqual({
-        shadowDom: false,
-        slotPolyfill: true,
-        event: false,
-        listener: false,
-        styles: false,
-        hostTheme: false
+        observeAttr: true,
+        updatable: true
       });
     });
 
     it('should do nothing with no member meta', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild).toEqual({
+        hasMembers: false,
         shadowDom: false,
-        slotPolyfill: true,
+        scoped: false,
         event: false,
         listener: false,
-        styles: false,
-        hostTheme: false
+        hostTheme: false,
+        updatable: false
       });
     });
 

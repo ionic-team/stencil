@@ -23,39 +23,102 @@ describe('validateDocs', () => {
   });
 
 
-  it('docs default readmeDir', () => {
+  it('readme docs dir', () => {
     config.flags.docs = true;
     config.outputTargets.push(
       {
         type: 'docs',
-        readmeDir: 'my-dir'
-      } as d.OutputTargetDocs
+        dir: 'my-dir'
+      } as d.OutputTargetDocsReadme
     );
     validateConfig(config);
     const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
-    expect(o).toBeDefined();
-    expect(o.readmeDir).toContain('my-dir');
+    expect(o.dir).toContain('my-dir');
   });
 
-  it('docs, keep docs output target', () => {
+  it('_deprecated: docs readmeDir', () => {
     config.flags.docs = true;
     config.outputTargets.push(
       {
         type: 'docs',
         readmeDir: 'my-dir'
-      } as d.OutputTargetDocs
+      } as any
     );
     validateConfig(config);
     const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
-    expect(o).toBeDefined();
-    expect(o.readmeDir).toContain('my-dir');
+    expect(o.dir).toContain('my-dir');
+  });
+
+  it('readme docs, keep docs output target', () => {
+    config.flags.docs = true;
+    config.outputTargets.push(
+      {
+        type: 'docs',
+        dir: 'my-dir'
+      } as d.OutputTargetDocsReadme
+    );
+    validateConfig(config);
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    expect(o.dir).toContain('my-dir');
+  });
+
+  it('_deprecated: docs, keep docs output target', () => {
+    config.flags.docs = true;
+    config.outputTargets.push(
+      {
+        type: 'docs',
+        readmeDir: 'my-dir'
+      } as d.OutputTargetDocsReadme
+    );
+    validateConfig(config);
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    expect(o.dir).toContain('my-dir');
+  });
+
+  it('docs-json w/ existing docs config', () => {
+    config.flags.docsJson = 'some/path/docs.json';
+    config.outputTargets.push(
+      {
+        type: 'docs-json',
+        file: 'hello.json'
+      } as d.OutputTargetDocsJson
+    );
+    validateConfig(config);
+    const o = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+    expect(o[0].file).toContain('hello.json');
+    expect(o[1].file).toContain('docs.json');
+  });
+
+  it('_deprecated: docs-json w/ existing docs config', () => {
+    config.flags.docsJson = 'some/path/docs.json';
+    config.outputTargets.push(
+      {
+        type: 'docs',
+        jsonFile: 'hello.json',
+      } as d.OutputTargetDocsReadme
+    );
+    validateConfig(config);
+    const depricated = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
+    expect(depricated).toBeUndefined();
+    const o = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+    expect(o[0].file).toContain('hello.json');
+    expect(o[1].file).toContain('docs.json');
   });
 
   it('docs-json flag', () => {
     config.flags.docsJson = 'some/path/docs.json';
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
-    expect(o.jsonFile).toContain('docs.json');
+    const o = config.outputTargets.find(o => o.type === 'docs-json') as d.OutputTargetDocsJson;
+    expect(o.file).toContain('docs.json');
+  });
+
+  it('_deprecated: docs-json flag', () => {
+    config.flags.docsJson = 'some/path/docs.json';
+    validateConfig(config);
+    const depricated = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    expect(depricated).toBeUndefined();
+    const o = config.outputTargets.find(o => o.type === 'docs-json') as d.OutputTargetDocsJson;
+    expect(o.file).toContain('docs.json');
   });
 
   it('docs flag, and docs output target', () => {
@@ -64,10 +127,10 @@ describe('validateDocs', () => {
     expect(config.outputTargets.some(o => o.type === 'docs')).toBe(true);
   });
 
-  it('default no docs, remove docs output target', () => {
+  it('default no docs, not remove docs output target', () => {
     config.outputTargets.push({ type: 'docs' });
     validateConfig(config);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(true);
   });
 
   it('default no docs, no output target', () => {

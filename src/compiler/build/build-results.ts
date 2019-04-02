@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
-import { genereateHmr } from './build-hmr';
+import { generateHmr } from './build-hmr';
 import { hasError, normalizePath } from '../util';
 
 
@@ -29,11 +29,10 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
     transpileBuildCount: buildCtx.transpileBuildCount,
 
     components: [],
-
     entries: generateBuildResultsEntries(config, buildCtx)
   };
 
-  const hmr = genereateHmr(config, compilerCtx, buildCtx);
+  const hmr = generateHmr(config, compilerCtx, buildCtx);
   if (hmr) {
     buildResults.hmr = hmr;
   }

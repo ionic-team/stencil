@@ -1,7 +1,7 @@
-import { Collection, Config } from '../../declarations';
+import * as d from '../../declarations';
 
 
-export function validateCollectionCompatibility(config: Config, collection: Collection): number[] {
+export function validateCollectionCompatibility(config: d.Config, collection: d.Collection): number[] {
   if (!collection.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
@@ -18,7 +18,7 @@ export function validateCollectionCompatibility(config: Config, collection: Coll
 }
 
 
-export function calculateRequiredUpgrades(config: Config, collectionVersion: string) {
+export function calculateRequiredUpgrades(config: d.Config, collectionVersion: string) {
   // CUSTOM CHECKS PER KNOWN BREAKING CHANGES
   // UNIT TEST UNIT TEST UNIT TEST
   const upgrades: CompilerUpgrade[] = [];

@@ -163,6 +163,7 @@ describe('css-imports', () => {
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.scss')),
+          altFilePath: normalizePath(path.join(root, 'src', 'cmp', '_file-b.scss')),
           srcImport: `@import "file-b";`,
           url: `file-b`
         }

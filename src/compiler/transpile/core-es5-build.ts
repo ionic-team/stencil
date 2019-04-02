@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileCoreBuild(config: d.Config, compilerCtx: d.CompilerCtx, coreBuild: d.BuildConditionals, input: string) {

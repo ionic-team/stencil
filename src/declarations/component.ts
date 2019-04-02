@@ -80,6 +80,8 @@ export interface AttributeTypeReferences {
 
 export interface AttributeTypeInfo {
   text: string;
+  optional: boolean;
+  required: boolean;
   typeReferences?: AttributeTypeReferences;
 }
 
@@ -164,6 +166,18 @@ export interface JsDoc {
   name: string;
   documentation: string;
   type: string;
+  tags: JSDocTagInfo[];
+  default?: string;
+  parameters?: JsDoc[];
+  returns?: {
+    type: string;
+    documentation: string;
+  };
+}
+
+export interface JSDocTagInfo {
+  name: string;
+  text?: string;
 }
 
 
@@ -237,28 +251,24 @@ export interface HostElement extends HTMLElement {
    * Reference to the HTML Comment that's placed inside of the
    * host element's original content. This comment is used to
    * always represent where host element's light dom is.
-   * (deprecated $defaultHolder)
    */
   ['s-cr']?: d.RenderNode;
 
   /**
    * Is Active Loading:
    * Array of child host elements that are actively loading.
-   * (deprecated $activeLoading)
    */
   ['s-ld']?: HostElement[];
 
   /**
    * Has Rendered:
    * Set to true if this component has rendered
-   * (deprecated $rendered)
    */
   ['s-rn']?: boolean;
 
   /**
    * On Render Callbacks:
    * Array of callbacks to fire off after it has rendered.
-   * (deprecated $onRender)
    */
   ['s-rc']?: (() => void)[];
 
@@ -273,7 +283,6 @@ export interface HostElement extends HTMLElement {
    * Component Initial Load:
    * The component has fully loaded, instance creatd,
    * and has rendered. Method is on the host element prototype.
-   * (deprecated $initLoad)
    */
   ['s-init']?: () => void;
 
@@ -300,39 +309,37 @@ export interface ComponentAppliedStyles {
 export type OnReadyCallback = ((elm: d.HostElement) => void);
 
 
-export interface ComponentHostData {
+export type ComponentHostData = [
   /**
    * tag name (ion-badge)
    */
-  [0]: string;
+  string,
 
   /**
    * map of bundle ids
    */
-  [1]: {
-    [modeName: string]: any[];
-  };
+  BundleIds,
 
   /**
    * has styles
    */
-  [2]: boolean;
+  boolean,
 
   /**
    * members
    */
-  [3]: ComponentMemberData[];
+  ComponentMemberData[],
 
   /**
    * encapsulated
    */
-  [4]: number;
+  number,
 
   /**
    * listeners
    */
-  [5]: ComponentListenersData[];
-}
+  ComponentListenersData[]
+];
 
 
 export interface ComponentMemberData {

@@ -42,6 +42,10 @@ describe('event decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'ionGestureMove',
+          tags: [{
+            name: 'param',
+            text: 'opts action sheet options'
+          }],
           type: 'EventEmitter<any>'
         }
       },
@@ -54,6 +58,7 @@ describe('event decorator', () => {
         jsdoc: {
           documentation: '',
           name: 'event-emitted',
+          tags: [],
           type: 'EventEmitter<any>'
         }
       }
@@ -77,6 +82,7 @@ describe('event decorator', () => {
         jsdoc: {
           documentation: 'Create event for something',
           name: 'my-event-name',
+          tags: [],
           type: 'EventEmitter<any>'
         }
       }

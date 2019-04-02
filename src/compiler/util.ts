@@ -80,7 +80,7 @@ export function isWebDevFile(filePath: string) {
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 
 
-export function generatePreamble(config: d.Config, opts: { prefix?: string; suffix?: string } = {}) {
+export function generatePreamble(config: d.Config, opts: { prefix?: string; suffix?: string, defaultBanner?: boolean } = {}) {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -93,7 +93,9 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
     });
   }
 
-  preamble.push(BANNER);
+  if (opts.defaultBanner === true)  {
+    preamble.push(BANNER);
+  }
 
   if (typeof opts.suffix === 'string') {
     opts.suffix.split('\n').forEach(c => {
@@ -110,7 +112,11 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
     return preamble.join('\n');
   }
 
-  return `/*! ${BANNER} */`;
+
+  if (opts.defaultBanner === true)  {
+    return `/*! ${BANNER} */`;
+  }
+  return '';
 }
 
 
@@ -197,6 +203,12 @@ export function hasError(diagnostics: d.Diagnostic[]): boolean {
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 
+export function hasWarning(diagnostics: d.Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
+  return diagnostics.some(d => d.level === 'warn');
+}
 
 export function pathJoin(config: d.Config, ...paths: string[]) {
   return normalizePath(config.sys.path.join.apply(config.sys.path, paths));
@@ -233,6 +245,10 @@ export function normalizePath(str: string) {
   }
 
   return str;
+}
+
+export function isDocsPublic(jsDocs: d.JsDoc | undefined) {
+  return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
 }
 
 const EXTENDED_PATH_REGEX = /^\\\\\?\\/;

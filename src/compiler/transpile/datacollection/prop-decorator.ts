@@ -4,7 +4,7 @@ import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { toDashCase } from '../../../util/helpers';
 import { validatePublicName } from './reserved-public-members';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string) {
@@ -17,7 +17,6 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
       if (propDecorator == null) {
         return allMembers;
       }
-
       const propOptions = getPropOptions(propDecorator, diagnostics);
       const memberName = (prop.name as ts.Identifier).text;
       const symbol = checker.getSymbolAtLocation(prop.name);
@@ -39,10 +38,16 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
-        memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
+        memberData.attribType = getAttribType(diagnostics, sourceFile, prop, memberName);
         memberData.reflectToAttrib = getReflectToAttr(propOptions);
-        memberData.propType = propTypeFromTSType(type, memberData.attribType.text);
+        memberData.propType = propTypeFromTSType(type);
         memberData.jsdoc = serializeSymbol(checker, symbol);
+
+        // extract default value
+        const initializer = prop.initializer;
+        if (initializer) {
+          memberData.jsdoc.default = initializer.getText();
+        }
       }
 
       allMembers[memberName] = memberData;
@@ -93,7 +98,7 @@ function getReflectToAttr(propOptions: d.PropOptions) {
 }
 
 
-function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration) {
+function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, memberName: string) {
   let attribType: d.AttributeTypeInfo;
 
   // If the @Prop() attribute does not have a defined type then infer it
@@ -109,11 +114,14 @@ function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, p
 
     attribType = {
       text: attribTypeText,
+      required: prop.exclamationToken !== undefined && memberName !== 'mode',
+      optional: prop.questionToken !== undefined
     };
-
   } else {
     attribType = {
       text: prop.type.getText(),
+      required: prop.exclamationToken !== undefined && memberName !== 'mode',
+      optional: prop.questionToken !== undefined,
       typeReferences: getAttributeTypeInfo(prop.type, sourceFile)
     };
   }
@@ -144,10 +152,15 @@ function inferPropType(expression: ts.Expression | undefined) {
   return undefined;
 }
 
-function propTypeFromTSType(type: ts.Type, text: string) {
+function propTypeFromTSType(type: ts.Type) {
   const isStr = checkType(type, isString);
   const isNu = checkType(type, isNumber);
   const isBool = checkType(type, isBoolean);
+  const isAnyType = checkType(type, isAny);
+
+  if (isAnyType) {
+    return PROP_TYPE.Any;
+  }
 
   // if type is more than a primitive type at the same time, we mark it as any
   if (Number(isStr) + Number(isNu) + Number(isBool) > 1) {
@@ -163,9 +176,6 @@ function propTypeFromTSType(type: ts.Type, text: string) {
   }
   if (isBool) {
     return PROP_TYPE.Boolean;
-  }
-  if (text === 'any') {
-    return PROP_TYPE.Any;
   }
   return PROP_TYPE.Unknown;
 }
@@ -197,6 +207,13 @@ function isNumber(t: ts.Type) {
 function isString(t: ts.Type) {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLike | ts.TypeFlags.StringLiteral));
+  }
+  return false;
+}
+
+function isAny(t: ts.Type) {
+  if (t) {
+    return !!(t.flags & ts.TypeFlags.Any);
   }
   return false;
 }

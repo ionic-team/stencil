@@ -5,11 +5,11 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 import { getUserCompilerOptions } from '../transpile/compiler-options';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
-import { RollupBuild, RollupDirOptions, rollup } from 'rollup';
-import nodeEnvVars from './rollup-plugins/node-env-vars';
+import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import pathsResolution from './rollup-plugins/paths-resolution';
+import pluginHelper from './rollup-plugins/plugin-helper';
 import rollupPluginReplace from './rollup-plugins/rollup-plugin-replace';
-import globals from './rollup-plugins/node-globals';
+import statsPlugin from './rollup-plugins/rollup-stats-plugin';
 
 
 export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
@@ -17,20 +17,12 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     buildCtx.debug(`createBundle aborted, not active build`);
   }
 
-  const buildConditionals = {
-    isDev: !!config.devMode
-  } as d.BuildConditionals;
-
-  const replaceObj = Object.keys(buildConditionals).reduce((all, key) => {
-    all[`Build.${key}`] = buildConditionals[key];
-    return all;
-  }, <{ [key: string]: any}>{});
-
   const timeSpan = buildCtx.createTimeSpan(`createBundle started`, true);
 
-  const builtins = require('rollup-plugin-node-builtins');
-  let rollupBundle: RollupBuild;
-
+  const replaceObj = {
+    'Build.isDev': !!config.devMode,
+    'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
+  };
   const commonjsConfig = {
     include: 'node_modules/**',
     sourceMap: false,
@@ -43,37 +35,43 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
     ...config.nodeResolve
   };
 
-  const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx);
+  const tsCompilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
 
-  const rollupConfig: RollupDirOptions = {
+  const rollupConfig: RollupOptions = {
     ...config.rollupConfig.inputOptions,
     input: entryModules.map(b => b.filePath),
-    experimentalCodeSplitting: true,
     preserveSymlinks: false,
+    treeshake: !config.devMode,
+    cache: config.enableCache ? compilerCtx.rollupCache : undefined,
     plugins: [
       abortPlugin(buildCtx),
-      rollupPluginReplace({
-        values: replaceObj
-      }),
       config.sys.rollup.plugins.nodeResolve(nodeResolveConfig),
+      config.sys.rollup.plugins.emptyJsResolver(),
       config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
-      globals(),
-      builtins(),
       inMemoryFsRead(config, compilerCtx, buildCtx, entryModules),
       pathsResolution(config, compilerCtx, tsCompilerOptions),
       localResolution(config, compilerCtx),
-      nodeEnvVars(config),
+      rollupPluginReplace({
+        values: replaceObj
+      }),
       ...config.plugins,
+      statsPlugin(buildCtx),
+      pluginHelper(config, compilerCtx, buildCtx),
       abortPlugin(buildCtx)
     ],
     onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
+  let rollupBundle: RollupBuild;
   try {
-    rollupBundle = await rollup(rollupConfig);
+    rollupBundle = await config.sys.rollup.rollup(rollupConfig);
+    compilerCtx.rollupCache = rollupBundle ? rollupBundle.cache : undefined;
 
   } catch (err) {
+    // clean rollup cache if error
+    compilerCtx.rollupCache = undefined;
+
     // looks like there was an error bundling!
     if (buildCtx.isActiveBuild) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
@@ -84,6 +82,5 @@ export async function createBundle(config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   timeSpan.finish(`createBundle finished`);
-
   return rollupBundle;
 }

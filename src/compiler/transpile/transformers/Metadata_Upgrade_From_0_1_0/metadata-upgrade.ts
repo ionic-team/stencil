@@ -1,7 +1,7 @@
 import * as d from '../../../../declarations';
 import { addStaticMeta } from '../add-component-metadata';
 import { normalizePath } from '../../../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export default function upgradeFromMetadata(moduleFiles: d.ModuleFiles) {

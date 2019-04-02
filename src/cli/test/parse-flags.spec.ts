@@ -11,6 +11,16 @@ describe('parseFlags', () => {
     process.argv = ['/node', '/stencil'];
   });
 
+  it('should get known and unknown args', () => {
+    process.argv.push('serve', '--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts');
+
+    const flags = parseFlags(process);
+    expect(flags.task).toBe('serve');
+    expect(flags.args).toEqual(['--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts']);
+    expect(flags.knownArgs).toEqual(['--address', '127.0.0.1']);
+    expect(flags.unknownArgs).toEqual(['--coverage', '--reporters', 'test.spec.ts']);
+  });
+
   it('should use cli args, no npm cmds', () => {
     // user command line args
     // $ npm run serve --port 4444
@@ -93,6 +103,26 @@ describe('parseFlags', () => {
     expect(flags.task).toBe(null);
   });
 
+  it('should parse build flag to true', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(true);
+  });
+
+  it('should parse build flag to false', () => {
+    process.argv[2] = 'test';
+    process.argv[3] = '--no-build';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(false);
+  });
+
+  it('should not parse build flag, default null', () => {
+    process.argv[2] = 'test';
+    const flags = parseFlags(process);
+    expect(flags.build).toBe(null);
+  });
+
   it('should parse --cache', () => {
     process.argv[2] = '--cache';
     const flags = parseFlags(process);
@@ -108,6 +138,23 @@ describe('parseFlags', () => {
   it('should not parse --cache', () => {
     const flags = parseFlags(process);
     expect(flags.cache).toBe(null);
+  });
+
+  it('should parse --ci', () => {
+    process.argv[2] = '--ci';
+    const flags = parseFlags(process);
+    expect(flags.ci).toBe(true);
+  });
+
+  it('should parse --compare', () => {
+    process.argv[2] = '--compare';
+    const flags = parseFlags(process);
+    expect(flags.compare).toBe(true);
+  });
+
+  it('should not parse --compare', () => {
+    const flags = parseFlags(process);
+    expect(flags.compare).toBe(null);
   });
 
   it('should override --config with second --config', () => {
@@ -190,6 +237,30 @@ describe('parseFlags', () => {
     expect(flags.docsJson).toBe('some/path/docs.json');
   });
 
+  it('should parse --e2e', () => {
+    process.argv[2] = '--e2e';
+    const flags = parseFlags(process);
+    expect(flags.e2e).toBe(true);
+  });
+
+  it('should parse --emulate=android', () => {
+    process.argv[2] = '--emulate=android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should parse --emulate android', () => {
+    process.argv[2] = '--emulate';
+    process.argv[3] = 'android';
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe('android');
+  });
+
+  it('should not parse --emulate', () => {
+    const flags = parseFlags(process);
+    expect(flags.emulate).toBe(null);
+  });
+
   it('should parse --es5', () => {
     process.argv[2] = '--es5';
     const flags = parseFlags(process);
@@ -206,6 +277,18 @@ describe('parseFlags', () => {
     process.argv[2] = '-h';
     const flags = parseFlags(process);
     expect(flags.help).toBe(true);
+  });
+
+  it('should parse --no-headless', () => {
+    process.argv[2] = '--no-headless';
+    const flags = parseFlags(process);
+    expect(flags.headless).toBe(false);
+  });
+
+  it('should parse --headless', () => {
+    process.argv[2] = '--headless';
+    const flags = parseFlags(process);
+    expect(flags.headless).toBe(true);
   });
 
   it('should parse --log-level', () => {
@@ -265,10 +348,22 @@ describe('parseFlags', () => {
     expect(flags.prod).toBe(true);
   });
 
+  it('should parse --profile', () => {
+    process.argv[2] = '--profile';
+    const flags = parseFlags(process);
+    expect(flags.profile).toBe(true);
+  });
+
   it('should parse --prerender', () => {
     process.argv[2] = '--prerender';
     const flags = parseFlags(process);
     expect(flags.prerender).toBe(true);
+  });
+
+  it('should parse --prerender-external', () => {
+    process.argv[2] = '--prerender-external';
+    const flags = parseFlags(process);
+    expect(flags.prerenderExternal).toBe(true);
   });
 
   it('should parse --root', () => {
@@ -276,6 +371,30 @@ describe('parseFlags', () => {
     process.argv[3] = 'custom-www';
     const flags = parseFlags(process);
     expect(flags.root).toBe('custom-www');
+  });
+
+  it('should parse --screenshot', () => {
+    process.argv[2] = '--screenshot';
+    const flags = parseFlags(process);
+    expect(flags.screenshot).toBe(true);
+  });
+
+  it('should parse --screenshot-connector scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector';
+    process.argv[3] = 'scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should parse --screenshot-connector=scripts/connector.js', () => {
+    process.argv[2] = '--screenshot-connector=scripts/connector.js';
+    const flags = parseFlags(process);
+    expect(flags.screenshotConnector).toBe('scripts/connector.js');
+  });
+
+  it('should not parse --screenshot-connector', () => {
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(null);
   });
 
   it('should parse --serve', () => {
@@ -290,10 +409,27 @@ describe('parseFlags', () => {
     expect(flags.serviceWorker).toBe(true);
   });
 
+  it('should parse --spec', () => {
+    process.argv[2] = '--spec';
+    const flags = parseFlags(process);
+    expect(flags.spec).toBe(true);
+  });
+
   it('should parse --stats', () => {
     process.argv[2] = '--stats';
     const flags = parseFlags(process);
     expect(flags.stats).toBe(true);
+  });
+
+  it('should parse --update-screenshot', () => {
+    process.argv[2] = '--update-screenshot';
+    const flags = parseFlags(process);
+    expect(flags.updateScreenshot).toBe(true);
+  });
+
+  it('should not parse --update-screenshot', () => {
+    const flags = parseFlags(process);
+    expect(flags.updateScreenshot).toBe(null);
   });
 
   it('should parse --version', () => {

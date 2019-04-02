@@ -14,12 +14,16 @@ const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-core');
 const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 const DECLARATIONS_SRC_FILES = [
   path.join(SRC_DIR, 'declarations', 'component-interfaces.ts'),
-  path.join(SRC_DIR, 'declarations', 'jsx.ts')
+  path.join(SRC_DIR, 'declarations', 'jsx.ts'),
+  path.join(SRC_DIR, 'declarations', 'functional-components.ts')
 ];
 const DECLARATIONS_DIST_FILE = path.join(DST_DIR, 'client', 'declarations', 'stencil.core.d.ts');
 
 const inputCoreFile = path.join(TRANSPILED_DIR, 'client', 'core-browser.js');
-const outputCoreFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
+const outputCoreFile = path.join(DIST_CLIENT_DIR, 'core.browser.js');
+
+const inputCoreLegacyFile = path.join(TRANSPILED_DIR, 'client', 'core-browser-legacy.js');
+const outputCoreLegacyFile = path.join(DIST_CLIENT_DIR, 'core.browser.legacy.js');
 
 const inputLoaderFile = path.join(TRANSPILED_DIR, 'client', 'loader.js');
 const outputLoaderFile = path.join(DST_DIR, 'client', 'loader.js');
@@ -27,6 +31,7 @@ const outputLoaderFile = path.join(DST_DIR, 'client', 'loader.js');
 const inputCoreEsmFile = path.join(TRANSPILED_DIR, 'client', 'core-esm.js');
 const outputCoreEsmFile = path.join(DIST_CLIENT_DIR, 'core.esm.js');
 const outputPolyfillsDir = path.join(DIST_CLIENT_DIR, 'polyfills');
+const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 
 const success = transpile(path.join('..', 'src', 'tsconfig.json'));
@@ -39,16 +44,18 @@ if (success) {
 
 
   // tasks
-  bundleClientCore();
+  bundleClientCore(inputCoreFile, outputCoreFile);
+  bundleClientCore(inputCoreLegacyFile, outputCoreLegacyFile);
+
   buildLoader(inputLoaderFile, outputLoaderFile);
   buildCoreEsm(inputCoreEsmFile, outputCoreEsmFile);
   copyMain();
   createCoreDts();
   copyUtilDir();
-  buildPolyfills(outputPolyfillsDir);
+  buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
 
 
-  function bundleClientCore() {
+  function bundleClientCore(inputCoreFile, outputCoreFile) {
     return rollup.rollup({
       input: inputCoreFile,
       onwarn: (message) => {
@@ -59,12 +66,10 @@ if (success) {
     .then(bundle => {
       bundle.generate({
         format: 'es',
-        intro: '(function(window, document, Context, namespace) {\n"use strict";\n',
-        outro: '})(window, document, Context, namespace);'
 
       }).then(clientCore => {
 
-        let code = clientCore.code.trim();
+        let code = clientCore.output[0].code.trim();
         code = dynamicImportFnHack(code);
 
         fs.writeFile(outputCoreFile, code, (err) => {
@@ -96,7 +101,7 @@ if (success) {
       .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
       .join('\n');
 
-    fs.mkdirSync(path.dirname(DECLARATIONS_DIST_FILE));
+    fs.ensureDirSync(path.dirname(DECLARATIONS_DIST_FILE));
     fs.writeFileSync(DECLARATIONS_DIST_FILE, coreFileContents);
   }
 

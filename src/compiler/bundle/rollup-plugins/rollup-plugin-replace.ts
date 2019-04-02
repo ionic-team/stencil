@@ -1,14 +1,12 @@
-// Adapted to TS from https://github.com/rollup/rollup-plugin-replace
-
-import MagicString, { SourceMap } from 'magic-string';
+import MagicString from 'magic-string';
 
 function escape(str: string) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+  return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 }
 
-function functor(thing: any) {
-  if (typeof thing === 'function') return thing;
-  return () => thing;
+function ensureFunction(functionOrValue: any) {
+  if (typeof functionOrValue === 'function') return functionOrValue;
+  return () => functionOrValue;
 }
 
 function longest(a: string, b: string) {
@@ -17,76 +15,63 @@ function longest(a: string, b: string) {
 
 interface Options {
   delimiters?: [string, string];
-  values?: {
+  values: {
     [key: string]: any
   };
-  sourcemap?: boolean;
 }
 
 interface Results {
   code: string;
-  map?: SourceMap;
 }
 
-export default function replace(options: Options = {}) {
-  const { delimiters } = options;
+function getReplacements (options: Options) {
+  return { ...options.values };
+}
 
-  let values: { [key: string]: any };
-
-  if (options.values) {
-    values = options.values;
-  } else {
-    values = Object.assign({}, options);
-    delete values.delimiters;
-    delete values.include;
-    delete values.exclude;
-  }
-
-  const keys = Object.keys(values).sort(longest).map(escape);
-
-  const pattern = delimiters ?
-    new RegExp(
-      `${escape(delimiters[0])}(${keys.join('|')})${escape(delimiters[1])}`,
-      'g'
-    ) :
-    new RegExp(
-      `\\b(${keys.join('|')})\\b`,
-      'g'
-    );
-
-  // convert all values to functions
-  Object.keys(values).forEach(key => {
-    values[key] = functor(values[key]);
+function mapToFunctions(object: {[key: string]: any}) {
+  const functions: { [key: string]: any } = {};
+  Object.keys(object).forEach(key => {
+    functions[key] = ensureFunction(object[key]);
   });
+  return functions;
+}
+
+export default function replace(options: Options) {
+  const { delimiters } = options;
+  const functionValues = mapToFunctions(getReplacements(options));
+  const keys = Object.keys(functionValues)
+    .sort(longest)
+    .map(escape);
+
+  const pattern = delimiters
+    ? new RegExp(`${escape(delimiters[0])}(${keys.join('|')})${escape(delimiters[1])}`, 'g')
+    : new RegExp(`\\b(${keys.join('|')})\\b`, 'g');
 
   return {
     name: 'replace',
 
-    transform(code: string, id: string) {
+    transform(code: string, id: string): Results {
       const magicString = new MagicString(code);
 
       let hasReplacements = false;
       let match;
-      let start, end, replacement;
+      let start;
+      let end;
+      let replacement;
 
       while ((match = pattern.exec(code))) {
         hasReplacements = true;
 
         start = match.index;
         end = start + match[0].length;
-        replacement = String(values[match[1]](id));
+        replacement = String(functionValues[match[1]](id));
 
         magicString.overwrite(start, end, replacement);
       }
 
       if (!hasReplacements) return null;
 
-      const result: Results = { code: magicString.toString() };
-      if (options.sourcemap !== false) {
-        result.map = magicString.generateMap({ hires: true });
-      }
-
-      return result;
+      return { code: magicString.toString() };
     }
   };
 }

@@ -1,10 +1,8 @@
 import * as d from '../../../declarations';
-import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
 
 
-export default function bundleJson(config: d.Config, options: Options = {}) {
+export default function bundleJson(config: d.Config) {
   const path = config.sys.path;
-  const filter = createFilter(options.include, options.exclude);
 
   const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir).map(o => o.collectionDir);
 
@@ -12,7 +10,7 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
     name: 'json',
 
     resolveId(importee: string, importer: string): any {
-      if (importer && importee.endsWith('.json')) {
+      if (typeof importer === 'string' && importee.endsWith('.json')) {
         const collectionDir = collectionDirs.find(cd => importer.startsWith(cd));
 
         if (collectionDir) {
@@ -27,8 +25,9 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
     },
 
     transform(json: string, id: string) {
+      if (typeof id !== 'string') return null;
+      if (/\0/.test(id)) return null;
       if (id.slice(-5) !== '.json') return null;
-      if (!filter(id)) return null;
 
       const data = JSON.parse(json);
       let code = '';
@@ -57,7 +56,7 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
           }
         });
       } else {
-        const indent = 'indent' in options ? options.indent : '\t';
+        const indent = '\t';
 
         const validKeys: string[] = [];
         const invalidKeys: string[] = [];
@@ -73,7 +72,7 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
         let char = 0;
 
         validKeys.forEach(key => {
-          const declarationType = options.preferConst ? 'const' : 'var';
+          const declarationType = 'const';
           const declaration = `export ${declarationType} ${key} = ${JSON.stringify(data[key])};`;
 
           const start = char;
@@ -188,6 +187,24 @@ export default function bundleJson(config: d.Config, options: Options = {}) {
       return { ast, code, map: { mappings: '' } };
     }
   };
+}
+
+const reservedWords = 'break case class catch const continue debugger default delete do else export extends finally for function if import in instanceof let new return super switch this throw try typeof var void while with yield enum await implements package protected static interface private public'.split(
+  ' '
+);
+const builtins = 'arguments Infinity NaN undefined null true false eval uneval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Symbol Error EvalError InternalError RangeError ReferenceError SyntaxError TypeError URIError Number Math Date String RegExp Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array Map Set WeakMap WeakSet SIMD ArrayBuffer DataView JSON Promise Generator GeneratorFunction Reflect Proxy Intl'.split(
+  ' '
+);
+
+const blacklisted: { [key: string]: boolean } = Object.create(null);
+reservedWords.concat(builtins).forEach(word => (blacklisted[word] = true));
+
+function makeLegalIdentifier(str: string): string {
+  str = str.replace(/-(\w)/g, (_, letter) => letter.toUpperCase()).replace(/[^$_a-zA-Z0-9]/g, '_');
+
+  if (/\d/.test(str[0]) || blacklisted[str]) str = `_${str}`;
+
+  return str;
 }
 
 export interface Options {

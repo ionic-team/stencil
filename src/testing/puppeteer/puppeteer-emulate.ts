@@ -1,0 +1,69 @@
+import * as d from '../../declarations';
+import * as puppeteer from 'puppeteer';
+
+
+export function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfig, env: d.E2EProcessEnv) {
+  const screenshotEmulate: d.EmulateConfig = {
+    userAgent: 'default',
+    viewport: {
+      width: 800,
+      height: 600,
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: false,
+      isLandscape: false
+    }
+  };
+
+  if (typeof userEmulateConfig.device === 'string') {
+    try {
+      const deviceDescriptors = require(env.__STENCIL_PUPPETEER_MODULE__ + '/DeviceDescriptors');
+
+      const puppeteerEmulateOpts = deviceDescriptors[userEmulateConfig.device] as puppeteer.EmulateOptions;
+      if (!puppeteerEmulateOpts) {
+        console.error(`invalid emulate device: ${userEmulateConfig.device}`);
+        return;
+      }
+
+      screenshotEmulate.device = userEmulateConfig.device;
+      screenshotEmulate.userAgent = puppeteerEmulateOpts.userAgent;
+      screenshotEmulate.viewport = puppeteerEmulateOpts.viewport;
+
+    } catch (e) {
+      console.error('error loading puppeteer DeviceDescriptors', e);
+      return;
+    }
+  }
+
+  if (userEmulateConfig.viewport) {
+    if (typeof userEmulateConfig.viewport.width === 'number') {
+      screenshotEmulate.viewport.width = userEmulateConfig.viewport.width;
+    }
+
+    if (typeof userEmulateConfig.viewport.height === 'number') {
+      screenshotEmulate.viewport.height = userEmulateConfig.viewport.height;
+    }
+
+    if (typeof userEmulateConfig.viewport.deviceScaleFactor === 'number') {
+      screenshotEmulate.viewport.deviceScaleFactor = userEmulateConfig.viewport.deviceScaleFactor;
+    }
+
+    if (typeof userEmulateConfig.viewport.hasTouch === 'boolean') {
+      screenshotEmulate.viewport.hasTouch = userEmulateConfig.viewport.hasTouch;
+    }
+
+    if (typeof userEmulateConfig.viewport.isLandscape === 'boolean') {
+      screenshotEmulate.viewport.isLandscape = userEmulateConfig.viewport.isLandscape;
+    }
+
+    if (typeof userEmulateConfig.viewport.isMobile === 'boolean') {
+      screenshotEmulate.viewport.isMobile = userEmulateConfig.viewport.isMobile;
+    }
+
+    if (typeof userEmulateConfig.userAgent === 'string') {
+      screenshotEmulate.userAgent = userEmulateConfig.userAgent;
+    }
+  }
+
+  env.__STENCIL_EMULATE__ = JSON.stringify(screenshotEmulate);
+}

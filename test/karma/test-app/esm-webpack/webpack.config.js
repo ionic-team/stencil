@@ -6,5 +6,8 @@ module.exports = {
     path: path.resolve(__dirname, '..', '..', 'www', 'esm-webpack'),
     publicPath: '/esm-webpack/'
   },
-  mode: 'production'
+  mode: 'production',
+  optimization: {
+    minimize: false
+  }
 };

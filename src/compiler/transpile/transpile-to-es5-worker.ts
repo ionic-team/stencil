@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
-export async function transpileToEs5Worker(cwd: string, input: string) {
+export async function transpileToEs5Worker(cwd: string, input: string, inlineHelpers: boolean) {
   const config: d.Config = {
     cwd: cwd,
     sys: {
@@ -19,10 +19,16 @@ export async function transpileToEs5Worker(cwd: string, input: string) {
 
   const transpileOpts: ts.TranspileOptions = {
     compilerOptions: {
+      sourceMap: false,
       allowJs: true,
       declaration: false,
       target: ts.ScriptTarget.ES5,
-      module: ts.ModuleKind.ESNext
+      module: ts.ModuleKind.ESNext,
+      removeComments: false,
+      isolatedModules: true,
+      skipLibCheck: true,
+      noEmitHelpers: !inlineHelpers,
+      importHelpers: !inlineHelpers
     }
   };
 

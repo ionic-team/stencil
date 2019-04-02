@@ -113,28 +113,27 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function flush(app: HTMLElement) {
+export function waitForChanges() {
+  const win = window as any;
+
   return new Promise(resolve => {
 
-    function done() {
-      observer && observer.disconnect();
-      clearTimeout(tmr);
-      resolve();
+    function pageLoaded() {
+      setTimeout(() => {
+        const promises = win['s-apps'].map((appNamespace: string) => {
+          return win[appNamespace].onReady();
+        });
+
+        Promise.all(promises).then(() => {
+          window.requestAnimationFrame(resolve);
+        });
+      }, 32);
     }
 
-    let tmr = setTimeout(done, 750);
-
-    var observer = new MutationObserver(() => {
-      setTimeout(() => {
-        (window as any).TestApp.Context.queue.write(done);
-      }, 100);
-    });
-
-    observer.observe(app, {
-      childList: true,
-      attributes: true,
-      characterData: true,
-      subtree: true
-    });
+    if (document.readyState === 'complete') {
+      pageLoaded();
+    } else {
+      window.addEventListener('load', pageLoaded, false);
+    }
   });
 }

@@ -15,28 +15,32 @@ describe('test/sys/node', () => {
 
 
   it('autoprefixCss', () => {
-    const input = `
-      div {
-        flex: 1;
-      }
-    `;
-    return sys.autoprefixCss(input).then(output => {
-      expect(output).toContain('-webkit-box-flex: 1');
-      expect(output).toContain('-ms-flex: 1');
-      expect(output).toContain('flex: 1');
+    const input = {
+      css: `
+        div {
+          flex: 1;
+        }
+      `
+    };
+    return sys.optimizeCss(input).then(output => {
+      expect(output.css).toContain('-ms-flex: 1');
+      expect(output.css).toContain('flex: 1');
     });
   });
 
   it('minifyCss', () => {
-    const input = `
-      /** comment **/
-      body {
-        color: #FF0000;
-      }
-    `;
+    const input = {
+      minify: true,
+      css: `
+        /** comment **/
+        body {
+          color: #FF0000;
+        }
+      `
+    };
 
-    return sys.minifyCss(input).then(results => {
-      expect(results.output).toBe(`body{color:red}`);
+    return sys.optimizeCss(input).then(output => {
+      expect(output.css).toBe(`body{color:red}`);
     });
   });
 

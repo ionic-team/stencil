@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getElementDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration) {

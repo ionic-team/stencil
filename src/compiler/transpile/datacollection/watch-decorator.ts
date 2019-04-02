@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { buildError, buildWarn } from '../../util';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators } from './utils';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { MEMBER_TYPE } from '../../../util/constants';
 
 

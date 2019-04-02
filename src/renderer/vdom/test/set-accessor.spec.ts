@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { mockPlatform } from '../../../testing/mocks';
 import { PROP_TYPE } from '../../../util/constants';
 import { setAccessor } from '../set-accessor';
-import '../../../testing/expect';
 
 describe('setAccessor for custom elements', () => {
 
@@ -239,7 +238,7 @@ describe('setAccessor for custom elements', () => {
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
 
-    expect(elm).toMatchAttributes({ });
+    expect(elm).toEqualAttributes({ });
   });
 
   it('should add aria role attribute', () => {
@@ -298,7 +297,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toMatchAttributes({ 'myprop': '' });
+    expect(elm).toEqualAttributes({ 'myprop': '' });
   });
 
   it('should set number to attribute', () => {
@@ -307,7 +306,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toMatchAttributes({ 'myprop': '88' });
+    expect(elm).toEqualAttributes({ 'myprop': '88' });
   });
 
   it('should set string to attribute', () => {
@@ -316,7 +315,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toMatchAttributes({ 'myprop': 'stringval' });
+    expect(elm).toEqualAttributes({ 'myprop': 'stringval' });
   });
 
 });
@@ -375,7 +374,7 @@ describe('setAccessor for inputs', () => {
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
         const expected = newValue === true ? '' : newValue.toString();
-        expect(inputElm).toMatchAttributes({ [propName]: expected });
+        expect(inputElm).toEqualAttributes({ [propName]: expected });
       }
 
       it(`aria-disabled should be added when set to true`, () => {
@@ -412,7 +411,7 @@ describe('setAccessor for inputs', () => {
         const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
-        expect(inputElm).toMatchAttributes({ });
+        expect(inputElm).toEqualAttributes({ });
       }
       it(`accept`, () => {
         testSpecialAttribute('accept', undefined, undefined);
@@ -457,7 +456,7 @@ describe('setAccessor for inputs', () => {
         const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
-        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
+        expect(inputElm).toEqualAttributes({ [propName]: newValue.toString() });
         expect((inputElm as any)[propName]).toBe(newValue);
       }
 
@@ -524,7 +523,7 @@ describe('setAccessor for inputs', () => {
         const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
-        expect(inputElm).toMatchAttributes({ [propName]: '' });
+        expect(inputElm).toEqualAttributes({ [propName]: '' });
         expect((inputElm as any)[propName]).toBe(newValue);
       }
 
@@ -568,7 +567,7 @@ describe('setAccessor for inputs', () => {
         const inputElm = domApi.$createElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false, false);
 
-        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
+        expect(inputElm).toEqualAttributes({ [propName]: newValue.toString() });
         expect((inputElm as any)[propName]).toBe(newValue.toString());
       }
 
@@ -699,30 +698,30 @@ describe('setAccessor for standard html elements', () => {
     it('should add classes', () => {
       const elm = domApi.$createElement('section');
       setAccessor(plt, elm, 'class', undefined, 'class1 class2   class3', false, false);
-      expect(elm).toMatchClasses(['class1', 'class2', 'class3']);
+      expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
 
       setAccessor(plt, elm, 'class', undefined, 'new', false, false);
-      expect(elm).toMatchClasses(['class1', 'class2', 'class3', 'new']);
+      expect(elm).toHaveClasses(['class1', 'class2', 'class3', 'new']);
 
       setAccessor(plt, elm, 'class',
         'class1 class2',
         'new class4', false, false);
-      expect(elm).toMatchClasses(['class3', 'new', 'class4']);
+      expect(elm).toHaveClasses(['class3', 'new', 'class4']);
     });
 
     it('should not add any classes', () => {
       const elm = domApi.$createElement('section');
       setAccessor(plt, elm, 'class', '', '', false, false);
-      expect(elm).toMatchClasses([]);
+      expect(elm).toHaveClasses([]);
 
       setAccessor(plt, elm, 'class', 'class1 class3 class2', 'class1 class2 class3', false, false);
-      expect(elm).toMatchClasses([]);
+      expect(elm).toHaveClasses([]);
 
       setAccessor(plt, elm, 'class', 'class1 class3 class2', undefined, false, false);
-      expect(elm).toMatchClasses([]);
+      expect(elm).toHaveClasses([]);
 
       setAccessor(plt, elm, 'class', undefined, undefined, false, false);
-      expect(elm).toMatchClasses([]);
+      expect(elm).toHaveClasses([]);
     });
 
     it('should remove classes', () => {
@@ -730,7 +729,7 @@ describe('setAccessor for standard html elements', () => {
       elm.classList.add('icon', 'ion-color');
 
       setAccessor(plt, elm, 'class', 'icon', 'icon2', false, false);
-      expect(elm).toMatchClasses(['ion-color', 'icon2']);
+      expect(elm).toHaveClasses(['ion-color', 'icon2']);
     });
 
     it('should not have duplicated classes', () => {

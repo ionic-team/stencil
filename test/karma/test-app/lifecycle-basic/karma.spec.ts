@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('lifecycle-basic', function() {
@@ -25,7 +25,7 @@ describe('lifecycle-basic', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
 
     loads = app.querySelectorAll('.lifecycle-loads-a li');
     expect(loads.length).toBe(6);

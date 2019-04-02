@@ -3,6 +3,7 @@ import { getConfigFilePath } from './cli-utils';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
 import { shouldIgnoreError } from '../compiler/util';
+import exit from 'exit';
 
 
 export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
@@ -20,11 +21,16 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   let config: d.Config;
   try {
     const configPath = getConfigFilePath(process, sys, flags.config);
+
+    // if --config is provided we need to check if it exists
+    if (flags.config && !sys.fs.existsSync(configPath)) {
+      throw new Error(`Stencil configuration file cannot be found at: "${flags.config}"`);
+    }
     config = sys.loadConfigFile(configPath, process);
 
   } catch (e) {
     logger.error(e);
-    process.exit(1);
+    exit(1);
   }
 
   try {
@@ -52,7 +58,7 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       config.logger.error(`uncaught cli error: ${e}`);
-      process.exit(1);
+      exit(1);
     }
   }
 }

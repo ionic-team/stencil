@@ -29,6 +29,25 @@ export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.Co
 }
 
 
+export function shouldPrerender(config: d.Config) {
+  if (!config.srcIndexHtml) {
+    return false;
+  }
+  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => {
+    return o.type === 'www' && o.indexHtml && o.hydrateComponents && o.prerenderLocations && o.prerenderLocations.length > 0;
+  });
+  return (outputTargets.length > 0);
+}
+
+/**
+ * shouldPrerenderExternal
+ * @description Checks if the cli flag has been set that a external prerenderer will be used
+ * @param config build config
+ */
+export function shouldPrerenderExternal(config: d.Config) {
+  return config.flags && config.flags.prerenderExternal;
+}
+
 async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[]) {
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
@@ -140,7 +159,9 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
 
     hydrateResults.push(results);
 
-    await writePrerenderDest(config, compilerCtx, outputTarget, results);
+    if (results.diagnostics == null || results.diagnostics.length === 0) {
+      await writePrerenderDest(config, compilerCtx, outputTarget, results);
+    }
 
   } catch (e) {
     // darn, idk, bad news
@@ -157,14 +178,16 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 async function writePrerenderDest(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, results: d.HydrateResults) {
-  // create the full path where this will be saved
-  const filePath = getWritePathFromUrl(config, outputTarget, results.url);
+  if (typeof results.url === 'string' && typeof results.html === 'string') {
+    // create the full path where this will be saved
+    const filePath = getWritePathFromUrl(config, outputTarget, results.url);
 
-  // add the prerender html content it to our collection of
-  // files that need to be saved when we're all ready
-  await compilerCtx.fs.writeFile(filePath, results.html, { useCache: false });
+    // add the prerender html content it to our collection of
+    // files that need to be saved when we're all ready
+    await compilerCtx.fs.writeFile(filePath, results.html, { useCache: false });
 
-  // write the files now
-  // and since we're not using cache it'll free up its memory
-  await compilerCtx.fs.commit();
+    // write the files now
+    // and since we're not using cache it'll free up its memory
+    await compilerCtx.fs.commit();
+  }
 }

@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('tag-names', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -14,7 +14,7 @@ describe('tag-names', () => {
     expect(dynamicImport.textContent.trim()).toBe('1 hello1 world1');
 
     (dynamicImport as any).update();
-    await flush(app);
+    await waitForChanges();
     expect(dynamicImport.textContent.trim()).toBe('2 hello2 world2');
   });
 

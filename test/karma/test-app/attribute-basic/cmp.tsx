@@ -21,6 +21,10 @@ export class AttributeBasic {
         <div class="customAttr">
           {this.customAttr}
         </div>
+        <div>
+          <label class="htmlForLabel" htmlFor={'a'}>htmlFor</label>
+          <input type="checkbox" id={'a'}></input>
+        </div>
       </div>
     );
   }

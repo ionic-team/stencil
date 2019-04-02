@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { catchError } from '../util';
+import { generateCommonJsDist } from '../distribution/dist-cjs';
 import { generateDistributions } from '../distribution/distribution';
 import { writeAppCollections } from '../collections/collection-data';
 
@@ -46,6 +47,8 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
       await compilerCtx.cache.commit();
       buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
       buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+
+      await generateCommonJsDist(config, compilerCtx);
 
     } else {
       buildCtx.debug(`commit cache aborted, not active build`);

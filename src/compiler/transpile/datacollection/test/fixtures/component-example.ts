@@ -1,8 +1,10 @@
 import { Component, CssClassMap, Element, Event, EventEmitter, Listen, Prop } from '@stencil/core';
-import { Animation, AnimationBuilder, AnimationController, Config } from '../../index';
+import { Animation, AnimationController, Config } from '../../index';
 
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
+
+interface AnimationBuilder {}
 
 /**
  * This is an actionSheet class
@@ -27,29 +29,14 @@ class ActionSheet {
    */
   @Event() ionActionSheetDidLoad: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has presented.
-   */
   @Event() ionActionSheetDidPresent: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted before the alert has presented.
-   */
   @Event() ionActionSheetWillPresent: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted before the alert has dismissed.
-   */
   @Event() ionActionSheetWillDismiss: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has dismissed.
-   */
   @Event() ionActionSheetDidDismiss: any;
 
-  /**
-   * @output {ActionSheetEvent} Emitted after the alert has unloaded.
-   */
   @Event() ionActionSheetDidUnload: any;
 
   @Prop({ connect: 'ion-animation-controller' }) animationCtrl: AnimationController;
@@ -62,7 +49,15 @@ class ActionSheet {
   @Prop() enableBackdropDismiss: boolean = true;
 
   @Prop() enterAnimation: AnimationBuilder;
+
+  /**
+   * @return this is a property
+   */
   @Prop() exitAnimation: AnimationBuilder;
+
+  /**
+   * @internal
+   */
   @Prop() actionSheetId: string;
 
 

@@ -21,6 +21,9 @@ function testPackage(testPkg) {
   var pkgImport = require(pkgPath);
 
   if (testPkg.files) {
+    if (!Array.isArray(pkgJson.files)) {
+      throw new Error(testPkg.packageJson + ' missing "files" property');
+    }
     testPkg.files.forEach(testPkgFile => {
       if (!pkgJson.files.includes(testPkgFile)) {
         throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
@@ -53,6 +56,36 @@ function testPackage(testPkg) {
     ]
   },
   {
+    packageJson: '../mock-doc/package.json',
+    exports: [
+      'applyWindowToGlobal',
+      'MockComment',
+      'mockDocument',
+      'MockDocument',
+      'MockElement',
+      'MockElement',
+      'MockNode',
+      'MockTextNode',
+      'mockWindow',
+      'MockWindow',
+      'parseHtmlToDocument',
+      'parseHtmlToFragment',
+      'serializeNodeToHtml'
+    ]
+  },
+  {
+    packageJson: '../screenshot/package.json',
+    files: [
+      'compare/',
+      'index.js',
+      'connector.js'
+    ],
+    exports: [
+      'ScreenshotConnector',
+      'ScreenshotLocalConnector'
+    ]
+  },
+  {
     packageJson: '../server/package.json',
     exports: [
       'h',
@@ -65,8 +98,13 @@ function testPackage(testPkg) {
   {
     packageJson: '../testing/package.json',
     exports: [
+      'createJestPuppeteerEnvironment',
       'h',
-      'TestWindow'
+      'jestPreprocessor',
+      'jestSetupTestFramework',
+      'newE2EPage',
+      'Testing',
+      'transpile'
     ]
   },
   {
@@ -82,6 +120,8 @@ function testPackage(testPkg) {
       "bin/",
       "dist/",
       "compiler/",
+      "mock-doc/",
+      "screenshot/",
       "server/",
       "sys/",
       "testing/"
@@ -89,5 +129,7 @@ function testPackage(testPkg) {
     exports: []
   }
 ].forEach(testPackage);
+
+
 
 console.log(`✅ test.dist`);

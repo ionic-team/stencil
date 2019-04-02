@@ -1,6 +1,7 @@
 import { Config } from '../../declarations';
 import { normalizePath } from '../util';
 import { setStringConfig } from './config-utils';
+import ts from 'typescript';
 
 
 export function validatePaths(config: Config) {
@@ -40,11 +41,18 @@ export function validatePaths(config: Config) {
   }
   config.cacheDir = normalizePath(config.cacheDir);
 
-  setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
-  if (!path.isAbsolute(config.tsconfig)) {
-    config.tsconfig = path.join(config.rootDir, config.tsconfig);
+  if (typeof config.tsconfig === 'string') {
+    if (!path.isAbsolute(config.tsconfig)) {
+      config.tsconfig = path.join(config.rootDir, config.tsconfig);
+    }
+
+  } else {
+    config.tsconfig = ts.findConfigFile(config.rootDir, ts.sys.fileExists);
   }
-  config.tsconfig = normalizePath(config.tsconfig);
+
+  if (typeof config.tsconfig === 'string') {
+    config.tsconfig = normalizePath(config.tsconfig);
+  }
 
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.srcIndexHtml)) {
@@ -67,4 +75,3 @@ const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
 const DEFAULT_CACHE_DIR = '.stencil';
 const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_TSCONFIG = 'tsconfig.json';

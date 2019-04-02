@@ -3,14 +3,19 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../util/constants';
 import { getScopeId } from '../util/scope';
 
 
-export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, encapsulation: ENCAPSULATION, style: string, styleMode: string) {
+export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, encapsulation: ENCAPSULATION, style: string, styleMode: string, perf: Performance) {
   if (style) {
+
+    if (_BUILD_.profile) {
+      perf.mark(`init_style_template_start:${cmpMeta.tagNameMeta}`);
+    }
+
     // we got a style mode for this component, let's create an id for this style
     const styleModeId = cmpMeta.tagNameMeta + (styleMode || DEFAULT_STYLE_MODE);
 
     if (!(cmpMeta as any)[styleModeId]) {
       // we don't have this style mode id initialized yet
-      if (__BUILD_CONDITIONALS__.es5) {
+      if (_BUILD_.es5) {
         // ie11's template polyfill doesn't fully do the trick and there's still issues
         // so instead of trying to clone templates with styles in them, we'll just
         // keep a map of the style text as a string to create <style> elements for es5 builds
@@ -30,7 +35,7 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
         (cmpMeta as any)[styleModeId] = templateElm;
 
         // add the style text to the template element's innerHTML
-        if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
+        if (_BUILD_.hotModuleReplacement) {
           // hot module replacement enabled
           // add a style id attribute, but only useful during dev
           const styleContent: string[] = [`<style`, ` data-style-tag="${cmpMeta.tagNameMeta}"`];
@@ -61,35 +66,40 @@ export function initStyleTemplate(domApi: d.DomApi, cmpMeta: d.ComponentMeta, en
         domApi.$appendChild(domApi.$doc.head, templateElm);
       }
     }
+
+    if (_BUILD_.profile) {
+      perf.mark(`init_style_template_end:${cmpMeta.tagNameMeta}`);
+      perf.measure(`init_style_template:${cmpMeta.tagNameMeta}`, `init_style_template_start:${cmpMeta.tagNameMeta}`, `init_style_template_end:${cmpMeta.tagNameMeta}`);
+    }
   }
 }
 
 
-export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement) {
+export const attachStyles = (plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, hostElm: d.HostElement) => {
   // first see if we've got a style for a specific mode
   // either this host element should use scoped css
   // or it wants to use shadow dom but the browser doesn't support it
   // create a scope id which is useful for scoped css
   // and add the scope attribute to the host
-  const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
 
   // create the style id w/ the host element's mode
-  let styleId = cmpMeta.tagNameMeta + hostElm.mode;
+  let styleId = cmpMeta.tagNameMeta + (_BUILD_.hasMode ? hostElm.mode : DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpMeta as any)[styleId];
 
-  if (shouldScopeCss) {
-    hostElm['s-sc'] = getScopeId(cmpMeta, hostElm.mode);
-  }
+  // if (_BUILD_.scoped || _BUILD_.shadowDom) {
+    const shouldScopeCss = (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss || (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom && !plt.domApi.$supportsShadowDom));
+    if (shouldScopeCss) {
+      hostElm['s-sc'] = styleTemplate
+        ? getScopeId(cmpMeta, hostElm.mode)
+        : getScopeId(cmpMeta);
+    }
+  // }
 
-  if (!styleTemplate) {
+  if (_BUILD_.hasMode && !styleTemplate) {
     // doesn't look like there's a style template with the mode
     // create the style id using the default style mode and try again
     styleId = cmpMeta.tagNameMeta + DEFAULT_STYLE_MODE;
     styleTemplate = (cmpMeta as any)[styleId];
-
-    if (shouldScopeCss) {
-      hostElm['s-sc'] = getScopeId(cmpMeta);
-    }
   }
 
   if (styleTemplate) {
@@ -98,7 +108,7 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
     // if this browser supports shadow dom, then let's climb up
     // the dom and see if we're within a shadow dom
-    if (domApi.$supportsShadowDom) {
+    if (_BUILD_.shadowDom && domApi.$supportsShadowDom) {
       if (cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
@@ -106,14 +116,9 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
       } else {
         // climb up the dom and see if we're in a shadow dom
-        let root: d.HostElement = hostElm;
-        while (root = domApi.$parentNode(root) as d.HostElement) {
-          if (root.host && root.host.shadowRoot) {
-            // looks like we are in shadow dom, let's use
-            // this shadow root as the container for these styles
-            styleContainerNode = (root.host.shadowRoot) as any;
-            break;
-          }
+        const rootEl = (hostElm as any).getRootNode();
+        if (rootEl.host) {
+          styleContainerNode = rootEl;
         }
       }
     }
@@ -129,12 +134,12 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
     // check if we haven't applied these styles to this container yet
     if (!appliedStyles[styleId]) {
       let styleElm: HTMLStyleElement;
-      if (__BUILD_CONDITIONALS__.es5) {
-        // es5 builds are not usig <template> because of ie11 issues
+      if (_BUILD_.es5) {
+        // es5 builds are not using <template> because of ie11 issues
         // instead the "template" is just the style text as a string
         // create a new style element and add as innerHTML
 
-        if (__BUILD_CONDITIONALS__.cssVarShim && plt.customStyle) {
+        if (_BUILD_.cssVarShim && plt.customStyle) {
           styleElm = plt.customStyle.createHostStyle(hostElm, styleId, styleTemplate);
 
         } else {
@@ -143,11 +148,10 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
 
           // remember we don't need to do this again for this element
           appliedStyles[styleId] = true;
-
         }
 
         if (styleElm) {
-          if (__BUILD_CONDITIONALS__.hotModuleReplacement) {
+          if (_BUILD_.hotModuleReplacement) {
             // add a style attributes, but only useful during dev
             domApi.$setAttribute(styleElm, 'data-style-tag', cmpMeta.tagNameMeta);
             if (hostElm.mode) {
@@ -177,4 +181,4 @@ export function attachStyles(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.Co
       }
     }
   }
-}
+};

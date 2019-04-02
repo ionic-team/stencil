@@ -3,7 +3,7 @@ import { buildWarn } from '../../util';
 import { ENCAPSULATION } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import { getStylesMeta } from './styles-meta';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
@@ -22,6 +22,12 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
   }
 
+  const regex = new RegExp(/^[a-z](?:[\-\.0-9_a-z\xB7\xC0-\xD6\xD8-\xF6\xF8-\u037D\u037F-\u1FFF\u200C\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]|[\uD800-\uDB7F][\uDC00-\uDFFF])*-(?:[\-\.0-9_a-z\xB7\xC0-\xD6\xD8-\xF6\xF8-\u037D\u037F-\u1FFF\u200C\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]|[\uD800-\uDB7F][\uDC00-\uDFFF])*$/);
+  if (!regex.test(componentOptions.tag)) {
+    throw new SyntaxError(`"${componentOptions.tag}" is not a valid tag name. Please refer to
+    https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`);
+  }
+
   if (node.heritageClauses && node.heritageClauses.some(c => c.token === ts.SyntaxKind.ExtendsKeyword)) {
     throw new Error(`Classes decorated with @Component can not extend from a base class.
   Inherency is temporarily disabled for stencil components.`);
@@ -29,7 +35,14 @@ export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: 
 
   // check if class has more than one decorator
   if (node.decorators.length > 1) {
-    throw new Error(`@Component({ tag: "${componentOptions.tag}"}) can not be decorated with more decorators at the same time`);
+    throw new Error(`@Component({ tag: "${componentOptions.tag}" }) can not be decorated with more decorators at the same time`);
+  }
+
+  if (componentOptions.host) {
+    const warn = buildWarn(diagnostics);
+    warn.header = 'Host prop deprecated';
+    warn.messageText = `The “host” property used in @Component({ tag: "${componentOptions.tag}" }) has been deprecated.
+It will be removed in future versions. Please use the "hostData()" method instead. `;
   }
 
   const symbol = checker.getSymbolAtLocation(node.name);

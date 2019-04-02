@@ -4,6 +4,9 @@ import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-uti
 
 
 export function validateDevServer(config: d.Config) {
+  if (config.devServer === false || config.devServer === null) {
+    return config.devServer = null;
+  }
   config.devServer = config.devServer || {};
 
   if (typeof config.flags.address === 'string') {
@@ -21,6 +24,7 @@ export function validateDevServer(config: d.Config) {
   setBooleanConfig(config.devServer, 'gzip', null, true);
   setBooleanConfig(config.devServer, 'hotReplacement', null, true);
   setBooleanConfig(config.devServer, 'openBrowser', null, true);
+  setBooleanConfig(config.devServer, 'websocket', null, true);
 
   validateProtocol(config.devServer);
 

@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import * as util from './util';
-import { getDevServerClientScript } from './serve-dev-client';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
 import * as path from 'path';
@@ -16,7 +15,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
       // easy text file, use the internal cache
       let content = await fs.readFile(req.filePath);
 
-      if (util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
+      if (devServerConfig.websocket && util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
         content += getDevServerClientScript(devServerConfig, req);
 
@@ -24,20 +23,23 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
         content = updateStyleUrls(req.url, content);
       }
 
-      const contentLength = Buffer.byteLength(content, 'utf8');
-
-      if (util.shouldCompress(devServerConfig, req, contentLength)) {
+      if (util.shouldCompress(devServerConfig, req)) {
         // let's gzip this well known web dev text file
         res.writeHead(200, util.responseHeaders({
-          'Content-Type': util.getContentType(devServerConfig, req.filePath)
+          'Content-Type': util.getContentType(devServerConfig, req.filePath),
+          'Content-Encoding': 'gzip',
+          'Vary': 'Accept-Encoding'
         }));
-        zlib.createGzip().pipe(res);
+
+        zlib.gzip(content, { level: 9 }, (_, data) => {
+          res.end(data);
+        });
 
       } else {
         // let's not gzip this file
         res.writeHead(200, util.responseHeaders({
           'Content-Type': util.getContentType(devServerConfig, req.filePath),
-          'Content-Length': contentLength
+          'Content-Length': Buffer.byteLength(content, 'utf8')
         }));
         res.write(content);
         res.end();
@@ -101,3 +103,9 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 }
 
 const urlVersionIds = new Map<string, string>();
+
+
+function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
+  return `\n<iframe src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
+}

@@ -1,18 +1,23 @@
 import * as d from '../declarations';
 import { normalizePath } from '../compiler/util';
+import exit from 'exit';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
   const { Compiler } = require('../compiler/index.js');
 
+  config.suppressLogs = true;
+
   const compiler: d.Compiler = new Compiler(config);
   if (!compiler.isValid) {
-    process.exit(1);
+    exit(1);
   }
 
   config.flags.serve = true;
-  config.devServer.openBrowser = false;
+  config.devServer.openBrowser = flags.open;
   config.devServer.hotReplacement = false;
+  config.devServer.initialLoadUrl = '/';
+  config.devServer.websocket = false;
   config.maxConcurrentWorkers = 1;
 
   config.devServer.root = process.cwd();
@@ -24,11 +29,14 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
   }
   config.devServer.root = normalizePath(config.devServer.root);
 
-  const clientConfig = await compiler.startDevServer();
-  compiler.config.logger.info(`dev server: ${clientConfig.browserUrl}`);
+  const devServer = await compiler.startDevServer();
+  if (devServer) {
+    compiler.config.logger.info(`dev server: ${devServer.browserUrl}`);
+  }
 
   process.once('SIGINT', () => {
     compiler.config.sys.destroy();
-    process.exit(0);
+    devServer && devServer.close();
+    exit(0);
   });
 }

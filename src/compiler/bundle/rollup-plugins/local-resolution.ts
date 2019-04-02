@@ -7,6 +7,11 @@ export default function localResolution(config: Config, compilerCtx: CompilerCtx
     name: 'localResolution',
 
     async resolveId(importee: string, importer: string) {
+      if (/\0/.test(importee)) {
+        // ignore IDs with null character, these belong to other plugins
+        return null;
+      }
+
       importee = normalizePath(importee);
 
       if (importee.indexOf('./') === -1) {

@@ -10,7 +10,8 @@ export function hmrStart(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Ho
   cmpMeta.componentConstructor = null;
 
   // no sir, this component has never loaded, not once, ever
-  plt.hasLoadedMap.delete(elm);
+  plt.isCmpLoaded.delete(elm);
+  plt.isCmpReady.delete(elm);
 
   // forget the instance
   const instance = plt.instanceMap.get(elm);

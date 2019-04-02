@@ -1,8 +1,7 @@
 import * as d from '../../declarations';
 import { buildWarn, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
-import { getComponentsDtsTypesFilePath } from './distribution';
-import { getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
+import { getComponentsDtsTypesFilePath, getDistCjsIndexPath, getDistEsmIndexPath, getLoaderPath } from '../app/app-file-naming';
 
 
 export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
@@ -28,12 +27,19 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 
 
 export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
-  const moduleAbs = getDistEsmIndexPath(config, outputTarget);
+  const moduleAbs = getDistEsmIndexPath(config, outputTarget, 'es5');
   const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
   if (typeof pkgData.module !== 'string') {
     const err = buildWarn(diagnostics);
     err.messageText = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
+    return;
+  }
+
+  // Check for not recommended values
+  if (pkgData.module.endsWith('collection/index.js')) {
+    const err = buildWarn(diagnostics);
+    err.messageText = `package.json "module" property is set to "${pkgData.module}" but it's not recommended since it might point to non-ES5 code. It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
 
@@ -44,10 +50,11 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
     err.messageText = `package.json "module" property is set to "${pkgData.module}" but cannot be found. It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
+
 }
 
 
-export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export async function validateMain(config: d.Config, _compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const mainAbs = getDistCjsIndexPath(config, outputTarget);
   const mainRel = pathJoin(config, config.sys.path.relative(config.rootDir, mainAbs));
 
@@ -57,13 +64,13 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const pkgFile = pathJoin(config, config.rootDir, pkgData.main);
-  const fileExists = await compilerCtx.fs.access(pkgFile);
-  if (!fileExists) {
-    const err = buildWarn(diagnostics);
-    err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found. It's recommended to set the "main" property to: ${mainRel}`;
-    return;
-  }
+  // const pkgFile = pathJoin(config, config.rootDir, pkgData.main);
+  // const fileExists = await compilerCtx.fs.access(pkgFile);
+  // if (!fileExists) {
+  //   const err = buildWarn(diagnostics);
+  //   err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found. It's recommended to set the "main" property to: ${mainRel}`;
+  //   return;
+  // }
 
   const loaderAbs = getLoaderPath(config, outputTarget);
   const loaderRel = pathJoin(config, config.sys.path.relative(config.rootDir, loaderAbs));

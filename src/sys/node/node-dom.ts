@@ -58,4 +58,11 @@ function polyfillJsDom(window: any) {
     };
   }
 
+  if (!window.matchMedia) {
+    window.matchMedia = () => {
+      return { matches: true
+      };
+    };
+  }
+
 }

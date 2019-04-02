@@ -18,6 +18,7 @@ class ActionSheet {
   /**
    * Create method for something
    * @param opts action sheet options
+   * @returns action sheet
    */
   @Method()
   create(opts?: ActionSheetOptions): Promise<ActionSheet> {

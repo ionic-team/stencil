@@ -3,7 +3,9 @@ import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
 import { taskHelp } from './task-help';
 import { taskServe } from './task-serve';
+import { taskTest } from './task-test';
 import { taskCheckVersion, taskVersion } from './task-version';
+import exit from 'exit';
 
 
 export async function runTask(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
@@ -23,17 +25,21 @@ export async function runTask(process: NodeJS.Process, config: d.Config, flags: 
         break;
 
       case 'docs':
-        await taskDocs(process, config);
+        await taskDocs(config);
         break;
 
       case 'serve':
         await taskServe(process, config, flags);
         break;
 
+      case 'test':
+        await taskTest(config);
+        break;
+
       default:
         config.logger.error(`Invalid stencil command, please see the options below:`);
         taskHelp(process, config.logger);
-        process.exit(1);
+        exit(1);
     }
   }
 }

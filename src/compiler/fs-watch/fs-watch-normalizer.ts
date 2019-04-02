@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { GENERATED_DTS } from '../distribution/distribution';
+import { GENERATED_DTS } from '../app/app-file-naming';
 import { normalizePath } from '../util';
 
 

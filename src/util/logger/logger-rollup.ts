@@ -10,7 +10,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
     type: 'bundling',
     language: 'javascript',
     code: rollupError.code,
-    header: formatErrorCode(rollupError.code),
+    header: `Rollup: ${formatErrorCode(rollupError.code)}`,
     messageText: rollupError.message,
     relFilePath: null,
     absFilePath: null,
@@ -40,7 +40,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
 
       const highlightLine = errorLine.text.substr(rollupError.loc.column);
       for (var i = 0; i < highlightLine.length; i++) {
-        if (CHAR_BREAK.indexOf(highlightLine.charAt(i)) > -1) {
+        if (charBreak.has(highlightLine.charAt(i))) {
           break;
         }
         errorLine.errorLength++;
@@ -84,24 +84,24 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
   buildCtx.diagnostics.push(d);
 }
 
-const CHAR_BREAK = [' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`'];
+const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
 
 export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
-  const previousWarns: {[key: string]: boolean} = {};
+  const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
-    if (!warning || warning.message in previousWarns) {
+    if (!warning || previousWarns.has(warning.message)) {
       return;
     }
 
-    previousWarns[warning.message] = true;
+    previousWarns.add(warning.message);
 
     if (warning.code) {
-      if (INGORE_WARNING_CODES.includes(warning.code)) {
+      if (ignoreWarnCodes.has(warning.code)) {
         return;
       }
-      if (SUPPRESS_WARNING_CODES.includes(warning.code)) {
+      if (suppressWarnCodes.has(warning.code)) {
         config.logger.debug(warning.message);
         return;
       }
@@ -115,21 +115,22 @@ export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundle
       }
     }
 
-    buildWarn(diagnostics).messageText = label + (warning.message || warning);
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.header = `Bundling Warning`;
+    diagnostic.messageText = label + (warning.message || warning);
   };
 }
 
-
-const INGORE_WARNING_CODES = [
+const ignoreWarnCodes = new Set([
   `THIS_IS_UNDEFINED`, `NON_EXISTENT_EXPORT`
-];
+]);
 
-const SUPPRESS_WARNING_CODES = [
+const suppressWarnCodes = new Set([
   `CIRCULAR_DEPENDENCY`
-];
+]);
 
 
-function formatErrorCode(errorCode: string) {
+function formatErrorCode(errorCode: any) {
   if (typeof errorCode === 'string') {
     return errorCode.split('_').map(c => {
       return toTitleCase(c.toLowerCase());

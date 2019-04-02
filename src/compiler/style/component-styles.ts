@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { autoprefixCssMain } from './auto-prefix-css-main';
 import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
-import { minifyStyle } from './minify-style';
+import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
@@ -152,7 +151,7 @@ function checkPluginHelper(config: d.Config, buildCtx: d.BuildCtx, externalStyle
   const msg = [
     `Style "${relPath}" is a ${pluginName} file, however the "${pluginId}" `,
     `plugin has not been installed. Please install the "@stencil/${pluginId}" `,
-    `plugin and add it to "config.plugins" within the project's stencil.config.js `,
+    `plugin and add it to "config.plugins" within the project's stencil config `,
     `file. For more info please see: https://www.npmjs.com/package/@stencil/${pluginId}`
   ].join('');
 
@@ -186,23 +185,21 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     filePath = externalStyle.absolutePath;
   }
 
-  // auto add css prefixes
-  const autoprefixConfig = config.autoprefixCss;
-  if (autoprefixConfig !== false) {
-    styleMeta.compiledStyleText = await autoprefixCssMain(config, compilerCtx, styleMeta.compiledStyleText, autoprefixConfig);
-  }
+  // auto add css prefixes and minifies when configured
+  styleMeta.compiledStyleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath, true);
 
-  if (config.minifyCss) {
-    // minify css
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath);
-  }
-
-  if (requiresScopedStyles(cmpMeta.encapsulationMeta)) {
+  if (requiresScopedStyles(cmpMeta.encapsulationMeta, config)) {
     // only create scoped styles if we need to
-    styleMeta.compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
-    if (config.devMode) {
-      styleMeta.compiledStyleTextScoped = '\n' + styleMeta.compiledStyleTextScoped + '\n';
+    const compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleTextScoped = compiledStyleTextScoped;
+    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
+      styleMeta.compiledStyleText = compiledStyleTextScoped;
     }
+  }
+
+  // by default the compiledTextScoped === compiledStyleText
+  if (!styleMeta.compiledStyleTextScoped) {
+    styleMeta.compiledStyleTextScoped = styleMeta.compiledStyleText;
   }
 
   let addStylesUpdate = false;
@@ -227,12 +224,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     }
   }
 
-  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
-
-  if (styleMeta.compiledStyleTextScoped) {
-    styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
-  }
-
   const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
 
   if (addStylesUpdate) {
@@ -255,6 +246,9 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     });
   }
 
+  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
+  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
+
   return styleMeta;
 }
 
@@ -276,8 +270,11 @@ export function escapeCssForJs(style: string) {
 }
 
 
-export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
-  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
+export function requiresScopedStyles(encapsulation: ENCAPSULATION, config: d.Config) {
+  return (
+    (encapsulation === ENCAPSULATION.ShadowDom && config.buildScoped) ||
+    (encapsulation === ENCAPSULATION.ScopedCss)
+  );
 }
 
 

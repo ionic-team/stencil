@@ -1,26 +1,28 @@
-
-:root {
-  --font-size: 22px;
-  --background: yellow;
-  --color: maroon;
-}
+@import "variables.css";
 
 .dark {
   --font-size: 18px;
   --background: black;
   --color: white;
+  --footer-color: black;
 }
 
 .light {
   --font-size: 18px;
   --background: #eee;
   --color: black;
+  --footer-color: gray;
 }
 
 header {
   background: var(--background);
   color: var(--color);
   border-bottom: 2px solid var(--color);
+}
+
+footer {
+  padding: 5px;
+  border-top: 5px solid var(--footer-color, red) !important;
 }
 
 main {

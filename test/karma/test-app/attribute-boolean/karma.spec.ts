@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('attribute-boolean', function() {
@@ -32,7 +32,7 @@ describe('attribute-boolean', function() {
     const button = app.querySelector('button');
     button.click();
 
-    await flush(app);
+    await waitForChanges();
 
 
     expect(root.getAttribute('aria-hidden')).toBe('true');

@@ -5,23 +5,30 @@ import { generatePreamble } from './util';
 /**
  * Interal minifier, not exposed publicly.
  */
-export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string) {
-  const opts: any = { output: {}, compress: {}, mangle: true };
+export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsText: string, sourceTarget: d.SourceTarget, preamble: boolean, buildTimestamp?: string): Promise<string> {
+  const opts: any = {
+    output: {beautify: false},
+    compress: {},
+    sourceMap: false,
+    mangle: true
+  };
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
-    opts.output.beautify = false;
+    opts.compress.pure_getters = true;
 
   } else {
-    opts.ecma = 6;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
+    opts.ecma = 7;
     opts.toplevel = true;
+    opts.module = true;
+    opts.output.ecma = 7;
+    opts.compress.ecma = 7;
     opts.compress.arrows = true;
-    opts.output.beautify = false;
+    opts.compress.module = true;
+    opts.compress.pure_getters = true;
   }
 
   if (config.logLevel === 'debug') {
@@ -48,20 +55,26 @@ export async function minifyJs(config: d.Config, compilerCtx: d.CompilerCtx, jsT
     cacheKey = compilerCtx.cache.createKey('minifyJs', '__BUILDID:MINIFYJS__', opts, jsText);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
-      return {
-        output: cachedContent,
-        diagnostics: []
-      };
+      return cachedContent;
     }
   }
 
   const r = await config.sys.minifyJs(jsText, opts);
-
-  if (compilerCtx) {
-    if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
+  if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
+    r.output = auxMinify(r.output);
+    if (compilerCtx) {
       await compilerCtx.cache.put(cacheKey, r.output);
     }
   }
 
-  return r;
+  if (r.diagnostics.length > 0) {
+    diagnostics.push(...r.diagnostics);
+    return jsText;
+  } else {
+    return r.output;
+  }
+}
+
+function auxMinify(jsText: string) {
+  return jsText.replace(/^window;/, '');
 }

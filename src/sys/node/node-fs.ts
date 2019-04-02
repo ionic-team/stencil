@@ -1,19 +1,30 @@
 import * as d from '../../declarations';
-import * as fs from 'fs';
+import fs from 'graceful-fs';
 
 
 export class NodeFs implements d.FileSystem {
 
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      const readStream = fs.createReadStream(src);
-      readStream.on('error', reject);
+      if (typeof fs.copyFile === 'function') {
+        fs.copyFile(src, dest, fs.constants.COPYFILE_FICLONE, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
 
-      const writeStream = fs.createWriteStream(dest);
-      writeStream.on('error', reject);
-      writeStream.on('close', resolve);
+      } else {
+        const readStream = fs.createReadStream(src);
+        readStream.on('error', reject);
 
-      readStream.pipe(writeStream);
+        const writeStream = fs.createWriteStream(dest);
+        writeStream.on('error', reject);
+        writeStream.on('close', resolve);
+
+        readStream.pipe(writeStream);
+      }
     });
   }
 
@@ -63,6 +74,16 @@ export class NodeFs implements d.FileSystem {
         }
       });
     });
+  }
+
+  exists(filePath: string) {
+    return new Promise<boolean>(resolve => {
+      fs.exists(filePath, resolve);
+    });
+  }
+
+  existsSync(filePath: string) {
+    return fs.existsSync(filePath);
   }
 
   readFileSync(filePath: string) {

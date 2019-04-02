@@ -23,7 +23,8 @@ describe('validate-workers', () => {
       platform: 'darwin',
       release: '17.6.0',
       runtime: 'node',
-      runtimeVersion: 'v10.0.0'
+      runtimeVersion: 'v10.0.0',
+      tmpDir: '/tmpdir'
     };
   });
 

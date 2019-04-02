@@ -2,6 +2,7 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constant
 import { gatherMetadata } from './test-utils';
 import { visitClass } from '../gather-metadata';
 import * as path from 'path';
+import { mockConfig } from '../../../../testing/mocks';
 
 
 describe('component', () => {
@@ -12,7 +13,7 @@ describe('component', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-        response = visitClass(diagnostics, checker, classNode, sourceFile);
+        response = visitClass(mockConfig(), diagnostics, checker, classNode, sourceFile);
       });
 
       expect(response).toEqual({
@@ -30,6 +31,10 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidLoad',
+              'tags': [{
+                'name': 'output',
+                'text': '{ActionSheetEvent} Emitted after the alert has loaded.'
+              }],
               'type': 'any',
             },
           },
@@ -42,6 +47,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidPresent',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -54,6 +60,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillPresent',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -66,6 +73,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillDismiss',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -78,6 +86,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidDismiss',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -90,6 +99,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidUnload',
+              'tags': [],
               'type': 'any',
             },
           },
@@ -100,6 +110,7 @@ describe('component', () => {
         'jsdoc': {
           'documentation': 'This is an actionSheet class',
           'name': 'ActionSheet',
+          'tags': [],
           'type': 'typeof ActionSheet',
         },
         'listenersMeta': [
@@ -112,6 +123,7 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'onDismiss',
+              'tags': [],
               'type': '(ev: any) => void',
             },
           },
@@ -121,11 +133,17 @@ describe('component', () => {
             'attribName': 'action-sheet-id',
             'attribType': {
               'text': 'string',
+              'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
               'name': 'actionSheetId',
+              'tags': [{
+                'name': 'internal',
+                'text': undefined,
+              }],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -140,6 +158,8 @@ describe('component', () => {
             'attribName': 'buttons',
             'attribType': {
               'text': 'ActionSheetButton[]',
+              'optional': false,
+              'required': false,
               'typeReferences': {
                 'ActionSheetButton': {
                   'referenceLocation': 'local',
@@ -149,7 +169,8 @@ describe('component', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'buttons',
-              'type': '{}',
+              'tags': [],
+              'type': 'ActionSheetButton[]',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -163,11 +184,14 @@ describe('component', () => {
             'attribName': 'css-class',
             'attribType': {
               'text': 'string',
+              'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
               'name': 'cssClass',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -181,12 +205,16 @@ describe('component', () => {
             'attribName': 'enable-backdrop-dismiss',
             'attribType': {
               'text': 'boolean',
+              'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
               'name': 'enableBackdropDismiss',
+              'tags': [],
               'type': 'boolean',
+              'default': 'true'
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Boolean,
@@ -196,17 +224,19 @@ describe('component', () => {
             'attribName': 'enter-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
+              'required': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'enterAnimation',
-              'type': 'any',
+              'tags': [],
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -216,17 +246,22 @@ describe('component', () => {
             'attribName': 'exit-animation',
             'attribType': {
               'text': 'AnimationBuilder',
+              'optional': false,
+              'required': false,
               'typeReferences': {
                 'AnimationBuilder': {
-                  'importReferenceLocation': '../../index',
-                  'referenceLocation': 'import',
+                  'referenceLocation': 'global',
                 },
               },
             },
             'jsdoc': {
               'documentation': '',
               'name': 'exitAnimation',
-              'type': 'any',
+              'tags': [{
+                'name': 'return',
+                'text': 'this is a property'
+              }],
+              'type': 'AnimationBuilder',
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
@@ -236,11 +271,14 @@ describe('component', () => {
             'attribName': 'sub-title',
             'attribType': {
               'text': 'string',
+              'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
               'name': 'subTitle',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,
@@ -251,11 +289,14 @@ describe('component', () => {
             'attribName': 'title',
             'attribType': {
               'text': 'string',
+              'optional': false,
+              'required': false,
               'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
               'name': 'title',
+              'tags': [],
               'type': 'string',
             },
             'memberType': MEMBER_TYPE.Prop,

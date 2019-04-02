@@ -8,7 +8,7 @@ export class SlotReplaceWrapper {
   @Prop() href: string = null;
 
   render() {
-    const TagType = (this.href != null ? 'a' : 'div');
+    const TagType = (this.href != null ? 'a' : 'div') as any;
     const attrs = (this.href != null ? { href: this.href, target: '_blank' } : {}) as any;
 
     return [

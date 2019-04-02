@@ -9,20 +9,30 @@ export function taskHelp(process: NodeJS.Process, logger: d.Logger) {
 
     ${p} ${logger.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
 
-      ${logger.green('--dev')} ${logger.dim('...............')} Execute a development build
-      ${logger.green('--watch')} ${logger.dim('.............')} Execute a build in watch mode
-      ${logger.green('--serve')} ${logger.dim('.............')} Start the dev-server
-      ${logger.green('--prerender')} ${logger.dim('.........')} Prerender URLs
-      ${logger.green('--stats')} ${logger.dim('.............')} Write stencil-stats.json file
-      ${logger.green('--log')} ${logger.dim('...............')} Write stencil-build.log file
-      ${logger.green('--config')} ${logger.dim('............')} Set stencil config file
-      ${logger.green('--docs')} ${logger.dim('..............')} Generate readme.md docs for each component
-      ${logger.green('--debug')} ${logger.dim('.............')} Set the log level to debug
+      ${logger.cyan('--dev')} ${logger.dim('.............')} Development build
+      ${logger.cyan('--watch')} ${logger.dim('...........')} Rebuild when files update
+      ${logger.cyan('--serve')} ${logger.dim('...........')} Start the dev-server
+      ${logger.cyan('--prerender')} ${logger.dim('.......')} Prerender the application
+      ${logger.cyan('--docs')} ${logger.dim('............')} Generate component readme.md docs
+      ${logger.cyan('--config')} ${logger.dim('..........')} Set stencil config file
+      ${logger.cyan('--stats')} ${logger.dim('...........')} Write stencil-stats.json file
+      ${logger.cyan('--log')} ${logger.dim('.............')} Write stencil-build.log file
+      ${logger.cyan('--debug')} ${logger.dim('...........')} Set the log level to debug
+
+
+  ${logger.bold('Test:')} ${logger.dim('Run unit and end-to-end tests.')}
+
+    ${p} ${logger.green('stencil test [--spec] [--e2e]')}
+
+      ${logger.cyan('--spec')} ${logger.dim('............')} Run unit tests with Jest
+      ${logger.cyan('--e2e')} ${logger.dim('.............')} Run e2e tests with Puppeteer
+
 
   ${logger.bold('Examples:')}
 
     ${p} ${logger.green('stencil build --dev --watch --serve')}
     ${p} ${logger.green('stencil build --prerender')}
+    ${p} ${logger.green('stencil test --spec --e2e')}
 
 `);
 }

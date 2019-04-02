@@ -34,8 +34,7 @@ describe('outputTargets', () => {
       },
       {
         type: 'docs',
-        format: 'readme'
-      } as d.OutputTargetDocs
+      } as d.OutputTargetDocsReadme
     ];
 
     c = new TestingCompiler(config);
@@ -67,7 +66,7 @@ describe('outputTargets', () => {
 
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp'),
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp.js'),
-      path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp', 'cmp-a.js'),
+      path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp', 'cmp-a.entry.js'),
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp', 'es5-build-disabled.js'),
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-build', 'testapp', 'testapp.core.js'),
 
@@ -82,7 +81,7 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'custom-www', 'www-build'),
       path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp'),
       path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp.js'),
-      path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp', 'cmp-a.js'),
+      path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp', 'cmp-a.entry.js'),
       path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp', 'es5-build-disabled.js'),
       path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp', 'testapp.core.js'),
       path.join(root, 'User', 'testing', 'custom-www', 'www-build', 'testapp', 'testapp.registry.json'),

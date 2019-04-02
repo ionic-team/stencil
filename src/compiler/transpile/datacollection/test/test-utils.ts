@@ -1,7 +1,7 @@
 import * as d from '../../../../declarations';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 const compilerOptions: ts.CompilerOptions = {

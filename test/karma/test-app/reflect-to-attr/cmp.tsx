@@ -13,6 +13,7 @@ export class ReflectToAttr {
   @Prop({reflectToAttr: true}) null: string = null;
   @Prop({reflectToAttr: true}) bool = false;
   @Prop({reflectToAttr: true}) otherBool = true;
+  @Prop({reflectToAttr: true}) disabled = false;
 
   @Prop({reflectToAttr: true, mutable: true}) dynamicStr: string;
   @Prop({reflectToAttr: true}) dynamicNu: number;

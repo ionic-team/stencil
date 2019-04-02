@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonjs = require('rollup-plugin-commonjs');
 const glob = require('glob');
 const transpile = require('./transpile');
 
@@ -26,6 +28,7 @@ if (success) {
         'buffer',
         'child_process',
         'crypto',
+        'events',
         'fs',
         'http',
         'https',
@@ -34,7 +37,21 @@ if (success) {
         'path',
         'querystring',
         'url',
-        'zlib'
+        'zlib',
+        '../sys/node/graceful-fs.js'
+      ],
+      plugins: [
+        (() => {
+          return {
+            resolveId(importee) {
+              if (importee === 'graceful-fs') {
+                return '../sys/node/graceful-fs.js';
+              }
+            }
+          }
+        })(),
+        rollupResolve(),
+        rollupCommonjs()
       ],
       onwarn: (message) => {
         if (/top level of an ES module/.test(message)) return;

@@ -1,6 +1,12 @@
 import * as d from '.';
 
 
+export interface DevServer {
+  browserUrl: string;
+  close(): Promise<void>;
+}
+
+
 export interface DevServerConfig {
   address?: string;
   baseUrl?: string;
@@ -18,6 +24,7 @@ export interface DevServerConfig {
   protocol?: 'http' | 'https';
   root?: string;
   ssl?: DevServerSSLConfig;
+  websocket?: boolean;
 }
 
 
@@ -83,7 +90,11 @@ export interface DevResponseHeaders {
   'Expires'?: string;
   'Content-Type'?: string;
   'Content-Length'?: number;
+  'Access-Control-Allow-Origin'?: string;
+  'Content-Encoding'?: 'gzip';
+  'Vary'?: 'Accept-Encoding';
   'X-Powered-By'?: string;
+  'X-Directory-Index'?: string;
 }
 
 

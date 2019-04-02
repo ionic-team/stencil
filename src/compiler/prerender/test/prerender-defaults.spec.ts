@@ -5,7 +5,7 @@ import { TestingCompiler } from '../../../testing/testing-compiler';
 import { TestingConfig } from '../../../testing/testing-config';
 
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe('prerender, defaults', () => {
   const root = path.resolve('/');
@@ -47,9 +47,9 @@ describe('prerender, defaults', () => {
       path.join(root, 'www', 'build', 'app.js'),
       path.join(root, 'www', 'build', 'app', 'app.core.js'),
       path.join(root, 'www', 'build', 'app', 'app.core.pf.js'),
-      path.join(root, 'www', 'build', 'app', 'ionic-docs.es5.js'),
+      path.join(root, 'www', 'build', 'app', 'ionic-docs.es5.entry.js'),
       path.join(root, 'www', 'build', 'app', 'app.registry.json'),
-      path.join(root, 'www', 'build', 'app', 'ionic-docs.js'),
+      path.join(root, 'www', 'build', 'app', 'ionic-docs.entry.js'),
       path.join(root, 'www', 'host.config.json'),
       path.join(root, 'www', 'index.html'),
       path.join(root, 'www', 'about', 'index.html'),

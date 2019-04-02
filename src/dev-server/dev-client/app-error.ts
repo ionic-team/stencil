@@ -9,9 +9,15 @@ export function appError(win: Window, doc: Document, config: d.DevClientConfig, 
     return;
   }
 
+  const diagnostics = buildResults.diagnostics.filter(diagnostic => diagnostic.level === 'error');
+
+  if (diagnostics.length === 0) {
+    return;
+  }
+
   const modal = getDevServerModal(doc);
 
-  buildResults.diagnostics.forEach(diagnostic => {
+  diagnostics.forEach(diagnostic => {
     logDiagnostic(diagnostic);
     appendDiagnostic(win, doc, config, modal, diagnostic);
   });

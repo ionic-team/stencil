@@ -57,7 +57,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.lastBuildHadError = false;
     }
 
-    if (!aborted) {
+    if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {
       // print out the time it took to build
       // and add the duration to the build results
       buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);

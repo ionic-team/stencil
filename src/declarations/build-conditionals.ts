@@ -1,8 +1,10 @@
 
 
+export type BuildCoreIds = 'core' | 'core.pf' | 'esm.es5' | 'esm.es2017';
+
 export interface BuildConditionals {
   [key: string]: any;
-  coreId: 'core' | 'core.pf' | 'esm.es5';
+  coreId: BuildCoreIds;
   polyfills: boolean;
   es5: boolean;
   cssVarShim: boolean;
@@ -16,15 +18,20 @@ export interface BuildConditionals {
   devInspector: boolean;
   hotModuleReplacement: boolean;
   verboseError: boolean;
+  profile: boolean;
 
   // ssr
   ssrServerSide: boolean;
+  prerenderClientSide: boolean;
+  prerenderExternal: boolean;
 
   // encapsulation
   styles: boolean;
+  hasMode: boolean;
 
   // dom
   shadowDom: boolean;
+  scoped: boolean;
   slotPolyfill: boolean;
 
   // vdom
@@ -39,7 +46,12 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
+  prop: boolean;
+  propMutable: boolean;
+  state: boolean;
   watchCallback: boolean;
+  hasMembers: boolean;
+  updatable: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;
@@ -57,7 +69,7 @@ export interface BuildConditionals {
 }
 
 declare global {
-  var __BUILD_CONDITIONALS__: BuildConditionals;
+  var _BUILD_: BuildConditionals;
 }
 
 export interface UserBuildConditionals {

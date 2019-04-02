@@ -1,4 +1,4 @@
-import { setupDomTests, flush } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('slot-basic', function() {
@@ -98,11 +98,11 @@ describe('slot-basic', function() {
 
     let button = app.querySelector('button');
     button.click();
-    await flush(app);
+    await waitForChanges();
     testValues(2);
 
     button.click();
-    await flush(app);
+    await waitForChanges();
     testValues(3);
   });
 

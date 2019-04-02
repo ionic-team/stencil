@@ -1,8 +1,8 @@
-import { BuildCtx, CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
 import { upgradeCollection } from './upgrade-collection';
 
 
-export async function initCollections(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function initCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const uninitialized = compilerCtx.collections.filter(c => !c.isInitialized);
 
   await Promise.all(uninitialized.map(async collection => {
