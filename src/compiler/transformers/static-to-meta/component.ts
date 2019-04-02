@@ -35,11 +35,13 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
 
   const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
   const docs = serializeSymbol(typeChecker, symbol);
+  const isCollectionDependency = moduleFile.isCollectionDependency;
+
   const cmp: d.ComponentCompilerMeta = {
     isLegacy: false,
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
-    isCollectionDependency: moduleFile.isCollectionDependency,
+    isCollectionDependency,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation: parseStaticEncapsulation(staticMembers),
@@ -50,7 +52,7 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
-    styles: parseStaticStyles(config, tagName, moduleFile.sourceFilePath, staticMembers),
+    styles: parseStaticStyles(config, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),

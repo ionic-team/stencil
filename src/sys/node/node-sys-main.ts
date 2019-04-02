@@ -10,6 +10,7 @@ import { NodeResolveModule } from './node-resolve-module';
 import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '@utils';
+// @ts-ignore
 import opn from 'opn';
 import semver from 'semver';
 import { WorkerManager } from './worker/index';
