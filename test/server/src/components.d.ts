@@ -5,19 +5,13 @@
  */
 
 
+import { HTMLStencilElement, JSX } from '@stencil/core';
 import { JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
-
 
 
 export namespace Components {
   interface AppRoot {}
   interface CurrentDate {}
-}
-
-interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
-  forceUpdate(): void;
 }
 
 declare namespace LocalJSX {

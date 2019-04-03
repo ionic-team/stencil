@@ -7,11 +7,13 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| cbaca1bc.js                | 452B     | 527B     | 815B     |
-| hello-world.entry.js       | 94B      | 126B     | 122B     |
-| helloworld.js              | 39B      | 59B      | 39B      |
-| loader.js                  | 48B      | 73B      | 53B      |
-| TOTAL                      | 633B     | 785B     | 1.00KB   |
+| helloworld.mjs.js          | ERROR    | 66B      | 46B      |
+| p-484b1720.js              | 1.18KB   | 1.33KB   | 2.41KB   |
+| p-98d80ae9.system.js       | 99B      | 132B     | 135B     |
+| p-ecec791d.js              | 2.04KB   | 2.28KB   | 5.06KB   |
+| p-lms1k6xz.system.entry.js | 178B     | 203B     | 276B     |
+| p-q4qpswuc.entry.js        | 105B     | 145B     | 151B     |
+| TOTAL                      | 3.59KB   | 4.14KB   | 8.06KB   |
 
 
 
@@ -19,8 +21,14 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.js                     | 695B     | 797B     | 1.35KB   |
-| TOTAL                      | 695B     | 797B     | 1.35KB   |
+| app.js                     | 2.61KB   | 2.93KB   | 7.63KB   |
+| app.mjs.js                 | ERROR    | 66B      | 46B      |
+| hello-vdom.entry.js        | 111B     | 145B     | 143B     |
+| hello-vdom.system.entry.js | 171B     | 208B     | 269B     |
+| p-10911033.js              | 2.66KB   | 2.92KB   | 5.99KB   |
+| p-23eb4237.js              | 3.51KB   | 3.87KB   | 8.82KB   |
+| p-4aed895a.system.js       | 99B      | 134B     | 135B     |
+| TOTAL                      | 9.16KB   | 10.27KB  | 23.02KB  |
 
 
 
@@ -28,14 +36,15 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| 3e150bdf.js                | 2.74KB   | 3.00KB   | 6.30KB   |
-| app-root.entry.js          | 454B     | 538B     | 1.13KB   |
+| app-root.todo-input.todo-item.entry.js | 682B     | 811B     | 2.03KB   |
+| app-root.todo-input.todo-item.system.entry.js | 759B     | 896B     | 2.34KB   |
 | app.css                    | 1.46KB   | 1.74KB   | 5.76KB   |
-| app.js                     | ERROR    | 64B      | 44B      |
-| loader.js                  | 53B      | 73B      | 53B      |
-| todo-input.entry.js        | 236B     | 299B     | 493B     |
-| todo-item.entry.js         | 237B     | 296B     | 534B     |
-| TOTAL                      | 5.16KB   | 5.98KB   | 14.29KB  |
+| app.js                     | 2.61KB   | 2.93KB   | 7.63KB   |
+| app.mjs.js                 | ERROR    | 61B      | 41B      |
+| p-5e3afced.js              | 3.10KB   | 3.40KB   | 7.04KB   |
+| p-73552692.js              | 3.95KB   | 4.35KB   | 9.96KB   |
+| p-d6353a60.system.js       | 99B      | 135B     | 135B     |
+| TOTAL                      | 12.63KB  | 14.28KB  | 34.93KB  |
 
 
 
@@ -43,6 +52,6 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.js                     | ERROR    | 64B      | 44B      |
-| TOTAL                      | ERROR    | 64B      | 44B      |
+| app.js                     | 2.62KB   | 2.93KB   | 7.63KB   |
+| TOTAL                      | 2.62KB   | 2.93KB   | 7.63KB   |
 

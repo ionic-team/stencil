@@ -5,9 +5,8 @@
  */
 
 
+import { HTMLStencilElement, JSX } from '@stencil/core';
 import { JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
-
 import {
   CarData,
 } from './car-list/car-data';
@@ -44,11 +43,6 @@ export namespace Components {
     'lastName': string;
   }
   interface StateCmp {}
-}
-
-interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
-  forceUpdate(): void;
 }
 
 declare namespace LocalJSX {

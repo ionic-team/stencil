@@ -5,9 +5,8 @@
  */
 
 
+import { HTMLStencilElement, JSX } from '@stencil/core';
 import { JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
-
 
 
 export namespace Components {
@@ -18,11 +17,6 @@ export namespace Components {
     'index': number;
     'text': string;
   }
-}
-
-interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
-  forceUpdate(): void;
 }
 
 declare namespace LocalJSX {

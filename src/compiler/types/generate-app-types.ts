@@ -63,11 +63,6 @@ export namespace Components {
   ${modules.map(m => `${m.component}`).join('\n').trim()}
 }
 
-interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
-  forceUpdate(): void;
-}
-
 declare namespace LocalJSX {
   ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
@@ -119,8 +114,8 @@ ${typeData.sort(sortImportNames).map(td => {
   }, '');
 
   const code = `
+import { HTMLStencilElement, JSX } from '@stencil/core';
 import { JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
 ${typeImportString}
 ${componentsFileString}
 `;

@@ -11,6 +11,7 @@ export {
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
+  HTMLStencilElement,
   QueueApi,
   Config as InternalConfig,
   Plugin,

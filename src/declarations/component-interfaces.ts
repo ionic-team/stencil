@@ -148,3 +148,8 @@ export interface QueueApi {
 export interface RafCallback {
   (timeStamp: number): void;
 }
+
+export interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
+}
