@@ -407,7 +407,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     while (true) {
       p = this.path.dirname(p);
-      if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false) {
+      if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false && p.endsWith(':\\') === false) {
         allDirs.push(p);
       } else {
         break;
