@@ -129,7 +129,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.runner !== 'string') {
     testing.runner = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.runner.js'
+      config.sys.compiler.packageDir, 'testing', 'jest-runner.js'
     );
   }
 

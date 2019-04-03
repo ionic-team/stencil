@@ -17,6 +17,6 @@
     "workbox-build": "3.4.1"
   },
   "jest": {
-    "preset": "../../testing/jest.preset.js"
+    "preset": "../../testing/jest-preset.js"
   }
 }
