@@ -2,12 +2,12 @@
 
 ## BREAKING CHANGES
 
-Most required changes are in order to avoid global types, which often cause issues for JSX and apps which import from numerous packages. The other significant change is having each component import its renderer, such as VDom's `h()` function.
+Most required changes are in order to avoid global types, which often cause issues for JSX and apps which import from numerous packages. The other significant change is having each component import its renderer, such as JSX's `h()` function.
 
 
 ### Import `{ h }` is required
 
-In order to render JSX in stencil apps, the `h()` function must be imported from `@stencil/core`:
+In order to render JSX in Stencil apps, the `h()` function must be imported from `@stencil/core`:
 
 ```tsx
 import { h } from '@stencil/core';
@@ -17,17 +17,17 @@ function app() {
 }
 ```
 
-The `h` stands for "hyperscript", which is what JSX elements are transformed into (it's the actual function exectued when rendering within the runtime). Stencil's `h` import is an equivilent to React's [React.createElement](https://reactjs.org/docs/react-without-jsx.html). This also explains why the `tsconfig.json` uses the `{ "jsxFactory": "h" }` config, which is detailed further in  [TypeScript's JSX Factory Function Docs](https://www.typescriptlang.org/docs/handbook/jsx.html#factory-functions).
+The `h` stands for "hyperscript", which is what JSX elements are transformed into (it's the actual function exectued when rendering within the runtime). Stencil's `h` import is an equivalent to React's [React.createElement](https://reactjs.org/docs/react-without-jsx.html). This also explains why the app's `tsconfig.json` sets the `{ "jsxFactory": "h" }` config, which is detailed further in  [TypeScript's JSX Factory Function Docs](https://www.typescriptlang.org/docs/handbook/jsx.html#factory-functions).
 
 
-### Index.html must be updated to include `type=”module”`
+### index.html scripts updated to use `type="module"`
 
-Stencil used to generate a loader `.js` file that automatically decided which entry-point to load based in the browser's capabilities, in stencil 1.0 we have decided to completely remove the overhead of this loader by directly loading the collection's core.
+Stencil used to generate a loader `.js` file that automatically decided which entry-point to load based in the browser's capabilities. In Stencil 1.0 we have decided to completely remove the overhead of this loader by directly loading the core using the web-standard `type="module"` script attribute. Less runtime and preferring native browser features. Win Win. For more for info, please see [Using JavaScript modules on the web](https://developers.google.com/web/fundamentals/primers/modules#browser).
 
 ```diff
 - <script src="/build/app.js"></script>
-+ <script src="/build/app.js" nomodule></script>
 + <script type="module" src="/build/app.mjs.js"></script>
++ <script nomodule src="/build/app.js"></script>
 ```
 
 
@@ -58,7 +58,7 @@ render(): JSX.Element {
 
 ### Removed: Global `HTMLStencilElement` was removed
 
-The global type for `HTMLStencilElement` has been removed and should now be imported from `@stencil/core`. Even better is to import the exact type of your component, such as `HTMLIonButtonElement`.
+The global type for `HTMLStencilElement` has been removed. Instead it's better is to use the exact type of your component, such as `HTMLIonButtonElement`. The HTML types are automatically generated within the `components.d.ts` file.
 
 
 ### Removed: `StencilIntrinsecElement`
@@ -105,6 +105,18 @@ hostData() usage has been replaced by the new `Host` exposed in `@stencil/core`.
   }
 ```
 
+### All void methods return promise (right now method(): void is valid)
+
+Until Stencil 1.0, public component methods decorated with `@Method()` could only return `Promise<...>` or `void`. Now, only the `async` methods are supported, meaning that retuning `void` is not valid.
+
+```diff
+  @Method()
+- doSomething() {
++ async doSomething() {
+    console.log('hello');
+  }
+```
+
 
 ### `@Listen('TARGET:event’)`
 
@@ -136,7 +148,7 @@ Most of the functionality can be replaced by new functions exposed in `@stencil/
 
 ### `@Prop(connect)`
 
-It will not be recommended to use `@Prop(connect)` in order to lazily load components. It's recommended to use ES Modules and/or dynamic imports to load code lazyly.
+It will not be recommended to use `@Prop(connect)` in order to lazily load components. Instead it's recommended to use ES Modules and/or dynamic imports to load code lazily.
 
 
 ### `@Component.assetsDir`
@@ -146,18 +158,6 @@ It will not be recommended to use `@Prop(connect)` in order to lazily load compo
 -  assetsDir: 'resource',
 +  assetsDirs: ['resource']
 })
-```
-
-### All void methods return promise (right now method(): void is valid)
-
-Until Stencil 1.0, public component methods decorated with `@Method()` could only return `Promise<...>` or `void`. Now, only the async methods are supported, meaning that retuning `void` is not valid.
-
-```diff
-  @Method()
-- doSomething() {
-+ async doSomething() {
-    console.log('hello');
-  }
 ```
 
 ### Stencil.config.ts root “copy” deprecated

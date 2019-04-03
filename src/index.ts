@@ -11,13 +11,7 @@ export {
   EventEmitter,
   EventListenerEnable,
   FunctionalComponent,
-  HTMLStencilElement,
-  QueueApi,
-  Config as InternalConfig,
-  Plugin,
-  CompilerCtx,
-  Module,
-  ComponentCompilerMeta
+  QueueApi
 } from './declarations';
 
 /**
@@ -94,8 +88,6 @@ export declare function getDocument(ref: any): Document;
  * Host
  */
 export declare const Host: d.FunctionalComponent<any>;
-
-export interface HostElement extends HTMLElement {}
 
 declare namespace LocalJSX {
   interface Element {}

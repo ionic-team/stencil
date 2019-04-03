@@ -5,8 +5,8 @@
  */
 
 
-import { HTMLStencilElement, JSX } from '@stencil/core';
-import { JSXBase } from '@stencil/core/internal';
+import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 import {
   CarData,
 } from './car-list/car-data';
