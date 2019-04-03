@@ -29,6 +29,8 @@ export function teardownGlobal(global: any) {
 
 
 const WINDOW_PROPERTIES = [
+  'cancelAnimationFrame',
+  'cancelIdleCallback',
   'customElements',
   'dispatchEvent',
   'document',
@@ -41,6 +43,7 @@ const WINDOW_PROPERTIES = [
   'performance',
   'removeEventListener',
   'requestAnimationFrame',
+  'requestIdleCallback',
   'sessionStorage',
   'CSS',
   'CustomEvent',
