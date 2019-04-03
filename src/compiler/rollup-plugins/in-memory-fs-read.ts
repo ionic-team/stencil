@@ -8,10 +8,11 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
     name: 'inMemoryFsRead',
 
     async resolveId(importee: string, importer: string) {
-      if (/\0/.test(importee)) {
+      if (typeof importee !== 'string' || /\0/.test(importee)) {
         // ignore IDs with null character, these belong to other plugins
         return null;
       }
+
       // skip non-paths
       if (importee[0] !== '.' && importee[0] !== '/') {
         return null;
@@ -23,28 +24,48 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
         return importee;
       }
 
-      // Resolve absolute path
+      // resolve absolute path
       if (!path.isAbsolute(importee)) {
         importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);
       }
 
       importee = normalizePath(importee);
-      const importeeDir = path.dirname(importee);
-      const importeeBase = path.basename(importee);
 
-      // Direct FS check
-      let filePath = importee;
-      let accessData = await compilerCtx.fs.accessData(filePath);
+      let accessData = await compilerCtx.fs.accessData(importee);
       if (accessData.exists) {
-        return accessData.isFile ? filePath : path.join(filePath, '/index.js');
+        if (accessData.isFile) {
+          // exact importee file path exists
+          return importee;
+        }
+
+        const indexJsFilePath = path.join(importee, 'index.js');
+        accessData = await compilerCtx.fs.accessData(indexJsFilePath);
+        if (accessData.exists) {
+          // ./importee/index.js
+          return indexJsFilePath;
+        }
+
+        const indexMjsFilePath = path.join(importee, 'index.mjs');
+        accessData = await compilerCtx.fs.accessData(indexMjsFilePath);
+        if (accessData.exists) {
+          // ./importee/index.mjs
+          return indexMjsFilePath;
+        }
       }
 
-      filePath = path.join(importeeDir, importeeBase) + '.js';
-      accessData = await compilerCtx.fs.accessData(filePath);
+      // ./importee.js
+      const jsFilePath = importee + '.js';
+      accessData = await compilerCtx.fs.accessData(jsFilePath);
       if (accessData.exists) {
-        return filePath;
+        return jsFilePath;
       }
-      console.error('path not found', importee);
+
+      // ./importee.mjs
+      const mjsFilePath = importee + '.mjs';
+      accessData = await compilerCtx.fs.accessData(mjsFilePath);
+      if (accessData.exists) {
+        return mjsFilePath;
+      }
 
       return null;
     },
