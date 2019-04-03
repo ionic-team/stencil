@@ -69,7 +69,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.setuptestframework.js'
+      config.sys.compiler.packageDir, 'testing', 'jest-setuptestframework.js'
     );
 
   } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
@@ -81,7 +81,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.testEnvironment !== 'string') {
     testing.testEnvironment = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.environment.js'
+      config.sys.compiler.packageDir, 'testing', 'jest-environment.js'
     );
 
   } else if (!path.isAbsolute(testing.testEnvironment)) {
@@ -153,7 +153,7 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.transform[DEFAULT_TS_TRANSFORM] !== 'string') {
     testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest.preprocessor.js'
+      config.sys.compiler.packageDir, 'testing', 'jest-preprocessor.js'
     );
 
   } else if (!path.isAbsolute(testing.transform[DEFAULT_TS_TRANSFORM])) {

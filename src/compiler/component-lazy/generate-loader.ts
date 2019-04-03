@@ -17,7 +17,7 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
   }
 
   const packageJsonContent = JSON.stringify({
-    'name': 'loader',
+    'name': config.fsNamespace + '-loader',
     'typings': './index.d.ts',
     'module': './index.mjs',
     'main': './index.cjs.js',

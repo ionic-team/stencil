@@ -16,10 +16,11 @@ module.exports = {
     "@stencil/core/sys": "<rootDir>/dist/sys/node",
     "@stencil/core/testing": "<rootDir>/dist/testing",
     "@stencil/core/utils": "<rootDir>/dist/utils",
+    "@stencil/core/internal": "<rootDir>/internal",
     "@stencil/core": "<rootDir>/dist/testing/core"
   },
-  setupTestFrameworkScriptFile: path.join(__dirname, 'jest.setuptestframework.js'),
-  testEnvironment: path.join(__dirname, 'jest.environment.js'),
+  setupTestFrameworkScriptFile: path.join(__dirname, 'jest-setuptestframework.js'),
+  testEnvironment: path.join(__dirname, 'jest-environment.js'),
   testPathIgnorePatterns: [
     '/.stencil',
     '/dist',
@@ -28,6 +29,6 @@ module.exports = {
   ],
   testRegex: '/src/.*\\.spec\\.(ts|tsx|js)$',
   transform: {
-    '^.+\\.(ts|tsx)$': path.join(__dirname, 'jest.preprocessor.js')
+    '^.+\\.(ts|tsx)$': path.join(__dirname, 'jest-preprocessor.js')
   }
 };
