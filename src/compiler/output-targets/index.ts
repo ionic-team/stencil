@@ -30,7 +30,7 @@ async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
   await outputModule(config, compilerCtx, buildCtx);
   const bundleModules = await outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
 
-  if (!buildCtx.shouldAbort) {
+  if (bundleModules != null) {
     await outputWww(config, compilerCtx, buildCtx, bundleModules);
   }
 }
