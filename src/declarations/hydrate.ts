@@ -91,6 +91,7 @@ export interface HydrateOptions {
   afterHydrate?(doc: Document, url?: URL): void;
   beforeHydrate?(doc: Document, url?: URL): void;
   canonicalLink?: string;
+  constrainTimeouts?: boolean;
   clientHydrateAnnotations?: boolean;
   collapseBooleanAttributes?: boolean;
   collapseWhitespace?: boolean;

@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
+import { constrainTimeouts } from '@mock-doc';
 import globalScripts from '@global-scripts';
 
 
@@ -48,6 +49,10 @@ export function initializeWindow(results: d.HydrateResults, win: Window, doc: Do
     globalScripts(win, true);
   } catch (e) {
     catchError(results.diagnostics, e);
+  }
+
+  if (opts.constrainTimeouts) {
+    constrainTimeouts(win);
   }
 
   return windowLocationUrl;

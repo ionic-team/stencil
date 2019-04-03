@@ -32,9 +32,9 @@ export interface PropOptions {
 
   /** @deprecated: "attr" has been deprecated, please use "attribute" instead. */
   attr?: string;
-  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
+  /** @deprecated "context" has been deprecated. */
   context?: string;
-  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
+  /** @deprecated "connect" has been deprecated, please use ES modules and/or dynamic imports instead. */
   connect?: string;
   /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
   reflectToAttr?: boolean;

@@ -24,6 +24,16 @@ export class MockWindow {
   document: Document;
   performance: Performance;
 
+  innerHeight: number;
+  innerWidth: number;
+  screen: Screen;
+  screenLeft: number;
+  screenTop: number;
+  screenX: number;
+  screenY: number;
+  scrollX: number;
+  scrollY: number;
+
   constructor(html: string | boolean = null) {
     if (html !== false) {
       this.document = new MockDocument(html, this) as any;
@@ -32,10 +42,27 @@ export class MockWindow {
     }
     this.performance = new MockPerformance();
     this.customElements = new MockCustomElementRegistry(this as any);
+    resetWindowDimensions(this);
   }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
     addEventListener(this, type, handler);
+  }
+
+  cancelAnimationFrame(id: any) {
+    clearTimeout(id);
+  }
+
+  cancelIdleCallback(id: any) {
+    clearTimeout(id);
+  }
+
+  clearInterval(id: any) {
+    clearInterval(id);
+  }
+
+  clearTimeout(id: any) {
+    clearTimeout(id);
   }
 
   close() {
@@ -126,8 +153,15 @@ export class MockWindow {
     removeEventListener(this, type, handler);
   }
 
-  requestAnimationFrame(cb: (timestamp: number) => void) {
-    setTimeout(() => cb(Date.now()));
+  requestAnimationFrame(callback: (timestamp: number) => void) {
+    return setTimeout(() => callback(Date.now())) as number;
+  }
+
+  requestIdleCallback(callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void) {
+    return setTimeout(() => callback({
+      didTimeout: false,
+      timeRemaining: () => 0
+    })) as number;
   }
 
   get self() {
@@ -145,6 +179,20 @@ export class MockWindow {
   set sessionStorage(locStorage: any) {
     sessionStorageMap.set(this, locStorage);
   }
+
+  setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    return setInterval(callback, ms, ...args) as any;
+  }
+
+  setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    return setTimeout(callback, ms, ...args) as any;
+  }
+
+  scroll(_x?: number, _y?: number) {/**/}
+
+  scrollBy(_x?: number, _y?: number) {/**/}
+
+  scrollTo(_x?: number, _y?: number) {/**/}
 
   get top() {
     return this;
@@ -262,6 +310,25 @@ export function cloneDocument(srcDoc: Document) {
   return dstWin.document;
 }
 
+/**
+ * Constrain setTimeout() to 1ms, but still async. Also
+ * only allow setInterval() to fire once, also constrained to 1ms.
+ */
+export function constrainTimeouts(win: any) {
+  try {
+    win.setTimeout = shortSetTimeout;
+    win.setInterval = shortSetTimeout;
+    win.clearInterval = shortClearTimeout;
+  } catch (e) {}
+}
+
+function shortSetTimeout(callback: (...args: any[]) => void, _ms: number, ...args: any[]) {
+  return setTimeout(callback, 1, ...args);
+}
+
+function shortClearTimeout(id: any) {
+  clearTimeout(id);
+}
 
 export function resetWindow(win: Window) {
   if (win != null) {
@@ -274,6 +341,8 @@ export function resetWindow(win: Window) {
         delete (win as any)[key];
       }
     }
+
+    resetWindowDimensions(win);
 
     resetEventListeners(win);
 
@@ -292,4 +361,34 @@ export function resetWindow(win: Window) {
       } catch (e) {}
     }
   }
+}
+
+function resetWindowDimensions(win: any) {
+  try {
+    win.innerHeight = 768;
+    win.innerWidth = 1366;
+
+    win.screenLeft = 0;
+    win.screenTop = 0;
+    win.screenX = 0;
+    win.screenY = 0;
+    win.scrollX = 0;
+    win.scrollY = 0;
+
+    win.screen = {
+      availHeight: win.innerHeight,
+      availLeft: 0,
+      availTop: 0,
+      availWidth: win.innerWidth,
+      colorDepth: 24,
+      height: win.innerHeight,
+      keepAwake: false,
+      orientation: {
+        angle: 0,
+        type: 'portrait-primary'
+      },
+      pixelDepth: 24,
+      width: win.innerWidth
+    };
+  } catch (e) {}
 }

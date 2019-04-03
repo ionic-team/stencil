@@ -9,6 +9,10 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
     outputOpts.clientHydrateAnnotations = true;
   }
 
+  if (typeof outputOpts.constrainTimeouts !== 'boolean') {
+    outputOpts.constrainTimeouts = true;
+  }
+
   if (typeof outputOpts.maxHydrateCount !== 'number') {
     outputOpts.maxHydrateCount = 300;
   }
