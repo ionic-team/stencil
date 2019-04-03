@@ -2,18 +2,19 @@ import * as d from '.';
 
 
 export interface PrerenderManager {
-  config: d.Config;
   compilerCtx: d.CompilerCtx;
-  buildCtx: d.BuildCtx;
+  config: d.Config;
+  diagnostics: d.Diagnostic[];
+  hydrateAppFilePath: string;
   outputTarget: d.OutputTargetWww;
+  prerenderConfig: d.HydrateConfig;
+  prerenderConfigPath: string;
   prodMode: boolean;
   resolve: Function;
   templateId: string;
   urlsProcessing: Set<string>;
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
-  prerenderConfig: d.HydrateConfig;
-  prerenderConfigPath: string;
 }
 
 

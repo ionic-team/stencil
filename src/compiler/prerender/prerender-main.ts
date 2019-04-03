@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
-import { buildWarn, catchError, hasError } from '@utils';
+import { catchError, hasError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 
@@ -14,14 +14,17 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
   // keep track of how long the entire build process takes
   const timeSpan = buildCtx.createTimeSpan(`prerendering started`);
 
+  const prerenderDiagnostics: d.Diagnostic[] = [];
+
   try {
     // get the prerender urls to queue up
     const manager: d.PrerenderManager = {
       templateId: null,
+      diagnostics: prerenderDiagnostics,
       config: config,
       compilerCtx: compilerCtx,
-      buildCtx: buildCtx,
-      prerenderConfig: getPrerenderConfig(buildCtx.diagnostics, outputTarget.prerenderConfig),
+      hydrateAppFilePath: buildCtx.hydrateAppFilePath,
+      prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
       outputTarget: outputTarget,
       prodMode: (!config.devMode && config.logLevel !== 'debug'),
@@ -34,8 +37,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     initializePrerenderEntryUrls(manager);
 
     if (manager.urlsPending.size === 0) {
-      const d = buildWarn(buildCtx.diagnostics);
-      d.messageText = `No urls found in the prerender config`;
+      timeSpan.finish(`prerendering failed: no urls found in the prerender config`);
       return;
     }
 
@@ -43,42 +45,50 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
 
     await new Promise(resolve => {
       manager.resolve = resolve;
-      drainPrerenderQueue(manager);
+
+      config.sys.nextTick(() => {
+        drainPrerenderQueue(manager);
+      });
     });
 
-    timeSpan.finish(`prerendered paths: ${manager.urlsCompleted.size}`);
+    timeSpan.finish(`prerendered finished: ${manager.urlsCompleted.size} urls`);
 
   } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+    catchError(prerenderDiagnostics, e);
   }
 
-  if (hasError(buildCtx.diagnostics)) {
+  if (hasError(prerenderDiagnostics)) {
+    config.logger.printDiagnostics(prerenderDiagnostics, config.rootDir);
     timeSpan.finish(`prerendering failed`);
   }
 
-  if (compilerCtx.localPrerenderServer) {
-    compilerCtx.localPrerenderServer.close();
-    delete compilerCtx.localPrerenderServer;
+  if (compilerCtx.localPrerenderServer != null) {
+    if (typeof compilerCtx.localPrerenderServer.close === 'function') {
+      compilerCtx.localPrerenderServer.close();
+    }
+    compilerCtx.localPrerenderServer = null;
   }
 }
 
 
 function drainPrerenderQueue(manager: d.PrerenderManager) {
   manager.urlsPending.forEach(url => {
-    // move to processing
-    manager.urlsProcessing.add(url);
-
     // remove from pending
     manager.urlsPending.delete(url);
 
+    // move to processing
+    manager.urlsProcessing.add(url);
+
+    // kick off async prerendering
     prerenderUrl(manager, url);
   });
 
-  if (manager.urlsProcessing.size === 0) {
+  if (manager.urlsProcessing.size === 0 && typeof manager.resolve === 'function') {
     // we're not actively processing anything
     // and there aren't anymore urls in the queue to be prerendered
     // so looks like our job here is done, good work team
     manager.resolve();
+    manager.resolve = null;
   }
 }
 
@@ -86,7 +96,7 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
 async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   try {
     const prerenderRequest: d.PrerenderRequest = {
-      hydrateAppFilePath: manager.buildCtx.hydrateAppFilePath,
+      hydrateAppFilePath: manager.hydrateAppFilePath,
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
       writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
@@ -96,7 +106,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     // prender this path and wait on the results
     const results = await manager.config.sys.prerenderUrl(prerenderRequest);
 
-    manager.buildCtx.diagnostics.push(...results.diagnostics);
+    manager.diagnostics.push(...results.diagnostics);
 
     if (Array.isArray(results.anchorUrls) === true) {
       results.anchorUrls.forEach(anchorUrl => {
@@ -106,16 +116,17 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
   } catch (e) {
     // darn, idk, bad news
-    catchError(manager.buildCtx.diagnostics, e);
+    catchError(manager.diagnostics, e);
   }
 
   manager.urlsProcessing.delete(url);
   manager.urlsCompleted.add(url);
-  url = null;
 
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not
-  drainPrerenderQueue(manager);
+  manager.config.sys.nextTick(() => {
+    drainPrerenderQueue(manager);
+  });
 }
 
 

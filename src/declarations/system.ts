@@ -32,6 +32,7 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
   }>;
+  nextTick?(cb: Function): void;
   open?: (url: string, opts?: any) => Promise<void>;
   optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
   path?: Path;

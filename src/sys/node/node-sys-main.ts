@@ -32,6 +32,7 @@ export class NodeSystem implements d.StencilSystem {
   private nodeLazyRequire: NodeLazyRequire;
   private nodeResolveModule: NodeResolveModule;
   storage: NodeStorage;
+  nextTick: (cb: Function) => void;
 
   fs: d.FileSystem;
   path: d.Path;
@@ -59,6 +60,8 @@ export class NodeSystem implements d.StencilSystem {
 
     this.packageDir = path.join(__dirname, '..', '..', '..');
     this.distDir = path.join(this.packageDir, 'dist');
+
+    this.nextTick = process.nextTick.bind(process);
 
     try {
       this.packageJsonData = require(path.join(this.packageDir, 'package.json'));

@@ -66,6 +66,7 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
+        "--prerender",
         "--max-workers=1",
         "--config",
         "${workspaceFolder}/test/prerender-shadow/stencil.config.ts"
