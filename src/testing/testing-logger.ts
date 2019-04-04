@@ -40,8 +40,8 @@ export class TestingLogger implements d.Logger {
   dim(msg: string) { return msg; }
   createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
     return {
-      finish: () => {
-        /* finish */
+      finish() {
+        return 0;
       }
     };
   }

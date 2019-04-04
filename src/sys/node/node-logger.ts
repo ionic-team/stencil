@@ -489,6 +489,8 @@ class CmdTimeSpan {
       this.debug,
       this.appendTo
     );
+
+    return duration;
   }
 
 }
