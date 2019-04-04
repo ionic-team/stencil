@@ -11,8 +11,6 @@ const buildId = getBuildId();
 
 const start = Date.now();
 
-console.log(color.dim(`\n  Build: ${buildId}\n`));
-
 
 run(async () => {
   execSync('npm install resolve@1.8.1', {
