@@ -137,6 +137,14 @@ async function bundleNodeSysMain() {
             if (importee === '@utils') {
               return '../../utils';
             }
+          },
+          transform(code, id) {
+            if (typeof id === 'string' && id.includes('micromatch') && id.endsWith('index.js') && code.includes('micromatch')) {
+              // somewhere along the way "micromatch" has issues exporting "matcher"
+              // this is a gentle nudge to make it easier for rollup to find the export
+              code += `\nmodule.exports.matcher = micromatch.matcher;`;
+              return code;
+            }
           }
         }
       })(),

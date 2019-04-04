@@ -1,6 +1,15 @@
 import * as d from '.';
 
-export type ModuleFormat = 'amd' | 'cjs' | 'system' | 'es' | 'esm' | 'iife' | 'umd';
+export type ModuleFormat =
+  | 'amd'
+  | 'cjs'
+  | 'commonjs'
+  | 'es'
+  | 'esm'
+  | 'iife'
+  | 'module'
+  | 'system'
+  | 'umd';
 
 export interface RollupResultModule {
   id: string;
