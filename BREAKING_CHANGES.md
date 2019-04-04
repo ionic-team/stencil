@@ -36,9 +36,6 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 
 ```diff
   {
--    "main": "dist/index.js",
-+    "main": "dist/index.js",
-
 -    "module": "dist/esm/index.js",
 +    "module": "dist/index.mjs",
 
@@ -305,12 +302,14 @@ This is due to the fact that prerendering runs in `node` which is a different Ja
 
 A new testing utility has been created to make it easier to unit test components. It's API is similar to `newE2EPage()`. In the example below, a mock `CmpA` was created in the test, but it could have also imported an existing component and registered it into the test using the `component` array option.
 
-```
+```tsx
+import { Component, Prop } from '@stencil/core';
+import { newSpecPage } from '@stencil/core/testing';
+
 it('override default values from attribute', async () => {
   @Component({ tag: 'cmp-a'})
   class CmpA {
     @Prop() someProp = '';
-
     render() {
       return `${this.someProp}`;
     }

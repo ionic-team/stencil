@@ -7,25 +7,31 @@ describe('prop', () => {
   it('override default values from attribute', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      @Prop() someProp = '';
-
+      @Prop() boolFalse = false;
+      @Prop() boolTrue = true;
+      @Prop() str = 'string';
+      @Prop() num = 88;
       render() {
-        return `${this.someProp}`;
+        return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}`;
       }
     }
 
     const { root } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a some-prop="value"></cmp-a>`,
+      html: `<cmp-a bool-false="true" bool-true="false" str="attr" num="99"></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a some-prop="value">
-        value
+      <cmp-a bool-false="true" bool-true="false" str="attr" num="99">
+        true-false-attr-99
       </cmp-a>
     `);
 
-    expect(root.someProp).toBe('value');
+    expect(root.textContent).toBe('true-false-attr-99');
+    expect(root.boolFalse).toBe(true);
+    expect(root.boolTrue).toBe(false);
+    expect(root.str).toBe('attr');
+    expect(root.num).toBe(99);
   });
 
   it('set default values', async () => {
