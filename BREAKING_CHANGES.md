@@ -20,7 +20,7 @@ function app() {
 The `h` stands for "hyperscript", which is what JSX elements are transformed into (it's the actual function exectued when rendering within the runtime). Stencil's `h` import is an equivalent to React's [React.createElement](https://reactjs.org/docs/react-without-jsx.html). This also explains why the app's `tsconfig.json` sets the `{ "jsxFactory": "h" }` config, which is detailed further in  [TypeScript's JSX Factory Function Docs](https://www.typescriptlang.org/docs/handbook/jsx.html#factory-functions).
 
 
-### index.html's <script>s updated to use `type="module"`
+### index.html's `<script>`s updated to use `type="module"`
 
 Stencil used to generate a loader `.js` file that automatically decided which entry-point to load based in the browser's capabilities. In Stencil 1.0 we have decided to completely remove the overhead of this loader by directly loading the core using the web-standard `type="module"` script attribute. Less runtime and preferring native browser features. Win Win. For more for info, please see [Using JavaScript modules on the web](https://developers.google.com/web/fundamentals/primers/modules#browser).
 
@@ -289,9 +289,9 @@ export default function() {
   }
 ```
 
-You might wonder why not using `window` or `document` directly. While technically it would work just fine in a browser, it will likely break once you try to prerender your application.
+You might wonder why not using `window` or `document` directly. While technically it would work just fine in a browser, it will likely cause issues once you try to prerender your application.
 
-This is due to the fact that prerendering runs in `node` which is a lightly different Javascript environment that does not have `window`, `document`. This new APIs feel the gap!
+This is due to the fact that prerendering runs in `node` which is a different JavaScript environment that does not have the global `window` or `document` objects. These new APIs fill the gap! But if there are no plans to prerender components, using browser globals is perfectly acceptable.
 
 ### setMode() and getMode()
 
@@ -300,3 +300,33 @@ This is due to the fact that prerendering runs in `node` which is a lightly diff
 ### `dist-module` output target
 
 ### OutputTarget local copy tasks
+
+### Testing `newSpecPage()`
+
+A new testing utility has been created to make it easier to unit test components. It's API is similar to `newE2EPage()`. In the example below, a mock `CmpA` was created in the test, but it could have also imported an existing component and registered it into the test using the `component` array option.
+
+```
+it('override default values from attribute', async () => {
+  @Component({ tag: 'cmp-a'})
+  class CmpA {
+    @Prop() someProp = '';
+
+    render() {
+      return `${this.someProp}`;
+    }
+  }
+
+  const { root } = await newSpecPage({
+    components: [CmpA],
+    html: `<cmp-a some-prop="value"></cmp-a>`,
+  });
+
+  expect(root).toEqualHtml(`
+    <cmp-a some-prop="value">
+      value
+    </cmp-a>
+  `);
+
+  expect(root.someProp).toBe('value');
+});
+```
