@@ -4,8 +4,8 @@ import { constrainTimeouts } from '@mock-doc';
 import globalScripts from '@global-scripts';
 
 
-export function initializeWindow(results: d.HydrateResults, win: Window, doc: Document, opts: d.HydrateOptions) {
-  const windowLocationUrl = setWindowUrl(win, opts);
+export async function initializeWindow(results: d.HydrateResults, win: Window, doc: Document, opts: d.HydrateOptions) {
+  setWindowUrl(win, opts);
 
   if (typeof opts.url === 'string') {
     try {
@@ -39,7 +39,7 @@ export function initializeWindow(results: d.HydrateResults, win: Window, doc: Do
   }
   if (typeof opts.beforeHydrate === 'function') {
     try {
-      opts.beforeHydrate(doc as any, windowLocationUrl);
+      await opts.beforeHydrate(win, opts);
     } catch (e) {
       catchError(results.diagnostics, e);
     }
@@ -54,17 +54,17 @@ export function initializeWindow(results: d.HydrateResults, win: Window, doc: Do
   if (opts.constrainTimeouts) {
     constrainTimeouts(win);
   }
-
-  return windowLocationUrl;
 }
 
 
 function setWindowUrl(win: Window, opts: d.HydrateOptions) {
-  const url = typeof opts.url === 'string' ? opts.url : BASE_URL;
+  if (typeof opts.url !== 'string' || opts.url.trim().length === 0) {
+    opts.url = '/';
+  }
   try {
-    win.location.href = url;
+    win.location.href = opts.url;
   } catch (e) {}
-  return new URL(url, BASE_URL);
+  return new URL(opts.url, BASE_URL);
 }
 
 const BASE_URL = 'http://prerender.stenciljs.com';

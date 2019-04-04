@@ -88,8 +88,8 @@ export interface HydrateImgElement extends HydrateElement {
 
 
 export interface HydrateOptions {
-  afterHydrate?(doc: Document, url?: URL): void;
-  beforeHydrate?(doc: Document, url?: URL): void;
+  afterHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
+  beforeHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
   canonicalLink?: string;
   constrainTimeouts?: boolean;
   clientHydrateAnnotations?: boolean;

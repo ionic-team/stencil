@@ -6,7 +6,7 @@ import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
 import { updateCanonicalLink } from '../compiler/html/canonical-link';
 
 
-export function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateResults, windowLocationUrl: URL, doc: Document) {
+export async function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateResults, win: Window, doc: Document) {
   optimizeStyles(doc, opts, results);
 
   if (typeof opts.title === 'string') {
@@ -37,7 +37,7 @@ export function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateResults
 
   if (typeof opts.afterHydrate === 'function') {
     try {
-      opts.afterHydrate(doc as any, windowLocationUrl);
+      await opts.afterHydrate(win, opts);
     } catch (e) {
       catchError(results.diagnostics, e);
     }

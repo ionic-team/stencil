@@ -23,7 +23,7 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
     const win: Window = new MockWindow(html) as any;
     const doc = win.document;
 
-    const windowLocationUrl = initializeWindow(results, win, doc, opts);
+    await initializeWindow(results, win, doc, opts);
 
     const waitPromises: Promise<any>[] = [];
     connectElements(opts, results, doc.body, waitPromises);
@@ -33,7 +33,7 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
       insertVdomAnnotations(doc);
     }
 
-    finalizeWindow(opts, results, windowLocationUrl, doc);
+    finalizeWindow(opts, results, win, doc);
 
     if (results.diagnostics.length === 0) {
       results.html = serializeNodeToHtml(doc, {
@@ -71,7 +71,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
     polyfillDocumentImplementation(win, doc);
 
-    const windowLocationUrl = initializeWindow(results, win, doc, opts);
+    await initializeWindow(results, win, doc, opts);
 
     const waitPromises: Promise<any>[] = [];
     connectElements(opts, results, doc.body, waitPromises);
@@ -81,7 +81,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
       insertVdomAnnotations(doc);
     }
 
-    finalizeWindow(opts, results, windowLocationUrl, doc);
+    await finalizeWindow(opts, results, win, doc);
 
   } catch (e) {
     catchError(results.diagnostics, e);
