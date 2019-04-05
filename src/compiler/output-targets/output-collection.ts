@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath, sortBy } from '@utils';
-import { generateTypesAndValidate } from '../types/generate-types';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { processCopyTasks } from '../copy/local-copy-tasks';
@@ -23,7 +22,6 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
 
   const moduleFiles = buildCtx.moduleFiles.filter(m => !m.isCollectionDependency && m.jsFilePath);
   await Promise.all([
-    writeTypes(config, compilerCtx, buildCtx, outputTargets),
     writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
     writeManifests(config, compilerCtx, buildCtx, outputTargets)
   ]);
@@ -112,39 +110,4 @@ function serializeCollectionDependencies(compilerCtx: d.CompilerCtx): d.Collecti
   }));
 
   return sortBy(collectionDeps, item => item.name);
-}
-
-export async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
-
-  const pkgData = await readPackageJson(config, compilerCtx);
-  const timespan = buildCtx.createTimeSpan(`generate types started`, true);
-
-  await Promise.all(outputTargets.map(outputsTarget => {
-    return generateTypesAndValidate(config, compilerCtx, buildCtx, pkgData, outputsTarget);
-  }));
-
-  timespan.finish(`generate types finished`);
-}
-
-
-async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
-
-  let pkgJson: string;
-  try {
-    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
-
-  } catch (e) {
-    throw new Error(`Missing "package.json" file for distribution: ${pkgJsonPath}`);
-  }
-
-  let pkgData: d.PackageJsonData;
-  try {
-    pkgData = JSON.parse(pkgJson);
-
-  } catch (e) {
-    throw new Error(`Error parsing package.json: ${pkgJsonPath}, ${e}`);
-  }
-
-  return pkgData;
 }

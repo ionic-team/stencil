@@ -3,8 +3,9 @@ import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputHydrate } from './output-hydrate';
-import { outputWww } from './output-www';
 import { outputModule } from './output-module';
+import { outputTypes } from './output-types';
+import { outputWww } from './output-www';
 import { createPluginOutput } from '../output-plugins/create-plugin-output';
 
 
@@ -24,6 +25,10 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
   ];
 
   await Promise.all(generateOutputs);
+
+  // must run after all the other outputs
+  // since it validates files were created
+  await outputTypes(config, compilerCtx, buildCtx);
 }
 
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

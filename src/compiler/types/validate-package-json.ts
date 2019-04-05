@@ -67,7 +67,10 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
   const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const err = buildWarn(diagnostics);
-    err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found. It's recommended to set the "main" property to: ${mainRel}`;
+    err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found.`;
+    if (pkgData.main !== mainRel) {
+      err.messageText += ` It's recommended to set the "main" property to: ${mainRel}`;
+    }
     return;
   }
 
@@ -108,7 +111,10 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
   if (!fileExists) {
     const err = buildWarn(diagnostics);
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
-    err.messageText = `package.json "types" property is set to "${pkgData.types}" but cannot be found. It's recommended to set the "types" property to: ${recommendedPath}`;
+    err.messageText = `package.json "types" property is set to "${pkgData.types}" but cannot be found.`;
+    if (pkgData.types !== recommendedPath) {
+      err.messageText += ` It's recommended to set the "types" property to: ${recommendedPath}`;
+    }
     return false;
   }
 
