@@ -14,7 +14,7 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
       }
 
       // skip non-paths
-      if (importee[0] !== '.' && importee[0] !== '/') {
+      if (importee[0] !== '.' && importee[0] !== '/' && importee[1] !== ':') {
         return null;
       }
 

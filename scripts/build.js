@@ -73,7 +73,7 @@ run(async () => {
   });
 
   listr.run().then(() => {
-    console.log(color.dim(`\n  ${Date.now() - start}ms`) + '  🎉\n');
+    console.log(color.dim(`\n  ${Date.now() - start}ms`) + (process.platform === 'win32' ? '' : '🎉') + '\n');
 
   }).catch(() => {
     console.error('\n' + errors.join('\n'));
