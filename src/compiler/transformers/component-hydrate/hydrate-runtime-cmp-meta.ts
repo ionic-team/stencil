@@ -5,7 +5,13 @@ import ts from 'typescript';
 
 
 export function addHydrateRuntimeCmpMeta(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
-  const cmpMeta = formatComponentRuntimeMeta(cmp, true);
+  const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(cmp, true);
+  const cmpMeta: d.ComponentRuntimeMeta = {
+    $flags$: compactMeta[0],
+    $tagName$: compactMeta[1],
+    $members$: compactMeta[2],
+    $listeners$: compactMeta[3],
+  };
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
   classMembers.push(staticMember);
 }

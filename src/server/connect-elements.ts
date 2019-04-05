@@ -2,32 +2,47 @@ import * as d from '../declarations';
 import { hydrateComponent } from './hydrate-component';
 
 
-export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[]) {
+export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[], hydratedElements: WeakSet<any>, collectedElements: WeakSet<any>) {
   if (elm != null && typeof elm.nodeName === 'string') {
 
     if (!elm.hasAttribute('no-prerender')) {
       const tagName = elm.nodeName.toLowerCase();
 
       if (tagName.includes('-') === true) {
-        hydrateComponent(opts, results, tagName, elm, waitPromises);
+        if (!hydratedElements.has(elm)) {
+          hydratedElements.add(elm);
+          hydrateComponent(opts, results, tagName, elm, waitPromises, hydratedElements, collectedElements);
+        }
 
       } else if (opts.collectAnchors === true && tagName === 'a') {
-        collectAnchors(results, elm as HTMLAnchorElement);
+        if (!collectedElements.has(elm)) {
+          collectedElements.add(elm);
+          collectAnchors(results, elm as HTMLAnchorElement);
+        }
 
       } else if (opts.collectScripts === true && tagName === 'script') {
-        collectScriptElement(results, elm as HTMLScriptElement);
+        if (!collectedElements.has(elm)) {
+          collectedElements.add(elm);
+          collectScriptElement(results, elm as HTMLScriptElement);
+        }
 
       } else if (opts.collectStylesheets === true && tagName === 'link') {
-        collectLinkElement(results, elm as HTMLLinkElement);
+        if (!collectedElements.has(elm)) {
+          collectedElements.add(elm);
+          collectLinkElement(results, elm as HTMLLinkElement);
+        }
 
       } else if (opts.collectImgs === true && tagName === 'img') {
-        collectImgElement(results, elm as HTMLImageElement);
+        if (!collectedElements.has(elm)) {
+          collectedElements.add(elm);
+          collectImgElement(results, elm as HTMLImageElement);
+        }
       }
 
       const children = elm.children;
       if (children != null) {
         for (let i = 0, ii = children.length; i < ii; i++) {
-          connectElements(opts, results, children[i] as any, waitPromises);
+          connectElements(opts, results, children[i] as any, waitPromises, hydratedElements, collectedElements);
         }
       }
     }

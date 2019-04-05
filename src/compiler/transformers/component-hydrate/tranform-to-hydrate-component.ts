@@ -5,6 +5,7 @@ import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
 
+
 export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   if (buildCtx.shouldAbort) {
     return null;
@@ -16,7 +17,10 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        target: getBuildScriptTarget(build)
+        target: getBuildScriptTarget(build),
+        skipLibCheck: true,
+        noResolve: true,
+        noLib: true,
       },
       fileName: cmp.jsFilePath,
       transformers: {
@@ -47,6 +51,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFa
   return transformCtx => {
 
     return tsSourceFile => {
+
       function visitNode(node: ts.Node): any {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);

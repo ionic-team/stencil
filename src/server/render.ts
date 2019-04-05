@@ -26,7 +26,11 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
     await initializeWindow(results, win, doc, opts);
 
     const waitPromises: Promise<any>[] = [];
-    connectElements(opts, results, doc.body, waitPromises);
+    const hydratedElements = new WeakSet<any>();
+    const collectedElements = new WeakSet<any>();
+
+    connectElements(opts, results, doc.body, waitPromises, hydratedElements, collectedElements);
+
     await Promise.all(waitPromises);
 
     if (opts.clientHydrateAnnotations) {
@@ -74,7 +78,11 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
     await initializeWindow(results, win, doc, opts);
 
     const waitPromises: Promise<any>[] = [];
-    connectElements(opts, results, doc.body, waitPromises);
+    const hydratedElements = new WeakSet<any>();
+    const collectedElements = new WeakSet<any>();
+
+    connectElements(opts, results, doc.body, waitPromises, hydratedElements, collectedElements);
+
     await Promise.all(waitPromises);
 
     if (opts.clientHydrateAnnotations) {

@@ -51,7 +51,13 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       });
     });
 
-    timeSpan.finish(`prerendered finished: ${manager.urlsCompleted.size} urls`);
+    const totalDuration = timeSpan.finish(`prerendered finished`);
+
+    const totalUrls = manager.urlsCompleted.size;
+    if (totalUrls > 1) {
+      const average = Math.round(totalDuration / totalUrls);
+      config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
+    }
 
   } catch (e) {
     catchError(prerenderDiagnostics, e);
