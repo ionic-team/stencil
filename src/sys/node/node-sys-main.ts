@@ -10,8 +10,7 @@ import { NodeResolveModule } from './node-resolve-module';
 import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '@utils';
-// @ts-ignore
-import opn from 'opn';
+import open from 'open';
 import semver from 'semver';
 import { WorkerManager } from './worker/index';
 
@@ -196,7 +195,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   open(target: string, opts?: any) {
-    return opn(target, opts) as Promise<any>;
+    return open(target, opts) as Promise<any>;
   }
 
   get details() {

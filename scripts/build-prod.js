@@ -42,7 +42,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'is-glob',
   'minimatch',
   'node-fetch',
-  'opn',
+  'open',
   'parse5',
   'pixelmatch',
   'pngjs',

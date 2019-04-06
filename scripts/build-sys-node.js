@@ -166,9 +166,9 @@ async function bundleNodeSysMain() {
 
 
 async function copyXdgOpen() {
-  // copy opn's xdg-open file
+  // copy open's xdg-open file
   const xdgOpenSrcPath = glob.sync('xdg-open', {
-    cwd: path.join(__dirname, '..', 'node_modules', 'opn'),
+    cwd: path.join(__dirname, '..', 'node_modules', 'open'),
     absolute: true
   });
   if (xdgOpenSrcPath.length !== 1) {

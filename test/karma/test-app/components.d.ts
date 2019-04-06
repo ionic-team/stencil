@@ -5,8 +5,8 @@
  */
 
 
-import { JSXBase } from '@stencil/core';
-
+import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+import { JSX } from '@stencil/core';
 
 
 export namespace Components {
@@ -154,11 +154,6 @@ export namespace Components {
   interface SvgClass {}
   interface Tag3dComponent {}
   interface Tag88 {}
-}
-
-interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
-  forceUpdate(): void;
 }
 
 declare namespace LocalJSX {
