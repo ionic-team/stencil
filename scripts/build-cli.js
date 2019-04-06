@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { run, transpile } = require('./script-utils');
+const { run, transpile, relativeResolve } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-cli');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli', 'index.js');
@@ -20,18 +20,16 @@ async function buildCli() {
       'https',
       'os',
       'path',
-      '../utils',
-      '../sys/node'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id) {
+          resolveId(id, importer) {
             if (id === '@sys') {
-              return '../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (id === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }
         }

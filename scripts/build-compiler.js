@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { run, transpile, updateBuildIds } = require('./script-utils');
+const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
 const { urlPlugin } = require('./plugin-url');
 
 
@@ -22,29 +22,25 @@ async function bundleCompiler() {
     input: INPUT_FILE,
     external: [
       'typescript',
-      '../mock-doc',
-      '../server',
-      '../sys/node',
-      '../utils'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id) {
+          resolveId(id, importer) {
             if (id === '@build-conditionals') {
               return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
             }
             if (id === '@mock-doc') {
-              return '../mock-doc';
+              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
             if (id === '@server') {
-              return '../server';
+              return relativeResolve(importer, TRANSPILED_DIR, 'server');
             }
             if (id === '@sys') {
-              return '../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (id === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
             if (id === 'path') {
               return path.join(__dirname, 'helpers', 'path.js');
@@ -98,9 +94,9 @@ async function buildUtils() {
     plugins: [
       (() => {
         return {
-          resolveId(id) {
+          resolveId(id, importer) {
             if (id === '@sys') {
-              return '../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
           }
         }

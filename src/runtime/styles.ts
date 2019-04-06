@@ -4,14 +4,20 @@ import { CMP_FLAG } from '@utils';
 import { getDoc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 
+declare global {
+  export interface CSSStyleSheet {
+    replaceSync(cssText: string): void;
+    replace(cssText: string): Promise<CSSStyleSheet>;
+  }
+}
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
 
 export const registerStyle = (styleId: string, cssText: string) => {
   let style = styles.get(styleId);
   if (supportsConstructibleStylesheets) {
-    style = style || new CSSStyleSheet();
-    (style as any).replaceSync(cssText);
+    style = (style || new CSSStyleSheet()) as CSSStyleSheet;
+    style.replace(cssText);
   } else {
     style = cssText;
   }

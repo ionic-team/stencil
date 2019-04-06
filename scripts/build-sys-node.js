@@ -6,7 +6,7 @@ const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const rollupJson = require('rollup-plugin-json');
 const glob = require('glob');
-const { run, transpile, updateBuildIds } = require('./script-utils');
+const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-node');
@@ -117,33 +117,22 @@ async function bundleNodeSysMain() {
       'typescript',
       'url',
       'util',
-      './graceful-fs.js',
-      '../../utils',
-      '../../sys/node'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(importee) {
+          resolveId(importee, importer) {
             if (importee === 'resolve') {
               return path.join(__dirname, 'helpers', 'resolve.js');
             }
             if (importee === 'graceful-fs') {
-              return './graceful-fs.js';
+              return { id: './graceful-fs.js', external: true };
             }
             if (importee === '@sys') {
-              return '../../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (importee === '@utils') {
-              return '../../utils';
-            }
-          },
-          transform(code, id) {
-            if (typeof id === 'string' && id.includes('micromatch') && id.endsWith('index.js') && code.includes('micromatch')) {
-              // somewhere along the way "micromatch" has issues exporting "matcher"
-              // this is a gentle nudge to make it easier for rollup to find the export
-              code += `\nmodule.exports.matcher = micromatch.matcher;`;
-              return code;
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }
         }
@@ -151,7 +140,11 @@ async function bundleNodeSysMain() {
       rollupResolve({
         preferBuiltins: true,
       }),
-      rollupCommonjs(),
+      rollupCommonjs({
+        namedExports: {
+          'micromatch': [ 'matcher' ]
+        }
+      }),
       rollupJson()
     ],
     onwarn: (message) => {

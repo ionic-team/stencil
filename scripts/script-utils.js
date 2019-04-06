@@ -1,6 +1,15 @@
 const path = require('path');
 const cp = require('child_process');
 
+function relativeResolve(importer, TRANSPILED_DIR, relativePath) {
+  const absolutePath = path.resolve(TRANSPILED_DIR, relativePath);
+  return {
+    id: path.relative(path.dirname(importer), absolutePath),
+    external: true
+  };
+}
+exports.relativeResolve = relativeResolve;
+
 
 function transpile(tsConfigPath) {
   try {

@@ -25,8 +25,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
-          jsnext: true,
-          main: true
+          mainFields: ['collection:main', 'jsnext:main', 'module', 'main']
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({

@@ -4,7 +4,7 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const rollupJson = require('rollup-plugin-json');
-const { run, transpile, updateBuildIds } = require('./script-utils');
+const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-testing');
 const TRANSPILED_TESTING_DIR = path.join(TRANSPILED_DIR, 'testing');
@@ -48,31 +48,26 @@ async function bundleTesting() {
       'vm',
       'yargs',
       'zlib',
-      '../compiler',
-      '../mock-doc',
-      '../runtime',
-      '../sys/node',
-      '../utils',
       '@stencil/core/build-conditionals'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id) {
+          resolveId(id, importer) {
             if (id === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
             }
             if (id === '@mock-doc') {
-              return '../mock-doc';
+              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
             if (id === '@runtime') {
-              return '../runtime';
+              return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
             }
             if (id === '@sys') {
-              return '../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (id === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }
         }

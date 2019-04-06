@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { run, transpile, updateBuildIds } = require('./script-utils');
+const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
 const { urlPlugin } = require('./plugin-url');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
@@ -19,14 +19,11 @@ async function bundleServer() {
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/global-scripts',
-      '../mock-doc',
-      '../runtime',
-      '../utils'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id) {
+          resolveId(id, importer) {
             if (id === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
             }
@@ -34,13 +31,13 @@ async function bundleServer() {
               return '@stencil/core/global-scripts';
             }
             if (id === '@mock-doc') {
-              return '../mock-doc';
+              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
             if (id === '@runtime') {
-              return '../runtime';
+              return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
             }
             if (id === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
             if (id === '@platform') {
               return path.join(TRANSPILED_DIR, 'server', 'index.js');

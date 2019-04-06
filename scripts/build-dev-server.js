@@ -4,7 +4,7 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const glob = require('glob');
-const { run, transpile } = require('./script-utils');
+const { run, transpile, relativeResolve } = require('./script-utils');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const DST_DIR = path.join(ROOT_DIR, 'dist');
@@ -33,22 +33,19 @@ async function bundleDevServer() {
       'querystring',
       'url',
       'zlib',
-      '../sys/node/graceful-fs.js',
-      '../sys/node',
-      '../utils'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(importee) {
+          resolveId(importee, importer) {
             if (importee === 'graceful-fs') {
-              return '../sys/node/graceful-fs.js';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node/graceful-fs.js');
             }
             if (importee === '@sys') {
-              return '../sys/node';
+              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (importee === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }
         }
