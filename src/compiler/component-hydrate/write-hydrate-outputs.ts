@@ -20,6 +20,10 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   const pkgJsonPath = config.sys.path.join(hydrateAppDirPath, 'package.json');
   const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateAppFilePath, hydrateAppDtsFilePath);
 
+  // dirty hack to make sure patchNodeGlobal(global) runs immediately before everything else
+  hydrateAppCode = hydrateAppCode.replace(`patchNodeGlobal(global);`, ``);
+  hydrateAppCode = hydrateAppCode.replace(`'use strict';`, `'use strict'; patchNodeGlobal(global);`);
+
   return Promise.all([
     compilerCtx.fs.writeFile(hydrateAppFilePath, hydrateAppCode),
     compilerCtx.fs.writeFile(hydrateAppDtsFilePath, HYDRATE_DTS_CODE),

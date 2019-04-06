@@ -63,5 +63,8 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
 }
 
 const SERVER_ENTRY = `
+import { patchNodeGlobal } from '@stencil/core/platform';
+patchNodeGlobal(global);
+
 export { hydrateDocument, renderToString } from '@stencil/core/app';
 `;

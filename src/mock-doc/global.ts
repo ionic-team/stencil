@@ -29,6 +29,7 @@ export function teardownGlobal(global: any) {
 
 
 const WINDOW_PROPERTIES = [
+  'addEventListener',
   'cancelAnimationFrame',
   'cancelIdleCallback',
   'customElements',
