@@ -11,6 +11,7 @@ export function addHydrateRuntimeCmpMeta(classMembers: ts.ClassElement[], cmp: d
     $tagName$: compactMeta[1],
     $members$: compactMeta[2],
     $listeners$: compactMeta[3],
+    $attrsToReflect$: []
   };
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
   classMembers.push(staticMember);

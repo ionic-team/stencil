@@ -85,7 +85,7 @@ function patchWindownObject(global: any, winKey: string) {
   if (typeof global[winKey] !== 'object') {
     Object.defineProperty(global, winKey, {
       get() {
-        console.warn(`Please use a local window reference when using "${winKey}" while prerendering.`);
+        console.trace(`Please use a local window reference when using "${winKey}" while prerendering.`);
         return {};
       }
     });
@@ -95,7 +95,7 @@ function patchWindownObject(global: any, winKey: string) {
 function patchWindownFunction(global: any, winKey: string) {
   if (typeof global[winKey] !== 'function') {
     global[winKey] = function() {
-      console.warn(`Please use a local window reference when using "${winKey}" while prerendering.`);
+      console.trace(`Please use a local window reference when using "${winKey}" while prerendering.`);
       return {};
     };
   }

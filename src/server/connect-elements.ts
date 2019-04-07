@@ -53,7 +53,8 @@ export function connectElements(opts: d.HydrateOptions, results: d.HydrateResult
 function collectAttributes(node: HTMLElement, parsedElm: d.HydrateElement) {
   const attrs = node.attributes;
   for (let i = 0; i < attrs.length; i++) {
-    parsedElm[attrs[i].nodeName.toLowerCase()] = attrs[i].nodeValue;
+    const attr = attrs.item(i);
+    parsedElm[attr.nodeName.toLowerCase()] = attr.nodeValue;
   }
 }
 
