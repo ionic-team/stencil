@@ -270,6 +270,74 @@ export default function() {
 }
 ```
 
+### OutputTarget local copy tasks
+
+The root `copy` property in `stencil.config.ts` has been deprecated in favour of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
+
+```diff
+  const copy =
+  export const config = {
+    outputTargets: [
+      {
+        type: 'www',
++       copy: [
++        {
++           src: 'index-module.html',
++           dest: 'index-module.html'
++         }
++       ]
+      }
+    ],
+-   copy: [
+-     {
+-       src: 'index-module.html',
+-       dest: 'index-module.html'
+-     }
+-   ]
+  };
+```
+
+This change has been motivated by the confusing semantics of the root copy task, currently the copy tasks are executed multiple times with within different working-directories for each output-target.
+
+Take this example:
+
+```ts
+export const config = {
+  outputTargets: [
+    { type: 'dist' },
+    { type: 'dist', dir: 'dist-app' },
+    { type: 'www' }
+  ],
+  copy: [
+    { src: 'main.html' }
+  ]
+};
+```
+
+In the example above, the `main.html` file is actually copied into 5 different places!!
+
+- dist/collection/main.html
+- dist/app/main.html
+- dist-app/collection/main.html
+- dist-app/app/main.html
+- www/main.html
+
+If the old behaviour is still desired, the config can be refactored to:
+
+```ts
+const copy = [
+  { src: 'main.html' }
+];
+
+export const config = {
+  outputTargets: [
+    { type: 'dist', copy },
+    { type: 'dist', dir: 'dist-app', copy },
+    { type: 'www', copy }
+  ]
+};
+```
+
 ## New APIs
 
 ### getWindow(this) and getDocument(this)
@@ -296,7 +364,7 @@ This is due to the fact that prerendering runs in `node` which is a different Ja
 
 ### `dist-module` output target
 
-### OutputTarget local copy tasks
+
 
 ### Testing `newSpecPage()`
 
