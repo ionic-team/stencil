@@ -1,13 +1,13 @@
 import * as d from '../../../declarations';
-import { buildError, buildWarn, flatOne } from '@utils';
+import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) {
+export function listenDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
-    .map(method => parseListenDecorators(diagnostics, tsSourceFile, method));
+    .map(method => parseListenDecorators(config, diagnostics, method));
 
   const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
@@ -16,7 +16,7 @@ export function listenDecoratorsToStatic(diagnostics: d.Diagnostic[], tsSourceFi
 }
 
 
-function parseListenDecorators(diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, method: ts.MethodDeclaration) {
+function parseListenDecorators(config: d.Config, diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) {
   const listenDecorators = method.decorators.filter(isDecoratorNamed('Listen'));
   if (listenDecorators.length === 0) {
     return [];
@@ -30,14 +30,15 @@ function parseListenDecorators(diagnostics: d.Diagnostic[], tsSourceFile: ts.Sou
     if (eventNames.length > 1) {
       const err = buildError(diagnostics);
       err.messageText = 'Please use multiple @Listen() decorators instead of comma-separated names.';
+      augmentDiagnosticWithNode(config, err, listenDecorator)
     }
 
-    return parseListener(diagnostics, tsSourceFile, eventNames[0], listenOptions, methodName);
+    return parseListener(config, diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);
   });
 }
 
 
-export function parseListener(diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, eventName: string, opts: d.ListenOptions = {}, methodName: string) {
+export function parseListener(config: d.Config, diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) {
   let rawEventName = eventName.trim();
   let target = opts.target;
 
@@ -49,7 +50,8 @@ export function parseListener(diagnostics: d.Diagnostic[], tsSourceFile: ts.Sour
       rawEventName = splt[1].trim();
       target = prefix;
       const warn = buildWarn(diagnostics);
-      warn.messageText = `Deprecated @Listen() feature on "${methodName}". Use @Listen('${rawEventName}', { target: '${prefix}' }) instead. ${tsSourceFile.fileName}`;
+      warn.messageText = `Deprecated @Listen() feature on "${methodName}". Use @Listen('${rawEventName}', { target: '${prefix}' }) instead.`;
+      augmentDiagnosticWithNode(config, warn, decoratorNode);
     }
   }
 
@@ -58,7 +60,8 @@ export function parseListener(diagnostics: d.Diagnostic[], tsSourceFile: ts.Sour
   if (rest === undefined && isValidKeycodeSuffix(keycode)) {
     rawEventName = finalEvent;
     const warn = buildError(diagnostics);
-    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using "${rawEventName}" is no longer supported, use "event.key" within the function itself instead. ${tsSourceFile.fileName}`;
+    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using "${rawEventName}" is no longer supported, use "event.key" within the function itself instead.`;
+    augmentDiagnosticWithNode(config, warn, decoratorNode);
   }
 
   const listener: d.ComponentCompilerListener = {

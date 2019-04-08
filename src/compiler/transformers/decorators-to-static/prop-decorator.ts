@@ -1,15 +1,16 @@
 import * as d from '../../../declarations';
-import { buildError, catchError, normalizePath, toDashCase } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, resolveType, serializeSymbol, typeToString, isMemberPrivate } from '../transform-utils';
+import { augmentDiagnosticWithNode, buildError, catchError, toDashCase } from '@utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, resolveType, serializeSymbol, typeToString } from '../transform-utils';
 import ts from 'typescript';
+import { validatePublicName } from '../reserved-public-members';
 
 
-export function propDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export function propDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
   const connect: any[] = [];
   const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(config, diagnostics, sourceFile, typeChecker, prop, context, connect, newMembers))
+    .map(prop => parsePropDecorator(config, diagnostics, typeChecker, prop, context, connect, newMembers))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
@@ -24,7 +25,7 @@ export function propDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnost
 }
 
 
-function parsePropDecorator(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], newMembers: ts.ClassElement[]) {
+function parsePropDecorator(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], newMembers: ts.ClassElement[]) {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -53,9 +54,10 @@ function parsePropDecorator(config: d.Config, diagnostics: d.Diagnostic[], sourc
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
     err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    err.absFilePath = normalizePath(sourceFile.fileName);
-    err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+    augmentDiagnosticWithNode(config, err, prop.modifiers[0]);
   }
+
+  validatePublicName(config, diagnostics, propName, '@Prop()', 'prop', prop.name);
 
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);

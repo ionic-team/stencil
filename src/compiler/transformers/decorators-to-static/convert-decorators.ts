@@ -51,13 +51,13 @@ function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   const decoratedMembers = newMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(config, diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    propDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
     stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
-    eventDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    eventDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
     methodDecoratorsToStatic(config, diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
-    listenDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, newMembers);
+    listenDecoratorsToStatic(config, diagnostics, decoratedMembers, newMembers);
 
     removeStencilDecorators(decoratedMembers);
   }
