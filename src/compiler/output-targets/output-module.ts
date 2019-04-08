@@ -36,7 +36,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
         let code = result.code;
 
         if (config.minifyJs) {
-          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', false, code);
+          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, false, code);
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
           if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {

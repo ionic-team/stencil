@@ -6,13 +6,14 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
 export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
-  const systemOutputs = config.buildEs5 ? outputTargets.filter(o => !!o.systemDir) : [];
+  const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'system',
       entryFileNames: build.isDev ? '[name].system.js' : 'p-[hash].system.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js'
+      chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js',
+      preferConst: true
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {

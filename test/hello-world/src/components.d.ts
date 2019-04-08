@@ -35,6 +35,7 @@ declare module "@stencil/core" {
 
 declare global {
 
+
   interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
   var HTMLHelloWorldElement: {
     prototype: HTMLHelloWorldElement;

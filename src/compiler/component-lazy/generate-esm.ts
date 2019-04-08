@@ -6,6 +6,10 @@ import { relativeImport } from '@utils';
 import { RollupResult } from '../../declarations';
 
 export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, webpackBuild: boolean, outputTargets: d.OutputTargetDistLazy[]) {
+  if (webpackBuild && !config.buildEsm) {
+    return undefined;
+  }
+
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir) : [];
   const esmOutputs = outputTargets.filter(o => !!o.esmDir);
 
@@ -14,6 +18,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       format: 'esm',
       entryFileNames: '[name].mjs.js',
       chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js',
+      preferConst: true
     };
     // This is needed until Firefox 67, which ships native dynamic imports
     if (!webpackBuild) {

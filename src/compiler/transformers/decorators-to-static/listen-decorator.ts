@@ -30,7 +30,7 @@ function parseListenDecorators(config: d.Config, diagnostics: d.Diagnostic[], me
     if (eventNames.length > 1) {
       const err = buildError(diagnostics);
       err.messageText = 'Please use multiple @Listen() decorators instead of comma-separated names.';
-      augmentDiagnosticWithNode(config, err, listenDecorator)
+      augmentDiagnosticWithNode(config, err, listenDecorator);
     }
 
     return parseListener(config, diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);

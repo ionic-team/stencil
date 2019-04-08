@@ -2,26 +2,39 @@ import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 
 
-export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, webpackBuild: boolean, input: string) {
+export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, isCore: boolean, webpackBuild: boolean, input: string) {
   const opts: any = {
     output: {},
     compress: {
       pure_getters: true,
       keep_fargs: false,
-      passes: 4,
-      pure_funcs: ['getHostRef'],
-      global_defs: {
-        'STENCIL_SOURCE_TARGET': sourceTarget,
-        'STENCIL_PATCH_IMPORT': !webpackBuild
-      }
+      passes: 2,
     },
     mangle: {
-      properties: {
-        regex: '^\\$.+\\$$',
-      },
       toplevel: true,
     }
   };
+
+  if (isCore) {
+    opts.compress.passes = 4;
+    opts.compress.pure_funcs = ['getHostRef'];
+    opts.compress.global_defs = {
+      'STENCIL_SOURCE_TARGET': sourceTarget,
+      'STENCIL_PATCH_IMPORT': !webpackBuild
+    };
+    opts.mangle.properties = {
+      regex: '^\\$.+\\$$',
+    };
+    if (webpackBuild) {
+      opts.output.beautify = true;
+      opts.output.indent_level = 2;
+      opts.output.comments = 'all';
+
+      // bug in terser removes comments
+      opts.compress.unused = false;
+      opts.compress.evaluate = false;
+    }
+  }
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
@@ -38,9 +51,6 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     opts.compress.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
-  }
-  if (webpackBuild) {
-    opts.output.comments = '/webpack/';
   }
 
   if (config.logLevel === 'debug') {

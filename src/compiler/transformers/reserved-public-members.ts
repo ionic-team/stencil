@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, augmentDiagnosticWithNode } from '@utils';
+import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
 

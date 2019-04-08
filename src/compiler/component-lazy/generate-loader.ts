@@ -1,8 +1,11 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
-export function generateLoaders(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
-  return Promise.all(
+export async function generateLoaders(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  if (!config.buildEsm) {
+    return;
+  }
+  await Promise.all(
     outputTargets.map(o => generateLoader(config, compilerCtx, o))
   );
 }
