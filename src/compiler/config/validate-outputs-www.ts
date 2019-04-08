@@ -51,6 +51,9 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   ]);
   outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
   outputTarget.serviceWorker = validateServiceWorker(config, outputTarget.serviceWorker, outputTarget.dir);
+  if (outputTarget.polyfills === undefined) {
+    outputTarget.polyfills = true;
+  }
   outputTarget.polyfills = !!outputTarget.polyfills;
 
   // Add dist-lazy output target
