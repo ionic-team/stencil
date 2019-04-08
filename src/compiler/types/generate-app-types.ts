@@ -38,7 +38,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
 async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx, _destination: string) {
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
-  // const isSrcTypes = destination === 'src';
+  const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
   const components = sortBy(
     buildCtx.components,
     cmp => cmp.tagName
@@ -55,6 +55,13 @@ declare module "@stencil/core" {
     interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
     interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
   }
+}
+`;
+
+const jsxElementGlobal = !needsJSXElementHack ? '' : `
+// Adding a global JSX for backcompatibility with legacy dependencies
+export namespace JSX {
+  export interface Element {}
 }
 `;
 
@@ -77,6 +84,7 @@ declare namespace LocalJSX {
 export { LocalJSX as JSX };
 ${jsxAugmentation}
 declare global {
+  ${jsxElementGlobal}
   ${modules.map(m => m.element).join('\n')}
   interface HTMLElementTagNameMap {
   ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
