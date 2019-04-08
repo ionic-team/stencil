@@ -644,6 +644,7 @@ export namespace JSXBase {
     is?: string;
     radioGroup?: string; // <command>, <menuitem>
     radiogroup?: string;
+    part?: string;
 
     // WAI-ARIA
     role?: string;

@@ -119,6 +119,7 @@ const METHODS = [
   'lookupPrefix',
   'matches',
   'normalize',
+  'part',
   'prepend',
   'querySelector',
   'querySelectorAll',
