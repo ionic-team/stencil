@@ -8,7 +8,6 @@ import * as v from './validate-package-json';
 export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistCollection) {
   v.validatePackageFiles(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateCollection(config, outputTarget, buildCtx.diagnostics, pkgData);
-  v.validateNamespace(config, buildCtx.diagnostics);
   v.validateTypes(config, outputTarget, buildCtx.diagnostics, pkgData);
 
   if (!buildCtx.hasError) {
@@ -19,8 +18,9 @@ export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.
       await copyStencilCoreDts(config, compilerCtx);
     }
 
-    await v.validateModule(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
-    await v.validateMain(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
+    v.validateModule(config, outputTarget, buildCtx.diagnostics, pkgData);
+    v.validateMain(config, outputTarget, buildCtx.diagnostics, pkgData);
+    // v.validateCollectionMain(config, outputTarget, buildCtx.diagnostics, pkgData);
     v.validateBrowser(buildCtx.diagnostics, pkgData);
   }
 }

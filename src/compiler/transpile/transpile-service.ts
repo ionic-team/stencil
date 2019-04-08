@@ -143,8 +143,8 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
     // loop through each ts file that has changed
-    await Promise.all(tsFilePaths.map(async tsFilePath => {
-      await tranpsileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
+    await Promise.all(tsFilePaths.map(tsFilePath => {
+      return transpileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
     }));
 
     if (config.watch && !transpileCtx.hasQueuedTsServicePrime) {
@@ -166,7 +166,7 @@ interface TranspileContext {
 }
 
 
-async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, sourceFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
+async function transpileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, sourceFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
   if (!ctx.buildCtx.isActiveBuild) {
     ctx.buildCtx.debug(`tranpsileTsFile aborted, not active build: ${sourceFilePath}`);
     return;

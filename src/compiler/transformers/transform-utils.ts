@@ -7,6 +7,12 @@ export const LegacyScriptTarget = ts.ScriptTarget.ES5;
 export const ScriptTarget = ts.ScriptTarget.ES2017;
 export const ModuleKind = ts.ModuleKind.ESNext;
 
+export function isMemberPrivate(member: ts.ClassElement) {
+  if (member.modifiers && member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)) {
+    return true;
+  }
+  return false;
+}
 
 export function getBuildScriptTarget(build: d.Build) {
   if (build.es5) {

@@ -26,7 +26,7 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 }
 
 
-export async function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validateModule(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const moduleAbs = config.sys.path.join(outputTarget.dir, 'index.mjs');
   const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
@@ -37,23 +37,32 @@ export async function validateModule(config: d.Config, compilerCtx: d.CompilerCt
   }
 
   // Check for not recommended values
-  if (pkgData.module.endsWith('collection/index.js')) {
+  if (pkgData.module !== moduleRel) {
     const err = buildWarn(diagnostics);
-    err.messageText = `package.json "module" property is set to "${pkgData.module}" but it's not recommended since it might point to non-ES5 code. It's recommended to set the "module" property to: ${moduleRel}`;
-    return;
-  }
-
-  const pkgFile = config.sys.path.join(config.rootDir, pkgData.module);
-  const fileExists = await compilerCtx.fs.access(pkgFile);
-  if (!fileExists) {
-    const err = buildWarn(diagnostics);
-    err.messageText = `package.json "module" property is set to "${pkgData.module}" but cannot be found. It's recommended to set the "module" property to: ${moduleRel}`;
+    err.messageText = `package.json "module" property is set to "${pkgData.module}". It's recommended to set the "module" property to: ${moduleRel}`;
     return;
   }
 }
 
+export function validateCollectionMain(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+  const moduleAbs = config.sys.path.join(outputTarget.collectionDir, 'index.js');
+  const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
-export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+  if (typeof pkgData['collection:main'] !== 'string') {
+    const err = buildWarn(diagnostics);
+    err.messageText = `package.json "collection:main" property is recommended when generating a distribution. It's recommended to set the "collection:main" property to: ${moduleRel}`;
+    return;
+  }
+
+  // Check for not recommended values
+  if (pkgData.module !== moduleRel) {
+    const err = buildWarn(diagnostics);
+    err.messageText = `package.json "collection:main" property is set to "${pkgData['collection:main']}". It's recommended to set the "collection:main" property to: ${moduleRel}`;
+    return;
+  }
+}
+
+export function validateMain(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const mainAbs = config.sys.path.join(outputTarget.dir, 'index.js');
   const mainRel = normalizePath(config.sys.path.relative(config.rootDir, mainAbs));
 
@@ -63,22 +72,9 @@ export async function validateMain(config: d.Config, compilerCtx: d.CompilerCtx,
     return;
   }
 
-  const pkgFile = config.sys.path.join(config.rootDir, pkgData.main);
-  const fileExists = await compilerCtx.fs.access(pkgFile);
-  if (!fileExists) {
+  if (pkgData.main !== mainRel) {
     const err = buildWarn(diagnostics);
-    err.messageText = `package.json "main" property is set to "${pkgData.main}" but cannot be found.`;
-    if (pkgData.main !== mainRel) {
-      err.messageText += ` It's recommended to set the "main" property to: ${mainRel}`;
-    }
-    return;
-  }
-
-  const loaderAbs = config.sys.path.join(outputTarget.dir, `${config.fsNamespace}.js`);
-  const loaderRel = normalizePath(config.sys.path.relative(config.rootDir, loaderAbs));
-  if (normalizePath(pkgData.main) === loaderRel) {
-    const err = buildWarn(diagnostics);
-    err.messageText = `package.json "main" property should not be set to "${pkgData.main}", which is the browser loader (this was a previous recommendation, but recently updated). Instead, please set the "main" property to: ${mainRel}`;
+    err.messageText = `package.json "main" property is set to "${pkgData.module}". It's recommended to set the "main" property to: ${mainRel}`;
     return;
   }
 }
@@ -137,14 +133,6 @@ export function validateBrowser(diagnostics: d.Diagnostic[], pkgData: d.PackageJ
   if (typeof pkgData.browser === 'string') {
     const err = buildWarn(diagnostics);
     err.messageText = `package.json "browser" property is set to "${pkgData.browser}". However, for maximum compatibility with all bundlers it's recommended to not set the "browser" property and instead ensure both "module" and "main" properties are set.`;
-  }
-}
-
-
-export function validateNamespace(config: d.Config, diagnostics: d.Diagnostic[]) {
-  if (typeof config.namespace !== 'string' || config.fsNamespace === 'app') {
-    const err = buildWarn(diagnostics);
-    err.messageText = `When generating a distribution it is recommended to choose a unique namespace rather than the default setting "App". Please updated the "namespace" config property within the stencil.config.js file.`;
   }
 }
 

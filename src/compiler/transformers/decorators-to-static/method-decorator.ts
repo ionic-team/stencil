@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, serializeSymbol, typeToString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, serializeSymbol, typeToString, isMemberPrivate } from '../transform-utils';
 import { buildError, buildWarn, normalizePath } from '@utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
@@ -54,6 +54,13 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       err.absFilePath = normalizePath(sourceFile.fileName);
       err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
     }
+  }
+
+  if (isMemberPrivate(method)) {
+    const err = buildError(diagnostics);
+    err.messageText = 'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
+    err.absFilePath = normalizePath(sourceFile.fileName);
+    err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
   }
 
   // Validate if the method name does not conflict with existing public names
