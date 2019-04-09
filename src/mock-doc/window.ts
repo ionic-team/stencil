@@ -77,6 +77,29 @@ export class MockWindow {
     return Promise.resolve();
   }
 
+  getComputedStyle(_: any) {
+    return {
+      cssText: '',
+      length: 0,
+      parentRule: null,
+      getPropertyPriority(): any {
+        return null;
+      },
+      getPropertyValue(): any {
+        return '';
+      },
+      item(): any {
+        return null;
+      },
+      removeProperty(): any {
+        return null;
+      },
+      setProperty(): any {
+        return null;
+      }
+    } as any;
+  }
+
   get globalThis() {
     return this;
   }
@@ -252,29 +275,6 @@ export class MockWindow {
   }
   set CustomEvent(custEvClass: any) {
     customEventClassMap.set(this, custEvClass);
-  }
-
-  getComputedStyle(_: any) {
-    return {
-      cssText: '',
-      length: 0,
-      parentRule: null,
-      getPropertyPriority(): any {
-        return null;
-      },
-      getPropertyValue(): any {
-        return '';
-      },
-      item(): any {
-        return null;
-      },
-      removeProperty(): any {
-        return null;
-      },
-      setProperty(): any {
-        return null;
-      }
-    } as any;
   }
 
 }

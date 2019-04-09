@@ -1,6 +1,6 @@
+import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement } from './node';
-import { creatCustomElement } from './custom-element-registry';
 import { URL } from 'url';
 
 
@@ -39,7 +39,7 @@ export function createElement(ownerDocument: any, tagName: string) {
   if (ownerDocument != null && tagName.includes('-')) {
     const win = ownerDocument.defaultView;
     if (win != null && win.customElements != null) {
-      return creatCustomElement(win.customElements, ownerDocument, tagName);
+      return createCustomElement(win.customElements, ownerDocument, tagName);
     }
   }
 

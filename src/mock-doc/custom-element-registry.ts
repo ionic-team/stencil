@@ -33,13 +33,14 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
       }
     }
 
-    if (this.win.document != null) {
-      const hosts = this.win.document.querySelectorAll(tagName);
+    const doc = this.win.document;
+    if (doc != null) {
+      const hosts = doc.querySelectorAll(tagName);
       hosts.forEach(host => {
         if (upgradedElements.has(host) === false) {
-          tempDisableCallbacks.add(this.win.document);
+          tempDisableCallbacks.add(doc);
 
-          const upgradedCmp = creatCustomElement(this, this.win.document, tagName) as MockNode;
+          const upgradedCmp = createCustomElement(this, doc, tagName) as MockNode;
 
           for (let i = 0; i < host.childNodes.length; i++) {
             const childNode = host.childNodes[i];
@@ -47,9 +48,9 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
             upgradedCmp.appendChild(childNode as any);
           }
 
-          tempDisableCallbacks.delete(this.win.document);
+          tempDisableCallbacks.delete(doc);
 
-          if (proxyElements.has(host) === true) {
+          if (proxyElements.has(host)) {
             proxyElements.set(host, upgradedCmp);
           }
         }
@@ -116,7 +117,7 @@ export function resetCustomElementRegistry(customElements: CustomElementRegistry
 }
 
 
-export function creatCustomElement(customElements: MockCustomElementRegistry, ownerDocument: any, tagName: string) {
+export function createCustomElement(customElements: MockCustomElementRegistry, ownerDocument: any, tagName: string) {
   const Cstr = customElements.get(tagName);
 
   if (Cstr != null) {
@@ -128,35 +129,36 @@ export function creatCustomElement(customElements: MockCustomElementRegistry, ow
 
   const host = new Proxy({}, {
     get(obj: any, prop: string) {
-      const instance = proxyElements.get(host);
-      if (instance != null) {
-        return instance[prop];
+      const elm = proxyElements.get(host);
+      if (elm != null) {
+        return elm[prop];
       }
       return obj[prop];
     },
-    has(obj: any, prop: string) {
-      if (prop in obj) {
-        return true;
-      }
-      if (prop in instance) {
-        return true;
-      }
-      return false;
-    },
     set(obj: any, prop: string, val: any) {
-      const instance = proxyElements.get(host);
-      if (instance != null) {
-        instance[prop] = val;
+      const elm = proxyElements.get(host);
+      if (elm != null) {
+        elm[prop] = val;
       } else {
         obj[prop] = val;
       }
       return true;
+    },
+    has(obj: any, prop: string) {
+      const elm = proxyElements.get(host);
+      if (prop in elm) {
+        return true;
+      }
+      if (prop in obj) {
+        return true;
+      }
+      return false;
     }
   });
 
-  const instance = new MockElement(ownerDocument, tagName);
+  const elm = new MockElement(ownerDocument, tagName);
 
-  proxyElements.set(host, instance);
+  proxyElements.set(host, elm);
 
   return host;
 }
