@@ -9,15 +9,27 @@ Most required changes are in order to avoid global types, which often cause issu
 
 In order to render JSX in Stencil apps, the `h()` function must be imported from `@stencil/core`:
 
-```tsx
-import { h } from '@stencil/core';
+```diff
++ import { h } from '@stencil/core';
 
 function app() {
   return <ion-app></ion-app>
 }
 ```
 
-The `h` stands for "hyperscript", which is what JSX elements are transformed into (it's the actual function exectued when rendering within the runtime). Stencil's `h` import is an equivalent to React's [React.createElement](https://reactjs.org/docs/react-without-jsx.html). This also explains why the app's `tsconfig.json` sets the `{ "jsxFactory": "h" }` config, which is detailed further in  [TypeScript's JSX Factory Function Docs](https://www.typescriptlang.org/docs/handbook/jsx.html#factory-functions).
+The `h` stands for "hyperscript", which is what JSX elements are transformed into (it's the actual function executed when rendering within the runtime). Stencil's `h` import is an equivalent to React's [React.createElement](https://reactjs.org/docs/react-without-jsx.html). This also explains why the app's `tsconfig.json` sets the `{ "jsxFactory": "h" }` config, which is detailed further in  [TypeScript's JSX Factory Function Docs](https://www.typescriptlang.org/docs/handbook/jsx.html#factory-functions).
+
+You might think that `h` will be marked as "unused" by linters, but it's not! Any JSX syntax you write, is equivalent to using `h` directly, and the typescript's tooling is aware of that.
+
+```tsx
+const jsx = <ion-button>;
+```
+
+is the same as:
+
+```tsx
+const jsx = h('ion-button', null, null);
+```
 
 
 ### index.html's `<script>`s updated to use `type="module"`
@@ -32,7 +44,13 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 
 ### Collection's package.json
 
-**package.json:**
+Stencil One has chaged the internal folder structure of the `dist` folder, and some entry-points are located in different location:
+
+- **"module"**: `dist/esm/index.js` => `dist/index.mjs`
+- **"jsnext:main**": `dist/esm/es2017/index.mjs.js` => `dist/esm/index.mjs.js`
+
+
+Make sure you update the `package.json` in the root of your project, like this:
 
 ```diff
   {
@@ -265,10 +283,19 @@ console.log('global script ran');
 **AFTER:**
 
 ```ts
-export default function() {
++export default function() {
   console.log('global script ran');
 }
 ```
+
+Ie, just wrap most of your logic within your global script around a exported default function:
+
+```diff
++ export default function() {
+    console.log('global script ran');
++ }
+```
+
 
 ### OutputTarget local copy tasks
 
