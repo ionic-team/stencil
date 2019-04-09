@@ -5,13 +5,15 @@ import globalScripts from '@global-scripts';
 
 
 export async function initializeWindow(results: d.HydrateResults, win: Window, doc: Document, opts: d.HydrateOptions) {
-  setWindowUrl(win, opts);
+  const url = (typeof opts.url === 'string' && opts.url.trim().length > 0) ? opts.url.trim() : '/';
 
-  if (typeof opts.url === 'string') {
-    try {
-      win.location.href = opts.url;
-    } catch (e) {}
+  try {
+    const parsedUrl = new URL(url, BASE_URL);
+    win.location.href = parsedUrl.href;
+  } catch (e) {
+    catchError(results.diagnostics, e);
   }
+
   if (typeof opts.userAgent === 'string') {
     try {
       (win.navigator as any).userAgent = opts.userAgent;
@@ -60,15 +62,5 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
   }
 }
 
-
-function setWindowUrl(win: Window, opts: d.HydrateOptions) {
-  if (typeof opts.url !== 'string' || opts.url.trim().length === 0) {
-    opts.url = '/';
-  }
-  try {
-    win.location.href = opts.url;
-  } catch (e) {}
-  return new URL(opts.url, BASE_URL);
-}
 
 const BASE_URL = 'http://prerender.stenciljs.com';

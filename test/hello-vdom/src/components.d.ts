@@ -35,6 +35,7 @@ declare module "@stencil/core" {
 
 declare global {
 
+
   interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
   var HTMLHelloVdomElement: {
     prototype: HTMLHelloVdomElement;
