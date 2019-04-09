@@ -4,7 +4,7 @@ import { generateAppTypes } from '../types/generate-app-types';
 import { transpileService } from './transpile-service';
 import { validateTypesMain } from './validate-types-main';
 import { getComponentsFromModules } from '../output-targets/output-utils';
-
+import { resolveComponentDependencies} from '../entries/resolve-component-dependencies';
 
 export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
@@ -36,6 +36,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
+  resolveComponentDependencies(buildCtx.components);
 
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!

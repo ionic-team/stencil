@@ -52,8 +52,6 @@ export interface ComponentCompilerFeatures {
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs: CompilerAssetDir[];
   componentClassName: string;
-  dependencies: string[];
-  dependants?: string[];
   elementRef: string;
   encapsulation: Encapsulation;
   excludeFromCollection: boolean;
@@ -73,9 +71,13 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styles: d.StyleCompiler[];
   tagName: string;
   internal: boolean;
-
   legacyConnect: ComponentCompilerLegacyConnect[];
   legacyContext: ComponentCompilerLegacyContext[];
+
+  dependencies?: string[];
+  dependants?: string[];
+  directDependencies?: string[];
+  directDependants?: string[];
 }
 
 export interface ComponentCompilerLegacyConnect {

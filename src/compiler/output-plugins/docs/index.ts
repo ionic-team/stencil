@@ -14,7 +14,7 @@ export const plugin: d.Plugin<d.OutputTargetDocsReadme> = {
     }
 
     await Promise.all(docsData.components.map(cmpData => {
-      return generateReadme(config, compilerCtx, outputTargets, cmpData);
+      return generateReadme(config, compilerCtx, outputTargets, cmpData, docsData.components);
     }));
   }
 };

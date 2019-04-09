@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { sortBy } from '@utils';
 import { getDefaultBundles } from './default-bundles';
-import { resolveComponentDependencies } from './resolve-component-dependencies';
 
 
 export function generateComponentBundles(
@@ -12,7 +11,6 @@ export function generateComponentBundles(
   if (config.devMode) {
     return cmps.map(cmp => [cmp]);
   }
-  resolveComponentDependencies(cmps);
 
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
 

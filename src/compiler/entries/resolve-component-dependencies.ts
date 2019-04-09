@@ -9,13 +9,13 @@ export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
 function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
   const visited = new Set();
   cmps.forEach(cmp => {
-    cmp.dependencies = resolveTransitiveDependencies(cmp, cmps, visited);
+    resolveTransitiveDependencies(cmp, cmps, visited);
   });
 }
 
 function computeDependants(cmps: d.ComponentCompilerMeta[]) {
   cmps.forEach(cmp => {
-    cmp.dependants = resolveTransitiveDependants(cmp.tagName, cmps);
+    resolveTransitiveDependants(cmp, cmps);
   });
 }
 
@@ -30,15 +30,21 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
       .map(tagName => cmps.find(c => c.tagName === tagName))
       .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
-  return unique([
+  cmp.directDependencies = dependencies;
+  return cmp.dependencies = unique([
     ...dependencies,
     ...transitiveDeps
   ]).sort();
 }
 
-function resolveTransitiveDependants(tagName: string, cmps: d.ComponentCompilerMeta[]) {
-  return cmps
-    .filter(c => c.dependencies.includes(tagName))
+function resolveTransitiveDependants(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+  cmp.dependants = cmps
+    .filter(c => c.dependencies.includes(cmp.tagName))
+    .map(c => c.tagName)
+    .sort();
+
+  cmp.directDependants = cmps
+    .filter(c => c.directDependencies.includes(cmp.tagName))
     .map(c => c.tagName)
     .sort();
 }

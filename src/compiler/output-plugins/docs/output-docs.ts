@@ -8,10 +8,10 @@ import { slotsToMarkdown } from './markdown-slots';
 import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT, NOTE } from '../../docs/constants';
 
-export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent) {
+export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
-  const content = generateMarkdown(userContent, docsData);
+  const content = generateMarkdown(config, userContent, docsData, cmps);
   const readmeContent = content.join('\n');
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
@@ -30,7 +30,7 @@ export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCt
   }));
 }
 
-export function generateMarkdown(userContent: string, cmp: d.JsonDocsComponent) {
+export function generateMarkdown(config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
   return [
     userContent,
     AUTO_GENERATE_COMMENT,
@@ -42,7 +42,7 @@ export function generateMarkdown(userContent: string, cmp: d.JsonDocsComponent) 
     ...methodsToMarkdown(cmp.methods),
     ...slotsToMarkdown(cmp.slots),
     ...stylesToMarkdown(cmp.styles),
-    ...depsToMarkdown(cmp),
+    ...depsToMarkdown(config, cmp, cmps),
     `----------------------------------------------`,
     '',
     NOTE,

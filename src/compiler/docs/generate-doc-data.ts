@@ -38,6 +38,8 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
         docs: generateDocs(readme, cmp.docs),
         docsTags: cmp.docs.tags,
         encapsulation: getEncapsulation(cmp),
+        dependants: cmp.directDependants,
+        dependencies: cmp.directDependencies,
         dependencyGraph: buildDepGraph(cmp, buildCtx.components),
 
         props: getProperties(cmp),
@@ -56,7 +58,7 @@ function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
   function walk(tagName: string) {
     if (!dependencies[tagName]) {
       const cmp = cmps.find(c => c.tagName === tagName);
-      const deps = cmp.potentialCmpRefs.filter(c => cmps.some(c2 => c2.tagName === c));
+      const deps = cmp.directDependencies;
       if (deps.length > 0) {
         dependencies[tagName] = deps;
         deps.forEach(walk);
@@ -64,6 +66,15 @@ function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
     }
   }
   walk(cmp.tagName);
+
+  // load dependants
+  cmp.directDependants.forEach(tagName => {
+    if (dependencies[tagName] && !dependencies[tagName].includes(tagName)) {
+      dependencies[tagName].push(cmp.tagName);
+    } else {
+      dependencies[tagName] = [cmp.tagName];
+    }
+  });
   return dependencies;
 }
 

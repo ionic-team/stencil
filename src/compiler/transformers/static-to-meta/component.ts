@@ -58,7 +58,6 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(config, staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
-    dependencies: [],
     docs,
     jsFilePath: moduleFile.jsFilePath,
     sourceFilePath: moduleFile.sourceFilePath,

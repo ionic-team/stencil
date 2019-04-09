@@ -36,7 +36,6 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
       tags: []
     },
     internal: false,
-    dependencies: [],
     jsFilePath: moduleFile.jsFilePath,
     sourceFilePath: '',
     styleDocs: [],
