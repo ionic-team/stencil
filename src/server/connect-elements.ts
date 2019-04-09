@@ -2,47 +2,39 @@ import * as d from '../declarations';
 import { hydrateComponent } from './hydrate-component';
 
 
-export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[], hydratedElements: WeakSet<any>, collectedElements: WeakSet<any>) {
+export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[], hydratedElements: Set<any>) {
   if (elm != null && typeof elm.nodeName === 'string') {
 
-    if (!elm.hasAttribute('no-prerender')) {
-      const tagName = elm.nodeName.toLowerCase();
+    const tagName = elm.nodeName.toLowerCase();
 
-      if (tagName.includes('-') === true) {
-        if (!hydratedElements.has(elm)) {
-          hydratedElements.add(elm);
-          hydrateComponent(opts, results, tagName, elm, waitPromises, hydratedElements, collectedElements);
-        }
+    if (!NO_HYDRATE_TAGS.has(tagName) && !elm.hasAttribute('no-prerender')) {
+      if (!hydratedElements.has(elm)) {
+        hydratedElements.add(elm);
 
-      } else if (opts.collectAnchors === true && tagName === 'a') {
-        if (!collectedElements.has(elm)) {
-          collectedElements.add(elm);
+        if (tagName.includes('-')) {
+          hydrateComponent(opts, results, tagName, elm, waitPromises);
+
+        } else if (opts.collectAnchors && tagName === 'a') {
           collectAnchors(results, elm as HTMLAnchorElement);
-        }
 
-      } else if (opts.collectScripts === true && tagName === 'script') {
-        if (!collectedElements.has(elm)) {
-          collectedElements.add(elm);
+        } else if (opts.collectScripts && tagName === 'script') {
           collectScriptElement(results, elm as HTMLScriptElement);
-        }
+          return;
 
-      } else if (opts.collectStylesheets === true && tagName === 'link') {
-        if (!collectedElements.has(elm)) {
-          collectedElements.add(elm);
+        } else if (opts.collectStylesheets && tagName === 'link') {
           collectLinkElement(results, elm as HTMLLinkElement);
-        }
+          return;
 
-      } else if (opts.collectImgs === true && tagName === 'img') {
-        if (!collectedElements.has(elm)) {
-          collectedElements.add(elm);
+        } else if (opts.collectImgs && tagName === 'img') {
           collectImgElement(results, elm as HTMLImageElement);
+          return;
         }
       }
 
       const children = elm.children;
       if (children != null) {
         for (let i = 0, ii = children.length; i < ii; i++) {
-          connectElements(opts, results, children[i] as any, waitPromises, hydratedElements, collectedElements);
+          connectElements(opts, results, children[i] as any, waitPromises, hydratedElements);
         }
       }
     }
@@ -71,9 +63,10 @@ function collectAnchors(hydrateResults: d.HydrateResults, elm: HTMLAnchorElement
 
 function collectScriptElement(hydrateResults: d.HydrateResults, elm: HTMLScriptElement) {
   const parsedElm: d.HydrateScriptElement = {};
+  const src = parsedElm.src;
   collectAttributes(elm, parsedElm);
 
-  if (hydrateResults.scripts.some(a => a.src === parsedElm.src) === false) {
+  if (hydrateResults.scripts.some(a => a.src !== src)) {
     hydrateResults.scripts.push(parsedElm);
   }
 }
@@ -84,11 +77,12 @@ function collectLinkElement(hydrateResults: d.HydrateResults, elm: HTMLLinkEleme
 
   if (rel === 'stylesheet') {
     const parsedElm: d.HydrateStyleElement = {};
+    const href = parsedElm.href;
     collectAttributes(elm, parsedElm);
     delete parsedElm.rel;
     delete parsedElm.type;
 
-    if (hydrateResults.styles.some(a => a.href === parsedElm.href) === false) {
+    if (hydrateResults.styles.some(a => a.href !== href)) {
       hydrateResults.styles.push(parsedElm);
     }
   }
@@ -97,9 +91,25 @@ function collectLinkElement(hydrateResults: d.HydrateResults, elm: HTMLLinkEleme
 
 function collectImgElement(hydrateResults: d.HydrateResults, elm: HTMLImageElement) {
   const parsedElm: d.HydrateImgElement = {};
+  const src = parsedElm.src;
   collectAttributes(elm, parsedElm);
 
-  if (hydrateResults.imgs.some(a => a.src === parsedElm.src) === false) {
+  if (hydrateResults.imgs.some(a => a.src !== src)) {
     hydrateResults.imgs.push(parsedElm);
   }
 }
+
+
+const NO_HYDRATE_TAGS = new Set([
+  'code',
+  'iframe',
+  'input',
+  'object',
+  'output',
+  'noscript',
+  'pre',
+  'select',
+  'style',
+  'template',
+  'textarea'
+]);

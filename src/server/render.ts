@@ -25,13 +25,11 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
 
     await initializeWindow(results, win, doc, opts);
 
-    const waitPromises: Promise<any>[] = [];
-    const hydratedElements = new WeakSet<any>();
-    const collectedElements = new WeakSet<any>();
-
-    connectElements(opts, results, doc.body, waitPromises, hydratedElements, collectedElements);
-
-    await Promise.all(waitPromises);
+    await new Promise(resolve => {
+      const hydratedElements = new Set<any>();
+      startRender(opts, results, doc.body, hydratedElements, resolve);
+      hydratedElements.clear();
+    });
 
     if (opts.clientHydrateAnnotations) {
       insertVdomAnnotations(doc);
@@ -77,13 +75,11 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
     await initializeWindow(results, win, doc, opts);
 
-    const waitPromises: Promise<any>[] = [];
-    const hydratedElements = new WeakSet<any>();
-    const collectedElements = new WeakSet<any>();
-
-    connectElements(opts, results, doc.body, waitPromises, hydratedElements, collectedElements);
-
-    await Promise.all(waitPromises);
+    await new Promise(resolve => {
+      const hydratedElements = new Set<any>();
+      startRender(opts, results, doc.body, hydratedElements, resolve);
+      hydratedElements.clear();
+    });
 
     if (opts.clientHydrateAnnotations) {
       insertVdomAnnotations(doc);
@@ -96,4 +92,36 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
   }
 
   return results;
+}
+
+
+async function startRender(opts: d.HydrateOptions, results: d.HydrateResults, body: HTMLElement, hydratedElements: Set<any>, resolve: Function) {
+  process.nextTick(async () => {
+    const waitPromises1: Promise<any>[] = [];
+    const hydratedElementsBefore = hydratedElements.size;
+
+    try {
+      connectElements(opts, results, body, waitPromises1, hydratedElements);
+    } catch (e) {
+      catchError(results.diagnostics, e);
+    }
+    await Promise.all(waitPromises1);
+
+    process.nextTick(async () => {
+      const waitPromises2: Promise<any>[] = [];
+      try {
+        connectElements(opts, results, body, waitPromises1, hydratedElements);
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+      await Promise.all(waitPromises2);
+
+      const hydratedElementsAfter = hydratedElements.size;
+      if (hydratedElementsBefore === hydratedElementsAfter) {
+        resolve();
+      } else {
+        startRender(opts, results, body, hydratedElements, resolve);
+      }
+    });
+  });
 }

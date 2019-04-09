@@ -1,11 +1,10 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { connectElements } from './connect-elements';
 import { connectedCallback, getComponent, registerHost } from '@platform';
 import { proxyHostElement } from './proxy-host-element';
 
 
-export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[], hydratedElements: WeakSet<any>, collectedElements: WeakSet<any>) {
+export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
   const Cstr = getComponent(tagName);
 
   if (Cstr != null) {
@@ -47,13 +46,6 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
           catchError(results.diagnostics, e);
         }
 
-        const children = elm.children;
-        if (children != null) {
-          for (let i = 0, ii = children.length; i < ii; i++) {
-            connectElements(opts, results, children[i] as any, waitPromises, hydratedElements, collectedElements);
-          }
-        }
-
         resolve();
       });
 
@@ -66,7 +58,7 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
 function getNodeDepth(elm: Node) {
   let depth = 0;
 
-  while (elm.parentNode) {
+  while (elm.parentNode != null) {
     depth++;
     elm = elm.parentNode;
   }

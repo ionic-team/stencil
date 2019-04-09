@@ -46,6 +46,10 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
   }
 
   try {
+    win.customElements = null;
+  } catch (e) {}
+
+  try {
     globalScripts(win, true);
   } catch (e) {
     catchError(results.diagnostics, e);
