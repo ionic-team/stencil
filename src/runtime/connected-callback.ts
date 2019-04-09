@@ -38,11 +38,14 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
     }
 
     if (BUILD.slotRelocation && !hostId) {
-      // initUpdate, BUILD.slotRelocation
+      // initUpdate
       // if the slot polyfill is required we'll need to put some nodes
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
-      if ((BUILD.slot && cmpMeta.$flags$ & CMP_FLAG.hasSlotRelocation) || (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || BUILD.hydrateServerSide) {
+      if (
+        BUILD.hydrateServerSide ||
+        (BUILD.slot && cmpMeta.$flags$ & CMP_FLAG.hasSlotRelocation) ||
+        (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation)) {
         setContentReference(elm);
       }
     }

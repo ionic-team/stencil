@@ -108,7 +108,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
      * - if it's a SVG, since properties might not work in <svg>
      * - if the newValue is null/undefined or 'false'.
      */
-    const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
+    const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, ''))) ? true : false;
     if (newValue == null || newValue === false) {
       if (isXlinkNs) {
         elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));

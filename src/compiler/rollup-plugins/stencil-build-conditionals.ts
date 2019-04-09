@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 
 
 export function stencilBuildConditionalsPlugin(build: d.Build) {
-  const buildData = `export const BUILD = ${JSON.stringify(build)}`;
+  const buildData = `export const BUILD = ${JSON.stringify(build)};`;
 
   return {
     resolveId(id: string) {

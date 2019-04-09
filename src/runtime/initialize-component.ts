@@ -15,7 +15,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     hostRef.$stateFlags$ |= HOST_STATE.hasInitializedComponent;
 
     if (BUILD.mode && hostRef.$modeName$ == null) {
-      // initializeComponent, BUILD.mode
+      // initializeComponent
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
@@ -46,15 +46,18 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         // ok, time to construct the instance
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
-        BUILD.member && (hostRef.$stateFlags$ |= HOST_STATE.isConstructingInstance);
-
+        if (BUILD.member) {
+          hostRef.$stateFlags$ |= HOST_STATE.isConstructingInstance;
+        }
         // construct the lazy-loaded component implementation
         // passing the hostRef is very important during
         // construction in order to directly wire together the
         // host element and the lazy-loaded instance
         new (Cstr as any)(hostRef);
 
-        BUILD.member && (hostRef.$stateFlags$ &= ~HOST_STATE.isConstructingInstance);
+        if (BUILD.member) {
+          hostRef.$stateFlags$ &= ~HOST_STATE.isConstructingInstance;
+        }
 
       } catch (e) {
         consoleError(e);
