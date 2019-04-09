@@ -30,6 +30,11 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           hostRef.$instanceValues$.set(memberName, parsedAttrValue);
         }
 
+        const ownValue = (elm as any)[memberName];
+        if (ownValue !== undefined) {
+          hostRef.$instanceValues$.set(memberName, ownValue);
+        }
+
         Object.defineProperty(elm, memberName,
           {
             get(this: d.RuntimeRef) {
