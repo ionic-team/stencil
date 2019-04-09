@@ -67,6 +67,18 @@ export function validateTesting(config: d.Config) {
     });
   }
 
+  if (typeof testing.preset !== 'string') {
+    testing.preset = path.join(
+      config.sys.compiler.packageDir, 'testing'
+    );
+
+  } else if (!path.isAbsolute(testing.preset)) {
+    testing.preset = path.join(
+      config.configPath,
+      testing.preset
+    );
+  }
+
   if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
     testing.setupTestFrameworkScriptFile = path.join(
       config.sys.compiler.packageDir, 'testing', 'jest-setuptestframework.js'
@@ -122,9 +134,7 @@ export function validateTesting(config: d.Config) {
     delete testing.testMatch;
 
   } else {
-    testing.testMatch = [
-      `**/*(*.)+(e2e|spec).+(ts)?(x)`
-    ];
+    testing.testRegex = '(/__tests__/.*|\\.(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
   }
 
   if (typeof testing.runner !== 'string') {

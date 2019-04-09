@@ -309,6 +309,7 @@ export interface JestConfig {
   testEnvironmentOptions?: any;
   testMatch?: string[];
   testPathIgnorePatterns?: string[];
+  testPreset?: string;
   testRegex?: string;
   testResultsProcessor?: string;
   testRunner?: string;

@@ -30,9 +30,12 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     build: {}
   };
 
-  if (sourceFilePath.endsWith('.tsx')) {
+  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && opts.jsx == null) {
     // ensure we're setup for JSX in typescript
     opts.jsx = ts.JsxEmit.React;
+  }
+
+  if (opts.jsx != null && typeof opts.jsxFactory !== 'string') {
     opts.jsxFactory = 'h';
   }
 
