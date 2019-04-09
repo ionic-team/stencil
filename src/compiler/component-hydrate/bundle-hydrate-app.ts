@@ -21,7 +21,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
       plugins: [
         stencilLoaderPlugin({
           '@core-entrypoint': SERVER_ENTRY,
-          '@stencil/core/app': coreSource,
+          '@stencil/core': coreSource,
         }),
         stencilServerPlugin(config),
         stencilConsolePlugin(),
@@ -65,5 +65,5 @@ const SERVER_ENTRY = `
 import { patchNodeGlobal } from '@stencil/core/platform';
 patchNodeGlobal(global);
 
-export { hydrateDocument, renderToString } from '@stencil/core/app';
+export { hydrateDocument, renderToString } from '@stencil/core';
 `;

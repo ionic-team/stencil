@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const rootAppliedStyles: d.RootAppliedStyleMap = BUILD.style ? new WeakMap() : undefined;
+const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
 export const registerStyle = (styleId: string, cssText: string) => {
   let style = styles.get(styleId);

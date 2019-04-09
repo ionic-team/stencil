@@ -86,7 +86,7 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
 function generateEntryPoint(entryModules: d.EntryModule[]) {
   let count = 0;
   const result: string[] = [
-    `import { proxyNative } from '@stencil/core/app';`
+    `import { proxyNative } from '@stencil/core';`
   ];
   entryModules.forEach(entry => entry.cmps.forEach(cmp => {
     if (cmp.isPlain) {

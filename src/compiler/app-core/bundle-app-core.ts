@@ -16,7 +16,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       input: bundleCoreOptions.entryInputs,
       plugins: [
         stencilLoaderPlugin({
-          '@stencil/core/app': DEFAULT_CORE,
+          '@stencil/core': DEFAULT_CORE,
           '@core-entrypoint': DEFAULT_ENTRY,
           ...bundleCoreOptions.loader
         }),
@@ -46,7 +46,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     };
     if (bundleCoreOptions.coreChunk) {
       rollupOptions.manualChunks = {
-        [config.fsNamespace]: ['@stencil/core/app']
+        [config.fsNamespace]: ['@stencil/core']
       };
     }
 
@@ -87,5 +87,5 @@ export * from '@stencil/core/platform';
 `;
 
 export const DEFAULT_ENTRY = `
-import '@stencil/core/app';
+export * from '@stencil/core';
 `;

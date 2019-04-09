@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
 import { plt } from './client-window';
 
@@ -83,8 +82,8 @@ const flush = () => {
   }
 };
 
-export const tick = (BUILD.taskQueue ? Promise.resolve() : undefined);
+export const tick = /*@__PURE__*/Promise.resolve();
 
-export const readTask = (BUILD.taskQueue) ? queueTask(queueDomReads) : undefined;
+export const readTask = /*@__PURE__*/queueTask(queueDomReads);
 
-export const writeTask = (BUILD.taskQueue) ? queueTask(queueDomWrites) : undefined;
+export const writeTask = /*@__PURE__*/queueTask(queueDomWrites);

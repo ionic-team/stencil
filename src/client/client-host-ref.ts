@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 
 
-const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
+const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/new WeakMap();
 
 export const getHostRef = (ref: d.RuntimeRef) =>
   hostRefs.get(ref);

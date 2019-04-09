@@ -1,6 +1,3 @@
-import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
-
 export { bootstrapLazy } from './bootstrap-lazy';
 export { patchDynamicImport } from './dynamic-import-shim';
 export { connectedCallback } from './connected-callback';
@@ -16,7 +13,3 @@ export { parsePropertyValue } from './parse-property-value';
 export { proxyNative, proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/vdom-render';
 export { setMode, getMode } from './mode';
-
-export const Build: d.UserBuildConditionals = {
-  isDev: BUILD.isDev
-};

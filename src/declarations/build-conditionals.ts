@@ -94,5 +94,6 @@ export interface Build extends BuildFeatures {
 }
 
 export interface UserBuildConditionals {
-  isDev?: boolean;
+  isDev: boolean;
+  isServer: boolean;
 }

@@ -52,7 +52,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
 async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const loader: any = {
-    '@stencil/core/app': CORE,
+    '@stencil/core': CORE,
     '@core-entrypoint': BROWSER_ENTRY,
     '@external-entrypoint': EXTERNAL_ENTRY,
   };
@@ -100,11 +100,11 @@ export const defineCustomElements = (win, options) => {
 `;
 
 const BROWSER_ENTRY = `
-import { defineCustomElements } from '@stencil/core/app';
+import { defineCustomElements } from '@stencil/core';
 defineCustomElements(window);
 `;
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-export { defineCustomElements } from '@stencil/core/app';
+export { defineCustomElements } from '@stencil/core';
 `;

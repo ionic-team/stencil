@@ -16,6 +16,11 @@ const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
 export const styles: d.StyleMap = new Map();
 
+export const Build: d.UserBuildConditionals = {
+  isDev: true,
+  isServer: false
+};
+
 export const plt: d.PlatformRuntime = {
   $isTmpDisconnected$: false,
   $queueCongestion$: 0,

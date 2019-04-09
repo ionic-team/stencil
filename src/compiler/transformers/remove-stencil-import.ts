@@ -21,7 +21,7 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
                 ts.createIdentifier(name)
               ))
             )),
-            ts.createLiteral('@stencil/core/app')
+            importNode.moduleSpecifier
           );
         }
       }

@@ -18,7 +18,7 @@ if (BUILD.taskQueue) {
 
 export const supportsShadowDom = (BUILD.shadowDom) ? !!getDoc().documentElement.attachShadow : false;
 
-export const supportsListenerOptions = (BUILD.hostListener) ? (() => {
+export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;
   try {
     getWin().addEventListener('e', null,
@@ -28,13 +28,13 @@ export const supportsListenerOptions = (BUILD.hostListener) ? (() => {
     );
   } catch (e) {}
   return supportsListenerOptions;
-})() : false;
+})();
 
 
-export const supportsConstructibleStylesheets = BUILD.style ? (() => {
+export const supportsConstructibleStylesheets = /*@__PURE__*/(() => {
   try {
     new CSSStyleSheet();
     return true;
   } catch (e) {}
   return false;
-})() : false;
+})();

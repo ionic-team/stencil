@@ -16,5 +16,5 @@ export function addNativeImports(transformCtx: ts.TransformationContext, compile
     importFns.push('h');
   }
 
-  return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core/app');
+  return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core');
 }

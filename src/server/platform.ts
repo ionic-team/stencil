@@ -109,12 +109,15 @@ export const registerHost = (elm: d.HostElement) => {
   return hostRefs.set(elm, hostRef);
 };
 
+export const Build: d.UserBuildConditionals = {
+  isDev: false,
+  isServer: true
+};
 
 export const styles: d.StyleMap = new Map();
 
 
 export {
-  Build,
   connectedCallback,
   createEvent,
   getConnect,
