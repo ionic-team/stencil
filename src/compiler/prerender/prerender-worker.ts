@@ -35,8 +35,19 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       catchError(results.diagnostics, e);
     }
 
-    const hydrateOpts = prerenderConfig.hydrateOptions(windowLocationUrl);
-    hydrateOpts.collectAnchors = true;
+    const hydrateOpts: d.HydrateOptions = {
+      url: windowLocationUrl.href,
+      collectAnchors: true
+    };
+
+    if (typeof prerenderConfig.hydrateOptions === 'function') {
+      try {
+        const userOpts = prerenderConfig.hydrateOptions(windowLocationUrl);
+        Object.assign(hydrateOpts, userOpts);
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+    }
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html

@@ -27,10 +27,6 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
     prerenderConfig.normalizeUrl = normalizeUrl;
   }
 
-  if (typeof prerenderConfig.hydrateOptions !== 'function') {
-    prerenderConfig.hydrateOptions = hydrateOptions;
-  }
-
   return prerenderConfig;
 }
 
@@ -45,14 +41,6 @@ function normalizeUrl(url: URL, base: URL) {
   outputUrl.hash = '';
   outputUrl.search = '';
   return outputUrl.href;
-}
-
-
-function hydrateOptions(_url: URL) {
-  const opts: d.HydrateOptions = {
-
-  };
-  return opts;
 }
 
 
