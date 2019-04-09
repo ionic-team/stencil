@@ -283,7 +283,7 @@ console.log('global script ran');
 **AFTER:**
 
 ```ts
-+export default function() {
+export default function() {
   console.log('global script ran');
 }
 ```
@@ -393,9 +393,33 @@ This is due to the fact that prerendering runs in `node` which is a different Ja
 
 
 
-### Testing `newSpecPage()`
+## Testing
 
-A new testing utility has been created to make it easier to unit test components. It's API is similar to `newE2EPage()`. In the example below, a mock `CmpA` was created in the test, but it could have also imported an existing component and registered it into the test using the `component` array option.
+### Jest Presets
+
+Previously, most of Jest had to be manually configured within each app's `package.json`, and required the `transform` config to be manually wired up to Stencil's `jest.preprocessor.js`. With the latest changes, most of the Jest config can be replaced with just `"preset": "@stencil/core/testing"`. You can still override the preset defaults, but it's best to start with the defaults first.
+
+```diff
+  "jest": {
++    "preset": "@stencil/core/testing"
+-    "transform": {
+-      "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/@stencil/core/testing/jest.preprocessor.js"
+-    },
+-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(tsx?|jsx?)$",
+-    "moduleFileExtensions": [
+-      "ts",
+-      "tsx",
+-      "js",
+-      "json",
+-      "jsx"
+-    ]
+  }
+```
+
+
+### `newSpecPage()` Spec Testing Utility
+
+A new testing utility has been created to make it easier to unit test components. Its API is similar to `newE2EPage()` for consistency. In the example below, a mock `CmpA` component was created in the test, but it could have also imported numerous existing component and registered them into the test using the `components` config.
 
 ```tsx
 import { Component, Prop } from '@stencil/core';
