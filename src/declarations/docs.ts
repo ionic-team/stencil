@@ -29,6 +29,11 @@ export interface JsonDocsComponent {
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
   slots: JsonDocsSlot[];
+  dependencyGraph: JsonDocsDependencyGraph;
+}
+
+export interface JsonDocsDependencyGraph {
+  [tagName: string]: string[];
 }
 
 export interface JsonDocsTag {

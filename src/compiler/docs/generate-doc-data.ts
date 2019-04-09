@@ -38,6 +38,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
         docs: generateDocs(readme, cmp.docs),
         docsTags: cmp.docs.tags,
         encapsulation: getEncapsulation(cmp),
+        dependencyGraph: buildDepGraph(cmp, buildCtx.components),
 
         props: getProperties(cmp),
         methods: getMethods(cmp.methods),
@@ -48,6 +49,22 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
     }));
 
   return sortBy(flatOne(results), cmp => cmp.tag);
+}
+
+function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+  const dependencies: d.JsonDocsDependencyGraph = {};
+  function walk(tagName: string) {
+    if (!dependencies[tagName]) {
+      const cmp = cmps.find(c => c.tagName === tagName);
+      const deps = cmp.potentialCmpRefs.filter(c => cmps.some(c2 => c2.tagName === c));
+      if (deps.length > 0) {
+        dependencies[tagName] = deps;
+        deps.forEach(walk);
+      }
+    }
+  }
+  walk(cmp.tagName);
+  return dependencies;
 }
 
 function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {

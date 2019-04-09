@@ -5,6 +5,7 @@ import { methodsToMarkdown } from './markdown-methods';
 import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
 import { slotsToMarkdown } from './markdown-slots';
+import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT, NOTE } from '../../docs/constants';
 
 export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent) {
@@ -41,6 +42,7 @@ export function generateMarkdown(userContent: string, cmp: d.JsonDocsComponent) 
     ...methodsToMarkdown(cmp.methods),
     ...slotsToMarkdown(cmp.slots),
     ...stylesToMarkdown(cmp.styles),
+    ...depsToMarkdown(cmp),
     `----------------------------------------------`,
     '',
     NOTE,
