@@ -9,6 +9,7 @@
 
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
+import { isMemberInElement } from '@platform';
 import { toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
@@ -63,13 +64,13 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
   } else if (BUILD.vdomRef && memberName === 'ref') {
     // minifier will clean this up
 
-  } else if (BUILD.vdomListener && memberName.startsWith('on') && !(memberName in elm)) {
+  } else if (BUILD.vdomListener && memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
     // then we're assuming it's an event listener
 
-    if (toLowerCase(memberName) in elm) {
+    if (isMemberInElement(elm, toLowerCase(memberName))) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
       // member name "onmouseover" is on the element's prototype
@@ -93,7 +94,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
   } else {
     // Set property if it exists and it's not a SVG
-    const isProp = memberName in elm;
+    const isProp = isMemberInElement(elm, memberName);
     const isComplex = ['object', 'function'].includes(typeof newValue);
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {

@@ -22,6 +22,8 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   platform.resetPlatform();
   bc.resetBuildConditionals(bc.BUILD);
 
+  platform.registerComponents(opts.components);
+
   if (opts.hydrateServerSide) {
     platform.supportsShadowDom = false;
   } else {

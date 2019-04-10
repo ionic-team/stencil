@@ -34,3 +34,5 @@ export const registerHost = (elm: d.HostElement) => {
     return hostRefs.set(elm, hostRef);
   }
 };
+
+export const isMemberInElement = (elm: any, memberName: string) => memberName in elm;

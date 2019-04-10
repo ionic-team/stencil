@@ -32,9 +32,14 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 
         const ownValue = (elm as any)[memberName];
         if (ownValue !== undefined) {
+          // we've got an actual value already set on the host element
+          // let's add that to our instance values and pull it off the element
+          // so the getter/setter kicks in instead, but still getting this value
           hostRef.$instanceValues$.set(memberName, ownValue);
+          delete (elm as any)[memberName];
         }
 
+        // create the getter/setter on the host element for this property name
         Object.defineProperty(elm, memberName,
           {
             get(this: d.RuntimeRef) {

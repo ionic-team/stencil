@@ -46,6 +46,8 @@ export function resetPlatform() {
   }
 
   resetTaskQueue();
+
+  cstrs.clear();
 }
 
 
@@ -83,6 +85,28 @@ export const getContext = (elm: Node, context: string) => {
   }
   return (Context as any)[context];
 };
+
+const cstrs = new Map<string, d.ComponentTestingConstructor>();
+
+export const registerComponents = (Cstrs: d.ComponentTestingConstructor[]) => {
+  Cstrs.forEach(Cstr => {
+    cstrs.set(Cstr.COMPILER_META.tagName, Cstr);
+  });
+};
+
+export const isMemberInElement = (elm: any, memberName: string) => {
+  if (elm != null) {
+    if (memberName in elm) {
+      return true;
+    }
+    const cstr = cstrs.get(elm.nodeName.toLowerCase());
+    if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
+      return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+    }
+  }
+  return false;
+};
+
 
 export {
   Host,

@@ -12,6 +12,16 @@ export const getComponent = (tagName: string) => {
   return cstrs.get(tagName);
 };
 
+export const isMemberInElement = (elm: any, memberName: string) => {
+  if (elm != null) {
+    const hostRef: d.ComponentNativeConstructor = getComponent(elm.nodeName.toLowerCase());
+    if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
+      return memberName in hostRef.cmpMeta.$members$;
+    }
+  }
+  return false;
+};
+
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   Cstrs.forEach(Cstr => {
     cstrs.set(Cstr.cmpMeta.$tagName$, Cstr);
