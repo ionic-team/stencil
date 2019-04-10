@@ -419,7 +419,7 @@ When running Jest directly, previously most of Jest had to be manually configure
 
 ### `newSpecPage()` Spec Testing Utility
 
-A new testing utility has been created to make it easier to unit test components. Its API is similar to `newE2EPage()` for consistency. In the example below, a mock `CmpA` component was created in the test, but it could have also imported numerous existing component and registered them into the test using the `components` config.
+A new testing utility has been created to make it easier to unit test components. Its API is similar to `newE2EPage()` for consistency, but internally `newSpecPage()` does not use Puppeteer, but rather runs on top of a pure Node environment. Additionally, user code should not have to be written with legacy CommonJS, and code can safely use global browser variables like `window` and `document` . In the example below, a mock `CmpA` component was created in the test, but it could have also imported numerous existing component and registered them into the test using the `components` config.
 
 ```tsx
 import { Component, Prop } from '@stencil/core';
