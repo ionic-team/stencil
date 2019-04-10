@@ -57,6 +57,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     // if in debug mode, still mangle the property names
     // but at least make them readable of what the
     // properties originally were named
+    opts.mangle.properties = opts.mangle.properties || {};
     opts.mangle.properties.debug = true;
     opts.mangle.keep_fnames = true;
     opts.compress.drop_console = false;
