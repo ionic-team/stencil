@@ -1,8 +1,8 @@
 import * as d from '../declarations';
-import { buildError, catchError } from '@utils';
+import { buildError } from '@utils';
 import { connectElements } from './connect-elements';
 import { finalizeWindow } from './window-finalize';
-import { generateHydrateResults, normalizeHydrateOptions } from './hydrate-utils';
+import { formatRuntimeErrors, generateHydrateResults, hydrateError, normalizeHydrateOptions } from './hydrate-utils';
 import { initializeWindow } from './window-initialize';
 import { insertVdomAnnotations } from '@platform';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
@@ -44,8 +44,10 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
       });
     }
 
+    formatRuntimeErrors(win, results);
+
   } catch (e) {
-    catchError(results.diagnostics, e);
+    hydrateError(results, e);
   }
 
   return results;
@@ -87,8 +89,10 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
     await finalizeWindow(opts, results, win, doc);
 
+    formatRuntimeErrors(win, results);
+
   } catch (e) {
-    catchError(results.diagnostics, e);
+    hydrateError(results, e);
   }
 
   return results;
@@ -103,7 +107,7 @@ async function startRender(opts: d.HydrateOptions, results: d.HydrateResults, bo
     try {
       connectElements(opts, results, body, waitPromises1, hydratedElements);
     } catch (e) {
-      catchError(results.diagnostics, e);
+      hydrateError(results, e);
     }
     await Promise.all(waitPromises1);
 
@@ -112,7 +116,7 @@ async function startRender(opts: d.HydrateOptions, results: d.HydrateResults, bo
       try {
         connectElements(opts, results, body, waitPromises1, hydratedElements);
       } catch (e) {
-        catchError(results.diagnostics, e);
+        hydrateError(results, e);
       }
       await Promise.all(waitPromises2);
 

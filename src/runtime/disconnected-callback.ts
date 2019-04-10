@@ -17,7 +17,7 @@ export const disconnectedCallback = (elm: d.HostElement) => {
       try {
         instance.componentDidUnload();
       } catch (e) {
-        consoleError(e);
+        consoleError(e, elm);
       }
     }
   }

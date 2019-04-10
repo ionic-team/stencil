@@ -1,7 +1,7 @@
 import * as d from '../declarations';
-import { catchError } from '@utils';
 import { constrainTimeouts } from '@mock-doc';
 import globalScripts from '@global-scripts';
+import { hydrateError } from './hydrate-utils';
 
 
 export async function initializeWindow(results: d.HydrateResults, win: Window, doc: Document, opts: d.HydrateOptions) {
@@ -11,7 +11,7 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
     const parsedUrl = new URL(url, BASE_URL);
     win.location.href = parsedUrl.href;
   } catch (e) {
-    catchError(results.diagnostics, e);
+    hydrateError(results, e);
   }
 
   if (typeof opts.userAgent === 'string') {
@@ -43,7 +43,7 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
     try {
       await opts.beforeHydrate(win, opts);
     } catch (e) {
-      catchError(results.diagnostics, e);
+      hydrateError(results, e);
     }
   }
 
@@ -54,7 +54,7 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
   try {
     globalScripts(win, true);
   } catch (e) {
-    catchError(results.diagnostics, e);
+    hydrateError(results, e);
   }
 
   if (opts.constrainTimeouts) {

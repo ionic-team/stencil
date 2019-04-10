@@ -41,7 +41,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
               );
 
             } catch (e) {
-              consoleError(e);
+              consoleError(e, elm);
             }
           });
         }

@@ -1,6 +1,6 @@
 import * as d from '../declarations';
-import { catchError } from '@utils';
 import { connectedCallback, getComponent, registerHost } from '@platform';
+import { hydrateError } from './hydrate-utils';
 import { proxyHostElement } from './proxy-host-element';
 
 
@@ -43,7 +43,7 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
           await elm.componentOnReady();
 
         } catch (e) {
-          catchError(results.diagnostics, e);
+          hydrateError(results, e);
         }
 
         resolve();

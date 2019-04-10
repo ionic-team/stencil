@@ -1,6 +1,6 @@
 import * as d from '../declarations';
-import { catchError } from '@utils';
 import { collapseHtmlWhitepace } from '../compiler/html/collapse-html-whitespace';
+import { hydrateError } from './hydrate-utils';
 import { optimizeStyles } from '../compiler/html/optimize-styles';
 import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
 import { updateCanonicalLink } from '../compiler/html/canonical-link';
@@ -39,7 +39,7 @@ export async function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateR
     try {
       await opts.afterHydrate(win, opts);
     } catch (e) {
-      catchError(results.diagnostics, e);
+      hydrateError(results, e);
     }
   }
 

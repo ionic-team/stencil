@@ -66,6 +66,8 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string
   if (diagnostics != null && !shouldIgnoreError(diagnostic.messageText)) {
     diagnostics.push(diagnostic);
   }
+
+  return diagnostic;
 }
 
 export function hasError(diagnostics: d.Diagnostic[]): boolean {

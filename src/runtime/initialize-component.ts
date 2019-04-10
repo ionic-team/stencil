@@ -60,7 +60,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         }
 
       } catch (e) {
-        consoleError(e);
+        consoleError(e, elm);
       }
 
     } else if (BUILD.hydrateServerSide) {

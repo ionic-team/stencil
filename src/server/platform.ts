@@ -44,18 +44,47 @@ export const getHead = (elm?: Node) => {
   return null;
 };
 
-export const readTask = (cb: Function) => {
-  process.nextTick(cb);
+export const readTask = (cb: Function, elm: any) => {
+  process.nextTick(() => {
+    try {
+      cb();
+    } catch (e) {
+      consoleError(e, elm);
+    }
+  });
 };
 
-export const writeTask = (cb: Function) => {
-  process.nextTick(cb);
+export const writeTask = (cb: Function, elm: any) => {
+  process.nextTick(() => {
+    try {
+      cb();
+    } catch (e) {
+      consoleError(e, elm);
+    }
+  });
 };
 
 export const tick = Promise.resolve();
 
-export const consoleError = (e: any) => {
+export const windowErrors = new WeakMap<any, { err: any, tagName: string }[]>();
+
+export const consoleError = (e: any, elm?: any) => {
   if (e != null) {
+    if (elm != null) {
+      const win = getWin(elm);
+      if (win != null) {
+        let errors = windowErrors.get(win);
+        if (errors == null) {
+          errors = [];
+          windowErrors.set(win, errors);
+        }
+        errors.push({
+          err: e,
+          tagName: elm.tagName
+        });
+        return;
+      }
+    }
     console.error(e.stack || e.message || e);
   }
 };
