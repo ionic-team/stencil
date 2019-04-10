@@ -24,9 +24,10 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       config: config,
       compilerCtx: compilerCtx,
       hydrateAppFilePath: buildCtx.hydrateAppFilePath,
+      logCount: 0,
+      outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
-      outputTarget: outputTarget,
       prodMode: (!config.devMode && config.logLevel !== 'debug'),
       urlsCompleted: new Set(),
       urlsPending: new Set(),
@@ -51,7 +52,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       });
     });
 
-    const totalDuration = timeSpan.finish(`prerendered finished`);
+    const totalDuration = timeSpan.finish(`prerendering finished`);
 
     const totalUrls = manager.urlsCompleted.size;
     if (totalUrls > 1) {
@@ -89,18 +90,33 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
     prerenderUrl(manager, url);
   });
 
-  if (manager.urlsProcessing.size === 0 && typeof manager.resolve === 'function') {
-    // we're not actively processing anything
-    // and there aren't anymore urls in the queue to be prerendered
-    // so looks like our job here is done, good work team
-    manager.resolve();
-    manager.resolve = null;
+  if (manager.urlsProcessing.size === 0) {
+    if (typeof manager.resolve === 'function') {
+      // we're not actively processing anything
+      // and there aren't anymore urls in the queue to be prerendered
+      // so looks like our job here is done, good work team
+      manager.resolve();
+      manager.resolve = null;
+    }
+
+  } else {
+    const counter = 50;
+    const urlsCompletedSize = manager.urlsCompleted.size;
+    if (urlsCompletedSize >= (manager.logCount + counter)) {
+      manager.logCount = Math.floor(urlsCompletedSize / counter) * counter;
+      manager.config.logger.info(`prerendered ${manager.logCount} urls ${manager.config.logger.dim(`...`)}`);
+    }
   }
 }
 
 
 async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   try {
+    if (manager.config.logLevel === 'debug') {
+      const pathname = new URL(url).pathname;
+      manager.config.logger.debug(`prerender, start: ${pathname}`);
+    }
+
     const prerenderRequest: d.PrerenderRequest = {
       hydrateAppFilePath: manager.hydrateAppFilePath,
       prerenderConfigPath: manager.prerenderConfigPath,
@@ -116,7 +132,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
     if (Array.isArray(results.anchorUrls) === true) {
       results.anchorUrls.forEach(anchorUrl => {
-        addUrlToPendingQueue(manager, anchorUrl);
+        addUrlToPendingQueue(manager, anchorUrl, url);
       });
     }
 

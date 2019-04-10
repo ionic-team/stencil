@@ -6,6 +6,7 @@ export interface PrerenderManager {
   config: d.Config;
   diagnostics: d.Diagnostic[];
   hydrateAppFilePath: string;
+  logCount: number;
   outputTarget: d.OutputTargetWww;
   prerenderConfig: d.HydrateConfig;
   prerenderConfigPath: string;
