@@ -43,7 +43,9 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
-  if (config.flags && config.flags.open === false) {
+  if (config.flags.open === false) {
+    config.devServer.openBrowser = false;
+  } else if (config.flags.prerender && !config.watch) {
     config.devServer.openBrowser = false;
   }
 

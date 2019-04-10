@@ -91,7 +91,7 @@ function getLastCheck(storage: d.Storage): Promise<number> {
 }
 
 function setLastCheck(storage: d.Storage) {
-  storage.set(STORAGE_KEY, Date.now());
+  return storage.set(STORAGE_KEY, Date.now());
 }
 
 const STORAGE_KEY = 'last_version_check';

@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { PRERENDER_HOST } from './prerender-queue';
 
 
 export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputUrl: string) {
-  const url = new URL(inputUrl, PRERENDER_HOST);
+  const url = new URL(inputUrl, manager.origin);
 
   let pathName = url.pathname;
   if (pathName.startsWith(manager.outputTarget.baseUrl)) {

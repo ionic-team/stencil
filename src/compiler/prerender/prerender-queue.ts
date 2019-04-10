@@ -3,17 +3,19 @@ import { URL } from 'url';
 
 
 export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
-  const prerenderUrl = new URL(PRERENDER_HOST);
+  const hostUrl = new URL(manager.origin);
+  manager.origin = hostUrl.origin;
+  manager.config.logger.debug(`prerender http origin: ${manager.origin}`);
 
   if (Array.isArray(manager.prerenderConfig.entryUrls) === true) {
     manager.prerenderConfig.entryUrls.forEach(entryUrl => {
-      const url = manager.prerenderConfig.normalizeUrl(new URL(entryUrl, PRERENDER_HOST), prerenderUrl);
+      const url = manager.prerenderConfig.normalizeUrl(new URL(entryUrl, manager.origin), hostUrl);
       addUrlToPendingQueue(manager, url, '#entryUrls');
     });
 
   } else {
-    const baseUrl = new URL(manager.outputTarget.baseUrl, PRERENDER_HOST);
-    const url = manager.prerenderConfig.normalizeUrl(baseUrl, prerenderUrl);
+    const baseUrl = new URL(manager.outputTarget.baseUrl, manager.origin);
+    const url = manager.prerenderConfig.normalizeUrl(baseUrl, hostUrl);
     addUrlToPendingQueue(manager, url, '#baseUrl');
   }
 }
@@ -40,6 +42,3 @@ export function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: stri
     manager.config.logger.debug(`prerender queue: ${url} (from ${from})`);
   }
 }
-
-
-export const PRERENDER_HOST = `http://prerender.stenciljs.com`;

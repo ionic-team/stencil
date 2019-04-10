@@ -23,6 +23,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       diagnostics: prerenderDiagnostics,
       config: config,
       compilerCtx: compilerCtx,
+      origin: config.devServer.browserUrl,
       hydrateAppFilePath: buildCtx.hydrateAppFilePath,
       isDebug: (config.logLevel === 'debug'),
       logCount: 0,

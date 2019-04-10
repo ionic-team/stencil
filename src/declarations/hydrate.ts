@@ -8,6 +8,7 @@ export interface PrerenderManager {
   hydrateAppFilePath: string;
   isDebug: boolean;
   logCount: number;
+  origin: string;
   outputTarget: d.OutputTargetWww;
   prerenderConfig: d.HydrateConfig;
   prerenderConfigPath: string;

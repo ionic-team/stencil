@@ -13,7 +13,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   }
 
   let devServerStart: Promise<d.DevServer> = null;
-  if (config.devServer && flags.serve) {
+  if (shouldStartDevServer(config, flags)) {
     try {
       devServerStart = compiler.startDevServer();
     } catch (e) {
@@ -24,28 +24,29 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
 
   const latestVersion = getLatestCompilerVersion(config.sys, config.logger);
 
-  const results = await compiler.build();
-
   let devServer: d.DevServer = null;
   if (devServerStart) {
     devServer = await devServerStart;
   }
 
-  if (!config.watch && hasError(results && results.diagnostics)) {
-    config.sys.destroy();
+  const results = await compiler.build();
 
+  if (!config.watch) {
     if (devServer) {
       await devServer.close();
     }
 
-    exit(1);
+    if (hasError(results && results.diagnostics)) {
+      config.sys.destroy();
+      exit(1);
+    }
   }
 
   if (config.watch || devServerStart) {
     process.once('SIGINT', () => {
       config.sys.destroy();
 
-      if (devServer) {
+      if (devServer != null) {
         devServer.close();
       }
     });
@@ -54,4 +55,8 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   await validateCompilerVersion(config.sys, config.logger, latestVersion);
 
   return results;
+}
+
+function shouldStartDevServer(config: d.Config, flags: d.ConfigFlags) {
+  return (config.devServer && (flags.serve || flags.prerender));
 }
