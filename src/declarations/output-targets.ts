@@ -102,7 +102,6 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 }
 
 
-
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
@@ -133,8 +132,8 @@ export interface OutputTargetDistModule extends OutputTargetBase {
 }
 
 
-export interface OutputTargetDistSelfcontained extends OutputTargetBase {
-  type: 'dist-selfcontained';
+export interface OutputTargetDistSelfContained extends OutputTargetBase {
+  type: 'dist-self-contained';
 
   dir?: string;
   buildDir?: string;
@@ -144,7 +143,7 @@ export interface OutputTargetDistSelfcontained extends OutputTargetBase {
 
 
 export interface OutputTargetHydrate extends OutputTargetBase {
-  type: 'hydrate';
+  type: 'dist-hydrate-script';
   dir?: string;
 }
 
@@ -206,7 +205,7 @@ export type OutputTarget =
  | OutputTargetDistCollection
  | OutputTargetDistLazy
  | OutputTargetDistModule
- | OutputTargetDistSelfcontained
+ | OutputTargetDistSelfContained
  | OutputTargetWww
  | OutputTargetHydrate
  | OutputTargetStats;

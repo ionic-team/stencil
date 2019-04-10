@@ -1,16 +1,16 @@
 import * as d from '../../declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validatePrerender } from './validate-prerender';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
+import { WWW, isOutputTargetWww, DIST_LAZY } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetWww(config: d.Config) {
   if (!Array.isArray(config.outputTargets)) {
     config.outputTargets = [
-      { type: 'www' }
+      { type: WWW }
     ];
   }
 
@@ -58,7 +58,7 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
 
   // Add dist-lazy output target
   config.outputTargets.push({
-    type: 'dist-lazy',
+    type: DIST_LAZY,
     copyDir: outputTarget.buildDir,
     esmDir: outputTarget.buildDir,
     systemDir: outputTarget.buildDir,

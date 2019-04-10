@@ -47,35 +47,35 @@ export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.
 }
 
 export function isOutputTargetDist(o: d.OutputTarget): o is d.OutputTargetDist {
-  return o.type === 'dist';
+  return o.type === DIST;
 }
 
 export function isOutputTargetDistCollection(o: d.OutputTarget): o is d.OutputTargetDistCollection {
-  return o.type === 'dist-collection';
+  return o.type === DIST_COLLECTION;
 }
 
 export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDistLazy {
-  return o.type === 'dist-lazy';
+  return o.type === DIST_LAZY;
 }
 
 export function isOutputTargetDistModule(o: d.OutputTarget): o is d.OutputTargetDistModule {
-  return o.type === 'dist-module';
+  return o.type === DIST_MODULE;
 }
 
-export function isOutputTargetDistSelfcontained(o: d.OutputTarget): o is d.OutputTargetDistSelfcontained {
-  return o.type === 'dist-selfcontained';
+export function isOutputTargetDistSelfContained(o: d.OutputTarget): o is d.OutputTargetDistSelfContained {
+  return o.type === DIST_SELF_CONTAINED;
 }
 
 export function isOutputTargetHydrate(o: d.OutputTarget): o is d.OutputTargetHydrate {
-  return o.type === 'hydrate';
+  return o.type === DIST_HYDRATE_SCRIPT;
 }
 
 export function isOutputTargetWww(o: d.OutputTarget): o is d.OutputTargetWww {
-  return o.type === 'www';
+  return o.type === WWW;
 }
 
 export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats {
-  return o.type === 'stats';
+  return o.type === STATS;
 }
 
 export function getComponentsFromModules(moduleFiles: d.Module[]) {
@@ -91,5 +91,25 @@ export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
   }
   return true;
 }
+
+export const DIST = `dist`;
+export const DIST_COLLECTION = `dist-collection`;
+export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
+export const DIST_LAZY = `dist-lazy`;
+export const DIST_MODULE = `dist-module`;
+export const DIST_SELF_CONTAINED = `dist-self-contained`;
+export const STATS = `stats`;
+export const WWW = `www`;
+
+export const VALID_TYPES = [
+  DIST,
+  DIST_COLLECTION,
+  DIST_HYDRATE_SCRIPT,
+  DIST_LAZY,
+  DIST_MODULE,
+  DIST_SELF_CONTAINED,
+  STATS,
+  WWW,
+];
 
 export const GENERATED_DTS = 'components.d.ts';

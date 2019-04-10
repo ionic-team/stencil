@@ -1,14 +1,14 @@
 import * as d from '../../declarations';
-import { isOutputTargetStats } from '../output-targets/output-utils';
+import { STATS, isOutputTargetStats } from '../output-targets/output-utils';
 
 
-export function validateStats(config: d.Config) {
+export function validateOutputStats(config: d.Config) {
 
   if (config.flags.stats) {
     const hasOutputTarget = config.outputTargets.some(isOutputTargetStats);
     if (!hasOutputTarget) {
       config.outputTargets.push({
-        type: 'stats'
+        type: STATS
       });
     }
   }

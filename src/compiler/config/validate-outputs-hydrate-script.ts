@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
+import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../output-targets/output-utils';
 
 
-export function validateOutputTargetHydrate(config: d.Config) {
+export function validateOutputTargetDistHydrateScript(config: d.Config) {
   const hasHydrateOutputTarget = config.outputTargets.some(isOutputTargetHydrate);
 
   if (hasHydrateOutputTarget === false) {
@@ -24,7 +24,7 @@ export function validateOutputTargetHydrate(config: d.Config) {
       }
 
       const hydrateForWwwOutputTarget: d.OutputTargetHydrate = {
-        type: 'hydrate',
+        type: DIST_HYDRATE_SCRIPT,
         dir: hydrateDir
       };
       config.outputTargets.push(hydrateForWwwOutputTarget);

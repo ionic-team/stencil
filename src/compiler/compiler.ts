@@ -161,14 +161,6 @@ export class Compiler implements d.Compiler {
     return this.ctx.fs;
   }
 
-  // get name() {
-  //   return sys.compiler.name;
-  // }
-
-  // get version() {
-  //   return sys.compiler.version;
-  // }
-
 }
 
 
@@ -181,7 +173,7 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
   } catch (e) {
     if (config.logger) {
       const diagnostics: d.Diagnostic[] = [];
-      catchError(diagnostics, e);
+      catchError(diagnostics, e, e.message);
       config.logger.printDiagnostics(diagnostics, config.rootDir);
 
     } else {

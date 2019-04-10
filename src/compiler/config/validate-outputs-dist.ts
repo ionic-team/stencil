@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
+import { DIST_COLLECTION, DIST_LAZY, isOutputTargetDist } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
-import { isOutputTargetDist } from '../output-targets/output-utils';
 import { validateResourcesUrl } from './validate-resources-url';
 
 
@@ -58,7 +58,7 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     config.outputTargets.push({
-      type: 'dist-collection',
+      type: DIST_COLLECTION,
       dir: outputTarget.dir,
       collectionDir: outputTarget.collectionDir,
       empty: outputTarget.empty,
@@ -66,7 +66,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     const lazyDir = path.join(outputTarget.buildDir, config.fsNamespace);
     config.outputTargets.push({
-      type: 'dist-lazy',
+      type: DIST_LAZY,
       copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: lazyDir,
@@ -77,7 +77,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     if (config.buildEsm) {
       config.outputTargets.push({
-        type: 'dist-lazy',
+        type: DIST_LAZY,
         esmDir: path.join(outputTarget.dir, 'esm'),
         esmEs5Dir: path.join(outputTarget.dir, 'esm', 'legacy'),
         cjsDir: path.join(outputTarget.dir, 'cjs'),
