@@ -3,6 +3,7 @@ import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-anchors';
 import { getPrerenderConfig } from './prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
+import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +18,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
   try {
     const windowLocationUrl = new URL(prerenderRequest.url);
-    const win = getWindow(prerenderRequest.templateId);
+    const url = windowLocationUrl.href;
+    const win = getWindow(prerenderRequest.templateId, url);
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
@@ -37,7 +39,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: windowLocationUrl.href,
+      url: url,
       collectAnchors: true
     };
 
@@ -144,7 +146,7 @@ function ensureDir(p: string) {
 
 const templateWindows = new Map<string, Window>();
 
-function getWindow(templateId: string) {
+function getWindow(templateId: string, originUrl: string) {
   let templateWindow = templateWindows.get(templateId);
   if (templateWindow == null) {
     const templateHtml = fs.readFileSync(templateId, 'utf8');
@@ -152,7 +154,12 @@ function getWindow(templateId: string) {
     templateWindows.set(templateId, templateWindow);
   }
 
-  return cloneWindow(templateWindow);
+  const win = cloneWindow(templateWindow);
+
+  patchNodeGlobal(global, originUrl);
+  patchWindowGlobal(global, win);
+
+  return win;
 }
 
 declare const __webpack_require__: any;
