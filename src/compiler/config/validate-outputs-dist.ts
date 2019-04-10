@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { DIST_COLLECTION, DIST_LAZY, isOutputTargetDist } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 import { validateResourcesUrl } from './validate-resources-url';
+import { validateCopy } from './validate-copy';
 
 
 export function validateOutputTargetDist(config: d.Config) {
@@ -57,11 +58,14 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.empty = DEFAULT_EMPTY_DIR;
     }
 
+    outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+
     config.outputTargets.push({
       type: DIST_COLLECTION,
       dir: outputTarget.dir,
       collectionDir: outputTarget.collectionDir,
       empty: outputTarget.empty,
+      copy: outputTarget.copy
     });
 
     const lazyDir = path.join(outputTarget.buildDir, config.fsNamespace);

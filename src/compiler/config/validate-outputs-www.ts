@@ -4,7 +4,7 @@ import { validatePrerender } from './validate-prerender';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
-import { WWW, isOutputTargetWww, DIST_LAZY } from '../output-targets/output-utils';
+import { DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetWww(config: d.Config) {
