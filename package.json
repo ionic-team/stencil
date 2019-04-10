@@ -104,7 +104,7 @@
     "pixelmatch": "4.0.2",
     "postcss": "7.0.14",
     "puppeteer": "~1.12.2",
-    "rollup": "1.9.0",
+    "rollup": "1.9.3",
     "rollup-plugin-commonjs": "9.3.4",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",

@@ -90,7 +90,6 @@ export async function writeLazyCore(config: d.Config, compilerCtx: d.CompilerCtx
     `${lazyRuntimeData}`
   );
   if (webpackBuild) {
-    code = code.replace('/*!STENCIL:LOAD_MODULE_IMPORT*/ import(', DYNAMIC_IMPORT_REPLACEMENT);
     code = code.replace(/import\.meta\.url/g, '""');
   }
   code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, true, webpackBuild, code);
@@ -132,8 +131,3 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRunt
     bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
 }
-
-const DYNAMIC_IMPORT_REPLACEMENT = `import(
-  /* webpackInclude: /\.entry\.js$/ */
-  /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
-  /* webpackMode: "lazy" */`;

@@ -16,8 +16,10 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
       : bundleId
     }.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
 
-  // TODO: replace once rollup is fixed
-  return /*!STENCIL:LOAD_MODULE_IMPORT*/ import(
+  return import(
+    /* webpackInclude: /\.entry\.js$/ */
+    /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
+    /* webpackMode: "lazy" */
     url
   ).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
 };
