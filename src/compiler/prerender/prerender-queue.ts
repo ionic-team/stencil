@@ -34,10 +34,10 @@ export function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: stri
 
   manager.urlsPending.add(queueUrl);
 
-  if (manager.config.logLevel === 'debug') {
+  if (manager.isDebug) {
     const url = new URL(queueUrl).pathname;
     const from = fromUrl.startsWith('#') ? fromUrl : new URL(fromUrl).pathname;
-    manager.config.logger.debug(`prerender, queue: ${url} (from ${from})`);
+    manager.config.logger.debug(`prerender queue: ${url} (from ${from})`);
   }
 }
 

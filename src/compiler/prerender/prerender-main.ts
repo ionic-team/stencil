@@ -24,6 +24,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       config: config,
       compilerCtx: compilerCtx,
       hydrateAppFilePath: buildCtx.hydrateAppFilePath,
+      isDebug: (config.logLevel === 'debug'),
       logCount: 0,
       outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
@@ -112,9 +113,10 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
 
 async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   try {
-    if (manager.config.logLevel === 'debug') {
+    let timespan: d.LoggerTimeSpan;
+    if (manager.isDebug) {
       const pathname = new URL(url).pathname;
-      manager.config.logger.debug(`prerender, start: ${pathname}`);
+      timespan = manager.config.logger.createTimeSpan(`prerender start: ${pathname}`, true);
     }
 
     const prerenderRequest: d.PrerenderRequest = {
@@ -128,10 +130,10 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     // prender this path and wait on the results
     const results = await manager.config.sys.prerenderUrl(prerenderRequest);
 
-    if (manager.config.logLevel === 'debug') {
+    if (manager.isDebug) {
       const pathname = new URL(url).pathname;
       const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
-      manager.config.logger.debug(`prerender, finish: ${pathname}, ${filePath}`);
+      timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
     }
 
     manager.diagnostics.push(...results.diagnostics);
