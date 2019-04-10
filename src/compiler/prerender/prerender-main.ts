@@ -128,6 +128,12 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     // prender this path and wait on the results
     const results = await manager.config.sys.prerenderUrl(prerenderRequest);
 
+    if (manager.config.logLevel === 'debug') {
+      const pathname = new URL(url).pathname;
+      const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
+      manager.config.logger.debug(`prerender, finish: ${pathname}, ${filePath}`);
+    }
+
     manager.diagnostics.push(...results.diagnostics);
 
     if (Array.isArray(results.anchorUrls) === true) {

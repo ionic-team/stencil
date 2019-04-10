@@ -49,8 +49,9 @@ export interface PrerenderRequest {
 
 
 export interface PrerenderResults {
-  diagnostics: d.Diagnostic[];
   anchorUrls: string[];
+  diagnostics: d.Diagnostic[];
+  filePath: string;
 }
 
 

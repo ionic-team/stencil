@@ -11,7 +11,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   // worker thread!
   const results: d.PrerenderResults = {
     diagnostics: [],
-    anchorUrls: null
+    anchorUrls: null,
+    filePath: prerenderRequest.writeToFilePath
   };
 
   try {
@@ -73,18 +74,20 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
         pretty: hydrateOpts.prettyHtml
       });
 
-      let writeToFilePath = prerenderRequest.writeToFilePath;
+      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
+
       if (typeof prerenderConfig.filePath === 'function') {
-        const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
-        if (typeof userWriteToFilePath === 'string') {
-          writeToFilePath = userWriteToFilePath;
+        try {
+          const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
+          if (typeof userWriteToFilePath === 'string') {
+            results.filePath = userWriteToFilePath;
+          }
+        } catch (e) {
+          catchError(results.diagnostics, e);
         }
       }
 
-      // not waiting on the file to finish writing on purpose
-      writePrerenderedHtml(writeToFilePath, html);
-
-      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
+      await writePrerenderedHtml(results, html);
     }
 
   } catch (e) {
@@ -96,20 +99,24 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 }
 
 
-async function writePrerenderedHtml(writeToFilePath: string, html: string) {
-  await ensureDir(writeToFilePath);
+function writePrerenderedHtml(results: d.PrerenderResults, html: string) {
+  ensureDir(results.filePath);
 
-  fs.writeFile(writeToFilePath, html, err => {
-    if (err != null) {
-      console.error(err);
-    }
+  return new Promise(resolve => {
+    fs.writeFile(results.filePath, html, err => {
+      if (err != null) {
+        results.filePath = null;
+        catchError(results.diagnostics, err);
+      }
+      resolve();
+    });
   });
 }
 
 
 const ensuredDirs = new Set<string>();
 
-async function ensureDir(p: string) {
+function ensureDir(p: string) {
   const allDirs: string[] = [];
 
   while (true) {
@@ -125,15 +132,11 @@ async function ensureDir(p: string) {
 
   for (let i = 0; i < allDirs.length; i++) {
     const dir = allDirs[i];
-    if (ensuredDirs.has(dir) === false) {
+    if (!ensuredDirs.has(dir)) {
       ensuredDirs.add(dir);
 
       try {
-        await new Promise(resolve => {
-          fs.mkdir(dir, _ => {
-            resolve();
-          });
-        });
+        fs.mkdirSync(dir);
       } catch (e) {}
     }
   }
