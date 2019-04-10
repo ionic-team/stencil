@@ -15,7 +15,7 @@ export function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, window
     });
   }
 
-  return anchorUrls;
+  return anchorUrls.sort(sortUrls);
 }
 
 
@@ -44,4 +44,15 @@ function getCrawlableHref(prerenderConfig: d.HydrateConfig, windowLocationUrl: U
   }
 
   return prerenderConfig.normalizeUrl(url, windowLocationUrl);
+}
+
+
+function sortUrls(a: string, b: string) {
+  const partsA = a.split('/');
+  const partsB = b.split('/');
+  if (partsA.length < partsB.length) return -1;
+  if (partsA.length > partsB.length) return 1;
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
 }

@@ -73,8 +73,6 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
         pretty: hydrateOpts.prettyHtml
       });
 
-      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
-
       let writeToFilePath = prerenderRequest.writeToFilePath;
       if (typeof prerenderConfig.filePath === 'function') {
         const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
@@ -85,6 +83,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
       // not waiting on the file to finish writing on purpose
       writePrerenderedHtml(writeToFilePath, html);
+
+      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
     }
 
   } catch (e) {
