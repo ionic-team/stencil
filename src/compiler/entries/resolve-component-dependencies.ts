@@ -10,6 +10,7 @@ function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
   const visited = new Set();
   cmps.forEach(cmp => {
     resolveTransitiveDependencies(cmp, cmps, visited);
+    cmp.dependencies = unique(cmp.dependencies).sort();
   });
 }
 
@@ -34,10 +35,10 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
       .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
   cmp.directDependencies = dependencies;
-  return cmp.dependencies = unique([
+  return cmp.dependencies = [
     ...dependencies,
     ...transitiveDeps
-  ]).sort();
+  ];
 }
 
 function resolveTransitiveDependants(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {

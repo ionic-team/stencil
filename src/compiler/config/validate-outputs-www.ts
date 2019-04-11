@@ -63,7 +63,8 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
     esmDir: outputTarget.buildDir,
     systemDir: outputTarget.buildDir,
     polyfills: outputTarget.polyfills,
-    systemLoaderFile: config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`)
+    systemLoaderFile: config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`),
+    isBrowserBuild: true,
   });
 }
 

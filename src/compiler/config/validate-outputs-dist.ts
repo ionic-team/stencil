@@ -77,6 +77,7 @@ export function validateOutputTargetDist(config: d.Config) {
       systemLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.js'),
       esmLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.mjs.js'),
       polyfills: true,
+      isBrowserBuild: true,
     });
 
     if (config.buildEsm) {
@@ -89,7 +90,6 @@ export function validateOutputTargetDist(config: d.Config) {
         cjsIndexFile: path.join(outputTarget.dir, 'index.js'),
         esmIndexFile: path.join(outputTarget.dir, 'index.mjs'),
         loaderDir: outputTarget.esmLoaderPath,
-        webpackBuild: true,
         polyfills: true,
       });
     }

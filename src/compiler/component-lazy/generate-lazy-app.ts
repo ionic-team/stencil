@@ -21,8 +21,8 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   await buildCtx.stylesPromise;
 
   const [bundleModules] = await Promise.all([
-    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.webpackBuild)),
-    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.webpackBuild)),
+    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.isBrowserBuild)),
+    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.isBrowserBuild)),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
     generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
 

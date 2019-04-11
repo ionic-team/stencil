@@ -22,14 +22,14 @@ export function generateComponentBundles(
     entry.forEach(cmp => visited.add(cmp));
   });
 
-  const bundlers: d.ComponentCompilerMeta[][] = [
-    ...defaultBundles,
-    ...cmps
-        .filter(cmp => !visited.has(cmp))
-        .map(cmp => [cmp])
-  ];
-  return optimizeBundlers(bundlers, 0.6);
+  const bundlers: d.ComponentCompilerMeta[][] = cmps
+    .filter(cmp => !visited.has(cmp))
+    .map(cmp => [cmp]);
 
+  return [
+    ...defaultBundles,
+    ...optimizeBundlers(bundlers, 0.6)
+  ];
 }
 
 
@@ -45,9 +45,19 @@ function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: numbe
   const matrix = bundles.map(entry => {
     const vector = new Uint8Array(bundles.length);
     entry.forEach(cmp => {
-      cmp.dependants.forEach(tag => vector[cmpIndexMap.get(tag)] = 1);
+      cmp.dependants.forEach(tag => {
+        const index = cmpIndexMap.get(tag);
+        if (index !== undefined) {
+          vector[index] = 1;
+        }
+      });
     });
-    entry.forEach(cmp => vector[cmpIndexMap.get(cmp.tagName)] = 0);
+    entry.forEach(cmp => {
+      const index = cmpIndexMap.get(cmp.tagName);
+      if (index !== undefined) {
+        vector[index] = 0;
+      }
+    });
     return vector;
   });
 

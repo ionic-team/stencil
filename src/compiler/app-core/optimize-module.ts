@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 
 
-export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, isCore: boolean, webpackBuild: boolean, input: string) {
+export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, isCore: boolean, isBrowserBuild: boolean, input: string) {
   const opts: any = {
     output: {},
     compress: {
@@ -20,12 +20,12 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     opts.compress.pure_funcs = ['getHostRef'];
     opts.compress.global_defs = {
       'STENCIL_SOURCE_TARGET': sourceTarget,
-      'STENCIL_PATCH_IMPORT': !webpackBuild
+      'STENCIL_PATCH_IMPORT': isBrowserBuild
     };
     opts.mangle.properties = {
       regex: '^\\$.+\\$$',
     };
-    if (webpackBuild) {
+    if (!isBrowserBuild) {
       opts.output.beautify = true;
       opts.output.indent_level = 2;
       opts.output.comments = 'all';

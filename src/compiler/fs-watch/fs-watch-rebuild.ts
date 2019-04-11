@@ -3,7 +3,7 @@ import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
 import { isCopyTaskFile } from '../copy/local-copy-tasks';
-import { normalizePath } from '@utils';
+import { normalizePath, unique } from '@utils';
 
 
 export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {
@@ -107,13 +107,11 @@ function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildC
 
 export function filesChanged(buildCtx: d.BuildCtx) {
   // files changed include updated, added and deleted
-  return buildCtx.filesUpdated.concat(buildCtx.filesAdded, buildCtx.filesDeleted).reduce((filesChanged, filePath: string) => {
-    if (!filesChanged.includes(filePath)) {
-      filesChanged.push(filePath);
-    }
-
-    return filesChanged;
-  }, [] as string[]).sort();
+  return unique([
+    ...buildCtx.filesUpdated,
+    ...buildCtx.filesAdded,
+    ...buildCtx.filesDeleted
+  ]).sort();
 }
 
 
