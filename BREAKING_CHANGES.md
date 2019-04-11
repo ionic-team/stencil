@@ -74,14 +74,14 @@ Stencil will not read/write to the browser's global `window` anymore. So things 
 
 ### `@Prop() mode` is no longer reserved prop
 
-`@Prop() mode` used to be way to define and read the current mode of a component. This API was removed since it was very local to the use case of Ionic.
+`@Prop() mode` used to be the way to define and read the current mode of a component. This API was removed since it was very local to the use case of Ionic.
 
 Instead, the `mode` can be read by using the `getMode()` method from `@stencil/core`.
 
 
 ### Removed: Global `JSX`
 
-For all the same reasons for now importing `h`, in order to prevent type collision in the future, we have moved to local scoped JSX namespaces. Unfortunately this means `JSX` is no longer global and it needs to be imported from `@stencil/core`. Also note that while the below example has the render function with a return type of `JSX.Element`, we recommend to not have a return type at all:
+For all the same reasons for now importing `h`, in order to prevent type collision in the future, we have moved to local scoped JSX namespaces. Unfortunately, this means `JSX` is no longer global and it needs to be imported from `@stencil/core`. Also, note that while the below example has the render function with a return type of `JSX.Element`, we recommend to not have a return type at all:
 
 ```tsx
 import { JSX, h } from '@stencil/core';
@@ -94,17 +94,17 @@ render(): JSX.Element {
 
 ### Removed: Global `HTMLStencilElement` was removed
 
-The global type for `HTMLStencilElement` has been removed. Instead it's better is to use the exact type of your component, such as `HTMLIonButtonElement`. The HTML types are automatically generated within the `components.d.ts` file.
+The global type for `HTMLStencilElement` has been removed. Instead, it's better is to use the exact type of your component, such as `HTMLIonButtonElement`. The HTML types are automatically generated within the `components.d.ts` file.
 
 
-### Removed: `StencilIntrinsecElement`
+### Removed: `StencilIntrinsicElement`
 
-The global type `StencilIntrinsecElement` has been removed. It can be replaced by importing the `JSX` namespace from `@stencil/core`:
+The global type `StencilIntrinsicElement` has been removed. It can be replaced by importing the `JSX` namespace from `@stencil/core`:
 
 ```tsx
 import { JSX } from '@stencil/core';
 
-export type StencilIntrinsecElement = JSX.IntrinsecElement;
+export type StencilIntrinsicElement = JSX.IntrinsicElement;
 ```
 
 ### Removed: `Context` in global
@@ -113,7 +113,7 @@ export type StencilIntrinsecElement = JSX.IntrinsecElement;
 
 ### Removed: @Listen('event.KEY’)
 
-It's not longer possible to use the `event.KEY` syntax in the `@Listen` decorator in order to only listen for specific key strokes.
+It's no longer possible to use the `event.KEY` syntax in the `@Listen` decorator in order to only listen for specific key strokes.
 Instead, the browser already implements easy-to-use APIs:
 
 **BEFORE:**
@@ -146,7 +146,7 @@ The event name should be provided excl
 
 ### Removed: @Component({ host })
 
-This feature was deprecated a long time ago, and it being removed definively from Stencil.
+This feature was deprecated a long time ago, and it is being removed definitely from Stencil.
 
 ### Removed: 'angular' output target
 
@@ -184,7 +184,8 @@ hostData() usage has been replaced by the new `Host` exposed in `@stencil/core`.
 
 ### All void methods return promise (right now method(): void is valid)
 
-Until Stencil 1.0, public component methods decorated with `@Method()` could only return `Promise<...>` or `void`. Now, only the `async` methods are supported, meaning that retuning `void` is not valid.
+Until Stencil 1.0, public component methods decorated with `@Method()` could only return `Promise<...>` or `void`.
+Now, only the `async` methods are supported, meaning that retuning `void` is not valid.
 
 ```diff
   @Method()
@@ -194,7 +195,8 @@ Until Stencil 1.0, public component methods decorated with `@Method()` could onl
   }
 ```
 
-This change was motivated by the fact that Stencil's 1.0 runtime will be able to proxy all component method calls! That means, developers will be able to call component methods safely without using componentOnReady()! even if the actual component has been not downloaded yet.
+This change was motivated by the fact that Stencil's 1.0 runtime will be able to proxy all component method calls!
+That means, developers will be able to call component methods safely without using componentOnReady()! even if the actual component has not been downloaded yet.
 
 #### Given an example component like:
 
@@ -220,7 +222,7 @@ element.doSomething();
 **AFTER:**
 
 ```ts
-// Stencil One will automatically proxy the method call (like a RPC),
+// Stencil One will automatically proxy the method call (like an RPC),
 // and it's safe to call any method without using `componentOnReady()`.
 await element.doSomething();
 ```
@@ -273,7 +275,7 @@ It will not be recommended to use `@Prop(connect)` in order to lazily load compo
 
 ### Global script should export a default function
 
-Currently the collection's global script is executed as a side effect, this makes it impossible to execute the global script multiple times within the same execution context, this is a critical requirement in order to property SSR (Server-Side Rendering) an application, or have isolated unit tests.
+Currently the collection's global script is executed as a side effect, this makes it impossible to execute the global script multiple times within the same execution context, this is a critical requirement in order to properly SSR (Server-Side Rendering) an application, or have isolated unit tests.
 
 **BEFORE**:
 ```ts
@@ -288,7 +290,7 @@ export default function() {
 }
 ```
 
-Ie, just wrap most of your logic within your global script around a exported default function:
+i.e., just wrap most of your logic within your global script around a exported default function:
 
 ```diff
 + export default function() {
@@ -324,7 +326,7 @@ The root `copy` property in `stencil.config.ts` has been deprecated in favour of
   };
 ```
 
-This change has been motivated by the confusing semantics of the root copy task, currently the copy tasks are executed multiple times with within different working-directories for each output-target.
+This change has been motivated by the confusing semantics of the root copy task, currently the copy tasks are executed multiple times within different working-directories for each output-target.
 
 Take this example:
 
@@ -369,7 +371,7 @@ export const config = {
 
 ### getWindow(this) and getDocument(this)
 
-`getWindow(this)` and `getDocument(this)` replaces `@Prop({context: 'window'})` and `@Prop({context: 'document'})` respectivelly. This methods can only be used within the context of a component by passing `this` as first argument, ie a reference to the component itself:
+`getWindow(this)` and `getDocument(this)` replaces `@Prop({context: 'window'})` and `@Prop({context: 'document'})` respectively. This methods can only be used within the context of a component by passing `this` as first argument, ie a reference to the component itself:
 
 ```diff
 + import { Component, getWindow } from '@stencil/core';
@@ -381,9 +383,9 @@ export const config = {
   }
 ```
 
-You might wonder why not using `window` or `document` directly. While technically it would work just fine in a browser, it will likely cause issues once you try to prerender your application.
+You might wonder why not use `window` or `document` directly. While technically it would work just fine in a browser, it will likely cause issues once you try to prerender your application.
 
-This is due to the fact that prerendering runs in `node` which is a different JavaScript environment that does not have the global `window` or `document` objects. These new APIs fill the gap! But if there are no plans to prerender components, using browser globals is perfectly acceptable.
+This is due to the fact that prerendering runs in `node`, which is a different JavaScript environment that does not have the global `window` or `document` objects. These new APIs fill the gap! But if there are no plans to prerender components, using browser globals is perfectly acceptable.
 
 ### setMode() and getMode()
 
@@ -397,7 +399,7 @@ This is due to the fact that prerendering runs in `node` which is a different Ja
 
 ### Jest Presets
 
-When running Jest directly, previously most of Jest had to be manually configured within each app's `package.json`, and required the `transform` config to be manually wired up to Stencil's `jest.preprocessor.js`. With the latest changes, most of the Jest config can be replaced with just `"preset": "@stencil/core/testing"`. You can still override the preset defaults, but it's best to start with the defaults first. Also note, the Jest config can be avoid entirely by using the `stencil test --spec` command rather than calling Jest directly.
+When running Jest directly, previously most of Jest had to be manually configured within each app's `package.json`, and required the `transform` config to be manually wired up to Stencil's `jest.preprocessor.js`. With the latest changes, most of the Jest config can be replaced with just `"preset": "@stencil/core/testing"`. You can still override the preset defaults, but it's best to start with the defaults first. Also note, the Jest config can be avoided entirely by using the `stencil test --spec` command rather than calling Jest directly.
 
 ```diff
   "jest": {
