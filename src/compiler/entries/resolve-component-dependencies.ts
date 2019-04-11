@@ -24,17 +24,16 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
   if (visited.has(cmp.tagName)) {
     return cmp.dependencies;
   }
-  // Reset deps
-  cmp.dependencies = cmp.directDependencies = [];
   visited.add(cmp.tagName);
 
   const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
+  cmp.dependencies = cmp.directDependencies = dependencies;
+
   const transitiveDeps = flatOne(
     dependencies
       .map(tagName => cmps.find(c => c.tagName === tagName))
       .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
-  cmp.directDependencies = dependencies;
   return cmp.dependencies = [
     ...dependencies,
     ...transitiveDeps
