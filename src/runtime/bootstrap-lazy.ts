@@ -70,9 +70,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
         }
 
         disconnectedCallback() {
-          if (BUILD.cmpDidUnload) {
-            disconnectedCallback(this);
-          }
+          disconnectedCallback(this);
         }
 
         's-init'() {

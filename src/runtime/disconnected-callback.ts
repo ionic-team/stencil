@@ -11,14 +11,12 @@ export const disconnectedCallback = (elm: d.HostElement) => {
       hostRef.$rmListeners$ = undefined;
     }
   }
-  if (BUILD.cmpDidUnload) {
-    const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
-    if (instance && instance.componentDidUnload) {
-      try {
-        instance.componentDidUnload();
-      } catch (e) {
-        consoleError(e, elm);
-      }
+  const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
+  if (instance && instance.componentDidUnload) {
+    try {
+      instance.componentDidUnload();
+    } catch (e) {
+      consoleError(e, elm);
     }
   }
 };
