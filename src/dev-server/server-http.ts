@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { createRequestHandler } from './request-handler';
 import { findClosestOpenPort } from './find-closest-port';
-import { getSSL } from './ssl';
 import * as http from 'http';
 import * as https from 'https';
 
@@ -16,9 +15,9 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
 
   let server: http.Server;
 
-  if (devServerConfig.protocol === 'https') {
+  if (devServerConfig.protocol === 'https' && devServerConfig.ssl && typeof devServerConfig.ssl === 'object') {
     // https server
-    server = https.createServer(await getSSL(), reqHandler) as any;
+    server = https.createServer(devServerConfig.ssl, reqHandler) as any;
 
   } else {
     // http server

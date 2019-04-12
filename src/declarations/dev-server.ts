@@ -24,8 +24,15 @@ export interface DevServerConfig {
   port?: number;
   protocol?: 'http' | 'https';
   root?: string;
+  ssl?: DevServerGetSSL | DevServerSSLConfig;
 }
 
+export type DevServerGetSSL = () => Promise<DevServerSSLConfig>;
+
+export interface DevServerSSLConfig {
+  cert?: string | Buffer | Array<string | Buffer>;
+  key?: string | Buffer | Array<Buffer | Object>;
+}
 
 export interface DevServerStartResponse {
   browserUrl?: string;
