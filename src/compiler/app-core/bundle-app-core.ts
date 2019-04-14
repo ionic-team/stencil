@@ -29,7 +29,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
-          include: 'node_modules/**',
+          include: /node_modules/,
           sourceMap: false
         }),
         bundleJson(config),
