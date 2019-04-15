@@ -87,6 +87,16 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     }
   }
 
+  if (BUILD.hydrateServerSide) {
+    try {
+      // manually connected child components during server-side hydrate
+      serverSideConnected(elm);
+
+    } catch (e) {
+      consoleError(e, elm);
+    }
+  }
+
   // set that this component lifecycle rendering has completed
   if (BUILD.lifecycle) {
     elm['s-lr'] = true;
@@ -189,5 +199,19 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {
     elm.dispatchEvent(new CustomEvent('stencil_' + lifecycleName, { 'bubbles': true, 'composed': true }));
+  }
+};
+
+
+const serverSideConnected = (elm: any) => {
+  const children = elm.children;
+  if (children != null) {
+    for (let i = 0, ii = children.length; i < ii; i++) {
+      const childElm = children[i] as any;
+      if (typeof childElm.connectedCallback === 'function') {
+        childElm.connectedCallback();
+      }
+      serverSideConnected(childElm);
+    }
   }
 };

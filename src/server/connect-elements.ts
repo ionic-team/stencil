@@ -1,15 +1,84 @@
 import * as d from '../declarations';
+import { getComponent, getHostRef } from '@platform';
 import { hydrateComponent } from './hydrate-component';
+import { postUpdateComponent } from '../runtime/update-component';
 
 
-export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, waitPromises: Promise<any>[], hydratedElements: Set<any>) {
-  if (elm != null && typeof elm.nodeName === 'string') {
+export function initConnectDocument(doc: Document, opts: d.HydrateOptions, results: d.HydrateResults, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
+  const patchedConnectedCallback = function patchedConnectedCallback(this: d.HostElement) {
+    connectElements(opts, results, this, connectedElements, waitPromises);
+  };
+
+  const patchedComponentInit = function patchedComponentInit(this: d.HostElement) {
+    const hostRef = getHostRef(this);
+    if (hostRef != null) {
+      postUpdateComponent(this, hostRef);
+    }
+  };
+
+  const patchComponent = function(elm: d.HostElement) {
+    const tagName = elm.nodeName.toLowerCase();
+    if (elm.tagName.includes('-')) {
+      const Cstr = getComponent(tagName);
+
+      if (Cstr != null) {
+        if (typeof elm.connectedCallback !== 'function') {
+          elm.connectedCallback = patchedConnectedCallback;
+        }
+
+        if (typeof elm['s-init'] !== 'function') {
+          elm['s-rc'] = [];
+          elm['s-init'] = patchedComponentInit;
+        }
+      }
+    }
+  };
+
+  const orgDocumentCreateElement = doc.createElement;
+  doc.createElement = function patchedCreateElement(tagName: string) {
+    const elm = orgDocumentCreateElement.call(doc, tagName);
+    patchComponent(elm);
+    return elm;
+  };
+
+  const patchChild = (elm: any) => {
+    if (elm != null && elm.nodeType === 1) {
+      patchComponent(elm);
+
+      const children = elm.children;
+      for (let i = 0, ii = children.length; i < ii; i++) {
+        patchChild(children[i]);
+      }
+    }
+  };
+
+  const body = doc.body;
+  patchChild(body);
+
+  const initConnectElement = (elm: d.HostElement) => {
+    if (elm != null && elm.nodeType === 1) {
+      if (typeof elm.connectedCallback === 'function') {
+        elm.connectedCallback();
+      }
+      const children = elm.children;
+      for (let i = 0, ii = children.length; i < ii; i++) {
+        initConnectElement(children[i] as any);
+      }
+    }
+  };
+
+  initConnectElement(body);
+}
+
+
+export function connectElements(opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
+  if (elm != null && elm.nodeType === 1) {
 
     const tagName = elm.nodeName.toLowerCase();
 
     if (!NO_HYDRATE_TAGS.has(tagName) && !elm.hasAttribute('no-prerender')) {
-      if (!hydratedElements.has(elm)) {
-        hydratedElements.add(elm);
+      if (!connectedElements.has(elm)) {
+        connectedElements.add(elm);
 
         if (tagName.includes('-')) {
           hydrateComponent(opts, results, tagName, elm, waitPromises);
@@ -34,7 +103,7 @@ export function connectElements(opts: d.HydrateOptions, results: d.HydrateResult
       const children = elm.children;
       if (children != null) {
         for (let i = 0, ii = children.length; i < ii; i++) {
-          connectElements(opts, results, children[i] as any, waitPromises, hydratedElements);
+          connectElements(opts, results, children[i] as any, connectedElements, waitPromises);
         }
       }
     }

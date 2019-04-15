@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import { buildError } from '@utils';
-import { connectElements } from './connect-elements';
 import { finalizeWindow } from './window-finalize';
 import { formatRuntimeErrors, generateHydrateResults, hydrateError, normalizeHydrateOptions } from './hydrate-utils';
+import { initConnectDocument } from './connect-elements';
 import { initializeWindow } from './window-initialize';
 import { insertVdomAnnotations } from '@platform';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
@@ -25,10 +25,22 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
 
     await initializeWindow(results, win, doc, opts);
 
-    await new Promise(resolve => {
-      const hydratedElements = new Set<any>();
-      startRender(opts, results, doc.body, hydratedElements, resolve);
-      hydratedElements.clear();
+    await new Promise(async resolve => {
+      const connectedElements = new Set<any>();
+      const waitPromises: Promise<any>[] = [];
+
+      try {
+        initConnectDocument(doc, opts, results, connectedElements, waitPromises);
+        await Promise.all(waitPromises);
+
+      } catch (e) {
+        hydrateError(results, e);
+      }
+
+      connectedElements.clear();
+      waitPromises.length = 0;
+
+      resolve();
     });
 
     if (opts.clientHydrateAnnotations) {
@@ -77,10 +89,22 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
     await initializeWindow(results, win, doc, opts);
 
-    await new Promise(resolve => {
-      const hydratedElements = new Set<any>();
-      startRender(opts, results, doc.body, hydratedElements, resolve);
-      hydratedElements.clear();
+    await new Promise(async resolve => {
+      const connectedElements = new Set<any>();
+      const waitPromises: Promise<any>[] = [];
+
+      try {
+        initConnectDocument(doc, opts, results, connectedElements, waitPromises);
+        await Promise.all(waitPromises);
+
+      } catch (e) {
+        hydrateError(results, e);
+      }
+
+      connectedElements.clear();
+      waitPromises.length = 0;
+
+      resolve();
     });
 
     if (opts.clientHydrateAnnotations) {
@@ -96,36 +120,4 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
   }
 
   return results;
-}
-
-
-async function startRender(opts: d.HydrateOptions, results: d.HydrateResults, body: HTMLElement, hydratedElements: Set<any>, resolve: Function) {
-  process.nextTick(async () => {
-    const waitPromises1: Promise<any>[] = [];
-    const hydratedElementsBefore = hydratedElements.size;
-
-    try {
-      connectElements(opts, results, body, waitPromises1, hydratedElements);
-    } catch (e) {
-      hydrateError(results, e);
-    }
-    await Promise.all(waitPromises1);
-
-    process.nextTick(async () => {
-      const waitPromises2: Promise<any>[] = [];
-      try {
-        connectElements(opts, results, body, waitPromises1, hydratedElements);
-      } catch (e) {
-        hydrateError(results, e);
-      }
-      await Promise.all(waitPromises2);
-
-      const hydratedElementsAfter = hydratedElements.size;
-      if (hydratedElementsBefore === hydratedElementsAfter) {
-        resolve();
-      } else {
-        startRender(opts, results, body, hydratedElements, resolve);
-      }
-    });
-  });
 }
