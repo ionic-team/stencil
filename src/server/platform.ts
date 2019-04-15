@@ -14,6 +14,9 @@ export const getComponent = (tagName: string) => {
 
 export const isMemberInElement = (elm: any, memberName: string) => {
   if (elm != null) {
+    if (memberName in elm) {
+      return true;
+    }
     const hostRef: d.ComponentNativeConstructor = getComponent(elm.nodeName.toLowerCase());
     if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
       return memberName in hostRef.cmpMeta.$members$;
@@ -170,6 +173,7 @@ export {
   h,
   insertVdomAnnotations,
   parsePropertyValue,
+  postUpdateComponent,
   setMode,
   setValue
 } from '@runtime';

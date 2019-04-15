@@ -119,5 +119,6 @@ export {
   insertVdomAnnotations,
   h,
   parsePropertyValue,
+  postUpdateComponent,
   setValue
 } from '@runtime';
