@@ -47,6 +47,11 @@ export namespace Components {
   interface CssVariables {}
   interface CssVariablesRoot {}
   interface CustomEventRoot {}
+  interface DomReattach {
+    'didLoad': number;
+    'didUnload': number;
+    'willLoad': number;
+  }
   interface DynamicCssVariable {}
   interface DynamicImport {
     'update': () => Promise<void>;
@@ -191,6 +196,11 @@ declare namespace LocalJSX {
   interface CssVariables extends JSXBase.HTMLAttributes {}
   interface CssVariablesRoot extends JSXBase.HTMLAttributes {}
   interface CustomEventRoot extends JSXBase.HTMLAttributes {}
+  interface DomReattach extends JSXBase.HTMLAttributes {
+    'didLoad'?: number;
+    'didUnload'?: number;
+    'willLoad'?: number;
+  }
   interface DynamicCssVariable extends JSXBase.HTMLAttributes {}
   interface DynamicImport extends JSXBase.HTMLAttributes {}
   interface Es5AddclassSvg extends JSXBase.HTMLAttributes {}
@@ -320,6 +330,7 @@ declare namespace LocalJSX {
     'CssVariables': Components.CssVariables;
     'CssVariablesRoot': Components.CssVariablesRoot;
     'CustomEventRoot': Components.CustomEventRoot;
+    'DomReattach': Components.DomReattach;
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
@@ -401,6 +412,7 @@ declare namespace LocalJSX {
     'CssVariables': LocalJSX.CssVariables;
     'CssVariablesRoot': LocalJSX.CssVariablesRoot;
     'CustomEventRoot': LocalJSX.CustomEventRoot;
+    'DomReattach': LocalJSX.DomReattach;
     'DynamicCssVariable': LocalJSX.DynamicCssVariable;
     'DynamicImport': LocalJSX.DynamicImport;
     'Es5AddclassSvg': LocalJSX.Es5AddclassSvg;
@@ -477,6 +489,7 @@ declare module "@stencil/core" {
 }
 
 declare global {
+
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
   var HTMLAttributeBasicElement: {
@@ -560,6 +573,12 @@ declare global {
   var HTMLCustomEventRootElement: {
     prototype: HTMLCustomEventRootElement;
     new (): HTMLCustomEventRootElement;
+  };
+
+  interface HTMLDomReattachElement extends Components.DomReattach, HTMLStencilElement {}
+  var HTMLDomReattachElement: {
+    prototype: HTMLDomReattachElement;
+    new (): HTMLDomReattachElement;
   };
 
   interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {}
@@ -960,6 +979,7 @@ declare global {
     'css-variables': HTMLCssVariablesElement
     'css-variables-root': HTMLCssVariablesRootElement
     'custom-event-root': HTMLCustomEventRootElement
+    'dom-reattach': HTMLDomReattachElement
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
@@ -1041,6 +1061,7 @@ declare global {
     'css-variables': HTMLCssVariablesElement;
     'css-variables-root': HTMLCssVariablesRootElement;
     'custom-event-root': HTMLCustomEventRootElement;
+    'dom-reattach': HTMLDomReattachElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
