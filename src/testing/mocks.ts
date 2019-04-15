@@ -38,7 +38,6 @@ export function mockCompilerCtx() {
     lastBuildResults: null,
     lastBuildStyles: null,
     lazyModuleRollupCache: new Map(),
-    localPrerenderServer: null,
     moduleMap: new Map(),
     nodeMap: new WeakMap(),
     resolvedCollections: new Set(),

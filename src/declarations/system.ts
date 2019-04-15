@@ -50,10 +50,6 @@ export interface StencilSystem {
     resolve(from: string, to: string): string;
   };
   validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
-  vm?: {
-    createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
-    runInContext(code: string, contextifiedSandbox: any, options?: any): any;
-  };
 }
 
 

@@ -33,7 +33,6 @@ export interface CompilerCtx {
   lastBuildResults: d.BuildResults;
   lastBuildStyles: Map<string, string>;
   lazyModuleRollupCache: any;
-  localPrerenderServer: any;
   moduleMap: d.ModuleMap;
   nodeMap: NodeMap;
   resolvedCollections: Set<string>;

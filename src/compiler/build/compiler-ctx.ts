@@ -33,7 +33,6 @@ export class CompilerContext implements d.CompilerCtx {
   lastBuildStyles = new Map<string, string>();
   lastComponentStyleInput = new Map<string, string>();
   lazyModuleRollupCache: any = null;
-  localPrerenderServer: any = null;
   moduleMap: d.ModuleMap = new Map();
   nodeMap = new WeakMap();
   resolvedCollections = new Set<string>();

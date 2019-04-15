@@ -70,13 +70,6 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     config.logger.printDiagnostics(prerenderDiagnostics, config.rootDir);
     timeSpan.finish(`prerendering failed`);
   }
-
-  if (compilerCtx.localPrerenderServer != null) {
-    if (typeof compilerCtx.localPrerenderServer.close === 'function') {
-      compilerCtx.localPrerenderServer.close();
-    }
-    compilerCtx.localPrerenderServer = null;
-  }
 }
 
 
