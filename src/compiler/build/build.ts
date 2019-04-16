@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError } from '@utils';
+import { createDocument } from '@mock-doc';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
@@ -9,7 +10,6 @@ import { initIndexHtmls } from './init-index-html';
 import { transpileApp } from '../transpile/transpile-app';
 import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
-import { createDocument } from '../../mock-doc/document';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
