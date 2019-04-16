@@ -55,6 +55,7 @@ export class BuildContext implements d.BuildCtx {
   transpileBuildCount = 0;
   pendingCopyTasks: Promise<d.CopyResults>[] = [];
   validateTypesPromise: Promise<d.ValidateTypesResults>;
+  packageJson: d.PackageJsonData = {};
 
   constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {}
 

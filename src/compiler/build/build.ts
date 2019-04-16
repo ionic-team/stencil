@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
-import { catchError } from '@utils';
+import { catchError, readPackageJson } from '@utils';
 import { createDocument } from '@mock-doc';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
@@ -17,6 +17,9 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // ensure any existing worker tasks are not running
     // and we've got a clean slate
     config.sys.cancelWorkerTasks();
+
+    buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort) return buildCtx.abort();
 
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist

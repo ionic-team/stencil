@@ -70,16 +70,17 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 }
 
 export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const bundleCoreOptions: d.BundleCoreOptions = {
-    entryInputs: {
+  const bundleAppOptions: d.BundleAppOptions = {
+    inputs: {
       'index': '@core-entrypoint'
     },
     loader: {
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
-    }
+    },
+    skipDeps: true
   };
 
-  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
   return generateRollupOutput(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 

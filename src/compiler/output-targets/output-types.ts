@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { buildError } from '@utils';
 import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
 import { generateTypesAndValidate } from '../types/generate-types';
 
@@ -19,7 +18,7 @@ export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, 
 
 
 async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
-  const pkgData = await readPackageJson(config, compilerCtx, buildCtx);
+  const pkgData = buildCtx.packageJson;
   if (pkgData == null) {
     return;
   }
@@ -33,31 +32,3 @@ async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   timespan.finish(`generate types finished`);
 }
 
-
-async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
-
-  let pkgJson: string;
-  try {
-    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
-
-  } catch (e) {
-    const diagnostic = buildError(buildCtx.diagnostics);
-    diagnostic.header = `Missing "package.json"`;
-    diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
-    return null;
-  }
-
-  let pkgData: d.PackageJsonData;
-  try {
-    pkgData = JSON.parse(pkgJson);
-
-  } catch (e) {
-    const diagnostic = buildError(buildCtx.diagnostics);
-    diagnostic.header = `Error parsing "package.json"`;
-    diagnostic.messageText = `${pkgJsonPath}, ${e}`;
-    return null;
-  }
-
-  return pkgData;
-}

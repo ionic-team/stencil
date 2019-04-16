@@ -44,17 +44,17 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const coreSource = await generateHydrateAppCore(config, compilerCtx, buildCtx, build);
 
-  const bundleCoreOptions: d.BundleCoreOptions = {
+  const bundleAppOptions: d.BundleAppOptions = {
     loader: {
       '@stencil/core': coreSource,
       '@core-entrypoint': SERVER_ENTRY,
     },
-    entryInputs: {
+    inputs: {
       [config.fsNamespace]: '@core-entrypoint',
     },
     isServer: true
   };
-  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
   return rollupBuild;
 }
 

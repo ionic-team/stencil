@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
-import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics, getDependencies } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
@@ -11,18 +11,18 @@ import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 import { stencilConsolePlugin } from '../rollup-plugins/stencil-console';
 
-export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
+export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
   try {
     const rollupOptions: RollupOptions = {
-      input: bundleCoreOptions.entryInputs,
-      inlineDynamicImports: bundleCoreOptions.isServer === true,
+      input: bundleAppOptions.inputs,
+      inlineDynamicImports: bundleAppOptions.isServer === true,
       plugins: [
         stencilLoaderPlugin({
           '@stencil/core': DEFAULT_CORE,
           '@core-entrypoint': DEFAULT_ENTRY,
-          ...bundleCoreOptions.loader
+          ...bundleAppOptions.loader
         }),
-        bundleCoreOptions.isServer
+        bundleAppOptions.isServer
           ? stencilServerPlugin(config)
           : stencilClientPlugin(config),
 
@@ -47,10 +47,13 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         propertyReadSideEffects: false,
         pureExternalModules: false
       },
-      cache: bundleCoreOptions.cache,
+      cache: bundleAppOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
+      external: bundleAppOptions.skipDeps
+        ? getDependencies(buildCtx)
+        : []
     };
-    if (bundleCoreOptions.coreChunk) {
+    if (bundleAppOptions.emitCoreChunk) {
       rollupOptions.manualChunks = {
         [config.fsNamespace]: ['@stencil/core']
       };
