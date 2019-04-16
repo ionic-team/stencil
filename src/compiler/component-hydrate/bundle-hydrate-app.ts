@@ -29,7 +29,7 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
         config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'module', 'main'],
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           preferBuiltins: true
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
