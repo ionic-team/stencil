@@ -35,6 +35,7 @@ declare module "@stencil/core" {
 
 declare global {
 
+
   interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
   var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;

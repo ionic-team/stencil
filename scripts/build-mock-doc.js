@@ -9,7 +9,6 @@ const { urlPlugin } = require('./plugin-url');
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-mock-doc');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
 const DEST_DIR = path.join(__dirname, '..', 'dist', 'mock-doc');
-const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
 async function bundle() {
@@ -27,10 +26,16 @@ async function bundle() {
   });
 
   // bundle up the compiler into one js file
-  await rollupBuild.write({
-    format: 'cjs',
-    file: DEST_FILE
-  });
+  await Promise.all([
+    rollupBuild.write({
+      format: 'esm',
+      file: path.join(DEST_DIR, 'index.mjs')
+    }),
+    rollupBuild.write({
+      format: 'cjs',
+      file: path.join(DEST_DIR, 'index.js')
+    })
+  ]);
 
   await mergeDts(path.dirname(ENTRY_FILE), DEST_DIR);
 }

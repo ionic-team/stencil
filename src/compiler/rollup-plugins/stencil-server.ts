@@ -8,7 +8,7 @@ export function stencilServerPlugin(config: d.Config) {
         return config.sys.path.join(config.sys.compiler.distDir, 'server', 'index.mjs');
       }
       if (id === '@stencil/core/mock-doc') {
-        return config.sys.path.join(config.sys.compiler.distDir, 'mock-doc', 'index.js');
+        return config.sys.path.join(config.sys.compiler.distDir, 'mock-doc', 'index.mjs');
       }
       if (id === '@stencil/core/runtime') {
         return config.sys.path.join(config.sys.compiler.distDir, 'runtime', 'index.mjs');

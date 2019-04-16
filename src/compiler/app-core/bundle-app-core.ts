@@ -7,25 +7,31 @@ import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
+import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
 import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
-
+import { stencilConsolePlugin } from '../rollup-plugins/stencil-console';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
   try {
     const rollupOptions: RollupOptions = {
       input: bundleCoreOptions.entryInputs,
+      inlineDynamicImports: bundleCoreOptions.isServer === true,
       plugins: [
         stencilLoaderPlugin({
           '@stencil/core': DEFAULT_CORE,
           '@core-entrypoint': DEFAULT_ENTRY,
           ...bundleCoreOptions.loader
         }),
-        stencilClientPlugin(config),
+        bundleCoreOptions.isServer
+          ? stencilServerPlugin(config)
+          : stencilClientPlugin(config),
+
+        stencilConsolePlugin(),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'module', 'main']
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({

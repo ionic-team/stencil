@@ -242,6 +242,7 @@ export interface BundleCoreOptions {
   entryInputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
+  isServer?: boolean;
 }
 
 export interface BundleEntryInputs {

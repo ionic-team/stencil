@@ -1,20 +1,23 @@
 import * as d from '../../declarations';
-import { bundleHydrateCore } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
+import { bundleApp } from '../app-core/bundle-app-core';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
   try {
     const cmps = buildCtx.components;
     const build = getBuildConditionals(config, cmps);
-    const coreSource = await generateHydrateAppCoreEntry(config, compilerCtx, buildCtx, cmps, build);
-    const code = await bundleHydrateCore(config, compilerCtx, buildCtx, build, buildCtx.entryModules, coreSource);
+    const rollupBuild = await bundleHydrateApp(config, compilerCtx, buildCtx, build);
+    if (rollupBuild) {
+      const { output } = await rollupBuild.generate({ format: 'cjs' });
+      const code = output[0].code;
 
-    if (!buildCtx.shouldAbort && typeof code === 'string') {
-      await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, code);
+      if (!buildCtx.shouldAbort && typeof code === 'string') {
+        await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, code);
+      }
     }
 
   } catch (e) {
@@ -38,7 +41,25 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[], build: d.Build) {
+async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+  const coreSource = await generateHydrateAppCore(config, compilerCtx, buildCtx, build);
+
+  const bundleCoreOptions: d.BundleCoreOptions = {
+    loader: {
+      '@stencil/core': coreSource,
+      '@core-entrypoint': SERVER_ENTRY,
+    },
+    entryInputs: {
+      [config.fsNamespace]: '@core-entrypoint',
+    },
+    isServer: true
+  };
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  return rollupBuild;
+}
+
+async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+  const cmps = buildCtx.components;
   const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, build, cmps);
 
@@ -73,3 +94,10 @@ async function generateHydrateAppCoreEntry(config: d.Config, compilerCtx: d.Comp
   coreText.push(`export * from '@stencil/core/platform';`);
   return coreText.join('\n');
 }
+
+const SERVER_ENTRY = `
+import { patchNodeGlobal } from '@stencil/core/platform';
+patchNodeGlobal(global);
+
+export { hydrateDocument, renderToString } from '@stencil/core';
+`;
