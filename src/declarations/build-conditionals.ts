@@ -1,80 +1,76 @@
 
 export interface BuildFeatures {
   // encapsulation
-  style?: boolean;
-  mode?: boolean;
+  style: boolean;
+  mode: boolean;
 
   // dom
-  shadowDom?: boolean;
-  scoped?: boolean;
+  shadowDom: boolean;
+  scoped: boolean;
 
   // render
   /**
    * Every component has a render function
    */
-  allRenderFn?: boolean;
+  allRenderFn: boolean;
   /**
    * At least one component has a render function
    */
-  hasRenderFn?: boolean;
-  /**
-   * No components have a render function
-   */
-  noRenderFn?: boolean;
+  hasRenderFn: boolean;
 
   // vdom
-  vdomRender?: boolean;
-  noVdomRender?: boolean;
-  vdomAttribute?: boolean;
-  vdomClass?: boolean;
-  vdomStyle?: boolean;
-  vdomKey?: boolean;
-  vdomRef?: boolean;
-  vdomListener?: boolean;
-  vdomFunctional?: boolean;
-  vdomText?: boolean;
+  vdomRender: boolean;
+  noVdomRender: boolean;
+  vdomAttribute: boolean;
+  vdomClass: boolean;
+  vdomStyle: boolean;
+  vdomKey: boolean;
+  vdomRef: boolean;
+  vdomListener: boolean;
+  vdomFunctional: boolean;
+  vdomText: boolean;
 
   // elements
-  slot?: boolean;
-  svg?: boolean;
+  slot: boolean;
+  svg: boolean;
 
   // decorators
-  element?: boolean;
-  event?: boolean;
-  hostListener?: boolean;
-  hostListenerTargetWindow?: boolean;
-  hostListenerTargetDocument?: boolean;
-  hostListenerTargetBody?: boolean;
-  hostListenerTargetParent?: boolean;
-  hostListenerTarget?: boolean;
-  method?: boolean;
-  prop?: boolean;
-  propMutable?: boolean;
-  state?: boolean;
-  watchCallback?: boolean;
-  member?: boolean;
-  updatable?: boolean;
+  element: boolean;
+  event: boolean;
+  hostListener: boolean;
+  hostListenerTargetWindow: boolean;
+  hostListenerTargetDocument: boolean;
+  hostListenerTargetBody: boolean;
+  hostListenerTargetParent: boolean;
+  hostListenerTarget: boolean;
+  method: boolean;
+  prop: boolean;
+  propMutable: boolean;
+  state: boolean;
+  watchCallback: boolean;
+  member: boolean;
+  updatable: boolean;
 
   // lifecycle events
-  lifecycle?: boolean;
-  cmpDidLoad?: boolean;
-  cmpWillLoad?: boolean;
-  cmpDidUpdate?: boolean;
-  cmpWillUpdate?: boolean;
-  cmpWillRender?: boolean;
-  cmpDidRender?: boolean;
-  cmpDidUnload?: boolean;
-  connectedCallback?: boolean;
-  disconnectedCallback?: boolean;
+  lifecycle: boolean;
+  cmpDidLoad: boolean;
+  cmpWillLoad: boolean;
+  cmpDidUpdate: boolean;
+  cmpWillUpdate: boolean;
+  cmpWillRender: boolean;
+  cmpDidRender: boolean;
+  cmpDidUnload: boolean;
+  connectedCallback: boolean;
+  disconnectedCallback: boolean;
 
   // attr
-  observeAttribute?: boolean;
-  reflect?: boolean;
+  observeAttribute: boolean;
+  reflect: boolean;
 
-  taskQueue?: boolean;
+  taskQueue: boolean;
 }
 
-export interface Build extends BuildFeatures {
+export interface Build extends Partial<BuildFeatures> {
   clientSide?: boolean;
   devInspector?: boolean;
   es5?: boolean;
@@ -82,7 +78,6 @@ export interface Build extends BuildFeatures {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;
-  isProd?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
@@ -90,7 +85,6 @@ export interface Build extends BuildFeatures {
   polyfills?: boolean;
   profile?: boolean;
   slotRelocation?: boolean;
-  syncQueue?: boolean;
 }
 
 export interface UserBuildConditionals {

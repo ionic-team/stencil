@@ -7,14 +7,14 @@ export class TodoInput {
   @Event() inputSubmit: EventEmitter;
   @State() value: string;
 
-  handleOnSubmit = (e: any) => {
+  private handleOnSubmit = (e: any) => {
     e.preventDefault();
     if (!this.value) return;
     this.inputSubmit.emit(this.value);
     this.value = '';
   }
 
-  handleInputChange = (event: any) => this.value = event.target.value;
+  private handleInputChange = (event: any) => this.value = event.target.value;
 
   render() {
     return (

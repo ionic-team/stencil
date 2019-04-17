@@ -55,6 +55,7 @@ declare module "@stencil/core" {
 
 declare global {
 
+
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;

@@ -11,6 +11,13 @@ import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
+  const external = bundleAppOptions.skipDeps
+    ? getDependencies(buildCtx)
+    : [];
+  if (bundleAppOptions.externalRuntime) {
+    external.push('@stencil/core');
+  }
+
   try {
     const rollupOptions: RollupOptions = {
       input: bundleAppOptions.inputs,
@@ -40,15 +47,13 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       treeshake: config.devMode ? false : {
         annotations: true,
         propertyReadSideEffects: false,
-        pureExternalModules: false
+        pureExternalModules: bundleAppOptions.externalRuntime
       },
       cache: bundleAppOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
-      external: bundleAppOptions.skipDeps
-        ? getDependencies(buildCtx)
-        : []
+      external
     };
-    if (bundleAppOptions.emitCoreChunk) {
+    if (!bundleAppOptions.externalRuntime && bundleAppOptions.emitCoreChunk) {
       rollupOptions.manualChunks = {
         [config.fsNamespace]: ['@stencil/core']
       };

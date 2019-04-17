@@ -10,6 +10,7 @@ const ROOT_DIR = path.join(__dirname, '..');
 const SUBMODULES = [
   'compiler',
   'hydrate',
+  'build-conditionals',
   'internal',
   'mock-doc',
   'screenshot',

@@ -27,6 +27,7 @@ dist/
 /server
 /sys
 /testing
+/build-conditionals
 
 /screenshot/index.js
 /screenshot/package.json

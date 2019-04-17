@@ -5,27 +5,28 @@ import { Component, State, h } from '@stencil/core';
   tag: 'app-root'
 })
 export class AppRoot {
+
   @State() list: TodoItem[] = [
     { text: 'my initial todo', checked: false },
     { text: 'Learn about Web Components', checked: true }
   ];
 
-  inputSubmiHandler = (e: CustomEvent) => {
+  private inputSubmiHandler = (e: CustomEvent) => {
     this.list = [...this.list, { text: e.detail, checked: false, }];
   }
 
-  itemCheckedHandler = (e: CustomEvent) => {
+  private itemCheckedHandler = (e: CustomEvent) => {
     const list = [...this.list];
     const item = list[e.detail];
     list[e.detail] = Object.assign({}, item, { checked: !item.checked });
     this.list = list;
   }
 
-  itemRemoveHandler = (e: CustomEvent) => {
+  private itemRemoveHandler = (e: CustomEvent) => {
     this.list = [...this.list.slice(0, e.detail), ...this.list.slice(e.detail + 1)];
   }
 
-  toggleAllHandler = (e: CustomEvent) => {
+  private toggleAllHandler = (e: CustomEvent) => {
     this.list = this.list.map(item => {
       item.checked = !!(e.target as HTMLInputElement).checked;
       return item;
