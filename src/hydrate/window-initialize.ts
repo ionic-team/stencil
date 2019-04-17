@@ -8,7 +8,7 @@ export async function initializeWindow(win: Window, doc: Document, opts: d.Hydra
   const url = (typeof opts.url === 'string' && opts.url.trim().length > 0) ? opts.url.trim() : '/';
 
   try {
-    const parsedUrl = new URL(url, BASE_URL);
+    const parsedUrl = new URL(url, 'http://hydrate.stenciljs.com');
     win.location.href = parsedUrl.href;
   } catch (e) {
     renderError(results, e);
@@ -73,18 +73,28 @@ export async function initializeWindow(win: Window, doc: Document, opts: d.Hydra
         absFilePath: null,
         lines: []
       };
-
       if (typeof results.pathname === 'string') {
         diagnostic.header += `: ${results.pathname}`;
       }
-
       results.diagnostics.push(diagnostic);
     };
 
+    win.console.debug = function() {
+      const diagnostic: d.Diagnostic = {
+        level: 'debug',
+        type: 'build',
+        header: 'Hydrate Debug',
+        messageText: [...arguments].join(', '),
+        relFilePath: null,
+        absFilePath: null,
+        lines: []
+      };
+      if (typeof results.pathname === 'string') {
+        diagnostic.header += `: ${results.pathname}`;
+      }
+      results.diagnostics.push(diagnostic);
+    };
   } catch (e) {
     renderError(results, e);
   }
 }
-
-
-const BASE_URL = 'http://hydrate.stenciljs.com';

@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { getLatestCompilerVersion, validateCompilerVersion } from '@sys';
-import { hasError } from './cli-utils';
 import exit from 'exit';
 
 
@@ -32,13 +31,17 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   const results = await compiler.build();
 
   if (!config.watch) {
-    if (devServer) {
+    if (devServer != null) {
       await devServer.close();
+      devServer = null;
     }
 
-    if (hasError(results && results.diagnostics)) {
-      config.sys.destroy();
-      exit(1);
+    if (results != null && Array.isArray(results.diagnostics)) {
+      const hasError = results.diagnostics.some(d => d.level === 'error' && d.type === 'runtime');
+      if (hasError) {
+        config.sys.destroy();
+        exit(1);
+      }
     }
   }
 

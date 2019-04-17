@@ -71,6 +71,8 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
 
 async function render(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
+  catchUnhandledErrors(results);
+
   await initializeWindow(win, doc, opts, results);
 
   await new Promise(resolve => {
@@ -95,4 +97,17 @@ async function render(win: Window, doc: Document, opts: d.HydrateOptions, result
   });
 
   await finalizeWindow(win, doc, opts, results);
+}
+
+
+function catchUnhandledErrors(results: d.HydrateResults) {
+  if ((process as any).__stencilErrors) {
+    return;
+  }
+  (process as any).__stencilErrors = true;
+
+
+  process.on('unhandledRejection', e => {
+    renderError(results, e);
+  });
 }

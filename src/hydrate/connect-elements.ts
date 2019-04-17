@@ -147,9 +147,16 @@ function collectAttributes(node: HTMLElement, parsedElm: d.HydrateElement) {
 
 function collectAnchors(hydrateResults: d.HydrateResults, elm: HTMLAnchorElement) {
   const parsedElm: d.HydrateAnchorElement = {};
-  collectAttributes(elm, parsedElm);
+  const attrs = elm.attributes;
+  for (let i = 0; i < attrs.length; i++) {
+    const attr = attrs.item(i);
+    const attrName = attr.nodeName.toLowerCase();
+    if (attrName === 'href' || attrName === 'target') {
+      parsedElm[attrName] = attr.nodeValue;
+    }
+  }
 
-  if (hydrateResults.anchors.some(a => a.href === parsedElm.href) === false) {
+  if (hydrateResults.anchors.some(a => a.href !== parsedElm.href)) {
     hydrateResults.anchors.push(parsedElm);
   }
 }

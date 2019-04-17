@@ -17,11 +17,3 @@ export function getConfigFilePath(process: NodeJS.Process, sys: d.StencilSystem,
   // nothing was passed in, use the current working directory
   return normalizePath(process.cwd());
 }
-
-
-export function hasError(diagnostics: d.Diagnostic[]): boolean {
-  if (!diagnostics) {
-    return false;
-  }
-  return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
-}
