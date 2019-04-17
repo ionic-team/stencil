@@ -15,7 +15,11 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'dist'
+      type: 'dist',
+    },
+    {
+      type: 'experimental-dist-module',
+      externalRuntime: true
     }
   ],
   enableCache: false

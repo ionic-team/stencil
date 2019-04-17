@@ -18,20 +18,27 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
-  // await buildCtx.stylesPromise;
-
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
+  await Promise.all([
+    bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => o.externalRuntime), true),
+    bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => !o.externalRuntime), false),
+  ]);
+
+  timespan.finish(`generate module web components finished`);
+}
+
+async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[], externalRuntime: boolean) {
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
-  const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build);
+  const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build, externalRuntime);
 
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
     await Promise.all(
       rollupResults.map(async result => {
         let code = result.code;
 
-        if (config.minifyJs) {
+        if (!externalRuntime && config.minifyJs) {
           const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, false, code);
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
@@ -47,8 +54,6 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
       })
     );
   }
-
-  timespan.finish(`generate module web components finished`);
 }
 
 
@@ -65,7 +70,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, externalRuntime: boolean) {
   const bundleAppOptions: d.BundleAppOptions = {
     inputs: {
       'index': '@core-entrypoint'
@@ -74,6 +79,7 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
     },
     cache: compilerCtx.rollupCacheNative,
+    externalRuntime: externalRuntime,
     skipDeps: true
   };
 
