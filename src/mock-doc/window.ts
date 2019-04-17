@@ -1,3 +1,4 @@
+import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
@@ -7,6 +8,7 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
+import { URL } from 'url';
 
 
 const historyMap = new WeakMap<MockWindow, MockHistory>();
@@ -20,12 +22,16 @@ const customEventClassMap = new WeakMap<MockWindow, any>();
 
 
 export class MockWindow {
+  console: Console;
   customElements: CustomElementRegistry;
   document: Document;
   performance: Performance;
 
+  devicePixelRatio: number;
   innerHeight: number;
   innerWidth: number;
+  pageXOffset: number;
+  pageYOffset: number;
   screen: Screen;
   screenLeft: number;
   screenTop: number;
@@ -42,12 +48,15 @@ export class MockWindow {
     }
     this.performance = new MockPerformance();
     this.customElements = new MockCustomElementRegistry(this as any);
+    this.console = createConsole();
     resetWindowDimensions(this);
   }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
     addEventListener(this, type, handler);
   }
+
+  alert() {/**/}
 
   cancelAnimationFrame(id: any) {
     clearTimeout(id);
@@ -69,12 +78,16 @@ export class MockWindow {
     resetWindow(this as any);
   }
 
+  confirm() {
+    return false;
+  }
+
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
 
   fetch() {
-    return Promise.resolve();
+    return Promise.reject(`fetch() unimplemented`);
   }
 
   getComputedStyle(_: any) {
@@ -170,6 +183,14 @@ export class MockWindow {
 
   get parent(): any {
     return null;
+  }
+
+  prompt() {
+    return '';
+  }
+
+  get origin() {
+    return this.location.origin;
   }
 
   removeEventListener(type: string, handler: any) {
@@ -277,6 +298,8 @@ export class MockWindow {
     customEventClassMap.set(this, custEvClass);
   }
 
+  URL = URL;
+
 }
 
 export function createWindow(html: string | boolean = null): Window {
@@ -365,8 +388,13 @@ export function resetWindow(win: Window) {
 
 function resetWindowDimensions(win: any) {
   try {
+    win.devicePixelRatio = 1;
+
     win.innerHeight = 768;
     win.innerWidth = 1366;
+
+    win.pageXOffset = 0;
+    win.pageYOffset = 0;
 
     win.screenLeft = 0;
     win.screenTop = 0;
