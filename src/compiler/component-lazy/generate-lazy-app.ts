@@ -8,7 +8,7 @@ import { generateCjs } from './generate-cjs';
 import { generateLoaders } from './generate-loader';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
-  const timespan = buildCtx.createTimeSpan(`generate lazy components started`);
+  const timespan = buildCtx.createTimeSpan(`bundling components started`);
 
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
@@ -29,7 +29,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
     generateLoaders(config, compilerCtx, outputTargets)
   ]);
 
-  timespan.finish(`generate lazy components finished`);
+  timespan.finish(`bundling components finished`);
 
   return bundleModules;
 }

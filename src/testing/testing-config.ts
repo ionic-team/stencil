@@ -15,7 +15,7 @@ export class TestingConfig implements d.Config {
   enableCache = false;
   buildAppCore = false;
   buildScoped = true;
-  buildEsm = true;
+  buildDist = true;
   flags: d.ConfigFlags = {};
   bundles: d.ConfigBundle[];
   outputTargets: d.OutputTarget[];

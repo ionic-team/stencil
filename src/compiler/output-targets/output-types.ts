@@ -1,13 +1,9 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
+import { isOutputTargetDistCollection } from './output-utils';
 import { generateTypesAndValidate } from '../types/generate-types';
 
 
 export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
     return;

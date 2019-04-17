@@ -13,11 +13,11 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 
   const commentOriginalSelector = config.outputTargets.some(isOutputTargetHydrate);
 
-  const componentStyles = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
-    await Promise.all(moduleFile.cmps.map(async cmps => {
-      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile, cmps, commentOriginalSelector);
-    }));
-  }));
+  const componentStyles = await Promise.all(
+    buildCtx.components.map(cmp => {
+      generateComponentStyles(config, compilerCtx, buildCtx, cmp, commentOriginalSelector);
+    })
+  );
 
   // create the global styles
   const globalStyles = await Promise.all(
@@ -35,9 +35,9 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) {
+export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) {
   await Promise.all(cmp.styles.map(async style => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, cmp, style, style.modeName, commentOriginalSelector);
+    await generateComponentStylesMode(config, compilerCtx, buildCtx, cmp, style, style.modeName, commentOriginalSelector);
   }));
 }
 
@@ -52,7 +52,7 @@ function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
   }
 
   if (buildCtx.isRebuild) {
-    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
+    if (buildCtx.hasStyleChanges) {
       return false;
     }
 

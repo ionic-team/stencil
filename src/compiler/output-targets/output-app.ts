@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, isOutputTargetDistLazy } from './output-utils';
+import { isOutputTargetDistLazy } from './output-utils';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { dashToPascalCase, flatOne } from '@utils';
@@ -11,10 +11,6 @@ import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
-  if (canSkipAppCoreBuild(buildCtx)) {
-    return undefined;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return undefined;

@@ -34,7 +34,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // async scan the src directory for ts files
     // then transpile them all in one go
     // buildCtx.moduleFiles is populated here
-    await transpileApp(config, compilerCtx, buildCtx);
+    buildCtx.hasScriptChanges = await transpileApp(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort) return buildCtx.abort();
 
     if (config.srcIndexHtml) {

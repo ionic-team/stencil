@@ -11,11 +11,6 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
     return;
   }
 
-  if (!buildCtx.isActiveBuild) {
-    buildCtx.debug(`validateTypesMain aborted, not active build`);
-    return;
-  }
-
   if (buildCtx.hasError) {
     buildCtx.debug(`validateTypesMain aborted`);
     return;
@@ -56,13 +51,11 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       // the build has already finished before the
       // type checking transpile finished, which is fine for watch
       // we'll need to create build to show the diagnostics
-      if (buildCtx.isActiveBuild) {
-        buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
-        const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
-        diagnosticsBuildCtx.start();
-        diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
-        diagnosticsBuildCtx.finish();
-      }
+      buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
+      const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
+      diagnosticsBuildCtx.start();
+      diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
+      diagnosticsBuildCtx.finish();
 
     } else {
       // cool the build hasn't finished yet

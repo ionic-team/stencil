@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 
-export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx) {
   const path = config.sys.path;
   return {
     name: 'inMemoryFsRead',
@@ -18,11 +18,6 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
         return null;
       }
 
-      // note: node-resolve plugin has already ran
-      // we can assume the importee is a file path
-      if (!buildCtx.isActiveBuild) {
-        return importee;
-      }
 
       // resolve absolute path
       if (!path.isAbsolute(importee)) {
@@ -71,9 +66,6 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, bui
     },
 
     async load(sourcePath: string) {
-      if (!buildCtx.isActiveBuild) {
-        return `/* build aborted */`;
-      }
       return compilerCtx.fs.readFile(sourcePath);
     }
   };

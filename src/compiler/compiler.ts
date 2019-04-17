@@ -15,6 +15,7 @@ export class Compiler implements d.Compiler {
   protected ctx: d.CompilerCtx;
   isValid: boolean;
   config: d.Config;
+  queuedRebuild = false;
 
   constructor(compilerConfig: d.Config) {
     [ this.isValid, this.config ] = isValid(compilerConfig);
@@ -59,7 +60,7 @@ export class Compiler implements d.Compiler {
       this.ctx = new CompilerContext(config);
 
       this.on('fsChange', fsWatchResults => {
-        this.rebuild(fsWatchResults);
+        this.queueFsChanges(fsWatchResults);
       });
     }
   }
@@ -67,16 +68,59 @@ export class Compiler implements d.Compiler {
   build() {
     const buildCtx = new BuildContext(this.config, this.ctx);
     buildCtx.start();
-    return build(this.config, this.ctx, buildCtx);
+    return this.drainBuild(buildCtx);
   }
 
-  rebuild(fsWatchResults: d.FsWatchResults) {
-    const buildCtx = generateBuildFromFsWatch(this.config, this.ctx, fsWatchResults);
+  rebuild() {
+    this.queuedRebuild = false;
+    const buildCtx = generateBuildFromFsWatch(this.config, this.ctx);
     if (buildCtx != null) {
       logFsWatchMessage(this.config, buildCtx);
       buildCtx.start();
       updateCacheFromRebuild(this.ctx, buildCtx);
-      build(this.config, this.ctx, buildCtx);
+      this.drainBuild(buildCtx);
+    }
+  }
+
+  private async drainBuild(buildCtx: BuildContext) {
+    if (this.ctx.isActivelyBuilding) {
+      // already running
+      return undefined;
+    }
+
+    this.ctx.isActivelyBuilding = true;
+    let buildResults: d.BuildResults = undefined;
+    try {
+      // clean
+      this.ctx.activeDirsAdded.length = 0;
+      this.ctx.activeDirsDeleted.length = 0;
+      this.ctx.activeFilesAdded.length = 0;
+      this.ctx.activeFilesDeleted.length = 0;
+      this.ctx.activeFilesUpdated.length = 0;
+
+      // Run Build
+      buildResults = await build(this.config, this.ctx, buildCtx);
+
+    } catch (e) {
+      console.error(e);
+    }
+    this.ctx.isActivelyBuilding = false;
+    if (this.queuedRebuild) {
+      this.rebuild();
+    }
+    return buildResults;
+  }
+
+  queueFsChanges(fsWatchResults: d.FsWatchResults) {
+    this.ctx.activeDirsAdded.push(...fsWatchResults.dirsAdded);
+    this.ctx.activeDirsDeleted.push(...fsWatchResults.dirsDeleted);
+    this.ctx.activeFilesAdded.push(...fsWatchResults.filesAdded);
+    this.ctx.activeFilesDeleted.push(...fsWatchResults.filesDeleted);
+    this.ctx.activeFilesUpdated.push(...fsWatchResults.filesUpdated);
+    this.queuedRebuild = true;
+
+    if (!this.ctx.isActivelyBuilding) {
+      this.rebuild();
     }
   }
 

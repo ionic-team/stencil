@@ -7,10 +7,14 @@ import { outputModule } from './output-module';
 import { outputTypes } from './output-types';
 import { outputWww } from './output-www';
 import { createPluginOutput } from '../output-plugins/create-plugin-output';
+import { canSkipAppCoreBuild } from './output-utils';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.shouldAbort) {
+    return;
+  }
+  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

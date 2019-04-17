@@ -59,7 +59,6 @@ export interface BuildCtx {
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
-  isActiveBuild: boolean;
   isRebuild: boolean;
   moduleFiles: d.Module[];
   requiresFullBuild: boolean;

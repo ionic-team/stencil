@@ -11,20 +11,17 @@ export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx,
     const doTranspile = await transpileService(config, compilerCtx, buildCtx);
 
     await processMetadata(config, compilerCtx, buildCtx, doTranspile);
+    return doTranspile;
 
   } catch (e) {
     // gah!!
     catchError(buildCtx.diagnostics, e);
   }
+  return false;
 }
 
 
 async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, doTranspile: boolean) {
-  if (!buildCtx.isActiveBuild) {
-    buildCtx.debug(`processMetadata aborted, not active build`);
-    return;
-  }
-
   if (buildCtx.hasError) {
     buildCtx.debug(`processMetadata aborted`);
     return;

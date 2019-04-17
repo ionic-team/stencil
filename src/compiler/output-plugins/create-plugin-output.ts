@@ -5,6 +5,9 @@ import { generateDocData } from '../docs/generate-doc-data';
 type PluginTargetList = [d.Plugin, d.OutputTarget[]];
 
 export async function createPluginOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pluginList?: d.Plugin[]) {
+  if (config.devMode) {
+    return;
+  }
   const outputPlugins = pluginList || config.plugins.filter(isOutputPlugin);
 
   // Build a tuple containing the plugin and all output targets that it will need

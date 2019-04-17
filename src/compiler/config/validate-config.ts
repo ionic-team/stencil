@@ -29,7 +29,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   config.flags = config.flags || {};
 
-  if (config.flags.debug) {
+  if (config.flags.debug || config.flags.verbose) {
     config.logLevel = 'debug';
   } else if (config.flags.logLevel) {
     config.logLevel = config.flags.logLevel;
@@ -74,7 +74,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
-  setBooleanConfig(config, 'buildEsm', 'esm', config.buildEs5);
+  setBooleanConfig(config, 'buildDist', 'esm', config.buildEs5);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
   /**

@@ -6,7 +6,7 @@ import { relativeImport } from '@utils';
 import { RollupResult } from '../../declarations';
 
 export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, isBrowserBuild: boolean, outputTargets: d.OutputTargetDistLazy[]) {
-  if (!isBrowserBuild && !config.buildEsm) {
+  if (!isBrowserBuild && !config.buildDist) {
     return undefined;
   }
 

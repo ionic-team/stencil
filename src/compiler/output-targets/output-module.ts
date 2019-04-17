@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
-import { canSkipAppCoreBuild, isOutputTargetDistModule } from './output-utils';
+import { isOutputTargetDistModule } from './output-utils';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
@@ -8,10 +8,6 @@ import { optimizeModule } from '../app-core/optimize-module';
 
 
 export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
   if (outputTargets.length === 0) {
     return;

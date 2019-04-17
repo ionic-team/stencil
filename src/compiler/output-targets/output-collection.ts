@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, isOutputTargetDistCollection } from './output-utils';
+import { isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath, sortBy } from '@utils';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
@@ -7,7 +7,7 @@ import { processCopyTasks } from '../copy/local-copy-tasks';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
+  if (!config.buildDist) {
     return;
   }
 

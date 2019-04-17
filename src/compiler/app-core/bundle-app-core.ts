@@ -42,7 +42,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
-      treeshake: {
+      treeshake: config.devMode ? false : {
         annotations: true,
         propertyReadSideEffects: false,
         pureExternalModules: false

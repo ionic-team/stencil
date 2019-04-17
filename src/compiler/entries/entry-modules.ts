@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentBundles } from './component-bundles';
 
-export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx, ) {
+export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
   // figure out how modules and components connect
   try {
     const bundles = generateComponentBundles(
