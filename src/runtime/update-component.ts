@@ -38,6 +38,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
+  console.log('scheduleUpdate');
   if (BUILD.taskQueue) {
     writeTask(() => updateComponent(elm, hostRef, cmpMeta, true, instance), elm);
   } else {
@@ -48,6 +49,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
 
 const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean, instance: any) => {
   // updateComponent
+  console.log('updateComponent');
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$stateFlags$ &= ~HOST_STATE.isQueuedForUpdate;
   }
@@ -61,6 +63,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
   }
 
+  console.log(BUILD.hasRenderFn, BUILD.reflect, BUILD.vdomRender || BUILD.reflect);
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
       // tell the platform we're actively rendering
@@ -121,6 +124,12 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
   if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
     const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
+
+    if (BUILD.cmpDidRender && instance.componentDidRender) {
+      instance.componentDidRender();
+    }
+    emitLifecycleEvent(elm, 'componentDidRender');
+
     if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {
       hostRef.$stateFlags$ |= HOST_STATE.hasLoadedComponent;
 
@@ -156,11 +165,6 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       }
       emitLifecycleEvent(elm, 'componentDidUpdate');
     }
-
-    if (BUILD.cmpDidRender && instance.componentDidRender) {
-      instance.componentDidRender();
-    }
-    emitLifecycleEvent(elm, 'componentDidRender');
 
     if (BUILD.hotModuleReplacement) {
       elm['s-hmr-load'] && elm['s-hmr-load']();
