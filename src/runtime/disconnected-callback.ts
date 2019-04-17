@@ -14,7 +14,7 @@ export const disconnectedCallback = (elm: d.HostElement) => {
   const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
   if (BUILD.disconnectedCallback && instance && instance.disconnectedCallback) {
     try {
-      instance.componentDidUnload();
+      instance.disconnectedCallback();
     } catch (e) {
       consoleError(e, elm);
     }

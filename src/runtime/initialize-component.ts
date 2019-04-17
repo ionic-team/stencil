@@ -88,8 +88,8 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     );
 
   } else {
-    if (BUILD.connectedCallback && hostRef.$lazyInstance$.connected) {
-      await hostRef.$lazyInstance$.componentWillLoad();
+    if (BUILD.connectedCallback && hostRef.$lazyInstance$.connectedCallback) {
+      hostRef.$lazyInstance$.connectedCallback();
     }
     scheduleUpdate(elm, hostRef, cmpMeta, true);
   }
