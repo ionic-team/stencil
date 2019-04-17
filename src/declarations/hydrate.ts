@@ -113,6 +113,7 @@ export interface HydrateOptions {
   referrer?: string;
   removeScripts?: string[];
   removeUnusedStyles?: boolean;
+  timeout?: number;
   title?: string;
   url?: string;
   userAgent?: string;

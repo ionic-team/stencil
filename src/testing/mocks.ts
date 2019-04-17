@@ -37,10 +37,12 @@ export function mockCompilerCtx() {
     lastBuildHadError: false,
     lastBuildResults: null,
     lastBuildStyles: null,
-    lazyModuleRollupCache: new Map(),
     moduleMap: new Map(),
     nodeMap: new WeakMap(),
     resolvedCollections: new Set(),
+    rollupCacheHydrate: null,
+    rollupCacheLazy: null,
+    rollupCacheNative: null,
     rootTsFiles: [],
     tsService: null,
     reset: () => {/**/}

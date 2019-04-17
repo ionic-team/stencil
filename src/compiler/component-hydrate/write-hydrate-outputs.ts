@@ -1,34 +1,37 @@
 import * as d from '../../declarations';
+import { RollupOutput } from 'rollup';
 
 
-export function writeHydrateOutputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], hydrateAppCode: string) {
+export function writeHydrateOutputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], rollupOutput: RollupOutput) {
   return Promise.all(outputTargets.map(outputTarget => {
-    return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, hydrateAppCode);
+    return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
   }));
 }
 
 
-async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetHydrate, hydrateAppCode: string) {
+async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetHydrate, rollupOutput: RollupOutput) {
   const hydrateAppDirPath = outputTarget.dir;
 
-  const hydrateAppFilePath = config.sys.path.join(hydrateAppDirPath, 'index.js');
-  const hydrateAppDtsFilePath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
-
-  // always remember a path to the hydrate app that the prerendering may need later on
-  buildCtx.hydrateAppFilePath = hydrateAppFilePath;
+  const hydrateCoreIndexPath = config.sys.path.join(hydrateAppDirPath, 'index.js');
+  const hydrateCoreIndexDtsFilePath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
 
   const pkgJsonPath = config.sys.path.join(hydrateAppDirPath, 'package.json');
-  const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateAppFilePath, hydrateAppDtsFilePath);
+  const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath);
 
-  // dirty hack to make sure patchNodeGlobal(global) runs immediately before everything else
-  hydrateAppCode = hydrateAppCode.replace(`patchNodeGlobal(global);`, ``);
-  hydrateAppCode = hydrateAppCode.replace(`'use strict';`, `'use strict'; patchNodeGlobal(global);`);
-
-  return Promise.all([
-    compilerCtx.fs.writeFile(hydrateAppFilePath, hydrateAppCode),
-    compilerCtx.fs.writeFile(hydrateAppDtsFilePath, HYDRATE_DTS_CODE),
+  const writePromises: Promise<any>[] = [
+    compilerCtx.fs.writeFile(hydrateCoreIndexDtsFilePath, HYDRATE_DTS_CODE),
     compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
-  ]);
+  ];
+
+  rollupOutput.output.forEach(output => {
+    const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
+    writePromises.push(compilerCtx.fs.writeFile(filePath, output.code));
+  });
+
+  // always remember a path to the hydrate app that the prerendering may need later on
+  buildCtx.hydrateAppFilePath = hydrateCoreIndexPath;
+
+  return Promise.all(writePromises);
 }
 
 

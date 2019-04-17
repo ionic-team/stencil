@@ -17,7 +17,6 @@ export function addHydrateImports(transformCtx: ts.TransformationContext, compil
   }
 
   tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core');
-  tsSourceFile = addImports(transformCtx, tsSourceFile, ['console'], '@stencil/core/console');
 
   return tsSourceFile;
 }

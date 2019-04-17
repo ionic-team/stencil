@@ -7,18 +7,24 @@ const { run, transpile, updateBuildIds, relativeResolve } = require('./script-ut
 const { urlPlugin } = require('./plugin-url');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
-const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-server');
-const INPUT_FILE = path.join(TRANSPILED_DIR, 'server', 'index.js');
-const SERVER_DIST_DIR = path.join(DIST_DIR, 'server');
-const SERVER_DIST_FILE = path.join(SERVER_DIST_DIR, 'index.mjs');
+const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-hydrate');
+const INDEX_INDEX_INPUT_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'index.js');
+const INDEX_PLATFORM_INPUT_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'platform.js');
+const SERVER_DIST_DIR = path.join(DIST_DIR, 'hydrate');
 
 
-async function bundleServer() {
+async function bundleHydrate() {
   const rollupBuild = await rollup.rollup({
-    input: INPUT_FILE,
+    input: [
+      INDEX_INDEX_INPUT_FILE,
+      INDEX_PLATFORM_INPUT_FILE
+    ],
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/global-scripts',
+      'fs',
+      'path',
+      'vm'
     ],
     plugins: [
       (() => {
@@ -40,7 +46,7 @@ async function bundleServer() {
               return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
             if (id === '@platform') {
-              return path.join(TRANSPILED_DIR, 'server', 'index.js');
+              return path.join(TRANSPILED_DIR, 'hydrate', 'platform.js');
             }
           }
         }
@@ -59,20 +65,23 @@ async function bundleServer() {
 
   const { output } = await rollupBuild.generate({
     format: 'esm',
-    file: SERVER_DIST_FILE
+    dir: SERVER_DIST_DIR
   });
 
   await fs.emptyDir(SERVER_DIST_DIR);
 
-  const outputText = updateBuildIds(output[0].code);
-  await fs.writeFile(SERVER_DIST_FILE, outputText);
+  await Promise.all(output.map(async o => {
+    const filePath = path.join(SERVER_DIST_DIR, o.fileName).replace('.js', '.mjs');
+    const outputText = updateBuildIds(o.code);
+    await fs.writeFile(filePath, outputText);
+  }));
 }
 
 
 run(async () => {
-  transpile(path.join('..', 'src', 'server', 'tsconfig.json'))
+  transpile(path.join('..', 'src', 'hydrate', 'tsconfig.json'))
 
-  await bundleServer();
+  await bundleHydrate();
 
-  await fs.remove(TRANSPILED_DIR);
+  // await fs.remove(TRANSPILED_DIR);
 });

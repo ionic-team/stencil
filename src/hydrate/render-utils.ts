@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
 import { URL } from 'url';
-import { windowErrors } from '@platform';
 
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
@@ -17,6 +16,10 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
 
   if (typeof outputOpts.maxHydrateCount !== 'number') {
     outputOpts.maxHydrateCount = 300;
+  }
+
+  if (typeof outputOpts.timeout !== 'number') {
+    outputOpts.timeout = 5000;
   }
 
   return outputOpts;
@@ -58,33 +61,10 @@ export function generateHydrateResults(opts: d.HydrateOptions) {
 }
 
 
-export function hydrateError(results: d.HydrateResults, e: any) {
+export function renderError(results: d.HydrateResults, e: any) {
   const diagnostic = catchError(results.diagnostics, e);
   diagnostic.header = `Hydrate Error`;
   if (typeof results.pathname === 'string') {
     diagnostic.header += `: ${results.pathname}`;
   }
 }
-
-
-export function formatRuntimeErrors(win: Window, results: d.HydrateResults) {
-  const winErrors = windowErrors.get(win);
-  if (winErrors != null) {
-    winErrors.forEach(winError => {
-      const diagnostic = catchError(results.diagnostics, winError.err);
-      diagnostic.header = `Hydrate Runtime Error`;
-      const info: string[] = [];
-      if (typeof winError.tagName === 'string') {
-        info.push(winError.tagName.toLowerCase());
-      }
-      if (typeof results.pathname === 'string') {
-        info.push(results.pathname);
-      }
-      if (info.length > 0) {
-        diagnostic.header += `: ${info.join((', '))}`;
-      }
-    });
-    windowErrors.delete(win);
-  }
-}
-

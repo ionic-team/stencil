@@ -1,17 +1,17 @@
 import * as d from '../declarations';
 import { constrainTimeouts } from '@mock-doc';
 import globalScripts from '@global-scripts';
-import { hydrateError } from './hydrate-utils';
+import { renderError } from './render-utils';
 
 
-export async function initializeWindow(results: d.HydrateResults, win: Window, doc: Document, opts: d.HydrateOptions) {
+export async function initializeWindow(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
   const url = (typeof opts.url === 'string' && opts.url.trim().length > 0) ? opts.url.trim() : '/';
 
   try {
     const parsedUrl = new URL(url, BASE_URL);
     win.location.href = parsedUrl.href;
   } catch (e) {
-    hydrateError(results, e);
+    renderError(results, e);
   }
 
   if (typeof opts.userAgent === 'string') {
@@ -43,7 +43,7 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
     try {
       await opts.beforeHydrate(win, opts);
     } catch (e) {
-      hydrateError(results, e);
+      renderError(results, e);
     }
   }
 
@@ -54,13 +54,37 @@ export async function initializeWindow(results: d.HydrateResults, win: Window, d
   try {
     globalScripts(win, true);
   } catch (e) {
-    hydrateError(results, e);
+    renderError(results, e);
   }
 
   if (opts.constrainTimeouts) {
     constrainTimeouts(win);
   }
+
+  try {
+    win.console.error = function() {
+
+      const diagnostic: d.Diagnostic = {
+        level: 'error',
+        type: 'runtime',
+        header: 'Hydrate Error',
+        messageText: [...arguments].join(', '),
+        relFilePath: null,
+        absFilePath: null,
+        lines: []
+      };
+
+      if (typeof results.pathname === 'string') {
+        diagnostic.header += `: ${results.pathname}`;
+      }
+
+      results.diagnostics.push(diagnostic);
+    };
+
+  } catch (e) {
+    renderError(results, e);
+  }
 }
 
 
-const BASE_URL = 'http://prerender.stenciljs.com';
+const BASE_URL = 'http://hydrate.stenciljs.com';

@@ -1,10 +1,9 @@
 import * as d from '../declarations';
 import { buildError } from '@utils';
 import { finalizeWindow } from './window-finalize';
-import { formatRuntimeErrors, generateHydrateResults, hydrateError, normalizeHydrateOptions } from './hydrate-utils';
-import { initConnectDocument } from './connect-elements';
+import { generateHydrateResults, normalizeHydrateOptions, renderError } from './render-utils';
+import { getHydrateAppSandbox } from './run-in-context';
 import { initializeWindow } from './window-initialize';
-import { insertVdomAnnotations } from '@platform';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
 import { polyfillDocumentImplementation } from './polyfill-implementation';
 
@@ -23,31 +22,7 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
     const win: Window = new MockWindow(html) as any;
     const doc = win.document;
 
-    await initializeWindow(results, win, doc, opts);
-
-    await new Promise(async resolve => {
-      const connectedElements = new Set<any>();
-      const waitPromises: Promise<any>[] = [];
-
-      try {
-        initConnectDocument(doc, opts, results, connectedElements, waitPromises);
-        await Promise.all(waitPromises);
-
-      } catch (e) {
-        hydrateError(results, e);
-      }
-
-      connectedElements.clear();
-      waitPromises.length = 0;
-
-      resolve();
-    });
-
-    if (opts.clientHydrateAnnotations) {
-      insertVdomAnnotations(doc);
-    }
-
-    finalizeWindow(opts, results, win, doc);
+    await render(win, doc, opts, results);
 
     if (results.diagnostics.length === 0) {
       results.html = serializeNodeToHtml(doc, {
@@ -56,10 +31,8 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
       });
     }
 
-    formatRuntimeErrors(win, results);
-
   } catch (e) {
-    hydrateError(results, e);
+    renderError(results, e);
   }
 
   return results;
@@ -87,37 +60,39 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateOptions = {}
 
     polyfillDocumentImplementation(win, doc);
 
-    await initializeWindow(results, win, doc, opts);
-
-    await new Promise(async resolve => {
-      const connectedElements = new Set<any>();
-      const waitPromises: Promise<any>[] = [];
-
-      try {
-        initConnectDocument(doc, opts, results, connectedElements, waitPromises);
-        await Promise.all(waitPromises);
-
-      } catch (e) {
-        hydrateError(results, e);
-      }
-
-      connectedElements.clear();
-      waitPromises.length = 0;
-
-      resolve();
-    });
-
-    if (opts.clientHydrateAnnotations) {
-      insertVdomAnnotations(doc);
-    }
-
-    await finalizeWindow(opts, results, win, doc);
-
-    formatRuntimeErrors(win, results);
+    await render(win, doc, opts, results);
 
   } catch (e) {
-    hydrateError(results, e);
+    renderError(results, e);
   }
 
   return results;
+}
+
+
+async function render(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
+  await initializeWindow(win, doc, opts, results);
+
+  await new Promise(resolve => {
+    const tmr = setTimeout(() => {
+      win.console.error(`Hydrate exceeded timeout: ${opts.timeout}, ${win.location.pathname}`);
+      resolve();
+    }, opts.timeout);
+
+    try {
+      const sandbox = getHydrateAppSandbox(win);
+
+      sandbox.initConnect(win, doc, opts, results, () => {
+        clearTimeout(tmr);
+        resolve();
+      });
+
+    } catch (e) {
+      renderError(results, e);
+      clearTimeout(tmr);
+      resolve();
+    }
+  });
+
+  await finalizeWindow(win, doc, opts, results);
 }

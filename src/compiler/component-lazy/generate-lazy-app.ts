@@ -73,17 +73,18 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
       'index': usersIndexJsPath
     },
     emitCoreChunk: true,
-    cache: compilerCtx.lazyModuleRollupCache
+    cache: compilerCtx.rollupCacheLazy
   };
 
   buildCtx.entryModules.forEach(entryModule => {
     bundleAppOptions.inputs[entryModule.entryKey] = entryModule.entryKey;
   });
+
   const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
-  if (rollupBuild) {
-    compilerCtx.lazyModuleRollupCache = rollupBuild.cache;
+  if (rollupBuild != null) {
+    compilerCtx.rollupCacheLazy = rollupBuild.cache;
   } else {
-    compilerCtx.lazyModuleRollupCache = undefined;
+    compilerCtx.rollupCacheLazy = null;
   }
   return rollupBuild;
 }

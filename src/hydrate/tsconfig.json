@@ -19,7 +19,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../dist/transpiled-server",
+    "outDir": "../../dist/transpiled-hydrate",
     "pretty": true,
     "removeComments": true,
     "rootDir": "../",
@@ -56,6 +56,7 @@
     "../../types/*.d.ts"
   ],
   "files": [
-    "./index.ts"
+    "index.ts",
+    "platform.ts"
   ]
 }

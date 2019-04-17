@@ -82,8 +82,36 @@ export class MockWindow {
     return false;
   }
 
+  get CSS() {
+    return {
+      supports: () => true
+    };
+  }
+
+  get CustomEvent() {
+    const custEvClass = customEventClassMap.get(this);
+    if (custEvClass != null) {
+      return custEvClass;
+    }
+    return MockCustomEvent;
+  }
+  set CustomEvent(custEvClass: any) {
+    customEventClassMap.set(this, custEvClass);
+  }
+
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
+  }
+
+  get Event() {
+    const evClass = eventClassMap.get(this);
+    if (evClass != null) {
+      return evClass;
+    }
+    return MockEvent;
+  }
+  set Event(ev: any) {
+    eventClassMap.set(this, ev);
   }
 
   fetch() {
@@ -127,6 +155,30 @@ export class MockWindow {
   }
   set history(hsty: any) {
     historyMap.set(this, hsty);
+  }
+
+  get HTMLElement() {
+    let HtmlElementCstr = htmlElementCstrMap.get(this);
+    if (HtmlElementCstr == null) {
+      const ownerDocument = this.document;
+      HtmlElementCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+
+          const observedAttributes = (this.constructor as any).observedAttributes;
+          if (Array.isArray(observedAttributes) && typeof (this as any).attributeChangedCallback === 'function') {
+            observedAttributes.forEach(attrName => {
+              const attrValue = this.getAttribute(attrName);
+              if (attrValue != null) {
+                (this as any).attributeChangedCallback(attrName, null, attrValue);
+              }
+            });
+          }
+        }
+      };
+      htmlElementCstrMap.set(this, HtmlElementCstr);
+    }
+    return HtmlElementCstr;
   }
 
   get localStorage() {
@@ -208,6 +260,12 @@ export class MockWindow {
     })) as number;
   }
 
+  scroll(_x?: number, _y?: number) {/**/}
+
+  scrollBy(_x?: number, _y?: number) {/**/}
+
+  scrollTo(_x?: number, _y?: number) {/**/}
+
   get self() {
     return this;
   }
@@ -232,70 +290,12 @@ export class MockWindow {
     return setTimeout(callback, ms, ...args) as any;
   }
 
-  scroll(_x?: number, _y?: number) {/**/}
-
-  scrollBy(_x?: number, _y?: number) {/**/}
-
-  scrollTo(_x?: number, _y?: number) {/**/}
-
   get top() {
     return this;
   }
 
   get window() {
     return this;
-  }
-
-  get CSS() {
-    return {
-      supports: () => true
-    };
-  }
-
-  get HTMLElement() {
-    let HtmlElementCstr = htmlElementCstrMap.get(this);
-    if (HtmlElementCstr == null) {
-      const ownerDocument = this.document;
-      HtmlElementCstr = class extends MockElement {
-        constructor() {
-          super(ownerDocument, '');
-
-          const observedAttributes = (this.constructor as any).observedAttributes;
-          if (Array.isArray(observedAttributes) && typeof (this as any).attributeChangedCallback === 'function') {
-            observedAttributes.forEach(attrName => {
-              const attrValue = this.getAttribute(attrName);
-              if (attrValue != null) {
-                (this as any).attributeChangedCallback(attrName, null, attrValue);
-              }
-            });
-          }
-        }
-      };
-      htmlElementCstrMap.set(this, HtmlElementCstr);
-    }
-    return HtmlElementCstr;
-  }
-
-  get Event() {
-    const evClass = eventClassMap.get(this);
-    if (evClass != null) {
-      return evClass;
-    }
-    return MockEvent;
-  }
-  set Event(ev: any) {
-    eventClassMap.set(this, ev);
-  }
-
-  get CustomEvent() {
-    const custEvClass = customEventClassMap.get(this);
-    if (custEvClass != null) {
-      return custEvClass;
-    }
-    return MockCustomEvent;
-  }
-  set CustomEvent(custEvClass: any) {
-    customEventClassMap.set(this, custEvClass);
   }
 
   URL = URL;

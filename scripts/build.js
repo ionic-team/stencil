@@ -24,10 +24,10 @@ run(async () => {
     ['Compiler', 'build-compiler.js'],
     ['Dev Sever', 'build-dev-server.js'],
     ['Dev Server Client', 'build-dev-server-client.js'],
+    ['Hydrate', 'build-hydrate.js'],
     ['Mock Doc', 'build-mock-doc.js'],
     ['Runtime', 'build-runtime.js'],
     ['Screenshot', 'build-screenshot.js'],
-    ['Server', 'build-server.js'],
     ['Submodules', 'build-submodules.js'],
     ['Sys Node', 'build-sys-node.js'],
     ['Testing', 'build-testing.js']

@@ -1,22 +1,27 @@
 import * as d from '../../declarations';
+import { bundleHydrateApp } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
-import { bundleApp } from '../app-core/bundle-app-core';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
   try {
     const cmps = buildCtx.components;
     const build = getBuildConditionals(config, cmps);
-    const rollupBuild = await bundleHydrateApp(config, compilerCtx, buildCtx, build);
-    if (rollupBuild) {
-      const { output } = await rollupBuild.generate({ format: 'cjs' });
-      const code = output[0].code;
 
-      if (!buildCtx.shouldAbort && typeof code === 'string') {
-        await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, code);
+    const appEntryCode = await generateHydrateAppCore(config, compilerCtx, buildCtx, build);
+
+    const rollupAppBuild = await bundleHydrateApp(config, compilerCtx, buildCtx, build, appEntryCode);
+    if (rollupAppBuild != null) {
+      const rollupOutput = await rollupAppBuild.generate({
+        format: 'cjs',
+        chunkFileNames: '[name].js',
+      });
+
+      if (!buildCtx.shouldAbort && rollupOutput != null && Array.isArray(rollupOutput.output)) {
+        await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
       }
     }
 
@@ -25,45 +30,13 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
   }
 }
 
-function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
-
-  build.lazyLoad = false;
-  build.es5 = false;
-  build.polyfills = false;
-  build.hydrateClientSide = false;
-  build.hydrateServerSide = true;
-
-  updateBuildConditionals(config, build);
-  build.lifecycleDOMEvents = false;
-  build.hotModuleReplacement = false;
-  build.slotRelocation = true;
-  return build;
-}
-
-async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const coreSource = await generateHydrateAppCore(config, compilerCtx, buildCtx, build);
-
-  const bundleAppOptions: d.BundleAppOptions = {
-    loader: {
-      '@stencil/core': coreSource,
-      '@core-entrypoint': SERVER_ENTRY,
-    },
-    inputs: {
-      [config.fsNamespace]: '@core-entrypoint',
-    },
-    isServer: true
-  };
-  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
-  return rollupBuild;
-}
 
 async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const cmps = buildCtx.components;
   const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, build, cmps);
 
-  coreText.push(`import { registerComponents, styles } from '@stencil/core/platform';`);
+  coreText.push(`import { initConnect, registerComponents, styles } from '@stencil/core/platform';`);
 
   hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
 
@@ -91,13 +64,25 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
     });
   });
 
-  coreText.push(`export * from '@stencil/core/platform';`);
+  coreText.push(`export { initConnect }`);
+
   return coreText.join('\n');
 }
 
-const SERVER_ENTRY = `
-import { patchNodeGlobal } from '@stencil/core/platform';
-patchNodeGlobal(global);
 
-export { hydrateDocument, renderToString } from '@stencil/core';
-`;
+function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
+  const build = getBuildFeatures(cmps) as d.Build;
+
+  build.lazyLoad = false;
+  build.es5 = false;
+  build.polyfills = false;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = true;
+
+  updateBuildConditionals(config, build);
+  build.lifecycleDOMEvents = false;
+  build.hotModuleReplacement = false;
+  build.slotRelocation = true;
+  return build;
+}
+

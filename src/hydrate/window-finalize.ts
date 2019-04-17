@@ -1,12 +1,12 @@
 import * as d from '../declarations';
 import { collapseHtmlWhitepace } from '../compiler/html/collapse-html-whitespace';
-import { hydrateError } from './hydrate-utils';
 import { optimizeStyles } from '../compiler/html/optimize-styles';
 import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
+import { renderError } from './render-utils';
 import { updateCanonicalLink } from '../compiler/html/canonical-link';
 
 
-export async function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateResults, win: Window, doc: Document) {
+export async function finalizeWindow(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
   optimizeStyles(doc, opts, results);
 
   if (typeof opts.title === 'string') {
@@ -39,7 +39,7 @@ export async function finalizeWindow(opts: d.HydrateOptions, results: d.HydrateR
     try {
       await opts.afterHydrate(win, opts);
     } catch (e) {
-      hydrateError(results, e);
+      renderError(results, e);
     }
   }
 

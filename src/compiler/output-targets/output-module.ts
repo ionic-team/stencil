@@ -73,10 +73,17 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
     loader: {
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
     },
+    cache: compilerCtx.rollupCacheNative,
     skipDeps: true
   };
 
   const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
+  if (rollupBuild != null) {
+    compilerCtx.rollupCacheNative = rollupBuild.cache;
+  } else {
+    compilerCtx.rollupCacheNative = null;
+  }
+
   return generateRollupOutput(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 

@@ -32,10 +32,12 @@ export interface CompilerCtx {
   lastBuildHadError: boolean;
   lastBuildResults: d.BuildResults;
   lastBuildStyles: Map<string, string>;
-  lazyModuleRollupCache: any;
   moduleMap: d.ModuleMap;
   nodeMap: NodeMap;
   resolvedCollections: Set<string>;
+  rollupCacheHydrate: any;
+  rollupCacheLazy: any;
+  rollupCacheNative: any;
   rootTsFiles: string[];
   tsService: TsService;
 

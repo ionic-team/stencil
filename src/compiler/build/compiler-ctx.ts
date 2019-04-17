@@ -32,10 +32,12 @@ export class CompilerContext implements d.CompilerCtx {
   lastBuildResults: d.BuildResults = null;
   lastBuildStyles = new Map<string, string>();
   lastComponentStyleInput = new Map<string, string>();
-  lazyModuleRollupCache: any = null;
   moduleMap: d.ModuleMap = new Map();
   nodeMap = new WeakMap();
   resolvedCollections = new Set<string>();
+  rollupCacheHydrate: any = null;
+  rollupCacheLazy: any = null;
+  rollupCacheNative: any = null;
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
 
@@ -54,7 +56,9 @@ export class CompilerContext implements d.CompilerCtx {
     this.collections.length = 0;
     this.compilerOptions = null;
     this.lastComponentStyleInput.clear();
-    this.lazyModuleRollupCache = null;
+    this.rollupCacheHydrate = null;
+    this.rollupCacheLazy = null;
+    this.rollupCacheNative = null;
     this.moduleMap.clear();
     this.resolvedCollections.clear();
     this.rootTsFiles.length = 0;
