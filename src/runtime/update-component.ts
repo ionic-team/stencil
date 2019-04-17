@@ -15,7 +15,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   try {
     if (isInitialLoad) {
       emitLifecycleEvent(elm, 'componentWillLoad');
-      if (instance.componentWillLoad) {
+      if (BUILD.cmpWillLoad &&  instance.componentWillLoad) {
         await instance.componentWillLoad();
       }
 

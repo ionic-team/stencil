@@ -12,7 +12,7 @@ export interface ComponentCompilerFeatures {
   hasComponentDidRenderFn: boolean;
   hasComponentDidUnloadFn: boolean;
   hasConnectedCallbackFn: boolean;
-  hasDisonnectedCallbackFn: boolean;
+  hasDisconnectedCallbackFn: boolean;
   hasElement: boolean;
   hasEvent: boolean;
   hasLifecycle: boolean;

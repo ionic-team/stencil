@@ -13,7 +13,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     cmpWillRender: cmps.some(c => c.hasComponentWillRenderFn),
 
     connectedCallback: cmps.some(c => c.hasConnectedCallbackFn),
-    disconnectedCallback: cmps.some(c => c.hasDisonnectedCallbackFn),
+    disconnectedCallback: cmps.some(c => c.hasDisconnectedCallbackFn),
     element: cmps.some(c => c.hasElement),
     event: cmps.some(c => c.hasEvent),
     hasRenderFn: cmps.some(c => c.hasRenderFn),

@@ -62,6 +62,9 @@ export interface ComponentDidUnload {
 }
 
 export interface ComponentInstance {
+  connectedCallback?: () => void;
+  disconnectedCallback?: () => void;
+
   /**
    * The component is about to load and it has not
    * rendered yet.
