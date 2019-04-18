@@ -38,6 +38,7 @@ function createSandbox(win: any) {
     __dirname: __dirname,
     Buffer: Buffer,
     exports: exports,
+    fetch: win.fetch,
     global: global,
     module: module,
     process: process,
@@ -46,13 +47,27 @@ function createSandbox(win: any) {
   };
 
   WINDOW_PROPS.forEach(prop => {
-    Object.defineProperty(sandbox, prop, {
-      get() { return win[prop]; },
-      set(val: any) { win[prop] = val; },
-      configurable: true,
-      enumerable: true
-    });
+    if (typeof win[prop] === 'function') {
+      Object.defineProperty(sandbox, prop, {
+        value() { return win[prop].bind(win); },
+        configurable: true,
+        enumerable: true
+      });
+
+    } else {
+      Object.defineProperty(sandbox, prop, {
+        get() { return win[prop]; },
+        set(val: any) { win[prop] = val; },
+        configurable: true,
+        enumerable: true
+      });
+    }
   });
+
+  win.__clearInterval = clearInterval.bind(win);
+  win.__clearTimeout = clearTimeout.bind(win);
+  win.__setInterval = setInterval.bind(win);
+  win.__setTimeout = setTimeout.bind(win);
 
   return sandbox;
 }
@@ -74,7 +89,6 @@ const WINDOW_PROPS = [
   'dispatchEvent',
   'Event',
   'document',
-  'fetch',
   'getComputedStyle',
   'globalThis',
   'history',

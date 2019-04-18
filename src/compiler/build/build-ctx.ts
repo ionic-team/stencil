@@ -92,8 +92,10 @@ export class BuildContext implements d.BuildCtx {
       }
 
       return {
+        duration: () => {
+          return timeSpan.duration();
+        },
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
-          let duration = 0;
           if (!this.hasFinished || debug) {
             if (debug) {
               if (this.config.watch) {
@@ -101,7 +103,7 @@ export class BuildContext implements d.BuildCtx {
               }
             }
 
-            duration = timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
+            timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
               this.compilerCtx.events.emit('buildLog', {
@@ -109,15 +111,14 @@ export class BuildContext implements d.BuildCtx {
               } as d.BuildLog);
             }
           }
-          return duration;
+          return timeSpan.duration();
         }
       };
     }
 
     return {
-      finish() {
-        return 0;
-      }
+      duration() { return 0; },
+      finish() { return 0; }
     };
   }
 

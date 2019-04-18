@@ -40,9 +40,8 @@ export class TestingLogger implements d.Logger {
   dim(msg: string) { return msg; }
   createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
     return {
-      finish() {
-        return 0;
-      }
+      duration() { return 0; },
+      finish() { return 0; }
     };
   }
   printDiagnostics(_diagnostics: d.Diagnostic[]) {

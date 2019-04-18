@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { crawlAnchorsForNextUrls } from './crawl-anchors';
-import { getPrerenderConfig } from './prerender-config';
+import { getPrerenderConfig, normalizeHref } from './prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
 import fs from 'fs';
@@ -17,9 +16,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   };
 
   try {
-    const windowLocationUrl = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
-    const url = windowLocationUrl.href;
-    const win = getWindow(prerenderRequest.templateId, url);
+    const base = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
+    const originUrl = base.href;
+    const win = getWindow(prerenderRequest.templateId, originUrl);
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
@@ -29,7 +28,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.beforeHydrate(win.document, windowLocationUrl);
+        const rtn = prerenderConfig.beforeHydrate(win.document, base);
         if (rtn != null) {
           await rtn;
         }
@@ -39,13 +38,13 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: url,
+      url: originUrl,
       collectAnchors: true
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
       try {
-        const userOpts = prerenderConfig.hydrateOptions(windowLocationUrl);
+        const userOpts = prerenderConfig.hydrateOptions(base);
         Object.assign(hydrateOpts, userOpts);
       } catch (e) {
         catchError(results.diagnostics, e);
@@ -59,7 +58,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.afterHydrate(win.document, windowLocationUrl);
+        const rtn = prerenderConfig.afterHydrate(win.document, base);
         if (rtn != null) {
           await rtn;
         }
@@ -73,11 +72,11 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       pretty: hydrateOpts.prettyHtml
     });
 
-    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
+    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, base, hydrateResults.anchors);
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {
-        const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
+        const userWriteToFilePath = prerenderConfig.filePath(base);
         if (typeof userWriteToFilePath === 'string') {
           results.filePath = userWriteToFilePath;
         }
@@ -157,6 +156,38 @@ function getWindow(templateId: string, originUrl: string) {
 
   return win;
 }
+
+
+function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+  if (!Array.isArray(parsedAnchors)) {
+    return [];
+  }
+
+  return parsedAnchors
+    .filter(anchor => prerenderConfig.filterAnchor(anchor, base))
+    .map(anchor => prerenderConfig.normalizeUrl(anchor.href, base))
+    .filter(url => prerenderConfig.filterUrl(url, base))
+    .map(url => normalizeHref(prerenderConfig, url))
+    .reduce((hrefs, href) => {
+      if (!hrefs.includes(href)) {
+        hrefs.push(href);
+      }
+      return hrefs;
+    }, [] as string[])
+    .sort(sortHrefs);
+}
+
+
+function sortHrefs(a: string, b: string) {
+  const partsA = a.split('/').length;
+  const partsB = b.split('/').length;
+  if (partsA < partsB) return -1;
+  if (partsA > partsB) return 1;
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 
 declare const __webpack_require__: any;
 declare const __non_webpack_require__: any;

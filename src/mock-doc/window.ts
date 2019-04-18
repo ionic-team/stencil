@@ -56,22 +56,24 @@ export class MockWindow {
     addEventListener(this, type, handler);
   }
 
-  alert() {/**/}
+  alert(msg: string) {
+    this.console.debug(msg);
+  }
 
   cancelAnimationFrame(id: any) {
-    clearTimeout(id);
+    this.__clearTimeout(id);
   }
 
   cancelIdleCallback(id: any) {
-    clearTimeout(id);
+    this.__clearTimeout(id);
   }
 
   clearInterval(id: any) {
-    clearInterval(id);
+    this.__clearInterval(id);
   }
 
   clearTimeout(id: any) {
-    clearTimeout(id);
+    this.__clearTimeout(id);
   }
 
   close() {
@@ -250,14 +252,18 @@ export class MockWindow {
   }
 
   requestAnimationFrame(callback: (timestamp: number) => void) {
-    return setTimeout(() => callback(Date.now())) as number;
+    return this.setTimeout(() => {
+      callback(Date.now());
+    }, 0) as number;
   }
 
   requestIdleCallback(callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void) {
-    return setTimeout(() => callback({
-      didTimeout: false,
-      timeRemaining: () => 0
-    })) as number;
+    return this.setTimeout(() => {
+      callback({
+        didTimeout: false,
+        timeRemaining: () => 0
+      });
+    }, 0);
   }
 
   scroll(_x?: number, _y?: number) {/**/}
@@ -283,11 +289,37 @@ export class MockWindow {
   }
 
   setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
-    return setInterval(callback, ms, ...args) as any;
+    ms = Math.min(ms, this.__maxTimeout);
+
+    if (this.__allowInterval) {
+      return this.__setInterval(() => {
+        try {
+          callback(...args);
+        } catch (e) {
+          this.console.error(e);
+        }
+      }, ms) as any;
+    }
+
+    return this.__setTimeout(() => {
+      try {
+        callback(...args);
+      } catch (e) {
+        this.console.error(e);
+      }
+    }, ms) as any;
   }
 
   setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
-    return setTimeout(callback, ms, ...args) as any;
+    ms = Math.min(ms, this.__maxTimeout);
+
+    return (this.__setTimeout(() => {
+      try {
+        callback(...args);
+      } catch (e) {
+        this.console.error(e);
+      }
+    }, ms) as any) as number;
   }
 
   get top() {
@@ -300,7 +332,16 @@ export class MockWindow {
 
   URL = URL;
 
+  // used so the native setTimeout can actually be used
+  // but allows us to monkey patch the window.setTimeout
+  __clearInterval = clearInterval;
+  __clearTimeout = clearTimeout;
+  __setInterval = setInterval;
+  __setTimeout = setTimeout;
+  __maxTimeout = 30000;
+  __allowInterval = true;
 }
+
 
 export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
@@ -338,20 +379,10 @@ export function cloneDocument(srcDoc: Document) {
  * only allow setInterval() to fire once, also constrained to 1ms.
  */
 export function constrainTimeouts(win: any) {
-  try {
-    win.setTimeout = shortSetTimeout;
-    win.setInterval = shortSetTimeout;
-    win.clearInterval = shortClearTimeout;
-  } catch (e) {}
+  (win as MockWindow).__allowInterval = false;
+  (win as MockWindow).__maxTimeout = 0;
 }
 
-function shortSetTimeout(callback: (...args: any[]) => void, _ms: number, ...args: any[]) {
-  return setTimeout(callback, 1, ...args);
-}
-
-function shortClearTimeout(id: any) {
-  clearTimeout(id);
-}
 
 export function resetWindow(win: Window) {
   if (win != null) {

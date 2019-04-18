@@ -464,8 +464,12 @@ class CmdTimeSpan {
     this.logger.timespanStart(startMsg, debug, this.appendTo);
   }
 
+  duration() {
+    return Date.now() - this.start;
+  }
+
   finish(msg: string, color?: 'red', bold?: boolean, newLineSuffix?: boolean) {
-    const duration = Date.now() - this.start;
+    const duration = this.duration();
     let time: string;
 
     if (duration > 1000) {

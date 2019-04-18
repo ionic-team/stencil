@@ -133,7 +133,7 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--prerender",
-        "--max-workers=8",
+        "--max-workers=1",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"
       ],

@@ -12,7 +12,6 @@ export interface PrerenderManager {
   outputTarget: d.OutputTargetWww;
   prerenderConfig: d.HydrateConfig;
   prerenderConfigPath: string;
-  prodMode: boolean;
   resolve: Function;
   templateId: string;
   urlsProcessing: Set<string>;
@@ -121,17 +120,13 @@ export interface HydrateOptions {
 
 
 export interface HydrateConfig {
-  entryUrls?: string[];
-
-  filterUrl?(url?: URL, base?: URL): boolean;
-
-  normalizeUrl?(url?: URL, base?: URL): string;
-
-  filePath?(url?: URL): string;
-
-  beforeHydrate?(doc?: Document, url?: URL): void | Promise<void>;
-
   afterHydrate?(doc?: Document, url?: URL): void | Promise<void>;
-
+  beforeHydrate?(doc?: Document, url?: URL): void | Promise<void>;
+  entryUrls?: string[];
+  filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;
+  filterUrl?(url?: URL, base?: URL): boolean;
+  filePath?(url?: URL): string;
   hydrateOptions?(url?: URL): HydrateOptions;
+  normalizeUrl?(href?: string, base?: URL): URL;
+  trailingSlash?: boolean;
 }

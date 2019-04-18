@@ -138,7 +138,7 @@ function connectElements(win: Window, opts: d.HydrateOptions, results: d.Hydrate
 
 function collectAttributes(node: HTMLElement, parsedElm: d.HydrateElement) {
   const attrs = node.attributes;
-  for (let i = 0; i < attrs.length; i++) {
+  for (let i = 0, ii = attrs.length; i < ii; i++) {
     const attr = attrs.item(i);
     parsedElm[attr.nodeName.toLowerCase()] = attr.nodeValue;
   }
@@ -147,16 +147,9 @@ function collectAttributes(node: HTMLElement, parsedElm: d.HydrateElement) {
 
 function collectAnchors(hydrateResults: d.HydrateResults, elm: HTMLAnchorElement) {
   const parsedElm: d.HydrateAnchorElement = {};
-  const attrs = elm.attributes;
-  for (let i = 0; i < attrs.length; i++) {
-    const attr = attrs.item(i);
-    const attrName = attr.nodeName.toLowerCase();
-    if (attrName === 'href' || attrName === 'target') {
-      parsedElm[attrName] = attr.nodeValue;
-    }
-  }
+  collectAttributes(elm, parsedElm);
 
-  if (hydrateResults.anchors.some(a => a.href !== parsedElm.href)) {
+  if (!hydrateResults.anchors.some(a => a.href === parsedElm.href)) {
     hydrateResults.anchors.push(parsedElm);
   }
 }
@@ -167,7 +160,7 @@ function collectScriptElement(hydrateResults: d.HydrateResults, elm: HTMLScriptE
   const src = parsedElm.src;
   collectAttributes(elm, parsedElm);
 
-  if (hydrateResults.scripts.some(a => a.src !== src)) {
+  if (!hydrateResults.scripts.some(a => a.src === src)) {
     hydrateResults.scripts.push(parsedElm);
   }
 }
@@ -183,7 +176,7 @@ function collectLinkElement(hydrateResults: d.HydrateResults, elm: HTMLLinkEleme
     delete parsedElm.rel;
     delete parsedElm.type;
 
-    if (hydrateResults.styles.some(a => a.href !== href)) {
+    if (!hydrateResults.styles.some(a => a.href === href)) {
       hydrateResults.styles.push(parsedElm);
     }
   }
@@ -195,7 +188,7 @@ function collectImgElement(hydrateResults: d.HydrateResults, elm: HTMLImageEleme
   const src = parsedElm.src;
   collectAttributes(elm, parsedElm);
 
-  if (hydrateResults.imgs.some(a => a.src !== src)) {
+  if (!hydrateResults.imgs.some(a => a.src === src)) {
     hydrateResults.imgs.push(parsedElm);
   }
 }

@@ -30,7 +30,6 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
-      prodMode: (!config.devMode && config.logLevel !== 'debug'),
       urlsCompleted: new Set(),
       urlsPending: new Set(),
       urlsProcessing: new Set(),
@@ -67,21 +66,23 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     if (prerenderBuildErrors.length > 0) {
       // convert to just runtime errors so the other build files still write
       // but the CLI knows an error occurred and should have an exit code 1
-      prerenderBuildErrors.forEach(diagnostic => diagnostic.type = 'runtime');
+      prerenderBuildErrors.forEach(diagnostic => {
+        diagnostic.type = 'runtime';
+      });
       buildCtx.diagnostics.push(...prerenderBuildErrors);
     }
     buildCtx.diagnostics.push(...prerenderRuntimeErrors);
 
+    const totalUrls = manager.urlsCompleted.size;
+    if (totalUrls > 1) {
+      const average = Math.round(timeSpan.duration() / totalUrls);
+      config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
+    }
+
     const statusMessage = prerenderBuildErrors.length > 0 ? 'failed' : 'finished';
     const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
 
-    const totalDuration = timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-
-    const totalUrls = manager.urlsCompleted.size;
-    if (totalUrls > 1) {
-      const average = Math.round(totalDuration / totalUrls);
-      config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
-    }
+    timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
 
   } catch (e) {
     catchError(prerenderDiagnostics, e);
@@ -111,7 +112,7 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
     }
 
   } else {
-    const counter = 50;
+    const counter = 200;
     const urlsCompletedSize = manager.urlsCompleted.size;
     if (urlsCompletedSize >= (manager.logCount + counter)) {
       manager.logCount = Math.floor(urlsCompletedSize / counter) * counter;
