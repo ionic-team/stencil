@@ -1,3 +1,4 @@
+import { cloneAttributes } from './attribute';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement } from './node';
@@ -201,6 +202,27 @@ export class MockTemplateElement extends MockElement {
   }
   set innerHTML(html: string) {
     this.content.innerHTML = html;
+  }
+
+  cloneNode(deep?: boolean) {
+    const cloned = new MockTemplateElement(null);
+    cloned.attributes = cloneAttributes(this.attributes);
+
+    const styleCssText = this.getAttribute('style');
+    if (styleCssText != null && styleCssText.length > 0) {
+      cloned.setAttribute('style', styleCssText);
+    }
+
+    cloned.content = this.content.cloneNode(deep);
+
+    if (deep) {
+      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
+        const clonedChildNode = this.childNodes[i].cloneNode(true);
+        cloned.appendChild(clonedChildNode);
+      }
+    }
+
+    return cloned;
   }
 }
 
