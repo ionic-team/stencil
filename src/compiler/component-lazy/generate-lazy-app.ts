@@ -39,7 +39,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   build.lazyLoad = true;
   build.es5 = false;
-  build.polyfills = false;
   build.hydrateServerSide = false;
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);

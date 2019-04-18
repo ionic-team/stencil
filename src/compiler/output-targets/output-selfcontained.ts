@@ -49,7 +49,6 @@
 //   const build = getBuildFeatures(cmps) as d.Build;
 //   build.lazyLoad = false;
 //   build.es5 = false;
-//   build.polyfills = false;
 //   build.hydrateClientSide = false;
 //   build.hydrateServerSide = false;
 

@@ -375,8 +375,7 @@ function primeTsServiceCache(transpileCtx: TranspileContext) {
 
       // loop through each file system cached ts files and run the transpile again
       // so that we get the ts service's cache all up to speed
-      const modified = await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
-      console.log('here', modified);
+      await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
 
       timeSpan.finish(`prime ts service cache finished`);
     }, PRIME_TS_CACHE_TIMEOUT);

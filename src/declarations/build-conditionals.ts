@@ -71,10 +71,7 @@ export interface BuildFeatures {
 }
 
 export interface Build extends Partial<BuildFeatures> {
-  clientSide?: boolean;
-  devInspector?: boolean;
   es5?: boolean;
-  externalModuleLoader?: boolean;
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;
@@ -82,7 +79,6 @@ export interface Build extends Partial<BuildFeatures> {
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
   lazyLoad?: boolean;
-  polyfills?: boolean;
   profile?: boolean;
   slotRelocation?: boolean;
 }

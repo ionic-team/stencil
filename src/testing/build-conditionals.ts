@@ -13,7 +13,6 @@ export function resetBuildConditionals(b: d.Build) {
     }
   });
 
-  b.clientSide = true;
   b.isDev = true;
   b.lazyLoad = true;
   b.member = true;

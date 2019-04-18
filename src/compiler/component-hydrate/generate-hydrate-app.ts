@@ -75,7 +75,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   build.lazyLoad = false;
   build.es5 = false;
-  build.polyfills = false;
   build.hydrateClientSide = false;
   build.hydrateServerSide = true;
 

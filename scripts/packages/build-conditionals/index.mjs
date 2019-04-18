@@ -46,13 +46,14 @@ export const BUILD = {
   watchCallback: true,
   taskQueue: true,
 
-  isProd: true,
+  es5: false,
+  hotModuleReplacement: true,
   isDebug: false,
   isDev: false,
+  hydrateServerSide: false,
+  hydrateClientSide: false,
   lifecycleDOMEvents: false,
+  lazyLoad: false,
   profile: false,
-  slotRelocation: true,
-  hotModuleReplacement: false,
-  updatable: true,
-  member: true
+  slotRelocation: true
 };
