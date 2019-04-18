@@ -63,7 +63,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         consoleError(e, elm);
       }
 
-    } else if (BUILD.hydrateServerSide) {
+    } else {
       Cstr = elm.constructor as any;
     }
 
@@ -88,7 +88,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     );
 
   } else {
-    if (BUILD.connectedCallback && hostRef.$lazyInstance$.connectedCallback) {
+    if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.connectedCallback && hostRef.$lazyInstance$.connectedCallback) {
       hostRef.$lazyInstance$.connectedCallback();
     }
     scheduleUpdate(elm, hostRef, cmpMeta, true);
