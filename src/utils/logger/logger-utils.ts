@@ -48,11 +48,12 @@ function normalizeDiagnostic(compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
           if (srcLine.includes('@stencil/core')) {
             const msgLines: d.PrintLine[] = [];
 
-            if (i > 0) {
+            const beforeLineIndex = i - 1;
+            if (beforeLineIndex > -1) {
               const beforeLine: d.PrintLine = {
-                lineIndex: -1,
-                lineNumber: i - 1,
-                text: srcLines[i - 1],
+                lineIndex: beforeLineIndex,
+                lineNumber: beforeLineIndex + 1,
+                text: srcLines[beforeLineIndex],
                 errorCharStart: -1,
                 errorLength: -1
               };
@@ -60,21 +61,22 @@ function normalizeDiagnostic(compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
             }
 
             const errorLine: d.PrintLine = {
-              lineIndex: -1,
-              lineNumber: i,
+              lineIndex: i,
+              lineNumber: i + 1,
               text: srcLine,
               errorCharStart: 0,
               errorLength: -1
             };
             msgLines.push(errorLine);
-            diagnostic.lineNumber = i;
+            diagnostic.lineNumber = errorLine.lineNumber;
             diagnostic.columnNumber = srcLine.indexOf('}');
 
-            if (i < srcLines.length) {
+            const afterLineIndex = i + 1;
+            if (afterLineIndex < srcLines.length) {
               const afterLine: d.PrintLine = {
-                lineIndex: -1,
-                lineNumber: i + 1,
-                text: srcLines[i + 1],
+                lineIndex: afterLineIndex,
+                lineNumber: afterLineIndex + 1,
+                text: srcLines[afterLineIndex],
                 errorCharStart: -1,
                 errorLength: -1
               };
