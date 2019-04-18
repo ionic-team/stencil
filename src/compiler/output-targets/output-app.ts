@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, isOutputTargetDistLazy } from './output-utils';
+import { isOutputTargetDistLazy } from './output-utils';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
 import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { dashToPascalCase, flatOne } from '@utils';
@@ -7,14 +7,10 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { processCopyTasks } from '../copy/local-copy-tasks';
 import { RollupOptions } from 'rollup';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { loaderPlugin } from '../rollup-plugins/loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
-  if (canSkipAppCoreBuild(buildCtx)) {
-    return undefined;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return undefined;
@@ -48,7 +44,7 @@ import * as c from 'modules';
   const rollupOptions: RollupOptions = {
     input: '@core-entrypoint',
     plugins: [
-      stencilLoaderPlugin({
+      loaderPlugin({
         '@core-entrypoint': entryPoint
       }),
       inMemoryFsRead(config, compilerCtx, buildCtx),

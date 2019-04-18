@@ -80,7 +80,7 @@ export function validateOutputTargetDist(config: d.Config) {
       isBrowserBuild: true,
     });
 
-    if (config.buildEsm) {
+    if (config.buildDist) {
       config.outputTargets.push({
         type: DIST_LAZY,
         esmDir: path.join(outputTarget.dir, 'esm'),

@@ -29,4 +29,4 @@ export const patchDynamicImport = (win: any) => {
       };
     }
   }
-}
+};

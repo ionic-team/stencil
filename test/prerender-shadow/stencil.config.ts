@@ -10,7 +10,7 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'hydrate',
+      type: 'dist-hydrate-script',
       dir: 'dist/hydrate'
     }
   ],

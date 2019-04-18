@@ -42,6 +42,18 @@ export class MockDocument extends MockElement {
     }
   }
 
+  get baseURI() {
+    if (this.defaultView != null) {
+      return (this.defaultView as Window).location.href;
+    }
+    return '';
+  }
+  set baseURI(value: string) {
+    if (this.defaultView != null) {
+      (this.defaultView as Window).location.href = value;
+    }
+  }
+
   get documentElement() {
     for (let i = this.childNodes.length - 1; i >= 0; i--) {
       if (this.childNodes[i].nodeName === 'HTML') {

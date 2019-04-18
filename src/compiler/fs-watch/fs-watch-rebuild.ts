@@ -6,17 +6,17 @@ import { isCopyTaskFile } from '../copy/local-copy-tasks';
 import { normalizePath, unique } from '@utils';
 
 
-export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {
+export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx) {
   const buildCtx = new BuildContext(config, compilerCtx);
 
   // copy watch results over to build ctx data
   // also add in any active build data that
   // hasn't gone though a full build yet
-  mergeData(buildCtx.filesUpdated, fsWatchResults.filesUpdated, compilerCtx.activeFilesUpdated);
-  mergeData(buildCtx.filesAdded, fsWatchResults.filesAdded, compilerCtx.activeFilesAdded);
-  mergeData(buildCtx.filesDeleted, fsWatchResults.filesDeleted, compilerCtx.activeFilesDeleted);
-  mergeData(buildCtx.dirsDeleted, fsWatchResults.dirsDeleted, compilerCtx.activeDirsDeleted);
-  mergeData(buildCtx.dirsAdded, fsWatchResults.dirsAdded, compilerCtx.activeDirsAdded);
+  buildCtx.filesAdded = unique(compilerCtx.activeFilesAdded);
+  buildCtx.filesDeleted = unique(compilerCtx.activeFilesDeleted);
+  buildCtx.filesUpdated = unique(compilerCtx.activeFilesUpdated);
+  buildCtx.dirsAdded = unique(compilerCtx.activeDirsAdded);
+  buildCtx.dirsDeleted = unique(compilerCtx.activeDirsDeleted);
 
   // recursively drill down through any directories added and fill up more data
   buildCtx.dirsAdded.forEach(dirAdded => {
@@ -63,22 +63,6 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   // return our new build context that'll be used for the next build
   return buildCtx;
 }
-
-
-function mergeData(target: string[], arr1: string[], arr2: string[]) {
-  arr1.forEach(p => {
-    if (!target.includes(p)) {
-      target.push(p);
-    }
-  });
-  arr2.forEach(p => {
-    if (!target.includes(p)) {
-      target.push(p);
-    }
-  });
-  target.sort();
-}
-
 
 function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   dir = normalizePath(dir);

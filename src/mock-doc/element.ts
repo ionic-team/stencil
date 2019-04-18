@@ -1,3 +1,4 @@
+import { cloneAttributes } from './attribute';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement } from './node';
@@ -66,7 +67,7 @@ class MockButtonElement extends MockElement {
     super(ownerDocument, 'button');
   }
 }
-patchPropAttributes(MockButtonElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockButtonElement.prototype, {
   type: String
 });
 
@@ -83,7 +84,7 @@ class MockImgElement extends MockElement {
     this.setAttribute('src', value);
   }
 }
-patchPropAttributes(MockImgElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockImgElement.prototype, {
   height: Number,
   width: Number
 });
@@ -94,7 +95,7 @@ class MockInputElement extends MockElement {
     super(ownerDocument, 'input');
   }
 }
-patchPropAttributes(MockInputElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockInputElement.prototype, {
   accept: String,
   autocomplete: String,
   autofocus: Boolean,
@@ -134,7 +135,7 @@ class MockFormElement extends MockElement {
     super(ownerDocument, 'form');
   }
 }
-patchPropAttributes(MockFormElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockFormElement.prototype, {
   name: String
 });
 
@@ -151,7 +152,7 @@ class MockLinkElement extends MockElement {
     this.setAttribute('href', value);
   }
 }
-patchPropAttributes(MockLinkElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockLinkElement.prototype, {
   crossorigin: String,
   media: String,
   rel: String,
@@ -164,7 +165,7 @@ class MockMetaElement extends MockElement {
     super(ownerDocument, 'meta');
   }
 }
-patchPropAttributes(MockMetaElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockMetaElement.prototype, {
   charset: String,
   content: String,
   name: String
@@ -183,7 +184,7 @@ class MockScriptElement extends MockElement {
     this.setAttribute('src', value);
   }
 }
-patchPropAttributes(MockScriptElement.prototype, {
+/*@__PURE__*/patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
@@ -201,6 +202,27 @@ export class MockTemplateElement extends MockElement {
   }
   set innerHTML(html: string) {
     this.content.innerHTML = html;
+  }
+
+  cloneNode(deep?: boolean) {
+    const cloned = new MockTemplateElement(null);
+    cloned.attributes = cloneAttributes(this.attributes);
+
+    const styleCssText = this.getAttribute('style');
+    if (styleCssText != null && styleCssText.length > 0) {
+      cloned.setAttribute('style', styleCssText);
+    }
+
+    cloned.content = this.content.cloneNode(deep);
+
+    if (deep) {
+      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
+        const clonedChildNode = this.childNodes[i].cloneNode(true);
+        cloned.appendChild(clonedChildNode);
+      }
+    }
+
+    return cloned;
   }
 }
 

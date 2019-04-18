@@ -14,7 +14,6 @@ export async function updateToNativeComponent(config: d.Config, compilerCtx: d.C
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = config.sys.path.join(inputFileDir, outputFileName);
 
-
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
     outputJsText = transformToNativeComponentText(compilerCtx, buildCtx, build, cmp, inputJsText);

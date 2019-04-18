@@ -165,6 +165,7 @@ const ARG_OPTS = {
     'e2e',
     'es5',
     'esm',
+    'verbose',
     'headless',
     'help',
     'log',

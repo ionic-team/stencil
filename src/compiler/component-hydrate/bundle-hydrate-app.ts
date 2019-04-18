@@ -1,39 +1,38 @@
 import * as d from '../../declarations';
 import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
+import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
-import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
-import { RollupOptions } from 'rollup'; // types only
+import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
-import { stencilConsolePlugin } from '../rollup-plugins/stencil-console';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
-import { stencilServerPlugin } from '../rollup-plugins/stencil-server';
+import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
+import { loaderPlugin } from '../rollup-plugins/loader';
 
 
-export async function bundleHydrateCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[], coreSource: string) {
-  let code: string = null;
-
+export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
   try {
     const rollupOptions: RollupOptions = {
-      input: '@core-entrypoint',
-      inlineDynamicImports: true,
+      input: [
+        'index',
+        'app'
+      ],
       plugins: [
-        stencilLoaderPlugin({
-          '@core-entrypoint': SERVER_ENTRY,
-          '@stencil/core': coreSource,
+        loaderPlugin({
+          'index': CORE_ENTRY,
+          'app': appEntryCode
         }),
-        stencilServerPlugin(config),
-        stencilConsolePlugin(),
+        stencilHydratePlugin(config),
+
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
-        componentEntryPlugin(config, compilerCtx, buildCtx, build, entryModules),
+        componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'module', 'main'],
-          preferBuiltins: true
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
+          include: /node_modules/,
           sourceMap: false
         }),
         bundleJson(config),
@@ -41,29 +40,33 @@ export async function bundleHydrateCore(config: d.Config, compilerCtx: d.Compile
         ...config.plugins
       ],
       external: [
-        'url'
+        'fs',
+        'path',
+        'vm'
       ],
+      treeshake: {
+        annotations: true,
+        propertyReadSideEffects: false,
+        pureExternalModules: false
+      },
+      cache: compilerCtx.rollupCacheHydrate,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };
 
-    const rollupBuild = await config.sys.rollup.rollup(rollupOptions);
+    const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
+    if (rollupBuild != null) {
+      compilerCtx.rollupCacheHydrate = rollupBuild.cache;
+    } else {
+      compilerCtx.rollupCacheHydrate = null;
+    }
 
-    const { output } = await rollupBuild.generate({
-      format: 'cjs'
-    });
-
-    code = output[0].code;
+    return rollupBuild;
 
   } catch (e) {
     loadRollupDiagnostics(compilerCtx, buildCtx, e);
   }
 
-  return code;
+  return undefined;
 }
 
-const SERVER_ENTRY = `
-import { patchNodeGlobal } from '@stencil/core/platform';
-patchNodeGlobal(global);
-
-export { hydrateDocument, renderToString } from '@stencil/core';
-`;
+const CORE_ENTRY = `export { hydrateDocument, renderToString } from '@stencil/core/hydrate';`;

@@ -7,4 +7,5 @@ export * from './client-log';
 export * from './client-style';
 export * from './client-task-queue';
 export * from './client-build';
+export * from './dynamic-import-shim';
 export * from '@runtime';

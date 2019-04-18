@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
+import { DEFAULT_STYLE_MODE, sortBy, hasDependency } from '@utils';
 import { optimizeModule } from '../app-core/optimize-module';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
@@ -85,7 +85,8 @@ export async function convertChunk(
   code: string
 ) {
   if (sourceTarget === 'es5') {
-    const transpileResults = await transpileToEs5Main(config, compilerCtx, code, true);
+    const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
+    const transpileResults = await transpileToEs5Main(config, compilerCtx, code, inlineHelpers);
     buildCtx.diagnostics.push(...transpileResults.diagnostics);
     if (transpileResults.diagnostics.length === 0) {
       code = transpileResults.code;

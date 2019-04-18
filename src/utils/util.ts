@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { BANNER } from './constants';
+import { buildError } from './message-utils';
 
 
 /**
@@ -113,3 +114,46 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
 export function isDocsPublic(jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) {
   return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
 }
+
+
+export function getDependencies(buildCtx: d.BuildCtx) {
+  if (buildCtx.packageJson.dependencies) {
+    return Object.keys(buildCtx.packageJson.dependencies)
+      .filter(pkgName => !SKIP_DEPS.includes(pkgName));
+  }
+  return [];
+}
+
+export function hasDependency(buildCtx: d.BuildCtx, depName: string) {
+  return getDependencies(buildCtx).includes(depName);
+}
+
+export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
+
+  let pkgJson: string;
+  try {
+    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
+
+  } catch (e) {
+    const diagnostic = buildError(buildCtx.diagnostics);
+    diagnostic.header = `Missing "package.json"`;
+    diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
+    return null;
+  }
+
+  let pkgData: d.PackageJsonData;
+  try {
+    pkgData = JSON.parse(pkgJson);
+
+  } catch (e) {
+    const diagnostic = buildError(buildCtx.diagnostics);
+    diagnostic.header = `Error parsing "package.json"`;
+    diagnostic.messageText = `${pkgJsonPath}, ${e}`;
+    return null;
+  }
+
+  return pkgData;
+}
+
+const SKIP_DEPS = ['@stencil/core'];

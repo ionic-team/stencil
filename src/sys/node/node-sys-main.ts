@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import color from 'ansi-colors';
-import { createContext, runInContext } from './node-context';
 import { FsWatcher } from './node-fs-watcher';
 import glob from 'glob';
 import { loadConfigFile } from './node-config';
@@ -257,13 +256,6 @@ export class NodeSystem implements d.StencilSystem {
       [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
       { isLongRunningTask: true, workerKey: 'validateTypes' }
     );
-  }
-
-  get vm(): any {
-    return {
-      createContext,
-      runInContext
-    };
   }
 
 }

@@ -227,6 +227,11 @@ export class MockElement extends MockNode {
     const cloned = new MockElement(null, this.nodeName);
     cloned.attributes = cloneAttributes(this.attributes);
 
+    const styleCssText = this.getAttribute('style');
+    if (styleCssText != null && styleCssText.length > 0) {
+      cloned.setAttribute('style', styleCssText);
+    }
+
     if (deep) {
       for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
         const clonedChildNode = this.childNodes[i].cloneNode(true);
@@ -316,8 +321,8 @@ export class MockElement extends MockNode {
 
       if (typeof html === 'string') {
         const frag = parseFragmentUtil(this.ownerDocument, html);
-        for (let i = 0, ii = frag.childNodes.length; i < ii; i++) {
-          this.appendChild(frag.childNodes[i]);
+        while (frag.childNodes.length > 0) {
+          this.appendChild(frag.childNodes[0]);
         }
       }
     }

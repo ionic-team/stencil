@@ -1,17 +1,18 @@
 
 const URL = `
-let Url = function() { return {}; };
+const URL_ = /*@__PURE__*/(function(){
+  if (typeof URL === 'function') {
+    return URL;
 
-if (typeof URL === 'function') {
-  Url = URL;
+  } else if (typeof require === 'function') {
+    try {
+      return require('url').URL;
+    } catch (e) {}
+  }
+  return function() {}
+})();
 
-} else if (typeof require === 'function') {
-  try {
-    Url = require('url').URL;
-  } catch (e) {}
-}
-
-export { Url as URL };
+export { URL_ as URL };
 `
 
 function urlPlugin() {

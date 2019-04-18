@@ -113,7 +113,7 @@ export function createOnWarnFn(diagnostics: d.Diagnostic[], bundleModulesFiles?:
     }
 
     const diagnostic = buildWarn(diagnostics);
-    diagnostic.header = `Bundling Warning`;
+    diagnostic.header = `Bundling Warning ${warning.code}`;
     diagnostic.messageText = label + (warning.message || warning);
   };
 }
@@ -122,7 +122,8 @@ const ignoreWarnCodes = new Set([
   'THIS_IS_UNDEFINED',
   'NON_EXISTENT_EXPORT',
   'CIRCULAR_DEPENDENCY',
-  'EMPTY_BUNDLE'
+  'EMPTY_BUNDLE',
+  'UNUSED_EXTERNAL_IMPORT'
 ]);
 
 

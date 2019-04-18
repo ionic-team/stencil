@@ -5,7 +5,7 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
 export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
-  if (!config.buildEsm) {
+  if (!config.buildDist) {
     return;
   }
   const cjsOutputs = outputTargets.filter(o => !!o.cjsDir);

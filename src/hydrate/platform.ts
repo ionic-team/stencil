@@ -14,6 +14,9 @@ export const getComponent = (tagName: string) => {
 
 export const isMemberInElement = (elm: any, memberName: string) => {
   if (elm != null) {
+    if (memberName in elm) {
+      return true;
+    }
     const hostRef: d.ComponentNativeConstructor = getComponent(elm.nodeName.toLowerCase());
     if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
       return memberName in hostRef.cmpMeta.$members$;
@@ -76,25 +79,8 @@ export const writeTask = (cb: Function, elm: any) => {
 
 export const tick = Promise.resolve();
 
-export const windowErrors = new WeakMap<any, { err: any, tagName: string }[]>();
-
-export const consoleError = (e: any, elm?: any) => {
+export const consoleError = (e: any, _elm?: any) => {
   if (e != null) {
-    if (elm != null) {
-      const win = getWin(elm);
-      if (win != null) {
-        let errors = windowErrors.get(win);
-        if (errors == null) {
-          errors = [];
-          windowErrors.set(win, errors);
-        }
-        errors.push({
-          err: e,
-          tagName: elm.tagName
-        });
-        return;
-      }
-    }
     console.error(e.stack || e.message || e);
   }
 };
@@ -155,6 +141,7 @@ export const Build: d.UserBuildConditionals = {
 
 export const styles: d.StyleMap = new Map();
 
+export { initConnect } from './connect-elements';
 
 export {
   connectedCallback,
@@ -170,6 +157,7 @@ export {
   h,
   insertVdomAnnotations,
   parsePropertyValue,
+  postUpdateComponent,
   setMode,
   setValue
 } from '@runtime';

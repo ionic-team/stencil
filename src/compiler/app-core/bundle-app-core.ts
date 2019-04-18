@@ -1,56 +1,63 @@
 import * as d from '../../declarations';
 import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
-import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { loaderPlugin } from '../rollup-plugins/loader';
+import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
 
 
-export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleCoreOptions: d.BundleCoreOptions) {
+export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
+  const external = bundleAppOptions.skipDeps
+    ? getDependencies(buildCtx)
+    : [];
+
   try {
     const rollupOptions: RollupOptions = {
-      input: bundleCoreOptions.entryInputs,
+      input: bundleAppOptions.inputs,
       plugins: [
-        stencilLoaderPlugin({
+        stencilExternalRuntimePlugin(bundleAppOptions.externalRuntime),
+        loaderPlugin({
           '@stencil/core': DEFAULT_CORE,
           '@core-entrypoint': DEFAULT_ENTRY,
-          ...bundleCoreOptions.loader
+          ...bundleAppOptions.loader
         }),
         stencilClientPlugin(config),
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'module', 'main']
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
-          include: 'node_modules/**',
+          include: /node_modules/,
           sourceMap: false
         }),
         bundleJson(config),
         inMemoryFsRead(config, compilerCtx, buildCtx),
         ...config.plugins
       ],
-      treeshake: {
+      treeshake: config.devMode ? false : {
         annotations: true,
         propertyReadSideEffects: false,
         pureExternalModules: false
       },
-      cache: bundleCoreOptions.cache,
+      cache: bundleAppOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
+      external
     };
-    if (bundleCoreOptions.coreChunk) {
+    if (bundleAppOptions.emitCoreChunk) {
       rollupOptions.manualChunks = {
         [config.fsNamespace]: ['@stencil/core']
       };
     }
 
-    const rollupBuild = await config.sys.rollup.rollup(rollupOptions);
+    const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
     return rollupBuild;
 
   } catch (e) {

@@ -23,18 +23,14 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     buildCtx.dirsAdded = commitResults.dirsAdded;
     totalFilesWrote = commitResults.filesWritten.length;
 
-    if (buildCtx.isActiveBuild) {
-      // successful write
-      // kick off writing the cached file stuff
-      await compilerCtx.cache.commit();
-      buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
-      buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+    // successful write
+    // kick off writing the cached file stuff
+    await compilerCtx.cache.commit();
+    buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
+    buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-      await outputPrerender(config, compilerCtx, buildCtx);
+    await outputPrerender(config, compilerCtx, buildCtx);
 
-    } else {
-      buildCtx.debug(`commit cache aborted, not active build`);
-    }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

@@ -395,10 +395,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     // return only the files that were
     return {
-      filesWritten: filesWritten,
-      filesDeleted: filesDeleted,
-      dirsDeleted: dirsDeleted,
-      dirsAdded: dirsAdded
+      filesWritten,
+      filesDeleted,
+      dirsDeleted,
+      dirsAdded
     };
   }
 

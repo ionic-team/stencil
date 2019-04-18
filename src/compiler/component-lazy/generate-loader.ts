@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 export async function generateLoaders(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
-  if (!config.buildEsm) {
+  if (!config.buildDist) {
     return;
   }
   await Promise.all(

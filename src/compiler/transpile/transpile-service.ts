@@ -48,12 +48,13 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
     const useFsCache = config.enableCache && !buildCtx.isRebuild;
 
     // go ahead and kick off the ts service
-    await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles, true, useFsCache);
+    const changedContent = await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles, true, useFsCache);
 
     timeSpan.finish(`transpile finished`);
+    return changedContent;
   }
 
-  return doTranspile;
+  return false;
 }
 
 
@@ -143,7 +144,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
     // loop through each ts file that has changed
-    await Promise.all(tsFilePaths.map(tsFilePath => {
+    const changedContent = await Promise.all(tsFilePaths.map(tsFilePath => {
       return transpileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
     }));
 
@@ -152,6 +153,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
       transpileCtx.hasQueuedTsServicePrime = true;
       primeTsServiceCache(transpileCtx);
     }
+    return changedContent.some(Boolean);
   };
 }
 
@@ -167,14 +169,9 @@ interface TranspileContext {
 
 
 async function transpileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, sourceFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
-  if (!ctx.buildCtx.isActiveBuild) {
-    ctx.buildCtx.debug(`tranpsileTsFile aborted, not active build: ${sourceFilePath}`);
-    return;
-  }
-
   if (ctx.buildCtx.hasError) {
     ctx.buildCtx.debug(`tranpsileTsFile aborted: ${sourceFilePath}`);
-    return;
+    return false;
   }
 
   const hasWarning = ctx.buildCtx.hasWarning && !config._isTesting;
@@ -190,7 +187,7 @@ async function transpileTsFile(config: d.Config, services: ts.LanguageService, c
 
   if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!
-    return;
+    return false;
   }
 
   // save the cache key for future lookups
@@ -221,7 +218,7 @@ async function transpileTsFile(config: d.Config, services: ts.LanguageService, c
 
       // write the cached js output too
       await outputFile(ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
-      return;
+      return true;
     }
 
   } else {
@@ -247,20 +244,15 @@ async function transpileTsFile(config: d.Config, services: ts.LanguageService, c
 
     loadTypeScriptDiagnostics(ctx.buildCtx.diagnostics, tsDiagnostics);
 
-    return;
+    return false;
   }
 
-  await Promise.all(output.outputFiles.map(async tsOutput => {
+  const changedContent = await Promise.all(output.outputFiles.map(async tsOutput => {
     const outputFilePath = normalizePath(tsOutput.name);
 
-    if (!ctx.buildCtx.isActiveBuild) {
-      ctx.buildCtx.debug(`tranpsileTsFile write aborted, not active build: ${sourceFilePath}`);
-      return;
-    }
-
     if (ctx.buildCtx.hasError) {
-      ctx.buildCtx.debug(`tranpsileTsFile write aborted: ${sourceFilePath}`);
-      return;
+      ctx.buildCtx.debug(`transpileTsFile write aborted: ${sourceFilePath}`);
+      return false;
     }
 
     if (outputFilePath.endsWith('.js')) {
@@ -286,19 +278,21 @@ async function transpileTsFile(config: d.Config, services: ts.LanguageService, c
     }
 
     // write the text to our in-memory fs and output targets
-    await outputFile(ctx, outputFilePath, tsOutput.text);
+    return outputFile(ctx, outputFilePath, tsOutput.text);
   }));
+  return changedContent.some(Boolean);
 }
 
 
 async function outputFile(ctx: TranspileContext, outputFilePath: string, outputText: string) {
   // the in-memory .js version is be virtually next to the source ts file
   // but it never actually gets written to disk, just there in spirit
-  await ctx.compilerCtx.fs.writeFile(
+  const { changedContent } = await ctx.compilerCtx.fs.writeFile(
     outputFilePath,
     outputText,
     { inMemoryOnly: true }
   );
+  return changedContent;
 }
 
 
@@ -381,7 +375,8 @@ function primeTsServiceCache(transpileCtx: TranspileContext) {
 
       // loop through each file system cached ts files and run the transpile again
       // so that we get the ts service's cache all up to speed
-      await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
+      const modified = await transpileCtx.compilerCtx.tsService(transpileCtx.compilerCtx, transpileCtx.buildCtx, transpileCtx.filesFromFsCache, false, false);
+      console.log('here', modified);
 
       timeSpan.finish(`prime ts service cache finished`);
     }, PRIME_TS_CACHE_TIMEOUT);

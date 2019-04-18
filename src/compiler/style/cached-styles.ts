@@ -2,8 +2,8 @@ import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
 
 
-export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, cmp, styleMeta.modeName);
+export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
+  const cacheKey = getComponentStylesCacheKey(cmp, styleMeta.modeName);
 
   const cachedStyleMeta = compilerCtx.cachedStyleMeta.get(cacheKey);
   if (!cachedStyleMeta) {
@@ -11,7 +11,7 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
     return null;
   }
 
-  if (isChangedTsFile(moduleFile, buildCtx) && hasDecoratorStyleChanges(compilerCtx, cmp, cacheKey)) {
+  if (isChangedTsFile(cmp.sourceFilePath, buildCtx) && hasDecoratorStyleChanges(compilerCtx, cmp, cacheKey)) {
     // this module is one of the changed ts files
     // and the changed ts file has different
     // styleUrls or styleStr in the component decorator
@@ -44,8 +44,8 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
 }
 
 
-function isChangedTsFile(moduleFile: d.Module, buildCtx: d.BuildCtx) {
-  return (buildCtx.filesChanged.includes(moduleFile.sourceFilePath));
+function isChangedTsFile(sourceFilePath: string, buildCtx: d.BuildCtx) {
+  return (buildCtx.filesChanged.includes(sourceFilePath));
 }
 
 
@@ -159,8 +159,8 @@ function getComponentStyleInputKey(cmp: d.ComponentCompilerMeta) {
 }
 
 
-export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, cmp, styleMeta.modeName);
+export function setComponentStylesCache(compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(cmp, styleMeta.modeName);
 
   compilerCtx.cachedStyleMeta.set(cacheKey, styleMeta);
 
@@ -169,6 +169,6 @@ export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: 
 }
 
 
-function getComponentStylesCacheKey(moduleFile: d.Module, cmp: d.ComponentCompilerMeta, modeName: string) {
-  return `${moduleFile.sourceFilePath}#${cmp.tagName}#${modeName}`;
+function getComponentStylesCacheKey(cmp: d.ComponentCompilerMeta, modeName: string) {
+  return `${cmp.sourceFilePath}#${cmp.tagName}#${modeName}`;
 }

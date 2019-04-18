@@ -24,5 +24,6 @@ export interface Logger {
 
 
 export interface LoggerTimeSpan {
+  duration(): number;
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }

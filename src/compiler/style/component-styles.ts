@@ -7,13 +7,13 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
+export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
   if (buildCtx.shouldAbort) {
     return;
   }
 
   if (buildCtx.isRebuild) {
-    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta, commentOriginalSelector);
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, cmp, styleMeta, commentOriginalSelector);
     if (cachedCompiledStyles) {
       styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
       styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
@@ -23,7 +23,7 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   }
 
   // compile each mode style
-  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, cmp, styleMeta);
+  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, cmp, styleMeta);
 
   // format and set the styles for use later
   const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, cmp, modeName, styleMeta.externalStyles, compiledStyles, commentOriginalSelector);
@@ -35,19 +35,19 @@ export async function generateComponentStylesMode(config: d.Config, compilerCtx:
   if (config.watch) {
     // since this is a watch and we'll be checking this again
     // let's cache what we've learned today
-    setComponentStylesCache(compilerCtx, moduleFile, cmp, styleMeta);
+    setComponentStylesCache(compilerCtx, cmp, styleMeta);
   }
 }
 
 
-async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
   // get all the absolute paths for each style
   const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
   if (typeof styleMeta.styleStr === 'string') {
     // plain styles just in a string
     // let's put these file in an in-memory file
-    const inlineAbsPath = moduleFile.jsFilePath + '.css';
+    const inlineAbsPath = cmp.jsFilePath + '.css';
     extStylePaths.push(inlineAbsPath);
 
     await compilerCtx.fs.writeFile(inlineAbsPath, styleMeta.styleStr, { inMemoryOnly: true });
@@ -55,14 +55,14 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
   // build an array of style strings
   const compiledStyles = await Promise.all(extStylePaths.map(extStylePath => {
-    return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, cmp, extStylePath);
+    return compileExternalStyle(config, compilerCtx, buildCtx, cmp, extStylePath);
   }));
 
   return compiledStyles;
 }
 
 
-async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, extStylePath: string) {
+async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, extStylePath: string) {
   if (buildCtx.shouldAbort) {
     return '/* build aborted */';
   }
@@ -72,7 +72,7 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   // see if we can used a cached style first
   let styleText: string;
 
-  if (moduleFile.isCollectionDependency) {
+  if (cmp.isCollectionDependency) {
     // if it's a collection dependency and it's a preprocessor file like sass
     // AND we have the correct plugin then let's compile it
     const hasPlugin = hasPluginInstalled(config, extStylePath);
@@ -94,7 +94,7 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   try {
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, cmp);
 
-    if (!moduleFile.isCollectionDependency) {
+    if (!cmp.isCollectionDependency) {
       const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
       const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
@@ -113,7 +113,7 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     if (e.code === 'ENOENT') {
       const d = buildError(buildCtx.diagnostics);
       const relExtStyle = config.sys.path.relative(config.cwd, extStylePath);
-      const relSrc = config.sys.path.relative(config.cwd, moduleFile.sourceFilePath);
+      const relSrc = config.sys.path.relative(config.cwd, cmp.sourceFilePath);
       d.messageText = `Unable to load style ${relExtStyle} from ${relSrc}`;
     } else {
       catchError(buildCtx.diagnostics, e);

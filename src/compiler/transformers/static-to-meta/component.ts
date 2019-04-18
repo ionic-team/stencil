@@ -71,7 +71,7 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     hasComponentDidRenderFn: false,
     hasComponentDidUnloadFn: false,
     hasConnectedCallbackFn: false,
-    hasDisonnectedCallbackFn: false,
+    hasDisconnectedCallbackFn: false,
     hasElement: false,
     hasEvent: false,
     hasLifecycle: false,

@@ -116,7 +116,7 @@ export interface StencilConfig {
   entryComponentsHint?: string[];
   assetVersioning?: ConfigAssetVersioning;
   buildEs5?: boolean;
-  buildEsm?: boolean;
+  buildDist?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
   commonjs?: BundlingConfig;
@@ -232,6 +232,7 @@ export interface ConfigFlags {
   help?: boolean;
   log?: boolean;
   logLevel?: string;
+  verbose?: boolean;
   maxWorkers?: number;
   open?: boolean;
   port?: number;

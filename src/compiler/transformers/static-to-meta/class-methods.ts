@@ -17,7 +17,7 @@ export function parseClassMethods(cmpNode: ts.ClassDeclaration, cmpMeta: d.Compo
 
   cmpMeta.hasAttributeChangedCallbackFn = classMethods.some(m => isMethod(m, 'attributeChangedCallback'));
   cmpMeta.hasConnectedCallbackFn = classMethods.some(m => isMethod(m, 'connectedCallback'));
-  cmpMeta.hasDisonnectedCallbackFn = classMethods.some(m => isMethod(m, 'disconnectedCallback'));
+  cmpMeta.hasDisconnectedCallbackFn = classMethods.some(m => isMethod(m, 'disconnectedCallback'));
   cmpMeta.hasComponentWillLoadFn = classMethods.some(m => isMethod(m, 'componentWillLoad'));
   cmpMeta.hasComponentWillUpdateFn = classMethods.some(m => isMethod(m, 'componentWillUpdate'));
   cmpMeta.hasComponentWillRenderFn = classMethods.some(m => isMethod(m, 'componentWillRender'));

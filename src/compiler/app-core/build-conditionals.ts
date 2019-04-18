@@ -13,7 +13,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     cmpWillRender: cmps.some(c => c.hasComponentWillRenderFn),
 
     connectedCallback: cmps.some(c => c.hasConnectedCallbackFn),
-    disconnectedCallback: cmps.some(c => c.hasDisonnectedCallbackFn),
+    disconnectedCallback: cmps.some(c => c.hasDisconnectedCallbackFn),
     element: cmps.some(c => c.hasElement),
     event: cmps.some(c => c.hasEvent),
     hasRenderFn: cmps.some(c => c.hasRenderFn),
@@ -27,7 +27,6 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     member: cmps.some(c => c.hasMember),
     method: cmps.some(c => c.hasMethod),
     mode: cmps.some(c => c.hasMode),
-    noRenderFn: cmps.every(c => !c.hasRenderFn),
     noVdomRender: cmps.every(c => !c.hasVdomRender),
     observeAttribute: cmps.some(c => c.hasAttribute),
     prop: cmps.some(c => c.hasProp),
@@ -60,7 +59,6 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
-  b.isProd = !config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
   b.slotRelocation = !!(b.scoped || (b.hydrateServerSide) || (b.es5 && b.shadowDom));

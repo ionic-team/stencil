@@ -28,14 +28,14 @@
       "@build-conditionals": [
         "./app-core/build-conditionals.ts"
       ],
+      "@hydrate": [
+        "../hydrate/index.ts"
+      ],
       "@mock-doc": [
         "../mock-doc/index.ts"
       ],
       "@platform": [
         "../client/index.ts"
-      ],
-      "@server": [
-        "../server/index.ts"
       ],
       "@sys": [
         "../sys/node/index.ts"

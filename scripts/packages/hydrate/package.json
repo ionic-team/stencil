@@ -1,0 +1,9 @@
+{
+  "name": "@stencil/core/hydrate",
+  "private": true,
+  "main": "./index.js",
+  "module": "../dist/hydrate/index.mjs",
+  "jsnext:main": "../dist/hydrate/index.mjs",
+  "es2015": "../dist/hydrate/index.mjs",
+  "es2017": "../dist/hydrate/index.mjs"
+}

@@ -31,7 +31,8 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.hasLoggedServerUrl = true;
     }
 
-    if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted && buildCtx.isActiveBuild) {
+    const hasChanges = buildCtx.hasScriptChanges || buildCtx.hasStyleChanges;
+    if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
       logHmr(config.logger, buildCtx);
@@ -72,15 +73,6 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
     }
 
-    if (buildCtx.isActiveBuild && !aborted && !buildCtx.hasError) {
-      // this is the most recent build, it wasn't aborted, and it was a successful build
-      compilerCtx.activeDirsAdded.length = 0;
-      compilerCtx.activeDirsDeleted.length = 0;
-      compilerCtx.activeFilesAdded.length = 0;
-      compilerCtx.activeFilesDeleted.length = 0;
-      compilerCtx.activeFilesUpdated.length = 0;
-    }
-
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
     config.logger.writeLogs(buildCtx.isRebuild);
@@ -101,10 +93,6 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   // it's official, this build has finished
   buildCtx.hasFinished = true;
-
-  if (buildCtx.isActiveBuild) {
-    compilerCtx.isActivelyBuilding = false;
-  }
 
   return buildCtx.buildResults;
 }

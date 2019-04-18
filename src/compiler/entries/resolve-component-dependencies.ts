@@ -20,21 +20,20 @@ function computeDependants(cmps: d.ComponentCompilerMeta[]) {
   });
 }
 
-function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[], visited: Set<string>): string[] {
-  if (visited.has(cmp.tagName)) {
+function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[], visited: Set<d.ComponentCompilerMeta>): string[] {
+  if (visited.has(cmp)) {
     return cmp.dependencies;
   }
-  // Reset deps
-  cmp.dependencies = cmp.directDependencies = [];
-  visited.add(cmp.tagName);
+  visited.add(cmp);
 
   const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
+  cmp.dependencies = cmp.directDependencies = dependencies;
+
   const transitiveDeps = flatOne(
     dependencies
       .map(tagName => cmps.find(c => c.tagName === tagName))
       .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
-  cmp.directDependencies = dependencies;
   return cmp.dependencies = [
     ...dependencies,
     ...transitiveDeps

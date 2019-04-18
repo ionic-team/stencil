@@ -33,9 +33,6 @@ async function bundleCompiler() {
             if (id === '@mock-doc') {
               return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
-            if (id === '@server') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'server');
-            }
             if (id === '@sys') {
               return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }

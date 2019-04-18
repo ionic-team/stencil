@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { crawlAnchorsForNextUrls } from './crawl-anchors';
-import { getPrerenderConfig } from './prerender-config';
+import { getPrerenderConfig, normalizeHref } from './prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
 import fs from 'fs';
@@ -17,9 +16,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   };
 
   try {
-    const windowLocationUrl = new URL(prerenderRequest.url);
-    const url = windowLocationUrl.href;
-    const win = getWindow(prerenderRequest.templateId, url);
+    const base = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
+    const originUrl = base.href;
+    const win = getWindow(prerenderRequest.templateId, originUrl);
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
@@ -27,25 +26,25 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath) as d.HydrateConfig;
 
-    try {
-      if (typeof prerenderConfig.beforeHydrate === 'function') {
-        const rtn = prerenderConfig.beforeHydrate(win.document, windowLocationUrl);
+    if (typeof prerenderConfig.beforeHydrate === 'function') {
+      try {
+        const rtn = prerenderConfig.beforeHydrate(win.document, base);
         if (rtn != null) {
           await rtn;
         }
+      } catch (e) {
+        catchError(results.diagnostics, e);
       }
-    } catch (e) {
-      catchError(results.diagnostics, e);
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: url,
+      url: originUrl,
       collectAnchors: true
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
       try {
-        const userOpts = prerenderConfig.hydrateOptions(windowLocationUrl);
+        const userOpts = prerenderConfig.hydrateOptions(base);
         Object.assign(hydrateOpts, userOpts);
       } catch (e) {
         catchError(results.diagnostics, e);
@@ -55,42 +54,38 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
     const hydrateResults = await hydrateApp.hydrateDocument(win.document, hydrateOpts) as d.HydrateResults;
+    results.diagnostics.push(...hydrateResults.diagnostics);
 
-    if (hydrateResults.diagnostics.length > 0) {
-      results.diagnostics.push(...hydrateResults.diagnostics);
-
-    } else {
+    if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
-        if (typeof prerenderConfig.afterHydrate === 'function') {
-          const rtn = prerenderConfig.afterHydrate(win.document, windowLocationUrl);
-          if (rtn != null) {
-            await rtn;
-          }
+        const rtn = prerenderConfig.afterHydrate(win.document, base);
+        if (rtn != null) {
+          await rtn;
         }
       } catch (e) {
         catchError(results.diagnostics, e);
       }
-
-      const html = serializeNodeToHtml(win.document, {
-        collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
-        pretty: hydrateOpts.prettyHtml
-      });
-
-      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, windowLocationUrl, hydrateResults.anchors);
-
-      if (typeof prerenderConfig.filePath === 'function') {
-        try {
-          const userWriteToFilePath = prerenderConfig.filePath(windowLocationUrl);
-          if (typeof userWriteToFilePath === 'string') {
-            results.filePath = userWriteToFilePath;
-          }
-        } catch (e) {
-          catchError(results.diagnostics, e);
-        }
-      }
-
-      await writePrerenderedHtml(results, html);
     }
+
+    const html = serializeNodeToHtml(win.document, {
+      collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
+      pretty: hydrateOpts.prettyHtml
+    });
+
+    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, base, hydrateResults.anchors);
+
+    if (typeof prerenderConfig.filePath === 'function') {
+      try {
+        const userWriteToFilePath = prerenderConfig.filePath(base);
+        if (typeof userWriteToFilePath === 'string') {
+          results.filePath = userWriteToFilePath;
+        }
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+    }
+
+    await writePrerenderedHtml(results, html);
 
   } catch (e) {
     // ahh man! what happened!
@@ -161,6 +156,38 @@ function getWindow(templateId: string, originUrl: string) {
 
   return win;
 }
+
+
+function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+  if (!Array.isArray(parsedAnchors)) {
+    return [];
+  }
+
+  return parsedAnchors
+    .filter(anchor => prerenderConfig.filterAnchor(anchor, base))
+    .map(anchor => prerenderConfig.normalizeUrl(anchor.href, base))
+    .filter(url => prerenderConfig.filterUrl(url, base))
+    .map(url => normalizeHref(prerenderConfig, url))
+    .reduce((hrefs, href) => {
+      if (!hrefs.includes(href)) {
+        hrefs.push(href);
+      }
+      return hrefs;
+    }, [] as string[])
+    .sort(sortHrefs);
+}
+
+
+function sortHrefs(a: string, b: string) {
+  const partsA = a.split('/').length;
+  const partsB = b.split('/').length;
+  if (partsA < partsB) return -1;
+  if (partsA > partsB) return 1;
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 
 declare const __webpack_require__: any;
 declare const __non_webpack_require__: any;

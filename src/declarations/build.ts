@@ -28,6 +28,7 @@ export interface BuildCtx {
   collections: d.Collection[];
   components: d.ComponentCompilerMeta[];
   indexDoc: Document;
+  packageJson: d.PackageJsonData;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
@@ -58,7 +59,6 @@ export interface BuildCtx {
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
-  isActiveBuild: boolean;
   isRebuild: boolean;
   moduleFiles: d.Module[];
   requiresFullBuild: boolean;
@@ -237,11 +237,14 @@ export interface BundleOutputChunk {
 
 export type SourceTarget = 'es5' | 'es2017';
 
-export interface BundleCoreOptions {
-  coreChunk?: boolean;
-  entryInputs: BundleEntryInputs;
+export interface BundleAppOptions {
+  inputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
+  emitCoreChunk?: boolean;
+  externalRuntime?: string;
+  skipDeps?: boolean;
+  isServer?: boolean;
 }
 
 export interface BundleEntryInputs {

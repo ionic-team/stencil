@@ -4,14 +4,15 @@ import { Component, Prop, Event, EventEmitter, h } from '@stencil/core';
   tag: 'todo-item'
 })
 export class TodoItem {
+
   @Prop() checked: boolean;
   @Prop() text: string;
   @Prop() index: number;
   @Event() itemCheck: EventEmitter;
   @Event() itemRemove: EventEmitter;
 
-  handleOnCheck = () => this.itemCheck.emit(this.index);
-  handleOnRemove = () => this.itemRemove.emit(this.index);
+  private handleOnCheck = () => this.itemCheck.emit(this.index);
+  private handleOnRemove = () => this.itemRemove.emit(this.index);
 
   render() {
     return (

@@ -55,22 +55,14 @@ export class BuildContext implements d.BuildCtx {
   transpileBuildCount = 0;
   pendingCopyTasks: Promise<d.CopyResults>[] = [];
   validateTypesPromise: Promise<d.ValidateTypesResults>;
+  packageJson: d.PackageJsonData = {};
 
-  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {}
+  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
+    this.buildId = ++this.compilerCtx.activeBuildId;
+  }
 
   start() {
-    this.compilerCtx.isActivelyBuilding = true;
-
     // get the build id from the incremented activeBuildId
-    ++this.compilerCtx.activeBuildId;
-
-    if (this.compilerCtx.activeBuildId > 99) {
-      // reset the build id back to 0
-      this.compilerCtx.activeBuildId = 0;
-    }
-
-    this.buildId = this.compilerCtx.activeBuildId;
-
     // print out a good message
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
 
@@ -85,7 +77,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
-    if ((this.isActiveBuild && !this.hasFinished) || debug) {
+    if (!this.hasFinished || debug) {
       if (debug) {
         if (this.config.watch) {
           msg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`;
@@ -100,16 +92,18 @@ export class BuildContext implements d.BuildCtx {
       }
 
       return {
+        duration: () => {
+          return timeSpan.duration();
+        },
         finish: (finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) => {
-          let duration = 0;
-          if ((this.isActiveBuild && !this.hasFinished) || debug) {
+          if (!this.hasFinished || debug) {
             if (debug) {
               if (this.config.watch) {
                 finishedMsg = `${this.config.logger.cyan('[' + this.buildId + ']')} ${finishedMsg}`;
               }
             }
 
-            duration = timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
+            timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
               this.compilerCtx.events.emit('buildLog', {
@@ -117,15 +111,14 @@ export class BuildContext implements d.BuildCtx {
               } as d.BuildLog);
             }
           }
-          return duration;
+          return timeSpan.duration();
         }
       };
     }
 
     return {
-      finish() {
-        return 0;
-      }
+      duration() { return 0; },
+      finish() { return 0; }
     };
   }
 
@@ -135,10 +128,6 @@ export class BuildContext implements d.BuildCtx {
     } else {
       this.config.logger.debug(msg);
     }
-  }
-
-  get isActiveBuild() {
-    return (this.compilerCtx.activeBuildId === this.buildId);
   }
 
   get hasError() {
@@ -153,7 +142,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   get shouldAbort() {
-    return (!this.isActiveBuild || this.hasError);
+    return this.hasError;
   }
 
   get hasWarning() {
@@ -172,7 +161,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   async validateTypesBuild() {
-    if (this.hasError || !this.isActiveBuild) {
+    if (this.hasError) {
       // no need to wait on this one since
       // we already aborted this build
       return;

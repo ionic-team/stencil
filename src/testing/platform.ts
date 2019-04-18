@@ -107,11 +107,11 @@ export const isMemberInElement = (elm: any, memberName: string) => {
   return false;
 };
 
+export const patchDynamicImport = (_: string) => { return; };
 
 export {
   Host,
   bootstrapLazy,
-  patchDynamicImport,
   createEvent,
   getElement,
   getConnect,
@@ -119,5 +119,6 @@ export {
   insertVdomAnnotations,
   h,
   parsePropertyValue,
+  postUpdateComponent,
   setValue
 } from '@runtime';

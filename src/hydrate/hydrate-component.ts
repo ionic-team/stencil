@@ -1,10 +1,9 @@
 import * as d from '../declarations';
 import { connectedCallback, getComponent, registerHost } from '@platform';
-import { hydrateError } from './hydrate-utils';
 import { proxyHostElement } from './proxy-host-element';
 
 
-export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
+export function hydrateComponent(win: Window, opts: d.HydrateOptions, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
   const Cstr = getComponent(tagName);
 
   if (Cstr != null) {
@@ -43,7 +42,7 @@ export function hydrateComponent(opts: d.HydrateOptions, results: d.HydrateResul
           await elm.componentOnReady();
 
         } catch (e) {
-          hydrateError(results, e);
+          win.console.error(e);
         }
 
         resolve();

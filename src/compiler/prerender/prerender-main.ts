@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
-import { catchError, hasError } from '@utils';
+import { catchError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 
@@ -30,7 +30,6 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
-      prodMode: (!config.devMode && config.logLevel !== 'debug'),
       urlsCompleted: new Set(),
       urlsPending: new Set(),
       urlsProcessing: new Set(),
@@ -54,28 +53,39 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
       });
     });
 
-    const totalDuration = timeSpan.finish(`prerendering finished`);
+    if (manager.isDebug) {
+      const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
+      if (debugDiagnostics.length > 0) {
+        config.logger.printDiagnostics(debugDiagnostics, config.rootDir);
+      }
+    }
+
+    const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
+    const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
+
+    if (prerenderBuildErrors.length > 0) {
+      // convert to just runtime errors so the other build files still write
+      // but the CLI knows an error occurred and should have an exit code 1
+      prerenderBuildErrors.forEach(diagnostic => {
+        diagnostic.type = 'runtime';
+      });
+      buildCtx.diagnostics.push(...prerenderBuildErrors);
+    }
+    buildCtx.diagnostics.push(...prerenderRuntimeErrors);
 
     const totalUrls = manager.urlsCompleted.size;
     if (totalUrls > 1) {
-      const average = Math.round(totalDuration / totalUrls);
+      const average = Math.round(timeSpan.duration() / totalUrls);
       config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
     }
 
+    const statusMessage = prerenderBuildErrors.length > 0 ? 'failed' : 'finished';
+    const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
+
+    timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
+
   } catch (e) {
     catchError(prerenderDiagnostics, e);
-  }
-
-  if (hasError(prerenderDiagnostics)) {
-    config.logger.printDiagnostics(prerenderDiagnostics, config.rootDir);
-    timeSpan.finish(`prerendering failed`);
-  }
-
-  if (compilerCtx.localPrerenderServer != null) {
-    if (typeof compilerCtx.localPrerenderServer.close === 'function') {
-      compilerCtx.localPrerenderServer.close();
-    }
-    compilerCtx.localPrerenderServer = null;
   }
 }
 
@@ -102,7 +112,7 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
     }
 
   } else {
-    const counter = 50;
+    const counter = 200;
     const urlsCompletedSize = manager.urlsCompleted.size;
     if (urlsCompletedSize >= (manager.logCount + counter)) {
       manager.logCount = Math.floor(urlsCompletedSize / counter) * counter;
@@ -139,7 +149,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
     manager.diagnostics.push(...results.diagnostics);
 
-    if (Array.isArray(results.anchorUrls) === true) {
+    if (Array.isArray(results.anchorUrls)) {
       results.anchorUrls.forEach(anchorUrl => {
         addUrlToPendingQueue(manager, anchorUrl, url);
       });

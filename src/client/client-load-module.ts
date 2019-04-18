@@ -10,16 +10,14 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
     ? cmpMeta.$lazyBundleIds$[hostRef.$modeName$]
     : cmpMeta.$lazyBundleIds$;
 
-  const url = `./${
-    BUILD.shadowDom
-      ? bundleId + (!supportsShadowDom ? '.sc' : '')
-      : bundleId
-    }.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`;
-
   return import(
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    url
+    `./${
+      BUILD.shadowDom
+        ? bundleId + (!supportsShadowDom ? '.sc' : '')
+        : bundleId
+      }.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
   ).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
 };

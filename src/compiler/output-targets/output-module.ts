@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
-import { canSkipAppCoreBuild, isOutputTargetDistModule } from './output-utils';
+import { isOutputTargetDistModule } from './output-utils';
 import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
@@ -8,10 +8,6 @@ import { optimizeModule } from '../app-core/optimize-module';
 
 
 export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
   if (outputTargets.length === 0) {
     return;
@@ -22,20 +18,27 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
-  // await buildCtx.stylesPromise;
-
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
+  await Promise.all([
+    bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => o.externalRuntime), true),
+    bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => !o.externalRuntime), false),
+  ]);
+
+  timespan.finish(`generate module web components finished`);
+}
+
+async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[], externalRuntime: boolean) {
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
-  const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build);
+  const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build, externalRuntime);
 
   if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
     await Promise.all(
       rollupResults.map(async result => {
         let code = result.code;
 
-        if (config.minifyJs) {
+        if (!externalRuntime && config.minifyJs) {
           const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, false, code);
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
@@ -51,8 +54,6 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
       })
     );
   }
-
-  timespan.finish(`generate module web components finished`);
 }
 
 
@@ -69,17 +70,26 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
-  const bundleCoreOptions: d.BundleCoreOptions = {
-    entryInputs: {
+export async function bundleNativeModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, externalRuntime: boolean) {
+  const bundleAppOptions: d.BundleAppOptions = {
+    inputs: {
       'index': '@core-entrypoint'
     },
     loader: {
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
-    }
+    },
+    cache: compilerCtx.rollupCacheNative,
+    externalRuntime: externalRuntime ? '@stencil/core/runtime' : undefined,
+    skipDeps: true
   };
 
-  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleCoreOptions);
+  const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
+  if (rollupBuild != null) {
+    compilerCtx.rollupCacheNative = rollupBuild.cache;
+  } else {
+    compilerCtx.rollupCacheNative = null;
+  }
+
   return generateRollupOutput(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 

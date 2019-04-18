@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild, isOutputTargetWww } from '../output-targets/output-utils';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 import { runPrerenderMain } from '../prerender/prerender-main';
 import { buildError } from '@utils';
 
@@ -10,10 +10,6 @@ export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerC
   }
 
   if (!config.flags || !config.flags.prerender) {
-    return;
-  }
-
-  if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }
 

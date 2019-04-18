@@ -20,12 +20,15 @@ dist/
 
 # submodule packages
 /compiler
+/hydrate
 /internal
 /mock-doc
 /polyfills
 /server
 /sys
 /testing
+/build-conditionals
+/runtime
 
 /screenshot/index.js
 /screenshot/package.json

@@ -1,38 +1,24 @@
-import { Component, State } from '@stencil/core';
+import { Component, Prop, Watch, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
 describe('lifecycle', () => {
 
-  it('fire lifecycle methods', async () => {
+  it('wait for willLoad', async () => {
 
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      @State() willLoad = '';
-      @State() didLoad = '';
-      @State() willUpdate = '';
-      @State() didUpdate = '';
-      @State() stateChangeInRender = '';
 
       componentWillLoad() {
-        this.willLoad = 'componentWillLoad';
-      }
-
-      componentDidLoad() {
-        this.didLoad = 'componentDidLoad';
-      }
-
-      componentWillUpdate() {
-        this.willUpdate = 'componentWillUpdate';
-      }
-
-      componentDidUpdate() {
-        this.didUpdate = 'componentDidUpdate';
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 10);
+        });
       }
 
       render() {
-        this.stateChangeInRender = 'stateChangeInRender';
-        return `${this.willLoad} ${this.didLoad} ${this.willUpdate} ${this.didUpdate} ${this.stateChangeInRender}`;
+        return 'Loaded';
       }
     }
 
@@ -41,7 +27,81 @@ describe('lifecycle', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root.textContent).toBe('componentWillLoad componentDidLoad componentWillUpdate componentDidUpdate stateChangeInRender');
+    expect(root.textContent).toBe(
+      'Loaded'
+    );
+  });
+
+
+  it('fire lifecycle methods', async () => {
+
+    let log = '';
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+
+      @Prop() prop = 0;
+      @Watch('prop')
+      propDidChange() {
+        log += ' propDidChange';
+      }
+
+      connectedCallback() {
+        log += ' connectedCallback';
+      }
+
+      disconnectedCallback() {
+        log += ' disconnectedCallback';
+      }
+
+      componentWillLoad() {
+        log += ' componentWillLoad';
+      }
+
+      componentDidLoad() {
+        log += ' componentDidLoad';
+      }
+
+      componentWillUpdate() {
+        log += ' componentWillUpdate';
+      }
+
+      componentDidUpdate() {
+        log += ' componentDidUpdate';
+      }
+
+      componentWillRender() {
+        log += ' componentWillRender';
+      }
+
+      componentDidRender() {
+        log += ' componentDidRender';
+      }
+
+      render() {
+        log += ' render';
+        return log.trim();
+      }
+    }
+
+    const { root, flush } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root.textContent).toBe(
+      'connectedCallback componentWillLoad componentWillRender render'
+    );
+    expect(log.trim()).toEqual(
+      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
+    );
+
+    log = '';
+    root.prop = 1;
+    await flush();
+
+    expect(log.trim()).toBe(
+      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
+    );
   });
 
 });
