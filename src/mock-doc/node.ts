@@ -321,8 +321,8 @@ export class MockElement extends MockNode {
 
       if (typeof html === 'string') {
         const frag = parseFragmentUtil(this.ownerDocument, html);
-        for (let i = 0, ii = frag.childNodes.length; i < ii; i++) {
-          this.appendChild(frag.childNodes[i]);
+        while (frag.childNodes.length > 0) {
+          this.appendChild(frag.childNodes[0]);
         }
       }
     }
