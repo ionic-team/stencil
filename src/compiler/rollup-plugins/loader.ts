@@ -1,6 +1,6 @@
 
 
-export function stencilLoaderPlugin(entries: {[id: string]: string}) {
+export function loaderPlugin(entries: {[id: string]: string}) {
   return {
     name: 'stencilLoaderPlugin',
     resolveId(id: string) {

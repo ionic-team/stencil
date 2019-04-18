@@ -28,6 +28,7 @@ dist/
 /sys
 /testing
 /build-conditionals
+/runtime
 
 /screenshot/index.js
 /screenshot/package.json

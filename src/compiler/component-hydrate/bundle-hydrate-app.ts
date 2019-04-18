@@ -7,7 +7,7 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { loaderPlugin } from '../rollup-plugins/loader';
 
 
 export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
@@ -18,7 +18,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         'app'
       ],
       plugins: [
-        stencilLoaderPlugin({
+        loaderPlugin({
           'index': CORE_ENTRY,
           'app': appEntryCode
         }),

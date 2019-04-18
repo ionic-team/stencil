@@ -7,28 +7,26 @@ import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { loaderPlugin } from '../rollup-plugins/loader';
+import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
 
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
   const external = bundleAppOptions.skipDeps
     ? getDependencies(buildCtx)
     : [];
-  if (bundleAppOptions.externalRuntime) {
-    external.push('@stencil/core');
-  }
 
   try {
     const rollupOptions: RollupOptions = {
       input: bundleAppOptions.inputs,
       plugins: [
-        stencilLoaderPlugin({
+        stencilExternalRuntimePlugin(bundleAppOptions.externalRuntime),
+        loaderPlugin({
           '@stencil/core': DEFAULT_CORE,
           '@core-entrypoint': DEFAULT_ENTRY,
           ...bundleAppOptions.loader
         }),
         stencilClientPlugin(config),
-
         stencilBuildConditionalsPlugin(build),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
@@ -47,13 +45,13 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       treeshake: config.devMode ? false : {
         annotations: true,
         propertyReadSideEffects: false,
-        pureExternalModules: bundleAppOptions.externalRuntime
+        pureExternalModules: false
       },
       cache: bundleAppOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
       external
     };
-    if (!bundleAppOptions.externalRuntime && bundleAppOptions.emitCoreChunk) {
+    if (bundleAppOptions.emitCoreChunk) {
       rollupOptions.manualChunks = {
         [config.fsNamespace]: ['@stencil/core']
       };

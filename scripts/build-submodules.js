@@ -14,6 +14,7 @@ const SUBMODULES = [
   'internal',
   'mock-doc',
   'screenshot',
+  'runtime',
   'sys/node',
   'testing'
 ];

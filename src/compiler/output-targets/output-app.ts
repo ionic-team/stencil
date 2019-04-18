@@ -7,7 +7,7 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { processCopyTasks } from '../copy/local-copy-tasks';
 import { RollupOptions } from 'rollup';
-import { stencilLoaderPlugin } from '../rollup-plugins/stencil-loader';
+import { loaderPlugin } from '../rollup-plugins/loader';
 
 
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
@@ -44,7 +44,7 @@ import * as c from 'modules';
   const rollupOptions: RollupOptions = {
     input: '@core-entrypoint',
     plugins: [
-      stencilLoaderPlugin({
+      loaderPlugin({
         '@core-entrypoint': entryPoint
       }),
       inMemoryFsRead(config, compilerCtx, buildCtx),

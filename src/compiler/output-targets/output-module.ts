@@ -79,7 +79,7 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
       '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
     },
     cache: compilerCtx.rollupCacheNative,
-    externalRuntime: externalRuntime,
+    externalRuntime: externalRuntime ? '@stencil/core/runtime' : undefined,
     skipDeps: true
   };
 
