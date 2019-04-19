@@ -12,14 +12,14 @@ module.exports = {
     'json'
   ],
   moduleNameMapper: {
-    "@stencil/core/build-conditionals": path.join(distDir, 'testing', 'build-conditionals'),
-    "@stencil/core/internal": path.join(rootDir, 'internal'),
-    "@stencil/core/mock-doc": path.join(distDir, 'testing', 'mock-doc'),
-    "@stencil/core/platform": path.join(distDir, 'testing', 'platform'),
-    "@stencil/core/sys": path.join(distDir, 'sys', 'node'),
-    "@stencil/core/testing": path.join(distDir, 'testing'),
-    "@stencil/core/utils": path.join(distDir, 'utils'),
-    "@stencil/core": path.join(distDir, 'testing', 'core')
+    "^@stencil/core/build-conditionals$": path.join(distDir, 'testing', 'build-conditionals'),
+    "^@stencil/core/internal$": path.join(rootDir, 'internal'),
+    "^@stencil/core/mock-doc$": path.join(distDir, 'testing', 'mock-doc'),
+    "^@stencil/core/platform$": path.join(distDir, 'testing', 'platform'),
+    "^@stencil/core/sys$": path.join(distDir, 'sys', 'node'),
+    "^@stencil/core/testing$": path.join(distDir, 'testing'),
+    "^@stencil/core/utils$": path.join(distDir, 'utils'),
+    "^@stencil/core$": path.join(distDir, 'testing', 'core')
   },
   setupTestFrameworkScriptFile: path.join(testingDir, 'jest-setuptestframework.js'),
   testEnvironment: path.join(testingDir, 'jest-environment.js'),
