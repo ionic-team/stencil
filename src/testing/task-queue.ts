@@ -70,7 +70,7 @@ export function writeTask(cb: d.RafCallback, _elm?: any) {
 export function flushQueue() {
   return new Promise((resolve, reject) => {
 
-    function drain() {
+    async function drain() {
       try {
         if (queuedWriteTasks.length > 0) {
           const writeTasks = queuedWriteTasks.slice();
@@ -79,7 +79,10 @@ export function flushQueue() {
 
           let cb: Function;
           while ((cb = writeTasks.shift())) {
-            cb(Date.now());
+            const result = cb(Date.now());
+            if (result != null && typeof result.then === 'function') {
+              await result;
+            }
           }
         }
 

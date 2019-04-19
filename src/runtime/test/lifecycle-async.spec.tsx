@@ -2,7 +2,32 @@ import { Component, Prop, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
-describe('lifecycle sync', () => {
+describe('lifecycle async', () => {
+
+  it('wait for componentWillLoad', async () => {
+
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      componentWillLoad() {
+        return new Promise(resolve => {
+          setTimeout(resolve);
+        });
+      }
+
+      render() {
+        return 'Loaded';
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root.textContent).toBe(
+      'Loaded'
+    );
+  });
 
   it('fire lifecycle methods', async () => {
 
@@ -25,7 +50,12 @@ describe('lifecycle sync', () => {
       }
 
       componentWillLoad() {
-        log += ' componentWillLoad';
+        return new Promise(resolve => {
+          setTimeout(() => {
+            log += ' componentWillLoad';
+            resolve();
+          });
+        });
       }
 
       componentDidLoad() {
@@ -33,7 +63,12 @@ describe('lifecycle sync', () => {
       }
 
       componentWillUpdate() {
-        log += ' componentWillUpdate';
+        return new Promise(resolve => {
+          setTimeout(() => {
+            log += ' componentWillUpdate';
+            resolve();
+          });
+        });
       }
 
       componentDidUpdate() {
@@ -41,7 +76,12 @@ describe('lifecycle sync', () => {
       }
 
       componentWillRender() {
-        log += ' componentWillRender';
+        return new Promise(resolve => {
+          setTimeout(() => {
+            log += ' componentWillRender';
+            resolve();
+          });
+        });
       }
 
       componentDidRender() {

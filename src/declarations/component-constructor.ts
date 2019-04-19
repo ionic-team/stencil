@@ -22,6 +22,14 @@ export interface ComponentConstructorWatchers {
 
 export interface ComponentTestingConstructor extends ComponentConstructor {
   COMPILER_META: d.ComponentCompilerMeta;
+  prototype?: {
+    componentWillLoad?: Function;
+    componentWillUpdate?: Function;
+    componentWillRender?: Function;
+    __componentWillLoad?: Function;
+    __componentWillUpdate?: Function;
+    __componentWillRender?: Function;
+  };
 }
 
 export interface ComponentNativeConstructor extends ComponentConstructor {

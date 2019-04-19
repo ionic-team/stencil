@@ -43,6 +43,8 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
 
+    proxyComponentLifeCycles(platform, Cstr);
+
     const cmpBuild = getBuildFeatures([Cstr.COMPILER_META]) as any;
 
     Object.keys(cmpBuild).forEach(key => {
@@ -60,7 +62,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
       bc.BUILD.hydrateClientSide = false;
     }
 
-    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 89999) + 10000)}`;
+    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
 
     const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
 
@@ -142,6 +144,61 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   }
 
   return results;
+}
+
+
+function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstructor) {
+  if (typeof Cstr.prototype.__componentWillLoad === 'function') {
+    Cstr.prototype.componentWillLoad = Cstr.prototype.__componentWillLoad;
+    Cstr.prototype.__componentWillLoad = null;
+  }
+  if (typeof Cstr.prototype.__componentWillUpdate === 'function') {
+    Cstr.prototype.componentWillUpdate = Cstr.prototype.__componentWillUpdate;
+    Cstr.prototype.__componentWillUpdate = null;
+  }
+  if (typeof Cstr.prototype.__componentWillRender === 'function') {
+    Cstr.prototype.componentWillRender = Cstr.prototype.__componentWillRender;
+    Cstr.prototype.__componentWillRender = null;
+  }
+
+  if (typeof Cstr.prototype.componentWillLoad === 'function') {
+    Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
+    Cstr.prototype.componentWillLoad = function() {
+      const result = this.__componentWillLoad();
+      if (result != null && typeof result.then === 'function') {
+        platform.writeTask(() => result);
+      } else {
+        platform.writeTask(() => Promise.resolve());
+      }
+      return result;
+    };
+  }
+
+  if (typeof Cstr.prototype.componentWillUpdate === 'function') {
+    Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
+    Cstr.prototype.componentWillUpdate = function() {
+      const result = this.__componentWillUpdate();
+      if (result != null && typeof result.then === 'function') {
+        platform.writeTask(() => result);
+      } else {
+        platform.writeTask(() => Promise.resolve());
+      }
+      return result;
+    };
+  }
+
+  if (typeof Cstr.prototype.componentWillRender === 'function') {
+    Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
+    Cstr.prototype.componentWillRender = function() {
+      const result = this.__componentWillRender();
+      if (result != null && typeof result.then === 'function') {
+        platform.writeTask(() => result);
+      } else {
+        platform.writeTask(() => Promise.resolve());
+      }
+      return result;
+    };
+  }
 }
 
 
