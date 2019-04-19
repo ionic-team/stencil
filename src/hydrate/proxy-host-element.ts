@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
-import { MEMBER_TYPE } from '@utils';
+import { MEMBER_FLAGS } from '@utils';
 
 
 export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
@@ -21,7 +21,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
     members.forEach(([memberName, m]) => {
       const memberFlags = m[0];
 
-      if (memberFlags & MEMBER_TYPE.Prop) {
+      if (memberFlags & MEMBER_FLAGS.Prop) {
         const attributeName = (m[1] || memberName);
         const attrValue = elm.getAttribute(attributeName);
 
@@ -55,7 +55,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           }
         );
 
-      } else if (memberFlags & MEMBER_TYPE.Method) {
+      } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement) {
             const ref = getHostRef(this);

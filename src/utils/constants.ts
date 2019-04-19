@@ -25,7 +25,6 @@ export const enum EVENT_FLAGS {
   Bubbles = 1 << 2,
 }
 
-
 export const enum LISTENER_FLAGS {
   Passive = 1 << 0,
   Capture = 1 << 1,
@@ -56,59 +55,15 @@ export const enum CMP_FLAG {
 }
 
 /**
- * Member Types
- */
-export const enum MEMBER_TYPE {
-  Prop = MEMBER_FLAGS.Prop,
-  State = MEMBER_FLAGS.State,
-  Method = MEMBER_FLAGS.Method,
-  Element = MEMBER_FLAGS.Element,
-  Event = MEMBER_FLAGS.Event,
-}
-
-
-/**
- * Property Types
- */
-export const enum PROP_TYPE {
-  Unknown = MEMBER_FLAGS.Unknown,
-  Any = MEMBER_FLAGS.Any,
-  String = MEMBER_FLAGS.String,
-  Boolean = MEMBER_FLAGS.Boolean,
-  Number = MEMBER_FLAGS.Number,
-}
-
-
-/**
- * Encapsulation
- */
-export const enum ENCAPSULATION {
-  NoEncapsulation = 0,
-  ShadowDom = 1,
-  ScopedCss = 2,
-}
-
-
-/**
- * SSR Attribute Names
- */
-export const SSR_VNODE_ID = 'ssrv';
-export const SSR_CHILD_ID = 'ssrc';
-
-
-/**
  * Default style mode id
  */
 export const DEFAULT_STYLE_MODE = '$';
-
 
 /**
  * Reusable empty obj/array
  * Don't add values to these!!
  */
 export const EMPTY_OBJ: any = {};
-export const EMPTY_ARR: any[] = [];
-
 
 /**
  * Namespaces
@@ -117,25 +72,8 @@ export const SVG_NS = 'http://www.w3.org/2000/svg';
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';
 export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
-
 /**
  * File names and value
  */
 export const BANNER = `Built with http://stenciljs.com`;
 export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
-export const APP_NAMESPACE_REGEX = /["']__APP__['"]/g;
-
-
-/**
- * Runtime Errors
- */
-export const enum RUNTIME_ERROR {
-  LoadBundleError = 1,
-  QueueEventsError = 2,
-  WillLoadError = 3,
-  DidLoadError = 4,
-  WillUpdateError = 5,
-  DidUpdateError = 6,
-  InitInstanceError = 7,
-  RenderError = 8,
-}

@@ -393,7 +393,7 @@ function convertType(type: string): d.ComponentCompilerPropertyType {
 //       cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
 //       cmpMeta.membersMeta[methodData.name] = {
-//         memberType: MEMBER_TYPE.PropContext,
+//         memberType: MEMBER_FLAGS.PropContext,
 //         ctrlId: methodData.id
 //       };
 //     }
@@ -411,7 +411,7 @@ function convertType(type: string): d.ComponentCompilerPropertyType {
 //       cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
 //       cmpMeta.membersMeta[methodData.name] = {
-//         memberType: MEMBER_TYPE.PropConnect,
+//         memberType: MEMBER_FLAGS.PropConnect,
 //         ctrlId: methodData.tag
 //       };
 //     }

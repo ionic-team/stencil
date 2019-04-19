@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS, MEMBER_TYPE, PROP_TYPE } from '@utils';
+import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
@@ -97,18 +97,18 @@ function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
 
 function formatPropType(type: d.ComponentCompilerPropertyType) {
   if (type === 'string') {
-    return PROP_TYPE.String;
+    return MEMBER_FLAGS.String;
   }
   if (type === 'number') {
-    return PROP_TYPE.Number;
+    return MEMBER_FLAGS.Number;
   }
   if (type === 'boolean') {
-    return PROP_TYPE.Boolean;
+    return MEMBER_FLAGS.Boolean;
   }
   if (type === 'any') {
-    return PROP_TYPE.Any;
+    return MEMBER_FLAGS.Any;
   }
-  return PROP_TYPE.Unknown;
+  return MEMBER_FLAGS.Unknown;
 }
 
 
@@ -120,7 +120,7 @@ function formatStatesRuntimeMember(states: d.ComponentCompilerState[]) {
       /**
        * [0] member flags
        */
-      MEMBER_TYPE.State
+      MEMBER_FLAGS.State
     ];
   });
   return runtimeMembers;
@@ -135,7 +135,7 @@ function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
       /**
        * [0] member flags
        */
-      MEMBER_TYPE.Method
+      MEMBER_FLAGS.Method
     ];
   });
   return runtimeMembers;

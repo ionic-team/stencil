@@ -4,7 +4,7 @@ import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 import { getHostRef } from '@platform';
 import { getValue, setValue } from './set-value';
-import { MEMBER_FLAGS, MEMBER_TYPE } from '../utils/constants';
+import { MEMBER_FLAGS } from '../utils/constants';
 
 
 export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
@@ -54,7 +54,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           }
         );
 
-      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberFlags & MEMBER_TYPE.Method)) {
+      } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberFlags & MEMBER_FLAGS.Method)) {
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
           value(this: d.HostElement) {

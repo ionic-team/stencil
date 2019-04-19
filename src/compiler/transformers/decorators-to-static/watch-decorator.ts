@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
-import ts from 'typescript';
 import { flatOne } from '@utils';
+import ts from 'typescript';
 
 
 export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) {
@@ -47,5 +47,5 @@ function parseWatchDecorator(_diagnostics: d.Diagnostic[], method: ts.MethodDecl
 //     return false;
 //   }
 // const type = member.memberType;
-// return type === MEMBER_TYPE.State || type === MEMBER_TYPE.Prop || type === MEMBER_TYPE.PropMutable;
+// return type === MEMBER_FLAGS.State || type === MEMBER_FLAGS.Prop || type === MEMBER_FLAGS.PropMutable;
 // }
