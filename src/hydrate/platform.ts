@@ -35,29 +35,29 @@ export const win = window;
 
 export const doc = win.document;
 
-export const readTask = (cb: Function, elm: any) => {
+export const readTask = (cb: Function) => {
   process.nextTick(() => {
     try {
       cb();
     } catch (e) {
-      consoleError(e, elm);
+      consoleError(e);
     }
   });
 };
 
-export const writeTask = (cb: Function, elm: any) => {
+export const writeTask = (cb: Function) => {
   process.nextTick(() => {
     try {
       cb();
     } catch (e) {
-      consoleError(e, elm);
+      consoleError(e);
     }
   });
 };
 
 export const tick = Promise.resolve();
 
-export const consoleError = (e: any, _elm?: any) => {
+export const consoleError = (e: any) => {
   if (e != null) {
     console.error(e.stack || e.message || e);
   }

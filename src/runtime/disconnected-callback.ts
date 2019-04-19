@@ -16,14 +16,14 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     try {
       instance.disconnectedCallback();
     } catch (e) {
-      consoleError(e, elm);
+      consoleError(e);
     }
   }
   if (BUILD.cmpDidUnload && instance && instance.componentDidUnload) {
     try {
       instance.componentDidUnload();
     } catch (e) {
-      consoleError(e, elm);
+      consoleError(e);
     }
   }
 };

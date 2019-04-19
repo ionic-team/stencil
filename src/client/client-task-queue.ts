@@ -8,7 +8,7 @@ const queueDomWrites: d.RafCallback[] = [];
 const queueDomWritesLow: d.RafCallback[] = [];
 
 
-const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback, _elm: any) => {
+const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
   // queue dom reads
   queue.push(cb);
 

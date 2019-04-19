@@ -22,11 +22,6 @@ const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
         // instance is ready, let's call it's member method for this event
         return hostRef.$lazyInstance$[methodName](ev);
 
-      } else if (BUILD.hydrateServerSide) {
-        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(err => {
-          consoleError(err, hostRef.$hostElement$);
-        });
-
       } else {
         return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(consoleError);
       }

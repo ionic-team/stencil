@@ -8,7 +8,7 @@ const queuedLoadModules: QueuedLoadModule[] = [];
 const caughtErrors: Error[] = [];
 
 
-export const consoleError = (e: any, _elm?: any) => {
+export const consoleError = (e: any) => {
   caughtErrors.push(e);
 };
 
@@ -62,7 +62,7 @@ export function flushTicks() {
 }
 
 
-export function writeTask(cb: d.RafCallback, _elm?: any) {
+export function writeTask(cb: d.RafCallback) {
   queuedWriteTasks.push(cb);
 }
 

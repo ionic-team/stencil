@@ -33,13 +33,13 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
     }
 
   } catch (e) {
-    consoleError(e, elm);
+    consoleError(e);
   }
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, hostRef, cmpMeta, true, instance), elm);
+    writeTask(() => updateComponent(elm, hostRef, cmpMeta, true, instance));
   } else {
     // syncronuously write DOM
     updateComponent(elm, hostRef, cmpMeta, true, instance);
@@ -79,7 +79,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
           (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
         );
       } catch (e) {
-        consoleError(e, elm);
+        consoleError(e);
       }
       hostRef.$stateFlags$ &= ~HOST_STATE.isActiveRender;
     } else {
@@ -93,7 +93,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       serverSideConnected(elm);
 
     } catch (e) {
-      consoleError(e, elm);
+      consoleError(e);
     }
   }
 

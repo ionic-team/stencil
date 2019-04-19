@@ -60,7 +60,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         }
 
       } catch (e) {
-        consoleError(e, elm);
+        consoleError(e);
       }
 
     } else {
