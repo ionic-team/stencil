@@ -22,7 +22,7 @@ export type ComponentRuntimeMetaCompact = [
   {[memberName: string]: ComponentRuntimeMember}?,
 
   /** listeners */
-  d.ComponentRuntimeHostListener[]?
+  ComponentRuntimeHostListener[]?
 ];
 
 
@@ -30,8 +30,8 @@ export type ComponentRuntimeMetaCompact = [
 export interface ComponentRuntimeMeta {
   $flags$: number;
   $tagName$: string;
-  $members$?: d.ComponentRuntimeMembers;
-  $listeners$?: d.ComponentRuntimeHostListener[];
+  $members$?: ComponentRuntimeMembers;
+  $listeners$?: ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
   $watchers$?: d.ComponentConstructorWatchers;
   $lazyBundleIds$?: d.ModeBundleIds;

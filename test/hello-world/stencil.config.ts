@@ -5,7 +5,7 @@ export const config: Config = {
   outputTargets: [
     { type: 'dist' },
     {
-      type: 'dist-module',
+      type: 'experimental-dist-module',
       dir: 'www'
     },
     {

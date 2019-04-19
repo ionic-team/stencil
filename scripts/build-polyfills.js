@@ -11,28 +11,15 @@ const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
   await fs.emptyDir(outputPolyfillsDir);
 
-  const esmDir = path.join(outputPolyfillsDir, 'esm');
-  await fs.emptyDir(esmDir);
-
-  const es5Dir = path.join(outputPolyfillsDir, 'es5');
-  await fs.emptyDir(es5Dir);
-
   const files = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));
 
-  files.forEach(fileName => {
-    const srcFilePath = path.join(SRC_DIR, fileName);
-    const esmFilePath = path.join(esmDir, fileName);
-    const es5FilePath = path.join(es5Dir, fileName);
-
-    const polyfillContent = fs.readFileSync(srcFilePath, 'utf8');
-
-    const esmWrapped = (fileName === 'tslib.js' || fileName === 'system.js')
-      ? polyfillContent
-      : esmWrap(polyfillContent);
-
-    fs.writeFileSync(esmFilePath, esmWrapped);
-    fs.writeFileSync(es5FilePath, polyfillContent);
-  });
+  await Promise.all(
+    files.map(fileName => {
+      const srcFilePath = path.join(SRC_DIR, fileName);
+      const dstfilePath = path.join(outputPolyfillsDir, fileName);
+      return fs.copyFile(srcFilePath, dstfilePath);
+    })
+  );
 
 
   const rollupBuild = await rollup.rollup({
@@ -43,10 +30,7 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     }
   });
 
-  const { output } = await rollupBuild.generate({
-    format: 'esm'
-  });
-
+  const { output } = await rollupBuild.generate({ format: 'esm' });
   const transpile = ts.transpileModule(output[0].code, {
     compilerOptions: {
       target: ts.ScriptTarget.ES5
@@ -62,16 +46,9 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
 
   const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
 
-  const esmFilePath = path.join(esmDir, 'css-shim.js');
-  const es5FilePath = path.join(es5Dir, 'css-shim.js');
+  const filePath = path.join(outputPolyfillsDir, 'css-shim.js');
 
   await Promise.all([
-    fs.writeFile(esmFilePath, esmWrap(cssShimMapPolyfill)),
-    fs.writeFile(es5FilePath, cssShimMapPolyfill)
+    fs.writeFile(filePath, cssShimMapPolyfill)
   ]);
 };
-
-
-function esmWrap(polyfillContent) {
-  return `export function applyPolyfill(window, document) {${polyfillContent}}`;
-}

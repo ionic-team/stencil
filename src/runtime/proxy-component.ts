@@ -2,9 +2,9 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { getHostRef } from '@platform';
+import { getHostRef, supportsShadowDom } from '@platform';
 import { getValue, setValue } from './set-value';
-import { MEMBER_FLAGS } from '../utils/constants';
+import { CMP_FLAG, MEMBER_FLAGS } from '../utils/constants';
 
 
 export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
@@ -17,6 +17,9 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
   };
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
+  }
+  if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation && !supportsShadowDom) {
+    cmpMeta.$flags$ |= CMP_FLAG.needsShadowDomShim;
   }
   Cstr.prototype.connectedCallback = function() {
     connectedCallback(this, cmpMeta);

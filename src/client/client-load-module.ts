@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError } from './client-log';
-import { supportsShadowDom } from './client-window';
 
 
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, hmrVersionId?: string): Promise<d.ComponentConstructor> => {
@@ -14,10 +13,6 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    `./${
-      BUILD.shadowDom
-        ? bundleId + (!supportsShadowDom ? '.sc' : '')
-        : bundleId
-      }.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
+    `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
   ).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
 };

@@ -1,13 +1,12 @@
+import { proxyComponent } from './proxy-component';
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { disconnectedCallback } from './disconnected-callback';
-import { proxyComponent } from './proxy-component';
-import { getHostRef, registerHost, supportsShadowDom } from '@platform';
+import { BUILD } from '@build-conditionals';
+import { getHostRef, plt, registerHost, supportsShadowDom } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HTMLElement } from './html-element';
 import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 
@@ -20,6 +19,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  if (options.resourcesUrl) {
+    plt.$importMetaUrl$ = options.resourcesUrl;
+  }
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
@@ -47,6 +49,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
       if (BUILD.watchCallback) {
         cmpMeta.$watchers$ = {};
       }
+      if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
+        cmpMeta.$flags$ |= CMP_FLAG.needsShadowDomShim;
+      }
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
         ['s-lr'] = false;
@@ -57,7 +62,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
           // @ts-ignore
           super(self);
           registerHost(this);
-          if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
+          if (BUILD.shadowDom &&  cmpMeta.$flags$ === CMP_FLAG.shadowDomEncapsulation) {
             // this component is using shadow dom
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element

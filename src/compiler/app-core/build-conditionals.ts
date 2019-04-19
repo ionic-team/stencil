@@ -70,3 +70,4 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
 
 
 export const BUILD: d.Build = {};
+export const NAMESPACE = 'app';

@@ -27,7 +27,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...bundleAppOptions.loader
         }),
         stencilClientPlugin(config),
-        stencilBuildConditionalsPlugin(build),
+        stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx, buildCtx, build),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({

@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, loadModule } from '@platform';
-import { HOST_STATE } from '@utils';
+import { CMP_FLAG, HOST_STATE } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
@@ -69,7 +69,12 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
       // this component has styles but we haven't registered them yet
-      registerStyle(getScopeId(cmpMeta.$tagName$, hostRef.$modeName$), Cstr.style);
+      let style = Cstr.style;
+      let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
+      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
+        style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
+      }
+      registerStyle(scopeId, style);
       Cstr.isStyleRegistered = true;
     }
   }

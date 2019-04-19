@@ -71,4 +71,5 @@ export interface HostElement extends HTMLElement {
 
 export interface CustomElementsDefineOptions {
   exclude?: string[];
+  resourcesUrl?: string;
 }

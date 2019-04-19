@@ -43,14 +43,14 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       // in here to act as original content anchors as we move nodes around
       // host element has been connected to the DOM
       if (
-        BUILD.hydrateServerSide ||
+        (BUILD.hydrateServerSide) ||
         (BUILD.slot && cmpMeta.$flags$ & CMP_FLAG.hasSlotRelocation) ||
-        (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation)) {
+        (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim)) {
         setContentReference(elm);
       }
     }
 
-    if (BUILD.slotRelocation && BUILD.es5 && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
+    if (BUILD.slotRelocation && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
       try {
         (elm as any).shadowRoot = elm;
       } catch (e) {}

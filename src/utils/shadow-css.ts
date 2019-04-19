@@ -9,7 +9,12 @@
  * https://github.com/webcomponents/webcomponentsjs/blob/4efecd7e0e/src/ShadowCSS/ShadowCSS.js
  * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
  */
-export class ShadowCss {
+export function scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean) {
+  const sc = new ShadowCss();
+  return sc.shimCssText(cssText, scopeId, scopeId + '-h', scopeId + '-s', commentOriginalSelector);
+}
+
+class ShadowCss {
   strictStyling = true;
 
   shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false): string {

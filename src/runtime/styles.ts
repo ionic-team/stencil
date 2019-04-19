@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
-import { doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { doc, styles, supportsConstructibleStylesheets } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 
 declare global {
@@ -78,9 +78,9 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
   const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot)
     ? elm.shadowRoot
-    : (elm as any).getRootNode(), cmpMeta.$tagName$, mode);
+    : elm.getRootNode(), cmpMeta.$tagName$, mode);
 
-  if ((BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) || (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation)) {
+  if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAG.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -91,7 +91,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     elm['s-sc'] = styleId;
     elm.classList.add(styleId + '-h');
 
-    if (cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
+    if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
       elm.classList.add(styleId + '-s');
     }
   }
@@ -100,10 +100,6 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 
 export const getScopeId = (tagName: string, mode?: string) =>
   'sc-' + ((BUILD.mode && mode) ? tagName + '-' + mode : tagName);
-
-export const getElementScopeId = (scopeId: string, isHostElement: boolean) =>
-  scopeId + (isHostElement ? '-h' : '-s');
-
 
 export const convertScopedToShadow = (css: string) =>
   css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');

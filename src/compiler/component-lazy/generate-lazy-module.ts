@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { DEFAULT_STYLE_MODE, sortBy, hasDependency } from '@utils';
+import { DEFAULT_STYLE_MODE, hasDependency, sortBy } from '@utils';
 import { optimizeModule } from '../app-core/optimize-module';
 import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
@@ -115,10 +115,7 @@ export async function writeLazyCore(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`
   );
-  if (!isBrowserBuild) {
-    code = code.replace(/import\.meta\.url/g, '""');
-  }
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, true, true, isBrowserBuild, code);
+  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, config.minifyJs, true, isBrowserBuild, code);
 
   await Promise.all(destinations.map(dst => {
     const filePath = config.sys.path.join(dst, rollupResult.fileName);

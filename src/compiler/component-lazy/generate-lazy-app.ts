@@ -94,14 +94,15 @@ import globalScripts from '@stencil/core/global-scripts';
 export * from '@stencil/core/platform';
 export const defineCustomElements = (win, options) => {
   globalScripts(win);
-  patchDynamicImport(win);
   bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], win, options);
 };
 `;
 
 const BROWSER_ENTRY = `
-import { defineCustomElements } from '@stencil/core';
-defineCustomElements(window);
+import { defineCustomElements, patchBrowser } from '@stencil/core';
+patchBrowser().then(resourcesUrl => {
+  defineCustomElements(window, { resourcesUrl });
+});
 `;
 
 // This is for webpack

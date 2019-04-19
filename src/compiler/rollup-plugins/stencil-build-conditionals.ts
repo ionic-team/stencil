@@ -1,8 +1,11 @@
 import * as d from '../../declarations';
 
 
-export function stencilBuildConditionalsPlugin(build: d.Build) {
-  const buildData = `export const BUILD = ${JSON.stringify(build)};`;
+export function stencilBuildConditionalsPlugin(build: d.Build, namespace: string) {
+  const buildData = `
+export const BUILD = ${JSON.stringify(build)};
+export const NAMESPACE = '${namespace}';
+`;
 
   return {
     resolveId(id: string) {

@@ -21,7 +21,9 @@ const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
 
 async function bundleRuntime() {
   const rollupBuild = await rollup.rollup({
-    input: runtimeInputFile,
+    input: {
+      'index': runtimeInputFile
+    },
     external: [
       '@stencil/core/build-conditionals',
       '@stencil/core/platform',
@@ -53,11 +55,12 @@ async function bundleRuntime() {
   await Promise.all([
     rollupBuild.write({
       format: 'esm',
-      file: path.join(DIST_RUNTIME_DIR, 'index.mjs')
+      entryFileNames: '[name].mjs',
+      dir: path.join(DIST_RUNTIME_DIR)
     }),
     rollupBuild.write({
       format: 'cjs',
-      file: path.join(DIST_RUNTIME_DIR, 'index.js')
+      dir: path.join(DIST_RUNTIME_DIR)
     })
   ]);
 }
@@ -65,16 +68,15 @@ async function bundleRuntime() {
 
 async function bundleClient() {
   const rollupBuild = await rollup.rollup({
-    input: clientInputFile,
-    external: [
-      '@stencil/core/build-conditionals'
-    ],
+    input: {
+      'index': clientInputFile
+    },
     plugins: [
       (() => {
         return {
           resolveId(id) {
             if (id === '@build-conditionals') {
-              return '@stencil/core/build-conditionals';
+              return {id: '@stencil/core/build-conditionals', external: true}
             }
             if (id === '@platform') {
               return clientInputFile;
@@ -95,14 +97,15 @@ async function bundleClient() {
     }
   });
 
-  const results = await Promise.all([
+  await Promise.all([
     rollupBuild.write({
       format: 'esm',
-      file: path.join(DIST_CLIENT_DIR, 'index.mjs')
+      entryFileNames: '[name].mjs',
+      dir: path.join(DIST_CLIENT_DIR)
     }),
     rollupBuild.write({
       format: 'cjs',
-      file: path.join(DIST_CLIENT_DIR, 'index.js')
+      dir: path.join(DIST_CLIENT_DIR)
     })
   ]);
 }

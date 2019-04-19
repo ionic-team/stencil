@@ -40,12 +40,9 @@ function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rol
 }
 
 async function getSystemLoader(config: d.Config, corePath: string, includePolyfills: boolean) {
-  const staticName = config.sys.path.join('polyfills', 'esm', 'system.js');
   const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
-  const systemLoader = await config.sys.getClientCoreFile({ staticName: staticName });
   return `
 ${polyfills}
-${systemLoader}
 // Find resourceUrl
 var doc = document;
 var allScripts = doc.querySelectorAll('script');

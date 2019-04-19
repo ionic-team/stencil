@@ -18,10 +18,6 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
   if (isCore) {
     opts.compress.passes = 4;
     opts.compress.pure_funcs = ['getHostRef'];
-    opts.compress.global_defs = {
-      'STENCIL_SOURCE_TARGET': sourceTarget,
-      'STENCIL_PATCH_IMPORT': isBrowserBuild
-    };
     opts.mangle.properties = {
       regex: '^\\$.+\\$$',
     };

@@ -52,6 +52,9 @@ export const enum CMP_FLAG {
   shadowDomEncapsulation = 1 << 0,
   scopedCssEncapsulation = 1 << 1,
   hasSlotRelocation = 1 << 2,
+
+  needsShadowDomShim = 1 << 3,
+  needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 
 /**

@@ -40,7 +40,7 @@ export interface StencilSystem {
   requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
-  scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean) => Promise<string>;
+  scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
   semver?: Semver;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;

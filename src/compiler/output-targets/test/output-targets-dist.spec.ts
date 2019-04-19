@@ -63,7 +63,6 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'promise.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'string.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'url.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'tslib.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.components.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.core.js'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.define.js'),
