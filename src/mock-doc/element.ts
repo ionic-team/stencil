@@ -67,7 +67,7 @@ class MockButtonElement extends MockElement {
     super(ownerDocument, 'button');
   }
 }
-/*@__PURE__*/patchPropAttributes(MockButtonElement.prototype, {
+patchPropAttributes(MockButtonElement.prototype, {
   type: String
 });
 
@@ -84,7 +84,7 @@ class MockImgElement extends MockElement {
     this.setAttribute('src', value);
   }
 }
-/*@__PURE__*/patchPropAttributes(MockImgElement.prototype, {
+patchPropAttributes(MockImgElement.prototype, {
   height: Number,
   width: Number
 });
@@ -95,7 +95,7 @@ class MockInputElement extends MockElement {
     super(ownerDocument, 'input');
   }
 }
-/*@__PURE__*/patchPropAttributes(MockInputElement.prototype, {
+patchPropAttributes(MockInputElement.prototype, {
   accept: String,
   autocomplete: String,
   autofocus: Boolean,
@@ -135,7 +135,7 @@ class MockFormElement extends MockElement {
     super(ownerDocument, 'form');
   }
 }
-/*@__PURE__*/patchPropAttributes(MockFormElement.prototype, {
+patchPropAttributes(MockFormElement.prototype, {
   name: String
 });
 
@@ -152,7 +152,7 @@ class MockLinkElement extends MockElement {
     this.setAttribute('href', value);
   }
 }
-/*@__PURE__*/patchPropAttributes(MockLinkElement.prototype, {
+patchPropAttributes(MockLinkElement.prototype, {
   crossorigin: String,
   media: String,
   rel: String,
@@ -165,7 +165,7 @@ class MockMetaElement extends MockElement {
     super(ownerDocument, 'meta');
   }
 }
-/*@__PURE__*/patchPropAttributes(MockMetaElement.prototype, {
+patchPropAttributes(MockMetaElement.prototype, {
   charset: String,
   content: String,
   name: String
@@ -184,7 +184,7 @@ class MockScriptElement extends MockElement {
     this.setAttribute('src', value);
   }
 }
-/*@__PURE__*/patchPropAttributes(MockScriptElement.prototype, {
+patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
