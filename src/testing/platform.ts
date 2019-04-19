@@ -47,11 +47,27 @@ export function resetPlatform() {
 }
 
 
-export const getHostRef = (elm: d.RuntimeRef) =>
-  hostRefs.get(elm);
+export const getHostRef = (elm: d.RuntimeRef) => {
+  return hostRefs.get(elm);
+}
 
-export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
+export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
+  if (lazyInstance == null || lazyInstance.constructor == null) {
+    throw new Error(`Invalid component constructor`);
+  }
+
+  if (hostRef == null) {
+    const Cstr = lazyInstance.constructor as d.ComponentTestingConstructor;
+    const tagName = (Cstr.COMPILER_META && Cstr.COMPILER_META.tagName) ? Cstr.COMPILER_META.tagName : 'div';
+    const elm = document.createElement(tagName);
+    registerHost(elm);
+    hostRef = getHostRef(elm);
+  }
+
+  hostRef.$lazyInstance$ = lazyInstance;
+  return hostRefs.set(lazyInstance, hostRef);
+};
+
 
 export const registerHost = (elm: d.HostElement) => {
   const hostRef: d.HostRef = {
