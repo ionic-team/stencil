@@ -31,31 +31,9 @@ export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   });
 };
 
-export const getDoc = (elm?: Node) => {
-  if (elm != null) {
-    if (elm.nodeType === 9) {
-      return elm as Document;
-    }
-    return elm.ownerDocument;
-  }
-  return null;
-};
+export const win = window;
 
-export const getWin = (elm?: Node) => {
-  const doc = getDoc(elm);
-  if (doc != null) {
-    return doc.defaultView;
-  }
-  return null;
-};
-
-export const getHead = (elm?: Node) => {
-  const doc = getDoc(elm);
-  if (doc != null) {
-    return doc.head;
-  }
-  return null;
-};
+export const doc = win.document;
 
 export const readTask = (cb: Function, elm: any) => {
   process.nextTick(() => {
@@ -95,12 +73,12 @@ const Context = {
   }
 };
 
-export const getContext = (ref: d.RuntimeRef, context: string) => {
+export const getContext = (_ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
-    return getWin(getHostRef(ref).$hostElement$);
+    return win;
   }
   if (context === 'document') {
-    return getDoc(getHostRef(ref).$hostElement$);
+    return doc;
   }
   if (context === 'isServer') {
     return true;
@@ -150,8 +128,6 @@ export {
   getElement,
   getMode,
   getValue,
-  getWindow,
-  getDocument,
   getAssetPath,
   Host,
   h,

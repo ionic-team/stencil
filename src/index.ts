@@ -75,16 +75,6 @@ export declare function getMode<T = (string | undefined)>(ref: any): T;
 export declare function getAssetPath(path: string): string;
 
 /**
- * getWindow
- */
-export declare function getWindow(ref: any): Window;
-
-/**
- * getDocument
- */
-export declare function getDocument(ref: any): Document;
-
-/**
  * getElement
  */
 export declare function getElement(ref: any): HTMLElement;

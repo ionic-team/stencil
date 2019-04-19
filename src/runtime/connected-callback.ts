@@ -3,7 +3,7 @@ import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, HOST_STATE, MEMBER_FLAGS } from '@utils';
-import { getDoc, getHostRef, supportsShadowDom, tick } from '@platform';
+import { doc, getHostRef, supportsShadowDom, tick } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
@@ -118,7 +118,7 @@ const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) =
     crName = '';
   }
 
-  contentRefElm = elm['s-cr'] = (getDoc(elm).createComment(crName) as any);
+  contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

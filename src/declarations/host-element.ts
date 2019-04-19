@@ -68,3 +68,7 @@ export interface HostElement extends HTMLElement {
 
   componentOnReady?: () => Promise<this>;
 }
+
+export interface CustomElementsDefineOptions {
+  exclude?: string[];
+}

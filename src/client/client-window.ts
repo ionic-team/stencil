@@ -2,11 +2,11 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 
 
-export const getWin = (_?: any) => window;
+export const win = window;
 
-export const getDoc = (_?: any) => document;
+export const doc = document;
 
-export const getHead = (_?: any) => getDoc().head;
+export const getHead = (_?: any) => doc.head;
 
 export const plt: d.PlatformRuntime = {};
 
@@ -16,12 +16,12 @@ if (BUILD.taskQueue) {
   plt.$queueAsync$ = false;
 }
 
-export const supportsShadowDom = (BUILD.shadowDom) ? !!getDoc().documentElement.attachShadow : false;
+export const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;
 
 export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;
   try {
-    getWin().addEventListener('e', null,
+    doc.addEventListener('e', null,
       Object.defineProperty({}, 'passive', {
         get() { supportsListenerOptions = true; }
       })

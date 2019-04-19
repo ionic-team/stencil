@@ -217,11 +217,8 @@ async function waitForChanges(page: pd.E2EPageInternal) {
     }
 
     await page.evaluate(() => {
-
-      const promises = (window as d.WindowData)['s-apps'].map((appNamespace: string) => {
-        return (window as any)[appNamespace].onReady();
-      });
-
+      const promises: Promise<any>[] = [];
+      waitComponentOnReady(document.body, promises);
       return Promise.all(promises);
     });
 
@@ -236,6 +233,23 @@ async function waitForChanges(page: pd.E2EPageInternal) {
     await page.waitFor(4);
 
   } catch (e) {}
+}
+
+
+function waitComponentOnReady(elm: Element, promises: Promise<any>[]) {
+  if (elm != null) {
+    const children = elm.children;
+    const len = children.length;
+    for (let i = 0; i < len; i++) {
+      const childElm = children[i];
+      if (childElm != null) {
+        if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
+          promises.push((childElm as d.HostElement).componentOnReady());
+        }
+        waitComponentOnReady(childElm, promises);
+      }
+    }
+  }
 }
 
 

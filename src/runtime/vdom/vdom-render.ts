@@ -9,7 +9,7 @@
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
-import { getDoc, plt, supportsShadowDom } from '@platform';
+import { doc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
 import { NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
@@ -575,7 +575,6 @@ const isHost = (node: any): node is d.VNode => {
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
   const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
-  const doc = getDoc(hostElm);
   hostTagName = toLowerCase(hostElm.tagName);
 
   if (isHost(renderFnResults)) {

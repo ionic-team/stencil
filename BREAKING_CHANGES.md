@@ -254,8 +254,6 @@ In addition, the new syntax allows for strong typing, since the `{target}` only 
 
 Most of the functionality can be replaced by new functions exposed in `@stencil/core`.
 
-- `@Prop({context: 'window'})` => `getWindow(this)`
-- `@Prop({context: 'document'})` => `getDocument(this)`
 - `@Prop({context: 'resourcesUrl'})` => `getAssetsPath(this, 'image.png')`
 
 
@@ -368,24 +366,6 @@ export const config = {
 ```
 
 ## New APIs
-
-### getWindow(this) and getDocument(this)
-
-`getWindow(this)` and `getDocument(this)` replaces `@Prop({context: 'window'})` and `@Prop({context: 'document'})` respectively. This methods can only be used within the context of a component by passing `this` as first argument, ie a reference to the component itself:
-
-```diff
-+ import { Component, getWindow } from '@stencil/core';
-
-  @Component({...})
-  export class MyComponent {
--   @Prop({ context: 'window' }) win!: Window;
-+   win = getWindow(this);
-  }
-```
-
-You might wonder why not use `window` or `document` directly. While technically it would work just fine in a browser, it will likely cause issues once you try to prerender your application.
-
-This is due to the fact that prerendering runs in `node`, which is a different JavaScript environment that does not have the global `window` or `document` objects. These new APIs fill the gap! But if there are no plans to prerender components, using browser globals is perfectly acceptable.
 
 ### setMode() and getMode()
 

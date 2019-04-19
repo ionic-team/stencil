@@ -1,7 +1,8 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, getDoc, getWin, supportsListenerOptions } from '@platform';
+import { consoleError, doc, supportsListenerOptions, win } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
+
 
 export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
   const removeFns = listeners.map(([flags, name, method]) => {
@@ -37,9 +38,9 @@ const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
 
 
 const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
-  if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return getDoc(elm);
-  if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return getWin(elm);
-  if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return getDoc(elm).body;
+  if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
+  if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
+  if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
   if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
   return elm;
 };

@@ -1,10 +1,9 @@
 import * as d from '../declarations';
-import { getDocument } from './element';
+import { doc } from '@platform';
 
 
-export const getConnect = (ref: d.HostRef, tagName: string) => {
+export const getConnect = (_ref: d.HostRef, tagName: string) => {
   function componentOnReady(): Promise<any> {
-    const doc = getDocument(ref) as Document;
     let elm = doc.querySelector(tagName) as any;
     if (!elm) {
       elm = doc.createElement(tagName) as any;

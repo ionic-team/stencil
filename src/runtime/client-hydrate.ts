@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
-import { getDoc, plt } from '@platform';
+import { doc, plt } from '@platform';
 import { toLowerCase } from '@utils';
 
 
@@ -16,7 +16,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   };
 
   if (!plt.$orgLocNodes$) {
-    initializeDocumentHydrate(getDoc(hostElm).body, plt.$orgLocNodes$ = new Map());
+    initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
   }
 
   hostElm[HYDRATE_ID] = hostId;
@@ -175,7 +175,7 @@ const clientHydrate = (
           if (BUILD.shadowDom && shadowRootNodes) {
             // browser support shadowRoot and this is a shadow dom component
             // create an actual slot element
-            childVNode.$elm$ = getDoc(node).createElement(childVNode.$tag$);
+            childVNode.$elm$ = doc.createElement(childVNode.$tag$);
 
             if (childVNode.$name$) {
               // add the slot name attribute

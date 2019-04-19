@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
-import { getDoc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 
 declare global {
@@ -49,7 +49,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
         } else {
           const dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
 
-          styleElm = getDoc(styleContainerNode).createElement('style');
+          styleElm = doc.createElement('style');
           styleElm.innerHTML = style;
 
           if (BUILD.hydrateServerSide) {

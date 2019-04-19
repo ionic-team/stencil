@@ -1,5 +1,4 @@
 
-export * from './app-global';
 export * from './assets';
 export * from './build';
 export * from './build-conditionals';
