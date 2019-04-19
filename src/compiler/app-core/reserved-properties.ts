@@ -16,7 +16,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'initialized',
   'isClient',
   'isPrerender',
-  'isServer',
+  'isBrowser',
   'key',
   'loaded',
   'mode',

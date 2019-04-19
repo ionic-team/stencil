@@ -114,7 +114,7 @@ export const registerHost = (elm: d.HostElement) => {
 
 export const Build: d.UserBuildConditionals = {
   isDev: false,
-  isServer: true
+  isBrowser: false
 };
 
 export const styles: d.StyleMap = new Map();

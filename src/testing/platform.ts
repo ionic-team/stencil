@@ -14,7 +14,7 @@ export const styles: d.StyleMap = new Map();
 
 export const Build: d.UserBuildConditionals = {
   isDev: true,
-  isServer: false
+  isBrowser: false
 };
 
 export const plt: d.PlatformRuntime = {

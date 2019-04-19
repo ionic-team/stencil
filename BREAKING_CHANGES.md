@@ -249,13 +249,63 @@ The first argument of the `@Listen()` decorator is now only the event name, such
 This change was motivated by the fact that `body:event` is a valid DOM event name.
 In addition, the new syntax allows for strong typing, since the `{target}` only accepts the following string values (`'window'`, `'document'`, `'body'`, `'parent'`).
 
+### `@Prop({context})`
 
-### `@Prop(context)`
+Using the `@Prop` decorator with the `context` has been deprecated and their usage is highly unrecommended. Here's how update each case:
 
-Most of the functionality can be replaced by new functions exposed in `@stencil/core`.
 
-- `@Prop({context: 'resourcesUrl'})` => `getAssetsPath(this, 'image.png')`
+#### `'window'`
 
+Accessing `window` using `Prop({context: 'window'})` was previously required because of Server-side-rendering requirements, fortunately this is not longer needed, and developers can use global `window` directly.
+
+- `Prop({context: 'window'})` becomes `window`
+
+```diff
+-  @Prop({context: 'window'}) win!: Window;
+
+   method() {
+     // print window
+-    console.log(this.win);
++    console.log(window);
+   }
+```
+
+#### `'document'`
+
+Accessing `document` using `Prop({context: 'document'})` was previously required because of Server-side-rendering requirements, fortunately this is not longer needed, and developers can use global `document` directly.
+
+- `Prop({context: 'document'})` becomes `document`
+
+```diff
+-  @Prop({context: 'document'}) doc!: Document;
+
+   method() {
+     // print document
+-    console.log(this.doc);
++    console.log(document);
+   }
+```
+
+#### `'isServer'`
+
+In order to determine if the your component is being rendered in the browser or the server as part of some prerendering/ssr process, stencil exposes a compiler-time constant through the `Build` object, exposed in `@stencil/core`:
+
+- `Prop({context: 'isServer'})` becomes `!Build.isBrowser`
+
+```diff
++  import { Build } from '@stencil/core';
+
+   [...]
+
+-  @Prop({context: 'isServer'}) isServer!: boolean;
+
+   method() {
+-    if (!this.isServer) {
++    if (Build.isBrowser) {
+       console.log('only log in the browser');
+     }
+   }
+```
 
 ### `@Prop(connect)`
 
