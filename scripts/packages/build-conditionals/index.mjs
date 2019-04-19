@@ -57,3 +57,4 @@ export const BUILD = {
   profile: false,
   slotRelocation: true
 };
+export const NAMESPACE = 'app';
