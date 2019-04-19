@@ -77,7 +77,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     return lazyBundleRuntimeMeta;
   });
 
-  const win = platform.getWin() as Window;
+  const win = platform.win as Window;
   const doc = win.document;
 
   const results = {
