@@ -37,5 +37,7 @@ const KEEP_IMPORTS = new Set([
   'getMode',
   'Build',
   'Host',
-  'getAssetPath'
+  'getAssetPath',
+  'writeTask',
+  'readTask'
 ]);

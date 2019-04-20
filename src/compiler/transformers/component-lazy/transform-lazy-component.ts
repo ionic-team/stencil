@@ -7,10 +7,6 @@ import ts from 'typescript';
 
 
 export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
-  if (buildCtx.shouldAbort) {
-    return null;
-  }
-
   let outputText: string = null;
 
   try {

@@ -33,7 +33,7 @@ async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx,
   const build = getBuildConditionals(config, cmps);
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build, externalRuntime);
 
-  if (Array.isArray(rollupResults) && !buildCtx.shouldAbort) {
+  if (Array.isArray(rollupResults) && !buildCtx.hasError) {
     await Promise.all(
       rollupResults.map(async result => {
         let code = result.code;

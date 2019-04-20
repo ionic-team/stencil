@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 
-export function optimizeCriticalPath(doc: Document, config: d.Config, criticalBundlers: string[], outputTarget: d.OutputTargetWww) {
+export function optimizeCriticalPath(config: d.Config, doc: Document, criticalBundlers: string[], outputTarget: d.OutputTargetWww) {
   const relativeBuildDir = config.sys.path.relative(outputTarget.dir, outputTarget.buildDir);
   const paths = criticalBundlers.map(path => '/' + config.sys.path.join(relativeBuildDir, path));
 

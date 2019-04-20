@@ -47,7 +47,6 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     if (buildCtx.hasError) {
       // gosh darn, build had errors
       // ಥ_ಥ
-      compilerCtx.lastBuildHadError = true;
       buildStatus = 'failed';
       statusColor = 'red';
 
@@ -55,7 +54,6 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       // successful build!
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
       compilerCtx.hasSuccessfulBuild = true;
-      compilerCtx.lastBuildHadError = false;
     }
 
     if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {

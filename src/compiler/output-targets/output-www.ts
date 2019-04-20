@@ -10,6 +10,7 @@ import { performCopyTasks } from '../copy/copy-tasks';
 import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 import { getUsedComponents } from '../html/used-components';
+import { writeGlobalStyles } from '../style/global-styles';
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
@@ -60,6 +61,9 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
   }
 
+  // Copy global styles into the build directory
+  writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
+
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
     await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
@@ -88,35 +92,26 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
 }
 
 async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
-  if (buildCtx.shouldAbort) {
-    return;
-  }
-
-  if (compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0 && !buildCtx.hasIndexHtmlChanges) {
+  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasIndexHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }
 
   // get the source index html content
   try {
+    const doc = cloneDocument(buildCtx.indexDoc);
 
-    try {
-      const doc = cloneDocument(buildCtx.indexDoc);
+    // validateHtml(config, buildCtx, doc);
+    await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
+    await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+    optimizeCriticalPath(config, doc, criticalPath, outputTarget);
 
-      await updateIndexHtmlServiceWorker(doc, config, buildCtx, outputTarget);
-      await inlineEsmImport(doc, config, compilerCtx, outputTarget);
-      optimizeCriticalPath(doc, config, criticalPath, outputTarget);
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, serializeNodeToHtml(doc));
 
-      await compilerCtx.fs.writeFile(outputTarget.indexHtml, serializeNodeToHtml(doc));
-
-      buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
-
-    } catch (e) {
-      catchError(buildCtx.diagnostics, e);
-    }
+    buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
   } catch (e) {
-    // it's ok if there's no index file
-    buildCtx.debug(`no index html: ${config.srcIndexHtml}`);
+    catchError(buildCtx.diagnostics, e);
   }
 }
+

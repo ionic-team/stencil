@@ -97,7 +97,7 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  $importMetaUrl$?: string;
+  $resourcesUrl$?: string;
   $isTmpDisconnected$?: boolean;
   $orgLocNodes$?: Map<string, d.RenderNode>;
   $queueAsync$?: boolean;

@@ -11,7 +11,7 @@ export const getHead = (_?: any) => doc.head;
 export const plt: d.PlatformRuntime = {};
 
 if (BUILD.taskQueue) {
-  plt.$importMetaUrl$ = '/';
+  plt.$resourcesUrl$ = '/';
   plt.$queueCongestion$ = 0;
   plt.$queuePending$ = false;
   plt.$queueAsync$ = false;

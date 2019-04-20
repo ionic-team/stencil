@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 
 
-export async function inlineEsmImport(doc: Document, config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  const expectedSrc = `/build/${config.fsNamespace}.mjs.js`;
+export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) {
+  const expectedSrc = `/build/${config.fsNamespace}.esm.js`;
   const script = Array.from(doc.querySelectorAll('script'))
     .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
 

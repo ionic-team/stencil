@@ -1,11 +1,11 @@
+import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
-import * as d from '../declarations';
 import { CMP_FLAG } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import { disconnectedCallback } from './disconnected-callback';
+import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { getHostRef, plt, registerHost, supportsShadowDom } from '@platform';
+import { doc, getHostRef, plt, registerHost, supportsShadowDom } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
@@ -14,13 +14,12 @@ import { postUpdateComponent, scheduleUpdate } from './update-component';
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window, options: d.CustomElementsDefineOptions = {}) => {
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
-  const doc = win.document;
   const head = doc.head;
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   if (options.resourcesUrl) {
-    plt.$importMetaUrl$ = options.resourcesUrl;
+    plt.$resourcesUrl$ = new URL(options.resourcesUrl, doc.baseURI).href;
   }
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {

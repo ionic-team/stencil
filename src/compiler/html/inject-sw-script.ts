@@ -3,7 +3,7 @@ import { generateServiceWorkerUrl } from '../service-worker/service-worker-util'
 import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
 
-export async function updateIndexHtmlServiceWorker(doc: Document, config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+export async function updateIndexHtmlServiceWorker(config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) {
   if (!outputTarget.serviceWorker && config.devMode) {
     // if we're not generating a sw, and this is a dev build
     // then let's inject a script that always unregisters any service workers

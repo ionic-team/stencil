@@ -20,7 +20,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
         chunkFileNames: '[name].js',
       });
 
-      if (!buildCtx.shouldAbort && rollupOutput != null && Array.isArray(rollupOutput.output)) {
+      if (!buildCtx.hasError && rollupOutput != null && Array.isArray(rollupOutput.output)) {
         await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
       }
     }

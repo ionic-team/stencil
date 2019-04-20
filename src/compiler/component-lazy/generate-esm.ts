@@ -16,13 +16,13 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'esm',
-      entryFileNames: '[name].mjs.js',
+      entryFileNames: '[name].esm.js',
       chunkFileNames: isProd ? 'p-[hash].js' : '[name]-[hash].js',
       preferConst: true
     };
     // This is needed until Firefox 67, which ships native dynamic imports
     if (isBrowserBuild) {
-      esmOpts.dynamicImportFunction = '__stencil_import';
+      esmOpts.dynamicImportFunction = `__sc_import_${config.fsNamespace}`;
     }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 

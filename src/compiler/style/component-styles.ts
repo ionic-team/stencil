@@ -8,10 +8,6 @@ import { scopeComponentCss } from './scope-css';
 
 
 export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
-  if (buildCtx.shouldAbort) {
-    return;
-  }
-
   if (buildCtx.isRebuild) {
     const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, cmp, styleMeta, commentOriginalSelector);
     if (cachedCompiledStyles) {
@@ -63,9 +59,6 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 
 async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, extStylePath: string) {
-  if (buildCtx.shouldAbort) {
-    return '/* build aborted */';
-  }
 
   extStylePath = normalizePath(extStylePath);
 

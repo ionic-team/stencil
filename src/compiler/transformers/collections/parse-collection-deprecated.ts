@@ -23,6 +23,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   moduleFile.excludeFromCollection = excludeFromCollection(config, cmpData);
   moduleFile.originalCollectionComponentPath = cmpData.componentPath;
   moduleFile.jsFilePath = parseJsFilePath(config, collectionDir, cmpData);
+
   const cmpMeta: d.ComponentCompilerMeta = {
     isLegacy: moduleFile.isLegacy,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -99,7 +100,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   };
   setComponentBuildConditionals(cmpMeta);
 
-  moduleFile.cmps.push(cmpMeta);
+  moduleFile.cmps = [cmpMeta];
 
   // parseComponentDependencies(cmpData, cmpMeta);
   // parseContextMember(cmpData, cmpMeta);

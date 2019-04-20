@@ -6,10 +6,6 @@ import ts from 'typescript';
 import { addNativeImports } from './native-imports';
 
 export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
-  if (buildCtx.shouldAbort) {
-    return null;
-  }
-
   let outputText: string = null;
 
   try {

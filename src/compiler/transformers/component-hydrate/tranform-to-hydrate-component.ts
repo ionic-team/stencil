@@ -7,10 +7,6 @@ import ts from 'typescript';
 
 
 export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
-  if (buildCtx.shouldAbort) {
-    return null;
-  }
-
   let outputText: string = null;
 
   try {

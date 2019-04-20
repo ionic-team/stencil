@@ -8,7 +8,6 @@ import { hasError, hasWarning } from '@utils';
  * and rebuild.
  */
 export class BuildContext implements d.BuildCtx {
-  appFileBuildCount = 0;
   buildId = -1;
   buildMessages: string[] = [];
   buildResults: d.BuildResults = null;
@@ -27,8 +26,7 @@ export class BuildContext implements d.BuildCtx {
   filesUpdated: string[] = [];
   filesWritten: string[] = [];
   skipAssetsCopy = false;
-  global: d.Module = null;
-  graphData: d.GraphData = null;
+  globalStyle: string = undefined;
   hasConfigChanges = false;
   hasCopyChanges = false;
   hasFinished = false;
@@ -36,9 +34,7 @@ export class BuildContext implements d.BuildCtx {
   hasPrintedResults = false;
   hasServiceWorkerChanges = false;
   hasScriptChanges = true;
-  hasSlot: boolean = null;
   hasStyleChanges = true;
-  hasSvg: boolean = null;
   hydrateAppFilePath: string = null;
   indexBuildCount = 0;
   isRebuild = false;
@@ -131,25 +127,11 @@ export class BuildContext implements d.BuildCtx {
   }
 
   get hasError() {
-    if (hasError(this.diagnostics)) {
-      // remember if the last build had an error or not
-      // this is useful if the next build should do a full build or not
-      this.compilerCtx.lastBuildHadError = true;
-      return true;
-    }
-
-    return false;
-  }
-
-  get shouldAbort() {
-    return this.hasError;
+    return hasError(this.diagnostics);
   }
 
   get hasWarning() {
-    if (hasWarning(this.diagnostics)) {
-      return true;
-    }
-    return false;
+    return hasWarning(this.diagnostics);
   }
 
   async abort() {

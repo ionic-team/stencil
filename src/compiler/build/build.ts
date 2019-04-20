@@ -19,23 +19,23 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     config.sys.cancelWorkerTasks();
 
     buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist
       await initIndexHtmls(config, compilerCtx, buildCtx);
-      if (buildCtx.shouldAbort) return buildCtx.abort();
+      if (buildCtx.hasError) return buildCtx.abort();
     }
 
     // empty the directories on the first build
     await emptyOutputTargetDirs(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // async scan the src directory for ts files
     // then transpile them all in one go
     // buildCtx.moduleFiles is populated here
     buildCtx.hasScriptChanges = await transpileApp(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     if (config.srcIndexHtml) {
       const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
@@ -48,7 +48,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
     generateEntryModules(config, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
@@ -56,11 +56,11 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // generate the core app files
     await generateOutputTargets(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // wait on some promises we kicked off earlier
     await Promise.all([
@@ -74,11 +74,11 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       // so they're not stepping on each other writing files
       waitForCopyTasks(buildCtx)
     ]);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
-    if (buildCtx.shouldAbort) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
   } catch (e) {
     // ¯\_(ツ)_/¯

@@ -54,9 +54,9 @@ function cleanModuleFileCache(compilerCtx: d.CompilerCtx) {
   // hold on to stuff we know is being used
   const foundSourcePaths = new Set<string>();
 
-  compilerCtx.rootTsFiles.sort().forEach(rootTsFile => {
+  compilerCtx.rootTsFiles.forEach(rootTsFile => {
     const moduleFile = compilerCtx.moduleMap.get(rootTsFile);
-    addSourcePaths(compilerCtx, foundSourcePaths, moduleFile);
+    addSourcePaths(compilerCtx, moduleFile, foundSourcePaths);
   });
 
   compilerCtx.moduleMap.forEach(moduleFile => {
@@ -76,14 +76,14 @@ function cleanModuleFileCache(compilerCtx: d.CompilerCtx) {
 }
 
 
-function addSourcePaths(compilerCtx: d.CompilerCtx, foundSourcePaths: Set<string>, moduleFile: d.Module) {
+function addSourcePaths(compilerCtx: d.CompilerCtx, moduleFile: d.Module, foundSourcePaths: Set<string>) {
   if (moduleFile && !foundSourcePaths.has(moduleFile.sourceFilePath)) {
     foundSourcePaths.add(moduleFile.sourceFilePath);
 
     moduleFile.localImports.forEach(localImport => {
       const moduleFile = compilerCtx.moduleMap.get(localImport);
       if (moduleFile) {
-        addSourcePaths(compilerCtx, foundSourcePaths, moduleFile);
+        addSourcePaths(compilerCtx, moduleFile, foundSourcePaths);
       }
     });
   }

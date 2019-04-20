@@ -28,7 +28,6 @@ export class CompilerContext implements d.CompilerCtx {
   hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
   isActivelyBuilding = false;
-  lastBuildHadError = false;
   lastBuildResults: d.BuildResults = null;
   lastBuildStyles = new Map<string, string>();
   lastComponentStyleInput = new Map<string, string>();
@@ -40,6 +39,7 @@ export class CompilerContext implements d.CompilerCtx {
   rollupCacheNative: any = null;
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
+  cachedGlobalStyle: string;
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;
@@ -53,6 +53,7 @@ export class CompilerContext implements d.CompilerCtx {
   reset() {
     this.cache.clear();
     this.cachedStyleMeta.clear();
+    this.cachedGlobalStyle = null;
     this.collections.length = 0;
     this.compilerOptions = null;
     this.lastComponentStyleInput.clear();

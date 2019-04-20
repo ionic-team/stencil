@@ -20,6 +20,7 @@ export interface CompilerCtx {
   activeFilesUpdated: string[];
   cache: d.Cache;
   cachedStyleMeta: Map<string, d.StyleCompiler>;
+  cachedGlobalStyle: string;
   collections: d.CollectionCompilerMeta[];
   compilerOptions: any;
   events: d.BuildEvents;
@@ -29,7 +30,6 @@ export interface CompilerCtx {
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
-  lastBuildHadError: boolean;
   lastBuildResults: d.BuildResults;
   lastBuildStyles: Map<string, string>;
   moduleMap: d.ModuleMap;

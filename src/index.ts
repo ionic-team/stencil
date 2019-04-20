@@ -75,9 +75,14 @@ export declare function getMode<T = (string | undefined)>(ref: any): T;
 export declare function getAssetPath(path: string): string;
 
 /**
- * getElement
+ * writeTask
  */
-export declare function getElement(ref: any): HTMLElement;
+export declare function writeTask(task: d.RafCallback): void;
+
+/**
+ * readTask
+ */
+export declare function readTask(task: d.RafCallback): void;
 
 /**
  * Host

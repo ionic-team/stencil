@@ -24,7 +24,7 @@ let checkSlotRelocate = false;
 let isSvgMode = false;
 
 
-const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode, doc: Document) => {
+const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
   const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
@@ -93,7 +93,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
-        childNode = createElm(oldParentVNode, newVNode, i, elm, doc);
+        childNode = createElm(oldParentVNode, newVNode, i, elm);
 
         // return node could have been null
         if (childNode) {
@@ -174,7 +174,6 @@ const addVnodes = (
   vnodes: d.VNode[],
   startIdx: number,
   endIdx: number,
-  doc: Document
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
   let childNode: Node;
@@ -184,7 +183,7 @@ const addVnodes = (
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      childNode = createElm(null, parentVNode, startIdx, parentElm, doc);
+      childNode = createElm(null, parentVNode, startIdx, parentElm);
       if (childNode) {
         vnodes[startIdx].$elm$ = childNode as any;
         containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
@@ -221,7 +220,7 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, node?
   }
 };
 
-const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[], doc: Document) => {
+const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[]) => {
   let oldStartIdx = 0;
   let newStartIdx = 0;
   let idxInOld = 0;
@@ -250,12 +249,12 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newEndVnode = newCh[--newEndIdx];
 
     } else if (isSameVnode(oldStartVnode, newStartVnode)) {
-      patch(oldStartVnode, newStartVnode, doc);
+      patch(oldStartVnode, newStartVnode);
       oldStartVnode = oldCh[++oldStartIdx];
       newStartVnode = newCh[++newStartIdx];
 
     } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-      patch(oldEndVnode, newEndVnode, doc);
+      patch(oldEndVnode, newEndVnode);
       oldEndVnode = oldCh[--oldEndIdx];
       newEndVnode = newCh[--newEndIdx];
 
@@ -264,7 +263,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldStartVnode.$elm$.parentNode);
       }
-      patch(oldStartVnode, newEndVnode, doc);
+      patch(oldStartVnode, newEndVnode);
       parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
@@ -274,7 +273,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldEndVnode.$elm$.parentNode);
       }
-      patch(oldEndVnode, newStartVnode, doc);
+      patch(oldEndVnode, newStartVnode);
       parentElm.insertBefore(oldEndVnode.$elm$, oldStartVnode.$elm$);
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
@@ -295,10 +294,10 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
         elmToMove = oldCh[idxInOld];
 
         if (elmToMove.$tag$ !== newStartVnode.$tag$) {
-          node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm, doc);
+          node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
 
         } else {
-          patch(elmToMove, newStartVnode, doc);
+          patch(elmToMove, newStartVnode);
           oldCh[idxInOld] = undefined;
           node = elmToMove.$elm$;
         }
@@ -307,7 +306,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 
       } else {
         // new element
-        node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm, doc);
+        node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm);
         newStartVnode = newCh[++newStartIdx];
       }
 
@@ -328,7 +327,6 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
               newCh,
               newStartIdx,
               newEndIdx,
-              doc
             );
 
   } else if (BUILD.updatable && newStartIdx > newEndIdx) {
@@ -364,7 +362,7 @@ const referenceNode = (node: d.RenderNode) => {
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
 
-export const patch = (oldVNode: d.VNode, newVNode: d.VNode, doc: Document) => {
+export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   const elm = newVNode.$elm$ = oldVNode.$elm$;
   const oldChildren = oldVNode.$children$;
   const newChildren = newVNode.$children$;
@@ -397,7 +395,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, doc: Document) => {
 
     if (BUILD.updatable && isDef(oldChildren) && isDef(newChildren)) {
       // looks like there's child vnodes for both the old and new vnodes
-      updateChildren(elm, oldChildren, newVNode, newChildren, doc);
+      updateChildren(elm, oldChildren, newVNode, newChildren);
 
     } else if (isDef(newChildren)) {
       // no old child vnodes, but there are new child vnodes to add
@@ -406,7 +404,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, doc: Document) => {
         elm.textContent = '';
       }
       // add the new vnode children
-      addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1, doc);
+      addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
 
     } else if (BUILD.updatable && isDef(oldChildren)) {
       // no new child vnodes, but there are old child vnodes to remove
@@ -603,7 +601,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   // synchronous patch
-  patch(oldVNode, renderFnResults, doc);
+  patch(oldVNode, renderFnResults);
 
   if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {

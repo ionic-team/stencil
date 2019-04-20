@@ -1,4 +1,3 @@
-
 import * as d from '../../declarations';
 
 export function getUsedComponents(doc: Document, cmps: d.ComponentCompilerMeta[]) {

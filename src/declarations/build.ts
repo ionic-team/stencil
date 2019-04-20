@@ -20,13 +20,14 @@ export interface RollupResults {
 
 export interface BuildCtx {
   abort(): Promise<BuildResults>;
-  appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: d.Collection[];
   components: d.ComponentCompilerMeta[];
+  moduleFiles: d.Module[];
+  entryModules: d.EntryModule[];
   indexDoc: Document;
   packageJson: d.PackageJsonData;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
@@ -35,7 +36,6 @@ export interface BuildCtx {
   diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
-  entryModules: d.EntryModule[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
@@ -43,8 +43,7 @@ export interface BuildCtx {
   filesWritten: string[];
   skipAssetsCopy: boolean;
   finish(): Promise<BuildResults>;
-  global: d.Module;
-  graphData: GraphData;
+  globalStyle: string | undefined;
   hasConfigChanges: boolean;
   hasCopyChanges: boolean;
   hasError: boolean;
@@ -53,19 +52,15 @@ export interface BuildCtx {
   hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
-  hasSlot: boolean;
   hasStyleChanges: boolean;
-  hasSvg: boolean;
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
   isRebuild: boolean;
-  moduleFiles: d.Module[];
   requiresFullBuild: boolean;
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  shouldAbort: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;
@@ -87,8 +82,6 @@ export interface BuildStyleUpdate {
   isScoped: boolean;
 }
 
-
-export type GraphData = Map<string, string[]>;
 
 
 export interface BuildLog {
@@ -112,8 +105,6 @@ export interface BuildResults {
   filesWritten: string[];
   hasError: boolean;
   hasSuccessfulBuild: boolean;
-  hasSlot: boolean;
-  hasSvg: boolean;
   hmr?: HotModuleReplacement;
   isRebuild: boolean;
   styleBuildCount: number;

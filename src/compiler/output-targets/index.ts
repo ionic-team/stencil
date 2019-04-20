@@ -11,9 +11,6 @@ import { canSkipAppCoreBuild } from './output-utils';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort) {
-    return;
-  }
   if (canSkipAppCoreBuild(buildCtx)) {
     return;
   }

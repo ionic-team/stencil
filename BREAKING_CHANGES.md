@@ -43,7 +43,7 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 
 ```diff
 - <script src="/build/app.js"></script>
-+ <script type="module" src="/build/app.mjs.js"></script>
++ <script type="module" src="/build/app.esm.js"></script>
 + <script nomodule src="/build/app.js"></script>
 ```
 

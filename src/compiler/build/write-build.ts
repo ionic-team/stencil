@@ -4,10 +4,6 @@ import { outputPrerender } from '../output-targets/output-prerender';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.shouldAbort) {
-    return;
-  }
-
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;

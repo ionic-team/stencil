@@ -7,7 +7,7 @@ import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
   // main thread!
-  if (buildCtx.shouldAbort) {
+  if (buildCtx.hasError) {
     return;
   }
 
