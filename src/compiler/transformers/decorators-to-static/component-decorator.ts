@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
 import ts from 'typescript';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 
 
-export function componentDecoratorToStatic(config: d.Config, cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
+export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
   removeDecorators(cmpNode, ['Component']);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
@@ -12,7 +12,7 @@ export function componentDecoratorToStatic(config: d.Config, cmpNode: ts.ClassDe
     return;
   }
 
-  if (typeof componentOptions.tag !== 'string' || componentOptions.tag.trim().length === 0) {
+  if (!validateComponent(config, diagnostics, componentOptions, cmpNode, componentDecorator)) {
     return;
   }
 
@@ -68,6 +68,59 @@ export function componentDecoratorToStatic(config: d.Config, cmpNode: ts.ClassDe
   }
 }
 
+function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
+  const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
+  if (extendNode) {
+    const err = buildError(diagnostics);
+    err.messageText = `Classes decorated with @Component can not extend from a base class.
+    Stencil needs to be able to switch between different base classes in order to implement the different output targets such as: lazy and raw web components.`;
+    augmentDiagnosticWithNode(config, err, extendNode);
+    return false;
+  }
+
+  // check if class has more than one decorator
+  const otherDecorator = cmpNode.decorators && cmpNode.decorators.find(d => d !== componentDecorator);
+  if (otherDecorator) {
+    const err = buildError(diagnostics);
+    err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
+    Stencil performs extensive static analysis on top of your components in order to generate the necesary metadata, runtime decorators at the components level make this task very hard.`;
+    augmentDiagnosticWithNode(config, err, otherDecorator);
+    return false;
+  }
+
+  const tag = componentOptions.tag;
+  if (typeof tag !== 'string' || tag.trim().length === 0) {
+    const err = buildError(diagnostics);
+    err.messageText = `tag missing in component decorator`;
+    augmentDiagnosticWithNode(config, err, componentDecorator);
+    return false;
+  }
+
+  const tagError = validateComponentTag(tag);
+  if (tagError) {
+    const err = buildError(diagnostics);
+    err.messageText = `${tagError}. Please refer to https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`;
+    augmentDiagnosticWithNode(config, err, findTagNode(componentDecorator));
+    return false;
+  }
+  return true;
+}
+
+function findTagNode(node: ts.Node) {
+  if (ts.isDecorator(node) && ts.isCallExpression(node.expression)) {
+    const arg = node.expression.arguments[0];
+    if (ts.isObjectLiteralExpression(arg)) {
+      arg.properties.forEach(p => {
+        if (ts.isPropertyAssignment(p)) {
+          if (p.name.getText() === 'tag') {
+            node = p.initializer;
+          }
+        }
+      });
+    }
+  }
+  return node;
+}
 
 function normalizeExtension(config: d.Config, styleUrls: d.CompilerModeStyles): d.CompilerModeStyles {
   const compilerStyleUrls: d.CompilerModeStyles = {};

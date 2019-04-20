@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, flatOne, unique } from '@utils';
-import { validateComponentTag } from '../config/validate-component';
+import { buildError, buildWarn, flatOne, unique, validateComponentTag } from '@utils';
 import { getUsedComponents } from '../html/used-components';
 
 export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
@@ -35,7 +34,12 @@ export function getUserConfigBundles(config: d.Config, buildCtx: d.BuildCtx, cmp
   const definedTags = new Set<string>();
   const entryTags = config.bundles.map(b => {
     return b.components.map(tag => {
-      tag = validateComponentTag(tag);
+      const tagError = validateComponentTag(tag);
+      if (tagError) {
+        const err = buildError(buildCtx.diagnostics);
+        err.header = `Stencil Config`;
+        err.messageText = tagError;
+      }
 
       const component = cmps.find(cmp => cmp.tagName === tag);
       if (!component) {

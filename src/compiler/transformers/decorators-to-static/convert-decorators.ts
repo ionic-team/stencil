@@ -46,7 +46,7 @@ function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
   const newMembers: ts.ClassElement[] = [...cmpNode.members];
 
   // parser component decorator (Component)
-  componentDecoratorToStatic(config, cmpNode, newMembers, componentDecorator);
+  componentDecoratorToStatic(config, diagnostics, cmpNode, newMembers, componentDecorator);
 
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   const decoratedMembers = newMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
