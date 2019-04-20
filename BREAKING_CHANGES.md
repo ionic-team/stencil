@@ -1,5 +1,10 @@
 # Stencil One
 
+Most of the updates for the `1.0.0` release involve removing custom APIs, and continuing to leverage web-standards in order to generate future-proof components that scale.
+
+Additionally, these updates allow Stencil to further improve its tooling, with a focus on great developer experience for teams maintaining codebases across large organizations.
+
+
 ## BREAKING CHANGES
 
 Most required changes are in order to avoid global types, which often cause issues for JSX and apps which import from numerous packages. The other significant change is having each component import its renderer, such as JSX's `h()` function.
@@ -256,7 +261,7 @@ Using the `@Prop` decorator with the `context` has been deprecated and their usa
 
 #### `'window'`
 
-Accessing `window` using `Prop({context: 'window'})` was previously required because of Server-side-rendering requirements, fortunately this is not longer needed, and developers can use global `window` directly.
+Accessing `window` using `Prop({context: 'window'})` was previously required because of Server-side-rendering requirements, fortunately this is no longer needed, and developers can use global `window` directly.
 
 - `Prop({context: 'window'})` becomes `window`
 
@@ -272,7 +277,7 @@ Accessing `window` using `Prop({context: 'window'})` was previously required bec
 
 #### `'document'`
 
-Accessing `document` using `Prop({context: 'document'})` was previously required because of Server-side-rendering requirements, fortunately this is not longer needed, and developers can use global `document` directly.
+Accessing `document` using `Prop({context: 'document'})` was previously required because of Server-side-rendering requirements, fortunately this is no longer needed, and developers can use global `document` directly.
 
 - `Prop({context: 'document'})` becomes `document`
 
