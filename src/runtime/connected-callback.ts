@@ -50,12 +50,6 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
     }
 
-    if (BUILD.slotRelocation && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
-      try {
-        (elm as any).shadowRoot = elm;
-      } catch (e) {}
-    }
-
     if (BUILD.lifecycle) {
       // find the first ancestor component (if there is one) and register
       // this component as one of the actively loading child components for its ancestor

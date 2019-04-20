@@ -5,13 +5,13 @@ import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { doc, getHostRef, plt, registerHost, supportsShadowDom } from '@platform';
+import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 
 
-export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window, options: d.CustomElementsDefineOptions = {}) => {
+export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const head = doc.head;
@@ -60,12 +60,16 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, win: Window
         constructor(self: HTMLElement) {
           // @ts-ignore
           super(self);
-          registerHost(this);
-          if (BUILD.shadowDom &&  cmpMeta.$flags$ === CMP_FLAG.shadowDomEncapsulation) {
+          self = this;
+          registerHost(self);
+          if (BUILD.shadowDom && cmpMeta.$flags$ === CMP_FLAG.shadowDomEncapsulation) {
             // this component is using shadow dom
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element
-            this.attachShadow({ 'mode': 'open' });
+            self.attachShadow({ 'mode': 'open' });
+          }
+          if (BUILD.shadowDom && !BUILD.hydrateServerSide && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
+            (self as any).shadowRoot = self;
           }
         }
 

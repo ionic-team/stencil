@@ -93,14 +93,14 @@ import globalScripts from '@stencil/core/global-scripts';
 export * from '@stencil/core/platform';
 export const defineCustomElements = (win, options) => {
   globalScripts(win);
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], win, options);
+  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 };
 `;
 
 const BROWSER_ENTRY = `
 import { defineCustomElements, patchBrowser } from '@stencil/core';
 patchBrowser().then(resourcesUrl => {
-  defineCustomElements(window, { resourcesUrl });
+  defineCustomElements(null, { resourcesUrl });
 });
 `;
 
