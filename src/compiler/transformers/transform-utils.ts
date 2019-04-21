@@ -14,13 +14,6 @@ export function isMemberPrivate(member: ts.ClassElement) {
   return false;
 }
 
-export function getBuildScriptTarget(build: d.Build) {
-  if (build.es5) {
-    return LegacyScriptTarget;
-  }
-  return ScriptTarget;
-}
-
 
 export function convertValueToLiteral(val: any, refs: WeakSet<any> = null) {
   if (refs == null) {

@@ -1,19 +1,19 @@
 import * as d from '../../../declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
 
-export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
+export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
   let outputText: string = null;
 
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        target: getBuildScriptTarget(build),
+        target: ScriptTarget,
         skipLibCheck: true,
         noResolve: true,
         noLib: true,

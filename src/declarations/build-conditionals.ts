@@ -71,7 +71,6 @@ export interface BuildFeatures {
 }
 
 export interface Build extends Partial<BuildFeatures> {
-  es5?: boolean;
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;

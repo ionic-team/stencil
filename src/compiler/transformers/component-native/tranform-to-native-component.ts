@@ -1,23 +1,23 @@
 import * as d from '../../../declarations';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
 import { addNativeImports } from './native-imports';
 
-export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   let outputText: string = null;
 
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        target: getBuildScriptTarget(build)
+        target: ScriptTarget,
       },
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform(compilerCtx, build)
+          nativeComponentTransform(compilerCtx)
         ]
       }
     };
@@ -38,7 +38,7 @@ export function transformToNativeComponentText(compilerCtx: d.CompilerCtx, build
 }
 
 
-function nativeComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): ts.TransformerFactory<ts.SourceFile> {
+function nativeComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return transformCtx => {
 
@@ -47,7 +47,7 @@ function nativeComponentTransform(compilerCtx: d.CompilerCtx, build: d.Build): t
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(node, cmp, build);
+            return updateNativeComponentClass(node, cmp);
           }
         }
 

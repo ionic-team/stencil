@@ -4,7 +4,7 @@ import * as d from '../../../declarations';
 // import { convertValueToLiteral } from '../transform-utils';
 
 
-export function addNativeConnectedCallback(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, _build: d.Build) {
+export function addNativeConnectedCallback(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
   // function call to stencil's exported connectedCallback(elm, plt)
   const methodName = 'connectedCallback';
 

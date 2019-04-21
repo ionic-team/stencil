@@ -25,8 +25,8 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
       if (entryModule != null) {
         const modules = await Promise.all(
           build.lazyLoad
-            ? entryModule.cmps.map(cmp => updateToLazyComponent(config, compilerCtx, buildCtx, build, cmp))
-            : entryModule.cmps.map(cmp => updateToNativeComponent(config, compilerCtx, buildCtx, build, cmp))
+            ? entryModule.cmps.map(cmp => updateToLazyComponent(config, compilerCtx, buildCtx, cmp))
+            : entryModule.cmps.map(cmp => updateToNativeComponent(config, compilerCtx, buildCtx, cmp))
         );
 
         return sortBy(modules, m => m.cmp.tagName)

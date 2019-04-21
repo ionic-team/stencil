@@ -9,7 +9,7 @@ import { addWatchers } from '../transforms/watcher-meta-transform';
 import { transformHostData } from '../transforms/host-data-transform';
 
 
-export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
+export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -17,7 +17,7 @@ export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: 
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode),
-    updateNativeHostComponentMembers(classNode, cmp, build)
+    updateNativeHostComponentMembers(classNode, cmp)
   );
 }
 
@@ -37,11 +37,11 @@ function updateNativeHostComponentHeritageClauses(classNode: ts.ClassDeclaration
 }
 
 
-function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, build: d.Build) {
+function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateNativeConstructor(classMembers, cmp, build, true);
-  addNativeConnectedCallback(classMembers, cmp, build);
+  updateNativeConstructor(classMembers, cmp, true);
+  addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addComponentStyle(classMembers, cmp);

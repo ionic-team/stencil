@@ -5,7 +5,7 @@ import { REGISTER_HOST } from '../exports';
 import { addLegacyProps } from '../legacy-props';
 
 
-export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, _build: d.Build, ensureSuper: boolean) {
+export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, ensureSuper: boolean) {
   if (cmp.isPlain) {
     return;
   }

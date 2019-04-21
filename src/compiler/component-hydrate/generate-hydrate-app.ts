@@ -11,7 +11,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     const cmps = buildCtx.components;
     const build = getBuildConditionals(config, cmps);
 
-    const appEntryCode = await generateHydrateAppCore(config, compilerCtx, buildCtx, build);
+    const appEntryCode = await generateHydrateAppCore(config, compilerCtx, buildCtx);
 
     const rollupAppBuild = await bundleHydrateApp(config, compilerCtx, buildCtx, build, appEntryCode);
     if (rollupAppBuild != null) {
@@ -31,10 +31,10 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
 }
 
 
-async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const cmps = buildCtx.components;
   const coreText: string[] = [];
-  const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, build, cmps);
+  const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
 
   coreText.push(`import { initConnect, registerComponents, styles } from '@stencil/core/platform';`);
   coreText.push(`import '@stencil/core/global-scripts';`);
@@ -75,7 +75,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   const build = getBuildFeatures(cmps) as d.Build;
 
   build.lazyLoad = false;
-  build.es5 = false;
   build.hydrateClientSide = false;
   build.hydrateServerSide = true;
 

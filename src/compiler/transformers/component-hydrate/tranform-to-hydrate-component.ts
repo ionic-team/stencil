@@ -1,19 +1,19 @@
 import * as d from '../../../declarations';
 import { addHydrateImports } from './hydrate-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, getBuildScriptTarget, getComponentMeta } from '../transform-utils';
+import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
 
 
-export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) {
   let outputText: string = null;
 
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ModuleKind,
-        target: getBuildScriptTarget(build),
+        target: ScriptTarget,
         skipLibCheck: true,
         noResolve: true,
         noLib: true,

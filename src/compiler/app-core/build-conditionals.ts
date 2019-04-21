@@ -61,7 +61,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDev = !!config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
-  b.slotRelocation = !!(b.scoped || (b.hydrateServerSide) || (b.es5 && b.shadowDom));
+  b.slotRelocation = !!(b.scoped || b.hydrateServerSide || b.shadowDom);
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.hotReplacement);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);

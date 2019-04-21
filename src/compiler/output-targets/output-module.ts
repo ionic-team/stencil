@@ -61,7 +61,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   const build = getBuildFeatures(cmps) as d.Build;
 
   build.lazyLoad = false;
-  build.es5 = false;
   build.hydrateClientSide = false;
   build.hydrateServerSide = false;
 
