@@ -25,7 +25,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         stencilHydratePlugin(config),
 
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        globalScriptsPlugin(config, compilerCtx, buildCtx, build),
+        globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']

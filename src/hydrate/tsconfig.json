@@ -32,9 +32,6 @@
       "@compiler": [
         "../compiler/index.ts"
       ],
-      "@global-scripts": [
-        "./global-scripts.ts"
-      ],
       "@mock-doc": [
         "../mock-doc/index.ts"
       ],

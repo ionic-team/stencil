@@ -28,7 +28,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         stencilClientPlugin(config),
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        globalScriptsPlugin(config, compilerCtx, buildCtx, build),
+        globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']
@@ -91,6 +91,7 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
 
 export const DEFAULT_CORE = `
 export * from '@stencil/core/platform';
+import '@stencil/core/global-scripts';
 `;
 
 export const DEFAULT_ENTRY = `

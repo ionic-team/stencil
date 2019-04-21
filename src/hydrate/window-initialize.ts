@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { constrainTimeouts } from '@mock-doc';
-import globalScripts from '@global-scripts';
 import { renderError } from './render-utils';
 
 
@@ -50,12 +49,6 @@ export async function initializeWindow(win: Window, doc: Document, opts: d.Hydra
   try {
     win.customElements = null;
   } catch (e) {}
-
-  try {
-    globalScripts(win, true);
-  } catch (e) {
-    renderError(results, e);
-  }
 
   if (opts.constrainTimeouts) {
     constrainTimeouts(win);

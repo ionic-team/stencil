@@ -89,10 +89,9 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 const CORE = `
 import { bootstrapLazy, patchDynamicImport } from '@stencil/core/platform';
-import globalScripts from '@stencil/core/global-scripts';
 export * from '@stencil/core/platform';
+import '@stencil/core/global-scripts';
 export const defineCustomElements = (win, options) => {
-  globalScripts(win);
   bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 };
 `;
