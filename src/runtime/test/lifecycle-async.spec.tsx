@@ -94,7 +94,7 @@ describe('lifecycle async', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -108,7 +108,7 @@ describe('lifecycle async', () => {
 
     log = '';
     root.prop = 1;
-    await flush();
+    await waitForChanges();
 
     expect(log.trim()).toBe(
       'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'

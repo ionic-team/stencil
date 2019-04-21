@@ -25,7 +25,7 @@ describe('state', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -41,7 +41,7 @@ describe('state', () => {
     expect(root.num).toBe(undefined);
 
     await root.update();
-    await flush();
+    await waitForChanges();
 
     expect(root.textContent).toBe('true-false-hello-99');
   });

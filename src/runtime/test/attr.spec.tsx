@@ -273,7 +273,7 @@ describe('attribute', () => {
         }
       }
 
-      const { root, flush } = await newSpecPage({
+      const { root, waitForChanges } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
       });
@@ -289,7 +289,7 @@ describe('attribute', () => {
       root.bool = true;
       root.otherBool = false;
 
-      await flush();
+      await waitForChanges();
 
       expect(root).toEqualHtml(`
         <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>

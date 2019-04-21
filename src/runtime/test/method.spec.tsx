@@ -27,7 +27,7 @@ describe('method', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -38,13 +38,13 @@ describe('method', () => {
 
     await root.asyncMethod('async');
 
-    await flush();
+    await waitForChanges();
 
     expect(root.textContent).toBe('async');
 
     await root.promiseMethod('promise');
 
-    await flush();
+    await waitForChanges();
 
     expect(root.textContent).toBe('promise');
   });

@@ -16,19 +16,19 @@ describe('element', () => {
       }
     }
     // @ts-ignore
-    const { root, flush } = await newSpecPage({
+    const page = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root).toEqualHtml(`
+    expect(page.root).toEqualHtml(`
       <cmp-a></cmp-a>
     `);
 
-    await root.setClassNow();
-    await flush();
+    await page.root.setClassNow();
+    await page.waitForChanges();
 
-    expect(root).toEqualHtml(`
+    expect(page.root).toEqualHtml(`
       <cmp-a class="new-class"></cmp-a>
     `);
   });

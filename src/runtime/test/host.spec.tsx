@@ -18,8 +18,8 @@ describe('hostData', () => {
         };
       }
     }
-    // @ts-ignore
-    const { root, flush } = await newSpecPage({
+
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -28,7 +28,7 @@ describe('hostData', () => {
     `);
 
     root.hidden = true;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
@@ -51,8 +51,8 @@ describe('hostData', () => {
         );
       }
     }
-    // @ts-ignore
-    const { root, flush } = await newSpecPage({
+
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -61,7 +61,7 @@ describe('hostData', () => {
     `);
 
     root.hidden = true;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
@@ -100,8 +100,8 @@ describe('hostData', () => {
         );
       }
     }
-    // @ts-ignore
-    const { doc, root, flush } = await newSpecPage({
+
+    const { doc, root, waitForChanges } = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
     });
@@ -110,7 +110,7 @@ describe('hostData', () => {
     `);
 
     (doc.querySelector('cmp-b') as any).click();
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
     <cmp-a><span>1</span><cmp-b>1</cmp-b></cmp-a>

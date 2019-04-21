@@ -27,35 +27,35 @@ describe('event', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const page = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root).toEqualHtml(`
+    expect(page.root).toEqualHtml(`
       <cmp-a>0</cmp-a>
     `);
 
-    await root.emitEvent();
-    await flush();
+    await page.root.emitEvent();
+    await page.waitForChanges();
 
-    expect(root).toEqualHtml(`
+    expect(page.root).toEqualHtml(`
       <cmp-a>1</cmp-a>
     `);
 
     let called = false;
-    root.addEventListener('ionChange', (ev: CustomEvent) => {
+    page.root.addEventListener('ionChange', (ev: CustomEvent) => {
       expect(ev.bubbles).toBe(true);
       expect(ev.cancelable).toBe(true);
       expect(ev.composed).toBe(true);
       called = true;
     });
 
-    await root.emitEvent();
-    await flush();
+    await page.root.emitEvent();
+    await page.waitForChanges();
 
     expect(called).toBe(true);
-    expect(root).toEqualHtml(`
+    expect(page.root).toEqualHtml(`
       <cmp-a>2</cmp-a>
     `);
   });
@@ -82,7 +82,7 @@ describe('event', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -99,7 +99,7 @@ describe('event', () => {
       called = true;
     });
     await root.emitEvent();
-    await flush();
+    await waitForChanges();
 
     expect(called).toBe(true);
     expect(root).toEqualHtml(`
@@ -135,7 +135,7 @@ describe('event', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -152,7 +152,7 @@ describe('event', () => {
       called = true;
     });
     await root.emitEvent();
-    await flush();
+    await waitForChanges();
 
     expect(called).toBe(true);
 

@@ -13,7 +13,7 @@ describe('render-vdom', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -23,14 +23,14 @@ describe('render-vdom', () => {
     `);
 
     root.excitement = `!`;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a><div>Hello VDOM!</div></cmp-a>
     `);
 
     root.excitement = `!!`;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a><div>Hello VDOM!!</div></cmp-a>
@@ -63,12 +63,12 @@ describe('render-vdom', () => {
       }
     }
 
-    const { body, flush } = await newSpecPage({
+    const { body, waitForChanges } = await newSpecPage({
       components: [CmpA]
     });
 
     body.innerHTML = `<cmp-a></cmp-a>`;
-    await flush();
+    await waitForChanges();
 
     expect(body).toEqualHtml(`
       <cmp-a><div>Hello VDOM</div></cmp-a>

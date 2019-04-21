@@ -19,7 +19,7 @@ describe('listen', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -29,14 +29,14 @@ describe('listen', () => {
     `);
 
     root.click();
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a>1</cmp-a>
     `);
 
     root.click();
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a>2</cmp-a>
@@ -83,7 +83,7 @@ describe('listen', () => {
       }
     }
 
-    const { win, doc, body, root, flush } = await newSpecPage({
+    const { win, doc, body, root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<other><parent><cmp-a></cmp-a></parent></other>`,
     });
@@ -97,39 +97,39 @@ describe('listen', () => {
 
 
     root.click();
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,1,1,1,1</cmp-a>
     `);
 
 
     parent.click();
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,2,2,2</cmp-a>
     `);
 
 
     other.click();
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,3,3,3</cmp-a>
     `);
 
     body.click();
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,4,4</cmp-a>
     `);
 
     doc.dispatchEvent(new CustomEvent('click', {bubbles: true}));
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,5,5</cmp-a>
     `);
 
     win.dispatchEvent(new CustomEvent('click', {bubbles: true}));
-    await flush();
+    await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,5,6</cmp-a>
     `);

@@ -227,7 +227,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -238,7 +238,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.textContent).toBe('parent text');
 
     root.innerH = <h6>parent text update</h6>;
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SECTION');
@@ -247,7 +247,7 @@ describe('scoped slot', () => {
 
     const child = root.querySelector('ion-child');
     child.Tag = 'article';
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ARTICLE');
@@ -282,7 +282,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -295,7 +295,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('BADGER');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -343,7 +343,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -353,17 +353,17 @@ describe('scoped slot', () => {
 
     const child = root.querySelector('ion-child');
     child.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.textContent).toBe('content 1content 2');
 
     child.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.textContent).toBe('');
 
     child.forceUpdate();
-    await flush();
+    await waitForChanges();
     expect(root.firstElementChild.textContent).toBe('content 4');
   });
 
@@ -393,7 +393,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -405,7 +405,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
     root.msg = 'change 1';
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('CHEETAH');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -414,7 +414,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
     root.msg = 'change 2';
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('CHEETAH');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -447,7 +447,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -458,7 +458,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
     root.msg = 'change 1';
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -466,7 +466,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
     root.msg = 'change 2';
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -502,7 +502,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -515,7 +515,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.children[1].textContent).toBe('2');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -525,7 +525,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.children[1].textContent).toBe('4');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -568,7 +568,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Child],
       html: `<ion-parent></ion-parent>`,
     });
@@ -585,7 +585,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('2');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -599,7 +599,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('5');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -651,7 +651,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [Parent, Test1, Test2],
       html: `<ion-parent></ion-parent>`,
     });
@@ -664,7 +664,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('1');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('TEST-1');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -674,7 +674,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('2');
 
     root.forceUpdate();
-    await flush();
+    await waitForChanges();
 
     expect(root.firstElementChild.nodeName).toBe('TEST-1');
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -724,7 +724,7 @@ describe('scoped slot', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root } = await newSpecPage({
       components: [Parent, Test1, Test2],
       html: `<ion-parent></ion-parent>`,
     });
@@ -741,7 +741,7 @@ describe('scoped slot', () => {
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
 
     // root.forceUpdate();
-    // await flush();
+    // await waitForChanges();
 
     // expect(root.firstElementChild.nodeName).toBe('TEST-1');
     // expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -755,7 +755,7 @@ describe('scoped slot', () => {
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
 
     // root.forceUpdate();
-    // await flush();
+    // await waitForChanges();
 
     // expect(root.firstElementChild.nodeName).toBe('TEST-1');
     // expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');

@@ -22,20 +22,32 @@ describe('render-text', () => {
     `);
   });
 
-  it('Hello World, innerHTML, await flush', async () => {
-    const { body, flush } = await newSpecPage({
+  it('Hello World, innerHTML, await waitForChanges', async () => {
+    const { body, waitForChanges } = await newSpecPage({
       components: [CmpA]
     });
 
     body.innerHTML = `<cmp-a></cmp-a>`;
-    await flush();
+    await waitForChanges();
 
     expect(body).toEqualHtml(`
       <cmp-a>Hello World</cmp-a>
     `);
   });
 
-  it('Hello World, re-render, flush', async () => {
+  it('Hello World, page.setContent, await waitForChanges', async () => {
+    const page = await newSpecPage({
+      components: [CmpA]
+    });
+
+    await page.setContent(`<cmp-a></cmp-a>`);
+
+    expect(page.body).toEqualHtml(`
+      <cmp-a>Hello World</cmp-a>
+    `);
+  });
+
+  it('Hello World, re-render, waitForChanges', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
       @Prop() excitement = '';
@@ -44,7 +56,7 @@ describe('render-text', () => {
       }
     }
 
-    const { root, flush } = await newSpecPage({
+    const { root, waitForChanges } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
@@ -54,14 +66,14 @@ describe('render-text', () => {
     `);
 
     root.excitement = `!`;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a>Hello World!</cmp-a>
     `);
 
     root.excitement = `!!`;
-    await flush();
+    await waitForChanges();
 
     expect(root).toEqualHtml(`
       <cmp-a>Hello World!!</cmp-a>

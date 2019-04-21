@@ -83,15 +83,23 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   const results = {
     win: win,
     doc: doc,
-    head: doc.head,
     body: doc.body,
     root: null as any,
     rootInstance: null as any,
     build: bc.BUILD as d.Build,
     styles: platform.styles as Map<string, string>,
-    flush: (): Promise<void> => platform.flushAll(),
+    setContent: (html: string) => {
+      doc.body.innerHTML = html;
+      return platform.flushAll();
+    },
+    waitForChanges: (): Promise<void> => platform.flushAll(),
     flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
     flushQueue: (): Promise<void> => platform.flushQueue()
+  };
+
+  (results as any).flush = () => {
+    console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);
+    return results.waitForChanges();
   };
 
   if (typeof opts.url === 'string') {
@@ -131,7 +139,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
   }
 
   if (opts.flushQueue !== false) {
-    await results.flush();
+    await results.waitForChanges();
   }
 
   results.root = findRoot(cmpTags, results.body);
