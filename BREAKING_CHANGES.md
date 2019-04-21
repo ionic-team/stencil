@@ -7,8 +7,7 @@ Additionally, these updates allow Stencil to further improve its tooling, with a
 
 ## BREAKING CHANGES
 
-Most required changes are in order to avoid global types, which often cause issues for JSX and apps which import from numerous packages. The other significant change is having each component import its renderer, such as JSX's `h()` function.
-
+A common issue with JSX is each separate project's use of global JSX types. Many of the required changes are in order to avoid global types, which often cause issues for apps which import from numerous packages. The other change is having each component import its renderer, such as JSX's `h()` function.
 
 ### Import `{ h }` is required
 
@@ -432,6 +431,40 @@ export const config = {
 
 ## Testing
 
+### `newSpecPage()` Spec Testing Utility
+
+A new testing utility has been created to make it easier to unit test components. Its API is similar to `newE2EPage()` for consistency, but internally `newSpecPage()` does not use Puppeteer, but rather runs on top of a pure Node environment. Additionally, user code should not have to be written with legacy CommonJS, and code can safely use global browser variables such as `window` and `document`. In the example below, a mock `CmpA` component was created in the test, but it could have also imported numerous existing components and registered them into the test using the `components` config. The returned `page` variable also has a  `root` property, which is convenience property to get the top-level component found in the test.
+
+```tsx
+import { Component, Prop } from '@stencil/core';
+import { newSpecPage } from '@stencil/core/testing';
+
+it('override default values from attribute', async () => {
+  @Component({ tag: 'cmp-a'})
+  class CmpA {
+    @Prop() someProp = '';
+    render() {
+      return `${this.someProp}`;
+    }
+  }
+
+  const page = await newSpecPage({
+    components: [CmpA],
+    html: `<cmp-a some-prop="value"></cmp-a>`,
+  });
+
+  // "root" is a convenience property which is the
+  // the top level component found in the test
+  expect(page.root).toEqualHtml(`
+    <cmp-a some-prop="value">
+      value
+    </cmp-a>
+  `);
+
+  expect(root.someProp).toBe('value');
+});
+```
+
 ### Jest Presets
 
 When running Jest directly, previously most of Jest had to be manually configured within each app's `package.json`, and required the `transform` config to be manually wired up to Stencil's `jest.preprocessor.js`. With the latest changes, most of the Jest config can be replaced with just `"preset": "@stencil/core/testing"`. You can still override the preset defaults, but it's best to start with the defaults first. Also note, the Jest config can be avoided entirely by using the `stencil test --spec` command rather than calling Jest directly.
@@ -451,37 +484,4 @@ When running Jest directly, previously most of Jest had to be manually configure
 -      "jsx"
 -    ]
   }
-```
-
-
-### `newSpecPage()` Spec Testing Utility
-
-A new testing utility has been created to make it easier to unit test components. Its API is similar to `newE2EPage()` for consistency, but internally `newSpecPage()` does not use Puppeteer, but rather runs on top of a pure Node environment. Additionally, user code should not have to be written with legacy CommonJS, and code can safely use global browser variables like `window` and `document` . In the example below, a mock `CmpA` component was created in the test, but it could have also imported numerous existing components and registered them into the test using the `components` config.
-
-```tsx
-import { Component, Prop } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
-
-it('override default values from attribute', async () => {
-  @Component({ tag: 'cmp-a'})
-  class CmpA {
-    @Prop() someProp = '';
-    render() {
-      return `${this.someProp}`;
-    }
-  }
-
-  const { root } = await newSpecPage({
-    components: [CmpA],
-    html: `<cmp-a some-prop="value"></cmp-a>`,
-  });
-
-  expect(root).toEqualHtml(`
-    <cmp-a some-prop="value">
-      value
-    </cmp-a>
-  `);
-
-  expect(root.someProp).toBe('value');
-});
 ```
