@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, plt, writeTask } from '@platform';
+import { consoleError, doc, plt, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
 import { HYDRATED_CLASS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
@@ -145,13 +145,15 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
         hostRef.$onReadyResolve$(elm);
       }
-      // on appload
+
       if (!ancestorComponent) {
+        // on appload
         // we have finish the first big initial render
-        elm.ownerDocument.documentElement.classList.add('hydrated');
-        setTimeout(() => plt.$queueAsync$ = true, 1000);
+        doc.documentElement.classList.add(HYDRATED_CLASS);
+        setTimeout(() => plt.$queueAsync$ = true, 999);
         emitLifecycleEvent(elm, 'appload');
       }
+
     } else {
       if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
         // we've already loaded this component

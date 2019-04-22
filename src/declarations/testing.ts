@@ -1,3 +1,4 @@
+import * as d from '.';
 
 declare global {
   namespace jest {
@@ -450,6 +451,21 @@ export interface EmulateViewport {
    * Specifies if viewport is in landscape mode. Defaults to false.
    */
   isLandscape?: boolean;
+}
+
+
+export interface SpecPage {
+  win: Window;
+  doc: HTMLDocument;
+  body: HTMLBodyElement;
+  root?: any;
+  rootInstance?: any;
+  build: d.Build;
+  styles: Map<string, string>;
+  setContent: (html: string) => Promise<any>;
+  waitForChanges: () => Promise<any>;
+  flushLoadModule: (bundleId?: string) => Promise<any>;
+  flushQueue: () => Promise<any>;
 }
 
 

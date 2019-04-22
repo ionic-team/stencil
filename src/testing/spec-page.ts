@@ -36,12 +36,34 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
 
   const cmpTags = new Set<string>();
 
+  const win = platform.win as Window;
+  const doc = win.document;
+
+  const page: d.SpecPage = {
+    win: win,
+    doc: doc,
+    body: doc.body as any,
+    root: null as any,
+    rootInstance: null as any,
+    build: bc.BUILD as d.Build,
+    styles: platform.styles as Map<string, string>,
+    setContent: (html: string) => {
+      doc.body.innerHTML = html;
+      return platform.flushAll();
+    },
+    waitForChanges: (): Promise<void> => platform.flushAll(),
+    flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
+    flushQueue: (): Promise<void> => platform.flushQueue()
+  };
+
   const lazyBundles: d.LazyBundlesRuntimeData = opts.components.map((Cstr: d.ComponentTestingConstructor) => {
     if (Cstr.COMPILER_META == null) {
       throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
     }
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
+
+    Cstr.isProxied = false;
 
     proxyComponentLifeCycles(platform, Cstr);
 
@@ -77,81 +99,61 @@ export async function newSpecPage(opts: d.NewSpecPageOptions) {
     return lazyBundleRuntimeMeta;
   });
 
-  const win = platform.win as Window;
-  const doc = win.document;
-
-  const results = {
-    win: win,
-    doc: doc,
-    body: doc.body,
-    root: null as any,
-    rootInstance: null as any,
-    build: bc.BUILD as d.Build,
-    styles: platform.styles as Map<string, string>,
-    setContent: (html: string) => {
-      doc.body.innerHTML = html;
-      return platform.flushAll();
-    },
-    waitForChanges: (): Promise<void> => platform.flushAll(),
-    flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
-    flushQueue: (): Promise<void> => platform.flushQueue()
-  };
-
-  (results as any).flush = () => {
+  (page as any).flush = () => {
     console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);
-    return results.waitForChanges();
+    return page.waitForChanges();
   };
 
   if (typeof opts.url === 'string') {
-    results.win.location.href = opts.url;
+    page.win.location.href = opts.url;
   }
 
   if (typeof opts.direction === 'string') {
-    results.doc.documentElement.setAttribute('dir', opts.direction);
+    page.doc.documentElement.setAttribute('dir', opts.direction);
   }
 
   if (typeof opts.language === 'string') {
-    results.doc.documentElement.setAttribute('lang', opts.language);
+    page.doc.documentElement.setAttribute('lang', opts.language);
   }
 
   if (typeof opts.cookie === 'string') {
     try {
-      results.doc.cookie = opts.cookie;
+      page.doc.cookie = opts.cookie;
     } catch (e) {}
   }
 
   if (typeof opts.referrer === 'string') {
     try {
-      (results.doc as any).referrer = opts.referrer;
+      (page.doc as any).referrer = opts.referrer;
     } catch (e) {}
   }
 
   if (typeof opts.userAgent === 'string') {
     try {
-      (results.win.navigator as any).userAgent = opts.userAgent;
+      (page.win.navigator as any).userAgent = opts.userAgent;
     } catch (e) {}
   }
 
   platform.bootstrapLazy(lazyBundles);
 
   if (typeof opts.html === 'string') {
-    results.body.innerHTML = opts.html;
+    page.body.innerHTML = opts.html;
   }
 
   if (opts.flushQueue !== false) {
-    await results.waitForChanges();
+    await page.waitForChanges();
   }
 
-  results.root = findRoot(cmpTags, results.body);
-  if (results.root != null) {
-    results.rootInstance = platform.getHostRef(results.root).$lazyInstance$;
+  page.root = findRoot(cmpTags, page.body);
+  if (page.root != null) {
+    page.rootInstance = platform.getHostRef(page.root).$lazyInstance$;
   }
 
   if (opts.hydrateServerSide) {
     platform.insertVdomAnnotations(doc);
   }
 
-  return results;
+  return page;
 }
 
 
