@@ -325,32 +325,6 @@ It will not be recommended to use `@Prop(connect)` in order to lazily load compo
 })
 ```
 
-### Global script should export a default function
-
-Currently the collection's global script is executed as a side effect, this makes it impossible to execute the global script multiple times within the same execution context, this is a critical requirement in order to properly SSR (Server-Side Rendering) an application, or have isolated unit tests.
-
-**BEFORE**:
-```ts
-console.log('global script ran');
-```
-
-**AFTER:**
-
-```ts
-export default function() {
-  console.log('global script ran');
-}
-```
-
-i.e., just wrap most of your logic within your global script around a exported default function:
-
-```diff
-+ export default function() {
-    console.log('global script ran');
-+ }
-```
-
-
 ### OutputTarget local copy tasks
 
 The root `copy` property in `stencil.config.ts` has been deprecated in favour of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
