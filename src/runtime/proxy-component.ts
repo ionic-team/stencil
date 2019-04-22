@@ -1,35 +1,8 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { connectedCallback } from './connected-callback';
-import { disconnectedCallback } from './disconnected-callback';
-import { getHostRef, supportsShadowDom } from '@platform';
+import { getHostRef } from '@platform';
 import { getValue, setValue } from './set-value';
-import { CMP_FLAG, MEMBER_FLAGS } from '../utils/constants';
-
-
-export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
-  const cmpMeta: d.ComponentRuntimeMeta = {
-    $flags$: compactMeta[0],
-    $tagName$: compactMeta[1],
-    $members$: compactMeta[2],
-    $listeners$: compactMeta[3],
-    $watchers$: Cstr.$watchers$
-  };
-  if (BUILD.reflect) {
-    cmpMeta.$attrsToReflect$ = [];
-  }
-  if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation && !supportsShadowDom) {
-    cmpMeta.$flags$ |= CMP_FLAG.needsShadowDomShim;
-  }
-  Cstr.prototype.connectedCallback = function() {
-    connectedCallback(this, cmpMeta);
-  };
-  Cstr.prototype.disconnectedCallback = function() {
-    disconnectedCallback(this);
-  };
-  return proxyComponent(Cstr, cmpMeta, 1, 1);
-};
-
+import { MEMBER_FLAGS } from '../utils/constants';
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, isElementConstructor: 0 | 1, proxyState: 0 | 1) => {
   if (BUILD.member && cmpMeta.$members$) {

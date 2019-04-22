@@ -15,30 +15,16 @@ export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeNa
       }
     }
 
-    const styleIdPlaceholder = getStyleIdPlaceholder(cmp);
     const styleTextPlaceholder = getStyleTextPlaceholder(cmp);
-    const styleId = getStyleId(cmp, styleModeName);
-
-    code = code.replace(styleIdPlaceholder, styleId);
     code = code.replace(styleTextPlaceholder, style.compiledStyleText);
   });
 
   return code;
 }
 
-
-function getStyleId(_cmp: d.ComponentCompilerMeta, modeName: string) {
-  return modeName === DEFAULT_STYLE_MODE ? '' : `${modeName}`;
-}
-
-export function getStyleIdPlaceholder(cmp: d.ComponentCompilerMeta) {
-  return `STYLE_ID_PLACEHOLDER:${cmp.tagName}`;
-}
-
 export function getStyleTextPlaceholder(cmp: d.ComponentCompilerMeta) {
   return `STYLE_TEXT_PLACEHOLDER:${cmp.tagName}`;
 }
-
 
 export function getAllModes(cmps: d.ComponentCompilerMeta[]) {
   const allModes: string[] = [DEFAULT_STYLE_MODE];

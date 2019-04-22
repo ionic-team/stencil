@@ -1,12 +1,12 @@
 import * as d from '../../../declarations';
 import ts from 'typescript';
-import { addComponentStyle } from '../component-style';
 import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateNativeConstructor } from './native-constructor';
 import { addWatchers } from '../transforms/watcher-meta-transform';
 import { transformHostData } from '../transforms/host-data-transform';
+import { createStaticGetter } from '../transform-utils';
 
 
 export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
@@ -50,3 +50,13 @@ function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d
   return classMembers;
 }
 
+export function addComponentStyle(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+  if (!cmp.hasStyle) {
+    return;
+  }
+  const style = cmp.styles[0];
+  if (style == null || style.compiledStyleText == null) {
+    console.log(cmp);
+  }
+  classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.compiledStyleText)));
+}

@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { addComponentStyle } from '../component-style';
+import { addComponentStylePlaceholders } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateLazyComponentConstructor } from './lazy-constructor';
@@ -30,7 +30,7 @@ function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.Clas
   transformHostData(classMembers);
 
   if (opts.addStyle) {
-    addComponentStyle(classMembers, cmp, false);
+    addComponentStylePlaceholders(classMembers, cmp);
   }
 
   return classMembers;

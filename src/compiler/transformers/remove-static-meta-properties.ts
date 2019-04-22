@@ -29,6 +29,7 @@ const REMOVE_STATIC_GETTERS = new Set([
   'methods',
   'states',
   'styleMode',
+  'originalStyleUrls',
   'styles',
   'styleUrl',
   'watchers',

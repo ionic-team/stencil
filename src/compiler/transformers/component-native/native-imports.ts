@@ -1,14 +1,13 @@
 import { addImports, getModuleFromSourceFile } from '../transform-utils';
 import ts from 'typescript';
 import * as d from '../../../declarations';
-import { COMMON_IMPORTS, CONNECTED_CALLBACK, PROXY_COMPONENT, REGISTER_HOST } from '../exports';
+import { ATTACH_SHADOW, COMMON_IMPORTS, REGISTER_HOST } from '../exports';
 
 
 export function addNativeImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
   const importFns = [
     ...COMMON_IMPORTS,
-    `proxyComponent as ${PROXY_COMPONENT}`,
-    `connectedCallback as ${CONNECTED_CALLBACK}`,
+    `attachShadow as ${ATTACH_SHADOW}`,
     `registerHost as ${REGISTER_HOST}`,
   ];
   const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);

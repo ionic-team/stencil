@@ -9,6 +9,7 @@ export const REGISTER_HOST = '__stencil_registerHost';
 export const CONNECTED_CALLBACK = '__stencil_connectedCallback';
 export const PROXY_COMPONENT = '__stencil_proxyComponent';
 export const H = '__stencil_h';
+export const ATTACH_SHADOW = '__stencil_attachShadow';
 
 export const COMMON_IMPORTS = [
   `createEvent as ${CREATE_EVENT}`,

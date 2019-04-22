@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { getStaticValue } from '../transform-utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
@@ -57,5 +57,5 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
 
   normalizeStyles(config, tagName, componentFilePath, styles);
 
-  return styles;
+  return sortBy(styles, s => s.modeName);
 }

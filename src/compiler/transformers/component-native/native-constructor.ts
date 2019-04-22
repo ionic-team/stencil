@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
 import ts from 'typescript';
-import { REGISTER_HOST } from '../exports';
+import { ATTACH_SHADOW, REGISTER_HOST } from '../exports';
 import { addLegacyProps } from '../legacy-props';
 
 
@@ -16,7 +16,7 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
     let statements: ts.Statement[] = [
-      nativeRegisterHostStatement(),
+      ...nativeInit(cmp),
       ...cstrMethod.body.statements,
       ...addCreateEvents(cmp),
       ...addLegacyProps(cmp)
@@ -43,9 +43,9 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
   } else {
     // create a constructor()
     let statements: ts.Statement[] = [
-      nativeRegisterHostStatement(),
+      ...nativeInit(cmp),
       ...addCreateEvents(cmp),
-      ...addLegacyProps(cmp)
+      ...addLegacyProps(cmp),
     ];
 
     if (ensureSuper) {
@@ -66,9 +66,27 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
 }
 
 
+function nativeInit(cmp: d.ComponentCompilerMeta) {
+  const initStatements =  [
+    nativeRegisterHostStatement(),
+  ];
+  if (cmp.encapsulation === 'shadow') {
+    initStatements.push(nativeAttachShadowStatement());
+  }
+  return initStatements;
+}
+
 function nativeRegisterHostStatement() {
   return ts.createStatement(ts.createCall(
     ts.createIdentifier(REGISTER_HOST),
+    undefined,
+    [ ts.createThis() ]
+  ));
+}
+
+function nativeAttachShadowStatement() {
+  return ts.createStatement(ts.createCall(
+    ts.createIdentifier(ATTACH_SHADOW),
     undefined,
     [ ts.createThis() ]
   ));

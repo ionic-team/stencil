@@ -1,11 +1,10 @@
 import * as d from '../../declarations';
 import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
 import { isOutputTargetDistModule } from './output-utils';
-import { dashToPascalCase } from '@utils';
+import { buildWarn, dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { optimizeModule } from '../app-core/optimize-module';
-
 
 export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
@@ -20,6 +19,8 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
 export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
+  await buildCtx.stylesPromise;
+
   await Promise.all([
     bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => o.externalRuntime), true),
     bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => !o.externalRuntime), false),
@@ -31,6 +32,11 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
 async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[], externalRuntime: boolean) {
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
+
+  if (build.mode) {
+    const warn = buildWarn(buildCtx.diagnostics);
+    warn.messageText = 'Multiple modes is not fully supported by "dist-module" output target';
+  }
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build, externalRuntime);
 
   if (Array.isArray(rollupResults) && !buildCtx.hasError) {

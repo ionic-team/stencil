@@ -52,15 +52,15 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
 
   hydrateCmps.forEach(cmpData => {
     cmpData.cmp.styles.forEach(style => {
-      let styleId = 'sc-' + cmpData.cmp.tagName;
+      let scopeId = 'sc-' + cmpData.cmp.tagName;
       if (style.modeName !== DEFAULT_STYLE_MODE) {
-        styleId += `-${style.modeName}`;
+        scopeId += `-${style.modeName}`;
       }
 
       if (typeof style.compiledStyleTextScopedCommented === 'string') {
-        coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScopedCommented}');`);
+        coreText.push(`styles.set('${scopeId}','${style.compiledStyleTextScopedCommented}');`);
       } else {
-        coreText.push(`styles.set('${styleId}','${style.compiledStyleTextScoped}');`);
+        coreText.push(`styles.set('${scopeId}','${style.compiledStyleTextScoped}');`);
       }
     });
   });
