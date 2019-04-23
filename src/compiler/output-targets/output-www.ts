@@ -62,7 +62,7 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // Copy global styles into the build directory
-  writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
+  await writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
 
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
