@@ -36,9 +36,6 @@ export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx,
   // or at least one ts file has changed
   const timeSpan = buildCtx.createTimeSpan(`transpile started`);
 
-  // invalidate all changed files
-  compilerCtx.tsService.invalidate(changedTsFiles);
-
   // go ahead and kick off the ts service
   const changeCtx = await compilerCtx.tsService.transpile(compilerCtx, buildCtx, changedTsFiles);
 
@@ -54,13 +51,12 @@ export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx,
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
   resolveComponentDependencies(buildCtx.components);
 
+  // create the components.d.ts file and write to disk
   if (await generateAppTypes(config, compilerCtx, buildCtx, 'src')) {
     changeCtx.types = changeCtx.implementation = true;
   }
 
   if (changeCtx.types) {
-    // ts changes have happened!!
-    // create the components.d.ts file and write to disk
     const typeDiagnostics = compilerCtx.tsService.getTypeDiagnostics();
     loadTypeScriptDiagnostics(buildCtx.diagnostics, typeDiagnostics);
 

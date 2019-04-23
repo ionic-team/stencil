@@ -77,36 +77,44 @@ export async function buildTsService(config: d.Config, compilerCtx: d.CompilerCt
 
   // create our typescript language service to be reused
   const service = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
-  return {
-    getTypeDiagnostics: (tsFilePaths?: string[]) => {
-      if (tsFilePaths) {
-        return flatOne(tsFilePaths.map(sourceFilePath => {
-          return service.getSemanticDiagnostics(sourceFilePath);
-        }));
-      } else {
-        return service.getProgram().getSemanticDiagnostics();
-      }
-    },
-    invalidate: (tsFilePaths: string[]) => {
-      const version = ++transpileCtx.snapVersion;
-      tsFilePaths.forEach(file => {
-        transpileCtx.snapshotVersions.set(file, String(version));
-      });
-    },
-    transpile: async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => {
-      transpileCtx.compilerCtx = compilerCtx;
-      transpileCtx.buildCtx = buildCtx;
-
-      // loop through each ts file that has changed
-      const changeCtx = {
-        types: false,
-        implementation: false,
-      };
-      await Promise.all(tsFilePaths.map(tsFilePath => {
-        return transpileTsFile(service, transpileCtx, changeCtx, tsFilePath);
+  const getTypeDiagnostics = (tsFilePaths?: string[]) => {
+    if (tsFilePaths) {
+      return flatOne(tsFilePaths.map(sourceFilePath => {
+        return service.getSemanticDiagnostics(sourceFilePath);
       }));
-      return changeCtx;
+    } else {
+      return service.getProgram().getSemanticDiagnostics();
     }
+  };
+
+  const invalidate = (tsFilePaths: string[]) => {
+    const version = ++transpileCtx.snapVersion;
+    tsFilePaths.forEach(file => {
+      transpileCtx.snapshotVersions.set(file, String(version));
+    });
+  };
+
+  const transpile = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) => {
+    transpileCtx.compilerCtx = compilerCtx;
+    transpileCtx.buildCtx = buildCtx;
+
+    invalidate(tsFilePaths);
+
+    // loop through each ts file that has changed
+    const changeCtx = {
+      types: false,
+      implementation: false,
+    };
+    await Promise.all(tsFilePaths.map(tsFilePath => {
+      return transpileTsFile(service, transpileCtx, changeCtx, tsFilePath);
+    }));
+    return changeCtx;
+  };
+
+  return {
+    getTypeDiagnostics,
+    invalidate,
+    transpile
   };
 }
 

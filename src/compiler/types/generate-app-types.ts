@@ -27,7 +27,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
   const { changedContent } = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
   timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
   if (changedContent) {
-    compilerCtx.tsService.invalidate([componentsDtsFilePath]);
+    compilerCtx.tsService.invalidate([componentsDtsFilePath, ...compilerCtx.rootTsFiles]);
   }
 
   return changedContent;

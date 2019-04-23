@@ -16,7 +16,8 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
     return;
   }
 
-  if (await canSkipGlobalStyles(config, compilerCtx, buildCtx)) {
+  const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx);
+  if (canSkip) {
     buildCtx.globalStyle = compilerCtx.cachedGlobalStyle;
     return;
   }
