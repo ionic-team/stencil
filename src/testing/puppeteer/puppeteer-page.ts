@@ -247,36 +247,46 @@ async function waitForChanges(page: pd.E2EPageInternal) {
 
     await page.evaluate(() => {
       // BROWSER CONTEXT
-      const promises: Promise<any>[] = [];
+      return new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const promises: Promise<any>[] = [];
 
-      const waitComponentOnReady = (elm: Element, promises: Promise<any>[]) => {
-        if (elm != null) {
-          const children = elm.children;
-          const len = children.length;
-          for (let i = 0; i < len; i++) {
-            const childElm = children[i];
-            if (childElm != null) {
-              if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
-                promises.push((childElm as d.HostElement).componentOnReady());
+          const waitComponentOnReady = (elm: Element, promises: Promise<any>[]) => {
+            if (elm != null) {
+              const children = elm.children;
+              const len = children.length;
+              for (let i = 0; i < len; i++) {
+                const childElm = children[i];
+                if (childElm != null) {
+                  if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
+                    promises.push((childElm as d.HostElement).componentOnReady());
+                  }
+                  waitComponentOnReady(childElm, promises);
+                }
               }
-              waitComponentOnReady(childElm, promises);
             }
-          }
-        }
-      };
+          };
 
-      waitComponentOnReady(document.documentElement, promises);
+          waitComponentOnReady(document.documentElement, promises);
 
-      return Promise.all(promises);
+          Promise.all(promises)
+            .then(() => {
+              resolve();
+            })
+            .catch(() => {
+              resolve();
+            });
+        });
+      });
     });
 
     if (page.isClosed()) {
       return;
     }
 
-    await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
-
     await page.waitFor(100);
+
+    await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
 
   } catch (e) {}
 }

@@ -2,7 +2,10 @@ import { Component, State, h } from '@stencil/core';
 
 @Component({
   tag: 'state-cmp',
-  styles: `.selected { font-weight: bold; color: blue; }`,
+  styles: `
+    button { color: black; }
+    .selected { font-weight: bold; color: blue; }
+  `,
   shadow: true
 })
 export class StateCmp {
