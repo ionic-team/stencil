@@ -3,11 +3,15 @@ import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
-import { MockElement, parseHtmlToFragment } from '@mock-doc';
+import { MockElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
 
 
 export class E2EElement extends MockElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
+
+  private _queueAction(action: ElementAction) {
+    this._queuedActions.push(action);
+  }
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
@@ -23,7 +27,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   callMethod(methodName: string, ...methodArgs: any[]) {
-    this._queuedActions.push({
+    this._queueAction({
       methodName: methodName,
       methodArgs: methodArgs
     });
@@ -32,7 +36,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   triggerEvent(eventName: string, eventInitDict?: d.EventInitDict) {
-    this._queuedActions.push({
+    this._queueAction({
       eventName: eventName,
       eventInitDict: eventInitDict
     });
@@ -186,7 +190,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   setProperty(propertyName: string, value: any) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: propertyName,
       setPropertyValue: value
     });
@@ -198,7 +202,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   setAttribute(name: string, value: any) {
-    this._queuedActions.push({
+    this._queueAction({
       setAttributeName: name,
       setAttributeValue: value
     });
@@ -208,26 +212,26 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     const api: any = {
       add: (...classNames: string[]) => {
         classNames.forEach(className => {
-          this._queuedActions.push({
+          this._queueAction({
             classAdd: className
           });
         });
       },
       remove: (...classNames: string[]) => {
         classNames.forEach(className => {
-          this._queuedActions.push({
+          this._queueAction({
             classRemove: className
           });
         });
       },
       toggle: (className: string) => {
-        this._queuedActions.push({
+        this._queueAction({
           classToggle: className
         });
       },
       contains: (className: string) => {
         this._validate();
-        return this.className.split(' ').includes(className);
+        return super.className.split(' ').includes(className);
       }
     };
     return api;
@@ -239,7 +243,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set className(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'className',
       setPropertyValue: value
     });
@@ -251,7 +255,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set id(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'id',
       setPropertyValue: value
     });
@@ -263,7 +267,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set innerHTML(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'innerHTML',
       setPropertyValue: value
     });
@@ -275,7 +279,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set innerText(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'innerText',
       setPropertyValue: value
     });
@@ -287,10 +291,12 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set nodeValue(value: string) {
-    this._queuedActions.push({
-      setPropertyName: 'nodeValue',
-      setPropertyValue: value
-    });
+    if (typeof value === 'string') {
+      this._queueAction({
+        setPropertyName: 'nodeValue',
+        setPropertyValue: value
+      });
+    }
   }
 
   get outerHTML() {
@@ -307,13 +313,17 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return super.shadowRoot;
   }
 
+  set shadowRoot(value: any) {
+    super.shadowRoot = value;
+  }
+
   get tabIndex() {
     this._validate();
     return super.tabIndex;
   }
 
   set tabIndex(value: number) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'tabIndex',
       setPropertyValue: value
     });
@@ -325,7 +335,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set textContent(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'textContent',
       setPropertyValue: value
     });
@@ -337,7 +347,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
   }
 
   set title(value: string) {
-    this._queuedActions.push({
+    this._queueAction({
       setPropertyName: 'title',
       setPropertyValue: value
     });
@@ -458,7 +468,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
       };
     }, this._elmHandle);
 
-    if (shadowRootHTML) {
+    if (typeof shadowRootHTML === 'string') {
       (this as any).shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
       (this as any).shadowRoot.host = this;
 
@@ -471,10 +481,10 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     const rootElm = frag.firstElementChild;
 
     this.nodeName = rootElm.nodeName;
-    this.attributes = rootElm.attributes.cloneAttributes();
+    this.attributes = cloneAttributes(rootElm.attributes);
 
-    for (let i = this.childNodes.length - 1; i >= 0; i--) {
-      this.removeChild(this.childNodes[i]);
+    while (this.childNodes.length > 0) {
+      this.removeChild(this.childNodes[0]);
     }
 
     while (rootElm.childNodes.length > 0) {

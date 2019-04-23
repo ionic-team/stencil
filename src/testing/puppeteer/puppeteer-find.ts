@@ -99,7 +99,7 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
 }
 
 
-export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: string) {
+export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
   const foundElms: E2EElement[] = [];
 
   const { lightSelector, shadowSelector } = getSelector(selector);

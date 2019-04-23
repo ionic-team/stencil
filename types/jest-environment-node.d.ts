@@ -3,7 +3,7 @@ declare module "jest-environment-node" {
   class NodeEnvironment {
     constructor(config: any);
 
-    teardown(): void;
+    teardown(): any;
   }
 
   export = NodeEnvironment;

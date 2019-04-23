@@ -8,7 +8,10 @@ import { DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-util
 
 
 export function validateOutputTargetWww(config: d.Config) {
-  if (!Array.isArray(config.outputTargets)) {
+  const hasOutputTargets = Array.isArray(config.outputTargets);
+  const hasE2eTests = !!(config.flags && config.flags.e2e);
+
+  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww))) {
     config.outputTargets = [
       { type: WWW }
     ];

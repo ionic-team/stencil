@@ -414,7 +414,9 @@ import { Component, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 it('override default values from attribute', async () => {
-  @Component({ tag: 'cmp-a'})
+  @Component({
+    tag: 'cmp-a'
+  })
   class CmpA {
     @Prop() someProp = '';
     render() {
@@ -435,9 +437,54 @@ it('override default values from attribute', async () => {
     </cmp-a>
   `);
 
-  expect(root.someProp).toBe('value');
+  expect(page.root.someProp).toBe('value');
 });
 ```
+
+
+### Serialized `<shadow-root>`
+
+Traditionally, when a component is serialized to a string its shadow-root is ignored and not include within the HTML output. However, when building web components and using Shadow DOM, the nodes generated within the components are just as important as any other nodes to be tested. For this reason, both spec and e2e tests will serialize the shadow-root content into a mocked `<shadow-root>` element. Note that this serialized shadow-root is simply for testing and comparing values, and is not used at browser runtime.
+
+```tsx
+import { Component } from '@stencil/core';
+import { newSpecPage } from '@stencil/core/testing';
+
+it('test shadow root innerHTML', async () => {
+  @Component({
+    tag: 'cmp-a',
+    shadow: true
+  })
+  class CmpA {
+    render() {
+      return (
+        <div>Shadow Content</div>
+      );
+    }
+  }
+
+  const page = await newSpecPage({
+    components: [CmpA],
+    html: `
+      <cmp-a>
+        Light Content
+      </cmp-a>
+    `,
+  });
+
+  expect(page.root).toEqualHtml(`
+    <cmp-a>
+      <shadow-root>
+        <div>
+          Shadow Content
+        </div>
+      </shadow-root>
+      Light Content
+    </cmp-a>
+  `);
+});
+```
+
 
 ### Jest Presets
 

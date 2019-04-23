@@ -530,4 +530,38 @@ describe('hydrate, shadow child', () => {
     `);
   });
 
+  it('test shadow root innerHTML', async () => {
+    @Component({
+      tag: 'cmp-a',
+      shadow: true
+    })
+    class CmpA {
+      render() {
+        return (
+          <div>Shadow Content</div>
+        );
+      }
+    }
+
+    const page = await newSpecPage({
+      components: [CmpA],
+      html: `
+        <cmp-a>
+          Light Content
+        </cmp-a>
+      `,
+    });
+
+    expect(page.root).toEqualHtml(`
+      <cmp-a>
+        <shadow-root>
+          <div>
+            Shadow Content
+          </div>
+        </shadow-root>
+        Light Content
+      </cmp-a>
+    `);
+  });
+
 });

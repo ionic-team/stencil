@@ -57,16 +57,39 @@ export class MockAttributeMap {
   }
 }
 
-export function cloneAttributes(srcAttrs: MockAttributeMap) {
+export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) {
   const dstAttrs = new MockAttributeMap();
   if (srcAttrs != null) {
-    for (let i = 0, ii = srcAttrs.length; i < ii; i++) {
-      const srcAttr = srcAttrs.item(i);
-      const dstAttr = new MockAttr(srcAttr.name, srcAttr.value, srcAttr.namespaceURI);
-      dstAttrs.setNamedItemNS(dstAttr);
+    const attrLen = srcAttrs.length;
+
+    if (sortByName && attrLen > 1) {
+      const sortedAttrs: MockAttr[] = [];
+      for (let i = 0; i < attrLen; i++) {
+        const srcAttr = srcAttrs.item(i);
+        const dstAttr = new MockAttr(srcAttr.name.toLowerCase(), srcAttr.value, srcAttr.namespaceURI);
+        sortedAttrs.push(dstAttr);
+      }
+
+      sortedAttrs.sort(sortAttributes).forEach(attr => {
+        dstAttrs.setNamedItemNS(attr);
+      });
+
+    } else {
+      for (let i = 0; i < attrLen; i++) {
+        const srcAttr = srcAttrs.item(i);
+        const dstAttr = new MockAttr(srcAttr.name, srcAttr.value, srcAttr.namespaceURI);
+        dstAttrs.setNamedItemNS(dstAttr);
+      }
     }
+
   }
   return dstAttrs;
+}
+
+function sortAttributes(a: MockAttr, b: MockAttr) {
+  if (a.name < b.name) return -1;
+  if (a.name > b.name) return 1;
+  return 0;
 }
 
 

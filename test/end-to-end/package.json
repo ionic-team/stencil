@@ -1,6 +1,10 @@
 {
   "name": "@stencil/end-to-end",
   "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/types/components.d.ts",
+  "collection": " dist/collection/collection-manifest.json",
   "scripts": {
     "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
@@ -14,7 +18,7 @@
     "@types/puppeteer": "1.12.3",
     "jest": "23.6.0",
     "jest-cli": "23.6.0",
-    "puppeteer": "1.12.2",
+    "puppeteer": "1.14.0",
     "workbox-build": "3.4.1"
   },
   "jest": {

@@ -16,17 +16,17 @@ export class EventCmp {
   @Event() myWindowEvent: EventEmitter<number>;
 
   @Method()
-  methodThatFiresMyWindowEvent(value: number) {
+  async methodThatFiresMyWindowEvent(value: number) {
     this.myWindowEvent.emit(value);
   }
 
   @Method()
-  methodThatFiresMyDocumentEvent() {
+  async methodThatFiresMyDocumentEvent() {
     this.myDocumentEvent.emit();
   }
 
   @Method()
-  methodThatFiresEventWithOptions() {
+  async methodThatFiresEventWithOptions() {
     this.myEventWithOptions.emit({ mph: 88 });
   }
 

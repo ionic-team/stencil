@@ -173,7 +173,7 @@ export interface E2EProcessEnv {
   __STENCIL_EMULATE_CONFIGS__?: string;
   __STENCIL_EMULATE__?: string;
   __STENCIL_BROWSER_URL__?: string;
-  __STENCIL_LOADER_URL__?: string;
+  __STENCIL_APP_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
 
   __STENCIL_SCREENSHOT__?: 'true';

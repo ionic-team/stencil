@@ -129,10 +129,30 @@ function nodeContextEvents(waitForEvents: pd.WaitForEvent[], browserEvent: pd.Br
 function browserContextEvents() {
   // BROWSER CONTEXT
 
-  window.addEventListener('appload', () => {
-    // BROWSER CONTEXT
+  const appLoaded = () => {
     (window as pd.BrowserWindow).stencilAppLoaded = true;
-  });
+  };
+
+  const domReady = () => {
+    const promises: Promise<any>[] = [];
+    const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
+      if (elm != null && elm.nodeType === 1) {
+        for (let i = 0; i < elm.children.length; i++) {
+          const childElm = elm.children[i];
+          if (childElm.tagName.includes('-') && typeof (childElm as any).componentOnReady === 'function') {
+            promises.push((childElm as any).componentOnReady());
+          }
+          waitForDidLoad(promises, childElm);
+        }
+      }
+    };
+
+    waitForDidLoad(promises, window.document.documentElement);
+
+    Promise.all(promises)
+      .then(appLoaded)
+      .catch(appLoaded);
+  };
 
   (window as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
     // BROWSER CONTEXT
@@ -181,4 +201,11 @@ function browserContextEvents() {
     };
     return serializedEvent;
   };
+
+  if (window.document.readyState === 'complete') {
+    domReady();
+
+  } else {
+    window.document.addEventListener('DOMContentLoaded', domReady);
+  }
 }

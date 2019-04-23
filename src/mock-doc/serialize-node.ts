@@ -1,3 +1,4 @@
+import { cloneAttributes } from './attribute';
 import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
@@ -8,7 +9,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     text: []
   };
 
-  if (opts.pretty === true) {
+  if (opts.pretty) {
     if (typeof opts.indentSpaces !== 'number') {
       opts.indentSpaces = 2;
     }
@@ -38,7 +39,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     opts.serializeShadowRoot = false;
   }
 
-  if (opts.outerHTML === true) {
+  if (opts.outerHTML) {
     serializeToHtml(elm as Node, opts, output, false);
 
   } else {
@@ -63,11 +64,11 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
     const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
 
-    const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName) === true);
+    const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName));
 
     if (ignoreTag === false) {
 
-      if (opts.newLines === true) {
+      if (opts.newLines) {
         output.text.push('\n');
       }
 
@@ -79,12 +80,13 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
       output.text.push('<' + tagName);
 
-      if (opts.pretty === true) {
-        sortHtmlAttributes(node as HTMLElement);
-      }
+      const attrsLength = (node as HTMLElement).attributes.length;
+      const attributes = (opts.pretty && attrsLength > 1) ?
+        cloneAttributes((node as HTMLElement).attributes as any, true) :
+        (node as Element).attributes;
 
-      for (let i = 0, attrsLength = (node as Element).attributes.length; i < attrsLength; i++) {
-        const attr = (node as Element).attributes.item(i);
+      for (let i = 0; i < attrsLength; i++) {
+        const attr = attributes.item(i);
         const attrName = attr.name;
 
         if (attrName === 'style') {
@@ -92,7 +94,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
         }
 
         let attrValue = attr.value;
-        if (opts.removeEmptyAttributes === true && attrValue === '' && REMOVE_EMPTY_ATTR.has(attrName) === true) {
+        if (opts.removeEmptyAttributes && attrValue === '' && REMOVE_EMPTY_ATTR.has(attrName)) {
           continue;
         }
 
@@ -117,24 +119,24 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
           output.text.push(' ' + attrNamespaceURI + ':' + attrName);
         }
 
-        if (opts.pretty === true && attrName === 'class') {
+        if (opts.pretty && attrName === 'class') {
           attrValue = attr.value = attrValue.split(' ').filter(t => t !== '').sort().join(' ').trim();
 
         } else if (attrValue === '') {
-          if ((opts.collapseBooleanAttributes === true && BOOLEAN_ATTR.has(attrName) === true) || (opts.removeEmptyAttributes === true && attrName.startsWith('data-'))) {
+          if ((opts.collapseBooleanAttributes && BOOLEAN_ATTR.has(attrName)) || (opts.removeEmptyAttributes && attrName.startsWith('data-'))) {
             continue;
           }
         }
 
-        if (opts.removeAttributeQuotes === true && CAN_REMOVE_ATTR_QUOTES.test(attrValue) === true) {
+        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
           output.text.push('=' + escapeString(attrValue, true));
         } else {
           output.text.push('="' + escapeString(attrValue, true) + '"');
         }
       }
 
-      if ((node as Element).hasAttribute('style') === true) {
-        if (opts.minifyInlineStyles === true) {
+      if ((node as Element).hasAttribute('style')) {
+        if (opts.minifyInlineStyles) {
           const minCssText = ((node as HTMLElement).style as any).cssTextMinified;
           if (typeof minCssText === 'string') {
             output.text.push(` style="${minCssText}">`);
@@ -155,7 +157,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
         output.indent = output.indent + opts.indentSpaces;
         serializeToHtml((node as HTMLElement).shadowRoot, opts, output, true);
         output.indent = output.indent - opts.indentSpaces;
-        if (opts.newLines === true && node.childNodes.length === 0) {
+        if (opts.newLines && node.childNodes.length === 0) {
           output.text.push('\n');
           for (let i = 0; i < output.indent; i++) {
             output.text.push(' ');
@@ -181,7 +183,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
             }
 
             if (ignoreTag === false) {
-              if (opts.newLines === true) {
+              if (opts.newLines) {
                 output.text.push('\n');
               }
 
@@ -203,7 +205,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
   } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
     if (typeof node.nodeValue === 'string' && node.nodeValue.trim() !== '') {
-      if (opts.newLines === true) {
+      if (opts.newLines) {
         output.text.push('\n');
       }
 
@@ -215,11 +217,11 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
       const parentTagName = (node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
 
-      if (NON_ESCAPABLE_CONTENT.has(parentTagName) === true) {
+      if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
         output.text.push(node.nodeValue);
 
       } else {
-        if (opts.pretty === true) {
+        if (opts.pretty) {
           output.text.push(escapeString(node.nodeValue.replace(/\s\s+/g, ' ').trim(), false));
         } else {
           output.text.push(escapeString(node.nodeValue, false));
@@ -228,7 +230,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
     }
 
   } else if (node.nodeType === NODE_TYPES.COMMENT_NODE && opts.removeHtmlComments === false) {
-    if (opts.newLines === true) {
+    if (opts.newLines) {
       output.text.push('\n');
     }
 
@@ -245,35 +247,6 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
   }
 }
 
-interface AttrItem {
-  key: string;
-  value: string;
-}
-
-function sortHtmlAttributes(elm: HTMLElement) {
-  const sortedAttrs: AttrItem[] = [];
-
-  const attrs = elm.attributes;
-  for (let i = attrs.length - 1; i >= 0; i--) {
-    const attr = attrs.item(i);
-    sortedAttrs.push({
-      key: attr.nodeName.toLowerCase(),
-      value: attr.nodeValue
-    });
-    elm.removeAttribute(attr.nodeName);
-  }
-
-  sortedAttrs.sort(sortAttrs).forEach(attr => {
-    elm.setAttribute(attr.key, attr.value);
-  });
-}
-
-function sortAttrs(a: AttrItem, b: AttrItem) {
-  if (a.key < b.key) return -1;
-  if (a.key > b.key) return 1;
-  return 0;
-}
-
 
 const AMP_REGEX = /&/g;
 const NBSP_REGEX = /\u00a0/g;
@@ -285,7 +258,7 @@ const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
 
-  if (attrMode === true) {
+  if (attrMode) {
     return str.replace(DOUBLE_QUOTE_REGEX, '&quot;');
   }
 

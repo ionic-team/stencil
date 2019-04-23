@@ -6,8 +6,6 @@ export const win = window;
 
 export const doc = document;
 
-export const getHead = (_?: any) => doc.head;
-
 export const plt: d.PlatformRuntime = {};
 
 if (BUILD.taskQueue) {

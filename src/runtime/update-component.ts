@@ -150,7 +150,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         // on appload
         // we have finish the first big initial render
         doc.documentElement.classList.add(HYDRATED_CLASS);
-        setTimeout(() => plt.$queueAsync$ = true, 999);
+
+        if (!BUILD.hydrateServerSide) {
+          setTimeout(() => plt.$queueAsync$ = true, 999);
+        }
+
         emitLifecycleEvent(elm, 'appload');
       }
 

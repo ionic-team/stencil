@@ -196,7 +196,7 @@ export interface E2EElement {
    * `element.findAll('my-cmp >>> li')`. Returns an empty array if
    * no elements were found.
    */
-  findAll(selector: string): Promise<E2EElement[]>;
+  findAll(selector: FindSelector): Promise<E2EElement[]>;
 
   /**
    * Sets focus on the element.

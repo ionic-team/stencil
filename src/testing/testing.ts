@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { hasError } from '@utils';
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
@@ -37,11 +38,7 @@ export class Testing implements d.Testing {
     const env: d.E2EProcessEnv = process.env;
     const compiler = this.compiler;
     const config = this.config;
-    const { isValid, outputTarget } = getOutputTarget(config);
-    if (!isValid) {
-      this.isValid = false;
-      return false;
-    }
+    config.outputTargets = getOutputTargets(config);
 
     const msg: string[] = [];
 
@@ -102,10 +99,10 @@ export class Testing implements d.Testing {
 
       if (this.devServer) {
         env.__STENCIL_BROWSER_URL__ = this.devServer.browserUrl;
-        this.config.logger.debug(`dev server url: ${env.__STENCIL_BROWSER_URL__}`);
+        this.config.logger.debug(`e2e dev server url: ${env.__STENCIL_BROWSER_URL__}`);
 
-        env.__STENCIL_LOADER_URL__ = getLoaderScriptUrl(config, outputTarget, this.devServer.browserUrl);
-        this.config.logger.debug(`dev server loader: ${env.__STENCIL_LOADER_URL__}`);
+        env.__STENCIL_APP_URL__ = getAppUrl(config, this.devServer.browserUrl);
+        this.config.logger.debug(`e2e app url: ${env.__STENCIL_APP_URL__}`);
       }
     }
 
@@ -161,35 +158,20 @@ function setupTestingConfig(config: d.Config) {
 }
 
 
-function getOutputTarget(config: d.Config) {
-  let isValid = true;
-
-  let outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
-  if (!outputTarget) {
-    outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetWww;
-    if (!outputTarget) {
-      config.logger.error(`Test missing config output target`);
-      isValid = false;
-    }
-  }
-  outputTarget.serviceWorker = null;
-
-  config.outputTargets = [outputTarget];
-
-  return { isValid, outputTarget };
+function getOutputTargets(config: d.Config) {
+  return config.outputTargets.filter(o => {
+    return isOutputTargetWww(o) || isOutputTargetDistLazy(o);
+  });
 }
 
 
-function getLoaderScriptUrl(config: d.Config, outputTarget: d.OutputTargetWww, browserUrl: string) {
-  const appLoaderFilePath = 'getLoaderPath(config, outputTarget)';
+function getAppUrl(config: d.Config, browserUrl: string) {
+  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+  const appBuildDir = wwwOutput.buildDir;
+  const appFileName = `${config.fsNamespace}.esm.js`;
+  const appFilePath = config.sys.path.join(appBuildDir, appFileName);
 
-  let appLoadUrlPath: string;
+  const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
 
-  if (outputTarget.type === 'www') {
-    appLoadUrlPath = config.sys.path.relative(outputTarget.dir, appLoaderFilePath);
-  } else {
-    appLoadUrlPath = config.sys.path.relative(config.rootDir, appLoaderFilePath);
-  }
-
-  return browserUrl + appLoadUrlPath;
+  return browserUrl + appUrlPath;
 }
