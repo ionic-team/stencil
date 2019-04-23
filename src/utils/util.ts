@@ -128,6 +128,12 @@ export function hasDependency(buildCtx: d.BuildCtx, depName: string) {
   return getDependencies(buildCtx).includes(depName);
 }
 
+export function getDynamicImportFunction(namespace: string) {
+  return `__sc_import_${
+    namespace.replace(/\s|-/g, '_')
+  }`;
+}
+
 export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 

@@ -1,5 +1,6 @@
 import { NAMESPACE } from '@build-conditionals';
 import { doc, win } from './client-window';
+import { getDynamicImportFunction } from '@utils';
 
 export const patchBrowser = async () => {
   const scriptElm = Array.from(doc.querySelectorAll('script')).find(a => a.src.includes(NAMESPACE));
@@ -14,7 +15,7 @@ export const patchBrowser = async () => {
 };
 
 export const patchDynamicImport = (base: string) => {
-  const importFunctionName = `__sc_import_${NAMESPACE}`;
+  const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
     (win as any)[importFunctionName] = new Function('w', 'return import(w);');
   } catch (e) {
@@ -25,7 +26,7 @@ export const patchDynamicImport = (base: string) => {
       if (!mod) {
         const script = doc.createElement('script');
         script.type = 'module';
-        script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; ${importFunctionName}.m = m;`], { type: 'application/javascript' }))
+        script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window[${importFunctionName}].m = m;`], { type: 'application/javascript' }))
         mod = new Promise(resolve => {
           script.onload = () => {
             resolve((win as any)[importFunctionName].m);

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { generateRollupOutput } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
-import { relativeImport } from '@utils';
+import { getDynamicImportFunction, relativeImport } from '@utils';
 import { RollupResult } from '../../declarations';
 
 export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, isBrowserBuild: boolean, outputTargets: d.OutputTargetDistLazy[]) {
@@ -22,7 +22,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
     };
     // This is needed until Firefox 67, which ships native dynamic imports
     if (isBrowserBuild) {
-      esmOpts.dynamicImportFunction = `__sc_import_${config.fsNamespace}`;
+      esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
     }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
