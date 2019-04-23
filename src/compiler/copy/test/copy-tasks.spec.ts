@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
-import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTasks } from '../config-copy-tasks';
+import * as d from '../../../declarations';
+import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTasks } from '../local-copy-tasks';
 import { mockConfig } from '../../../testing/mocks';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 
 
 describe('copy tasks', () => {
@@ -17,29 +17,9 @@ describe('copy tasks', () => {
 
   describe('processCopyTasks', () => {
 
-    it('should throw error when dest is a glob', async () => {
-      try {
-        const copyTask: d.CopyTask = {
-          src: 'assets',
-          dest: '**/*'
-        };
-        await processCopyTasks(config, [], copyTask);
-        expect('this should').toBe('get called');
-
-      } catch (e) {}
-    });
-
-    it('should throw error when missing src', async () => {
-      try {
-        const copyTask: d.CopyTask = {};
-        await processCopyTasks(config, [], copyTask);
-
-      } catch (e) {}
-    });
-
     it('should resolve with null copy task', async () => {
-      const r = await processCopyTasks(config, [], null);
-      expect(r).toBeUndefined();
+      const r = await processCopyTasks(config, null, []);
+      expect(r).toEqual([]);
     });
 
   });

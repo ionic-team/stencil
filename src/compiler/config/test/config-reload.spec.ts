@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { configReload } from '../config-reload';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 import * as path from 'path';
 import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../validate-config';
@@ -8,11 +8,13 @@ import { validateConfig } from '../validate-config';
 
 describe('config-reload', () => {
   let config: d.Config;
+  let logger: d.Logger;
   let updateConfig: d.Config;
   const root = path.resolve('/');
 
   beforeEach(() => {
     config = new TestingConfig();
+    logger = config.logger;
     config.rootDir = normalizePath(path.join(root, 'my-app'));
     config.cwd = normalizePath(path.join(root, 'my-app'));
     updateConfig = new TestingConfig();

@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { ensureDirs } from '../copy-tasks-worker';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 import * as path from 'path';
 
 const ROOT = path.resolve('/');

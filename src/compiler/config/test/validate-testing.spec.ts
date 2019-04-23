@@ -1,6 +1,5 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { pathJoin } from '../../util';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
 
@@ -22,7 +21,7 @@ describe('validateTesting', () => {
     };
     config.outputTargets = [{
       type: 'www',
-      dir: pathJoin(config, ROOT, 'www')
+      dir: sys.path.join(ROOT, 'www')
     } as any as d.OutputTargetStats];
   });
 
@@ -82,10 +81,10 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
-      pathJoin(config, ROOT, 'www')
+      sys.path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+      sys.path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+      sys.path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+      sys.path.join(ROOT, 'www')
     ]);
   });
 
@@ -98,11 +97,11 @@ describe('validateTesting', () => {
     ];
     validateConfig(config);
     expect(config.testing.testPathIgnorePatterns).toEqual([
-      pathJoin(config, ROOT, 'User', 'some', 'path', '.vscode'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', '.stencil'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', 'node_modules'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', 'dist-folder'),
-      pathJoin(config, ROOT, 'User', 'some', 'path', 'www-folder'),
+      sys.path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+      sys.path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+      sys.path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+      sys.path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
+      sys.path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
     ]);
   });
 });

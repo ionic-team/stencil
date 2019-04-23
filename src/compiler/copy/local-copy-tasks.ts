@@ -11,7 +11,7 @@ export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, bu
 }
 
 export async function processCopyTasks(config: d.Config, dest: string, tasks: d.CopyTask[]) {
-  if (!tasks) {
+  if (!Array.isArray(tasks)) {
     return [];
   }
   return flatOne(
@@ -53,7 +53,7 @@ async function processGlobTask(config: d.Config, copyTask: d.CopyTask, dest: str
 }
 
 
-function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destDir: string, globRelPath: string): d.CopyTask {
+export function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destDir: string, globRelPath: string): d.CopyTask {
   let dest = copyTask.dest;
   if (dest) {
     if (config.sys.path.isAbsolute(dest)) {
@@ -74,7 +74,7 @@ function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destDir: str
 }
 
 
-function getSrcAbsPath(config: d.Config, src: string) {
+export function getSrcAbsPath(config: d.Config, src: string) {
   if (config.sys.path.isAbsolute(src)) {
     return src;
   }
@@ -82,7 +82,7 @@ function getSrcAbsPath(config: d.Config, src: string) {
 }
 
 
-function getDestAbsPath(config: d.Config, src: string, destAbsPath: string, destRelPath: string) {
+export function getDestAbsPath(config: d.Config, src: string, destAbsPath: string, destRelPath: string) {
   if (destRelPath) {
     if (config.sys.path.isAbsolute(destRelPath)) {
       return destRelPath;

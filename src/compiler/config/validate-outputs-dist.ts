@@ -14,7 +14,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
 
-    if (!outputTarget.dir) {
+    if (typeof outputTarget.dir !== 'string') {
       outputTarget.dir = DEFAULT_DIR;
     }
 
@@ -22,7 +22,7 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
     }
 
-    if (!outputTarget.buildDir) {
+    if (typeof outputTarget.buildDir !== 'string') {
       outputTarget.buildDir = DEFAULT_BUILD_DIR;
     }
 

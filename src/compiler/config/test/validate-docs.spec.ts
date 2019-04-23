@@ -1,7 +1,6 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../validate-config';
-import * as path from 'path';
 
 
 describe('validateDocs', () => {
@@ -32,7 +31,7 @@ describe('validateDocs', () => {
       } as d.OutputTargetDocsReadme
     );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
   });
 
@@ -45,7 +44,7 @@ describe('validateDocs', () => {
       } as any
     );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
   });
 
@@ -58,7 +57,7 @@ describe('validateDocs', () => {
       } as d.OutputTargetDocsReadme
     );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
   });
 
@@ -71,7 +70,7 @@ describe('validateDocs', () => {
       } as d.OutputTargetDocsReadme
     );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
   });
 
@@ -115,7 +114,7 @@ describe('validateDocs', () => {
   it('_deprecated: docs-json flag', () => {
     config.flags.docsJson = 'some/path/docs.json';
     validateConfig(config);
-    const depricated = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocs;
+    const depricated = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
     expect(depricated).toBeUndefined();
     const o = config.outputTargets.find(o => o.type === 'docs-json') as d.OutputTargetDocsJson;
     expect(o.file).toContain('docs.json');

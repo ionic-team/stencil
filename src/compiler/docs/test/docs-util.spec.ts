@@ -1,4 +1,4 @@
-import { MarkdownTable } from '../docs-util';
+import { MarkdownTable } from '../../output-plugins/docs/docs-util';
 
 
 describe('markdown-table', () => {

@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateConfig } from '../validate-config';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 
 
 describe('validation', () => {
@@ -103,7 +103,7 @@ describe('validation', () => {
 
     it('should default exclude glob', () => {
       validateConfig(config);
-      expect(config.excludeSrc).toEqual(['**/*.+(spec|e2e).*']);
+      expect(config.excludeSrc).toEqual(['**/test/*']);
     });
 
   });
@@ -152,7 +152,7 @@ describe('validation', () => {
       config.watch = true;
       config.devMode = false;
       validateConfig(config);
-      expect(config.hashFileNames).toBe(false);
+      expect(config.hashFileNames).toBe(true);
     });
 
     it('should default hashFileNames to true in prod mode', () => {

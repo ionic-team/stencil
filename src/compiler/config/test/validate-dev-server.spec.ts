@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { normalizePath } from '../../util';
+import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
 

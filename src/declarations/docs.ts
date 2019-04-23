@@ -55,9 +55,9 @@ export interface JsonDocsProp {
   attr: string | undefined;
   reflectToAttr: boolean;
   docs: string;
-  docsTags: JsonDocsTag[];
+  docsTags?: JsonDocsTag[];
   default: string;
-  deprecation: string | undefined;
+  deprecation?: string | undefined;
 
   optional: boolean;
   required: boolean;

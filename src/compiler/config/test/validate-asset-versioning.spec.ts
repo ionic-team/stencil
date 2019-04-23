@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import { Config } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';

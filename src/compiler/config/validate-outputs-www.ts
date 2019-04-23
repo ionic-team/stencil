@@ -52,8 +52,10 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
     ...config.copy,
     ...DEFAULT_WWW_COPY,
   ]);
+
   outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
-  outputTarget.serviceWorker = validateServiceWorker(config, outputTarget.serviceWorker, outputTarget.dir);
+  validateServiceWorker(config, outputTarget);
+
   if (outputTarget.polyfills === undefined) {
     outputTarget.polyfills = true;
   }

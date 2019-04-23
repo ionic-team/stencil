@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { validateStats } from '../validate-stats';
+import { validateOutputStats } from '../validate-output-stats';
 
 
 describe('validateStats', () => {
@@ -25,7 +25,7 @@ describe('validateStats', () => {
   it('adds stats from flags, w/ no outputTargets', () => {
     config.flags.stats = true;
 
-    validateStats(config);
+    validateOutputStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('stencil-stats.json');
@@ -36,7 +36,7 @@ describe('validateStats', () => {
       type: 'stats',
       file: 'custom-path.json'
     } as d.OutputTargetStats);
-    validateStats(config);
+    validateOutputStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('custom-path.json');
@@ -46,14 +46,14 @@ describe('validateStats', () => {
     config.outputTargets.push({
       type: 'stats'
     });
-    validateStats(config);
+    validateOutputStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('stencil-stats.json');
   });
 
   it('default no stats', () => {
-    validateStats(config);
+    validateOutputStats(config);
     expect(config.outputTargets.some(o => o.type === 'stats')).toBe(false);
   });
 
