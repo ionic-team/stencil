@@ -547,9 +547,9 @@ describe(`in-memory-fs`, () => {
 
   it(`writeFile with immediate disk write`, async () => {
     await fs.writeFile(`/dir/file1.js`, `content`, { immediateWrite: true });
-    expect(mockedFs.diskWrites).toBe(1);
+    expect(mockedFs.diskWrites).toBe(2);
     await fs.writeFile(`/dir/file2.js`, `content`);
-    expect(mockedFs.diskWrites).toBe(1);
+    expect(mockedFs.diskWrites).toBe(2);
 
     const content = await fs.readFile(`/dir/file2.js`);
     expect(content).toBe(`content`);
@@ -595,7 +595,7 @@ describe(`in-memory-fs`, () => {
     await fs.commit();
 
     expect(fs.getItem(`/dir/file1.js`).fileText).toBe('1');
-    expect(fs.getItem(`/dir/file2.js`).exists).toBe(undefined);
+    expect(fs.getItem(`/dir/file2.js`).exists).toBe(null);
   });
 
   it(`clearDirCache`, async () => {
@@ -607,9 +607,9 @@ describe(`in-memory-fs`, () => {
 
     fs.clearDirCache(`/dir1`);
 
-    expect(fs.getItem(`/dir1/file1.js`).exists).toBe(undefined);
-    expect(fs.getItem(`/dir1/file2.js`).exists).toBe(undefined);
-    expect(fs.getItem(`/dir1/dir2/file3.js`).exists).toBe(undefined);
+    expect(fs.getItem(`/dir1/file1.js`).exists).toBe(null);
+    expect(fs.getItem(`/dir1/file2.js`).exists).toBe(null);
+    expect(fs.getItem(`/dir1/dir2/file3.js`).exists).toBe(null);
     expect(fs.getItem(`/dir3/file4.js`).fileText).toBe('4');
   });
 
@@ -622,9 +622,9 @@ describe(`in-memory-fs`, () => {
 
     fs.clearDirCache(`C:\\dir1`);
 
-    expect(fs.getItem(`C:\\dir1\\file1.js`).exists).toBe(undefined);
-    expect(fs.getItem(`C:\\dir1\\file2.js`).exists).toBe(undefined);
-    expect(fs.getItem(`C:\\dir1\\dir2\\file3.js`).exists).toBe(undefined);
+    expect(fs.getItem(`C:\\dir1\\file1.js`).exists).toBe(null);
+    expect(fs.getItem(`C:\\dir1\\file2.js`).exists).toBe(null);
+    expect(fs.getItem(`C:\\dir1\\dir2\\file3.js`).exists).toBe(null);
     expect(fs.getItem(`C:\\dir3\\file4.js`).fileText).toBe('4');
   });
 

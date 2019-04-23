@@ -1,5 +1,5 @@
-import * as d from '../declarations';
-import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../util';
+import * as d from '../../declarations';
+import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../dev-server-utils';
 
 
 describe('dev-server, util', () => {

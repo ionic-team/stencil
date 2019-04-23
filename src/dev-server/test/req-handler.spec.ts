@@ -1,7 +1,7 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { createRequestHandler } from '../request-handler';
 import { mockConfig } from '../../testing/mocks';
-import { normalizePath } from '@utils';
+import { normalizePath } from '../../utils';
 import { TestingFs } from '../../testing/testing-fs';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import * as nodeFs from 'fs';
@@ -9,7 +9,7 @@ import * as http from 'http';
 import * as path from 'path';
 
 
-describe('request-handler', async () => {
+describe('request-handler', () => {
 
   let config: d.DevServerConfig;
   let fs: TestingFs;
