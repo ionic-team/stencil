@@ -101,13 +101,15 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.logger.debug(`imagesDirPath: ${this.imagesDir}`);
     this.logger.debug(`buildsDirPath: ${this.buildsDir}`);
     this.logger.debug(`currentBuildDir: ${this.currentBuildDir}`);
+    this.logger.debug(`cacheDir: ${this.cacheDir}`);
 
     await mkDir(this.screenshotDir);
 
     await Promise.all([
       mkDir(this.imagesDir),
       mkDir(this.buildsDir),
-      mkDir(this.currentBuildDir)
+      mkDir(this.currentBuildDir),
+      mkDir(this.cacheDir)
     ]);
   }
 
