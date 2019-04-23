@@ -3,7 +3,11 @@ import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc'
 
 export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {
   if (input == null) {
-    throw new Error(`expect toEqualHtml value is null`);
+    throw new Error(`expect toEqualHtml() value is "${input}"`);
+  }
+
+  if (typeof (input as any).then === 'function') {
+    throw new Error(`element must be a resolved value, not a promise, before it can be tested`);
   }
 
   let serializeA: string;
@@ -32,7 +36,7 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
     });
 
   } else {
-    throw new Error(`expect toEqualHtml value should be an element, shadow root or string`);
+    throw new Error(`expect toEqualHtml() value should be an element, shadow root or string.`);
   }
 
   const parseB = parseHtmlToFragment(shouldEqual);

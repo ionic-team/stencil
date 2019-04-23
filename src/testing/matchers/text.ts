@@ -2,8 +2,8 @@ import { NODE_TYPES } from '@mock-doc';
 
 
 export function toEqualText(input: HTMLElement | string, expectTextContent: string) {
-  if (!input) {
-    throw new Error(`expect toEqualText value is null`);
+  if (input == null) {
+    throw new Error(`expect toEqualText() value is "${input}"`);
   }
 
   if (typeof (input as any).then === 'function') {
