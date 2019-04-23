@@ -5,10 +5,11 @@ import { Component } from '@stencil/core';
 })
 export class HelloWorld {
 
-  private valuek = 12;
+  private value = 11;
   render() {
+    console.log('holas');
     return (
-      'Hello World' + this.valuek
+      'Hello World' + this.value
     );
   }
 }

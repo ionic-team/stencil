@@ -64,10 +64,6 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     // wait on some promises we kicked off earlier
     await Promise.all([
-      // await on the validate types build to finish
-      // do this before we attempt to write build files
-      buildCtx.validateTypesBuild(),
-
       // we started the copy tasks a long long time ago
       // i'm sure it's done by now, but let's double check
       // make sure this finishes before the write build files

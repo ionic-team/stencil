@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { flatOne } from '@utils';
+import { flatOne, sortBy } from '@utils';
 
 
 export function getDistEsmDir(config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) {
@@ -79,7 +79,7 @@ export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats
 }
 
 export function getComponentsFromModules(moduleFiles: d.Module[]) {
-  return flatOne(moduleFiles.map(m => m.cmps));
+  return sortBy(flatOne(moduleFiles.map(m => m.cmps)), c => c.tagName);
 }
 
 export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {

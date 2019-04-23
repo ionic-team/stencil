@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '@utils';
+import { catchError, sortBy } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentBundles } from './component-bundles';
 
@@ -21,9 +21,9 @@ export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
 
 export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
   // generate a unique entry key based on the components within this entry module
+  cmps = sortBy(cmps, c => c.tagName);
   const entryKey = cmps
     .map(c => c.tagName)
-    .sort()
     .join('.');
 
   return {

@@ -3,7 +3,7 @@ import { COMPONENTS_DTS_HEADER, indentTypes, sortImportNames } from './types-uti
 import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { updateReferenceTypeImports } from './update-import-refs';
-import { normalizePath, sortBy } from '@utils';
+import { normalizePath } from '@utils';
 import { updateStencilTypesImports } from './stencil-types';
 
 
@@ -24,9 +24,13 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
     componentTypesFileContent = updateStencilTypesImports(config.sys.path, destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
-  await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
-
+  const { changedContent } = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
   timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
+  if (changedContent) {
+    compilerCtx.tsService.invalidate([componentsDtsFilePath]);
+  }
+
+  return changedContent;
 }
 
 
@@ -39,10 +43,7 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
   const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
-  const components = sortBy(
-    buildCtx.components,
-    cmp => cmp.tagName
-  ).filter(m => !m.isCollectionDependency);
+  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
 
   const modules: d.TypesModule[] = components.map(cmp => {
     typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmp, cmp.sourceFilePath);

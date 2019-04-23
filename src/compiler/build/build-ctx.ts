@@ -50,7 +50,6 @@ export class BuildContext implements d.BuildCtx {
   timestamp: string;
   transpileBuildCount = 0;
   pendingCopyTasks: Promise<d.CopyResults>[] = [];
-  validateTypesPromise: Promise<d.ValidateTypesResults>;
   packageJson: d.PackageJsonData = {};
 
   constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
@@ -140,29 +139,6 @@ export class BuildContext implements d.BuildCtx {
 
   async finish() {
     return buildFinish(this.config, this.compilerCtx, this as any, false);
-  }
-
-  async validateTypesBuild() {
-    if (this.hasError) {
-      // no need to wait on this one since
-      // we already aborted this build
-      return;
-    }
-
-    if (!this.validateTypesPromise) {
-      // there is no pending validate types promise
-      // so it probably already finished
-      // so no need to wait on anything
-      return;
-    }
-
-    if (!this.config.watch) {
-      // this is not a watch build, so we need to make
-      // sure that the type validation has finished
-      this.debug(`build, non-watch, waiting on validateTypes`);
-      await this.validateTypesPromise;
-      this.debug(`build, non-watch, finished waiting on validateTypes`);
-    }
   }
 
 }

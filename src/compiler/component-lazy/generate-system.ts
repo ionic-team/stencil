@@ -6,6 +6,9 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
 export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+  if (config.devMode) {
+    return;
+  }
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {

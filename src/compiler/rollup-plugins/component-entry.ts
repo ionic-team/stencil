@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { sortBy } from '@utils';
 import { updateToLazyComponent } from '../component-lazy/update-to-lazy-component';
 import { updateToNativeComponent } from '../component-native/update-to-native-component';
 
@@ -29,7 +28,7 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
             : entryModule.cmps.map(cmp => updateToNativeComponent(config, compilerCtx, buildCtx, cmp))
         );
 
-        return sortBy(modules, m => m.cmp.tagName)
+        return modules
           .map(lazyModule => lazyModule.exportLine)
           .join('\n');
       }

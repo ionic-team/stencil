@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
+import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 
 
 export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -52,7 +53,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
 
 
   // generate .d.ts files when generating a distribution and in prod mode
-  const typesOutputTarget = (config.outputTargets as d.OutputTargetDist[]).find(o => !!o.typesDir);
+  const typesOutputTarget = config.outputTargets.find(isOutputTargetDistCollection);
   if (typesOutputTarget) {
     compilerOptions.declaration = true;
     compilerOptions.declarationDir = typesOutputTarget.typesDir;

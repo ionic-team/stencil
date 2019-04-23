@@ -7,6 +7,10 @@ import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-con
 import { optimizeModule } from '../app-core/optimize-module';
 
 export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.devMode) {
+    return;
+  }
+
   const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
   if (outputTargets.length === 0) {
     return;

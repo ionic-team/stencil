@@ -46,4 +46,13 @@ export interface CompilerCtx {
 
 export type NodeMap = WeakMap<ts.ClassDeclaration, d.ComponentCompilerMeta>;
 
-export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<boolean>;
+export interface TsService {
+  transpile(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]): Promise<TsChangeContext>;
+  invalidate(tsFilePaths?: string[]): void;
+  getTypeDiagnostics(tsFilePaths?: string[]): readonly ts.Diagnostic[];
+}
+
+export interface TsChangeContext {
+  types: boolean;
+  implementation: boolean;
+}

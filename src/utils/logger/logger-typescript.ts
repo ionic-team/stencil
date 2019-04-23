@@ -68,7 +68,7 @@ export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, nod
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: readonly ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {

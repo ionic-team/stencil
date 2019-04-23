@@ -7,7 +7,6 @@ import { optimizeCssWorker } from './optimize-css-worker';
 import { prerenderWorker } from '../../compiler/prerender/prerender-worker';
 import { requestLatestCompilerVersion } from './check-version';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
-import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 
 const Terser = require('terser/dist/bundle.js');
@@ -54,10 +53,6 @@ export class NodeSystemWorker {
 
   transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
-  }
-
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
-    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
   }
 
 }
