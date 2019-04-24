@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 
-export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, _buildCtx: d.BuildCtx) {
+export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx) {
   const path = config.sys.path;
   return {
     name: 'inMemoryFsRead',
@@ -17,7 +17,6 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx, _bu
       if (importee[0] !== '.' && importee[0] !== '/' && importee[1] !== ':') {
         return null;
       }
-
 
       // resolve absolute path
       if (!path.isAbsolute(importee)) {

@@ -33,7 +33,7 @@ async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   return performCopyTasks(config, compilerCtx, buildCtx, allCopyTasks);
 }
 
-export async function generateNativeApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
+export async function generateNativeApp(config: d.Config, compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
   const entryPoint = `
 import * as c from 'modules';
 [
@@ -47,7 +47,7 @@ import * as c from 'modules';
       loaderPlugin({
         '@core-entrypoint': entryPoint
       }),
-      inMemoryFsRead(config, compilerCtx, buildCtx),
+      inMemoryFsRead(config, compilerCtx),
     ]
   };
 

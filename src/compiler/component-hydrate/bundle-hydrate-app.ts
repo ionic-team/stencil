@@ -36,7 +36,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
           sourceMap: false
         }),
         bundleJson(config),
-        inMemoryFsRead(config, compilerCtx, buildCtx),
+        inMemoryFsRead(config, compilerCtx),
         ...config.plugins
       ],
       external: [

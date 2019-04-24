@@ -39,7 +39,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           sourceMap: false
         }),
         bundleJson(config),
-        inMemoryFsRead(config, compilerCtx, buildCtx),
+        inMemoryFsRead(config, compilerCtx),
         ...config.plugins
       ],
       treeshake: config.devMode ? false : {

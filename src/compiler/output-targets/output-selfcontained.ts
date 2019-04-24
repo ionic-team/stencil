@@ -38,7 +38,7 @@
 // async function generateSelfContainedWebComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetSelfContained[], cmp: d.ComponentCompilerMeta) {
 //   const cmps = [cmp];
 //   const build = getBuildConditionals(config, cmps);
-//   const outputText = await generateSelfContainedCore(config, compilerCtx, buildCtx, build, cmps);
+//   const outputText = await generateSelfContainedCore(config, compilerCtx, build, cmps);
 
 //   if (!buildCtx.shouldAbort && typeof outputText === 'string') {
 //     await writeNativeSelfContained(config, compilerCtx, buildCtx, build, outputTargets, cmps, outputText);
@@ -55,6 +55,6 @@
 //   return build;
 // }
 
-// function generateSelfContainedCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
-//   return generateNativeAppCore(config, compilerCtx, buildCtx, cmps, build);
+// function generateSelfContainedCore(config: d.Config, compilerCtx: d.CompilerCtx, build: d.Build, cmps: d.ComponentCompilerMeta[]) {
+//   return generateNativeAppCore(config, compilerCtx, cmps, build);
 // }
