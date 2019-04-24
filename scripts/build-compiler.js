@@ -37,7 +37,7 @@ async function bundleCompiler() {
               return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (id === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return path.join(TRANSPILED_DIR, 'utils', 'index.js');
             }
             if (id === 'path') {
               return path.join(__dirname, 'helpers', 'path.js');
