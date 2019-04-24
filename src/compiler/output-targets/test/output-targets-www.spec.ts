@@ -1,15 +1,15 @@
-import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
+import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { TestingConfig } from '@stencil/core/testing';
 import path from 'path';
 
-const root = path.resolve('/');
 
-describe('outputTargets', () => {
+describe('outputTarget, www', () => {
 
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
+  const root = path.resolve('/');
 
   it('default www files', async () => {
 
@@ -26,17 +26,14 @@ describe('outputTargets', () => {
     await compiler.fs.commit();
 
     const r = await compiler.build();
-    expect(r.diagnostics).toEqual([]);
+    expect(r.diagnostics).toHaveLength(0);
 
     expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'www'),
       path.join(root, 'User', 'testing', 'www', 'build'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.js'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'cmp-a.entry.js'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'es5-build-disabled.js'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.core.js'),
-      path.join(root, 'User', 'testing', 'www', 'build', 'app', 'app.registry.json'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'app.esm.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'cmp-a.entry.js'),
 
       path.join(root, 'User', 'testing', 'www', 'index.html'),
 

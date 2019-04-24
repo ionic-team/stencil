@@ -6,7 +6,7 @@ export { jestPreprocessor } from './jest/jest-preprocessor';
 export { jestSetupTestFramework } from './jest/jest-setup-test-framework';
 export { newE2EPage } from './puppeteer/puppeteer-page';
 export { newSpecPage } from './spec-page';
-export { shuffleArray } from './shuffle-array';
+export { shuffleArray } from './testing-utils';
 export { Testing } from './testing';
 export { TestingConfig } from './testing-config';
 export { transpile } from './test-transpile';

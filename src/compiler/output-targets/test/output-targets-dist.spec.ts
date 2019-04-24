@@ -1,10 +1,10 @@
-import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
+import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { TestingConfig } from '@stencil/core/testing';
 import path from 'path';
 
 
-describe('outputTargets', () => {
+describe('outputTarget, dist', () => {
 
   jest.setTimeout(20000);
   let compiler: Compiler;
@@ -24,7 +24,7 @@ describe('outputTargets', () => {
 
     await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'package.json')]: `{
-        "module": "dist/esm/index.js",
+        "module": "dist/index.mjs",
         "main": "dist/index.js",
         "collection": "dist/collection/collection-manifest.json",
         "types": "dist/types/components.d.ts"
@@ -45,10 +45,11 @@ describe('outputTargets', () => {
     await compiler.fs.commit();
 
     const r = await compiler.build();
-    expect(r.diagnostics).toEqual([]);
+    expect(r.diagnostics).toHaveLength(0);
 
     expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
+      path.join(root, 'User', 'testing', 'dist', 'index.mjs'),
 
       path.join(root, 'User', 'testing', 'dist', 'collection', 'collection-manifest.json'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.js'),
@@ -56,38 +57,13 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.md.css'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'global.js'),
 
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'array.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'dom.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'fetch.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'object.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'promise.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'string.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'polyfills', 'url.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.components.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.core.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.define.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'testapp.global.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.ios.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.ios.sc.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.md.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'es5', 'build', 'cmp-a.md.sc.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'index.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.ios.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.ios.sc.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.md.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'cmp-a.md.sc.entry.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'testapp.core.js'),
-      path.join(root, 'User', 'testing', 'dist', 'testapp', 'testapp.global.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'index.esm.js'),
+
+      path.join(root, 'User', 'testing', 'dist', 'testapp.esm.js'),
+
+      path.join(root, 'User', 'testing', 'dist', 'loader'),
 
       path.join(root, 'User', 'testing', 'dist', 'types'),
-
-      // these are written by the worker thread now which is hard to test
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'components'),
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'components.d.ts'),
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'components', 'cmp-a.d.ts'),
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'global.d.ts'),
-      // path.join(root, 'User', 'testing', 'dist', 'types', 'stencil.core.d.ts'),
 
       path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
