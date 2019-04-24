@@ -8,6 +8,6 @@ export { newE2EPage } from './puppeteer/puppeteer-page';
 export { newSpecPage } from './spec-page';
 export { shuffleArray } from './shuffle-array';
 export { Testing } from './testing';
-export { TestingCompiler } from './testing-compiler';
+export { TestingConfig } from './testing-config';
 export { transpile } from './test-transpile';
 export * from './mocks';

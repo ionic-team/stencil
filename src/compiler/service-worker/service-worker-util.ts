@@ -12,7 +12,12 @@ export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.Outpu
     swUrl = '/' + swUrl;
   }
 
-  swUrl = outputTarget.baseUrl + swUrl.substring(1);
+  let baseUrl = outputTarget.baseUrl;
+  if (!baseUrl.endsWith('/')) {
+    baseUrl += '/';
+  }
+
+  swUrl = baseUrl + swUrl.substring(1);
 
   return swUrl;
 }

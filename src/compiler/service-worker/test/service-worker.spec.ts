@@ -1,13 +1,13 @@
 import * as path from 'path';
 import * as d from '../../../declarations';
-import { TestingCompiler } from '../../../testing/testing-compiler';
-import { TestingConfig } from '../../../testing/testing-config';
+import { Compiler, Config } from '@stencil/core/compiler';
+import { TestingConfig } from '@stencil/core/testing';
 
 
 describe('service worker', () => {
 
-  let c: TestingCompiler;
-  let config: d.Config;
+  let compiler: Compiler;
+  let config: Config;
   const root = path.resolve('/');
 
 
@@ -26,18 +26,18 @@ describe('service worker', () => {
       } as d.OutputTargetWww
     ];
 
-    c = new TestingCompiler(config);
-    await c.fs.writeFile(path.join(root, 'www', 'script.js'), `/**/`);
-    await c.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
-    await c.fs.writeFile(path.join(root, 'src', 'components', 'cmp-a', 'cmp-a.tsx'), `
+    compiler = new Compiler(config);
+    await compiler.fs.writeFile(path.join(root, 'www', 'script.js'), `/**/`);
+    await compiler.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
+    await compiler.fs.writeFile(path.join(root, 'src', 'components', 'cmp-a', 'cmp-a.tsx'), `
       @Component({ tag: 'cmp-a' }) export class CmpA { render() { return <p>cmp-a</p>; } }
     `);
-    await c.fs.commit();
+    await compiler.fs.commit();
 
-    const r = await c.build();
+    const r = await compiler.build();
     expect(r.diagnostics).toEqual([]);
 
-    const indexHtml = await c.fs.readFile(path.join(root, 'www', 'index.html'));
+    const indexHtml = await compiler.fs.readFile(path.join(root, 'www', 'index.html'));
     expect(indexHtml).toContain(`registration.unregister()`);
   });
 

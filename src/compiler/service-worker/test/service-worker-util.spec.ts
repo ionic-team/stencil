@@ -1,12 +1,12 @@
 import * as d from '../../../declarations';
 import { generateServiceWorkerUrl } from '../service-worker-util';
-import { TestingConfig } from '../../../testing/testing-config';
-import { validateConfig } from '../../config/validate-config';
+import { Config, validateConfig } from '@stencil/core/compiler';
+import { TestingConfig } from '@stencil/core/testing';
 
 
 describe('generateServiceWorkerUrl', () => {
 
-  let config: d.Config;
+  let config: Config;
   let outputTarget: d.OutputTargetWww;
 
   it('sw url w/ baseUrl', () => {
