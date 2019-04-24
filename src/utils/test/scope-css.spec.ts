@@ -12,7 +12,7 @@
  */
 
 import { ShadowCss } from '../shadow-css';
-import { convertScopedToShadow, getElementScopeId } from '../../../runtime/styles';
+import { convertScopedToShadow } from '../../runtime/styles';
 
 
 describe('ShadowCss', function() {
@@ -328,18 +328,6 @@ describe('ShadowCss', function() {
       expect(convertScopedToShadow(input)).toBe(expected);
     });
 
-  });
-
-  describe('getElementScopeId, host', () => {
-    it('should add -h suffix', () => {
-      expect(getElementScopeId('sc-my-tag', true)).toBe('sc-my-tag-h');
-    });
-  });
-
-  describe('getElementScopeId, slot', () => {
-    it('should add -s suffix', () => {
-      expect(getElementScopeId('sc-my-tag', false)).toBe('sc-my-tag-s');
-    });
   });
 
   it('should handle ::shadow', () => {

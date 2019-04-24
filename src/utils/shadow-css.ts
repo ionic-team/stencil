@@ -14,7 +14,7 @@ export function scopeCss(cssText: string, scopeId: string, commentOriginalSelect
   return sc.shimCssText(cssText, scopeId, scopeId + '-h', scopeId + '-s', commentOriginalSelector);
 }
 
-class ShadowCss {
+export class ShadowCss {
   strictStyling = true;
 
   shimCssText(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false): string {
