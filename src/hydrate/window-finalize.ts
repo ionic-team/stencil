@@ -1,13 +1,19 @@
 import * as d from '../declarations';
 import { collapseHtmlWhitepace } from '../compiler/html/collapse-html-whitespace';
-import { optimizeStyles } from '../compiler/html/optimize-styles';
 import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../compiler/html/remove-unused-styles';
 import { renderError } from './render-utils';
 import { updateCanonicalLink } from '../compiler/html/canonical-link';
 
 
 export async function finalizeWindow(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
-  optimizeStyles(doc, opts, results);
+  if (opts.removeUnusedStyles !== false) {
+    try {
+      removeUnusedStyles(doc, results);
+    } catch (e) {
+      renderError(results, e);
+    }
+  }
 
   if (typeof opts.title === 'string') {
     try {

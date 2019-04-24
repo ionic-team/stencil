@@ -62,7 +62,7 @@ export function mockCompilerCtx() {
       if (this._cache == null) {
         this._cache = mockCache();
       }
-      return this._fs;
+      return this._cache;
     }
   });
 

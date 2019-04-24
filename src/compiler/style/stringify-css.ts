@@ -10,9 +10,17 @@ import { UsedSelectors } from './used-selectors';
 
 export class StringifyCss {
   usedSelectors: UsedSelectors;
+  hasUsedAttrs: boolean;
+  hasUsedClassNames: boolean;
+  hasUsedIds: boolean;
+  hasUsedTags: boolean;
 
-  constructor(opts: StringifyCssOptions) {
-    this.usedSelectors = opts.usedSelectors;
+  constructor(usedSelectors: UsedSelectors) {
+    this.usedSelectors = usedSelectors;
+    this.hasUsedAttrs = usedSelectors.attrs.size > 0;
+    this.hasUsedClassNames = usedSelectors.classNames.size > 0;
+    this.hasUsedIds = usedSelectors.ids.size > 0;
+    this.hasUsedTags = usedSelectors.tags.size > 0;
   }
 
   /**
@@ -28,10 +36,10 @@ export class StringifyCss {
    */
 
   mapVisit(nodes: any, delim?: any) {
-    var buf = '';
+    let buf = '';
     delim = delim || '';
 
-    for (var i = 0, length = nodes.length; i < length; i++) {
+    for (let i = 0, length = nodes.length; i < length; i++) {
       buf += this.visit(nodes[i]);
       if (delim && i < length - 1) buf += delim;
     }
@@ -184,73 +192,78 @@ export class StringifyCss {
 
   rule(node: any) {
     const decls = node.declarations;
-    if (!decls.length) return '';
+    if (decls == null || decls.length === 0) {
+      return '';
+    }
 
-    var i: number, j: number;
+    const usedSelectors = this.usedSelectors;
+
+    let i: number;
+    let j: number;
 
     for (i = node.selectors.length - 1; i >= 0; i--) {
       const sel = getSelectors(node.selectors[i]);
 
-      if (this.usedSelectors) {
-        var include = true;
+      let include = true;
 
-        // classes
-        var jlen = sel.classNames.length;
+      // classes
+      let jlen = sel.classNames.length;
+      if (jlen > 0 && this.hasUsedClassNames) {
+        for (j = 0; j < jlen; j++) {
+          if (!usedSelectors.classNames.has(sel.classNames[j])) {
+            include = false;
+            break;
+          }
+        }
+      }
+
+      // tags
+      if (include && this.hasUsedTags) {
+        jlen = sel.tags.length;
         if (jlen > 0) {
           for (j = 0; j < jlen; j++) {
-            if (this.usedSelectors.classNames.has(sel.classNames[j])) {
+            if (!usedSelectors.tags.has(sel.tags[j])) {
               include = false;
               break;
             }
           }
         }
+      }
 
-        // tags
-        if (include) {
-          jlen = sel.tags.length;
-          if (jlen > 0) {
-            for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.tags.has(sel.tags[j])) {
-                include = false;
-                break;
-              }
+      // attrs
+      if (include && this.hasUsedAttrs) {
+        jlen = sel.attrs.length;
+        if (jlen > 0) {
+          for (j = 0; j < jlen; j++) {
+            if (!usedSelectors.attrs.has(sel.attrs[j])) {
+              include = false;
+              break;
             }
           }
         }
+      }
 
-        // attrs
-        if (include) {
-          jlen = sel.attrs.length;
-          if (jlen > 0) {
-            for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.attrs.has(sel.attrs[j])) {
-                include = false;
-                break;
-              }
+      // ids
+      if (include && this.hasUsedIds) {
+        jlen = sel.ids.length;
+        if (jlen > 0) {
+          for (j = 0; j < jlen; j++) {
+            if (!usedSelectors.ids.has(sel.ids[j])) {
+              include = false;
+              break;
             }
           }
         }
+      }
 
-        // ids
-        if (include) {
-          jlen = sel.ids.length;
-          if (jlen > 0) {
-            for (j = 0; j < jlen; j++) {
-              if (this.usedSelectors.ids.has(sel.ids[j])) {
-                include = false;
-                break;
-              }
-            }
-          }
-        }
-
-        if (!include) {
-          node.selectors.splice(i, 1);
-        }
+      if (!include) {
+        node.selectors.splice(i, 1);
       }
     }
 
-    if (node.selectors.length === 0) return '';
+    if (node.selectors.length === 0) {
+      return '';
+    }
 
     return `${node.selectors}{${this.mapVisit(decls)}}`;
   }
@@ -263,9 +276,4 @@ export class StringifyCss {
     return node.property + ':' + node.value + ';';
   }
 
-}
-
-
-export interface StringifyCssOptions {
-  usedSelectors?: UsedSelectors;
 }

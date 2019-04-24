@@ -4,26 +4,35 @@ import { StringifyCss } from '../style/stringify-css';
 import { UsedSelectors } from '../style/used-selectors';
 
 
-export function removeUnusedStyles(results: d.HydrateResults, doc: Document, styleElm: HTMLStyleElement) {
+export function removeUnusedStyles(doc: Document, results: d.HydrateResults) {
+  const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
+
+  if (styleElms.length > 0) {
+    // pick out all of the selectors that are actually
+    // being used in the html document
+    const usedSelectors = new UsedSelectors(doc.body);
+
+    for (let i = 0; i < styleElms.length; i++) {
+      removeUnusedStyleText(usedSelectors, results, styleElms[i]);
+    }
+  }
+}
+
+
+function removeUnusedStyleText(usedSelectors: UsedSelectors, results: d.HydrateResults, styleElm: HTMLStyleElement) {
   try {
     // parse the css from being applied to the document
     const cssAst = parseCss(styleElm.innerHTML);
 
     if (cssAst.stylesheet.diagnostics.length > 0) {
-      cssAst.stylesheet.diagnostics.forEach(d => {
-        results.diagnostics.push(d);
-      });
+      results.diagnostics.push(...cssAst.stylesheet.diagnostics);
       return;
     }
 
     try {
-      // pick out all of the selectors that are actually
-      // being used in the html document
-      const usedSelectors = new UsedSelectors(doc.body);
-
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
-      const stringify = new StringifyCss({ usedSelectors });
+      const stringify = new StringifyCss(usedSelectors);
       styleElm.innerHTML = stringify.compile(cssAst);
 
     } catch (e) {
