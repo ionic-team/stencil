@@ -1,14 +1,10 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
-import { setStringConfig } from './config-utils';
-
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
   if (!config.flags || !config.flags.prerender) {
     return;
   }
-
-  setStringConfig(outputTarget, 'baseUrl', '/');
 
   outputTarget.baseUrl = normalizePath(outputTarget.baseUrl);
   if (!outputTarget.baseUrl.startsWith('/')) {

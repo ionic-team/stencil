@@ -27,6 +27,7 @@ export function validateOutputTargetWww(config: d.Config) {
 function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww) {
   const path = config.sys.path;
 
+  setStringConfig(outputTarget, 'baseUrl', '/');
   setStringConfig(outputTarget, 'dir', DEFAULT_DIR);
 
   if (!path.isAbsolute(outputTarget.dir)) {
