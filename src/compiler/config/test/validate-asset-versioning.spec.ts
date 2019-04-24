@@ -1,12 +1,11 @@
-import { Config } from '../../../declarations';
-import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import * as d from '@stencil/core/declarations';
+import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
-import * as path from 'path';
 
 
 describe('validateAssetVerioning', () => {
 
-  let config: Config;
+  let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
 

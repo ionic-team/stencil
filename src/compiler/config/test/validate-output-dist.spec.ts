@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { validateOutputTargetDist } from '../validate-outputs-dist';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('validateDistOutputTarget', () => {

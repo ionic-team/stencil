@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import * as d from '@stencil/core/declarations';
+import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateOutputStats } from '../validate-output-stats';
 
 

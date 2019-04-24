@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
-import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
+import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
 import ts from 'typescript';
 

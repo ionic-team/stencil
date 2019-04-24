@@ -1,15 +1,15 @@
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
-import { TestingCompiler } from '../../../testing/testing-compiler';
-import { TestingConfig } from '../../../testing/testing-config';
+import { Compiler, Config } from '@stencil/core/compiler';
+import { TestingConfig } from '@stencil/core/testing';
 import path from 'path';
 
-const root = path.resolve('/');
 
 describe('outputTargets', () => {
 
   jest.setTimeout(20000);
-  let c: TestingCompiler;
-  let config: TestingConfig;
+  let compiler: Compiler;
+  let config: Config;
+  const root = path.resolve('/');
 
   it('default dist files', async () => {
     config = new TestingConfig();
@@ -20,9 +20,9 @@ describe('outputTargets', () => {
     config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
     config.outputTargets = [{ type: 'dist' }];
 
-    c = new TestingCompiler(config);
+    compiler = new Compiler(config);
 
-    await c.fs.writeFiles({
+    await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'package.json')]: `{
         "module": "dist/esm/index.js",
         "main": "dist/index.js",
@@ -42,12 +42,12 @@ describe('outputTargets', () => {
         [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.md.css')]: `cmp-a { color: green; }`,
         [path.join(root, 'User', 'testing', 'src', 'global.ts')]: `export const MyGlobal: any = {};`
     });
-    await c.fs.commit();
+    await compiler.fs.commit();
 
-    const r = await c.build();
+    const r = await compiler.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c.fs, [
+    expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
 
       path.join(root, 'User', 'testing', 'dist', 'collection', 'collection-manifest.json'),
@@ -92,7 +92,7 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
 
-    doNotExpectFiles(c.fs, [
+    doNotExpectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'build'),
       path.join(root, 'User', 'testing', 'esm'),
       path.join(root, 'User', 'testing', 'es5'),

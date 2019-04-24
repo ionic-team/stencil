@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import * as d from '@stencil/core/declarations';
+import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-package-json';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('validate-package-json', () => {

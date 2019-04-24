@@ -1,34 +1,3 @@
 {
-  "compilerOptions": {
-    "alwaysStrict": true,
-    "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false,
-    "declaration": true,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
-    "jsxFactory": "h",
-    "lib": [
-      "dom",
-      "es2017",
-      "esnext.array"
-    ],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "pretty": true,
-    "target": "es2017",
-    "baseUrl": ".",
-    "paths": {
-      "@testing": [
-        "../../../testing/index.ts"
-      ],
-      "@utils": [
-        "../../../utils/index.ts"
-      ]
-    }
-  }
+  "extends": "../../../testing/tsconfig.internal.json"
 }

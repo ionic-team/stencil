@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
-import { TestingCompiler } from '../../../testing/testing-compiler';
-import { TestingConfig } from '../../../testing/testing-config';
+import { Compiler, Config } from '@stencil/core/compiler';
+import { TestingConfig } from '@stencil/core/testing';
 import path from 'path';
 
 const root = path.resolve('/');
@@ -9,8 +9,8 @@ const root = path.resolve('/');
 describe('outputTargets', () => {
 
   jest.setTimeout(20000);
-  let c: TestingCompiler;
-  let config: TestingConfig;
+  let compiler: Compiler;
+  let config: Config;
 
   it('dist, www and readme files w/ custom paths', async () => {
     config = new TestingConfig();
@@ -37,9 +37,9 @@ describe('outputTargets', () => {
       } as d.OutputTargetDocsReadme
     ];
 
-    c = new TestingCompiler(config);
+    compiler = new Compiler(config);
 
-    await c.fs.writeFiles({
+    await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'package.json')]: `{
         "module": "custom-dist/dist-build/esm/index.js",
         "main": "custom-dist/dist-build/index.js",
@@ -49,12 +49,12 @@ describe('outputTargets', () => {
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
-    await c.fs.commit();
+    await compiler.fs.commit();
 
-    const r = await c.build();
+    const r = await compiler.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c.fs, [
+    expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'custom-dist'),
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-collection'),
       path.join(root, 'User', 'testing', 'custom-dist', 'dist-collection', 'collection-manifest.json'),
@@ -90,7 +90,7 @@ describe('outputTargets', () => {
       path.join(root, 'User', 'testing', 'src', 'components', 'readme.md')
     ]);
 
-    doNotExpectFiles(c.fs, [
+    doNotExpectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'www', '/'),
       path.join(root, 'User', 'testing', 'www', 'index.html'),
       path.join(root, 'User', 'testing', 'www', 'custom-index.htm'),

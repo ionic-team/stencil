@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { getCssImports, getModuleId, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
-import { mockBuildCtx, mockConfig } from '../../../testing/mocks';
-import { normalizePath } from '../../../utils';
+import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
 import * as path from 'path';
 
 

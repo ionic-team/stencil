@@ -1,8 +1,8 @@
-import * as d from '../../../declarations';
-import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { normalizePath } from '../../../utils';
+import * as d from '@stencil/core/declarations';
+import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
 import { validateConfig } from '../validate-config';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('validateDevServer', () => {

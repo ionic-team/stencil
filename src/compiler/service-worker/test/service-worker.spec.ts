@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { TestingConfig } from '@stencil/core/testing';
 

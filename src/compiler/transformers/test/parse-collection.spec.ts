@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { mockCompilerCtx, mockConfig, mockStencilSystem } from '@testing';
+import * as d from '@stencil/core/declarations';
+import { mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import { transpileModule } from './transpile';
 
 

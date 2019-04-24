@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTasks } from '../local-copy-tasks';
-import { mockConfig } from '../../../testing/mocks';
-import { normalizePath } from '../../../utils';
+import { mockConfig } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
 
 
 describe('copy tasks', () => {

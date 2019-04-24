@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
-import { mockLogger } from '../../../testing/mocks';
-import * as path from 'path';
+import { mockLogger } from '@stencil/core/testing';
+import path from 'path';
 
 
 describe('validate-workers', () => {

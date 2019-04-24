@@ -1,9 +1,9 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { configReload } from '../config-reload';
-import { normalizePath } from '../../../utils';
-import * as path from 'path';
-import { TestingConfig } from '../../../testing/testing-config';
+import { normalizePath } from '@stencil/core/utils';
+import { TestingConfig } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
+import path from 'path';
 
 
 describe('config-reload', () => {

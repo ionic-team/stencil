@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { ensureDirs } from '../copy-tasks-worker';
-import { normalizePath } from '../../../utils';
+import { normalizePath } from '@stencil/core/utils';
 import * as path from 'path';
 
 const ROOT = path.resolve('/');

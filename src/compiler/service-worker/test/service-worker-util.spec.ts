@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { generateServiceWorkerUrl } from '../service-worker-util';
 import { Config, validateConfig } from '@stencil/core/compiler';
 import { TestingConfig } from '@stencil/core/testing';

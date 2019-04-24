@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { validateOutputTargetWww } from '../validate-outputs-www';
-import * as path from 'path';
 import { isOutputTargetWww } from '../../output-targets/output-utils';
+import path from 'path';
 
 
 describe('validateOutputTargetWww', () => {
