@@ -1,6 +1,6 @@
-import { Config } from '../../declarations';
+import { Config } from '@stencil/core/declarations';
 import { getConfigFilePath } from '../cli-utils';
-import { mockStencilSystem } from '../../testing/mocks';
+import { mockStencilSystem } from '@stencil/core/testing';
 
 
 describe('cli', () => {
@@ -19,7 +19,7 @@ describe('cli', () => {
   beforeEach(() => {
     process = {} as any;
     process.cwd = () => '/User/ellie_mae';
-    (process as any).exit = (code) => { exitCode = code; };
+    (process as any).exit = (code: any) => { exitCode = code; };
     process.once = () => process;
     process.on = () => process;
     process.env = {};

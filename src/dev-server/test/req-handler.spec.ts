@@ -1,12 +1,12 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/declarations';
 import { createRequestHandler } from '../request-handler';
-import { mockConfig } from '../../testing/mocks';
-import { normalizePath } from '../../utils';
+import { mockConfig } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
 import { TestingFs } from '../../testing/testing-fs';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
-import * as nodeFs from 'fs';
-import * as http from 'http';
-import * as path from 'path';
+import nodeFs from 'fs';
+import http from 'http';
+import path from 'path';
 
 
 describe('request-handler', () => {
@@ -45,13 +45,13 @@ describe('request-handler', () => {
     req = {} as any;
     res = {} as any;
 
-    res.writeHead = (statusCode, headers) => {
+    res.writeHead = (statusCode: number, headers: any) => {
       res.$statusCode = statusCode;
       res.$headers = headers;
       res.$contentType = headers['Content-Type'];
     };
 
-    res.write = (content) => {
+    res.write = (content: any) => {
       res.$contentWrite = content;
       return true;
     };

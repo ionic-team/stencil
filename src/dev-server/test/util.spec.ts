@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/declarations';
 import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../dev-server-utils';
 
 
@@ -37,7 +37,7 @@ describe('dev-server, util', () => {
   it('should get path with no port', () => {
     const protocol = 'http';
     const address = '0.0.0.0';
-    const port = undefined;
+    const port: any = undefined;
     const baseUrl = '/';
     const pathname = '/';
     const url = getBrowserUrl(protocol, address, port, baseUrl, pathname);
@@ -100,7 +100,7 @@ describe('getDevServerClientUrl',  () => {
       port: 3333,
       baseUrl: '/my-base-url/'
     };
-    const host = null;
+    const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);
     expect(url).toBe(`http://localhost:3333/my-base-url${DEV_SERVER_URL}`);
   });
@@ -111,7 +111,7 @@ describe('getDevServerClientUrl',  () => {
       address: '0.0.0.0',
       baseUrl: '/my-base-url/'
     };
-    const host = null;
+    const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);
     expect(url).toBe(`${devServerConfig.protocol}://localhost/my-base-url${DEV_SERVER_URL}`);
   });
@@ -123,7 +123,7 @@ describe('getDevServerClientUrl',  () => {
       port: 3333,
       baseUrl: '/my-base-url/'
     };
-    const host = null;
+    const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);
     expect(url).toBe(`${devServerConfig.protocol}://${devServerConfig.address}:3333/my-base-url${DEV_SERVER_URL}`);
   });
