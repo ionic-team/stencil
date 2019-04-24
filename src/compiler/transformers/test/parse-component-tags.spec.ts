@@ -3,23 +3,6 @@ import { transpileModule } from './transpile';
 
 describe('parse component tags', () => {
 
-  it('innerHTML', () => {
-    const t = transpileModule(`
-      @Component({tag: 'cmp-a'})
-      export class CmpA {
-        connectedCallback() {
-          this.elm.innerHTML = '<some-cmp></some-cmp>';
-        }
-        render() {
-          return <div/>
-        }
-      }
-    `);
-
-    expect(t.cmp.potentialCmpRefs).toHaveLength(1);
-    expect(t.cmp.potentialCmpRefs[0].html).toContain('<some-cmp');
-  });
-
   it('createElement', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -34,7 +17,7 @@ describe('parse component tags', () => {
     `);
 
     expect(t.cmp.potentialCmpRefs).toHaveLength(1);
-    expect(t.cmp.potentialCmpRefs[0].tag).toBe('some-cmp');
+    expect(t.cmp.potentialCmpRefs[0]).toBe('some-cmp');
   });
 
   it('createElement', () => {
@@ -51,7 +34,7 @@ describe('parse component tags', () => {
     `);
 
     expect(t.cmp.potentialCmpRefs).toHaveLength(1);
-    expect(t.cmp.potentialCmpRefs[0].tag).toBe('some-cmp');
+    expect(t.cmp.potentialCmpRefs[0]).toBe('some-cmp');
   });
 
   it('jsx tagged component', () => {
@@ -65,7 +48,7 @@ describe('parse component tags', () => {
     `);
 
     expect(t.cmp.potentialCmpRefs).toHaveLength(1);
-    expect(t.cmp.potentialCmpRefs[0].tag).toBe('some-cmp');
+    expect(t.cmp.potentialCmpRefs[0]).toBe('some-cmp');
   });
 
 });

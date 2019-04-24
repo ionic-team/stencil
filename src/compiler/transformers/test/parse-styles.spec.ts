@@ -12,7 +12,7 @@ describe('parse styles', () => {
       export class CmpA {}
     `);
 
-    expect(getStaticGetter(t.outputText, 'styleUrl')).toEqual('style.css');
+    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual({ $: ['style.css'] });
   });
 
   it('add static "styleUrls"', () => {
@@ -23,7 +23,7 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual(['style.css']);
+    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual({ $: ['style.css'] });
   });
 
   it('add static "styles"', () => {

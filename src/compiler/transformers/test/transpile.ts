@@ -71,7 +71,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      convertStaticToMeta(sys, config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
     ]
   });
 
