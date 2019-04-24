@@ -1,60 +1,52 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { generateBuildFromFsWatch } from '../fs-watch-rebuild';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
-import { normalizePath } from '../../../utils';
-import * as path from 'path';
+import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
+import path from 'path';
 
 
-describe('watch-rebuild', () => {
+describe('fs-watch, rebuild', () => {
   const config = mockConfig();
   let compilerCtx: d.CompilerCtx;
-  let fsWatchResults: d.FsWatchResults;
 
   beforeEach(() => {
     compilerCtx = mockCompilerCtx();
-    fsWatchResults = {
-      dirsAdded: [],
-      dirsDeleted: [],
-      filesAdded: [],
-      filesDeleted: [],
-      filesUpdated: [],
-    };
   });
 
   it('should combine files added, deleted, updated to in filesChanged', () => {
-    fsWatchResults.filesAdded = ['added'];
-    fsWatchResults.filesDeleted = ['deleted'];
-    fsWatchResults.filesUpdated = ['updated'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesAdded = ['added'];
+    compilerCtx.activeFilesDeleted = ['deleted'];
+    compilerCtx.activeFilesUpdated = ['updated'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.filesChanged).toEqual(['added', 'deleted', 'updated']);
   });
 
   it('should get all the scripts added', () => {
-    fsWatchResults.filesAdded = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesAdded = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.scriptsAdded).toEqual([
       'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx'
     ]);
   });
 
   it('should get all the scripts deleted', () => {
-    fsWatchResults.filesDeleted = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesDeleted = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.scriptsDeleted).toEqual([
       'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx'
     ]);
   });
 
   it('hasScriptChanges', () => {
-    fsWatchResults.filesUpdated = ['file.tsx'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['file.tsx'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.hasScriptChanges).toBe(true);
   });
 
   it('hasStyleChanges', () => {
-    fsWatchResults.filesUpdated = ['file.css'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['file.css'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.hasStyleChanges).toBe(true);
   });
@@ -68,8 +60,8 @@ describe('watch-rebuild', () => {
     await compilerCtx.fs.disk.writeFile(path.join(root, 'added-1', 'added-2', 'file-2.tsx'), '');
     await compilerCtx.fs.disk.writeFile(path.join(root, 'added-1', 'added-2', 'added-3', 'file-3.tsx'), '');
 
-    fsWatchResults.dirsAdded = [normalizePath(path.join(root, 'added-1'))];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeDirsAdded = [normalizePath(path.join(root, 'added-1'))];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
 
     expect(buildCtx.dirsAdded).toEqual([
@@ -92,31 +84,31 @@ describe('watch-rebuild', () => {
   });
 
   it('should rebuild for dirsDeleted', () => {
-    fsWatchResults.dirsDeleted = ['deleted'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeDirsDeleted = ['deleted'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.dirsDeleted).toEqual(['deleted']);
   });
 
   it('should rebuild for filesAdded', () => {
-    fsWatchResults.filesAdded = ['added'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesAdded = ['added'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.filesAdded).toEqual(['added']);
     expect(buildCtx.filesChanged).toEqual(['added']);
   });
 
   it('should rebuild for filesDeleted', () => {
-    fsWatchResults.filesDeleted = ['deleted'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesDeleted = ['deleted'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.filesDeleted).toEqual(['deleted']);
     expect(buildCtx.filesChanged).toEqual(['deleted']);
   });
 
   it('should rebuild for filesUpdated', () => {
-    fsWatchResults.filesUpdated = ['updated'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['updated'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.isRebuild).toBe(true);
     expect(buildCtx.filesUpdated).toEqual(['updated']);
@@ -126,27 +118,27 @@ describe('watch-rebuild', () => {
   it('should requiresFullBuild if hasSuccessfulBuild but also has config update', () => {
     compilerCtx.hasSuccessfulBuild = true;
     config.configPath = 'stencil.config.js';
-    fsWatchResults.filesUpdated = ['stencil.config.js'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['stencil.config.js'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.requiresFullBuild).toBe(true);
   });
 
   it('should not requiresFullBuild if hasSuccessfulBuild', () => {
     compilerCtx.hasSuccessfulBuild = true;
-    fsWatchResults.filesUpdated = ['updated'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['updated'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.requiresFullBuild).toBe(false);
   });
 
   it('should requiresFullBuild if no hasSuccessfulBuild', () => {
     compilerCtx.hasSuccessfulBuild = false;
-    fsWatchResults.filesUpdated = ['updated'];
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    compilerCtx.activeFilesUpdated = ['updated'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.requiresFullBuild).toBe(true);
   });
 
   it('should not rebuild for no changes', () => {
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx, fsWatchResults);
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBe(null);
   });
 

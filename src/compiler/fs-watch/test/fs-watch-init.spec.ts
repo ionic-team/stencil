@@ -1,11 +1,11 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { BuildEvents } from '../../events';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import { initFsWatcher } from '../fs-watch-init';
-import { validateConfig } from '../../../compiler/config/validate-config';
+import { validateConfig } from '@stencil/core/compiler';
 
 
-describe('watcher', () => {
+describe('fs-watch, init', () => {
 
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
@@ -14,14 +14,19 @@ describe('watcher', () => {
   beforeEach(() => {
     config = mockConfig();
     config.watch = true;
-    config.sys.createFsWatcher = (() => {/**/}) as any;
+    config.sys.createFsWatcher = (() => {
+      return {
+        addDirectory() {/**/}
+      };
+    }) as any;
     compilerCtx = mockCompilerCtx();
+
     buildCtx = mockBuildCtx(config, compilerCtx);
     compilerCtx.events = new BuildEvents();
   });
 
 
-  fit('should only create the watch listener once', async () => {
+  it('should only create the watch listener once', async () => {
     let didCreateWatcher = await initFsWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(true);
 
