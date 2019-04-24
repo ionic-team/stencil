@@ -69,6 +69,9 @@ export interface BuildCtx {
   timestamp: string;
   transpileBuildCount: number;
   pendingCopyTasks: Promise<d.CopyResults>[];
+  validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
+  validateTypesPromise?: Promise<d.ValidateTypesResults>;
+  validateTypesBuild?(): Promise<void>;
 }
 
 

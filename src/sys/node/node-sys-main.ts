@@ -249,4 +249,13 @@ export class NodeSystem implements d.StencilSystem {
   get url() {
     return url;
   }
+
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+    return this.sysWorker.run(
+      'validateTypes',
+      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
+      { isLongRunningTask: true, workerKey: 'validateTypes' }
+    );
+  }
+
 }

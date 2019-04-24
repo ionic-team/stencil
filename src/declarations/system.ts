@@ -49,6 +49,7 @@ export interface StencilSystem {
     format(url: Url): string;
     resolve(from: string, to: string): string;
   };
+  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
 }
 
 

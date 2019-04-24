@@ -90,6 +90,7 @@ export class Compiler implements d.Compiler {
 
     this.ctx.isActivelyBuilding = true;
     let buildResults: d.BuildResults = undefined;
+    let didError = false;
     try {
       // clean
       this.ctx.activeDirsAdded.length = 0;
@@ -100,10 +101,18 @@ export class Compiler implements d.Compiler {
 
       // Run Build
       buildResults = await build(this.config, this.ctx, buildCtx);
+      didError = buildResults.hasError;
     } catch (e) {
       console.error(e);
+      didError = true;
     }
-
+    if (didError) {
+      this.ctx.activeDirsAdded.push(...buildCtx.dirsAdded);
+      this.ctx.activeDirsDeleted.push(...buildCtx.dirsDeleted);
+      this.ctx.activeFilesAdded.push(...buildCtx.filesAdded);
+      this.ctx.activeFilesDeleted.push(...buildCtx.filesDeleted);
+      this.ctx.activeFilesUpdated.push(...buildCtx.filesUpdated);
+    }
     this.ctx.isActivelyBuilding = false;
     if (this.queuedRebuild) {
       this.rebuild();
