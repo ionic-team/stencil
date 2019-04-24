@@ -117,7 +117,7 @@ export function isDocsPublic(jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) {
 
 
 export function getDependencies(buildCtx: d.BuildCtx) {
-  if (buildCtx.packageJson.dependencies) {
+  if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
     return Object.keys(buildCtx.packageJson.dependencies)
       .filter(pkgName => !SKIP_DEPS.includes(pkgName));
   }
@@ -142,9 +142,11 @@ export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerC
     pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
 
   } catch (e) {
-    const diagnostic = buildError(buildCtx.diagnostics);
-    diagnostic.header = `Missing "package.json"`;
-    diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
+    if (!config.outputTargets.some(o => o.type.includes('dist'))) {
+      const diagnostic = buildError(buildCtx.diagnostics);
+      diagnostic.header = `Missing "package.json"`;
+      diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
+    }
     return null;
   }
 
