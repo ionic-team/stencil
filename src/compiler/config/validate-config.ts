@@ -9,7 +9,6 @@ import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 import { sortBy } from '@utils';
 
 
@@ -124,11 +123,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   if (!Array.isArray(config.excludeSrc)) {
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
   }
-
-  /**
-   * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
-   */
-  _deprecatedValidateConfigCollections(config);
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');

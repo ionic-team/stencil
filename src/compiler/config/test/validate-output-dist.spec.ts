@@ -24,7 +24,7 @@ describe('validateDistOutputTarget', () => {
     };
     config.outputTargets = [outputTarget];
     validateOutputTargetDist(config);
-    expect(config.outputTargets).toHaveLength(1);
+    expect(config.outputTargets).toHaveLength(3);
     expect(outputTarget).toBeDefined();
     expect(outputTarget.dir).toBe('/my-dist');
     expect(outputTarget.buildDir).toBe('/my-dist/my-build');

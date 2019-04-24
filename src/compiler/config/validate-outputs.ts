@@ -8,14 +8,11 @@ import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
 import { getPluginOutputTypeNames } from '../output-plugins/output-plugin-utils';
 import { validatePluginOutputs } from '../output-plugins/validate';
 import { VALID_TYPES, WWW } from '../output-targets/output-utils';
-import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
 
 export function validateOutputTargets(config: d.Config) {
 
   // setup outputTargets from deprecated config properties
-  _deprecatedToMultipleTarget(config);
-
   if (Array.isArray(config.outputTargets)) {
     const validTargetTypes = VALID_TYPES.slice().concat(getPluginOutputTypeNames(config)).sort();
 

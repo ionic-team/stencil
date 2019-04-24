@@ -49,7 +49,7 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   validatePrerender(config, outputTarget);
 
   outputTarget.copy = validateCopy(outputTarget.copy, [
-    ...config.copy,
+    ...(config.copy || []),
     ...DEFAULT_WWW_COPY,
   ]);
 

@@ -68,14 +68,15 @@ export function validateOutputTargetDist(config: d.Config) {
       copy: outputTarget.copy
     });
 
-    const lazyDir = path.join(outputTarget.buildDir, config.fsNamespace);
+    const namespace = config.fsNamespace || 'app';
+    const lazyDir = path.join(outputTarget.buildDir, namespace);
     config.outputTargets.push({
       type: DIST_LAZY,
       copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: lazyDir,
-      systemLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.js'),
-      esmLoaderFile: path.join(outputTarget.dir, config.fsNamespace + '.esm.js'),
+      systemLoaderFile: path.join(outputTarget.dir, namespace + '.js'),
+      esmLoaderFile: path.join(outputTarget.dir, namespace + '.esm.js'),
       polyfills: true,
       isBrowserBuild: true,
     });

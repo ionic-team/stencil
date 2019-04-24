@@ -103,7 +103,7 @@ describe('validation', () => {
 
     it('should default exclude glob', () => {
       validateConfig(config);
-      expect(config.excludeSrc).toEqual(['**/test/*']);
+      expect(config.excludeSrc).toEqual(['**/*.+(spec|e2e).*']);
     });
 
   });
@@ -280,12 +280,6 @@ describe('validation', () => {
     expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
   });
 
-  it('should set generateDistribution to be defined', () => {
-    (config as any).generateDistribution = true;
-    validateConfig(config);
-    expect(config.outputTargets[0].type).toBe('dist');
-  });
-
   it('should default dist false and www true', () => {
     validateConfig(config);
     expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
@@ -326,12 +320,6 @@ describe('validation', () => {
   it('should set default generateDocs to false', () => {
     validateConfig(config);
     expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
-  });
-
-  it('should set generateDistribution to be defined', () => {
-    (config as any).generateDistribution = true;
-    validateConfig(config);
-    expect(config.outputTargets[0].type).toBe('dist');
   });
 
   it('should default dist false and www true', () => {

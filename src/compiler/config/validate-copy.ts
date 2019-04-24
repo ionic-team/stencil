@@ -9,7 +9,7 @@ export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
     copy = [];
   }
   return unique([
+    ...copy,
     ...defaultCopy,
-    ...copy
   ], task => task.src);
 }
