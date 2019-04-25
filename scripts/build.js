@@ -17,7 +17,7 @@ run(async () => {
     cwd: path.join(__dirname, '..', 'node_modules', 'rollup-plugin-node-resolve')
   });
 
-  await fs.remove(DIST_DIR);
+  await fs.emptyDir(DIST_DIR);
 
   const scripts = [
     ['CLI', 'build-cli.js'],
