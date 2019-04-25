@@ -7,7 +7,7 @@ import { serve404, serve404Content } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveDirectoryIndex } from './serve-directory-index';
 import * as http from 'http';
-import * as path from 'path';
+import path from 'path';
 import * as url from 'url';
 
 

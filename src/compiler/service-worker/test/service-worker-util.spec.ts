@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { generateServiceWorkerUrl } from '../service-worker-util';
 import { Config, validateConfig } from '@stencil/core/compiler';
-import { TestingConfig } from '@stencil/core/testing';
+import { mockConfig } from '@stencil/core/testing';
 
 
 describe('generateServiceWorkerUrl', () => {
@@ -10,7 +10,7 @@ describe('generateServiceWorkerUrl', () => {
   let outputTarget: d.OutputTargetWww;
 
   it('sw url w/ baseUrl', () => {
-    config = new TestingConfig();
+    config = mockConfig();
     config.devMode = false;
     config.outputTargets = [
       {
@@ -25,7 +25,7 @@ describe('generateServiceWorkerUrl', () => {
   });
 
   it('default sw url', () => {
-    config = new TestingConfig();
+    config = mockConfig();
     config.devMode = false;
     validateConfig(config);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;

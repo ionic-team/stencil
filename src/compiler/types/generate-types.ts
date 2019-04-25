@@ -5,7 +5,7 @@ import { isDtsFile } from '@utils';
 import * as v from './validate-package-json';
 
 
-export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistCollection) {
+export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
   v.validatePackageFiles(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateCollection(config, outputTarget, buildCtx.diagnostics, pkgData);
   v.validateTypes(config, outputTarget, buildCtx.diagnostics, pkgData);
@@ -25,7 +25,7 @@ export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.
   }
 }
 
-async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistCollection) {
+async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
   if (typeof pkgData.types !== 'string') {
     return;
   }

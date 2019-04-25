@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { buildJestArgv } from '../jest-config';
-import { parseFlags } from '../../../cli/parse-flags';
-import { TestingConfig } from '../../testing-config';
+import { mockConfig } from '@stencil/core/testing';
+import { parseFlags } from '@stencil/core/cli';
 import path from 'path';
 
 
@@ -11,7 +11,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--maxWorkers=2']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
@@ -27,7 +27,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', '--ci', '--e2e']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
@@ -43,7 +43,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', '--maxWorkers=2']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
@@ -58,7 +58,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', '--ci']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
@@ -74,7 +74,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test', 'hello.spec.ts']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
@@ -89,7 +89,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node', 'stencil', 'test']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {
       testMatch: ['hello.spec.ts']
@@ -107,7 +107,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node stencil test']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.rootDir = rootDir;
     config.flags = parseFlags(process);
     config.testing = {
@@ -130,7 +130,7 @@ describe('jest-config', () => {
     const process: any = {
       argv: ['node stencil test']
     };
-    const config = new TestingConfig();
+    const config = mockConfig();
     config.rootDir = rootDir;
     config.flags = parseFlags(process);
     config.testing = {};

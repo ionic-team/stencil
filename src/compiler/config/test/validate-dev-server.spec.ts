@@ -22,7 +22,8 @@ describe('validateDevServer', () => {
       },
       flags: {
         serve: true
-      }
+      },
+      namespace: 'Testing'
     };
   });
 

@@ -23,6 +23,9 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
+      "@stencil/core/cli": [
+        "../cli/index.ts"
+      ],
       "@stencil/core/compiler": [
         "../compiler/index.ts"
       ],

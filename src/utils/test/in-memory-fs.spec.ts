@@ -1,9 +1,8 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/declarations';
 import { InMemoryFileSystem, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
-import { mockFs } from '../../testing/mocks';
-import { normalizePath } from '../normalize-path';
-import { TestingFs } from '../../testing/testing-fs';
-import * as path from 'path';
+import { mockFs } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
+import path from 'path';
 
 
 describe(`in-memory-fs, getCommitInstructions`, () => {

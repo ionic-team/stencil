@@ -1,5 +1,5 @@
 import { Compiler, Config } from '@stencil/core/compiler';
-import { TestingConfig } from '@stencil/core/testing';
+import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@stencil/core/utils';
 import path from 'path';
 
@@ -10,7 +10,7 @@ describe('plugin', () => {
   const root = path.resolve('/');
 
   beforeEach(async () => {
-    config = new TestingConfig();
+    config = mockConfig();
     compiler = new Compiler(config);
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'index.html')]: `<cmp-a></cmp-a>`

@@ -14,6 +14,7 @@ describe('fs-watch, init', () => {
   beforeEach(() => {
     config = mockConfig();
     config.watch = true;
+    config.srcDir = 'src';
     config.sys.createFsWatcher = (() => {
       return {
         addDirectory() {/**/}

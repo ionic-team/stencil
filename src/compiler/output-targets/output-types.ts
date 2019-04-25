@@ -9,11 +9,11 @@ export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, 
     return;
   }
 
-  return writeTypes(config, compilerCtx, buildCtx, outputTargets);
+  return writeTypes(config, compilerCtx, buildCtx, outputTargets as any);
 }
 
 
-async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
+async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDist[]) {
   const pkgData = buildCtx.packageJson;
   if (pkgData == null) {
     return;

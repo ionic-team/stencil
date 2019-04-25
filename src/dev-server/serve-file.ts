@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import * as util from './dev-server-utils';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
-import * as path from 'path';
+import path from 'path';
 import * as querystring from 'querystring';
 import * as Url from 'url';
 import * as zlib from 'zlib';

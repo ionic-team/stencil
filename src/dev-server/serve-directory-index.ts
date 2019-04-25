@@ -3,7 +3,7 @@ import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import * as http from 'http';
-import * as path from 'path';
+import path from 'path';
 import * as url from 'url';
 import { responseHeaders, sendMsg } from './dev-server-utils';
 

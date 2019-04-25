@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';
-import { validateNamespace } from './validate-namespace';
+import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
@@ -13,7 +13,7 @@ import { sortBy } from '@utils';
 
 
 export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
-  if (!config) {
+  if (config == null) {
     throw new Error(`invalid build config`);
   }
 
@@ -86,6 +86,10 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   // setup the outputTargets
   validateOutputTargets(config);
 
+  if (!config._isTesting) {
+    validateDistNamespace(config);
+  }
+
   if (typeof config.validateTypes !== 'boolean') {
     config.validateTypes = true;
   }
@@ -126,7 +130,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');
-  config.bundles = sortBy(config.bundles, (a) => a.components.length);
+  config.bundles = sortBy(config.bundles, (a: d.ConfigBundle) => a.components.length);
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;

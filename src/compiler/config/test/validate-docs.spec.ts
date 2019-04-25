@@ -17,7 +17,8 @@ describe('validateDocs', () => {
       flags: {},
       outputTargets: [
         { type: 'www' }
-      ]
+      ],
+      namespace: 'Testing'
     };
   });
 

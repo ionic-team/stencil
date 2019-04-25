@@ -15,7 +15,8 @@ describe('validateResourcesUrl', () => {
     config = {
       sys: sys,
       logger: logger,
-      rootDir: '/User/some/path/'
+      rootDir: '/User/some/path/',
+      namespace: 'Testing'
     };
   });
 

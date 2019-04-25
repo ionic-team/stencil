@@ -18,6 +18,7 @@ describe('validateTesting', () => {
       rootDir: path.join(ROOT, 'User', 'some', 'path'),
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
+      namespace: 'Testing'
     };
     config.outputTargets = [{
       type: 'www',

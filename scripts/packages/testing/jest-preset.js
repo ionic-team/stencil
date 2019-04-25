@@ -13,6 +13,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     "^@stencil/core/build-conditionals$": path.join(distDir, 'testing', 'build-conditionals'),
+    "^@stencil/core/cli$": path.join(distDir, 'cli'),
     "^@stencil/core/compiler$": path.join(rootDir, 'compiler'),
     "^@stencil/core/internal$": path.join(rootDir, 'internal'),
     "^@stencil/core/mock-doc$": path.join(distDir, 'testing', 'mock-doc'),

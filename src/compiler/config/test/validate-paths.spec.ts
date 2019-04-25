@@ -17,7 +17,8 @@ describe('validatePaths', () => {
     config = {
       sys: sys,
       logger: logger,
-      rootDir: path.join(ROOT, 'User', 'my-app')
+      rootDir: path.join(ROOT, 'User', 'my-app'),
+      namespace: 'Testing'
     };
   });
 

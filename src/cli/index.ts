@@ -55,3 +55,5 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
     }
   }
 }
+
+export { parseFlags } from './parse-flags';

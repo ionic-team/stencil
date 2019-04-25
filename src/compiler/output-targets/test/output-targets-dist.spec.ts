@@ -1,6 +1,6 @@
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
-import { TestingConfig } from '@stencil/core/testing';
+import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
 
@@ -12,7 +12,7 @@ describe('outputTarget, dist', () => {
   const root = path.resolve('/');
 
   it('default dist files', async () => {
-    config = new TestingConfig();
+    config = mockConfig();
     config.buildAppCore = true;
     config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'TestApp';

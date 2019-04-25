@@ -2,7 +2,7 @@ import * as d from '@stencil/core/declarations';
 import { getCssImports, getModuleId, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
 import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@stencil/core/utils';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('css-imports', () => {

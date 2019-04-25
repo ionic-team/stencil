@@ -1,17 +1,42 @@
 import * as d from '../declarations';
-import { BuildContext, Cache, validateConfig } from '../compiler';
+import { BuildContext, Cache } from '../compiler';
 import { InMemoryFileSystem } from '@utils';
 import { MockWindow } from '@mock-doc';
-import { TestingConfig } from './testing-config';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 import path from 'path';
 
 
-export function mockConfig(): d.Config {
-  const config = new TestingConfig();
-  return validateConfig(config);
+export function mockConfig() {
+  const config: d.Config = {
+    _isTesting: true,
+
+    namespace: 'Testing',
+    rootDir: path.resolve('/'),
+    cwd: path.resolve('/'),
+    globalScript: null,
+    devMode: true,
+    enableCache: false,
+    buildAppCore: false,
+    buildDist: true,
+    flags: {},
+    bundles: null,
+    outputTargets: null,
+    buildEs5: false,
+    hashFileNames: false,
+    logger: new TestingLogger(),
+    maxConcurrentWorkers: 1,
+    minifyCss: false,
+    minifyJs: false,
+    sys: new TestingSystem(),
+    testing: null,
+    validateTypes: false,
+    nodeResolve: {
+      customResolveOptions: {},
+    }
+  };
+  return config;
 }
 
 

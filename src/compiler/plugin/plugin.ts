@@ -104,7 +104,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 
     if (typeof plugin.transform === 'function') {
       try {
-        let pluginTransformResults: PluginTransformResults;
+        let pluginTransformResults: PluginTransformResults | string;
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
 
         if (results != null) {

@@ -1,9 +1,10 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
 import { dashToPascalCase } from '@utils';
+import { isOutputTargetDist } from '../output-targets/output-utils';
 import { setStringConfig } from './config-utils';
 
 
-export function validateNamespace(config: Config) {
+export function validateNamespace(config: d.Config) {
   setStringConfig(config, 'namespace', DEFAULT_NAMESPACE);
   config.namespace = config.namespace.trim();
 
@@ -33,6 +34,15 @@ export function validateNamespace(config: Config) {
     // convert to PascalCase
     // this is the same namespace that gets put on "window"
     config.namespace = dashToPascalCase(config.namespace);
+  }
+}
+
+export function validateDistNamespace(config: d.Config) {
+  const hasDist = config.outputTargets.some(isOutputTargetDist);
+  if (hasDist) {
+    if (typeof config.namespace !== 'string' || config.namespace.toLowerCase() === 'app') {
+      throw new Error(`When generating a distribution it is recommended to choose a unique namespace rather than the default setting "App". Please updated the "namespace" config property within the stencil config.`);
+    }
   }
 }
 

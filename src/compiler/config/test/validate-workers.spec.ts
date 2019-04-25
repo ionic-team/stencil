@@ -15,7 +15,8 @@ describe('validate-workers', () => {
         path: path
       } as any,
       logger: logger,
-      rootDir: '/'
+      rootDir: '/',
+      namespace: 'Testing'
     };
     config.sys.details = {
       cpuModel: 'cpuModel',

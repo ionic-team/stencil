@@ -42,7 +42,7 @@ export function getComponentsDtsSrcFilePath(config: d.Config) {
   return config.sys.path.join(config.srcDir, GENERATED_DTS);
 }
 
-export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDistCollection) {
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
   return config.sys.path.join(outputTarget.typesDir, GENERATED_DTS);
 }
 
@@ -79,7 +79,7 @@ export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats
 }
 
 export function getComponentsFromModules(moduleFiles: d.Module[]) {
-  return sortBy(flatOne(moduleFiles.map(m => m.cmps)), c => c.tagName);
+  return sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 }
 
 export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {

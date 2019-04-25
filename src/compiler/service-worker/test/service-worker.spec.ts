@@ -1,7 +1,7 @@
-import * as path from 'path';
 import * as d from '@stencil/core/declarations';
 import { Compiler, Config } from '@stencil/core/compiler';
-import { TestingConfig } from '@stencil/core/testing';
+import { mockConfig } from '@stencil/core/testing';
+import path from 'path';
 
 
 describe('service worker', () => {
@@ -12,7 +12,7 @@ describe('service worker', () => {
 
 
   it('dev service worker', async () => {
-    config = new TestingConfig();
+    config = mockConfig();
     config.devMode = true;
     config.outputTargets = [
       {

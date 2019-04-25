@@ -5,7 +5,7 @@ import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import { serveOpenInEditor } from './open-in-editor';
 import * as http  from 'http';
-import * as path from 'path';
+import path from 'path';
 
 
 export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {

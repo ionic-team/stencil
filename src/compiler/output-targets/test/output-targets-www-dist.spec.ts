@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
-import { TestingConfig } from '@stencil/core/testing';
+import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
 
@@ -13,7 +13,7 @@ describe('outputTarget, www / dist / docs', () => {
   const root = path.resolve('/');
 
   it('dist, www and readme files w/ custom paths', async () => {
-    config = new TestingConfig();
+    config = mockConfig();
     config.flags.docs = true;
     config.buildAppCore = true;
     config.rootDir = path.join(root, 'User', 'testing', '/');

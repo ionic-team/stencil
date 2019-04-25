@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { configReload } from '../config-reload';
+import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { normalizePath } from '@stencil/core/utils';
-import { TestingConfig } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
@@ -13,11 +13,15 @@ describe('config-reload', () => {
   const root = path.resolve('/');
 
   beforeEach(() => {
-    config = new TestingConfig();
+    config = {
+      logger: mockLogger(),
+      sys: mockStencilSystem(),
+      namespace: 'Testing'
+    };
     logger = config.logger;
     config.rootDir = normalizePath(path.join(root, 'my-app'));
     config.cwd = normalizePath(path.join(root, 'my-app'));
-    updateConfig = new TestingConfig();
+    updateConfig = {};
   });
 
   it('should keep flags', () => {

@@ -16,7 +16,7 @@ import { WorkerManager } from './worker/index';
 
 import { createHash } from 'crypto';
 import { cpus, platform, release, tmpdir } from 'os';
-import * as path from 'path';
+import path from 'path';
 import * as url from 'url';
 
 

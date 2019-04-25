@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
-import { buildWarn, normalizePath } from '@utils';
-import { COLLECTION_MANIFEST_FILE_NAME } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME, buildWarn, normalizePath } from '@utils';
 import { getComponentsDtsTypesFilePath } from '../output-targets/output-utils';
 
 
-export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (Array.isArray(pkgData.files)) {
     const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
 
@@ -26,7 +25,7 @@ export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTar
 }
 
 
-export function validateModule(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validateModule(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const moduleAbs = config.sys.path.join(outputTarget.dir, 'index.mjs');
   const moduleRel = normalizePath(config.sys.path.relative(config.rootDir, moduleAbs));
 
@@ -62,7 +61,7 @@ export function validateCollectionMain(config: d.Config, outputTarget: d.OutputT
   }
 }
 
-export function validateMain(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validateMain(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   const mainAbs = config.sys.path.join(outputTarget.dir, 'index.js');
   const mainRel = normalizePath(config.sys.path.relative(config.rootDir, mainAbs));
 
@@ -80,7 +79,7 @@ export function validateMain(config: d.Config, outputTarget: d.OutputTargetDistC
 }
 
 
-export function validateTypes(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validateTypes(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (typeof pkgData.types !== 'string' || pkgData.types === '') {
     const err = buildWarn(diagnostics);
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
@@ -97,7 +96,7 @@ export function validateTypes(config: d.Config, outputTarget: d.OutputTargetDist
 }
 
 
-export async function validateTypesExist(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export async function validateTypesExist(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (typeof pkgData.types !== 'string') {
     return false;
   }
@@ -118,7 +117,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
 }
 
 
-export function validateCollection(config: d.Config, outputTarget: d.OutputTargetDistCollection, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
+export function validateCollection(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (outputTarget.collectionDir) {
     const collectionRel = config.sys.path.join(config.sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
     if (!pkgData.collection || normalizePath(pkgData.collection) !== collectionRel) {
@@ -137,7 +136,7 @@ export function validateBrowser(diagnostics: d.Diagnostic[], pkgData: d.PackageJ
 }
 
 
-export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDistCollection) {
+export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDist) {
   const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
   return normalizePath(config.sys.path.relative(config.rootDir, typesAbs));
 }
