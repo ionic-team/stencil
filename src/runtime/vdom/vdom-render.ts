@@ -192,30 +192,31 @@ const addVnodes = (
   }
 };
 
-const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, node?: d.RenderNode) => {
+const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
     if (isDef(vnodes[startIdx])) {
 
-      node = vnodes[startIdx].$elm$;
+      elm = vnodes[startIdx].$elm$;
+      callNodeRefs(vnodes[startIdx], true);
 
       if (BUILD.slotRelocation) {
         // we're removing this element
         // so it's possible we need to show slot fallback content now
         checkSlotFallbackVisibility = true;
 
-        if (node['s-ol']) {
+        if (elm['s-ol']) {
           // remove the original location comment
-          node['s-ol'].remove();
+          elm['s-ol'].remove();
 
         } else {
           // it's possible that child nodes of the node
           // that's being removed are slot nodes
-          putBackInOriginalLocation(node, true);
+          putBackInOriginalLocation(elm, true);
         }
       }
 
       // remove the vnode's element from the dom
-      node.remove();
+      elm.remove();
     }
   }
 };
@@ -550,6 +551,15 @@ const relocateSlotContent = (
   }
 };
 
+export const callNodeRefs = (vNode: d.VNode, isDestroy?: boolean) => {
+  if (BUILD.vdomRef && vNode) {
+    vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(isDestroy ? null : vNode.$elm$);
+
+    vNode.$children$ && vNode.$children$.forEach(vChild => {
+      callNodeRefs(vChild, isDestroy);
+    });
+  }
+};
 
 interface RelocateNode {
   slotRefNode: d.RenderNode;

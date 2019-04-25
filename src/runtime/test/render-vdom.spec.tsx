@@ -97,21 +97,26 @@ describe('render-vdom', () => {
       expect(rootInstance.el).toEqual(rootInstance.selfRef);
     });
 
-    it('should set', async () => {
+    it('should set and reset', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         divRef: HTMLElement;
+        @Prop() visible = true;
         render() {
-          return <div ref={el => this.divRef = el}>Hello VDOM</div>;
+          return this.visible && <div ref={el => this.divRef = el}>Hello VDOM</div>;
         }
       }
 
-      const { root, rootInstance } = await newSpecPage({
+      const { root, rootInstance, waitForChanges } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
       });
 
       expect(rootInstance.divRef).toEqual(root.querySelector('div'));
+      root.visible = false;
+      await waitForChanges();
+
+      expect(rootInstance.divRef).toEqual(null);
     });
 
     it('should set once', async () => {
