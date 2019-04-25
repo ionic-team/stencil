@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
 
 
-export async function newSpecPage(opts: d.NewSpecPageOptions) {
+export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPage> {
   if (opts == null) {
     throw new Error(`NewSpecPageOptions required`);
   }

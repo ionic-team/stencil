@@ -551,17 +551,6 @@ const relocateSlotContent = (
 };
 
 
-export const callNodeRefs = (vNode: d.VNode, isDestroy?: boolean) => {
-  if (BUILD.vdomRef && vNode) {
-    vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(isDestroy ? null : vNode.$elm$);
-
-    vNode.$children$ && vNode.$children$.forEach(vChild => {
-      callNodeRefs(vChild, isDestroy);
-    });
-  }
-};
-
-
 interface RelocateNode {
   slotRefNode: d.RenderNode;
   nodeToRelocate: d.RenderNode;
@@ -682,10 +671,5 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
     // always reset
     relocateNodes.length = 0;
-  }
-
-  // fire off the ref if it exists
-  if (BUILD.vdomRef) {
-    callNodeRefs(renderFnResults);
   }
 };

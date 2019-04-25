@@ -70,6 +70,10 @@ describe('lifecycle sync', () => {
     root.prop = 1;
     await waitForChanges();
 
+    expect(root.textContent).toBe(
+      'propDidChange componentWillUpdate componentWillRender render'
+    );
+
     expect(log.trim()).toBe(
       'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
     );

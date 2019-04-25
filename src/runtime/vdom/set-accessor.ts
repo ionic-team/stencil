@@ -7,13 +7,12 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { isMemberInElement } from '@platform';
 import { toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
-export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
+export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
   if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
@@ -63,6 +62,7 @@ export const setAccessor = (elm: d.HostElement, memberName: string, oldValue: an
 
   } else if (BUILD.vdomRef && memberName === 'ref') {
     // minifier will clean this up
+    newValue(elm);
 
   } else if (BUILD.vdomListener && memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
     // Event Handlers

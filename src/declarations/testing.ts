@@ -453,12 +453,15 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
+export interface AnyHTMLElement extends HTMLElement {
+  [key: string]: any;
+}
 
 export interface SpecPage {
   win: Window;
   doc: HTMLDocument;
   body: HTMLBodyElement;
-  root?: any;
+  root?: AnyHTMLElement;
   rootInstance?: any;
   build: d.Build;
   styles: Map<string, string>;

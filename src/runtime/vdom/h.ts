@@ -121,7 +121,7 @@ export function h(nodeName: any, vnodeData: any) {
   return vnode;
 }
 
-export const Host: d.FunctionalComponent<any> = {} as any;
+export const Host = {};
 
 const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.map(convertToPublic).forEach(cb),
