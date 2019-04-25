@@ -45,7 +45,7 @@ describe('component-styles', () => {
     expect(content).toContain('\\\\2014 \\\\00A0');
   });
 
-  it('should build one component w/ inline style', async () => {
+  it('should build one component w/ inline style, and re-compile on module file changes', async () => {
     compiler.config.watch = true;
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: red; }' }) export class CmpA {}`,
@@ -99,13 +99,20 @@ describe('component-styles', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const iosContent = await compiler.fs.readFile(path.join(root, 'www', 'build', 'u.entry.js'));
-    expect(iosContent).toContain(`body{font-family:Helvetica}`);
-    expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
+    let hasIos = false;
+    let hasMd = false;
 
-    const mdContent = await compiler.fs.readFile(path.join(root, 'www', 'build', 'h.entry.js'));
-    expect(mdContent).toContain(`body{font-family:Roboto}`);
-    expect(mdContent).toContain(`static get styleMode(){return"md"}`);
+    r.filesWritten.forEach(f => {
+      const content = compiler.fs.readFileSync(f);
+      if (content.includes(`body{font-family:Helvetica}`)) {
+        hasIos = true;
+      } else if (content.includes(`body{font-family:Roboto}`)) {
+        hasMd = true;
+      }
+    });
+
+    expect(hasIos).toBe(true);
+    expect(hasMd).toBe(true);
   });
 
   it('should add default styles to hashed filename/minified builds', async () => {
@@ -125,7 +132,7 @@ describe('component-styles', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'hashed.entry.js'));
+    const content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'p-hashed.entry.js'));
     expect(content).toContain(`body{color:red}`);
   });
 
@@ -176,7 +183,6 @@ describe('component-styles', () => {
     expect(r.diagnostics).toHaveLength(0);
     expect(r.components).toHaveLength(1);
     expect(r.transpileBuildCount).toBe(1);
-    // expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
     let content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
@@ -216,7 +222,6 @@ describe('component-styles', () => {
     expect(r.diagnostics).toHaveLength(0);
     expect(r.components).toHaveLength(1);
     expect(r.transpileBuildCount).toBe(1);
-    // expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
     let content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
@@ -253,7 +258,6 @@ describe('component-styles', () => {
     expect(r.diagnostics).toHaveLength(0);
     expect(r.components).toHaveLength(1);
     expect(r.transpileBuildCount).toBe(1);
-    // expect(r.bundleBuildCount).toBe(1);
     expect(r.styleBuildCount).toBe(1);
 
     let content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));

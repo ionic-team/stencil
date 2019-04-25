@@ -20,8 +20,9 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const commentOriginalSelector = config.outputTargets.some(isOutputTargetHydrate);
+
   return Promise.all(
     buildCtx.components.map(cmp => {
       return Promise.all(cmp.styles.map(style => {
@@ -36,5 +37,16 @@ function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
     return false;
   }
 
-  return buildCtx.isRebuild && !buildCtx.hasStyleChanges;
+  if (buildCtx.isRebuild) {
+    if (buildCtx.hasStyleChanges || buildCtx.hasScriptChanges) {
+      // this is a rebuild and there are style or script changes
+      // changes to scripts are important too because it could be
+      // a change to the style url or style text
+      return false;
+    }
+
+    return true;
+  }
+
+  return false;
 }
