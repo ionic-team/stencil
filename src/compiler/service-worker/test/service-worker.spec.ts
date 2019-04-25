@@ -6,6 +6,7 @@ import path from 'path';
 
 describe('service worker', () => {
 
+  jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');

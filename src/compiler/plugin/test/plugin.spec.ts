@@ -5,6 +5,8 @@ import path from 'path';
 
 
 describe('plugin', () => {
+
+  jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');

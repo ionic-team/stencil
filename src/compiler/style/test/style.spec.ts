@@ -5,6 +5,7 @@ import path from 'path';
 
 describe('component-styles', () => {
 
+  jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');
