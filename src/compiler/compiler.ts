@@ -31,7 +31,7 @@ export class Compiler implements d.Compiler {
         startupMsg += `💎`;
       }
 
-      if (!config._isTesting) {
+      if (config.suppressLogs !== true) {
         logger.info(logger.cyan(startupMsg));
 
         if (sys.semver.prerelease(sys.compiler.version)) {

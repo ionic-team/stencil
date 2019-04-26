@@ -1,4 +1,0 @@
-
-exports.config = {
-  excludeSrc: []
-};
