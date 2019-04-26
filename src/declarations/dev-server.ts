@@ -24,6 +24,7 @@ export interface DevServerConfig {
   port?: number;
   protocol?: 'http' | 'https';
   root?: string;
+  websocket?: boolean;
 }
 
 

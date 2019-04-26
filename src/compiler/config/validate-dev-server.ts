@@ -28,6 +28,7 @@ export function validateDevServer(config: d.Config) {
 
   setBooleanConfig(config.devServer, 'gzip', null, true);
   setBooleanConfig(config.devServer, 'openBrowser', null, true);
+  setBooleanConfig(config.devServer, 'websocket', null, true);
 
   validateProtocol(config.devServer);
 

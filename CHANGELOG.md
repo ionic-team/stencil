@@ -1,3 +1,21 @@
+<a name="0.18.1"></a>
+## 😎 [0.18.1](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1) (2019-03-15)
+
+
+### Features
+
+* **package:** require node >= 8.9.0 and npm >= 6.0.0 ([d9325a3](https://github.com/ionic-team/stencil/commit/d9325a3))
+* **server:** serve openBrowser configurable with open flag ([#1407](https://github.com/ionic-team/stencil/issues/1407)) ([cb4d916](https://github.com/ionic-team/stencil/commit/cb4d916))
+
+
+### Bug Fixes
+
+* **copy:** use fs.copyFile and reduce concurrent copy tasks ([e51c0a4](https://github.com/ionic-team/stencil/commit/e51c0a4))
+* **dev-server:** serve command launch root url ([#1410](https://github.com/ionic-team/stencil/issues/1410)) ([7abdc39](https://github.com/ionic-team/stencil/commit/7abdc39))
+* **dev-server:** start server w/out dev websocket, suppress startup logs config ([ca96c58](https://github.com/ionic-team/stencil/commit/ca96c58))
+* **dist:** add dist/cjs directory ([24f5416](https://github.com/ionic-team/stencil/commit/24f5416))
+
+
 <a name="0.18.0"></a>
 # 🏐 [0.18.0](https://github.com/ionic-team/stencil/compare/v0.17.2...v0.18.0) (2019-02-12)
 

@@ -47,7 +47,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         return serve404Content(devServerConfig, req, res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
       }
 
-      if (isDevClient(req.pathname)) {
+      if (isDevClient(req.pathname) && devServerConfig.websocket) {
         return serveDevClient(devServerConfig, fs, req, res);
       }
 
