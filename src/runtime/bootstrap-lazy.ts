@@ -1,6 +1,6 @@
 import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
-import { CMP_FLAG } from '@utils';
+import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import * as d from '../declarations';
@@ -48,8 +48,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       if (BUILD.watchCallback) {
         cmpMeta.$watchers$ = {};
       }
-      if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation) {
-        cmpMeta.$flags$ |= CMP_FLAG.needsShadowDomShim;
+      if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+        cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
@@ -62,13 +62,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           super(self);
           self = this;
           registerHost(self);
-          if (BUILD.shadowDom && cmpMeta.$flags$ === CMP_FLAG.shadowDomEncapsulation) {
+          if (BUILD.shadowDom && cmpMeta.$flags$ === CMP_FLAGS.shadowDomEncapsulation) {
             // this component is using shadow dom
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element
             self.attachShadow({ 'mode': 'open' });
           }
-          if (BUILD.shadowDom && !BUILD.hydrateServerSide && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
+          if (BUILD.shadowDom && !BUILD.hydrateServerSide && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
             (self as any).shadowRoot = self;
           }
         }

@@ -1,8 +1,84 @@
-import { Component, Prop, Watch } from '@stencil/core';
+import { Component, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
 describe('lifecycle sync', () => {
+
+  it('should fire connected/disconnected when removed', async () => {
+    let connectedCallback = 0;
+    let disconnectedCallback = 0;
+
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      connectedCallback() {
+        connectedCallback++;
+      }
+      disconnectedCallback() {
+        disconnectedCallback++;
+      }
+    }
+
+    const { root, doc, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+    expect(connectedCallback).toBe(1);
+    expect(disconnectedCallback).toBe(0);
+
+    root.remove();
+    await waitForChanges();
+
+    expect(connectedCallback).toBe(1);
+    expect(disconnectedCallback).toBe(1);
+
+    doc.body.appendChild(root);
+    await waitForChanges();
+
+    expect(connectedCallback).toBe(2);
+    expect(disconnectedCallback).toBe(1);
+  });
+
+  it('should not fire connected/disconnected during recolocation', async () => {
+    let connectedCallback = 0;
+    let disconnectedCallback = 0;
+
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      connectedCallback() {
+        connectedCallback++;
+      }
+      disconnectedCallback() {
+        disconnectedCallback++;
+      }
+    }
+
+    @Component({ tag: 'cmp-b'})
+    class CmpB {
+      render() {
+        return (
+          <div>
+            <slot></slot>
+          </div>
+        );
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `<cmp-b><cmp-a></cmp-a></cmp-b>`,
+    });
+    expect(root).toEqualHtml(`
+      <cmp-b>
+        <!---->
+        <div>
+          <cmp-a></cmp-a>
+        </div>
+      </cmp-b>
+    `);
+
+    expect(connectedCallback).toBe(1);
+    expect(disconnectedCallback).toBe(0);
+  });
 
   it('fire lifecycle methods', async () => {
 

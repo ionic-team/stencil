@@ -19,9 +19,8 @@ export const Build: d.UserBuildConditionals = {
 };
 
 export const plt: d.PlatformRuntime = {
-  $isTmpDisconnected$: false,
-  $queueCongestion$: 0,
-  $queuePending$: false,
+  $flags$: 0,
+  $resourcesUrl$: '/'
 };
 
 export const supportsShadowDom = true;
@@ -35,7 +34,7 @@ export function resetPlatform() {
 
   hostRefs.clear();
   styles.clear();
-  plt.$isTmpDisconnected$ = false;
+  plt.$flags$ = 0;
 
   if (plt.$orgLocNodes$ != null) {
     plt.$orgLocNodes$.clear();

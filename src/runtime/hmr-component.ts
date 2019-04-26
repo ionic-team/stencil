@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { getHostRef } from '@platform';
-import { HOST_STATE } from '@utils';
+import { HOST_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
 
@@ -9,7 +9,7 @@ export function hmrStart(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hm
   const hostRef = getHostRef(elm);
 
   // reset state flags to only have been connected
-  hostRef.$stateFlags$ = HOST_STATE.hasConnected;
+  hostRef.$stateFlags$ = HOST_FLAGS.hasConnected;
 
   // TODO
   // detatch any event listeners that may have been added

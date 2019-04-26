@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { CMP_FLAG, LISTENER_FLAGS, MEMBER_FLAGS } from '@utils';
+import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from '@utils';
 
 
 export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
@@ -13,12 +13,12 @@ export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentComp
 export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact {
   let flags = 0;
   if (compilerMeta.encapsulation === 'shadow') {
-    flags |= CMP_FLAG.shadowDomEncapsulation;
+    flags |= CMP_FLAGS.shadowDomEncapsulation;
   } else if (compilerMeta.encapsulation === 'scoped') {
-    flags |= CMP_FLAG.scopedCssEncapsulation;
+    flags |= CMP_FLAGS.scopedCssEncapsulation;
   }
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
-    flags |= CMP_FLAG.hasSlotRelocation;
+    flags |= CMP_FLAGS.hasSlotRelocation;
   }
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);

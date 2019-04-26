@@ -86,7 +86,10 @@ export const getContext = (_ref: d.RuntimeRef, context: string) => {
   return (Context as any)[context];
 };
 
-export const plt: d.PlatformRuntime = {};
+export const plt: d.PlatformRuntime = {
+  $flags$: 0,
+  $resourcesUrl$: '/',
+};
 
 export const supportsShadowDom = false;
 

@@ -62,30 +62,11 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     }
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
-
     Cstr.isProxied = false;
 
     proxyComponentLifeCycles(platform, Cstr);
 
-    const cmpBuild = getBuildFeatures([Cstr.COMPILER_META]) as any;
-
-    Object.keys(cmpBuild).forEach(key => {
-      if ((cmpBuild as any)[key] === true) {
-        (bc.BUILD as any)[key] = true;
-      }
-    });
-
-    if (opts.hydrateClientSide) {
-      bc.BUILD.hydrateClientSide = true;
-      bc.BUILD.hydrateServerSide = false;
-
-    } else if (opts.hydrateServerSide) {
-      bc.BUILD.hydrateServerSide = true;
-      bc.BUILD.hydrateClientSide = false;
-    }
-
     const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
-
     const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
 
     platform.registerModule(bundleId, Cstr);
@@ -98,6 +79,24 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 
     return lazyBundleRuntimeMeta;
   });
+
+  const cmpBuild = getBuildFeatures(
+    opts.components.map(Cstr => Cstr.COMPILER_META)
+  ) as any;
+  Object.keys(cmpBuild).forEach(key => {
+    if ((cmpBuild as any)[key] === true) {
+      (bc.BUILD as any)[key] = true;
+    }
+  });
+
+  if (opts.hydrateClientSide) {
+    bc.BUILD.hydrateClientSide = true;
+    bc.BUILD.hydrateServerSide = false;
+
+  } else if (opts.hydrateServerSide) {
+    bc.BUILD.hydrateServerSide = true;
+    bc.BUILD.hydrateClientSide = false;
+  }
 
   (page as any).flush = () => {
     console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);

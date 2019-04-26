@@ -2,14 +2,14 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
-import { HOST_STATE } from '@utils';
+import { HOST_FLAGS, PLATFORM_FLAGS } from '@utils';
 import { HYDRATED_CLASS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
-    hostRef.$stateFlags$ |= HOST_STATE.isQueuedForUpdate;
+    hostRef.$stateFlags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
   const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
   try {
@@ -39,17 +39,17 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, hostRef, cmpMeta, true, instance));
+    writeTask(() => updateComponent(elm, hostRef, cmpMeta, isInitialLoad, instance));
   } else {
     // syncronuously write DOM
-    updateComponent(elm, hostRef, cmpMeta, true, instance);
+    updateComponent(elm, hostRef, cmpMeta, isInitialLoad, instance);
   }
 };
 
 const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean, instance: any) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$stateFlags$ &= ~HOST_STATE.isQueuedForUpdate;
+    hostRef.$stateFlags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.lifecycle) {
@@ -66,7 +66,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
-      hostRef.$stateFlags$ |= HOST_STATE.isActiveRender;
+      hostRef.$stateFlags$ |= HOST_FLAGS.isActiveRender;
 
       try {
         // looks like we've got child nodes to render into this host element
@@ -81,13 +81,13 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       } catch (e) {
         consoleError(e);
       }
-      hostRef.$stateFlags$ &= ~HOST_STATE.isActiveRender;
+      hostRef.$stateFlags$ &= ~HOST_FLAGS.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
-    if (cssVarShim) {
-      cssVarShim.updateHost(elm);
-    }
+  }
+  if (cssVarShim) {
+    cssVarShim.updateHost(elm);
   }
 
   if (BUILD.hydrateServerSide) {
@@ -105,7 +105,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     elm['s-lr'] = true;
   }
   if (BUILD.updatable || BUILD.lazyLoad || BUILD.hydrateServerSide) {
-    hostRef.$stateFlags$ |= HOST_STATE.hasRendered;
+    hostRef.$stateFlags$ |= HOST_FLAGS.hasRendered;
   }
 
   if (BUILD.lifecycle && elm['s-rc'] !== undefined) {
@@ -130,8 +130,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     }
     emitLifecycleEvent(elm, 'componentDidRender');
 
-    if (!(hostRef.$stateFlags$ & HOST_STATE.hasLoadedComponent)) {
-      hostRef.$stateFlags$ |= HOST_STATE.hasLoadedComponent;
+    if (!(hostRef.$stateFlags$ & HOST_FLAGS.hasLoadedComponent)) {
+      hostRef.$stateFlags$ |= HOST_FLAGS.hasLoadedComponent;
 
       if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.style) {
         // DOM WRITE!
@@ -155,7 +155,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         doc.documentElement.classList.add(HYDRATED_CLASS);
 
         if (!BUILD.hydrateServerSide) {
-          setTimeout(() => plt.$queueAsync$ = true, 999);
+          setTimeout(() => plt.$flags$ |= PLATFORM_FLAGS.queueAsync, 999);
         }
 
         emitLifecycleEvent(elm, 'appload');

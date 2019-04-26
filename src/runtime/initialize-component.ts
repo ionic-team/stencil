@@ -1,18 +1,19 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, loadModule } from '@platform';
-import { CMP_FLAG, HOST_STATE } from '@utils';
+import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
+import { fireConnectedCallback } from './connected-callback';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_STATE.hasInitializedComponent)) {
+  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_FLAGS.hasInitializedComponent)) {
     // we haven't initialized this element yet
-    hostRef.$stateFlags$ |= HOST_STATE.hasInitializedComponent;
+    hostRef.$stateFlags$ |= HOST_FLAGS.hasInitializedComponent;
 
     if (BUILD.mode && hostRef.$modeName$ == null) {
       // initializeComponent
@@ -47,7 +48,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
         if (BUILD.member) {
-          hostRef.$stateFlags$ |= HOST_STATE.isConstructingInstance;
+          hostRef.$stateFlags$ |= HOST_FLAGS.isConstructingInstance;
         }
         // construct the lazy-loaded component implementation
         // passing the hostRef is very important during
@@ -56,8 +57,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         new (Cstr as any)(hostRef);
 
         if (BUILD.member) {
-          hostRef.$stateFlags$ &= ~HOST_STATE.isConstructingInstance;
+          hostRef.$stateFlags$ &= ~HOST_FLAGS.isConstructingInstance;
         }
+        fireConnectedCallback(hostRef.$lazyInstance$);
 
       } catch (e) {
         consoleError(e);
@@ -71,7 +73,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
       let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
-      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.needsShadowDomShim) {
+      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
       registerStyle(scopeId, style);
@@ -93,9 +95,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     );
 
   } else {
-    if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.connectedCallback && hostRef.$lazyInstance$.connectedCallback) {
-      hostRef.$lazyInstance$.connectedCallback();
-    }
     scheduleUpdate(elm, hostRef, cmpMeta, true);
   }
 };

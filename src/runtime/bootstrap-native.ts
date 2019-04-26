@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { getHostRef, postUpdateComponent, supportsShadowDom } from '@platform';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAG } from '@utils';
+import { CMP_FLAGS } from '@utils';
 import { scheduleUpdate } from './update-component';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
@@ -26,8 +26,8 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
   }
-  if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation && !supportsShadowDom) {
-    cmpMeta.$flags$ |= CMP_FLAG.needsShadowDomShim;
+  if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && !supportsShadowDom) {
+    cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
 
   Object.assign(Cstr.prototype, {

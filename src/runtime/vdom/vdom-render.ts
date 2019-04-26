@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAG, SVG_NS, isDef, toLowerCase } from '@utils';
+import { CMP_FLAGS, SVG_NS, isDef, toLowerCase, PLATFORM_FLAGS } from '@utils';
 import { doc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
 import { NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
@@ -127,7 +127,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
         // we've got an old slot vnode and the wrapper is being replaced
         // so let's move the old slot content back to it's original location
-        putBackInOriginalLocation(oldParentVNode.$elm$);
+        putBackInOriginalLocation(oldParentVNode.$elm$, false);
       }
     }
   }
@@ -135,17 +135,17 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
   return newVNode.$elm$;
 };
 
-const putBackInOriginalLocation = (parentElm: Node, recursive?: boolean, i?: number, childNode?: d.RenderNode) => {
-  plt.$isTmpDisconnected$ = true;
+const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
+  plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
   const oldSlotChildNodes = parentElm.childNodes;
-  for (i = oldSlotChildNodes.length - 1; i >= 0; i--) {
-    childNode = oldSlotChildNodes[i] as any;
+  for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
+    const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
 
-      // this child node in the old element is from another component
-      // remove this node from the old slot's parent
-      childNode.remove();
+      // // this child node in the old element is from another component
+      // // remove this node from the old slot's parent
+      // childNode.remove();
 
       // and relocate it back to it's original location
       parentReferenceNode(childNode).insertBefore(childNode, referenceNode(childNode));
@@ -164,7 +164,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive?: boolean, i?: num
     }
   }
 
-  plt.$isTmpDisconnected$ = false;
+  plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
 const addVnodes = (
@@ -262,7 +262,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
     } else if (isSameVnode(oldStartVnode, newEndVnode)) {
       // Vnode moved right
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
-        putBackInOriginalLocation(oldStartVnode.$elm$.parentNode);
+        putBackInOriginalLocation(oldStartVnode.$elm$.parentNode, false);
       }
       patch(oldStartVnode, newEndVnode);
       parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
@@ -272,7 +272,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
     } else if (isSameVnode(oldEndVnode, newStartVnode)) {
       // Vnode moved left
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
-        putBackInOriginalLocation(oldEndVnode.$elm$.parentNode);
+        putBackInOriginalLocation(oldEndVnode.$elm$.parentNode, false);
       }
       patch(oldEndVnode, newStartVnode);
       parentElm.insertBefore(oldEndVnode.$elm$, oldStartVnode.$elm$);
@@ -592,7 +592,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = !!(supportsShadowDom && cmpMeta.$flags$ & CMP_FLAG.shadowDomEncapsulation);
+    useNativeShadowDom = !!(supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation);
     scopeId = hostElm['s-sc'];
 
     // always reset
@@ -626,7 +626,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
       // while we're moving nodes around existing nodes, temporarily disable
       // the disconnectCallback from working
-      plt.$isTmpDisconnected$ = true;
+      plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
       for (let i = 0; i < relocateNodes.length; i++) {
         const relocateNode = relocateNodes[i];
@@ -661,9 +661,6 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
           // has a different next sibling or parent relocated
 
           if (relocateNode.nodeToRelocate !== insertBeforeNode) {
-            // remove the node from the dom
-            relocateNode.nodeToRelocate.remove();
-
             // add it back to the dom but in its new home
             parentNodeRef.insertBefore(relocateNode.nodeToRelocate, insertBeforeNode);
           }
@@ -672,7 +669,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
       // done moving nodes around
       // allow the disconnect callback to work again
-      plt.$isTmpDisconnected$ = false;
+      plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
     }
 
     if (checkSlotFallbackVisibility) {

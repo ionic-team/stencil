@@ -6,13 +6,13 @@ export const win = window;
 
 export const doc = document;
 
-export const plt: d.PlatformRuntime = {};
+export const plt: d.PlatformRuntime = {
+  $flags$: 0,
+  $resourcesUrl$: '/'
+};
 
 if (BUILD.taskQueue) {
   plt.$resourcesUrl$ = '/';
-  plt.$queueCongestion$ = 0;
-  plt.$queuePending$ = false;
-  plt.$queueAsync$ = false;
 }
 
 export const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;

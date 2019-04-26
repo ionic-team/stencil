@@ -35,7 +35,7 @@ export const enum LISTENER_FLAGS {
   TargetBody = 1 << 5,
 }
 
-export const enum HOST_STATE {
+export const enum HOST_FLAGS {
   hasConnected = 1 << 0,
   hasRendered = 1 << 1,
   isActiveRender = 1 << 2,
@@ -48,13 +48,18 @@ export const enum HOST_STATE {
   hasLoadedComponent = 1 << 9,
 }
 
-export const enum CMP_FLAG {
+export const enum CMP_FLAGS {
   shadowDomEncapsulation = 1 << 0,
   scopedCssEncapsulation = 1 << 1,
   hasSlotRelocation = 1 << 2,
 
   needsShadowDomShim = 1 << 3,
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
+}
+
+export const enum PLATFORM_FLAGS {
+  isTmpDisconnected = 1 << 0,
+  queueAsync = 1 << 1,
 }
 
 /**

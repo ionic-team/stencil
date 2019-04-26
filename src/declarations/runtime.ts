@@ -97,12 +97,9 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  $resourcesUrl$?: string;
-  $isTmpDisconnected$?: boolean;
+  $flags$: number;
+  $resourcesUrl$: string;
   $orgLocNodes$?: Map<string, d.RenderNode>;
-  $queueAsync$?: boolean;
-  $queueCongestion$?: number;
-  $queuePending$?: boolean;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

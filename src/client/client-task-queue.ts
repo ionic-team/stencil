@@ -1,19 +1,22 @@
 import * as d from '../declarations';
 import { consoleError } from './client-log';
 import { plt } from './client-window';
+import { PLATFORM_FLAGS } from '@utils';
 
+
+let queueCongestion = 0;
+let queuePending = false;
 
 const queueDomReads: d.RafCallback[] = [];
 const queueDomWrites: d.RafCallback[] = [];
 const queueDomWritesLow: d.RafCallback[] = [];
 
-
 const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
   // queue dom reads
   queue.push(cb);
 
-  if (!plt.$queuePending$) {
-    plt.$queuePending$ = true;
+  if (!queuePending) {
+    queuePending = true;
 
     requestAnimationFrame(flush);
   }
@@ -34,7 +37,7 @@ const consume = (queue: d.RafCallback[]) => {
 
 const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
   let i = 0;
-  let ts: number;
+  let ts = 0;
   while (i < queue.length && (ts = performance.now()) < timeout) {
     try {
       queue[i++](ts);
@@ -51,7 +54,7 @@ const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
 
 
 const flush = () => {
-  plt.$queueCongestion$++;
+  queueCongestion++;
 
   // always force a bunch of medium callbacks to run, but still have
   // a throttle on how many can run in a certain time
@@ -59,8 +62,8 @@ const flush = () => {
   // DOM READS!!!
   consume(queueDomReads);
 
-  const timeout = plt.$queueAsync$
-    ? performance.now() + (7 * Math.ceil(plt.$queueCongestion$ * (1.0 / 22.0)))
+  const timeout = plt.$flags$ & PLATFORM_FLAGS.queueAsync
+    ? performance.now() + (7 * Math.ceil(queueCongestion * (1.0 / 22.0)))
     : Infinity;
 
   // DOM WRITES!!!
@@ -72,13 +75,14 @@ const flush = () => {
     queueDomWrites.length = 0;
   }
 
-  if (plt.$queuePending$ = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
+  if (queuePending = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
     requestAnimationFrame(flush);
 
+
   } else {
-    plt.$queueCongestion$ = 0;
+    queueCongestion = 0;
   }
 };
 

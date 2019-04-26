@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAG } from '@utils';
+import { CMP_FLAGS } from '@utils';
 import { cssVarShim, doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 
@@ -64,9 +64,8 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
             styleElm.setAttribute(HYDRATE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(
+          styleContainerNode.appendChild(
             styleElm,
-            styleContainerNode.querySelector('link')
           );
         }
 
@@ -90,7 +89,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     ? elm.shadowRoot
     : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
 
-  if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAG.needsScopedEncapsulation) {
+  if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -101,7 +100,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     elm['s-sc'] = styleId;
     elm.classList.add(styleId + '-h');
 
-    if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAG.scopedCssEncapsulation) {
+    if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
       elm.classList.add(styleId + '-s');
     }
   }

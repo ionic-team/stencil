@@ -50,7 +50,7 @@ export class CustomStyle {
       throw new Error('host style already created');
     }
     const baseScope = this.registerHostTemplate(cssText, cssScopeId);
-    const isDynamicScoped = baseScope.isDynamic && baseScope.cssScopeId;
+    const isDynamicScoped = !!(baseScope.isDynamic && baseScope.cssScopeId);
     const needStyleEl = isDynamicScoped || !baseScope.styleEl;
     const styleEl = this.doc.createElement('style');
 
@@ -59,7 +59,7 @@ export class CustomStyle {
     } else {
       if (isDynamicScoped) {
         cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
-
+        styleEl.innerHTML = '/*needs update*/';
         this.hostStyleMap.set(hostEl, styleEl);
         this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
         this.count++;
