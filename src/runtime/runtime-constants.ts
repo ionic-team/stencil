@@ -5,6 +5,11 @@ export const enum VNODE_FLAGS {
   isHost = 1 << 2,
 }
 
+export const enum PLATFORM_FLAGS {
+  isTmpDisconnected = 1 << 0,
+  queueAsync = 1 << 1,
+}
+
 export const enum NODE_TYPE {
   ElementNode = 1,
   TextNode = 3,

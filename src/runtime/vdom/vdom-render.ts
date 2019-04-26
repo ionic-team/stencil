@@ -8,10 +8,10 @@
  */
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAGS, SVG_NS, isDef, toLowerCase, PLATFORM_FLAGS } from '@utils';
+import { CMP_FLAGS, SVG_NS, isDef, toLowerCase } from '@utils';
 import { doc, plt, supportsShadowDom } from '@platform';
 import { Host, h } from './h';
-import { NODE_TYPE, VNODE_FLAGS } from '../runtime-constants';
+import { NODE_TYPE, VNODE_FLAGS, PLATFORM_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
 
 

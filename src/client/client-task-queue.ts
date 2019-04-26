@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { consoleError } from './client-log';
 import { plt } from './client-window';
-import { PLATFORM_FLAGS } from '@utils';
+import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
 
 
 let queueCongestion = 0;

@@ -2,9 +2,9 @@ import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS, PLATFORM_FLAGS } from '@utils';
+import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
 import { doc, getHostRef, plt, supportsShadowDom, tick } from '@platform';
-import { HYDRATE_ID } from './runtime-constants';
+import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
 

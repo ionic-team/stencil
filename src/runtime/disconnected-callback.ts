@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { consoleError, cssVarShim, getHostRef, plt } from '@platform';
-import { PLATFORM_FLAGS } from '@utils';
+import { PLATFORM_FLAGS } from './runtime-constants';
 
 
 export const disconnectedCallback = (elm: d.HostElement) => {

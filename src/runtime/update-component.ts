@@ -2,8 +2,8 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
-import { HOST_FLAGS, PLATFORM_FLAGS } from '@utils';
-import { HYDRATED_CLASS } from './runtime-constants';
+import { HOST_FLAGS } from '@utils';
+import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 

@@ -57,11 +57,6 @@ export const enum CMP_FLAGS {
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 
-export const enum PLATFORM_FLAGS {
-  isTmpDisconnected = 1 << 0,
-  queueAsync = 1 << 1,
-}
-
 /**
  * Default style mode id
  */

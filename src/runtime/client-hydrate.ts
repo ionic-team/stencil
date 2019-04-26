@@ -16,7 +16,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   };
 
   if (!plt.$orgLocNodes$) {
-    initializeDocumentHydrate(doc.body, plt.$orgLocNodes$);
+    initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
   }
 
   hostElm[HYDRATE_ID] = hostId;
