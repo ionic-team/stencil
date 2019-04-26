@@ -9,6 +9,7 @@
   },
   "files": [
     "bin/",
+    "build-conditionals/",
     "compiler/",
     "dist/",
     "hydrate/",
@@ -17,7 +18,6 @@
     "polyfills/",
     "runtime/",
     "screenshot/",
-    "build-conditionals/",
     "sys/",
     "testing/"
   ],
@@ -47,7 +47,8 @@
     "test.dist": "node scripts/test-dist.js",
     "test.end-to-end": "cd test/end-to-end && npm test",
     "test.jest": "jest",
-    "test.karma": "cd test/karma && npm run karma.prod",
+    "test.karma": "cd test/karma && npm run karma",
+    "test.karma.prod": "cd test/karma && npm run karma.prod",
     "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.server && npm run test.sys.node && npm run test.testing",
     "test.sys.node": "cd test/sys/node && npm run test.prod",
     "test.testing": "node scripts/test-testing.js",

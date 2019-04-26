@@ -98,6 +98,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "End-To-End Test",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "test",
+        "--e2e",
+        "--config",
+        "${workspaceFolder}/test/end-to-end/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Conference App",
       "args": [
         "${workspaceFolder}/bin/stencil",

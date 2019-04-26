@@ -8,7 +8,7 @@
   "scripts": {
     "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
-    "test": "node ../../bin/stencil test --e2e --spec",
+    "test": "node ../../bin/stencil test --e2e --spec --screenshot",
     "test.e2e": "node ../../bin/stencil test --e2e --debug",
     "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot",
     "test.spec": "node ../../bin/stencil test --spec --debug",

@@ -11,19 +11,14 @@ export class DomReattach {
 
   componentWillLoad() {
     this.willLoad++;
-    console.log('componentWillLoad', this.willLoad);
-
   }
 
   componentDidLoad() {
     this.didLoad++;
-    console.log('componentDidLoad', this.didLoad);
-
   }
 
   componentDidUnload() {
     this.didUnload++;
-    console.log('componentDidUnload', this.didUnload);
   }
 
   render() {

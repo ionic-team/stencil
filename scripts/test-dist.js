@@ -1,13 +1,13 @@
-var path = require('path');
-var fs = require('fs');
+const path = require('path');
+const fs = require('fs');
 
 
 // used to double-triple check all the packages
 // are good to go before publishing
 
 function testPackage(testPkg) {
-  var pkgDir = path.dirname(testPkg.packageJson);
-  var pkgJson = require(testPkg.packageJson);
+  const pkgDir = path.dirname(testPkg.packageJson);
+  const pkgJson = require(testPkg.packageJson);
 
   if (!pkgJson.name) {
     throw new Error('missing package.json name: ' + testPkg.packageJson);
@@ -17,8 +17,8 @@ function testPackage(testPkg) {
     throw new Error('missing package.json main: ' + testPkg.packageJson);
   }
 
-  var pkgPath = path.join(pkgDir, pkgJson.main);
-  var pkgImport = require(pkgPath);
+  const pkgPath = path.join(pkgDir, pkgJson.main);
+  const pkgImport = require(pkgPath);
 
   if (testPkg.files) {
     if (!Array.isArray(pkgJson.files)) {
@@ -29,22 +29,24 @@ function testPackage(testPkg) {
         throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
       }
 
-      var filePath = path.join(__dirname, pkgDir, testPkgFile);
+      const filePath = path.join(__dirname, pkgDir, testPkgFile);
       fs.accessSync(filePath);
     });
   }
 
   if (pkgJson.types) {
-    var pkgTypes = path.join(__dirname, pkgDir, pkgJson.types);
+    const pkgTypes = path.join(__dirname, pkgDir, pkgJson.types);
     fs.accessSync(pkgTypes)
   }
 
-  testPkg.exports.forEach(exportName => {
-    var m = pkgImport[exportName];
-    if (!m) {
-      throw new Error('export "' + exportName + '" not found in: ' + testPkg.packageJson);
-    }
-  });
+  if (testPkg.exports) {
+    testPkg.exports.forEach(exportName => {
+      const m = pkgImport[exportName];
+      if (!m) {
+        throw new Error('export "' + exportName + '" not found in: ' + testPkg.packageJson);
+      }
+    });
+  }
 }
 
 
@@ -56,17 +58,18 @@ function testPackage(testPkg) {
     ]
   },
   {
+    packageJson: '../hydrate/package.json',
+    exports: []
+  },
+  {
     packageJson: '../mock-doc/package.json',
     exports: [
-      'applyWindowToGlobal',
       'MockComment',
-      'mockDocument',
       'MockDocument',
       'MockElement',
       'MockElement',
       'MockNode',
       'MockTextNode',
-      'mockWindow',
       'MockWindow',
       'parseHtmlToDocument',
       'parseHtmlToFragment',
@@ -86,23 +89,13 @@ function testPackage(testPkg) {
     ]
   },
   {
-    packageJson: '../server/package.json',
-    exports: [
-      'h',
-      'ssrMiddleware',
-      'ssrPathRegex',
-      'loadConfig',
-      'Renderer'
-    ]
-  },
-  {
     packageJson: '../testing/package.json',
     exports: [
       'createJestPuppeteerEnvironment',
-      'h',
       'jestPreprocessor',
       'jestSetupTestFramework',
       'newE2EPage',
+      'newSpecPage',
       'Testing',
       'transpile'
     ]
@@ -120,9 +113,9 @@ function testPackage(testPkg) {
       "bin/",
       "dist/",
       "compiler/",
+      "hydrate/",
       "mock-doc/",
       "screenshot/",
-      "server/",
       "sys/",
       "testing/"
     ],

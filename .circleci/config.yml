@@ -1,113 +1,103 @@
-# version: 2
+version: 2
 
-# aliases:
-#   - &install-browserstack
-#       name: Install BrowserStack
-#       command: |
-#         wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip" &&
-#         unzip BrowserStackLocal-linux-x64.zip
+aliases:
+  - &install-browserstack
+      name: Install BrowserStack
+      command: |
+        wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip" &&
+        unzip BrowserStackLocal-linux-x64.zip
 
-#   - &run-browserstack
-#       name: Run BrowserStack
-#       command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
+  - &run-browserstack
+      name: Run BrowserStack
+      command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
 
-#   - &restore-cache-deps
-#       key: dependency-cache-{{ checksum "package.json" }}-2
+  - &restore-cache-deps
+      key: dependency-cache-{{ checksum "package.json" }}-3
 
-#   - &save-cache-deps
-#       key: dependency-cache-{{ checksum "package.json" }}-2
-#       paths:
-#         - node_modules
+  - &save-cache-deps
+      key: dependency-cache-{{ checksum "package.json" }}-3
+      paths:
+        - node_modules
 
-# defaults: &defaults
-#   working_directory: ~/stencil
-#   docker:
-#     - image: circleci/node:latest-browsers
+defaults: &defaults
+  working_directory: ~/stencil
+  docker:
+    - image: circleci/node:latest-browsers
 
-# jobs:
-#   build:
-#     <<: *defaults
-#     steps:
-#       - checkout
-#       - restore_cache: *restore-cache-deps
-#       - run: npm install npm@latest
-#       - run: npm install
-#       - save_cache: *save-cache-deps
-#       - run: npm run build
-#       - persist_to_workspace:
-#           root: ~/stencil
-#           paths:
-#             - "*"
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-deps
+      - run: npm install npm@latest
+      - run: npm install
+      - save_cache: *save-cache-deps
+      - run: npm run build
+      - persist_to_workspace:
+          root: ~/stencil
+          paths:
+            - "*"
 
-#   test_dist:
-#     <<: *defaults
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: npm run test.dist && npm run test.testing
+  test_dist:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: npm run test.dist && npm run test.testing
 
-#   test_example:
-#     <<: *defaults
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: npm run test.example -- --ci --debug --maxWorkers=4
+  test_end_to_end:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: npm run test.end-to-end -- --ci --debug --maxWorkers=4
 
-#   test_jest:
-#     <<: *defaults
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: npm run test.jest -- --maxWorkers=4
+  test_jest:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: npm run test.jest -- --maxWorkers=4
 
-#   test_server:
-#     <<: *defaults
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: npm run test.server
+  test_sys_node:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: npm run test.sys.node
 
-#   test_sys_node:
-#     <<: *defaults
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: npm run test.sys.node
+  test_karma:
+    <<: *defaults
+    working_directory: ~/stencil/test/karma
+    steps:
+      - attach_workspace:
+          at: ~/stencil
+      - run: *install-browserstack
+      - run: *run-browserstack
+      - restore_cache: *restore-cache-deps # works because of working_directory
+      - run: npm install npm@latest
+      - run: npm install
+      - save_cache: *save-cache-deps # works because of working_directory
+      - run: npm run test.karma.prod
 
-#   test_karma:
-#     <<: *defaults
-#     working_directory: ~/stencil/test/karma
-#     steps:
-#       - attach_workspace:
-#           at: ~/stencil
-#       - run: *install-browserstack
-#       - run: *run-browserstack
-#       - restore_cache: *restore-cache-deps # works because of working_directory
-#       - run: npm install npm@latest
-#       - run: npm install
-#       - save_cache: *save-cache-deps # works because of working_directory
-#       - run: npm run karma.prod
-
-# workflows:
-#   version: 2
-#   build:
-#     jobs:
-#       - build
-#       - test_dist:
-#           requires:
-#             - build
-#       - test_example:
-#           requires:
-#             - build
-#       - test_jest:
-#           requires:
-#             - build
-#       - test_server:
-#           requires:
-#             - build
-#       - test_sys_node:
-#           requires:
-#             - build
-#       - test_karma:
-#           requires:
-#             - build
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - test_karma:
+          requires:
+            - build
+      - test_jest:
+          requires:
+            - build
+      - test_end_to_end:
+          requires:
+            - build
+      - test_sys_node:
+          requires:
+            - build
+      - test_dist:
+          requires:
+            - build

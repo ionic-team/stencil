@@ -146,7 +146,7 @@ describe('test/sys/node', () => {
     const slotScopeAttr = `sc-ion-tag-s`;
 
     return sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr).then(scopeCss => {
-      expect(scopeCss).toBe(`.sc-ion-tag-s > * {}`);
+      expect(scopeCss).toBe(`/*!@::slotted(*)*/.sc-ion-tag-s > * {}`);
     });
   });
 

@@ -115,7 +115,7 @@ async function createPublicJavaScriptExports() {
   const entryPath = path.join(DST_DIR, 'index.js');
 
   await fs.writeFile(entryPath,
-    `export function h() {}`
+    `exports.h = function() {};`
   );
 }
 
