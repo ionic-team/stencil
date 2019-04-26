@@ -11,7 +11,7 @@ describe('dom-reattach', function() {
   afterEach(tearDownDom);
 
   it('should have proper values', async () => {
-
+    app;
   });
 
 });

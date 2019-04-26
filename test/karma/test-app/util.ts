@@ -143,7 +143,7 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function waitForChanges(timeout = 100) {
+export function waitForChanges(timeout = 150) {
   const win = window as any;
 
   return new Promise(resolve => {
