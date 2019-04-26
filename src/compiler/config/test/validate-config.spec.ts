@@ -104,7 +104,7 @@ describe('validation', () => {
 
     it('should default exclude glob', () => {
       validateConfig(config);
-      expect(config.excludeSrc).toEqual(['**/*.+(spec|e2e).*']);
+      expect(config.excludeSrc).toEqual(['/User/some/path/src/**/test/**']);
     });
 
   });

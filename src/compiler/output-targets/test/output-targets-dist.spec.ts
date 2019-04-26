@@ -59,8 +59,6 @@ describe('outputTarget, dist', () => {
 
       path.join(root, 'User', 'testing', 'dist', 'esm', 'index.esm.js'),
 
-      path.join(root, 'User', 'testing', 'dist', 'testapp.esm.js'),
-
       path.join(root, 'User', 'testing', 'dist', 'loader'),
 
       path.join(root, 'User', 'testing', 'dist', 'types'),
