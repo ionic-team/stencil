@@ -233,7 +233,7 @@ export const RESERVED_PROPERTIES: string[] = [
 
   /** CSS Vars Shim */
   'createHostStyle',
-  'customStyleShim',
+  '__stencil_cssshim',
   'initShim',
   'removeHost',
   'updateGlobal',

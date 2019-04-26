@@ -22,10 +22,12 @@ const INLINE_POLYFILLS = [
   'array.js',
   'object.js',
   'string.js',
+  'dom.js',
   'es5-html-element.js',
   'promise.js',
   'map.js',
   'fetch.js',
   'url.js',
   'system.js',
+  'css-shim.js'
 ];

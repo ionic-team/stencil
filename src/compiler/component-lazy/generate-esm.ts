@@ -12,7 +12,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir) : [];
   const esmOutputs = outputTargets.filter(o => !!o.esmDir);
-  const isProd = build.isDev && isBrowserBuild;
+  const isProd = !build.isDev && isBrowserBuild;
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'esm',
@@ -42,20 +42,10 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
 
 export function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) {
   const indexFilename = rollupResult.find(r => r.isIndex).fileName;
-  const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
 
   return Promise.all(
     outputTargets.map(async o => {
       if (o.esmDir) {
-        if (o.esmLoaderFile) {
-          const entryPointPath = config.buildEs5 && o.esmEs5Dir
-            ? config.sys.path.join(o.esmEs5Dir, loaderFilename)
-            : config.sys.path.join(o.esmDir, loaderFilename);
-
-          const relativePath = relativeImport(config, o.esmLoaderFile, entryPointPath);
-          const shortcutContent = `export * from '${relativePath}';`;
-          await compilerCtx.fs.writeFile(o.esmLoaderFile, shortcutContent);
-        }
         if (o.esmIndexFile) {
           const entryPointPath = config.buildEs5 && o.esmEs5Dir
             ? config.sys.path.join(o.esmEs5Dir, indexFilename)

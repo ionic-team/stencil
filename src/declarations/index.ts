@@ -4,6 +4,7 @@ export * from './build';
 export * from './build-conditionals';
 export * from './build-events';
 export * from './cache';
+export * from './css-var-shim';
 export * from './collection';
 export * from './collection-manifest';
 export * from './compiler';

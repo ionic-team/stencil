@@ -75,8 +75,7 @@ export function validateOutputTargetDist(config: d.Config) {
       copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: lazyDir,
-      systemLoaderFile: path.join(outputTarget.dir, namespace + '.js'),
-      esmLoaderFile: path.join(outputTarget.dir, namespace + '.esm.js'),
+      systemLoaderFile: path.join(lazyDir, namespace + '.js'),
       polyfills: true,
       isBrowserBuild: true,
     });

@@ -9,7 +9,7 @@ export const patchBrowser = async () => {
 
   if (!window.customElements) {
     // @ts-ignore
-    await import('./polyfills/dom.js');
+    await import('./polyfills/custom-elements.js');
   }
   return resourcesUrl.pathname;
 };
@@ -26,7 +26,7 @@ export const patchDynamicImport = (base: string) => {
       if (!mod) {
         const script = doc.createElement('script');
         script.type = 'module';
-        script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window[${importFunctionName}].m = m;`], { type: 'application/javascript' }))
+        script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], { type: 'application/javascript' }))
         mod = new Promise(resolve => {
           script.onload = () => {
             resolve((win as any)[importFunctionName].m);

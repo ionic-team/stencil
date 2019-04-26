@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAG } from '@utils';
-import { doc, styles, supportsConstructibleStylesheets } from '@platform';
+import { cssVarShim, doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID } from './runtime-constants';
 
 declare global {
@@ -13,56 +13,66 @@ declare global {
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
-export const registerStyle = (styleId: string, cssText: string) => {
-  let style = styles.get(styleId);
+export const registerStyle = (scopeId: string, cssText: string) => {
+  let style = styles.get(scopeId);
   if (supportsConstructibleStylesheets) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
     style.replace(cssText);
   } else {
     style = cssText;
   }
-  styles.set(styleId, style);
+  styles.set(scopeId, style);
 };
 
-export const addStyle = (styleContainerNode: any, tagName: string, mode: string, ) => {
-  let styleId = getScopeId(tagName, mode);
-  let style = styles.get(styleId);
+export const addStyle = (styleContainerNode: any, tagName: string, mode: string, hostElm?: HTMLElement) => {
+  let scopeId = getScopeId(tagName, mode);
+  let style = styles.get(scopeId);
 
   if (BUILD.mode && !style) {
-    styleId = getScopeId(tagName);
-    style = styles.get(styleId);
+    scopeId = getScopeId(tagName);
+    style = styles.get(scopeId);
   }
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerNode.head ? styleContainerNode.head : styleContainerNode;
+      styleContainerNode = styleContainerNode.head || styleContainerNode;
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
+      let styleElm;
       if (!appliedStyles) {
         rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
       }
-
-      if (!appliedStyles.has(styleId)) {
-        let styleElm;
+      if (!appliedStyles.has(scopeId)) {
         if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
+          // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
 
         } else {
-          const dataStyles = styleContainerNode.querySelectorAll('[data-styles],[charset]');
+          if (cssVarShim) {
+            styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style);
+            scopeId = (styleElm as any)['s-sc'];
+            // we don't want to add this styleID to the appliedStyles Set
+            // since the cssVarShim might need to apply several different
+            // stylesheets for the same component
+            appliedStyles = null;
 
-          styleElm = doc.createElement('style');
-          styleElm.innerHTML = style;
+          } else {
+            styleElm = doc.createElement('style');
+            styleElm.innerHTML = style;
+          }
 
           if (BUILD.hydrateServerSide) {
-            styleElm.setAttribute(HYDRATE_ID, styleId);
+            styleElm.setAttribute(HYDRATE_ID, scopeId);
           }
 
           styleContainerNode.insertBefore(
             styleElm,
-            (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild
+            styleContainerNode.querySelector('link')
           );
         }
 
-        appliedStyles.add(styleId);
+        if (appliedStyles) {
+          appliedStyles.add(scopeId);
+        }
       }
 
     } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
@@ -72,13 +82,13 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
       ];
     }
   }
-  return styleId;
+  return scopeId;
 };
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
-  const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot)
+  const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot && supportsShadowDom)
     ? elm.shadowRoot
-    : elm.getRootNode(), cmpMeta.$tagName$, mode);
+    : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
 
   if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAG.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)

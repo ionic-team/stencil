@@ -6,7 +6,7 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
 export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
-  if (config.devMode) {
+  if (!config.buildEs5) {
     return;
   }
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
@@ -59,6 +59,8 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
 
 // Load resource
-System.import(new URL('${corePath}', resourcesUrl).pathname);
+__stencil_cssshim.initShim().then(function() {
+  System.import(new URL('${corePath}', resourcesUrl).pathname);
+});
 `;
 }

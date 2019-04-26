@@ -80,6 +80,7 @@ export interface Build extends Partial<BuildFeatures> {
   lazyLoad?: boolean;
   profile?: boolean;
   slotRelocation?: boolean;
+  cssVarShim?: boolean;
 }
 
 export interface UserBuildConditionals {

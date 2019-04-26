@@ -116,9 +116,8 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   isBrowserBuild?: boolean;
 
   esmIndexFile?: string;
-  esmLoaderFile?: string;
-  systemLoaderFile?: string;
   cjsIndexFile?: string;
+  systemLoaderFile?: string;
 
   loaderDir?: string;
 

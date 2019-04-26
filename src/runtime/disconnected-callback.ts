@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, getHostRef } from '@platform';
+import { consoleError, cssVarShim, getHostRef } from '@platform';
 
 
 export const disconnectedCallback = (elm: d.HostElement) => {
@@ -11,6 +11,12 @@ export const disconnectedCallback = (elm: d.HostElement) => {
       hostRef.$rmListeners$ = undefined;
     }
   }
+
+  // clear CSS var-shim tracking
+  if (cssVarShim) {
+    cssVarShim.removeHost(elm);
+  }
+
   const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
   if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.disconnectedCallback && instance && instance.disconnectedCallback) {
     try {

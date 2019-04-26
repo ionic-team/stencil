@@ -37,9 +37,9 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     }
   });
 
-  const minify = terser.minify(transpile.outputText);
+  // const minify = terser.minify(transpile.outputText);
 
-  const cssShimOutput = minify.code;
+  const cssShimOutput = transpile.outputText;
 
   const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
   const mapPolyfill = await fs.readFile(mapPolyfillFilePath, 'utf8');

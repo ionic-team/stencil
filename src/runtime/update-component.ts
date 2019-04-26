@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, plt, writeTask } from '@platform';
+import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
 import { HOST_STATE } from '@utils';
 import { HYDRATED_CLASS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
@@ -84,6 +84,9 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       hostRef.$stateFlags$ &= ~HOST_STATE.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
+    }
+    if (cssVarShim) {
+      cssVarShim.updateHost(elm);
     }
   }
 
