@@ -15,11 +15,14 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     }
   };
 
+  const isDebug = (config.logLevel === 'debug');
+
   if (isCore) {
     opts.compress.passes = 4;
     opts.compress.pure_funcs = ['getHostRef'];
     opts.mangle.properties = {
       regex: '^\\$.+\\$$',
+      debug: isDebug
     };
     if (!isBrowserBuild) {
       opts.output.beautify = true;
@@ -49,12 +52,10 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     opts.compress.module = true;
   }
 
-  if (config.logLevel === 'debug') {
+  if (isDebug) {
     // if in debug mode, still mangle the property names
     // but at least make them readable of what the
     // properties originally were named
-    opts.mangle.properties = opts.mangle.properties || {};
-    opts.mangle.properties.debug = true;
     opts.mangle.keep_fnames = true;
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
