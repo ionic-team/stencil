@@ -22,7 +22,9 @@ export function loadRollupDiagnostics(_compilerCtx: d.CompilerCtx, buildCtx: d.B
     diagnostic.columnNumber = rollupError.loc.column;
   }
   if (typeof rollupError.frame === 'string') {
-    diagnostic.lines = (rollupError.frame as string).split('\n')
+    const sourceText = (rollupError.frame as string).replace(/\r/g, '\n');
+
+    diagnostic.lines = sourceText.split('\n')
       .map(line => {
         const errorLine: d.PrintLine = {
           lineIndex: 0,
