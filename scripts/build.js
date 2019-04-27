@@ -8,6 +8,7 @@ const { getBuildId, run } = require('./script-utils');
 
 const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const buildId = getBuildId();
+const isCI = process.argv.includes('--ci');
 
 const start = Date.now();
 
@@ -38,7 +39,7 @@ run(async () => {
   const tasks = scripts.map(script => {
     return {
       title: script[0],
-      task: () => {
+      task() {
         return new Promise((resolve, reject) => {
           const cmd = path.join(__dirname, script[1]);
           const args = [`--build-id=${buildId}`];
@@ -48,7 +49,7 @@ run(async () => {
           const cp = fork(cmd, args, opts);
 
           cp.stderr.on('data', data => {
-            errors.push(data);
+            errors.push(`\n${color.bold(color.red(script[0] + ' error:'))}\n\n${data}`);
           });
 
           cp.on('exit', code => {
@@ -58,25 +59,33 @@ run(async () => {
               resolve();
             }
           });
-
-        }).catch(() => {
-          throw new Error();
         });
       }
     };
   });
 
-  const listr = new Listr(tasks, {
-    concurrent: true,
-    exitOnError: true,
-    showSubtasks: false
-  });
+  try {
+    if (isCI) {
+      await Promise.all(tasks.map(async t => {
+        await t.task();
+        console.log(`${color.bold(color.green('✓'))} ${t.title}`);
+      }));
 
-  listr.run().then(() => {
-    console.log(color.dim(`\n  ${Date.now() - start}ms`) + (process.platform === 'win32' ? '' : '🎉') + '\n');
+    } else {
+      const listr = new Listr(tasks, {
+        concurrent: true,
+        exitOnError: true,
+        showSubtasks: false
+      });
 
-  }).catch(() => {
-    console.error('\n' + errors.join('\n'));
-  });
+      await listr.run();
 
+      console.log(color.dim(`\n  ${Date.now() - start}ms`) + (process.platform === 'win32' ? '' : ' 🎉') + '\n');
+    }
+
+  } catch (e) {
+    errors.forEach(err => {
+      console.error(err);
+    });
+  }
 });
