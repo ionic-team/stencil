@@ -12,10 +12,10 @@ aliases:
       command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
 
   - &restore-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}-2
+      key: dependency-cache-{{ checksum "package.json" }}-3
 
   - &save-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}-2
+      key: dependency-cache-{{ checksum "package.json" }}-3
       paths:
         - node_modules
 
