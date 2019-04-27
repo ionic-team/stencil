@@ -11,6 +11,10 @@ export const config = {
     {
       type: 'www',
       empty: false
+    },
+    {
+      type: 'dist',
+      dir: 'test-dist'
     }
   ],
   copy: [
