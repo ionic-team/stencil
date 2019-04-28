@@ -147,8 +147,8 @@ function runTasks(opts) {
         task: () => execa('npm', ['run', 'test.karma'], { cwd: rootDir })
       },
       {
-        title: 'Run server tests',
-        task: () => execa('npm', ['run', 'test.server'], { cwd: rootDir })
+        title: 'Run hydrate tests',
+        task: () => execa('npm', ['run', 'test.hydrate'], { cwd: rootDir })
       },
       {
         title: 'Run sys/node tests',
