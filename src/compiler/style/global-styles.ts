@@ -5,10 +5,18 @@ import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 
 export async function writeGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dest: string) {
-  if (buildCtx.globalStyle) {
-    const filePath = config.sys.path.join(dest, config.fsNamespace + '.css');
-    await compilerCtx.fs.writeFile(filePath, buildCtx.globalStyle);
+  if (!buildCtx.globalStyle) {
+    return undefined;
   }
+  const originalFilename = config.fsNamespace + '.css';
+  await compilerCtx.fs.writeFile(config.sys.path.join(dest, originalFilename), buildCtx.globalStyle);
+
+  if (config.hashFileNames) {
+    const hashedFilename = 'p-' + config.sys.generateContentHash(buildCtx.globalStyle, config.hashedFileNameLength) + '.css';
+    await compilerCtx.fs.writeFile(config.sys.path.join(dest, hashedFilename), buildCtx.globalStyle);
+    return hashedFilename;
+  }
+  return originalFilename;
 }
 
 export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string) {

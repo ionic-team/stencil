@@ -10,6 +10,7 @@ import { processCopyTasks } from '../copy/local-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { writeGlobalStyles } from '../style/global-styles';
+import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
@@ -62,11 +63,11 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // Copy global styles into the build directory
-  await writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
+  const globalStylesFilename = await writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
 
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
-    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
+    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, globalStylesFilename, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);
 }
@@ -91,7 +92,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
 }
 
-async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
+async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], globalStylesFilename: string, outputTarget: d.OutputTargetWww) {
   if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasIndexHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
@@ -104,6 +105,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+    updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
     optimizeCriticalPath(config, doc, criticalPath, outputTarget);
 
     await compilerCtx.fs.writeFile(outputTarget.indexHtml, config.sys.serializeNodeToHtml(doc));
