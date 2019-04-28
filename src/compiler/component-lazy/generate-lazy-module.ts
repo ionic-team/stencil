@@ -42,7 +42,7 @@ async function generateLazyEntryModule(
   sufix: string
 ): Promise<d.BundleModule> {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, false, false, isBrowserBuild, rollupResult.code);
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
   const outputs = await Promise.all(
     entryModule.modeNames.map(modeName =>
       writeLazyModule(config, compilerCtx, destinations, entryModule, shouldMinify, code, modeName, sufix)
