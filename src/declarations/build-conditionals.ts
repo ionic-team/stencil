@@ -81,6 +81,7 @@ export interface Build extends Partial<BuildFeatures> {
   profile?: boolean;
   slotRelocation?: boolean;
   cssVarShim?: boolean;
+  constructibleCSS?: boolean;
 }
 
 export interface UserBuildConditionals {

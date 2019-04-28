@@ -30,10 +30,10 @@ export const supportsListenerOptions = /*@__PURE__*/(() => {
 })();
 
 
-export const supportsConstructibleStylesheets = /*@__PURE__*/(() => {
+export const supportsConstructibleStylesheets = BUILD.constructibleCSS ? /*@__PURE__*/(() => {
   try {
     new CSSStyleSheet();
     return true;
   } catch (e) {}
   return false;
-})();
+})() : false;

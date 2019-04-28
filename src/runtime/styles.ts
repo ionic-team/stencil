@@ -74,7 +74,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
         }
       }
 
-    } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
+    } else if (BUILD.constructibleCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
       styleContainerNode.adoptedStyleSheets = [
         ...styleContainerNode.adoptedStyleSheets,
         style

@@ -75,6 +75,8 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.hydrateServerSide = false;
 
   updateBuildConditionals(config, build);
+  build.constructibleCSS = !build.isDev;
+
   return build;
 }
 
