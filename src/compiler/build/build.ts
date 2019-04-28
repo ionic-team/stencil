@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError, readPackageJson } from '@utils';
-import { createDocument } from '@mock-doc';
 import { emptyOutputTargetDirs } from './empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
@@ -41,7 +40,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
       if (hasIndex) {
         const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
-        buildCtx.indexDoc = createDocument(indexSrcHtml);
+        buildCtx.indexDoc = config.sys.createDocument(indexSrcHtml);
       }
     }
 

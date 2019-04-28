@@ -5,7 +5,6 @@ import { scopeCss } from '../../utils/shadow-css';
 import { loadMinifyJsDiagnostics } from '@utils';
 import { optimizeCssWorker } from './optimize-css-worker';
 import { prerenderWorker } from '../../compiler/prerender/prerender-worker';
-import { requestLatestCompilerVersion } from './check-version';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
@@ -42,10 +41,6 @@ export class NodeSystemWorker {
 
   prerenderUrl(prerenderRequest: d.PrerenderRequest) {
     return prerenderWorker(prerenderRequest);
-  }
-
-  requestLatestCompilerVersion() {
-    return requestLatestCompilerVersion();
   }
 
   scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean) {

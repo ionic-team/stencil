@@ -31,9 +31,6 @@
       "@hydrate": [
         "../hydrate/index.ts"
       ],
-      "@mock-doc": [
-        "../mock-doc/index.ts"
-      ],
       "@platform": [
         "../client/index.ts"
       ],

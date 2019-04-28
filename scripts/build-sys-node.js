@@ -112,8 +112,8 @@ async function bundleNodeSysMain() {
       'module',
       'path',
       'net',
-      'tty',
       'os',
+      'tty',
       'typescript',
       'url',
       'util',
@@ -127,6 +127,9 @@ async function bundleNodeSysMain() {
             }
             if (importee === 'graceful-fs') {
               return { id: './graceful-fs.js', external: true };
+            }
+            if (importee === '@mock-doc') {
+              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
             if (importee === '@sys') {
               return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');

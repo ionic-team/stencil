@@ -1,6 +1,8 @@
 import * as d from '../../declarations';
+import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import color from 'ansi-colors';
 import { FsWatcher } from './node-fs-watcher';
+import { getLatestCompilerVersion } from './check-version';
 import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
@@ -12,7 +14,6 @@ import { normalizePath } from '@utils';
 import open from 'open';
 import semver from 'semver';
 import { WorkerManager } from './worker/index';
-
 
 import { createHash } from 'crypto';
 import { cpus, platform, release, tmpdir } from 'os';
@@ -118,6 +119,10 @@ export class NodeSystem implements d.StencilSystem {
     this.destroys.push(fn);
   }
 
+  cloneDocument(doc: Document) {
+    return cloneDocument(doc);
+  }
+
   get compiler() {
     return {
       name: this.packageJsonData.name,
@@ -131,6 +136,10 @@ export class NodeSystem implements d.StencilSystem {
 
   async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
     return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
+  }
+
+  createDocument(html: string) {
+    return createDocument(html);
   }
 
   async createFsWatcher(config: d.Config, fs: d.FileSystem, events: d.BuildEvents) {
@@ -160,6 +169,10 @@ export class NodeSystem implements d.StencilSystem {
   getClientCoreFile(opts: any) {
     const filePath = normalizePath(path.join(this.distDir, 'client', opts.staticName));
     return this.fs.readFile(filePath);
+  }
+
+  getLatestCompilerVersion(logger: d.Logger, forceCheck: boolean) {
+    return getLatestCompilerVersion(this.storage, logger, forceCheck);
   }
 
   glob(pattern: string, opts: any) {
@@ -222,10 +235,6 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('prerenderUrl', [prerenderRequest]);
   }
 
-  requestLatestCompilerVersion() {
-    return this.sysWorker.run('requestLatestCompilerVersion');
-  }
-
   resolveModule(fromDir: string, moduleId: string, opts?: d.ResolveModuleOptions) {
     return this.nodeResolveModule.resolveModule(fromDir, moduleId, opts);
   }
@@ -240,6 +249,10 @@ export class NodeSystem implements d.StencilSystem {
 
   get color() {
     return color;
+  }
+
+  serializeNodeToHtml(elm: Element | Document) {
+    return serializeNodeToHtml(elm);
   }
 
   async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {

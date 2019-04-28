@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { getLatestCompilerVersion, validateCompilerVersion } from '@sys';
+import { validateCompilerVersion } from './task-version';
 import exit from 'exit';
 
 
@@ -21,7 +21,10 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     }
   }
 
-  const latestVersion = getLatestCompilerVersion(config.sys, config.logger);
+  let latestVersionPromise: Promise<string>;
+  if (config.devMode && config.watch) {
+    latestVersionPromise = config.sys.getLatestCompilerVersion(config.logger, false);
+  }
 
   let devServer: d.DevServer = null;
   if (devServerStart) {
@@ -55,7 +58,9 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     });
   }
 
-  await validateCompilerVersion(config.sys, config.logger, latestVersion);
+  if (latestVersionPromise != null) {
+    await validateCompilerVersion(config.sys, config.logger, latestVersionPromise);
+  }
 
   return results;
 }

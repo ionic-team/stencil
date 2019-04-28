@@ -21,7 +21,7 @@ async function bundleCompiler() {
   const rollupBuild = await rollup.rollup({
     input: INPUT_FILE,
     external: [
-      'typescript',
+      'typescript'
     ],
     plugins: [
       (() => {
@@ -29,9 +29,6 @@ async function bundleCompiler() {
           resolveId(id, importer) {
             if (id === '@build-conditionals') {
               return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
-            }
-            if (id === '@mock-doc') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
             if (id === '@sys') {
               return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');

@@ -13,12 +13,15 @@ export interface StencilSystem {
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
   color?: any;
+  cloneDocument?(doc: Document): Document;
   createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents): Promise<d.FsWatcher>;
+  createDocument?(html: string): Document;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
   fs?: d.FileSystem;
   generateContentHash?(content: string, length: number): string;
+  getLatestCompilerVersion?(logger: d.Logger, forceCheck: boolean): Promise<string>;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
@@ -37,11 +40,11 @@ export interface StencilSystem {
   optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
   path?: Path;
   prerenderUrl?: (prerenderRequest: d.PrerenderRequest) => Promise<d.PrerenderResults>;
-  requestLatestCompilerVersion?(): Promise<string>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
   semver?: Semver;
+  serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
   url?: {

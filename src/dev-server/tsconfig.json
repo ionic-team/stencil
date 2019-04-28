@@ -26,6 +26,9 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
+      "@mock-doc": [
+        "../mock-doc/index.ts"
+      ],
       "@sys": [
         "../sys/node/index.ts"
       ],
@@ -36,6 +39,7 @@
   },
   "files": [
     "./index.ts",
+    "../../types/css-what.d.ts",
     "../../types/rollup-plugin-commonjs.d.ts",
     "../../types/rollup-plugin-node-globals.d.ts",
     "../../types/rollup-plugin-node-resolve.d.ts"

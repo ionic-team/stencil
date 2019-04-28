@@ -1,16 +1,16 @@
-import { isOutputTargetWww } from './output-utils';
-import { processCopyTasks } from '../copy/local-copy-tasks';
-import { inlineEsmImport } from '../html/inline-esm-import';
-import { optimizeCriticalPath } from '../html/inject-module-preloads';
-import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
-import { cloneDocument, serializeNodeToHtml } from '@mock-doc';
 import * as d from '../../declarations';
 import { catchError, flatOne, normalizePath, unique } from '@utils';
-import { performCopyTasks } from '../copy/copy-tasks';
-import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
+import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { getUsedComponents } from '../html/used-components';
+import { inlineEsmImport } from '../html/inline-esm-import';
+import { isOutputTargetWww } from './output-utils';
+import { optimizeCriticalPath } from '../html/inject-module-preloads';
+import { processCopyTasks } from '../copy/local-copy-tasks';
+import { performCopyTasks } from '../copy/copy-tasks';
+import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { writeGlobalStyles } from '../style/global-styles';
+
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
@@ -99,14 +99,14 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   // get the source index html content
   try {
-    const doc = cloneDocument(buildCtx.indexDoc);
+    const doc = config.sys.cloneDocument(buildCtx.indexDoc);
 
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     await inlineEsmImport(config, compilerCtx, doc, outputTarget);
     optimizeCriticalPath(config, doc, criticalPath, outputTarget);
 
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, serializeNodeToHtml(doc));
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, config.sys.serializeNodeToHtml(doc));
 
     buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 
