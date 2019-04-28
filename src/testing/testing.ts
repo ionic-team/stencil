@@ -149,6 +149,7 @@ function setupTestingConfig(config: d.Config) {
   config.devMode = true;
   config.maxConcurrentWorkers = 1;
   config.validateTypes = false;
+  config._isTesting = true;
 
   config.flags = config.flags || {};
   config.flags.serve = false;

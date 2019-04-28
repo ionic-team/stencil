@@ -66,6 +66,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle);
+  b.constructibleCSS = !b.isDev || config._isTesting;
 }
 
 
