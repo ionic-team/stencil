@@ -77,7 +77,7 @@ export declare function getAssetPath(path: string): string;
 /**
  * getElement
  */
-export declare function getElement(ref: any): d.HostElement;
+export declare function getElement(ref: any): d.HTMLStencilElement;
 
 /**
  * writeTask
