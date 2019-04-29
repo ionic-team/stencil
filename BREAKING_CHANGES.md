@@ -95,6 +95,21 @@ render(): JSX.Element {
 }
 ```
 
+- `HTMLAttributes` might not be available as a global
+- `JSX`
+
+### Removed: Global `HTMLAttributes` was removed
+
+`HTMLAttributes` used to be exposed as a global interface, just like the `JSX` namespace, but that caused type conflicts when mixing different versions of stencil in the same project.
+
+Now `HTMLAttributes` is part of `JSXBase`, exposed in `@stencil/core`:
+
+```ts
+import { JSXBase } from '@stencil/core';
+
+JSXBase.HTMLAttributes
+
+```
 
 ### Removed: Global `HTMLStencilElement` was removed
 
