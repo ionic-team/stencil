@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { buildError } from '@utils';
+import { crawlDocument } from './crawl-document';
 import { finalizeWindow } from './window-finalize';
 import { generateHydrateResults, normalizeHydrateOptions, renderError } from './render-utils';
 import { getHydrateAppSandbox } from './run-in-context';
@@ -95,6 +96,8 @@ async function render(win: Window, doc: Document, opts: d.HydrateOptions, result
       resolve();
     }
   });
+
+  crawlDocument(doc, results);
 
   await finalizeWindow(win, doc, opts, results);
 }

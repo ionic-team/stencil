@@ -43,17 +43,18 @@ export function generateHydrateResults(opts: d.HydrateOptions) {
     url: opts.url,
     host: urlParse.host,
     hostname: urlParse.hostname,
+    href: urlParse.href,
     port: urlParse.port,
     pathname: urlParse.pathname,
     search: urlParse.search,
     hash: urlParse.hash,
     html: null,
     hydratedCount: 0,
-    anchors: opts.collectAnchors ? [] : null,
-    components: opts.collectComponents ? [] : null,
-    styles: opts.collectScripts ? [] : null,
-    scripts: opts.collectStylesheets ? [] : null,
-    imgs: opts.collectImgs ? [] : null,
+    anchors: [],
+    components: [],
+    imgs: [],
+    scripts: [],
+    styles: [],
     title: null
   };
 

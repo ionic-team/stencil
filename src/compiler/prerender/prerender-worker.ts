@@ -19,6 +19,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const base = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
     const originUrl = base.href;
     const win = getWindow(prerenderRequest.templateId, originUrl);
+    const doc = win.document;
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
@@ -28,7 +29,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.beforeHydrate(win.document, base);
+        const rtn = prerenderConfig.beforeHydrate(doc, base);
         if (rtn != null) {
           await rtn;
         }
@@ -38,8 +39,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: originUrl,
-      collectAnchors: true
+      url: originUrl
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
@@ -53,12 +53,12 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydrateResults = await hydrateApp.hydrateDocument(win.document, hydrateOpts) as d.HydrateResults;
+    const hydrateResults = await hydrateApp.hydrateDocument(doc, hydrateOpts) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.afterHydrate(win.document, base);
+        const rtn = prerenderConfig.afterHydrate(doc, base);
         if (rtn != null) {
           await rtn;
         }
@@ -67,7 +67,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       }
     }
 
-    const html = serializeNodeToHtml(win.document, {
+    const html = serializeNodeToHtml(doc, {
       collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
       pretty: hydrateOpts.prettyHtml
     });
@@ -76,7 +76,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {
-        const userWriteToFilePath = prerenderConfig.filePath(base);
+        const userWriteToFilePath = prerenderConfig.filePath(base, results.filePath);
         if (typeof userWriteToFilePath === 'string') {
           results.filePath = userWriteToFilePath;
         }
@@ -159,7 +159,7 @@ function getWindow(templateId: string, originUrl: string) {
 
 
 function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
-  if (!Array.isArray(parsedAnchors)) {
+  if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
   }
 

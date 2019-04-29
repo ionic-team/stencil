@@ -25,16 +25,17 @@ export interface HydrateResults {
   url?: string;
   host?: string;
   hostname?: string;
+  href?: string;
   port?: string;
   pathname?: string;
   search?: string;
   hash?: string;
   html?: string;
-  components?: HydrateComponent[];
-  anchors?: HydrateAnchorElement[];
-  styles?: HydrateStyleElement[];
-  scripts?: HydrateScriptElement[];
-  imgs?: HydrateImgElement[];
+  components: HydrateComponent[];
+  anchors: HydrateAnchorElement[];
+  styles: HydrateStyleElement[];
+  scripts: HydrateScriptElement[];
+  imgs: HydrateImgElement[];
   title: string;
   hydratedCount: number;
 }
@@ -98,11 +99,6 @@ export interface HydrateOptions {
   clientHydrateAnnotations?: boolean;
   collapseBooleanAttributes?: boolean;
   collapseWhitespace?: boolean;
-  collectAnchors?: boolean;
-  collectComponents?: boolean;
-  collectImgs?: boolean;
-  collectScripts?: boolean;
-  collectStylesheets?: boolean;
   cookie?: string;
   direction?: string;
   language?: string;
@@ -125,7 +121,7 @@ export interface HydrateConfig {
   entryUrls?: string[];
   filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;
   filterUrl?(url?: URL, base?: URL): boolean;
-  filePath?(url?: URL): string;
+  filePath?(url?: URL, filePath?: string): string;
   hydrateOptions?(url?: URL): HydrateOptions;
   normalizeUrl?(href?: string, base?: URL): URL;
   trailingSlash?: boolean;

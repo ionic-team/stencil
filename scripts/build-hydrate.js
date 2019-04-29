@@ -29,23 +29,23 @@ async function bundleHydrate() {
     plugins: [
       (() => {
         return {
-          resolveId(id, importer) {
-            if (id === '@build-conditionals') {
+          resolveId(importee, importer) {
+            if (importee === '@build-conditionals') {
               return '@stencil/core/build-conditionals';
             }
-            if (id === '@global-scripts') {
+            if (importee === '@global-scripts') {
               return '@stencil/core/global-scripts';
             }
-            if (id === '@mock-doc') {
+            if (importee === '@mock-doc') {
               return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
-            if (id === '@runtime') {
+            if (importee === '@runtime') {
               return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
             }
-            if (id === '@utils') {
+            if (importee === '@utils') {
               return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
-            if (id === '@platform') {
+            if (importee === '@platform') {
               return path.join(TRANSPILED_DIR, 'hydrate', 'platform.js');
             }
           }
@@ -83,5 +83,5 @@ run(async () => {
 
   await bundleHydrate();
 
-  // await fs.remove(TRANSPILED_DIR);
+  await fs.remove(TRANSPILED_DIR);
 });
