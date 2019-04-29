@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
+import { Plugin } from 'rollup';
 
 
-export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx) {
+export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const globalPaths: string[] = [];
 
   if (typeof config.globalScript === 'string') {
@@ -20,22 +21,29 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
 
   return {
     name: 'globalScriptsPlugin',
-    resolveId(id: string) {
+    resolveId(id) {
       if (id === GLOBAL_ID) {
         return id;
       }
       return null;
     },
-    load(id: string) {
+    load(id) {
       if (id === GLOBAL_ID) {
         return globalPaths
           .map(path => `import '${path}';`)
           .join('\n');
       }
       return null;
+    },
+    transform(code, id) {
+      if (globalPaths.includes(id)) {
+        return INJECT_CONTEXT + code;
+      }
+      return null;
     }
   };
 }
 
+const INJECT_CONTEXT = `import { Context } from '@stencil/core';\n`;
 const GLOBAL_ID = '@stencil/core/global-scripts';
 

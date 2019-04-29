@@ -111,10 +111,6 @@ import { JSX } from '@stencil/core';
 export type StencilIntrinsicElement = JSX.IntrinsicElement;
 ```
 
-### Removed: `Context` in global
-
-
-
 ### Removed: @Listen('event.KEY’)
 
 It's no longer possible to use the `event.KEY` syntax in the `@Listen` decorator in order to only listen for specific key strokes.

@@ -69,6 +69,9 @@ export namespace Components {
     'num': number;
   }
   interface KeyReorderRoot {}
+  interface LegacyContext {
+    'getData': () => { win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; };
+  }
   interface LifecycleAsyncA {}
   interface LifecycleAsyncB {
     'value': string;
@@ -216,6 +219,7 @@ declare namespace LocalJSX {
     'num'?: number;
   }
   interface KeyReorderRoot extends JSXBase.HTMLAttributes {}
+  interface LegacyContext extends JSXBase.HTMLAttributes {}
   interface LifecycleAsyncA extends JSXBase.HTMLAttributes {}
   interface LifecycleAsyncB extends JSXBase.HTMLAttributes {
     'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
@@ -341,6 +345,7 @@ declare namespace LocalJSX {
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorder': Components.KeyReorder;
     'KeyReorderRoot': Components.KeyReorderRoot;
+    'LegacyContext': Components.LegacyContext;
     'LifecycleAsyncA': Components.LifecycleAsyncA;
     'LifecycleAsyncB': Components.LifecycleAsyncB;
     'LifecycleAsyncC': Components.LifecycleAsyncC;
@@ -423,6 +428,7 @@ declare namespace LocalJSX {
     'InitCssRoot': LocalJSX.InitCssRoot;
     'KeyReorder': LocalJSX.KeyReorder;
     'KeyReorderRoot': LocalJSX.KeyReorderRoot;
+    'LegacyContext': LocalJSX.LegacyContext;
     'LifecycleAsyncA': LocalJSX.LifecycleAsyncA;
     'LifecycleAsyncB': LocalJSX.LifecycleAsyncB;
     'LifecycleAsyncC': LocalJSX.LifecycleAsyncC;
@@ -639,6 +645,12 @@ declare global {
   var HTMLKeyReorderRootElement: {
     prototype: HTMLKeyReorderRootElement;
     new (): HTMLKeyReorderRootElement;
+  };
+
+  interface HTMLLegacyContextElement extends Components.LegacyContext, HTMLStencilElement {}
+  var HTMLLegacyContextElement: {
+    prototype: HTMLLegacyContextElement;
+    new (): HTMLLegacyContextElement;
   };
 
   interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
@@ -990,6 +1002,7 @@ declare global {
     'init-css-root': HTMLInitCssRootElement
     'key-reorder': HTMLKeyReorderElement
     'key-reorder-root': HTMLKeyReorderRootElement
+    'legacy-context': HTMLLegacyContextElement
     'lifecycle-async-a': HTMLLifecycleAsyncAElement
     'lifecycle-async-b': HTMLLifecycleAsyncBElement
     'lifecycle-async-c': HTMLLifecycleAsyncCElement
@@ -1072,6 +1085,7 @@ declare global {
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
+    'legacy-context': HTMLLegacyContextElement;
     'lifecycle-async-a': HTMLLifecycleAsyncAElement;
     'lifecycle-async-b': HTMLLifecycleAsyncBElement;
     'lifecycle-async-c': HTMLLifecycleAsyncCElement;

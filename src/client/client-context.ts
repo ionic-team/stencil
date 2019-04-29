@@ -3,6 +3,8 @@ import { readTask, tick, writeTask } from './client-task-queue';
 import { getAssetPath } from '@runtime';
 
 
+export const Context: any = {};
+
 export const getContext = (_elm: HTMLElement, context: string) => {
   switch (context) {
     case 'window': return win;
@@ -15,5 +17,5 @@ export const getContext = (_elm: HTMLElement, context: string) => {
       tick
     };
   }
-  return undefined;
+  return Context[context];
 };
