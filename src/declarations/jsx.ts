@@ -1043,6 +1043,28 @@ export namespace JSXBase {
     onTouchStart?: (event: TouchEvent) => void;
     onTouchStartCapture?: (event: TouchEvent) => void;
 
+    // Pointer Events
+    onPointerDown?: (event: PointerEvent) => void;
+    onPointerDownCapture?: (event: PointerEvent) => void;
+    onPointerMove?: (event: PointerEvent) => void;
+    onPointerMoveCapture?: (event: PointerEvent) => void;
+    onPointerUp?: (event: PointerEvent) => void;
+    onPointerUpCapture?: (event: PointerEvent) => void;
+    onPointerCancel?: (event: PointerEvent) => void;
+    onPointerCancelCapture?: (event: PointerEvent) => void;
+    onPointerEnter?: (event: PointerEvent) => void;
+    onPointerEnterCapture?: (event: PointerEvent) => void;
+    onPointerLeave?: (event: PointerEvent) => void;
+    onPointerLeaveCapture?: (event: PointerEvent) => void;
+    onPointerOver?: (event: PointerEvent) => void;
+    onPointerOverCapture?: (event: PointerEvent) => void;
+    onPointerOut?: (event: PointerEvent) => void;
+    onPointerOutCapture?: (event: PointerEvent) => void;
+    onGotPointerCapture?: (event: PointerEvent) => void;
+    onGotPointerCaptureCapture?: (event: PointerEvent) => void;
+    onLostPointerCapture?: (event: PointerEvent) => void;
+    onLostPointerCaptureCapture?: (event: PointerEvent) => void;
+
     // UI Events
     onScroll?: (event: UIEvent) => void;
     onScrollCapture?: (event: UIEvent) => void;
