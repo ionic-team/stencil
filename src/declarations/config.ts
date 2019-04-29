@@ -329,7 +329,8 @@ export interface ServiceWorkerConfig {
   modifyUrlPrefix?: any;
   dontCacheBustURLsMatching?: RegExp;
   navigateFallback?: string;
-  navigateFallbackWhitelist?: any[];
+  navigateFallbackWhitelist?: RegExp[];
+  navigateFallbackBlacklist?: RegExp[];
   cacheId?: string;
   skipWaiting?: boolean;
   clientsClaim?: boolean;

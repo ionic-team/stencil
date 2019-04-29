@@ -137,10 +137,10 @@ function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
       name: member.name,
       returns: {
         type: member.complexType.return,
-        docs: '',
+        docs: member.docs.tags.filter(t => t.name === 'return').join('\n'),
       },
       signature: `${member.name}${member.complexType.signature}`,
-      parameters: member.docs.tags,
+      parameters: [], // TODO
       docs: member.docs.text,
       docsTags: member.docs.tags,
       deprecation: getDeprecation(member.docs.tags)

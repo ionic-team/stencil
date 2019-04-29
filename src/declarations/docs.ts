@@ -55,7 +55,7 @@ export interface JsonDocsProp {
   attr: string | undefined;
   reflectToAttr: boolean;
   docs: string;
-  docsTags?: JsonDocsTag[];
+  docsTags: JsonDocsTag[];
   default: string;
   deprecation?: string | undefined;
 
@@ -75,14 +75,14 @@ export interface JsonDocsMethod {
 }
 
 export interface JsonDocsMethodReturn {
-  type?: string;
-  docs?: string;
+  type: string;
+  docs: string;
 }
 
 export interface JsonDocMethodParameter {
-  name?: string;
-  type?: string;
-  docs?: string;
+  name: string;
+  type: string;
+  docs: string;
 }
 
 export interface JsonDocsEvent {

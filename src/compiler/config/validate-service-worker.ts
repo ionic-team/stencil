@@ -43,6 +43,12 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
     outputTarget.serviceWorker.globIgnores = [outputTarget.serviceWorker.globIgnores];
   }
+  if (!outputTarget.serviceWorker.navigateFallback) {
+    outputTarget.serviceWorker.navigateFallback = config.sys.path.relative(outputTarget.dir, outputTarget.indexHtml);
+    outputTarget.serviceWorker.navigateFallbackBlacklist = [
+      /\.[a-z]{2,4}$/i
+    ];
+  }
 
   outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
 
@@ -57,6 +63,7 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
   }
+  console.log(outputTarget.serviceWorker);
 }
 
 
