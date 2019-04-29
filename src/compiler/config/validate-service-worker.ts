@@ -63,7 +63,6 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
   }
-  console.log(outputTarget.serviceWorker);
 }
 
 
