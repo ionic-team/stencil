@@ -39,5 +39,6 @@ const KEEP_IMPORTS = new Set([
   'Host',
   'getAssetPath',
   'writeTask',
-  'readTask'
+  'readTask',
+  'getElement'
 ]);
