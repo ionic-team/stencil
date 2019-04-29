@@ -18,7 +18,7 @@ export function validateComponentTag(tag: string) {
   }
 
   if (tag.indexOf(',') > -1) {
-    return `"${tag}" tag cannot be use for multiple tags`;
+    return `"${tag}" tag cannot be used for multiple tags`;
   }
 
   const invalidChars = tag.replace(/\w|-/g, '');
