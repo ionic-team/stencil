@@ -32,7 +32,7 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
       outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
 
     } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
-      outputTarget.serviceWorker.globPatterns = [DEFAULT_GLOB_PATTERNS];
+      outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
   }
 
@@ -46,7 +46,9 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 
   outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
 
-  addGlobIgnores(outputTarget.serviceWorker.globIgnores);
+  addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
+
+  outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
 
   if (!outputTarget.serviceWorker.swDest) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
@@ -58,11 +60,21 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 }
 
 
-function addGlobIgnores(globIgnores: string[]) {
-  const hostConfigJson = `**/${HOST_CONFIG_FILENAME}`;
-  globIgnores.push(hostConfigJson);
+function addGlobIgnores(config: d.Config, globIgnores: string[]) {
+  globIgnores.push(
+    `**/${HOST_CONFIG_FILENAME}`,
+    `**/*.system.entry.js`,
+    `**/*.system.js`,
+    `**/${config.fsNamespace}.js`,
+    `**/${config.fsNamespace}.esm.js`,
+    `**/${config.fsNamespace}.css`,
+  );
 }
 
 
-const DEFAULT_GLOB_PATTERNS = '**/*.{js,css,json,html}';
+const DEFAULT_GLOB_PATTERNS = [
+  '*.html',
+  '**/*.{js,css,json}',
+];
+
 const DEFAULT_FILENAME = 'sw.js';

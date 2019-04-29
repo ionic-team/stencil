@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputHydrate } from './output-hydrate';
@@ -18,7 +17,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
   const generateOutputs = [
     outputCollections(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
-    generateServiceWorkers(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
     createPluginOutput(config, compilerCtx, buildCtx),
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),

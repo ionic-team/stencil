@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { catchError, flatOne, normalizePath, unique } from '@utils';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
-import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { getUsedComponents } from '../html/used-components';
 import { inlineEsmImport } from '../html/inline-esm-import';
 import { isOutputTargetWww } from './output-utils';
@@ -25,7 +24,6 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
   await Promise.all(
     outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
   );
-  await generateServiceWorkers(config, compilerCtx, buildCtx);
 
   timespan.finish(`generate www finished`);
 }

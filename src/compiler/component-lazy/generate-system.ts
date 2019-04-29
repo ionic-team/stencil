@@ -15,7 +15,7 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
     const esmOpts: OutputOptions = {
       format: 'system',
       entryFileNames: build.isDev ? '[name].system.js' : 'p-[hash].system.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].js' : 'p-[hash].js',
+      chunkFileNames: build.isDev ? '[name]-[hash].system.js' : 'p-[hash].system.js',
       preferConst: true
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

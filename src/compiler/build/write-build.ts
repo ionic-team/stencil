@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { outputPrerender } from '../output-targets/output-prerender';
-
+import { outputServiceWorkers } from '../output-targets/output-service-workers';
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
@@ -25,6 +25,7 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
+    await outputServiceWorkers(config, buildCtx);
     await outputPrerender(config, compilerCtx, buildCtx);
 
 

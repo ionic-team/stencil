@@ -327,7 +327,7 @@ export interface ServiceWorkerConfig {
   maximumFileSizeToCacheInBytes?: number;
   manifestTransforms?: any;
   modifyUrlPrefix?: any;
-  dontCacheBustUrlsMatching?: any;
+  dontCacheBustURLsMatching?: RegExp;
   navigateFallback?: string;
   navigateFallbackWhitelist?: any[];
   cacheId?: string;
