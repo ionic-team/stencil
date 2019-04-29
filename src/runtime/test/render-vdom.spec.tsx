@@ -1,4 +1,4 @@
-import { Component, Prop, h, Host, Element } from '@stencil/core';
+import { Component, Element, Host, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -73,6 +73,63 @@ describe('render-vdom', () => {
     expect(body).toEqualHtml(`
       <cmp-a><div>Hello VDOM</div></cmp-a>
     `);
+  });
+
+  it('should set once', async () => {
+
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+
+      @Prop() first = '';
+      @Prop() middle = '';
+      @Prop() last = '';
+
+      private getText(): string {
+        return `${this.first} ${this.middle} ${this.last}`;
+      }
+
+      render() {
+        const name = <b>{this.getText()}</b>;
+
+        return (
+          <div>
+            <div>Hello, World! I'm {name}</div>
+            <div>I repeat, I'm {name}</div>
+            <div>One last time, I'm {name}</div>
+          </div>
+        );
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a first="Stencil" last="'Don't call me a framework' JS"></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a first="Stencil" last="'Don't call me a framework' JS">
+        <div>
+          <div>Hello, World! I'm <b>Stencil 'Don't call me a framework' JS</b></div>
+          <div>I repeat, I'm <b>Stencil 'Don't call me a framework' JS</b></div>
+          <div>One last time, I'm <b>Stencil 'Don't call me a framework' JS</b></div>
+        </div>
+      </cmp-a>
+    `);
+
+    root.first = 'Not';
+    await waitForChanges();
+
+
+    expect(root).toEqualHtml(`
+      <cmp-a first="Stencil" last="'Don't call me a framework' JS">
+        <div>
+          <div>Hello, World! I'm <b>Not 'Don't call me a framework' JS</b></div>
+          <div>I repeat, I'm <b>Not 'Don't call me a framework' JS</b></div>
+          <div>One last time, I'm <b>Not 'Don't call me a framework' JS</b></div>
+        </div>
+      </cmp-a>
+    `);
+
   });
 
   describe('ref property', () => {
