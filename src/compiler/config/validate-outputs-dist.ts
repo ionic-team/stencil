@@ -55,7 +55,7 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     if (typeof outputTarget.empty !== 'boolean') {
-      outputTarget.empty = DEFAULT_EMPTY_DIR;
+      outputTarget.empty = true;
     }
 
     outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
@@ -64,7 +64,7 @@ export function validateOutputTargetDist(config: d.Config) {
       type: DIST_COLLECTION,
       dir: outputTarget.dir,
       collectionDir: outputTarget.collectionDir,
-      empty: outputTarget.empty,
+      typesDir: outputTarget.typesDir,
       copy: outputTarget.copy
     });
 
@@ -105,7 +105,8 @@ export function validateOutputTargetDist(config: d.Config) {
         esmDir,
         esmEs5Dir,
         cjsDir,
-        componentDts: getComponentsDtsTypesFilePath(config, outputTarget)
+        componentDts: getComponentsDtsTypesFilePath(config, outputTarget),
+        empty: outputTarget.empty
       });
     }
   });
@@ -114,7 +115,6 @@ export function validateOutputTargetDist(config: d.Config) {
 
 const DEFAULT_DIR = 'dist';
 const DEFAULT_BUILD_DIR = '';
-const DEFAULT_EMPTY_DIR = true;
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_ESM_LOADER_DIR = 'loader';

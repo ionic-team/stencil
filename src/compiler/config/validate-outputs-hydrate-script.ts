@@ -43,5 +43,9 @@ export function validateOutputTargetDistHydrateScript(config: d.Config) {
     if (!config.sys.path.isAbsolute(outputTarget.dir)) {
       outputTarget.dir = config.sys.path.join(config.rootDir, outputTarget.dir);
     }
+
+    if (typeof outputTarget.empty !== 'boolean') {
+      outputTarget.empty = true;
+    }
   });
 }

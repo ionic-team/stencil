@@ -3,7 +3,6 @@ import { validateOutputStats } from './validate-output-stats';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetDistHydrateScript } from './validate-outputs-hydrate-script';
 import { validateOutputTargetWww } from './validate-outputs-www';
-import { validateOutputTargetDistCollection } from './validate-outputs-dist-collection';
 import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
 import { getPluginOutputTypeNames } from '../output-plugins/output-plugin-utils';
 import { validatePluginOutputs } from '../output-plugins/validate';
@@ -31,7 +30,6 @@ export function validateOutputTargets(config: d.Config) {
 
   validateOutputTargetWww(config);
   validateOutputTargetDist(config);
-  validateOutputTargetDistCollection(config);
   validateOutputTargetDistHydrateScript(config);
   validateOutputTargetDistModule(config);
   validateOutputStats(config);

@@ -82,23 +82,23 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   buildDir?: string;
   dir?: string;
-  empty?: boolean;
   resourcesUrl?: string;
 
   collectionDir?: string;
   typesDir?: string;
   esmLoaderPath?: string;
   copy?: d.CopyTask[];
+
+  empty?: boolean;
 }
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
   type: 'dist-collection';
 
-  dir?: string;
-  collectionDir?: string;
-  typesDir?: string;
-  empty?: boolean;
-  copy?: d.CopyTask[];
+  dir: string;
+  collectionDir: string;
+  typesDir: string;
+  copy: d.CopyTask[];
 }
 
 
@@ -118,8 +118,6 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
-
-  empty?: boolean;
 }
 
 
@@ -131,6 +129,8 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   esmEs5Dir: string;
   cjsDir: string;
   componentDts: string;
+
+  empty: boolean;
 }
 
 export interface OutputTargetDistModule extends OutputTargetBase {
@@ -138,6 +138,7 @@ export interface OutputTargetDistModule extends OutputTargetBase {
 
   dir?: string;
   externalRuntime?: boolean;
+  empty?: boolean;
 }
 
 
@@ -147,6 +148,7 @@ export interface OutputTargetDistSelfContained extends OutputTargetBase {
   dir?: string;
   buildDir?: string;
   resourcesUrl?: string;
+
   empty?: boolean;
 }
 
@@ -154,6 +156,8 @@ export interface OutputTargetDistSelfContained extends OutputTargetBase {
 export interface OutputTargetHydrate extends OutputTargetBase {
   type: 'dist-hydrate-script';
   dir?: string;
+
+  empty?: boolean;
 }
 
 export interface OutputTargetDocsVscode extends OutputTargetBase {

@@ -18,6 +18,9 @@ export function validateOutputTargetDistModule(config: d.Config) {
       outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
     }
 
+    if (typeof outputTarget.empty !== 'boolean') {
+      outputTarget.empty = true;
+    }
   });
 }
 

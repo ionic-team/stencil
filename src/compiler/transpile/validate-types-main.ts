@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
-import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
+import { getComponentsDtsSrcFilePath, isOutputTargetDistCollection } from '../output-targets/output-utils';
 import { getUserCompilerOptions } from './compiler-options';
 
 
@@ -75,7 +75,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const compilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
 
   // only write dts files when we have an output target with a types directory
-  const emitDtsFiles = (config.outputTargets as d.OutputTargetDist[]).some(o => !!o.typesDir);
+  const emitDtsFiles = config.outputTargets.some(isOutputTargetDistCollection);
 
   // kick off validating types by sending the data over to the worker process
   buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError, readPackageJson } from '@utils';
-import { emptyOutputTargetDirs } from './empty-dir';
+import { emptyOutputTargets } from '../output-targets/empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
 import { generateStyles } from '../style/generate-styles';
@@ -27,7 +27,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     }
 
     // empty the directories on the first build
-    await emptyOutputTargetDirs(config, compilerCtx, buildCtx);
+    await emptyOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
     // async scan the src directory for ts files
