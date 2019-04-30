@@ -9,7 +9,7 @@ import { renderVdom } from './vdom/vdom-render';
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
-    hostRef.$stateFlags$ |= HOST_FLAGS.isQueuedForUpdate;
+    hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
   const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
   try {
@@ -49,7 +49,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
 const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean, instance: any) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$stateFlags$ &= ~HOST_FLAGS.isQueuedForUpdate;
+    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.lifecycle) {
@@ -66,7 +66,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       // tell the platform we're actively rendering
       // if a value is changed within a render() then
       // this tells the platform not to queue the change
-      hostRef.$stateFlags$ |= HOST_FLAGS.isActiveRender;
+      hostRef.$flags$ |= HOST_FLAGS.isActiveRender;
 
       try {
         // looks like we've got child nodes to render into this host element
@@ -81,7 +81,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
       } catch (e) {
         consoleError(e);
       }
-      hostRef.$stateFlags$ &= ~HOST_FLAGS.isActiveRender;
+      hostRef.$flags$ &= ~HOST_FLAGS.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
@@ -105,15 +105,14 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     elm['s-lr'] = true;
   }
   if (BUILD.updatable || BUILD.lazyLoad || BUILD.hydrateServerSide) {
-    hostRef.$stateFlags$ |= HOST_FLAGS.hasRendered;
+    hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
-  if (BUILD.lifecycle && elm['s-rc'] !== undefined) {
+  if (BUILD.lifecycle && elm['s-rc'].length > 0) {
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
     elm['s-rc'].forEach(cb => cb());
-    elm['s-rc'] = undefined;
   }
 
   postUpdateComponent(elm, hostRef);
@@ -130,8 +129,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     }
     emitLifecycleEvent(elm, 'componentDidRender');
 
-    if (!(hostRef.$stateFlags$ & HOST_FLAGS.hasLoadedComponent)) {
-      hostRef.$stateFlags$ |= HOST_FLAGS.hasLoadedComponent;
+    if (!(hostRef.$flags$ & HOST_FLAGS.hasLoadedComponent)) {
+      hostRef.$flags$ |= HOST_FLAGS.hasLoadedComponent;
 
       if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.style) {
         // DOM WRITE!

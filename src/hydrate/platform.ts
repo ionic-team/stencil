@@ -107,7 +107,7 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
 
 export const registerHost = (elm: d.HostElement) => {
   const hostRef: d.HostRef = {
-    $stateFlags$: 0,
+    $flags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
   };

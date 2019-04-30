@@ -76,10 +76,6 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
         (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback) ? 'slot-fb' : newVNode.$tag$ as string)
         ) as any;
 
-    if (BUILD.lifecycle) {
-      elm['s-lr'] = false;
-    }
-
     if (BUILD.svg) {
       isSvgMode = newVNode.$tag$ === 'svg' ? true : (newVNode.$tag$ === 'foreignObject' ? false : isSvgMode);
     }

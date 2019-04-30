@@ -26,9 +26,9 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.$listeners$);
     }
 
-    if (!(hostRef.$stateFlags$ & HOST_FLAGS.hasConnected)) {
+    if (!(hostRef.$flags$ & HOST_FLAGS.hasConnected)) {
       // first time this component has connected
-      hostRef.$stateFlags$ |= HOST_FLAGS.hasConnected;
+      hostRef.$flags$ |= HOST_FLAGS.hasConnected;
 
       let hostId: string;
       if (BUILD.hydrateClientSide) {

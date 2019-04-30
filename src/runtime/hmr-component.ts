@@ -9,7 +9,7 @@ export function hmrStart(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hm
   const hostRef = getHostRef(elm);
 
   // reset state flags to only have been connected
-  hostRef.$stateFlags$ = HOST_FLAGS.hasConnected;
+  hostRef.$flags$ = HOST_FLAGS.hasConnected;
 
   // TODO
   // detatch any event listeners that may have been added

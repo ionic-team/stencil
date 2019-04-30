@@ -11,9 +11,9 @@ import { fireConnectedCallback } from './connected-callback';
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && !(hostRef.$stateFlags$ & HOST_FLAGS.hasInitializedComponent)) {
+  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
-    hostRef.$stateFlags$ |= HOST_FLAGS.hasInitializedComponent;
+    hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
     if (BUILD.mode && hostRef.$modeName$ == null) {
       // initializeComponent
@@ -48,7 +48,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         // but let's keep track of when we start and stop
         // so that the getters/setters don't incorrectly step on data
         if (BUILD.member) {
-          hostRef.$stateFlags$ |= HOST_FLAGS.isConstructingInstance;
+          hostRef.$flags$ |= HOST_FLAGS.isConstructingInstance;
         }
         // construct the lazy-loaded component implementation
         // passing the hostRef is very important during
@@ -57,7 +57,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         new (Cstr as any)(hostRef);
 
         if (BUILD.member) {
-          hostRef.$stateFlags$ &= ~HOST_FLAGS.isConstructingInstance;
+          hostRef.$flags$ &= ~HOST_FLAGS.isConstructingInstance;
         }
         fireConnectedCallback(hostRef.$lazyInstance$);
 

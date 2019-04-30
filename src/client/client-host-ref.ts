@@ -15,7 +15,7 @@ export const registerHost = (elm: d.HostElement) => {
   if (BUILD.lazyLoad) {
 
     const hostRef: d.HostRef = {
-      $stateFlags$: 0,
+      $flags$: 0,
       $hostElement$: elm
     };
     hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
@@ -26,7 +26,7 @@ export const registerHost = (elm: d.HostElement) => {
 
   } else {
     const hostRef: d.HostRef = {
-      $stateFlags$: 0,
+      $flags$: 0,
     };
     if (BUILD.prop || BUILD.state) {
       hostRef.$instanceValues$ = new Map();

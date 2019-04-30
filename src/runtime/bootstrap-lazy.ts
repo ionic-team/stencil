@@ -53,14 +53,21 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
-        ['s-lr'] = false;
-        ['s-rc']: (() => void)[] = [];
+
+        ['s-lr']: boolean;
+        ['s-rc']: (() => void)[];
 
         // StencilLazyHost
         constructor(self: HTMLElement) {
           // @ts-ignore
           super(self);
           self = this;
+
+          if (BUILD.lifecycle) {
+            this['s-lr'] = false;
+            this['s-rc'] = [];
+          }
+
           registerHost(self);
           if (BUILD.shadowDom && cmpMeta.$flags$ === CMP_FLAGS.shadowDomEncapsulation) {
             // this component is using shadow dom

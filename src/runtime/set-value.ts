@@ -14,7 +14,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   const hostRef = getHostRef(ref);
   const elm = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$hostElement$ : ref as d.HostElement;
   const oldVal = hostRef.$instanceValues$.get(propName);
-  const flags = hostRef.$stateFlags$;
+  const flags = hostRef.$flags$;
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
 
   if (newVal !== oldVal && (!(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined)) {
