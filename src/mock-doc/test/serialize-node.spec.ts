@@ -8,6 +8,54 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('do not remove whitespace within <code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `
+      <p>
+        <code>
+          <span>var</span>
+          <b>value</b>
+          <strong>=</strong>
+          <em>88</em><i>;</i>
+        </code>
+      </p>
+    `;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<p><code>
+          <span>var</span>
+          <b>value</b>
+          <strong>=</strong>
+          <em>88</em><i>;</i>
+        </code></p>`);
+  });
+
+  it('pretty print with comments', () => {
+    const elm = doc.createElement('div');
+    elm.innerHTML =  `
+      <p>
+        <!--comment1-->
+        <!--comment2-->
+        <span>Hello</span>
+        <!--comment3-->
+        <!--comment4-->
+      </p>
+    `;
+
+    expect(elm).toEqualHtml(`
+      <div>
+        <p>
+          <!--comment1-->
+          <!--comment2-->
+          <span>Hello</span>
+          <!--comment3-->
+          <!--comment4-->
+        </p>
+      </div>
+    `);
+  });
+
   it('shadow root to template', () => {
     const elm = doc.createElement('cmp-a');
     expect(elm.shadowRoot).toEqual(null);
