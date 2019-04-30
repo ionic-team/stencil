@@ -40,6 +40,7 @@ export namespace Components {
     'nuAttr': number | null;
     'strAttr': string;
   }
+  interface BadSharedJsx {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -64,6 +65,7 @@ export namespace Components {
   interface ExternalImportA {}
   interface ExternalImportB {}
   interface ExternalImportC {}
+  interface FactoryJsx {}
   interface InitCssRoot {}
   interface KeyReorder {
     'num': number;
@@ -192,6 +194,7 @@ declare namespace LocalJSX {
     'nuAttr'?: number | null;
     'strAttr'?: string;
   }
+  interface BadSharedJsx extends JSXBase.HTMLAttributes {}
   interface ConditionalBasic extends JSXBase.HTMLAttributes {}
   interface ConditionalRerender extends JSXBase.HTMLAttributes {}
   interface ConditionalRerenderRoot extends JSXBase.HTMLAttributes {}
@@ -214,6 +217,7 @@ declare namespace LocalJSX {
   interface ExternalImportA extends JSXBase.HTMLAttributes {}
   interface ExternalImportB extends JSXBase.HTMLAttributes {}
   interface ExternalImportC extends JSXBase.HTMLAttributes {}
+  interface FactoryJsx extends JSXBase.HTMLAttributes {}
   interface InitCssRoot extends JSXBase.HTMLAttributes {}
   interface KeyReorder extends JSXBase.HTMLAttributes {
     'num'?: number;
@@ -327,6 +331,7 @@ declare namespace LocalJSX {
     'AttributeComplex': Components.AttributeComplex;
     'AttributeHost': Components.AttributeHost;
     'AttributeHtmlRoot': Components.AttributeHtmlRoot;
+    'BadSharedJsx': Components.BadSharedJsx;
     'ConditionalBasic': Components.ConditionalBasic;
     'ConditionalRerender': Components.ConditionalRerender;
     'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
@@ -342,6 +347,7 @@ declare namespace LocalJSX {
     'ExternalImportA': Components.ExternalImportA;
     'ExternalImportB': Components.ExternalImportB;
     'ExternalImportC': Components.ExternalImportC;
+    'FactoryJsx': Components.FactoryJsx;
     'InitCssRoot': Components.InitCssRoot;
     'KeyReorder': Components.KeyReorder;
     'KeyReorderRoot': Components.KeyReorderRoot;
@@ -410,6 +416,7 @@ declare namespace LocalJSX {
     'AttributeComplex': LocalJSX.AttributeComplex;
     'AttributeHost': LocalJSX.AttributeHost;
     'AttributeHtmlRoot': LocalJSX.AttributeHtmlRoot;
+    'BadSharedJsx': LocalJSX.BadSharedJsx;
     'ConditionalBasic': LocalJSX.ConditionalBasic;
     'ConditionalRerender': LocalJSX.ConditionalRerender;
     'ConditionalRerenderRoot': LocalJSX.ConditionalRerenderRoot;
@@ -425,6 +432,7 @@ declare namespace LocalJSX {
     'ExternalImportA': LocalJSX.ExternalImportA;
     'ExternalImportB': LocalJSX.ExternalImportB;
     'ExternalImportC': LocalJSX.ExternalImportC;
+    'FactoryJsx': LocalJSX.FactoryJsx;
     'InitCssRoot': LocalJSX.InitCssRoot;
     'KeyReorder': LocalJSX.KeyReorder;
     'KeyReorderRoot': LocalJSX.KeyReorderRoot;
@@ -539,6 +547,12 @@ declare global {
     new (): HTMLAttributeHtmlRootElement;
   };
 
+  interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {}
+  var HTMLBadSharedJsxElement: {
+    prototype: HTMLBadSharedJsxElement;
+    new (): HTMLBadSharedJsxElement;
+  };
+
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
   var HTMLConditionalBasicElement: {
     prototype: HTMLConditionalBasicElement;
@@ -627,6 +641,12 @@ declare global {
   var HTMLExternalImportCElement: {
     prototype: HTMLExternalImportCElement;
     new (): HTMLExternalImportCElement;
+  };
+
+  interface HTMLFactoryJsxElement extends Components.FactoryJsx, HTMLStencilElement {}
+  var HTMLFactoryJsxElement: {
+    prototype: HTMLFactoryJsxElement;
+    new (): HTMLFactoryJsxElement;
   };
 
   interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
@@ -984,6 +1004,7 @@ declare global {
     'attribute-complex': HTMLAttributeComplexElement
     'attribute-host': HTMLAttributeHostElement
     'attribute-html-root': HTMLAttributeHtmlRootElement
+    'bad-shared-jsx': HTMLBadSharedJsxElement
     'conditional-basic': HTMLConditionalBasicElement
     'conditional-rerender': HTMLConditionalRerenderElement
     'conditional-rerender-root': HTMLConditionalRerenderRootElement
@@ -999,6 +1020,7 @@ declare global {
     'external-import-a': HTMLExternalImportAElement
     'external-import-b': HTMLExternalImportBElement
     'external-import-c': HTMLExternalImportCElement
+    'factory-jsx': HTMLFactoryJsxElement
     'init-css-root': HTMLInitCssRootElement
     'key-reorder': HTMLKeyReorderElement
     'key-reorder-root': HTMLKeyReorderRootElement
@@ -1067,6 +1089,7 @@ declare global {
     'attribute-complex': HTMLAttributeComplexElement;
     'attribute-host': HTMLAttributeHostElement;
     'attribute-html-root': HTMLAttributeHtmlRootElement;
+    'bad-shared-jsx': HTMLBadSharedJsxElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
@@ -1082,6 +1105,7 @@ declare global {
     'external-import-a': HTMLExternalImportAElement;
     'external-import-b': HTMLExternalImportBElement;
     'external-import-c': HTMLExternalImportCElement;
+    'factory-jsx': HTMLFactoryJsxElement;
     'init-css-root': HTMLInitCssRootElement;
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;

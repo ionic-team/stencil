@@ -75,7 +75,7 @@ describe('render-vdom', () => {
     `);
   });
 
-  it('should set once', async () => {
+  it('should error when reusing vnodes', async () => {
 
     @Component({ tag: 'cmp-a' })
     class CmpA {
@@ -101,35 +101,16 @@ describe('render-vdom', () => {
       }
     }
 
-    const { root, waitForChanges } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a first="Stencil" last="'Don't call me a framework' JS"></cmp-a>`,
-    });
-
-    expect(root).toEqualHtml(`
-      <cmp-a first="Stencil" last="'Don't call me a framework' JS">
-        <div>
-          <div>Hello, World! I'm <b>Stencil 'Don't call me a framework' JS</b></div>
-          <div>I repeat, I'm <b>Stencil 'Don't call me a framework' JS</b></div>
-          <div>One last time, I'm <b>Stencil 'Don't call me a framework' JS</b></div>
-        </div>
-      </cmp-a>
-    `);
-
-    root.first = 'Not';
-    await waitForChanges();
-
-
-    expect(root).toEqualHtml(`
-      <cmp-a first="Stencil" last="'Don't call me a framework' JS">
-        <div>
-          <div>Hello, World! I'm <b>Not 'Don't call me a framework' JS</b></div>
-          <div>I repeat, I'm <b>Not 'Don't call me a framework' JS</b></div>
-          <div>One last time, I'm <b>Not 'Don't call me a framework' JS</b></div>
-        </div>
-      </cmp-a>
-    `);
-
+    let error;
+    try {
+      await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a first="Stencil" last="'Don't call me a framework' JS"></cmp-a>`,
+      });
+    } catch (e) {
+      error = e;
+    }
+    expect(error.message).toContain('JSX');
   });
 
   describe('ref property', () => {
