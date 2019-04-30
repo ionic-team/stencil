@@ -33,3 +33,14 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputUr
 
   return filePath;
 }
+
+
+export async function writeOrgIndexHtml(manager: d.PrerenderManager, templateHtml: string) {
+  const fileName = `index-org.html`;
+  const filePath = manager.config.sys.path.join(
+    manager.outputTarget.dir,
+    fileName
+  );
+
+  await manager.compilerCtx.fs.writeFile(filePath, templateHtml, { immediateWrite: true });
+}

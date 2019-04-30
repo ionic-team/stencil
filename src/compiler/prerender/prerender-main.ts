@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { catchError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
-import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
+import { getWriteFilePathFromUrlPath, writeOrgIndexHtml } from './prerendered-write-path';
 
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -44,6 +44,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     }
 
     manager.templateId = await createPrerenderTemplate(config, templateHtml);
+    await writeOrgIndexHtml(manager, templateHtml);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
