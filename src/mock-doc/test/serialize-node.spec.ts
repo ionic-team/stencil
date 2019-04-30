@@ -8,6 +8,15 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('remove most whitespace in text nodes, but not all of it when not in pretty print', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<div><span>  var   </span><b>\n\n\n\t     value\n\n\n\n\n    \t</b><code>     88     </code></div>`;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<div><span> var </span><b> value </b><code>     88     </code></div>`);
+  });
+
   it('do not remove whitespace within <code>', () => {
     const elm = doc.createElement('div');
 

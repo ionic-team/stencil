@@ -127,9 +127,13 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
         if (opts.pretty && attrName === 'class') {
           attrValue = attr.value = attrValue.split(' ').filter(t => t !== '').sort().join(' ').trim();
+        }
 
-        } else if (attrValue === '') {
-          if ((opts.collapseBooleanAttributes && BOOLEAN_ATTR.has(attrName)) || (opts.removeEmptyAttributes && attrName.startsWith('data-'))) {
+        if (attrValue === '') {
+          if (opts.collapseBooleanAttributes && BOOLEAN_ATTR.has(attrName)) {
+            continue;
+          }
+          if (opts.removeEmptyAttributes && attrName.startsWith('data-')) {
             continue;
           }
         }
@@ -214,7 +218,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
     }
 
   } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
-    const textContent = node.nodeValue;
+    let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
       const isWhitespaceOnly = (textContent.trim() === '');
@@ -241,14 +245,31 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
         const parentTagName = (node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
 
         if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
-          output.text.push(node.nodeValue);
+          output.text.push(textContent);
 
         } else {
-          if (opts.pretty) {
-            output.text.push(escapeString(node.nodeValue.replace(/\s\s+/g, ' ').trim(), false));
+          let textContentLength = textContent.length;
 
-          } else {
-            output.text.push(escapeString(node.nodeValue, false));
+          if (textContentLength > 0) {
+            if (opts.pretty) {
+              output.text.push(escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false));
+
+            } else {
+              if (!output.isWithinWhitespaceSensitive) {
+                if (/\s/.test(textContent.charAt(0))) {
+                  textContent = ' ' + textContent.trimLeft();
+                }
+
+                textContentLength = textContent.length;
+                if (textContentLength > 1) {
+                  if (/\s/.test(textContent.charAt(textContentLength - 1))) {
+                    textContent =  textContent.trimRight() + ' ';
+                  }
+                }
+              }
+
+              output.text.push(escapeString(textContent, false));
+            }
           }
         }
       }
