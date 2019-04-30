@@ -119,9 +119,18 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   cjsIndexFile?: string;
   systemLoaderFile?: string;
 
-  loaderDir?: string;
-
   empty?: boolean;
+}
+
+
+export interface OutputTargetDistLazyLoader extends OutputTargetBase {
+  type: 'dist-lazy-loader';
+  dir: string;
+
+  esmDir: string;
+  esmEs5Dir: string;
+  cjsDir: string;
+  componentDts: string;
 }
 
 export interface OutputTargetDistModule extends OutputTargetBase {
@@ -204,6 +213,7 @@ export type OutputTarget =
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy
+ | OutputTargetDistLazyLoader
  | OutputTargetDistModule
  | OutputTargetDistSelfContained
  | OutputTargetWww

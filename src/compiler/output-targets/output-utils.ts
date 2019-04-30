@@ -58,6 +58,10 @@ export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDi
   return o.type === DIST_LAZY;
 }
 
+export function isOutputTargetDistLazyLoader(o: d.OutputTarget): o is d.OutputTargetDistLazyLoader {
+  return o.type === DIST_LAZY_LOADER;
+}
+
 export function isOutputTargetDistModule(o: d.OutputTarget): o is d.OutputTargetDistModule {
   return o.type === DIST_MODULE;
 }
@@ -96,6 +100,7 @@ export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
+export const DIST_LAZY_LOADER = `dist-lazy-loader`;
 export const DIST_MODULE = `experimental-dist-module`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const STATS = `stats`;

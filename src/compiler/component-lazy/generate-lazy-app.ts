@@ -5,7 +5,6 @@ import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
 import { generateCjs } from './generate-cjs';
-import { generateLoaders } from './generate-loader';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
@@ -24,8 +23,6 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.isBrowserBuild)),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
     generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
-
-    generateLoaders(config, compilerCtx, outputTargets)
   ]);
 
   timespan.finish(`bundling components finished`);

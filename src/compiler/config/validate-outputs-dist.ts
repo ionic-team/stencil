@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DIST_COLLECTION, DIST_LAZY, isOutputTargetDist } from '../output-targets/output-utils';
+import { DIST_COLLECTION, DIST_LAZY, isOutputTargetDist, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateCopy } from './validate-copy';
@@ -81,16 +81,31 @@ export function validateOutputTargetDist(config: d.Config) {
     });
 
     if (config.buildDist) {
+      const esmDir = path.join(outputTarget.dir, 'esm');
+      const esmEs5Dir = path.join(outputTarget.dir, 'esm', 'legacy');
+      const cjsDir = path.join(outputTarget.dir, 'cjs');
+
+      // Create lazy output-target
       config.outputTargets.push({
         type: DIST_LAZY,
-        esmDir: path.join(outputTarget.dir, 'esm'),
-        esmEs5Dir: path.join(outputTarget.dir, 'esm', 'legacy'),
-        cjsDir: path.join(outputTarget.dir, 'cjs'),
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
 
         cjsIndexFile: path.join(outputTarget.dir, 'index.js'),
         esmIndexFile: path.join(outputTarget.dir, 'index.mjs'),
-        loaderDir: outputTarget.esmLoaderPath,
         polyfills: true,
+      });
+
+      // Create output target that will generate the /loader entry-point
+      config.outputTargets.push({
+        type: DIST_LAZY_LOADER,
+        dir: outputTarget.esmLoaderPath,
+
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
+        componentDts: getComponentsDtsTypesFilePath(config, outputTarget)
       });
     }
   });
