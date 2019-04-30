@@ -87,7 +87,10 @@ describe('validateServiceWorker', () => {
       dir: '/www'
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{js,css,json,html}']);
+    expect(outputTarget.serviceWorker.globPatterns).toEqual([
+      '*.html',
+      '**/*.{js,css,json}'
+    ]);
   });
 
   it('should create default sw config when www type and prod mode', () => {
