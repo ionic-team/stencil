@@ -20,15 +20,63 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
   }
 
   if (typeof prerenderConfig.filterAnchor !== 'function') {
-    prerenderConfig.filterAnchor = defaultFilterAnchor;
+    prerenderConfig.filterAnchor = function defaultFilterAnchor(attrs: {[attrName: string]: string}, _base: URL) {
+      let isValidAnchor = false;
+
+      try {
+        let href = attrs.href;
+        if (typeof href === 'string') {
+          href = href.trim();
+
+          if (href !== '' && href !== '#') {
+            const target = attrs.target;
+            if (typeof target === 'string' && attrs.target.trim().toLowerCase() !== '_self') {
+              isValidAnchor = false;
+            } else {
+              isValidAnchor = true;
+            }
+          }
+        }
+
+      } catch (e) {
+        catchError(diagnostics, e);
+      }
+
+      return isValidAnchor;
+    };
   }
 
   if (typeof prerenderConfig.normalizeUrl !== 'function') {
-    prerenderConfig.normalizeUrl = defaultNormalizeUrl;
+    prerenderConfig.normalizeUrl = function defaultNormalizeUrl(href: string, base: URL) {
+      if (typeof href === 'string') {
+        try {
+          const outputUrl = new URL(href, base.href);
+          outputUrl.hash = '';
+          outputUrl.search = '';
+          return outputUrl;
+
+        } catch (e) {
+          catchError(diagnostics, e);
+        }
+      }
+      return null;
+    };
   }
 
   if (typeof prerenderConfig.filterUrl !== 'function') {
-    prerenderConfig.filterUrl = defaultFilterUrl;
+    prerenderConfig.filterUrl = function defaultFilterUrl(url: URL, base: URL) {
+      let isValidUrl = false;
+
+      try {
+        if (url != null && base != null) {
+          isValidUrl = !(url.hostname != null && base.hostname != null && url.hostname !== base.hostname);
+        }
+
+      } catch (e) {
+        catchError(diagnostics, e);
+      }
+      return isValidUrl;
+    };
   }
 
   if (typeof prerenderConfig.trailingSlash !== 'boolean') {
@@ -39,67 +87,37 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
 }
 
 
-function defaultFilterAnchor(attrs: {[attrName: string]: string}, _base: URL) {
-  let href = attrs.href;
-  if (typeof href !== 'string') {
-    return false;
-  }
+export function normalizeHref(prerenderConfig: d.HydrateConfig, diagnostics: d.Diagnostic[], url: URL) {
+  try {
+    if (url != null && typeof url.href === 'string') {
+      let href = url.href.trim();
 
-  href = href.trim();
-  if (href === '' || href === '#') {
-    return false;
-  }
+      if (prerenderConfig.trailingSlash) {
+        // url should have a trailing slash
+        if (!href.endsWith('/')) {
+          const parts = url.pathname.split('/');
+          const lastPart = parts[parts.length - 1];
+          if (!lastPart.includes('.')) {
+            // does not end with a slash and last part does not have a dot
+            href += '/';
+          }
+        }
 
-  if (typeof attrs.target === 'string' && attrs.target.trim().toLowerCase() !== '_self') {
-    return false;
-  }
-
-  return true;
-}
-
-
-function defaultNormalizeUrl(href: string, base: URL) {
-  const outputUrl = new URL(href, base.href);
-  outputUrl.hash = '';
-  outputUrl.search = '';
-  return outputUrl;
-}
-
-
-export function normalizeHref(prerenderConfig: d.HydrateConfig, url: URL) {
-  let href = url.href.trim();
-
-  if (prerenderConfig.trailingSlash) {
-    // url should have a trailing slash
-    if (!href.endsWith('/')) {
-      const parts = url.pathname.split('/');
-      const lastPart = parts[parts.length - 1];
-      if (!lastPart.includes('.')) {
-        // does not end with a slash and last part does not have a dot
-        href += '/';
+      } else {
+        // url should NOT have a trailing slash
+        if (href.endsWith('/') && url.pathname !== '/') {
+          // this has a trailing slash and it's not the root path
+          href = href.substr(0, href.length - 1);
+        }
       }
+
+      return href;
     }
 
-  } else {
-    // url should NOT have a trailing slash
-    if (href.endsWith('/') && url.pathname !== '/') {
-      // this has a trailing slash and it's not the root path
-      href = href.substr(0, href.length - 1);
-    }
+  } catch (e) {
+    catchError(diagnostics, e);
   }
-
-  return href;
-}
-
-
-function defaultFilterUrl(url: URL, base: URL) {
-  if (url == null || base == null) {
-    return false;
-  }
-  if (url.hostname != null && base.hostname != null && url.hostname !== base.hostname) {
-    return false;
-  }
-  return true;
+  return null;
 }
 
 

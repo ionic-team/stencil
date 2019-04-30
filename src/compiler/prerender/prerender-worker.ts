@@ -72,7 +72,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       pretty: hydrateOpts.prettyHtml
     });
 
-    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, base, hydrateResults.anchors);
+    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, base, hydrateResults.anchors);
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {
@@ -158,7 +158,7 @@ function getWindow(templateId: string, originUrl: string) {
 }
 
 
-function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, diagnostics: d.Diagnostic[], base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
   }
@@ -167,7 +167,7 @@ function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, base: URL, pa
     .filter(anchor => prerenderConfig.filterAnchor(anchor, base))
     .map(anchor => prerenderConfig.normalizeUrl(anchor.href, base))
     .filter(url => prerenderConfig.filterUrl(url, base))
-    .map(url => normalizeHref(prerenderConfig, url))
+    .map(url => normalizeHref(prerenderConfig, diagnostics, url))
     .reduce((hrefs, href) => {
       if (!hrefs.includes(href)) {
         hrefs.push(href);
