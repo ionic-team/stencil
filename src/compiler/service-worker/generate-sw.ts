@@ -2,17 +2,21 @@ import * as d from '../../declarations';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export async function generateServiceWorker(buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
+export async function generateServiceWorker(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
+  await writeOrgIndexHtml(config, compilerCtx, outputTarget);
+
+  const serviceWorker = await getServiceWorker(outputTarget);
   if (outputTarget.serviceWorker.swSrc) {
     return Promise.all([
       copyLib(buildCtx, outputTarget, workbox),
-      injectManifest(buildCtx, outputTarget, workbox)
+      injectManifest(buildCtx, serviceWorker, workbox)
     ]);
 
   } else {
-    return generateSW(buildCtx, outputTarget.serviceWorker, workbox);
+    return generateSW(buildCtx, serviceWorker, workbox);
   }
 }
+
 
 async function copyLib(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) {
   const timeSpan = buildCtx.createTimeSpan(`copy service worker library started`, true);
@@ -42,11 +46,11 @@ async function generateSW(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerCo
 }
 
 
-async function injectManifest(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) {
+async function injectManifest(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) {
   const timeSpan = buildCtx.createTimeSpan(`inject manifest into service worker started`);
 
   try {
-    await workbox.injectManifest(outputTarget.serviceWorker);
+    await workbox.injectManifest(serviceWorker);
     timeSpan.finish('inject manifest into service worker finished');
 
   } catch (e) {
@@ -68,6 +72,29 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
     return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });
 }
+
+async function getServiceWorker(outputTarget: d.OutputTargetWww) {
+  const serviceWorker: d.ServiceWorkerConfig = {
+    ...outputTarget.serviceWorker
+  };
+
+  if (!serviceWorker.navigateFallback) {
+    serviceWorker.navigateFallback = INDEX_ORG;
+    if (!serviceWorker.navigateFallbackBlacklist && serviceWorker.navigateFallback) {
+      serviceWorker.navigateFallbackBlacklist = [
+        /\.[a-z]{2,4}$/i
+      ];
+    }
+  }
+  return serviceWorker;
+}
+
+export async function writeOrgIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+  const filePath = config.sys.path.join(outputTarget.dir, INDEX_ORG);
+  await compilerCtx.fs.disk.copyFile(outputTarget.indexHtml, filePath);
+}
+
+const INDEX_ORG = 'index-org.html';
 
 export function getRegisterSW(swUrl: string) {
   return `
