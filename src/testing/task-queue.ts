@@ -110,7 +110,14 @@ export async function flushAll() {
     await flushQueue();
   }
   if (caughtErrors.length > 0) {
-      throw caughtErrors[0];
+    const err = caughtErrors[0];
+    if (err == null) {
+      throw new Error('Error!');
+    }
+    if (typeof err === 'string') {
+      throw new Error(err);
+    }
+    throw err;
   }
 }
 
