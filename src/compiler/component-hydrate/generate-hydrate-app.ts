@@ -81,7 +81,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   updateBuildConditionals(config, build);
   build.lifecycleDOMEvents = false;
   build.hotModuleReplacement = false;
-  build.slotRelocation = true;
 
   return build;
 }

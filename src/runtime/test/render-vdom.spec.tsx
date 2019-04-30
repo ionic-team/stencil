@@ -55,6 +55,28 @@ describe('render-vdom', () => {
     `);
   });
 
+  it('<slot> test', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      render() {
+        return <a href='#'><slot></slot></a>;
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a>Hello</cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a>
+        <!---->
+        <a href="#">Hello</a>
+      </cmp-a>
+    `);
+  });
+
+
   it('Hello VDOM, body.innerHTML, await flush', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {

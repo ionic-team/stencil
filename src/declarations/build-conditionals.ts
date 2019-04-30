@@ -29,6 +29,7 @@ export interface BuildFeatures {
   vdomListener: boolean;
   vdomFunctional: boolean;
   vdomText: boolean;
+  slotRelocation: boolean;
 
   // elements
   slot: boolean;
@@ -79,7 +80,6 @@ export interface Build extends Partial<BuildFeatures> {
   lifecycleDOMEvents?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
-  slotRelocation?: boolean;
   cssVarShim?: boolean;
   constructibleCSS?: boolean;
 }

@@ -2,6 +2,8 @@ import * as d from '../../declarations';
 
 
 export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
+  const slot = cmps.some(c => c.htmlTagNames.includes('slot'));
+  const shadowDom = cmps.some(c => c.encapsulation === 'shadow');
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
@@ -33,8 +35,9 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     propMutable: cmps.some(c => c.hasPropMutable),
     reflect: cmps.some(c => c.hasReflect),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
-    shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
-    slot: cmps.some(c => c.htmlTagNames.includes('slot')),
+    shadowDom,
+    slot,
+    slotRelocation: slot, // TODO: slot && !shadow
     state: cmps.some(c => c.hasState),
     style: cmps.some(c => c.hasStyle),
     svg: cmps.some(c => c.htmlTagNames.includes('svg')),
@@ -61,7 +64,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDev = !!config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
-  b.slotRelocation = !!(b.scoped || b.hydrateServerSide || b.shadowDom);
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.hotReplacement);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
