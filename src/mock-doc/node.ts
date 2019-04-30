@@ -158,12 +158,12 @@ export class MockNode {
 }
 
 
-const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
 const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
+const shadowRootMap = new WeakMap<MockElement, ShadowRoot>();
+const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
 
 export class MockElement extends MockNode {
   namespaceURI: string;
-  private _shadowRoot: ShadowRoot;
 
   constructor(ownerDocument: any, nodeName: string) {
     super(
@@ -180,16 +180,21 @@ export class MockElement extends MockNode {
   }
 
   attachShadow(_opts: ShadowRootInit) {
-    this._shadowRoot = this.ownerDocument.createDocumentFragment();
-    (this._shadowRoot as any).host = this;
-    return this._shadowRoot;
+    const shadowRoot = this.ownerDocument.createDocumentFragment();
+    this.shadowRoot = shadowRoot;
+    return shadowRoot;
   }
 
   get shadowRoot() {
-    return this._shadowRoot || null;
+    return shadowRootMap.get(this) || null;
   }
-  set shadowRoot(value: any) {
-    this._shadowRoot = value;
+  set shadowRoot(shadowRoot: any) {
+    if (shadowRoot != null) {
+      shadowRoot.host = this;
+      shadowRootMap.set(this, shadowRoot);
+    } else {
+      shadowRootMap.delete(this);
+    }
   }
 
   get attributes() {
@@ -600,9 +605,8 @@ export class MockElement extends MockNode {
 export function resetElement(elm: any) {
   resetEventListeners(elm);
   attrsMap.delete(elm);
-  try {
-    elm.shadowRoot = null;
-  } catch (e) {}
+  shadowRootMap.delete(elm);
+  stylesMap.delete(elm);
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
