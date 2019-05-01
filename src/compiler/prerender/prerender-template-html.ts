@@ -33,14 +33,6 @@ function inlineGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, output
 
       const parent = link.parentNode;
 
-      // insert <link rel="preload">
-      const preload = doc.createElement('link');
-      preload.setAttribute('rel', 'preload');
-      preload.setAttribute('href', href);
-      preload.setAttribute('as', 'style');
-      preload.setAttribute('importance', 'low');
-      parent.insertBefore(preload, link);
-
       // insert inline <style>
       const style = doc.createElement('style');
       style.setAttribute('data-styles', '');
