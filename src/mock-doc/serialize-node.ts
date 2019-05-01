@@ -5,9 +5,11 @@ import { NODE_TYPES } from './constants';
 
 export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElementOptions = {}) {
   const output: SerializeOutput = {
+    currentLineWidth: 0,
     indent: 0,
+    isWithinBody: false,
+    isWithinWhitespaceSensitive: false,
     text: [],
-    isWithinWhitespaceSensitive: false
   };
 
   if (opts.pretty) {
@@ -18,6 +20,11 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     if (typeof opts.newLines !== 'boolean') {
       opts.newLines = true;
     }
+    opts.approximateLineWidth = -1;
+  }
+
+  if (typeof opts.approximateLineWidth !== 'number') {
+    opts.approximateLineWidth = -1;
   }
 
   if (typeof opts.removeAttributeQuotes !== 'boolean') {
@@ -65,6 +72,10 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
     const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
 
+    if (tagName === 'body') {
+      output.isWithinBody = true;
+    }
+
     let isElementWhitespaceSensitive = false;
     const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName));
 
@@ -76,15 +87,18 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
       if (opts.newLines) {
         output.text.push('\n');
+        output.currentLineWidth = 0;
       }
 
       if (opts.indentSpaces > 0) {
         for (let i = 0; i < output.indent; i++) {
           output.text.push(' ');
         }
+        output.currentLineWidth += output.indent;
       }
 
       output.text.push('<' + tagName);
+      output.currentLineWidth += (tagName.length + 1);
 
       const attrsLength = (node as HTMLElement).attributes.length;
       const attributes = (opts.pretty && attrsLength > 1) ?
@@ -106,23 +120,36 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
         const attrNamespaceURI = attr.namespaceURI;
         if (attrNamespaceURI == null) {
-          output.text.push(' ' + attrName);
+          output.currentLineWidth += (attrName.length + 1);
+          if (opts.approximateLineWidth > 0 && output.currentLineWidth > opts.approximateLineWidth) {
+            output.text.push('\n' + attrName);
+            output.currentLineWidth = 0;
 
-        } else if (attrNamespaceURI === 'http://www.w3.org/XML/1998/namespace') {
-          output.text.push(' xml:' + attrName);
-
-        } else if (attrNamespaceURI === 'http://www.w3.org/2000/xmlns/') {
-          if (attrName !== 'xmlns') {
-            output.text.push(' xmlns:' + attrName);
           } else {
             output.text.push(' ' + attrName);
           }
 
+        } else if (attrNamespaceURI === 'http://www.w3.org/XML/1998/namespace') {
+          output.text.push(' xml:' + attrName);
+          output.currentLineWidth += (attrName.length + 5);
+
+        } else if (attrNamespaceURI === 'http://www.w3.org/2000/xmlns/') {
+          if (attrName !== 'xmlns') {
+            output.text.push(' xmlns:' + attrName);
+            output.currentLineWidth += (attrName.length + 7);
+
+          } else {
+            output.text.push(' ' + attrName);
+            output.currentLineWidth += (attrName.length + 1);
+          }
+
         } else if (attrNamespaceURI === 'http://www.w3.org/1999/xlink') {
           output.text.push(' xlink:' + attrName);
+          output.currentLineWidth += (attrName.length + 7);
 
         } else {
           output.text.push(' ' + attrNamespaceURI + ':' + attrName);
+          output.currentLineWidth += (attrNamespaceURI.length + attrName.length + 2);
         }
 
         if (opts.pretty && attrName === 'class') {
@@ -140,25 +167,38 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
         if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
           output.text.push('=' + escapeString(attrValue, true));
+          output.currentLineWidth += (attrValue.length + 1);
+
         } else {
           output.text.push('="' + escapeString(attrValue, true) + '"');
+          output.currentLineWidth += (attrValue.length + 3);
         }
       }
 
       if ((node as Element).hasAttribute('style')) {
+        let cssText: string;
         if (opts.minifyInlineStyles) {
-          const minCssText = ((node as HTMLElement).style as any).cssTextMinified;
-          if (typeof minCssText === 'string') {
-            output.text.push(` style="${minCssText}">`);
-          } else {
-            output.text.push(` style="${(node as HTMLElement).style.cssText}">`);
+          cssText = ((node as HTMLElement).style as any).cssTextMinified;
+          if (cssText !== 'string') {
+            cssText = (node as HTMLElement).style.cssText;
           }
+
         } else {
-          output.text.push(` style="${(node as HTMLElement).style.cssText}">`);
+          cssText = (node as HTMLElement).style.cssText;
+        }
+
+        if (opts.approximateLineWidth > 0 && (output.currentLineWidth + cssText.length + 10) > opts.approximateLineWidth) {
+          output.text.push(`\nstyle="${cssText}">`);
+          output.currentLineWidth = 0;
+
+        } else {
+          output.text.push(` style="${cssText}">`);
+          output.currentLineWidth += (cssText.length + 10);
         }
 
       } else {
         output.text.push('>');
+        output.currentLineWidth += 1;
       }
     }
 
@@ -167,11 +207,15 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
         output.indent = output.indent + opts.indentSpaces;
         serializeToHtml((node as HTMLElement).shadowRoot, opts, output, true);
         output.indent = output.indent - opts.indentSpaces;
-        if (opts.newLines && node.childNodes.length === 0) {
+
+        if (opts.newLines && (node.childNodes.length === 0 || (node.childNodes.length === 1 && node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && node.childNodes[0].nodeValue.trim() === ''))) {
           output.text.push('\n');
+          output.currentLineWidth = 0;
+
           for (let i = 0; i < output.indent; i++) {
             output.text.push(' ');
           }
+          output.currentLineWidth += output.indent;
         }
       }
 
@@ -195,6 +239,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
             if (ignoreTag === false) {
               if (opts.newLines) {
                 output.text.push('\n');
+                output.currentLineWidth = 0;
               }
 
               if (opts.indentSpaces > 0) {
@@ -202,6 +247,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
                 for (let i = 0; i < output.indent; i++) {
                   output.text.push(' ');
                 }
+                output.currentLineWidth += output.indent;
               }
             }
           }
@@ -209,53 +255,95 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
         if (ignoreTag === false) {
           output.text.push('</' + tagName + '>');
+          output.currentLineWidth += (tagName.length + 3);
         }
       }
     }
 
+    if (opts.approximateLineWidth > 0 && STRUCTURE_ELEMENTS.has(tagName)) {
+      output.text.push('\n');
+      output.currentLineWidth = 0;
+    }
+
     if (isElementWhitespaceSensitive) {
       output.isWithinWhitespaceSensitive = false;
+    } else if (tagName === 'body') {
+      output.isWithinBody = false;
     }
 
   } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
     let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
-      const isWhitespaceOnly = (textContent.trim() === '');
 
-      if (isWhitespaceOnly) {
+      if (textContent.trim() === '') {
+        // this text node is whitespace only
+
         if (output.isWithinWhitespaceSensitive) {
           // whitespace matters within this element
-          // just add the text we were given
+          // just add the exact text we were given
           output.text.push(textContent);
+          output.currentLineWidth += textContent.length;
+
+        } else if (opts.approximateLineWidth > 0 && !output.isWithinBody) {
+          // do nothing if we're not in the <body> and we're tracking line width
+
+        } else if (!opts.pretty) {
+          // this text node is only whitespace, and it's not
+          // within a whitespace sensitive element like <pre> or <code>
+          // so replace the entire white space with a single new line
+          output.currentLineWidth += 1;
+
+          if (opts.approximateLineWidth > 0 && output.currentLineWidth > opts.approximateLineWidth) {
+            // good enough for a new line
+            // for perf these are all just estimates
+            // we don't care to ensure exact line lengths
+            output.text.push('\n');
+            output.currentLineWidth = 0;
+
+          } else {
+            // let's keep it all on the same line yet
+            output.text.push(' ');
+          }
         }
 
       } else {
-        // has text content
+        // this text node has text content
         if (opts.newLines) {
           output.text.push('\n');
+          output.currentLineWidth = 0;
         }
 
         if (opts.indentSpaces > 0) {
           for (let i = 0; i < output.indent; i++) {
             output.text.push(' ');
           }
+          output.currentLineWidth += output.indent;
         }
 
-        const parentTagName = (node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
+        let textContentLength = textContent.length;
+        if (textContentLength > 0) {
+          // this text node has text content
 
-        if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
-          output.text.push(textContent);
+          const parentTagName = (node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
+          if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
+            // this text node cannot have its content escaped since it's going
+            // into an element like <style> or <script>
+            output.text.push(textContent);
+            output.currentLineWidth += textContentLength;
 
-        } else {
-          let textContentLength = textContent.length;
-
-          if (textContentLength > 0) {
+          } else {
+            // this text node is going into a normal element and html can be escaped
             if (opts.pretty) {
+              // pretty print the text node
               output.text.push(escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false));
+              output.currentLineWidth += textContentLength;
 
             } else {
+              // not pretty printing the text node
               if (!output.isWithinWhitespaceSensitive) {
+                // this element is not a whitespace sensitive one, like <pre> or <code> so
+                // any whitespace at the start and end can be cleaned up to just be one space
                 if (/\s/.test(textContent.charAt(0))) {
                   textContent = ' ' + textContent.trimLeft();
                 }
@@ -263,9 +351,19 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
                 textContentLength = textContent.length;
                 if (textContentLength > 1) {
                   if (/\s/.test(textContent.charAt(textContentLength - 1))) {
-                    textContent =  textContent.trimRight() + ' ';
+                    if (opts.approximateLineWidth > 0 && (output.currentLineWidth + textContentLength) > opts.approximateLineWidth) {
+                      textContent =  textContent.trimRight() + '\n';
+                      output.currentLineWidth = 0;
+
+                    } else {
+                      textContent =  textContent.trimRight() + ' ';
+                    }
                   }
                 }
+                output.currentLineWidth += textContentLength;
+
+              } else {
+                output.currentLineWidth += textContentLength;
               }
 
               output.text.push(escapeString(textContent, false));
@@ -278,21 +376,23 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
   } else if (node.nodeType === NODE_TYPES.COMMENT_NODE && opts.removeHtmlComments === false) {
     if (opts.newLines) {
       output.text.push('\n');
+      output.currentLineWidth = 0;
     }
 
     if (opts.indentSpaces > 0) {
       for (let i = 0; i < output.indent; i++) {
         output.text.push(' ');
       }
+      output.currentLineWidth += output.indent;
     }
 
     output.text.push('<!--' + node.nodeValue + '-->');
+    output.currentLineWidth += (node.nodeValue.length + 7);
 
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     output.text.push('<!doctype html>');
   }
 }
-
 
 const AMP_REGEX = /&/g;
 const NBSP_REGEX = /\u00a0/g;
@@ -321,14 +421,19 @@ function escapeString(str: string, attrMode: boolean) {
 
 /*@__PURE__*/const BOOLEAN_ATTR = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'compact', 'controls', 'declare', 'default', 'defaultchecked', 'defaultmuted', 'defaultselected', 'defer', 'disabled', 'enabled', 'formnovalidate', 'hidden', 'indeterminate', 'inert', 'ismap', 'itemscope', 'loop', 'multiple', 'muted', 'nohref', 'noresize', 'noshade', 'novalidate', 'nowrap', 'open', 'pauseonexit', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected', 'sortable', 'truespeed', 'typemustmatch', 'visible']);
 
+/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'meta', 'link', 'title', 'script', 'iframe', 'style']);
+
 
 interface SerializeOutput {
+  currentLineWidth: number;
   indent: number;
-  text: string[];
+  isWithinBody: boolean;
   isWithinWhitespaceSensitive: boolean;
+  text: string[];
 }
 
 export interface SerializeElementOptions {
+  approximateLineWidth?: number;
   collapseBooleanAttributes?: boolean;
   excludeTagContent?: string[];
   excludeTags?: string[];

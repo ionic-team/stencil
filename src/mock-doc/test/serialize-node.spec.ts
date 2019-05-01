@@ -8,13 +8,22 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('remove most whitespace between elements, but not all of it when not in pretty print', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<div>\n\n\n   <span></span>\t\t  \n<b></b><code>  \t<b>var</b>    <span>88 </span>  </code>  </div>`;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<div> <span></span> <b></b><code>  \t<b>var</b>    <span>88 </span>  </code> </div>`);
+  });
+
   it('remove most whitespace in text nodes, but not all of it when not in pretty print', () => {
     const elm = doc.createElement('div');
 
-    elm.innerHTML = `<div><span>  var   </span><b>\n\n\n\t     value\n\n\n\n\n    \t</b><code>     88     </code></div>`;
+    elm.innerHTML = `<div><span>var \n \t </span><b>\n\n\n\t     value\n\n\n\n\n    \t</b><span>    =</span><code>     88     </code>;</div>`;
 
     const html = serializeNodeToHtml(elm);
-    expect(html).toBe(`<div><span> var </span><b> value </b><code>     88     </code></div>`);
+    expect(html).toBe(`<div><span>var </span><b> value </b><span> =</span><code>     88     </code>;</div>`);
   });
 
   it('do not remove whitespace within <code>', () => {
@@ -32,12 +41,12 @@ describe('serializeNodeToHtml', () => {
     `;
 
     const html = serializeNodeToHtml(elm);
-    expect(html).toBe(`<p><code>
+    expect(html).toBe(`<p> <code>
           <span>var</span>
           <b>value</b>
           <strong>=</strong>
           <em>88</em><i>;</i>
-        </code></p>`);
+        </code> </p>`);
   });
 
   it('pretty print with comments', () => {

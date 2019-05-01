@@ -93,6 +93,7 @@ export interface HydrateImgElement extends HydrateElement {
 
 export interface HydrateOptions {
   afterHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
+  approximateLineWidth?: number;
   beforeHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
   canonicalLink?: string;
   constrainTimeouts?: boolean;
@@ -117,6 +118,7 @@ export interface HydrateOptions {
 
 export interface HydrateConfig {
   afterHydrate?(doc?: Document, url?: URL): void | Promise<void>;
+  approximateLineWidth?: number;
   beforeHydrate?(doc?: Document, url?: URL): void | Promise<void>;
   entryUrls?: string[];
   filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;

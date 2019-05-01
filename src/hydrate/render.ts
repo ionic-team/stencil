@@ -27,6 +27,7 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
 
     if (results.diagnostics.length === 0) {
       results.html = serializeNodeToHtml(doc, {
+        approximateLineWidth: opts.approximateLineWidth,
         collapseBooleanAttributes: opts.collapseBooleanAttributes,
         pretty: opts.prettyHtml
       });

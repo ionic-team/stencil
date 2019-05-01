@@ -39,7 +39,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: originUrl
+      url: originUrl,
+      approximateLineWidth: 100
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
@@ -68,6 +69,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const html = serializeNodeToHtml(doc, {
+      approximateLineWidth: hydrateOpts.approximateLineWidth,
       collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
       pretty: hydrateOpts.prettyHtml
     });
