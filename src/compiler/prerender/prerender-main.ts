@@ -3,6 +3,7 @@ import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-
 import { catchError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
+import { getRelativeBuildDir } from '../html/utils';
 
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -16,77 +17,74 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
 
   const prerenderDiagnostics: d.Diagnostic[] = [];
 
-  try {
-    // get the prerender urls to queue up
-    const manager: d.PrerenderManager = {
-      templateId: null,
-      diagnostics: prerenderDiagnostics,
-      config: config,
-      compilerCtx: compilerCtx,
-      origin: config.devServer.browserUrl,
-      hydrateAppFilePath: buildCtx.hydrateAppFilePath,
-      isDebug: (config.logLevel === 'debug'),
-      logCount: 0,
-      outputTarget: outputTarget,
-      prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
-      prerenderConfigPath: outputTarget.prerenderConfig,
-      urlsCompleted: new Set(),
-      urlsPending: new Set(),
-      urlsProcessing: new Set(),
-      resolve: null
-    };
+  // get the prerender urls to queue up
+  const manager: d.PrerenderManager = {
+    templateId: null,
+    componentGraphPath: null,
+    diagnostics: prerenderDiagnostics,
+    config: config,
+    compilerCtx: compilerCtx,
+    origin: config.devServer.browserUrl,
+    hydrateAppFilePath: buildCtx.hydrateAppFilePath,
+    isDebug: (config.logLevel === 'debug'),
+    logCount: 0,
+    outputTarget: outputTarget,
+    prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
+    prerenderConfigPath: outputTarget.prerenderConfig,
+    urlsCompleted: new Set(),
+    urlsPending: new Set(),
+    urlsProcessing: new Set(),
+    resolve: null
+  };
 
-    initializePrerenderEntryUrls(manager);
+  initializePrerenderEntryUrls(manager);
 
-    if (manager.urlsPending.size === 0) {
-      timeSpan.finish(`prerendering failed: no urls found in the prerender config`);
-      return;
-    }
-
-    manager.templateId = await createPrerenderTemplate(config, templateHtml);
-
-    await new Promise(resolve => {
-      manager.resolve = resolve;
-
-      config.sys.nextTick(() => {
-        drainPrerenderQueue(manager);
-      });
-    });
-
-    if (manager.isDebug) {
-      const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
-      if (debugDiagnostics.length > 0) {
-        config.logger.printDiagnostics(debugDiagnostics, config.rootDir);
-      }
-    }
-
-    const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
-    const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
-
-    if (prerenderBuildErrors.length > 0) {
-      // convert to just runtime errors so the other build files still write
-      // but the CLI knows an error occurred and should have an exit code 1
-      prerenderBuildErrors.forEach(diagnostic => {
-        diagnostic.type = 'runtime';
-      });
-      buildCtx.diagnostics.push(...prerenderBuildErrors);
-    }
-    buildCtx.diagnostics.push(...prerenderRuntimeErrors);
-
-    const totalUrls = manager.urlsCompleted.size;
-    if (totalUrls > 1) {
-      const average = Math.round(timeSpan.duration() / totalUrls);
-      config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
-    }
-
-    const statusMessage = prerenderBuildErrors.length > 0 ? 'failed' : 'finished';
-    const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
-
-    timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-
-  } catch (e) {
-    catchError(prerenderDiagnostics, e);
+  if (manager.urlsPending.size === 0) {
+    timeSpan.finish(`prerendering failed: no urls found in the prerender config`);
+    return;
   }
+
+  manager.templateId = await createPrerenderTemplate(config, templateHtml);
+  manager.componentGraphPath = await createComponentGraphPath(config, buildCtx, outputTarget);
+
+  await new Promise(resolve => {
+    manager.resolve = resolve;
+
+    config.sys.nextTick(() => {
+      drainPrerenderQueue(manager);
+    });
+  });
+
+  if (manager.isDebug) {
+    const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
+    if (debugDiagnostics.length > 0) {
+      config.logger.printDiagnostics(debugDiagnostics, config.rootDir);
+    }
+  }
+
+  const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
+  const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
+
+  if (prerenderBuildErrors.length > 0) {
+    // convert to just runtime errors so the other build files still write
+    // but the CLI knows an error occurred and should have an exit code 1
+    prerenderBuildErrors.forEach(diagnostic => {
+      diagnostic.type = 'runtime';
+    });
+    buildCtx.diagnostics.push(...prerenderBuildErrors);
+  }
+  buildCtx.diagnostics.push(...prerenderRuntimeErrors);
+
+  const totalUrls = manager.urlsCompleted.size;
+  if (totalUrls > 1) {
+    const average = Math.round(timeSpan.duration() / totalUrls);
+    config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
+  }
+
+  const statusMessage = prerenderBuildErrors.length > 0 ? 'failed' : 'finished';
+  const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
+
+  timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
 }
 
 
@@ -134,6 +132,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       hydrateAppFilePath: manager.hydrateAppFilePath,
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
+      componentGraphPath: manager.componentGraphPath,
       writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
       url: url
     };
@@ -176,4 +175,25 @@ async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
   const templateId = config.sys.path.join(config.sys.details.tmpDir, templateFileName);
   await config.sys.fs.writeFile(templateId, templateHtml);
   return templateId;
+}
+
+
+async function createComponentGraphPath(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+  if (buildCtx.componentGraph) {
+    const content = getComponentPathContent(config, buildCtx.componentGraph, outputTarget);
+    const fileName = `prerender-component-graph-${config.sys.generateContentHash(content, 12)}.json`;
+    const componentGraphPath = config.sys.path.join(config.sys.details.tmpDir, fileName);
+    await config.sys.fs.writeFile(componentGraphPath, content);
+    return componentGraphPath;
+  }
+  return null;
+}
+
+function getComponentPathContent(config: d.Config, componentGraph: Map<string, string[]>, outputTarget: d.OutputTargetWww) {
+  const buildDir = '/' + getRelativeBuildDir(config, outputTarget);
+  const object: {[key: string]: string[]} = {};
+  for (const [key, chunks] of componentGraph.entries()) {
+    object[key] = chunks.map(filename => config.sys.path.join(buildDir, filename));
+  }
+  return JSON.stringify(object);
 }

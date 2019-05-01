@@ -1,21 +1,27 @@
 import * as d from '../../declarations';
+import { getRelativeBuildDir } from './utils';
 
 export function optimizeCriticalPath(config: d.Config, doc: Document, criticalBundlers: string[], outputTarget: d.OutputTargetWww) {
-  const relativeBuildDir = config.sys.path.relative(outputTarget.dir, outputTarget.buildDir);
-  const paths = criticalBundlers.map(path => '/' + config.sys.path.join(relativeBuildDir, path));
-
+  const buildDir = '/' + getRelativeBuildDir(config, outputTarget);
+  const paths = criticalBundlers.map(path => config.sys.path.join(buildDir, path));
   injectModulePreloads(doc, paths);
 }
 
 export function injectModulePreloads(doc: Document, paths: string[]) {
-  const links = paths.map(path => createModulePreload(doc, path));
+  const existingLinks = (Array.from(doc.querySelectorAll('link[rel=modulepreload]')) as HTMLLinkElement[])
+    .map(link => link.href);
+
+  const addLinks = paths
+    .filter(path => !existingLinks.includes(path))
+    .map(path => createModulePreload(doc, path));
+
   const firstScript = doc.head.querySelector('script');
   if (firstScript) {
-    links.forEach(link => {
+    addLinks.forEach(link => {
       doc.head.insertBefore(link, firstScript);
     });
   } else {
-    links.forEach(link => {
+    addLinks.forEach(link => {
       doc.head.appendChild(link);
     });
   }

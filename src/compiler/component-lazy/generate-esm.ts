@@ -4,6 +4,7 @@ import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { getDynamicImportFunction, relativeImport } from '@utils';
 import { RollupResult } from '../../declarations';
+import { generateModuleGraph } from '../entries/component-graph';
 
 export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, isBrowserBuild: boolean, outputTargets: d.OutputTargetDistLazy[]) {
   if (!isBrowserBuild && !config.buildDist) {
@@ -34,7 +35,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, output, 'es5', isBrowserBuild, '');
 
       await generateShortcuts(config, compilerCtx, outputTargets, output);
-      return componentBundle;
+      return generateModuleGraph(buildCtx.components, componentBundle);
     }
   }
   return undefined;

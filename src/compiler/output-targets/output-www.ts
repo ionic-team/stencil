@@ -10,16 +10,17 @@ import { performCopyTasks } from '../copy/copy-tasks';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { writeGlobalStyles } from '../style/global-styles';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
+import { getScopeId } from '../style/scope-css';
 
 
-export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
+export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
   }
 
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
-  const criticalBundles = getCriticalPath(buildCtx, bundleModules);
+  const criticalBundles = getCriticalPath(buildCtx);
 
   await Promise.all(
     outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
@@ -28,27 +29,18 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
   timespan.finish(`generate www finished`);
 }
 
-function getCriticalPath(buildCtx: d.BuildCtx, bundleModules: d.BundleModule[]) {
-  if (!buildCtx.indexDoc || !bundleModules) {
+function getCriticalPath(buildCtx: d.BuildCtx) {
+  const componentGraph = buildCtx.componentGraph;
+  if (!buildCtx.indexDoc || !componentGraph) {
     return [];
   }
   return unique(
     flatOne(
       getUsedComponents(buildCtx.indexDoc, buildCtx.components)
-        .map(tagName => getModulesForTagName(tagName, bundleModules))
+        .map(tagName => getScopeId(tagName))
+        .map(scopeId => buildCtx.componentGraph.get(scopeId) || [])
     )
   ).sort();
-}
-
-function getModulesForTagName(tagName: string, bundleModules: d.BundleModule[], _defaultMode?: string) {
-  const bundle = bundleModules.find(bundle => bundle.cmps.some(c => c.tagName === tagName));
-  const entry = bundle.outputs.length === 1
-    ? [bundle.outputs[0].fileName]
-    : [];
-  return [
-    ...entry,
-    ...bundle.rollupResult.imports
-  ];
 }
 
 async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {

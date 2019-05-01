@@ -26,6 +26,7 @@ export interface BuildCtx {
   bundleBuildCount: number;
   collections: d.Collection[];
   components: d.ComponentCompilerMeta[];
+  componentGraph: Map<string, string[]>;
   moduleFiles: d.Module[];
   entryModules: d.EntryModule[];
   indexDoc: Document;

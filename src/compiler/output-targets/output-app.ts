@@ -13,12 +13,12 @@ import { loaderPlugin } from '../rollup-plugins/loader';
 export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _webComponentsModule: string) {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
-    return undefined;
+    return;
   }
 
   copyAssets(config, compilerCtx, buildCtx, outputTargets);
 
-  return generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets);
+  await generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets);
 }
 
 async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {

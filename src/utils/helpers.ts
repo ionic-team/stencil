@@ -50,6 +50,15 @@ export function unique<T>(array: T[], predicate: (item: T) => any = (i) => i): T
   });
 }
 
+export function fromEntries<V>(entries: IterableIterator<[string, V]>) {
+  const object: { [key: string]: V} = {};
+  for (const [key, value] of entries) {
+    object[key] = value;
+  }
+  return object;
+}
+
+
 export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string, addPrefix = true) {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
   if (addPrefix) {

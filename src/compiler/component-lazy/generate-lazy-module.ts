@@ -66,9 +66,6 @@ async function writeLazyChunk(
   shouldMinify: boolean,
   isBrowserBuild: boolean
 ) {
-  if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
-    return;
-  }
   const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, rollupResult.isCore, isBrowserBuild, rollupResult.code);
 
   await Promise.all(destinations.map(dst => {
@@ -84,6 +81,9 @@ async function writeLazyEntry(
   sourceTarget: d.SourceTarget,
   isBrowserBuild: boolean,
 ) {
+  if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
+    return;
+  }
   let code = rollupResult.code.replace(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`

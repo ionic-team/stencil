@@ -14,6 +14,7 @@ export interface PrerenderManager {
   prerenderConfigPath: string;
   resolve: Function;
   templateId: string;
+  componentGraphPath: string;
   urlsProcessing: Set<string>;
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
@@ -45,6 +46,7 @@ export interface PrerenderRequest {
   hydrateAppFilePath: string;
   prerenderConfigPath: string;
   templateId: string;
+  componentGraphPath: string;
   writeToFilePath: string;
   url: string;
 }

@@ -3,6 +3,7 @@ import { catchError, normalizePath } from '@utils';
 import { getPrerenderConfig, normalizeHref } from './prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
+import { generateModulePreloads } from './prerender-modulepreload';
 import fs from 'fs';
 import path from 'path';
 
@@ -18,6 +19,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   try {
     const base = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
     const originUrl = base.href;
+    const componentGraph = getComponentGraph(prerenderRequest.componentGraphPath);
     const win = getWindow(prerenderRequest.templateId, originUrl);
     const doc = win.document;
 
@@ -59,6 +61,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     // serialize the hydrated dom nodes back to into html
     const hydrateResults = await hydrateApp.hydrateDocument(doc, hydrateOpts) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
+
+    generateModulePreloads(doc, hydrateResults, componentGraph);
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
@@ -164,6 +168,20 @@ function getWindow(templateId: string, originUrl: string) {
   return win;
 }
 
+let componentGraph: Map<string, string[]>;
+
+function getComponentGraph(componentGraphPath: string) {
+  if (componentGraphPath == null) {
+    return undefined;
+  }
+  if (componentGraph == null) {
+    const componentGraphJson = JSON.parse(fs.readFileSync(componentGraphPath, 'utf8'));
+    componentGraph = new Map<string, string[]>(
+      Object.entries(componentGraphJson)
+    );
+  }
+  return componentGraph;
+}
 
 function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, diagnostics: d.Diagnostic[], base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {

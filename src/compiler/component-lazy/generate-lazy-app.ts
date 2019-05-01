@@ -13,12 +13,12 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
   if (buildCtx.hasError) {
-    return null;
+    return;
   }
 
   await buildCtx.stylesPromise;
 
-  const [bundleModules] = await Promise.all([
+  const [componentGraph] = await Promise.all([
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.isBrowserBuild)),
     generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.isBrowserBuild)),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
@@ -26,8 +26,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   ]);
 
   timespan.finish(`bundling components finished`);
-
-  return bundleModules;
+  buildCtx.componentGraph = componentGraph;
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
