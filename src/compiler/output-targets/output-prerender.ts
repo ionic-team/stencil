@@ -1,6 +1,8 @@
 import * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { runPrerenderMain } from '../prerender/prerender-main';
+import { generateTemplateHtml } from '../prerender/prerender-template-html';
+
 import { buildError } from '@utils';
 
 
@@ -33,21 +35,11 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
   // get the www index html content for the template for all prerendered pages
-  let templateHtml: string = null;
-  try {
-    templateHtml = await compilerCtx.fs.readFile(outputTarget.indexHtml);
-  } catch (e) {}
-
-  if (typeof templateHtml !== 'string') {
-    // looks like we don't have an index html file, which is fine
-    buildCtx.debug(`prerenderOutputTarget, missing index.html for prerendering`);
-    return;
-  }
-
   if (typeof buildCtx.hydrateAppFilePath !== 'string') {
     buildCtx.debug(`prerenderOutputTarget, missing hydrateAppFilePath for prerendering`);
     return;
   }
 
+  const templateHtml = await generateTemplateHtml(config, compilerCtx, buildCtx, outputTarget);
   await runPrerenderMain(config, compilerCtx, buildCtx, outputTarget, templateHtml);
 }
