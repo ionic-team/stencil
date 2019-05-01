@@ -17,17 +17,21 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   };
 
   try {
-    const base = new URL(prerenderRequest.url, 'http://hydrate.stenciljs.com');
-    const originUrl = base.href;
+    const base = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
+    const prerenderUrl = base.href;
     const componentGraph = getComponentGraph(prerenderRequest.componentGraphPath);
-    const win = getWindow(prerenderRequest.templateId, originUrl);
+    const win = getWindow(prerenderRequest);
     const doc = win.document;
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
     const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
 
-    const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath) as d.HydrateConfig;
+    const prerenderConfig = getPrerenderConfig(
+      results.diagnostics,
+      prerenderRequest.prerenderConfigPath,
+      prerenderRequest.devServerHostUrl
+    ) as d.HydrateConfig;
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
@@ -41,10 +45,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const hydrateOpts: d.HydrateOptions = {
-      url: originUrl,
+      url: prerenderUrl,
       approximateLineWidth: 100,
       collapseBooleanAttributes: true,
-      removeAttributeQuotes: true,
       removeEmptyAttributes: true
     };
 
@@ -152,17 +155,17 @@ function ensureDir(p: string) {
 
 const templateWindows = new Map<string, Window>();
 
-function getWindow(templateId: string, originUrl: string) {
-  let templateWindow = templateWindows.get(templateId);
+function getWindow(prerenderRequest: d.PrerenderRequest) {
+  let templateWindow = templateWindows.get(prerenderRequest.templateId);
   if (templateWindow == null) {
-    const templateHtml = fs.readFileSync(templateId, 'utf8');
+    const templateHtml = fs.readFileSync(prerenderRequest.templateId, 'utf8');
     templateWindow = new MockWindow(templateHtml) as any;
-    templateWindows.set(templateId, templateWindow);
+    templateWindows.set(prerenderRequest.templateId, templateWindow);
   }
 
   const win = cloneWindow(templateWindow);
 
-  patchNodeGlobal(global, originUrl);
+  patchNodeGlobal(global, prerenderRequest.devServerHostUrl);
   patchWindowGlobal(global, win);
 
   return win;

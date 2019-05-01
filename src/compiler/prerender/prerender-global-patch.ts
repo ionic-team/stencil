@@ -1,6 +1,6 @@
 
 
-export function patchNodeGlobal(nodeGlobal: any, originUrl: string) {
+export function patchNodeGlobal(nodeGlobal: any, devServerHostUrl: string) {
   if (typeof nodeGlobal.fetch !== 'function') {
     const path = require('path');
 
@@ -10,12 +10,13 @@ export function patchNodeGlobal(nodeGlobal: any, originUrl: string) {
 
     nodeGlobal.fetch = (input: any, init: any) => {
       if (typeof input === 'string') {
-        // fetch(url)
-        return nodeFetch.fetch(normalizeUrl(input, originUrl), init);
+        // fetch(url) w/ url string
+        const urlStr = normalizeUrl(input, devServerHostUrl);
+        return nodeFetch.fetch(urlStr, init);
 
       } else {
-        // fetch(Request)
-        input.url = normalizeUrl(input.url, originUrl);
+        // fetch(Request) w/ request object
+        input.url = normalizeUrl(input.url, devServerHostUrl);
         return nodeFetch.fetch(input, init);
       }
     };
@@ -28,8 +29,8 @@ export function patchNodeGlobal(nodeGlobal: any, originUrl: string) {
 }
 
 
-function normalizeUrl(inputUrl: string, originUrl: string) {
-  const requestUrl = new URL(inputUrl, originUrl);
+function normalizeUrl(inputUrl: string, devServerHostUrl: string) {
+  const requestUrl = new URL(inputUrl, devServerHostUrl);
   return requestUrl.href;
 }
 

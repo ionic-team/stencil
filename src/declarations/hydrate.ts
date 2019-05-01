@@ -2,13 +2,14 @@ import * as d from '.';
 
 
 export interface PrerenderManager {
+  basePath: string;
   compilerCtx: d.CompilerCtx;
   config: d.Config;
+  devServerHostUrl: string;
   diagnostics: d.Diagnostic[];
   hydrateAppFilePath: string;
   isDebug: boolean;
   logCount: number;
-  origin: string;
   outputTarget: d.OutputTargetWww;
   prerenderConfig: d.HydrateConfig;
   prerenderConfigPath: string;
@@ -43,12 +44,13 @@ export interface HydrateResults {
 
 
 export interface PrerenderRequest {
+  componentGraphPath: string;
+  devServerHostUrl: string;
   hydrateAppFilePath: string;
   prerenderConfigPath: string;
   templateId: string;
-  componentGraphPath: string;
-  writeToFilePath: string;
   url: string;
+  writeToFilePath: string;
 }
 
 

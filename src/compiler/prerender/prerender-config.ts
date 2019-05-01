@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 
 
-export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
+export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string, devServerHostUrl: string) {
   const prerenderConfig: d.HydrateConfig = {};
 
   if (typeof prerenderConfigPath === 'string') {
@@ -50,7 +50,8 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
     prerenderConfig.normalizeUrl = function defaultNormalizeUrl(href: string, base: URL) {
       if (typeof href === 'string') {
         try {
-          const outputUrl = new URL(href, base.href);
+          const baseHref = base ? base.href : devServerHostUrl;
+          const outputUrl = new URL(href, baseHref);
           outputUrl.hash = '';
           outputUrl.search = '';
           return outputUrl;

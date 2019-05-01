@@ -1,5 +1,7 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
+import { URL } from 'url';
+
 
 export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
   if (!config.flags || !config.flags.prerender) {
@@ -7,8 +9,15 @@ export function validatePrerender(config: d.Config, outputTarget: d.OutputTarget
   }
 
   outputTarget.baseUrl = normalizePath(outputTarget.baseUrl);
-  if (!outputTarget.baseUrl.startsWith('/')) {
-    throw new Error(`baseUrl "${outputTarget.baseUrl}" must start with a slash "/". This represents an absolute path to the root of the domain.`);
+
+  if (!outputTarget.baseUrl.startsWith('http://') && !outputTarget.baseUrl.startsWith('https://')) {
+    throw new Error(`When prerendering, the "baseUrl" output target config must be a full URL and start with either "http://" or "https://". The config can be updated in the "www" output target within the stencil config.`);
+  }
+
+  try {
+    new URL(outputTarget.baseUrl);
+  } catch (e) {
+    throw new Error(`invalid "baseUrl": ${e}`);
   }
 
   if (!outputTarget.baseUrl.endsWith('/')) {

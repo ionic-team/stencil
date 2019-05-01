@@ -1,21 +1,23 @@
 import * as d from '../../declarations';
+import { URL } from 'url';
 
 
 export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputUrl: string) {
-  const url = new URL(inputUrl, manager.origin);
+  const url = new URL(inputUrl, manager.devServerHostUrl);
 
-  let pathName = url.pathname;
-  if (pathName.startsWith(manager.outputTarget.baseUrl)) {
-    pathName = pathName.substring(manager.outputTarget.baseUrl.length);
 
-  } else if (manager.outputTarget.baseUrl === pathName + '/') {
-    pathName = '/';
+  let prerenderPathname = url.pathname;
+  if (prerenderPathname.startsWith(manager.basePath)) {
+    prerenderPathname = prerenderPathname.substring(manager.basePath.length);
+
+  } else if (manager.outputTarget.baseUrl === prerenderPathname + '/') {
+    prerenderPathname = '/';
   }
 
   // figure out the directory where this file will be saved
   const dir = manager.config.sys.path.join(
     manager.outputTarget.dir,
-    pathName
+    prerenderPathname
   );
 
   // create the full path where this will be saved (normalize for windowz)

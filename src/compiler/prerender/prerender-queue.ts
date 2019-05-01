@@ -1,25 +1,34 @@
 import * as d from '../../declarations';
+import { buildError } from '@utils';
 import { normalizeHref } from './prerender-config';
 import { URL } from 'url';
 
 
 export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
-  const base = new URL(manager.origin);
-  manager.origin = base.origin;
-  manager.config.logger.debug(`prerender http origin: ${manager.origin}`);
+  const entryHrefs: string[] = [];
 
   if (Array.isArray(manager.prerenderConfig.entryUrls)) {
     manager.prerenderConfig.entryUrls.forEach(entryUrl => {
-      const url = manager.prerenderConfig.normalizeUrl(entryUrl, base);
-      const href = normalizeHref(manager.prerenderConfig, manager.diagnostics, url);
-      addUrlToPendingQueue(manager, href, '#entryUrls');
+      entryHrefs.push(entryUrl);
     });
 
   } else {
-    const url = manager.prerenderConfig.normalizeUrl(manager.outputTarget.baseUrl, base);
-    const href = normalizeHref(manager.prerenderConfig, manager.diagnostics, url);
-    addUrlToPendingQueue(manager, href, '#baseUrl');
+    entryHrefs.push(manager.outputTarget.baseUrl);
   }
+
+  entryHrefs.forEach(href => {
+    try {
+      new URL(href);
+      const url = manager.prerenderConfig.normalizeUrl(href);
+      const normalizesHref = normalizeHref(manager.prerenderConfig, manager.diagnostics, url);
+      addUrlToPendingQueue(manager, normalizesHref, '#entryUrl');
+
+    } catch (e) {
+      const diagnostic = buildError(manager.diagnostics);
+      diagnostic.header = `Invalid Prerender Entry Url: ${href}`;
+      diagnostic.messageText = `Entry Urls must include the protocol and domain of the site being prerendered.`;
+    }
+  });
 }
 
 

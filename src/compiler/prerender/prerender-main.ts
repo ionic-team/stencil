@@ -4,6 +4,7 @@ import { catchError } from '@utils';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { getRelativeBuildDir } from '../html/utils';
+import { URL } from 'url';
 
 
 export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -17,19 +18,27 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
 
   const prerenderDiagnostics: d.Diagnostic[] = [];
 
+  const devServerBaseUrl = new URL(config.devServer.browserUrl);
+  const devServerHostUrl = devServerBaseUrl.origin;
+  config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
+
+  const baseUrl = new URL(outputTarget.baseUrl, devServerHostUrl);
+  const basePath = baseUrl.pathname;
+
   // get the prerender urls to queue up
   const manager: d.PrerenderManager = {
+    basePath: basePath,
     templateId: null,
     componentGraphPath: null,
     diagnostics: prerenderDiagnostics,
     config: config,
     compilerCtx: compilerCtx,
-    origin: config.devServer.browserUrl,
+    devServerHostUrl: devServerHostUrl,
     hydrateAppFilePath: buildCtx.hydrateAppFilePath,
     isDebug: (config.logLevel === 'debug'),
     logCount: 0,
     outputTarget: outputTarget,
-    prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
+    prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig, devServerHostUrl),
     prerenderConfigPath: outputTarget.prerenderConfig,
     urlsCompleted: new Set(),
     urlsPending: new Set(),
@@ -129,12 +138,13 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     }
 
     const prerenderRequest: d.PrerenderRequest = {
+      componentGraphPath: manager.componentGraphPath,
+      devServerHostUrl: manager.devServerHostUrl,
       hydrateAppFilePath: manager.hydrateAppFilePath,
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
-      componentGraphPath: manager.componentGraphPath,
-      writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
-      url: url
+      url: url,
+      writeToFilePath: getWriteFilePathFromUrlPath(manager, url)
     };
 
     // prender this path and wait on the results
