@@ -69,7 +69,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
     'hosting': {
       'headers': [
         {
-          'source': `/${buildDir}/p-*.js`,
+          'source': `/${buildDir}/p-*`,
           'headers': [ {
             'key': 'Cache-Control',
             'value': 'max-age=365000000, immutable'
