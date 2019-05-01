@@ -53,12 +53,23 @@ describe('validateDevServer', () => {
       } as d.OutputTargetWww
     ];
     validateConfig(config);
-    expect(config.devServer.baseUrl).toBe('/my-base-url/');
+    expect(config.devServer.basePath).toBe('/my-base-url/');
   });
 
-  it('should default baseUrl', () => {
+  it('should get custom baseUrl with domain', () => {
+    config.outputTargets = [
+      {
+        type: 'www',
+        baseUrl: 'http://stenciljs.com/my-base-url'
+      } as d.OutputTargetWww
+    ];
     validateConfig(config);
-    expect(config.devServer.baseUrl).toBe('/');
+    expect(config.devServer.basePath).toBe('/my-base-url/');
+  });
+
+  it('should default basePath', () => {
+    validateConfig(config);
+    expect(config.devServer.basePath).toBe('/');
   });
 
   it('should default root', () => {

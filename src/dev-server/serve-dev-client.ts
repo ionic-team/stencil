@@ -45,7 +45,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
   let content = await fs.readFile(filePath);
 
   const devClientConfig: d.DevClientConfig = {
-    baseUrl: devServerConfig.baseUrl,
+    basePath: devServerConfig.basePath,
     editors: devServerConfig.editors,
     hmr: devServerConfig.hotReplacement
   };

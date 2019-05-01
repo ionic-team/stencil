@@ -38,6 +38,6 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
 
 function isInitialDevServerLoad(win: d.DevClientWindow, config: d.DevClientConfig) {
   let pathname = win.location.pathname;
-  pathname = '/' + pathname.substring(config.baseUrl.length);
+  pathname = '/' + pathname.substring(config.basePath.length);
   return pathname === DEV_SERVER_INIT_URL;
 }

@@ -43,11 +43,11 @@ const DEFAULT_HEADERS: d.DevResponseHeaders = {
 };
 
 
-export function getBrowserUrl(protocol: string, address: string, port: number, baseUrl: string, pathname: string) {
+export function getBrowserUrl(protocol: string, address: string, port: number, basePath: string, pathname: string) {
   address = (address === `0.0.0.0`) ? `localhost` : address;
   const portSuffix = (!port || port === 80 || port === 443) ? '' : (':' + port);
 
-  let path = baseUrl;
+  let path = basePath;
   if (pathname.startsWith('/')) {
     pathname = pathname.substring(1);
   }
@@ -72,7 +72,7 @@ export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: 
     devServerConfig.protocol,
     address,
     port,
-    devServerConfig.baseUrl,
+    devServerConfig.basePath,
     DEV_SERVER_URL
   );
 }

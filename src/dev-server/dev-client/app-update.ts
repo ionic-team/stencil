@@ -107,7 +107,7 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
 export function appReset(win: d.DevClientWindow, config: d.DevClientConfig) {
   // we're probably at some ugly url
   // let's update the url to be the expect root url: /
-  win.history.replaceState({}, 'App', config.baseUrl);
+  win.history.replaceState({}, 'App', config.basePath);
 
   if (!win.navigator.serviceWorker) {
     return Promise.resolve();

@@ -74,7 +74,7 @@ describe('getDevServerClientUrl',  () => {
       protocol: 'http',
       address: '0.0.0.0',
       port: 3333,
-      baseUrl: '/my-base-url/'
+      basePath: '/my-base-url/'
     };
     const host = 'staging.stenciljs:5555.com';
     const url = getDevServerClientUrl(devServerConfig, host);
@@ -86,7 +86,7 @@ describe('getDevServerClientUrl',  () => {
       protocol: 'http',
       address: '0.0.0.0',
       port: 3333,
-      baseUrl: '/my-base-url/'
+      basePath: '/my-base-url/'
     };
     const host = 'staging.stenciljs.com';
     const url = getDevServerClientUrl(devServerConfig, host);
@@ -98,7 +98,7 @@ describe('getDevServerClientUrl',  () => {
       protocol: 'http',
       address: '0.0.0.0',
       port: 3333,
-      baseUrl: '/my-base-url/'
+      basePath: '/my-base-url/'
     };
     const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);
@@ -109,7 +109,7 @@ describe('getDevServerClientUrl',  () => {
     const devServerConfig: d.DevServerConfig = {
       protocol: 'http',
       address: '0.0.0.0',
-      baseUrl: '/my-base-url/'
+      basePath: '/my-base-url/'
     };
     const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);
@@ -121,7 +121,7 @@ describe('getDevServerClientUrl',  () => {
       protocol: 'http',
       address: '1.2.3.4',
       port: 3333,
-      baseUrl: '/my-base-url/'
+      basePath: '/my-base-url/'
     };
     const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host);

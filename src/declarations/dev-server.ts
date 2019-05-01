@@ -9,7 +9,7 @@ export interface DevServer {
 
 export interface DevServerConfig {
   address?: string;
-  baseUrl?: string;
+  basePath?: string;
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
@@ -42,7 +42,7 @@ export interface DevClientWindow extends Window {
 
 
 export interface DevClientConfig {
-  baseUrl: string;
+  basePath: string;
   editors: d.DevServerEditor[];
   hmr: boolean;
 }

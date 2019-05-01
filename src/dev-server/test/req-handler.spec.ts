@@ -35,7 +35,7 @@ describe('request-handler', () => {
       contentTypes: contentTypes,
       devServerDir: normalizePath(path.join(__dirname, '..')),
       root: normalizePath(path.join(root, 'www')),
-      baseUrl: '/'
+      basePath: '/'
     };
 
     await fs.mkdir(stencilConfig.devServer.root);
@@ -239,7 +239,7 @@ describe('request-handler', () => {
     });
 
     it('get directory index.html with trailing slash and base url', async () => {
-      config.baseUrl = '/my-base-url/';
+      config.basePath = '/my-base-url/';
       await fs.mkdir(path.join(root, 'www', 'about-us'));
       await fs.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, fs);
@@ -312,7 +312,7 @@ describe('request-handler', () => {
     });
 
     it('serve root index.html w/ base url', async () => {
-      config.baseUrl = '/my-base-url/';
+      config.basePath = '/my-base-url/';
       await fs.writeFile(path.join(root, 'www', 'index.html'), `hello`);
       const handler = createRequestHandler(config, fs);
 

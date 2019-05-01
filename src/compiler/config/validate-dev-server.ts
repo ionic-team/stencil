@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
+import { URL } from 'url';
 
 
 export function validateDevServer(config: d.Config) {
@@ -51,13 +52,15 @@ export function validateDevServer(config: d.Config) {
   }
 
   let serveDir: string = null;
-  let baseUrl: string = null;
+  let basePath: string = null;
   const wwwOutputTarget = config.outputTargets.find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
     serveDir = wwwOutputTarget.dir;
-    baseUrl = wwwOutputTarget.baseUrl;
-    config.logger.debug(`dev server www root: ${serveDir}, base url: ${baseUrl}`);
+    const defaultPath = wwwOutputTarget.baseUrl || '/';
+    const baseUrl = new URL(defaultPath, 'http://config.stenciljs.com');
+    basePath = baseUrl.pathname;
+    config.logger.debug(`dev server www root: ${serveDir}, base path: ${basePath}`);
 
   } else {
     serveDir = config.rootDir;
@@ -67,18 +70,18 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
-  if (typeof baseUrl !== 'string') {
-    baseUrl = `/`;
+  if (typeof basePath !== 'string' || basePath.trim() === '') {
+    basePath = `/`;
   }
 
-  baseUrl = normalizePath(baseUrl);
+  basePath = normalizePath(basePath);
 
-  if (!baseUrl.startsWith('/')) {
-    baseUrl = '/' + baseUrl;
+  if (!basePath.startsWith('/')) {
+    basePath = '/' + basePath;
   }
 
-  if (!baseUrl.endsWith('/')) {
-    baseUrl += '/';
+  if (!basePath.endsWith('/')) {
+    basePath += '/';
   }
 
   if (typeof config.devServer.logRequests !== 'boolean') {
@@ -86,7 +89,11 @@ export function validateDevServer(config: d.Config) {
   }
 
   setStringConfig(config.devServer, 'root', serveDir);
-  setStringConfig(config.devServer, 'baseUrl', baseUrl);
+  setStringConfig(config.devServer, 'basePath', basePath);
+
+  if (typeof (config.devServer as any).baseUrl === 'string') {
+    throw new Error(`devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`);
+  }
 
   if (!config.sys.path.isAbsolute(config.devServer.root)) {
     config.devServer.root = config.sys.path.join(config.rootDir, config.devServer.root);
