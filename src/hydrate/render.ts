@@ -29,7 +29,8 @@ export async function renderToString(html: string, opts: d.HydrateOptions = {}) 
       results.html = serializeNodeToHtml(doc, {
         approximateLineWidth: opts.approximateLineWidth,
         collapseBooleanAttributes: opts.collapseBooleanAttributes,
-        pretty: opts.prettyHtml
+        pretty: opts.prettyHtml,
+        removeEmptyAttributes: opts.removeEmptyAttributes
       });
     }
 

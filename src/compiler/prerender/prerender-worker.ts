@@ -40,7 +40,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const hydrateOpts: d.HydrateOptions = {
       url: originUrl,
-      approximateLineWidth: 100
+      approximateLineWidth: 100,
+      collapseBooleanAttributes: true,
+      removeAttributeQuotes: true,
+      removeEmptyAttributes: true
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
@@ -71,7 +74,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const html = serializeNodeToHtml(doc, {
       approximateLineWidth: hydrateOpts.approximateLineWidth,
       collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
-      pretty: hydrateOpts.prettyHtml
+      pretty: hydrateOpts.prettyHtml,
+      removeAttributeQuotes: hydrateOpts.removeAttributeQuotes,
+      removeEmptyAttributes: hydrateOpts.removeEmptyAttributes
     });
 
     results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, base, hydrateResults.anchors);

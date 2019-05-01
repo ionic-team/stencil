@@ -99,7 +99,6 @@ export interface HydrateOptions {
   constrainTimeouts?: boolean;
   clientHydrateAnnotations?: boolean;
   collapseBooleanAttributes?: boolean;
-  collapseWhitespace?: boolean;
   cookie?: string;
   direction?: string;
   language?: string;
@@ -107,6 +106,8 @@ export interface HydrateOptions {
   minifyInlineStyles?: boolean;
   prettyHtml?: boolean;
   referrer?: string;
+  removeAttributeQuotes?: boolean;
+  removeEmptyAttributes?: boolean;
   removeScripts?: string[];
   removeUnusedStyles?: boolean;
   timeout?: number;
