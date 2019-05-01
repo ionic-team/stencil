@@ -48,7 +48,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       url: prerenderUrl,
       approximateLineWidth: 100,
       collapseBooleanAttributes: true,
-      removeEmptyAttributes: true
+      removeEmptyAttributes: true,
+      canonicalLink: prerenderUrl
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {
