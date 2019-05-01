@@ -1,27 +1,12 @@
-import { Component, getAssetPath } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { getAssetPath } from '@stencil/core';
 
 
 describe('assets', () => {
 
-  it('can call getAssetPath', async () => {
-    @Component({ tag: 'cmp-a'})
-    class CmpA {
-      componentWillLoad() {
-        getAssetPath("foo.png");
-      }
-    }
+  it('can call getAssetPath from tests', async () => {
 
-    const { root } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-    });
+    expect(() => getAssetPath("foo.png")).not.toThrow();
 
-    expect(root).toEqualHtml(`
-      <cmp-a></cmp-a>
-    `);
-
-    expect(root.textContent).toBe('');
   });
 
 });
