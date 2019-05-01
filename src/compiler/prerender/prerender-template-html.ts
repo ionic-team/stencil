@@ -38,6 +38,7 @@ function inlineGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, output
       preload.setAttribute('rel', 'preload');
       preload.setAttribute('href', href);
       preload.setAttribute('as', 'style');
+      preload.setAttribute('importance', 'low');
       parent.insertBefore(preload, link);
 
       // insert inline <style>
@@ -48,6 +49,9 @@ function inlineGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, output
 
       // move <link rel="stylesheet"> to the end of <body>
       link.remove();
+
+      // since it's not longer a critical resource
+      link.setAttribute('importance', 'low');
       doc.body.appendChild(link);
     })
   );
