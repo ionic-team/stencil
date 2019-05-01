@@ -1,3 +1,4 @@
+import { normalizePath } from '@utils';
 import { TestingFs } from './testing-fs';
 import { StencilSystem } from '../declarations';
 import fs from 'fs';
@@ -18,7 +19,13 @@ export class TestingSystem extends NodeSystem {
   constructor() {
     const fs = new TestingFs();
     super(fs);
-    this.path = path;
+    this.path = Object.assign({}, path);
+
+    const orgPathJoin = path.join;
+    this.path.join = function(...paths) {
+      return normalizePath(orgPathJoin.apply(path, paths));
+    };
+
     this.createFsWatcher = null;
     this.initWorkers(1, 1);
   }

@@ -97,8 +97,10 @@ export function serializeCollectionManifest(config: d.Config, compilerCtx: d.Com
     }))
   };
   if (config.globalScript) {
-    const mod = compilerCtx.moduleMap.get(config.globalScript);
-    collectionManifest.global = config.sys.path.relative(config.srcDir, mod.jsFilePath);
+    const mod = compilerCtx.moduleMap.get(normalizePath(config.globalScript));
+    if (mod) {
+      collectionManifest.global = config.sys.path.relative(config.srcDir, mod.jsFilePath);
+    }
   }
   return collectionManifest;
 }

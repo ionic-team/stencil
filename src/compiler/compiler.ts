@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
-import { catchError } from '@utils';
+import { catchError, normalizePath } from '@utils';
 import { CompilerContext } from './build/compiler-ctx';
 import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
@@ -186,19 +186,19 @@ export class Compiler implements d.Compiler {
 
     switch (eventName) {
       case 'fileUpdate':
-        fsWatchResults.filesUpdated.push(args[0]);
+        fsWatchResults.filesUpdated.push(normalizePath(args[0]));
         break;
       case 'fileAdd':
-        fsWatchResults.filesAdded.push(args[0]);
+        fsWatchResults.filesAdded.push(normalizePath(args[0]));
         break;
       case 'fileDelete':
-        fsWatchResults.filesDeleted.push(args[0]);
+        fsWatchResults.filesDeleted.push(normalizePath(args[0]));
         break;
       case 'dirAdd':
-        fsWatchResults.dirsAdded.push(args[0]);
+        fsWatchResults.dirsAdded.push(normalizePath(args[0]));
         break;
       case 'dirDelete':
-        fsWatchResults.dirsDeleted.push(args[0]);
+        fsWatchResults.dirsDeleted.push(normalizePath(args[0]));
         break;
     }
 

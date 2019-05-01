@@ -6,13 +6,14 @@ import path from 'path';
 
 describe('validateOutputTargetWww', () => {
 
+  const rootDir = path.resolve('/');
   let config: d.Config;
   beforeEach(() => {
     config = {
       sys: {
         path: path
       },
-      rootDir: '/',
+      rootDir: rootDir,
       flags: {}
     } as any;
   });
@@ -93,9 +94,9 @@ describe('validateOutputTargetWww', () => {
     config.outputTargets = [outputTarget];
     validateOutputTargetWww(config);
 
-    expect(outputTarget.dir).toBe('/www/docs');
-    expect(outputTarget.buildDir).toBe('/www/docs/build');
-    expect(outputTarget.indexHtml).toBe('/www/docs/index.html');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'www', 'docs'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'docs', 'build'));
+    expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'docs', 'index.html'));
   });
 
   it('should set www values', () => {
@@ -110,9 +111,9 @@ describe('validateOutputTargetWww', () => {
     validateOutputTargetWww(config);
 
     expect(outputTarget.type).toBe('www');
-    expect(outputTarget.dir).toBe('/my-www');
-    expect(outputTarget.buildDir).toBe('/my-www/my-build');
-    expect(outputTarget.indexHtml).toBe('/my-www/my-index.htm');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'my-www'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, 'my-www', 'my-build'));
+    expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'my-www', 'my-index.htm'));
     expect(outputTarget.empty).toBe(false);
   });
 
@@ -121,9 +122,9 @@ describe('validateOutputTargetWww', () => {
     expect(config.outputTargets).toHaveLength(2);
 
     const outputTarget = config.outputTargets.find(isOutputTargetWww);
-    expect(outputTarget.dir).toBe('/www');
-    expect(outputTarget.buildDir).toBe('/www/build');
-    expect(outputTarget.indexHtml).toBe('/www/index.html');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'build'));
+    expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'index.html'));
     expect(outputTarget.empty).toBe(true);
   });
 
