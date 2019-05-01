@@ -323,6 +323,7 @@ export namespace JSXBase {
     alt?: string;
     decoding?: 'async' | 'auto' | 'sync';
     height?: number | string;
+    loading?: 'lazy' | 'auto' | 'eager';
     sizes?: string;
     src?: string;
     srcSet?: string;
