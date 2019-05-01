@@ -437,7 +437,6 @@ function createConfigKey(config: d.Config, compilerOptions: ts.CompilerOptions) 
       config.hashFileNames,
       config.outputTargets,
       config.enableCache,
-      config.assetVersioning,
       config.buildAppCore,
       config.excludeSrc,
       config.includeSrc,

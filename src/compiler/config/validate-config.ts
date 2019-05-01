@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
-import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
@@ -106,8 +105,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     }
   }
 
-
-  validateAssetVerioning(config);
 
   validateDevServer(config);
 
