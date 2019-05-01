@@ -12,7 +12,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   }
   const shouldMinify = config.minifyJs && isBrowserBuild;
   const entryComponentsResults = rollupResults.filter(rollupResult => rollupResult.isComponent);
-  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isCore);
+  const chunkResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && !rollupResult.isEntry);
 
   const [bundleModules] = await Promise.all([
     Promise.all(entryComponentsResults.map(rollupResult => {
@@ -23,10 +23,11 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
     }))
   ]);
 
-  const coreResults = rollupResults.filter(rollupResult => rollupResult.isCore);
+  const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
+  const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
-    coreResults.map(rollupResult => {
-      return writeLazyCore(config, compilerCtx, buildCtx, rollupResult, destinations, bundleModules, sourceTarget, isBrowserBuild);
+    entryResults.map(rollupResult => {
+      return writeLazyEntry(config, compilerCtx, buildCtx, rollupResult, destinations, lazyRuntimeData, sourceTarget, isBrowserBuild);
     })
   );
   return bundleModules;
@@ -58,7 +59,7 @@ async function generateLazyEntryModule(
   };
 }
 
-export async function writeLazyChunk(
+async function writeLazyChunk(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
   rollupResult: d.RollupResult, destinations: string[],
   sourceTarget: d.SourceTarget,
@@ -68,7 +69,7 @@ export async function writeLazyChunk(
   if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
     return;
   }
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, rollupResult.isCore, isBrowserBuild, rollupResult.code);
 
   await Promise.all(destinations.map(dst => {
     const filePath = config.sys.path.join(dst, rollupResult.fileName);
@@ -76,7 +77,55 @@ export async function writeLazyChunk(
   }));
 }
 
-export async function convertChunk(
+async function writeLazyEntry(
+  config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
+  rollupResult: d.RollupResult, destinations: string[],
+  lazyRuntimeData: string,
+  sourceTarget: d.SourceTarget,
+  isBrowserBuild: boolean,
+) {
+  let code = rollupResult.code.replace(
+    `[/*!__STENCIL_LAZY_DATA__*/]`,
+    `${lazyRuntimeData}`
+  );
+  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, config.minifyJs, false, isBrowserBuild, code);
+
+  await Promise.all(destinations.map(dst => {
+    const filePath = config.sys.path.join(dst, rollupResult.fileName);
+    return compilerCtx.fs.writeFile(filePath, code);
+  }));
+}
+
+function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
+  const lazyBundles = bundleModules.map(formatLazyRuntimeBundle);
+  return stringifyRuntimeData(lazyBundles);
+}
+
+function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRuntimeData {
+  let bundleId: any;
+  if (bundleModule.outputs.length === 0) {
+    throw new Error('bundleModule.output must be at least one');
+  }
+
+  if (bundleModule.outputs[0].modeName !== DEFAULT_STYLE_MODE) {
+    // more than one mode, object of bundleIds with the mode as a key
+    bundleId = {};
+    bundleModule.outputs.forEach(output => {
+      bundleId[output.modeName] = output.bundleId;
+    });
+
+  } else {
+    // only one default mode, bundleId is a string
+    bundleId = bundleModule.outputs[0].bundleId;
+  }
+
+  return [
+    bundleId,
+    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
+  ];
+}
+
+async function convertChunk(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
@@ -101,54 +150,4 @@ export async function convertChunk(
     }
   }
   return code;
-}
-
-export async function writeLazyCore(
-  config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
-  rollupResult: d.RollupResult, destinations: string[],
-  bundleModules: d.BundleModule[],
-  sourceTarget: d.SourceTarget,
-  isBrowserBuild: boolean,
-) {
-  const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
-  let code = rollupResult.code.replace(
-    `[/*!__STENCIL_LAZY_DATA__*/]`,
-    `${lazyRuntimeData}`
-  );
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, config.minifyJs, true, isBrowserBuild, code);
-
-  await Promise.all(destinations.map(dst => {
-    const filePath = config.sys.path.join(dst, rollupResult.fileName);
-    return compilerCtx.fs.writeFile(filePath, code);
-  }));
-}
-
-function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
-  const lazyBundles = bundleModules.map(formatLazyRuntimeBundle);
-  return stringifyRuntimeData(lazyBundles);
-}
-
-
-function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRuntimeData {
-  let bundleId: any;
-  if (bundleModule.outputs.length === 0) {
-    throw new Error('bundleModule.output must be at least one');
-  }
-
-  if (bundleModule.outputs[0].modeName !== DEFAULT_STYLE_MODE) {
-    // more than one mode, object of bundleIds with the mode as a key
-    bundleId = {};
-    bundleModule.outputs.forEach(output => {
-      bundleId[output.modeName] = output.bundleId;
-    });
-
-  } else {
-    // only one default mode, bundleId is a string
-    bundleId = bundleModule.outputs[0].bundleId;
-  }
-
-  return [
-    bundleId,
-    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
-  ];
 }

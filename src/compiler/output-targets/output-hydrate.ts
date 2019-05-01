@@ -4,7 +4,7 @@ import { generateHydrateApp } from '../component-hydrate/generate-hydrate-app';
 
 
 export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
+  if (config.devMode && !config.flags.prerender) {
     return;
   }
   const hydrateOutputTargets = config.outputTargets.filter(isOutputTargetHydrate);

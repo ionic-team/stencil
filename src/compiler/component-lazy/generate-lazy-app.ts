@@ -47,7 +47,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
 async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
   const loader: any = {
-    '@stencil/core': CORE,
     '@core-entrypoint': BROWSER_ENTRY,
     '@external-entrypoint': EXTERNAL_ENTRY,
   };
@@ -84,23 +83,18 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
   return rollupBuild;
 }
 
-const CORE = `
-import { bootstrapLazy, patchDynamicImport } from '@stencil/core/platform';
-export * from '@stencil/core/platform';
-import '@stencil/core/global-scripts';
-export const defineCustomElements = (win, options) => {
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
-};
-`;
-
 const BROWSER_ENTRY = `
-import { defineCustomElements, patchBrowser } from '@stencil/core';
+import { bootstrapLazy, patchBrowser } from '@stencil/core';
 patchBrowser().then(resourcesUrl => {
-  defineCustomElements(null, { resourcesUrl });
+  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
 });
 `;
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-export { defineCustomElements } from '@stencil/core';
+import { bootstrapLazy } from '@stencil/core';
+
+export const defineCustomElements = (win, options) => {
+  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
+};
 `;
