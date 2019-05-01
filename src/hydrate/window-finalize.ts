@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { collapseHtmlWhitepace } from '../compiler/html/collapse-html-whitespace';
 import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
 import { removeUnusedStyles } from '../compiler/html/remove-unused-styles';
 import { renderError } from './render-utils';
@@ -23,12 +22,6 @@ export async function finalizeWindow(win: Window, doc: Document, opts: d.Hydrate
 
   if (opts.removeScripts) {
     removeScripts(doc.documentElement);
-  }
-
-  if (opts.collapseWhitespace) {
-    try {
-      collapseHtmlWhitepace(doc.documentElement);
-    } catch (e) {}
   }
 
   if (typeof opts.canonicalLink === 'string') {
