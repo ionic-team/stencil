@@ -26,10 +26,7 @@ export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerC
   const inlinedScript = doc.createElement('script');
   inlinedScript.setAttribute('type', 'module');
   inlinedScript.innerHTML = content;
-  script.parentNode.insertBefore(
-    inlinedScript,
-    script
-  );
+  doc.body.appendChild(script);
 
   // remove original script
   script.remove();
