@@ -11,6 +11,7 @@ import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { writeGlobalStyles } from '../style/global-styles';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { getScopeId } from '../style/scope-css';
+import { inlineStyleSheets } from '../html/inline-style-sheets';
 
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -95,6 +96,7 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+    await inlineStyleSheets(config, compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
     updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
     optimizeCriticalPath(config, doc, criticalPath, outputTarget);
 
@@ -107,3 +109,4 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
   }
 }
 
+const MAX_CSS_INLINE_SIZE = 3 * 1024;
