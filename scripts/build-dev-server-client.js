@@ -29,7 +29,7 @@ async function bundleDevServerClient() {
     banner: [
       '<meta charset="utf-8">',
       '💎 Stencil Dev Server',
-      '<script type="module">',
+      '<script>',
       '/* Dev Server Client */'
     ].join('\n'),
 
