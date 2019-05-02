@@ -41,6 +41,8 @@ export function resetPlatform() {
     plt.$orgLocNodes$ = undefined;
   }
 
+  plt.$resourcesUrl$ = `http://testing.stenciljs.com/`;
+
   resetTaskQueue();
 
   cstrs.clear();
@@ -120,6 +122,10 @@ export const isMemberInElement = (elm: any, memberName: string) => {
 };
 
 export const patchDynamicImport = (_: string) => { return; };
+
+export const getAssetPath = (path: string) => {
+  return new URL(path, plt.$resourcesUrl$).pathname;
+};
 
 export {
   Host,
