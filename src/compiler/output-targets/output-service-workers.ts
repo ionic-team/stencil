@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { isOutputTargetWww } from './output-utils';
 
-export async function outputServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputServiceWorkers(config: d.Config, buildCtx: d.BuildCtx) {
   const wwwServiceOutputs = config.outputTargets
     .filter(isOutputTargetWww)
     .filter(o => typeof o.indexHtml === 'string' && !!o.serviceWorker);
@@ -19,7 +19,7 @@ export async function outputServiceWorkers(config: d.Config, compilerCtx: d.Comp
 
   await Promise.all(
     wwwServiceOutputs.map(outputTarget => (
-      generateServiceWorker(config, compilerCtx, buildCtx, workbox, outputTarget)
+      generateServiceWorker(buildCtx, workbox, outputTarget)
     ))
   );
 }

@@ -25,9 +25,8 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    await outputServiceWorkers(config, compilerCtx, buildCtx);
     await outputPrerender(config, compilerCtx, buildCtx);
-
+    await outputServiceWorkers(config, buildCtx);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

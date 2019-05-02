@@ -12,6 +12,7 @@ import { writeGlobalStyles } from '../style/global-styles';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { getScopeId } from '../style/scope-css';
 import { inlineStyleSheets } from '../html/inline-style-sheets';
+import { INDEX_ORG } from '../service-worker/generate-sw';
 
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -100,7 +101,11 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
     optimizeCriticalPath(config, doc, criticalPath, outputTarget);
 
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, config.sys.serializeNodeToHtml(doc));
+    const indexContent = config.sys.serializeNodeToHtml(doc);
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);
+    if (outputTarget.serviceWorker) {
+      await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.dir, INDEX_ORG), indexContent);
+    }
 
     buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
 

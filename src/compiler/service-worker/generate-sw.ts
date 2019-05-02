@@ -2,9 +2,7 @@ import * as d from '../../declarations';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export async function generateServiceWorker(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
-  await writeOrgIndexHtml(config, compilerCtx, outputTarget);
-
+export async function generateServiceWorker(buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (outputTarget.serviceWorker.swSrc) {
     return Promise.all([
@@ -89,12 +87,7 @@ async function getServiceWorker(outputTarget: d.OutputTargetWww) {
   return serviceWorker;
 }
 
-export async function writeOrgIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  const filePath = config.sys.path.join(outputTarget.dir, INDEX_ORG);
-  await compilerCtx.fs.disk.copyFile(outputTarget.indexHtml, filePath);
-}
-
-const INDEX_ORG = 'index-org.html';
+export const INDEX_ORG = 'index-org.html';
 
 export function getRegisterSW(swUrl: string) {
   return `
