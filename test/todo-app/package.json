@@ -9,6 +9,6 @@
   "devDependencies": {
     "todomvc-app-css": "latest",
     "todomvc-common": "latest",
-    "workbox-build": "3.4.1"
+    "workbox-build": "4.3.1"
   }
 }

@@ -11,6 +11,6 @@
   "module": "dist/index.mjs",
   "main": "dist/index.js",
   "devDependencies": {
-    "workbox-build": "3.4.1"
+    "workbox-build": "4.3.1"
   }
 }

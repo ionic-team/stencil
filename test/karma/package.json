@@ -33,6 +33,6 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1",
-    "workbox-build": "4.3.0"
+    "workbox-build": "4.3.1"
   }
 }
