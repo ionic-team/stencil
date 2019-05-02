@@ -1,6 +1,7 @@
 import * as d from '../declarations';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
+import { URL } from 'url';
 
 export * from './task-queue';
 
@@ -51,7 +52,7 @@ export function resetPlatform() {
 
 export const getHostRef = (elm: d.RuntimeRef) => {
   return hostRefs.get(elm);
-}
+};
 
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
   if (lazyInstance == null || lazyInstance.constructor == null) {
