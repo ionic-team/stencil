@@ -44,12 +44,21 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       }
     }
 
+    let canonicalUrl = prerenderUrl;
+    if (typeof prerenderConfig.canonicalUrl === 'function') {
+      try {
+        canonicalUrl = prerenderConfig.canonicalUrl(base);
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+    }
+
     const hydrateOpts: d.HydrateOptions = {
       url: prerenderUrl,
       approximateLineWidth: 100,
       collapseBooleanAttributes: true,
       removeEmptyAttributes: true,
-      canonicalLink: prerenderUrl
+      canonicalUrl: canonicalUrl
     };
 
     if (typeof prerenderConfig.hydrateOptions === 'function') {

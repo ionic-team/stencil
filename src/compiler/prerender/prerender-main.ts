@@ -1,6 +1,8 @@
 import * as d from '../../declarations';
 import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { catchError } from '@utils';
+import { generateRobotsTxt } from './robots-txt';
+import { generateSitemapXml } from './sitemap-xml';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { getRelativeBuildDir } from '../html/utils';
@@ -71,6 +73,11 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     }
   }
 
+  const duration = timeSpan.duration();
+
+  const sitemapResults = await generateSitemapXml(manager);
+  await generateRobotsTxt(manager, sitemapResults);
+
   const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
   const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
 
@@ -86,7 +93,7 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
 
   const totalUrls = manager.urlsCompleted.size;
   if (totalUrls > 1) {
-    const average = Math.round(timeSpan.duration() / totalUrls);
+    const average = Math.round(duration / totalUrls);
     config.logger.info(`prerendered ${totalUrls} urls, averaging ${average} ms per url`);
   }
 

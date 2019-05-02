@@ -99,7 +99,7 @@ export interface HydrateOptions {
   afterHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
   approximateLineWidth?: number;
   beforeHydrate?(win: Window, opts: d.HydrateOptions): Promise<any>;
-  canonicalLink?: string;
+  canonicalUrl?: string;
   constrainTimeouts?: boolean;
   clientHydrateAnnotations?: boolean;
   collapseBooleanAttributes?: boolean;
@@ -125,11 +125,39 @@ export interface HydrateConfig {
   afterHydrate?(doc?: Document, url?: URL): void | Promise<void>;
   approximateLineWidth?: number;
   beforeHydrate?(doc?: Document, url?: URL): void | Promise<void>;
+  canonicalUrl?(url?: URL): string | null;
   entryUrls?: string[];
   filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;
   filterUrl?(url?: URL, base?: URL): boolean;
   filePath?(url?: URL, filePath?: string): string;
   hydrateOptions?(url?: URL): HydrateOptions;
   normalizeUrl?(href?: string, base?: URL): URL;
+  robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
+  sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
   trailingSlash?: boolean;
+}
+
+export interface RobotsTxtOpts {
+  urls: string[];
+  sitemapUrl: string;
+  baseUrl: string;
+  dir: string;
+}
+
+export interface RobotsTxtResults {
+  content: string;
+  filePath: string;
+  url: string;
+}
+
+export interface SitemapXmpOpts {
+  urls: string[];
+  baseUrl: string;
+  dir: string;
+}
+
+export interface SitemapXmpResults {
+  content: string;
+  filePath: string;
+  url: string;
 }

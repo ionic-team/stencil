@@ -17,17 +17,19 @@ export async function finalizeWindow(win: Window, doc: Document, opts: d.Hydrate
   if (typeof opts.title === 'string') {
     try {
       doc.title = opts.title;
-    } catch (e) {}
+    } catch (e) {
+      renderError(results, e);
+    }
   }
 
   if (opts.removeScripts) {
     removeScripts(doc.documentElement);
   }
 
-  if (typeof opts.canonicalLink === 'string') {
-    try {
-      updateCanonicalLink(doc, opts.canonicalLink);
-    } catch (e) {}
+  try {
+    updateCanonicalLink(doc, opts.canonicalUrl);
+  } catch (e) {
+    renderError(results, e);
   }
 
   try {
