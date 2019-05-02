@@ -131,11 +131,11 @@ describe('serializeNodeToHtml', () => {
     expect(input).toBe(output);
   });
 
-  it('collapse boolean attributes', () => {
+  it('remove boolean attributes', () => {
     const input = `<input type="checkbox" checked="">`;
     doc.body.innerHTML = input;
 
-    const output = serializeNodeToHtml(doc.body, { collapseBooleanAttributes: true});
+    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true});
     expect(output).toBe(`<input type="checkbox" checked>`);
   });
 
@@ -159,7 +159,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('name', '');
     elm.setAttribute('title', '');
 
-    const html = serializeNodeToHtml(elm, { outerHTML: true, removeEmptyAttributes: false });
+    const html = serializeNodeToHtml(elm, { outerHtml: true, removeEmptyAttributes: false });
     expect(html).toBe(`<button class="" dir="" my-attr="" id="" data-custom="" lang="" name="" title=""></button>`);
   });
 
@@ -175,7 +175,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('name', '');
     elm.setAttribute('title', '');
 
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<button my-attr="" data-custom></button>`);
   });
 
@@ -184,7 +184,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('type', 'submit');
     elm.setAttribute('id', 'btn');
     elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true, pretty: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true, prettyHtml: true });
     expect(html).toBe(`<button id="btn" type="submit">
   Text
 </button>`);
@@ -195,23 +195,14 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('type', 'submit');
     elm.setAttribute('id', 'btn');
     elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<button type="submit" id="btn">Text</button>`);
-  });
-
-  it('set attributes, removeAttributeQuotes', () => {
-    const elm = doc.createElement('button');
-    elm.setAttribute('type', 'submit');
-    elm.setAttribute('id', 'btn');
-    elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true, removeAttributeQuotes: true });
-    expect(html).toBe(`<button type=submit id=btn>Text</button>`);
   });
 
   it('do not escape scripts', () => {
     const elm = doc.createElement('script');
     elm.innerHTML = `if (true && false) { console.log('hi); }`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<script>if (true && false) { console.log('hi); }</script>`);
   });
 
@@ -221,7 +212,7 @@ describe('serializeNodeToHtml', () => {
   });
 
   it('empty document, pretty', () => {
-    const html = serializeNodeToHtml(doc, { pretty: true });
+    const html = serializeNodeToHtml(doc, { prettyHtml: true });
     expect(html).toBe(`<!doctype html>
 <html>
   <head></head>

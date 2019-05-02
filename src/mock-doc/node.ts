@@ -5,7 +5,7 @@ import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
-import { NON_ESCAPABLE_CONTENT, SerializeElementOptions, serializeNodeToHtml } from './serialize-node';
+import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
 
 
@@ -389,8 +389,8 @@ export class MockElement extends MockNode {
 
   get outerHTML() {
     return serializeNodeToHtml(this as any, {
-      outerHTML: true,
       newLines: false,
+      outerHtml: true,
       indentSpaces: 0
     });
   }
@@ -596,7 +596,7 @@ export class MockElement extends MockNode {
   onwebkitfullscreenerror() {/**/}
   onwheel() {/**/}
 
-  toString(opts?: SerializeElementOptions) {
+  toString(opts?: SerializeNodeToHtmlOptions) {
     return serializeNodeToHtml(this as any, opts);
   }
 

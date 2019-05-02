@@ -4,7 +4,7 @@ import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 
 
-export function initConnect(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults, resolve: Function) {
+export function initConnect(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults, resolve: Function) {
   try {
     const connectedElements = new Set<any>();
     const waitPromises: Promise<any>[] = [];
@@ -96,7 +96,7 @@ export function initConnect(win: Window, doc: Document, opts: d.HydrateOptions, 
 }
 
 
-function connectElements(win: Window, opts: d.HydrateOptions, results: d.HydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
+function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
   if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount) {
 
     const tagName = elm.nodeName.toLowerCase();

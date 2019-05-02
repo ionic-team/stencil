@@ -3,8 +3,8 @@ import { catchError } from '@utils';
 import { URL } from 'url';
 
 
-export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
-  const outputOpts: d.HydrateOptions = Object.assign({}, inputOpts);
+export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
+  const outputOpts: d.HydrateDocumentOptions = Object.assign({}, inputOpts);
 
   if (typeof outputOpts.clientHydrateAnnotations !== 'boolean') {
     outputOpts.clientHydrateAnnotations = true;
@@ -26,28 +26,21 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateOptions) {
 }
 
 
-export function generateHydrateResults(opts: d.HydrateOptions) {
+export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
   if (typeof opts.url !== 'string') {
     opts.url = `https://hydrate.stenciljs.com/`;
-  }
-
-  let urlParse: URL;
-  try {
-    urlParse = new URL(opts.url);
-  } catch (e) {
-    urlParse = {} as any;
   }
 
   const hydrateResults: d.HydrateResults = {
     diagnostics: [],
     url: opts.url,
-    host: urlParse.host,
-    hostname: urlParse.hostname,
-    href: urlParse.href,
-    port: urlParse.port,
-    pathname: urlParse.pathname,
-    search: urlParse.search,
-    hash: urlParse.hash,
+    host: null,
+    hostname: null,
+    href: null,
+    port: null,
+    pathname: null,
+    search: null,
+    hash: null,
     html: null,
     hydratedCount: 0,
     anchors: [],
@@ -57,6 +50,21 @@ export function generateHydrateResults(opts: d.HydrateOptions) {
     styles: [],
     title: null
   };
+
+  try {
+    const url = new URL(opts.url, `https://hydrate.stenciljs.com/`);
+    hydrateResults.url = url.href;
+    hydrateResults.host = url.host;
+    hydrateResults.hostname = url.hostname;
+    hydrateResults.href = url.href;
+    hydrateResults.port = url.port;
+    hydrateResults.pathname = url.pathname;
+    hydrateResults.search = url.search;
+    hydrateResults.hash = url.hash;
+
+  } catch (e) {
+    catchError(hydrateResults.diagnostics, e);
+  }
 
   return hydrateResults;
 }

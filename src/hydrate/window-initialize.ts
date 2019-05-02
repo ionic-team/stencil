@@ -3,7 +3,7 @@ import { constrainTimeouts } from '@mock-doc';
 import { renderError } from './render-utils';
 
 
-export async function initializeWindow(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
+export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   const url = (typeof opts.url === 'string' && opts.url.trim().length > 0) ? opts.url.trim() : '/';
 
   try {
@@ -37,13 +37,6 @@ export async function initializeWindow(win: Window, doc: Document, opts: d.Hydra
     try {
       doc.documentElement.setAttribute('lang', opts.language);
     } catch (e) {}
-  }
-  if (typeof opts.beforeHydrate === 'function') {
-    try {
-      await opts.beforeHydrate(win, opts);
-    } catch (e) {
-      renderError(results, e);
-    }
   }
 
   try {
@@ -87,6 +80,7 @@ export async function initializeWindow(win: Window, doc: Document, opts: d.Hydra
       }
       results.diagnostics.push(diagnostic);
     };
+
   } catch (e) {
     renderError(results, e);
   }

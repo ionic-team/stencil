@@ -4,7 +4,7 @@ import { copyTasksWorker } from '../../compiler/copy/copy-tasks-worker';
 import { scopeCss } from '../../utils/shadow-css';
 import { loadMinifyJsDiagnostics } from '@utils';
 import { optimizeCssWorker } from './optimize-css-worker';
-import { prerenderWorker } from '../../compiler/prerender/prerender-worker';
+import { prerenderWorker } from '../../compiler/prerender/prerender-worker/prerender-worker';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 

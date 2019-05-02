@@ -14,19 +14,15 @@ function crawlElement(results: d.HydrateResults, elm: Element, depth: number) {
     const tagName = childElm.tagName.toLowerCase();
 
     if (tagName.includes('-')) {
+      // we've already collected components that were hydrated
+      // now that the document is completed we can count how
+      // many they are and their depth
       const cmp = results.components.find(c => c.tag === tagName);
       if (cmp != null) {
         cmp.count++;
         if (depth > cmp.depth) {
           cmp.depth = depth;
         }
-
-      } else {
-        results.components.push({
-          tag: tagName,
-          count: 1,
-          depth: depth
-        });
       }
 
     } else {

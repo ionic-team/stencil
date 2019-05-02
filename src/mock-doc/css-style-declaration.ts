@@ -37,16 +37,6 @@ export class CSSStyleDeclaration {
     return cssText.join(' ').trim();
   }
 
-  get cssTextMinified() {
-    const cssText: string[] = [];
-
-    this._styles.forEach((value, prop) => {
-      cssText.push(`${prop}:${value}`);
-    });
-
-    return cssText.join(';').trim();
-  }
-
   set cssText(cssText: string) {
     if (cssText == null || cssText === '') {
       this._styles.clear();

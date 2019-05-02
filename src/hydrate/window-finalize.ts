@@ -5,7 +5,7 @@ import { renderError } from './render-utils';
 import { updateCanonicalLink } from '../compiler/html/canonical-link';
 
 
-export async function finalizeWindow(win: Window, doc: Document, opts: d.HydrateOptions, results: d.HydrateResults) {
+export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   if (opts.removeUnusedStyles !== false) {
     try {
       removeUnusedStyles(doc, results);
@@ -35,14 +35,6 @@ export async function finalizeWindow(win: Window, doc: Document, opts: d.Hydrate
   try {
     relocateMetaCharset(doc);
   } catch (e) {}
-
-  if (typeof opts.afterHydrate === 'function') {
-    try {
-      await opts.afterHydrate(win, opts);
-    } catch (e) {
-      renderError(results, e);
-    }
-  }
 
   if (opts.clientHydrateAnnotations) {
     doc.documentElement.classList.add('hydrated');

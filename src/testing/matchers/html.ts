@@ -14,15 +14,15 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
 
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
     serializeA = serializeNodeToHtml((input as any), {
-      pretty: true,
-      outerHTML: true,
+      prettyHtml: true,
+      outerHtml: true,
       excludeTags: ['body'],
       serializeShadowRoot: true
     });
 
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
     serializeA = serializeNodeToHtml((input as any), {
-      pretty: true,
+      prettyHtml: true,
       excludeTags: ['style'],
       excludeTagContent: ['style'],
       serializeShadowRoot: true
@@ -31,7 +31,7 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
   } else if (typeof input === 'string') {
     const parseA = parseHtmlToFragment(input);
     serializeA = serializeNodeToHtml(parseA, {
-      pretty: true,
+      prettyHtml: true,
       serializeShadowRoot: true
     });
 
@@ -42,7 +42,7 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
   const parseB = parseHtmlToFragment(shouldEqual);
 
   const serializeB = serializeNodeToHtml(parseB, {
-    pretty: true,
+    prettyHtml: true,
     excludeTags: ['body']
   });
 

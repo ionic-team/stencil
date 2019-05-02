@@ -32,6 +32,7 @@ export * from './module';
 export * from './optimize-css';
 export * from './output-targets';
 export * from './plugin';
+export * from './prerender';
 export * from './render';
 export * from './runtime';
 export * from './screenshots';

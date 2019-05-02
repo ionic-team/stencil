@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 
 
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string, devServerHostUrl: string) {
-  const prerenderConfig: d.HydrateConfig = {};
+  const prerenderConfig: d.PrerenderConfig = {};
 
   if (typeof prerenderConfigPath === 'string') {
     try {
@@ -88,7 +88,7 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
 }
 
 
-export function normalizeHref(prerenderConfig: d.HydrateConfig, diagnostics: d.Diagnostic[], url: URL) {
+export function normalizeHref(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], url: URL) {
   try {
     if (url != null && typeof url.href === 'string') {
       let href = url.href.trim();

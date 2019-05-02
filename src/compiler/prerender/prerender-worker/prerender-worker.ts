@@ -1,11 +1,12 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { getPrerenderConfig, normalizeHref } from './prerender-config';
+import { getPrerenderConfig, normalizeHref } from '../prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
-import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
-import { generateModulePreloads } from './prerender-modulepreload';
+import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
+import { generateModulePreloads } from '../prerender-modulepreload';
 import fs from 'fs';
 import path from 'path';
+import { URL } from 'url';
 
 
 export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
@@ -17,8 +18,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   };
 
   try {
-    const base = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
-    const prerenderUrl = base.href;
+    const url = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
     const componentGraph = getComponentGraph(prerenderRequest.componentGraphPath);
     const win = getWindow(prerenderRequest);
     const doc = win.document;
@@ -31,12 +31,14 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       results.diagnostics,
       prerenderRequest.prerenderConfigPath,
       prerenderRequest.devServerHostUrl
-    ) as d.HydrateConfig;
+    );
+
+    const opts = getRenderToStringOptions(prerenderConfig, url, results);
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.beforeHydrate(doc, base);
-        if (rtn != null) {
+        const rtn = prerenderConfig.beforeHydrate(doc, url);
+        if (rtn != null && typeof rtn.then === 'function') {
           await rtn;
         }
       } catch (e) {
@@ -44,43 +46,17 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       }
     }
 
-    let canonicalUrl = prerenderUrl;
-    if (typeof prerenderConfig.canonicalUrl === 'function') {
-      try {
-        canonicalUrl = prerenderConfig.canonicalUrl(base);
-      } catch (e) {
-        catchError(results.diagnostics, e);
-      }
-    }
-
-    const hydrateOpts: d.HydrateOptions = {
-      url: prerenderUrl,
-      approximateLineWidth: 100,
-      collapseBooleanAttributes: true,
-      removeEmptyAttributes: true,
-      canonicalUrl: canonicalUrl
-    };
-
-    if (typeof prerenderConfig.hydrateOptions === 'function') {
-      try {
-        const userOpts = prerenderConfig.hydrateOptions(base);
-        Object.assign(hydrateOpts, userOpts);
-      } catch (e) {
-        catchError(results.diagnostics, e);
-      }
-    }
-
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydrateResults = await hydrateApp.hydrateDocument(doc, hydrateOpts) as d.HydrateResults;
+    const hydrateResults = await hydrateApp.hydrateDocument(doc, opts) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
     generateModulePreloads(doc, hydrateResults, componentGraph);
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.afterHydrate(doc, base);
-        if (rtn != null) {
+        const rtn = prerenderConfig.afterHydrate(doc, url);
+        if (rtn != null && typeof rtn.then === 'function') {
           await rtn;
         }
       } catch (e) {
@@ -89,18 +65,20 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     const html = serializeNodeToHtml(doc, {
-      approximateLineWidth: hydrateOpts.approximateLineWidth,
-      collapseBooleanAttributes: hydrateOpts.collapseBooleanAttributes,
-      pretty: hydrateOpts.prettyHtml,
-      removeAttributeQuotes: hydrateOpts.removeAttributeQuotes,
-      removeEmptyAttributes: hydrateOpts.removeEmptyAttributes
+      approximateLineWidth: opts.approximateLineWidth,
+      outerHtml: false,
+      prettyHtml: opts.prettyHtml,
+      removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
+      removeEmptyAttributes: opts.removeEmptyAttributes,
+      removeHtmlComments: false,
+      serializeShadowRoot: false
     });
 
-    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, base, hydrateResults.anchors);
+    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, url, hydrateResults.anchors);
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {
-        const userWriteToFilePath = prerenderConfig.filePath(base, results.filePath);
+        const userWriteToFilePath = prerenderConfig.filePath(url, results.filePath);
         if (typeof userWriteToFilePath === 'string') {
           results.filePath = userWriteToFilePath;
         }
@@ -117,6 +95,39 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   }
 
   return results;
+}
+
+
+function getRenderToStringOptions(prerenderConfig: d.PrerenderConfig, url: URL, results: d.PrerenderResults) {
+  const prerenderUrl = url.href;
+
+  const opts: d.RenderToStringOptions = {
+    url: prerenderUrl,
+    approximateLineWidth: 100,
+    removeBooleanAttributeQuotes: true,
+    removeEmptyAttributes: true
+  };
+
+  if (typeof prerenderConfig.canonicalUrl === 'function') {
+    try {
+      opts.canonicalUrl = prerenderConfig.canonicalUrl(url);
+    } catch (e) {
+      catchError(results.diagnostics, e);
+    }
+  } else {
+    opts.canonicalUrl = prerenderUrl;
+  }
+
+  if (typeof prerenderConfig.hydrateOptions === 'function') {
+    try {
+      const userOpts = prerenderConfig.hydrateOptions(url);
+      Object.assign(opts, userOpts);
+    } catch (e) {
+      catchError(results.diagnostics, e);
+    }
+  }
+
+  return opts;
 }
 
 
@@ -196,7 +207,7 @@ function getComponentGraph(componentGraphPath: string) {
   return componentGraph;
 }
 
-function crawlAnchorsForNextUrls(prerenderConfig: d.HydrateConfig, diagnostics: d.Diagnostic[], base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
   }

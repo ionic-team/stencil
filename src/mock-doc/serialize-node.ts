@@ -3,7 +3,7 @@ import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
-export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElementOptions = {}) {
+export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToHtmlOptions = {}) {
   const output: SerializeOutput = {
     currentLineWidth: 0,
     indent: 0,
@@ -12,7 +12,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     text: [],
   };
 
-  if (opts.pretty) {
+  if (opts.prettyHtml) {
     if (typeof opts.indentSpaces !== 'number') {
       opts.indentSpaces = 2;
     }
@@ -27,16 +27,12 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     opts.approximateLineWidth = -1;
   }
 
-  if (typeof opts.removeAttributeQuotes !== 'boolean') {
-    opts.removeAttributeQuotes = false;
-  }
-
   if (typeof opts.removeEmptyAttributes !== 'boolean') {
     opts.removeEmptyAttributes = true;
   }
 
-  if (typeof opts.collapseBooleanAttributes !== 'boolean') {
-    opts.collapseBooleanAttributes = false;
+  if (typeof opts.removeBooleanAttributeQuotes !== 'boolean') {
+    opts.removeBooleanAttributeQuotes = false;
   }
 
   if (typeof opts.removeHtmlComments !== 'boolean') {
@@ -47,7 +43,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
     opts.serializeShadowRoot = false;
   }
 
-  if (opts.outerHTML) {
+  if (opts.outerHtml) {
     serializeToHtml(elm as Node, opts, output, false);
 
   } else {
@@ -68,7 +64,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeElement
 }
 
 
-function serializeToHtml(node: Node, opts: SerializeElementOptions, output: SerializeOutput, isShadowRoot: boolean) {
+function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
     const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
 
@@ -101,7 +97,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
       output.currentLineWidth += (tagName.length + 1);
 
       const attrsLength = (node as HTMLElement).attributes.length;
-      const attributes = (opts.pretty && attrsLength > 1) ?
+      const attributes = (opts.prettyHtml && attrsLength > 1) ?
         cloneAttributes((node as HTMLElement).attributes as any, true) :
         (node as Element).attributes;
 
@@ -152,12 +148,12 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
           output.currentLineWidth += (attrNamespaceURI.length + attrName.length + 2);
         }
 
-        if (opts.pretty && attrName === 'class') {
+        if (opts.prettyHtml && attrName === 'class') {
           attrValue = attr.value = attrValue.split(' ').filter(t => t !== '').sort().join(' ').trim();
         }
 
         if (attrValue === '') {
-          if (opts.collapseBooleanAttributes && BOOLEAN_ATTR.has(attrName)) {
+          if (opts.removeBooleanAttributeQuotes && BOOLEAN_ATTR.has(attrName)) {
             continue;
           }
           if (opts.removeEmptyAttributes && attrName.startsWith('data-')) {
@@ -165,27 +161,12 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
           }
         }
 
-        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
-          output.text.push('=' + escapeString(attrValue, true));
-          output.currentLineWidth += (attrValue.length + 1);
-
-        } else {
-          output.text.push('="' + escapeString(attrValue, true) + '"');
+        output.text.push('="' + escapeString(attrValue, true) + '"');
           output.currentLineWidth += (attrValue.length + 3);
-        }
       }
 
       if ((node as Element).hasAttribute('style')) {
-        let cssText: string;
-        if (opts.minifyInlineStyles) {
-          cssText = ((node as HTMLElement).style as any).cssTextMinified;
-          if (cssText !== 'string') {
-            cssText = (node as HTMLElement).style.cssText;
-          }
-
-        } else {
-          cssText = (node as HTMLElement).style.cssText;
-        }
+        const cssText = (node as HTMLElement).style.cssText;
 
         if (opts.approximateLineWidth > 0 && (output.currentLineWidth + cssText.length + 10) > opts.approximateLineWidth) {
           output.text.push(`\nstyle="${cssText}">`);
@@ -288,7 +269,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
         } else if (opts.approximateLineWidth > 0 && !output.isWithinBody) {
           // do nothing if we're not in the <body> and we're tracking line width
 
-        } else if (!opts.pretty) {
+        } else if (!opts.prettyHtml) {
           // this text node is only whitespace, and it's not
           // within a whitespace sensitive element like <pre> or <code>
           // so replace the entire white space with a single new line
@@ -334,7 +315,7 @@ function serializeToHtml(node: Node, opts: SerializeElementOptions, output: Seri
 
           } else {
             // this text node is going into a normal element and html can be escaped
-            if (opts.pretty) {
+            if (opts.prettyHtml) {
               // pretty print the text node
               output.text.push(escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false));
               output.currentLineWidth += textContentLength;
@@ -399,7 +380,6 @@ const NBSP_REGEX = /\u00a0/g;
 const DOUBLE_QUOTE_REGEX = /"/g;
 const LT_REGEX = /</g;
 const GT_REGEX = />/g;
-const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
@@ -432,17 +412,15 @@ interface SerializeOutput {
   text: string[];
 }
 
-export interface SerializeElementOptions {
+export interface SerializeNodeToHtmlOptions {
   approximateLineWidth?: number;
-  collapseBooleanAttributes?: boolean;
   excludeTagContent?: string[];
   excludeTags?: string[];
   indentSpaces?: number;
-  minifyInlineStyles?: boolean;
   newLines?: boolean;
-  outerHTML?: boolean;
-  pretty?: boolean;
-  removeAttributeQuotes?: boolean;
+  outerHtml?: boolean;
+  prettyHtml?: boolean;
+  removeBooleanAttributeQuotes?: boolean;
   removeHtmlComments?: boolean;
   removeEmptyAttributes?: boolean;
   serializeShadowRoot?: boolean;

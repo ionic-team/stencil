@@ -14,12 +14,13 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   const hydrateCoreIndexPath = config.sys.path.join(hydrateAppDirPath, 'index.js');
   const hydrateCoreIndexDtsFilePath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
+  const hydrateCoreIndexDtsContent = await generateHydrateDtsContent(config, compilerCtx);
 
   const pkgJsonPath = config.sys.path.join(hydrateAppDirPath, 'package.json');
   const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath);
 
   const writePromises: Promise<any>[] = [
-    compilerCtx.fs.writeFile(hydrateCoreIndexDtsFilePath, HYDRATE_DTS_CODE),
+    compilerCtx.fs.writeFile(hydrateCoreIndexDtsFilePath, hydrateCoreIndexDtsContent),
     compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
   ];
 
@@ -56,7 +57,18 @@ async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
+async function generateHydrateDtsContent(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const hydrateDtsSourcePath = config.sys.path.join(config.sys.compiler.distDir, 'declarations', 'hydrate.d.ts');
+
+  let dts = await compilerCtx.fs.readFile(hydrateDtsSourcePath);
+
+  dts += HYDRATE_DTS_CODE;
+
+  return dts;
+}
+
+
 const HYDRATE_DTS_CODE = `
-export declare function renderToString(html: string, opts?: any): Promise<any>;
-export declare function hydrateDocument(doc: any, opts?: any): Promise<any>;
-`.trim();
+export declare function renderToString(html: string, opts?: RenderToStringOptions): Promise<HydrateResults>;
+export declare function hydrateDocument(doc: any, opts?: HydrateDocumentOptions): Promise<HydrateResults>;
+`;

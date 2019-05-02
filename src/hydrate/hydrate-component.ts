@@ -12,6 +12,16 @@ export function hydrateComponent(win: Window, results: d.HydrateResults, tagName
     if (cmpMeta != null) {
       results.hydratedCount++;
 
+      if (!results.components.some(c => c.tag === tagName)) {
+        // only collect up which components were hydrated
+        // but count them and get their depth later;
+        results.components.push({
+          tag: tagName,
+          count: 0,
+          depth: 0
+        });
+      }
+
       const hydratePromise = new Promise(async resolve => {
         try {
           registerHost(elm);
