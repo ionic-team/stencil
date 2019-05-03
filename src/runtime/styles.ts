@@ -60,7 +60,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
             styleElm.innerHTML = style;
           }
 
-          if (BUILD.hydrateServerSide) {
+          if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
             styleElm.setAttribute(HYDRATE_ID, scopeId);
           }
 
@@ -74,7 +74,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
         }
       }
 
-    } else if (BUILD.constructibleCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
+    } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
       styleContainerNode.adoptedStyleSheets = [
         ...styleContainerNode.adoptedStyleSheets,
         style

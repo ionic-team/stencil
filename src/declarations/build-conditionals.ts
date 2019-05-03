@@ -81,7 +81,7 @@ export interface Build extends Partial<BuildFeatures> {
   lazyLoad?: boolean;
   profile?: boolean;
   cssVarShim?: boolean;
-  constructibleCSS?: boolean;
+  constructableCSS?: boolean;
 }
 
 export interface UserBuildConditionals {

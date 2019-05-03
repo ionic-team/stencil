@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { normalizePath, sortBy } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 import { isOutputTargetWww } from '../output-targets/output-utils';
+import { getScopeId } from '../style/scope-css';
 
 
 export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -39,18 +40,13 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
-    hmr.inlineStylesUpdated = buildCtx.stylesUpdated.map(s => {
+    hmr.inlineStylesUpdated = sortBy(buildCtx.stylesUpdated.map(s => {
       return {
+        styleId: getScopeId(s.styleTag, s.styleMode),
         styleTag: s.styleTag,
-        styleMode: s.styleMode,
         styleText: s.styleText,
-        isScoped: s.isScoped
       } as d.HmrStyleUpdate;
-    }).sort((a, b) => {
-      if (a.styleTag < b.styleTag) return -1;
-      if (a.styleTag > b.styleTag) return 1;
-      return 0;
-    });
+    }), s => s.styleId);
   }
 
   const externalStylesUpdated = getExternalStylesUpdated(config, buildCtx);

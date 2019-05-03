@@ -184,8 +184,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   // auto add css prefixes and minifies when configured
   compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
-
-  if (requiresScopedStyles(cmp.encapsulation)) {
+  if (requiresScopedStyles(cmp.encapsulation, commentOriginalSelector)) {
     // only create scoped styles if we need to
     compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, false);
     if (cmp.encapsulation === 'scoped') {
@@ -203,7 +202,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   let addStylesUpdate = false;
-  let addScopedStylesUpdate = false;
 
   // test to see if the last styles are different
   const styleId = getStyleId(cmp, modeName, false);
@@ -218,10 +216,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   const scopedStyleId = getStyleId(cmp, modeName, true);
   if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== compiledStyle.styleTextScoped) {
     compilerCtx.lastBuildStyles.set(scopedStyleId, compiledStyle.styleTextScoped);
-
-    if (buildCtx.isRebuild) {
-      addScopedStylesUpdate = true;
-    }
   }
 
   const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
@@ -233,16 +227,6 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       styleTag: cmp.tagName,
       styleMode: styleMode,
       styleText: compiledStyle.styleText,
-      isScoped: false
-    });
-  }
-
-  if (addScopedStylesUpdate) {
-    buildCtx.stylesUpdated.push({
-      styleTag: cmp.tagName,
-      styleMode: styleMode,
-      styleText: compiledStyle.styleTextScoped,
-      isScoped: true
     });
   }
 
@@ -272,8 +256,8 @@ export function escapeCssForJs(style: string) {
 }
 
 
-function requiresScopedStyles(encapsulation: d.Encapsulation) {
-  return (encapsulation === 'shadow' || encapsulation === 'scoped');
+function requiresScopedStyles(encapsulation: d.Encapsulation, commentOriginalSelector: boolean) {
+  return (encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector));
 }
 
 

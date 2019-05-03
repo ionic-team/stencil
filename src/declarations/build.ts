@@ -80,7 +80,6 @@ export interface BuildStyleUpdate {
   styleTag: string;
   styleText: string;
   styleMode: string;
-  isScoped: boolean;
 }
 
 
@@ -128,10 +127,9 @@ export interface HotModuleReplacement {
 
 
 export interface HmrStyleUpdate {
+  styleId: string;
   styleTag: string;
   styleText: string;
-  styleMode: string;
-  isScoped: boolean;
 }
 
 
