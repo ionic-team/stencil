@@ -259,6 +259,8 @@ export interface ConfigBundle {
 
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
+  unregister?: boolean;
+
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];

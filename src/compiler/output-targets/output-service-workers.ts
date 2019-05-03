@@ -19,7 +19,7 @@ export async function outputServiceWorkers(config: d.Config, buildCtx: d.BuildCt
 
   await Promise.all(
     wwwServiceOutputs.map(outputTarget => (
-      generateServiceWorker(buildCtx, workbox, outputTarget)
+      generateServiceWorker(config, buildCtx, workbox, outputTarget)
     ))
   );
 }

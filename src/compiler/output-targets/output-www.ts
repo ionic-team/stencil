@@ -96,10 +96,12 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
-    await inlineEsmImport(config, compilerCtx, doc, outputTarget);
-    await inlineStyleSheets(config, compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
-    updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
-    optimizeCriticalPath(config, doc, criticalPath, outputTarget);
+    if (!config.watch && !config.devMode) {
+      await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+      await inlineStyleSheets(config, compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
+      updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
+      optimizeCriticalPath(config, doc, criticalPath, outputTarget);
+    }
 
     const indexContent = config.sys.serializeNodeToHtml(doc);
     await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);

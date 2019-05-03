@@ -2,9 +2,12 @@ import * as d from '../../declarations';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export async function generateServiceWorker(buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
+export async function generateServiceWorker(config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
   const serviceWorker = await getServiceWorker(outputTarget);
-  if (outputTarget.serviceWorker.swSrc) {
+  if (serviceWorker.unregister) {
+    await config.sys.fs.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
+
+  } else if (serviceWorker.swSrc) {
     return Promise.all([
       copyLib(buildCtx, outputTarget, workbox),
       injectManifest(buildCtx, serviceWorker, workbox)
@@ -72,9 +75,15 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
 }
 
 async function getServiceWorker(outputTarget: d.OutputTargetWww) {
+  if (!outputTarget.serviceWorker) {
+    return undefined;
+  }
   const serviceWorker: d.ServiceWorkerConfig = {
     ...outputTarget.serviceWorker
   };
+  if (serviceWorker.unregister !== true) {
+    delete serviceWorker.unregister;
+  }
 
   if (!serviceWorker.navigateFallback) {
     serviceWorker.navigateFallback = INDEX_ORG;
@@ -119,3 +128,20 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   });
 }
 `;
+
+export const SELF_UNREGISTER_SW = `
+self.addEventListener('install', function(e) {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function(e) {
+  self.registration.unregister()
+    .then(function() {
+      return self.clients.matchAll();
+    })
+    .then(function(clients) {
+      clients.forEach(client => client.navigate(client.url))
+    });
+});
+`;
+
