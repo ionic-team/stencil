@@ -56,7 +56,15 @@ export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.Co
         flags[flagKey] = true;
         knownArgs.push(cmdArg);
 
+      } else if (cmdArg === `--${flagKey}`) {
+        flags[flagKey] = true;
+        knownArgs.push(cmdArg);
+
       } else if (cmdArg === `--no-${booleanName}`) {
+        flags[flagKey] = false;
+        knownArgs.push(cmdArg);
+
+      } else if (cmdArg === `--no${dashToPascalCase(booleanName)}`) {
         flags[flagKey] = false;
         knownArgs.push(cmdArg);
 
@@ -89,6 +97,17 @@ export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.Co
         flags[flagKey] = args[i + 1];
         knownArgs.push(cmdArg);
         knownArgs.push(args[i + 1]);
+
+      } else if (cmdArg === `--${flagKey}`) {
+        flags[flagKey] = args[i + 1];
+        knownArgs.push(cmdArg);
+        knownArgs.push(args[i + 1]);
+
+      } else if (cmdArg.startsWith(`--${flagKey}=`)) {
+        const values = cmdArg.split('=');
+        values.shift();
+        flags[flagKey] = values.join('=');
+        knownArgs.push(cmdArg);
 
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
@@ -124,6 +143,16 @@ export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.Co
         knownArgs.push(cmdArg);
 
       } else if (cmdArg === `--${numberName}`) {
+        flags[flagKey] = parseInt(args[i + 1], 10);
+        knownArgs.push(args[i + 1]);
+
+      } else if (cmdArg.startsWith(`--${flagKey}=`)) {
+        const values = cmdArg.split('=');
+        values.shift();
+        flags[flagKey] = parseInt(values.join(''), 10);
+        knownArgs.push(cmdArg);
+
+      } else if (cmdArg === `--${flagKey}`) {
         flags[flagKey] = parseInt(args[i + 1], 10);
         knownArgs.push(args[i + 1]);
 

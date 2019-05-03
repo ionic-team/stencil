@@ -9,8 +9,8 @@ export function buildJestArgv(config: d.Config) {
     ...config.flags.knownArgs.slice()
   ];
 
-  if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--max-workers'))) {
-    args.push('--max-workers=4');
+  if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
+    args.push('--maxWorkers=4');
   }
 
   config.logger.debug(`jest args: ${args.join(' ')}`);
