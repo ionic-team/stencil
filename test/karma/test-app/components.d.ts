@@ -58,6 +58,7 @@ export namespace Components {
     'update': () => Promise<void>;
   }
   interface Es5AddclassSvg {}
+  interface Es5Polyfills {}
   interface EsmImport {
     'propVal': number;
     'someMethod': () => void;
@@ -210,6 +211,7 @@ declare namespace LocalJSX {
   interface DynamicCssVariable extends JSXBase.HTMLAttributes {}
   interface DynamicImport extends JSXBase.HTMLAttributes {}
   interface Es5AddclassSvg extends JSXBase.HTMLAttributes {}
+  interface Es5Polyfills extends JSXBase.HTMLAttributes {}
   interface EsmImport extends JSXBase.HTMLAttributes {
     'onSomeEvent'?: (event: CustomEvent<any>) => void;
     'propVal'?: number;
@@ -343,6 +345,7 @@ declare namespace LocalJSX {
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
+    'Es5Polyfills': Components.Es5Polyfills;
     'EsmImport': Components.EsmImport;
     'ExternalImportA': Components.ExternalImportA;
     'ExternalImportB': Components.ExternalImportB;
@@ -428,6 +431,7 @@ declare namespace LocalJSX {
     'DynamicCssVariable': LocalJSX.DynamicCssVariable;
     'DynamicImport': LocalJSX.DynamicImport;
     'Es5AddclassSvg': LocalJSX.Es5AddclassSvg;
+    'Es5Polyfills': LocalJSX.Es5Polyfills;
     'EsmImport': LocalJSX.EsmImport;
     'ExternalImportA': LocalJSX.ExternalImportA;
     'ExternalImportB': LocalJSX.ExternalImportB;
@@ -617,6 +621,12 @@ declare global {
   var HTMLEs5AddclassSvgElement: {
     prototype: HTMLEs5AddclassSvgElement;
     new (): HTMLEs5AddclassSvgElement;
+  };
+
+  interface HTMLEs5PolyfillsElement extends Components.Es5Polyfills, HTMLStencilElement {}
+  var HTMLEs5PolyfillsElement: {
+    prototype: HTMLEs5PolyfillsElement;
+    new (): HTMLEs5PolyfillsElement;
   };
 
   interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {}
@@ -1016,6 +1026,7 @@ declare global {
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
+    'es5-polyfills': HTMLEs5PolyfillsElement
     'esm-import': HTMLEsmImportElement
     'external-import-a': HTMLExternalImportAElement
     'external-import-b': HTMLExternalImportBElement
@@ -1101,6 +1112,7 @@ declare global {
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
+    'es5-polyfills': HTMLEs5PolyfillsElement;
     'esm-import': HTMLEsmImportElement;
     'external-import-a': HTMLExternalImportAElement;
     'external-import-b': HTMLExternalImportBElement;

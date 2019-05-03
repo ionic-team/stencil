@@ -56,6 +56,7 @@ module.exports = function(config) {
     plugins: [
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-ie-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
       'karma-jasmine',
@@ -64,9 +65,10 @@ module.exports = function(config) {
     ],
     browsers: browserStack
       ? Object.keys(browserStackLaunchers)
-      : Object.keys(localLaunchers),
+      // : Object.keys(localLaunchers),
+      : ['IE'],
 
-    singleRun: true, // set this to false to leave the browser open
+    singleRun: false, // set this to false to leave the browser open
 
     frameworks: [
       'jasmine',
