@@ -3,7 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { run, transpile } = require('./script-utils');
+const { run, transpile, relativeResolve } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-screenshot');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'screenshot', 'index.js');
@@ -23,18 +23,17 @@ async function bundleScreenshot() {
       'os',
       'path',
       'url',
-      '../sys/node/graceful-fs.js',
-      '../utils'
+      '../sys/node/graceful-fs.js'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(importee) {
+          resolveId(importee, importer) {
             if (importee === 'graceful-fs') {
               return '../sys/node/graceful-fs.js';
             }
             if (importee === '@utils') {
-              return '../utils';
+              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }
         }

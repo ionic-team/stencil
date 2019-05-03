@@ -47,26 +47,28 @@ async function bundleTesting() {
       'util',
       'vm',
       'yargs',
-      'zlib',
-      '@stencil/core/build-conditionals'
+      'zlib'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id, importer) {
-            if (id === '@build-conditionals') {
-              return '@stencil/core/build-conditionals';
+          resolveId(importee, importer) {
+            if (importee === '@build-conditionals') {
+              return {
+                id: '@stencil/core/build-conditionals',
+                external: true
+              }
             }
-            if (id === '@mock-doc') {
+            if (importee === '@mock-doc') {
               return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
             }
-            if (id === '@runtime') {
+            if (importee === '@runtime') {
               return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
             }
-            if (id === '@sys') {
+            if (importee === '@sys') {
               return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
-            if (id === '@utils') {
+            if (importee === '@utils') {
               return relativeResolve(importer, TRANSPILED_DIR, 'utils');
             }
           }

@@ -24,23 +24,27 @@ async function bundleRuntime() {
     input: {
       'index': runtimeInputFile
     },
-    external: [
-      '@stencil/core/build-conditionals',
-      '@stencil/core/platform',
-      '@stencil/core/utils'
-    ],
     plugins: [
       (() => {
         return {
           resolveId(id) {
             if (id === '@build-conditionals') {
-              return '@stencil/core/build-conditionals';
+              return {
+                id: '@stencil/core/build-conditionals',
+                external: true
+              };
             }
             if (id === '@platform') {
-              return '@stencil/core/platform';
+              return {
+                id: '@stencil/core/platform',
+                external: true
+              };
             }
             if (id === '@utils') {
-              return '@stencil/core/utils';
+              return {
+                id: '@stencil/core/utils',
+                external: true
+              };
             }
           }
         }
